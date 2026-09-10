@@ -1,0 +1,21 @@
+{
+  "id": "8-1-7-reading-build-wrote-a-program",
+  "title": "8.1.7 Reading: Build Wrote a Program",
+  "description": "Every button you press on the Build side writes a line of text on the Code side. Same part, two views.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "8.1 Solid Shapes",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

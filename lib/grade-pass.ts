@@ -15,7 +15,7 @@
 // Directive: every consumer asking "is this student struggling?" comes
 // through here. Do not compare the totals at the call site.
 
-export interface PassCriterion {
+interface PassCriterion {
   verdict: 'met' | 'partial' | 'missing';
 }
 

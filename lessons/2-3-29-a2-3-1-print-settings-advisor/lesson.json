@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Comment where fall-through would happen",
-      "instructions": "Above one of your case labels, write a comment explaining exactly what would print for that filament (and which cases below it) if its break were removed. Don't actually remove the break: the comment is the deliverable."
+      "instructions": "Above one of your case labels, write a comment explaining exactly what would print for that filament (and which cases below it) if its break were removed. Use the word \"break\" in your comment. Don't actually remove the break: the comment is the deliverable."
     }
   ],
   "requirements": [
@@ -119,6 +119,17 @@
       "pattern": "speed",
       "flags": "i",
       "points": 0
+    },
+    {
+      "id": "r10",
+      "title": "fall-through comment written",
+      "description": "A comment explains what would print if a break were removed",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\n]*\\bbreak\\b",
+      "flags": "i",
+      "points": 0,
+      "stripComments": false
     }
   ],
   "grading": {

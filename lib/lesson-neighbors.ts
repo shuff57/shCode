@@ -51,7 +51,7 @@ export async function getHrefsByLessonNumber(
   return hrefs;
 }
 
-export async function getNextLesson(currentId: string): Promise<ManifestLesson | null> {
+async function getNextLesson(currentId: string): Promise<ManifestLesson | null> {
   const lessons = await loadLessons();
   const current = lessons.find((l) => l.id === currentId);
   if (!current) return null;

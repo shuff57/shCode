@@ -7,7 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "reading",
-  "sourceRef": "book 2.4: §2.4.6 intro example, Definition 2.4.5, 'multiply, do not add' counting note",
+  "sourceRef": "book 2.4.6: 'Nested Loops' intro example, Definition 2.4.5, 'multiply, do not add' counting note",
   "week": 7,
   "slos": [
     "SLO-3"

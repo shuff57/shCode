@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.8: 'Combining Conditions', Example 2.8/2.9/2.10 (&&, ||, !)",
+  "sourceRef": "book 2.1.8: 'Combining Conditions', Example 2.1.9/2.1.10/2.1.11 (&&, ||, !)",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

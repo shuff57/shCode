@@ -3187,9 +3187,10 @@ project *is* the assessment, and it is graded individually even when built in a 
 - **Individual, closed book, closed laptop.** A **printed one-page syntax reference** is supplied with
   every test (the relevant subset of Appendix A's style guide plus bare method signatures). Beginners
   should be assessed on whether they can reason, not on whether they memorized argument order.
-- **No retake penalty on the first retake.** One equivalent alternate form, within two weeks, replaces
-  the original score. This matches the green-to-advance model used for lessons: the goal is evidence of
-  mastery, not evidence of when mastery arrived.
+- **No retakes.** The score a student earns on the day is the score. Decided 2026-09-02, replacing
+  an earlier rule that gave one penalty-free retake on an equivalent alternate form within two weeks.
+  Green-to-advance still governs the lessons; it does not extend to the chapter tests, which are the
+  one place in the course that measures what a student can do unaided on a given day.
 
 | Part | What it is | Weight |
 |---|---|---:|

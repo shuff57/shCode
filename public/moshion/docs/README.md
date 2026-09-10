@@ -26,6 +26,7 @@ The whole API is a handful of globals: `Sprite`, `Group`, `world`, `camera`,
 - `runner.html` — sandbox host: loads planck + moSHion, injects a student sketch
   from `?code=<base64url>`, pipes console/errors back to the parent app.
 - `assets/` — sprite-sheet art used by lesson examples.
+- `textures/` — named pixel-art textures for `sprite.texture` (CC0, Kenney).
 
 ## Licensing
 

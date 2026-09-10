@@ -6,10 +6,11 @@ import { badgeForLesson } from '../lib/lesson-badges';
 import { bypassesLessonLock, useLessonState } from '../lib/progress';
 import { withInlineCode } from './InlineCode';
 import { lessonHref } from '../lib/lesson-href';
-import { moduleIdFromTitle, resolveDue, useDueDates } from '../lib/due-dates';
-import DueBadge from './DueBadge';
+import { moduleIdFromTitle, resolveDue, useDueDates, useLessonAvailability } from '../lib/due-dates';
+import DueBadge, { OpensBadge } from './DueBadge';
 import DueDateChip from './DueDateChip';
-import { ownDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
+import LessonAccessChip from './LessonAccessChip';
+import { ownDate, ownOpenDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
 
 const typeBadgeColors: Record<string, string> = {
   lesson: '#5baafd',
@@ -44,9 +45,15 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
   // title prefix — "1.1.4 What a Program Is" -> "1.1".
   const moduleId = moduleIdFromTitle(lesson.title);
   const lessonDue = resolveDue(due, lesson.id, moduleId, lesson.category ?? null);
-  // Lock = caller flagged it AND the viewer isn't an admin/teacher. Default
-  // to unlocked until the snapshot loads to avoid first-paint flicker.
-  const locked = progress.loaded && lockedForStudent && !bypassesLessonLock(progress.role);
+  const availability = useLessonAvailability(lesson.id, moduleId, lesson.category ?? null);
+  const bypass = bypassesLessonLock(progress.role);
+  // Two independent gates, and either one closes the card:
+  //   sequence — caller flagged it (prior lesson not green)
+  //   clock    — the teacher's "available after" time hasn't arrived
+  // Both default to unlocked until their snapshot loads, to avoid a
+  // first-paint flicker. Admins and teachers bypass both.
+  const timeLocked = !availability.available && !bypass;
+  const locked = (progress.loaded && lockedForStudent && !bypass) || timeLocked;
 
   const cardStyle: React.CSSProperties = {
     borderLeftColor: pBadge?.color ?? typeBadgeColors[type] ?? 'var(--brand)',
@@ -97,15 +104,44 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
           className={lessonDue?.className}
           ambiguous={lessonDue?.ambiguous}
         />
+        <OpensBadge
+          openAt={availability.openAt}
+          available={availability.available || bypass}
+          className={availability.className}
+          ambiguous={availability.ambiguous}
+        />
         {/* Teacher only, and pushed to the right edge of the card. Renders
-            null for a student, so it costs no layout there. */}
+            null for a student, so it costs no layout there. Opening it also
+            surfaces "available after" -- see DueDateChip's own comment for
+            why that isn't a second, always-visible chip. */}
         <DueDateChip
           scope="lesson"
           scopeId={lesson.id}
           resolvedAt={resolveForClass(teacherDue, lesson.id, moduleId, lesson.category ?? null)}
           ownAt={ownDate(teacherDue, 'lesson', lesson.id)}
+          openOwnAt={ownOpenDate(teacherDue, 'lesson', lesson.id)}
           pushRight
         />
+        {/* Same roster-checkbox controls as the Due Dates panel, so a teacher
+            doesn't have to leave the home page to grant one student early or
+            late access. Self-gated on teacherDue.canEdit — renders null for
+            a student, same as DueDateChip above. */}
+        {teacherDue.canEdit && teacherDue.activeClassId && (
+          <>
+            <LessonAccessChip
+              classId={teacherDue.activeClassId}
+              lessonId={lesson.id}
+              lessonTitle={lesson.title}
+              kind="early"
+            />
+            <LessonAccessChip
+              classId={teacherDue.activeClassId}
+              lessonId={lesson.id}
+              lessonTitle={lesson.title}
+              kind="late"
+            />
+          </>
+        )}
         {locked && (
           <span
             style={{
@@ -120,10 +156,14 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
               letterSpacing: '0.04em',
               marginLeft: 'auto',
             }}
-            aria-label="Locked"
-            title="Open the module to start with the first lesson, then continue from there."
+            aria-label={timeLocked ? 'Not available yet' : 'Locked'}
+            title={
+              timeLocked
+                ? 'Your teacher set this lesson to open later — the date is on the card.'
+                : 'Open the module to start with the first lesson, then continue from there.'
+            }
           >
-            🔒 Locked
+            {timeLocked ? '🔒 Not yet' : '🔒 Locked'}
           </span>
         )}
       </div>

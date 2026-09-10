@@ -27,6 +27,8 @@ import {
 } from 'lucide-react';
 
 import EditorPlaceholder from './diagram/EditorPlaceholder';
+import SolutionPanel from './SolutionPanel';
+import DiagramHintPanel from './DiagramHintPanel';
 
 // React Flow is a large chunk of the client bundle. Loading it lazily keeps it
 // out of the 270-odd lesson pages that have no diagram on them at all.
@@ -36,7 +38,9 @@ const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
 });
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
-import { fetchDraft, saveDraft, recordSubmission } from '../lib/written-grader-store';
+import { fetchDraft, saveDraft, recordSubmission, streamGrade } from '../lib/written-grader-store';
+import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
+import GraderPicker, { useGraderChoice } from './GraderPicker';
 import { checkDiagram, allPassed, type CheckResult } from '../lib/diagram-check';
 import { describeDiagram, fromMermaid } from '../lib/diagram-mermaid';
 import { DEFAULT_RULES, emptyDiagram, type DiagramConfig, type DiagramDoc } from '../lib/diagram-types';
@@ -66,6 +70,8 @@ interface Props {
   config: DiagramConfig;
   /** Falls back to this when config.prompt is unset. */
   fallbackPrompt?: string;
+  /** Buckets the AI-hint quota, the same way the code tutor is bucketed. */
+  unit?: string | null;
 }
 
 function parseDoc(raw: string | null): DiagramDoc | null {
@@ -96,6 +102,7 @@ export default function DiagramAssignmentView({
   lessonTitle,
   config,
   fallbackPrompt,
+  unit,
 }: Props) {
   const starter = useMemo(
     () => (config.starter ? fromMermaid(config.starter) : emptyDiagram()),
@@ -108,6 +115,11 @@ export default function DiagramAssignmentView({
   const [checks, setChecks] = useState<CheckResult[] | null>(null);
   const [result, setResult] = useState<GradeResult | null>(null);
   const [grading, setGrading] = useState(false);
+  // Mirrors WrittenGrader: the server reports what it is doing, so Submit shows
+  // motion instead of a still spinner. Null when no stage was reported.
+  const [stage, setStage] = useState<GradeStage | null>(null);
+  // Which grader marks this. Remembered per browser; see useGraderChoice.
+  const { graders, grader, setGrader } = useGraderChoice();
   const [error, setError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -156,6 +168,9 @@ export default function DiagramAssignmentView({
     setError(null);
   }, []);
 
+  // One part of a sat test -- see DiagramConfig.summative.
+  const summative = !!config.summative;
+
   const runChecks = useCallback((): CheckResult[] => {
     const results = checkDiagram(doc, rules);
     setChecks(results);
@@ -171,7 +186,10 @@ export default function DiagramAssignmentView({
 
   async function submit() {
     const results = runChecks();
-    if (!allPassed(results)) return;
+    // On a test the structural checks stop being a gate: a student who cannot
+    // get a second exit off their diamond would otherwise never reach Part 5.
+    // See DiagramConfig.summative.
+    if (!allPassed(results) && !summative) return;
 
     // Structure-only lesson: the checks are the whole grade.
     if (!config.aiGrader) {
@@ -181,7 +199,11 @@ export default function DiagramAssignmentView({
           lessonId,
           response: JSON.stringify(doc),
           gradeJson: { structural: results },
-          score: results.length,
+          // The real number passed, not results.length. Before summative
+          // charts could be handed in partial this branch only ran on a clean
+          // sweep, so the two were the same number; now they are not, and
+          // recording the length would hand a half-finished chart full marks.
+          score: results.filter((r) => r.passed).length,
           possible: results.length,
         });
         saveDraft(lessonId, JSON.stringify(doc));
@@ -194,11 +216,8 @@ export default function DiagramAssignmentView({
     setError(null);
     setOffline(false);
     try {
-      const res = await fetch('/api/grade-written', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({
+      const { status, data } = await streamGrade(
+        {
           lessonId,
           lessonTitle,
           prompt: config.aiGrader.prompt ?? config.prompt ?? fallbackPrompt ?? '',
@@ -208,13 +227,12 @@ export default function DiagramAssignmentView({
           rubric: config.aiGrader.rubric,
           model: config.aiGrader.model,
           contextDocs: config.aiGrader.contextDocs,
-        }),
-      });
-      const text = await res.text();
-      let data: any;
-      try {
-        data = text ? JSON.parse(text) : null;
-      } catch {
+          grader,
+        },
+        setStage,
+      );
+      const res = { status };
+      if (data === null) {
         setError(
           `Grader returned a non-JSON response (HTTP ${res.status}). Ask your teacher — the Ollama key or endpoint may not be configured.`,
         );
@@ -244,6 +262,7 @@ export default function DiagramAssignmentView({
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setGrading(false);
+      setStage(null);
     }
   }
 
@@ -253,6 +272,7 @@ export default function DiagramAssignmentView({
   );
   const structureOk = checks !== null && allPassed(checks);
   const promptText = config.prompt ?? fallbackPrompt ?? '';
+  const failedCount = checks ? checks.filter((c) => !c.passed).length : 0;
 
   if (!loaded) return null;
 
@@ -302,6 +322,25 @@ export default function DiagramAssignmentView({
           Check my diagram
         </button>
 
+        {/* Teacher-only, and it renders nothing at all for a student — the
+            panel checks the role itself and the endpoint behind it is gated
+            server-side, so this is not a client-side secret. A diagram lesson
+            stores its reference as Mermaid under solution/, which the existing
+            generate-solutions pipeline already picks up unchanged: solution/
+            is keyed by filename and never assumed to be JavaScript. */}
+        <SolutionPanel
+          lessonId={lessonId}
+          onInsert={(files) => {
+            const key =
+              Object.keys(files).find((k) => k.endsWith('.mmd')) ??
+              Object.keys(files).sort()[0];
+            if (!key) return;
+            if (!confirm('Replace the diagram on the canvas with the reference chart?')) return;
+            setDoc(fromMermaid(files[key]));
+            setChecks(null);
+          }}
+        />
+
         <button
           onClick={submit}
           disabled={grading || doc.nodes.length === 0}
@@ -322,12 +361,16 @@ export default function DiagramAssignmentView({
           {/* Structure-only lessons have no feedback to offer — the checks are the
               grade — so promising it on the button misnames what the click does. */}
           {grading
-            ? 'Grading…'
+            ? stage
+              ? `${GRADE_STAGE_LABELS[stage]}…`
+              : 'Grading…'
             : config.aiGrader
               ? result
                 ? 'Re-submit for feedback'
                 : 'Submit for feedback'
-              : 'Submit'}
+              : summative && checks !== null && failedCount > 0
+                ? 'Hand in what I have'
+                : 'Submit'}
         </button>
 
         <button
@@ -358,12 +401,48 @@ export default function DiagramAssignmentView({
         </span>
       </div>
 
+      {/* Only a lesson with an aiGrader makes a model call at all -- on a
+          structure-only chart the checks ARE the grade, so offering a choice of
+          grader would name a step that never runs. Renders nothing anyway when
+          the deploy has one grader. */}
+      {config.aiGrader ? (
+        <div style={{ marginTop: 10 }}>
+          <GraderPicker
+            graders={graders}
+            value={grader}
+            onChange={setGrader}
+            disabled={grading}
+            cloudModel={config.aiGrader.model}
+          />
+        </div>
+      ) : null}
+
+      {/* Between the checker and the grader: the checker names a broken rule
+          but not the shape that fixes it, and the grader only speaks after
+          submit. This is the one place a student stuck mid-chart can ask. */}
+      <div style={{ marginTop: 12 }}>
+        <DiagramHintPanel
+          lessonTitle={lessonTitle}
+          unit={unit}
+          task={promptText}
+          doc={doc}
+          checks={checks}
+          authed={progress.authed}
+        />
+      </div>
+
       {checks && (
         <div style={{ marginTop: 16 }}>
           <h3 style={{ fontSize: 14, color: '#8be9fd', margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <ListChecks size={16} />
             Flowchart structure — {checks.filter((c) => c.passed).length} / {checks.length} checks passed
           </h3>
+          {summative && failedCount > 0 && (
+            <p style={{ margin: '0 0 8px', color: '#ffb86c', fontSize: 12.5, lineHeight: 1.5 }}>
+              This is a test, so you can hand the chart in like this. It unlocks the
+              next part and your teacher marks it — come back if you have time.
+            </p>
+          )}
           <div style={{ display: 'grid', gap: 8 }}>
             {checks.map((c) => (
               <div

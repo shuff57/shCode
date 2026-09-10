@@ -1,7 +1,7 @@
 // Apply prose rewrites to lib/reshape-docs.ts. Input: a JSON array of
 // { title, from, to } — `from` must appear exactly once in that page's body.
 import { readFileSync, writeFileSync } from 'node:fs';
-const DOC = new URL('../lib/reshape-docs.ts', import.meta.url);
+const DOC = new URL('../../reshape-cad/packages/script/src/reshape-docs.ts', import.meta.url);
 const patch = JSON.parse(readFileSync(process.argv[2], 'utf8'));
 let src = readFileSync(DOC, 'utf8');
 // Normalise line endings on the way in. A CRLF copy of this file makes every

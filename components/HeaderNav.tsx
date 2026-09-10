@@ -41,6 +41,10 @@ export default function HeaderNav() {
     <>
       <Link href="/" className="text-white">Lessons</Link>
       <Link href="/sandbox" className="text-white">Sandbox</Link>
+      {/* The pixel editor behind `sprite.texture`. Linked here rather than
+          only from the docs: a page nothing navigates to is the failure
+          check-reachable.mjs exists to catch. */}
+      <Link href="/textures" className="text-white">Textures</Link>
       {/* One Docs tab for the whole family — JavaScript, moSHion and reSHape
           each have a set inside, switched from the hub at /docs and from the
           family switcher on every docs page. */}
@@ -56,6 +60,13 @@ export default function HeaderNav() {
           shown after filing a report, which is not visibility. */}
       {loaded && user?.role === 'student' && (
         <Link href="/issues" className="text-white">Issues</Link>
+      )}
+      {/* The student's own gradebook. Until 2026-09-02 /progress was linked
+          from NOWHERE in the app — the score table, the due dates and the
+          teacher's override comments all rendered on a page reachable only by
+          typing the URL. scripts/check-reachable.mjs now holds that open. */}
+      {loaded && user?.role === 'student' && (
+        <Link href="/progress" className="text-white">Progress</Link>
       )}
       {loaded && user?.role === 'admin' && (
         <Link href="/admin/users" className="text-white">Users</Link>

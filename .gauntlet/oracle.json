@@ -1,0 +1,906 @@
+{
+  "sha": "40235606930c4949ab29d4bebfd539dcd218776a",
+  "takenAt": "2026-09-03",
+  "models": {
+    "box": {
+      "volume": 24000,
+      "bbox": [
+        [
+          -20,
+          -15,
+          -10
+        ],
+        [
+          20,
+          15,
+          10
+        ]
+      ],
+      "polys": 6,
+      "exact": 24000
+    },
+    "box-rounded": {
+      "volume": 22822.1949,
+      "bbox": [
+        [
+          -20,
+          -15,
+          -10
+        ],
+        [
+          20,
+          15,
+          10
+        ]
+      ],
+      "polys": 614,
+      "curved": true
+    },
+    "cylinder": {
+      "volume": 13484.6431,
+      "bbox": [
+        [
+          -12,
+          -12,
+          -15
+        ],
+        [
+          12,
+          12,
+          15
+        ]
+      ],
+      "polys": 96,
+      "curved": true,
+      "exact": 13571.6803
+    },
+    "cone": {
+      "volume": 4494.881,
+      "bbox": [
+        [
+          -12,
+          -12,
+          -15
+        ],
+        [
+          12,
+          12,
+          15
+        ]
+      ],
+      "polys": 64,
+      "curved": true,
+      "exact": 4523.8934
+    },
+    "sphere": {
+      "volume": 13911.5534,
+      "bbox": [
+        [
+          -15,
+          -15,
+          -15
+        ],
+        [
+          15,
+          15,
+          15
+        ]
+      ],
+      "polys": 512,
+      "curved": true,
+      "exact": 14137.1669
+    },
+    "torus": {
+      "volume": 4365.0521,
+      "bbox": [
+        [
+          -18,
+          -18,
+          -4
+        ],
+        [
+          18,
+          18,
+          4
+        ]
+      ],
+      "polys": 2048,
+      "curved": true,
+      "exact": 4421.5828
+    },
+    "sketch-extrude": {
+      "volume": 12000,
+      "bbox": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          40,
+          25,
+          12
+        ]
+      ],
+      "polys": 12,
+      "exact": 12000
+    },
+    "sketch-on-xz": {
+      "volume": 12000,
+      "bbox": [
+        [
+          0,
+          -12,
+          0
+        ],
+        [
+          40,
+          0,
+          25
+        ]
+      ],
+      "polys": 12
+    },
+    "sketch-on-yz-offset": {
+      "volume": 12000,
+      "bbox": [
+        [
+          10,
+          0,
+          0
+        ],
+        [
+          22,
+          40,
+          25
+        ]
+      ],
+      "polys": 12
+    },
+    "sketch-revolve": {
+      "volume": 27000,
+      "bbox": [
+        [
+          -20,
+          0,
+          -20
+        ],
+        [
+          20,
+          30,
+          20
+        ]
+      ],
+      "polys": 96,
+      "curved": true,
+      "exact": 28274.3339
+    },
+    "revolve-on-xy": {
+      "volume": 27000,
+      "bbox": [
+        [
+          -20,
+          -20,
+          0
+        ],
+        [
+          20,
+          20,
+          30
+        ]
+      ],
+      "polys": 96,
+      "curved": true,
+      "exact": 28274.3339
+    },
+    "revolve-on-yz": {
+      "volume": 27000,
+      "bbox": [
+        [
+          0,
+          -20,
+          -20
+        ],
+        [
+          30,
+          20,
+          20
+        ]
+      ],
+      "polys": 96,
+      "curved": true,
+      "exact": 28274.3339
+    },
+    "circle-extrude": {
+      "volume": 14046.5032,
+      "bbox": [
+        [
+          -15,
+          -15,
+          0
+        ],
+        [
+          15,
+          15,
+          20
+        ]
+      ],
+      "polys": 124,
+      "curved": true,
+      "exact": 14137.1669
+    },
+    "rounded-corner": {
+      "volume": 11906.3239,
+      "bbox": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          40,
+          25,
+          12
+        ]
+      ],
+      "polys": 60,
+      "curved": true
+    },
+    "chamfered-corner": {
+      "volume": 11784,
+      "bbox": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          40,
+          25,
+          12
+        ]
+      ],
+      "polys": 16
+    },
+    "bowed-edge": {
+      "volume": 14619.5652,
+      "bbox": [
+        [
+          0,
+          -8,
+          0
+        ],
+        [
+          40,
+          25,
+          12
+        ]
+      ],
+      "polys": 56,
+      "curved": true
+    },
+    "blend": {
+      "volume": 21000,
+      "bbox": [
+        [
+          -20,
+          -20,
+          0
+        ],
+        [
+          20,
+          20,
+          30
+        ]
+      ],
+      "polys": 12
+    },
+    "blend-mixed-corners": {
+      "volume": 9806.53,
+      "bbox": [
+        [
+          -20,
+          -20,
+          0
+        ],
+        [
+          20,
+          20,
+          30
+        ]
+      ],
+      "polys": 20
+    },
+    "boolean-cut": {
+      "volume": 28004.5502,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 104,
+      "curved": true
+    },
+    "boolean-union": {
+      "volume": 35995.4498,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -20
+        ],
+        [
+          20,
+          20,
+          20
+        ]
+      ],
+      "polys": 138,
+      "curved": true
+    },
+    "boolean-intersect": {
+      "volume": 14046.5032,
+      "bbox": [
+        [
+          -15,
+          -15,
+          -10
+        ],
+        [
+          15,
+          15,
+          10
+        ]
+      ],
+      "polys": 34,
+      "curved": true
+    },
+    "mirror": {
+      "volume": 16000,
+      "bbox": [
+        [
+          0,
+          -10,
+          -10
+        ],
+        [
+          40,
+          10,
+          10
+        ]
+      ],
+      "polys": 6
+    },
+    "moved": {
+      "volume": 8000,
+      "bbox": [
+        [
+          5,
+          -5,
+          -10
+        ],
+        [
+          25,
+          15,
+          10
+        ]
+      ],
+      "polys": 6
+    },
+    "turned": {
+      "volume": 8000,
+      "bbox": [
+        [
+          -21.2132,
+          -21.2132,
+          -5
+        ],
+        [
+          21.2132,
+          21.2132,
+          5
+        ]
+      ],
+      "polys": 6
+    },
+    "hole-through": {
+      "volume": 31438.1399,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 104,
+      "curved": true,
+      "exact": 31434.5133
+    },
+    "hole-blind": {
+      "volume": 31719.0699,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 40,
+      "curved": true,
+      "exact": 31717.2567
+    },
+    "hole-corners": {
+      "volume": 29752.5595,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 330,
+      "curved": true,
+      "exact": 29738.0533
+    },
+    "hole-x-axis": {
+      "volume": 30876.2797,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 104,
+      "curved": true,
+      "exact": 30869.0266
+    },
+    "shell-2": {
+      "volume": 11264,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 12,
+      "exact": 11264
+    },
+    "pattern-linear-3": {
+      "volume": 96000,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          140,
+          20,
+          10
+        ]
+      ],
+      "polys": 18,
+      "exact": 96000
+    },
+    "pattern-circular-6": {
+      "volume": 6000,
+      "bbox": [
+        [
+          -35,
+          -32.8109,
+          -5
+        ],
+        [
+          35,
+          32.8109,
+          5
+        ]
+      ],
+      "polys": 36,
+      "exact": 6000
+    },
+    "round-one-edge": {
+      "volume": 32000,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 6,
+      "jscadLacks": true,
+      "exact": 31862.6548
+    },
+    "bevel-one-edge": {
+      "volume": 32000,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 6,
+      "jscadLacks": true,
+      "exact": 31680
+    },
+    "draft-one-face": {
+      "volume": 32000,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 6,
+      "jscadLacks": true,
+      "exact": 30875.6733
+    }
+  },
+  "sketches": {
+    "nothing-asked": {
+      "satisfied": [],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          0,
+          0
+        ],
+        [
+          40,
+          0
+        ],
+        [
+          40,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "horizontal": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          0,
+          3
+        ],
+        [
+          40,
+          3
+        ],
+        [
+          40,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "vertical": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          0,
+          0
+        ],
+        [
+          43,
+          0
+        ],
+        [
+          43,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "length": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          5,
+          0
+        ],
+        [
+          35,
+          0
+        ],
+        [
+          40,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "equal": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          3.7462,
+          -0.0683
+        ],
+        [
+          36.2525,
+          -3.744
+        ],
+        [
+          40.0683,
+          28.7461
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "parallel": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          0,
+          0
+        ],
+        [
+          40,
+          0
+        ],
+        [
+          46,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "perpendicular": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          -0.0749,
+          1.3115
+        ],
+        [
+          40.8361,
+          4.8011
+        ],
+        [
+          39.1261,
+          24.8487
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "lock-holds-a-corner": {
+      "satisfied": [
+        true,
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [
+        true
+      ],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          0,
+          0
+        ],
+        [
+          40,
+          0
+        ],
+        [
+          40,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "a-real-square": {
+      "satisfied": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          3.7581,
+          -3.7413
+        ],
+        [
+          36.2576,
+          -3.7413
+        ],
+        [
+          36.2576,
+          28.7582
+        ],
+        [
+          3.7581,
+          28.7582
+        ]
+      ],
+      "_residual": 0
+    },
+    "two-lengths-one-edge": {
+      "satisfied": [
+        false,
+        false,
+        true
+      ],
+      "overConstrained": true,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          7.2478,
+          -2.5128
+        ],
+        [
+          32.0701,
+          0.463
+        ],
+        [
+          39.0094,
+          24.4806
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 15
+    },
+    "impossible-triangle": {
+      "satisfied": [
+        false,
+        false,
+        false
+      ],
+      "overConstrained": true,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          1.3482,
+          -0.7643
+        ],
+        [
+          38.648,
+          -0.6219
+        ],
+        [
+          19.8747,
+          31.6095
+        ]
+      ],
+      "_residual": 25.8604
+    }
+  }
+}

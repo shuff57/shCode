@@ -1,18 +1,27 @@
 // GET /api/classes/[id]/due-dates
-//   -> { dueDates: [{ scope, scopeId, dueAt, date, setBy, setAt }] }
+//   -> { dueDates: [{ scope, scopeId, dueAt, date, time, setBy, setAt }] }
 // PUT /api/classes/[id]/due-dates
-//   body { entries: [{ scope, scopeId, date: 'YYYY-MM-DD' | null }] }
+//   body { entries: [{ scope, scopeId, date: 'YYYY-MM-DD' | null, time?: 'HH:MM' | null }] }
 //   `date: null` DELETES that row, which is how a lesson override is cleared
 //   and the lesson goes back to inheriting its module.
+//   `time` is optional and defaults to the end of the school day, which is
+//   what every row written before times existed already stores.
 //
 // Both are teacher-only (owner, co-teacher, or admin) via canManageClass.
 //
-// The client sends a plain calendar date, never a timestamp — the server owns
-// the conversion to an instant so every class shares one school timezone and a
-// student's device clock can never move a deadline. See lib/due-dates-core.ts.
+// The client sends a calendar date and a wall-clock time, never a timestamp —
+// the server owns the conversion to an instant so every class shares one
+// school timezone and a student's device clock can never move a deadline.
+// See lib/due-dates-core.ts.
 
 import { canManageClass } from '../../../../_shared/classAuth';
-import { endOfSchoolDay, schoolDateString } from '../../../../../lib/due-dates-core';
+import {
+  EOD_TIME,
+  endOfSchoolDay,
+  schoolDateString,
+  schoolInstant,
+  schoolTimeString,
+} from '../../../../../lib/due-dates-core';
 
 interface Env {
   DB: D1Database;
@@ -22,6 +31,7 @@ type Ctx = EventContext<Env, 'id', SessionData>;
 
 const SCOPES = new Set(['unit', 'module', 'lesson']);
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_RE = /^\d{2}:\d{2}(:\d{2})?$/;
 // One PUT covers at most a whole module's worth of lessons plus the module
 // row. The largest module in the course is ~25 lessons; 600 is far above any
 // legitimate write and still bounds a hostile one.
@@ -31,6 +41,8 @@ interface Entry {
   scope: string;
   scopeId: string;
   date: string | null;
+  /** Optional HH:MM in the school timezone. Omitted = end of the school day. */
+  time?: string | null;
 }
 
 interface Row {
@@ -62,9 +74,11 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
       scope: r.scope,
       scopeId: r.scope_id,
       dueAt: r.due_at,
-      // Echo the calendar date back so the editor can put it straight into an
-      // <input type="date"> without redoing the timezone math client-side.
+      // Echo the calendar date and wall-clock time back so the editor can put
+      // them straight into <input type="date"> / <input type="time"> without
+      // redoing the timezone math client-side.
       date: schoolDateString(r.due_at),
+      time: schoolTimeString(r.due_at),
       setBy: r.set_by,
       setAt: r.set_at,
     })),
@@ -117,10 +131,20 @@ export const onRequestPut: PagesFunction<Env, 'id', SessionData> = async (contex
     if (typeof entry.date !== 'string' || !DATE_RE.test(entry.date)) {
       return json({ error: `date must be YYYY-MM-DD or null, got ${JSON.stringify(entry.date)}` }, 400);
     }
+    if (entry.time != null && (typeof entry.time !== 'string' || !TIME_RE.test(entry.time))) {
+      return json({ error: `time must be HH:MM or null, got ${JSON.stringify(entry.time)}` }, 400);
+    }
 
     let dueAt: number;
     try {
-      dueAt = endOfSchoolDay(entry.date);
+      // No time, or the end-of-day time the editor shows for a legacy row:
+      // keep the 23:59:59.999 semantics. Sending "23:59" back through
+      // schoolInstant would silently move the deadline 59.999s earlier on
+      // every re-save of a date the teacher never meant to change.
+      dueAt =
+        entry.time == null || entry.time.slice(0, 5) === EOD_TIME
+          ? endOfSchoolDay(entry.date)
+          : schoolInstant(entry.date, entry.time);
     } catch {
       return json({ error: `Invalid date ${JSON.stringify(entry.date)}` }, 400);
     }

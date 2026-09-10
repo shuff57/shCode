@@ -166,6 +166,18 @@ export interface DiagramConfig {
   /** Structural rules. Omit to use DEFAULT_RULES; pass [] to check nothing. */
   rules?: DiagramRule[];
   /**
+   * This chart is one part of a test the student sits in one sitting.
+   *
+   * Normally Submit refuses until every structural rule is green, which is
+   * the right teaching move on a practice chart. On a test it strands a
+   * student: the parts after this one stay locked behind a diamond they
+   * could not get a second exit onto, and they never reach the questions
+   * they could have answered. When set, Submit records whatever is on the
+   * canvas -- with the REAL number of checks passed, not a flattering full
+   * marks -- and unlocks the next part. See `Grading.summative`.
+   */
+  summative?: boolean;
+  /**
    * When present, "Submit for feedback" also sends the Mermaid text to the
    * Ollama grader through the existing /api/grade-written endpoint.
    */

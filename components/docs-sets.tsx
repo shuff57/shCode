@@ -8,7 +8,7 @@ import { sections as jsSections, searchDocs as searchJsDocs } from '../lib/js-do
 import { sections as moshionSections, searchDocs as searchMoshionDocs } from '../lib/moshion-docs';
 import { sections as reshapeSections, searchDocs as searchReshapeDocs } from '../lib/reshape-docs';
 
-export type SnippetComponent = (props: {
+type SnippetComponent = (props: {
   initialCode: string;
   fileKey: string;
 }) => React.ReactElement | null;

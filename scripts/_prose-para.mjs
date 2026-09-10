@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
-const src = readFileSync(new URL('../lib/reshape-docs.ts', import.meta.url), 'utf8');
+const src = readFileSync(new URL('../../reshape-cad/packages/script/src/reshape-docs.ts', import.meta.url), 'utf8');
 const want = new Set(process.argv.slice(2));
 let listing = '';
 try { listing = execSync('node scripts/check-docs-prose.mjs --list', { encoding: 'utf8' }); }

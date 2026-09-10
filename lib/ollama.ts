@@ -9,7 +9,7 @@
  * explicitly.
  */
 
-export interface ChatMessage {
+interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
 }
@@ -25,7 +25,7 @@ export interface OllamaChatOptions {
   json?: boolean;
 }
 
-export interface OllamaChatResponse {
+interface OllamaChatResponse {
   model: string;
   message: { role: string; content: string };
   done: boolean;
@@ -41,41 +41,6 @@ function resolveHost(host: string | undefined, apiKey: string | undefined): stri
 
 function authHeaders(apiKey: string | undefined): Record<string, string> {
   return apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
-}
-
-export async function chat(opts: OllamaChatOptions): Promise<OllamaChatResponse> {
-  const host = resolveHost(opts.host, opts.apiKey);
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), opts.timeoutMs ?? 120_000);
-
-  try {
-    const res = await fetch(`${host}/api/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeaders(opts.apiKey),
-      },
-      body: JSON.stringify({
-        model: opts.model,
-        messages: opts.messages,
-        stream: false,
-        format: opts.json ? 'json' : undefined,
-        options: {
-          temperature: opts.temperature ?? 0.3,
-        },
-      }),
-      signal: controller.signal,
-    });
-
-    if (!res.ok) {
-      const body = await res.text();
-      throw new Error(`Ollama ${res.status}: ${body.slice(0, 300)}`);
-    }
-
-    return (await res.json()) as OllamaChatResponse;
-  } finally {
-    clearTimeout(t);
-  }
 }
 
 /**
@@ -141,25 +106,4 @@ export async function chatStream(opts: OllamaChatOptions): Promise<ReadableStrea
       }
     },
   });
-}
-
-export async function isReachable(
-  host?: string,
-  apiKey?: string,
-  timeoutMs = 2000,
-): Promise<boolean> {
-  const resolved = resolveHost(host, apiKey);
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const res = await fetch(`${resolved}/api/tags`, {
-      signal: controller.signal,
-      headers: authHeaders(apiKey),
-    });
-    return res.ok;
-  } catch {
-    return false;
-  } finally {
-    clearTimeout(t);
-  }
 }

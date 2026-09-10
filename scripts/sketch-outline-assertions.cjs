@@ -14,14 +14,14 @@
 // stops breaking, the check beside it is measuring nothing and says so. Every
 // pinned number was measured, both ways, before it was written down.
 
-module.exports = function run(dir) {
+module.exports = async function run(load) {
   const path = require('path');
   const fs = require('fs');
-  const vm = require('vm');
-  const arc = require(path.join(dir, 'sketch-arc.js'));
-  const gen = require(path.join(dir, 'model-codegen.js'));
-  const handles = require(path.join(dir, 'model-handles.js'));
-  const solve = require(path.join(dir, 'sketch-solve.js'));
+  const arc = await load('sketch-arc');
+  const gen = await load('model-codegen');
+  const handles = await load('model-handles');
+  const solve = await load('sketch-solve');
+  const outline = await load('sketch-outline');
 
   let pass = 0;
   const fails = [];
@@ -157,8 +157,14 @@ module.exports = function run(dir) {
   }
 
   const moving = gen.solveDoc(doc(sk({ rounds: { 1: 8 }, constraints: SETS[4][1] }))).features[0];
+  // 1e-4, not 1e-6. This is a no-op guard -- its job is to prove the design
+  // really travelled from 0/40 to -10/50 rather than sitting still while every
+  // #C2 above passed for the wrong reason -- and a window ten thousand times
+  // tighter than the 60-unit move it is checking was incidental precision, not
+  // the point. The old relaxation set a length analytically and landed on the
+  // number exactly; least squares approaches it and stops a few millionths out.
   check('...and length e0=60 really did move the design (so C2 is not measuring a no-op)',
-    Math.abs(moving.points[0][0] + 10) < 1e-6 && Math.abs(moving.points[1][0] - 50) < 1e-6,
+    Math.abs(moving.points[0][0] + 10) < 1e-4 && Math.abs(moving.points[1][0] - 50) < 1e-4,
     `design came back ${JSON.stringify(moving.points)} -- unchanged means the solver did `
       + 'nothing and every #C2 above passed for the wrong reason');
 
@@ -257,7 +263,7 @@ module.exports = function run(dir) {
   // corner 2 afterwards. Getting this wrong slides a student's radius onto a
   // corner they never chose, silently, on a button press that is supposed to
   // leave the outline exactly where it was.
-  const types = require(path.join(dir, 'model-types.js'));
+  const types = await load('model-types');
   const split = types.addCorner(sk({ rounds: { 1: 8 } }), 0);
   check('...Corner moves a round with its corner (1 -> 2), not with its index',
     split.points.length === 5 && split.rounds && split.rounds[2] === 8
@@ -343,99 +349,18 @@ module.exports = function run(dir) {
       + 'bulges-only passthrough and the chamfer was ignored');
 
   // ------------------------------------------------------------------ C5 --
-  console.log('\n=== C5 the generated source drags live ===');
-
-  const src = gen.toReshape({
-    version: 1,
-    features: [
-      sk({ rounds: { 1: 8 } }),
-      { id: 'pull1', kind: 'extrude', target: 'sk1', height: 10 },
-    ],
-  });
-  const at = src.indexOf('const sk1 =');
-  const call = src.slice(at, src.indexOf('\n', at));
-  check('#C5 a rounded sketch emits roundPoly, not a baked outline',
-    /roundPoly\(\[/.test(call), call);
-  check('...its corners are PARAMETERS, so a drag moves the shape without regenerating',
-    ['p.sk1_p0u', 'p.sk1_p1u', 'p.sk1_p2u', 'p.sk1_p3u'].every((n) => call.includes(n)),
-    `${call} -- literal trim points here mean the corner parameters are referenced by `
-      + 'nothing, so the shape freezes mid-drag and only catches up on release');
-  check('...and so is the radius, which is the only live readout of it anywhere',
-    call.includes('p.sk1_r1') && src.includes("{ name: 'sk1_r1', type: 'float', initial: 8"),
-    call);
-  // The corner list specifically: a bare number anywhere in it is a baked
-  // trim point, which is the freeze-mid-drag failure. (The rounds map beside
-  // it legitimately contains the corner INDEX as a key, so the whole call
-  // cannot be scanned for digits.)
-  const cornerList = call.slice(call.indexOf('roundPoly([') + 10, call.indexOf(']],') + 1);
-  check('...no coordinate is emitted as a literal in the corner list',
-    // Regex LITERAL, not new RegExp(a string): inside a string the \\d collapsed to a
-    // bare d, so this was a character class of 'd' and '.', matched nothing, and
-    // stayed green when every coordinate was emitted as a baked literal. Watched
-    // failing after the fix, against that same sabotage.
-    !/\[\s*-?[\d.]/.test(cornerList), cornerList);
-
-  // The generated helper is a second implementation of the same arithmetic --
-  // it has to be, it runs inside the sandboxed frame with no imports. So it is
-  // measured against the first one rather than trusted. This is the only thing
-  // that catches the two drifting apart.
-  // Both helpers by name, in dependency order -- toReshape emits them in
-  // whatever order the needs set happened to fill, so slicing a range from
-  // one of them silently drops the other.
-  const fnSrc = (name) => {
-    const i = src.indexOf(`function ${name}(`);
-    return i < 0 ? '' : src.slice(i, src.indexOf('\n}', i) + 2);
-  };
-  const helperSrc = `${fnSrc('polyArc')}\n${fnSrc('roundPoly')}`;
-  const captured = [];
-  const sandbox = {
-    Math,
-    Object,
-    Number,
-    geometries: { geom2: { fromPoints: (pts) => { captured.push(pts); return pts; } } },
-  };
-  vm.createContext(sandbox);
-
-  // Four requests, not one. A single r=8 round on a 40x25 rectangle sits well
-  // under every limit, so it exercises none of the arithmetic the two copies
-  // could disagree about -- watched: deleting the clamp from the generated
-  // helper left this check green while r=8 was the only case. 12.5+8 makes the
-  // two rounds fight over the edge between them (descending order, and the
-  // second clamp), all-four fills the ring, and 500 is a request only a clamp
-  // can survive.
-  const CASES = [
-    ['one modest round', { 1: 8 }],
-    ['two rounds sharing an edge', { 1: 12.5, 2: 8 }],
-    ['all four', { 0: 8, 1: 8, 2: 8, 3: 8 }],
-    ['a request far past the ceiling', { 1: 500 }],
-  ];
-  for (const [label, rounds] of CASES) {
-    captured.length = 0;
-    vm.runInContext(
-      `${helperSrc}\nroundPoly([[0,0],[40,0],[40,25],[0,25]], ${JSON.stringify(rounds)}, {})`,
-      sandbox);
-    const fromHelper = captured[0];
-    const o = arc.outlineOf(sk({ rounds }));
-    const fromLib = arc.tessellate({ points: o.points, bulges: o.bulges });
-    check(`...the generated roundPoly agrees with outlineOf: ${label}`,
-      Array.isArray(fromHelper) && fromHelper.length === fromLib.length
-        && fromHelper.every((p, i) => Math.abs(p[0] - fromLib[i][0]) < 1e-9
-          && Math.abs(p[1] - fromLib[i][1]) < 1e-9),
-      `helper gave ${Array.isArray(fromHelper) ? fromHelper.length : 'nothing'} points, lib `
-        + `gave ${fromLib.length} -- two separate implementations of the same trim/bulge `
-        + 'arithmetic, and this is the only thing tying them together');
-    check(`...(and ${label} is a real sampled outline, not two empty lists)`,
-      fromLib.length > 8 && Array.isArray(fromHelper) && fromHelper.length > 8,
-      `lib ${fromLib.length}, helper ${Array.isArray(fromHelper) ? fromHelper.length : 'n/a'}`);
-  }
-
-  // Unchanged: a doc with bulges and no rounds is somebody else's outline.
-  const legacySrc = gen.toReshape(doc(sk({
-    points: [[0, 0], [25, 0], [28, 9], [0, 30]],
-    bulges: { 1: 0.720748 },
-  })));
-  check('#C4 a bulges-no-rounds doc still emits polyArc, untouched',
-    /polyArc\(\[/.test(legacySrc) && !legacySrc.includes('roundPoly(['), legacySrc);
+  // This section used to decompile the generated JSCAD source, extract its
+  // roundPoly()/polyArc() helper bodies (a from-scratch SECOND
+  // implementation of the corner-trim arithmetic, forced to exist because
+  // the sandboxed runner had no import access to lib/sketch-arc.ts), and
+  // measure that copy against outlineOf() directly. That whole premise is
+  // gone: the kernel (lib/occt-build.ts) calls arc.outlineOf() itself --
+  // see its own "the part of the adapter that pays off the architecture"
+  // comment -- so there is no second implementation left to drift, and
+  // nothing generates source text at all for reSHape Script to decompile
+  // (toScript()'s `.round(k, r)` call carries the radius as a literal
+  // by design, not as a live p.<name> reference the way JSCAD's did). No
+  // engine-independent property survives to port.
 
   // --------------------------------------------------------- the handles --
   console.log('\n=== the handles a student can actually grab ===');
@@ -538,9 +463,11 @@ module.exports = function run(dir) {
   console.log('\n=== the wiring, because a fix that never reaches a click is half a fix ===');
 
   const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-  const editorSrc = read('components', 'model', 'ModelEditor.tsx');
-  const wsSrc = read('components', 'SandboxWorkspace.tsx');
-  const panelSrc = read('components', 'model', 'SketchConstraints.tsx');
+  const editorSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx');
+  // The reSHape half of SandboxWorkspace moved into ReshapeStudio.tsx on
+  // 2026-09-04 (SPEC-A1); the wiring under test lives there now.
+  const wsSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'ReshapeStudio.tsx');
+  const panelSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'SketchConstraints.tsx');
 
   check('Round a corner writes a request, not geometry',
     /rounds: \{ \.\.\.\(f\.rounds \?\? \{\}\), \[corner\]: radius \}/.test(editorSrc),
@@ -553,12 +480,28 @@ module.exports = function run(dir) {
     'ModelEditor.tsx still imports filletCorner');
   check('...the outline the overlay draws comes from outlineOf, not from f.points',
     /outlineOf\(f\)/.test(wsSrc) && /basis: o\.basis/.test(wsSrc),
-    'SandboxWorkspace.tsx still hands the raw feature points to the overlay');
+    'ReshapeStudio.tsx still hands the raw feature points to the overlay');
+  // The gate moved into foldParams when the B-rep live preview landed, so this
+  // reads the property where it now lives rather than grepping for the old
+  // line -- and there are THREE adoption paths to cover now, not two: a
+  // commit, and the preview doc a drag feeds to the viewport. Both fold
+  // through the one function, which is the whole reason it was extracted.
+  const foldSrc = (wsSrc.match(/function foldParams[\s\S]*?\n\}/) || [''])[0];
   check('...commitParams goes through the same gate loadDoc does',
-    /next = solveDoc\(next\)/.test(wsSrc),
-    'applyParam output reaches the doc ungated -- two adoption paths, one gate');
+    /= foldParams\(docRef\.current, pending\)/.test(wsSrc)
+      && /return solveDoc\(next\);/.test(foldSrc),
+    'applyParam output reaches the doc ungated -- three adoption paths, one gate');
+  check('...and so does the live-preview doc a drag puts on screen',
+    /previewDocRef\.current = foldParams\(/.test(wsSrc),
+    'the preview doc is built without the gate the committed one goes through');
+  // `!outline.ok` alone only catches a TRUE zero-length collapse -- a rule
+  // can satisfy every residual by squeezing the shape to a sliver well short
+  // of that (S09, 2026-09-04), so the toggle's refusal condition grew a
+  // second half, `collapsedByRatio`, alongside it rather than in place of it.
   check('...the constraint toggle refuses a collapsing rule out loud',
-    /outlineOf\(\{ \.\.\.f, points \}\)/.test(editorSrc) && /if \(!outline\.ok\)/.test(editorSrc),
+    /outlineOf\(\{ \.\.\.f, points \}\)/.test(editorSrc)
+      && /if \(!outline\.ok \|\| shrunk\)/.test(editorSrc)
+      && /collapsedByRatio\(rawPoints, points\)/.test(editorSrc),
     'ModelEditor.setConstraints applies any rule the solver will accept, collapse included');
   check('...the Round box shows the radius currently set, so it can be edited or cleared',
     /defaultValue=\{set !== undefined \? String\(set\) : ''\}/.test(panelSrc),
@@ -566,6 +509,390 @@ module.exports = function run(dir) {
   check('...and a Length already set on a curved edge stays clearable',
     /disabled=\{curved && !fixed\}/.test(panelSrc),
     'the note says "remove one to settle it" while the box that removes it is disabled');
+
+
+  // ---- reading an outline back as design edges and treated corners --------
+  //
+  // A face of a pulled solid has to be nameable after the thing the student
+  // drew. That means telling apart, in a finished outline, which segments are
+  // design edges and which are the arc or flat a rounded corner left behind.
+  // The information is already in `basis` -- rounding a corner is exactly what
+  // duplicates an entry there -- so this is a read, not a new derivation.
+  //
+  // The control below matters as much as the check: if rounding a corner ever
+  // stops changing the outline's length, every assertion here passes for a
+  // reason that has nothing to do with segmentRoles.
+
+  const square = { points: [[0, 0], [40, 0], [40, 20], [0, 20]] };
+
+  const plainRoles = arc.segmentRoles(arc.outlineOf(square).basis);
+  check('an untouched outline is design edges all the way round',
+    plainRoles.length === 4
+      && plainRoles.every((r, i) => r.role === 'edge' && r.index === i),
+    JSON.stringify(plainRoles));
+
+  const rounded = arc.outlineOf({ ...square, rounds: { 2: 5 } });
+  check('CONTROL: rounding corner 2 really does lengthen the outline',
+    rounded.points.length === 5,
+    'the round was refused, so nothing below is measuring anything');
+
+  const roles2 = arc.segmentRoles(rounded.basis);
+  check('...and exactly one segment is reported as that corner',
+    roles2.filter((r) => r.role === 'corner').length === 1
+      && roles2.find((r) => r.role === 'corner').index === 2,
+    JSON.stringify(roles2));
+  check('...while the four design edges keep the numbers they always had',
+    JSON.stringify(roles2.filter((r) => r.role === 'edge').map((r) => r.index))
+      === JSON.stringify([0, 1, 2, 3]),
+    JSON.stringify(roles2));
+
+  // The property the whole naming scheme leans on: rounding one corner must
+  // not renumber the edges, or every name written before the round moves to a
+  // different face.
+  const rounded0 = arc.segmentRoles(arc.outlineOf({ ...square, rounds: { 0: 5 } }).basis);
+  check('rounding a DIFFERENT corner still leaves design edge 3 called edge 3',
+    rounded0.filter((r) => r.role === 'edge').map((r) => r.index).join(',') === '0,1,2,3'
+      && rounded0.find((r) => r.role === 'corner').index === 0,
+    JSON.stringify(rounded0));
+
+  // Every corner treated at once -- the case where an ordinal into the outline
+  // would be furthest from the design number it is meant to mean.
+  const allRound = arc.outlineOf({ ...square, rounds: { 0: 4, 1: 4, 2: 4, 3: 4 } });
+  const rolesAll = arc.segmentRoles(allRound.basis);
+  check('CONTROL: four rounds really do double the outline', allRound.points.length === 8,
+    'got ' + allRound.points.length + ' points');
+  check('...and it reads back as four corners and four edges, correctly numbered',
+    rolesAll.filter((r) => r.role === 'corner').map((r) => r.index).join(',') === '0,1,2,3'
+      && rolesAll.filter((r) => r.role === 'edge').map((r) => r.index).join(',') === '0,1,2,3',
+    JSON.stringify(rolesAll));
+
+  // A chamfer is the same shape of edit, so it must read the same way.
+  const cham = arc.segmentRoles(arc.outlineOf({ ...square, chamfers: { 1: 5 } }).basis);
+  check('a chamfered corner reads as that corner too, not as a new edge',
+    cham.filter((r) => r.role === 'corner').length === 1
+      && cham.find((r) => r.role === 'corner').index === 1
+      && cham.filter((r) => r.role === 'edge').map((r) => r.index).join(',') === '0,1,2,3',
+    JSON.stringify(cham));
+
+  console.log('\n=== sketch-outline: what the on-canvas labels say and where ===');
+
+  const near5 = (a, b, tol = 1e-6) => Math.abs(a - b) < tol;
+
+  check('two decimals only when needed', outline.formatLabel(40) === '40'
+    && outline.formatLabel(17.5) === '17.5'
+    && outline.formatLabel(17.25) === '17.25'
+    && outline.formatLabel(17.256) === '17.26'
+    && outline.formatLabel(40.0001) === '40',
+    JSON.stringify([outline.formatLabel(40), outline.formatLabel(17.5), outline.formatLabel(17.25), outline.formatLabel(17.256), outline.formatLabel(40.0001)]));
+
+  const originCircle = outline.circleLabel([[-5, 0], [5, 0]]);
+  check('a circle across 10 at the origin reads "⌀10" at the centre',
+    near5(originCircle.x, 0) && near5(originCircle.y, 0) && originCircle.text === '⌀10',
+    JSON.stringify(originCircle));
+  const offCentreCircle = outline.circleLabel([[0, 3], [10, 3]]);
+  check('a circle of across 10 at centre (5, 3) reads "⌀10" there, not at the origin',
+    near5(offCentreCircle.x, 5) && near5(offCentreCircle.y, 3) && offCentreCircle.text === '⌀10',
+    JSON.stringify(offCentreCircle));
+  check('the label follows whichever diameter is actually stored, not just a horizontal one',
+    (() => {
+      const c = outline.circleLabel([[0, 0], [0, 8]]); // vertical diameter, across 8
+      return near5(c.x, 0) && near5(c.y, 4) && c.text === '⌀8';
+    })(),
+    JSON.stringify(outline.circleLabel([[0, 0], [0, 8]])));
+  check('circleLabel is null for anything that is not exactly two points',
+    outline.circleLabel(square.points) === null && outline.circleLabel([[0, 0]]) === null);
+
+  const rectLabels = outline.sketchLabels(square.points, []);
+  check('a rectangle gets four edge labels, one per edge',
+    rectLabels.edges.length === 4, JSON.stringify(rectLabels.edges));
+  check('opposite edges read the same length -- 40/20/40/20',
+    rectLabels.edges.map((l) => l.text).join(',') === '40,20,40,20',
+    JSON.stringify(rectLabels.edges.map((l) => l.text)));
+  check('nothing is ruled, so every label is a plain length, not a dimension',
+    rectLabels.edges.every((l) => l.kind === 'length'));
+  check('no rounds, no chamfers, no bows means no corner or bow labels',
+    rectLabels.corners.length === 0 && rectLabels.bows.length === 0);
+
+  // Edge 0 runs (0,0) -> (40,0). Its outward normal is -y (the rectangle's
+  // centroid at (20,10) sits on the +y side), so the label lands BELOW the
+  // edge, at y = 0 - LABEL_OFFSET -- outside the shape, never crossing it.
+  const e0 = rectLabels.edges.find((l) => l.edge === 0);
+  check('edge 0\'s label sits at its midpoint, offset OUTWARD (away from centroid)',
+    near5(e0.x, 20) && e0.y < 0, JSON.stringify(e0));
+  // Edge 1 runs (40,0) -> (40,20); centroid is on the -x side, so this label
+  // lands to the RIGHT of the shape (x > 40).
+  const e1 = rectLabels.edges.find((l) => l.edge === 1);
+  check('edge 1\'s label also sits outward, on the opposite side from the centroid',
+    near5(e1.y, 10) && e1.x > 40, JSON.stringify(e1));
+
+  const ruledLabels = outline.sketchLabels(square.points, [{ kind: 'length', edge: 0, value: 40 }]);
+  check('a Length rule on edge 0 draws THAT edge as a dimension, not a length',
+    ruledLabels.edges.find((l) => l.edge === 0).kind === 'dimension'
+    && ruledLabels.edges.filter((l) => l.kind === 'length').length === 3,
+    JSON.stringify(ruledLabels.edges));
+
+  const roundLabels = outline.sketchLabels(square.points, [], { 1: 3 });
+  check('a rounded corner gets an "R" label at that corner, and the edges stay labelled straight',
+    roundLabels.corners.length === 1
+    && roundLabels.corners[0].corner === 1
+    && roundLabels.corners[0].kind === 'round'
+    && roundLabels.corners[0].text === 'R3'
+    && roundLabels.edges.length === 4,
+    JSON.stringify(roundLabels.corners));
+
+  // The FULL pipeline HandleOverlay.tsx actually runs: outlineOf() renders
+  // the round as trim points plus a bulge on the arc segment, and that
+  // bulge's KEY is the arc's own POSITION in the rendered outline, not the
+  // design edge number sitting nearest it. Handing that raw bulge dict to
+  // sketchLabels as if it were edge-indexed mislabels the round's own arc as
+  // a bowed edge -- measured 2026-09-04 live: "Round a corner 1" drew "R3"
+  // at the corner AND a spurious "+8.28" on the arc itself.
+  // treatmentsFromOutline is the fix: it reads segmentRoles back off the
+  // RENDERED outline, so a 'corner' segment's bulge becomes a round (never a
+  // bow) regardless of what position it landed at.
+  const renderedRound = arc.outlineOf({ ...square, rounds: { 1: 3 } });
+  const treatments = outline.treatmentsFromOutline(
+    square.points, renderedRound.points, renderedRound.basis, renderedRound.bulges,
+  );
+  check('treatmentsFromOutline recovers the SAME round the direct call above found',
+    treatments.rounds[1] !== undefined && Math.abs(treatments.rounds[1] - 3) < 1e-6
+    && Object.keys(treatments.chamfers).length === 0,
+    JSON.stringify(treatments));
+  check('...and finds no genuinely bowed edge in a doc that only has a round',
+    Object.keys(treatments.edgeBulges).length === 0, JSON.stringify(treatments.edgeBulges));
+
+  // The regression this file exists to pin: a round's label used to sit AT
+  // the design corner -- exactly where that corner's own drag handle already
+  // is, which for a small radius can hide the whole visible arc behind the
+  // handle and read as "no round was drawn at all" (measured live,
+  // 2026-09-04, Round corner 1 = 3 on a 40x20 rectangle: R3 showed, the
+  // corner still looked perfectly sharp). The label must sit on the ARC's
+  // own midpoint, past it, not on the corner.
+  const designCorner1 = square.points[1];
+  const roundLabelPos = treatments.corners.find((c) => c.corner === 1);
+  const distFromDesignCorner = Math.hypot(roundLabelPos.x - designCorner1[0], roundLabelPos.y - designCorner1[1]);
+  check('a round\'s label is NOT placed at the design corner -- it is a real distance from it',
+    distFromDesignCorner > 1,
+    `label at (${roundLabelPos.x.toFixed(2)}, ${roundLabelPos.y.toFixed(2)}), corner at (${designCorner1[0]}, ${designCorner1[1]}), distance ${distFromDesignCorner.toFixed(2)}`);
+  check('...specifically OUTWARD -- further from the rectangle than the corner itself, not into it',
+    roundLabelPos.x > designCorner1[0] && roundLabelPos.y < designCorner1[1],
+    JSON.stringify(roundLabelPos));
+
+  // Same claim for a chamfer: its trim segment is straight, so the label is
+  // the segment's own midpoint, offset outward -- not the design corner.
+  const renderedChamferForLabel = arc.outlineOf({ ...square, chamfers: { 1: 4 } });
+  const chamferTreatForLabel = outline.treatmentsFromOutline(
+    square.points, renderedChamferForLabel.points, renderedChamferForLabel.basis, renderedChamferForLabel.bulges,
+  );
+  const chamferLabelPos = chamferTreatForLabel.corners.find((c) => c.corner === 1);
+  const chamferDistFromCorner = Math.hypot(chamferLabelPos.x - designCorner1[0], chamferLabelPos.y - designCorner1[1]);
+  check('a chamfer\'s label also sits away from the design corner, outward',
+    chamferDistFromCorner > 1 && chamferLabelPos.x > designCorner1[0],
+    `label at (${chamferLabelPos.x.toFixed(2)}, ${chamferLabelPos.y.toFixed(2)}), distance ${chamferDistFromCorner.toFixed(2)}`);
+
+  const pipelineLabels = outline.sketchLabels(
+    square.points, [], treatments.rounds, treatments.chamfers, treatments.edgeBulges,
+  );
+  check('end to end: rounding corner 1 draws exactly one R label and ZERO bow labels',
+    pipelineLabels.corners.length === 1
+    && pipelineLabels.corners[0].kind === 'round'
+    && pipelineLabels.corners[0].text === 'R3'
+    && pipelineLabels.bows.length === 0,
+    JSON.stringify({ corners: pipelineLabels.corners, bows: pipelineLabels.bows }));
+
+  // Same claim, chamfer side: a chamfer's own trim segment must not read as
+  // a bow either (it has no bulge at all, but the regression is worth
+  // pinning the same way rather than trusting a bulge-less segment "just
+  // works" by accident).
+  const renderedChamfer = arc.outlineOf({ ...square, chamfers: { 2: 4 } });
+  const chamferTreatments = outline.treatmentsFromOutline(
+    square.points, renderedChamfer.points, renderedChamfer.basis, renderedChamfer.bulges,
+  );
+  const chamferPipelineLabels = outline.sketchLabels(
+    square.points, [], chamferTreatments.rounds, chamferTreatments.chamfers, chamferTreatments.edgeBulges,
+  );
+  check('end to end: chamfering corner 2 draws exactly one C label and ZERO bow labels',
+    chamferPipelineLabels.corners.length === 1
+    && chamferPipelineLabels.corners[0].kind === 'chamfer'
+    && chamferPipelineLabels.bows.length === 0,
+    JSON.stringify({ corners: chamferPipelineLabels.corners, bows: chamferPipelineLabels.bows }));
+
+  // Control: a genuinely bowed edge (legacy bulges, no rounds/chamfers at
+  // all -- outlineOf's "pass through untouched" path) must still produce its
+  // bow label through the SAME treatmentsFromOutline adapter, so the fix
+  // above did not just delete bow labels wholesale.
+  const renderedBow = arc.outlineOf({ ...square, bulges: { 0: 0.5 } });
+  const bowTreatments = outline.treatmentsFromOutline(
+    square.points, renderedBow.points, renderedBow.basis, renderedBow.bulges,
+  );
+  const bowPipelineLabels = outline.sketchLabels(
+    square.points, [], bowTreatments.rounds, bowTreatments.chamfers, bowTreatments.edgeBulges,
+  );
+  check('a GENUINELY bowed edge still gets its bow label through the same adapter',
+    bowPipelineLabels.bows.length === 1 && bowPipelineLabels.bows[0].edge === 0,
+    JSON.stringify(bowPipelineLabels.bows));
+
+  const chamferLabels = outline.sketchLabels(square.points, [], undefined, { 2: 2.5 });
+  check('a chamfered corner gets a "C" label',
+    chamferLabels.corners.length === 1
+    && chamferLabels.corners[0].kind === 'chamfer'
+    && chamferLabels.corners[0].text === 'C2.5',
+    JSON.stringify(chamferLabels.corners));
+
+  const bothLabels = outline.sketchLabels(square.points, [], { 0: 4 }, { 0: 4 });
+  check('a corner asked for both is labelled ROUND, not chamfer -- outlineOf\'s own tie-break',
+    bothLabels.corners.length === 1 && bothLabels.corners[0].kind === 'round',
+    JSON.stringify(bothLabels.corners));
+
+  // A legacy bulge on edge 0: the edge is curved, so it gets a bow label
+  // instead of a straight length, and the label sits on the arc's own peak
+  // (further from the chord than the chord midpoint itself), not crossing
+  // into the shape.
+  const bowed = outline.sketchLabels(square.points, [], undefined, undefined, { 0: 0.5 });
+  check('a bowed (legacy bulge) edge is skipped as a straight length',
+    bowed.edges.length === 3 && !bowed.edges.some((l) => l.edge === 0),
+    JSON.stringify(bowed.edges));
+  check('...and gets exactly one bow label instead, signed positive for a positive bulge',
+    bowed.bows.length === 1 && bowed.bows[0].edge === 0 && bowed.bows[0].text.startsWith('+'),
+    JSON.stringify(bowed.bows));
+  const bowPeakY = bowed.bows[0].y;
+  check('...positioned outside the chord, on the far side from the rectangle\'s own middle',
+    bowPeakY < 0, `peak at y=${bowPeakY}, chord runs along y=0, centroid is at y=10`);
+
+  check('a collapsed (zero-length) edge is skipped rather than producing a NaN label',
+    outline.sketchLabels([[5, 5], [5, 5], [40, 25]], []).edges.every(
+      (l) => Number.isFinite(l.x) && Number.isFinite(l.y)
+    ));
+
+  console.log('\n=== layoutLabels: no two duplicate-looking labels sit on the same pixels ===');
+
+  const viewport = { width: 800, height: 600 };
+  const overlap = (a, b) => Math.abs(a.x - b.x) * 2 < a.width + b.width && Math.abs(a.y - b.y) * 2 < a.height + b.height;
+
+  const twoForties = outline.layoutLabels(
+    [
+      { id: 'a', x: 400, y: 300, width: 24, height: 16, alongX: 1, alongY: 0 },
+      { id: 'b', x: 402, y: 301, width: 24, height: 16, alongX: 1, alongY: 0 },
+    ],
+    viewport,
+  );
+  check('two labels landing on the same pixels ("two duplicate 40s") no longer overlap after layout',
+    !overlap({ ...twoForties.a, width: 24, height: 16 }, { ...twoForties.b, width: 24, height: 16 }),
+    JSON.stringify(twoForties));
+  check('...and the FIRST one (a) is not the one that moved -- earlier labels hold still',
+    twoForties.a.x === 400 && twoForties.a.y === 300, JSON.stringify(twoForties.a));
+
+  const farApart = outline.layoutLabels(
+    [
+      { id: 'a', x: 100, y: 100, width: 20, height: 14, alongX: 1, alongY: 0 },
+      { id: 'b', x: 700, y: 500, width: 20, height: 14, alongX: 0, alongY: 1 },
+    ],
+    viewport,
+  );
+  check('labels nowhere near each other are left exactly where they were',
+    farApart.a.x === 100 && farApart.a.y === 100 && farApart.b.x === 700 && farApart.b.y === 500,
+    JSON.stringify(farApart));
+
+  const offCanvas = outline.layoutLabels(
+    [{ id: 'a', x: -30, y: 900, width: 20, height: 14, alongX: 1, alongY: 0 }],
+    viewport,
+  );
+  check('a label that projected off-canvas is pulled back fully inside the viewport',
+    offCanvas.a.x - 10 >= 0 && offCanvas.a.x + 10 <= viewport.width
+    && offCanvas.a.y - 7 >= 0 && offCanvas.a.y + 7 <= viewport.height,
+    JSON.stringify(offCanvas.a));
+
+  const threeStacked = outline.layoutLabels(
+    [
+      { id: 'a', x: 200, y: 200, width: 24, height: 16, alongX: 1, alongY: 0 },
+      { id: 'b', x: 200, y: 200, width: 24, height: 16, alongX: 1, alongY: 0 },
+      { id: 'c', x: 200, y: 200, width: 24, height: 16, alongX: 1, alongY: 0 },
+    ],
+    viewport,
+  );
+  const boxOf = (r) => ({ ...r, width: 24, height: 16 });
+  check('three labels stacked exactly on top of each other all end up clear of one another',
+    !overlap(boxOf(threeStacked.a), boxOf(threeStacked.b))
+    && !overlap(boxOf(threeStacked.a), boxOf(threeStacked.c))
+    && !overlap(boxOf(threeStacked.b), boxOf(threeStacked.c)),
+    JSON.stringify(threeStacked));
+
+  const viewportTiny = { width: 40, height: 40 };
+  const clampedStillDistinct = outline.layoutLabels(
+    [
+      { id: 'a', x: 20, y: 20, width: 24, height: 16, alongX: 1, alongY: 0 },
+      { id: 'b', x: 22, y: 21, width: 24, height: 16, alongX: 1, alongY: 0 },
+    ],
+    viewportTiny,
+  );
+  check('every label stays fully inside even a viewport too small to separate them cleanly',
+    clampedStillDistinct.a.x - 12 >= -1e-6 && clampedStillDistinct.a.x + 12 <= 40 + 1e-6
+    && clampedStillDistinct.b.x - 12 >= -1e-6 && clampedStillDistinct.b.x + 12 <= 40 + 1e-6,
+    JSON.stringify(clampedStillDistinct));
+
+  console.log('\n=== layoutLabels: a drawn HANDLE is an obstacle too, not only other labels ===');
+
+  const onAHandle = outline.layoutLabels(
+    [{ id: 'diam', x: 300, y: 300, width: 24, height: 16, alongX: 1, alongY: 0 }],
+    viewport,
+    [{ x: 300, y: 300, width: 13, height: 13 }],
+  );
+  check('a label sitting exactly on a handle is moved clear of it',
+    !overlap({ ...onAHandle.diam, width: 24, height: 16 }, { x: 300, y: 300, width: 13, height: 13 }),
+    JSON.stringify(onAHandle));
+
+  const handleNeverMoves = outline.layoutLabels(
+    [{ id: 'diam', x: 300, y: 300, width: 24, height: 16, alongX: 1, alongY: 0 }],
+    viewport,
+    [{ x: 300, y: 300, width: 13, height: 13 }],
+  );
+  check('...and the handle itself is never in the result -- layoutLabels only ever reports label ids',
+    Object.keys(handleNeverMoves).length === 1 && 'diam' in handleNeverMoves, JSON.stringify(handleNeverMoves));
+
+  const clearOfBoth = outline.layoutLabels(
+    [
+      { id: 'a', x: 500, y: 400, width: 20, height: 14, alongX: 1, alongY: 0 },
+      { id: 'b', x: 502, y: 401, width: 20, height: 14, alongX: 1, alongY: 0 },
+    ],
+    viewport,
+    [{ x: 500, y: 400, width: 13, height: 13 }],
+  );
+  const boxOf2 = (r) => ({ ...r, width: 20, height: 14 });
+  check('a label can be pushed clear of BOTH a colliding label and a handle in the same pass',
+    !overlap(boxOf2(clearOfBoth.a), { x: 500, y: 400, width: 13, height: 13 })
+    && !overlap(boxOf2(clearOfBoth.b), { x: 500, y: 400, width: 13, height: 13 })
+    && !overlap(boxOf2(clearOfBoth.a), boxOf2(clearOfBoth.b)),
+    JSON.stringify(clearOfBoth));
+
+  const noObstaclesAtAll = outline.layoutLabels(
+    [{ id: 'a', x: 250, y: 250, width: 20, height: 14, alongX: 1, alongY: 0 }],
+    viewport,
+  );
+  check('omitting obstacles entirely behaves exactly as before -- a lone label never moves',
+    noObstaclesAtAll.a.x === 250 && noObstaclesAtAll.a.y === 250, JSON.stringify(noObstaclesAtAll));
+
+  // Reproduces a real live case, byte-for-byte: a circle's own diameter
+  // label boxed in between two point handles 20.4px apart and a rounded
+  // corner's radius handle just past them -- a fixed-step "slide away from
+  // whichever ONE thing you're touching" pass bounced this label between
+  // two positions forever, since escaping either handle landed it squarely
+  // on the other. Measured 2026-09-04, screenshot item18-01-both-sketches.png.
+  const denseCluster = outline.layoutLabels(
+    [{ id: 'diam', x: 306.1, y: 415.94, width: 27, height: 16, alongX: 1, alongY: 0 }],
+    { width: 884, height: 662 },
+    [
+      { x: 293.37, y: 415.94, width: 20, height: 16 },
+      { x: 306.1, y: 415.94, width: 10, height: 10 },
+      { x: 326.48, y: 415.94, width: 11, height: 11 },
+    ],
+  );
+  const clearOfAllThree = ![
+    { x: 293.37, y: 415.94, width: 20, height: 16 },
+    { x: 306.1, y: 415.94, width: 10, height: 10 },
+    { x: 326.48, y: 415.94, width: 11, height: 11 },
+  ].some((o) => overlap({ ...denseCluster.diam, width: 27, height: 16 }, o));
+  check('a label boxed in by THREE nearby obstacles escapes all of them in one pass, not a 2-cycle',
+    clearOfAllThree, JSON.stringify(denseCluster));
 
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;

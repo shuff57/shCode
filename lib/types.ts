@@ -1,4 +1,6 @@
 import type { DiagramConfig } from './diagram-types';
+import type { LessonMode } from './lesson-mode';
+import type { ModelExpect } from './model-check';
 
 // ---- File System ----
 
@@ -36,10 +38,10 @@ export type FileHistory = Record<string, Version[]>;
 
 // ---- Lessons & Assignments ----
 
-export type LessonType = 'lesson' | 'assignment' | 'project' | 'example' | 'challenge';
-export type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom';
+type LessonType = 'lesson' | 'assignment' | 'project' | 'example' | 'challenge';
+type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom' | 'model';
 
-export interface Step {
+interface Step {
   id: string;
   title: string;
   instructions?: string;
@@ -74,12 +76,47 @@ export interface Requirement {
    *  (e.g. "at least four // comments"), since stripping runs first and
    *  would delete the very thing being matched for. Defaults to true. */
   stripComments?: boolean;
+  /** type: 'model' only. The features (and named fields on them) the
+   *  student's ModelDoc must contain — see lib/model-check.ts. */
+  expect?: ModelExpect[];
+  /** type: 'model' only. Absolute tolerance for numeric field comparisons.
+   *  Defaults to 0.01 (see lib/model-check.ts). */
+  tolerance?: number;
 }
 
-export interface Grading {
+interface Grading {
   totalPoints: number;
   passingScore: number;
   allowLateSubmit?: boolean;
+  /**
+   * This item is one part of a test the student sits in one sitting.
+   *
+   * On a practice assignment Submit is the reward for getting everything
+   * green, which is right: the checklist IS the teaching. On a test it is
+   * backwards. A student who cannot fix the syntax error in Part 3 is then
+   * held behind a locked Part 4 and Part 5 and never gets to answer the
+   * questions they could have answered. So on a summative item Submit is
+   * always available, an incomplete attempt still records completion, and
+   * the next part unlocks -- green-to-advance here means "you sat it", not
+   * "you passed it". Marking happens afterwards, off the student's screen.
+   *
+   * This is the console/requirements-graded twin of `QuizConfig.summative`
+   * and `AiGraderConfig.summative`; `DiagramConfig.summative` is the third.
+   * scripts/check-summative-parts.mjs measures that every part of a test
+   * unit sets whichever one its renderer reads.
+   */
+  summative?: boolean;
+  /**
+   * The lesson's CORRECT answer includes an uncaught runtime error -- 2.5.3
+   * asks the student to log an undeclared variable and watch it fail, before
+   * try/catch exists to catch it, and 2.5.24 requires a second error left
+   * deliberately unguarded. Drops the runtimeError half of canSubmit ONLY;
+   * the requirements gate still applies, which is what makes this narrower
+   * than `summative` (which drops both). Without it these two lessons can
+   * never be submitted, and because access is gated on prior siblings being
+   * completed, 2.5.3 walls a student out of the rest of the module.
+   */
+  expectsRuntimeError?: boolean;
 }
 
 export interface Lesson {
@@ -94,6 +131,10 @@ export interface Lesson {
   category?: string;
   unit?: string;
   preview?: 'html' | 'console' | 'reshape' | 'moshion' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides' | 'diagram' | 'quiz';
+  /** Which reSHape side(s) this lesson shows: 'visual' = Build tools only,
+   *  'code' = script only, 'both' = both, Build first. A teacher's
+   *  class/assignment mode (see lib/lesson-mode.ts) overrides this. */
+  mode?: LessonMode;
   week?: number;
   slos?: string[];
   files: FileNode[];
@@ -123,21 +164,67 @@ export interface QuizQuestion {
   code?: string;
   /** Two or more. Exactly one is correct; the rest must be wrong, not merely worse. */
   options: string[];
-  /** 0-based index into `options`. */
-  answer: number;
-  /** Shown after submitting, right or wrong. Says why, never just "correct". */
-  explanation: string;
+  /**
+   * 0-based index into `options`. Required when authoring -- scripts/test-quiz.mjs
+   * fails a lesson without it -- and ABSENT on the client for a summative quiz,
+   * where lib/quiz-redact.ts strips the key before the page is serialised.
+   */
+  answer?: number;
+  /**
+   * Shown after submitting, right or wrong. Says why, never just "correct".
+   * Required when authoring; stripped for a summative quiz alongside `answer`.
+   */
+  explanation?: string;
   /** Displayed lesson number to reread, e.g. "1.4.5". */
   source?: string;
+  /**
+   * Which form of the test this question belongs to. Only meaningful when the
+   * quiz declares `variants`: a student assigned form "b" is shown the
+   * untagged questions plus the ones tagged "b", and never sees "a" or "c".
+   * Absent means "every form asks this one".
+   */
+  variant?: string;
 }
 
 export interface QuizConfig {
   /** Percent correct needed to advance. Default 70. */
   passPercent?: number;
+  /**
+   * Re-order questions and options per student. **Off by default, and that
+   * default is load-bearing:** module quizzes routinely explain themselves
+   * positionally ("the second list is the lifecycle"), and shuffling turns
+   * those notes into lies. Opt in only when every explanation is written
+   * without reference to where an option sits -- scripts/test-quiz.mjs
+   * refuses a shuffled quiz whose prose says "the third".
+   */
+  shuffle?: boolean;
+  /**
+   * Form labels, e.g. `["a", "b", "c"]`. Each student is assigned one
+   * deterministically from their email, so a proctored room gets neighbours
+   * on different forms with no cards to hand out and nothing for a teacher
+   * to track. Every form must end up the same length -- the checker enforces
+   * it.
+   */
+  variants?: string[];
+  /**
+   * Test mode. A module quiz is formative -- it marks each answer, explains
+   * itself and invites another go. A chapter test is not: submitting is final,
+   * the paper locks, no answer is marked, no explanation is shown, and the
+   * lesson completes on submission rather than on a score, because the course
+   * is green-to-advance and a summative score is the teacher's to hand back.
+   */
+  summative?: boolean;
   questions: QuizQuestion[];
 }
 
 export interface AiGraderConfig {
+  /**
+   * Test mode, the written-response twin of QuizConfig.summative. One
+   * submission, no rubric feedback returned to the student, and the lesson
+   * completes on submission. Rubric feedback on a graded test is the answer
+   * key: it names the criterion that was missed, and the student resubmits.
+   */
+  summative?: boolean;
   rubricTitle?: string;
   model?: string;
   contextDocs?: string[];
@@ -147,7 +234,7 @@ export interface AiGraderConfig {
 
 // ---- Student State (localStorage) ----
 
-export interface StudentProgress {
+interface StudentProgress {
   lessonId: string;
   fileContents: Record<string, string>;
   commits: Commit[];

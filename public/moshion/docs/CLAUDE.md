@@ -18,6 +18,14 @@ configured.
 - `runner.html` — sandbox host used by the app's preview iframes
   (`/moshion/runner.html?code=<base64url>`).
 - `assets/` — sprite-sheet art for lesson examples.
+- `textures/` — the `sprite.texture = 'name'` catalog: 40 PNGs plus a
+  generated `textures.json` / `textures.js`. **Generated, not hand-edited.**
+  Regenerate with `python scripts/make-moshion-textures.py`; adding a texture
+  means adding a name -> tile index there, never dropping a PNG in by hand.
+  Third-party CC0 art (Kenney) -- see LICENSE.md section 5, not section 1.
+  `scripts/check-moshion-textures.mjs` gates the whole pipeline, including
+  that `runner.html` loads `textures.js` **before** `moshion.js` (the catalog
+  must exist before a sketch runs -- `.texture` is a synchronous setter).
 
 ## Commands
 

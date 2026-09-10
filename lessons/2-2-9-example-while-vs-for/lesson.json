@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed, while vs for comparison + infinite-loop trap, informed by book 2.2.4 Insight Note; do…while portion is shCode-added beyond book §2.2 (see report)",
+  "sourceRef": "designed, while vs for comparison + infinite-loop trap, informed by book 2.2.4 Insight Note",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

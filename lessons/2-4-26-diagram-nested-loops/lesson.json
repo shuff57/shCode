@@ -7,7 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "diagram",
-  "sourceRef": "designed: extends the single-hexagon pattern from module 2.2's 'Chart the for-loop' to two nested hexagons",
+  "sourceRef": "designed: extends the single-hexagon pattern from module 2.2's 'Chart the for-loop' to two nested hexagons for book 2.4.6",
   "week": 7,
   "slos": [
     "SLO-2",

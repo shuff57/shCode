@@ -1,4 +1,4 @@
-// 2.1.41 Challenges: Optional Stretch
+// 2.1.41 Challenges: Stretch Problems
 
 // CHALLENGE 1: Leap year checker.
 const year = 2024;

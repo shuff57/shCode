@@ -41,29 +41,12 @@ function draw() {
 // Every dimension is declared in getParameterDefinitions() rather than written
 // as a literal in main(). That is what lets the Dimensions panel drive the model
 // without touching a character of the source.
-const RESHAPE_STARTER = `// reSHape sandbox — solid modelling.
-// Numbers declared here show up in the Dimensions panel.
+const RESHAPE_STARTER = `// reSHape sandbox -- solid modelling.
+// Every line is one step, the same steps the Build tools make.
+// Every number becomes a slider in the Dimensions panel.
 
-function getParameterDefinitions() {
-  return [
-    { name: 'width',  type: 'float', initial: 40, min: 5, max: 120, step: 1, caption: 'Width' },
-    { name: 'depth',  type: 'float', initial: 40, min: 5, max: 120, step: 1, caption: 'Depth' },
-    { name: 'height', type: 'float', initial: 20, min: 5, max: 120, step: 1, caption: 'Height' },
-    { name: 'round',  type: 'float', initial: 4,  min: 0, max: 20,  step: 0.5, caption: 'Corner round' },
-    { name: 'hole',   type: 'float', initial: 10, min: 0, max: 40,  step: 1, caption: 'Hole radius' },
-  ]
-}
-
-function main(p) {
-  const body = p.round > 0
-    ? cuboid(p.width, p.depth, p.height, { roundRadius: p.round })
-    : cuboid(p.width, p.depth, p.height)
-
-  if (p.hole <= 0) return body
-
-  const drill = cylinder(p.hole, p.height * 2)
-  return subtract(body, drill)
-}
+const body = box(40, 40, 20, { corner: 4 })
+hole(body, { across: 10 })
 `;
 
 export const SANDBOX_MODES: SandboxMode[] = [

@@ -1,0 +1,15 @@
+flowchart TD
+  A([Start])
+  B[Get the pizzeria name, the pizza price and the slice count]
+  C[Work out the cost per slice: price divided by slices]
+  D{Is the cost per slice at or under $2.00?}
+  E[Report that it is a good deal]
+  F[Report that it costs more than we agreed to pay]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -->|yes| E
+  D -->|no| F
+  E --> Z
+  F --> Z

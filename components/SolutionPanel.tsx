@@ -8,11 +8,15 @@ interface SolutionPanelProps {
   lessonId: string;
   // Receives every file of the reference answer, keyed by path. An assignment
   // that grades README.md as well as script.js needs all of them inserted, or
-  // the reference cannot score full marks.
-  onInsert: (files: Record<string, string>) => void;
+  // the reference cannot score full marks. Omit for a lesson with nothing to
+  // insert into (a quiz) and pass readOnly instead.
+  onInsert?: (files: Record<string, string>) => void;
+  // No editor to insert into (a quiz's answer key) — view-only, no Insert
+  // button, no "replaces your editor contents" copy.
+  readOnly?: boolean;
 }
 
-export default function SolutionPanel({ lessonId, onInsert }: SolutionPanelProps) {
+export default function SolutionPanel({ lessonId, onInsert, readOnly }: SolutionPanelProps) {
   const [allowed, setAllowed] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -73,7 +77,7 @@ export default function SolutionPanel({ lessonId, onInsert }: SolutionPanelProps
   };
 
   const handleInsert = () => {
-    if (!files) return;
+    if (!files || !onInsert) return;
     onInsert(files);
     setOpen(false);
   };
@@ -88,7 +92,11 @@ export default function SolutionPanel({ lessonId, onInsert }: SolutionPanelProps
         type="button"
         className="btn-secondary btn-sm"
         onClick={reveal}
-        title="Admin/teacher only — review the reference solution and optionally insert it into the editor"
+        title={
+          readOnly
+            ? 'Admin/teacher only — view the answer key'
+            : 'Admin/teacher only — review the reference solution and optionally insert it into the editor'
+        }
         style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
       >
         <Eye size={14} />
@@ -104,15 +112,21 @@ export default function SolutionPanel({ lessonId, onInsert }: SolutionPanelProps
       >
         <div className="solution-dialog-content">
           <div className="solution-dialog-header">
-            <h3>Reference solution</h3>
+            <h3>{readOnly ? 'Answer key' : 'Reference solution'}</h3>
             <span className="solution-dialog-badge">admin / teacher only</span>
           </div>
           <p className="solution-dialog-desc">
-            Inserting replaces your editor contents
-            {paths.length > 1 ? ` in all ${paths.length} files` : ''}. Autosave
-            is paused while the solution is loaded — your progress will not be
-            polluted. Click<strong> Reset</strong> in the toolbar to restore the
-            starter.
+            {readOnly ? (
+              'The correct option on every question, across every form, with the explanation shown once a student is graded. Never shipped to the student — this is fetched fresh from the server, on your account only.'
+            ) : (
+              <>
+                Inserting replaces your editor contents
+                {paths.length > 1 ? ` in all ${paths.length} files` : ''}. Autosave
+                is paused while the solution is loaded — your progress will not be
+                polluted. Click<strong> Reset</strong> in the toolbar to restore the
+                starter.
+              </>
+            )}
           </p>
           {loading && <div className="solution-dialog-status">Loading…</div>}
           {error && <div className="solution-dialog-status error">{error}</div>}
@@ -142,13 +156,15 @@ export default function SolutionPanel({ lessonId, onInsert }: SolutionPanelProps
             <button className="btn-secondary" onClick={() => setOpen(false)}>
               Close
             </button>
-            <button
-              className="btn-primary"
-              onClick={handleInsert}
-              disabled={paths.length === 0}
-            >
-              {paths.length > 1 ? 'Insert all files' : 'Insert into editor'}
-            </button>
+            {!readOnly && (
+              <button
+                className="btn-primary"
+                onClick={handleInsert}
+                disabled={paths.length === 0}
+              >
+                {paths.length > 1 ? 'Insert all files' : 'Insert into editor'}
+              </button>
+            )}
           </div>
         </div>
       </dialog>

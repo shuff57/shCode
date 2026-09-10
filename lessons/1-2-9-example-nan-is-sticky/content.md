@@ -15,7 +15,7 @@ The third line is the one to notice. `"not a number" / 2` produced `NaN`, and th
 ## Step 2: Which is why NaN travels
 
 ```js live plain
-let price = "12.99";        // oops: text, not a number
+let price = "$12.99";       // oops: text with a $ in it, not a number
 let quantity = 3;
 
 let subtotal = price * quantity;
@@ -27,7 +27,9 @@ console.log("total: " + total);
 
 The mistake is on the first line: `price` holds *text*. But nothing complains there. The `NaN` is born at `price * quantity` and then travels through `tax` and `total`, so the error surfaces four lines later, in a `console.log` that is completely innocent.
 
-Change `"12.99"` to `12.99`: no quotes, and run it again. Everything downstream repairs itself, because the problem was never downstream.
+The `$` is what does it. `*` tries to turn both sides into numbers first (`1.2.7 Reading: Arithmetic Operators and Type Coercion`), and `"12.99"` would survive that: it is text, but it is text that reads as a number. `"$12.99"` does not, so the conversion fails and you get `NaN`.
+
+Change `"$12.99"` to `12.99`: no quotes and no dollar sign, and run it again. Everything downstream repairs itself, because the problem was never downstream.
 
 ## Step 3: The one exception
 

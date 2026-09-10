@@ -14,7 +14,7 @@ The last six lessons named four things you were already doing when you solved a 
 | **Decomposition** | 1.5.8 |
 | **Pattern recognition** | 1.5.9 |
 | **Abstraction** | 1.5.13 |
-| **Algorithmic thinking** | 1.5.4, and again from 1.5.18 |
+| **Algorithmic thinking** | 1.5.4 |
 
 They come in that order surprisingly often: break it up, notice what repeats, throw away what does not matter, write down the steps.
 

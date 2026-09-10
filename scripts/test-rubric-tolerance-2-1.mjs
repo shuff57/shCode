@@ -18,13 +18,14 @@
 // a correct differently-shaped answer that must still PASS, and the untouched
 // starter, which must score 0.
 import { execFileSync } from 'child_process';
-import { mkdtempSync, writeFileSync, readFileSync, existsSync, readdirSync } from 'fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync } from 'fs';
 import { createRequire } from 'module';
 import { tmpdir } from 'os';
 import path from 'path';
 
 const root = process.cwd();
-const out = mkdtempSync(path.join(tmpdir(), 'fix21-'));
+mkdirSync(path.join(root, 'node_modules', '.pkg-load-cache'), { recursive: true });
+const out = mkdtempSync(path.join(root, 'node_modules', '.pkg-load-cache', 'fix21-'));
 execFileSync(process.execPath, [
   path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
   'lib/grader.ts', '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',

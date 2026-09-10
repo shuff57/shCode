@@ -35,7 +35,9 @@ async function readFiles(dir, rel = '') {
 }
 
 const entries = await fs.readdir(lessonsDir, { withFileTypes: true });
-const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+// A folder starting with _ (lessons/_retired/) is not a lesson and must not
+// reach the worker bundle -- it once carried the retired JSCAD starters to prod.
+const dirs = entries.filter((e) => e.isDirectory() && !e.name.startsWith('_')).map((e) => e.name);
 
 /** @type {Record<string, Record<string, string>>} */
 const map = {};

@@ -254,7 +254,10 @@ module.exports = function run(dir) {
   // sketchHandles() in lib/model-handles.ts emits one 'point' handle per
   // sketch corner. Checked in the source rather than asserted in prose,
   // because an unreachable remedy has now shipped three generations running.
-  const handlesSrc = fs.readFileSync(path.join(__dirname, '..', 'lib', 'model-handles.ts'), 'utf8');
+  // model-handles.ts moved to reshape-cad's packages/script (B1 extraction,
+  // plan: freecad-browser.md).
+  const handlesSrc = fs.readFileSync(
+    path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'script', 'src', 'model-handles.ts'), 'utf8');
   check('#D1 ...and "drag the corner" is a remedy that actually exists',
     /kind:\s*'point'\s*as const/.test(handlesSrc) && /f\.points\.map/.test(handlesSrc),
     'sketchHandles() no longer emits a per-corner point handle, so the message tells a ' +
@@ -536,14 +539,16 @@ module.exports = function run(dir) {
   // A library that refuses correctly and a UI that never passes the bulges
   // is the same defect wearing a different hat: the panel would keep
   // offering a ceiling for a corner that cannot be rounded.
+  // SketchConstraints.tsx and ModelEditor.tsx moved to reshape-cad's
+  // packages/studio (B1 extraction, plan: freecad-browser.md).
   const panelSrc = fs.readFileSync(
-    path.join(__dirname, '..', 'components', 'model', 'SketchConstraints.tsx'), 'utf8');
+    path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'SketchConstraints.tsx'), 'utf8');
   check('the Rules panel asks maxFilletRadius with the bulges, not just the points',
     /maxFilletRadius\(\s*points\s*,\s*i\s*,\s*bulges\s*\)/.test(panelSrc),
     'SketchConstraints.tsx still calls maxFilletRadius(points, i) -- the ceiling it shows is for ' +
     'a straight-edged sketch that is not the one on screen');
   const editorSrc = fs.readFileSync(
-    path.join(__dirname, '..', 'components', 'model', 'ModelEditor.tsx'), 'utf8');
+    path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx'), 'utf8');
   check('...and the editor asks whyCannotRoundCorner with them too',
     /whyCannotRoundCorner\(\s*f\.points\s*,\s*corner\s*,\s*f\.bulges\s*\)/.test(editorSrc),
     'ModelEditor.tsx still calls whyCannotRoundCorner(f.points, corner)');
@@ -577,6 +582,223 @@ module.exports = function run(dir) {
     /maxFilletRadius\(f\.points,\s*corner,\s*f\.bulges\)/.test(editorSrc)
       && /radius\s*>\s*ceiling/.test(editorSrc),
     'ModelEditor.tsx never asks for the ceiling, so an over-radius round is still silent');
+
+
+  {
+    console.log('\n=== bowing a straight edge into an arc ===');
+
+    // A 40x25 rectangle. Edge 0 is the 40-long bottom, edge 1 the 25-long right.
+    const bowRect = { points: [[0, 0], [40, 0], [40, 25], [0, 25]] };
+
+    check('a straight edge reports no bow', A.bowOf(bowRect.points, 0) === 0);
+    check('the ceiling is half the chord -- a half circle',
+      A.maxBow(bowRect.points, 0) === 20 && A.maxBow(bowRect.points, 1) === 12.5,
+      `${A.maxBow(bowRect.points, 0)} / ${A.maxBow(bowRect.points, 1)}`);
+
+    // Round trip: a bow in, the same bow back out. This is the whole contract
+    // between the panel (which speaks distances) and the outline (which speaks
+    // bulges), and a factor-of-two slip here is invisible in both directions
+    // separately.
+    for (const [edge, want] of [[0, 5], [0, -5], [1, 12.5], [2, 0.25], [3, -3]]) {
+      const bowed = A.bowEdge(bowRect, edge, want);
+      check(`bow ${want} on edge ${edge + 1} round-trips`,
+        near(A.bowOf(bowed.points, edge, bowed.bulges), want),
+        `asked ${want}, read back ${A.bowOf(bowed.points, edge, bowed.bulges)}`);
+    }
+
+    // The geometry it actually produces, measured rather than asserted from the
+    // formula it was built with: a bow of exactly half the chord is a half
+    // circle, so the radius must be half the chord and the arc's midpoint must
+    // sit exactly `bow` off the chord.
+    const half = A.bowEdge(bowRect, 0, 20);
+    check('a half-chord bow is bulge 1', near(half.bulges[0], 1), String(half.bulges[0]));
+    const arc = A.arcFromBulge(bowRect.points[0], bowRect.points[1], half.bulges[0]);
+    check('...and that is a half circle: radius = half the chord',
+      near(arc.radius, 20), String(arc.radius));
+    check('...centred on the chord itself',
+      near(arc.center[0], 20) && near(arc.center[1], 0), JSON.stringify(arc.center));
+
+    // A quarter-ish bow, checked by sampling the drawn outline rather than by
+    // re-running the same arithmetic: tessellate() is what the student sees.
+    const bowed5 = A.bowEdge(bowRect, 0, 5);
+    const drawn = A.tessellate(bowed5);
+    const far = drawn.reduce((m, p) => (Math.abs(p[1]) > Math.abs(m) && p[0] > 1 && p[0] < 39 ? p[1] : m), 0);
+    check('the drawn outline really stands off the chord by the bow',
+      near(Math.abs(far), 5, 0.05), `furthest sample is ${far} from the chord, asked 5`);
+
+    check('0 clears the bow rather than storing a straight arc',
+      A.bowEdge(bowed5, 0, 0).bulges === undefined,
+      JSON.stringify(A.bowEdge(bowed5, 0, 0).bulges));
+
+    // Clamping and refusal. The panel is supposed to REPORT the ceiling rather
+    // than silently clamp -- same contract the round/chamfer rows already have,
+    // and the reason whyCannotBowEdge exists at all.
+    check('over the ceiling is refused with a sentence naming the ceiling',
+      /at most 20\.0/.test(A.whyCannotBowEdge(bowRect.points, 0, 40) || ''),
+      String(A.whyCannotBowEdge(bowRect.points, 0, 40)));
+    check('...and refused in the negative direction too',
+      A.whyCannotBowEdge(bowRect.points, 0, -40) !== null);
+    check('...but an in-range bow is not refused',
+      A.whyCannotBowEdge(bowRect.points, 0, 19.9) === null);
+    check('a bow still clamps rather than producing a bulge past 1, if one gets through',
+      Math.abs(A.bulgeFromBow(bowRect.points, 0, 400)) <= 1,
+      String(A.bulgeFromBow(bowRect.points, 0, 400)));
+
+    const collapsed = { points: [[0, 0], [0, 0], [40, 25], [0, 25]] };
+    check('a zero-length edge cannot be bowed, and says why rather than NaN-ing',
+      A.bulgeFromBow(collapsed.points, 0, 5) === 0
+        && /no length/.test(A.whyCannotBowEdge(collapsed.points, 0, 5) || ''),
+      String(A.whyCannotBowEdge(collapsed.points, 0, 5)));
+
+    check('a circle refuses to be bowed -- its two points are a diameter, not an edge',
+      A.bowEdge({ points: [[0, 0], [20, 0]], shape: 'circle' }, 0, 5).bulges === undefined);
+
+    // The bulge survives a corner move, which is the whole reason it is stored
+    // rather than the bow: the included angle is what a curve should keep.
+    const moved = { ...bowed5, points: [[0, 0], [80, 0], [40, 25], [0, 25]] };
+    check('moving a corner keeps the ANGLE and scales the bow with the chord',
+      near(moved.bulges[0], bowed5.bulges[0]) && near(A.bowOf(moved.points, 0, moved.bulges), 10),
+      `bulge ${moved.bulges[0]}, bow now ${A.bowOf(moved.points, 0, moved.bulges)}`);
+  }
+
+  {
+    console.log('\n=== removing a corner: splitEdge run backwards ===');
+
+    const pent = {
+      points: [[0, 0], [40, 0], [50, 20], [20, 35], [-10, 20]],
+      constraints: [
+        { kind: 'lock', corner: 0 },
+        { kind: 'lock', corner: 3 },
+        { kind: 'length', edge: 0, value: 40 },
+        { kind: 'length', edge: 3, value: 25 },
+        { kind: 'equal', edge: 1, other: 4 },
+      ],
+      bulges: { 3: 0.2 },
+      rounds: { 2: 4 },
+      chamfers: { 4: 3 },
+    };
+
+    const gone = A.removeCorner(pent, 2);
+    check('the corner is gone and the rest stay put',
+      gone.points.length === 4 && JSON.stringify(gone.points[2]) === JSON.stringify([20, 35]),
+      JSON.stringify(gone.points));
+
+    // Corner keys: 3 and 4 slide down to 2 and 3, corner 2's own round goes.
+    check('a lock above the removed corner slides down',
+      gone.constraints.some((c) => c.kind === 'lock' && c.corner === 2),
+      JSON.stringify(gone.constraints));
+    check('...and one below it does not move',
+      gone.constraints.some((c) => c.kind === 'lock' && c.corner === 0));
+    check('the round ON the removed corner goes with it',
+      gone.rounds === undefined, JSON.stringify(gone.rounds));
+    check('a chamfer above it slides down, keeping its value',
+      gone.chamfers && gone.chamfers[3] === 3, JSON.stringify(gone.chamfers));
+
+    // Edge keys: edges 1 and 2 merged, so anything naming either is dropped.
+    check('a length rule on an edge that did not merge slides down',
+      gone.constraints.some((c) => c.kind === 'length' && c.edge === 2 && c.value === 25),
+      JSON.stringify(gone.constraints));
+    check('...and one below the seam stays where it is',
+      gone.constraints.some((c) => c.kind === 'length' && c.edge === 0 && c.value === 40));
+    check('a pair rule touching a merged edge is DROPPED, not remapped',
+      !gone.constraints.some((c) => c.kind === 'equal'),
+      'edge 1 merged, so "edge 1 = edge 5" is a rule about an edge that no longer exists');
+    check('the curve on a merged edge is dropped rather than guessed at',
+      !gone.bulges || gone.bulges[3] === undefined, JSON.stringify(gone.bulges));
+
+    // A curve NOT on a merging edge has to survive, or the drop above is just
+    // a bug that happens to look like a policy.
+    const curvedFar = A.removeCorner({ ...pent, bulges: { 0: 0.3 } }, 3);
+    check('a curve on an untouched edge survives the removal',
+      curvedFar.bulges && Math.abs(curvedFar.bulges[0] - 0.3) < 1e-9,
+      JSON.stringify(curvedFar.bulges));
+
+    // Removing corner 0 is the wrap-around case: edges 4 and 0 merge, and the
+    // merged edge lands LAST rather than first. Off-by-one here mis-keys every
+    // rule on the shape.
+    const first = A.removeCorner({ ...pent, bulges: undefined, rounds: undefined, chamfers: undefined }, 0);
+    check('removing corner 1 wraps: the merged edge lands last, not first',
+      first.points.length === 4
+        && first.constraints.some((c) => c.kind === 'length' && c.edge === 2 && c.value === 25)
+        && !first.constraints.some((c) => c.kind === 'length' && c.value === 40),
+      JSON.stringify(first.constraints));
+
+    // The real contract, measured on the OUTLINE rather than on index
+    // arithmetic: put a corner in and take it back out, and the shape has to
+    // come back. Numbers that look plausible are exactly how the four earlier
+    // faces of the arc-endpoint bug shipped.
+    const area = (pts) => {
+      let a = 0;
+      for (let i = 0; i < pts.length; i++) {
+        const [x1, y1] = pts[i];
+        const [x2, y2] = pts[(i + 1) % pts.length];
+        a += x1 * y2 - x2 * y1;
+      }
+      return Math.abs(a) / 2;
+    };
+    for (const edge of [0, 2, 4]) {
+      const base = { points: pent.points };
+      const split = A.splitEdge(base, edge);
+      const back = A.removeCorner(split, edge + 1);
+      check(`split edge ${edge + 1} then remove the new corner restores the shape`,
+        back.points.length === base.points.length
+          && near(area(A.tessellate(back)), area(A.tessellate(base)), 1e-6),
+        `${back.points.length} corners, area ${area(A.tessellate(back))} vs ${area(A.tessellate(base))}`);
+    }
+
+    console.log('\n=== removing a corner: what it refuses ===');
+
+    const tri = { points: [[0, 0], [40, 0], [20, 30]] };
+    check('a triangle refuses -- three corners is the floor',
+      /at least three corners/.test(A.whyCannotRemoveCorner(tri, 1) || ''),
+      String(A.whyCannotRemoveCorner(tri, 1)));
+    check('...and really does not change it',
+      A.removeCorner(tri, 1).points.length === 3);
+    check('a circle refuses, and says why in circle words',
+      /diameter/.test(A.whyCannotRemoveCorner({ points: [[0, 0], [20, 0]], shape: 'circle' }, 0) || ''));
+    check('an out-of-range corner refuses rather than splicing nothing',
+      A.whyCannotRemoveCorner(pent, 9) !== null);
+    check('a four-corner shape is still allowed to lose one',
+      A.whyCannotRemoveCorner({ points: pent.points.slice(0, 4) }, 1) === null);
+
+    console.log('\n=== removing a corner: saying what it costs, first ===');
+
+    const cost = A.whyRemovingCornerCosts(pent, 2);
+    // ONE rule, not three: of pent's five, only the equal pair names a
+    // merging edge. Written as 3 first, which is what the fixture LOOKS like
+    // at a glance -- the counter was right and the expectation was wrong.
+    check('the warning counts the rules that will go',
+      /so 1 rule and/.test(cost || ''), String(cost));
+    check('...and pluralises once there is more than one',
+      /3 rules/.test(A.whyRemovingCornerCosts({
+        points: pent.points,
+        constraints: [
+          { kind: 'lock', corner: 2 },
+          { kind: 'length', edge: 1, value: 10 },
+          { kind: 'horizontal', edge: 2 },
+          { kind: 'vertical', edge: 4 },
+        ],
+      }, 2) || ''),
+      String(A.whyRemovingCornerCosts({
+        points: pent.points,
+        constraints: [
+          { kind: 'lock', corner: 2 },
+          { kind: 'length', edge: 1, value: 10 },
+          { kind: 'horizontal', edge: 2 },
+          { kind: 'vertical', edge: 4 },
+        ],
+      }, 2)));
+    check('...names the round on that corner',
+      /its round/.test(cost || ''), String(cost));
+    check('...and says WHY, in edges rather than in indices',
+      /joins the two edges beside it into one/.test(cost || ''), String(cost));
+    check('a corner that costs nothing warns about nothing',
+      A.whyRemovingCornerCosts({ points: pent.points }, 2) === null,
+      String(A.whyRemovingCornerCosts({ points: pent.points }, 2)));
+    check('the warning counts a curve on a merging edge too',
+      /a curve/.test(A.whyRemovingCornerCosts({ points: pent.points, bulges: { 1: 0.4 } }, 2) || ''),
+      String(A.whyRemovingCornerCosts({ points: pent.points, bulges: { 1: 0.4 } }, 2)));
+  }
 
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;

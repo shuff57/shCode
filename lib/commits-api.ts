@@ -25,7 +25,7 @@ function toClientCommit(api: ApiCommit): Commit {
   };
 }
 
-export class ApiError extends Error {
+class ApiError extends Error {
   constructor(public status: number, public body: string) {
     super(`${status}: ${body}`);
   }
@@ -67,12 +67,4 @@ export async function createCommit(
   if (!res.ok) throw new ApiError(res.status, await readText(res));
   const data = (await res.json()) as { commit: ApiCommit };
   return toClientCommit(data.commit);
-}
-
-export async function deleteCommit(id: string): Promise<void> {
-  const res = await fetch(`/api/commits/${encodeURIComponent(id)}`, {
-    method: 'DELETE',
-    credentials: 'same-origin',
-  });
-  if (!res.ok) throw new ApiError(res.status, await readText(res));
 }

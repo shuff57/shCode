@@ -39,4 +39,4 @@ Three assignments and a print, each running once, top to bottom. Nothing chooses
 | **sequence** | Do this, then this, then this |
 | **selection** | Choose between paths depending on a condition |
 | **repetition** | Do something more than once |
-| **arbitrary jump** | Moving to any line from any line: what the discipline forbids (see 1.4.13) |
+| **arbitrary jump** | Moving to any line from any line: what the discipline forbids (1.4.13 takes this up) |

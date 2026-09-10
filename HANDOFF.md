@@ -1,3 +1,146 @@
+# Handoff — 2026-09-05 (latest) · JSCAD is gone from the tree and the site
+
+Two passes today. The first deleted the runner, its vendored bundles,
+`jscad-legacy.md`, `toReshape()` and every script that only measured them
+(full list: CLAUDE.md, "JSCAD is retired", the 2026-09-05 updates). The
+second swept what the first left: the JSCAD `challenges.md` ladder and its
+docs-index card, the `/brep-three/` spike page (twin of the deleted
+`/brep-test/`), the three `lessons/_retired/jscad-*` folders, the two python
+sandbox gates that drove `public/jscad/runner.html`, and the book-conversion
+audit. Nothing on shcode.pages.dev answers with JSCAD code any more.
+
+Trap found on the way: `scripts/generate-lesson-starters.mjs` walked
+`lessons/_retired/` and shipped every retired starter -- the JSCAD ones
+included -- inside the Pages Functions worker under an `_retired` key. It now
+skips any `_folder`; `lib/lessons.ts` and the manifest generator already did.
+
+Defect found and fixed in pass one: `/docs/reshape/overview/` and the lesson
+docs-drawer snippet were still sending reSHape Script to the deleted JSCAD
+runner (`ReferenceError: box is not defined` on every Run); both now go
+through `components/ReshapeScriptPreview.tsx` onto the kernel.
+
+Still carrying the word, deliberately: `public/_redirects` (`/docs/jscad/*`
+-> `/docs/reshape/`, keeps old links alive), `lib/version-control.ts` (renames
+students' `sandbox-jscad*` localStorage keys), `.gauntlet/oracle.json` (a
+frozen fixture), comments that compare kernel results with the old engine,
+and the curriculum planning docs under `curriculum-data/`.
+
+---
+# Handoff — 2026-09-01 (later) · Phase B run; two defects found and fixed
+
+The gauntlet closed earlier today on the toolbars. Its OTHER exit criterion --
+a full click-through of the sandbox, create -> timeline -> orbit/pan/zoom ->
+save -- had never been run in ten rounds. It has now: `scripts/drive-phase-b.py`,
+23 checks, **all passing** after two fixes in `4189ddf`.
+
+## What it found that nothing else could
+
+- **The Save buttons were unreachable in Build mode.** The timeline strip is
+  `absolute; bottom: 0` over the pane; the runner puts Save STL/3MF/OBJ/SVG at
+  the bottom of its own viewport. `elementFromPoint()` at the STL button centre
+  returned the timeline `<ol>`. **A student could build a model and never export
+  it.** Fixed by ending the view above the strip, not by moving the runner's bar
+  -- the runner is shared with the docs and the lessons.
+- **A save that declined was reported as a build that failed.** Save SVG on a
+  solid refuses on purpose, but went through `__previewFail`, so Build mode told
+  the student "These numbers stopped the code before it produced a shape" about a
+  model that had exported to STL seconds earlier.
+
+## Open, and it is a judgement call
+
+The runner's error banner is `position: fixed; top: 0` inside the frame, and
+Build floats a 48px ribbon over that band -- so the first line of any runner
+error is unreadable in Build mode. Fixing it means bending the shared runner
+(wrong for the docs pages and lessons, which have no ribbon) or undoing the
+floating ribbon from `ae1f21e`. Left for a person to choose.
+
+## Also worth knowing
+
+Two of the driver's original assertions were wrong about the APP, not the other
+way round, and both came from reasoning out of Onshape's habits:
+an illegal reorder is refused with a sentence rather than a disabled arrow, and
+Save SVG on a solid declines by design. Check what this app does before
+asserting what it should.
+
+---
+# Handoff — 2026-09-01 · the reSHape/Onshape parity gauntlet is CLOSED
+
+Every build item on both toolbars is `landed`. `npm test` prints the census:
+
+```
+feature toolbar: 75 tools -- 12 shipped, 4 pieces queued, 61 refused with a reason
+sketch  toolbar: 52 tools -- 8 shipped, 8 pieces queued, 35 refused with a reason
+both toolbars: every tool accounted for exactly once
+```
+
+All 127 tools are shipped, built, or refused with a written model reason.
+The full record is `~/.claude/plans/reshape-fusion-parity.md` (see its final
+`CLOSED` section) and `.gauntlet/parity.json` / `parity-sketch.json`.
+
+## Shipped in rounds 6–10 (2026-09-01)
+
+| Commit | What |
+| --- | --- |
+| `8a036de` | conflict display — losing edges turn red, dismissible banner over the canvas |
+| `887f73e` | **Bow an edge** — an arc is a bulge on an existing edge, not a standalone curve |
+| `f32593e` | **Remove a corner** — `addCorner`'s missing inverse |
+| `6348b65` | `trim` reclassified; Onshape's Trim/Extend refused |
+| `af804a8` | **Sits on: Ground/Front/Side** — a sketch can leave the xy plane; sketch bar closed |
+| `73bc48d` | **Blend** — two sketches skinned into a tapered solid |
+
+## The one thing worth carrying forward
+
+Three of five rounds found the same shape: **a finished pipeline with nothing
+at the top of it.** `bulges` (arc), `SketchFeature.plane`, and earlier `equal`
+were each recorded in `.gauntlet/` as blocked on a model problem. None was.
+Each was a declared, plumbed, tested capability with no writer.
+
+Before believing a queue item is blocked: read the type, then grep for who
+writes it. `scripts/check-constraint-ui.mjs` is the guard shape for this —
+parse the declaration out of the source and fail if nothing reaches it.
+
+## Traps this stretch cost a cycle on
+
+- **This checkout is CRLF.** A multi-line anchor joined with bare `\n` matches
+  nothing and fails silently. Detect with `s.includes('\r\n')` before any
+  multi-line string replace. Cost two cycles; already in this file's history
+  once, which did not stop it.
+- **`cat -A` piped through `sed 's/\$$//'` hides the `^M`** — that is how the
+  CRLF was missed the second time. Check `s.includes('\r')` in node instead.
+- **A quoted heredoc keeps `\n` literal, which is right for JS source but wrong
+  for a JS *string* you intend as a real newline.** Both appear in the same
+  script; know which you are writing.
+- **Two `npm run dev` on one `.next` corrupts it.** Every chunk 500s while the
+  page still serves 200 HTML, so it looks like a hydration bug. Kill both, `rm
+  -rf .next`, start one.
+- **`labelOf()` used to end in a bare `: 'Sphere'`.** Any new Feature kind
+  inherited it. Now exhaustive against `never` — a new kind will not compile
+  until it is named.
+
+## Still open, deliberately
+
+- **Construction (guide lines)** is the only genuine model wall left: an edge
+  excluded from the outline breaks the one-closed-polygon invariant that
+  `outlineOf`, `tessellate`, the solver and the codegen all assume. Refused,
+  not forgotten.
+- **No canvas drag handle for a bow.** It fits the existing one-axis
+  `HandleSpec` exactly (origin at the edge midpoint, axis the chord normal,
+  scale 1), but the bulge would have to become an emitted parameter rather than
+  a literal first.
+- **The `+` tool still always splits edge 1** while its new inverse is
+  per-corner. Asymmetric.
+
+## What to run
+
+```bash
+cd shCode && npx tsc --noEmit && npm test
+# and, with a dev server up, the five browser drivers:
+npm run dev &
+for f in scripts/drive-*.py; do python "$f"; done
+```
+
+---
+
 # Handoff — 2026-08-31 · stale gitignored generated bundles after a lesson pull
 
 A `git pull` that touched 14 lessons' `solution.js` files left `npm test` failing
@@ -1081,9 +1224,17 @@ request). Restart the dev server after editing a lesson before trusting a browse
 not mean abandoned; it means someone else is mid-task. Check mtimes and stage explicit
 paths. Blanket staging has swept another session's work into a commit twice.
 
-**Run `wrangler d1 migrations list --remote` before applying.** The ledger drifted once
-because migration files were hand-run with `d1 execute`, which does not write it. As of
-2026-08-22 the ledger is current through 0015 and matches the data.
+**Run `npm run d1:status` before applying.** The ledger drifted once because migration
+files were hand-run with `d1 execute`, which does not write it. As of 2026-09-02 the
+ledger is current through 0023 and matches the data.
+
+**Use `npm run d1:status` / `npm run d1:migrate`, not bare wrangler.** Both go through
+`scripts/d1.mjs`, which retries the transient Cloudflare failures. The one that costs a
+debugging cycle is `[code: 7403] The given account is not valid or is not authorized`:
+it reads like an expired login and is not one. Seen 2026-09-02 mid-deploy, gone on the
+next attempt with no re-auth, while `wrangler d1 list` — same account, same token —
+worked the whole time. When the wrapper does give up it runs that probe for you and says
+which of the three it is: Cloudflare flaking, network down, or credentials actually wrong.
 
 ## 6. moSHion decisions worth keeping (distilled from the file that stays behind)
 

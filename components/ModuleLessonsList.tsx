@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { badgeForLesson } from '../lib/lesson-badges';
 import { bypassesLessonLock, useLessonState } from '../lib/progress';
 import { lessonHref } from '../lib/lesson-href';
-import { resolveDue, resolveModuleSummary, useDueDates } from '../lib/due-dates';
-import DueBadge, { ModuleDueBadge } from './DueBadge';
+import { lessonAvailability, resolveDue, resolveModuleSummary, useDueDates, useNow } from '../lib/due-dates';
+import DueBadge, { ModuleDueBadge, OpensBadge } from './DueBadge';
 import DueClassPicker from './DueClassPicker';
 import DueDateChip from './DueDateChip';
+import LessonAccessChip from './LessonAccessChip';
 import { moduleSummaryForClass, ownDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
 
 interface LessonItem {
@@ -42,6 +43,10 @@ export default function ModuleLessonsList({
 }) {
   const progress = useLessonState();
   const due = useDueDates();
+  // One clock for the whole list. Availability is resolved per row with the
+  // pure lessonAvailability(), not the hook — a hook inside .map() would be
+  // a different number of hooks per render.
+  const now = useNow();
 
   if (lessons.length === 0) {
     return <p style={{ opacity: 0.6 }}>No lessons yet.</p>;
@@ -116,8 +121,11 @@ export default function ModuleLessonsList({
         const lessonState = progress.states[l.id];
         const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
         const stateLabel = stateLabels[lessonState ?? ''];
-        const locked = progress.loaded && idx > firstUnlocked && !lockBypass;
         const lessonDue = resolveDue(due, l.id, moduleId, unitId);
+        // Two independent gates — sequence and clock. Either closes the row.
+        const availability = lessonAvailability(due, l.id, moduleId, unitId, now);
+        const timeLocked = !availability.available && !lockBypass;
+        const locked = (progress.loaded && idx > firstUnlocked && !lockBypass) || timeLocked;
 
         const rowStyle: React.CSSProperties = {
           display: 'flex',
@@ -171,10 +179,14 @@ export default function ModuleLessonsList({
                   textTransform: 'uppercase',
                   letterSpacing: '0.04em',
                 }}
-                aria-label="Locked"
-                title="Get a green on the lesson above before this one unlocks"
+                aria-label={timeLocked ? 'Not available yet' : 'Locked'}
+                title={
+                  timeLocked
+                    ? 'Your teacher set this lesson to open later — the date is on this row.'
+                    : 'Get a green on the lesson above before this one unlocks'
+                }
               >
-                🔒 Locked
+                {timeLocked ? '🔒 Not yet' : '🔒 Locked'}
               </span>
             ) : stateLabel ? (
               <span
@@ -199,6 +211,12 @@ export default function ModuleLessonsList({
               className={lessonDue?.className}
               ambiguous={lessonDue?.ambiguous}
             />
+            <OpensBadge
+              openAt={availability.openAt}
+              available={availability.available || lockBypass}
+              className={availability.className}
+              ambiguous={availability.ambiguous}
+            />
             {l.estimateMins ? (
               <span style={{ opacity: 0.5, fontSize: 12 }}>~{l.estimateMins} min</span>
             ) : null}
@@ -209,6 +227,25 @@ export default function ModuleLessonsList({
               ownAt={ownDate(teacherDue, 'lesson', l.id)}
               pushRight
             />
+            {/* Same roster-checkbox controls as the home-page card and the
+                Due Dates panel — this list is the third and last place a
+                teacher edits a lesson's dates, so it gets the same pair. */}
+            {teacherDue.canEdit && teacherDue.activeClassId && (
+              <>
+                <LessonAccessChip
+                  classId={teacherDue.activeClassId}
+                  lessonId={l.id}
+                  lessonTitle={l.displayTitle}
+                  kind="early"
+                />
+                <LessonAccessChip
+                  classId={teacherDue.activeClassId}
+                  lessonId={l.id}
+                  lessonTitle={l.displayTitle}
+                  kind="late"
+                />
+              </>
+            )}
           </>
         );
 

@@ -7,7 +7,7 @@
 
 import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react';
 
-export interface EditableEdgeData extends Record<string, unknown> {
+interface EditableEdgeData extends Record<string, unknown> {
   editing?: boolean;
   onLabelChange?: (id: string, label: string) => void;
   onEditEnd?: () => void;
@@ -19,7 +19,7 @@ export interface EditableEdgeData extends Record<string, unknown> {
   spliceTarget?: boolean;
 }
 
-export default function EditableEdge({
+function EditableEdge({
   id,
   sourceX,
   sourceY,

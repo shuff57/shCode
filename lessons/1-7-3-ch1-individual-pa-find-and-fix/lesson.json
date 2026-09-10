@@ -1,0 +1,107 @@
+{
+  "id": "1-7-3-ch1-individual-pa-find-and-fix",
+  "title": "1.7.3 Individual PA Part 3: Find and Fix",
+  "description": "A book-order receipt with four bugs in it. Repair all four and name what kind each one was. Auto-checked.",
+  "type": "assignment",
+  "estimateMins": 11,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.7 Chapter 1 Individual Performance Assessment",
+  "preview": "console",
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Read the error before you change anything",
+      "instructions": "Run it. The console tells you where it gave up and what it did not understand. Start there: one of the four bugs stops the file from running at all, so until that one is gone you cannot see what the others do."
+    },
+    {
+      "id": "s2",
+      "title": "Fix all four",
+      "instructions": "Two of the four never produce an error message. The receipt prints, the numbers look like numbers, and two of the lines are wrong anyway. Work out by hand what the receipt SHOULD say for 6 notebooks at 4.25 with 5 for shipping and 8% tax, then find the lines that disagree with you."
+    },
+    {
+      "id": "s3",
+      "title": "Name each one",
+      "instructions": "Above each fix, add a comment naming the kind of bug it was: syntax, runtime or logic. A syntax bug means the file is not valid JavaScript. A runtime bug means it is valid, starts running, and then stops. A logic bug means it runs all the way through and tells you something untrue.",
+      "hints": [
+        "The kind is about WHEN it goes wrong, not about how hard it was to find",
+        "Two of these four are the same kind as each other"
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "One variable, one meaning",
+      "instructions": "One of the logic bugs is a variable being used for two different things. Do not fix it by moving lines around, and do not just delete the second use -- give the second meaning a variable of its own. The name is yours to pick: anything that says what it counts, as long as it is not count."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Bug 1 — the program does not run at all",
+      "description": "The file is valid JavaScript and reaches the end.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+itemName\\s*=\\s*(?:\"[^\"\\n]*\"|'[^'\\n]*'|`[^`\\n]*`)\\s*;",
+      "flags": "",
+      "stripComments": false,
+      "hint": "The console names the line it gave up on. Go to that line and read it one character at a time.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Bug 2 — the program stops part way through",
+      "description": "Nothing in the file uses a name that was never declared.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*\\bbeforTax\\b)(?=[\\s\\S]*\\btotal\\s*=\\s*(?:beforeTax\\s*\\+\\s*tax|tax\\s*\\+\\s*beforeTax))[\\s\\S]*$",
+      "flags": "",
+      "hint": "A ReferenceError always names the thing it could not find. That name is the clue.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Bug 3 — the Before tax line prints the wrong thing",
+      "description": "The total before tax is the sum of the values that make it up.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let\\s+shipping\\s*=\\s*5\\s*;|beforeTax\\s*=\\s*[^;\\n]*Number\\s*\\(\\s*shipping\\s*\\))",
+      "flags": "",
+      "hint": "Work out on paper what that line should say, then compare. If the two disagree, ask what type each value being combined actually is.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Bug 4 — the Ordered line prints the wrong thing",
+      "description": "The receipt reports the number of notebooks that were actually ordered.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*\\bcount\\s*=\\s*2\\b)(?=[\\s\\S]*\\b(?:let|const)\\s+([A-Za-z_$][A-Za-z0-9_$]*)\\s*=\\s*2\\s*;[\\s\\S]*\\bwrapFee\\s*=[^;\\n]*(?<![A-Za-z0-9_$])\\1(?![A-Za-z0-9_$]))[\\s\\S]*$",
+      "flags": "",
+      "hint": "Follow the value that line prints, from where it is set to where it is printed. The second meaning needs a variable of its own; you choose its name.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "All four bugs are named",
+      "description": "A comment beside each fix names its kind: syntax, runtime or logic.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*syntax)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*runtime)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*logic[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*logic)[\\s\\S]*$",
+      "flags": "i",
+      "stripComments": false,
+      "hint": "Four fixes, four comments.",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true,
+    "summative": true
+  },
+  "assignmentCode": "A1.7.3"
+}

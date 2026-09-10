@@ -67,6 +67,17 @@ const RULES = [
     fix: 'mount it on the teacher class page, or a teacher cannot set a gate',
   },
   {
+    what: "the student's own gradebook",
+    exists: 'app/progress/page.tsx',
+    // href="/progress", not "/progress": a dozen files import '../lib/progress'
+    // and that substring alone would let this rule pass with no link anywhere.
+    // Which is how it shipped — StudentGradebook, the due column and the
+    // teacher-feedback expander all rendered on a page nothing navigated to.
+    needle: 'href="/progress"',
+    excluding: ['app/progress/page.tsx'],
+    fix: 'students need a Progress link in components/HeaderNav.tsx or they cannot see a grade',
+  },
+  {
     what: 'the sandbox',
     exists: 'components/SandboxWorkspace.tsx',
     needle: '/sandbox',

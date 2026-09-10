@@ -66,7 +66,7 @@ export default function DocsIndex() {
           reSHape →
         </Link>
         <p style={{ color: '#888', fontSize: 14, margin: '6px 0 0' }}>
-          Solid modelling — the plain-words layer over JSCAD.
+          Solid modelling — reSHape Script on the B-rep kernel.
         </p>
       </div>
     </main>

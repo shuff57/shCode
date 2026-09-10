@@ -1,0 +1,77 @@
+{
+  "id": "8-1-11-project-desk-tray",
+  "title": "8.1.11 Project: Desk Tray",
+  "description": "Put it all together: a box, hollowed into a tray, with one softened edge. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "8.1 Solid Shapes",
+  "preview": "reshape",
+  "mode": "both",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add the box",
+      "instructions": "Press the Box tool. In the Dimensions panel, type 80 in width, 50 in depth, and 20 in height.",
+      "hints": [
+        "This is the same first step as every box you've built this unit - just three different numbers."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Hollow it into a tray",
+      "instructions": "Click the top face, then press Hollow. Check that wall reads 2 in the Dimensions panel.",
+      "hints": [
+        "A message under the 3D view should read \"Hollow 1 is open at the top face.\" That's what makes it a tray instead of a sealed block."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Round an upright corner edge",
+      "instructions": "Move the mouse onto one of the vertical edges of the tray, where the front face meets a side face - an upright corner edge, not the thin top rim. Aim about halfway down the edge, well below the rim, and click when the edge lights up light blue. The label above the Dimensions panel must read \"Box 1 · edge\". Press Round, then type 3 in the radius field.",
+      "hints": [
+        "The top rim is only 2 mm thick after the hollow, so a 3 mm round doesn't fit there and reSHape will refuse it. An upright corner edge is thick enough to take it.",
+        "If the label reads \"Hollow 1 · edge\", you caught the inner corner of the hollow, which sits right behind the outer one near the rim; Round stays greyed out for it. Click again lower down the same edge until the label reads \"Box 1 · edge\".",
+        "If a warning appears on the Round 1 step (the round would not fit), click that step in the timeline, press the Delete button in the toolbar, pick a point lower down the edge, and press Round again.",
+        "The label above the Dimensions panel should read \"edge\", not a face name."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "An 80 x 50 x 20 tray with one rounded edge",
+      "description": "An 80 x 50 x 20 mm box, hollowed to 2 mm walls with the top open, with one upright corner edge rounded to a 3 mm radius.",
+      "type": "model",
+      "expect": [
+        {
+          "kind": "box",
+          "size": [
+            80,
+            50,
+            20
+          ]
+        },
+        {
+          "kind": "shell",
+          "thickness": 2,
+          "open": true
+        },
+        {
+          "kind": "fillet",
+          "size": 3
+        }
+      ],
+      "hint": "Box 80 x 50 x 20, Hollow wall 2 open top, then Round an upright corner edge to 3.",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

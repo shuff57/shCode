@@ -6,7 +6,13 @@ import HomeModuleLessons from './HomeModuleLessons';
 import UnitProgressBadge from './UnitProgressBadge';
 import DueClassPicker from './DueClassPicker';
 import DueDateChip from './DueDateChip';
-import { moduleSummaryForClass, ownDate, useTeacherDue } from '../lib/due-dates-edit';
+import {
+  moduleOpenSummaryForClass,
+  moduleSummaryForClass,
+  ownDate,
+  ownOpenDate,
+  useTeacherDue,
+} from '../lib/due-dates-edit';
 import type { Lesson } from '../lib/types';
 
 /** Subset of ModuleSummary needed by the home page accordion. */
@@ -218,6 +224,7 @@ function ModuleDueChip({
   unitId: string | null;
 }) {
   const summary = moduleSummaryForClass(snap, moduleId, lessonIds, unitId);
+  const openSummary = moduleOpenSummaryForClass(snap, moduleId, lessonIds, unitId);
   return (
     <DueDateChip
       scope="module"
@@ -229,6 +236,8 @@ function ModuleDueChip({
       max={summary.max}
       moduleLessonIds={lessonIds}
       size="md"
+      openOwnAt={ownOpenDate(snap, 'module', moduleId)}
+      openMixed={openSummary.kind === 'mixed'}
     />
   );
 }

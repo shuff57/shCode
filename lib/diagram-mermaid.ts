@@ -155,7 +155,7 @@ const ROW_H = 150;
  * horizontally. Crude, but a flowchart is nearly a tree and the student can
  * drag anything that lands badly.
  */
-export function layout(doc: DiagramDoc): DiagramDoc {
+function layout(doc: DiagramDoc): DiagramDoc {
   const { nodes, edges } = doc;
   if (nodes.length === 0) return doc;
 

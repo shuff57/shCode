@@ -13,7 +13,7 @@ Eleven items, in no order, with no relationship to each other. This is what raw 
 ```js live plain
 let ingredients = ["bread", "jam", "butter"];
 let equipment = ["plate", "knife"];
-let actions = ["repeat x times", "left hand", "right hand", "pick up", "unscrew"];
+let actions = ["repeat x times", "left hand", "right hand", "pick up", "unscrew", "spread"];
 
 console.log("ingredients: " + ingredients.length);
 console.log("equipment:   " + equipment.length);
@@ -45,7 +45,7 @@ for (let i = 0; i < actions.length; i = i + 1) {
 }
 ```
 
-Eight actions now, up from five. Three of them: "put down", "screw on", "spread": exist only because a category was staring at you with a hole in it.
+Eight actions now, up from six. Two of them: "put down" and "screw on": exist only because a category was staring at you with a hole in it.
 
 The instructions the robot eventually gets will be better for it, and none of this required writing a program.
 

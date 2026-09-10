@@ -6,6 +6,10 @@ import path from 'path';
 // reviewed locally, it has to be reviewed through the same function that
 // decides what a student may see in production.
 import { publicReport, rankReports, visibleToStudent } from './functions/_shared/issue-reports.ts';
+// Both lesson-id routes below resolve paths through this. It lives in lib/ so
+// scripts/test-lesson-solution-parity.mjs can compare the real dev behaviour
+// against the Pages Function rather than a reimplementation of it.
+import { resolveLessonDir as resolveLessonDirIn, readLessonSolution } from './lib/lesson-solution-fs.mjs';
 
 // Who the dev auth stub pretends to be. `DEV_ROLE=student npm run dev` is the
 // only way to see the student half of anything here — the real session comes
@@ -16,6 +20,14 @@ const DEV_ROLE = process.env.DEV_ROLE === 'student' ? 'student' : process.env.DE
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
+
+// Two routes join a client-supplied id onto a filesystem path (/api/grade and
+// /api/lesson-solution) and neither had any validation, which made both
+// traversable. The charset check and the realpath containment behind it now
+// live in lib/lesson-solution-fs.mjs, so the test can exercise the same guard
+// the server runs.
+const LESSONS_ROOT = () => path.join(process.cwd(), 'lessons');
+const resolveLessonDir = (id) => resolveLessonDirIn(id, LESSONS_ROOT());
 
 // Extract the body of a named function by balancing braces. Returns just
 // the code between the opening { and matching closing }, or null if the
@@ -79,20 +91,137 @@ function stripJsComments(src) {
 app.prepare().then(() => {
   const server = express();
 
+  // ---- public/_headers, for the one prefix that cannot work without it ----
+  //
+  // Cloudflare Pages reads public/_headers; this Express server does not, so
+  // without this the local preview and production differ on exactly the thing
+  // that makes the B-rep kernel loadable at all.
+  //
+  // The preview iframe is sandboxed WITHOUT allow-same-origin, which puts it in
+  // an OPAQUE origin, so its fetches carry `Origin: null`. A classic
+  // <script src> is no-cors and loads fine -- which is why JSCAD never needed
+  // this -- but an ES module is always fetched in CORS mode, and so is the wasm
+  // an emscripten module pulls in. Missing header, and the kernel is blocked
+  // before its wasm is even requested.
+  //
+  // Failing only in dev would be bad enough; the reverse is worse. Whichever way
+  // round it went, the difference would be found by a person, in a classroom.
+  // Kept deliberately narrow to the same prefix public/_headers grants, and
+  // NOT applied to /api/*, which stays same-origin and cookie-gated.
+  server.use('/reshape/kernel', (_req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+  });
+
   // ---- Dev-only auth + lesson-state stubs --------------------------------
   // The real /api/auth/* and /api/lesson-state* are Cloudflare Pages
   // Functions (functions/api/**), which this local Express server does NOT
   // emulate. Without these stubs every lesson past the first in a module
   // renders "Lesson locked" because the client sees role=null. Production
   // (Cloudflare Pages) ignores this file entirely — dev convenience only.
-  server.get('/api/me', (_req, res) => {
-    res.json({ email: DEV_EMAIL, role: DEV_ROLE });
+  // A `dev_student=<name>` cookie (set by a test harness on its browser
+  // context) gives that browser its own progress, so several headless
+  // students can walk a module on one server without unlocking each other's
+  // lessons. No cookie means the single shared DEV_EMAIL identity.
+  const devIdentity = (req) => {
+    const m = /(?:^|;\s*)dev_student=([^;]+)/.exec(req.headers.cookie || '');
+    return m ? decodeURIComponent(m[1]) : DEV_EMAIL;
+  };
+  server.get('/api/me', (req, res) => {
+    res.json({ email: devIdentity(req), role: DEV_ROLE });
   });
-  server.post('/api/auth/login', (_req, res) => {
-    res.json({ email: DEV_EMAIL, role: DEV_ROLE });
+  server.post('/api/auth/login', (req, res) => {
+    res.json({ email: devIdentity(req), role: DEV_ROLE });
   });
   server.post('/api/auth/logout', (_req, res) => {
     res.json({ ok: true });
+  });
+  // Class-scoped student data. The real routes are
+  // functions/api/my-enrollments.ts and my-due-dates.ts and both need D1; this
+  // server has no binding, so it answers the well-formed empty case. Without
+  // them both 404, and lib/due-dates.ts THROWS on a non-OK response -- so every
+  // page in dev ran its date logic through a caught exception, and HeaderNav +
+  // AnnouncementBanner ate a failed fetch on every load.
+  server.get('/api/my-enrollments', (_req, res) => {
+    res.json({ enrollments: [] });
+  });
+  server.get('/api/my-due-dates', (_req, res) => {
+    res.json({ classes: [], overrides: [], dueWaivers: [] });
+  });
+  // Written-answer drafts. Real route: functions/api/lesson-drafts/[lessonId].ts
+  // (D1 table lesson_drafts, one row per student+lesson). Held in memory here,
+  // keyed the same way. NOTE the 404 on a missing draft is CORRECT and matches
+  // production -- a student who has not saved yet has no row.
+  const devDrafts = new Map(); // `${identity}\u0000${lessonId}` -> {response, updatedAt}
+  const draftKey = (req) => `${devIdentity(req)}\u0000${req.params.lessonId}`;
+  server.get('/api/lesson-drafts/:lessonId', (req, res) => {
+    const row = devDrafts.get(draftKey(req));
+    if (!row) return res.status(404).json({ error: 'Not found' });
+    res.json(row);
+  });
+  server.post('/api/lesson-drafts/:lessonId', express.json({ limit: '1mb' }), (req, res) => {
+    const { response } = req.body || {};
+    if (typeof response !== 'string') {
+      return res.status(400).json({ error: 'response (string) required' });
+    }
+    const updatedAt = Date.now();
+    devDrafts.set(draftKey(req), { response, updatedAt });
+    res.json({ ok: true, updatedAt });
+  });
+  server.delete('/api/lesson-drafts/:lessonId', (req, res) => {
+    devDrafts.delete(draftKey(req));
+    res.json({ ok: true });
+  });
+  // Grading targets. Real route: functions/api/grade-written.ts onRequestGet.
+  // No OLLAMA/Workers-AI credentials exist in dev, so the honest answer is an
+  // empty list -- GraderPicker's hasGraderChoice() renders nothing below two
+  // available targets, which is the correct unconfigured-dev surface.
+  server.get('/api/grade-written', (_req, res) => {
+    res.json({ graders: [], fallback: null });
+  });
+  // Version-control commit pool. Real routes: functions/api/commits/index.ts
+  // (GET ?lessonId= -> { commits }, POST -> { commit }) and commits/[id].ts
+  // (DELETE). Held in memory, keyed by identity+lesson the way the D1 table is.
+  // Without this listCommits() THREW an ApiError on every code lab, because
+  // lib/commits-api.ts rejects any non-OK response.
+  const devCommits = new Map(); // `${identity}\u0000${lessonId}` -> ApiCommit[]
+  const commitKey = (req, lessonId) => `${devIdentity(req)}\u0000${lessonId}`;
+  server.get('/api/commits', (req, res) => {
+    const lessonId = req.query.lessonId;
+    if (typeof lessonId !== 'string' || !lessonId) {
+      return res.status(400).json({ error: 'lessonId required' });
+    }
+    res.json({ commits: devCommits.get(commitKey(req, lessonId)) ?? [] });
+  });
+  server.post('/api/commits', express.json({ limit: '4mb' }), (req, res) => {
+    const { id, lessonId, message, files, changedFileIds } = req.body || {};
+    if (typeof id !== 'string' || typeof lessonId !== 'string') {
+      return res.status(400).json({ error: 'id and lessonId required' });
+    }
+    const commit = {
+      id,
+      lessonId,
+      message: typeof message === 'string' ? message : '',
+      files: files && typeof files === 'object' ? files : {},
+      changedFileIds: Array.isArray(changedFileIds) ? changedFileIds : [],
+      createdAt: Date.now(),
+      authoredByEmail: devIdentity(req),
+    };
+    const key = commitKey(req, lessonId);
+    // Newest first, matching the real route's ORDER BY created_at DESC.
+    devCommits.set(key, [commit, ...(devCommits.get(key) ?? [])]);
+    res.json({ commit });
+  });
+  server.delete('/api/commits/:id', (req, res) => {
+    for (const [key, list] of devCommits) {
+      const next = list.filter((c) => c.id !== req.params.id);
+      if (next.length !== list.length) {
+        devCommits.set(key, next);
+        return res.json({ ok: true });
+      }
+    }
+    res.status(404).json({ error: 'Not found' });
   });
   // Teacher gates (migrations/0016_lesson_modes.sql). Held in memory rather
   // than D1 because this server does not have a D1 binding; the real routes
@@ -113,26 +242,111 @@ app.prepare().then(() => {
     res.json({ ok: true, ...devLessonModes });
   });
 
-  server.get('/api/lesson-state', (_req, res) => {
-    res.json({ states: {}, scores: {}, role: DEV_ROLE });
+  // Held in memory for the life of the process so `DEV_ROLE=student` walks a
+  // module the way a student does: Submit turns the lesson green and the next
+  // one unlocks after navigation. Before this, POST was a no-op and GET always
+  // returned {}, so every lesson past the first read "Lesson locked" the
+  // moment the page reloaded. Restarting the server is the reset.
+  const devLessonStates = new Map();
+  const devStateFor = (req) => {
+    const id = devIdentity(req);
+    if (!devLessonStates.has(id)) devLessonStates.set(id, { states: {}, scores: {} });
+    return devLessonStates.get(id);
+  };
+  server.get('/api/lesson-state', (req, res) => {
+    res.json({ ...devStateFor(req), role: DEV_ROLE });
   });
-  server.post('/api/lesson-state/:lessonId', (_req, res) => {
+  server.post('/api/lesson-state/:lessonId', express.json(), (req, res) => {
+    const st = devStateFor(req);
+    const { lessonId } = req.params;
+    const { state, score } = req.body || {};
+    if (state === 'completed') {
+      st.states[lessonId] = 'completed';
+      if (typeof score === 'number') st.scores[lessonId] = score;
+    } else if (state === 'started' && !st.states[lessonId]) {
+      st.states[lessonId] = 'started';
+    }
     res.json({ ok: true });
   });
-  // Reference solutions (admin/teacher "View solution" button). Serves the
-  // same map the Pages Function reads, so the sandbox's solution panel works
-  // locally.
-  // Reference solutions (admin/teacher "View solution" button). Dev reads the
-  // lesson's solution.js straight from disk; the Pages Function serves the
-  // generated map instead.
-  server.get('/api/lesson-solution/:id', async (req, res) => {
-    const id = decodeURIComponent(req.params.id);
+  server.delete('/api/lesson-state/:lessonId', (req, res) => {
+    const st = devStateFor(req);
+    delete st.states[req.params.lessonId];
+    delete st.scores[req.params.lessonId];
+    res.json({ ok: true });
+  });
+  // Submit records a submission before it marks the lesson complete and
+  // refuses to complete when that POST fails (LessonWorkspace.confirmSubmit),
+  // so without this stub no graded lesson can ever turn green in dev. The
+  // real route is functions/api/lesson-submissions.ts.
+  const devSubmissions = [];
+  server.get('/api/lesson-submissions', (req, res) => {
+    const lessonId = req.query.lessonId;
+    res.json({ submissions: devSubmissions.filter((s) => !lessonId || s.lessonId === lessonId) });
+  });
+  server.post('/api/lesson-submissions', express.json({ limit: '1mb' }), (req, res) => {
+    const body = req.body || {};
+    devSubmissions.push({ ...body, studentEmail: devIdentity(req), submittedAt: Date.now() });
+    res.json({ ok: true, id: body.id });
+  });
+  // The student gradebook on /progress. The real route is
+  // functions/api/my-gradebook.ts, reading lesson_state + lesson_submissions
+  // out of D1, which this server does not have. Without a stub the page shows
+  // its "could not load" card in dev and the table is unreviewable locally,
+  // so this serves a fixture that hits every status the component renders --
+  // including `pending` (grader outage) and a teacher override with feedback,
+  // the two states that are hardest to produce on purpose against real data.
+  server.get('/api/my-gradebook', async (_req, res) => {
+    const day = 86400000;
+    const now = Date.now();
+    let ids = [];
     try {
-      const solution = await fs.readFile(path.join(process.cwd(), 'lessons', id, 'solution.js'), 'utf8');
-      res.json({ solution });
+      const raw = await fs.readFile(path.join(process.cwd(), 'public', 'lessons-manifest.json'), 'utf8');
+      ids = JSON.parse(raw).lessons.filter((l) => l.type === 'assignment').slice(0, 5).map((l) => l.id);
     } catch {
-      res.status(404).json({ error: 'No solution for this lesson' });
+      ids = [];
     }
+    const base = {
+      state: null, score: null, submittedScore: null, possible: null,
+      late: false, pending: false, completedAt: null, submittedAt: null,
+      teacherFeedback: null, teacherReviewedAt: null,
+    };
+    const fixtures = [
+      { ...base, state: 'completed', score: 100, completedAt: now - 6 * day, due: now - 7 * day + day },
+      { ...base, state: 'completed', score: 90, submittedScore: 18, possible: 20, completedAt: now - day, late: true, due: now - 3 * day },
+      { ...base, state: 'completed', score: 75, submittedScore: 15, possible: 20, completedAt: now - 2 * day,
+        teacherFeedback: 'Nice work on the nested loop. Next time give the counter a clearer name than i, and add a comment above draw() saying what it animates.',
+        teacherReviewedAt: now - day, due: now - 2 * day },
+      { ...base, pending: true, submittedAt: now - 3600000, due: now + 2 * day },
+      { ...base, late: true, due: now - day },
+    ];
+    const cells = {};
+    const dueDates = {};
+    ids.forEach((id, i) => {
+      const { due, ...cell } = fixtures[i];
+      cells[id] = cell;
+      if (due) dueDates[id] = due;
+    });
+    res.json({ cells, dueDates });
+  });
+  // Reference solutions (admin/teacher "View solution" button). Dev reads the
+  // lesson straight from disk; the Pages Function serves the generated map.
+  // Both must answer with the same shape, so this mirrors
+  // functions/api/lesson-solution/[id].ts.
+  //
+  // It used to read solution.js and nothing else, so every lesson using the
+  // solution/ DIRECTORY form 404'd locally while working in production --
+  // 1.3.19, 7.1.1 and 1.6.1. That is the form CLAUDE.md documents for an
+  // assignment grading more than one file, and it is also how a diagram
+  // lesson stores its reference chart, so "no solution" in the browser meant
+  // "not implemented in dev" rather than anything about the lesson.
+  server.get('/api/lesson-solution/:id', async (req, res) => {
+    // NOT decodeURIComponent(req.params.id) -- Express has ALREADY decoded the
+    // param, so decoding again turns %252e%252e into .. after the router has
+    // stopped looking. CLAUDE.md's always-decode rule is about Pages Functions,
+    // which do not decode for you. Express does.
+    const found = await readLessonSolution(req.params.id, LESSONS_ROOT());
+    if (!found) return res.status(404).json({ error: 'No solution for this lesson' });
+    res.json(found);
   });
 
   // Scope express.json() to the Express-owned route only. Applying it globally
@@ -141,7 +355,11 @@ app.prepare().then(() => {
   server.post('/api/grade', express.json(), async (req, res) => {
     const { lessonId, files } = req.body;
     try {
-      const lessonDir = path.join(process.cwd(), 'lessons', lessonId);
+      // Same traversal guard as /api/lesson-solution. lessonId arrives in a
+      // JSON body here rather than the path, which makes it MORE attacker-
+      // shaped, not less -- nothing upstream normalises it at all.
+      const lessonDir = await resolveLessonDir(lessonId);
+      if (!lessonDir) return res.status(404).json({ error: 'No such lesson' });
       const meta = JSON.parse(
         await fs.readFile(path.join(lessonDir, 'lesson.json'), 'utf8')
       );

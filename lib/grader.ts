@@ -1,6 +1,20 @@
 import type { Requirement } from './types';
+import type { ModelDoc } from './model-types';
+import { checkModel, type Refusals } from './model-check';
 
-export interface GradeResult {
+/** The reSHape ModelDoc a `model` requirement checks against. Optional and
+ *  last so every existing caller — which passes only
+ *  (requirements, files, passingScore) — keeps working unchanged; a caller
+ *  with no reSHape lesson in play simply never supplies it, and a `model`
+ *  requirement then fails via checkModel's own null-doc message. */
+export interface GradeContext {
+  modelDoc?: ModelDoc | null;
+  /** Feature ids the kernel refused to build, with its reason; a refused
+   *  feature does not count towards a `model` requirement. */
+  refusals?: Refusals | null;
+}
+
+interface GradeResult {
   id: string;
   title: string;
   status: 'passed' | 'failed';
@@ -108,11 +122,13 @@ function checkInFunction(req: Requirement, files: Record<string, string>): boole
 export function grade(
   requirements: Requirement[],
   files: Record<string, string>,
-  passingScore: number = 0
+  passingScore: number = 0,
+  context?: GradeContext
 ): GradeReport {
   const results: GradeResult[] = requirements.map((req) => {
     const type = req.type || 'regex';
     let passed = false;
+    let modelMessage: string | null = null;
 
     switch (type) {
       case 'regex':
@@ -129,6 +145,16 @@ export function grade(
       case 'custom':
         passed = false;
         break;
+      case 'model':
+        {
+          const result = checkModel(req, context?.modelDoc ?? null, context?.refusals ?? null);
+          passed = result.passed;
+          // The checker's own sentence ("Expected a round 3; the round could
+          // not be built: ...") is the only place the kernel's reason reaches
+          // the student without clicking the warning step.
+          if (!passed && result.message) modelMessage = result.message;
+        }
+        break;
     }
 
     const points = req.points || 0;
@@ -141,7 +167,7 @@ export function grade(
       // why, so a correct-looking answer that missed by one token read as
       // the grader being arbitrary (issue report #9). Both renderers
       // already handled `messages`; nothing ever filled it.
-      messages: !passed && req.hint ? [req.hint] : [],
+      messages: passed ? [] : [...(modelMessage ? [modelMessage] : []), ...(req.hint ? [req.hint] : [])],
       pointsEarned: passed ? points : 0,
       pointsPossible: points,
     };

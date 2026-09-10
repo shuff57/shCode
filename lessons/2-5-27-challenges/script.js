@@ -1,4 +1,4 @@
-// 2.5.27 Challenges -- Optional Stretch
+// 2.5.27 Challenges: Stretch Problems
 
 // CHALLENGE 1: Divide Safely
 //   JavaScript does NOT throw on division by zero -- it returns

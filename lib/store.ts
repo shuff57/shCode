@@ -19,11 +19,6 @@ interface UIState {
   activeSidebarTab: 'Files' | 'Grading';
 }
 
-/** Coerce stale persisted value 'Steps' → 'Grading'. */
-export function parseTab(raw: unknown): 'Files' | 'Grading' {
-  if (raw === 'Files') return 'Files';
-  return 'Grading';
-}
 
 interface LessonState {
   // Lesson
@@ -90,7 +85,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       files.map((f) => [f.path, normalizeEol(f.content || '')])
     );
 
-    // For JS-only preview modes (console, jscad, moshion), default to script.js
+    // For JS-only preview modes (console, reshape, moshion), default to script.js
     const jsPreviewModes = ['console', 'reshape', 'moshion'];
     const defaultFile = jsPreviewModes.includes(lesson.preview || '')
       ? (files.find((f) => f.path.endsWith('.js'))?.path || files[0]?.path)

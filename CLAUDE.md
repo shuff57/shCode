@@ -11,6 +11,187 @@ route is a Pages Function in `functions/`, backed by a single D1 database
 > cycle. The top section is the most recent. When a section is stale or its decisions
 > are made, delete that section; when the file is empty, delete the file and this note.
 
+## JSCAD is retired. Do not build new modelling work on it.
+
+**Decision, 2026-09-01.** JSCAD is the engine reSHape currently runs on and it
+is the thing being replaced. It is not a target. Anything new that needs
+geometry should be written so that the swap does not have to touch it.
+
+This note exists because the tree does not say so on its own: `HANDOFF.md`
+describes reSHape as "a plain-words surface over `@jscad/modeling`", the
+vendored bundle sits in `public/reshape/lib/`, and 227 doc examples run against
+it in `npm test`. Read only the code and you would reasonably conclude JSCAD is
+the direction. It is not.
+
+**It cannot simply be deleted.** Every preview goes through it, the whole
+reference teaches its API, and removing it breaks the app. Retired here means
+*no new dependence*, not *gone*.
+
+**Update, 2026-09-03.** The B-rep kernel is now the DEFAULT engine for
+reSHape's Build side (`?engine=jscad` opts back in) and ships with the site
+(`public/reshape/kernel/`, gitignored, rebuilt by `prebuild`; deploy from a
+worktree with the wasm copied in). The gauntlets that settled this: `.gauntlet/chili3d-verdicts.json`
+(12/12 blind vs Chili3D), `.gauntlet/oracle.json` + `scripts/test-occt-adapter.mjs`
+(134/134 vs the JSCAD oracle), `.gauntlet/brep-default-lenses.json` (three
+student lenses, two rounds).
+
+**Update, 2026-09-03, later.** Code mode now runs **reSHape Script**
+(`lib/reshape-script.ts`, spec `.gauntlet/SPEC-reshape-script.md`): a script
+is the Build timeline written down, every call appends a feature to the same
+`ModelDoc`, the sandboxed iframe (`public/reshape/script-runner.html`) posts
+JSON only and the parent builds it on the kernel. `public/reshape/docs/reference.md`
+and `lib/reshape-docs.ts` teach that language; the JSCAD reference is
+`public/reshape/docs/jscad-legacy.md`, reachable with `?engine=jscad`
+(`?script=0` keeps the kernel for Build but the JSCAD runner for Code). Every
+check that measures the JSCAD shim (`test-reshape.mjs`, `reshape-simple-checks.mjs`,
+`check-docs-prose.mjs`) reads the legacy file through the harness's
+`docText.legacy()`; `test-reshape-script.mjs` runs every reference fence and
+in-app page on the kernel (195/195). Record: `.gauntlet/reshape-script-loop.json`.
+The JSCAD runner and `public/reshape/lib/` are due for deletion one release
+after this.
+
+**Update, 2026-09-04.** Visual and workflow parity loop against Chili3D (3D)
+and jsketcher's standalone sketcher (2D), blind judges, five rounds: all
+twelve pieces ours or at parity. Record and the kernel/naming facts it
+settled: `.gauntlet/reshape-parity-loop.json`. Two rules it left in the
+code: every operation that rebuilds the shape registers an op in the build
+history (fillet and shell now do, like the booleans), and a `between` edge
+name is resolved through its two faces, never through a fillet's edge
+history. The Rules panel is a docked column; a sketch is viewed flat and
+fitted to the visible canvas; Home fits the model.
+
+**Update, 2026-09-04, evening.** reSHape now lives inside lessons. Module
+8.1 Solid Shapes (`lessons/8-1-*`, `curriculum/modules/8.1_solid-shapes.md`,
+category "Unit 3: reSHape: Solid Modelling") is the first; every lesson
+passes the three cs-student lenses in a real browser (record:
+`.gauntlet/reshape-module-loop.json`). The pieces a lesson author needs:
+`preview: "reshape"` mounts `components/reshape/ReshapeStudio.tsx` (the
+sandbox's reSHape half, extracted); `mode: visual | code | both` picks the
+side(s) through `lib/lesson-mode.ts`; `script.js` is the one saved artifact
+(Build regenerates it, reload rebuilds the model from it); a requirement of
+`type: "model"` checks the built `ModelDoc` through `lib/model-check.ts`
+(named fields only, tolerance 0.01, a feature the kernel refused does not
+count, sentences in the course's words). Targets must not equal a tool's
+default (Box 40x40x20, Hole 6, Hollow wall 2, Round 4) or the typing step
+is never exercised. `scripts/check-reshape-solutions.mjs` builds every
+reference and starter on the kernel; `scripts/verify-reshape-grading.py`
+and `scripts/verify-reshape-lesson.py` drive the browser. For a student
+walk on the dev server use `DEV_ROLE=student npm run dev` and a
+`dev_student=<name>` cookie per browser (server.js keeps that identity's
+progress in memory).
+
+**Update, 2026-09-05.** Tool-by-tool parity loop against Chili3D (3D) and
+jsketcher's sketcher (2D), blind judges, one piece per Build tool plus the
+four defects the six-task loop left open: record and the bar facts it
+settled in `.gauntlet/reshape-tool-parity-loop.json`. Rules a lesson author
+or a builder now relies on: a sketch rule is drawn on the geometry (dash,
+tick, slanted tick, right-angle square, pin), never a floating chip; the
+Rules panel's words are Level / Upright / Equal / Parallel / Right angle /
+Pin, the pair cell is a picker (never a cycle), and the same rules appear as
+a strip beside a clicked edge or corner; a rule added in Build survives the
+Code round trip through `sk.across()/up()/length()/equal()/parallel()/
+perpendicular()/pin()` (lib/reshape-script.ts, emitted by
+lib/reshape-script-gen.ts); a between-edges rule is solved fewest-movers and
+refused if any edge or the area would lose 75% (`collapsedByRatio`); a
+conflict drops the oldest one or two non-lock rules with a calm note, a lock
+last. On the solid side: the chamfer tool is "Bevel" everywhere (reference
+wins over the toolbar); every round shape's panel says "across" (diameter);
+Four Corners fields are "in from each side"; Shift-click builds a multi-edge
+selection for Round/Bevel; the pill reads the picked face or edge size off
+the kernel ("Box 1 · top face · 40 x 40"); Delete on a step with dependents
+confirms by name and says afterwards what went; Blend accepts a circle; a
+single-edge round ending in a sharp cap at the far vertex is correct B-rep
+behaviour, not a defect. Capture rule learned twice: a blind pack must crop
+chrome, not controls (the docked Rules column, the timeline strip), and a
+win over an invalid bar shot is void until the bar is recaptured with its
+sizes proven by the bar's own Measure tool.
+
+**Update, 2026-09-05, later.** The JSCAD runner is gone: `public/reshape/runner.html`,
+`public/reshape/reshape.js`, `public/reshape/svg.js`, the vendored bundles under
+`public/reshape/lib/`, `public/reshape/docs/jscad-legacy.md`, and the scripts that
+only ever measured them (`test-reshape.mjs`, `reshape-harness.mjs`,
+`reshape-simple-checks.mjs`, `reshape-checks.mjs`, `reshape-render-check.mjs`,
+`reshape-build-harness.cjs`, `check-runner-hoisting.mjs`, `oracle-measure.mjs`) are
+all deleted. `lib/model-codegen.ts`'s `toReshape()` (the JSCAD text emitter) is
+deleted with it; the file keeps only the doc-level helpers (`generatedParams`,
+`applyParam`, `paramValues`, `solveDoc`, `solveSketchDrag`) that `lib/reshape-script.ts`
+and `lib/reshape-script-gen.ts` still import. `?engine=jscad` and `?script=0` no
+longer exist — the kernel is the only engine, unconditionally, on both sides.
+`.gauntlet/oracle.json` is now a frozen fixture: it was recorded from
+`@jscad/modeling` 2.13.0 by the now-deleted `oracle-measure.mjs` and can no longer
+be regenerated, so `scripts/test-occt-adapter.mjs` reads it as a fixed baseline
+going forward (its `exact` fields are the real targets; the tessellated `volume`
+field is history). The docs live preview and the docs-drawer snippet, which used
+to send reSHape Script to the JSCAD runner and fail with `ReferenceError: box is
+not defined`, now run through `components/ReshapeScriptPreview.tsx` onto the
+kernel, same as everywhere else.
+
+**Update, 2026-09-05, evening.** The sweep after the runner:
+`public/reshape/docs/challenges.md` (the JSCAD challenge ladder) and its card
+on the docs index, `app/brep-three/` (the spike page twinning the deleted
+`/brep-test/`), `lessons/_retired/jscad-*`, `scripts/sandbox-checks.py` and
+`scripts/sandbox-mutations.py` (they drove `public/jscad/runner.html`; their
+`test:sandbox*` npm aliases went with them), `scripts/_prose-dump.mjs` and
+`scripts/audit-book-conversion.mjs` are deleted. `scripts/generate-lesson-starters.mjs`
+no longer walks `lessons/_retired/` -- it had been shipping the retired JSCAD
+starters into the Pages Functions worker. `scripts/drive-phase-b.py` section 4
+drives the studio's Export STL/OBJ/3MF buttons instead of the runner's Save
+bar. Kept on purpose: the `/docs/jscad/*` redirects, the `sandbox-jscad*`
+localStorage rename in `lib/version-control.ts`, `.gauntlet/oracle.json`, and
+the comments that compare kernel results with the old engine.
+
+### Where the line already falls
+
+Measured 2026-09-01 across the 55 files that round of work touched (see the
+2026-09-05 update above for what has since been deleted outright):
+
+| Layer | Couples to JSCAD? |
+| --- | --- |
+| `lib/least-squares.ts`, `lib/sketch-solve.ts`, `lib/sketch-arc.ts` | **no** -- zero mentions |
+| `components/model/*` (Rules panel, handles, overlay) | **no** -- zero mentions |
+| `lib/model-types.ts` (`ModelDoc`, the Feature kinds) | comments only |
+| **`lib/model-codegen.ts`** | no longer emits engine calls at all -- `toReshape()` is deleted; the surviving exports are doc-level only |
+| `public/reshape/reshape.js` + `public/reshape/lib/` | **deleted** -- was the shim and the bundle |
+| `public/reshape/docs/reference.md` + its 227 examples | **deleted the JSCAD half** -- reference.md now teaches reSHape Script only (public/reshape/docs/jscad-legacy.md, the JSCAD copy, is deleted) |
+
+`ModelDoc` is the interface and it is already the right one. Everything above it
+is first-party and portable; `model-codegen.ts` is the one file that turns a
+document into engine calls. **Keep it that way.** A new feature that reaches
+past `ModelDoc` into JSCAD directly is the thing this note is trying to prevent.
+
+### What has already moved off it
+
+The sketch solver. `lib/sketch-solve.ts` was relaxation and is now least
+squares over `lib/least-squares.ts` -- first-party, MIT, no payload, and able to
+express tangency, which relaxation could not. That is the pattern for the rest:
+own the layer, keep `ModelDoc` as the seam.
+
+### The kernel: B-rep, and the hard part is not the kernel
+
+A B-rep kernel WAS refused on 2026-09-01 and the refusal was reversed the same
+day. The refusal weighed B-rep by which toolbar entries it unlocks; the goal is
+a true parametric modeller with persistent face and edge references, and that is
+a representation, not a feature list. A mesh has no face to refer to -- which is
+exactly why Bevel on a cylinder is currently a hull of two cylinders instead of
+a chamfer.
+
+Corrected numbers, since the first pass overstated them: OpenCascade via
+`replicad-opencascadejs` is 21.9 MB uncompressed but **6.9 MB gzipped**, cached
+after first load, and the runner is already conditional on
+`lesson.preview === 'reshape'` rather than loading on every page. LGPL-2.1 for a
+wasm module loaded at runtime is the case that licence was written for and does
+not reach our own code.
+
+**The hard part is topological naming.** B-rep gives ADDRESSABLE faces, not
+PERSISTENT ones: change an upstream dimension, OCCT rebuilds, and the face
+indices are new. "Face 3" may not be the face the student clicked. FreeCAD lived
+with this as its most notorious defect for over a decade. It is a design problem
+we own on top of the kernel, and adopting the kernel is the easy half.
+
+One structural advantage: `ModelDoc` is already a feature history -- an ordered
+list of operations with stable ids -- which is exactly what a naming scheme needs
+and what most CAD systems have to retrofit. Ours exists because the timeline
+demanded it.
 ## Runtime layout
 
 - **Client** — React 19 (+ CodeMirror, Zustand, lucide-react). Builds to `out/` via
@@ -45,6 +226,11 @@ Cloudflare dashboard env vars pane (plain vars):
 | `AUTH_SECRET` | secret | HS256 signing key for session JWTs |
 | `OLLAMA_API_KEY` | secret | Bearer token for `https://ollama.com/api/chat` |
 | `OLLAMA_HOST` | var (optional) | Override Ollama endpoint (defaults to `https://ollama.com`) |
+| `AI` | **binding** | Workers AI. Not a variable — attach it in the dashboard: Pages → shcode → Settings → Functions → **AI bindings**, name `AI`. `wrangler.toml`'s `[ai]` block covers local dev only. Absent ⇒ the fast grader reports unavailable and the picker hides it; grading still works on the other targets. |
+| `WORKERS_AI_MODEL` | var (optional) | Model id for the `workersai` target. Defaults to `@cf/google/gemma-4-26b-a4b-it`. **Do not swap this for a frontier model** (`kimi-k2.*`, `glm-5.2`) — those carry a 20-requests-per-minute account cap, measured to refuse 5 of 25 simultaneous submissions. Ordinary text-generation models get 300/min. |
+| `OLLAMA_LOCAL_HOST` | var (optional) | Second grading target — the "Classroom grader" in the student dropdown. Must be reachable **from Cloudflare**, so a LAN address will not work; publish the box through a Cloudflare Tunnel. |
+| `OLLAMA_LOCAL_MODEL` | var (optional) | Model id as the *local* server names it. No default: a lesson's `model` is a cloud id and will not exist on the box. Without this the local grader stays unavailable even when the host is set. |
+| `OLLAMA_LOCAL_API_KEY` | secret (optional) | Bearer token for the local server. Omit for an unauthenticated box — the Function then sends no `Authorization` header at all. |
 | `ADMIN_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='admin'` |
 | `TEACHER_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='teacher'` |
 | `AI_HELP_DAILY_LIMIT` | var (optional) | Per-student per-unit daily quota for `POST /api/ai-help`; default `10`. Each unit gets its own bucket. Teachers/admins are exempt. |
@@ -53,7 +239,8 @@ Cloudflare dashboard env vars pane (plain vars):
 ## D1 schema
 
 Applied in migration order. Every ALTER/CREATE uses `IF NOT EXISTS` so re-applies
-are safe. Apply with `npx wrangler d1 migrations apply shcode-commits --remote`.
+are safe. Apply with `npm run d1:migrate` (see Build + deploy — that wrapper
+retries Cloudflare's transient failures; bare `wrangler` does not).
 
 ### Table highlights
 
@@ -67,6 +254,19 @@ are safe. Apply with `npx wrangler d1 migrations apply shcode-commits --remote`.
   buys ~10× on student code.
 - `commits.authored_by_email`: teacher email on teacher pushes; NULL or
   `student_email` for own commits.
+- `class_open_dates` (0023) is the "available after" gate and the mirror of
+  `class_due_dates`: same `(class_id, scope, scope_id)` key, same
+  lesson-over-module-over-unit inheritance, same school timezone. The
+  difference is what they mean — a due date is advisory, an open date
+  **locks**. Two tables rather than one nullable column because
+  `class_due_dates.due_at` is NOT NULL and SQLite cannot relax that in place.
+  **A lesson-id rename migration must UPDATE BOTH tables** where
+  `scope = 'lesson'`; an orphaned due row only loses a badge, but an orphaned
+  open row leaves a lesson locked with no findable date holding it shut.
+- Both `due_at` and `open_at` now carry a real time of day. Every row written
+  before 0023 sits at 23:59:59.999, and the due-dates route special-cases the
+  `23:59` an `<input type="time">` reads back so re-saving one does not
+  silently move it 59.999s earlier.
 
 ## API surface
 
@@ -77,12 +277,66 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 
 - There is no `PUT /api/lesson-state` and no per-lesson GET — read state from
   the bulk `GET /api/lesson-state`.
+- `GET|PUT /api/classes/[id]/open-dates` is the "available after" editor, the
+  deliberate sibling of `due-dates` (same auth, same entries array, same
+  batching). Both entry shapes take an optional `time: 'HH:MM'`.
+- `GET /api/my-due-dates` carries BOTH kinds — `rows` (due) and `openRows`
+  (open) — per class. One endpoint, because a lesson's lock state must not
+  flicker because one of two fetches landed first.
+- **The open-date lock is enforced client-side only**, in
+  `components/LessonAccessGate.tsx` and the two list components. That matches
+  the existing green-to-advance gate, which is also client-side. A determined
+  student can still reach a not-yet-open lesson's data through the API.
+  `functions/_shared/dueDates.ts` exports `isLessonAvailableForStudent` ready
+  for a route that wants to enforce it server-side; nothing calls it yet.
 - `lesson-drafts` doubles as diagram storage (the serialized `DiagramDoc`);
   there is no diagram-specific table.
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
 - `POST /api/ai-help` streams `text/plain`, trims code blocks to <=3 lines, and
   is quota'd per student **per unit** per UTC day (`AI_HELP_DAILY_LIMIT`).
+- `POST /api/grade-written?stream=1` answers **NDJSON**: zero or more `{stage}`
+  lines while work happens, then exactly one terminal `{result}` or `{error}`
+  line. Without the query param the response is one plain JSON object, byte for
+  byte as before, and the client falls back to that when the content type is
+  not ndjson. Two rules hold the design together. **Every guard that can refuse
+  runs before the first byte** — once a byte is written the HTTP status is
+  committed, so a 429 or 503 could not be expressed any more. And **the model's
+  own tokens are never forwarded**: a half-arrived grade is meaningless, and a
+  rubric verdict the model then revises would lie to the student about their
+  score. Stage labels move; the grade appears once, whole.
+- The grader target is chosen by an enum, and there are three. `workersai` is
+  the **Workers AI binding** and the preferred one: no host, no key, no tunnel,
+  nothing to keep alive. `resolveTargets()` marks each target `kind: 'ollama'`
+  (an HTTP endpoint we fetch) or `kind: 'binding'` (an object Cloudflare hands
+  the Function); everything downstream branches on that and nothing else. The
+  default is resolved **per request** by `pickDefault()` walking
+  `['workersai', 'cloud', 'local']` and taking the first available, so a deploy
+  that never adds the AI binding keeps grading on `cloud` instead of 503ing.
+  `DEFAULT_GRADER` stays `'cloud'` as the last-resort constant for that reason.
+- **`max_tokens` on the Workers AI path is load-bearing** (`WORKERS_AI_MAX_TOKENS`,
+  8000). At 1500 a reasoning model spent its whole budget on its `reasoning`
+  field, stopped with `finish_reason: "length"`, and returned `content: null` —
+  which is indistinguishable from "this model cannot produce JSON" unless you
+  read `finish_reason`. That mistake made a first benchmark run score two
+  perfectly good models at 85% and 30%; both are 20/20. A null `content` is now
+  reported by name rather than read as `''`.
+- Model choice was **measured, not assumed** (2026-09-05, against the repo's own
+  rubrics via `buildPrompt` and `isPassingGrade`): `gemma-4-26b-a4b-it` and
+  `glm-5.3-flash` both scored 20/20 on a labelled set of strong / thin /
+  off-topic / prompt-injection answers. Only the burst separated them —
+  25 simultaneous submissions gave 25/25 for gemma and 20/25 for glm, the five
+  refusals being `3021: rate limiting`, i.e. the 20-rpm frontier cap. Cost ran
+  75–81 neurons per grade, so ~130 grades/day inside the free 10,000.
+- `GET /api/grade-written` lists the grading targets this deploy can run —
+  `workersai` (the binding), `cloud` (hosted) and `local` (the school's own box). The student picks between
+  them in `components/GraderPicker.tsx`; the choice is remembered per browser
+  and travels as a `grader` **enum** on the POST body. It is never a host, a
+  model, or a key — those are read from env in `resolveTargets()` and nowhere
+  else, for the same reason the rubric is: a client-supplied host is the
+  client-supplied-rubric hole one level down. An unconfigured target refuses
+  with 503 + `offline: true` rather than silently falling back, and both targets
+  share one rate-limit bucket so flipping the dropdown cannot reset the cap.
 - `POST /api/grade-written` takes **only** `lessonId` and `response` from the
   client. The rubric, prompt, model and contextDocs are read server-side from
   `public/ai-graders.json` (generated by `scripts/generate-ai-graders.mjs`,
@@ -129,9 +383,19 @@ npm run dev            # port 3002
 npm run build                                                   # static export to ./out
 npx wrangler pages deploy out --project-name shcode --branch cs-3d
 
-# D1 migrations
-npx wrangler d1 migrations apply shcode-commits --remote        # prod
-npx wrangler d1 migrations apply shcode-commits --local         # local dev DB
+# D1 migrations. Go through scripts/d1.mjs, not bare wrangler -- it retries the
+# transient Cloudflare failures and, when retries run out, tells you whether the
+# problem is Cloudflare or your credentials.
+npm run d1:status                                               # what's applied in prod
+npm run d1:migrate                                              # prod
+npm run d1 -- migrations apply shcode-commits --local           # local dev DB
+
+# A `--remote` d1 command can fail with "The given account is not valid or is not
+# authorized to access this service [code: 7403]" and mean nothing at all --
+# observed 2026-09-02, transient, gone on the next attempt with no re-auth.
+# It is NOT a login problem: `wrangler d1 list` kept working on the same token
+# throughout. The wrapper above absorbs this. If you ran bare wrangler and hit
+# it, retry once before touching `wrangler login`, token scopes, or database_id.
 
 # R2 bucket for image uploads — ONE TIME, before uploads will work at all.
 # Without it POST /api/uploads returns 500 "Uploads are not configured".

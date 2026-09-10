@@ -27,8 +27,10 @@ const read = (p) => readFileSync(path.join(root, p), 'utf8');
 const stripComments = (s) =>
   s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
 
-const SOLVER = 'lib/sketch-solve.ts';
-const PANEL = 'components/model/SketchConstraints.tsx';
+// Moved to reshape-cad's packages/sketch and packages/studio (B1 extraction,
+// plan: freecad-browser.md) -- read from there now, one level up.
+const SOLVER = '../reshape-cad/packages/sketch/src/sketch-solve.ts';
+const PANEL = '../reshape-cad/packages/studio/src/model/SketchConstraints.tsx';
 
 // `;\s*$` and not `;\n` -- this repo's files are CRLF on Windows checkouts,
 // and a \n-anchored match here failed to find a union that was sitting right

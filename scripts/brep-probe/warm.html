@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>reSHape kernel cache-warming probe</title>
+<!--
+  DOES WARMING THE CACHE ACTUALLY HELP THE PREVIEW?
+
+  The proposal is simple: fetch the B-rep kernel from a page the student is
+  already on -- a module index, a lesson's reading -- so the 3.82 MB arrives
+  while they read instead of while they wait on a model.
+
+  THE PART THAT IS NOT SIMPLE, and the only reason this page exists. The
+  preview runs in an iframe sandboxed WITHOUT allow-same-origin, which puts it
+  in an OPAQUE origin. Browsers partition the HTTP cache by a key that includes
+  the requesting frame, and an opaque origin is not the same key as the parent
+  page. So a fetch made by the parent may be completely invisible to the
+  iframe, and the warming would be 3.82 MB of wasted bandwidth that makes the
+  wait LONGER rather than shorter.
+
+  That cannot be reasoned out from the spec text -- partitioning behaviour
+  differs between browsers and versions. So: warm, then load the real sandboxed
+  frame, and time it. Under throttling the two outcomes are far apart and
+  cannot be confused. A cache hit initialises in about a second; a miss re-downloads.
+
+  ?warm=0 skips the prefetch, which is the control. Without it a fast run would
+  prove nothing -- it could just be a fast connection.
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: #191a21; color: #f8f8f2;
+    font: 13px/1.6 ui-monospace, Menlo, Consolas, monospace; display: flex;
+    flex-direction: column; }
+  header { padding: 10px 14px; border-bottom: 1px solid #44475a; }
+  .row { display: flex; gap: 10px; }
+  .row span:first-child { color: #6272a4; min-width: 190px; }
+  b { color: #50fa7b; font-weight: 600; }
+  .bad b { color: #ff5555; }
+  iframe { flex: 1 1 auto; width: 100%; border: 0; }
+</style>
+</head>
+<body>
+<header id="log"></header>
+<iframe id="probe" sandbox="allow-scripts allow-downloads" allow="fullscreen"></iframe>
+<script>
+  var params = new URLSearchParams(location.search);
+  var WARM = params.get('warm') !== '0';
+  var logEl = document.getElementById('log');
+  var report = { warmed: WARM };
+
+  function say(label, value, bad) {
+    var d = document.createElement('div');
+    d.className = 'row' + (bad ? ' bad' : '');
+    d.innerHTML = '<span></span><b></b>';
+    d.children[0].textContent = label;
+    d.children[1].textContent = value;
+    logEl.appendChild(d);
+  }
+
+  function loadFrame() {
+    var t = performance.now();
+    var frame = document.getElementById('probe');
+    window.addEventListener('message', function (e) {
+      if (e.source !== frame.contentWindow) return;
+      if (!e.data || e.data.type !== 'brep-probe') return;
+      report.frame = e.data.report;
+      report.frameWallMs = Math.round(performance.now() - t);
+      say('sandboxed frame ready', report.frameWallMs + ' ms');
+      say('  its kernel init', e.data.report.initMs + ' ms');
+      // THE VERDICT. Under throttling a cache hit and a re-download are an
+      // order of magnitude apart, so no threshold tuning is needed.
+      report.handedBytes = e.data.report.handedBytes || 0;
+      report.cacheHelped = (WARM || HANDOFF) && e.data.report.initMs < 5000;
+      say('frame skipped the network?',
+        HANDOFF ? (report.cacheHelped ? 'YES — bytes handed in' : 'NO')
+          : WARM ? (report.cacheHelped ? 'YES' : 'NO — partitioned away')
+            : 'n/a (control run)',
+        (WARM || HANDOFF) && !report.cacheHelped);
+      window.__warmReport = report;
+      document.title = 'WARM DONE';
+    });
+    frame.src = './brep.html';
+  }
+
+  // MODE 3, and the only one that works. The parent fetches the kernel, keeps
+  // the bytes, and posts them into the frame on request. The frame never goes
+  // to the network, so the cache partition that defeated plain warming never
+  // enters into it.
+  var HANDOFF = params.get('handoff') === '1';
+  var kernelBytes = null;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'brep-kernel-please') return;
+    if (!kernelBytes) return;
+    // Transferred rather than copied: a 3.8 MB structured clone per preview is
+    // not free, and there is exactly one consumer.
+    e.source.postMessage({ type: 'brep-kernel-bytes', bytes: kernelBytes },
+      '*', [kernelBytes]);
+    kernelBytes = null;
+  });
+
+  if (HANDOFF) {
+    say('mode', 'parent fetches, hands the BYTES to the frame');
+    var th = performance.now();
+    fetch('./replicad_single.wasm')
+      .then(function (r) { return r.arrayBuffer(); })
+      .then(function (b) {
+        kernelBytes = b;
+        report.warmMs = Math.round(performance.now() - th);
+        report.warmBytes = b.byteLength;
+        say('parent fetch done', report.warmMs + ' ms, '
+          + (b.byteLength / 1048576).toFixed(2) + ' MB');
+        loadFrame();
+      })
+      .catch(function (e) { say('parent fetch FAILED', String(e.message || e), true); });
+  } else if (!WARM) {
+    say('prefetch', 'SKIPPED (control)');
+    report.warmMs = 0;
+    loadFrame();
+  } else {
+    say('prefetch', 'fetching the kernel from the PARENT page…');
+    var t0 = performance.now();
+    // Exactly what a module index page would do: pull the wasm into the HTTP
+    // cache and throw the bytes away. No parsing, no instantiating -- the point
+    // is only that the file is local when the preview asks for it.
+    fetch('./replicad_single.wasm', { cache: 'force-cache' })
+      .then(function (r) { return r.arrayBuffer(); })
+      .then(function (b) {
+        report.warmMs = Math.round(performance.now() - t0);
+        report.warmBytes = b.byteLength;
+        say('prefetch done', report.warmMs + ' ms, '
+          + (b.byteLength / 1048576).toFixed(2) + ' MB');
+        loadFrame();
+      })
+      .catch(function (e) {
+        say('prefetch FAILED', String(e.message || e), true);
+        report.warmError = String(e.message || e);
+        loadFrame();
+      });
+  }
+</script>
+</body>
+</html>
