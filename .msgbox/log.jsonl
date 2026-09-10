@@ -78,3 +78,5 @@
 {"ts":"2026-08-30T02:01:34.785Z","kind":"claim","from":"opencode","paths":["components/SandboxWorkspace.tsx"]}
 {"ts":"2026-08-30T02:01:34.893Z","kind":"claim","from":"opencode","paths":["components/model/HandleOverlay.tsx"]}
 {"ts":"2026-08-30T02:06:43.910Z","kind":"release","from":"opencode","all":true}
+{"ts":"2026-08-31T15:46:14.941Z","kind":"claim","from":"claude","paths":["lessons/"]}
+{"ts":"2026-08-31T16:01:16.931Z","kind":"release","from":"claude","all":true}
