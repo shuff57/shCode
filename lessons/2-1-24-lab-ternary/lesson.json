@@ -27,22 +27,29 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "ternary operator used",
-      "description": "Code contains a ? ...: ternary expression",
+      "title": "ternary on isMember yields 20 : 0",
+      "description": "A ternary references isMember and chooses between 20 and 0, in that order",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\?[^:?]*:",
-      "flags": "i",
+      "pattern": "isMember[^\\n;]*\\?[^\\n;]*20[^\\n;]*:[^\\n;]*0",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "console.log present",
-      "description": "Code calls console.log",
+      "title": "discount assigned from the isMember ternary",
+      "description": "discount is assigned using a ternary on isMember",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(",
-      "flags": "i",
+      "pattern": "discount\\s*=[^\\n;]*isMember[^\\n;]*\\?",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "discount is logged",
+      "description": "console.log is called with the discount variable",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*discount\\s*\\)",
       "points": 0
     }
   ],

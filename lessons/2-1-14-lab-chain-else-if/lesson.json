@@ -27,32 +27,38 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "if statement present",
-      "description": "Code contains an if statement",
+      "title": "below 20 logs Low battery",
+      "description": "if condition checks batteryPercent < 20 and logs a message containing 'Low battery'",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(",
-      "flags": "i",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*batteryPercent\\s*<\\s*20\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\([^)]*Low battery",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "at least two else if branches",
-      "description": "Code contains two or more else if branches",
+      "title": "below 50 logs Battery ok",
+      "description": "else if condition checks batteryPercent < 50 and logs a message containing 'Battery ok'",
       "type": "regex",
       "file": "script.js",
-      "pattern": "else\\s+if\\s*\\([\\s\\S]*else\\s+if\\s*\\(",
-      "flags": "i",
+      "pattern": "else\\s+if\\s*\\(\\s*\\(?\\s*batteryPercent\\s*<\\s*50\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\([^)]*Battery ok",
       "points": 0
     },
     {
       "id": "r3",
-      "title": "final else present",
-      "description": "Code contains a closing else branch",
+      "title": "below 90 logs Battery good",
+      "description": "else if condition checks batteryPercent < 90 and logs a message containing 'Battery good'",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\}\\s*else\\s*\\{",
-      "flags": "i",
+      "pattern": "else\\s+if\\s*\\(\\s*\\(?\\s*batteryPercent\\s*<\\s*90\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\([^)]*Battery good",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "final else logs Battery full",
+      "description": "the closing else branch logs a message containing 'Battery full'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\}\\s*else\\s*\\{[^}]*console\\.log\\s*\\([^)]*Battery full",
       "points": 0
     }
   ],

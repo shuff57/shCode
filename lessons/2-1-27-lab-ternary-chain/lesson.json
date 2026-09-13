@@ -27,22 +27,38 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "at least two ternary operators chained",
-      "description": "Code contains two or more ? ...: ternary expressions",
+      "title": "90-or-above cutoff yields Excellent",
+      "description": "score >= 90 ? ... chooses Excellent",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\?[^:?]*:[\\s\\S]*\\?[^:?]*:",
-      "flags": "i",
+      "pattern": "score\\s*>=\\s*90\\s*\\?[^\\n;]*Excellent",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "console.log present",
-      "description": "Code calls console.log",
+      "title": "70-or-above cutoff yields Good, else Needs work",
+      "description": "score >= 70 ? chooses Good, otherwise Needs work",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(",
-      "flags": "i",
+      "pattern": "score\\s*>=\\s*70\\s*\\?[^\\n;]*Good[^\\n;]*:[^\\n;]*Needs work",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "rating assigned by checking 90 before 70",
+      "description": "rating is assigned from a chain that checks the 90 cutoff before the 70 cutoff",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "rating\\s*=[^\\n;]*score\\s*>=\\s*90[^\\n;]*\\?[^\\n;]*score\\s*>=\\s*70",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "rating is logged",
+      "description": "console.log is called with the rating variable",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*rating\\s*\\)",
       "points": 0
     }
   ],

@@ -27,22 +27,20 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "if statement present",
-      "description": "Code contains an if statement",
+      "title": "if statement checks score >= 70",
+      "description": "if statement's condition compares score to 70 with >=",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(",
-      "flags": "i",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*score\\s*>=\\s*70\\s*\\)?\\s*\\)",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "console.log present",
-      "description": "Code calls console.log",
+      "title": "console.log runs inside the if block",
+      "description": "console.log is called inside the score >= 70 if block",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(",
-      "flags": "i",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*score\\s*>=\\s*70\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\(",
       "points": 0
     }
   ],

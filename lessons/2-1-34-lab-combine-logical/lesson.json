@@ -27,41 +27,38 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "&& present",
-      "description": "if condition uses &&",
+      "title": "&& combines with a real variable",
+      "description": "if condition uses && together with a named variable, not a hardcoded true/false",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^{]*&&[^{]*\\)",
-      "flags": "i",
+      "pattern": "if\\s*\\((?=[^{]*&&)(?=[^{]*\\b(?!true\\b|false\\b)[A-Za-z_$][A-Za-z0-9_$]*\\b)[^{]*\\)",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "|| present",
-      "description": "if condition uses ||",
+      "title": "|| compares the same variable on both sides",
+      "description": "if condition uses || between two comparisons on the same variable (a range check, e.g. age < 5 || age >= 65)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^{]*\\|\\|[^{]*\\)",
-      "flags": "i",
+      "pattern": "if\\s*\\((?=[^{]*\\|\\|)(?:[^{]*\\b([A-Za-z_$][A-Za-z0-9_$]*)\\b\\s*(?:===|!==|==|!=|<=|>=|<|>)[^{]*\\|\\|[^{]*\\b\\1\\b\\s*(?:===|!==|==|!=|<=|>=|<|>))[^{]*\\)",
       "points": 0
     },
     {
       "id": "r3",
-      "title": "! present",
-      "description": "if condition uses !",
+      "title": "! flips a real variable",
+      "description": "if condition uses ! directly on a named variable, not a hardcoded literal",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^{]*!\\s*\\(?\\s*\\w",
-      "flags": "i",
+      "pattern": "if\\s*\\([^{]*!\\s*\\(?\\s*\\b(?!true\\b|false\\b)[A-Za-z_$][A-Za-z0-9_$]*\\b[^{]*\\)",
       "points": 0
     },
     {
       "id": "r4",
       "title": "all three combined in one condition",
-      "description": "A single if condition uses &&, || and ! together, not three separate ifs",
+      "description": "A single if condition uses &&, a same-variable range check with ||, and ! together, not three separate ifs",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\((?=[^{]*&&)(?=[^{]*\\|\\|)(?=[^{]*!\\s*\\(?\\s*\\w)[^{]*\\{",
+      "pattern": "if\\s*\\((?=[^{]*&&)(?=[^{]*!\\s*\\(?\\s*\\b(?!true\\b|false\\b)[A-Za-z_$][A-Za-z0-9_$]*\\b)(?=[^{]*\\b([A-Za-z_$][A-Za-z0-9_$]*)\\b\\s*(?:===|!==|==|!=|<=|>=|<|>)[^{]*\\|\\|[^{]*\\b\\1\\b\\s*(?:===|!==|==|!=|<=|>=|<|>))[^{]*\\{",
       "points": 0
     }
   ],

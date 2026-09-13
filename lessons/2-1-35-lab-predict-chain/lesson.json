@@ -27,12 +27,11 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "else if chain present",
-      "description": "Code contains an else if chain",
+      "title": "else if chain uses a real comparison",
+      "description": "Code contains an else if whose condition compares a variable, not a bare literal",
       "type": "regex",
       "file": "script.js",
-      "pattern": "else\\s+if\\s*\\(",
-      "flags": "i",
+      "pattern": "else\\s+if\\s*\\(\\s*\\(?\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*(?:===|!==|==|!=|<=|>=|<|>)",
       "points": 0
     },
     {
@@ -43,6 +42,15 @@
       "file": "script.js",
       "pattern": "\\?[^:?]*:[\\s\\S]*\\?[^:?]*:",
       "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "ternary chain uses a real comparison",
+      "description": "The ternary chain's condition compares a variable before the first ?, not a bare literal",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[A-Za-z_$][A-Za-z0-9_$]*\\s*(?:===|!==|==|!=|<=|>=|<|>)[^\\n;]*\\?[^:?]*:",
       "points": 0
     }
   ],

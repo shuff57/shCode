@@ -27,11 +27,11 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "switched value converted with Number()",
-      "description": "switch(...) wraps place in Number(...)",
+      "title": "switched value converted to a number",
+      "description": "switch(...) wraps place in Number(...), parseInt(...) or parseFloat(...)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "switch\\s*\\(\\s*Number\\s*\\(\\s*place\\s*\\)\\s*\\)",
+      "pattern": "switch\\s*\\(\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*\\)",
       "flags": "i",
       "points": 0
     },

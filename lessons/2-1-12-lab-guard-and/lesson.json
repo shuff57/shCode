@@ -27,12 +27,11 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "&& inside if condition",
-      "description": "if statement condition uses &&",
+      "title": "&& combines two real comparisons",
+      "description": "if statement condition uses && to combine two identifier-based comparisons, not just any two values",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^{]*&&[^{]*\\)",
-      "flags": "i",
+      "pattern": "if\\s*\\((?=[^{]*&&)(?:[^{]*\\b[A-Za-z_$][A-Za-z0-9_$]*\\b\\s*(?:===|!==|==|!=|<=|>=|<|>)){2,}[^{]*\\)",
       "points": 0
     },
     {

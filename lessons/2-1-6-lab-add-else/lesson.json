@@ -27,22 +27,20 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "if statement present",
-      "description": "Code contains an if statement",
+      "title": "if block checks score >= 70 and logs",
+      "description": "if statement's condition compares score to 70 with >=, and logs inside the block",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(",
-      "flags": "i",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*score\\s*>=\\s*70\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\(",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "else branch present",
-      "description": "Code contains an else branch",
+      "title": "else branch logs",
+      "description": "Code contains an else branch that calls console.log",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\}\\s*else\\s*\\{",
-      "flags": "i",
+      "pattern": "\\}\\s*else\\s*\\{[^}]*console\\.log\\s*\\(",
       "points": 0
     }
   ],

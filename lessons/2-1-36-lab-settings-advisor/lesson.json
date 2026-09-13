@@ -32,22 +32,47 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "else if chain present",
-      "description": "Code contains an else if chain",
+      "title": "PLA branch logs 200",
+      "description": "if condition checks filamentType === 'PLA' and logs 200",
       "type": "regex",
       "file": "script.js",
-      "pattern": "else\\s+if\\s*\\(",
-      "flags": "i",
+      "pattern": "filamentType\\s*(?:===|==)\\s*[\"']PLA[\"']\\s*\\)?\\s*\\)\\s*\\{[^}]*200",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "logical operator used in a second condition",
-      "description": "Code contains an if condition using && or ||",
+      "title": "PETG branch chains and logs 235",
+      "description": "an else if condition checks filamentType === 'PETG' and logs 235",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^)]*(&&|\\|\\|)",
-      "flags": "i",
+      "pattern": "else\\s+if\\s*\\(\\s*\\(?\\s*filamentType\\s*(?:===|==)\\s*[\"']PETG[\"']\\s*\\)?\\s*\\)\\s*\\{[^}]*235",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "ABS branch chains and logs 250",
+      "description": "an else if condition checks filamentType === 'ABS' and logs 250",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "else\\s+if\\s*\\(\\s*\\(?\\s*filamentType\\s*(?:===|==)\\s*[\"']ABS[\"']\\s*\\)?\\s*\\)\\s*\\{[^}]*250",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "final else logs Unknown filament type",
+      "description": "the closing else branch logs a message containing 'Unknown filament type'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\}\\s*else\\s*\\{[^}]*Unknown filament type",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "separate if warns on layerHeight range",
+      "description": "a separate if condition compares layerHeight on both sides of && or ||",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\((?=[^{]*(?:&&|\\|\\|))(?:[^{]*layerHeight){2,}[^{]*\\)",
       "points": 0
     }
   ],

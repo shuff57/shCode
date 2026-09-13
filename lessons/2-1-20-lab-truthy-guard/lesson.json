@@ -27,22 +27,20 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "if statement tests a variable directly",
-      "description": "if statement condition is a bare variable with no comparison operator",
+      "title": "if statement tests searchTerm directly and logs",
+      "description": "if statement condition is a bare searchTerm with no comparison operator, and logs inside the block",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\(?\\s*searchTerm\\s*\\)?\\s*\\)",
-      "flags": "i",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*searchTerm\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\(",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "else branch present",
-      "description": "Code contains an else branch",
+      "title": "else branch logs",
+      "description": "Code contains an else branch that calls console.log",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\}\\s*else\\s*\\{",
-      "flags": "i",
+      "pattern": "\\}\\s*else\\s*\\{[^}]*console\\.log\\s*\\(",
       "points": 0
     }
   ],

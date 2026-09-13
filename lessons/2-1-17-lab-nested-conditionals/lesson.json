@@ -27,21 +27,29 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "outer if statement present",
-      "description": "Code contains at least one if statement",
+      "title": "isAdmin check nested inside isLoggedIn, logs admin message",
+      "description": "if (isLoggedIn) nests an if (isAdmin) whose block logs a message about admin",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(",
-      "flags": "i",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*isLoggedIn\\s*\\)?\\s*\\)\\s*\\{[^{}]*if\\s*\\(\\s*\\(?\\s*isAdmin\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\([^)]*admin",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "a second if statement is nested inside the first",
-      "description": "Code contains a second if that opens after the first if's opening brace and before its closing brace",
+      "title": "isAdmin's else logs user message",
+      "description": "the else paired with if (isAdmin) logs a message about user",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*\\{[^{}]*if\\s*\\(",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*isAdmin\\s*\\)?\\s*\\)\\s*\\{[^}]*\\}\\s*else\\s*\\{[^}]*console\\.log\\s*\\([^)]*user",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "outer else logs please log in",
+      "description": "the outer else (paired with isLoggedIn) logs a message containing 'log in'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\}\\s*else\\s*\\{[^}]*console\\.log\\s*\\([^)]*log in",
       "flags": "i",
       "points": 0
     }
