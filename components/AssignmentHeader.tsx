@@ -18,6 +18,11 @@ interface AssignmentHeaderProps {
   showSubmit?: boolean;
   /** Where the score block sits. `'right'` pushes it to the right slot (used when there is no Submit button). Defaults to `'center'`. */
   scoreAlign?: 'center' | 'right';
+  /** Titles of requirements not yet passing. When Submit is disabled because
+   *  of unmet requirements (not a runtime error), shown as a small list so a
+   *  student isn't stuck guessing what's missing (issue #26) -- the Submit
+   *  gate itself is unchanged, this only makes the reason visible. */
+  unmetTitles?: string[];
 }
 
 export default function AssignmentHeader({
@@ -31,6 +36,7 @@ export default function AssignmentHeader({
   showStatus = true,
   showSubmit = true,
   scoreAlign = 'center',
+  unmetTitles,
 }: AssignmentHeaderProps) {
   const pct = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
 
@@ -54,6 +60,13 @@ export default function AssignmentHeader({
     </span>
   ) : null;
 
+  const unmetHint =
+    !submitted && !canSubmit && unmetTitles && unmetTitles.length > 0 ? (
+      <div className="assignment-unmet-hint" title={unmetTitles.join(', ')}>
+        Still needed: {unmetTitles.join(', ')}
+      </div>
+    ) : null;
+
   const submitButton = showSubmit ? (
     <button
       className="btn-primary btn-sm"
@@ -73,6 +86,7 @@ export default function AssignmentHeader({
       <div className="assignment-header-center">
         {scoreAlign === 'center' && scoreBlock}
         {statusBadge}
+        {unmetHint}
       </div>
       <div className="assignment-header-right">
         {scoreAlign === 'right' && scoreBlock}

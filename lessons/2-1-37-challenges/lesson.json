@@ -32,18 +32,48 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "&& used",
-      "description": "Code uses the && operator",
+      "title": "checks divisibility by 4",
+      "description": "Challenge 1: tests year % 4",
       "type": "regex",
       "file": "script.js",
-      "pattern": "&&",
+      "pattern": "year\\s*%\\s*4",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
+      "title": "&& and || both used",
+      "description": "Challenge 1: the leap year check combines && and ||",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?=[\\s\\S]*&&)(?=[\\s\\S]*\\|\\|)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "logs both leap year messages",
+      "description": "Challenge 1: logs both \"Leap year\" and \"Not a leap year\"",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?=[\\s\\S]*['\"`]Leap year)(?=[\\s\\S]*['\"`]Not a leap year)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "playerOne and playerTwo declared",
+      "description": "Challenge 2: both playerOne and playerTwo exist",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?=[\\s\\S]*playerOne)(?=[\\s\\S]*playerTwo)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
       "title": "else if chain used",
-      "description": "Code contains an else if chain",
+      "description": "Challenge 2: code contains an else if chain",
       "type": "regex",
       "file": "script.js",
       "pattern": "else\\s+if\\s*\\(",
@@ -51,12 +81,42 @@
       "points": 0
     },
     {
-      "id": "r3",
+      "id": "r6",
+      "title": "logs a Tie result",
+      "description": "Challenge 2: logs \"Tie\" for the matching case",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "['\"`]Tie['\"`]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "isMember and orderTotal declared",
+      "description": "Challenge 3: both isMember and orderTotal exist",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?=[\\s\\S]*isMember)(?=[\\s\\S]*orderTotal)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r8",
       "title": "nested if used",
-      "description": "Code contains an if statement nested inside another if's block",
+      "description": "Challenge 3: an if statement nested inside another if's block",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*\\{[^{}]*if\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r9",
+      "title": "both shipping thresholds used",
+      "description": "Challenge 3: uses both the $35 and $75 thresholds",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?=[\\s\\S]*35)(?=[\\s\\S]*75)",
       "flags": "i",
       "points": 0
     }

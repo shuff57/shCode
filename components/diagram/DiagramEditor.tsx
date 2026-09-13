@@ -524,6 +524,58 @@ function Canvas({
     setEditEdge(null);
   }, [nodes.length, snapshot]);
 
+  // ---- copy/paste (issue #13) ----
+  // Single-shape only, matching the existing single-select model (selNode
+  // is one id, not an array) -- multi-select would need onSelectionChange
+  // widened first, which is a separate change nothing here depends on.
+  const clipboardRef = useRef<{ shape: FlowShape; label: string; x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    if (readOnly) return;
+    function isTypingTarget(el: EventTarget | null): boolean {
+      if (!(el instanceof HTMLElement)) return false;
+      const tag = el.tagName;
+      return tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable;
+    }
+    function handler(e: KeyboardEvent) {
+      const mod = e.ctrlKey || e.metaKey;
+      if (!mod) return;
+      // A shape's label is edited through its own on-canvas input (editNode/
+      // editEdge) -- while that's open, Ctrl+C/V must reach that input for
+      // ordinary text copy/paste, not clone the whole shape underneath it.
+      if (editNode || editEdge) return;
+      if (isTypingTarget(e.target) || isTypingTarget(document.activeElement)) return;
+
+      if (e.key === 'c' || e.key === 'C') {
+        if (!selNode) return;
+        const node = nodes.find((n) => n.id === selNode);
+        if (!node) return;
+        clipboardRef.current = {
+          shape: (node.data as { shape: FlowShape }).shape,
+          label: (node.data as { label: string }).label,
+          x: node.position.x,
+          y: node.position.y,
+        };
+        e.preventDefault();
+      } else if (e.key === 'v' || e.key === 'V') {
+        const clip = clipboardRef.current;
+        if (!clip) return;
+        snapshot();
+        const id = `s${++seq.current}`;
+        const position = { x: clip.x + 40, y: clip.y + 40 };
+        setNodes((ns) => [
+          ...ns,
+          { id, type: clip.shape, position, data: { label: clip.label, shape: clip.shape } },
+        ]);
+        setSelNode(id);
+        setSelEdge(null);
+        e.preventDefault();
+      }
+    }
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [readOnly, editNode, editEdge, selNode, nodes, snapshot]);
+
   // ---- selection + editing ----
 
   const onSelectionChange = useCallback((params: OnSelectionChangeParams) => {

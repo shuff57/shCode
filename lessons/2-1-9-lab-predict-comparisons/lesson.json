@@ -41,7 +41,27 @@
       "description": "Code calls console.log",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\(",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "logs a comparison expression",
+      "description": "At least one console.log directly prints the result of a comparison (e.g. console.log(5 > 3)), not just a plain value",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\([^)]*(===|!==|==|!=|<=|>=|<|>)[^)]*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "four comparisons logged",
+      "description": "At least four separate console.log calls each print the result of a comparison",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(console\\.log\\s*\\([^)]*(===|!==|==|!=|<=|>=|<|>)[^)]*\\)[\\s\\S]*){4}",
       "flags": "i",
       "points": 0
     }

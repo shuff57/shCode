@@ -38,10 +38,26 @@ self.onmessage = (e) => {
     new Function(e.data)(); // student code execution (educational tool)
     self.postMessage({ kind: 'done' });
   } catch (err) {
+    // The Function constructor wraps student code in a synthesized
+    // "function anonymous(\\n) {\\n" preamble -- exactly two lines -- before
+    // the body starts, so a V8 stack frame's <anonymous>:LINE:COL maps back
+    // to the student's own source at LINE - 2 (issue #25). Best-effort:
+    // an engine whose stack doesn't match this shape just gets no line/col
+    // rather than a wrong one.
+    let line = null;
+    let col = null;
+    const stack = (err && err.stack) || '';
+    const m = stack.match(/<anonymous>:(\\d+):(\\d+)/);
+    if (m) {
+      const rawLine = parseInt(m[1], 10) - 2;
+      if (rawLine >= 1) { line = rawLine; col = parseInt(m[2], 10); }
+    }
     self.postMessage({
       kind: 'error',
       name: (err && err.name) || 'Error',
       message: (err && err.message) || String(err),
+      line,
+      col,
     });
   }
 };

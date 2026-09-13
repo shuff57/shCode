@@ -151,6 +151,17 @@ function buildAgentPrompt(reports: IssueReport[]): string {
 
 type Filter = 'open' | 'all';
 
+// Issue #14: staff asked to filter the list by how old a report is, on top
+// of the existing open/all status filter. created_at is epoch ms and was
+// already stored + indexed (migration 0018) -- this needed no schema change.
+type AgeFilter = 'any' | '24h' | '7d' | '30d';
+const AGE_FILTER_MS: Record<AgeFilter, number | null> = {
+  any: null,
+  '24h': 24 * 60 * 60 * 1000,
+  '7d': 7 * 24 * 60 * 60 * 1000,
+  '30d': 30 * 24 * 60 * 60 * 1000,
+};
+
 function IssuesPageInner() {
   const [user, setUser] = useState<Awaited<ReturnType<typeof getCurrentUser>>>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -159,6 +170,7 @@ function IssuesPageInner() {
   const [loadError, setLoadError] = useState('');
   const [voteError, setVoteError] = useState('');
   const [filter, setFilter] = useState<Filter>('open');
+  const [ageFilter, setAgeFilter] = useState<AgeFilter>('any');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [copied, setCopied] = useState('');
 
@@ -271,7 +283,10 @@ function IssuesPageInner() {
     );
   }
 
-  const visible = filter === 'open' ? reports.filter((r) => r.status === 'open') : reports;
+  const maxAgeMs = AGE_FILTER_MS[ageFilter];
+  const visible = (filter === 'open' ? reports.filter((r) => r.status === 'open') : reports).filter(
+    (r) => maxAgeMs === null || Date.now() - r.created_at <= maxAgeMs,
+  );
   const openCount = reports.filter((r) => r.status === 'open').length;
   const counts = STATUS_ORDER.map(
     (s) => `${s}: ${reports.filter((r) => r.status === s).length}`,
@@ -296,6 +311,18 @@ function IssuesPageInner() {
         >
           <option value="open">Open only ({openCount})</option>
           <option value="all">All ({reports.length})</option>
+        </select>
+
+        <select
+          style={{ ...S.select, minWidth: 140 }}
+          value={ageFilter}
+          onChange={(e) => setAgeFilter(e.target.value as AgeFilter)}
+          aria-label="Filter by age"
+        >
+          <option value="any">Any age</option>
+          <option value="24h">Last 24 hours</option>
+          <option value="7d">Last 7 days</option>
+          <option value="30d">Last 30 days</option>
         </select>
 
         <button type="button" style={S.button} onClick={download}>

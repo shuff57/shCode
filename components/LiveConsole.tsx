@@ -171,6 +171,12 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
           background: var(--card);
           color: var(--text);
           font-family: 'Fira Code', Consolas, 'Courier New', monospace;
+          /* Issue #21: Fira Code's default ligatures render >=, !=, => etc.
+             as a single fused glyph, which reads as an unrecognizable
+             symbol rather than the two characters the student typed. */
+          font-variant-ligatures: none;
+          -webkit-font-feature-settings: "liga" 0, "calt" 0;
+          font-feature-settings: "liga" 0, "calt" 0;
           font-size: 12.5px;
         }
         .liveconsole-header {

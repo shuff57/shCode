@@ -41,7 +41,7 @@
       "description": "Catch block logs err.name",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\(\\s*err\\.name\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*err\\.name\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -51,7 +51,7 @@
       "description": "Catch block logs err.message",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\(\\s*err\\.message\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*err\\.message\\s*\\)",
       "flags": "i",
       "points": 0
     }

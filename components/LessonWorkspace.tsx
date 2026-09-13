@@ -403,14 +403,20 @@ export default function LessonWorkspace({
     }, RUN_TIMEOUT_MS);
 
     worker.onmessage = (e: MessageEvent) => {
-      const d = e.data as { kind: string; type?: string; message?: string; name?: string };
+      const d = e.data as { kind: string; type?: string; message?: string; name?: string; line?: number | null; col?: number | null };
       if (d.kind === 'log') {
         logs.push({ type: d.type || 'log', message: d.message || '', timestamp: time() });
         return;
       }
       if (d.kind === 'error') {
-        logs.push({ type: 'error', message: d.message || '', timestamp: time() });
-        setRuntimeError(`${d.name || 'Error'}: ${d.message || ''}`);
+        // issue #25: a line/col from the worker's own stack parsing (see
+        // lib/js-runner-source.ts) gets appended right on the message --
+        // this console has no clickable-jump machinery like Console.tsx's
+        // iframe path, so the line number goes in the text itself.
+        const where = d.line ? ` (line ${d.line}${d.col ? `, col ${d.col}` : ''})` : '';
+        const msg = `${d.message || ''}${where}`;
+        logs.push({ type: 'error', message: msg, timestamp: time() });
+        setRuntimeError(`${d.name || 'Error'}: ${msg}`);
       }
       clearTimeout(killer);
       cleanup();
@@ -629,6 +635,10 @@ export default function LessonWorkspace({
   const passedCriteria = requirements.filter((r) => r.status === 'passed').length;
   const totalCriteria = requirements.length;
   const allRequirementsPassed = totalCriteria > 0 && passedCriteria === totalCriteria;
+  // Titles only -- AssignmentHeader shows these next to a disabled Submit so
+  // a student isn't stuck guessing which of several 0-point criteria is
+  // still red (issue #26). Doesn't change canSubmit at all.
+  const unmetTitles = requirements.filter((r) => r.status !== 'passed').map((r) => r.title);
   // q5 lessons and mastery-based lessons (zero-points convention: totalPossible
   // === 0) gate Submit on every requirement being green. Legacy point-based
   // assignments (nonzero totalPoints, e.g. sdlc-overview) keep the
@@ -811,6 +821,7 @@ export default function LessonWorkspace({
           showStatus={!isMoshionMode}
           showSubmit={!isMoshionMode}
           scoreAlign={isMoshionMode ? 'right' : 'center'}
+          unmetTitles={unmetTitles}
         />
       ) : (
         <div id="titleRow">

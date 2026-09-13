@@ -41,7 +41,7 @@
       "description": "The catch block now logs something",
       "type": "regex",
       "file": "script.js",
-      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*console\\.log\\(",
+      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*console\\.log\\s*\\(",
       "flags": "i",
       "points": 0
     }

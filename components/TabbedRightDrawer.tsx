@@ -96,7 +96,12 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
           position: 'fixed',
           top: 0,
           right: 0,
-          bottom: 0,
+          // Issue #17: this used to be a flat 0, so at z-index 900 the
+          // drawer sat entirely over LessonProgressFooter (z-index 50)
+          // whenever it was open, including the module-progress bar's own
+          // clickable dots. LessonProgressFooter publishes its own height
+          // to this var (0px when it isn't mounted at all, e.g. no module).
+          bottom: 'var(--shd-footer-height, 0px)',
           width: `min(${width}px, 100vw)`,
           background: '#21222c',
           borderLeft: '1px solid #44475a',

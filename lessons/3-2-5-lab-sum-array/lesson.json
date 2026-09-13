@@ -55,7 +55,7 @@
       "description": "Code calls console.log",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\(",
+      "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0
     }

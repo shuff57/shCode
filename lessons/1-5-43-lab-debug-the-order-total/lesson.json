@@ -71,10 +71,10 @@
     {
       "id": "r4",
       "title": "At least three labelled prints",
-      "description": "Three or more console.log calls whose text includes a label",
+      "description": "Three or more console.log calls whose text includes a label (string concatenation or a template literal both count)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?console\\.log\\s*\\(\\s*[\"'][^\"']+[\"']\\s*\\+){3}",
+      "pattern": "(?:[\\s\\S]*?console\\.log\\s*\\(\\s*(?:[\"'][^\"']+[\"']\\s*\\+|`[^`]*\\$\\{)){3}",
       "flags": "",
       "points": 0
     },

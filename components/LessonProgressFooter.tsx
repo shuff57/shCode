@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { bypassesLessonLock, recordLessonStarted, useLessonState } from '../lib/progress';
 import { lessonHref } from '../lib/lesson-href';
@@ -20,6 +20,7 @@ interface Props {
 
 export default function LessonProgressFooter({ moduleId, currentLessonId, lessons }: Props) {
   const snap = useLessonState();
+  const footerRef = useRef<HTMLDivElement>(null);
 
   // Auto-mark this lesson as "started" on mount. The helper short-circuits
   // if unauthed or already started/completed, so this is safe to call
@@ -27,6 +28,26 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
   useEffect(() => {
     recordLessonStarted(currentLessonId);
   }, [currentLessonId]);
+
+  // Publish our own rendered height as a CSS var, the same trick
+  // TabbedRightDrawer already uses for its width (--shd-tabbed) -- so the
+  // drawer can inset its `bottom` above us instead of covering us entirely
+  // (issue #17: opening Steps/Docs blocked this footer). A ResizeObserver
+  // rather than a one-time measurement because this row can wrap onto two
+  // lines on a narrow window.
+  useEffect(() => {
+    const el = footerRef.current;
+    if (!el) return;
+    const cssVar = '--shd-footer-height';
+    const publish = () => document.documentElement.style.setProperty(cssVar, `${el.offsetHeight}px`);
+    publish();
+    const ro = new ResizeObserver(publish);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      document.documentElement.style.removeProperty(cssVar);
+    };
+  }, []);
 
   if (lessons.length === 0) return null;
   const idx = lessons.findIndex((l) => l.id === currentLessonId);
@@ -48,6 +69,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
 
   return (
     <div
+      ref={footerRef}
       className="lesson-progress-footer"
       style={{
         position: 'fixed',

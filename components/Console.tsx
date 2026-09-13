@@ -198,6 +198,12 @@ export default function Console({ resetKey }: { resetKey: string }) {
           color: #f8f8f2;
           border-radius: 3px;
           font-family: 'Fira Code', Consolas, monospace;
+          /* Issue #21: Fira Code's default ligatures render >=, !=, => etc.
+             as a single fused glyph, which reads as an unrecognizable
+             symbol rather than the two characters the student typed. */
+          font-variant-ligatures: none;
+          -webkit-font-feature-settings: "liga" 0, "calt" 0;
+          font-feature-settings: "liga" 0, "calt" 0;
           font-size: 0.85em;
           white-space: pre;
           overflow-x: auto;

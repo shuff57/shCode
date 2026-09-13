@@ -46,7 +46,7 @@
       "description": "The try block logs a variable called username",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\(\\s*username\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*username\\s*\\)",
       "flags": "i",
       "points": 0
     },

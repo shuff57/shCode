@@ -41,7 +41,7 @@
       "description": "The total is logged after the catch block, not inside the try",
       "type": "regex",
       "file": "script.js",
-      "pattern": "catch[\\s\\S]*console\\.log\\([\\s\\S]*total",
+      "pattern": "catch[\\s\\S]*console\\.log\\s*\\([\\s\\S]*total",
       "flags": "i",
       "points": 0
     }

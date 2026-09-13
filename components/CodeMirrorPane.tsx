@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import { javascript } from '@codemirror/lang-javascript';
+import { javascript, javascriptLanguage } from '@codemirror/lang-javascript';
 import { defaultKeymap, indentWithTab, history, historyKeymap } from '@codemirror/commands';
 import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
@@ -87,6 +87,20 @@ const darkTheme = EditorView.theme({
     backgroundColor: '#44475a',
     outline: `1px solid ${dracula.purple}`,
   },
+  // Issue #22: a student saw a ghosted, offset second copy of the editor's
+  // own syntax-highlighted text while scrolling. CM6's .cm-scroller doesn't
+  // promote itself to its own GPU compositing layer by default, which is
+  // the known-vulnerable shape for a Chromium/Windows tearing bug where a
+  // scrollable region shares a stale raster tile with the page for one
+  // frame during fast scroll. This is the standard, purely additive
+  // mitigation (force its own layer) -- unverified against the original
+  // report (a single-frame compositor tear can't be captured after the
+  // fact by a screenshot), but it cannot make anything render differently
+  // when the bug ISN'T occurring, so there's no downside to leaving it on.
+  '.cm-scroller': {
+    transform: 'translateZ(0)',
+    contain: 'paint',
+  },
 }, { dark: true });
 
 function makeExtensions(
@@ -122,6 +136,24 @@ function makeExtensions(
 
   if (language === 'javascript') {
     exts.push(javascript());
+    // Exclude `{`/`}` from auto-close (lang-javascript's own languageData
+    // normally lists it -- see node_modules/@codemirror/lang-javascript's
+    // `languageData.closeBrackets.brackets`). closeBrackets()'s "type over
+    // the bracket I just inserted" check only matches when the cursor sits
+    // on the SAME LINE as that inserted `}` (its internal bracketState
+    // field drops the marker the moment the selection moves to another
+    // line). But `indentWithTab`/Enter's own smart-split ALWAYS pushes an
+    // auto-closed `}` onto its own new line the instant you press Enter
+    // after `{` -- so for every multi-line block a student writes by hand
+    // (which is every `if`/function/loop body in this course), the real
+    // `}` they type later lands on a different line than the orphaned
+    // auto-inserted one, the skip-over never fires, and both survive:
+    // confirmed to leave one stray `}` per block, every time, at realistic
+    // typing speed. (), [], quotes keep auto-close -- those are opened and
+    // closed within one line/expression, where the same-line check holds.
+    exts.push(javascriptLanguage.data.of({
+      closeBrackets: { brackets: ['(', '[', "'", '"', '`'] },
+    }));
   }
 
   if (readOnly) {

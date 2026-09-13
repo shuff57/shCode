@@ -1035,6 +1035,18 @@ details.console > summary::-webkit-details-marker { display: none; }
   color: #10b981;
 }
 
+/* Issue #26: names the still-red requirements next to a disabled Submit
+   button, instead of leaving the student to guess. Truncated + title=
+   tooltip so a long list doesn't blow out the header row. */
+.assignment-unmet-hint {
+  font-size: 0.75rem;
+  color: #f59e0b;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .assignment-header-right {
   display: flex;
   gap: 0.5rem;
