@@ -3437,7 +3437,7 @@
     "output": [
       {
         "type": "log",
-        "text": "Took 31 shuffle(s) to get an ace."
+        "text": "Took 18 shuffle(s) to get an ace."
       }
     ],
     "nondeterministic": true
@@ -3828,6 +3828,258 @@
       }
     ]
   },
+  "3-2-10-example-return-vs-print#0": {
+    "code": "function areaAndPrint(width, height) {\n  console.log(width * height);\n}\n\nconst a = areaAndPrint(3, 4);\nconsole.log(\"The stored value is: \" + a);",
+    "output": [
+      {
+        "type": "log",
+        "text": "12"
+      },
+      {
+        "type": "log",
+        "text": "The stored value is: undefined"
+      }
+    ]
+  },
+  "3-2-10-example-return-vs-print#1": {
+    "code": "function areaAndPrint(width, height) {\n  console.log(width * height);\n}\n\nconst a = areaAndPrint(3, 4);\nconsole.log(\"Two rooms: \" + (a * 2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "12"
+      },
+      {
+        "type": "log",
+        "text": "Two rooms: NaN"
+      }
+    ]
+  },
+  "3-2-10-example-return-vs-print#2": {
+    "code": "function area(width, height) {\n  return width * height;\n}\n\nconst a = area(3, 4);\nconsole.log(\"One room: \" + a);\nconsole.log(\"Two rooms: \" + (a * 2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "One room: 12"
+      },
+      {
+        "type": "log",
+        "text": "Two rooms: 24"
+      }
+    ]
+  },
+  "3-2-10-example-return-vs-print#3": {
+    "code": "function area(width, height) {\n  return width * height;\n}\n\nconst room = area(5, 6);\n\nconsole.log(room);\nif (room > 25) {\n  console.log(\"That is a big room.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "30"
+      },
+      {
+        "type": "log",
+        "text": "That is a big room."
+      }
+    ]
+  },
+  "3-2-11-reading-return-ends-function#0": {
+    "code": "function check(n) {\n  return n * 2;\n  console.log(\"This line never runs.\");\n}\n\nconsole.log(check(5));",
+    "output": [
+      {
+        "type": "log",
+        "text": "10"
+      }
+    ]
+  },
+  "3-2-11-reading-return-ends-function#1": {
+    "code": "function describeNumber(n) {\n  if (n < 0) {\n    return \"negative\";\n  }\n  if (n === 0) {\n    return \"zero\";\n  }\n  return \"positive\";\n}\n\nconsole.log(describeNumber(-4));\nconsole.log(describeNumber(0));\nconsole.log(describeNumber(7));",
+    "output": [
+      {
+        "type": "log",
+        "text": "negative"
+      },
+      {
+        "type": "log",
+        "text": "zero"
+      },
+      {
+        "type": "log",
+        "text": "positive"
+      }
+    ]
+  },
+  "3-2-11-reading-return-ends-function#2": {
+    "code": "function describeNumber(n) {\n  if (n < 0) {\n    return \"negative\";\n  }\n  if (n === 0) {\n    return \"zero\";\n  }\n  return \"positive\";\n}\n\nconsole.log(describeNumber(-4));\nconsole.log(describeNumber(7));",
+    "output": [
+      {
+        "type": "log",
+        "text": "negative"
+      },
+      {
+        "type": "log",
+        "text": "positive"
+      }
+    ]
+  },
+  "3-2-13-reading-printing-not-returning#0": {
+    "code": "function addAndPrint(a, b) {\n  console.log(a + b);\n}\n\nconst total = addAndPrint(2, 3);\nconsole.log(\"total is: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "5"
+      },
+      {
+        "type": "log",
+        "text": "total is: undefined"
+      }
+    ]
+  },
+  "3-2-13-reading-printing-not-returning#1": {
+    "code": "function add(a, b) {\n  return a + b;\n}\n\nconst total = add(2, 3);\nconsole.log(\"total is: \" + total);\nconsole.log(\"and doubled: \" + total * 2);",
+    "output": [
+      {
+        "type": "log",
+        "text": "total is: 5"
+      },
+      {
+        "type": "log",
+        "text": "and doubled: 10"
+      }
+    ]
+  },
+  "3-2-13-reading-printing-not-returning#2": {
+    "code": "function addAndReturn(a, b) {\n  return a + b;\n}\n\nconst total = addAndReturn(2, 3);\nconsole.log(\"total is: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "total is: 5"
+      }
+    ]
+  },
+  "3-2-14-example-print-or-return#0": {
+    "code": "function totalPrice(price, quantity) {\n  return price * quantity;\n}\n\nconsole.log(totalPrice(3, 4));\n\nconst order = totalPrice(3, 4);\nif (order > 10) {\n  console.log(\"Free shipping!\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "12"
+      },
+      {
+        "type": "log",
+        "text": "Free shipping!"
+      }
+    ]
+  },
+  "3-2-14-example-print-or-return#1": {
+    "code": "function totalPrice(price, quantity) {\n  console.log(price * quantity);\n}\n\ntotalPrice(3, 4);\n\nconst order = totalPrice(3, 4);\nconsole.log(\"Is the order over 10? \" + (order > 10));",
+    "output": [
+      {
+        "type": "log",
+        "text": "12"
+      },
+      {
+        "type": "log",
+        "text": "12"
+      },
+      {
+        "type": "log",
+        "text": "Is the order over 10? false"
+      }
+    ]
+  },
+  "3-2-14-example-print-or-return#2": {
+    "code": "function reportOrder(price, quantity) {\n  const total = price * quantity;\n  console.log(\"You ordered \" + quantity + \" item(s).\");\n  console.log(\"Your total is $\" + total.toFixed(2) + \".\");\n}\n\nreportOrder(3, 4);\nreportOrder(5, 2);",
+    "output": [
+      {
+        "type": "log",
+        "text": "You ordered 4 item(s)."
+      },
+      {
+        "type": "log",
+        "text": "Your total is $12.00."
+      },
+      {
+        "type": "log",
+        "text": "You ordered 2 item(s)."
+      },
+      {
+        "type": "log",
+        "text": "Your total is $10.00."
+      }
+    ]
+  },
+  "3-2-14-example-print-or-return#3": {
+    "code": "function totalPrice(price, quantity) {\n  return price * quantity;\n}\n\nfunction reportOrder(price, quantity) {\n  const total = totalPrice(price, quantity);\n  console.log(\"Your total is $\" + total.toFixed(2) + \".\");\n}\n\nreportOrder(3, 4);\nconsole.log(\"Reusing the number: \" + totalPrice(3, 4) * 2);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Your total is $12.00."
+      },
+      {
+        "type": "log",
+        "text": "Reusing the number: 24"
+      }
+    ]
+  },
+  "3-2-16-reading-building-with-returns#0": {
+    "code": "function double(n) {\n  return n * 2;\n}\n\nfunction addTen(n) {\n  return n + 10;\n}\n\nconsole.log(double(addTen(5)));\nconsole.log(addTen(double(5)));",
+    "output": [
+      {
+        "type": "log",
+        "text": "30"
+      },
+      {
+        "type": "log",
+        "text": "20"
+      }
+    ]
+  },
+  "3-2-16-reading-building-with-returns#1": {
+    "code": "function double(n) {\n  return n * 2;\n}\n\nfunction addTen(n) {\n  return n + 10;\n}\n\nconst result = addTen(double(addTen(5)));\nconsole.log(result);",
+    "output": [
+      {
+        "type": "log",
+        "text": "40"
+      }
+    ]
+  },
+  "3-2-17-example-chaining-functions#0": {
+    "code": "function double(n) {\n  return n * 2;\n}\n\nfunction addTen(n) {\n  return n + 10;\n}\n\nconsole.log(double(5));\nconsole.log(addTen(5));",
+    "output": [
+      {
+        "type": "log",
+        "text": "10"
+      },
+      {
+        "type": "log",
+        "text": "15"
+      }
+    ]
+  },
+  "3-2-17-example-chaining-functions#1": {
+    "code": "function double(n) {\n  return n * 2;\n}\n\nfunction addTen(n) {\n  return n + 10;\n}\n\nconsole.log(double(addTen(5)));",
+    "output": [
+      {
+        "type": "log",
+        "text": "30"
+      }
+    ]
+  },
+  "3-2-17-example-chaining-functions#2": {
+    "code": "function double(n) {\n  return n * 2;\n}\n\nfunction addTen(n) {\n  return n + 10;\n}\n\nconsole.log(addTen(double(5)));",
+    "output": [
+      {
+        "type": "log",
+        "text": "20"
+      }
+    ]
+  },
+  "3-2-17-example-chaining-functions#3": {
+    "code": "function double(n) {\n  return n * 2;\n}\n\nfunction addTen(n) {\n  return n + 10;\n}\n\nconst result = addTen(double(addTen(5)));\nconsole.log(result);",
+    "output": [
+      {
+        "type": "log",
+        "text": "40"
+      }
+    ]
+  },
   "3-2-2-reading-array-basics#0": {
     "code": "let fruits = [\"apple\", \"banana\", \"cherry\"];\n\nconsole.log(fruits[0]);        // first item\nconsole.log(fruits[2]);        // third item\nconsole.log(fruits.length);    // 3\n\nfruits.push(\"date\");\nconsole.log(fruits.length);    // 4\nconsole.log(fruits[3]);        // \"date\"\n\nlet removed = fruits.pop();\nconsole.log(removed);          // \"date\"\nconsole.log(fruits.length);    // 3",
     "output": [
@@ -3890,6 +4142,96 @@
       }
     ]
   },
+  "3-2-3-reading-passing-information-in#0": {
+    "code": "function greet(name) {\n  console.log(\"Hello, \" + name + \"!\");\n}\n\ngreet(\"Marisol\");\ngreet(\"Dev\");\ngreet(\"Priya\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, Marisol!"
+      },
+      {
+        "type": "log",
+        "text": "Hello, Dev!"
+      },
+      {
+        "type": "log",
+        "text": "Hello, Priya!"
+      }
+    ]
+  },
+  "3-2-3-reading-passing-information-in#1": {
+    "code": "function describe(name, age) {\n  console.log(name + \" is \" + age + \" years old.\");\n}\n\ndescribe(\"Dev\", 19);\ndescribe(\"Priya\", 17);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Dev is 19 years old."
+      },
+      {
+        "type": "log",
+        "text": "Priya is 17 years old."
+      }
+    ]
+  },
+  "3-2-4-example-one-parameter#0": {
+    "code": "function greet() {\n  console.log(\"Hello, Marisol!\");\n}\n\ngreet();\ngreet();",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, Marisol!"
+      },
+      {
+        "type": "log",
+        "text": "Hello, Marisol!"
+      }
+    ]
+  },
+  "3-2-4-example-one-parameter#1": {
+    "code": "function greet(name) {\n  console.log(\"Hello, \" + name + \"!\");\n}\n\ngreet(\"Marisol\");\ngreet(\"Dev\");\ngreet(\"Priya\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, Marisol!"
+      },
+      {
+        "type": "log",
+        "text": "Hello, Dev!"
+      },
+      {
+        "type": "log",
+        "text": "Hello, Priya!"
+      }
+    ]
+  },
+  "3-2-4-example-one-parameter#2": {
+    "code": "function greetingFor(name) {\n  const message = \"Welcome back, \" + name + \"!\";\n  console.log(message);\n  console.log(\"Your name has \" + name.length + \" letters.\");\n}\n\ngreetingFor(\"Marisol\");\ngreetingFor(\"Dev\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Welcome back, Marisol!"
+      },
+      {
+        "type": "log",
+        "text": "Your name has 7 letters."
+      },
+      {
+        "type": "log",
+        "text": "Welcome back, Dev!"
+      },
+      {
+        "type": "log",
+        "text": "Your name has 3 letters."
+      }
+    ]
+  },
+  "3-2-4-example-one-parameter#3": {
+    "code": "function greet(name) {\n  console.log(\"Hello, \" + name + \"!\");\n}\n\ngreet(\"your own name here\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, your own name here!"
+      }
+    ]
+  },
   "3-2-4-reading-split-lines#0": {
     "code": "let fileContents = `Alice,90\nBob,75\nCarol,88\nDan,95`;\n\nlet lines = fileContents.split(\"\\n\");\n\nconsole.log(\"Total lines:\", lines.length);\n\nfor (let i = 0; i < lines.length; i++) {\n    console.log(\"Line \" + (i + 1) + \": \" + lines[i]);\n}",
     "output": [
@@ -3912,6 +4254,36 @@
       {
         "type": "log",
         "text": "Line 4: Dan,95"
+      }
+    ]
+  },
+  "3-2-5-reading-parameters-arguments#0": {
+    "code": "function priceWithTax(price) {   // price is the PARAMETER\n  console.log(price * 1.08);\n}\n\npriceWithTax(50);\npriceWithTax(20);",
+    "output": [
+      {
+        "type": "log",
+        "text": "54"
+      },
+      {
+        "type": "log",
+        "text": "21.6"
+      }
+    ]
+  },
+  "3-2-5-reading-parameters-arguments#1": {
+    "code": "function area(w, h) {\n  console.log(w * h);\n}\n\narea(3, 4);\narea(10, 2);\narea(7, 7);",
+    "output": [
+      {
+        "type": "log",
+        "text": "12"
+      },
+      {
+        "type": "log",
+        "text": "20"
+      },
+      {
+        "type": "log",
+        "text": "49"
       }
     ]
   },
@@ -3967,6 +4339,1925 @@
       {
         "type": "log",
         "text": "Goodbye!"
+      }
+    ]
+  },
+  "3-2-6-reading-order-matters#0": {
+    "code": "function describe(name, age) {\n  console.log(name + \" is \" + age + \" years old.\");\n}\n\ndescribe(\"Dev\", 19);\ndescribe(19, \"Dev\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Dev is 19 years old."
+      },
+      {
+        "type": "log",
+        "text": "19 is Dev years old."
+      }
+    ]
+  },
+  "3-2-6-reading-order-matters#1": {
+    "code": "function subtract(a, b) {\n  console.log(a - b);\n}\n\nsubtract(10, 3);\nsubtract(3, 10);",
+    "output": [
+      {
+        "type": "log",
+        "text": "7"
+      },
+      {
+        "type": "log",
+        "text": "-7"
+      }
+    ]
+  },
+  "3-2-9-reading-return#0": {
+    "code": "function doubleAndReturn(n) {\n  return n * 2;\n}\n\nconst result = doubleAndReturn(5);\nconsole.log(\"I can use this: \" + (result + 1));",
+    "output": [
+      {
+        "type": "log",
+        "text": "I can use this: 11"
+      }
+    ]
+  },
+  "3-2-9-reading-return#1": {
+    "code": "function square(n) {\n  return n * n;\n}\n\nconsole.log(square(4));\nconsole.log(square(3) + square(4));\n\nconst gap = square(6) - square(5);\nconsole.log(gap);",
+    "output": [
+      {
+        "type": "log",
+        "text": "16"
+      },
+      {
+        "type": "log",
+        "text": "25"
+      },
+      {
+        "type": "log",
+        "text": "11"
+      }
+    ]
+  },
+  "3-2-9-reading-return#2": {
+    "code": "function square(n) {\n  return n * n;\n}\n\nconsole.log(square(4));\nconsole.log(square(3) + square(4));",
+    "output": [
+      {
+        "type": "log",
+        "text": "16"
+      },
+      {
+        "type": "log",
+        "text": "25"
+      }
+    ]
+  },
+  "3-4-11-reading-passing-a-function#0": {
+    "code": "function applyTwice(operation, value) {\n  return operation(operation(value));\n}\n\nconst double = (n) => n * 2;\nconst addTen = (n) => n + 10;\n\nconsole.log(applyTwice(double, 5));\nconsole.log(applyTwice(addTen, 5));",
+    "output": [
+      {
+        "type": "log",
+        "text": "20"
+      },
+      {
+        "type": "log",
+        "text": "25"
+      }
+    ]
+  },
+  "3-4-11-reading-passing-a-function#1": {
+    "code": "function applyTwice(operation, value) {\n  return operation(operation(value));\n}\n\nconsole.log(applyTwice((n) => n * 2, 5));\nconsole.log(applyTwice((n) => n - 1, 5));\nconsole.log(applyTwice((s) => s + \"!\", \"hi\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "20"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "hi!!"
+      }
+    ]
+  },
+  "3-4-11-reading-passing-a-function#2": {
+    "code": "function countMatching(numbers, test) {\n  let count = 0;\n  for (let i = 0; i < numbers.length; i++) {\n    if (test(numbers[i])) {\n      count = count + 1;\n    }\n  }\n  return count;\n}\n\nconst readings = [4, -2, 7, 0, -9, 3];\n\nconsole.log(countMatching(readings, (n) => n > 0));\nconsole.log(countMatching(readings, (n) => n < 0));\nconsole.log(countMatching(readings, (n) => n % 2 === 0));",
+    "output": [
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      }
+    ]
+  },
+  "3-4-12-example-arrow-callback#0": {
+    "code": "function countMatching(numbers, test) {\n  let count = 0;\n  for (let i = 0; i < numbers.length; i++) {\n    if (test(numbers[i])) {\n      count = count + 1;\n    }\n  }\n  return count;\n}\n\nconst readings = [4, -2, 7, 0, -9, 3];\n\nconsole.log(countMatching(readings, (n) => n > 0));",
+    "output": [
+      {
+        "type": "log",
+        "text": "3"
+      }
+    ]
+  },
+  "3-4-12-example-arrow-callback#1": {
+    "code": "function countMatching(numbers, test) {\n  let count = 0;\n  for (let i = 0; i < numbers.length; i++) {\n    if (test(numbers[i])) {\n      count = count + 1;\n    }\n  }\n  return count;\n}\n\nconst readings = [4, -2, 7, 0, -9, 3];\n\nconsole.log(countMatching(readings, (n) => n < 0));\nconsole.log(countMatching(readings, (n) => n % 2 === 0));",
+    "output": [
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      }
+    ]
+  },
+  "3-4-12-example-arrow-callback#2": {
+    "code": "function applyTwice(operation, value) {\n  return operation(operation(value));\n}\n\nconst double = (n) => n * 2;\n\nconsole.log(applyTwice(double, 5));   // the function: 20\n\ntry {\n  console.log(applyTwice(double(), 5));  // the RESULT: fails\n} catch (err) {\n  console.log(err.name + \": \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "20"
+      },
+      {
+        "type": "log",
+        "text": "TypeError: operation is not a function"
+      }
+    ]
+  },
+  "3-4-14-reading-declaration-or-expression#0": {
+    "code": "console.log(declared(2));\n\nfunction declared(n) {\n  return n + 1;\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "3"
+      }
+    ]
+  },
+  "3-4-14-reading-declaration-or-expression#1": {
+    "code": "try {\n  console.log(expressed(2));\n} catch (err) {\n  console.log(err.name + \": \" + err.message);\n}\n\nconst expressed = (n) => n + 1;",
+    "output": [
+      {
+        "type": "log",
+        "text": "ReferenceError: Cannot access 'expressed' before initialization"
+      }
+    ]
+  },
+  "3-4-14-reading-declaration-or-expression#2": {
+    "code": "// The main operation: a declaration, called from several places.\nfunction area(w, h) {\n  return w * h;\n}\n\n// A helper that takes a callback.\nfunction mapList(values, fn) {\n  const out = [];\n  for (let i = 0; i < values.length; i++) {\n    out.push(fn(values[i]));\n  }\n  return out;\n}\n\n// The callback is an arrow: short, used once.\nconst areas = mapList([2, 4, 6], (side) => area(side, side));\n\nconsole.log(areas);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  4,\n  16,\n  36\n]"
+      }
+    ]
+  },
+  "3-4-18-example-zero-param-arrow#0": {
+    "code": "const shout = () => \"HEY!\";\n\nconsole.log(shout());",
+    "output": [
+      {
+        "type": "log",
+        "text": "HEY!"
+      }
+    ]
+  },
+  "3-4-18-example-zero-param-arrow#1": {
+    "code": "const greeting = () => {\n  const word = \"HEY\";\n  return word + \"!\";\n};\n\nconsole.log(greeting());",
+    "output": [
+      {
+        "type": "log",
+        "text": "HEY!"
+      }
+    ]
+  },
+  "3-4-2-reading-function-is-a-value#0": {
+    "code": "function greet() {\n  return \"Hello!\";\n}\n\nconsole.log(greet());        // the call: prints \"Hello!\"\nconsole.log(typeof greet);   // the value: prints \"function\"",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello!"
+      },
+      {
+        "type": "log",
+        "text": "function"
+      }
+    ]
+  },
+  "3-4-2-reading-function-is-a-value#1": {
+    "code": "function greet() {\n  return \"Hello!\";\n}\n\nconst sayHello = greet;      // the value — no parentheses\n\nconsole.log(sayHello());\nconsole.log(greet());",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello!"
+      },
+      {
+        "type": "log",
+        "text": "Hello!"
+      }
+    ]
+  },
+  "3-4-3-example-function-in-variable#0": {
+    "code": "function greet() {\n  return \"Hello!\";\n}\n\nconsole.log(greet());        // call\nconsole.log(typeof greet);   // value",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello!"
+      },
+      {
+        "type": "log",
+        "text": "function"
+      }
+    ]
+  },
+  "3-4-3-example-function-in-variable#1": {
+    "code": "function greet() {\n  return \"Hello!\";\n}\n\nconst sayHello = greet;      // the function value, no parentheses\n\nconsole.log(sayHello());\nconsole.log(greet());",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello!"
+      },
+      {
+        "type": "log",
+        "text": "Hello!"
+      }
+    ]
+  },
+  "3-4-3-example-function-in-variable#2": {
+    "code": "function greet() {\n  return \"Hello!\";\n}\n\nconst sayHello = greet();    // the RESULT — this is \"Hello!\", not a function\n\nconsole.log(sayHello);       // just prints the string\ntry {\n  console.log(sayHello());   // TypeError: sayHello is not a function\n} catch (err) {\n  console.log(err.name + \": \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello!"
+      },
+      {
+        "type": "log",
+        "text": "TypeError: sayHello is not a function"
+      }
+    ]
+  },
+  "3-4-4-reading-function-expressions#0": {
+    "code": "const greet = function () {\n  return \"Hello!\";\n};\n\nconsole.log(greet());",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello!"
+      }
+    ]
+  },
+  "3-4-4-reading-function-expressions#1": {
+    "code": "// Function DECLARATION — a statement that names a function.\nfunction addDeclared(a, b) {\n  return a + b;\n}\n\n// Function EXPRESSION — a function value assigned to a variable.\nconst addExpressed = function (a, b) {\n  return a + b;\n};\n\nconsole.log(addDeclared(2, 3));\nconsole.log(addExpressed(2, 3));",
+    "output": [
+      {
+        "type": "log",
+        "text": "5"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "3-4-4-reading-function-expressions#2": {
+    "code": "try {\n  console.log(later(2));\n} catch (err) {\n  console.log(err.name + \": \" + err.message);\n}\n\nconst later = function (n) {\n  return n + 1;\n};",
+    "output": [
+      {
+        "type": "log",
+        "text": "ReferenceError: Cannot access 'later' before initialization"
+      }
+    ]
+  },
+  "3-4-6-reading-arrow-functions#0": {
+    "code": "const add = (a, b) => a + b;\n\nconsole.log(add(2, 3));",
+    "output": [
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "3-4-6-reading-arrow-functions#1": {
+    "code": "function addA(a, b) {\n  return a + b;\n}\n\nconst addB = function (a, b) {\n  return a + b;\n};\n\nconst addC = (a, b) => a + b;\n\nconsole.log(addA(1, 2), addB(1, 2), addC(1, 2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "3 3 3"
+      }
+    ]
+  },
+  "3-4-6-reading-arrow-functions#2": {
+    "code": "function apply(fn, value) {\n  return fn(value);\n}\n\nconsole.log(apply((n) => n * 10, 4));",
+    "output": [
+      {
+        "type": "log",
+        "text": "40"
+      }
+    ]
+  },
+  "3-4-7-example-three-forms#0": {
+    "code": "function addDeclared(a, b) {\n  return a + b;\n}\n\nconsole.log(addDeclared(2, 3));",
+    "output": [
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "3-4-7-example-three-forms#1": {
+    "code": "const addExpressed = function (a, b) {\n  return a + b;\n};\n\nconsole.log(addExpressed(2, 3));",
+    "output": [
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "3-4-7-example-three-forms#2": {
+    "code": "const addArrow = (a, b) => a + b;\n\nconsole.log(addArrow(2, 3));",
+    "output": [
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "3-4-7-example-three-forms#3": {
+    "code": "function addA(a, b) {\n  return a + b;\n}\n\nconst addB = function (a, b) {\n  return a + b;\n};\n\nconst addC = (a, b) => a + b;\n\nconsole.log(addA(1, 2), addB(1, 2), addC(1, 2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "3 3 3"
+      }
+    ]
+  },
+  "3-4-8-reading-shorthand-rules#0": {
+    "code": "const double = (n) => n * 2;\n\nconsole.log(double(5));",
+    "output": [
+      {
+        "type": "log",
+        "text": "10"
+      }
+    ]
+  },
+  "3-4-8-reading-shorthand-rules#1": {
+    "code": "const doubleWrong = (n) => { n * 2; };\nconst doubleRight = (n) => { return n * 2; };\n\nconsole.log(doubleWrong(5));\nconsole.log(doubleRight(5));",
+    "output": [
+      {
+        "type": "log",
+        "text": "undefined"
+      },
+      {
+        "type": "log",
+        "text": "10"
+      }
+    ]
+  },
+  "3-4-8-reading-shorthand-rules#2": {
+    "code": "const describe = (n) => {\n  let kind = \"odd\";\n  if (n % 2 === 0) {\n    kind = \"even\";\n  }\n  return n + \" is \" + kind;\n};\n\nconsole.log(describe(7));",
+    "output": [
+      {
+        "type": "log",
+        "text": "7 is odd"
+      }
+    ]
+  },
+  "3-4-8-reading-shorthand-rules#3": {
+    "code": "const square = n => n * n;\n\nconsole.log(square(6));",
+    "output": [
+      {
+        "type": "log",
+        "text": "36"
+      }
+    ]
+  },
+  "3-4-8-reading-shorthand-rules#4": {
+    "code": "const shout = () => \"HEY!\";\n\nconsole.log(shout());",
+    "output": [
+      {
+        "type": "log",
+        "text": "HEY!"
+      }
+    ]
+  },
+  "3-5-10-example-nested-access#0": {
+    "code": "const student = {\n  name: \"Marisol\",\n  address: {\n    city: \"Chico\",\n    state: \"CA\"\n  }\n};\n\nconsole.log(student.address);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"city\": \"Chico\",\n  \"state\": \"CA\"\n}"
+      }
+    ]
+  },
+  "3-5-10-example-nested-access#1": {
+    "code": "const student = {\n  name: \"Marisol\",\n  address: {\n    city: \"Chico\",\n    state: \"CA\"\n  }\n};\n\nconsole.log(student.address.city);\nconsole.log(student.address.state);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Chico"
+      },
+      {
+        "type": "log",
+        "text": "CA"
+      }
+    ]
+  },
+  "3-5-10-example-nested-access#2": {
+    "code": "const students = [\n  { name: \"Marisol\", grade: 92 },\n  { name: \"Dev\", grade: 78 },\n  { name: \"Priya\", grade: 85 }\n];\n\nfor (let i = 0; i < students.length; i++) {\n  console.log(students[i].name + \": \" + students[i].grade);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Marisol: 92"
+      },
+      {
+        "type": "log",
+        "text": "Dev: 78"
+      },
+      {
+        "type": "log",
+        "text": "Priya: 85"
+      }
+    ]
+  },
+  "3-5-10-example-nested-access#3": {
+    "code": "const students = [\n  { name: \"Marisol\", grade: 92 },\n  { name: \"Dev\", grade: 78 },\n  { name: \"Priya\", grade: 85 }\n];\n\nconst one = students[1];\nconsole.log(one.name + \" scored \" + one.grade);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Dev scored 78"
+      }
+    ]
+  },
+  "3-5-13-reading-methods#0": {
+    "code": "const counter = {\n  count: 0,\n  describe: function () {\n    return \"I am a counter.\";\n  }\n};\n\nconsole.log(counter.describe());\nconsole.log(typeof counter.describe);",
+    "output": [
+      {
+        "type": "log",
+        "text": "I am a counter."
+      },
+      {
+        "type": "log",
+        "text": "function"
+      }
+    ]
+  },
+  "3-5-13-reading-methods#1": {
+    "code": "const word = \"javascript\";\n\nconsole.log(word.toUpperCase());\nconsole.log(word.length);\nconsole.log(typeof word.toUpperCase);",
+    "output": [
+      {
+        "type": "log",
+        "text": "JAVASCRIPT"
+      },
+      {
+        "type": "log",
+        "text": "10"
+      },
+      {
+        "type": "log",
+        "text": "function"
+      }
+    ]
+  },
+  "3-5-14-example-object-method#0": {
+    "code": "const student = {\n  name: \"Marisol\",\n  greet: function () {\n    return \"Hello!\";\n  }\n};\n\nconsole.log(student.greet);",
+    "output": [
+      {
+        "type": "log",
+        "text": "function () {\n    return \"Hello!\";\n  }"
+      }
+    ]
+  },
+  "3-5-14-example-object-method#1": {
+    "code": "const student = {\n  name: \"Marisol\",\n  greet: function () {\n    return \"Hello!\";\n  }\n};\n\nconsole.log(student.greet());",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello!"
+      }
+    ]
+  },
+  "3-5-14-example-object-method#2": {
+    "code": "const student = {\n  name: \"Marisol\"\n};\n\nstudent.greet = function (who) {\n  return \"Hello, \" + who + \"! I am \" + student.name + \".\";\n};\n\nconsole.log(student.greet(\"Dev\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, Dev! I am Marisol."
+      }
+    ]
+  },
+  "3-5-16-reading-named-arguments#0": {
+    "code": "function describeBoxPositional(width, height, depth, color) {\n  return color + \" box, \" + width + \"x\" + height + \"x\" + depth;\n}\n\nconsole.log(describeBoxPositional(10, 4, 6, \"red\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "red box, 10x4x6"
+      }
+    ]
+  },
+  "3-5-16-reading-named-arguments#1": {
+    "code": "function describeBox(options) {\n  return options.color + \" box, \" +\n    options.width + \"x\" + options.height + \"x\" + options.depth;\n}\n\nconsole.log(describeBox({ width: 10, height: 4, depth: 6, color: \"red\" }));\nconsole.log(describeBox({ color: \"blue\", depth: 6, height: 4, width: 10 }));",
+    "output": [
+      {
+        "type": "log",
+        "text": "red box, 10x4x6"
+      },
+      {
+        "type": "log",
+        "text": "blue box, 10x4x6"
+      }
+    ]
+  },
+  "3-5-17-example-options-object#0": {
+    "code": "function makeLabel(text, size, bold, color) {\n  let label = text + \" (\" + size + \"px\";\n  if (bold) {\n    label = label + \", bold\";\n  }\n  return label + \", \" + color + \")\";\n}\n\nconsole.log(makeLabel(\"HELLO\", 14, true, \"red\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "HELLO (14px, bold, red)"
+      }
+    ]
+  },
+  "3-5-17-example-options-object#1": {
+    "code": "function makeLabel(text, size, bold, color) {\n  let label = text + \" (\" + size + \"px\";\n  if (bold) {\n    label = label + \", bold\";\n  }\n  return label + \", \" + color + \")\";\n}\n\nconsole.log(makeLabel(\"HELLO\", true, 14, \"red\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "HELLO (truepx, bold, red)"
+      }
+    ]
+  },
+  "3-5-17-example-options-object#2": {
+    "code": "function makeLabel(options) {\n  let label = options.text + \" (\" + options.size + \"px\";\n  if (options.bold) {\n    label = label + \", bold\";\n  }\n  return label + \", \" + options.color + \")\";\n}\n\nconsole.log(makeLabel({ text: \"HELLO\", size: 14, bold: true, color: \"red\" }));",
+    "output": [
+      {
+        "type": "log",
+        "text": "HELLO (14px, bold, red)"
+      }
+    ]
+  },
+  "3-5-17-example-options-object#3": {
+    "code": "function makeLabel(options) {\n  let label = options.text + \" (\" + options.size + \"px\";\n  if (options.bold) {\n    label = label + \", bold\";\n  }\n  return label + \", \" + options.color + \")\";\n}\n\nconsole.log(makeLabel({ color: \"red\", bold: true, size: 14, text: \"HELLO\" }));",
+    "output": [
+      {
+        "type": "log",
+        "text": "HELLO (14px, bold, red)"
+      }
+    ]
+  },
+  "3-5-19-reading-destructuring#0": {
+    "code": "const student = { name: \"Marisol\", age: 19, city: \"Chico\" };\n\nconst { name, age, city } = student;\n\nconsole.log(name + \", \" + age + \", \" + city);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Marisol, 19, Chico"
+      }
+    ]
+  },
+  "3-5-19-reading-destructuring#1": {
+    "code": "const student = { name: \"Marisol\", age: 19, city: \"Chico\" };\n\nconst { city, name } = student;\n\nconsole.log(name + \" lives in \" + city);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Marisol lives in Chico"
+      }
+    ]
+  },
+  "3-5-19-reading-destructuring#2": {
+    "code": "const point = [10, 20];\nconst [x, y] = point;\n\nconsole.log(\"x is \" + x + \", y is \" + y);",
+    "output": [
+      {
+        "type": "log",
+        "text": "x is 10, y is 20"
+      }
+    ]
+  },
+  "3-5-2-reading-grouping-values#0": {
+    "code": "const studentName = \"Marisol\";\nconst studentAge = 19;\nconst studentCity = \"Chico\";\n\nconsole.log(studentName + \", \" + studentAge + \", from \" + studentCity);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Marisol, 19, from Chico"
+      }
+    ]
+  },
+  "3-5-2-reading-grouping-values#1": {
+    "code": "const student = {\n  name: \"Marisol\",\n  age: 19,\n  city: \"Chico\"\n};\n\nconsole.log(student.name + \", \" + student.age + \", from \" + student.city);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Marisol, 19, from Chico"
+      }
+    ]
+  },
+  "3-5-20-example-destructure-param#0": {
+    "code": "function describeBox(options) {\n  return options.color + \" box, \" + options.width + \"x\" + options.height;\n}\n\nconsole.log(describeBox({ width: 10, height: 4, color: \"red\" }));",
+    "output": [
+      {
+        "type": "log",
+        "text": "red box, 10x4"
+      }
+    ]
+  },
+  "3-5-20-example-destructure-param#1": {
+    "code": "function describeBox(options) {\n  const { width, height, color } = options;\n  return color + \" box, \" + width + \"x\" + height;\n}\n\nconsole.log(describeBox({ width: 10, height: 4, color: \"red\" }));",
+    "output": [
+      {
+        "type": "log",
+        "text": "red box, 10x4"
+      }
+    ]
+  },
+  "3-5-20-example-destructure-param#2": {
+    "code": "function describeBox({ width, height, color }) {\n  return color + \" box, \" + width + \"x\" + height;\n}\n\nconsole.log(describeBox({ width: 10, height: 4, color: \"red\" }));",
+    "output": [
+      {
+        "type": "log",
+        "text": "red box, 10x4"
+      }
+    ]
+  },
+  "3-5-23-example-record-shape#0": {
+    "code": "const student = {\n  name: \"Marisol\",\n  grade: 92,\n  city: \"Chico\"\n};\n\nconsole.log(student.name + \" scored \" + student.grade);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Marisol scored 92"
+      }
+    ]
+  },
+  "3-5-23-example-record-shape#1": {
+    "code": "const students = [\n  { name: \"Marisol\", grade: 92 },\n  { name: \"Dev\", grade: 78 },\n  { name: \"Priya\", grade: 85 }\n];\n\nfor (let i = 0; i < students.length; i++) {\n  console.log(students[i].name + \": \" + students[i].grade);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Marisol: 92"
+      },
+      {
+        "type": "log",
+        "text": "Dev: 78"
+      },
+      {
+        "type": "log",
+        "text": "Priya: 85"
+      }
+    ]
+  },
+  "3-5-23-example-record-shape#2": {
+    "code": "const students = [\n  { name: \"Marisol\", grade: 92 },\n  { name: \"Dev\", grade: 78 },\n  { name: \"Priya\", grade: 85 }\n];\n\nfunction findStudent(list, wantedName) {\n  for (let i = 0; i < list.length; i++) {\n    if (list[i].name === wantedName) {\n      return list[i];\n    }\n  }\n  return null;\n}\n\nconst found = findStudent(students, \"Dev\");\nconsole.log(found.grade);\n\nconst missing = findStudent(students, \"Sam\");\nconsole.log(missing);",
+    "output": [
+      {
+        "type": "log",
+        "text": "78"
+      },
+      {
+        "type": "log",
+        "text": "null"
+      }
+    ]
+  },
+  "3-5-3-example-object-literal#0": {
+    "code": "const title = \"Eloquent JavaScript\";\nconst author = \"Haverbeke\";\nconst pages = 472;\n\nconsole.log(title + \" by \" + author + \", \" + pages + \" pages\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Eloquent JavaScript by Haverbeke, 472 pages"
+      }
+    ]
+  },
+  "3-5-3-example-object-literal#1": {
+    "code": "const book = {\n  title: \"Eloquent JavaScript\",\n  author: \"Haverbeke\",\n  pages: 472\n};\n\nconsole.log(book);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"title\": \"Eloquent JavaScript\",\n  \"author\": \"Haverbeke\",\n  \"pages\": 472\n}"
+      }
+    ]
+  },
+  "3-5-3-example-object-literal#2": {
+    "code": "const book = {\n  title: \"Eloquent JavaScript\",\n  author: \"Haverbeke\",\n  pages: 472\n};\n\nconsole.log(book.title + \" by \" + book.author + \", \" + book.pages + \" pages\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Eloquent JavaScript by Haverbeke, 472 pages"
+      }
+    ]
+  },
+  "3-5-4-reading-properties#0": {
+    "code": "const book = {\n  title: \"Eloquent JavaScript\",\n  pages: 472\n};\n\nconsole.log(book.title);\nconsole.log(book.pages);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Eloquent JavaScript"
+      },
+      {
+        "type": "log",
+        "text": "472"
+      }
+    ]
+  },
+  "3-5-4-reading-properties#1": {
+    "code": "const student = { name: \"Marisol\", age: 19 };\n\nconsole.log(student.name);\nconsole.log(student.nmae);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Marisol"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      }
+    ]
+  },
+  "3-5-4-reading-properties#2": {
+    "code": "const book = {\n  title: \"Eloquent JavaScript\",\n  pages: 472\n};\n\nbook.pages = 480;\nbook.author = \"Haverbeke\";\n\nconsole.log(book);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"title\": \"Eloquent JavaScript\",\n  \"pages\": 480,\n  \"author\": \"Haverbeke\"\n}"
+      }
+    ]
+  },
+  "3-5-4-reading-properties#3": {
+    "code": "const book = { title: \"Eloquent JavaScript\", pages: 472 };\n\ndelete book.pages;\n\nconsole.log(book);\nconsole.log(book.pages);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"title\": \"Eloquent JavaScript\"\n}"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      }
+    ]
+  },
+  "3-5-6-reading-computed-keys#0": {
+    "code": "const settings = {\n  \"font size\": 14,\n  theme: \"dark\"\n};\n\nconsole.log(settings[\"font size\"]);\nconsole.log(settings.theme);",
+    "output": [
+      {
+        "type": "log",
+        "text": "14"
+      },
+      {
+        "type": "log",
+        "text": "dark"
+      }
+    ]
+  },
+  "3-5-6-reading-computed-keys#1": {
+    "code": "const student = { name: \"Marisol\", age: 19, city: \"Chico\" };\n\nconst field = \"age\";\n\nconsole.log(student[field]);\nconsole.log(student.field);",
+    "output": [
+      {
+        "type": "log",
+        "text": "19"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      }
+    ]
+  },
+  "3-5-6-reading-computed-keys#2": {
+    "code": "const student = { name: \"Marisol\", age: 19, city: \"Chico\" };\n\nfor (const key of Object.keys(student)) {\n  console.log(key + \": \" + student[key]);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "name: Marisol"
+      },
+      {
+        "type": "log",
+        "text": "age: 19"
+      },
+      {
+        "type": "log",
+        "text": "city: Chico"
+      }
+    ]
+  },
+  "3-5-7-example-bracket-access#0": {
+    "code": "const student = { name: \"Marisol\", age: 19, city: \"Chico\" };\n\nconst field = \"age\";\n\nconsole.log(field);",
+    "output": [
+      {
+        "type": "log",
+        "text": "age"
+      }
+    ]
+  },
+  "3-5-7-example-bracket-access#1": {
+    "code": "const student = { name: \"Marisol\", age: 19, city: \"Chico\" };\n\nconst field = \"age\";\n\nconsole.log(student.field);",
+    "output": [
+      {
+        "type": "log",
+        "text": "undefined"
+      }
+    ]
+  },
+  "3-5-7-example-bracket-access#2": {
+    "code": "const student = { name: \"Marisol\", age: 19, city: \"Chico\" };\n\nconst field = \"age\";\n\nconsole.log(student[field]);",
+    "output": [
+      {
+        "type": "log",
+        "text": "19"
+      }
+    ]
+  },
+  "3-5-9-reading-nested-objects#0": {
+    "code": "const student = {\n  name: \"Marisol\",\n  address: {\n    city: \"Chico\",\n    state: \"CA\"\n  },\n  courses: [\"CSCI 4\", \"MATH 105\"]\n};\n\nconsole.log(student.address.city);\nconsole.log(student.courses[0]);\nconsole.log(student.courses.length);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Chico"
+      },
+      {
+        "type": "log",
+        "text": "CSCI 4"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      }
+    ]
+  },
+  "3-5-9-reading-nested-objects#1": {
+    "code": "const students = [\n  { name: \"Marisol\", grade: 92 },\n  { name: \"Dev\", grade: 78 },\n  { name: \"Priya\", grade: 85 }\n];\n\nfor (let i = 0; i < students.length; i++) {\n  console.log(students[i].name + \": \" + students[i].grade);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Marisol: 92"
+      },
+      {
+        "type": "log",
+        "text": "Dev: 78"
+      },
+      {
+        "type": "log",
+        "text": "Priya: 85"
+      }
+    ]
+  },
+  "3-6-11-example-defensive-copy#0": {
+    "code": "function addItem(list, item) {\n  list.push(item);\n  return list;\n}\n\nconst myList = [\"a\", \"b\"];\nconst result = addItem(myList, \"c\");\nconsole.log(result);\nconsole.log(myList);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  \"a\",\n  \"b\",\n  \"c\"\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  \"a\",\n  \"b\",\n  \"c\"\n]"
+      }
+    ]
+  },
+  "3-6-11-example-defensive-copy#1": {
+    "code": "function addItemSafely(list, item) {\n  return [...list, item];\n}\n\nconst myList = [\"a\", \"b\"];\nconst result = addItemSafely(myList, \"c\");\nconsole.log(result);\nconsole.log(myList);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  \"a\",\n  \"b\",\n  \"c\"\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  \"a\",\n  \"b\"\n]"
+      }
+    ]
+  },
+  "3-6-11-example-defensive-copy#2": {
+    "code": "function highestThree(scores) {\n  const copy = [...scores];\n  copy.sort(function (a, b) { return b - a; });\n  return copy.slice(0, 3);\n}\n\nconst original = [40, 90, 15, 70, 55];\nconsole.log(highestThree(original));\nconsole.log(original);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  90,\n  70,\n  55\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  40,\n  90,\n  15,\n  70,\n  55\n]"
+      }
+    ]
+  },
+  "3-6-14-example-6-2-defensive-copy#0": {
+    "code": "let scores = [45, 30, 80, 60];\n\nfor (const score of scores) {\n  if (score < 50) {\n    scores.splice(scores.indexOf(score), 1);\n  }\n}\n\nconsole.log(scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  30,\n  80,\n  60\n]"
+      }
+    ]
+  },
+  "3-6-14-example-6-2-defensive-copy#1": {
+    "code": "let scores = [45, 30, 80, 60];\n\nfor (const score of [...scores]) {\n  if (score < 50) {\n    scores.splice(scores.indexOf(score), 1);\n  }\n}\n\nconsole.log(scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  80,\n  60\n]"
+      }
+    ]
+  },
+  "3-6-14-example-6-2-defensive-copy#2": {
+    "code": "let list = [3, 1, 2];\n\nfor (const n of list) {\n  console.log(\"walking \" + n);\n}\n\nfor (const n of [...list]) {\n  console.log(\"walking copy \" + n);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "walking 3"
+      },
+      {
+        "type": "log",
+        "text": "walking 1"
+      },
+      {
+        "type": "log",
+        "text": "walking 2"
+      },
+      {
+        "type": "log",
+        "text": "walking copy 3"
+      },
+      {
+        "type": "log",
+        "text": "walking copy 1"
+      },
+      {
+        "type": "log",
+        "text": "walking copy 2"
+      }
+    ]
+  },
+  "3-6-3-example-mutating-array-param#0": {
+    "code": "function tryToChange(num) {\n  num = 99;\n  console.log(\"inside:\", num);\n}\n\nlet myNum = 10;\ntryToChange(myNum);\nconsole.log(\"outside:\", myNum);",
+    "output": [
+      {
+        "type": "log",
+        "text": "inside: 99"
+      },
+      {
+        "type": "log",
+        "text": "outside: 10"
+      }
+    ]
+  },
+  "3-6-3-example-mutating-array-param#1": {
+    "code": "function addTo(arr) {\n  arr.push(99);\n}\n\nlet myArr = [1, 2, 3];\naddTo(myArr);\nconsole.log(myArr);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  99\n]"
+      }
+    ]
+  },
+  "3-6-3-example-mutating-array-param#2": {
+    "code": "function change(num, arr) {\n  num = 99;\n  arr.push(99);\n}\n\nlet myNum = 10;\nlet myArr = [1, 2, 3];\n\nchange(myNum, myArr);\n\nconsole.log(myNum);\nconsole.log(myArr);",
+    "output": [
+      {
+        "type": "log",
+        "text": "10"
+      },
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  99\n]"
+      }
+    ]
+  },
+  "3-6-5-reading-changing-vs-reassigning#0": {
+    "code": "let scores = [1, 2, 3];\nscores.push(4);\n\nconsole.log(scores[3]);\nconsole.log(scores.length);",
+    "output": [
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      }
+    ]
+  },
+  "3-6-5-reading-changing-vs-reassigning#1": {
+    "code": "function replace(arr) {\n  arr = [9, 9, 9];\n  console.log(\"inside: \", arr);\n}\n\nlet scores = [1, 2, 3];\nreplace(scores);\nconsole.log(\"outside:\", scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "inside:  [\n  9,\n  9,\n  9\n]"
+      },
+      {
+        "type": "log",
+        "text": "outside: [\n  1,\n  2,\n  3\n]"
+      }
+    ]
+  },
+  "3-6-5-reading-changing-vs-reassigning#2": {
+    "code": "const items = [\"pen\"];\nitems.push(\"notebook\");\nconsole.log(items);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  \"pen\",\n  \"notebook\"\n]"
+      }
+    ]
+  },
+  "3-6-6-example-reassign-doesnt-escape#0": {
+    "code": "function replace(arr) {\n  arr = [9, 9, 9];\n  console.log(\"inside: \", arr);\n}\n\nlet scores = [1, 2, 3];\nreplace(scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "inside:  [\n  9,\n  9,\n  9\n]"
+      }
+    ]
+  },
+  "3-6-6-example-reassign-doesnt-escape#1": {
+    "code": "function replace(arr) {\n  arr = [9, 9, 9];\n  console.log(\"inside: \", arr);\n}\n\nlet scores = [1, 2, 3];\nreplace(scores);\nconsole.log(\"outside:\", scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "inside:  [\n  9,\n  9,\n  9\n]"
+      },
+      {
+        "type": "log",
+        "text": "outside: [\n  1,\n  2,\n  3\n]"
+      }
+    ]
+  },
+  "3-6-6-example-reassign-doesnt-escape#2": {
+    "code": "function changeInPlace(arr) {\n  arr[0] = 9;\n  console.log(\"inside: \", arr);\n}\n\nlet scores = [1, 2, 3];\nchangeInPlace(scores);\nconsole.log(\"outside:\", scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "inside:  [\n  9,\n  2,\n  3\n]"
+      },
+      {
+        "type": "log",
+        "text": "outside: [\n  9,\n  2,\n  3\n]"
+      }
+    ]
+  },
+  "3-6-9-reading-side-effects-copies#0": {
+    "code": "function sortScores(scores) {\n  scores.sort(function (a, b) { return b - a; });\n}\n\nlet highScores = [40, 90, 15, 70];\nsortScores(highScores);\nconsole.log(highScores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  90,\n  70,\n  40,\n  15\n]"
+      }
+    ]
+  },
+  "3-6-9-reading-side-effects-copies#1": {
+    "code": "function getHighest(scores) {\n  scores.sort(function (a, b) { return b - a; });\n  return scores[0];\n}\n\nlet scores = [40, 90, 15, 70];\nlet top = getHighest(scores);\nconsole.log(\"highest: \" + top);\nconsole.log(scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "highest: 90"
+      },
+      {
+        "type": "log",
+        "text": "[\n  90,\n  70,\n  40,\n  15\n]"
+      }
+    ]
+  },
+  "3-6-9-reading-side-effects-copies#2": {
+    "code": "function getHighest(scores) {\n  const copy = [...scores];\n  copy.sort(function (a, b) { return b - a; });\n  return copy[0];\n}\n\nlet scores = [40, 90, 15, 70];\nlet top = getHighest(scores);\nconsole.log(\"highest: \" + top);\nconsole.log(scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "highest: 90"
+      },
+      {
+        "type": "log",
+        "text": "[\n  40,\n  90,\n  15,\n  70\n]"
+      }
+    ]
+  },
+  "3-7-10-example-concat-non-mutating#0": {
+    "code": "const first = [1, 2];\nconst second = [3, 4];\n\nconst joined = first.concat(second);\n\nconsole.log(joined);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  4\n]"
+      }
+    ]
+  },
+  "3-7-10-example-concat-non-mutating#1": {
+    "code": "const first = [1, 2];\nconst second = [3, 4];\n\nconst joined = first.concat(second);\n\nconsole.log(joined);\nconsole.log(first);\nconsole.log(second);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  4\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  3,\n  4\n]"
+      }
+    ]
+  },
+  "3-7-10-example-concat-non-mutating#2": {
+    "code": "const a = [1, 2];\nconst b = [3, 4];\n\nconst c = a.concat(b);\na.push(b);\n\nconsole.log(c);\nconsole.log(a);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  4\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  [\n    3,\n    4\n  ]\n]"
+      }
+    ]
+  },
+  "3-7-12-reading-spread-arguments#0": {
+    "code": "console.log(Math.max(3, 9, 4));\nconsole.log(Math.max([3, 9, 4]));",
+    "output": [
+      {
+        "type": "log",
+        "text": "9"
+      },
+      {
+        "type": "log",
+        "text": "NaN"
+      }
+    ]
+  },
+  "3-7-12-reading-spread-arguments#1": {
+    "code": "const numbers = [3, 9, 4];\n\nconsole.log(Math.max(...numbers));",
+    "output": [
+      {
+        "type": "log",
+        "text": "9"
+      }
+    ]
+  },
+  "3-7-12-reading-spread-arguments#2": {
+    "code": "function total(...numbers) {\n  let sum = 0;\n  for (let i = 0; i < numbers.length; i++) {\n    sum = sum + numbers[i];\n  }\n  return sum;\n}\n\nconsole.log(total(1, 2, 3));\nconsole.log(total(5, 5));",
+    "output": [
+      {
+        "type": "log",
+        "text": "6"
+      },
+      {
+        "type": "log",
+        "text": "10"
+      }
+    ]
+  },
+  "3-7-13-example-spread-call#0": {
+    "code": "console.log(Math.max(3, 9, 4));\nconsole.log(Math.max([3, 9, 4]));",
+    "output": [
+      {
+        "type": "log",
+        "text": "9"
+      },
+      {
+        "type": "log",
+        "text": "NaN"
+      }
+    ]
+  },
+  "3-7-13-example-spread-call#1": {
+    "code": "const numbers = [3, 9, 4];\n\nconsole.log(Math.max(...numbers));",
+    "output": [
+      {
+        "type": "log",
+        "text": "9"
+      }
+    ]
+  },
+  "3-7-13-example-spread-call#2": {
+    "code": "const parts = [\"a\", \"b\", \"c\"];\n\nfunction combine(x, y, z) {\n  return x + \"-\" + y + \"-\" + z;\n}\n\nconsole.log(combine(...parts));",
+    "output": [
+      {
+        "type": "log",
+        "text": "a-b-c"
+      }
+    ]
+  },
+  "3-7-14-reading-spread-into-new#0": {
+    "code": "const first = [1, 2];\nconst second = [3, 4];\n\nconst joined = [...first, ...second];\nconst withExtra = [0, ...first, 99];\n\nconsole.log(joined);\nconsole.log(withExtra);\nconsole.log(first);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  4\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  0,\n  1,\n  2,\n  99\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2\n]"
+      }
+    ]
+  },
+  "3-7-14-reading-spread-into-new#1": {
+    "code": "const base = { width: 10, height: 4, color: \"red\" };\n\nconst blue = { ...base, color: \"blue\" };\nconst tall = { ...base, height: 40 };\n\nconsole.log(blue);\nconsole.log(tall);\nconsole.log(base);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"width\": 10,\n  \"height\": 4,\n  \"color\": \"blue\"\n}"
+      },
+      {
+        "type": "log",
+        "text": "{\n  \"width\": 10,\n  \"height\": 40,\n  \"color\": \"red\"\n}"
+      },
+      {
+        "type": "log",
+        "text": "{\n  \"width\": 10,\n  \"height\": 4,\n  \"color\": \"red\"\n}"
+      }
+    ]
+  },
+  "3-7-15-example-spread-override#0": {
+    "code": "const base = { width: 10, height: 4, color: \"red\" };\n\nconsole.log(base);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"width\": 10,\n  \"height\": 4,\n  \"color\": \"red\"\n}"
+      }
+    ]
+  },
+  "3-7-15-example-spread-override#1": {
+    "code": "const base = { width: 10, height: 4, color: \"red\" };\n\nconst blue = { ...base, color: \"blue\" };\n\nconsole.log(blue);\nconsole.log(base);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"width\": 10,\n  \"height\": 4,\n  \"color\": \"blue\"\n}"
+      },
+      {
+        "type": "log",
+        "text": "{\n  \"width\": 10,\n  \"height\": 4,\n  \"color\": \"red\"\n}"
+      }
+    ]
+  },
+  "3-7-15-example-spread-override#2": {
+    "code": "const base = { width: 10, height: 4, color: \"red\" };\n\nconst right = { ...base, color: \"blue\" };\nconst wrong = { color: \"blue\", ...base };\n\nconsole.log(right);\nconsole.log(wrong);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"width\": 10,\n  \"height\": 4,\n  \"color\": \"blue\"\n}"
+      },
+      {
+        "type": "log",
+        "text": "{\n  \"color\": \"red\",\n  \"width\": 10,\n  \"height\": 4\n}"
+      }
+    ]
+  },
+  "3-7-19-reading-what-else#0": {
+    "code": "const nums = [4, 1, 3, 2];\n\n// .includes(value) asks true/false\nconsole.log(nums.includes(3));\n\n// .indexOf(value) gives the position, or -1\nconsole.log(nums.indexOf(2));\n\n// .every(callback) is true only if EVERY element passes\nconsole.log(nums.every((n) => n > 0));\n\n// .forEach(callback) runs once per item and returns nothing\nnums.forEach((n) => console.log(\"item:\", n));\n\n// .sort() and .reverse() change the array IN PLACE\nconst ordered = nums.slice();\nordered.sort((a, b) => a - b);\nconsole.log(ordered);",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "item: 4"
+      },
+      {
+        "type": "log",
+        "text": "item: 1"
+      },
+      {
+        "type": "log",
+        "text": "item: 3"
+      },
+      {
+        "type": "log",
+        "text": "item: 2"
+      },
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  4\n]"
+      }
+    ]
+  },
+  "3-7-2-reading-map#0": {
+    "code": "const prices = [10, 20, 30];\nconst withTax = prices.map((price) => price * 1.08);\n\nconsole.log(withTax);\nconsole.log(prices);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  10.8,\n  21.6,\n  32.400000000000006\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  10,\n  20,\n  30\n]"
+      }
+    ]
+  },
+  "3-7-2-reading-map#1": {
+    "code": "const names = [\"marisol\", \"dev\", \"priya\"];\n\nconsole.log(names.map((n) => n.toUpperCase()));\nconsole.log(names.map((n) => n.length));\nconsole.log(names.map((n) => \"Hi \" + n + \"!\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  \"MARISOL\",\n  \"DEV\",\n  \"PRIYA\"\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  7,\n  3,\n  5\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  \"Hi marisol!\",\n  \"Hi dev!\",\n  \"Hi priya!\"\n]"
+      }
+    ]
+  },
+  "3-7-20-example-push-then-map#0": {
+    "code": "const scores = [];\n\nscores.push(72);\nscores.push(95);\nscores.push(64);\n\nconsole.log(scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  72,\n  95,\n  64\n]"
+      }
+    ]
+  },
+  "3-7-20-example-push-then-map#1": {
+    "code": "const scores = [];\n\nscores.push(72);\nscores.push(95);\nscores.push(64);\n\nconst curved = scores.map((score) => score + 5);\n\nconsole.log(curved);\nconsole.log(scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  77,\n  100,\n  69\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  72,\n  95,\n  64\n]"
+      }
+    ]
+  },
+  "3-7-20-example-push-then-map#2": {
+    "code": "const scores = [];\n\nscores.push(72);\nscores.push(95);\nscores.push(64);\n\nconst curved = scores.map((score) => score + 5);\nconst passed = curved.filter((score) => score >= 80);\n\nconsole.log(scores);\nconsole.log(curved);\nconsole.log(passed);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  72,\n  95,\n  64\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  77,\n  100,\n  69\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  100\n]"
+      }
+    ]
+  },
+  "3-7-3-example-map-numeric#0": {
+    "code": "const prices = [10, 20, 30];\nconst withTax = [];\n\nfor (let i = 0; i < prices.length; i++) {\n  withTax.push(prices[i] * 1.08);\n}\n\nconsole.log(withTax);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  10.8,\n  21.6,\n  32.400000000000006\n]"
+      }
+    ]
+  },
+  "3-7-3-example-map-numeric#1": {
+    "code": "const prices = [10, 20, 30];\nconst withTax = prices.map((price) => price * 1.08);\n\nconsole.log(withTax);\nconsole.log(prices);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  10.8,\n  21.6,\n  32.400000000000006\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  10,\n  20,\n  30\n]"
+      }
+    ]
+  },
+  "3-7-3-example-map-numeric#2": {
+    "code": "const prices = [10, 20, 30];\nconst halfOff = prices.map((price) => price / 2);\n\nconsole.log(halfOff);\nconsole.log(prices);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  5,\n  10,\n  15\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  10,\n  20,\n  30\n]"
+      }
+    ]
+  },
+  "3-7-6-reading-slice#0": {
+    "code": "const letters = [\"a\", \"b\", \"c\", \"d\", \"e\"];\n\nconsole.log(letters.slice(1, 3));\nconsole.log(letters.slice(2));\nconsole.log(letters.slice(0, 2));\nconsole.log(letters);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  \"b\",\n  \"c\"\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  \"c\",\n  \"d\",\n  \"e\"\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  \"a\",\n  \"b\"\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  \"a\",\n  \"b\",\n  \"c\",\n  \"d\",\n  \"e\"\n]"
+      }
+    ]
+  },
+  "3-7-6-reading-slice#1": {
+    "code": "const original = [1, 2, 3];\nconst copy = original.slice();\n\ncopy.push(4);\n\nconsole.log(original);\nconsole.log(copy);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  4\n]"
+      }
+    ]
+  },
+  "3-7-7-example-slice-copy#0": {
+    "code": "const letters = [\"a\", \"b\", \"c\", \"d\", \"e\"];\n\nconsole.log(letters.slice(1, 3));\nconsole.log(letters.length);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  \"b\",\n  \"c\"\n]"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "3-7-7-example-slice-copy#1": {
+    "code": "const letters = [\"a\", \"b\", \"c\", \"d\", \"e\"];\n\nconsole.log(letters.slice(2));\nconsole.log(letters.slice(0, 2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  \"c\",\n  \"d\",\n  \"e\"\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  \"a\",\n  \"b\"\n]"
+      }
+    ]
+  },
+  "3-7-7-example-slice-copy#2": {
+    "code": "const original = [1, 2, 3];\nconst copy = original.slice();\n\ncopy.push(4);\n\nconsole.log(original);\nconsole.log(copy);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  4\n]"
+      }
+    ]
+  },
+  "3-7-9-reading-concat#0": {
+    "code": "const first = [1, 2];\nconst second = [3, 4];\n\nconst joined = first.concat(second);\n\nconsole.log(joined);\nconsole.log(first);\nconsole.log(second);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  4\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  3,\n  4\n]"
+      }
+    ]
+  },
+  "3-7-9-reading-concat#1": {
+    "code": "console.log([1, 2].concat(3));\nconsole.log([1].concat([2], [3, 4]));",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3\n]"
+      },
+      {
+        "type": "log",
+        "text": "[\n  1,\n  2,\n  3,\n  4\n]"
+      }
+    ]
+  },
+  "3-8-12-reading-parsing-can-fail#0": {
+    "code": "try {\n  const data = JSON.parse(\"{ this is not json }\");\n  console.log(data);\n} catch (err) {\n  console.log(\"Could not read the saved data.\");\n  console.log(err.name);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Could not read the saved data."
+      },
+      {
+        "type": "log",
+        "text": "SyntaxError"
+      }
+    ]
+  },
+  "3-8-12-reading-parsing-can-fail#1": {
+    "code": "function loadSettings(text) {\n  try {\n    return JSON.parse(text);\n  } catch (err) {\n    return { theme: \"light\", fontSize: 14 };\n  }\n}\n\nconsole.log(loadSettings('{\"theme\":\"dark\",\"fontSize\":18}'));\nconsole.log(loadSettings(\"corrupted!!\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"theme\": \"dark\",\n  \"fontSize\": 18\n}"
+      },
+      {
+        "type": "log",
+        "text": "{\n  \"theme\": \"light\",\n  \"fontSize\": 14\n}"
+      }
+    ]
+  },
+  "3-8-13-example-try-catch-parse#0": {
+    "code": "const data = JSON.parse(\"{ this is not json }\");\nconsole.log(data);",
+    "output": [],
+    "error": "Expected property name or '}' in JSON at position 2 (line 1 column 3)"
+  },
+  "3-8-13-example-try-catch-parse#1": {
+    "code": "try {\n  const data = JSON.parse(\"{ this is not json }\");\n  console.log(data);\n} catch (err) {\n  console.log(\"Could not read the saved data.\");\n  console.log(err.name);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Could not read the saved data."
+      },
+      {
+        "type": "log",
+        "text": "SyntaxError"
+      }
+    ]
+  },
+  "3-8-13-example-try-catch-parse#2": {
+    "code": "function loadSettings(text) {\n  try {\n    return JSON.parse(text);\n  } catch (err) {\n    return { theme: \"light\", fontSize: 14 };\n  }\n}\n\nconsole.log(loadSettings('{\"theme\":\"dark\",\"fontSize\":18}'));\nconsole.log(loadSettings(\"corrupted!!\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"theme\": \"dark\",\n  \"fontSize\": 18\n}"
+      },
+      {
+        "type": "log",
+        "text": "{\n  \"theme\": \"light\",\n  \"fontSize\": 14\n}"
+      }
+    ]
+  },
+  "3-8-13-example-try-catch-parse#3": {
+    "code": "function safeParse(text) {\n  try {\n    return JSON.parse(text);\n  } catch (err) {\n    return \"unreadable\";\n  }\n}\n\nconsole.log(safeParse('{\"ok\":true}'));\nconsole.log(safeParse(\"{oops\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"ok\": true\n}"
+      },
+      {
+        "type": "log",
+        "text": "unreadable"
+      }
+    ]
+  },
+  "3-8-15-reading-saving-by-key#0": {
+    "code": "localStorage.setItem(\"highScore\", \"1200\");\n\nconsole.log(localStorage.getItem(\"highScore\"));\nconsole.log(localStorage.getItem(\"nothingHere\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "1200"
+      },
+      {
+        "type": "log",
+        "text": "null"
+      }
+    ]
+  },
+  "3-8-15-reading-saving-by-key#1": {
+    "code": "localStorage.setItem(\"highScore\", 1200);\n\nconst score = localStorage.getItem(\"highScore\");\nconsole.log(score + 1);\nconsole.log(Number(score) + 1);",
+    "output": [
+      {
+        "type": "log",
+        "text": "12001"
+      },
+      {
+        "type": "log",
+        "text": "1201"
+      }
+    ]
+  },
+  "3-8-15-reading-saving-by-key#2": {
+    "code": "const saved = localStorage.getItem(\"settingsThatWereNeverSaved\");\n\nconsole.log(saved);\n\nif (saved === null) {\n  console.log(\"First run — using defaults.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "null"
+      },
+      {
+        "type": "log",
+        "text": "First run — using defaults."
+      }
+    ]
+  },
+  "3-8-16-example-whole-pattern#0": {
+    "code": "const defaults = { theme: \"light\", fontSize: 14 };\n\nfunction saveSettings(settings) {\n  localStorage.setItem(\"settings\", JSON.stringify(settings));\n}\n\nsaveSettings({ theme: \"dark\", fontSize: 18 });\n\nconsole.log(localStorage.getItem(\"settings\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\"theme\":\"dark\",\"fontSize\":18}"
+      }
+    ]
+  },
+  "3-8-16-example-whole-pattern#1": {
+    "code": "const defaults = { theme: \"light\", fontSize: 14 };\n\nfunction loadSettings() {\n  const text = localStorage.getItem(\"settings\");\n  if (text === null) {\n    return defaults;\n  }\n  try {\n    return JSON.parse(text);\n  } catch (err) {\n    return defaults;\n  }\n}\n\nconsole.log(loadSettings());",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"theme\": \"light\",\n  \"fontSize\": 14\n}"
+      }
+    ]
+  },
+  "3-8-16-example-whole-pattern#2": {
+    "code": "const defaults = { theme: \"light\", fontSize: 14 };\n\nfunction saveSettings(settings) {\n  localStorage.setItem(\"settings\", JSON.stringify(settings));\n}\n\nfunction loadSettings() {\n  const text = localStorage.getItem(\"settings\");\n  if (text === null) {\n    return defaults;\n  }\n  try {\n    return JSON.parse(text);\n  } catch (err) {\n    return defaults;\n  }\n}\n\nsaveSettings({ theme: \"dark\", fontSize: 18 });\nconsole.log(loadSettings());\n\nlocalStorage.setItem(\"settings\", \"{ not json\");\nconsole.log(loadSettings());",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"theme\": \"dark\",\n  \"fontSize\": 18\n}"
+      },
+      {
+        "type": "log",
+        "text": "{\n  \"theme\": \"light\",\n  \"fontSize\": 14\n}"
+      }
+    ]
+  },
+  "3-8-16-example-whole-pattern#3": {
+    "code": "const defaults = { theme: \"light\", fontSize: 14 };\n\nlocalStorage.setItem(\"settings\", JSON.stringify({ theme: \"dark\", fontSize: 18 }));\n\nconst text = localStorage.getItem(\"settings\");\nif (text === null) {\n  console.log(defaults);\n} else {\n  console.log(JSON.parse(text));\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"theme\": \"dark\",\n  \"fontSize\": 18\n}"
+      }
+    ]
+  },
+  "3-8-2-reading-data-outlives-program#0": {
+    "code": "const student = { name: \"Marisol\", age: 19, courses: [\"CSCI 4\", \"MATH 105\"] };\n\nconst asText = \"\" + student;\n\nconsole.log(asText);\nconsole.log(typeof asText);",
+    "output": [
+      {
+        "type": "log",
+        "text": "[object Object]"
+      },
+      {
+        "type": "log",
+        "text": "string"
+      }
+    ]
+  },
+  "3-8-20-reading-no-open#0": {
+    "code": "localStorage.setItem(\"note\", \"saved text\");\n\nconsole.log(localStorage.getItem(\"note\"));\n\n// The file functions other languages use do not exist in a page's\n// JavaScript. The only store a page gets is its own, under keys it chooses.\nconsole.log(typeof read);\nconsole.log(typeof write);",
+    "output": [
+      {
+        "type": "log",
+        "text": "saved text"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      }
+    ]
+  },
+  "3-8-21-example-browser-sandbox#0": {
+    "code": "localStorage.setItem(\"note\", \"hello from this page\");\nlocalStorage.setItem(\"count\", \"3\");\n\nconsole.log(localStorage.getItem(\"note\"));\nconsole.log(localStorage.getItem(\"count\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "hello from this page"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      }
+    ]
+  },
+  "3-8-21-example-browser-sandbox#1": {
+    "code": "console.log(typeof read);\nconsole.log(typeof write);\nconsole.log(typeof localStorage);",
+    "output": [
+      {
+        "type": "log",
+        "text": "undefined"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      },
+      {
+        "type": "log",
+        "text": "object"
+      }
+    ]
+  },
+  "3-8-21-example-browser-sandbox#2": {
+    "code": "localStorage.setItem(\"safe\", \"kept inside this site's own store\");\n\nconsole.log(localStorage.getItem(\"safe\"));\n\n// No function here can name a file on the computer.\nconsole.log(\"file access: \" + typeof read);\nconsole.log(\"per-site store: \" + typeof localStorage);",
+    "output": [
+      {
+        "type": "log",
+        "text": "kept inside this site's own store"
+      },
+      {
+        "type": "log",
+        "text": "file access: undefined"
+      },
+      {
+        "type": "log",
+        "text": "per-site store: object"
+      }
+    ]
+  },
+  "3-8-21-example-browser-sandbox#3": {
+    "code": "// The store the page gets is the only one it can reach on its own.\nlocalStorage.setItem(\"draft\", JSON.stringify({ level: 2 }));\n\nconst saved = localStorage.getItem(\"draft\");\nif (saved === null) {\n  console.log(\"nothing saved yet\");\n} else {\n  console.log(JSON.parse(saved));\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"level\": 2\n}"
+      }
+    ]
+  },
+  "3-8-3-example-readable-vs-lost#0": {
+    "code": "const book = { title: \"Eloquent JavaScript\", pages: 472, tags: [\"programming\", \"javascript\"] };\n\nconsole.log(JSON.stringify(book, null, 2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"title\": \"Eloquent JavaScript\",\n  \"pages\": 472,\n  \"tags\": [\n    \"programming\",\n    \"javascript\"\n  ]\n}"
+      }
+    ]
+  },
+  "3-8-3-example-readable-vs-lost#1": {
+    "code": "const book = { title: \"Eloquent JavaScript\", pages: 472, tags: [\"programming\", \"javascript\"] };\n\nconsole.log(JSON.stringify(book));\nconsole.log(JSON.stringify(book, null, 2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\"title\":\"Eloquent JavaScript\",\"pages\":472,\"tags\":[\"programming\",\"javascript\"]}"
+      },
+      {
+        "type": "log",
+        "text": "{\n  \"title\": \"Eloquent JavaScript\",\n  \"pages\": 472,\n  \"tags\": [\n    \"programming\",\n    \"javascript\"\n  ]\n}"
+      }
+    ]
+  },
+  "3-8-3-example-readable-vs-lost#2": {
+    "code": "const counter = {\n  count: 5,\n  describe: function () {\n    return \"I am a counter.\";\n  }\n};\n\nconsole.log(JSON.stringify(counter));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\"count\":5}"
+      }
+    ]
+  },
+  "3-8-3-example-readable-vs-lost#3": {
+    "code": "const settings = {\n  theme: \"dark\",\n  fontSize: undefined,\n  level: 3\n};\n\nconsole.log(JSON.stringify(settings));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\"theme\":\"dark\",\"level\":3}"
+      }
+    ]
+  },
+  "3-8-4-reading-json-stringify#0": {
+    "code": "const student = { name: \"Marisol\", age: 19, courses: [\"CSCI 4\", \"MATH 105\"] };\n\nconst json = JSON.stringify(student);\n\nconsole.log(json);\nconsole.log(typeof json);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\"name\":\"Marisol\",\"age\":19,\"courses\":[\"CSCI 4\",\"MATH 105\"]}"
+      },
+      {
+        "type": "log",
+        "text": "string"
+      }
+    ]
+  },
+  "3-8-4-reading-json-stringify#1": {
+    "code": "const scores = [1, 2, 3];\n\nconsole.log(JSON.stringify(scores));\nconsole.log(JSON.stringify(42));\nconsole.log(JSON.stringify(\"hello\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "[1,2,3]"
+      },
+      {
+        "type": "log",
+        "text": "42"
+      },
+      {
+        "type": "log",
+        "text": "\"hello\""
+      }
+    ]
+  },
+  "3-8-5-reading-readable-output#0": {
+    "code": "const student = { name: \"Marisol\", age: 19 };\n\nconsole.log(JSON.stringify(student, null, 2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\n  \"name\": \"Marisol\",\n  \"age\": 19\n}"
+      }
+    ]
+  },
+  "3-8-5-reading-readable-output#1": {
+    "code": "const book = { title: \"Eloquent JavaScript\", pages: 472, tags: [\"programming\", \"javascript\"] };\n\nconsole.log(JSON.stringify(book));\nconsole.log(JSON.stringify(book, null, 2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\"title\":\"Eloquent JavaScript\",\"pages\":472,\"tags\":[\"programming\",\"javascript\"]}"
+      },
+      {
+        "type": "log",
+        "text": "{\n  \"title\": \"Eloquent JavaScript\",\n  \"pages\": 472,\n  \"tags\": [\n    \"programming\",\n    \"javascript\"\n  ]\n}"
+      }
+    ]
+  },
+  "3-8-6-reading-what-does-not-survive#0": {
+    "code": "const counter = {\n  count: 5,\n  describe: function () {\n    return \"I am a counter.\";\n  }\n};\n\nconsole.log(JSON.stringify(counter));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\"count\":5}"
+      }
+    ]
+  },
+  "3-8-6-reading-what-does-not-survive#1": {
+    "code": "const settings = {\n  theme: \"dark\",\n  fontSize: undefined,\n  level: 3\n};\n\nconsole.log(JSON.stringify(settings));",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\"theme\":\"dark\",\"level\":3}"
+      }
+    ]
+  },
+  "3-8-8-reading-json-parse#0": {
+    "code": "const json = '{\"name\":\"Marisol\",\"age\":19,\"courses\":[\"CSCI 4\",\"MATH 105\"]}';\n\nconst student = JSON.parse(json);\n\nconsole.log(student.name);\nconsole.log(student.age + 1);\nconsole.log(student.courses[0]);\nconsole.log(student.courses.length);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Marisol"
+      },
+      {
+        "type": "log",
+        "text": "20"
+      },
+      {
+        "type": "log",
+        "text": "CSCI 4"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      }
+    ]
+  },
+  "3-8-8-reading-json-parse#1": {
+    "code": "const text = '{\"n\": 5}';\n\nconsole.log(text + \" (still just text, not usable fields)\");\n\nconst v = JSON.parse(text);\nconsole.log(v.n + 1);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\"n\": 5} (still just text, not usable fields)"
+      },
+      {
+        "type": "log",
+        "text": "6"
+      }
+    ]
+  },
+  "3-8-9-example-round-trip#0": {
+    "code": "const original = { width: 10, height: 4, tags: [\"red\", \"small\"] };\n\nconst saved = JSON.stringify(original);\nconst restored = JSON.parse(saved);\n\nconsole.log(saved);\nconsole.log(restored.width + restored.height);\nconsole.log(restored.tags[1]);",
+    "output": [
+      {
+        "type": "log",
+        "text": "{\"width\":10,\"height\":4,\"tags\":[\"red\",\"small\"]}"
+      },
+      {
+        "type": "log",
+        "text": "14"
+      },
+      {
+        "type": "log",
+        "text": "small"
+      }
+    ]
+  },
+  "3-8-9-example-round-trip#1": {
+    "code": "const original = { size: { width: 10, height: 4 } };\n\nconst alias = original;\nconst copy = JSON.parse(JSON.stringify(original));\n\nalias.size.width = 999;\n\nconsole.log(original.size.width);\nconsole.log(copy.size.width);",
+    "output": [
+      {
+        "type": "log",
+        "text": "999"
+      },
+      {
+        "type": "log",
+        "text": "10"
+      }
+    ]
+  },
+  "3-8-9-example-round-trip#2": {
+    "code": "const original = { size: { width: 10, height: 4 } };\n\nconst shallow = { ...original };\nconst deep = JSON.parse(JSON.stringify(original));\n\nshallow.size.width = 999;\n\nconsole.log(original.size.width);\nconsole.log(deep.size.width);",
+    "output": [
+      {
+        "type": "log",
+        "text": "999"
+      },
+      {
+        "type": "log",
+        "text": "10"
       }
     ]
   },

@@ -92,7 +92,18 @@ function runBlock(code) {
     sent++;
     output.push({ type, text: sent === MAX_LOGS ? TRUNCATION : args.map(ser).join(' ') });
   };
-  const context = vm.createContext({ console: { log: capture('log'), warn: capture('warn'), error: capture('error') } });
+  // A Worker has no window, so the student-facing runner injects a small
+  // in-memory localStorage (see lib/js-runner-source.ts, added for module 3.8).
+  // Mirror it here or every save-by-key figure throws ReferenceError and the
+  // snapshot records a lie about what a student sees.
+  const store = new Map();
+  const localStorage = {
+    setItem: (k, v) => { store.set(String(k), String(v)); },
+    getItem: (k) => (store.has(String(k)) ? store.get(String(k)) : null),
+    removeItem: (k) => { store.delete(String(k)); },
+    clear: () => { store.clear(); },
+  };
+  const context = vm.createContext({ console: { log: capture('log'), warn: capture('warn'), error: capture('error') }, localStorage });
   const result = { output };
   try {
     vm.runInContext(code, context, { timeout: RUN_TIMEOUT_MS });
