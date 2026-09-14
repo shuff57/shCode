@@ -46,7 +46,7 @@
       "description": "secondMissing is logged after the try...catch closes, not inside it",
       "type": "regex",
       "file": "script.js",
-      "pattern": "catch[\\s\\S]*\\}[\\s\\S]*console\\.log\\s*\\(\\s*secondMissing\\s*\\)",
+      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^{}]*\\}[\\s\\S]*console\\.log\\s*\\(\\s*secondMissing\\s*\\)",
       "flags": "i",
       "points": 0
     }
