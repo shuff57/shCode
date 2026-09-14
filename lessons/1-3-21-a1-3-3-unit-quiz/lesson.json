@@ -21,6 +21,7 @@
   "requirements": [],
   "assignmentCode": "A1.3.3",
   "quiz": {
+    "summative": true,
     "passPercent": 70,
     "questions": [
       {

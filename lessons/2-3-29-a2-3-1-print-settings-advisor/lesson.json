@@ -126,7 +126,7 @@
       "description": "A comment explains what would print if a break were removed",
       "type": "regex",
       "file": "script.js",
-      "pattern": "//[^\\n]*\\bbreak\\b",
+      "pattern": "//[^\\n]*\\bbreak\\b|/\\*[\\s\\S]*?\\bbreak\\b[\\s\\S]*?\\*/",
       "flags": "i",
       "points": 0,
       "stripComments": false

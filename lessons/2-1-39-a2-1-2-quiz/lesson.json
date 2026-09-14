@@ -23,6 +23,7 @@
   "requirements": [],
   "assignmentCode": "A2.1.2",
   "quiz": {
+    "summative": true,
     "passPercent": 70,
     "questions": [
       {
