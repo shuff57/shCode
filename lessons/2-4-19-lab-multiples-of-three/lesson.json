@@ -28,10 +28,10 @@
     {
       "id": "r1",
       "title": "for loop present",
-      "description": "Code contains a for loop",
+      "description": "A for loop from 1 to 20 uses %3 to decide when to continue, and logs the number otherwise, all inside the loop's own body",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\1\\s*(?:<=\\s*20|<\\s*21)[^)]*\\)\\s*\\{[^{}]*if\\s*\\([^)]*\\1\\s*%\\s*3[^)]*\\)\\s*\\{(?=[^{}]*\\bcontinue\\b)[^{}]*\\}[^{}]*console\\.log\\s*\\(\\s*\\1\\s*\\)[^{}]*\\}",
       "flags": "i",
       "points": 0
     },

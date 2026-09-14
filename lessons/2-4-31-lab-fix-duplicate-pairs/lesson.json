@@ -28,10 +28,10 @@
     {
       "id": "r1",
       "title": "inner loop starts at a + 1",
-      "description": "The inner loop's counter starts at a + 1, not a fixed value",
+      "description": "The inner loop's counter b starts at a + 1, not a fixed value, and the nested loops still log each pair",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|var)\\s+b\\s*=\\s*a\\s*\\+\\s*1",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+a\\s*=\\s*1\\s*;\\s*a\\s*<=\\s*3\\s*;\\s*a\\+\\+\\s*\\)\\s*\\{[^{}]*for\\s*\\(\\s*(?:let|var)\\s+b\\s*=\\s*a\\s*\\+\\s*1\\s*;\\s*b\\s*<=\\s*3\\s*;\\s*b\\+\\+\\s*\\)\\s*\\{(?=[^{}]*console\\.log)[^{}]*\\}[^{}]*\\}",
       "flags": "i",
       "points": 0
     }

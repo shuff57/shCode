@@ -28,20 +28,20 @@
     {
       "id": "r1",
       "title": "do...while loop present",
-      "description": "Code contains a do...while loop",
+      "description": "A do...while loop logs and increments a counter up through 5",
       "type": "regex",
       "file": "script.js",
-      "pattern": "do\\s*\\{",
+      "pattern": "do\\s*\\{(?=[^}]*console\\.log)(?=[^}]*(?:\\+\\+|\\+=\\s*1))[^}]*\\}\\s*while\\s*\\(\\s*[A-Za-z_$]\\w*\\s*(?:<=\\s*5|<\\s*6)\\s*\\)",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "closing while present",
-      "description": "Code contains the closing while condition of a do...while loop",
+      "description": "A second do...while loop logs something with a condition that is already false before the loop starts",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\}\\s*while\\s*\\(",
+      "pattern": "do\\s*\\{(?=[^}]*console\\.log)[^}]*\\}\\s*while\\s*\\(\\s*(?:false|[A-Za-z_$]\\w*\\s*<\\s*-?\\d+)\\s*\\)",
       "flags": "i",
       "points": 0
     },

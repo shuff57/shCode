@@ -53,20 +53,20 @@
     {
       "id": "r3",
       "title": "outer loop reads rows",
-      "description": "The outer loop's condition compares row against the rows variable, not a hardcoded number",
+      "description": "An outer for loop (from 0) contains a nested inner for loop (from 0) whose bound is the cols variable, the outer's bound is the rows variable, and the row is logged after the inner loop closes (any consistent counter names accepted, e.g. i/j)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "row\\s*<\\s*rows",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*0\\s*;\\s*\\1\\s*<\\s*rows\\s*;\\s*\\1\\+\\+\\s*\\)\\s*\\{[^{}]*for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*0\\s*;\\s*\\2\\s*<\\s*cols\\s*;\\s*\\2\\+\\+\\s*\\)\\s*\\{[^{}]*\\}(?=[^{}]*console\\.log)[^{}]*\\}",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r4",
       "title": "inner loop reads cols",
-      "description": "The inner loop's condition compares col against the cols variable, not a hardcoded number",
+      "description": "The inner loop's condition compares its own counter against the cols variable, and the outer against rows, not hardcoded numbers (any consistent counter names accepted, e.g. i/j)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "col\\s*<\\s*cols",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*0\\s*;\\s*\\1\\s*<\\s*rows\\s*;[\\s\\S]*?for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*0\\s*;\\s*\\2\\s*<\\s*cols\\s*;\\s*\\2\\+\\+\\s*\\)",
       "flags": "i",
       "points": 0
     },

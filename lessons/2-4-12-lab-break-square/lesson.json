@@ -28,20 +28,20 @@
     {
       "id": "r1",
       "title": "while (true) loop present",
-      "description": "Code contains a while (true) loop",
+      "description": "n is declared and set to 1",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(\\s*\\(?\\s*true\\s*\\)?\\s*\\)",
+      "pattern": "(?:let|var|const)\\s+n\\s*=\\s*1\\b",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "break present",
-      "description": "Code contains a break statement",
+      "description": "Inside the while (true) loop, n * n is compared to 50 and break runs when it is greater, with console.log also inside that check",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bbreak\\b",
+      "pattern": "while\\s*\\(\\s*\\(?\\s*true\\s*\\)?\\s*\\)\\s*\\{[^{}]*if\\s*\\([^)]*n\\s*\\*\\s*n\\s*>\\s*50[^)]*\\)\\s*\\{(?=[^{}]*console\\.log)(?=[^{}]*\\bbreak\\b)[^{}]*\\}[^{}]*\\}",
       "flags": "i",
       "points": 0
     },

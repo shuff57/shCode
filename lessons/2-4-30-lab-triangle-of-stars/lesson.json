@@ -33,20 +33,20 @@
     {
       "id": "r1",
       "title": "outer loop present",
-      "description": "Code contains an outer for loop using row",
+      "description": "An outer for loop (1 to 5) contains an inner for loop whose upper bound is the outer loop's own counter, and the row is logged after the inner loop closes",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+row\\s*=\\s*1",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\1\\s*(?:<=\\s*5|<\\s*6)\\s*;\\s*\\1\\+\\+\\s*\\)\\s*\\{[^{}]*for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\2\\s*<=\\s*\\1\\s*;\\s*\\2\\+\\+\\s*\\)\\s*\\{[^{}]*\\}(?=[^{}]*console\\.log)[^{}]*\\}",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "inner loop bound depends on row",
-      "description": "The inner loop's condition compares star to row, not to a fixed number",
+      "description": "The inner loop's condition compares its own counter to the outer loop's counter, not to a fixed number (any consistent counter names accepted, e.g. i/j)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "star\\s*<=\\s*row",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;[\\s\\S]*?for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\2\\s*<=\\s*\\1\\s*;\\s*\\2\\+\\+\\s*\\)",
       "flags": "i",
       "points": 0
     },

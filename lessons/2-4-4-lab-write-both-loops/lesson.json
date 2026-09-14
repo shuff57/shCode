@@ -28,20 +28,20 @@
     {
       "id": "r1",
       "title": "for loop present",
-      "description": "Code contains a for loop",
+      "description": "A for loop counts from 1 up to 8 and logs inside its own body",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\1\\s*(?:<=\\s*8|<\\s*9)[^)]*\\)\\s*\\{[^}]*console\\.log\\s*\\([^}]*\\}",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "while loop present",
-      "description": "Code contains a while loop",
+      "description": "A while loop doubles total on every pass until it exceeds 100",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(",
+      "pattern": "while\\s*\\(\\s*total\\s*<=\\s*100\\s*\\)\\s*\\{[^}]*total\\s*(?:=\\s*total\\s*\\*\\s*2|\\*=\\s*2)[^}]*\\}",
       "flags": "i",
       "points": 0
     },
