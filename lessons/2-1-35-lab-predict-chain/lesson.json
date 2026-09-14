@@ -50,7 +50,7 @@
       "description": "The ternary chain's condition compares a variable before the first ?, not a bare literal",
       "type": "regex",
       "file": "script.js",
-      "pattern": "[A-Za-z_$][A-Za-z0-9_$]*\\s*(?:===|!==|==|!=|<=|>=|<|>)[^\\n;]*\\?[^:?]*:",
+      "pattern": "[A-Za-z_$][A-Za-z0-9_$]*\\s*(?:===|!==|==|!=|<=|>=|<|>)[^;]*\\?[^:?]*:",
       "points": 0
     }
   ],

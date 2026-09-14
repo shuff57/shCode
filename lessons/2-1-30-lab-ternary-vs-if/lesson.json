@@ -31,7 +31,7 @@
       "description": "if statement compares loggedIn to 'yes' and logs a message containing 'Welcome back'",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\(?\\s*loggedIn\\s*(?:===|==)\\s*[\"']yes[\"']\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\([^)]*Welcome back",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*loggedIn\\s*(?:===|==)\\s*[\"']yes[\"']\\s*\\)?\\s*\\)\\s*(?:\\{[^}]*)?console\\.log\\s*\\([^)]*Welcome back",
       "points": 0
     },
     {
@@ -40,7 +40,7 @@
       "description": "the else branch logs a message containing 'Please log in'",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\}\\s*else\\s*\\{[^}]*console\\.log\\s*\\([^)]*Please log in",
+      "pattern": "(?:\\}|;)\\s*else\\s*(?:\\{[^}]*)?console\\.log\\s*\\([^)]*Please log in",
       "points": 0
     }
   ],

@@ -49,7 +49,7 @@
       "description": "console.log runs inside the if block, as step 2 asks",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^{]*\\{[^}]*console\\.log",
+      "pattern": "if\\s*\\([^{;]*(?:\\{[^}]*)?console\\.log",
       "points": 0
     }
   ],

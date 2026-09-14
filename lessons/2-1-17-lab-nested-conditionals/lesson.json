@@ -31,7 +31,7 @@
       "description": "if (isLoggedIn) nests an if (isAdmin) whose block logs a message about admin",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\(?\\s*isLoggedIn\\s*\\)?\\s*\\)\\s*\\{[^{}]*if\\s*\\(\\s*\\(?\\s*isAdmin\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\([^)]*admin",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*isLoggedIn\\s*\\)?\\s*\\)\\s*(?:\\{[^{}]*)?if\\s*\\(\\s*\\(?\\s*isAdmin\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\([^)]*admin",
       "points": 0
     },
     {

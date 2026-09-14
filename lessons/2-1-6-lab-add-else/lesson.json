@@ -31,7 +31,7 @@
       "description": "if statement's condition compares score to 70 with >=, and logs inside the block",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\(?\\s*score\\s*>=\\s*70\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\(",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*score\\s*>=\\s*70\\s*\\)?\\s*\\)\\s*(?:\\{[^}]*)?console\\.log\\s*\\(",
       "points": 0
     },
     {
@@ -40,7 +40,7 @@
       "description": "Code contains an else branch that calls console.log",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\}\\s*else\\s*\\{[^}]*console\\.log\\s*\\(",
+      "pattern": "(?:\\}|;)\\s*else\\s*(?:\\{[^}]*)?console\\.log\\s*\\(",
       "points": 0
     }
   ],
