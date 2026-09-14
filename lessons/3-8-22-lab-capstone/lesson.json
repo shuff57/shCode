@@ -1,0 +1,105 @@
+{
+  "id": "3-8-22-lab-capstone",
+  "title": "3.8.22 Lab: Saving-and-Loading Capstone",
+  "description": "Combine the whole module: save a state object by key, load it back with the missing-key and bad-parse guards, and print the restored values. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 30,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "console",
+  "week": 10,
+  "slos": [
+    "SLO-2",
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Define defaults and a state object",
+      "instructions": "Create a defaults object with at least two properties, then a state object describing a player with a score and a level."
+    },
+    {
+      "id": "s2",
+      "title": "Write a save function",
+      "instructions": "Define a function that takes a state object and stores it under a key with localStorage.setItem, converting it with JSON.stringify first."
+    },
+    {
+      "id": "s3",
+      "title": "Write a load function with all three questions",
+      "instructions": "Define a function that reads the key. If nothing is stored, return the defaults. Otherwise parse the text inside a try block, and return the defaults from the catch block if the text will not parse."
+    },
+    {
+      "id": "s4",
+      "title": "Round-trip it and print the result",
+      "instructions": "Call save with your state, then call load and use console.log to print a property of the restored object. Run it again and note the value persists between runs."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Save function stores by key",
+      "description": "Calls localStorage.setItem",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "localStorage\\.setItem\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "State converted with stringify",
+      "description": "Calls JSON.stringify",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.stringify\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Load reads the key",
+      "description": "Calls localStorage.getItem",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "localStorage\\.getItem\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Missing key handled",
+      "description": "Tests the read value against null",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "===\\s*null|==\\s*null",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Parse guarded",
+      "description": "Wraps JSON.parse in try and catch",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Restored state logged",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

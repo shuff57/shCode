@@ -1,0 +1,98 @@
+{
+  "id": "3-5-12-lab-nested-structure",
+  "title": "3.5.12 Lab: Build a Small Nested-Object Structure",
+  "description": "Build an object with a nested object and an array of objects, then read values out of it. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Outer object",
+      "instructions": "Create a variable named order and assign it an object literal."
+    },
+    {
+      "id": "s2",
+      "title": "Nested object",
+      "instructions": "Give the order a customer property whose value is another object with at least a name field."
+    },
+    {
+      "id": "s3",
+      "title": "Array of objects",
+      "instructions": "Give the order an items property whose value is an array of at least two objects, each with a name and a price."
+    },
+    {
+      "id": "s4",
+      "title": "Read the nested object",
+      "instructions": "Print the customer's name using a chain: the order, a dot, customer, a dot, name."
+    },
+    {
+      "id": "s5",
+      "title": "Walk the array and read each field",
+      "instructions": "Loop over the items array and print each item's name and price using bracket index then dot field."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "nested object built",
+      "description": "An object literal holds another object literal",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\{[^}]*\\{[^}]*\\}",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "array of objects built",
+      "description": "An array literal holds at least one object literal",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*\\{[^}]*\\}",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "nested chain read",
+      "description": "Reads a.b.c with at least two dots",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\.\\w+\\.\\w+",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "index then field read",
+      "description": "Reads arr[i].field",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\w+\\]\\.\\w+",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "loop present",
+      "description": "Contains a for loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

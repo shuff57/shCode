@@ -1,0 +1,22 @@
+{
+  "id": "3-6-5-reading-changing-vs-reassigning",
+  "title": "3.6.5 Reading: Changing vs. Reassigning",
+  "description": "Mutating an object changes what it holds; reassigning a name points it somewhere else. Only one of those reaches the caller.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.6 Functions: Pass by Value/Reference",
+  "preview": "reading",
+  "week": 7,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,15 @@
+flowchart TD
+  A([Start])
+  B[unpack width, height, color from options]
+  C[build note: color + " box " + width + "x" + height]
+  D{width > height}
+  E[note = note + " (wide)"]
+  F[/print note/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -->|yes| E
+  D -->|no| F
+  E --> F
+  F --> Z

@@ -1,0 +1,22 @@
+{
+  "id": "3-2-3-reading-passing-information-in",
+  "title": "3.2.3 Reading: Passing Information In",
+  "description": "A function with a parameter leaves a blank for the caller to fill, so one definition can produce a different result every time you call it.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "reading",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

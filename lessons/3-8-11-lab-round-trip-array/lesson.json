@@ -1,0 +1,89 @@
+{
+  "id": "3-8-11-lab-round-trip-array",
+  "title": "3.8.11 Lab: Round-Trip an Array of Objects",
+  "description": "Round-trip a game-state shape — an object holding an array of item objects — through stringify and parse, then read a nested field back. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "console",
+  "week": 10,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build the game-state object",
+      "instructions": "Create a variable holding an object with a player name and an array of at least two item objects. Each item should have a name and a price."
+    },
+    {
+      "id": "s2",
+      "title": "Save the whole thing",
+      "instructions": "Use JSON.stringify to turn the game state into text."
+    },
+    {
+      "id": "s3",
+      "title": "Restore it and reach a nested field",
+      "instructions": "Use JSON.parse to rebuild it, then use console.log to print the price of the second item plus ten, and the item's name. The nesting is array inside object."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Game-state object declared",
+      "description": "Declares an object with curly braces",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "An array of objects inside",
+      "description": "Contains an array whose elements are objects",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Saved with stringify",
+      "description": "Calls JSON.stringify to produce text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.stringify\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Restored with parse",
+      "description": "Calls JSON.parse on the saved text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.parse\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Output printed",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

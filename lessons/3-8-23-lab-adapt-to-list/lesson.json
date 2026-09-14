@@ -1,0 +1,94 @@
+{
+  "id": "3-8-23-lab-adapt-to-list",
+  "title": "3.8.23 Lab: Adapt the Pattern to a List",
+  "description": "Apply the save/load pattern to an array of records rather than a single object, and read one record's field back out. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "console",
+  "week": 10,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build a list of records",
+      "instructions": "Create a variable holding an array of at least two objects. Each object should describe one thing with a name and a value."
+    },
+    {
+      "id": "s2",
+      "title": "Save the whole list",
+      "instructions": "Use JSON.stringify on the array and store it with localStorage.setItem under a key."
+    },
+    {
+      "id": "s3",
+      "title": "Load it back",
+      "instructions": "Read the key with localStorage.getItem, then parse it back into an array using JSON.parse. An array round-trips exactly like an object."
+    },
+    {
+      "id": "s4",
+      "title": "Prove it is a real array again",
+      "instructions": "Use console.log to print the restored array's length and one record's field, confirming the array and its objects came back whole."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Array of objects declared",
+      "description": "Declares an array whose elements are objects",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "List saved by key",
+      "description": "Calls localStorage.setItem",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "localStorage\\.setItem\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Converted with stringify",
+      "description": "Calls JSON.stringify",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.stringify\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "List restored with parse",
+      "description": "Calls JSON.parse on the saved list",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.parse\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Restored list logged",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

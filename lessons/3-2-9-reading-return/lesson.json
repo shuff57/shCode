@@ -1,0 +1,22 @@
+{
+  "id": "3-2-9-reading-return",
+  "title": "3.2.9 Reading: Getting a Value Back with `return`",
+  "description": "return ends a function and hands a value back to the caller, so the call becomes an expression you can store, print, or use in arithmetic.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "reading",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "id": "3-6-16-lab-capstone",
+  "title": "3.6.16 Lab: Pass-by-Reference Capstone Practice",
+  "description": "Build a small scorebook that adds scores without harming the caller's array, and a function that updates an object's property the caller can see. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 30,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.6 Functions: Pass by Value/Reference",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "A safe function that returns a new array",
+      "instructions": "Define addScore(scores, score) that returns a NEW array containing the old scores plus the new one, without changing the array it was given. Use spread to build the new array."
+    },
+    {
+      "id": "s2",
+      "title": "A function that mutates a property on purpose",
+      "instructions": "Define recordPlay(song) that increases a plays property on the object it is given by 1. This one is meant to change the caller's object, because a play count is shared state."
+    },
+    {
+      "id": "s3",
+      "title": "A deep-copy function for a nested structure",
+      "instructions": "Define copyBook(library) that returns a deep copy of an object holding a nested array, using structuredClone, so the caller's library is never touched when the copy changes."
+    },
+    {
+      "id": "s4",
+      "title": "Demonstrate all three",
+      "instructions": "Call each function and log the caller's data before and after. Prove addScore and copyBook leave the originals alone, while recordPlay changes the object the caller sees."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "addScore defined",
+      "description": "Code defines a function named addScore",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+addScore\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "new array built with spread",
+      "description": "addScore builds a new array using spread syntax",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*\\.\\.\\.",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "recordPlay defined",
+      "description": "Code defines a function named recordPlay",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+recordPlay\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "plays property updated",
+      "description": "recordPlay assigns to the plays property",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.plays\\s*=",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "copyBook defined with a deep copy",
+      "description": "Code defines copyBook and calls structuredClone",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+copyBook\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "structuredClone used",
+      "description": "Code calls structuredClone for a deep copy",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "structuredClone\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "results logged",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "3-2-11-reading-return-ends-function",
+  "title": "3.2.11 Reading: `return` Ends the Function",
+  "description": "return does two jobs at once: it hands back a value and stops the function right there, so anything after it does not run.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "reading",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "id": "3-2-19-lab-compose-functions",
+  "title": "3.2.19 Lab: Compose Two Functions",
+  "description": "Write two returning functions, then feed one result into the other and log the chain. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Define the first function",
+      "instructions": "Define a function called double that takes one parameter n and returns n multiplied by 2."
+    },
+    {
+      "id": "s2",
+      "title": "Define the second function",
+      "instructions": "Define a function called addTen that takes one parameter n and returns n plus 10."
+    },
+    {
+      "id": "s3",
+      "title": "Compose them in one expression",
+      "instructions": "Call one function with the result of the other, for example addTen(double(5)). Because both return values, the inner call's result can be the outer call's argument."
+    },
+    {
+      "id": "s4",
+      "title": "Log the chain and a reversed chain",
+      "instructions": "Use console.log to print the composed result. Then compose them in the opposite order and log that too, so you can see the answer change with the order."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "double defined",
+      "description": "Code defines a function named double",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+double\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "addTen defined",
+      "description": "Code defines a function named addTen",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+addTen\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "returns a value",
+      "description": "Code contains a return statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return\\s",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "one call nested in another",
+      "description": "A call to one function is written as the argument of the other",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(double|addTen)\\s*\\(\\s*(double|addTen)\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "results are logged",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

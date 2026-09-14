@@ -1,0 +1,22 @@
+{
+  "id": "3-4-4-reading-function-expressions",
+  "title": "3.4.4 Reading: Function Expressions",
+  "description": "When a function is a value, you can write it directly on the right of an equals sign. Meet the function expression and how it differs from a declaration.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "reading",
+  "week": 8,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

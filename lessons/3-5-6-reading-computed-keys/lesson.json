@@ -1,0 +1,22 @@
+{
+  "id": "3-5-6-reading-computed-keys",
+  "title": "3.5.6 Reading: Square Brackets and Computed Keys",
+  "description": "When dot notation cannot work: keys with spaces, and keys held in a variable. Square brackets evaluate the name first.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "reading",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

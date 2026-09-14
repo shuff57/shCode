@@ -1,0 +1,68 @@
+{
+  "id": "3-4-17-lab-fix-broken-arrow",
+  "title": "3.4.17 Lab: Fix a Broken Arrow",
+  "description": "A two-parameter arrow function was written without the parentheses around its parameters, so the line will not parse. Fix it. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run the broken code",
+      "instructions": "Run the starter. The line where the arrow is defined throws a syntax error before anything else runs."
+    },
+    {
+      "id": "s2",
+      "title": "Find what is missing",
+      "instructions": "The arrow has two parameters but no parentheses around them. Parentheses are optional for exactly one parameter — they become required the moment a second one appears."
+    },
+    {
+      "id": "s3",
+      "title": "Fix the parameter list and run it",
+      "instructions": "Put parentheses around the two parameters, leaving the arrow body unchanged. Run it and confirm the call prints the product of the two arguments."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Parameters wrapped in parentheses",
+      "description": "An arrow function is written with parentheses around its parameter list",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\([^)]*\\)\\s*=>",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Two parameters inside the parentheses",
+      "description": "The parenthesised parameter list holds two comma-separated parameters",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\([^)]*,[^)]*\\)\\s*=>",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

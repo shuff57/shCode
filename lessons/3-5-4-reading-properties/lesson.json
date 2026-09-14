@@ -1,0 +1,22 @@
+{
+  "id": "3-5-4-reading-properties",
+  "title": "3.5.4 Reading: Reading and Changing Properties",
+  "description": "Read a property with a dot, change or add one by assignment, remove one with delete, and know why a missing property is undefined, not an error.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "reading",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

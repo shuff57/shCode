@@ -1,0 +1,84 @@
+{
+  "id": "3-7-17-lab-spread-array",
+  "title": "3.7.17 Lab: Build a New Array with Spread",
+  "description": "Use spread to combine two arrays and to add loose values around a copied one, without changing any input. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "console",
+  "week": 9,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create two arrays",
+      "instructions": "Create two variables that each hold an array of at least two values."
+    },
+    {
+      "id": "s2",
+      "title": "Combine them with spread",
+      "instructions": "Build a new array that contains every value from both arrays using array spread, and store it in a third variable."
+    },
+    {
+      "id": "s3",
+      "title": "Add loose values around a copy",
+      "instructions": "Build another new array that puts a loose value at the front and another at the back, with one of your arrays spread in between."
+    },
+    {
+      "id": "s4",
+      "title": "Log the results",
+      "instructions": "Use console.log to print both new arrays and one of the originals, to confirm the original did not change."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Spread used",
+      "description": "Uses array spread, written as ... inside an array literal",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*[^\\]]*\\.\\.\\.",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Two spread arrays combined",
+      "description": "Spreads two arrays into one new array literal",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\.\\.[^\\]]*,\\s*\\.\\.\\.",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Arrays declared",
+      "description": "Declares at least two arrays",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[\\s\\S]*(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

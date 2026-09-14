@@ -1,0 +1,22 @@
+{
+  "id": "3-6-9-reading-side-effects-copies",
+  "title": "3.6.9 Reading: Side Effects and Copies",
+  "description": "A side effect is a change that outlives the call. Make it the whole job or work on a copy so the caller's data survives.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.6 Functions: Pass by Value/Reference",
+  "preview": "reading",
+  "week": 7,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

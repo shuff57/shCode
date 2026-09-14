@@ -1,0 +1,21 @@
+{
+  "id": "3-6-14-example-6-2-defensive-copy",
+  "title": "3.6.14 Worked Example: Why 6.2 Copies Before It Loops",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.6 Functions: Pass by Value/Reference",
+  "preview": "example",
+  "week": 7,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

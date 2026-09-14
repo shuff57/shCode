@@ -1,0 +1,22 @@
+{
+  "id": "3-2-6-reading-order-matters",
+  "title": "3.2.6 Reading: Order Matters",
+  "description": "A function matches arguments to parameters by position, not by name, so swapping two arguments changes the answer without raising an error.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "reading",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

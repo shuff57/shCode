@@ -1,0 +1,157 @@
+{
+  "id": "3-5-26-objects-quiz",
+  "title": "3.5.26 Objects and Properties",
+  "description": "Eight multiple-choice questions on object literals, dot vs bracket access, nesting, methods, options objects, and destructuring. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "quiz",
+  "week": 8,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-object-literal",
+        "source": "3.5.2",
+        "question": "You need to store a name, an age and a city for one student as a single value. Which shape fits best?",
+        "options": [
+          "An array, because there are three values",
+          "An object literal with a key for each fact",
+          "Three separate variables with matching name prefixes",
+          "A string that joins the three values with commas"
+        ],
+        "answer": 1,
+        "explanation": "An object answers \"which name?\" and groups different facts about one thing. An array answers \"which position?\" and is for interchangeable items of the same kind.",
+        "sourceIds": [
+          "3-5-2-reading-grouping-values"
+        ]
+      },
+      {
+        "id": "q2-missing-property",
+        "source": "3.5.4",
+        "question": "A student writes console.log(car.model) on an object that has no `model` property. What happens?",
+        "options": [
+          "It throws a ReferenceError",
+          "It throws a TypeError",
+          "It prints undefined",
+          "It creates the property and prints null"
+        ],
+        "answer": 2,
+        "explanation": "Reading a property that does not exist gives undefined rather than an error. An undeclared variable is what throws a ReferenceError; a missing property fails silently.",
+        "sourceIds": [
+          "3-5-4-reading-properties"
+        ]
+      },
+      {
+        "id": "q3-change-vs-add",
+        "source": "3.5.4",
+        "question": "An object `book` already has a `pages` property. What does the line `book.pages = 480;` do?",
+        "options": [
+          "Creates a second `pages` property",
+          "Changes the value of the existing `pages` property",
+          "Deletes `pages` and replaces the whole object",
+          "Fails, because `book` was declared with const"
+        ],
+        "answer": 1,
+        "explanation": "Assignment to an existing property overwrites it, and it works even when the object was declared with const (const stops rebinding the variable, not changing the object). Assigning to a name that is not there would create a new property.",
+        "sourceIds": [
+          "3-5-4-reading-properties"
+        ]
+      },
+      {
+        "id": "q4-bracket-vs-dot",
+        "source": "3.5.6",
+        "question": "Given const key = \"price\"; and const item = { price: 10 };, what does item.key give and what does item[key] give?",
+        "options": [
+          "Both give 10",
+          "item.key gives 10; item[key] gives undefined",
+          "item.key gives undefined; item[key] gives 10",
+          "Both give undefined"
+        ],
+        "answer": 2,
+        "explanation": "Dot notation looks for a property literally named `key`, which does not exist, so item.key is undefined. Square brackets evaluate the variable first, find \"price\", and fetch that property, giving 10.",
+        "sourceIds": [
+          "3-5-6-reading-computed-keys"
+        ]
+      },
+      {
+        "id": "q5-bracket-required",
+        "source": "3.5.6",
+        "question": "Which property can NOT be reached with dot notation, so brackets are required?",
+        "options": [
+          "A property whose key contains a space, such as \"font size\"",
+          "A property whose value is a number",
+          "A property whose value is a boolean",
+          "A property that is the last one in the object literal"
+        ],
+        "answer": 0,
+        "explanation": "Dot notation needs a name that is a single typeable word, so a key with a space in it can only be reached with brackets. The value's type and the property's position make no difference.",
+        "sourceIds": [
+          "3-5-6-reading-computed-keys"
+        ]
+      },
+      {
+        "id": "q6-nested-chain",
+        "source": "3.5.9",
+        "question": "Given const student = { address: { city: \"Chico\" } };, which expression reads the city?",
+        "options": [
+          "student[address.city]",
+          "student.address[city]",
+          "student.address.city",
+          "student[address][city]"
+        ],
+        "answer": 2,
+        "explanation": "Read the chain left to right: take student, get its address object, then get that object's city. Each step is the same dot operation applied to whatever the previous step produced.",
+        "sourceIds": [
+          "3-5-9-reading-nested-objects"
+        ]
+      },
+      {
+        "id": "q7-method-call",
+        "source": "3.5.13",
+        "question": "What is the difference between word.toUpperCase and word.toUpperCase()?",
+        "options": [
+          "Nothing; the parentheses are optional",
+          "The first is an error; the second runs",
+          "The first is the function value itself; the second calls it and gives the result",
+          "The first changes the string; the second only reads it"
+        ],
+        "answer": 2,
+        "explanation": "A method is a property whose value is a function. Without parentheses you get the function itself; with them you call it and get its return value. The same rule that applies to any function value.",
+        "sourceIds": [
+          "3-5-13-reading-methods"
+        ]
+      },
+      {
+        "id": "q8-options-object",
+        "source": "3.5.16",
+        "question": "Why is passing one options object often safer than passing four positional arguments?",
+        "options": [
+          "It runs faster than four arguments",
+          "Each value carries its name, so keys decide placement and order cannot silently swap values",
+          "It is the only way to pass more than one value to a function",
+          "Positional arguments cannot be used with functions that return a value"
+        ],
+        "answer": 1,
+        "explanation": "With positional arguments, two same-typed values can be swapped and nothing errors. An options object attaches each name to its value, so the keys, not the order, determine what goes where.",
+        "sourceIds": [
+          "3-5-16-reading-named-arguments"
+        ]
+      }
+    ]
+  }
+}

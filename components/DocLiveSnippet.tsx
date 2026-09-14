@@ -20,20 +20,11 @@ interface LogEntry {
 // the sandbox's JavaScript mode — a docs page that teaches an infinite loop
 // (it does; see Loops > Infinite loops) must not be able to freeze the tab.
 //
-// The Worker has no window, so localStorage does not exist there. The JSON &
-// Storage section teaches the save-by-key pattern, so a small in-memory
-// localStorage is injected ahead of the runner: the pattern runs for real
-// (save, load, parse, missing-key check) within the one run. The "survives
-// the page closing" half cannot be shown in a console runner, and the page
-// body says so.
-const STORAGE_SHIM = `
-const __store = new Map();
-const localStorage = {
-  setItem: (k, v) => { __store.set(String(k), String(v)); },
-  getItem: (k) => (__store.has(String(k)) ? __store.get(String(k)) : null),
-  removeItem: (k) => { __store.delete(String(k)); },
-};
-`;
+// The Worker has no window, so localStorage does not exist there. The runner
+// itself now injects a small in-memory stand-in (see lib/js-runner-source.ts),
+// so the JSON & Storage section's save-by-key pattern runs for real here
+// without this component adding anything. The "survives the page closing"
+// half cannot be shown in a console runner, and the page body says so.
 
 export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
   const [code, setCode] = useState(initialCode);
@@ -93,7 +84,7 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
       cleanup();
     };
 
-    worker.postMessage(STORAGE_SHIM + '\n' + code);
+    worker.postMessage(code);
     cancelRef.current = cleanup;
   };
 

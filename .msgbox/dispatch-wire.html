@@ -1,0 +1,558 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Dispatch Wire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2f0ea;
+    --surface: #ffffff;
+    --surface-2: #ebe8e0;
+    --bubble-a: #eef0fb;
+    --bubble-b: #e9f5f1;
+    --border: #e2ddd0;
+    --text: #23262b;
+    --text-dim: #7a7d73;
+    --accent: #c07f1f;
+    --accent-strong: #9c6414;
+    --claude-hue: #5a5ecf;
+    --opencode-hue: #1f8a72;
+    --ok: #3f8a5c;
+    --fail: #c0402a;
+    --shadow: 0 1px 2px rgba(30, 28, 20, 0.05), 0 6px 20px -8px rgba(30, 28, 20, 0.12);
+    --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    --sans: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101216; --surface: #171a1f; --surface-2: #1e2229;
+      --bubble-a: #23273a; --bubble-b: #17282a; --border: #2a2e36;
+      --text: #e7e4da; --text-dim: #8b8e8f;
+      --accent: #e2a23f; --accent-strong: #f0b45a;
+      --claude-hue: #9a9df0; --opencode-hue: #57c7a9;
+      --ok: #5cb37e; --fail: #e17257;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -10px rgba(0,0,0,0.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  h1, h2 { margin: 0; text-wrap: balance; }
+  ::selection { background: var(--accent); color: #201400; }
+  button { font-family: inherit; }
+
+  .app { display: flex; flex-direction: column; height: 100vh; min-height: 560px; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px clamp(14px, 3vw, 26px);
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    flex: none;
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand-mark { font-size: 18px; }
+  .brand h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .tagline { font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  #search {
+    font-family: var(--sans); font-size: 13px; padding: 7px 12px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+    width: 200px; outline: none; transition: box-shadow .15s;
+  }
+  #search:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent); }
+  .meta {
+    font-family: var(--mono); font-size: 11.5px; color: var(--text-dim);
+    display: flex; gap: 14px; font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .meta b { color: var(--text); font-weight: 600; }
+
+  .app-body { flex: 1; display: flex; min-height: 0; }
+
+  .sidebar {
+    width: 300px; flex: none; overflow-y: auto;
+    border-right: 1px solid var(--border); background: var(--surface);
+    padding: 16px 14px 24px; display: flex; flex-direction: column; gap: 22px;
+  }
+  .side-block h2 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim);
+    font-weight: 600; margin-bottom: 10px;
+  }
+
+  .session-list { display: flex; flex-direction: column; gap: 4px; }
+  .session-item {
+    display: flex; align-items: center; gap: 10px; padding: 8px 8px; border-radius: 10px;
+    cursor: pointer; border: 1px solid transparent; background: none; width: 100%; text-align: left;
+    color: inherit;
+  }
+  .session-item:hover { background: var(--surface-2); }
+  .session-item.active { background: var(--surface-2); border-color: var(--border); }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-weight: 700; font-size: 13px;
+  }
+  .avatar.claude { background: color-mix(in srgb, var(--claude-hue) 22%, transparent); color: var(--claude-hue); }
+  .avatar.opencode { background: color-mix(in srgb, var(--opencode-hue) 22%, transparent); color: var(--opencode-hue); }
+  .avatar.all { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .session-main { min-width: 0; flex: 1; }
+  .session-name { font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+  .session-sub { font-size: 11.5px; color: var(--text-dim); font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .claim-chip {
+    font-family: var(--mono); font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 10px;
+    background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent-strong);
+  }
+
+  .dispatch-feed { display: flex; flex-direction: column; gap: 8px; }
+  .dispatch-card {
+    border-radius: 10px; padding: 9px 10px; background: var(--surface-2);
+    display: flex; flex-direction: column; gap: 4px; border-left: 3px solid var(--border);
+  }
+  .dispatch-card.ok { border-left-color: var(--ok); }
+  .dispatch-card.fail { border-left-color: var(--fail); }
+  .dispatch-card.running { border-left-color: var(--accent); }
+  .dispatch-card.stuck { border-left-color: var(--text-dim); opacity: .8; }
+  .dispatch-card .spec { font-family: var(--mono); font-weight: 600; font-size: 12px; overflow-wrap: anywhere; }
+  .dispatch-card .row { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); }
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px;
+    font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
+  }
+  .pill.ok { background: color-mix(in srgb, var(--ok) 22%, transparent); color: var(--ok); }
+  .pill.fail { background: color-mix(in srgb, var(--fail) 22%, transparent); color: var(--fail); }
+  .pill.running { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent-strong); }
+  .pill.stuck { background: color-mix(in srgb, var(--fail) 12%, transparent); color: var(--text-dim); }
+  .empty-note { font-size: 12px; color: var(--text-dim); font-style: italic; padding: 4px 2px; }
+
+  .dispatch-actions { display: flex; gap: 6px; margin-top: 2px; }
+  .btn {
+    font-family: var(--mono); font-size: 10.5px; font-weight: 600; letter-spacing: 0.02em;
+    padding: 4px 9px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); cursor: pointer;
+  }
+  .btn:hover { background: var(--bg); }
+  .btn.danger { color: var(--fail); border-color: color-mix(in srgb, var(--fail) 40%, var(--border)); }
+  .btn.primary { color: var(--accent-strong); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+  .raw-log {
+    font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); background: var(--ink, #14171b);
+    background: color-mix(in srgb, var(--text) 92%, var(--surface));
+    color: color-mix(in srgb, var(--surface) 85%, var(--text));
+    border-radius: 6px; padding: 8px; margin-top: 6px; max-height: 160px; overflow-y: auto;
+    white-space: pre-wrap; word-break: break-all;
+  }
+
+  .launch-form { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+  .launch-form input, .launch-form select {
+    font-family: var(--mono); font-size: 11.5px; padding: 6px 8px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text); width: 100%;
+  }
+  .conn-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); display: inline-block; }
+  .conn-dot.live { background: var(--ok); }
+  .conn-dot.dead { background: var(--fail); }
+
+  .reply-box { display: flex; flex-direction: column; gap: 6px; padding: 12px; border-top: 1px solid var(--border); }
+  .reply-box textarea {
+    font-family: var(--sans); font-size: 12.5px; padding: 8px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+    resize: vertical; min-height: 46px;
+  }
+
+  .thread-pane { flex: 1; min-width: 0; overflow-y: auto; padding: 18px clamp(14px, 3vw, 40px) 40px; }
+  .thread { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 4px; }
+
+  .day-divider { display: flex; align-items: center; gap: 10px; margin: 18px 0 10px; color: var(--text-dim); }
+  .day-divider::before, .day-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .day-divider span { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .sys-row { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 6px 0; }
+  .sys-pill {
+    font-family: var(--mono); font-size: 11px; color: var(--text-dim); background: var(--surface-2);
+    padding: 4px 12px; border-radius: 20px; cursor: default; display: flex; align-items: center; gap: 6px;
+  }
+  .sys-pill.clickable { cursor: pointer; }
+  .sys-pill .k-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .sys-time { font-family: var(--mono); font-size: 10px; color: var(--text-dim); opacity: .7; }
+  .sys-detail {
+    font-family: var(--mono); font-size: 11px; color: var(--text-dim); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 2px auto 8px;
+    max-width: 560px; word-break: break-all;
+  }
+
+  .msg-row { display: flex; gap: 9px; max-width: 82%; }
+  .msg-row.from-claude { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-row.from-opencode { align-self: flex-start; }
+  .bubble { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .bubble-head { display: flex; align-items: baseline; gap: 6px; font-size: 11.5px; }
+  .msg-row.from-claude .bubble-head { flex-direction: row-reverse; }
+  .bubble-name { font-weight: 700; }
+  .bubble-name.claude { color: var(--claude-hue); }
+  .bubble-name.opencode { color: var(--opencode-hue); }
+  .bubble-arrow { color: var(--text-dim); font-family: var(--mono); font-size: 10.5px; }
+  .bubble-time { color: var(--text-dim); font-family: var(--mono); font-size: 10.5px; }
+  .bubble-text {
+    padding: 9px 13px; border-radius: 14px; white-space: pre-wrap; box-shadow: var(--shadow);
+    font-size: 13.5px;
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .bubble-text.expanded { display: block; -webkit-line-clamp: unset; }
+  .msg-row.from-opencode .bubble-text { background: var(--bubble-b); border-bottom-left-radius: 4px; }
+  .msg-row.from-claude .bubble-text { background: var(--bubble-a); border-bottom-right-radius: 4px; }
+  .msg-toggle {
+    align-self: flex-start; cursor: pointer; background: none; border: none; padding: 0;
+    font-family: var(--mono); font-size: 10.5px; color: var(--accent-strong);
+  }
+  .msg-row.from-claude .msg-toggle { align-self: flex-end; }
+
+  footer {
+    flex: none; font-family: var(--mono); font-size: 11px; color: var(--text-dim);
+    border-top: 1px solid var(--border); background: var(--surface);
+    padding: 8px clamp(14px, 3vw, 26px);
+  }
+
+  @media (max-width: 760px) {
+    .app-body { flex-direction: column; }
+    .sidebar { width: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); gap: 16px; }
+    .side-block { min-width: 220px; }
+    .thread-pane { padding: 14px 14px 32px; }
+    .msg-row { max-width: 94%; }
+    #search { width: 140px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">📡</span>
+      <h1>Dispatch Wire</h1>
+      <span class="tagline">shCode &middot; .msgbox &middot; local file</span>
+    </div>
+    <div class="topbar-right">
+      <input id="search" type="text" placeholder="Search the wire&hellip;">
+      <div class="meta" id="headerMeta"><span class="conn-dot" id="connDot"></span> <span id="connLabel">connecting&hellip;</span></div>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <aside class="sidebar">
+      <section class="side-block">
+        <h2>Sessions</h2>
+        <div class="session-list" id="sessionList"></div>
+      </section>
+      <section class="side-block">
+        <h2>Dispatches</h2>
+        <div class="dispatch-feed" id="dispatchFeed"></div>
+      </section>
+      <section class="side-block">
+        <h2>New dispatch</h2>
+        <div class="launch-form">
+          <input id="launchSpec" type="text" placeholder="SPEC-file.md (repo root)">
+          <select id="launchModel">
+            <option value="ollama-cloud/glm-5.3-flash">glm-5.3-flash</option>
+            <option value="ollama-cloud/deepseek-v4-flash:0731">deepseek-v4-flash</option>
+          </select>
+          <button class="btn primary" onclick="launchDispatch()">Launch</button>
+          <div class="empty-note" id="launchStatus"></div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="thread-pane">
+      <div class="thread" id="thread"></div>
+    </main>
+  </div>
+
+  <div class="reply-box">
+    <textarea id="replyText" placeholder="Send a reply to opencode (from claude, re: last)&hellip;"></textarea>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="empty-note" id="replyStatus"></span>
+      <button class="btn primary" onclick="sendReply()">Send</button>
+    </div>
+  </div>
+
+  <footer><span id="entryCount"></span> entries &middot; polling /api/state every 2s &middot; run <code>node .msgbox/wire-server.mjs</code> for this to work &mdash; opened as a plain file it falls back to the static dispatch-wire-data.js snapshot</footer>
+</div>
+
+<script src="dispatch-wire-data.js"></script>
+<script>
+let ALL_ENTRIES = (window.SEED || []).slice().sort((a, b) => new Date(a.ts) - new Date(b.ts));
+let ACTIVE_FILTER = null; // null | 'claude' | 'opencode'
+let SERVER_RUNNING = []; // [{spec, pid, model, startedAt}] from /api/state, empty when server is unreachable
+let EXPANDED_LOG_SPEC = null;
+let LIVE = false;
+
+async function poll() {
+  try {
+    const res = await fetch('/api/state', { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    ALL_ENTRIES = data.entries.sort((a, b) => new Date(a.ts) - new Date(b.ts));
+    SERVER_RUNNING = data.running || [];
+    setConn(true);
+  } catch (e) {
+    setConn(false);
+  }
+  renderAll();
+  if (EXPANDED_LOG_SPEC) pollLog(EXPANDED_LOG_SPEC);
+}
+
+function setConn(live) {
+  LIVE = live;
+  document.getElementById('connDot').className = 'conn-dot ' + (live ? 'live' : 'dead');
+  document.getElementById('connLabel').textContent = live ? 'live' : 'no server — run wire-server.mjs';
+}
+
+async function pollLog(spec) {
+  try {
+    const res = await fetch('/api/log?spec=' + encodeURIComponent(spec), { cache: 'no-store' });
+    const data = await res.json();
+    const el = document.getElementById('rawlog-' + cssId(spec));
+    if (el) { el.textContent = data.log || '(no output yet)'; el.scrollTop = el.scrollHeight; }
+  } catch (e) {}
+}
+
+async function launchDispatch() {
+  const spec = document.getElementById('launchSpec').value.trim();
+  const model = document.getElementById('launchModel').value;
+  const status = document.getElementById('launchStatus');
+  if (!spec) { status.textContent = 'enter a spec filename first'; return; }
+  status.textContent = 'launching…';
+  try {
+    const res = await fetch('/api/dispatch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ spec, model }) });
+    const data = await res.json();
+    status.textContent = data.ok ? ('launched, pid ' + data.pid) : ('failed: ' + data.error);
+    if (data.ok) poll();
+  } catch (e) { status.textContent = 'server unreachable'; }
+}
+
+async function killDispatch(spec) {
+  const res = await fetch('/api/kill', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ spec }) });
+  await res.json();
+  poll();
+}
+
+async function sendReply() {
+  const ta = document.getElementById('replyText');
+  const status = document.getElementById('replyStatus');
+  const text = ta.value.trim();
+  if (!text) return;
+  status.textContent = 'sending…';
+  try {
+    const res = await fetch('/api/reply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+    const data = await res.json();
+    status.textContent = data.ok ? 'sent' : ('failed: ' + data.error);
+    if (data.ok) { ta.value = ''; poll(); }
+  } catch (e) { status.textContent = 'server unreachable'; }
+}
+
+function toggleLog(spec) {
+  EXPANDED_LOG_SPEC = EXPANDED_LOG_SPEC === spec ? null : spec;
+  renderDispatches();
+  if (EXPANDED_LOG_SPEC) pollLog(EXPANDED_LOG_SPEC);
+}
+
+function cssId(spec) { return spec.replace(/[^a-z0-9]/gi, ''); }
+
+function fmtTime(ts) { return new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false }); }
+function fmtDay(ts) { return new Date(ts).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }); }
+function basename(p) { return (p || '').split(/[\\/]/).pop(); }
+function escapeHtml(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function collapseActivity(entries) {
+  const out = [];
+  let i = 0;
+  while (i < entries.length) {
+    const e = entries[i];
+    if (e.kind === 'activity') {
+      const group = { kind: 'tool-group', from: e.from, ts: e.ts, tools: {} };
+      let j = i;
+      while (j < entries.length && entries[j].kind === 'activity' && entries[j].from === e.from) {
+        group.tools[entries[j].tool] = (group.tools[entries[j].tool] || 0) + 1;
+        group.ts = entries[j].ts;
+        j++;
+      }
+      out.push(group);
+      i = j;
+    } else { out.push(e); i++; }
+  }
+  return out;
+}
+
+function replayClaims(entries) {
+  const held = {};
+  for (const e of entries) {
+    if (e.kind === 'claim') {
+      held[e.from] = held[e.from] || new Set();
+      (e.paths || []).forEach(p => held[e.from].add(p));
+    } else if (e.kind === 'release') {
+      if (e.all) delete held[e.from];
+      else if (held[e.from]) (e.paths || []).forEach(p => held[e.from].delete(p));
+    }
+  }
+  return held;
+}
+
+function pairDispatches(entries) {
+  const spawns = entries.filter(e => e.kind === 'spawn' || e.kind === 'exit');
+  const out = [];
+  let pending = null;
+  for (const e of spawns) {
+    if (e.kind === 'spawn') {
+      if (pending) out.push(pending);
+      pending = { spec: e.spec, model: e.model, spawnTs: e.ts, exitTs: null, status: 'running', code: null };
+    } else if (pending) {
+      pending.exitTs = e.ts; pending.status = e.ok ? 'ok' : 'fail'; pending.code = e.code;
+      out.push(pending); pending = null;
+    }
+  }
+  if (pending) out.push(pending);
+  // a spawn with no exit is only really "running" if the server still holds its process;
+  // otherwise it was launched outside this server (or died silently) and can't be killed here
+  for (const d of out) {
+    if (d.status !== 'running') continue;
+    const live = SERVER_RUNNING.find(r => r.spec === d.spec || r.spec.endsWith('/' + basename(d.spec)));
+    if (live) { d.pid = live.pid; }
+    else {
+      const ageMin = (Date.now() - new Date(d.spawnTs)) / 60000;
+      d.status = ageMin > 3 ? 'stuck' : 'running';
+    }
+  }
+  return out.reverse();
+}
+
+function durationLabel(a, b) {
+  if (!b) return 'running';
+  const s = Math.round((new Date(b) - new Date(a)) / 1000);
+  return s < 60 ? s + 's' : Math.floor(s / 60) + 'm ' + (s % 60) + 's';
+}
+
+function setFilter(who) {
+  ACTIVE_FILTER = ACTIVE_FILTER === who ? null : who;
+  renderAll();
+}
+
+function renderAll() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  let entries = ALL_ENTRIES;
+  if (ACTIVE_FILTER) entries = entries.filter(e => e.from === ACTIVE_FILTER || e.to === ACTIVE_FILTER);
+  if (q) entries = entries.filter(e =>
+    (e.text && e.text.toLowerCase().includes(q)) ||
+    (e.from && e.from.toLowerCase().includes(q)) ||
+    (e.spec && e.spec.toLowerCase().includes(q)) ||
+    (e.tool && e.tool.toLowerCase().includes(q))
+  );
+
+  document.getElementById('entryCount').textContent = ALL_ENTRIES.length;
+  if (ALL_ENTRIES.length) {
+    const last = ALL_ENTRIES[ALL_ENTRIES.length - 1];
+    document.getElementById('headerMeta').innerHTML =
+      '<span><b>' + entries.length + '</b> shown</span><span>last &middot; <b>' + fmtDay(last.ts) + ' ' + fmtTime(last.ts) + '</b></span>';
+  }
+
+  renderSessions();
+  renderDispatches();
+  renderThread(entries);
+}
+
+function renderSessions() {
+  const held = replayClaims(ALL_ENTRIES);
+  const who = ['claude', 'opencode'];
+  let html = '<button class="session-item ' + (ACTIVE_FILTER === null ? 'active' : '') + '" onclick="setFilter(null)">' +
+    '<span class="avatar all">*</span><div class="session-main"><div class="session-name">All traffic</div>' +
+    '<div class="session-sub">' + ALL_ENTRIES.length + ' events total</div></div></button>';
+  html += who.map(w => {
+    const mine = ALL_ENTRIES.filter(e => e.from === w && e.text);
+    const lastMsg = mine[mine.length - 1];
+    const claims = held[w] ? held[w].size : 0;
+    return '<button class="session-item ' + (ACTIVE_FILTER === w ? 'active' : '') + '" onclick="setFilter(\'' + w + '\')">' +
+      '<span class="avatar ' + w + '">' + w[0].toUpperCase() + '</span>' +
+      '<div class="session-main"><div class="session-name">' + w + (claims ? ' <span class="claim-chip">' + claims + ' claimed</span>' : '') + '</div>' +
+      '<div class="session-sub">' + (lastMsg ? escapeHtml(lastMsg.text).slice(0, 46).replace(/\n/g, ' ') + '&hellip;' : 'no messages sent') + '</div></div></button>';
+  }).join('');
+  document.getElementById('sessionList').innerHTML = html;
+}
+
+function renderDispatches() {
+  const dispatches = pairDispatches(ALL_ENTRIES);
+  document.getElementById('dispatchFeed').innerHTML = dispatches.length ? dispatches.map(d => {
+    const pillText = d.status === 'ok' ? 'OK' : d.status === 'fail' ? 'FAILED' : d.status === 'stuck' ? 'NO EXIT' : 'RUNNING';
+    const canKill = d.pid && LIVE;
+    const isOpen = EXPANDED_LOG_SPEC === d.spec;
+    return '<div class="dispatch-card ' + d.status + '">' +
+      '<div class="spec">' + basename(d.spec) + '</div>' +
+      '<div class="row"><span>' + (d.model || '').replace('ollama-cloud/', '') + '</span><span class="pill ' + d.status + '">' + pillText + '</span></div>' +
+      '<div class="row"><span>' + fmtDay(d.spawnTs) + ' ' + fmtTime(d.spawnTs) + '</span><span>' + durationLabel(d.spawnTs, d.exitTs) + '</span></div>' +
+      '<div class="dispatch-actions">' +
+      (canKill ? '<button class="btn danger" onclick="killDispatch(\'' + d.spec + '\')">Kill</button>' : '') +
+      (LIVE ? '<button class="btn" onclick="toggleLog(\'' + d.spec + '\')">' + (isOpen ? 'hide log' : 'raw log') + '</button>' : '') +
+      '</div>' +
+      (isOpen ? '<div class="raw-log" id="rawlog-' + cssId(d.spec) + '">loading&hellip;</div>' : '') +
+      '</div>';
+  }).join('') : '<div class="empty-note">no dispatches yet</div>';
+}
+
+function renderThread(entries) {
+  const collapsed = collapseActivity(entries);
+  let dayCursor = '', html = '';
+  for (const e of collapsed) {
+    const day = fmtDay(e.ts);
+    if (day !== dayCursor) { html += '<div class="day-divider"><span>' + day + '</span></div>'; dayCursor = day; }
+    html += renderRow(e);
+  }
+  const t = document.getElementById('thread');
+  t.innerHTML = html || '<div class="empty-note">nothing matches</div>';
+}
+
+function sysPill(kindClass, color, label, time, detail) {
+  const id = 'd' + Math.random().toString(36).slice(2, 9);
+  return '<div class="sys-row">' +
+    '<span class="sys-pill' + (detail ? ' clickable' : '') + '" ' + (detail ? 'onclick="document.getElementById(\'' + id + '\').classList.toggle(\'expanded\')" ' : '') +
+    '><span class="k-dot" style="background:' + color + '"></span>' + label + '<span class="sys-time">' + time + '</span></span></div>' +
+    (detail ? '<div class="sys-detail" id="' + id + '" style="display:none">' + detail + '</div>' : '');
+}
+
+function renderRow(e) {
+  const time = fmtTime(e.ts);
+
+  if (e.kind === 'tool-group') {
+    const toolStr = Object.entries(e.tools).map(([t, n]) => t + (n > 1 ? '&times;' + n : '')).join(', ');
+    return sysPill('tool', 'var(--text-dim)', e.from + ' ran ' + Object.values(e.tools).reduce((a, b) => a + b, 0) + ' tool call(s) &mdash; ' + toolStr, time);
+  }
+  if (e.kind === 'claim' || e.kind === 'release') {
+    const paths = e.paths || [];
+    const label = e.from + ' ' + (e.kind === 'claim' ? 'claimed' : (e.all ? 'released everything' : 'released')) + (paths.length ? ' ' + paths.length + ' path' + (paths.length > 1 ? 's' : '') : '');
+    return sysPill('claim', 'var(--claude-hue)', label, time, paths.length ? paths.join('<br>') : null);
+  }
+  if (e.kind === 'spawn') {
+    return sysPill('spawn', 'var(--accent)', 'claude-handoff spawned ' + basename(e.spec) + ' on ' + (e.model || '').replace('ollama-cloud/', ''), time);
+  }
+  if (e.kind === 'exit') {
+    return sysPill('exit', e.ok ? 'var(--ok)' : 'var(--fail)', 'claude-handoff exited &mdash; ' + (e.ok ? 'OK' : 'FAILED (code ' + e.code + ')'), time);
+  }
+  // plain chat message
+  return '<div class="msg-row from-' + e.from + '">' +
+    '<span class="avatar ' + e.from + '">' + e.from[0].toUpperCase() + '</span>' +
+    '<div class="bubble">' +
+    '<div class="bubble-head"><span class="bubble-name ' + e.from + '">' + e.from + '</span><span class="bubble-arrow">&rarr; ' + (e.to || '?') + '</span>' + (e.re ? '<span class="bubble-arrow">re #' + e.re + '</span>' : '') + '<span class="bubble-time">' + time + '</span></div>' +
+    '<div class="bubble-text">' + escapeHtml(e.text) + '</div>' +
+    '<button class="msg-toggle" onclick="const t=this.previousElementSibling; t.classList.toggle(\'expanded\'); this.textContent = t.classList.contains(\'expanded\') ? \'collapse\' : \'expand\'">expand</button>' +
+    '</div></div>';
+}
+
+document.getElementById('search').addEventListener('input', renderAll);
+poll();
+setInterval(poll, 2000);
+</script>
+</body>
+</html>

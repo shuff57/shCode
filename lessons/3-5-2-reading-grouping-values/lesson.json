@@ -1,0 +1,23 @@
+{
+  "id": "3-5-2-reading-grouping-values",
+  "title": "3.5.2 Reading: Grouping Related Values",
+  "description": "Why an object exists: several facts about one thing, grouped under a single name with key: value pairs.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "reading",
+  "week": 8,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

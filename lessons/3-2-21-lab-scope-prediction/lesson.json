@@ -1,0 +1,83 @@
+{
+  "id": "3-2-21-lab-scope-prediction",
+  "title": "3.2.21 Lab: Scope Prediction Exercise",
+  "description": "Write a global and a local variable, then try to read the local one outside its function and watch the ReferenceError. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare a global variable",
+      "instructions": "Outside any function, declare a variable called score with let and set it to a number. It is global, so every function can read it."
+    },
+    {
+      "id": "s2",
+      "title": "Read the global from inside a function",
+      "instructions": "Define a function called showScore that uses console.log to print score. Because score is global, the function can read it."
+    },
+    {
+      "id": "s3",
+      "title": "Declare a local variable inside another function",
+      "instructions": "Define a second function called describeScore. Inside it, declare a variable called label with let, then log score and label together. The label only exists while this function runs."
+    },
+    {
+      "id": "s4",
+      "title": "Prove the local is invisible outside",
+      "instructions": "Call both functions so the working cases run. Then, after the calls, write a console.log of a local-only variable so the console shows a ReferenceError, proving a local variable cannot be reached from outside its function. Leave a comment saying what you expect before you run it."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "global variable declared",
+      "description": "A variable named score is declared with let",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+score\\b",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "a local variable declared inside a function",
+      "description": "A variable named label is declared with let",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+label\\b",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "two functions defined",
+      "description": "Code defines the functions showScore and describeScore",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+(showScore|describeScore)\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "calls are made",
+      "description": "The functions are called",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(showScore|describeScore)\\s*\\(\\s*\\)",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

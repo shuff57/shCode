@@ -1,0 +1,22 @@
+{
+  "id": "3-7-6-reading-slice",
+  "title": "3.7.6 Reading: Taking Part of a List with `.slice()`",
+  "description": "Learn how .slice(start, end) copies part of an array, why the end index is excluded, and why the original is never changed. Read before the .slice() lab.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "reading",
+  "week": 9,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

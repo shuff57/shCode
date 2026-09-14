@@ -1,0 +1,68 @@
+{
+  "id": "3-7-11-lab-concat-two-lists",
+  "title": "3.7.11 Lab: `.concat()` Two Lists",
+  "description": "Join two arrays into a new one with .concat(), then show both originals are unchanged. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "console",
+  "week": 9,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create two arrays",
+      "instructions": "Create two variables that each hold an array of at least three values."
+    },
+    {
+      "id": "s2",
+      "title": "Join them with .concat()",
+      "instructions": "Use .concat() on the first array to join the second array's values onto the end, and store the result in a third variable."
+    },
+    {
+      "id": "s3",
+      "title": "Print all three arrays",
+      "instructions": "Use console.log to print the joined array and both originals. Check that neither original changed."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Two arrays declared",
+      "description": "Declares at least two arrays with square brackets",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[\\s\\S]*(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": ".concat() used",
+      "description": "Calls .concat()",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.concat\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

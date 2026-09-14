@@ -1,0 +1,22 @@
+{
+  "id": "3-2-5-reading-parameters-arguments",
+  "title": "3.2.5 Reading: Parameters and Arguments",
+  "description": "These two words are used interchangeably in conversation but mean different things precisely: a parameter lives in the definition, an argument is passed at the call.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "reading",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

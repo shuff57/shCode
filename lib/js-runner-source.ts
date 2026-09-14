@@ -33,6 +33,21 @@ const cap = (type) => (...args) => {
 console.log = cap('log');
 console.warn = cap('warn');
 console.error = cap('error');
+// A Worker has no window, so localStorage does not exist there. Module 3.8
+// teaches the save-by-key pattern in this runner, and the book's own section
+// editor runs it for real, so supply a small in-memory stand-in: save, load,
+// parse and the missing-key check all run for real within the one run. The
+// "survives the page closing" half is what only a real browser adds, and the
+// lesson's prose says so. Same shim the docs drawer has always injected --
+// moved here so every console surface (Lessons, sandbox, docs, live blocks)
+// gets it from one place.
+const __store = new Map();
+const localStorage = {
+  setItem: (k, v) => { __store.set(String(k), String(v)); },
+  getItem: (k) => (__store.has(String(k)) ? __store.get(String(k)) : null),
+  removeItem: (k) => { __store.delete(String(k)); },
+  clear: () => { __store.clear(); },
+};
 self.onmessage = (e) => {
   try {
     new Function(e.data)(); // student code execution (educational tool)

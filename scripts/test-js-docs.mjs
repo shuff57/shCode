@@ -106,24 +106,16 @@ try {
   // RUNS — every example executes in the drawer's own runner.
   // -------------------------------------------------------------------------
   //
-  // The drawer runs code in a Worker built from lib/js-runner-source.ts with
-  // the localStorage shim prepended (see components/DocLiveSnippet.tsx). A
-  // vm context with the same console capture and the same timeout is the
-  // closest offline equivalent: the Worker's new Function and vm's run both
-  // execute the code as a script, and the timeout mirrors the kill timer that
-  // stops a runaway loop.
+  // The drawer runs code in a Worker built from lib/js-runner-source.ts, which
+  // now injects the localStorage shim itself so every console surface shares
+  // one copy. A vm context with the same console capture and the same timeout
+  // is the closest offline equivalent: the Worker's new Function and vm's run
+  // both execute the code as a script, and the timeout mirrors the kill timer
+  // that stops a runaway loop.
 
   section('examples run');
 
   const runnerSrc = readRunnerSource();
-  const storageShim = `
-const __store = new Map();
-const localStorage = {
-  setItem: (k, v) => { __store.set(String(k), String(v)); },
-  getItem: (k) => (__store.has(String(k)) ? __store.get(String(k)) : null),
-  removeItem: (k) => { __store.delete(String(k)); },
-};
-`;
 
   const withCode = pages.filter((p) => typeof p.code === 'string' && p.code.trim());
   ok('the runner source is readable', runnerSrc !== null, 'lib/js-runner-source.ts did not compile');
@@ -145,7 +137,7 @@ const localStorage = {
       // its title promises.
       const isRunaway = p.slug === 'loops' && p.title === 'Infinite loops';
       try {
-        vm.runInContext(storageShim + '\n' + runnerSrc + '\n' + p.code, ctx, {
+        vm.runInContext(runnerSrc + '\n' + p.code, ctx, {
           timeout: isRunaway ? 1000 : 5000,
           filename: `lib/js-docs.ts<${label}>`,
         });

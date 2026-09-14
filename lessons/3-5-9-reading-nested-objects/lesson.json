@@ -1,0 +1,22 @@
+{
+  "id": "3-5-9-reading-nested-objects",
+  "title": "3.5.9 Reading: Objects Inside Objects and Arrays",
+  "description": "A property's value can be another object or an array. Read a nested chain left to right, and see the array-of-objects shape.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "reading",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

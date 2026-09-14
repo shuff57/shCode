@@ -1,0 +1,20 @@
+flowchart TD
+  A([Start])
+  B[total = 0]
+  C{{i = 0 to order.items.length - 1}}
+  D[total = total + order.items[i].price]
+  E[name = order.customer.name]
+  F{order.customer.vip}
+  G[/print name + " (VIP) total: " + total/]
+  H[/print name + " total: " + total/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D --> C
+  C --> E
+  E --> F
+  F -->|yes| G
+  F -->|no| H
+  G --> Z
+  H --> Z

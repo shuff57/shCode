@@ -1,0 +1,68 @@
+{
+  "id": "3-6-8-lab-fix-reassign-bug",
+  "title": "3.6.8 Lab: Fix a Function That Reassigns Instead of Mutating",
+  "description": "A function is supposed to update the caller's array but reassigns its parameter instead, so nothing changes. Fix the body so the update reaches the caller. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.6 Functions: Pass by Value/Reference",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run the broken code",
+      "instructions": "The starter is meant to add 1 to every score in the caller's array. Run it and notice the caller's array comes back unchanged."
+    },
+    {
+      "id": "s2",
+      "title": "Find the reassignment",
+      "instructions": "Inside the function, the parameter is pointed at a brand-new array. That move is local: the caller's variable never follows it."
+    },
+    {
+      "id": "s3",
+      "title": "Rewrite the body to mutate",
+      "instructions": "Change the body so it writes each new value into the array the parameter already points at, using an index. Do not reassign the parameter. Run it and confirm the caller's array now updates."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "for loop present",
+      "description": "Code contains a for loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "indexed write into the parameter",
+      "description": "Code assigns into the array parameter by index",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\s*\\[\\s*\\w+\\s*\\]\\s*=",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "caller array logged",
+      "description": "Code calls console.log on the caller's array",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

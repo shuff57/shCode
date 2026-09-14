@@ -1,0 +1,22 @@
+flowchart TD
+  A([Start])
+  B[/read in the operation: add two numbers/]
+  C{Is the function named?}
+  D[Write a declaration: function addA with an explicit return]
+  E[Assign to a const with no name after function]
+  F{Does the body use braces?}
+  G[Write addB: braces kept, explicit return]
+  H[Write addC: drop braces, implicit return]
+  I[/print addA(1, 2), addB(1, 2), addC(1, 2)/]
+  Z([End])
+  A --> B
+  B --> C
+  C -->|yes| D
+  C -->|no| E
+  E --> F
+  F -->|yes| G
+  F -->|no| H
+  D --> I
+  G --> I
+  H --> I
+  I --> Z

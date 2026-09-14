@@ -1,0 +1,88 @@
+{
+  "id": "3-6-12-lab-object-param-mutation",
+  "title": "3.6.12 Lab: Object-Parameter Mutation",
+  "description": "Mutate a property on an object parameter and prove the caller sees it, then write a non-mutating version that keeps the original untouched. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.6 Functions: Pass by Value/Reference",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Define a function that mutates a property",
+      "instructions": "Define a function called birthday that takes one object parameter and adds 1 to its age property. Do not reassign the parameter; change the property the object already has."
+    },
+    {
+      "id": "s2",
+      "title": "Call it and log the caller's object",
+      "instructions": "Create an object variable with a name and an age. Call birthday with it, then console.log the caller's object. Confirm the age changed, because objects pass as a reference."
+    },
+    {
+      "id": "s3",
+      "title": "Write a non-mutating version",
+      "instructions": "Define a second function called birthdaySafe that returns a new object with the age increased, without changing the object it was given. Call it and log both the original and the returned object to prove the original is untouched."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "birthday defined",
+      "description": "Code defines a function named birthday",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+birthday\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "property mutated",
+      "description": "Code assigns to a property on the parameter object",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\w+\\s*=",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "birthdaySafe defined",
+      "description": "Code defines a function named birthdaySafe",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+birthdaySafe\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "object spread used",
+      "description": "Code copies the object with spread syntax",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\{\\s*\\.\\.\\.",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "results logged",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "3-7-4-lab-map-non-mutating",
+  "title": "3.7.4 Lab: Transform a List Without Mutating the Input",
+  "description": "Use .map() to build a transformed copy of an array, then demonstrate the original is unchanged. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "console",
+  "week": 9,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create the source list",
+      "instructions": "Create a variable called prices and assign it an array of numbers."
+    },
+    {
+      "id": "s2",
+      "title": "Build a transformed copy with .map()",
+      "instructions": "Use .map() on prices to build a new array where each number is transformed (for example, doubled), and store the result in a second variable."
+    },
+    {
+      "id": "s3",
+      "title": "Log both arrays",
+      "instructions": "Use console.log to print the transformed array and the original prices array. Confirm the original still holds its starting values."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Array declared",
+      "description": "Declares an array with square brackets",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": ".map() used",
+      "description": "Calls .map() to build a transformed array",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.map\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

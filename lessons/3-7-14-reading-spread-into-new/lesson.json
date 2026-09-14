@@ -1,0 +1,22 @@
+{
+  "id": "3-7-14-reading-spread-into-new",
+  "title": "3.7.14 Reading: Spreading into a New Array or Object",
+  "description": "Learn how spread copies contents into a new array or object literal, and how { ...obj, field } makes a copy with one value changed. Read before the spread labs.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "reading",
+  "week": 9,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

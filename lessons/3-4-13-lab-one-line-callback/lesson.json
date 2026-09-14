@@ -1,0 +1,68 @@
+{
+  "id": "3-4-13-lab-one-line-callback",
+  "title": "3.4.13 Lab: Write a One-Line Arrow Callback",
+  "description": "Write a helper that takes a callback, then pass it a one-line arrow. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write a helper that takes a function",
+      "instructions": "Define a function with two parameters: a value and a function. Inside it, call the function you were handed and return its result. The helper should not know what the function does."
+    },
+    {
+      "id": "s2",
+      "title": "Call it with a one-line arrow",
+      "instructions": "Call your helper and pass a single-expression arrow as the function argument. Write the arrow inline, on one line, with no braces and no return keyword."
+    },
+    {
+      "id": "s3",
+      "title": "Log the result",
+      "instructions": "Wrap the call in console.log and check the result matches what the arrow should produce."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Helper takes a function parameter",
+      "description": "A function is defined that calls one of its parameters as a function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+\\w+\\s*\\([^)]*\\w+\\s*\\)\\s*\\{[^}]*\\w+\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Inline arrow passed as an argument",
+      "description": "An arrow function is written inside a call's parentheses",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\([^)]*\\)\\s*=>\\s*[^{]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

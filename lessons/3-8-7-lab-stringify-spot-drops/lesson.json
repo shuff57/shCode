@@ -1,0 +1,79 @@
+{
+  "id": "3-8-7-lab-stringify-spot-drops",
+  "title": "3.8.7 Lab: Stringify an Object and Spot What Got Dropped",
+  "description": "Build an object that has a method and an undefined property, stringify it, and find out in the output what JSON refused to carry. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "console",
+  "week": 10,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build an object with a method and an undefined value",
+      "instructions": "Create a variable called counter and assign it an object. Give it a number property, a function property (a method), and a third property whose value is undefined."
+    },
+    {
+      "id": "s2",
+      "title": "Stringify it",
+      "instructions": "Use JSON.stringify on counter and store the result in a second variable."
+    },
+    {
+      "id": "s3",
+      "title": "Log the JSON text",
+      "instructions": "Use console.log to print the stringified result. Read it and find which properties survived."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Object declared",
+      "description": "Declares an object with curly braces",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "A function value in the object",
+      "description": "One property's value is a function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\s*:\\s*function\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "JSON.stringify used",
+      "description": "Calls JSON.stringify on the object",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.stringify\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Result logged",
+      "description": "Calls console.log on the stringified value",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

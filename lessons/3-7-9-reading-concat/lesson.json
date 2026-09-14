@@ -1,0 +1,22 @@
+{
+  "id": "3-7-9-reading-concat",
+  "title": "3.7.9 Reading: Joining Lists with `.concat()`",
+  "description": "Learn how .concat() returns a new array with another array's items added on the end, leaving both originals untouched. Read before the .concat() lab.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "reading",
+  "week": 9,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

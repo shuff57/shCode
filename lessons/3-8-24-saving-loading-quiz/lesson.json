@@ -1,0 +1,172 @@
+{
+  "id": "3-8-24-saving-loading-quiz",
+  "title": "3.8.24 Saving and Loading Data",
+  "description": "Eight multiple-choice questions on JSON.stringify, JSON.parse, what does not survive a round trip, parse failures, saving by key with localStorage, and the browser sandbox. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "quiz",
+  "week": 10,
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-object-to-text",
+        "source": "3.8.2",
+        "question": "The program does '' + student, where student is an object, and prints the result. What comes out?",
+        "options": [
+          "The full object, printed as JSON",
+          "[object Object]",
+          "An error",
+          "null"
+        ],
+        "answer": 1,
+        "explanation": "Turning an object into text without JSON.stringify gives the label [object Object], which throws away every property. There is no way to restore the data from it.",
+        "sourceIds": [
+          "3-8-2-reading-data-outlives-program"
+        ]
+      },
+      {
+        "id": "q2-stringify-array",
+        "source": "3.8.4",
+        "question": "What does JSON.stringify([1, 2, 3]) produce, and what type is the result?",
+        "options": [
+          "The array [1, 2, 3], type object",
+          "The number 6, type number",
+          "[object Object], type string",
+          "The string \"[1,2,3]\", type string"
+        ],
+        "answer": 3,
+        "explanation": "Arrays convert just like objects, and the result is always a string. The spaces are dropped in the compact form.",
+        "sourceIds": [
+          "3-8-4-reading-json-stringify"
+        ]
+      },
+      {
+        "id": "q3-readable-output",
+        "source": "3.8.5",
+        "question": "What does the third argument in JSON.stringify(student, null, 2) control?",
+        "options": [
+          "How many spaces to indent by, making the output readable for a person",
+          "The maximum number of properties to include",
+          "Whether strings use single or double quotes",
+          "The output's position in the console"
+        ],
+        "answer": 0,
+        "explanation": "The null is a filter you almost never need; the 2 is the indent width. Use it for output a human reads, and leave it off for the smaller compact form a program reads.",
+        "sourceIds": [
+          "3-8-5-reading-readable-output"
+        ]
+      },
+      {
+        "id": "q4-what-is-lost",
+        "source": "3.8.6",
+        "question": "An object has a count property and a describe method. What does JSON.stringify produce for it?",
+        "options": [
+          "{\"count\":5,\"describe\":\"function\"}",
+          "Only {\"count\":5} — the method is dropped silently",
+          "An error, because objects with methods cannot be serialized",
+          "{\"count\":5,\"describe\":null}"
+        ],
+        "answer": 1,
+        "explanation": "JSON has no way to represent a function, so methods are dropped, along with undefined values. That is JSON storing data rather than behaviour, not a bug.",
+        "sourceIds": [
+          "3-8-6-reading-what-does-not-survive"
+        ]
+      },
+      {
+        "id": "q5-parse-restores-numbers",
+        "source": "3.8.8",
+        "question": "After const v = JSON.parse('{\"n\": 5}'); what is v.n + 1, and why?",
+        "options": [
+          "\"51\", because parsing returns strings",
+          "NaN, because v.n is not a number",
+          "6, because parse restores the number as a real number",
+          "undefined, because n was not preserved"
+        ],
+        "answer": 2,
+        "explanation": "JSON.parse rebuilds objects, arrays and numbers as real values, so v.n is the number 5 and + adds. It would only join strings if the JSON had contained \"n\": \"5\".",
+        "sourceIds": [
+          "3-8-8-reading-json-parse"
+        ]
+      },
+      {
+        "id": "q6-why-parse-can-fail",
+        "source": "3.8.12",
+        "question": "Why does JSON.parse need a try...catch when JSON.stringify does not?",
+        "options": [
+          "JSON.parse is slower than stringify",
+          "stringify starts from a valid JavaScript value; parse starts from text that may be malformed",
+          "stringify returns null on failure instead of throwing",
+          "JSON.parse only fails on very large objects"
+        ],
+        "answer": 1,
+        "explanation": "You always hand stringify a real value, so there is nothing to be invalid. You hand parse text — often from storage, a file, or a network — and text can be anything, so a bad string throws a SyntaxError.",
+        "sourceIds": [
+          "3-8-12-reading-parsing-can-fail"
+        ]
+      },
+      {
+        "id": "q7-missing-key",
+        "source": "3.8.15",
+        "question": "What does localStorage.getItem(\"neverSaved\") return on a first run?",
+        "options": [
+          "undefined",
+          "An empty string",
+          "0",
+          "null"
+        ],
+        "answer": 3,
+        "explanation": "A key that was never saved gives null, not undefined. That is why a load function tests for null before parsing: JSON.parse(null) quietly returns null rather than throwing, so the missing-data case would slip through unnoticed.",
+        "sourceIds": [
+          "3-8-15-reading-saving-by-key"
+        ]
+      },
+      {
+        "id": "q8-storage-holds-strings",
+        "source": "3.8.15",
+        "question": "After localStorage.setItem(\"count\", 5), what does localStorage.getItem(\"count\") + 1 give?",
+        "options": [
+          "6",
+          "\"51\", because storage holds strings so the + joins text",
+          "null",
+          "NaN"
+        ],
+        "answer": 1,
+        "explanation": "Storage holds strings only, so the 5 became \"5\" on the way in and + joined it to \"1\". Wrap the read in Number(...) to add numerically.",
+        "sourceIds": [
+          "3-8-15-reading-saving-by-key"
+        ]
+      },
+      {
+        "id": "q9-sandbox",
+        "source": "3.8.20",
+        "question": "Why can JavaScript running in a web page not open a file on your computer by name?",
+        "options": [
+          "JavaScript is too slow to read files",
+          "Files must be converted to JSON before they can be read",
+          "Any page could then read your files just because you visited it",
+          "The browser has not implemented open() yet"
+        ],
+        "answer": 2,
+        "explanation": "A page runs code you did not write, so the browser gives it no filesystem access at all. Reading a local file requires the user to choose it, or the page to offer a download the user saves.",
+        "sourceIds": [
+          "3-8-20-reading-no-open"
+        ]
+      }
+    ]
+  }
+}
