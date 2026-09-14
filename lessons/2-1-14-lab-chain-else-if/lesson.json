@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Chain at least three branches",
-      "instructions": "Write an if / else if / else if / else chain that logs a status: below 20 logs 'Low battery', below 50 logs 'Battery ok', below 90 logs 'Battery good', and anything else logs 'Battery full'. Check the highest cutoff first, same as the grade example."
+      "instructions": "Write an if / else if / else if / else chain that logs a status: below 20 logs 'Low battery', below 50 logs 'Battery ok', below 90 logs 'Battery good', and anything else logs 'Battery full'. This chain uses < comparisons, not >=, so check the lowest cutoff first -- the opposite order from the grade example, which uses >= and checks the highest cutoff first."
     }
   ],
   "requirements": [

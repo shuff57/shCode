@@ -28,10 +28,10 @@
     {
       "id": "r1",
       "title": "switched value converted to a number",
-      "description": "switch(...) wraps place in Number(...), parseInt(...) or parseFloat(...)",
+      "description": "switch(...) wraps place in Number(...)/parseInt(...)/parseFloat(...), or place is reassigned from one of those before the switch",
       "type": "regex",
       "file": "script.js",
-      "pattern": "switch\\s*\\(\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*\\)",
+      "pattern": "(?:switch\\s*\\(\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*\\))|(?:place\\s*=\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))",
       "flags": "i",
       "points": 0
     },

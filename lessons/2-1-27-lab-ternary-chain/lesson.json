@@ -31,7 +31,7 @@
       "description": "score >= 90 ? ... chooses Excellent",
       "type": "regex",
       "file": "script.js",
-      "pattern": "score\\s*>=\\s*90\\s*\\?[^\\n;]*Excellent",
+      "pattern": "\\(?\\s*score\\s*>=\\s*90\\s*\\)?\\s*\\?[^\\n;]*Excellent",
       "points": 0
     },
     {
@@ -40,7 +40,7 @@
       "description": "score >= 70 ? chooses Good, otherwise Needs work",
       "type": "regex",
       "file": "script.js",
-      "pattern": "score\\s*>=\\s*70\\s*\\?[^\\n;]*Good[^\\n;]*:[^\\n;]*Needs work",
+      "pattern": "\\(?\\s*score\\s*>=\\s*70\\s*\\)?\\s*\\?[^\\n;]*Good[^\\n;]*:[^\\n;]*Needs work",
       "points": 0
     },
     {
@@ -49,7 +49,7 @@
       "description": "rating is assigned from a chain that checks the 90 cutoff before the 70 cutoff",
       "type": "regex",
       "file": "script.js",
-      "pattern": "rating\\s*=[^\\n;]*score\\s*>=\\s*90[^\\n;]*\\?[^\\n;]*score\\s*>=\\s*70",
+      "pattern": "rating\\s*=[^\\n;]*\\(?\\s*score\\s*>=\\s*90\\s*\\)?[^\\n;]*\\?[^\\n;]*\\(?\\s*score\\s*>=\\s*70\\s*\\)?",
       "points": 0
     },
     {
