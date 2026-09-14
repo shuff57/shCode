@@ -41,27 +41,27 @@
       "description": "An if statement tests score",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^{]*\\bscore\\b[^{]*\\)",
+      "pattern": "if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*console\\.log[^}]*\\}",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "else if chain present",
-      "description": "An else if chain with at least two branches, each testing score",
+      "description": "An else if chain with at least two branches, each testing score against a real cutoff and logging",
       "type": "regex",
       "file": "script.js",
-      "pattern": "else\\s+if\\s*\\([^{]*\\bscore\\b[\\s\\S]*else\\s+if\\s*\\([^{]*\\bscore\\b",
+      "pattern": "else\\s+if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*console\\.log[^}]*\\}[\\s\\S]*else\\s+if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*console\\.log[^}]*\\}",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "&& or || used to combine attendance and lateAssignments",
-      "description": "An if condition combines attendance and lateAssignments with && or ||",
+      "description": "An if condition compares attendance and lateAssignments each against a real value, combined with && or ||",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^{]*\\b(attendance|lateAssignments)\\b[^{]*(&&|\\|\\|)[^{]*\\)",
+      "pattern": "if\\s*\\((?=[^{]*(?:&&|\\|\\|))(?=[^{]*attendance\\s*(?:<=|>=|===|==|<|>)\\s*\\d+)(?=[^{]*lateAssignments\\s*(?:<=|>=|===|==|<|>)\\s*\\d+)[^{]*\\)",
       "flags": "i",
       "points": 0
     },

@@ -31,7 +31,7 @@
       "description": "Code contains a switch statement",
       "type": "regex",
       "file": "script.js",
-      "pattern": "switch\\s*\\(",
+      "pattern": "switch\\s*\\(\\s*letter\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -48,20 +48,20 @@
     {
       "id": "r3",
       "title": "'u' case reaches the shared block",
-      "description": "case 'u' is grouped in among the vowel cases",
+      "description": "case 'u' is grouped in among the vowel cases and the shared block logs Vowel",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s*['\"]u['\"]\\s*:",
+      "pattern": "case\\s*['\"]u['\"]\\s*:\\s*console\\.log\\s*\\([^)]*Vowel",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r4",
       "title": "default label present",
-      "description": "Code contains a default label",
+      "description": "The default label is directly followed by a console.log call that prints Consonant",
       "type": "regex",
       "file": "script.js",
-      "pattern": "default\\s*:",
+      "pattern": "default\\s*:\\s*console\\.log\\s*\\([^)]*Consonant",
       "flags": "i",
       "points": 0
     },

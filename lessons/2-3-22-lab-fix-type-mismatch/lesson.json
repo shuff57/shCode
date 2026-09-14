@@ -54,6 +54,16 @@
       "pattern": "case\\s+2\\s*:",
       "flags": "i",
       "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "case 2 actually prints output",
+      "description": "case 2's body calls console.log, so the fix is visible in the output",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s+2\\s*:\\s*console\\.log",
+      "flags": "i",
+      "points": 0
     }
   ],
   "grading": {

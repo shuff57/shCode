@@ -72,7 +72,7 @@
       "description": "a separate if condition compares layerHeight on both sides of && or ||",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\((?=[^{]*(?:&&|\\|\\|))(?:[^{]*layerHeight){2,}[^{]*\\)",
+      "pattern": "if\\s*\\((?=[^{]*(?:&&|\\|\\|))(?:[^{]*layerHeight\\s*(?:<=|>=|===|==|<|>)){2,}[^{]*\\)",
       "points": 0
     }
   ],

@@ -31,7 +31,7 @@
       "description": "A ternary references isMember and chooses between 20 and 0, in that order",
       "type": "regex",
       "file": "script.js",
-      "pattern": "isMember[^;]*\\?[^;]*20[^;]*:[^;]*0",
+      "pattern": "(?<![\"'`])isMember[^;]*\\?[^;]*20[^;]*:[^;]*0",
       "points": 0
     },
     {
@@ -40,7 +40,7 @@
       "description": "discount is assigned using a ternary on isMember",
       "type": "regex",
       "file": "script.js",
-      "pattern": "discount\\s*=[^;]*isMember[^;]*\\?",
+      "pattern": "discount\\s*=(?!\\s*[\"'`])[^;]*isMember[^;]*\\?",
       "points": 0
     },
     {

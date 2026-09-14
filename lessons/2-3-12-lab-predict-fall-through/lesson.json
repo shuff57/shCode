@@ -31,7 +31,7 @@
       "description": "Code contains a switch statement",
       "type": "regex",
       "file": "script.js",
-      "pattern": "switch\\s*\\(",
+      "pattern": "switch\\s*\\(\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -58,10 +58,10 @@
     {
       "id": "r4",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "A case label is directly followed by a console.log call",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(",
+      "pattern": "case[^:]*:\\s*console\\.log",
       "flags": "i",
       "points": 0
     }

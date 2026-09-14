@@ -31,27 +31,27 @@
       "description": "Code contains a switch statement",
       "type": "regex",
       "file": "script.js",
-      "pattern": "switch\\s*\\(",
+      "pattern": "switch\\s*\\(\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\)",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "second switch statement present",
-      "description": "Code contains a second switch statement",
+      "description": "Code contains a second switch statement, each switching on a real variable",
       "type": "regex",
       "file": "script.js",
-      "pattern": "switch\\s*\\([\\s\\S]*switch\\s*\\(",
+      "pattern": "switch\\s*\\(\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\)[\\s\\S]*switch\\s*\\(\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\)",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "default written before a later case",
-      "description": "The second switch writes default before its last case label",
+      "description": "The second switch writes default (with a console.log) before its last case label",
       "type": "regex",
       "file": "script.js",
-      "pattern": "default\\s*:[\\s\\S]*case\\s",
+      "pattern": "default\\s*:\\s*console\\.log[\\s\\S]*?case\\s",
       "flags": "i",
       "points": 0
     },

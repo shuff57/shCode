@@ -49,7 +49,7 @@
       "description": "rating is assigned from a chain that checks the 90 cutoff before the 70 cutoff",
       "type": "regex",
       "file": "script.js",
-      "pattern": "rating\\s*=[^;]*\\(?\\s*score\\s*>=\\s*90\\s*\\)?[^;]*\\?[^;]*\\(?\\s*score\\s*>=\\s*70\\s*\\)?",
+      "pattern": "rating\\s*=(?!\\s*[\"'`])[^;]*\\(?\\s*score\\s*>=\\s*90\\s*\\)?[^;]*\\?[^;]*\\(?\\s*score\\s*>=\\s*70\\s*\\)?",
       "points": 0
     },
     {

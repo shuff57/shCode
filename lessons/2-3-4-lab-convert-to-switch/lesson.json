@@ -31,27 +31,27 @@
       "description": "Code contains a switch statement",
       "type": "regex",
       "file": "script.js",
-      "pattern": "switch\\s*\\(",
+      "pattern": "switch\\s*\\(\\s*day\\s*\\)",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "case label present",
-      "description": "Code contains a case label",
+      "description": "A quoted case label is directly followed by a console.log call",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s",
+      "pattern": "case\\s*['\"][^'\"]+['\"]\\s*:\\s*console\\.log",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "default label present",
-      "description": "Code contains a default label",
+      "description": "The default label is directly followed by a console.log call",
       "type": "regex",
       "file": "script.js",
-      "pattern": "default\\s*:",
+      "pattern": "default\\s*:\\s*console\\.log",
       "flags": "i",
       "points": 0
     },

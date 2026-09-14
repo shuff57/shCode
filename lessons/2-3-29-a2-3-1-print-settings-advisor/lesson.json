@@ -103,20 +103,20 @@
     {
       "id": "r8",
       "title": "mentions temperature",
-      "description": "Code prints a recommended temperature somewhere",
+      "description": "A filament case's console.log call prints a recommended temperature",
       "type": "regex",
       "file": "script.js",
-      "pattern": "temp",
+      "pattern": "case\\s*['\"](?:PLA|ABS|PETG|TPU)['\"]\\s*:\\s*console\\.log\\s*\\([^)]*temp",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r9",
       "title": "mentions speed",
-      "description": "Code prints a recommended print speed somewhere",
+      "description": "A filament case's console.log call prints a recommended print speed",
       "type": "regex",
       "file": "script.js",
-      "pattern": "speed",
+      "pattern": "case\\s*['\"](?:PLA|ABS|PETG|TPU)['\"]\\s*:\\s*console\\.log\\s*\\([^)]*speed",
       "flags": "i",
       "points": 0
     },
