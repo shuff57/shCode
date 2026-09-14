@@ -1,0 +1,22 @@
+{
+  "id": "3-4-14-reading-declaration-or-expression",
+  "title": "3.4.14 Reading: Declaration or Expression?",
+  "description": "A declaration is hoisted and can be called from above its line; an expression or arrow cannot. Learn the one real difference and when to choose each.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "reading",
+  "week": 8,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "id": "3-6-13-lab-nested-mutation",
+  "title": "3.6.13 Lab: Nested-Structure Mutation",
+  "description": "Show that a spread copy is only one level deep: change a nested array inside the copy and the original still changes. Then fix it with a deep copy. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.6 Functions: Pass by Value/Reference",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Copy the outer object with spread",
+      "instructions": "Create an object that contains a nested array (for example, a student with a list of scores). Make a shallow copy with the object spread syntax: a new object with the same keys."
+    },
+    {
+      "id": "s2",
+      "title": "Change the nested array inside the copy",
+      "instructions": "Push a new value into the nested array of the copy. Then log both the copy and the original. Notice the original changed too, because a shallow copy still shares the nested array."
+    },
+    {
+      "id": "s3",
+      "title": "Make a deep copy instead",
+      "instructions": "Use structuredClone to make a copy that goes all the way down. Change the nested array inside that copy, then log both again to prove the original is now untouched."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "outer object copied with spread",
+      "description": "Code copies an object with the spread syntax",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\{\\s*\\.\\.\\.",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "nested array pushed into",
+      "description": "Code pushes into a nested array through a property access",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\w+\\.push\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "structuredClone used",
+      "description": "Code calls structuredClone for a deep copy",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "structuredClone\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "objects logged",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "id": "3-8-10-lab-round-trip-object",
+  "title": "3.8.10 Lab: Round-Trip an Object Through JSON",
+  "description": "Save an object to JSON text, restore it with JSON.parse, and prove the restored copy is independent of the original. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "console",
+  "week": 10,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create an object",
+      "instructions": "Create a variable holding an object with at least two properties, one of them a number."
+    },
+    {
+      "id": "s2",
+      "title": "Save it to text",
+      "instructions": "Use JSON.stringify to turn the object into a string and store that string in a second variable."
+    },
+    {
+      "id": "s3",
+      "title": "Restore it",
+      "instructions": "Use JSON.parse on the string to build a third variable back into a usable object."
+    },
+    {
+      "id": "s4",
+      "title": "Prove it works",
+      "instructions": "Use console.log to print a number property of the restored object plus one, and print one of the original properties. Confirm the restored value behaves like a real object."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Object declared",
+      "description": "Declares an object with curly braces",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Saved with stringify",
+      "description": "Calls JSON.stringify to produce text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.stringify\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Restored with parse",
+      "description": "Calls JSON.parse on the saved text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.parse\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Both logged",
+      "description": "Calls console.log to print the restored object",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

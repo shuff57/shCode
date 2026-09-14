@@ -1,0 +1,73 @@
+{
+  "id": "3-7-8-lab-slice-sublist",
+  "title": "3.7.8 Lab: Extract a Sub-List with `.slice()`",
+  "description": "Create an array, copy a middle range and a run to the end with .slice(), then show the original is unchanged. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "console",
+  "week": 9,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create the list",
+      "instructions": "Create a variable called items and assign it an array of at least five values."
+    },
+    {
+      "id": "s2",
+      "title": "Extract a middle range",
+      "instructions": "Use .slice(start, end) to copy a middle part of items into a variable. Remember the end index is not included."
+    },
+    {
+      "id": "s3",
+      "title": "Extract to the end",
+      "instructions": "Use .slice(start) with only a start index to copy everything from a position to the end of the array."
+    },
+    {
+      "id": "s4",
+      "title": "Print the results and the original",
+      "instructions": "Use console.log to print both slices and the original items array, to confirm the original did not change."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Array declared",
+      "description": "Declares an array with square brackets",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Two .slice() calls",
+      "description": "Calls .slice() at least twice",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:[\\s\\S]*\\.slice\\s*\\([\\s\\S]*\\.slice\\s*\\()",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

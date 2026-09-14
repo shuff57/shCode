@@ -1,0 +1,78 @@
+{
+  "id": "3-2-7-lab-rectangle-area",
+  "title": "3.2.7 Lab: findRectangleArea (multi-parameter)",
+  "description": "Define findRectangleArea(width, height) that returns the area, then call it and log the result. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Define findRectangleArea",
+      "instructions": "Define a function called findRectangleArea that takes two parameters, width and height."
+    },
+    {
+      "id": "s2",
+      "title": "Return the area",
+      "instructions": "Inside the function, hand back the area by returning width multiplied by height. Use return, not console.log, so the caller receives a number."
+    },
+    {
+      "id": "s3",
+      "title": "Call it and log the result",
+      "instructions": "Call findRectangleArea with two numbers, store or pass the result, and use console.log to print it. Try a second call with different numbers."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "findRectangleArea defined",
+      "description": "Code defines a function named findRectangleArea",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+findRectangleArea\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "two parameters",
+      "description": "findRectangleArea is defined with two parameters",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+findRectangleArea\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*,\\s*[A-Za-z_$][\\w$]*\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "returns a value",
+      "description": "Code contains a return statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return\\s",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "result is logged",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "3-8-6-reading-what-does-not-survive",
+  "title": "3.8.6 Reading: What Does Not Survive",
+  "description": "Learn what JSON silently drops — functions and undefined values — and why that is JSON storing data rather than behaviour, not a bug.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "reading",
+  "week": 10,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

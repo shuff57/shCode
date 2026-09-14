@@ -2792,7 +2792,7 @@
     },
     {
       "id": "3-1-3-reading-parameters-return",
-      "title": "3.2.1 Reading: Parameters & Return Values",
+      "title": "3.2.2 Reading: Parameters & Return Values",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -2801,7 +2801,7 @@
     },
     {
       "id": "3-1-4-reading-scope",
-      "title": "3.2.2 Reading: Scope: Local vs Global",
+      "title": "3.2.20 Reading: Scope: Local vs Global",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -2810,7 +2810,7 @@
     },
     {
       "id": "3-1-5-reading-pass-by-value-reference",
-      "title": "3.6.1 Reading: Pass by Value vs Reference",
+      "title": "3.6.2 Reading: Pass by Value vs Reference",
       "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "reading",
       "type": "lesson",
@@ -2819,7 +2819,7 @@
     },
     {
       "id": "3-1-6-reading-defensive-copying",
-      "title": "3.6.2 Reading: Defensive Copying: [...] and {...}",
+      "title": "3.6.10 Reading: Defensive Copying: [...] and {...}",
       "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "reading",
       "type": "lesson",
@@ -2828,7 +2828,7 @@
     },
     {
       "id": "3-1-7-a7-2-pass-by-reference-writeup",
-      "title": "3.6.3 Pass by Value vs Reference",
+      "title": "3.6.15 Writeup: Pass by Value vs Reference",
       "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "assignment",
       "type": "assignment",
@@ -2872,6 +2872,105 @@
       "week": null
     },
     {
+      "id": "3-2-1-slides-parameters-return",
+      "title": "3.2.1 Slides: Parameters and Return Values",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "slides",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-10-example-return-vs-print",
+      "title": "3.2.10 Worked Example: return instead of print",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-11-reading-return-ends-function",
+      "title": "3.2.11 Reading: `return` Ends the Function",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-12-lab-guard-clause",
+      "title": "3.2.12 Lab: an Early-Return Guard Clause",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-13-reading-printing-not-returning",
+      "title": "3.2.13 Reading: Printing Is Not Returning",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-14-example-print-or-return",
+      "title": "3.2.14 Worked Example: Which Should a Function Do?",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-15-lab-fix-print-not-return",
+      "title": "3.2.15 Lab: Fix a Function That Prints Instead of Returning",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-16-reading-building-with-returns",
+      "title": "3.2.16 Reading: Building With Returned Values",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-17-example-chaining-functions",
+      "title": "3.2.17 Worked Example: Chaining Two Functions",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-18-chart-chained-calls",
+      "title": "3.2.18 Chart the Code: Data Flow Through Chained Calls",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-19-lab-compose-functions",
+      "title": "3.2.19 Lab: Compose Two Functions",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
       "id": "3-2-2-reading-array-basics",
       "title": "3.3.2 Reading: Array Basics: Index, push, pop",
       "unit": "3.3 Arrays",
@@ -2881,6 +2980,24 @@
       "week": 8
     },
     {
+      "id": "3-2-21-lab-scope-prediction",
+      "title": "3.2.21 Lab: Scope Prediction Exercise",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-22-parameters-return-quiz",
+      "title": "3.2.22 Parameters and Return Values",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "3-2-3-reading-array-iteration",
       "title": "3.3.3 Reading: Looping Over Arrays (for / for…of)",
       "unit": "3.3 Arrays",
@@ -2888,6 +3005,24 @@
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
+    },
+    {
+      "id": "3-2-3-reading-passing-information-in",
+      "title": "3.2.3 Reading: Passing Information In",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-4-example-one-parameter",
+      "title": "3.2.4 Worked Example: a function with one parameter",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
     },
     {
       "id": "3-2-4-reading-split-lines",
@@ -2908,6 +3043,15 @@
       "week": 8
     },
     {
+      "id": "3-2-5-reading-parameters-arguments",
+      "title": "3.2.5 Reading: Parameters and Arguments",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
       "id": "3-2-6-example-menu-loop",
       "title": "3.3.6 Worked Example: A tiny menu loop",
       "unit": "3.3 Arrays",
@@ -2915,6 +3059,15 @@
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
+    },
+    {
+      "id": "3-2-6-reading-order-matters",
+      "title": "3.2.6 Reading: Order Matters",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
     },
     {
       "id": "3-2-6a-chart-the-array-loop",
@@ -2933,6 +3086,1005 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
+    },
+    {
+      "id": "3-2-7-lab-rectangle-area",
+      "title": "3.2.7 Lab: findRectangleArea (multi-parameter)",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-8-chart-parameter-trace",
+      "title": "3.2.8 Chart the Code: Tracing Parameter Values",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-9-reading-return",
+      "title": "3.2.9 Reading: Getting a Value Back with `return`",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-4-1-slides",
+      "title": "3.4.1 Slides: Function Expressions and Arrow Functions",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "slides",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "3-4-10-lab-implicit-return-drill",
+      "title": "3.4.10 Lab: Implicit-Return Rewrite Drill",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-11-reading-passing-a-function",
+      "title": "3.4.11 Reading: Passing a Function to a Function",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-12-example-arrow-callback",
+      "title": "3.4.12 Worked Example: An Arrow Passed as a Callback",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-13-lab-one-line-callback",
+      "title": "3.4.13 Lab: Write a One-Line Arrow Callback",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-14-reading-declaration-or-expression",
+      "title": "3.4.14 Reading: Declaration or Expression?",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-15-chart-form-decision",
+      "title": "3.4.15 Chart the Code: Decision Tree for Form Choice",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-16-lab-rewrite-three-arrows",
+      "title": "3.4.16 Lab: Rewrite 3 Named Functions as Arrows",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-17-lab-fix-broken-arrow",
+      "title": "3.4.17 Lab: Fix a Broken Arrow",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-18-example-zero-param-arrow",
+      "title": "3.4.18 Worked Example: An Arrow With No Parameters",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-19-lab-callback-capstone",
+      "title": "3.4.19 Lab: Callback Capstone",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-2-reading-function-is-a-value",
+      "title": "3.4.2 Reading: A Function Is a Value",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-20-chart-forms-comparison",
+      "title": "3.4.20 Chart the Code: Full Syntax-Forms Comparison",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-21-arrow-functions-quiz",
+      "title": "3.4.21 Function Expressions and Arrow Functions",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-3-example-function-in-variable",
+      "title": "3.4.3 Worked Example: Storing a Function in a Variable",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-4-reading-function-expressions",
+      "title": "3.4.4 Reading: Function Expressions",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-5-lab-declaration-to-expression",
+      "title": "3.4.5 Lab: Rewrite a Declaration as an Expression",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-6-reading-arrow-functions",
+      "title": "3.4.6 Reading: Arrow Functions",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-7-example-three-forms",
+      "title": "3.4.7 Worked Example: The Same Function Three Ways",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-8-reading-shorthand-rules",
+      "title": "3.4.8 Reading: The Shorthand Rules",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-4-9-chart-expand-arrow",
+      "title": "3.4.9 Chart the Code: Expanding an Arrow to Its Full Form",
+      "unit": "3.4 Function Expressions and Arrow Functions",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-1-slides",
+      "title": "3.5.1 Slides: Objects and Properties",
+      "unit": "3.5 Objects and Properties",
+      "preview": "slides",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-10-example-nested-access",
+      "title": "3.5.10 Worked Example: A Nested Object Access Chain",
+      "unit": "3.5 Objects and Properties",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-11-chart-nested-access",
+      "title": "3.5.11 Chart the Code: Tracing a Nested Access",
+      "unit": "3.5 Objects and Properties",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-12-lab-nested-structure",
+      "title": "3.5.12 Lab: Build a Small Nested-Object Structure",
+      "unit": "3.5 Objects and Properties",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-13-reading-methods",
+      "title": "3.5.13 Reading: Methods",
+      "unit": "3.5 Objects and Properties",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-14-example-object-method",
+      "title": "3.5.14 Worked Example: An Object With a Method",
+      "unit": "3.5 Objects and Properties",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-15-lab-add-method",
+      "title": "3.5.15 Lab: Add a Method to an Object",
+      "unit": "3.5 Objects and Properties",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-16-reading-named-arguments",
+      "title": "3.5.16 Reading: Objects as Named Arguments",
+      "unit": "3.5 Objects and Properties",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-17-example-options-object",
+      "title": "3.5.17 Worked Example: A Function Taking One Options Object",
+      "unit": "3.5 Objects and Properties",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-18-lab-params-to-object",
+      "title": "3.5.18 Lab: Rewrite a Multi-Parameter Function to Take an Object",
+      "unit": "3.5 Objects and Properties",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-19-reading-destructuring",
+      "title": "3.5.19 Reading: Destructuring",
+      "unit": "3.5 Objects and Properties",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-2-reading-grouping-values",
+      "title": "3.5.2 Reading: Grouping Related Values",
+      "unit": "3.5 Objects and Properties",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-20-example-destructure-param",
+      "title": "3.5.20 Worked Example: Destructuring in a Parameter List",
+      "unit": "3.5 Objects and Properties",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-21-chart-destructure-vs-access",
+      "title": "3.5.21 Chart the Code: Destructuring vs. Plain Access",
+      "unit": "3.5 Objects and Properties",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-22-lab-destructure-three",
+      "title": "3.5.22 Lab: Destructure 3 Fields From an Object",
+      "unit": "3.5 Objects and Properties",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-23-example-record-shape",
+      "title": "3.5.23 Worked Example: A Record-Shaped Object",
+      "unit": "3.5 Objects and Properties",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-24-lab-parallel-arrays-refactor",
+      "title": "3.5.24 Lab: Parallel-Arrays-vs-Object Refactor",
+      "unit": "3.5 Objects and Properties",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-25-lab-objects-capstone",
+      "title": "3.5.25 Lab: Objects Capstone — Build, Read, Destructure",
+      "unit": "3.5 Objects and Properties",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-26-objects-quiz",
+      "title": "3.5.26 Objects and Properties",
+      "unit": "3.5 Objects and Properties",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-3-example-object-literal",
+      "title": "3.5.3 Worked Example: An Object Literal for One Record",
+      "unit": "3.5 Objects and Properties",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-4-reading-properties",
+      "title": "3.5.4 Reading: Reading and Changing Properties",
+      "unit": "3.5 Objects and Properties",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-5-lab-read-update-fields",
+      "title": "3.5.5 Lab: Read and Update Object Fields",
+      "unit": "3.5 Objects and Properties",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-6-reading-computed-keys",
+      "title": "3.5.6 Reading: Square Brackets and Computed Keys",
+      "unit": "3.5 Objects and Properties",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-7-example-bracket-access",
+      "title": "3.5.7 Worked Example: Bracket Access With a Variable Key",
+      "unit": "3.5 Objects and Properties",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-8-lab-dot-vs-bracket",
+      "title": "3.5.8 Lab: Dot vs. Bracket — When You're Forced to Bracket",
+      "unit": "3.5 Objects and Properties",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-5-9-reading-nested-objects",
+      "title": "3.5.9 Reading: Objects Inside Objects and Arrays",
+      "unit": "3.5 Objects and Properties",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-6-1-slides",
+      "title": "3.6.1 Slides: Pass by Value/Reference",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "slides",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-11-example-defensive-copy",
+      "title": "3.6.11 Worked Example: Defensive Copy Before Mutating",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-12-lab-object-param-mutation",
+      "title": "3.6.12 Lab: Object-Parameter Mutation",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-13-lab-nested-mutation",
+      "title": "3.6.13 Lab: Nested-Structure Mutation",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-14-example-6-2-defensive-copy",
+      "title": "3.6.14 Worked Example: Why 6.2 Copies Before It Loops",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-16-lab-capstone",
+      "title": "3.6.16 Lab: Pass-by-Reference Capstone Practice",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-17-pass-by-reference-quiz",
+      "title": "3.6.17 Pass by Value/Reference",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-3-example-mutating-array-param",
+      "title": "3.6.3 Worked Example: Mutating an Array Parameter",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-4-lab-predict-primitive-vs-array",
+      "title": "3.6.4 Lab: Predict Output — Primitive vs. Array Argument",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-5-reading-changing-vs-reassigning",
+      "title": "3.6.5 Reading: Changing vs. Reassigning",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-6-example-reassign-doesnt-escape",
+      "title": "3.6.6 Worked Example: Reassigning a Parameter Doesn't Escape",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-7-chart-reassign-vs-mutate",
+      "title": "3.6.7 Chart the Code: Reassignment vs. Mutation Trace",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-8-lab-fix-reassign-bug",
+      "title": "3.6.8 Lab: Fix a Function That Reassigns Instead of Mutating",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-6-9-reading-side-effects-copies",
+      "title": "3.6.9 Reading: Side Effects and Copies",
+      "unit": "3.6 Functions: Pass by Value/Reference",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-7-1-slides",
+      "title": "3.7.1 Slides: Array Methods",
+      "unit": "3.7 Array Methods",
+      "preview": "slides",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-10-example-concat-non-mutating",
+      "title": "3.7.10 Worked Example: `.concat()` Without Mutating Either Input",
+      "unit": "3.7 Array Methods",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-11-lab-concat-two-lists",
+      "title": "3.7.11 Lab: `.concat()` Two Lists",
+      "unit": "3.7 Array Methods",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-12-reading-spread-arguments",
+      "title": "3.7.12 Reading: Spreading an Array into Arguments",
+      "unit": "3.7 Array Methods",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-13-example-spread-call",
+      "title": "3.7.13 Worked Example: `fn(...arr)` Spread-Call",
+      "unit": "3.7 Array Methods",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-14-reading-spread-into-new",
+      "title": "3.7.14 Reading: Spreading into a New Array or Object",
+      "unit": "3.7 Array Methods",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-15-example-spread-override",
+      "title": "3.7.15 Worked Example: Copying an Object with Changes",
+      "unit": "3.7 Array Methods",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-16-chart-spread-vs-rest",
+      "title": "3.7.16 Chart the Code: Spread vs. Rest, Side by Side",
+      "unit": "3.7 Array Methods",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-17-lab-spread-array",
+      "title": "3.7.17 Lab: Build a New Array with Spread",
+      "unit": "3.7 Array Methods",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-18-lab-spread-object",
+      "title": "3.7.18 Lab: Build a New Object with Spread + Override",
+      "unit": "3.7 Array Methods",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-19-reading-what-else",
+      "title": "3.7.19 Reading: What Else Is Out There",
+      "unit": "3.7 Array Methods",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-2-reading-map",
+      "title": "3.7.2 Reading: Transforming a List with `.map()`",
+      "unit": "3.7 Array Methods",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-20-example-push-then-map",
+      "title": "3.7.20 Worked Example: Chaining `.map()` off a `.push()`-Built Array",
+      "unit": "3.7 Array Methods",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-21-lab-mutating-sort-drill",
+      "title": "3.7.21 Lab: Mutating vs. Non-Mutating Method Sort Drill",
+      "unit": "3.7 Array Methods",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-22-lab-capstone",
+      "title": "3.7.22 Lab: Array-Methods Capstone",
+      "unit": "3.7 Array Methods",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-23-array-methods-quiz",
+      "title": "3.7.23 Array Methods",
+      "unit": "3.7 Array Methods",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-3-example-map-numeric",
+      "title": "3.7.3 Worked Example: `.map()` Over a Numeric Array",
+      "unit": "3.7 Array Methods",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-4-lab-map-non-mutating",
+      "title": "3.7.4 Lab: Transform a List Without Mutating the Input",
+      "unit": "3.7 Array Methods",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-5-chart-map-trace",
+      "title": "3.7.5 Chart the Code: `.map()`'s Callback Trace",
+      "unit": "3.7 Array Methods",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-6-reading-slice",
+      "title": "3.7.6 Reading: Taking Part of a List with `.slice()`",
+      "unit": "3.7 Array Methods",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-7-example-slice-copy",
+      "title": "3.7.7 Worked Example: `.slice()` Copies a Range",
+      "unit": "3.7 Array Methods",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-8-lab-slice-sublist",
+      "title": "3.7.8 Lab: Extract a Sub-List with `.slice()`",
+      "unit": "3.7 Array Methods",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-7-9-reading-concat",
+      "title": "3.7.9 Reading: Joining Lists with `.concat()`",
+      "unit": "3.7 Array Methods",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "3-8-1-slides",
+      "title": "3.8.1 Slides: Saving and Loading Data",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "slides",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-10-lab-round-trip-object",
+      "title": "3.8.10 Lab: Round-Trip an Object Through JSON",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-11-lab-round-trip-array",
+      "title": "3.8.11 Lab: Round-Trip an Array of Objects",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-12-reading-parsing-can-fail",
+      "title": "3.8.12 Reading: Parsing Can Fail",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-13-example-try-catch-parse",
+      "title": "3.8.13 Worked Example: `try`/`catch` Around a Bad Parse",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-14-lab-malformed-json",
+      "title": "3.8.14 Lab: Handle a Malformed JSON String",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-15-reading-saving-by-key",
+      "title": "3.8.15 Reading: Saving by Key",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-16-example-whole-pattern",
+      "title": "3.8.16 Worked Example: The Whole Pattern",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-17-chart-save-load-round-trip",
+      "title": "3.8.17 Chart the Code: Save/Load Round Trip End to End",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-18-lab-save-by-key",
+      "title": "3.8.18 Lab: Save a State Object by Key",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-19-lab-load-restore",
+      "title": "3.8.19 Lab: Load and Restore a Saved State",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-2-reading-data-outlives-program",
+      "title": "3.8.2 Reading: Data Has to Outlive the Program",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-20-reading-no-open",
+      "title": "3.8.20 Reading: Why There Is No `open()` Here",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-21-example-browser-sandbox",
+      "title": "3.8.21 Worked Example: What the Browser Sandbox Actually Allows",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-22-lab-capstone",
+      "title": "3.8.22 Lab: Saving-and-Loading Capstone",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-23-lab-adapt-to-list",
+      "title": "3.8.23 Lab: Adapt the Pattern to a List",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-24-saving-loading-quiz",
+      "title": "3.8.24 Saving and Loading Data",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-3-example-readable-vs-lost",
+      "title": "3.8.3 Worked Example: Readable Output vs. What Doesn't Survive",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-4-reading-json-stringify",
+      "title": "3.8.4 Reading: `JSON.stringify` — Object to Text",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-5-reading-readable-output",
+      "title": "3.8.5 Reading: Readable Output",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-6-reading-what-does-not-survive",
+      "title": "3.8.6 Reading: What Does Not Survive",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-7-lab-stringify-spot-drops",
+      "title": "3.8.7 Lab: Stringify an Object and Spot What Got Dropped",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-8-reading-json-parse",
+      "title": "3.8.8 Reading: `JSON.parse` — Text Back to Object",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
+    },
+    {
+      "id": "3-8-9-example-round-trip",
+      "title": "3.8.9 Worked Example: A Round Trip",
+      "unit": "3.8 Saving and Loading Data",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 10
     },
     {
       "id": "4-1-1-slides",

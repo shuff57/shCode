@@ -1,0 +1,22 @@
+{
+  "id": "3-8-12-reading-parsing-can-fail",
+  "title": "3.8.12 Reading: Parsing Can Fail",
+  "description": "Learn that JSON.parse throws a SyntaxError on malformed text, and why text you loaded is text you did not write so the call belongs in a try...catch.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "reading",
+  "week": 10,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

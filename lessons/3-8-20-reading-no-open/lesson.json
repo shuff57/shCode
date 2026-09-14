@@ -1,0 +1,22 @@
+{
+  "id": "3-8-20-reading-no-open",
+  "title": "3.8.20 Reading: Why There Is No `open()` Here",
+  "description": "Learn why a browser page gets no filesystem access at all, and why reading a local file requires the user to pick it. Read to close out the module before the sandbox example.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "reading",
+  "week": 10,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

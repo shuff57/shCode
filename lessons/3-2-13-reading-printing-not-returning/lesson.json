@@ -1,0 +1,22 @@
+{
+  "id": "3-2-13-reading-printing-not-returning",
+  "title": "3.2.13 Reading: Printing Is Not Returning",
+  "description": "console.log shows a value to a human; return gives it to the program. A function that prints produces undefined, which is why its result is unusable.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "reading",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

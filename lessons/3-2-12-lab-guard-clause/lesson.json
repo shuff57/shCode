@@ -1,0 +1,83 @@
+{
+  "id": "3-2-12-lab-guard-clause",
+  "title": "3.2.12 Lab: an Early-Return Guard Clause",
+  "description": "Write a function whose first check returns early when the input is invalid, so the valid path runs without an else. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Define the function",
+      "instructions": "Define a function called divide that takes two parameters, a and b."
+    },
+    {
+      "id": "s2",
+      "title": "Guard against the bad input first",
+      "instructions": "At the very top of the function, write an if that checks for a bad value of b, such as b equal to 0. Inside that if, return a message immediately. That early return is the guard: it ends the call before the rest of the body runs."
+    },
+    {
+      "id": "s3",
+      "title": "Return the good result without an else",
+      "instructions": "After the guard, return a divided by b. Because the early return already handled the bad case, no else is needed here."
+    },
+    {
+      "id": "s4",
+      "title": "Call it on both paths",
+      "instructions": "Call divide with a valid pair and with the bad value, and use console.log to print both results so you can see the guard fire."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "divide defined",
+      "description": "Code defines a function named divide",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+divide\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "if statement present",
+      "description": "Code contains an if condition",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "return statement present",
+      "description": "Code contains a return statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return\\s",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "results are logged",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

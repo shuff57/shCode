@@ -1,0 +1,21 @@
+{
+  "id": "3-2-17-example-chaining-functions",
+  "title": "3.2.17 Worked Example: Chaining Two Functions",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "example",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

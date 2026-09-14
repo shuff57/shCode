@@ -1,0 +1,115 @@
+{
+  "id": "3-7-22-lab-capstone",
+  "title": "3.7.22 Lab: Array-Methods Capstone",
+  "description": "Combine the module's non-mutating tools: build a list, transform it with .map(), take a range with .slice(), join with .concat() or spread, and copy an object with an override. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 30,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "console",
+  "week": 9,
+  "slos": [
+    "SLO-2",
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build a source list",
+      "instructions": "Create a variable called prices and fill it with at least five numbers, using .push() as you build."
+    },
+    {
+      "id": "s2",
+      "title": "Transform with .map()",
+      "instructions": "Use .map() to build a new array where every price is increased by a fixed amount or percentage, and store it in a second variable."
+    },
+    {
+      "id": "s3",
+      "title": "Take a range with .slice()",
+      "instructions": "Use .slice() to copy a part of the transformed array into a third variable."
+    },
+    {
+      "id": "s4",
+      "title": "Join two arrays",
+      "instructions": "Create a second array and join it with the range using .concat() or array spread, into a fourth variable."
+    },
+    {
+      "id": "s5",
+      "title": "Copy an object with an override",
+      "instructions": "Create an object with at least two properties, then build a copy with one property changed using object spread and an override. Log it alongside the original."
+    },
+    {
+      "id": "s6",
+      "title": "Log every result",
+      "instructions": "Use console.log for the transformed, sliced and joined arrays and for both objects. Confirm the original prices array still holds its starting values."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Array built with .push()",
+      "description": "Declares an array and adds to it with .push()",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[\\s\\S]*\\.push\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": ".map() used",
+      "description": "Calls .map() to transform the list",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.map\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": ".slice() used",
+      "description": "Calls .slice() to copy a range",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.slice\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Arrays joined",
+      "description": "Joins two arrays with .concat() or array spread",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(\\.concat\\s*\\(|\\[[^\\]]*\\.\\.\\.)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Object spread with override",
+      "description": "Builds an object copy with a property written after the spread",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\{\\s*\\.\\.\\.[^}]*,\\s*\\w+\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "console.log present",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "3-5-19-reading-destructuring",
+  "title": "3.5.19 Reading: Destructuring",
+  "description": "Unpack properties into variables in one statement. Objects match by name, arrays match by position.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "reading",
+  "week": 8,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

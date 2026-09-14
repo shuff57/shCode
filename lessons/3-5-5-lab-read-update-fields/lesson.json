@@ -1,0 +1,88 @@
+{
+  "id": "3-5-5-lab-read-update-fields",
+  "title": "3.5.5 Lab: Read and Update Object Fields",
+  "description": "Build one object, read a field with a dot, change a field, add a new field, and print the object. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create the object",
+      "instructions": "Create a variable named book and assign it an object literal with at least two properties, for example a title and a pages count."
+    },
+    {
+      "id": "s2",
+      "title": "Read a field with a dot",
+      "instructions": "Use console.log and dot notation to print one of the object's properties."
+    },
+    {
+      "id": "s3",
+      "title": "Change a field",
+      "instructions": "Assign a new value to one of the properties that already exists on the object."
+    },
+    {
+      "id": "s4",
+      "title": "Add a new field",
+      "instructions": "Add a new property the object did not have before by assigning to it with dot notation."
+    },
+    {
+      "id": "s5",
+      "title": "Print the whole object",
+      "instructions": "Use console.log to print the object itself, so the changed and added fields are visible."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "object literal created",
+      "description": "Declares an object with braces",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:const|let|var)\\s+\\w+\\s*=",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "property read with a dot",
+      "description": "Reads a property using dot notation",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\.\\w+",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "existing field changed",
+      "description": "Assigns a new value to a property",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\.\\w+\\s*=",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "whole object printed",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

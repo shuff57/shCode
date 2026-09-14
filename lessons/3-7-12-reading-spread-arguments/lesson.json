@@ -1,0 +1,22 @@
+{
+  "id": "3-7-12-reading-spread-arguments",
+  "title": "3.7.12 Reading: Spreading an Array into Arguments",
+  "description": "Learn how the spread operator ... unpacks an array into separate arguments, and how the same three dots mean the opposite in a function definition. Read before the spread-call example.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "reading",
+  "week": 9,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "3-4-3-example-function-in-variable",
+  "title": "3.4.3 Worked Example: Storing a Function in a Variable",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "example",
+  "week": 8,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

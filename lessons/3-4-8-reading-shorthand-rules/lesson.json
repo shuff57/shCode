@@ -1,0 +1,22 @@
+{
+  "id": "3-4-8-reading-shorthand-rules",
+  "title": "3.4.8 Reading: The Shorthand Rules",
+  "description": "The four optional shortenings of an arrow function, including the implicit return and the classic braces mistake that produces undefined.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "reading",
+  "week": 8,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

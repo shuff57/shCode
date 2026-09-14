@@ -1,0 +1,22 @@
+{
+  "id": "3-5-20-example-destructure-param",
+  "title": "3.5.20 Worked Example: Destructuring in a Parameter List",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "example",
+  "week": 8,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

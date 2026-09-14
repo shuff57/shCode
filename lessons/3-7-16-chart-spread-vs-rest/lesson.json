@@ -1,0 +1,65 @@
+{
+  "id": "3-7-16-chart-spread-vs-rest",
+  "title": "3.7.16 Chart the Code: Spread vs. Rest, Side by Side",
+  "description": "Draw the two directions the three dots can point: a definition that gathers arguments into an array, and a call that unpacks an array into arguments.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "diagram",
+  "week": 9,
+  "slos": [
+    "SLO-2",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
+    "rules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-process",
+        "count": 2
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      },
+      {
+        "id": "min-nodes",
+        "count": 7
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

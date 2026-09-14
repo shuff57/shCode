@@ -1,0 +1,21 @@
+{
+  "id": "3-7-3-example-map-numeric",
+  "title": "3.7.3 Worked Example: `.map()` Over a Numeric Array",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "example",
+  "week": 9,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

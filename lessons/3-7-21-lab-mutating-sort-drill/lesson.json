@@ -1,0 +1,84 @@
+{
+  "id": "3-7-21-lab-mutating-sort-drill",
+  "title": "3.7.21 Lab: Mutating vs. Non-Mutating Method Sort Drill",
+  "description": "Demonstrate one method that changes its array and one that returns a new array, logging before and after each. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "console",
+  "week": 9,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a working array",
+      "instructions": "Create a variable that holds an array of at least three values. You will demonstrate two methods on it."
+    },
+    {
+      "id": "s2",
+      "title": "Demonstrate a mutating method",
+      "instructions": "Call a method that changes the array in place, such as .push(). Log the array before and after so the change is visible."
+    },
+    {
+      "id": "s3",
+      "title": "Demonstrate a non-mutating method",
+      "instructions": "Call a method that returns a new array and leaves the original alone, such as .map() or .slice(). Store the result in a new variable and log it."
+    },
+    {
+      "id": "s4",
+      "title": "Log both results",
+      "instructions": "Use console.log to print the original array after the non-mutating call, so you can see it did not change."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Array declared",
+      "description": "Declares an array with square brackets",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "A mutating method is called",
+      "description": "Calls .push() (or another in-place method)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.(?:push|unshift|pop|shift|splice|sort|reverse)\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "A non-mutating method is called",
+      "description": "Calls .map(), .slice() or .concat(), which return a new array",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.(?:map|slice|concat)\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "console.log present",
+      "description": "Calls console.log to show before and after",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

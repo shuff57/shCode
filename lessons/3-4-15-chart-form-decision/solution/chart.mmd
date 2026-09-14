@@ -1,0 +1,18 @@
+flowchart TD
+  A([Start])
+  B[/read in the function's job/]
+  C{Called from several places?}
+  D[Write a function declaration]
+  E{Is the body a single expression?}
+  F[Write a one-line arrow with implicit return]
+  G[Write an arrow with a block body and return]
+  Z([End])
+  A --> B
+  B --> C
+  C -->|yes| D
+  C -->|no| E
+  E -->|yes| F
+  E -->|no| G
+  D --> Z
+  F --> Z
+  G --> Z

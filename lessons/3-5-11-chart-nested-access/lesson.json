@@ -1,0 +1,61 @@
+{
+  "id": "3-5-11-chart-nested-access",
+  "title": "3.5.11 Chart the Code: Tracing a Nested Access",
+  "description": "Chart a loop that reads a nested field inside an array, then a decision on a nested value. Get the loop's arrows landing in the right place.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "diagram",
+  "week": 8,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
+    "rules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      },
+      {
+        "id": "min-nodes",
+        "count": 7
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

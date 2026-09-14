@@ -1,0 +1,83 @@
+{
+  "id": "3-2-15-lab-fix-print-not-return",
+  "title": "3.2.15 Lab: Fix a Function That Prints Instead of Returning",
+  "description": "A function computes correctly but prints its result, so the caller gets undefined. Fix it to return, and prove the fix with arithmetic. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it and read the symptom",
+      "instructions": "Run the starter. The function prints the area, but the variable that stores the call prints as undefined. That is the tell of a missing return."
+    },
+    {
+      "id": "s2",
+      "title": "Find the missing return",
+      "instructions": "Look at where the function hands its answer to console.log. The function ends without a return, so the call produces undefined."
+    },
+    {
+      "id": "s3",
+      "title": "Fix the function",
+      "instructions": "Change the function so it returns the computed value instead of printing it. Use return, and let the caller print the result."
+    },
+    {
+      "id": "s4",
+      "title": "Prove the fix",
+      "instructions": "Use the returned value in an expression, such as doubling it, and log the result. If the arithmetic works, a real number came back."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "area defined",
+      "description": "Code defines a function named area",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+area\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "return statement present",
+      "description": "Code contains a return statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return\\s",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "result used in an expression",
+      "description": "Code multiplies the function result, proving a number came back",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\s*\\*\\s*2",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "results are logged",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "id": "3-5-22-lab-destructure-three",
+  "title": "3.5.22 Lab: Destructure 3 Fields From an Object",
+  "description": "Unpack three fields in one statement, use the bare names, and rewrite a function to destructure its parameter. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build an object with three fields",
+      "instructions": "Create an object with at least three properties, for example a title, a cost, and a quantity."
+    },
+    {
+      "id": "s2",
+      "title": "Unpack into three variables",
+      "instructions": "Destructure three of its properties into variables in one statement, using braces on the left of the equals sign."
+    },
+    {
+      "id": "s3",
+      "title": "Use the bare names",
+      "instructions": "Use the three variables (no dot, no object name) to build and print a sentence."
+    },
+    {
+      "id": "s4",
+      "title": "Destructure a parameter",
+      "instructions": "Write a function that takes one options object and destructures two or more of its keys directly in the parameter list, then returns a string from the bare names."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "object destructuring used",
+      "description": "Unpacks with a brace pattern",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:const|let|var)\\s*\\{[^}]*\\}\\s*=",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "parameter destructured",
+      "description": "A function parameter is a brace pattern",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "sentence printed",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

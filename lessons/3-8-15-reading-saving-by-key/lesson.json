@@ -1,0 +1,22 @@
+{
+  "id": "3-8-15-reading-saving-by-key",
+  "title": "3.8.15 Reading: Saving by Key",
+  "description": "Learn how localStorage saves a string under a name you choose, why everything comes back as a string, and why a never-saved key gives null. Read before the save/load labs.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "reading",
+  "week": 10,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

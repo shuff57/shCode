@@ -1,0 +1,79 @@
+{
+  "id": "3-5-18-lab-params-to-object",
+  "title": "3.5.18 Lab: Rewrite a Multi-Parameter Function to Take an Object",
+  "description": "Take a function with three positional parameters and rewrite it to read one options object instead. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the positional original",
+      "instructions": "Write a function that takes three positional parameters (for example width, height and color) and returns a string built from them."
+    },
+    {
+      "id": "s2",
+      "title": "Rewrite it to take one object",
+      "instructions": "Change the function so it takes a single parameter, an options object, and reads each value off that object with a dot."
+    },
+    {
+      "id": "s3",
+      "title": "Call it with an options object",
+      "instructions": "Call the function, passing one object literal with the three keys named, and print the result."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "function defined",
+      "description": "Defines a function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+\\w+\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "reads a property off the options object",
+      "description": "Uses options.property in the body",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "options\\.\\w+",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "called with an object literal",
+      "description": "A call passes a brace literal",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\s*\\(\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "result printed",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

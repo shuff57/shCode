@@ -1,0 +1,78 @@
+{
+  "id": "3-5-24-lab-parallel-arrays-refactor",
+  "title": "3.5.24 Lab: Parallel-Arrays-vs-Object Refactor",
+  "description": "Refactor three parallel arrays into one array of records, then read the fields back with a dot. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Start from the parallel arrays",
+      "instructions": "The starter keeps three separate arrays, one per field, aligned by index: a name, a score and a group for each player. Read it and see how each field is fetched from a different array at the same index."
+    },
+    {
+      "id": "s2",
+      "title": "Collapse them into one array of records",
+      "instructions": "Replace the three parallel arrays with a single array whose elements are objects, each object holding name, score and group for one player."
+    },
+    {
+      "id": "s3",
+      "title": "Read each record with a dot",
+      "instructions": "Loop over the new array and print each player's fields with bracket index then dot field, so all three fields come from one record."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "array of object records built",
+      "description": "An array literal holds object literals",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*\\{[^}]*\\}",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "record fields read with a dot",
+      "description": "Reads arr[i].field",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\w+\\]\\.\\w+",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "loop present",
+      "description": "Contains a for loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "output printed",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

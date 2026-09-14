@@ -1,0 +1,89 @@
+{
+  "id": "3-4-19-lab-callback-capstone",
+  "title": "3.4.19 Lab: Callback Capstone",
+  "description": "Write a counting helper that takes a callback, then use it with a one-line arrow to count matching values in an array. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the counting helper",
+      "instructions": "Define a function that takes an array and a test function. It should walk the array with a for loop, call the test on each element, and return how many elements passed the test."
+    },
+    {
+      "id": "s2",
+      "title": "Prepare an array of values",
+      "instructions": "Create a variable holding an array of at least five numbers."
+    },
+    {
+      "id": "s3",
+      "title": "Count with two different arrows",
+      "instructions": "Call the helper twice on your array, once with a one-line arrow testing one condition and once with an arrow testing a different condition. Log both counts."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Helper defined",
+      "description": "A function is defined that accepts an array and a test function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*\\w+\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "for loop present",
+      "description": "Code contains a for loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Callback called inside the helper",
+      "description": "The test function parameter is called inside the helper",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(\\s*\\w+\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "At least two inline arrows passed",
+      "description": "Two arrow functions appear in the file",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "=>[\\s\\S]*=>",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

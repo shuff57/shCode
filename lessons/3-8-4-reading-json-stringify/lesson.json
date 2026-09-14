@@ -1,0 +1,22 @@
+{
+  "id": "3-8-4-reading-json-stringify",
+  "title": "3.8.4 Reading: `JSON.stringify` — Object to Text",
+  "description": "Learn how JSON.stringify turns an object or array into a single string with every property intact, and what changes from a JavaScript literal. Read before the stringify lab.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "reading",
+  "week": 10,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

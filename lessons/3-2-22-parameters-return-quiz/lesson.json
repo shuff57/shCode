@@ -1,0 +1,160 @@
+{
+  "id": "3-2-22-parameters-return-quiz",
+  "title": "3.2.22 Parameters and Return Values",
+  "description": "Eight multiple-choice questions on parameters, arguments, return, and why printing is not returning. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "quiz",
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-parameter-vs-argument",
+        "source": "3.2.5",
+        "question": "In `function area(w, h)` called as `area(3, 4)`, which are the arguments?",
+        "options": [
+          "`w` and `h`",
+          "`3` and `4`",
+          "`area` and `3`",
+          "`w`, `h`, `3` and `4`"
+        ],
+        "answer": 1,
+        "explanation": "Arguments are the actual values handed in at the call, so `3` and `4` are the arguments. `w` and `h` are the parameters, the names written in the definition.",
+        "sourceIds": [
+          "3-2-5-reading-parameters-arguments"
+        ]
+      },
+      {
+        "id": "q2-parameter-defined-when",
+        "source": "3.2.3",
+        "question": "A parameter is a blank in a function's definition. When does it receive a value?",
+        "options": [
+          "When the file is first run, before any call",
+          "When the function is defined",
+          "Each time the function is called, from that call's argument",
+          "Only if the function contains a `return`"
+        ],
+        "answer": 2,
+        "explanation": "A parameter has no value until the function is called. Each call places its own argument into the parameter, which is why one definition can produce different results.",
+        "sourceIds": [
+          "3-2-3-reading-passing-information-in"
+        ]
+      },
+      {
+        "id": "q3-order-matters",
+        "source": "3.2.6",
+        "question": "What does this print?",
+        "code": "function subtract(a, b) {\n  console.log(a - b);\n}\n\nsubtract(10, 3);\nsubtract(3, 10);",
+        "options": [
+          "`7` then `7`",
+          "`7` then `-7`",
+          "`-7` then `7`",
+          "An error on the second call"
+        ],
+        "answer": 1,
+        "explanation": "Arguments match parameters by position, not by name. The second call sets `a` to `3` and `b` to `10`, so it prints `-7`. Nothing errors; subtracting in the other order just flips the sign.",
+        "sourceIds": [
+          "3-2-6-reading-order-matters"
+        ]
+      },
+      {
+        "id": "q4-return-value",
+        "source": "3.2.9",
+        "question": "What is the value of the call `square(4)` for this function?",
+        "code": "function square(n) {\n  return n * n;\n}",
+        "options": [
+          "`16`",
+          "`undefined`, because the function does not print",
+          "`4`",
+          "`n * n`, the expression text"
+        ],
+        "answer": 0,
+        "explanation": "`return` hands the computed value back to the caller, so `square(4)` is `16`. A function call that returns a value can be stored or used in an expression, which is why it has a value at all.",
+        "sourceIds": [
+          "3-2-9-reading-return"
+        ]
+      },
+      {
+        "id": "q5-return-ends",
+        "source": "3.2.11",
+        "question": "What does `test(3)` return, and why is the second `return` never reached?",
+        "code": "function test(n) {\n  if (n > 0) {\n    return \"big\";\n  }\n  return \"small\";\n}",
+        "options": [
+          "`\"big\"`, because the first `return` ends the function on the spot",
+          "`\"small\"`, because the last `return` always wins",
+          "`\"big\"` then `\"small\"`, because both run",
+          "Nothing, because two `return` statements in one function is an error"
+        ],
+        "answer": 0,
+        "explanation": "The first `return` ends the function immediately, so the line after the `if` is never reached on this call. It is the fallback for calls where `n > 0` is false, which is why no `else` is needed.",
+        "sourceIds": [
+          "3-2-11-reading-return-ends-function"
+        ]
+      },
+      {
+        "id": "q6-print-vs-return",
+        "source": "3.2.13",
+        "question": "What does this print?",
+        "code": "function triple(n) {\n  console.log(n * 3);\n}\n\nconst x = triple(2);\nconsole.log(x);",
+        "options": [
+          "`6` then `6`",
+          "`6` then `undefined`",
+          "`undefined` then `6`",
+          "`6` and nothing else"
+        ],
+        "answer": 1,
+        "explanation": "The `6` comes from the `console.log` inside `triple`. Then `x` prints as `undefined`, because `triple` has no `return` and so handed nothing back.",
+        "sourceIds": [
+          "3-2-13-reading-printing-not-returning"
+        ]
+      },
+      {
+        "id": "q7-undefined-cause",
+        "source": "3.2.13",
+        "question": "A function computes a value correctly, but the variable holding its result is `undefined`. What is the most likely cause?",
+        "options": [
+          "The function was called with the wrong arguments",
+          "The function prints its result instead of returning it",
+          "The variable was declared with `const`",
+          "The function was defined before it was called"
+        ],
+        "answer": 1,
+        "explanation": "The computation ran, which is why the right value was printed from inside. But the function ended without a `return`, so the call produced `undefined`. The fix is to replace the final print with `return`.",
+        "sourceIds": [
+          "3-2-13-reading-printing-not-returning"
+        ]
+      },
+      {
+        "id": "q8-chained-calls",
+        "source": "3.2.16",
+        "question": "What do these two lines print?",
+        "code": "function double(n) {\n  return n * 2;\n}\n\nfunction addTen(n) {\n  return n + 10;\n}\n\nconsole.log(double(addTen(5)));\nconsole.log(addTen(double(5)));",
+        "options": [
+          "`30` then `30`",
+          "`20` then `30`",
+          "`30` then `20`",
+          "`15` then `10`"
+        ],
+        "answer": 2,
+        "explanation": "The inner call always runs first. `addTen(5)` is `15`, then `double(15)` is `30`. Reversed, `double(5)` is `10`, then `addTen(10)` is `20`. The nesting order changes the answer.",
+        "sourceIds": [
+          "3-2-16-reading-building-with-returns"
+        ]
+      }
+    ]
+  }
+}

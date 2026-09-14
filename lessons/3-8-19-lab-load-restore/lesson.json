@@ -1,0 +1,94 @@
+{
+  "id": "3-8-19-lab-load-restore",
+  "title": "3.8.19 Lab: Load and Restore a Saved State",
+  "description": "Read a saved key, cope with a never-saved key, and parse the stored text back into a usable object with a fallback. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "console",
+  "week": 10,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Save something first",
+      "instructions": "Store an object under a key using JSON.stringify and localStorage.setItem, so there is something to load."
+    },
+    {
+      "id": "s2",
+      "title": "Read the key before parsing",
+      "instructions": "Use localStorage.getItem into a variable. A key that was never saved returns null, so check for null before you parse."
+    },
+    {
+      "id": "s3",
+      "title": "Restore inside a try/catch",
+      "instructions": "If text was found, parse it with JSON.parse inside a try block. In the catch block, fall back to a default object instead of letting the error stop the program."
+    },
+    {
+      "id": "s4",
+      "title": "Log the restored state",
+      "instructions": "Use console.log to print a property of the restored object, proving it came back as a real object and not a string."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Read by key",
+      "description": "Calls localStorage.getItem",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "localStorage\\.getItem\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Missing key checked",
+      "description": "Tests the read value against null",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "===\\s*null|==\\s*null|!\\s*\\w+",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Restored with parse",
+      "description": "Calls JSON.parse",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.parse\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "try/catch guard",
+      "description": "Wraps the parse in try and catch",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Restored state logged",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

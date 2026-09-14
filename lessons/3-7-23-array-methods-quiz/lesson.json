@@ -1,0 +1,158 @@
+{
+  "id": "3-7-23-array-methods-quiz",
+  "title": "3.7.23 Array Methods",
+  "description": "Eight multiple-choice questions on .map(), .slice(), .concat(), spread, rest, and mutating versus non-mutating methods. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "quiz",
+  "week": 9,
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-map-produces",
+        "source": "3.7.2 and 3.7.3",
+        "question": "What does [1, 2, 3].map((n) => n * n) produce?",
+        "options": [
+          "14",
+          "[1, 4, 9]",
+          "[1, 2, 3]",
+          "[2, 4, 6]"
+        ],
+        "answer": 1,
+        "explanation": ".map() applies the callback to each element and collects the results into a new array of the same length. It never combines the results into one number; that would be .reduce().",
+        "sourceIds": [
+          "3-7-2-reading-map",
+          "3-7-3-example-map-numeric"
+        ]
+      },
+      {
+        "id": "q2-map-original",
+        "source": "3.7.2",
+        "question": "After const b = a.map((n) => n * 2); what has happened to a?",
+        "options": [
+          "It now holds the doubled values",
+          "It is unchanged",
+          "It is empty",
+          "It is now the same array as b"
+        ],
+        "answer": 1,
+        "explanation": ".map() builds a new array and leaves the original alone, which is why the result has to be assigned to a variable to be kept at all.",
+        "sourceIds": [
+          "3-7-2-reading-map"
+        ]
+      },
+      {
+        "id": "q3-slice-end",
+        "source": "3.7.6",
+        "question": "What does [\"a\", \"b\", \"c\", \"d\", \"e\"].slice(1, 3) return?",
+        "options": [
+          "[\"b\", \"c\", \"d\"]",
+          "[\"a\", \"b\", \"c\"]",
+          "[\"b\", \"c\"]",
+          "[\"c\", \"d\"]"
+        ],
+        "answer": 2,
+        "explanation": ".slice(start, end) includes start but not end, so slice(1, 3) copies positions 1 and 2: [\"b\", \"c\"]. The count is end - start.",
+        "sourceIds": [
+          "3-7-6-reading-slice"
+        ]
+      },
+      {
+        "id": "q4-slice-no-args",
+        "source": "3.7.6",
+        "question": "Why is calling .slice() with no arguments useful?",
+        "options": [
+          "It sorts the array in place",
+          "It removes the last item",
+          "It makes a full, genuinely separate copy of the array",
+          "It converts the array to a string"
+        ],
+        "answer": 2,
+        "explanation": ".slice() with no arguments copies from start to finish into a new array, so changes to the copy do not affect the original. Assigning const copy = original would only give a second name for the same array.",
+        "sourceIds": [
+          "3-7-6-reading-slice"
+        ]
+      },
+      {
+        "id": "q5-push-vs-concat",
+        "source": "3.7.9",
+        "question": "When a and b are both arrays, what are the differences between a.push(b) and a.concat(b)?",
+        "options": [
+          "Nothing; they are the same",
+          "push changes a and adds b as one nested item; concat leaves a alone and returns a new flat array",
+          "concat changes a and push does not",
+          "push returns a new array and concat changes a"
+        ],
+        "answer": 1,
+        "explanation": "Two differences at once. push mutates a and nests the array argument, giving [1, 2, [3, 4]]; concat leaves both alone and flattens one level, giving [1, 2, 3, 4].",
+        "sourceIds": [
+          "3-7-9-reading-concat"
+        ]
+      },
+      {
+        "id": "q6-max-spread",
+        "source": "3.7.12",
+        "question": "Why does Math.max([3, 9, 4]) give NaN, and what one change fixes it?",
+        "options": [
+          "Math.max cannot handle numbers above 9; sort first",
+          "It received one argument that is an array, not a number; spread it as Math.max(...numbers)",
+          "The array must be joined into a string first",
+          "Math.max needs four arguments, not three"
+        ],
+        "answer": 1,
+        "explanation": "Math.max compares the separate arguments it is given. Handed a single array it tries to treat that array as a number and gets NaN. Spreading the array supplies the elements as individual arguments.",
+        "sourceIds": [
+          "3-7-12-reading-spread-arguments"
+        ]
+      },
+      {
+        "id": "q7-object-override",
+        "source": "3.7.14 and 3.7.15",
+        "question": "What is { ...base, size: 10 } when base is { size: 4, color: \"red\" }?",
+        "options": [
+          "{ size: 4, color: \"red\" }",
+          "{ size: 10, color: \"red\" }",
+          "An error, because size appears twice",
+          "{ size: 10 } only"
+        ],
+        "answer": 1,
+        "explanation": "The spread copies every property of base in, then the later entry size: 10 overwrites the copied size: 4. Duplicate keys are not an error: the last one wins, which is why the override must come after the spread.",
+        "sourceIds": [
+          "3-7-14-reading-spread-into-new",
+          "3-7-15-example-spread-override"
+        ]
+      },
+      {
+        "id": "q8-mutating-vs-not",
+        "source": "3.7.19",
+        "question": "Which pair correctly names one method that changes the array it is called on and one that does not?",
+        "options": [
+          "map mutates; slice does not",
+          "sort mutates; map does not",
+          "slice mutates; concat does not",
+          "concat mutates; sort does not"
+        ],
+        "answer": 1,
+        "explanation": ".sort() and .reverse() reorder the array in place, changing the original. .map(), .slice() and .concat() return something new and leave the input alone.",
+        "sourceIds": [
+          "3-7-19-reading-what-else"
+        ]
+      }
+    ]
+  }
+}

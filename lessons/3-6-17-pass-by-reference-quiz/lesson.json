@@ -1,0 +1,160 @@
+{
+  "id": "3-6-17-pass-by-reference-quiz",
+  "title": "3.6.17 Pass by Value/Reference",
+  "description": "Eight multiple-choice questions on primitives vs objects, mutation vs reassignment, side effects, and defensive copying. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.6 Functions: Pass by Value/Reference",
+  "preview": "quiz",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-primitive-copy",
+        "source": "3.6.2",
+        "question": "When you pass a primitive (a number, string, or boolean) to a function, what does the function receive?",
+        "options": [
+          "A pointer to the same value, so the function can change your variable",
+          "The name of your variable instead of its value",
+          "A copy of the value, so changing it leaves your original untouched",
+          "Nothing until the function asks for it"
+        ],
+        "answer": 2,
+        "explanation": "Primitives are passed by value: the function gets its own copy. Reassigning that copy cannot reach back to your variable. The first option describes objects, not primitives.",
+        "sourceIds": [
+          "3-1-5-reading-pass-by-value-reference"
+        ]
+      },
+      {
+        "id": "q2-object-reference",
+        "source": "3.6.2",
+        "question": "When you pass an array to a function, what does the function receive?",
+        "options": [
+          "A full copy of every element, kept separate from yours",
+          "A copy of the reference: an address pointing at the same array",
+          "A read-only view that cannot be changed",
+          "A new empty array to fill in"
+        ],
+        "answer": 1,
+        "explanation": "An array is an object, so the function gets a copy of the reference. Both names point at one array, which is why a push inside the function shows up outside it.",
+        "sourceIds": [
+          "3-1-5-reading-pass-by-value-reference"
+        ]
+      },
+      {
+        "id": "q3-trace-primitive",
+        "source": "3.6.5",
+        "code": "function update(val) {\n  val = val + 1;\n}\n\nlet x = 5;\nupdate(x);\nconsole.log(x);",
+        "question": "What does this print?",
+        "options": [
+          "6",
+          "5",
+          "undefined",
+          "An error: you cannot change a parameter"
+        ],
+        "answer": 1,
+        "explanation": "x is a number, so update received a copy. `val = val + 1` reassigned the copy to 6 and then the function ended. x never moved, so it prints 5.",
+        "sourceIds": [
+          "3-6-5-reading-changing-vs-reassigning"
+        ]
+      },
+      {
+        "id": "q4-trace-array",
+        "source": "3.6.4",
+        "code": "function addOne(nums) {\n  for (let i = 0; i < nums.length; i++) {\n    nums[i] = nums[i] + 1;\n  }\n}\n\nlet scores = [10, 20, 30];\naddOne(scores);\nconsole.log(scores);",
+        "question": "What does this print?",
+        "options": [
+          "[10, 20, 30]",
+          "[10, 20, 30, 1]",
+          "undefined",
+          "[11, 21, 31]"
+        ],
+        "answer": 3,
+        "explanation": "`nums[i] = ...` writes into the shared array, which is mutation rather than reassignment. The caller sees every change, so scores becomes [11, 21, 31].",
+        "sourceIds": [
+          "3-6-4-lab-predict-primitive-vs-array"
+        ]
+      },
+      {
+        "id": "q5-mutate-vs-reassign",
+        "source": "3.6.5",
+        "question": "Which line mutates an object rather than reassigning a name?",
+        "options": [
+          "arr = [4, 5]",
+          "num = 4",
+          "label = \"new\"",
+          "arr.push(4)"
+        ],
+        "answer": 3,
+        "explanation": "`arr.push(4)` changes the contents of the array both names point at, so everyone holding a reference sees it. The other three lines point one name at a different value and nothing else moves.",
+        "sourceIds": [
+          "3-6-5-reading-changing-vs-reassigning"
+        ]
+      },
+      {
+        "id": "q6-const-push",
+        "source": "3.6.5",
+        "question": "What happens when you run this? `const items = [\"pen\"]; items.push(\"notebook\");`",
+        "options": [
+          "It throws: you cannot change a const array",
+          "It runs fine; const locks the binding, not the contents",
+          "It runs but silently drops the new item",
+          "It makes a copy of items first, then pushes"
+        ],
+        "answer": 1,
+        "explanation": "const promises the name will always point at this same array. Pushing does not change which array that is, so it is allowed. The line that would throw is `items = [\"eraser\"]`, because that reassigns the binding.",
+        "sourceIds": [
+          "3-6-5-reading-changing-vs-reassigning"
+        ]
+      },
+      {
+        "id": "q7-side-effect",
+        "source": "3.6.9",
+        "question": "What is a side effect?",
+        "options": [
+          "Any value a function returns",
+          "An error thrown inside a function",
+          "A change a function makes that outlives the call and is visible outside it",
+          "A parameter with a default value"
+        ],
+        "answer": 2,
+        "explanation": "A side effect is a lasting change, most often mutating an object the function was passed. It is not automatically bad — sortScores exists to reorder — but an unexpected one is a hard bug.",
+        "sourceIds": [
+          "3-6-9-reading-side-effects-copies"
+        ]
+      },
+      {
+        "id": "q8-shallow-copy",
+        "source": "3.6.11 and 3.6.13",
+        "question": "You make a copy of an object with `{...original}` and then push into a nested array inside the copy. What happens to the original?",
+        "options": [
+          "The original's nested array changes too, because the copy is only one level deep",
+          "Nothing: the copy is completely separate",
+          "It throws, because you cannot copy an object that holds an array",
+          "The original becomes undefined"
+        ],
+        "answer": 0,
+        "explanation": "Spread makes a shallow copy: the outer object is new, but any nested array or object inside is still shared. Change the nested array and both see it. structuredClone makes a copy that goes all the way down.",
+        "sourceIds": [
+          "3-6-11-example-defensive-copy",
+          "3-6-13-lab-nested-mutation"
+        ]
+      }
+    ]
+  }
+}

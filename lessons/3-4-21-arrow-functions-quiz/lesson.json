@@ -1,0 +1,156 @@
+{
+  "id": "3-4-21-arrow-functions-quiz",
+  "title": "3.4.21 Function Expressions and Arrow Functions",
+  "description": "Eight multiple-choice questions on function values, expressions, arrow shorthand, callbacks, and hoisting. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "quiz",
+  "week": 8,
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-typeof-function",
+        "source": "3.4.2",
+        "question": "A function named greet returns the string \"Hello!\". What does console.log(typeof greet) print?",
+        "options": [
+          "string",
+          "Hello!",
+          "function",
+          "undefined"
+        ],
+        "answer": 2,
+        "explanation": "typeof greet asks what kind of value greet is, without calling it. A function value's type is \"function\". \"string\" would be the answer to typeof greet(), because that calls the function first.",
+        "sourceIds": [
+          "3-4-2-reading-function-is-a-value"
+        ]
+      },
+      {
+        "id": "q2-call-vs-value",
+        "source": "3.4.2",
+        "question": "A function greet returns \"Hello!\". A student writes const sayHello = greet();. What is stored in sayHello?",
+        "options": [
+          "The string \"Hello!\" — the parentheses called the function and stored its result",
+          "The function itself, because greet is a value",
+          "A second name for greet, like const sayHello = greet;",
+          "An error, because you cannot assign a call to a const"
+        ],
+        "answer": 0,
+        "explanation": "greet() calls the function immediately and yields its return value, so sayHello holds the string. Without the parentheses, const sayHello = greet; would copy the function value itself.",
+        "sourceIds": [
+          "3-4-2-reading-function-is-a-value"
+        ]
+      },
+      {
+        "id": "q3-expression-shape",
+        "source": "3.4.4",
+        "question": "Which line is a function expression rather than a function declaration?",
+        "options": [
+          "function add(a, b) { return a + b; }",
+          "const add = function (a, b) { return a + b; };",
+          "add(2, 3);",
+          "function add() {}"
+        ],
+        "answer": 1,
+        "explanation": "A function expression writes the function in a value position, here the right side of an assignment, and it is reached through the variable. The function itself has no name after the keyword, and the assignment ends with a semicolon.",
+        "sourceIds": [
+          "3-4-4-reading-function-expressions"
+        ]
+      },
+      {
+        "id": "q4-arrow-shape",
+        "source": "3.4.6",
+        "question": "What does const add = (a, b) => a + b; do when you call add(2, 3)?",
+        "options": [
+          "It returns undefined, because there is no return keyword",
+          "It returns 23, because the parameters are joined as text",
+          "An error, because an arrow needs the function keyword",
+          "It returns 5, because a single-expression arrow body returns that expression automatically"
+        ],
+        "answer": 3,
+        "explanation": "An arrow with a single expression and no braces has an implicit return: the expression a + b is the value handed back, so add(2, 3) gives 5. No function keyword and no return keyword is required.",
+        "sourceIds": [
+          "3-4-6-reading-arrow-functions"
+        ]
+      },
+      {
+        "id": "q5-braces-return",
+        "source": "3.4.8",
+        "question": "What does const doubleWrong = (n) => { n * 2; }; return when you call doubleWrong(5)?",
+        "options": [
+          "10",
+          "5",
+          "An error",
+          "undefined, because the braces make a block with no return"
+        ],
+        "answer": 3,
+        "explanation": "Braces make the body a block, so the implicit return no longer applies. n * 2 is computed and thrown away, and with no return statement the function falls off the end and produces undefined.",
+        "sourceIds": [
+          "3-4-8-reading-shorthand-rules"
+        ]
+      },
+      {
+        "id": "q6-parameter-parens",
+        "source": "3.4.8",
+        "question": "Which arrow function is written incorrectly?",
+        "options": [
+          "const f = x => x + 1;",
+          "const f = (x, y) => x + y;",
+          "const f = => 42;",
+          "const f = () => 42;"
+        ],
+        "answer": 2,
+        "explanation": "A function with no parameters still needs empty parentheses, so it must be const f = () => 42;. Parentheses are optional only for exactly one parameter, which is why the first option is fine.",
+        "sourceIds": [
+          "3-4-8-reading-shorthand-rules"
+        ]
+      },
+      {
+        "id": "q7-callback-no-parens",
+        "source": "3.4.11",
+        "question": "A helper applyTwice(operation, value) calls operation(operation(value)). Which call passes the function correctly?",
+        "options": [
+          "applyTwice(double(), 5)",
+          "applyTwice(double, 5)",
+          "applyTwice(double(5), 5)",
+          "applyTwice(\"double\", 5)"
+        ],
+        "answer": 1,
+        "explanation": "A callback is passed as the function value itself, with no parentheses: applyTwice(double, 5). writing double() would call it first and hand over its result, a number, which applyTwice would then try to call and fail.",
+        "sourceIds": [
+          "3-4-11-reading-passing-a-function"
+        ]
+      },
+      {
+        "id": "q8-hoisting",
+        "source": "3.4.14",
+        "question": "Why does calling a function declaration on a line above its definition work, while calling a function expression above its line fails?",
+        "options": [
+          "Declarations are prepared before any code runs (hoisting); an expression's variable is only filled in when its line executes",
+          "Function expressions are slower to create, so they are not ready yet",
+          "Expressions must be written with let instead of const to be hoisted",
+          "Declarations are hoisted only when called from inside another function"
+        ],
+        "answer": 0,
+        "explanation": "JavaScript reads the whole file and prepares every function declaration in advance, so a declared function can be called from above. A function expression or arrow is not hoisted: its const holds nothing until execution reaches that line, so an earlier call throws a ReferenceError.",
+        "sourceIds": [
+          "3-4-14-reading-declaration-or-expression"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+flowchart TD
+  A([Start])
+  B[read operation and value]
+  C[first = operation(value)]
+  D{applied operation twice yet?}
+  E[second = operation(first)]
+  F[/print second/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -->|no| E
+  E --> D
+  D -->|yes| F
+  F --> Z

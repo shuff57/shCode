@@ -1,0 +1,22 @@
+{
+  "id": "3-2-16-reading-building-with-returns",
+  "title": "3.2.16 Reading: Building With Returned Values",
+  "description": "Because a call to a returning function is itself a value, calls can be fed straight into other calls, which is how small functions build up to big programs.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "reading",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

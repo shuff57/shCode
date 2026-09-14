@@ -1,0 +1,22 @@
+{
+  "id": "3-7-19-reading-what-else",
+  "title": "3.7.19 Reading: What Else Is Out There",
+  "description": "Meet the array methods this book does not teach but other people's code uses: filter, forEach, reduce, indexOf, includes, sort, reverse, and every. Read to recognize them.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.7 Array Methods",
+  "preview": "reading",
+  "week": 9,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

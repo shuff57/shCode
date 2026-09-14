@@ -1,0 +1,20 @@
+{
+  "id": "3-4-1-slides",
+  "title": "3.4.1 Slides: Function Expressions and Arrow Functions",
+  "description": "Function Expressions and Arrow Functions slides. Placeholder until the deck is built from the book.",
+  "type": "lesson",
+  "estimateMins": 5,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "slides",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "id": "3-4-10-lab-implicit-return-drill",
+  "title": "3.4.10 Lab: Implicit-Return Rewrite Drill",
+  "description": "Write three one-line arrow functions using implicit return, and call each one. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write three one-line arrows",
+      "instructions": "Create three const variables, each assigned a single-expression arrow function with no braces and no return keyword. Give each one a different job: for example, one that multiplies, one that answers a yes/no question, and one that joins two strings."
+    },
+    {
+      "id": "s2",
+      "title": "Use implicit return",
+      "instructions": "Every arrow body must be a bare expression right after the `=>`. If you add braces, the implicit return stops working, so leave them off."
+    },
+    {
+      "id": "s3",
+      "title": "Call each and log the results",
+      "instructions": "Call each of the three functions with sample arguments and print each result with console.log."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "At least three arrow functions",
+      "description": "Code contains three or more arrow functions",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "=>[\\s\\S]*=>[\\s\\S]*=>",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Implicit return used",
+      "description": "An arrow body is a bare expression with no opening brace",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "=>\\s*[^{\\s]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

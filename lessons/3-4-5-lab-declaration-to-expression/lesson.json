@@ -1,0 +1,68 @@
+{
+  "id": "3-4-5-lab-declaration-to-expression",
+  "title": "3.4.5 Lab: Rewrite a Declaration as an Expression",
+  "description": "Take a named function declaration and rewrite it as a function expression assigned to a const, then call it. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.4 Function Expressions and Arrow Functions",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the expression form",
+      "instructions": "Create a const and assign it an unnamed function expression: the `function` keyword with no name after it, followed by the parameter list and body. It should compute and return a value from its parameter."
+    },
+    {
+      "id": "s2",
+      "title": "Call it and log the result",
+      "instructions": "Call your function through the const with a sample argument, and use console.log to print what it returns."
+    },
+    {
+      "id": "s3",
+      "title": "Check the shape",
+      "instructions": "Confirm there is no name between `function` and `(`, and that the whole assignment ends with a semicolon."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Anonymous function assigned to a variable",
+      "description": "A const/let/var is assigned a function expression with no name after the function keyword",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:const|let|var)\\s+\\w+\\s*=\\s*function\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Function called through the variable",
+      "description": "The assigned const is called inside a console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*\\w+\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

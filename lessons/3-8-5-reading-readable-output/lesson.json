@@ -1,0 +1,22 @@
+{
+  "id": "3-8-5-reading-readable-output",
+  "title": "3.8.5 Reading: Readable Output",
+  "description": "See how the second and third arguments to JSON.stringify turn compact text into indented, human-readable output, and when to use each form.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "reading",
+  "week": 10,
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

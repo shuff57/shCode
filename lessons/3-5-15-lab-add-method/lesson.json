@@ -1,0 +1,78 @@
+{
+  "id": "3-5-15-lab-add-method",
+  "title": "3.5.15 Lab: Add a Method to an Object",
+  "description": "Give an object a method, call it, and print its return value. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build an object with data",
+      "instructions": "Create a variable holding an object literal with at least one data property, such as a name."
+    },
+    {
+      "id": "s2",
+      "title": "Add a method",
+      "instructions": "Add a property whose value is a function. Give it a clear name and have it return a string."
+    },
+    {
+      "id": "s3",
+      "title": "Call the method",
+      "instructions": "Call the method with parentheses and print what it returns."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "method defined on the object",
+      "description": "A property is assigned a function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\s*:\\s*function\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "method called with parentheses",
+      "description": "Calls an object method",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\.\\w+\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "return used",
+      "description": "The method hands a value back",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return\\s",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "result printed",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

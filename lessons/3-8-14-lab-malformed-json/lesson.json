@@ -1,0 +1,89 @@
+{
+  "id": "3-8-14-lab-malformed-json",
+  "title": "3.8.14 Lab: Handle a Malformed JSON String",
+  "description": "Write a function that parses text and returns a usable fallback instead of letting a bad string stop the program. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "console",
+  "week": 10,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the parsing function",
+      "instructions": "Define a function named readSave that takes one parameter, a string. Inside it, attempt to parse the text with JSON.parse."
+    },
+    {
+      "id": "s2",
+      "title": "Guard the parse with try/catch",
+      "instructions": "Wrap the JSON.parse call in a try block. In the catch block, return a fallback object with a property such as ok set to false, instead of letting the error escape."
+    },
+    {
+      "id": "s3",
+      "title": "Test both paths",
+      "instructions": "Use console.log to call the function twice: once with a valid JSON string and once with garbage. Confirm the first returns a value and the second returns your fallback."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Function defined",
+      "description": "Defines a function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+\\w+\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Parse attempted",
+      "description": "Calls JSON.parse",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.parse\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "try block present",
+      "description": "Uses a try statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "try\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "catch block present",
+      "description": "Uses a catch clause",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "catch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Both paths logged",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

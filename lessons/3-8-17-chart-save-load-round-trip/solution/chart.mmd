@@ -1,0 +1,24 @@
+flowchart TD
+  A([Start])
+  B[save: stringify the state object]
+  C[store the text under a key]
+  D[load: read the text at the key]
+  E{text === null?}
+  F[return the defaults]
+  G{did the parse succeed?}
+  H[return the parsed object]
+  I[return the defaults]
+  J[/print the restored value/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D --> E
+  E -->|yes| F
+  E -->|no| G
+  G -->|yes| H
+  G -->|no| I
+  F --> J
+  H --> J
+  I --> J
+  J --> Z

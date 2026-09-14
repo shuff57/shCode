@@ -1,0 +1,88 @@
+{
+  "id": "3-5-8-lab-dot-vs-bracket",
+  "title": "3.5.8 Lab: Dot vs. Bracket — When You're Forced to Bracket",
+  "description": "Read a key with a space and a key held in a variable, and print every key/value pair with Object.keys. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build an object with a spaced key",
+      "instructions": "Create an object that has at least one property whose key contains a space, written in quotes, such as \"screen size\"."
+    },
+    {
+      "id": "s2",
+      "title": "Read the spaced key with brackets",
+      "instructions": "Print the value of the property with the space in its name. Use square brackets with the quoted key."
+    },
+    {
+      "id": "s3",
+      "title": "Store a key name in a variable",
+      "instructions": "Create a variable that holds the name of one of the object's properties, as a string."
+    },
+    {
+      "id": "s4",
+      "title": "Read that property with brackets",
+      "instructions": "Use the variable inside square brackets to print that property's value."
+    },
+    {
+      "id": "s5",
+      "title": "Walk every key",
+      "instructions": "Use Object.keys with a loop to print every key and its value, using brackets to fetch each value."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "square bracket access used",
+      "description": "Reads a property with square brackets",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\[",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "spaced key reached in brackets",
+      "description": "Uses a quoted key containing a space inside brackets",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*[\"'][^\"']+ [^\"']*[\"']\\s*\\]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Object.keys used",
+      "description": "Walks the object's keys",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "Object\\.keys\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "value fetched with brackets",
+      "description": "Uses the loop variable inside brackets",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\[\\s*key",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

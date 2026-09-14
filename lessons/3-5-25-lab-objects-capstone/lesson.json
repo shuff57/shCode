@@ -1,0 +1,134 @@
+{
+  "id": "3-5-25-lab-objects-capstone",
+  "title": "3.5.25 Lab: Objects Capstone — Build, Read, Destructure",
+  "description": "Build an array of records, read fields with dots and brackets, and destructure a record into variables. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 30,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.5 Objects and Properties",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build an array of records",
+      "instructions": "Create one array whose elements are objects. Give each object the same fields, for example a name, a price and a quantity. Include at least three records."
+    },
+    {
+      "id": "s2",
+      "title": "Add a nested object and a spaced key",
+      "instructions": "Give one record a nested object as a field, and give one record a key that contains a space, written in quotes."
+    },
+    {
+      "id": "s3",
+      "title": "Read fields two ways",
+      "instructions": "Print a field with a dot, and print the spaced key with square brackets. Also read the nested field with a chain (a dot then another dot)."
+    },
+    {
+      "id": "s4",
+      "title": "Loop and total",
+      "instructions": "Loop over the array and print each record's name and its cost (price times quantity), reading each field off the record with a dot."
+    },
+    {
+      "id": "s5",
+      "title": "Destructure one record",
+      "instructions": "Destructure two or more fields out of one of the records into variables, in one statement, and use the bare names in a printed sentence."
+    },
+    {
+      "id": "s6",
+      "title": "Walk the keys",
+      "instructions": "Use Object.keys with a loop to print every key and value of one record, fetching each value with brackets."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "array of records built",
+      "description": "An array literal holds object literals",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*\\{[^}]*\\}",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "nested object present",
+      "description": "An object literal holds another object literal",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\{[^}]*\\{[^}]*\\}",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "dot access used",
+      "description": "Reads a property with a dot",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\.\\w+",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "bracket access used",
+      "description": "Reads a property with square brackets",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\[",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "loop present",
+      "description": "Contains a for loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "destructuring used",
+      "description": "Unpacks with a brace pattern",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:const|let|var)\\s*\\{[^}]*\\}\\s*=",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "Object.keys used",
+      "description": "Walks the object's keys",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "Object\\.keys",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r8",
+      "title": "output printed",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

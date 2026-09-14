@@ -1,0 +1,89 @@
+{
+  "id": "3-8-18-lab-save-by-key",
+  "title": "3.8.18 Lab: Save a State Object by Key",
+  "description": "Turn a state object into JSON text and store it under a key so it survives the page closing. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.8 Saving and Loading Data",
+  "preview": "console",
+  "week": 10,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create the state object",
+      "instructions": "Create a variable called state holding an object with at least two properties, for example a score and a level."
+    },
+    {
+      "id": "s2",
+      "title": "Store it under a key",
+      "instructions": "Use localStorage.setItem to save the object under a key you choose. Remember the store holds strings, so the object has to be converted with JSON.stringify first."
+    },
+    {
+      "id": "s3",
+      "title": "Read the key back",
+      "instructions": "Use console.log with localStorage.getItem on the same key to confirm text was stored."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "State object declared",
+      "description": "Declares an object with curly braces",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Stored by key",
+      "description": "Calls localStorage.setItem",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "localStorage\\.setItem\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Converted with stringify",
+      "description": "Calls JSON.stringify before storing",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.stringify\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Key read back",
+      "description": "Calls localStorage.getItem",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "localStorage\\.getItem\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Stored text logged",
+      "description": "Calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
