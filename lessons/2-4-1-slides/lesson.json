@@ -7,6 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "slides",
+  "slidesUrl": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/chapter-2-control-flow/decks/2.4_loop_control_and_nested_loops.paper",
   "sourceRef": "designed: unit deck placeholder for book 2.4 Loop Control and Nested Loops",
   "slos": [
     "SLO-1"

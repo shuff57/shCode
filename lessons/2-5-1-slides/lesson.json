@@ -7,6 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
   "preview": "slides",
+  "slidesUrl": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/chapter-2-control-flow/decks/2.5_handling_errors_with_try_catch.paper",
   "slos": [
     "SLO-3"
   ],
