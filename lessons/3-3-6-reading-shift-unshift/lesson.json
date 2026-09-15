@@ -1,15 +1,15 @@
 {
-  "id": "3-2-6-example-menu-loop",
-  "title": "3.3.10 Worked Example: A tiny menu loop",
+  "id": "3-3-6-reading-shift-unshift",
+  "title": "3.3.6 Reading: Adding and Removing from the Front",
+  "description": "Learn .unshift() and .shift(), the front-of-list partners to .push() and .pop() you already know. Read before the queue lab.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
-  "preview": "example",
+  "preview": "reading",
   "week": 8,
   "slos": [
-    "SLO-3",
-    "SLO-4"
+    "SLO-3"
   ],
   "contentFile": "content.md",
   "steps": [],

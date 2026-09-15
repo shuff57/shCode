@@ -1,0 +1,83 @@
+{
+  "id": "3-3-14-lab-filter-function",
+  "title": "3.3.14 Lab: Write a Function That Filters an Array",
+  "description": "Write a function that builds and returns a new array of transformed values, proving the original is untouched. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.3 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write a function with an array parameter",
+      "instructions": "Write a function declaration (e.g. doubled or bigger) that takes an array parameter."
+    },
+    {
+      "id": "s2",
+      "title": "Build a new array inside it",
+      "instructions": "Create a new empty array inside the function and use a for...of loop to push each transformed value in."
+    },
+    {
+      "id": "s3",
+      "title": "Return the new array",
+      "instructions": "After the loop, return the new array."
+    },
+    {
+      "id": "s4",
+      "title": "Call it and log both arrays",
+      "instructions": "Call the function with a sample array and console.log both the result and the original array to show the original is untouched."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "function declaration present",
+      "description": "Code declares a function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+\\w+\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "for loop present",
+      "description": "Code uses a for or for...of loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": ".push used",
+      "description": "Code calls .push(",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.push\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "return present",
+      "description": "Code returns a value",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

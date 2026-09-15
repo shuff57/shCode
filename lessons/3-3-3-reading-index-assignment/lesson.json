@@ -1,15 +1,15 @@
 {
-  "id": "3-2-6-example-menu-loop",
-  "title": "3.3.10 Worked Example: A tiny menu loop",
+  "id": "3-3-3-reading-index-assignment",
+  "title": "3.3.3 Reading: Changing an Item by Index",
+  "description": "Learn how assigning to arr[i] replaces one item without changing the array's length. Read before the index-assignment lab.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
-  "preview": "example",
+  "preview": "reading",
   "week": 8,
   "slos": [
-    "SLO-3",
-    "SLO-4"
+    "SLO-3"
   ],
   "contentFile": "content.md",
   "steps": [],

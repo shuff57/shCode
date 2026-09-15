@@ -1,0 +1,73 @@
+{
+  "id": "3-3-7-lab-shift-unshift-queue",
+  "title": "3.3.7 Lab: Front-of-Line Queue",
+  "description": "Use push and shift to move people through a queue, first in first out. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.3 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a line array",
+      "instructions": "Create a variable called line and assign it an array containing at least two name strings."
+    },
+    {
+      "id": "s2",
+      "title": "Add someone to the back",
+      "instructions": "Use .push() to add one more name onto the back of the line."
+    },
+    {
+      "id": "s3",
+      "title": "Serve the first person",
+      "instructions": "Use .shift() to remove the first person from the line and store the returned value in a variable."
+    },
+    {
+      "id": "s4",
+      "title": "Log who is served and the rest",
+      "instructions": "Use console.log to print who is being served, then console.log the remaining line array."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": ".push used",
+      "description": "Code calls .push(",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.push\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": ".shift used",
+      "description": "Code calls .shift(",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.shift\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

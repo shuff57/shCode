@@ -1,6 +1,6 @@
 {
-  "id": "3-2-6-example-menu-loop",
-  "title": "3.3.10 Worked Example: A tiny menu loop",
+  "id": "3-3-13-example-filter-passing-scores",
+  "title": "3.3.13 Worked Example: Keeping Only the Passing Scores",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -8,8 +8,7 @@
   "preview": "example",
   "week": 8,
   "slos": [
-    "SLO-3",
-    "SLO-4"
+    "SLO-3"
   ],
   "contentFile": "content.md",
   "steps": [],

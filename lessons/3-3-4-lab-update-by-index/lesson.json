@@ -1,0 +1,58 @@
+{
+  "id": "3-3-4-lab-update-by-index",
+  "title": "3.3.4 Lab: Update Scores by Index",
+  "description": "Reassign one value inside an array by its index to update a score in place. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.3 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a scores array",
+      "instructions": "Create a variable called scores and assign it an array containing at least four number values."
+    },
+    {
+      "id": "s2",
+      "title": "Update the first score by index",
+      "instructions": "Reassign the value at index 0 using scores[0] = ... . Use index assignment, not push or pop, so the array keeps the same length."
+    },
+    {
+      "id": "s3",
+      "title": "Log the whole array",
+      "instructions": "Use console.log to print the scores array so you can see the updated value."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "index assignment present",
+      "description": "Code assigns to an array index (non-comparison)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\d+\\]\\s*=\\s*[^=]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

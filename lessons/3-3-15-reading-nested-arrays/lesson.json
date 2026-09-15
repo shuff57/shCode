@@ -1,15 +1,15 @@
 {
-  "id": "3-2-6-example-menu-loop",
-  "title": "3.3.10 Worked Example: A tiny menu loop",
+  "id": "3-3-15-reading-nested-arrays",
+  "title": "3.3.15 Reading: Lists Inside Lists",
+  "description": "Learn how an array can hold other arrays, which is how you store a grid or a table of rows. Read before the nested-array lab.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
-  "preview": "example",
+  "preview": "reading",
   "week": 8,
   "slos": [
-    "SLO-3",
-    "SLO-4"
+    "SLO-3"
   ],
   "contentFile": "content.md",
   "steps": [],

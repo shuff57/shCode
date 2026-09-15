@@ -2999,7 +2999,7 @@
     },
     {
       "id": "3-2-3-reading-array-iteration",
-      "title": "3.3.3 Reading: Looping Over Arrays (for / for…of)",
+      "title": "3.3.5 Reading: Looping Over Arrays (for / for…of)",
       "unit": "3.3 Arrays",
       "preview": "reading",
       "type": "lesson",
@@ -3026,7 +3026,7 @@
     },
     {
       "id": "3-2-4-reading-split-lines",
-      "title": "3.3.4 Reading: Splitting Text into Lines (.split)",
+      "title": "3.3.8 Reading: Splitting Text into Lines (.split)",
       "unit": "3.3 Arrays",
       "preview": "reading",
       "type": "lesson",
@@ -3035,7 +3035,7 @@
     },
     {
       "id": "3-2-5-lab-sum-array",
-      "title": "3.3.5 Sum an Array",
+      "title": "3.3.9 Sum an Array",
       "unit": "3.3 Arrays",
       "preview": "console",
       "type": "assignment",
@@ -3053,7 +3053,7 @@
     },
     {
       "id": "3-2-6-example-menu-loop",
-      "title": "3.3.6 Worked Example: A tiny menu loop",
+      "title": "3.3.10 Worked Example: A tiny menu loop",
       "unit": "3.3 Arrays",
       "preview": "example",
       "type": "lesson",
@@ -3071,7 +3071,7 @@
     },
     {
       "id": "3-2-6a-chart-the-array-loop",
-      "title": "3.3.7 Chart the Code: Looping Over an Array",
+      "title": "3.3.11 Chart the Code: Looping Over an Array",
       "unit": "3.3 Arrays",
       "preview": "diagram",
       "type": "lesson",
@@ -3080,7 +3080,7 @@
     },
     {
       "id": "3-2-7-arrays",
-      "title": "3.3.8 Arrays",
+      "title": "3.3.18 Arrays",
       "unit": "3.3 Arrays",
       "preview": "console",
       "type": "assignment",
@@ -3113,6 +3113,96 @@
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
+    },
+    {
+      "id": "3-3-12-reading-arrays-and-functions",
+      "title": "3.3.12 Reading: Arrays and Functions",
+      "unit": "3.3 Arrays",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-3-13-example-filter-passing-scores",
+      "title": "3.3.13 Worked Example: Keeping Only the Passing Scores",
+      "unit": "3.3 Arrays",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-3-14-lab-filter-function",
+      "title": "3.3.14 Lab: Write a Function That Filters an Array",
+      "unit": "3.3 Arrays",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-3-15-reading-nested-arrays",
+      "title": "3.3.15 Reading: Lists Inside Lists",
+      "unit": "3.3 Arrays",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-3-16-example-nested-array-grid",
+      "title": "3.3.16 Worked Example: A Tic-Tac-Toe Board as a Nested Array",
+      "unit": "3.3 Arrays",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-3-17-lab-nested-array-update",
+      "title": "3.3.17 Lab: Read and Update a Nested Array",
+      "unit": "3.3 Arrays",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-3-3-reading-index-assignment",
+      "title": "3.3.3 Reading: Changing an Item by Index",
+      "unit": "3.3 Arrays",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-3-4-lab-update-by-index",
+      "title": "3.3.4 Lab: Update Scores by Index",
+      "unit": "3.3 Arrays",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-3-6-reading-shift-unshift",
+      "title": "3.3.6 Reading: Adding and Removing from the Front",
+      "unit": "3.3 Arrays",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-3-7-lab-shift-unshift-queue",
+      "title": "3.3.7 Lab: Front-of-Line Queue",
+      "unit": "3.3 Arrays",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
     },
     {
       "id": "3-4-1-slides",

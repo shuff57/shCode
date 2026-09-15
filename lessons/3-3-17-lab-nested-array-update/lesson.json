@@ -1,0 +1,83 @@
+{
+  "id": "3-3-17-lab-nested-array-update",
+  "title": "3.3.17 Lab: Read and Update a Nested Array",
+  "description": "Read and reassign values in a nested array with double-index syntax, then sum every cell with a nested loop. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.3 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a nested array",
+      "instructions": "Create a variable called grid and assign it a 2x2 (or larger) nested array of numbers."
+    },
+    {
+      "id": "s2",
+      "title": "Log one inner value",
+      "instructions": "Use double-index syntax like grid[r][c] to console.log one specific inner value."
+    },
+    {
+      "id": "s3",
+      "title": "Update one inner value",
+      "instructions": "Reassign one inner value using grid[r][c] = ... ."
+    },
+    {
+      "id": "s4",
+      "title": "Sum every number",
+      "instructions": "Use a nested loop (outer over rows, inner over cells) to add up every number in the grid, then console.log the total."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "nested array literal present",
+      "description": "Code declares a nested array",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*\\[",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "double-index access present",
+      "description": "Code reads or writes with two indexes",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\]\\s*\\[",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "nested for loops present",
+      "description": "Code contains at least two for loops",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\([^{]*\\)\\s*\\{[^}]*for\\s*\\([^{]*\\)",
+      "flags": "is",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
