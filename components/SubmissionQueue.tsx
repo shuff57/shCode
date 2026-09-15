@@ -104,6 +104,19 @@ function parseFailedGrade(raw: string): FailedGrade | null {
   }
 }
 
+/** True when the grade_json shows a human has set this row's score since the
+ *  AI failed on it. The override endpoint stamps teacherReviewedAt (with
+ *  feedback) or teacherOverriddenAt (score only) — same fields the student
+ *  gradebook reads. */
+function hasTeacherReview(raw: string): boolean {
+  try {
+    const parsed = JSON.parse(raw) as { teacherReviewedAt?: unknown; teacherOverriddenAt?: unknown };
+    return typeof parsed?.teacherReviewedAt === 'number' || typeof parsed?.teacherOverriddenAt === 'number';
+  } catch {
+    return false;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Override form inline component
 // ---------------------------------------------------------------------------
@@ -314,7 +327,9 @@ export function SubmissionQueue({ classId }: Props) {
   // Ungraded attempts are the ones with a deadline attached — a student is
   // waiting on a human for these — so say how many there are rather than making
   // a teacher spot orange badges down a list of fifty.
-  const needsManual = submissions.filter((s) => parseFailedGrade(s.grade_json)).length;
+  const needsManual = submissions.filter(
+    (s) => parseFailedGrade(s.grade_json) && s.score === null,
+  ).length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -348,7 +363,11 @@ export function SubmissionQueue({ classId }: Props) {
               }
             : null);
         const diagram = parseDiagramResponse(sub.response);
-        const failed = parseFailedGrade(sub.grade_json);
+        // The row's own score, not the marker, decides. An override writes a
+        // score onto the row but leaves gradingFailed in place, so keying on
+        // the marker alone kept a graded submission reading "Needs manual
+        // grade" forever — the gradebook already treats it as scored.
+        const failed = sub.score === null && parseFailedGrade(sub.grade_json);
 
         return (
           <div
@@ -385,7 +404,9 @@ export function SubmissionQueue({ classId }: Props) {
               >
                 {failed
                   ? 'Needs manual grade'
-                  : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
+                  : hasTeacherReview(sub.grade_json)
+                    ? `Teacher score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
+                    : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
               </div>
             </div>
 
