@@ -3901,7 +3901,7 @@ in the browser, no AI call and no points. Frequency is the point, so nothing her
 | `2-3-3a-chart-the-switch` | chart the code | 2.3 |
 | `3-1-2a-reading-the-function-call-shape` | double-rail released | 3.1 |
 | `3-1-7a-a3-1-0-flowchart-gate` | **A3.1.0** — chart before you refactor | 3.1 |
-| `3-2-6a-chart-the-array-loop` | chart the code | 3.2 |
+| `3-3-11-chart-the-array-loop` | chart the code | 3.3 |
 | `4-1-2a-reading-connectors-and-notes` | connector + note released | 4.1 |
 | `4-1-3a-a4-1-0-design-chart` | **A4.1.0** — whole-program design, day 1 | 4.1 |
 | `5-3-20a-chart-the-method-chain` | chart the code — one method, not a program | 5.3 |
