@@ -22,7 +22,10 @@ type Ctx = EventContext<Env, string, { email: string }>;
 interface Body {
   email: string;
   password: string;
+  name?: string;
 }
+
+const MAX_NAME_LEN = 100;
 
 export const onRequestPost: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
   const { request, env } = context;
@@ -40,6 +43,14 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   if (!email) return json({ error: 'Email required' }, 400);
   if (password.length < 8) return json({ error: 'Password must be at least 8 characters' }, 400);
 
+  // Optional. Empty/omitted stores NULL — every display site falls back to
+  // email in that case.
+  const trimmedName = String(body.name || '').trim();
+  if (trimmedName.length > MAX_NAME_LEN) {
+    return json({ error: `Name must be ${MAX_NAME_LEN} characters or fewer` }, 400);
+  }
+  const displayName = trimmedName.length > 0 ? trimmedName : null;
+
   const existing = await env.DB.prepare('SELECT email FROM students WHERE email = ?')
     .bind(email)
     .first<{ email: string }>();
@@ -52,14 +63,14 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
     ? 'teacher'
     : 'student';
   await env.DB.prepare(
-    'INSERT INTO students (email, password_hash, created_at, role) VALUES (?, ?, ?, ?)',
+    'INSERT INTO students (email, password_hash, created_at, role, display_name) VALUES (?, ?, ?, ?, ?)',
   )
-    .bind(email, passwordHash, Date.now(), role)
+    .bind(email, passwordHash, Date.now(), role, displayName)
     .run();
 
   const token = await signSession(email, role, env.AUTH_SECRET);
   const secure = new URL(request.url).protocol === 'https:';
-  return json({ email, role }, 201, {
+  return json({ email, role, displayName }, 201, {
     'Set-Cookie': buildSessionCookie(token, 60 * 60 * 24 * 30, secure),
   });
 };

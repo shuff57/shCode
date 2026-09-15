@@ -12,6 +12,7 @@ interface Props {
 export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -27,6 +28,7 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
     } else {
       dialog.close();
       setEmail('');
+      setName('');
       setPassword('');
       setError(null);
       setMode('login');
@@ -39,8 +41,9 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
     setError(null);
     setLoading(true);
     try {
-      const fn = mode === 'login' ? login : signup;
-      const user = await fn(email.trim(), password);
+      const user = mode === 'login'
+        ? await login(email.trim(), password)
+        : await signup(email.trim(), password, name.trim());
       onAuthenticated(user);
       onClose();
     } catch (err) {
@@ -87,6 +90,31 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
             fontSize: 14,
           }}
         />
+
+        {mode === 'signup' && (
+          <>
+            <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>
+              Name <span style={{ color: '#6272a4' }}>(optional)</span>
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={100}
+              autoComplete="name"
+              style={{
+                width: '100%',
+                padding: 8,
+                marginBottom: 12,
+                background: '#282a36',
+                color: '#f8f8f2',
+                border: '1px solid #44475a',
+                borderRadius: 4,
+                fontSize: 14,
+              }}
+            />
+          </>
+        )}
 
         <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>
           Password {mode === 'signup' && <span style={{ color: '#6272a4' }}>(≥ 8 chars)</span>}

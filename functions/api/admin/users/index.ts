@@ -21,6 +21,7 @@ type Ctx = EventContext<Env, string, SessionData>;
 
 interface UserRow {
   email: string;
+  display_name: string | null;
   role: string;
   created_at: number;
   classes_owned: number;
@@ -67,7 +68,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
 
   const query = `
     SELECT
-      s.email, s.role, s.created_at,
+      s.email, s.display_name, s.role, s.created_at,
       (SELECT COUNT(*) FROM classes c WHERE c.owner_email = s.email) AS classes_owned,
       (SELECT COUNT(*) FROM enrollments e
         WHERE e.student_email = s.email AND e.expires_at > ?1) AS active_enrollments,

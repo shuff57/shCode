@@ -8,7 +8,7 @@ export default function Header() {
     <header className="bg-gray-800 text-white">
       <div className="flex items-center justify-between p-4">
         <Link href="/" className="font-bold">shCode</Link>
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-4 flex-wrap justify-end">
           <HeaderNav />
           <AuthButton />
         </nav>

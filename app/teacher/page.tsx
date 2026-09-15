@@ -76,6 +76,7 @@ interface SubmissionEntry {
 
 interface StudentDetail {
   student_email: string;
+  displayName?: string | null;
   lessonState: Record<string, LessonStateEntry>;
   latestSubmissions: Record<string, SubmissionEntry>;
 }
@@ -131,6 +132,7 @@ interface GradebookCell {
 
 interface GradebookStudent {
   email: string;
+  displayName?: string | null;
   cells: Record<string, GradebookCell>;
 }
 
@@ -543,7 +545,12 @@ function StudentDrawer({
             <div style={{ fontSize: 16, fontWeight: 700, color: '#f8f8f2', marginBottom: 2 }}>
               Student Progress
             </div>
-            <div style={{ fontSize: 13, color: '#8be9fd', fontFamily: 'monospace' }}>{email}</div>
+            <div style={{ fontSize: 13, color: '#8be9fd', fontFamily: 'monospace' }}>
+              {detail?.displayName || email}
+            </div>
+            {detail?.displayName && (
+              <div style={{ fontSize: 12, color: '#6272a4', fontFamily: 'monospace' }}>{email}</div>
+            )}
           </div>
           <button
             style={{ background: 'none', border: 'none', color: '#6272a4', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: '4px 8px' }}
@@ -1073,7 +1080,7 @@ function GradebookView({
                   onClick={() => onOpenStudent(student.email)}
                   title={student.email}
                 >
-                  {student.email}
+                  {student.displayName || student.email}
                 </td>
                 {/* Cell per lesson */}
                 {displayLessons.map((lesson) => {

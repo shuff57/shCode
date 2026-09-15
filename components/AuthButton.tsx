@@ -1,8 +1,30 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { getCurrentUser, logout, CurrentUser } from '../lib/auth';
 import AuthModal from './AuthModal';
+import NavDropdown from './NavDropdown';
+
+const roleBadgeStyle: React.CSSProperties = {
+  display: 'inline-block',
+  padding: '2px 8px',
+  borderRadius: 4,
+  fontSize: 11,
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+  color: '#282a36',
+};
+
+const menuItemStyle: React.CSSProperties = {
+  color: '#f8f8f2',
+  textDecoration: 'none',
+  fontSize: 13,
+  padding: '6px 10px',
+  borderRadius: 4,
+  whiteSpace: 'nowrap',
+};
 
 export default function AuthButton() {
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -35,41 +57,43 @@ export default function AuthButton() {
 
   if (user) {
     return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
-        {user.role === 'admin' && (
+      <NavDropdown
+        label={user.displayName || user.email}
+        align="right"
+        triggerStyle={{ fontSize: 13, opacity: 0.9 }}
+      >
+        {(user.role === 'admin' || user.role === 'teacher') && (
           <span
             style={{
-              display: 'inline-block',
-              padding: '2px 8px',
-              borderRadius: 4,
-              background: '#bd93f9',
-              color: '#282a36',
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
+              ...roleBadgeStyle,
+              background: user.role === 'admin' ? '#bd93f9' : '#ffb86c',
+              margin: '0 10px 4px',
             }}
           >
-            Admin
+            {user.role === 'admin' ? 'Admin' : 'Teacher'}
           </span>
         )}
-        <span style={{ opacity: 0.8 }}>{user.email}</span>
+        <Link
+          href="/account"
+          style={menuItemStyle}
+          title={user.displayName ? user.email : 'Set a display name'}
+        >
+          My account
+        </Link>
         <button
           type="button"
           onClick={handleLogout}
           style={{
+            ...menuItemStyle,
             background: 'transparent',
-            border: '1px solid rgba(255,255,255,0.3)',
-            color: 'inherit',
-            padding: '4px 10px',
-            borderRadius: 4,
+            border: 'none',
+            textAlign: 'left',
             cursor: 'pointer',
-            fontSize: 12,
           }}
         >
           Sign out
         </button>
-      </span>
+      </NavDropdown>
     );
   }
 

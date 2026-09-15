@@ -61,6 +61,10 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
     .first();
   if (!enrollment) return json({ error: 'Student not found in this class' }, 404);
 
+  const nameRow = await env.DB.prepare('SELECT display_name FROM students WHERE email = ?')
+    .bind(studentEmail)
+    .first<{ display_name: string | null }>();
+
   // Fetch all lesson_state rows for this student.
   const stateRows = await env.DB.prepare(
     `SELECT lesson_id, state, started_at, completed_at, score
@@ -127,7 +131,12 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
     };
   }
 
-  return json({ student_email: studentEmail, lessonState, latestSubmissions });
+  return json({
+    student_email: studentEmail,
+    displayName: nameRow?.display_name ?? null,
+    lessonState,
+    latestSubmissions,
+  });
 };
 
 function json(body: unknown, status = 200): Response {

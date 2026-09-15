@@ -11,6 +11,7 @@ function parseRole(raw: unknown): Role {
 export interface CurrentUser {
   email: string;
   role: Role;
+  displayName: string | null;
 }
 
 export class AuthError extends Error {
@@ -37,9 +38,9 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
   try {
     const res = await fetch('/api/me', { credentials: 'same-origin' });
     if (!res.ok) return null;
-    const data = (await res.json()) as { email?: string; role?: string };
+    const data = (await res.json()) as { email?: string; role?: string; displayName?: string | null };
     if (!data.email) return null;
-    return { email: data.email, role: parseRole(data.role) };
+    return { email: data.email, role: parseRole(data.role), displayName: data.displayName ?? null };
   } catch {
     return null;
   }
@@ -58,16 +59,16 @@ async function postAuth(path: string, body: unknown): Promise<CurrentUser> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  let data: { email?: string; role?: string; error?: string } = {};
+  let data: { email?: string; role?: string; displayName?: string | null; error?: string } = {};
   try { data = await res.json(); } catch { /* empty body */ }
   if (!res.ok) throw new AuthError(res.status, data.error || `${res.status}`);
   if (!data.email) throw new AuthError(500, 'No email in response');
-  cache = { email: data.email, role: parseRole(data.role) };
+  cache = { email: data.email, role: parseRole(data.role), displayName: data.displayName ?? null };
   return cache;
 }
 
-export function signup(email: string, password: string): Promise<CurrentUser> {
-  return postAuth('/api/auth/signup', { email, password });
+export function signup(email: string, password: string, name?: string): Promise<CurrentUser> {
+  return postAuth('/api/auth/signup', { email, password, name });
 }
 
 export function login(email: string, password: string): Promise<CurrentUser> {
@@ -77,4 +78,20 @@ export function login(email: string, password: string): Promise<CurrentUser> {
 export async function logout(): Promise<void> {
   await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
   invalidateCurrentUser();
+}
+
+/** Update the signed-in user's display name. `name: null` clears it. */
+export async function updateDisplayName(name: string | null): Promise<CurrentUser> {
+  const res = await fetch('/api/me', {
+    method: 'PUT',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+  let data: { email?: string; role?: string; displayName?: string | null; error?: string } = {};
+  try { data = await res.json(); } catch { /* empty body */ }
+  if (!res.ok) throw new AuthError(res.status, data.error || `${res.status}`);
+  if (!data.email) throw new AuthError(500, 'No email in response');
+  cache = { email: data.email, role: parseRole(data.role), displayName: data.displayName ?? null };
+  return cache;
 }

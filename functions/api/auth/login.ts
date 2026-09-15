@@ -36,10 +36,10 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   if (!email || !password) return json({ error: 'Invalid email or password' }, 401);
 
   const row = await env.DB.prepare(
-    'SELECT password_hash, role FROM students WHERE email = ?',
+    'SELECT password_hash, role, display_name FROM students WHERE email = ?',
   )
     .bind(email)
-    .first<{ password_hash: string; role: string }>();
+    .first<{ password_hash: string; role: string; display_name: string | null }>();
   if (!row) return json({ error: 'Invalid email or password' }, 401);
 
   const ok = await verifyPassword(password, row.password_hash);
@@ -49,7 +49,7 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
     row.role === 'admin' || row.role === 'teacher' ? row.role : 'student';
   const token = await signSession(email, role, env.AUTH_SECRET);
   const secure = new URL(request.url).protocol === 'https:';
-  return json({ email, role }, 200, {
+  return json({ email, role, displayName: row.display_name }, 200, {
     'Set-Cookie': buildSessionCookie(token, 60 * 60 * 24 * 30, secure),
   });
 };

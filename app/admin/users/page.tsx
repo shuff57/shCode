@@ -10,6 +10,7 @@ import { getCurrentUser, CurrentUser } from '../../../lib/auth';
 
 interface UserRecord {
   email: string;
+  display_name: string | null;
   role: 'admin' | 'teacher' | 'student';
   created_at: number;
   classes_owned: number;
@@ -370,7 +371,10 @@ function AdminUsersInner() {
                   <tr key={u.email}>
                     {/* Email */}
                     <td style={{ ...S.td, fontFamily: 'monospace', color: '#8be9fd' }}>
-                      {u.email}
+                      {u.display_name || u.email}
+                      {u.display_name && (
+                        <div style={{ fontSize: 11, color: '#6272a4' }}>{u.email}</div>
+                      )}
                     </td>
 
                     {/* Role dropdown */}

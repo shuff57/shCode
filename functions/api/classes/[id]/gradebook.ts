@@ -58,6 +58,7 @@ function isGradingFailed(raw: string | null): boolean {
 
 export interface GradebookStudent {
   email: string;
+  displayName: string | null;
   cells: Record<string, GradebookCell>;
 }
 
@@ -89,6 +90,17 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
   if (roster.length === 0) {
     return json({ students: [], dueDates: {} });
   }
+
+  const nameResult = await env.DB.prepare(
+    `SELECT email, display_name FROM students WHERE email IN (
+       SELECT student_email FROM enrollments WHERE class_id = ?1 AND expires_at > ?2
+     )`,
+  )
+    .bind(classId, now)
+    .all<{ email: string; display_name: string | null }>();
+  const nameMap = new Map<string, string | null>(
+    (nameResult.results ?? []).map((r) => [r.email, r.display_name]),
+  );
 
   // lesson_state rows for all students in this class.
   const stateResult = await env.DB.prepare(
@@ -199,7 +211,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
       };
     }
 
-    return { email, cells };
+    return { email, displayName: nameMap.get(email) ?? null, cells };
   });
 
   return json({ students, dueDates });
