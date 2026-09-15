@@ -1,0 +1,107 @@
+{
+  "id": "3-1-11-quiz-identify-calls",
+  "title": "3.1.3 Quiz: Identify the Function Calls",
+  "description": "Spot which lines are function calls and count how many run. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.1 Functions: Definition and Calls",
+  "preview": "quiz",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-not-a-call",
+        "source": "3.1.2",
+        "code": "let inputNum = 14;\nlet offsetNum = inputNum - 10;\nconsole.log(offsetNum);",
+        "question": "Which line has a function call?",
+        "options": [
+          "line 1",
+          "line 2",
+          "line 3"
+        ],
+        "answer": 2,
+        "explanation": "Lines 1 and 2 are assignments: they store a value using arithmetic, they do not run a job. Line 3, console.log(offsetNum), is a name followed by parentheses — that is what a call looks like.",
+        "sourceIds": [
+          "3-1-2-reading-function-basics"
+        ]
+      },
+      {
+        "id": "q2-count-console-log",
+        "source": "3.1.2",
+        "code": "console.log(\"Please log in\");\nlet username = prompt(\"Username:\");\nlet password = prompt(\"Password:\");\nconsole.log(\"Login successful\");\nconsole.log(\"Welcome,\", username);",
+        "question": "How many times is console.log() called?",
+        "options": [
+          "1",
+          "3",
+          "5"
+        ],
+        "answer": 1,
+        "explanation": "console.log() runs on lines 1, 4, and 5 — three times. The two prompt() calls on lines 2 and 3 are function calls too, but the question only asks about console.log().",
+        "sourceIds": [
+          "3-1-2-reading-function-basics"
+        ]
+      },
+      {
+        "id": "q3-count-all-calls",
+        "source": "3.1.2",
+        "code": "let width = Number(prompt(\"Enter width:\"));\nlet height = Number(prompt(\"Enter height:\"));\nconsole.log(\"Area is\", width * height);",
+        "question": "How many function calls are there in total?",
+        "options": [
+          "3",
+          "5",
+          "6"
+        ],
+        "answer": 1,
+        "explanation": "Number(...) runs twice and prompt(...) runs twice — four calls — plus one console.log(...). Five sets of parentheses, five calls.",
+        "sourceIds": [
+          "3-1-2-reading-function-basics"
+        ]
+      },
+      {
+        "id": "q4-math-pi-not-a-call",
+        "source": "3.1.2",
+        "code": "const radius = 5;\nconst area = Math.PI * radius ** 2;\nconsole.log(\"Area:\", area);",
+        "question": "Is Math.PI a function call?",
+        "options": [
+          "Yes — it has a dot, so it must be a method",
+          "No — it is a stored value with no parentheses after it",
+          "Only on the first time it is used"
+        ],
+        "answer": 1,
+        "explanation": "Parentheses mean \"run it now.\" Math.PI is a name you read, not a job you order — no parentheses, no call. Math.sqrt(16) would be a call.",
+        "sourceIds": [
+          "3-1-2-reading-function-basics"
+        ]
+      },
+      {
+        "id": "q5-fn-call-statement",
+        "source": "3.1.2",
+        "question": "Which statement calls a function named printPcSpecs?",
+        "options": [
+          "printPcSpecs",
+          "printPcSpecs()",
+          "function printPcSpecs()"
+        ],
+        "answer": 1,
+        "explanation": "printPcSpecs on its own just names the function without running it. function printPcSpecs() starts a definition, not a call. Only printPcSpecs() — name plus parentheses — actually runs it.",
+        "sourceIds": [
+          "3-1-2-reading-function-basics"
+        ]
+      }
+    ]
+  }
+}

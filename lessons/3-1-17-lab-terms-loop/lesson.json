@@ -1,0 +1,79 @@
+{
+  "id": "3-1-17-lab-terms-loop",
+  "title": "3.1.9 Lab: Terms and Conditions Loop",
+  "description": "Write terms(), a parameterless function that asks the user to accept terms and conditions, then call it once per user in a loop. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.1 Functions: Definition and Calls",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Define terms",
+      "instructions": "Define a function called terms that takes no parameters. Inside it, log \"Do you accept the terms and conditions?\", then read a Y or N with prompt()."
+    },
+    {
+      "id": "s2",
+      "title": "Respond to the answer",
+      "instructions": "If the answer is \"Y\", log \"Thank you for accepting.\" Otherwise, log \"Have a good day.\""
+    },
+    {
+      "id": "s3",
+      "title": "Ask how many users, then loop",
+      "instructions": "Read a number of users with Number(prompt(...)), then write a for loop that calls terms() once for each user."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "terms defined, no parameters",
+      "description": "Code defines a function named terms with an empty parameter list",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+terms\\s*\\(\\s*\\)\\s*\\{",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "reads an answer with prompt",
+      "description": "terms() calls prompt() to read the user's answer",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "prompt\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "if/else on the answer",
+      "description": "An if/else compares the answer to \"Y\" and logs a response either way",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\([^{]*===\\s*[\"']Y[\"'][^{]*\\)\\s*\\{[^}]*\\}\\s*else\\s*\\{[^}]*\\}",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "for loop calls terms()",
+      "description": "A for loop calls terms() once per user",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\([^)]*\\)\\s*\\{[^}]*terms\\s*\\(\\s*\\)[^}]*\\}",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

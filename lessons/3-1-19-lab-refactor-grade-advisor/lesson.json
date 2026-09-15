@@ -1,0 +1,106 @@
+{
+  "id": "3-1-19-lab-refactor-grade-advisor",
+  "title": "3.1.13 Lab: Refactor the Grade Advisor",
+  "description": "Take your grade-advisor program from 2.1.42 and break it into two named, parameterless functions: decideGrade() and printAdvice(). Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.1 Functions: Definition and Calls",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3",
+    "SLO-4"
+  ],
+  "sourceRef": "refactor lab for the 3.1.12 flowchart gate (A3.1.0), which is the plan for this lab and names both functions by the same names used here. Starts from 2-1-38-a2-1-1-grade-advisor's program.",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Keep the three variables where they are",
+      "instructions": "score, attendance, and lateAssignments stay as top-level variables, exactly like in 2.1.42. Neither function below takes them as a parameter — that is next module's tool. Both functions just read the outer variables directly."
+    },
+    {
+      "id": "s2",
+      "title": "Define decideGrade",
+      "instructions": "Move the else-if chain that picks a recommendation string based on score into a parameterless function called decideGrade. It should log the recommendation itself, the same way it did before."
+    },
+    {
+      "id": "s3",
+      "title": "Define printAdvice",
+      "instructions": "Move the check that combines attendance and lateAssignments with && or || into a parameterless function called printAdvice. It should log the review warning when the condition is true, the same way it did before."
+    },
+    {
+      "id": "s4",
+      "title": "Call both functions",
+      "instructions": "Call decideGrade() and then printAdvice() so the program's output matches what 2.1.42 printed before the refactor."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "decideGrade defined, no parameters",
+      "description": "Code defines a function named decideGrade with an empty parameter list",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+decideGrade\\s*\\(\\s*\\)\\s*\\{",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "printAdvice defined, no parameters",
+      "description": "Code defines a function named printAdvice with an empty parameter list",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+printAdvice\\s*\\(\\s*\\)\\s*\\{",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "else if chain on score",
+      "description": "An else if chain with at least two branches, each testing score against a real cutoff and logging",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "else\\s+if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*console\\.log[^}]*\\}[\\s\\S]*else\\s+if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*console\\.log[^}]*\\}",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "&& or || used to combine attendance and lateAssignments",
+      "description": "An if condition compares attendance and lateAssignments each against a real value, combined with && or ||",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\((?=[^{]*(?:&&|\\|\\|))(?=[^{]*attendance\\s*(?:<=|>=|===|==|<|>)\\s*\\d+)(?=[^{]*lateAssignments\\s*(?:<=|>=|===|==|<|>)\\s*\\d+)[^{]*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "decideGrade is called",
+      "description": "Code calls decideGrade() as a statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bdecideGrade\\s*\\(\\s*\\)\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "printAdvice is called",
+      "description": "Code calls printAdvice() as a statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bprintAdvice\\s*\\(\\s*\\)\\s*;",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

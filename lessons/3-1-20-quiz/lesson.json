@@ -1,0 +1,153 @@
+{
+  "id": "3-1-20-quiz",
+  "title": "3.1.18 Functions: Definition and Calls",
+  "description": "Eight multiple-choice questions on identifying calls, defining functions, hoisting, naming, and benefits. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.1 Functions: Definition and Calls",
+  "preview": "quiz",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-what-is-wrong",
+        "source": "3.1.5",
+        "code": "function waterPlant {\n  console.log(\"Watered!\");\n}",
+        "question": "What is wrong with this function definition's first line?",
+        "options": [
+          "The body should be indented",
+          "Parentheses should go after waterPlant",
+          "function should be func"
+        ],
+        "answer": 1,
+        "explanation": "A header must be function name() { — keyword, name, parentheses, brace. Indentation is a convention, not required; the keyword is correctly function, not func. The missing piece is the empty pair of parentheses after the name.",
+        "sourceIds": [
+          "3-1-13-lab-syntax-naming"
+        ]
+      },
+      {
+        "id": "q2-execution-order",
+        "source": "3.1.4",
+        "code": "function printPhoneNum() {\n  console.log(\"Phone: (864) 555-0199\");\n}\n\nconsole.log(\"User info:\");\nprintPhoneNum();",
+        "question": "What is the output?",
+        "options": [
+          "\"Phone: (864) 555-0199\" then \"User info:\"",
+          "\"User info:\" then \"Phone: (864) 555-0199\"",
+          "\"User info:\" only — the function is never called"
+        ],
+        "answer": 1,
+        "explanation": "Defining a function stores it but does not run its body. \"User info:\" prints first, then printPhoneNum() runs and prints the phone line.",
+        "sourceIds": [
+          "3-1-12-example-defining-hoisting"
+        ]
+      },
+      {
+        "id": "q3-appropriate-name",
+        "source": "3.1.5",
+        "question": "Which is an appropriate name for a function that calculates a user's taxes?",
+        "options": [
+          "calcTax",
+          "calculate user tax",
+          "cT"
+        ],
+        "answer": 0,
+        "explanation": "calcTax is descriptive, camelCase, and has no spaces. \"calculate user tax\" has spaces, which are not legal in an identifier. cT is legal but tells a reader nothing.",
+        "sourceIds": [
+          "3-1-13-lab-syntax-naming"
+        ]
+      },
+      {
+        "id": "q4-nothing-prints",
+        "source": "3.1.2",
+        "code": "function showMenu() {\n  console.log(\"1. Start  2. Options  3. Quit\");\n}",
+        "question": "Why does this program print nothing?",
+        "options": [
+          "showMenu is defined but never called",
+          "console.log needs two arguments here",
+          "The function body is missing a return statement"
+        ],
+        "answer": 0,
+        "explanation": "Defining a function only stores its code — the body never runs until something calls it. This program defines showMenu() but never calls it, so no output appears.",
+        "sourceIds": [
+          "3-1-2-reading-function-basics"
+        ]
+      },
+      {
+        "id": "q5-hoisting",
+        "source": "3.1.4",
+        "code": "sayHello();\n\nfunction sayHello() {\n  console.log(\"Hi!\");\n}",
+        "question": "This runs without error and prints \"Hi!\", even though the call comes before the definition. Why?",
+        "options": [
+          "JavaScript scans the file first and registers function declarations before running anything — this is called hoisting",
+          "JavaScript ignores call order entirely",
+          "This is actually a syntax error that gets silently skipped"
+        ],
+        "answer": 0,
+        "explanation": "Before running anything, JavaScript scans the whole file and registers every function declaration. By the time the first line executes, sayHello already exists.",
+        "sourceIds": [
+          "3-1-12-example-defining-hoisting"
+        ]
+      },
+      {
+        "id": "q6-calc-distance-lines",
+        "source": "3.1.7",
+        "question": "In the \"before\" version of calcDistance (math written out three times), how many lines mention a coordinate value? In the \"after\" version (one function, three calls)?",
+        "options": [
+          "3 and 1",
+          "6 and 3",
+          "9 and 3"
+        ],
+        "answer": 1,
+        "explanation": "The \"before\" version spends two lines per distance (declaring coordinates, then doing the math) — six lines total. The \"after\" version passes coordinates straight into the three calls — three lines.",
+        "sourceIds": [
+          "3-1-15-example-refactor-calcdistance"
+        ]
+      },
+      {
+        "id": "q7-how-many-calls",
+        "source": "3.1.7",
+        "question": "Once calcDistance() is defined, how many times can it be called?",
+        "options": [
+          "Once",
+          "Three times",
+          "As many times as you like"
+        ],
+        "answer": 2,
+        "explanation": "A function definition places no limit on how many times it can be invoked. That is what reusability means.",
+        "sourceIds": [
+          "3-1-15-example-refactor-calcdistance"
+        ]
+      },
+      {
+        "id": "q8-three-benefits",
+        "source": "3.1.6",
+        "question": "A repeated block of code gets moved into one function, called from three places. Which benefit does that demonstrate FIRST — before you've even called it more than once?",
+        "options": [
+          "Reusability — the ability to call it again",
+          "Modularity — the task now has one name and one place it lives",
+          "Maintainability — future changes touch one spot"
+        ],
+        "answer": 1,
+        "explanation": "Modularity happens the moment the task gets its own name and body, even before it's called a second time. Reusability is what you get by calling it more than once; maintainability is what you get later, when the logic needs to change.",
+        "sourceIds": [
+          "3-1-14-reading-benefits"
+        ]
+      }
+    ]
+  }
+}

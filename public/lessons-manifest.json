@@ -2765,7 +2765,88 @@
     },
     {
       "id": "3-1-10-functions",
-      "title": "3.1.7 Functions",
+      "title": "3.1.17 Preview: Functions with Parameters and Arrow Syntax",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-11-quiz-identify-calls",
+      "title": "3.1.3 Quiz: Identify the Function Calls",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-12-example-defining-hoisting",
+      "title": "3.1.4 Worked Example: Defining, Calling, and Hoisting",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-13-lab-syntax-naming",
+      "title": "3.1.5 Lab: Fix the Syntax and the Name",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-14-reading-benefits",
+      "title": "3.1.6 Reading: Why Bother?",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-15-example-refactor-calcdistance",
+      "title": "3.1.7 Worked Example: Refactoring calcDistance",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-16-lab-concessions-stand",
+      "title": "3.1.8 Lab: Concessions Stand",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-17-lab-terms-loop",
+      "title": "3.1.9 Lab: Terms and Conditions Loop",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-18-lab-refactor-receipt-header",
+      "title": "3.1.10 Lab: Refactor the Receipt Header",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-19-lab-refactor-grade-advisor",
+      "title": "3.1.13 Lab: Refactor the Grade Advisor",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
       "type": "assignment",
@@ -2782,8 +2863,26 @@
       "week": 7
     },
     {
+      "id": "3-1-20-quiz",
+      "title": "3.1.18 Functions: Definition and Calls",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-21-chart-built-grade-advisor",
+      "title": "3.1.14 Chart What You Built",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "diagram",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
       "id": "3-1-2a-reading-the-function-call-shape",
-      "title": "3.1.3 Reading: The Function-Call Shape",
+      "title": "3.1.11 Reading: The Function-Call Shape",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
       "type": "lesson",
@@ -2837,7 +2936,7 @@
     },
     {
       "id": "3-1-7a-a3-1-0-flowchart-gate",
-      "title": "3.1.4 Chart Before You Refactor",
+      "title": "3.1.12 Chart Before You Refactor",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "diagram",
       "type": "assignment",
@@ -2846,7 +2945,7 @@
     },
     {
       "id": "3-1-8-lab-findmax-iseven",
-      "title": "3.1.5 findMax & isEven",
+      "title": "3.1.15 Preview: findMax & isEven",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
       "type": "assignment",
@@ -2855,7 +2954,7 @@
     },
     {
       "id": "3-1-9-lab-sum-to-n",
-      "title": "3.1.6 Sum 1 to N",
+      "title": "3.1.16 Preview: Sum 1 to N",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
       "type": "assignment",
@@ -3070,15 +3169,6 @@
       "week": 7
     },
     {
-      "id": "3-2-6a-chart-the-array-loop",
-      "title": "3.3.11 Chart the Code: Looping Over an Array",
-      "unit": "3.3 Arrays",
-      "preview": "diagram",
-      "type": "lesson",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
       "id": "3-2-7-arrays",
       "title": "3.3.18 Arrays",
       "unit": "3.3 Arrays",
@@ -3113,6 +3203,15 @@
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
+    },
+    {
+      "id": "3-3-11-chart-the-array-loop",
+      "title": "3.3.11 Chart the Code: Looping Over an Array",
+      "unit": "3.3 Arrays",
+      "preview": "diagram",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
     },
     {
       "id": "3-3-12-reading-arrays-and-functions",

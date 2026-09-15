@@ -1,0 +1,79 @@
+{
+  "id": "3-1-18-lab-refactor-receipt-header",
+  "title": "3.1.10 Lab: Refactor the Receipt Header",
+  "description": "The starter prints a repeated header three times. Rewrite it so the header lives in one function, called three times, with the output unchanged. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.1 Functions: Definition and Calls",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Spot the repetition",
+      "instructions": "The starter logs the same header line three times, once before each book. That is the repetition to remove."
+    },
+    {
+      "id": "s2",
+      "title": "Define printHeader",
+      "instructions": "Define a parameterless function called printHeader that logs the header line exactly once, inside the function body."
+    },
+    {
+      "id": "s3",
+      "title": "Call it three times",
+      "instructions": "Replace each of the three inline header logs with a call to printHeader(), keeping the three book lines exactly where they were."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "printHeader defined, no parameters",
+      "description": "Code defines a function named printHeader with an empty parameter list",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+printHeader\\s*\\(\\s*\\)\\s*\\{",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "header text lives inside printHeader",
+      "description": "printHeader()'s body logs the header line",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+printHeader\\s*\\([^)]*\\)\\s*\\{[^}]*LIBRARY CHECKOUT[^}]*\\}",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "printHeader called three times",
+      "description": "printHeader() is called three separate times",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(printHeader\\s*\\(\\s*\\)\\s*;[\\s\\S]*){3}",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "all three books still printed",
+      "description": "The three distinct book titles are still logged, in order",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "The Hobbit[\\s\\S]*Dune[\\s\\S]*Kindred",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

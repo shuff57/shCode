@@ -1,0 +1,1 @@
+Every question here is about *finding* a call, not writing one. A call is a name followed by parentheses — that's the whole rule. Reread `3.1.2 Reading: Defining & Calling a Function` if anything here trips you up.

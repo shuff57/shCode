@@ -1,0 +1,68 @@
+{
+  "id": "3-1-13-lab-syntax-naming",
+  "title": "3.1.5 Lab: Fix the Syntax and the Name",
+  "description": "Take a broken function header — missing parentheses, wrong-case name — and fix both problems. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.1 Functions: Definition and Calls",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Fix the header",
+      "instructions": "The starter's function header is missing something every function header needs. Add it."
+    },
+    {
+      "id": "s2",
+      "title": "Fix the name",
+      "instructions": "A capitalized name is not a syntax error, but it breaks convention. Rename the function to camelCase: showTotal."
+    },
+    {
+      "id": "s3",
+      "title": "Call it",
+      "instructions": "Add a call to showTotal() after the definition so the body actually runs."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "showTotal defined, camelCase, with parentheses",
+      "description": "Code defines a function named showTotal (not ShowTotal) with an empty parameter list",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+showTotal\\s*\\(\\s*\\)\\s*\\{",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "prints the total",
+      "description": "The function body logs the total",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\([^)]*Total[^)]*42[^)]*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "showTotal is called",
+      "description": "Code calls showTotal() as a statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bshowTotal\\s*\\(\\s*\\)\\s*;",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "3-1-15-example-refactor-calcdistance",
+  "title": "3.1.7 Worked Example: Refactoring calcDistance",
+  "description": "Watch the same three distance calculations shrink from nine lines to three once the math moves into one function.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.1 Functions: Definition and Calls",
+  "preview": "example",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

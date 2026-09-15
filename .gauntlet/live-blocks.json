@@ -3437,7 +3437,7 @@
     "output": [
       {
         "type": "log",
-        "text": "Took 18 shuffle(s) to get an ace."
+        "text": "Took 24 shuffle(s) to get an ace."
       }
     ],
     "nondeterministic": true
@@ -3748,6 +3748,91 @@
       {
         "type": "log",
         "text": "Something went wrong."
+      }
+    ]
+  },
+  "3-1-12-example-defining-hoisting#0": {
+    "code": "function printWelcome() {\n  console.log(\"Welcome to the program!\");\n  console.log(\"We hope you enjoy using it.\");\n}\n\nprintWelcome();",
+    "output": [
+      {
+        "type": "log",
+        "text": "Welcome to the program!"
+      },
+      {
+        "type": "log",
+        "text": "We hope you enjoy using it."
+      }
+    ]
+  },
+  "3-1-12-example-defining-hoisting#1": {
+    "code": "sayHello();\n\nfunction sayHello() {\n  console.log(\"Hello from a function defined below!\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello from a function defined below!"
+      }
+    ]
+  },
+  "3-1-14-reading-benefits#0": {
+    "code": "console.log(\"=== SHOP RECEIPT ===\");\nconsole.log(\"Item: Notebook  $4.50\");\n\nconsole.log(\"=== SHOP RECEIPT ===\");\nconsole.log(\"Item: Pen  $1.25\");\n\nconsole.log(\"=== SHOP RECEIPT ===\");\nconsole.log(\"Item: Eraser  $0.80\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "=== SHOP RECEIPT ==="
+      },
+      {
+        "type": "log",
+        "text": "Item: Notebook  $4.50"
+      },
+      {
+        "type": "log",
+        "text": "=== SHOP RECEIPT ==="
+      },
+      {
+        "type": "log",
+        "text": "Item: Pen  $1.25"
+      },
+      {
+        "type": "log",
+        "text": "=== SHOP RECEIPT ==="
+      },
+      {
+        "type": "log",
+        "text": "Item: Eraser  $0.80"
+      }
+    ]
+  },
+  "3-1-15-example-refactor-calcdistance#0": {
+    "code": "const x1 = 0, y1 = 0, x2 = 3, y2 = 4;\nconst dist1 = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5;\nconsole.log(\"Distance 1:\", dist1);\n\nconst x3 = 1, y3 = 2, x4 = 4, y4 = 6;\nconst dist2 = ((x4 - x3) ** 2 + (y4 - y3) ** 2) ** 0.5;\nconsole.log(\"Distance 2:\", dist2);\n\nconst x5 = -1, y5 = -1, x6 = 2, y6 = 3;\nconst dist3 = ((x6 - x5) ** 2 + (y6 - y5) ** 2) ** 0.5;\nconsole.log(\"Distance 3:\", dist3);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Distance 1: 5"
+      },
+      {
+        "type": "log",
+        "text": "Distance 2: 5"
+      },
+      {
+        "type": "log",
+        "text": "Distance 3: 5"
+      }
+    ]
+  },
+  "3-1-15-example-refactor-calcdistance#1": {
+    "code": "function calcDistance(x1, y1, x2, y2) {\n  return ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5;\n}\n\nconsole.log(\"Distance 1:\", calcDistance(0, 0, 3, 4));\nconsole.log(\"Distance 2:\", calcDistance(1, 2, 4, 6));\nconsole.log(\"Distance 3:\", calcDistance(-1, -1, 2, 3));",
+    "output": [
+      {
+        "type": "log",
+        "text": "Distance 1: 5"
+      },
+      {
+        "type": "log",
+        "text": "Distance 2: 5"
+      },
+      {
+        "type": "log",
+        "text": "Distance 3: 5"
       }
     ]
   },
@@ -4404,6 +4489,200 @@
       {
         "type": "log",
         "text": "25"
+      }
+    ]
+  },
+  "3-3-12-reading-arrays-and-functions#0": {
+    "code": "function top(numbers) {\n  let best = numbers[0];\n  for (let n of numbers) {\n    if (n > best) {\n      best = n;\n    }\n  }\n  return best;\n}\n\nconsole.log(top([7, 2, 11, 3]));   // 11",
+    "output": [
+      {
+        "type": "log",
+        "text": "11"
+      }
+    ]
+  },
+  "3-3-12-reading-arrays-and-functions#1": {
+    "code": "function keepBig(numbers, cutoff) {\n  let result = [];\n  for (let n of numbers) {\n    if (n >= cutoff) {\n      result.push(n);\n    }\n  }\n  return result;\n}\n\nconsole.log(keepBig([3, 9, 2, 7], 5));   // [9, 7]",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  9,\n  7\n]"
+      }
+    ]
+  },
+  "3-3-13-example-filter-passing-scores#0": {
+    "code": "function passing(scores) {\n  let result = [];\n  for (let s of scores) {\n    if (s >= 60) {\n      result.push(s);\n    }\n  }\n  return result;\n}",
+    "output": []
+  },
+  "3-3-13-example-filter-passing-scores#1": {
+    "code": "function passing(scores) {\n  let result = [];\n  for (let s of scores) {\n    if (s >= 60) {\n      result.push(s);\n    }\n  }\n  return result;\n}\n\nlet grades = [72, 55, 88, 41, 60, 93];\nconsole.log(passing(grades));   // [72, 88, 60, 93]",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  72,\n  88,\n  60,\n  93\n]"
+      }
+    ]
+  },
+  "3-3-13-example-filter-passing-scores#2": {
+    "code": "function passing(scores) {\n  let result = [];\n  for (let s of scores) {\n    if (s >= 60) {\n      result.push(s);\n    }\n  }\n  return result;\n}\n\nconsole.log(passing([30, 45, 12]));   // []",
+    "output": [
+      {
+        "type": "log",
+        "text": "[]"
+      }
+    ]
+  },
+  "3-3-15-reading-nested-arrays#0": {
+    "code": "let grid = [[1, 2], [3, 4], [5, 6]];\n\nconsole.log(grid[1]);     // [3, 4]  -- the whole row\nconsole.log(grid[1][0]);  // 3       -- first cell of row 1\nconsole.log(grid[2][1]);  // 6       -- second cell of row 2",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  3,\n  4\n]"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "6"
+      }
+    ]
+  },
+  "3-3-15-reading-nested-arrays#1": {
+    "code": "let grid = [[1, 2], [3, 4], [5, 6]];\n\nconsole.log(grid.length);    // 3 rows\nconsole.log(grid[0].length); // 2 cells in row 0",
+    "output": [
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      }
+    ]
+  },
+  "3-3-15-reading-nested-arrays#2": {
+    "code": "let grid = [[1, 2], [3, 4], [5, 6]];\n\nfor (let row of grid) {\n  for (let cell of row) {\n    console.log(cell);   // 1 2 3 4 5 6\n  }\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      },
+      {
+        "type": "log",
+        "text": "6"
+      }
+    ]
+  },
+  "3-3-16-example-nested-array-grid#0": {
+    "code": "let board = [\n  [\"X\", \"O\", \"X\"],\n  [\"O\", \"\", \"X\"],\n  [\"\", \"O\", \"\"]\n];\n\nconsole.log(board[1][2]);   // \"X\" -- row 1, cell 2\nconsole.log(board[2][0]);   // \"\"  -- bottom-left, empty",
+    "output": [
+      {
+        "type": "log",
+        "text": "X"
+      },
+      {
+        "type": "log",
+        "text": ""
+      }
+    ]
+  },
+  "3-3-16-example-nested-array-grid#1": {
+    "code": "let board = [\n  [\"X\", \"O\", \"X\"],\n  [\"O\", \"\", \"X\"],\n  [\"\", \"O\", \"\"]\n];\n\nfor (let row of board) {\n  console.log(row.join(\" \"));\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "X O X"
+      },
+      {
+        "type": "log",
+        "text": "O  X"
+      },
+      {
+        "type": "log",
+        "text": " O "
+      }
+    ]
+  },
+  "3-3-16-example-nested-array-grid#2": {
+    "code": "let board = [\n  [\"X\", \"O\", \"X\"],\n  [\"O\", \"\", \"X\"],\n  [\"\", \"O\", \"\"]\n];\n\nboard[1][1] = \"O\";   // O plays the center cell\n\nfor (let row of board) {\n  console.log(row.join(\" \"));\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "X O X"
+      },
+      {
+        "type": "log",
+        "text": "O O X"
+      },
+      {
+        "type": "log",
+        "text": " O "
+      }
+    ]
+  },
+  "3-3-3-reading-index-assignment#0": {
+    "code": "let colors = [\"red\", \"green\", \"blue\"];\n\nconsole.log(colors.length);   // 3\n\ncolors[1] = \"yellow\";\nconsole.log(colors);          // [\"red\", \"yellow\", \"blue\"]\nconsole.log(colors.length);    // still 3",
+    "output": [
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "[\n  \"red\",\n  \"yellow\",\n  \"blue\"\n]"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      }
+    ]
+  },
+  "3-3-3-reading-index-assignment#1": {
+    "code": "let mixed = [42, \"hello\", true];\nconsole.log(mixed);   // [42, \"hello\", true]",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  42,\n  \"hello\",\n  true\n]"
+      }
+    ]
+  },
+  "3-3-6-reading-shift-unshift#0": {
+    "code": "let line = [\"ana\", \"bob\"];\n\nline.unshift(\"zoe\");   // front\nline.push(\"mia\");       // back\nconsole.log(line);      // [\"zoe\", \"ana\", \"bob\", \"mia\"]",
+    "output": [
+      {
+        "type": "log",
+        "text": "[\n  \"zoe\",\n  \"ana\",\n  \"bob\",\n  \"mia\"\n]"
+      }
+    ]
+  },
+  "3-3-6-reading-shift-unshift#1": {
+    "code": "let line = [\"ana\", \"bob\", \"mia\"];\n\nlet first = line.shift();   // \"ana\" leaves, and we keep it\nconsole.log(first);         // \"ana\"\nconsole.log(line);          // [\"bob\", \"mia\"]",
+    "output": [
+      {
+        "type": "log",
+        "text": "ana"
+      },
+      {
+        "type": "log",
+        "text": "[\n  \"bob\",\n  \"mia\"\n]"
       }
     ]
   },

@@ -1,0 +1,69 @@
+{
+  "id": "3-1-16-lab-concessions-stand",
+  "title": "3.1.8 Lab: Concessions Stand",
+  "description": "Write a parameterless function, concessions(), that prints the food and drink options at a cinema, then call it. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.1 Functions: Definition and Calls",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Define concessions",
+      "instructions": "Define a function called concessions that takes no parameters."
+    },
+    {
+      "id": "s2",
+      "title": "Print the options",
+      "instructions": "Inside the function, log exactly: Food/Drink Options: Popcorn: $8-10 Candy: $3-5 Soft drink: $5-7"
+    },
+    {
+      "id": "s3",
+      "title": "Call it",
+      "instructions": "Call concessions() after the definition so the body runs."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "concessions defined, no parameters",
+      "description": "Code defines a function named concessions with an empty parameter list",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+concessions\\s*\\(\\s*\\)\\s*\\{",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "prints the options line",
+      "description": "The function body logs the food/drink options",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\([^)]*Popcorn[^)]*Candy[^)]*Soft drink[^)]*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "concessions is called",
+      "description": "Code calls concessions() as a statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bconcessions\\s*\\(\\s*\\)\\s*;",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,12 +1,13 @@
 {
-  "id": "3-1-7a-a3-1-0-flowchart-gate",
-  "title": "3.1.12 Chart Before You Refactor",
-  "description": "Redraw your grade-advisor plan with each function as one double-rail shape. The gate for A3.1.1: chart first, refactor second.",
+  "id": "3-1-21-chart-built-grade-advisor",
+  "title": "3.1.14 Chart What You Built",
+  "description": "Draw the grade-advisor program you just refactored, using the double-rail shape for decideGrade() and printAdvice(). The after-chart to 3.1.12's before-chart.",
   "type": "assignment",
-  "estimateMins": 25,
+  "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",
   "preview": "diagram",
+  "week": 7,
   "slos": [
     "SLO-2",
     "SLO-3",
@@ -30,16 +31,6 @@
         "id": "no-orphans"
       },
       {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
         "id": "reaches-end"
       },
       {
@@ -47,7 +38,7 @@
       },
       {
         "id": "min-nodes",
-        "count": 7
+        "count": 5
       }
     ]
   },
@@ -57,6 +48,5 @@
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": [],
-  "assignmentCode": "A3.1.0"
+  "requirements": []
 }
