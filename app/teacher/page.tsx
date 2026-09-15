@@ -1261,7 +1261,7 @@ function ListView() {
 // Detail view
 // ---------------------------------------------------------------------------
 
-function DetailView({ classId }: { classId: string }) {
+function DetailView({ classId, initialView }: { classId: string; initialView?: 'roster' | 'gradebook' | 'attention' }) {
   const router = useRouter();
   const [detail, setDetail] = useState<ClassDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1287,8 +1287,10 @@ function DetailView({ classId }: { classId: string }) {
   const [lessonMap, setLessonMap] = useState<Map<string, LessonMeta>>(new Map());
   const [drawerEmail, setDrawerEmail] = useState<string | null>(null);
 
-  // View toggle: 'roster' | 'gradebook'
-  const [activeView, setActiveView] = useState<'roster' | 'gradebook' | 'attention'>('roster');
+  // View toggle: 'roster' | 'gradebook'. Seeded from the ?view= query param
+  // (top-nav "Gradebook" shortcut) on mount only -- clicking another tab
+  // after that is not overridden.
+  const [activeView, setActiveView] = useState<'roster' | 'gradebook' | 'attention'>(initialView ?? 'roster');
 
   const loadDetail = useCallback(async () => {
     setLoading(true);
@@ -1798,12 +1800,47 @@ function DetailView({ classId }: { classId: string }) {
 function TeacherPageInner() {
   const params = useSearchParams();
   const classId = params.get('class');
+  const view = params.get('view');
+  const wantsGradebook = view === 'gradebook';
 
   return (
     <div style={S.page}>
-      {classId ? <DetailView classId={classId} /> : <ListView />}
+      {classId ? (
+        <DetailView classId={classId} initialView={wantsGradebook ? 'gradebook' : undefined} />
+      ) : wantsGradebook ? (
+        <GradebookRedirect />
+      ) : (
+        <ListView />
+      )}
     </div>
   );
+}
+
+// Top-nav "Gradebook" shortcut lands here with ?view=gradebook and no
+// ?class= yet. No "last visited class" is persisted anywhere in this app
+// (grepped for localStorage in this file: none exists), so this picks the
+// first class in the teacher's own list and replaces into DetailView's
+// gradebook tab. Zero classes (or a fetch error, e.g. 403) falls through to
+// the ordinary ListView, which already renders the right empty/forbidden state.
+function GradebookRedirect() {
+  const router = useRouter();
+  const [empty, setEmpty] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void apiFetch<{ classes: ClassSummary[] }>('/api/classes').then((result) => {
+      if (cancelled) return;
+      if (result.error === null && result.data.classes.length > 0) {
+        router.replace(`/teacher?class=${result.data.classes[0].id}&view=gradebook`);
+      } else {
+        setEmpty(true);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [router]);
+
+  if (empty) return <ListView />;
+  return <div style={{ color: '#6272a4' }}>Loading…</div>;
 }
 
 export default function TeacherPage() {

@@ -77,6 +77,12 @@ export default function HeaderNav() {
         </NavDropdown>
       )}
 
+      {/* Top-level shortcut into the same gradebook DetailView tab reaches via
+          Teach -> Classes -> pick a class -> Gradebook tab. Staff only. */}
+      {isStaff && (
+        <Link href="/teacher?view=gradebook" className="text-white">Gradebook</Link>
+      )}
+
       {/* Students only get two extra links — not worth a dropdown for two.
           Students get the anonymised queue at /issues, staff get the triage
           page above (a different route, kept separate deliberately). Without
@@ -90,7 +96,7 @@ export default function HeaderNav() {
           teacher's override comments all rendered on a page reachable only by
           typing the URL. scripts/check-reachable.mjs now holds that open. */}
       {loaded && user?.role === 'student' && (
-        <Link href="/progress" className="text-white">Progress</Link>
+        <Link href="/progress" className="text-white">Gradebook</Link>
       )}
 
       {loaded && user?.role === 'student' && hasEnrollments === false && (
