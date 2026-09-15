@@ -7,7 +7,7 @@
 // display_name. The WHERE clause scopes to the session email, never a
 // client-supplied one — same ownership pattern as the uploads DELETE route.
 
-import { normalizeEmail } from './_shared/auth';
+import { normalizeEmail } from '../_shared/auth';
 
 interface Env {
   DB: D1Database;
