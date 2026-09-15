@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getCurrentUser, updateDisplayName, CurrentUser } from '../../lib/auth';
+import { getCurrentUser, updateName, CurrentUser } from '../../lib/auth';
 
 const S = {
   page: {
@@ -54,14 +54,16 @@ const S = {
 export default function AccountPage() {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     getCurrentUser().then((u) => {
       setUser(u);
-      setName(u?.displayName ?? '');
+      setFirstName(u?.firstName ?? '');
+      setLastName(u?.lastName ?? '');
       setLoaded(true);
     });
   }, []);
@@ -72,10 +74,15 @@ export default function AccountPage() {
     setSaving(true);
     setMessage(null);
     try {
-      const trimmed = name.trim();
-      const updated = await updateDisplayName(trimmed.length > 0 ? trimmed : null);
+      const trimmedFirst = firstName.trim();
+      const trimmedLast = lastName.trim();
+      const updated = await updateName(
+        trimmedFirst.length > 0 ? trimmedFirst : null,
+        trimmedLast.length > 0 ? trimmedLast : null,
+      );
       setUser(updated);
-      setName(updated.displayName ?? '');
+      setFirstName(updated.firstName ?? '');
+      setLastName(updated.lastName ?? '');
       setMessage({ kind: 'ok', text: 'Saved.' });
     } catch (err) {
       setMessage({ kind: 'error', text: err instanceof Error ? err.message : String(err) });
@@ -113,13 +120,23 @@ export default function AccountPage() {
         <input type="text" value={user.email} readOnly style={S.inputReadonly} />
 
         <form onSubmit={handleSave}>
-          <label style={S.label}>Display name</label>
+          <label style={S.label}>First name</label>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             maxLength={100}
             placeholder="Optional — shown instead of your email"
+            style={S.input}
+          />
+
+          <label style={S.label}>Last name</label>
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            maxLength={100}
+            placeholder="Optional"
             style={S.input}
           />
 

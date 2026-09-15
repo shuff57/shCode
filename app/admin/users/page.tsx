@@ -10,7 +10,8 @@ import { getCurrentUser, CurrentUser } from '../../../lib/auth';
 
 interface UserRecord {
   email: string;
-  display_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
   role: 'admin' | 'teacher' | 'student';
   created_at: number;
   classes_owned: number;
@@ -127,6 +128,12 @@ async function apiFetch<T>(
     // ignore parse errors
   }
   return { data: null, error: errorMsg, status: res.status };
+}
+
+/** "First Last", trimmed, handling either half being null. Null if both are unset. */
+function fullName(first: string | null, last: string | null): string | null {
+  const parts = [first, last].map((s) => (s || '').trim()).filter(Boolean);
+  return parts.length > 0 ? parts.join(' ') : null;
 }
 
 function fmtDate(ms: number): string {
@@ -371,8 +378,8 @@ function AdminUsersInner() {
                   <tr key={u.email}>
                     {/* Email */}
                     <td style={{ ...S.td, fontFamily: 'monospace', color: '#8be9fd' }}>
-                      {u.display_name || u.email}
-                      {u.display_name && (
+                      {fullName(u.first_name, u.last_name) || u.email}
+                      {fullName(u.first_name, u.last_name) && (
                         <div style={{ fontSize: 11, color: '#6272a4' }}>{u.email}</div>
                       )}
                     </td>

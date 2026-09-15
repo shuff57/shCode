@@ -11,7 +11,20 @@ function parseRole(raw: unknown): Role {
 export interface CurrentUser {
   email: string;
   role: Role;
-  displayName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+/** "First Last", trimmed, handling either half being null. Null if both are unset. */
+export function fullName(user: CurrentUser): string | null {
+  const parts = [user.firstName, user.lastName].map((s) => (s || '').trim()).filter(Boolean);
+  return parts.length > 0 ? parts.join(' ') : null;
+}
+
+/** First name if set, else the email — the fallback every display site uses. */
+export function firstNameOrFallback(user: CurrentUser): string {
+  const first = (user.firstName || '').trim();
+  return first || user.email;
 }
 
 export class AuthError extends Error {
@@ -38,9 +51,19 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
   try {
     const res = await fetch('/api/me', { credentials: 'same-origin' });
     if (!res.ok) return null;
-    const data = (await res.json()) as { email?: string; role?: string; displayName?: string | null };
+    const data = (await res.json()) as {
+      email?: string;
+      role?: string;
+      firstName?: string | null;
+      lastName?: string | null;
+    };
     if (!data.email) return null;
-    return { email: data.email, role: parseRole(data.role), displayName: data.displayName ?? null };
+    return {
+      email: data.email,
+      role: parseRole(data.role),
+      firstName: data.firstName ?? null,
+      lastName: data.lastName ?? null,
+    };
   } catch {
     return null;
   }
@@ -52,6 +75,14 @@ function invalidateCurrentUser(): void {
   inFlight = null;
 }
 
+interface AuthResponse {
+  email?: string;
+  role?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  error?: string;
+}
+
 async function postAuth(path: string, body: unknown): Promise<CurrentUser> {
   const res = await fetch(path, {
     method: 'POST',
@@ -59,16 +90,26 @@ async function postAuth(path: string, body: unknown): Promise<CurrentUser> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  let data: { email?: string; role?: string; displayName?: string | null; error?: string } = {};
+  let data: AuthResponse = {};
   try { data = await res.json(); } catch { /* empty body */ }
   if (!res.ok) throw new AuthError(res.status, data.error || `${res.status}`);
   if (!data.email) throw new AuthError(500, 'No email in response');
-  cache = { email: data.email, role: parseRole(data.role), displayName: data.displayName ?? null };
+  cache = {
+    email: data.email,
+    role: parseRole(data.role),
+    firstName: data.firstName ?? null,
+    lastName: data.lastName ?? null,
+  };
   return cache;
 }
 
-export function signup(email: string, password: string, name?: string): Promise<CurrentUser> {
-  return postAuth('/api/auth/signup', { email, password, name });
+export function signup(
+  email: string,
+  password: string,
+  firstName?: string,
+  lastName?: string,
+): Promise<CurrentUser> {
+  return postAuth('/api/auth/signup', { email, password, firstName, lastName });
 }
 
 export function login(email: string, password: string): Promise<CurrentUser> {
@@ -80,18 +121,26 @@ export async function logout(): Promise<void> {
   invalidateCurrentUser();
 }
 
-/** Update the signed-in user's display name. `name: null` clears it. */
-export async function updateDisplayName(name: string | null): Promise<CurrentUser> {
+/** Update the signed-in user's name. Either half `null` clears that half. */
+export async function updateName(
+  firstName: string | null,
+  lastName: string | null,
+): Promise<CurrentUser> {
   const res = await fetch('/api/me', {
     method: 'PUT',
     credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ firstName, lastName }),
   });
-  let data: { email?: string; role?: string; displayName?: string | null; error?: string } = {};
+  let data: AuthResponse = {};
   try { data = await res.json(); } catch { /* empty body */ }
   if (!res.ok) throw new AuthError(res.status, data.error || `${res.status}`);
   if (!data.email) throw new AuthError(500, 'No email in response');
-  cache = { email: data.email, role: parseRole(data.role), displayName: data.displayName ?? null };
+  cache = {
+    email: data.email,
+    role: parseRole(data.role),
+    firstName: data.firstName ?? null,
+    lastName: data.lastName ?? null,
+  };
   return cache;
 }

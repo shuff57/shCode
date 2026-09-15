@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getCurrentUser, logout, CurrentUser } from '../lib/auth';
+import { getCurrentUser, logout, firstNameOrFallback, CurrentUser } from '../lib/auth';
 import AuthModal from './AuthModal';
 import NavDropdown from './NavDropdown';
 
@@ -58,7 +58,7 @@ export default function AuthButton() {
   if (user) {
     return (
       <NavDropdown
-        label={user.displayName || user.email}
+        label={firstNameOrFallback(user)}
         align="right"
         triggerStyle={{ fontSize: 13, opacity: 0.9 }}
       >
@@ -76,7 +76,7 @@ export default function AuthButton() {
         <Link
           href="/account"
           style={menuItemStyle}
-          title={user.displayName ? user.email : 'Set a display name'}
+          title={user.firstName ? user.email : 'Set a name'}
         >
           My account
         </Link>

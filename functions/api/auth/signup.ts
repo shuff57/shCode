@@ -22,10 +22,19 @@ type Ctx = EventContext<Env, string, { email: string }>;
 interface Body {
   email: string;
   password: string;
-  name?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 const MAX_NAME_LEN = 100;
+
+/** Trim to null-if-empty, capped at MAX_NAME_LEN. Each half is independent —
+ *  a user can set only a first name. */
+function cleanName(raw: string | undefined): string | null | 'too_long' {
+  const trimmed = String(raw || '').trim();
+  if (trimmed.length > MAX_NAME_LEN) return 'too_long';
+  return trimmed.length > 0 ? trimmed : null;
+}
 
 export const onRequestPost: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
   const { request, env } = context;
@@ -43,13 +52,16 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   if (!email) return json({ error: 'Email required' }, 400);
   if (password.length < 8) return json({ error: 'Password must be at least 8 characters' }, 400);
 
-  // Optional. Empty/omitted stores NULL — every display site falls back to
-  // email in that case.
-  const trimmedName = String(body.name || '').trim();
-  if (trimmedName.length > MAX_NAME_LEN) {
-    return json({ error: `Name must be ${MAX_NAME_LEN} characters or fewer` }, 400);
+  // Optional, independently. Empty/omitted stores NULL — every display site
+  // falls back to email in that case.
+  const firstName = cleanName(body.firstName);
+  if (firstName === 'too_long') {
+    return json({ error: `First name must be ${MAX_NAME_LEN} characters or fewer` }, 400);
   }
-  const displayName = trimmedName.length > 0 ? trimmedName : null;
+  const lastName = cleanName(body.lastName);
+  if (lastName === 'too_long') {
+    return json({ error: `Last name must be ${MAX_NAME_LEN} characters or fewer` }, 400);
+  }
 
   const existing = await env.DB.prepare('SELECT email FROM students WHERE email = ?')
     .bind(email)
@@ -63,14 +75,14 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
     ? 'teacher'
     : 'student';
   await env.DB.prepare(
-    'INSERT INTO students (email, password_hash, created_at, role, display_name) VALUES (?, ?, ?, ?, ?)',
+    'INSERT INTO students (email, password_hash, created_at, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)',
   )
-    .bind(email, passwordHash, Date.now(), role, displayName)
+    .bind(email, passwordHash, Date.now(), role, firstName, lastName)
     .run();
 
   const token = await signSession(email, role, env.AUTH_SECRET);
   const secure = new URL(request.url).protocol === 'https:';
-  return json({ email, role, displayName }, 201, {
+  return json({ email, role, firstName, lastName }, 201, {
     'Set-Cookie': buildSessionCookie(token, 60 * 60 * 24 * 30, secure),
   });
 };

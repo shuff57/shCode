@@ -76,9 +76,16 @@ interface SubmissionEntry {
 
 interface StudentDetail {
   student_email: string;
-  displayName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   lessonState: Record<string, LessonStateEntry>;
   latestSubmissions: Record<string, SubmissionEntry>;
+}
+
+/** "First Last", trimmed, handling either half being null/undefined. Null if both unset. */
+function fullName(first?: string | null, last?: string | null): string | null {
+  const parts = [first, last].map((s) => (s || '').trim()).filter(Boolean);
+  return parts.length > 0 ? parts.join(' ') : null;
 }
 
 interface LessonMeta {
@@ -132,7 +139,8 @@ interface GradebookCell {
 
 interface GradebookStudent {
   email: string;
-  displayName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   cells: Record<string, GradebookCell>;
 }
 
@@ -546,9 +554,9 @@ function StudentDrawer({
               Student Progress
             </div>
             <div style={{ fontSize: 13, color: '#8be9fd', fontFamily: 'monospace' }}>
-              {detail?.displayName || email}
+              {fullName(detail?.firstName, detail?.lastName) || email}
             </div>
-            {detail?.displayName && (
+            {fullName(detail?.firstName, detail?.lastName) && (
               <div style={{ fontSize: 12, color: '#6272a4', fontFamily: 'monospace' }}>{email}</div>
             )}
           </div>
@@ -1080,7 +1088,7 @@ function GradebookView({
                   onClick={() => onOpenStudent(student.email)}
                   title={student.email}
                 >
-                  {student.displayName || student.email}
+                  {fullName(student.firstName, student.lastName) || student.email}
                 </td>
                 {/* Cell per lesson */}
                 {displayLessons.map((lesson) => {
