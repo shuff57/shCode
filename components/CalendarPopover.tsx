@@ -68,6 +68,21 @@ function firstWeekday(y: number, m: number): number {
   return new Date(Date.UTC(y, m, 1)).getUTCDay();
 }
 
+// Stacked popovers: one CalendarPopover can open from inside another — the
+// due-date chip's "Available after" row opens a second, nested month grid
+// while the due popover stays up. Both panels portal to document.body, so a
+// panel is never inside the other's DOM subtree and each popover's own
+// outside-click check would read a mousedown in the other one as "outside".
+// Every mounted popover registers an entry here; a popover yields a mousedown
+// to anything mounted above it, and Escape dismisses only the topmost, so
+// stacked popovers peel off one per press.
+interface StackEntry {
+  panel: () => HTMLDivElement | null;
+  anchor: () => HTMLElement | null;
+}
+
+const popoverStack: StackEntry[] = [];
+
 export interface CalendarPopoverProps {
   /** The button the panel hangs off. */
   anchor: HTMLElement | null;
@@ -85,6 +100,14 @@ export interface CalendarPopoverProps {
   time?: string;
   onTimeChange?: (time: string) => void;
   timeLabel?: string;
+  /** Accessible name for the dialog. Defaults to the due-date wording. */
+  label?: string;
+  /**
+   * Tooltip for days before `today`. Defaults to the due-date wording;
+   * available-after grids override it, because for them a past date only
+   * means the lesson is already open.
+   */
+  pastHint?: string;
   /** Extra content rendered below the time row, above the Today/Clear footer. */
   extra?: React.ReactNode;
 }
@@ -99,6 +122,8 @@ export default function CalendarPopover({
   time,
   onTimeChange,
   timeLabel = 'Time',
+  label = 'Pick a due date',
+  pastHint = 'In the past — anything not finished counts as late immediately',
   extra,
 }: CalendarPopoverProps) {
   const selected = parseISO(value);
@@ -108,6 +133,20 @@ export default function CalendarPopover({
   const [view, setView] = useState({ y: start.y, m: start.m });
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  // The stack handlers below read the *live* props through refs: an inline
+  // `onClose` changes identity every render, and keying the registration on it
+  // would make each caller's re-render re-push its entry — the "topmost"
+  // popover would then be whoever happened to re-render last, not whoever
+  // mounted last. With a memoized `onClose` the deps never fire at all and a
+  // caller whose props change silently keeps the first closure. Either way
+  // closure identity must not decide stack order; mount order does.
+  const onCloseRef = useRef(onClose);
+  const anchorRef = useRef(anchor);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+    anchorRef.current = anchor;
+  });
 
   // Flip above / nudge inward so the panel is never off-screen. Runs before
   // paint so it does not visibly jump.
@@ -121,24 +160,42 @@ export default function CalendarPopover({
   }, [anchor]);
 
   useEffect(() => {
+    const entry: StackEntry = { panel: () => panelRef.current, anchor: () => anchorRef.current };
+    // Push order = mount order, so "topmost" means "mounted last" no matter
+    // how the callers' closures are memoised. The deps pin to the component's
+    // mount/unmount only: refs above keep the handlers reading live props.
+    popoverStack.push(entry);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      // Stacked: Escape dismisses the topmost popover only, so two presses
+      // peel the available-after grid off before the due grid.
+      if (e.key === 'Escape' && popoverStack[popoverStack.length - 1] !== entry) return;
+      if (e.key === 'Escape') onCloseRef.current();
     };
     const onDown = (e: MouseEvent) => {
       const t = e.target as Node;
+      const anchor = anchorRef.current;
       if (panelRef.current?.contains(t)) return;
       if (anchor?.contains(t)) return; // the chip toggles itself
-      onClose();
+      // Stacked: a mousedown inside a popover mounted above this one is not
+      // "outside" — it belongs to that popover, not to this one. The topmost
+      // panel's own handler closes it; this one stays put.
+      for (let i = popoverStack.length - 1; i > popoverStack.indexOf(entry); i--) {
+        if (popoverStack[i].panel()?.contains(t) || popoverStack[i].anchor()?.contains(t)) return;
+      }
+      onCloseRef.current();
     };
     document.addEventListener('keydown', onKey);
     // Capture phase: cards are links, and a click on the page behind the panel
     // should dismiss it rather than navigate.
     document.addEventListener('mousedown', onDown, true);
     return () => {
+      const idx = popoverStack.indexOf(entry);
+      if (idx !== -1) popoverStack.splice(idx, 1);
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('mousedown', onDown, true);
     };
-  }, [anchor, onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (typeof document === 'undefined' || !pos) return null;
 
@@ -171,7 +228,7 @@ export default function CalendarPopover({
     <div
       ref={panelRef}
       role="dialog"
-      aria-label="Pick a due date"
+      aria-label={label}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -229,7 +286,7 @@ export default function CalendarPopover({
                 e.stopPropagation();
                 onPick(dayIso);
               }}
-              title={isPast ? 'In the past — anything not finished counts as late immediately' : undefined}
+              title={isPast ? pastHint : undefined}
               style={{
                 background: isSelected ? C.accent : 'none',
                 color: isSelected ? C.bg : isToday ? C.today : isPast ? C.dim : C.text,

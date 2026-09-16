@@ -24,8 +24,9 @@
 // and deletes every child override in the same batch, which is why the API
 // takes an entries array rather than a single row.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ChevronDown, ChevronRight, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Calendar, ChevronDown, ChevronRight, X } from 'lucide-react';
+import CalendarPopover from './CalendarPopover';
 import LessonAccessChip from './LessonAccessChip';
 import {
   buildDueIndex,
@@ -34,6 +35,7 @@ import {
   formatDueTime,
   moduleDueSummary,
   moduleIdFromTitle,
+  schoolDateString,
   type DueDateRow,
   type DueScope,
   type OpenDateRow,
@@ -74,6 +76,10 @@ interface UnitGroup {
 type Kind = 'open' | 'due';
 
 const ENDPOINT: Record<Kind, string> = { open: 'open-dates', due: 'due-dates' };
+
+// For an available-after grid a past date is not "late" — the gate already
+// opened — so the due wording is replaced on those fields only.
+const OPEN_PAST_HINT = 'Already in the past — the lesson is open now';
 
 const C = {
   border: '#44475a',
@@ -136,10 +142,13 @@ function groupLessons(lessons: ManifestLesson[]): UnitGroup[] {
   return out;
 }
 
-// One date + time pair. The time input is disabled until a date exists,
-// because a time with no date has nothing to write — the server takes the
-// pair or nothing, and a lone time silently doing nothing is worse than a
-// control that says it isn't ready.
+// One date + time pair. The calendar icon opens a CalendarPopover month grid
+// anchored to the field — same reason the due-date chip uses one: the native
+// date input's popup is unreliable to open on its own. The grid writes the
+// date and keeps the time already in the row. The time input is disabled
+// until a date exists, because a time with no date has nothing to write —
+// the server takes the pair or nothing, and a lone time silently doing
+// nothing is worse than a control that says it isn't ready.
 function DateTimeField({
   label,
   color,
@@ -147,6 +156,7 @@ function DateTimeField({
   onWrite,
   onClear,
   ariaSuffix,
+  pastHint,
 }: {
   label: string;
   color: string;
@@ -154,15 +164,48 @@ function DateTimeField({
   onWrite: (date: string | null, time: string | null) => void;
   onClear?: () => void;
   ariaSuffix: string;
+  /** Forwarded to the popover grid; set on available-after fields only. */
+  pastHint?: string;
 }) {
   const date = row?.date ?? '';
   const time = row?.time ?? '';
+  const [calOpen, setCalOpen] = useState(false);
+  const dateRef = useRef<HTMLButtonElement>(null);
+
+  const pickFromGrid = (d: string) => {
+    setCalOpen(false);
+    onWrite(d, time || null);
+  };
 
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
       <span style={{ fontSize: 11, color, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
         {label}
       </span>
+      <button
+        ref={dateRef}
+        type="button"
+        title={`Open the ${label.toLowerCase()} calendar`}
+        aria-label={`Open the ${label.toLowerCase()} calendar for ${ariaSuffix}`}
+        aria-expanded={calOpen}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setCalOpen((v) => !v);
+        }}
+        style={{
+          background: 'none',
+          border: `1px solid ${calOpen ? C.accent : C.border}`,
+          borderRadius: 4,
+          color: C.accent,
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          padding: 3,
+        }}
+      >
+        <Calendar size={13} strokeWidth={2} />
+      </button>
       <input
         type="date"
         value={date}
@@ -200,6 +243,17 @@ function DateTimeField({
         >
           <X size={14} />
         </button>
+      )}
+      {calOpen && (
+        <CalendarPopover
+          anchor={dateRef.current}
+          value={date === '' ? null : date}
+          today={schoolDateString(Date.now())}
+          onPick={pickFromGrid}
+          label={`Pick the ${label.toLowerCase()} date`}
+          pastHint={pastHint}
+          onClose={() => setCalOpen(false)}
+        />
       )}
     </span>
   );
@@ -334,11 +388,11 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
         module reads <strong>Mixed</strong>; clear that date and the lesson goes back to inheriting.
       </p>
       <p style={{ color: C.dim, fontSize: 13, margin: '0 0 14px 0' }}>
-        <strong style={{ color: C.open }}>Opens</strong> is a lock: before it, students see the lesson
+        <strong style={{ color: C.open }}>Available after</strong> is a lock: before it, students see the lesson
         greyed out with the date on it and cannot open it. Leave it blank and the lesson is available
         immediately, which is how all 512 lessons behave today.{' '}
         <strong>Due</strong> never locks — a past-due lesson still opens and still submits. Set a date
-        and leave the time blank and Opens starts at midnight, Due lands at 11:59 PM. All times are
+        and leave the time blank and Available after starts at midnight, Due lands at 11:59 PM. All times are
         school time.
       </p>
 
@@ -395,15 +449,16 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                   </button>
 
                   <DateTimeField
-                    label="Opens"
+                    label="Available after"
                     color={C.open}
                     row={byKey.open.get(`module:${mod.moduleId}`)}
                     onWrite={(date, time) => { void write('open', [{ scope: 'module', scopeId: mod.moduleId, date, time }]); }}
                     ariaSuffix={`module ${mod.moduleId}`}
+                    pastHint={OPEN_PAST_HINT}
                   />
 
                   <DateTimeField
-                    label="Due"
+                    label="Due at"
                     color={C.dim}
                     row={byKey.due.get(`module:${mod.moduleId}`)}
                     onWrite={(date, time) => { void write('due', [{ scope: 'module', scopeId: mod.moduleId, date, time }]); }}
@@ -482,16 +537,17 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                           </span>
 
                           <DateTimeField
-                            label="Opens"
+                            label="Available after"
                             color={C.open}
                             row={openRow}
                             onWrite={(date, time) => { void write('open', [{ scope: 'lesson', scopeId: lesson.id, date, time }]); }}
                             onClear={() => { void write('open', [{ scope: 'lesson', scopeId: lesson.id, date: null }]); }}
                             ariaSuffix={lesson.title}
+                            pastHint={OPEN_PAST_HINT}
                           />
 
                           <DateTimeField
-                            label="Due"
+                            label="Due at"
                             color={C.dim}
                             row={dueRow}
                             onWrite={(date, time) => { void write('due', [{ scope: 'lesson', scopeId: lesson.id, date, time }]); }}

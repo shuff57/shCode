@@ -26,7 +26,7 @@
 // click from toggling the accordion it sits in.
 
 import { useRef, useState } from 'react';
-import { CalendarClock, LockKeyhole, X } from 'lucide-react';
+import { Calendar, CalendarClock, LockKeyhole, X } from 'lucide-react';
 import CalendarPopover from './CalendarPopover';
 import {
   applyModuleDateToAll,
@@ -91,8 +91,9 @@ export interface DueDateChipProps {
 
   // ---- "Available after" companion, shown in the same popover ----
   /**
-   * This row's own Opens date, if any. Native date/time inputs edit this
-   * directly. Optional and defaulting to null — a caller that doesn't pass
+   * This row's own Opens date, if any. The calendar icon in the popover edits
+   * the date (a nested month grid); the time stays a native time input.
+   * Optional and defaulting to null — a caller that doesn't pass
    * it just doesn't get the Opens row or lock glyph, same as before this
    * existed (ModuleLessonsList.tsx, the /module/[id] page, hasn't opted in).
    */
@@ -117,12 +118,14 @@ export default function DueDateChip({
 }: DueDateChipProps) {
   const due = useTeacherDue();
   const [open, setOpen] = useState(false);
+  const [openCal, setOpenCal] = useState(false);
   // null = "not touched this session" -> falls back to the time already on
   // the row (or blank for a row with no date yet). A non-null value is what
   // the teacher is actively typing, and survives across open/close so a time
   // set before a date is picked isn't lost.
   const [timeDraft, setTimeDraft] = useState<string | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
+  const openAnchorRef = useRef<HTMLButtonElement>(null);
 
   if (!due.canEdit || !due.activeClassId) return null;
 
@@ -138,8 +141,16 @@ export default function DueDateChip({
   const anchorDate = ownAt ?? resolvedAt;
   const effectiveTime = timeDraft ?? (anchorDate !== null ? schoolTimeString(anchorDate) : '');
 
-  const commit = (date: string) => {
+  // The one way to close the outer popover. The nested available-after grid
+  // rides along: if it stayed open, re-clicking the chip would instantly
+  // resurrect a calendar the teacher had already left.
+  const closeAll = () => {
     setOpen(false);
+    setOpenCal(false);
+  };
+
+  const commit = (date: string) => {
+    closeAll();
     const time = timeDraft || undefined;
     setTimeDraft(null);
     // Setting a date on a Mixed module is the "apply to all" gesture — the
@@ -170,16 +181,24 @@ export default function DueDateChip({
   const openDateStr = openOwnAt !== null ? schoolDateString(openOwnAt) : '';
   const openTimeStr = openOwnAt !== null ? schoolTimeString(openOwnAt) : '';
 
-  const writeOpen = (date: string | null, time: string | null) => {
+  const writeOpen = (date: string | null, time: string | null, preserveTime: boolean) => {
     if (date === null) {
       void setOpenDate(scope, scopeId, null);
       return;
     }
+    const t = preserveTime ? openTimeStr || null : time;
     if (scope === 'module' && openMixed && moduleLessonIds) {
-      void applyModuleOpenDateToAll(scopeId, date, moduleLessonIds, time ?? undefined);
+      void applyModuleOpenDateToAll(scopeId, date, moduleLessonIds, t ?? undefined);
     } else {
-      void setOpenDate(scope, scopeId, date, time ?? undefined);
+      void setOpenDate(scope, scopeId, date, t ?? undefined);
     }
+  };
+
+  // A day picked in the nested calendar keeps the time already on the row,
+  // or defaults to none (midnight) when the row had no date yet.
+  const commitOpen = (date: string) => {
+    setOpenCal(false);
+    writeOpen(date, null, openDateStr !== '');
   };
 
   // ---- Due face label ----
@@ -228,7 +247,12 @@ export default function DueDateChip({
         disabled={due.saving}
         onClick={(e) => {
           stop(e);
-          setOpen((v) => !v);
+          // Toggle through the same helper so a close also drops the nested
+          // available-after grid — reopen must start on the due grid.
+          setOpen((v) => {
+            if (v) setOpenCal(false);
+            return !v;
+          });
         }}
         style={{
           display: 'inline-flex',
@@ -267,16 +291,17 @@ export default function DueDateChip({
           time={effectiveTime}
           onTimeChange={changeTime}
           timeLabel="Due at"
+          label="Due at — pick a date"
           onClear={
             ownAt === null
               ? undefined
               : () => {
-                  setOpen(false);
+                  closeAll();
                   setTimeDraft(null);
                   void setDueDate(scope, scopeId, null);
                 }
           }
-          onClose={() => setOpen(false)}
+          onClose={closeAll}
           extra={
             <div
               style={{
@@ -289,6 +314,35 @@ export default function DueDateChip({
                 borderTop: `1px solid ${C.border}`,
               }}
             >
+              <button
+                ref={openAnchorRef}
+                type="button"
+                title={
+                  openMixed
+                    ? 'Open the available-after calendar — pick a date to apply one to all'
+                    : 'Open the available-after calendar'
+                }
+                aria-label="Open the available-after calendar"
+                aria-expanded={openCal}
+                disabled={due.saving}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setOpenCal((v) => !v);
+                }}
+                style={{
+                  background: openCal ? C.raised : 'none',
+                  border: `1px solid ${openCal ? C.open : C.border}`,
+                  borderRadius: 4,
+                  color: C.open,
+                  cursor: due.saving ? 'wait' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: 2,
+                }}
+              >
+                <Calendar size={13} strokeWidth={2} />
+              </button>
               <LockKeyhole size={12} strokeWidth={2} color={C.open} />
               <span
                 style={{
@@ -301,24 +355,23 @@ export default function DueDateChip({
               >
                 Available after{openMixed ? ' (mixed)' : ''}
               </span>
-              <input
-                type="date"
-                value={openDateStr}
-                title={openMixed ? 'Lessons here open at different times — pick a date to apply one to all' : undefined}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  writeOpen(v === '' ? null : v, v === '' ? null : openTimeStr || null);
+              <span
+                style={{
+                  color: openDateStr === '' ? C.dim : C.text,
+                  fontSize: 12,
+                  fontFamily: 'inherit',
                 }}
-                style={dateInputStyle}
                 aria-label={`Available-after date for this ${scope}`}
-              />
+              >
+                {openDateStr === '' ? '—' : openDateStr}
+              </span>
               <input
                 type="time"
                 value={openTimeStr}
                 disabled={openDateStr === ''}
                 onChange={(e) => {
                   if (openDateStr === '') return;
-                  writeOpen(openDateStr, e.target.value === '' ? null : e.target.value);
+                  writeOpen(openDateStr, e.target.value === '' ? null : e.target.value, false);
                 }}
                 style={{ ...dateInputStyle, opacity: openDateStr === '' ? 0.4 : 1 }}
                 aria-label={`Available-after time for this ${scope}`}
@@ -328,7 +381,7 @@ export default function DueDateChip({
                 <button
                   type="button"
                   title="Clear the available-after date — the lesson opens immediately"
-                  onClick={() => writeOpen(null, null)}
+                  onClick={() => writeOpen(null, null, false)}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -344,6 +397,18 @@ export default function DueDateChip({
               )}
             </div>
           }
+        />
+      )}
+
+      {open && openCal && (
+        <CalendarPopover
+          anchor={openAnchorRef.current}
+          value={openDateStr === '' ? null : openDateStr}
+          today={schoolDateString(Date.now())}
+          onPick={commitOpen}
+          label="Pick an available-after date"
+          pastHint="Already in the past — the lesson is open now"
+          onClose={() => setOpenCal(false)}
         />
       )}
 
