@@ -231,6 +231,9 @@ Cloudflare dashboard env vars pane (plain vars):
 | `OLLAMA_LOCAL_HOST` | var (optional) | Second grading target — the "Classroom grader" in the student dropdown. Must be reachable **from Cloudflare**, so a LAN address will not work; publish the box through a Cloudflare Tunnel. |
 | `OLLAMA_LOCAL_MODEL` | var (optional) | Model id as the *local* server names it. No default: a lesson's `model` is a cloud id and will not exist on the box. Without this the local grader stays unavailable even when the host is set. |
 | `OLLAMA_LOCAL_API_KEY` | secret (optional) | Bearer token for the local server. Omit for an unauthenticated box — the Function then sends no `Authorization` header at all. |
+| `OPENROUTER_API_KEY` | secret (optional) | Enables the `openrouter` grader target — **class-restricted**, not general-availability; see `OPENROUTER_ALLOWED_OWNER_EMAILS` below. Without this the target reports unavailable regardless of allowlist membership. |
+| `OPENROUTER_MODEL` | var (optional) | Model id for the `openrouter` target. Defaults to `mistralai/mistral-small-24b-instruct-2501`, served free via OpenRouter's DeepInfra pool. |
+| `OPENROUTER_ALLOWED_OWNER_EMAILS` | var (optional) | Comma-separated class-owner allowlist. A student only sees/can select `openrouter` when their class's `owner_email` (or their own email, for a teacher previewing a lesson) is listed here — checked independently in both the GET menu and the POST handler. |
 | `ADMIN_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='admin'` |
 | `TEACHER_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='teacher'` |
 | `AI_HELP_DAILY_LIMIT` | var (optional) | Per-student per-unit daily quota for `POST /api/ai-help`; default `10`. Each unit gets its own bucket. Teachers/admins are exempt. |
@@ -305,15 +308,20 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   own tokens are never forwarded**: a half-arrived grade is meaningless, and a
   rubric verdict the model then revises would lie to the student about their
   score. Stage labels move; the grade appears once, whole.
-- The grader target is chosen by an enum, and there are three. `workersai` is
+- The grader target is chosen by an enum, and there are four. `workersai` is
   the **Workers AI binding** and the preferred one: no host, no key, no tunnel,
   nothing to keep alive. `resolveTargets()` marks each target `kind: 'ollama'`
-  (an HTTP endpoint we fetch) or `kind: 'binding'` (an object Cloudflare hands
-  the Function); everything downstream branches on that and nothing else. The
-  default is resolved **per request** by `pickDefault()` walking
+  (an HTTP endpoint we fetch), `kind: 'binding'` (an object Cloudflare hands
+  the Function), or `kind: 'openrouter'` (a single external API, no SLA of its
+  own); everything downstream branches on that and nothing else. The default
+  is resolved **per request** by `pickDefault()` walking
   `['workersai', 'cloud', 'local']` and taking the first available, so a deploy
   that never adds the AI binding keeps grading on `cloud` instead of 503ing.
   `DEFAULT_GRADER` stays `'cloud'` as the last-resort constant for that reason.
+  `openrouter` sits outside that walk entirely — it's class-gated (see the env
+  var table above), so it's only ever offered/defaulted-to for an allowed
+  class, and a failed `openrouter` call falls back to `cloud` silently rather
+  than 503ing the student.
 - **`max_tokens` on the Workers AI path is load-bearing** (`WORKERS_AI_MAX_TOKENS`,
   8000). At 1500 a reasoning model spent its whole budget on its `reasoning`
   field, stopped with `finish_reason: "length"`, and returned `content: null` —
@@ -329,7 +337,9 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   refusals being `3021: rate limiting`, i.e. the 20-rpm frontier cap. Cost ran
   75–81 neurons per grade, so ~130 grades/day inside the free 10,000.
 - `GET /api/grade-written` lists the grading targets this deploy can run —
-  `workersai` (the binding), `cloud` (hosted) and `local` (the school's own box). The student picks between
+  `workersai` (the binding), `cloud` (hosted), `local` (the school's own box),
+  and `openrouter` (class-restricted; only shown to an allowed class, see the
+  env var table above). The student picks between
   them in `components/GraderPicker.tsx`; the choice is remembered per browser
   and travels as a `grader` **enum** on the POST body. It is never a host, a
   model, or a key — those are read from env in `resolveTargets()` and nowhere
