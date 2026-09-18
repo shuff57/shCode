@@ -1,7 +1,7 @@
 {
   "id": "2-7-3-ch2-individual-pa-find-and-fix",
   "title": "2.7.3 Individual PA Part 3: Find and Fix",
-  "description": "Four broken programs. You identify the bug, name its type (syntax / runtime / logic), and fix it. Summative.",
+  "description": "Four broken programs. Identify each bug, name its type (syntax / runtime / logic), and fix it. One sitting; the checklist shows which symptom remains.",
   "type": "assignment",
   "estimateMins": 11,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -13,16 +13,11 @@
   ],
   "points": 0,
   "contentFile": "content.md",
-  "grading": {
-    "totalPoints": 0,
-    "passingScore": 0,
-    "allowLateSubmit": true
-  },
   "steps": [],
   "requirements": [
     {
       "id": "r1",
-      "title": "Bug 1 -- the program does not run at all",
+      "title": "Bug 1 — the program does not run at all",
       "description": "The file is valid JavaScript and reaches the end.",
       "type": "regex",
       "file": "script.js",
@@ -34,7 +29,7 @@
     },
     {
       "id": "r2",
-      "title": "Bug 2 -- the program stops part way through",
+      "title": "Bug 2 — the program stops part way through",
       "description": "Nothing in the file uses a name that was never declared.",
       "type": "regex",
       "file": "script.js",
@@ -46,26 +41,26 @@
     },
     {
       "id": "r3",
-      "title": "Bug 3 -- the loop prints the wrong thing",
-      "description": "The accumulator prints the correct final value.",
+      "title": "Bug 3 — the savings total is wrong",
+      "description": "The holiday-week skip does not swallow the deposit it is meant to skip.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+total\\s*=\\s*0\\s*;[\\s\\S]*for\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*total\\s*=\\s*total\\s*\\+\\s*[A-Za-z_$][A-Za-z0-9_$]*",
+      "pattern": "(?:let|const)\\s+savings\\s*=\\s*0\\s*;[\\s\\S]*for\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*savings\\s*=\\s*savings\\s*\\+\\s*[A-Za-z_$][A-Za-z0-9_$]*",
       "flags": "",
       "points": 0,
-      "hint": "Work out on paper what the accumulator should say, then compare. If the two disagree, ask what type each value being combined actually is.",
+      "hint": "Work out on paper what the savings should say for four weeks, then compare. If the two disagree, ask which week the skip actually skips.",
       "stripComments": false
     },
     {
       "id": "r4",
-      "title": "Bug 4 -- the inner loop counter never advances",
-      "description": "The inner loop variable increments on every iteration, even after a continue.",
+      "title": "Bug 4 — the loop counter never advances",
+      "description": "The counter increments on every round, including the ones that continue.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*if\\s*\\([^)]*\\)\\s*\\{\\s*continue\\s*;[^}]*\\}[\\s\\S]*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\+\\+",
+      "pattern": "while\\s*\\([\\s\\S]*?\\)\\s*\\{[\\s\\S]*?\\bi\\s*(?:\\+\\+|\\+=\\s*1|=\\s*i\\s*\\+\\s*1)",
       "flags": "",
       "points": 0,
-      "hint": "In a while loop, continue jumps past the increment. The increment must be before the continue, or use a for loop.",
+      "hint": "In a while loop, continue jumps past the increment. The update must run on EVERY pass -- move it above the continue, or restructure as a for.",
       "stripComments": false
     },
     {
@@ -74,7 +69,7 @@
       "description": "A comment beside each fix names its kind: syntax, runtime or logic.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*syntax)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*runtime)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*logic)",
+      "pattern": "^(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\bsyntax\\b)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\bruntime\\b)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\blogic\\b)",
       "flags": "i",
       "points": 0,
       "hint": "Four fixes, four comments -- one per bug.",
@@ -84,12 +79,34 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
-  },
-  "steps": [],
-  "requirements": [],
-  "assignmentCode": "A2.7.3",
-  "grading": {
+    "allowLateSubmit": true,
     "summative": true
-  }
+  },
+  "assignmentCode": "A2.7.3",
+  "files": [
+    {
+      "id": "index.html",
+      "type": "file",
+      "name": "index.html",
+      "path": "index.html",
+      "language": "html",
+      "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>2.7.3 Chapter 2 Test, Part 3: Find and Fix</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <script src=\"script.js\"></script>\n</body>\n</html>\n"
+    },
+    {
+      "id": "style.css",
+      "type": "file",
+      "name": "style.css",
+      "path": "style.css",
+      "language": "css",
+      "content": "/* 2.7.3 Chapter 2 Test Part 3 styles */\n"
+    },
+    {
+      "id": "script.js",
+      "type": "file",
+      "name": "script.js",
+      "path": "script.js",
+      "language": "javascript",
+      "content": "// Chapter 2 Test, Part 3 of 5: Find and Fix.\n//\n// This file has four bugs in it. One stops the program before it\n// starts, one stops it part way through, one lets it run and prints\n// something untrue, and one never finishes at all.\n//\n// Fix all four. Above each fix, write a comment naming what kind of\n// bug it was -- the three kinds are on the instructions beside this\n// editor.\n\nconst TAX_RATE = 0.08;\n\nlet itemName = \"Notebook;\nlet unitPrice = 4.25;\nlet count = 6;\n\nlet subtotal = unitPrice * count;\n\nlet shipping = 5;\nlet beforeTax = subtotal + shipping;\n\nlet tax = beforeTax * TAX_RATE;\nlet total = beforTax + tax;\n\n// Bug 3: savings -- ten a week for four weeks, but week three is a\n// holiday week you are meant to skip. The receipt prints 30 either\n// way; work out what it should print.\nconst DEPOSIT = 10;\nlet savings = 0;\nfor (let w = 1; w <= 4; w++) {\n  if (w === 3) {\n    continue;\n  }\n  savings = savings + DEPOSIT;\n}\n\n// Bug 4: the walking log, weeks 1 to 5, odd weeks only.\nlet i = 0;\nwhile (i < 5) {\n  if (i % 2 === 0) {\n    continue;\n  }\n  console.log(\"Week \" + i);\n  i++;\n}\n\nconsole.log(\"Item: \" + itemName);\nconsole.log(\"Ordered: \" + count);\nconsole.log(\"Before tax: \" + beforeTax);\nconsole.log(\"Savings: \" + savings);\nconsole.log(\"Total: \" + total);\n"
+    }
+  ]
 }

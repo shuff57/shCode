@@ -2755,6 +2755,78 @@
       "week": 7
     },
     {
+      "id": "2-6-1-ch2-group-pa-design-chart",
+      "title": "2.6.1 Group PA Part 1: Design the Chart",
+      "unit": "2.6 Chapter 2 Group Performance Assessment",
+      "preview": "diagram",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "2-6-2-ch2-group-pa-build",
+      "title": "2.6.2 Group PA Part 2: Build It",
+      "unit": "2.6 Chapter 2 Group Performance Assessment",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "2-6-3-ch2-group-pa-demo",
+      "title": "2.6.3 Group PA Part 3: Demo It",
+      "unit": "2.6 Chapter 2 Group Performance Assessment",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "2-7-1-ch2-individual-pa-concepts",
+      "title": "2.7.1 Individual PA Part 1: Concepts and Traces",
+      "unit": "2.7 Chapter 2 Individual Performance Assessment",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "2-7-2-ch2-individual-pa-own-words",
+      "title": "2.7.2 Individual PA Part 2: In Your Own Words",
+      "unit": "2.7 Chapter 2 Individual Performance Assessment",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "2-7-3-ch2-individual-pa-find-and-fix",
+      "title": "2.7.3 Individual PA Part 3: Find and Fix",
+      "unit": "2.7 Chapter 2 Individual Performance Assessment",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "2-7-4-ch2-individual-pa-chart-it",
+      "title": "2.7.4 Individual PA Part 4: Chart It",
+      "unit": "2.7 Chapter 2 Individual Performance Assessment",
+      "preview": "diagram",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "2-7-5-ch2-individual-pa-write-the-steps",
+      "title": "2.7.5 Individual PA Part 5: Write the Steps",
+      "unit": "2.7 Chapter 2 Individual Performance Assessment",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "3-1-1-slides",
       "title": "3.1.1 Slides: Functions",
       "unit": "3.1 Functions: Definition and Calls",

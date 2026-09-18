@@ -1,7 +1,7 @@
 {
   "id": "2-7-2-ch2-individual-pa-own-words",
   "title": "2.7.2 Individual PA Part 2: In Your Own Words",
-  "description": "Three short-answer questions. You explain the concepts in your own words. AI-graded.",
+  "description": "Three short-answer questions. Explain the ideas in your own words. AI-graded, summative: one submission, nothing marked on screen.",
   "type": "assignment",
   "estimateMins": 7,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -23,39 +23,29 @@
   "assignmentCode": "A2.7.2",
   "aiGrader": {
     "summative": true,
-    "rubricTitle": "Chapter 2 Individual PA Part 2: In Your Own Words",
+    "rubricTitle": "Chapter 2 Individual PA, Part 2: In Your Own Words",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "The student answers three short-answer questions in their own words. Grade each answer against its rubric. Be strict about correctness but generous with phrasing -- students are 14-year-olds explaining concepts in their own words. Do not deduct for minor grammar or spelling. Focus on whether the core idea is correct.\n\nQuestion 1: Explain the difference between `for` and `while` loops. When would you choose one over the other?\nExpected: `for` is for when you know how many iterations (or have a clear range with start, limit, step). `while` is for when you don't know the count in advance and loop until a condition changes. Key distinction: `for` packages the counter setup, condition, and step in the header; `while` only has the condition.",
-      "rubric": [
-        {
-          "id": "for-vs-while",
-          "title": "Explains when to use for vs while",
-          "description": "Student identifies that `for` is for known iteration counts/ranges, `while` for unknown counts/condition-driven loops. Mentions that `for` packages init/condition/step in the header.",
-          "points": 4
-        }
-      ],
+    "prompt": "The student answers three short-answer questions in their own words. Mark against the three criteria below. Grade strictly on correctness, generously on phrasing: these are 14-year-olds writing their own words under time pressure. Grammar and spelling are not being assessed. Each criterion is either credited, partially credited, or withheld -- say which in the feedback and why.\n\nQuestion 1 -- for versus while (worth 4).\nThe taught distinction (2.4.1): for is the loop whose header carries all three parts -- init, condition, step -- so it fits when you know the range you are walking; while carries only the condition, so it fits when the count is unknown in advance and something inside the body decides when to stop. Credit any answer that gets the when-to-choose reasoning right; the syntax observation (for has three parts in the header, while has one) is supporting detail, not required.\n\nQuestion 2 -- why the course teaches === and not == (worth 3).\nThe taught answer (2.1.7, 2.3.18): === compares the value AND the type; == converts before comparing, so 0 == false and \"5\" == 5 are both true. switch also matches with ===, so a case never matches a value of the wrong type. Credit the coercion explanation and at least one concrete surprise.\n\nQuestion 3 -- what throw does that console.log does not (worth 3).\nThe taught answer (2.5.4): throw stops the normal flow and hands the Error to the nearest catch, or ends the program if nothing catches it; console.log prints and the program keeps going. throw is how the program itself reacts to a broken rule; logging is how a human reads about it.",
+    "rubric": [
+      {
+        "id": "for-vs-while",
+        "title": "Question 1: when to choose for vs while",
+        "description": "Full credit: the response says for suits a known range/count (header packages init, condition, step) while while suits an unknown count decided inside the body. Partial: names one correctly, or describes the syntax difference without the when-to-choose reasoning. Withhold: conflates the two or calls them interchangeable.",
+        "points": 4
+      },
       {
         "id": "strict-equality",
-        "title": "Explains why `===` is safer than `==`",
-        "description": "Student explains that `===` compares both value AND type (strict equality), while `==` does type coercion which can cause surprising results (e.g., `0 == false` is true). Recommends `===` as the default.",
+        "title": "Question 2: why === beats ==",
+        "description": "Full credit: === compares value and type, == converts first, with at least one concrete surprise (0 == false, or \"5\" == 5). Partial: coercion named but no example, or an example without the value-and-type distinction. Withhold: says === is better with no reason.",
         "points": 3
       },
       {
-        "id": "throw-explains",
-        "title": "Explains what `throw` does differently from logging an error",
-        "description": "Student explains that `throw` stops the normal flow and jumps to the nearest `catch` (or crashes the program if uncaught), while `console.log` just prints and continues. `throw` is for signaling that something is wrong in a way the program can respond to; logging is just for humans to read.",
+        "id": "throw-vs-log",
+        "title": "Question 3: throw vs console.log",
+        "description": "Full credit: throw stops the flow and hands to the nearest catch (or ends the program uncaught); console.log prints and carries on. Partial: one side explained without the other. Withhold: says throw only crashes the program with no mention of catch.",
         "points": 3
       }
-    ],
-    "summative": true
-  },
-  "grading": {
-    "totalPoints": 0,
-    "passingScore": 0,
-    "allowLateSubmit": true
-  },
-  "steps": [],
-  "requirements": [],
-  "assignmentCode": "A2.7.2"
+    ]
+  }
 }

@@ -89,15 +89,6 @@
       ]
     },
     {
-      "id": "s10",
-      "title": "Report it",
-      "instructions": "At least three console.log calls, and at least one of them a template literal with a ${} in it so the numbers are inside the sentence. Also print typeof for one of your values.",
-      "hints": [
-        "console.log(`Total: ${total}`); -- template literal",
-        "console.log(typeof flips); -- prints the type"
-      ]
-    },
-    {
       "id": "s11",
       "title": "Read it back to each other",
       "instructions": "Swap the keyboard. The partner who did not type reads the program out loud line by line while the other checks it against the chart. Every shape on the chart should appear once, in order. Fix what does not match, then run three sets of numbers through it -- you will need them for the demo writeup."
@@ -222,42 +213,6 @@
       "flags": "",
       "points": 0,
       "hint": "if (n < 1) throw new Error('n must be at least 1'); -- before the loop.",
-      "stripComments": false
-    },
-    {
-      "id": "r11",
-      "title": "A template literal reports the result",
-      "description": "At least one console.log uses backticks with ${} inside",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*`[^`]*\\$\\{",
-      "flags": "",
-      "points": 0,
-      "hint": "console.log(`Total: ${total}`); -- backticks, not quotes, and ${} around the variable.",
-      "stripComments": false
-    },
-    {
-      "id": "r12",
-      "title": "typeof is reported for one value",
-      "description": "The program prints the type of at least one of its values",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "typeof\\s+[A-Za-z_$]",
-      "flags": "",
-      "points": 0,
-      "hint": "console.log(typeof flips); -- prints the type of your counter/accumulator.",
-      "stripComments": false
-    },
-    {
-      "id": "r13",
-      "title": "A template literal prints the report",
-      "description": "The final report uses a template literal with the computed values inside the sentence",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*`[^`]*\\$\\{",
-      "flags": "",
-      "points": 0,
-      "hint": "console.log(`Locker 7 is ${state}.`); -- backticks and ${}.",
       "stripComments": false
     }
   ],

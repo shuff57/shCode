@@ -66,15 +66,18 @@ let unitsChecked = 0;
 let partsChecked = 0;
 
 for (const [unit, entries] of byUnit) {
-  const isTestUnit = entries.some(({ lesson }) =>
-    gradedBlocks(lesson).some(([, block]) => block && block.summative === true),
-  );
-  // A unit is an assessment unit iff its first token matches N.6 or N.7
-  // (e.g., "2.6", "2.7", "11.6", "11.7"). This avoids marking teaching units
-  // as test units just because they contain a summative module quiz.
-  const unitFirstToken = unit.split(' ')[0];
-  const isAssessmentUnit = /^\d+\.[67]$/.test(unitFirstToken);
-  if (!isAssessmentUnit) continue;
+  // A unit is a TEST unit iff its name matches the individual chapter test
+  // pattern: "N.7 Chapter N Individual Performance Assessment". Keying on the
+  // bare number was wrong twice over: 3.7 Array Methods and 6.7 Advanced
+  // Input are teaching modules whose numbers merely end in .7, and N.6 units
+  // (the Group PAs) are deliberately NOT test units at all — their lessons
+  // are green-to-advance and set the flag nowhere (see 2.6's warning block —
+  // 2.6.1's chart is supposed to gate 2.6.2, and summative exists precisely
+  // to switch that gating off). Keying on any-lesson-summative was wrong the
+  // other way too: 2-1-39 and 1-3-21 are module quizzes legitimately marked
+  // quiz.summative, and that dragged their whole teaching units in.
+  const isTestUnit = /^(\d+)\.7 Chapter \1 Individual Performance Assessment$/.test(unit);
+  if (!isTestUnit) continue;
   unitsChecked++;
 
   for (const { dir, lesson } of entries) {

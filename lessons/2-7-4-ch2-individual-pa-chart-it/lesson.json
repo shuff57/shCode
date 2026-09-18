@@ -1,7 +1,7 @@
 {
   "id": "2-7-4-ch2-individual-pa-chart-it",
   "title": "2.7.4 Individual PA Part 4: Chart It",
-  "description": "Hand-draw a flowchart for the stated problem, then write the JavaScript it describes. Summative.",
+  "description": "Pick one of three problems and chart its loop on a flowchart. All ten checks must pass. The chart is graded as a legal drawing, never against the answer.",
   "type": "assignment",
   "estimateMins": 7,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -15,6 +15,7 @@
   "points": 0,
   "contentFile": "content.md",
   "diagram": {
+    "summative": true,
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
       {
@@ -65,8 +66,5 @@
   },
   "steps": [],
   "requirements": [],
-  "assignmentCode": "A2.7.4",
-  "diagram": {
-    "summative": true
-  }
+  "assignmentCode": "A2.7.4"
 }

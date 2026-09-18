@@ -2,27 +2,19 @@ flowchart TD
   A([Start])
   B[/Input n and bankName/]
   C{{i = 1 to n}}
-  D{Is i multiple of 3?}
-  E[Flip locker i]
-  F[If i == 7 record state]
-  G[/i = i + 1/]
-  H{{i <= n?}}
-  I[/Input lockerToCheck/]
-  J{state of locker?}
-  K[Switch: open / closed / never touched]
+  D{i <= n?}
+  E{Is i a multiple of 3?}
+  F[Flip locker i]
+  G[Set final state of locker 7]
+  H[/Print state and open count/]
   Z([End])
   A --> B
   B --> C
   C --> D
-  D -- Yes --> G
-  D -- No --> E
-  E --> F
-  F --> G
+  D -- Yes, enter the row --> E
+  D -- No, row is done --> G
+  E -- Multiple of 3, skip --> C
+  E -- Not a multiple --> F
+  F --> C
   G --> H
-  H -- Yes --> D
-  H -- No --> I
-  I --> J
-  J -- Open --> K
-  J -- Closed --> K
-  J -- Never touched --> K
-  K --> Z
+  H --> Z

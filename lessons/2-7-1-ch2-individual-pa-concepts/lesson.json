@@ -32,321 +32,326 @@
     ],
     "questions": [
       {
-        "id": "c1-lifecycle-conditional",
-        "source": "2.1.18",
-        "question": "Chapter 2 added the first conditional to your toolkit. Which statement about `if (x == true)` is correct?",
+        "id": "c1-if-decides",
+        "source": "2.1.12",
+        "question": "The condition inside if (...) is not required to be a comparison. What does if actually do with whatever is inside the parentheses?",
         "options": [
-          "It is the preferred way to test a boolean",
-          "It is redundant if x is already a boolean",
-          "It is required because `if (x)` doesn't work",
-          "It is the only way to check for truthiness"
+          "It converts it to true or false, using the six falsy values",
+          "It requires a comparison and refuses anything else",
+          "It runs the condition and checks whether the line printed true",
+          "It treats the line as text and checks whether it spells true"
+        ],
+        "answer": 0,
+        "explanation": "if converts whatever is inside the parentheses to a boolean (2.1.18). Zero, an empty string, null, undefined, NaN and false convert to false; everything else converts to true. That is why if (x == true) is redundant when x is already a boolean -- if (x) does the same job.",
+        "sourceIds": [
+          "2-1-18-reading-truthy-falsy"
+        ]
+      },
+      {
+        "id": "c2-switch-equality",
+        "source": "2.3.18",
+        "question": "A switch statement is deciding which case to run. How does it compare the value against each case label?",
+        "options": [
+          "With strict equality (===), so a string \"4\" never matches the number 4",
+          "With loose equality (==), converting types to find a match",
+          "It converts every case label to text before comparing",
+          "By treating a quoted case label as a different type from the value"
+        ],
+        "answer": 0,
+        "explanation": "switch matches with strict equality (2.3.18). switch (4) never matches case \"4\": the number 4 and the text \"4\" are different values under ===, which is exactly why a value of the wrong type falls through to default.",
+        "sourceIds": [
+          "2-3-18-reading-strict-equality"
+        ]
+      },
+      {
+        "id": "c3-loop-shapes",
+        "source": "2.4.24",
+        "question": "A loop sits inside another loop. The outer one runs 3 times. On every pass of the outer loop, the inner one runs 2 times. How many times does the inner loop's body run in total?",
+        "options": [
+          "5",
+          "6",
+          "3",
+          "2"
         ],
         "answer": 1,
-        "explanation": "If a value is already a boolean, writing `if (x == true)` is redundant. The conditional directly uses the truthiness of x. Use `if (x)` instead.",
+        "explanation": "Every pass of the outer loop runs the inner loop start to finish, so the inner body runs 3 x 2 = 6 times (2.4.24). Nested-loop cost is the product, not the sum.",
         "sourceIds": [
-          "2-1-18-reading-always-true-condition"
-        ]
-      },
-      {
-        "id": "c2-paradigm-choice",
-        "source": "2.1.18",
-        "question": "You are writing a program that makes a decision based on a comparison. Which paradigm are you using?",
-        "options": [
-          "Functional programming",
-          "Object-oriented programming",
-          "Procedural/structured programming",
-          "Declarative programming"
-        ],
-        "answer": 2,
-        "explanation": "A straight-line script with conditionals and loops that runs top to bottom is procedural/structured programming. Object-oriented needs objects/classes; functional avoids mutable state; declarative describes what, not how.",
-        "sourceIds": [
-          "2-1-18-reading-always-true-condition"
-        ]
-      },
-      {
-        "id": "c3-chart-shape",
-        "source": "2.6.1",
-        "question": "You are drawing a flowchart for a program with a loop that has a decision inside it. Which shapes must appear?",
-        "options": [
-          "Oval, rectangle, diamond only",
-          "Oval, rectangle, diamond, hexagon",
-          "Oval, rectangle, diamond, parallelogram",
-          "Oval, rectangle, diamond, hexagon, parallelogram"
-        ],
-        "answer": 3,
-        "explanation": "The loop requires a hexagon (§2.2), the decision needs a diamond, steps need rectangles, Start/End need ovals, and I/O uses parallelograms. That's five shapes total.",
-        "sourceIds": [
-          "2-6-1-reading-design-chart"
+          "2-4-24-reading-nested-loops"
         ]
       },
       {
         "id": "a-t1-equality",
         "variant": "a",
-        "source": "2.1.7",
+        "source": "2.1.15",
         "question": "What does this program print?",
-        "code": "let count = 0;\nif (count == false) {\n  console.log('empty');\n} else {\n  console.log('has items');\n}",
+        "code": "let baskets = 0;\nif (baskets == false) {\n  console.log(\"empty\");\n} else {\n  console.log(\"has baskets\");\n}",
         "options": [
           "empty",
-          "has items",
-          "Nothing -- the program stops with a TypeError",
-          "undefined"
+          "has baskets",
+          "Nothing — the program stops with an error",
+          "true"
         ],
         "answer": 0,
-        "explanation": "Loose equality `==` converts both sides to numbers. `0 == false` converts `false` to 0, so `0 == 0` is true. The program prints 'empty'.",
+        "explanation": "Loose equality converts before comparing: false becomes the number 0, and 0 == 0 is true, so the if runs and prints empty. That is the == trap; === would compare the boolean against the number and say false.",
         "sourceIds": [
           "2-1-7-reading-comparison-operators"
         ]
       },
       {
-        "id": "a-t2-coercion",
+        "id": "a-t2-step",
         "variant": "a",
-        "source": "2.1.7",
+        "source": "2.2.10",
         "question": "What does this program print?",
-        "code": "let a = \"10\" + 5;\nlet b = \"10\" - 5;\nconsole.log(a, b);",
+        "code": "for (let i = 2; i <= 10; i += 2) {\n  console.log(i);\n}",
         "options": [
-          "15 5",
-          "105 5",
-          "105 -5",
-          "15 -5"
+          "2 4 6 8 10 (five lines)",
+          "2 3 4 5 6 7 8 9 10 (nine lines)",
+          "10",
+          "Nothing — the loop never runs"
         ],
-        "answer": 1,
-        "explanation": "With text on one side, `+` joins rather than adds, so `\"10\" + 5` builds the text `105`. The `-` operator has no meaning for text, so JavaScript converts `\"10\"` to the number 10 and subtracts, giving 5.",
+        "answer": 0,
+        "explanation": "The step is += 2, so i goes 2, 4, 6, 8, 10 and stops before 12. The step clause of the for header runs at the end of every pass, and here it adds two each time.",
         "sourceIds": [
-          "2-1-7-reading-operators-coercion"
+          "2-2-6-example-trace-for"
         ]
       },
       {
-        "id": "a-t3-typeof",
+        "id": "a-t3-fallthrough",
         "variant": "a",
-        "source": "2.1.19",
+        "source": "2.3.9 and 2.3.11",
         "question": "What does this program print?",
-        "code": "console.log(typeof null, typeof NaN);",
+        "code": "let level = 2;\nswitch (level) {\n  case 1:\n    console.log(\"Beginner\");\n    break;\n  case 2:\n    console.log(\"Intermediate\");\n  case 3:\n    console.log(\"Advanced\");\n    break;\n  default:\n    console.log(\"Unknown\");\n}",
         "options": [
-          "null NaN",
-          "object number",
-          "null number",
-          "object NaN"
+          "Intermediate",
+          "Intermediate then Advanced",
+          "Intermediate then Beginner",
+          "Nothing — the program stops with an error"
         ],
-        "answer": 1,
-        "explanation": "`typeof null` reports `object` (a historical bug). `NaN` stands for Not a Number and is itself of type `number`.",
+        "answer": 0,
+        "explanation": "Case 2 matches and prints Intermediate, but its case has no break, so execution falls through into case 3 and prints Advanced too. Then case 3's break stops it. Two lines, in that order.",
         "sourceIds": [
-          "2-1-19-reading-typeof"
+          "2-3-10-reading-fall-through",
+          "2-3-11-example-missing-break"
         ]
       },
       {
-        "id": "a-t4-truthy",
+        "id": "a-t4-nested",
         "variant": "a",
-        "source": "2.1.8",
+        "source": "2.4.25",
         "question": "What does this program print?",
-        "code": "let items = [];\nif (items.length) {\n  console.log('has items');\n} else {\n  console.log('empty');\n}",
+        "code": "for (let row = 1; row <= 3; row++) {\n  for (let col = 1; col <= 2; col++) {\n    console.log(row + \"-\" + col);\n  }\n}",
         "options": [
-          "has items",
-          "empty",
-          "Nothing -- TypeError",
-          "undefined"
+          "1-1, 1-2, 2-1, 2-2, 3-1, 3-2 — six lines",
+          "1-1, 1-2, 1-3, 2-1, 2-2, 2-3 — six lines",
+          "1-1, 2-2, 3-3 — three lines",
+          "row-col three times"
         ],
-        "answer": 1,
-        "explanation": `items.length` is 0, which is falsy. The `else` branch runs and prints 'empty'. An empty array is truthy as an object, but its `.length` is 0 which is falsy.`,
+        "answer": 0,
+        "explanation": "The outer loop runs three passes. Each pass runs the inner loop start to finish: col is 1 then 2 while row stays put. So the pairs come out 1-1, 1-2, then 2-1, 2-2, then 3-1, 3-2.",
         "sourceIds": [
-          "2-1-8-reading-truthy-falsy"
+          "2-4-25-example-multiplication-table"
         ]
       },
       {
-        "id": "a-t5-template",
+        "id": "a-t5-finally",
         "variant": "a",
-        "source": "2.1.13",
+        "source": "2.5.21 and 2.5.25",
         "question": "What does this program print?",
-        "code": "const name = \"Ada\";\nconst boxes = 4;\nconsole.log(`${name} packed ${boxes * 3} mugs`);",
+        "code": "try {\n  console.log(\"A\");\n  throw new Error(\"boom\");\n} catch (err) {\n  console.log(\"B \" + err.message);\n} finally {\n  console.log(\"C\");\n}\nconsole.log(\"D\");",
         "options": [
-          "${name} packed ${boxes * 3} mugs",
-          "Ada packed 4 * 3 mugs",
-          "Ada packed 43 mugs",
-          "Ada packed 12 mugs"
+          "A, B boom, C, D",
+          "A, D",
+          "A, B boom, D, C",
+          "A, C, B boom, D"
         ],
-        "answer": 3,
-        "explanation": "Backticks make a template literal, and `${...}` runs the expression inside the braces and drops the result into the text. `boxes * 3` is arithmetic, so 12 lands in the sentence.",
+        "answer": 0,
+        "explanation": "A prints, the throw stops the try block, the catch prints B with the message, finally runs either way and prints C, and then the line after the whole statement prints D. finally is for cleanup that runs either way (2.5.21).",
         "sourceIds": [
-          "2-1-13-reading-template-literals"
+          "2-5-21-reading-finally",
+          "2-5-25-lab-predict-try-catch-finally"
         ]
       },
       {
         "id": "b-t1-equality",
         "variant": "b",
-        "source": "2.1.7",
+        "source": "2.1.15",
         "question": "What does this program print?",
-        "code": "const SPEED_LIMIT = 55;\nif (SPEED_LIMIT == false) {\n  console.log('slow');\n} else {\n  console.log('fast');\n}",
+        "code": "let crates = 0;\nif (crates == false) {\n  console.log(\"empty\");\n} else {\n  console.log(\"has crates\");\n}",
         "options": [
-          "slow",
-          "fast",
-          "Nothing -- TypeError",
-          "undefined"
+          "has crates",
+          "empty",
+          "Nothing — the program stops with an error",
+          "false"
         ],
-        "answer": 1,
-        "explanation": `55 == false` converts `false` to 0, so `55 == 0` is false. The `else` branch prints 'fast'.",
+        "answer": 0,
+        "explanation": "Loose equality converts false to the number 0, and 0 == 0 is true, so the if runs and prints empty. Under === the boolean and the number are different types and the comparison is false.",
         "sourceIds": [
           "2-1-7-reading-comparison-operators"
         ]
       },
       {
-        "id": "b-t2-coercion",
+        "id": "b-t2-step",
         "variant": "b",
-        "source": "2.1.7",
+        "source": "2.2.10",
         "question": "What does this program print?",
-        "code": "let a = \"3\" + 4;\nlet b = \"3\" * 4;\nconsole.log(a, b);",
+        "code": "for (let i = 3; i <= 12; i += 3) {\n  console.log(i);\n}",
         "options": [
-          "34 12",
-          "7 12",
-          "34 7",
-          "7 -12"
+          "3 6 9 12 (four lines)",
+          "3 4 5 6 7 8 9 10 11 12 (ten lines)",
+          "12",
+          "Nothing — the loop never runs"
         ],
         "answer": 0,
-        "explanation": "With text on one side, `+` joins rather than adds, so `\"3\" + 4` builds the text `34`. The `*` operator converts `\"3\"` to the number 3 and multiplies, giving 12.",
+        "explanation": "The step is += 3, so i goes 3, 6, 9, 12 and stops before 15. Four lines.",
         "sourceIds": [
-          "2-1-7-reading-operators-coercion"
+          "2-2-6-example-trace-for"
         ]
       },
       {
-        "id": "b-t3-typeof",
+        "id": "b-t3-fallthrough",
         "variant": "b",
-        "source": "2.1.19",
+        "source": "2.3.9",
         "question": "What does this program print?",
-        "code": "let chosen = null;\nconsole.log(typeof chosen);",
+        "code": "let day = \"Sat\";\nswitch (day) {\n  case \"Sat\":\n    console.log(\"Weekend\");\n  case \"Sun\":\n    console.log(\"Sleep in\");\n    break;\n  default:\n    console.log(\"Weekday\");\n}",
         "options": [
-          "undefined",
-          "empty",
-          "object",
-          "null"
-        ],
-        "answer": 2,
-        "explanation": "`typeof null` reports `object`. This is a historical bug in JavaScript: `null` is a primitive value, but `typeof` returns `object` for it.",
-        "sourceIds": [
-          "2-1-19-reading-typeof"
-        ]
-      },
-      {
-        "id": "b-t4-nan",
-        "variant": "b",
-        "source": "2.1.9",
-        "question": "What does this program print?",
-        "code": "let cost = Number(\"ten dollars\");\nlet doubled = cost + cost;\nconsole.log(doubled - 4);",
-        "options": [
-          "16",
-          "-4",
-          "0",
-          "NaN"
-        ],
-        "answer": 3,
-        "explanation": "`Number(\"ten dollars\")` produces `NaN`. Every arithmetic operation with `NaN` produces `NaN`, so it travels through the addition and subtraction unchanged.",
-        "sourceIds": [
-          "2-1-9-example-nan-is-sticky"
-        ]
-      },
-      {
-        "id": "b-t5-template",
-        "variant": "b",
-        "source": "2.1.13",
-        "question": "What does this program print?",
-        "code": "const pet = \"Rex\";\nconst pairs = 2;\nconsole.log(`${pet} has ${pairs * 2} legs`);",
-        "options": [
-          "Rex has 4 legs",
-          "${pet} has ${pairs * 2} legs",
-          "Rex has 2 * 2 legs",
-          "Rex has 22 legs"
+          "Weekend, then Sleep in",
+          "Weekend only",
+          "Weekend, then Weekday",
+          "Nothing — the program stops with an error"
         ],
         "answer": 0,
-        "explanation": "Backticks make a template literal, and `${...}` runs the expression inside the braces and drops the result into the text. `pairs * 2` is arithmetic, so 4 lands in the sentence.",
+        "explanation": "Case Sat matches and prints Weekend, but has no break, so it falls through into case Sun and prints Sleep in before Sun's break stops it.",
         "sourceIds": [
-          "2-1-13-reading-template-literals"
+          "2-3-10-reading-fall-through"
+        ]
+      },
+      {
+        "id": "b-t4-nested",
+        "variant": "b",
+        "source": "2.4.25",
+        "question": "What does this program print?",
+        "code": "for (let i = 1; i <= 2; i++) {\n  for (let j = 1; j <= 3; j++) {\n    console.log(i + \"x\" + j);\n}\n}",
+        "options": [
+          "1x1, 1x2, 1x3, 2x1, 2x2, 2x3 — six lines",
+          "1x1, 2x1, 1x2, 2x2, 1x3, 2x3 — six lines",
+          "1x1, 2x2, 3x3 — three lines",
+          "2x3 once"
+        ],
+        "answer": 0,
+        "explanation": "The outer loop runs two passes; each pass runs the inner loop three times. Same six lines as any 2 x 3 nesting: the outer value holds while the inner sweeps.",
+        "sourceIds": [
+          "2-4-25-example-multiplication-table"
+        ]
+      },
+      {
+        "id": "b-t5-finally",
+        "variant": "b",
+        "source": "2.5.21 and 2.5.25",
+        "question": "What does this program print?",
+        "code": "try {\n  console.log(\"W\");\n  throw new Error(\"disk\");\n} catch (err) {\n  console.log(\"X \" + err.message);\n} finally {\n  console.log(\"Y\");\n}\nconsole.log(\"Z\");",
+        "options": [
+          "W, X disk, Y, Z",
+          "W, Z",
+          "W, Z, Y, X disk",
+          "W, Y, X disk, Z"
+        ],
+        "answer": 0,
+        "explanation": "Same trip as every form: try prints W, the throw hands control to catch which prints X with the message, finally prints Y either way, and the line after prints Z.",
+        "sourceIds": [
+          "2-5-21-reading-finally",
+          "2-5-25-lab-predict-try-catch-finally"
         ]
       },
       {
         "id": "c-t1-equality",
         "variant": "c",
-        "source": "2.1.7",
+        "source": "2.1.15",
         "question": "What does this program print?",
-        "code": "const COUNT = 0;\nif (COUNT == false) {\n  console.log('zero');\n} else {\n  console.log('non-zero');\n}",
+        "code": "const COPIES = 0;\nif (COPIES == false) {\n  console.log(\"none\");\n} else {\n  console.log(\"some\");\n}",
         "options": [
-          "zero",
-          "non-zero",
-          "Nothing -- TypeError",
-          "undefined"
+          "none",
+          "some",
+          "Nothing — the program stops with an error",
+          "0"
         ],
         "answer": 0,
-        "explanation": "`0 == false` is true because `false` converts to 0. The program prints 'zero'. This is the loose-equality trap.",
+        "explanation": "false converts to the number 0, and 0 == 0 is true, so the if runs. A const declared with 0 is still a number, and 0 == false is the loose-equality trap.",
         "sourceIds": [
           "2-1-7-reading-comparison-operators"
         ]
       },
       {
-        "id": "c-t2-coercion",
+        "id": "c-t2-step",
         "variant": "c",
-        "source": "2.1.7",
+        "source": "2.2.10",
         "question": "What does this program print?",
-        "code": "let a = \"8\" + 2;\nlet b = \"8\" - 2;\nconsole.log(a, b);",
+        "code": "for (let i = 5; i <= 20; i += 5) {\n  console.log(i);\n}",
         "options": [
-          "82 6",
-          "10 6",
-          "82 8",
-          "10 -6"
+          "5 10 15 20 (four lines)",
+          "5 6 7 8 ... 20 (sixteen lines)",
+          "20",
+          "Nothing — the loop never runs"
         ],
         "answer": 0,
-        "explanation": "`\"8\" + 2` joins to `\"82\"`. The `-` operator converts `\"8\"` to the number 8 and subtracts 2, giving 6.",
+        "explanation": "The step is += 5, so i goes 5, 10, 15, 20 and stops before 25. Four lines.",
         "sourceIds": [
-          "2-1-7-reading-operators-coercion"
+          "2-2-6-example-trace-for"
         ]
       },
       {
-        "id": "c-t3-typeof",
+        "id": "c-t3-fallthrough",
         "variant": "c",
-        "source": "2.1.19",
+        "source": "2.3.9 and 2.3.11",
         "question": "What does this program print?",
-        "code": "console.log(typeof undefined, typeof NaN);",
+        "code": "let size = 1;\nswitch (size) {\n  case 1:\n    console.log(\"Small\");\n  case 2:\n    console.log(\"Medium\");\n    break;\n  default:\n    console.log(\"Large\");\n}",
         "options": [
-          "undefined NaN",
-          "undefined number",
-          "undefined object",
-          "undefined undefined"
-        ],
-        "answer": 1,
-        "explanation": "`typeof undefined` is `\"undefined\"`. `NaN` is of type `number`, so `typeof NaN` is `\"number\"`.",
-        "sourceIds": [
-          "2-1-19-reading-typeof"
-        ]
-      },
-      {
-        "id": "c-t4-nan",
-        "variant": "c",
-        "source": "2.1.9",
-        "question": "What does this program print?",
-        "code": "let age = Number(\"twenty\");\nlet nextYear = age + 1;\nconsole.log(nextYear + 10);",
-        "options": [
-          "NaN",
-          "11",
-          "1",
-          "11"
+          "Small, then Medium",
+          "Small only",
+          "Small, then Large",
+          "Nothing — the program stops with an error"
         ],
         "answer": 0,
-        "explanation": "`Number(\"twenty\")` produces `NaN`. Arithmetic with `NaN` always produces `NaN`.",
+        "explanation": "Case 1 matches and prints Small, then falls through into case 2 (no break on case 1) and prints Medium before case 2's break stops it. Default never runs.",
         "sourceIds": [
-          "2-1-9-example-nan-is-sticky"
+          "2-3-10-reading-fall-through",
+          "2-3-11-example-missing-break"
         ]
       },
       {
-        "id": "c-t5-template",
+        "id": "c-t4-nested",
         "variant": "c",
-        "source": "2.1.13",
+        "source": "2.4.25",
         "question": "What does this program print?",
-        "code": "const city = \"Chico\";\nconst days = 5;\nconsole.log(`${city} in ${days + 2} days`);",
+        "code": "for (let i = 1; i <= 3; i++) {\n  for (let j = 1; j <= 2; j++) {\n    console.log(i * j);\n}\n}",
         "options": [
-          "Chico in 52 days",
-          "Chico in 7 days",
-          "Chico in 5 + 2 days",
-          "Chico in 5 + 2 days"
+          "1, 2, 2, 4, 3, 6 — six lines",
+          "1, 2, 3 — three lines",
+          "1, 4, 9 — three lines",
+          "6"
         ],
-        "answer": 1,
-        "explanation": "Backticks make a template literal. `days + 2` is arithmetic (5 + 2 = 7), so `Chico in 7 days` prints.",
+        "answer": 0,
+        "explanation": "Same trip as the other forms: outer 3 passes, inner 2 passes, six prints. The body computes i * j, so the values differ from form a, but the trip — one inner sweep per outer pass — is identical.",
         "sourceIds": [
-          "2-1-13-reading-template-literals"
+          "2-4-25-example-multiplication-table"
+        ]
+      },
+      {
+        "id": "c-t5-finally",
+        "variant": "c",
+        "source": "2.5.25 and 2.5.21",
+        "question": "What does this program print?",
+        "code": "try {\n  console.log(\"P\");\n  throw new Error(\"late\");\n} catch (err) {\n  console.log(\"Q \" + err.message);\n} finally {\n  console.log(\"R\");\n}\nconsole.log(\"S\");",
+        "options": [
+          "P, Q late, R, S",
+          "P, S",
+          "P, R, Q late, S",
+          "P, S, R, Q late"
+        ],
+        "answer": 0,
+        "explanation": "P prints, the throw jumps to catch, Q prints with the message, finally prints R whether or not there was an error, and the line after the statement prints S.",
+        "sourceIds": [
+          "2-5-25-lab-predict-try-catch-finally",
+          "2-5-21-reading-finally"
         ]
       }
     ]

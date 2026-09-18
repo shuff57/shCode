@@ -1,7 +1,7 @@
 {
   "id": "2-7-5-ch2-individual-pa-write-the-steps",
   "title": "2.7.5 Individual PA Part 5: Write the Steps",
-  "description": "One problem, pick one of three, write the JavaScript that solves it. Nested loop, branch, and break/continue required. AI-graded, summative.",
+  "description": "One problem, pick one of three, write the JavaScript it describes: a nested loop, a branch, a break or continue, a guard. One attempt, no Run button.",
   "type": "assignment",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -14,48 +14,39 @@
   ],
   "points": 0,
   "contentFile": "content.md",
-  "grading": {
-    "totalPoints": 0,
-    "passingScore": 0,
-    "allowLateSubmit": true
-  },
   "steps": [],
   "requirements": [],
   "assignmentCode": "A2.7.5",
   "aiGrader": {
     "summative": true,
-    "rubricTitle": "Chapter 2 Individual PA Part 5: Write the Steps",
+    "rubricTitle": "Chapter 2 Individual PA, Part 5: Write the Steps",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "The student writes a complete JavaScript program (no functions, no arrays, no objects) that solves one of three problems. The program must contain: a nested loop, a branch (if/else if/else), a break or continue, and a try/catch guard. The student picks one of three problems from a menu. The program reads inputs from hardcoded constants (no user input), computes a result, and reports it with console.log. The AI grader evaluates:\n\n1. Correctness: the program produces the correct output for the given test cases (provided in the rubric).\n2. Structure: contains a nested loop (for/while inside for/while), an if/else if/else branch, at least one break or continue, and a try/catch around the risky input.\n3. Documentation: header comment with Problem, Partners (N/A for individual), Date; UPPER_SNAKE_CASE const for the limit; camelCase variables; at least one template literal console.log; typeof reported for one value.\n4. No functions, no arrays, no objects. Iteration only from counters or string indexing (word[i], word.length).\n\nRubric (20 points total):\n- 8 pts: §2.1 branch (if/else if/else with && or ||)\n- 12 pts: §2.4 loop and nesting (nested loop with break/continue inside)\n\nThe AI should award partial credit for partial structure (e.g., has nested loop but missing break).",
+    "prompt": "The student submitted one JavaScript program answering one of three Part 5 problems (Seat Map, Word Grid, Fuel Log). Mark the CODE against the three criteria below. This is a summative, one-attempt item: mark what is on the paper, do not ask the student to run it.\n\nThe Chapter 2 ceiling: no functions, no arrays, no objects. Iteration only from loop counters and string indexing (word[i], word.length). A program that uses any of those loses the criterion that needed it and the feedback says which line crossed the ceiling.\n\nCriterion 1 -- the branch (8 of the 20). An if / else if / else chain, with at least one compound condition using && or ||. Full credit: the chain resolves the problem's decision and the compound condition is meaningful, not (true && true). Partial: an if/else chain with a compound condition but no else-if rung, or a full chain where every condition is single. Withhold: no branch, or branches only.\n\nCriterion 2 -- the loop and its nesting (12 of the 20). A loop inside a loop, both of which run. Full credit: two nested for/while forms, the inner one completing a full sweep per outer pass, with the bounds consistent with the problem's inputs. Partial credit ladder: 9 for a correct nest with an off-by-one in one bound; 6 for two loops that do not actually nest; 3 for one loop only where two are required. Withhold: no loop.\n\nCriterion 3 -- loop control (counted inside criterion 2, not separately). At least one break or continue inside the loop that changes what would otherwise run: a continue past blocked seats or spaces, a break the moment the group size is met or the word ends. A control keyword sitting after the last statement of its loop body is decorative and earns nothing by itself.\n\nAlso check, without changing the 20: the header comment names Problem and Date (Partners is N/A on an individual paper); the limit is a const in UPPER_SNAKE_CASE; at least one template-literal console.log reports the result; typeof is reported for one value. Missing these are feedback lines, not point deductions -- the 20 points are the branch and the nested loop, and saying otherwise would re-weight the paper.",
     "rubric": [
       {
+        "id": "branch",
+        "title": "The branch: if / else if / else with && or ||",
+        "description": "Full credit 8: a full chain resolving the problem's decision, at least one compound condition. Partial 5: chain present, conditions all simple. Partial 3: single if/else only. Withhold: no branch.",
+        "points": 8
+      },
+      {
         "id": "nested-loop",
-        "title": "Contains a nested loop",
-        "description": "The program has a for/while loop inside another for/while loop. The outer loop iterates a range; the inner loop iterates a different range or walks a string.",
-        "points": 8
+        "title": "The nested loop, genuinely nested and genuinely running",
+        "description": "Full credit 9: two nested loop forms that both execute, bounds consistent with the problem. Partial 6-7: off-by-one in a bound or the inner sweep does not complete. Partial 3: two loops that do not nest. Withhold: no loop.",
+        "points": 9
       },
       {
-        "id": "branch-with-logic",
-        "title": "Has an if/else if/else with && or ||",
-        "description": "The program contains an if/else if/else chain with at least one compound condition using && or ||.",
-        "points": 8
-      },
-      {
-        "id": "break-or-continue",
-        "title": "Uses break or continue inside the loop",
-        "description": "The nested loop contains at least one break or continue that is not merely decorative (it affects control flow).",
-        "points": 4
+        "id": "loop-control",
+        "title": "break or continue that changes what runs",
+        "description": "Full credit 3: a break or continue inside the nest that the problem's logic requires (skip blocked seats, stop at group size, break at word end). Partial 1: present but decorative. Withhold: none, or only switch-case breaks counted as loop control.",
+        "points": 3
       }
-    ],
-    "summative": true
+    ]
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  },
-  "steps": [],
-  "requirements": [],
-  "assignmentCode": "A2.7.5"
+  }
 }
