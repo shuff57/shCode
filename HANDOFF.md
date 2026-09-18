@@ -1,3 +1,25 @@
+# Handoff — 2026-09-18 · Chapter 2 assessment block is built; two steps need the teacher's own session
+
+The Chapter 2 assessments (2.6 Group PA, Sep 28; 2.7 Individual Test, Sep 30) are
+built, gated and student-tested. All 8 lesson folders ship, every targeted gate is
+green, and the block went through the three cs-student lenses (record:
+`.gauntlet/ch2-assessment-loop.json`, transcripts under `.gauntlet/lens-transcripts/`).
+The full detail is in the gauntlet record; the two steps this box could not do:
+
+1. **Open-date locks.** `node scripts/set-ch2-open-dates.mjs` writes the module-scoped
+   `class_open_dates` rows (2.6 → Sep 28 00:00, 2.7 → Sep 30 00:00, America/Los_Angeles).
+   Needs `CLOUDFLARE_API_TOKEN` (this box has none). Run it where wrangler is authed,
+   then verify with the SELECT it prints.
+
+2. **Deploy.** `bun run build` exits 0 and the leak checks pass on `out/`; deploy with
+   `npx wrangler pages deploy out --project-name shcode --branch cs-3d`.
+
+**The old section below (npm test red) is still true and unchanged** — both causes
+still live in `../reshape-cad`, and the six pre-existing grader-tolerance refusals
+(2-4-4/2-4-8/2-4-12/2-4-19/2-4-23/3-4-19) predate and are untouched by this block.
+
+---
+
 # Handoff — 2026-09-09 · shCode's `npm test` is red, and both causes live in ../reshape-cad
 
 `npm test` is a single `&&` chain, so it stops at the first red. Two scripts
