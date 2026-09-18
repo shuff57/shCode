@@ -281,7 +281,18 @@ app.prepare().then(() => {
   const devSubmissions = [];
   server.get('/api/lesson-submissions', (req, res) => {
     const lessonId = req.query.lessonId;
-    res.json({ submissions: devSubmissions.filter((s) => !lessonId || s.lessonId === lessonId) });
+    // Filter by the requesting student, like the production route
+    // (functions/api/lesson-submissions/index.ts) does. Without this, one
+    // student's summative submission is served to every other dev identity
+    // and WrittenGrader's server-side already-submitted lock goes global —
+    // measured 2026-09-18: a student who never submitted 2.7.2 saw "Submitted"
+    // because adv-attack's answer was in the list.
+    const me = devIdentity(req);
+    res.json({
+      submissions: devSubmissions.filter(
+        (s) => (!lessonId || s.lessonId === lessonId) && s.studentEmail === me,
+      ),
+    });
   });
   server.post('/api/lesson-submissions', express.json({ limit: '1mb' }), (req, res) => {
     const body = req.body || {};

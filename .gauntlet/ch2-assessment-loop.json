@@ -1,0 +1,52 @@
+{
+  "loop": "chapter 2 assessment block (2.6 Group PA + 2.7 Individual Test): first assessment unit ever run through the three cs-student lenses",
+  "started": "2026-09-18",
+  "closed": "2026-09-18",
+  "bar": "beginner finishes every lesson unaided from lesson text alone; moderate solves the problems honestly within the taught ceiling; advanced breaks integrity and pace; fresh critics read the transcripts",
+  "lens_evidence": "session scratchpad lens-beginner/, lens-moderate/, lens-advanced/ (Playwright transcripts, screenshots, FINDINGS.md per lens); dev server DEV_ROLE=student, one dev_student cookie per lens",
+  "rounds": {
+    "r1": "5 CRITICAL: 2.7.3 ships no starter (lib/lessons.ts reads files from disk, never lesson.json) \u2014 editor opened content.md, garbage passed all 5 checks via redacted patterns; /module/2.6+/2.7 leak the full teacher doc in the RSC payload behind TeacherOnly (2.7.3 answer-key table included); two 2.7.1 answer keys wrong (a-t3, b-t1) \u2014 caught by executing every snippet; 2.7.2/2.7.5 cross-student submission leak in the dev stub (server.js filtered by lessonId only). MAJOR: 2.6.2 checklist gameable; two-point/three-way point splits in 2.7.5; switch (true) in the 2.7.5 reference; check-count text (ten/eight vs 11); 2.7.4 text claimed no in-app checker; 2.7.1 quiz reopenable by deleting the draft (M7)."
+  },
+  "fixes_r1": [
+    "2-7-3 starter files written to disk (index.html, style.css, script.js); content.md rewritten to match; steps synced",
+    "2-7-3 r3/r4 patterns made position-sensitive (fail on the buggy starter, pass on the fix)",
+    "2.7.1 a-t3 -> key 1, b-t1 -> key 1; all 15 traces executed against their keys, all agree",
+    "module teacher doc moved off the static page: scripts/generate-module-docs.mjs + /api/module-doc/[id] (role-gated) + ModuleTeacherPanel; page embeds nothing",
+    "check-quiz-key-leak.mjs now scans all 37 built module pages for teacher-doc probes",
+    "2-6-2 r8 demands break AND continue; r9 demands three cases + default; reference solution rewritten with a real guard; gameable program now refused",
+    "2-7-5 point split unified 8/9/3 across prompt/rubric/answer key; reference no longer uses switch (true)",
+    "2-6-1/2-7-4 text synced to the 11 checks the checker actually runs; 2.7.4 'checker not used' claim removed",
+    "2-6-3 heading renumber (two Part 3s -> Part 3/4/5/6, matching the prompt's six parts)",
+    "dev lesson-submissions stub now filters by student (prod was already correct)",
+    "check-count text, 2.6.2 gameability residual, and quiz-draft-reopen (M7) recorded in module docs"
+  ],
+  "left_open": [
+    "2.7.1 quiz draft-deletion reopen (M7): QuizView locks on localStorage+draft, not submissions; WrittenGrader was fixed for this (a6006dd5) but QuizView was not \u2014 needs the same fetchSubmissions treatment",
+    "2.6.2 checklist is syntax-presence only; gameable beyond the tightened r9 \u2014 the demo writeup is the real defense",
+    "no-hexagon chart passes all 11 checks (module docs say so); min-preparation floor not built this cycle",
+    "unreleased shapes (double-rail, connector, note) offered in the 2.6.1/2.7.4 palette",
+    "2.7.5 12-min budget unrealistic (strong student 14-18); 2.7.1 over-budgeted by ~4 min \u2014 reallocation deferred",
+    "module quizzes legitimately marked quiz.summative drag nothing now that the gate keys on N.7 test units, but the two module quizzes (2-1-39, 1-3-21) ship without marking \u2014 teacher may want formative marking back",
+    "pre-existing grader-tolerance refusals on 2-4-4/2-4-8/2-4-12/2-4-19/2-4-23/3-4-19 (6 lessons, predates this block)",
+    "open-date locks not set: needs teacher's Cloudflare auth (scripts/set-ch2-open-dates.mjs is ready)",
+    "deploy not run: needs teacher's wrangler session"
+  ],
+  "final": "12 of 15 gates green before the fix round; 15/15 + module-leak scan + solution-leak green after. Beginner lens: 5 PASS / 3 FAIL (all three FAILs fixed). Advanced lens: 7 FAIL / 1 PASS; every named defect fixed or recorded.",
+  "checks_owned": [
+    "scripts/check-summative-parts.mjs GREEN (10 parts / 2 test units, keyed on N.7 test-unit names)",
+    "scripts/check-quiz-key-leak.mjs OK \u2014 21 summative pages + 37 module pages, no answer keys",
+    "scripts/check-solution-leak.mjs OK \u2014 182 solution.js + 16 solution/",
+    "scripts/check-diagram-solutions.mjs OK \u2014 11 reference charts all green",
+    "scripts/check-starters.mjs every reference full, every starter not",
+    "scripts/test-quiz.mjs ALL PASS (24 quizzes / 189 questions)",
+    "scripts/test-quiz-variant.mjs ALL PASS",
+    "scripts/test-plan-seed.mjs OK",
+    "scripts/test-runner-timeout.mjs ALL PASS (incl. summative no-diagnosis contract)",
+    "scripts/audit-grader-tolerance.mjs --gate: 2-7-3 clean; 6 pre-existing refusals unchanged",
+    "tsc --noEmit exit 0",
+    "npm run build exit 0"
+  ],
+  "gate": "15/15 targeted gates + module-leak scan + solution-leak green; build exit 0",
+  "deployment": "not deployed \u2014 needs the teacher's wrangler session (npx wrangler pages deploy out --project-name shcode --branch cs-3d)",
+  "pushed": false
+}
