@@ -392,9 +392,20 @@ export default function LessonWorkspace({
     };
 
     const killer = setTimeout(() => {
+      // On a summative part the stop message reports the stop only. The
+      // practice-path message names the repair ("check that the value in the
+      // condition actually changes"), which on 2.7.3's while-continue bug is
+      // the answer, handed over by the platform on the one Part C item that
+      // can trigger it — the same giveaway the 2026-09-02 checklist narrowing
+      // stripped out of Part C's hints. The runtimeError banner keeps the
+      // diagnosis on both paths: it is the teacher's screen, and the paper
+      // locks on submit anyway.
+      const summative = lesson.grading?.summative === true;
       logs.push({
         type: 'error',
-        message: `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
+        message: summative
+          ? `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped.`
+          : `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
         timestamp: time(),
       });
       setRuntimeError('Stopped: your code ran too long (likely an infinite loop)');

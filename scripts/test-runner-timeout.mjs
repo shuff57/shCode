@@ -108,5 +108,30 @@ console.log('console runner: terminates runaway code\n');
     JSON.stringify(r.logs.map((l) => l.message)));
 }
 
+// 6. On a summative part, the stop message must not diagnose. 2.7.3's bug 4 is a
+// while-continue that never advances; the practice-path message names the repair
+// ("check that the value in the condition actually changes"), which is the same
+// giveaway the 2026-09-02 checklist narrowing stripped out of Part C — reappearing
+// one layer down, from the platform. The stop itself must still report.
+{
+  const lesson = JSON.parse(readFileSync(path.join(root, 'lessons', '2-7-3-ch2-individual-pa-find-and-fix', 'lesson.json'), 'utf8'));
+  check('2-7-3 is grading-summative (the fixture this guards)', lesson.grading?.summative === true,
+    JSON.stringify(lesson.grading));
+  const componentText = readFileSync(path.join(root, 'components', 'LessonWorkspace.tsx'), 'utf8');
+  const DIAGNOSIS = 'check that the value in the condition actually changes';
+  const stillRunning = componentText.match(/`[^`]*still running[^`]*`/g) ?? [];
+  check('the component composes a still-running stop message', stillRunning.length >= 1,
+    'no still-running template found in LessonWorkspace.tsx');
+  const guarded = /const summative\s*=\s*lesson\.grading\?\.summative\s*===\s*true/.test(componentText);
+  check('every stop message that carries the diagnosis is behind a summative guard',
+    stillRunning.every((tpl) => !tpl.includes(DIAGNOSIS) || guarded),
+    'a diagnosis-carrying message exists with no summative guard in the component');
+  const diagnosisTemplate = stillRunning.find((tpl) => tpl.includes(DIAGNOSIS));
+  const cleanTemplate = stillRunning.find((tpl) => !tpl.includes(DIAGNOSIS));
+  check('a summative variant of the stop message exists and omits the diagnosis',
+    guarded && !!diagnosisTemplate && !!cleanTemplate,
+    'no diagnosis-free stop message beside the diagnosed one, or no summative guard');
+}
+
 console.log(`\n${failures === 0 ? 'ALL PASS' : `${failures} FAILED`}  (component timeout is ${TIMEOUT}ms, log cap ${MAX_LOGS})`);
 process.exit(failures === 0 ? 0 : 1);
