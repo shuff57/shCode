@@ -1,9 +1,10 @@
 ## Chapter 2 Individual PA — Part 4 of 5: Chart It
 
 **This is the design part of the test, and you are doing it alone.** One problem, pick
-one of three, draw the flowchart, **10 points**, about **7 minutes**. The chart is
-hand-drawn on paper, then you submit a photo/scan. The in-app checker is **not** used
-here -- the teacher grades by eye against the same eight checks.
+one of three, draw the flowchart, **10 points**, about **7 minutes**. You draw the chart in the editor below, press
+**Check my diagram** as many times as you like, and submit. The checker judges
+whether your drawing is a legal flowchart -- never whether it answers the problem.
+Whether the loop is right is for you to read; the teacher grades the submitted chart.
 
 **Five shapes are legal on this chart** (Appendix D §D.2): oval, rectangle, diamond,
 parallelogram, and the **loop-setup hexagon** (released at §2.2). The double-rail
@@ -54,10 +55,10 @@ a `switch` to classify the outcome.
 
 ### What "green" means here
 
-The teacher checks your paper chart against the same eight structural checks the app
-uses. All eight must pass. A chart with no hexagon fails even if it is otherwise
-perfect. A chart with a tight `while` (diamond → body → back to diamond, no hexagon)
-passes the eight checks but will be graded down on the rubric -- the hexagon is the
+Eleven structural checks run, the same ones the whole course uses. A legal chart
+clears them all -- but a chart with no loop in it clears them too, and the lesson
+text cannot see that. Draw the loop; the hexagon is the point of the chapter. A chart with a tight `while` (diamond → body → back to diamond, no hexagon)
+passes all eleven checks (the rules judge legality, not chapter membership) but will be graded down on the rubric -- the hexagon is the
 point of this chapter.
 
 ### Before you submit

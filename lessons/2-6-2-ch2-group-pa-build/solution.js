@@ -1,97 +1,72 @@
-// Chapter 2 Group PA Part 2: Build It — Reference Solution (Locker Sweep)
+// Chapter 2 Group PA, Part 2 of 3: Build It.
 // Problem: Locker Sweep
 // Partners: Alex Chen, Jamie Rivera
 // Date: 2026-09-28
 
-// ========== PSEUDOCODE FROM CHART ==========
+// STEP 1: Inputs and limit.
+const N = 20;
+const BANK_NAME = "North Bank";
+const SKIP_MULTIPLE = 3;
+const REPORT_LOCKER = 7;
+
+// STEP 2: The chart from 2.6.1, as comments.
 // START
-// INPUT n, bankName
-// CONST GOOD_DEAL_LIMIT = 1 // just a placeholder for the limit concept
-// SET openCount = 0
-// SET lastState = ""
+// INPUT n and bankName
 // FOR i = 1 TO n
-//     IF i % 3 === 0 THEN
-//         CONTINUE
-//     END IF
-//     IF i % 2 === 1 THEN
-//         openCount = openCount + 1
-//         lastState = "open"
-//     ELSE
-//         lastState = "closed"
-//     END IF
+//   IF i is a multiple of 3 THEN CONTINUE
+//   FLIP locker i (odd opens, even closes)
 // END FOR
-// IF n % 3 === 0 THEN
-//     lastState = "never touched"
-// END IF
-// SWITCH lastState
-// CASE "open":
-//     PRINT "Locker " + n + " is open"
-//     BREAK
-// CASE "closed":
-//     PRINT "Locker " + n + " is closed"
-//     BREAK
-// CASE "never touched":
-//     PRINT "Locker " + n + " was skipped"
-//     BREAK
-// END SWITCH
-// PRINT "Open lockers: " + openCount
+// WORK OUT locker 7's final state
+// CLASSIFY open / closed / never touched
+// REPORT the classification and the open count
 // END
 
-// ========== YOUR CODE BELOW ==========
-
-// Problem: Locker Sweep
-// Partners: Alex Chen, Jamie Rivera
-// Date: 2026-09-28
-
-const N = 20;
-const BANK_NAME = "Main Hall";
-const SKIP_MULTIPLE = 3;
-
+// STEP 3: The program under the chart it came from.
+// The guard: the count can be bad (zero, negative, or not a number at all),
+// so it is checked before the loop and thrown on.
 try {
-  if (N < 1) {
-    throw new Error("n must be at least 1");
+  if (typeof N !== "number" || N < 1) {
+    throw new Error("n must be a number that is at least 1");
   }
 
   let openCount = 0;
-  let lastState = "";
+let locker7State = "never touched";
 
-  for (let i = 1; i <= N; i++) {
-    if (i % 3 === 0) {
-      continue;   // the rule skips multiples of 3
-    }
-    // flip: odd lockers open, even closed
+for (let i = 1; i <= N; i++) {
+  if (i % SKIP_MULTIPLE === 0) {
+    continue;
+  }
+  if (i === REPORT_LOCKER) {
     if (i % 2 === 1) {
-      openCount = openCount + 1;
-      lastState = "open";
+      locker7State = "open";
     } else {
-      lastState = "closed";
+      locker7State = "closed";
     }
   }
-
-  // classify one locker's final state with switch
-  let targetLocker = 7;
-  let targetState = "";
-  if (targetLocker % 3 === 0) {
-    targetState = "never touched";
-  } else if (targetLocker % 2 === 1) {
-    targetState = "open";
-  } else {
-    targetState = "closed";
+  if (i % 2 === 1) {
+    openCount = openCount + 1;
   }
+}
 
-  switch (targetState) {
-    case "open":
-      console.log("Locker " + targetLocker + " is open");
-      break;
-    case "closed":
-      console.log("Locker " + targetLocker + " is closed");
-      break;
-    default:
-      console.log("Locker " + targetLocker + " was skipped");
-  }
+switch (locker7State) {
+  case "open":
+    console.log(`Locker ${REPORT_LOCKER} at ${BANK_NAME} is open.`);
+    break;
+  case "closed":
+    console.log(`Locker ${REPORT_LOCKER} at ${BANK_NAME} is closed.`);
+    break;
+  case "never touched":
+    console.log(`Locker ${REPORT_LOCKER} at ${BANK_NAME} was never touched.`);
+    break;
+  default:
+    console.log("Unknown state");
+}
 
-  console.log("Open lockers: " + openCount);
-
+console.log("Open lockers: " + openCount);
+  console.log(typeof locker7State);
 } catch (err) {
   console.log(err.message);
 }
+
+// Early-finisher extension: run the sweep with N = 0 -- the loop never
+// enters, the report still prints, and locker 7 was never touched.

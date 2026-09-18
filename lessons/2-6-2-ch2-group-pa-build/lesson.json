@@ -181,26 +181,26 @@
     },
     {
       "id": "r8",
-      "title": "The loop has a break or another continue",
-      "description": "The loop contains either a break or a second continue, as the brief forces",
+      "title": "A break AND a continue",
+      "description": "The loop contains both a continue and a break, as the brief forces — one skip and one stop.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\b(break|continue)\\s*;",
+      "pattern": "\\bcontinue\\s*;[\\s\\S]*\\bbreak\\s*;|\\bbreak\\s*;[\\s\\S]*\\bcontinue\\s*;",
       "flags": "",
       "points": 0,
-      "hint": "Either break; or a second continue; -- the brief forces one of them.",
+      "hint": "Two keywords, both in the loop: continue for the iterations the rule excludes, break for the moment the outcome is decided.",
       "stripComments": false
     },
     {
       "id": "r9",
       "title": "A switch classifies the outcome",
-      "description": "A switch statement with at least three cases and a default, every case has a break",
+      "description": "A switch with at least three cases (each with a break) and a default.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bswitch\\s*\\([^)]*\\)\\s*\\{[^}]*\\bcase\\b[^}]*\\bbreak\\s*;",
+      "pattern": "switch\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?default\\s*:",
       "flags": "",
       "points": 0,
-      "hint": "switch (state) { case 'open': ... break; case 'closed': ... break; default: ... }",
+      "hint": "Three case labels -- the lesson text says your classification names three outcomes -- every one closed with break, and a default that catches the rest.",
       "stripComments": false
     },
     {

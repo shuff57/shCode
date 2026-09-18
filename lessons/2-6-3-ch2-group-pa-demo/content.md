@@ -29,7 +29,7 @@ than to report the answer: what you printed, what it showed you, and what you ch
 because of it. If nothing was wrong, say what the print confirmed and how you would have
 known if it had been.
 
-### Part 3: Lifecycle
+### Part 4: Lifecycle
 
 Chapter 1 opened with the four framework activities (1.1.6). They are:
 
@@ -43,7 +43,7 @@ Pick **ONE** of those four for each third of this period — the chart (2.6.1), 
 elaboration phase (the chart) comes before the construction phase (the code) in the
 lifecycle, and how that helped your pair avoid a bug.
 
-### Part 4: Chapter 2 checklist
+### Part 5: Chapter 2 checklist
 
 Name the specific section where each of these first appeared in your program:
 
@@ -55,7 +55,7 @@ Name the specific section where each of these first appeared in your program:
 
 If you didn't use one, say so.
 
-### Part 5: Extension — the zero-iteration case
+### Part 6: Extension — the zero-iteration case
 
 If you finished early, you were asked for an input that makes your loop run zero times.
 What was that input, and why did your pair assume it couldn't happen? (Hint: Chapter 1's

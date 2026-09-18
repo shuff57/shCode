@@ -127,7 +127,7 @@
           "Intermediate then Beginner",
           "Nothing — the program stops with an error"
         ],
-        "answer": 0,
+        "answer": 1,
         "explanation": "Case 2 matches and prints Intermediate, but its case has no break, so execution falls through into case 3 and prints Advanced too. Then case 3's break stops it. Two lines, in that order.",
         "sourceIds": [
           "2-3-10-reading-fall-through",
@@ -183,7 +183,7 @@
           "Nothing — the program stops with an error",
           "false"
         ],
-        "answer": 0,
+        "answer": 1,
         "explanation": "Loose equality converts false to the number 0, and 0 == 0 is true, so the if runs and prints empty. Under === the boolean and the number are different types and the comparison is false.",
         "sourceIds": [
           "2-1-7-reading-comparison-operators"

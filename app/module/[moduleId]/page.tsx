@@ -1,9 +1,8 @@
 import Link from 'next/link';
-import DOMPurify from 'isomorphic-dompurify';
 import { listModules, getModule } from '../../../lib/curriculum';
 import { notFound } from 'next/navigation';
 import ModuleLessonsList from '../../../components/ModuleLessonsList';
-import TeacherOnly from '../../../components/TeacherOnly';
+import ModuleTeacherPanel from '../../../components/ModuleTeacherPanel';
 
 export async function generateStaticParams() {
   const modules = await listModules();
@@ -18,8 +17,13 @@ export default async function ModulePage({
   const { moduleId } = await params;
   const result = await getModule(moduleId);
   if (!result) return notFound();
-  const { summary, html, lessons, artifacts } = result;
-  const cleanModuleHtml = DOMPurify.sanitize(html);
+  // The teacher reference is NOT embedded here. On a static export, anything
+  // passed into a client component is serialised into the RSC payload —
+  // TeacherOnly hides display, not shipment, and the full module doc
+  // (including 2.7.3's answer-key table) shipped to every visitor until
+  // 2026-09-18. The doc now travels through the role-gated
+  // /api/module-doc/[id] and is fetched client-side by ModuleTeacherPanel.
+  const { summary, lessons } = result;
 
   return (
     <main
@@ -47,33 +51,7 @@ export default async function ModulePage({
         <ModuleLessonsList lessons={lessons} moduleId={summary.id} unitId={summary.category ?? null} />
       </section>
 
-      <TeacherOnly>
-        <details>
-          <summary style={{ cursor: 'pointer', opacity: 0.55, fontSize: 14, padding: '8px 0' }}>
-            Module overview (teacher reference)
-          </summary>
-          <article
-            className="prose"
-            style={{ marginTop: 12 }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(cleanModuleHtml) }}
-          />
-        </details>
-
-        {artifacts.length > 0 && (
-          <details style={{ marginTop: 16 }}>
-            <summary style={{ cursor: 'pointer', opacity: 0.55, fontSize: 14, padding: '8px 0' }}>
-              Legacy module-level markdown files ({artifacts.length})
-            </summary>
-            {artifacts.map((a) => (
-              <div key={a.filename} style={{ marginTop: 12 }}>
-                <h3 style={{ margin: '16px 0 4px' }}>{a.label}</h3>
-                <code style={{ opacity: 0.55, fontSize: 12 }}>{a.filename}</code>
-                <article className="prose" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(a.html) }} />
-              </div>
-            ))}
-          </details>
-        )}
-      </TeacherOnly>
+      <ModuleTeacherPanel moduleId={summary.id} />
 
       <style>{`
         .prose h2 { margin-top: 28px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }

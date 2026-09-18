@@ -13,6 +13,12 @@
 // -- naming every accepted answer -- was still sitting in the built page,
 // because the `config` prop still carried the untouched object.
 // lib/quiz-redact.ts strips both now; this measures that they stayed stripped.
+// Measured 2026-09-18: the SAME class shipped on /module/2.6 and /module/2.7 —
+// the full teacher module doc (with 2.7.3's answer-key table) serialised into
+// the RSC payload behind TeacherOnly, which hides display, not shipment. The
+// module pages now embed nothing; the doc travels through the role-gated
+// /api/module-doc/[id]. This check scans every built module page for teacher-doc
+// probes so the class cannot reopen unnoticed.
 //
 // The check reads the BUILT output, not the source, because the source was
 // never the thing that was wrong.
@@ -209,6 +215,39 @@ if (fs.existsSync(home)) {
   console.log('NOT CHECKED: no out/index.html, so the home page is unverified.');
   if (!allowMissing) failures++;
   unchecked++;
+}
+
+
+// MODULE PAGES — the second surface of the same class. The /module/[id] page
+// rendered the teacher module doc server-side behind <TeacherOnly>, which
+// hides display but not shipment on a static export (measured 2026-09-18 on
+// /module/2.7: 2.7.3's answer-key table and the 2.7.1 trace topics shipped to
+// every visitor). The page now embeds nothing; this scan keeps it that way.
+const moduleHtmlProbes = ['beforTax', 'What View Source gives away'];
+const modulePageRoot = path.join(ROOT, 'out', 'module');
+if (fs.existsSync(modulePageRoot)) {
+  let moduleFailures = 0;
+  let modulePagesChecked = 0;
+  for (const mid of fs.readdirSync(modulePageRoot)) {
+    const page = path.join(modulePageRoot, mid, 'index.html');
+    if (!fs.existsSync(page)) continue;
+    modulePagesChecked++;
+    const html = fs.readFileSync(page, 'utf8');
+    for (const probe of moduleHtmlProbes) {
+      if (html.includes(probe)) {
+        console.log(`FAIL module ${mid}: the built /module/${mid}/ page contains `
+          + `"${probe}" — the teacher module doc ships in the RSC payload. `
+          + 'The page must embed nothing teacher-owned; see ModuleTeacherPanel.tsx and scripts/generate-module-docs.mjs.');
+        failures++;
+      }
+    }
+  }
+  if (modulePagesChecked > 0) {
+    console.log(`[module pages] ${modulePagesChecked} built module page(s) scanned for teacher-doc probes`);
+  }
+} else {
+  console.log('NOT CHECKED: no out/module pages, so the module-page surface is unverified.');
+  if (!allowMissing) failures++;
 }
 
 console.log(

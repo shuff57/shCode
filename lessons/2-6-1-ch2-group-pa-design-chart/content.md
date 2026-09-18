@@ -107,10 +107,10 @@ chart that looks finished.
 
 ### What "green in four minutes" means
 
-It means you drew a straight line and called it a design. **Ten checks run**, and two of
+It means you drew a straight line and called it a design. **Eleven checks run**, and two of
 them exist specifically to stop that: your chart needs at least **two** task rectangles
 and at least **one** decision diamond. A chart that passes those and still took four
-minutes is missing the loop setup or the reporting step.
+minutes is missing the loop setup or the reporting step. The checker also demands eight shapes in total -- a straight line with one diamond does not clear it.
 
 ### The part people get wrong
 

@@ -13,7 +13,27 @@
   ],
   "points": 0,
   "contentFile": "content.md",
-  "steps": [],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "Press Run before you change anything. One bug stops the file before it starts, and the console names the line. Start there."
+    },
+    {
+      "id": "s2",
+      "title": "Fix all four",
+      "instructions": "Work the file top to bottom. Two of the four never produce an error message — one prints something untrue, one never finishes at all. Run after every fix."
+    },
+    {
+      "id": "s3",
+      "title": "Name each one",
+      "instructions": "Above each fix, add a comment naming the kind of bug it was: syntax, runtime or logic. A syntax bug means the file is not valid JavaScript. A runtime bug means it is valid, starts running, and then stops. A logic bug means it runs all the way through and tells you something untrue.",
+      "hints": [
+        "The kind is about WHEN it goes wrong, not about how hard it was to find",
+        "Two of these four are the same kind as each other"
+      ]
+    }
+  ],
   "requirements": [
     {
       "id": "r1",
@@ -42,25 +62,25 @@
     {
       "id": "r3",
       "title": "Bug 3 — the savings total is wrong",
-      "description": "The holiday-week skip does not swallow the deposit it is meant to skip.",
+      "description": "The deposit line sits above the skip inside the loop, so only the holiday week is skipped.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+savings\\s*=\\s*0\\s*;[\\s\\S]*for\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*savings\\s*=\\s*savings\\s*\\+\\s*[A-Za-z_$][A-Za-z0-9_$]*",
+      "pattern": "(?:let|const)\\s+savings\\s*=\\s*0\\s*;[\\s\\S]*?for\\s*\\([^)]*\\)\\s*\\{(?![\\s\\S]*?continue[\\s\\S]*?savings\\s*=\\s*savings)[\\s\\S]*?savings\\s*=\\s*savings\\s*\\+\\s*[A-Za-z_$][A-Za-z0-9_$]*[\\s\\S]*?continue\\s*;",
       "flags": "",
       "points": 0,
-      "hint": "Work out on paper what the savings should say for four weeks, then compare. If the two disagree, ask which week the skip actually skips.",
+      "hint": "Run it. The receipt prints 30. Work out on paper what four weeks at ten a week should say, then compare. If the two disagree, ask which week the skip actually skips.",
       "stripComments": false
     },
     {
       "id": "r4",
       "title": "Bug 4 — the loop counter never advances",
-      "description": "The counter increments on every round, including the ones that continue.",
+      "description": "The counter increments on every round, including the rounds that continue.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\([\\s\\S]*?\\)\\s*\\{[\\s\\S]*?\\bi\\s*(?:\\+\\+|\\+=\\s*1|=\\s*i\\s*\\+\\s*1)",
+      "pattern": "while\\s*\\([\\s\\S]*?\\)\\s*\\{[\\s\\S]*?\\bi\\s*(?:\\+\\+|\\+=\\s*1|=\\s*i\\s*\\+\\s*1)\\s*;[\\s\\S]*?continue\\s*;",
       "flags": "",
       "points": 0,
-      "hint": "In a while loop, continue jumps past the increment. The update must run on EVERY pass -- move it above the continue, or restructure as a for.",
+      "hint": "Run it. The walk never reaches its stopping point. In a while loop, what does continue jump past?",
       "stripComments": false
     },
     {
