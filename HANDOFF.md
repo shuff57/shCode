@@ -1,18 +1,22 @@
 # Handoff — 2026-09-18 · Chapter 2 assessment block is built; two steps need the teacher's own session
 
 The Chapter 2 assessments (2.6 Group PA, Sep 28; 2.7 Individual Test, Sep 30) are
-built, gated and student-tested. All 8 lesson folders ship, every targeted gate is
-green, and the block went through the three cs-student lenses (record:
-`.gauntlet/ch2-assessment-loop.json`, transcripts under `.gauntlet/lens-transcripts/`).
-The full detail is in the gauntlet record; the two steps this box could not do:
+built, gated, student-tested, DEPLOYED and LOCKED (2026-09-18). All 8 lesson folders
+ship, every targeted gate is green, and the block went through the three cs-student
+lenses (record: `.gauntlet/ch2-assessment-loop.json`, transcripts under
+`.gauntlet/lens-transcripts/`).
 
-1. **Open-date locks.** `node scripts/set-ch2-open-dates.mjs` writes the module-scoped
-   `class_open_dates` rows (2.6 → Sep 28 00:00, 2.7 → Sep 30 00:00, America/Los_Angeles).
-   Needs `CLOUDFLARE_API_TOKEN` (this box has none). Run it where wrangler is authed,
-   then verify with the SELECT it prints.
+Done with the teacher's session on 2026-09-18:
+- **Open-date locks set and verified in prod D1** — 6 rows (3 classes × modules 2.6/2.7),
+  every open_at resolves to Sep 28 / Sep 30 00:00 PDT via the -7h check.
+- **Deployed** — https://5138254b.shcode.pages.dev (cs-3d branch alias: shcode.pages.dev).
+  Post-deploy leak probes on /module/2.6 and /module/2.7: beforTax, answer-key-table
+  prose, trace topics — all 0 hits. Lesson pages 200.
 
-2. **Deploy.** `bun run build` exits 0 and the leak checks pass on `out/`; deploy with
-   `npx wrangler pages deploy out --project-name shcode --branch cs-3d`.
+One item still open before Sep 30 (see the gauntlet record's left_open):
+**2.7.1's quiz can be retaken by deleting the draft** — QuizView locks on
+localStorage+draft; WrittenGrader got the server-side treatment in a6006dd5 but
+QuizView did not. Same fix shape, needs doing before the test.
 
 **The old section below (npm test red) is still true and unchanged** — both causes
 still live in `../reshape-cad`, and the six pre-existing grader-tolerance refusals
