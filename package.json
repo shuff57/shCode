@@ -64,7 +64,6 @@
     "@codemirror/state": "^6.6.0",
     "@codemirror/view": "^6.41.0",
     "@lezer/highlight": "^1.2.3",
-    "@shuff57/reshape-engine": "file:../reshape-cad/packages/engine",
     "@shuff57/reshape-kernel": "file:../reshape-cad/packages/kernel",
     "@shuff57/reshape-script": "file:../reshape-cad/packages/script",
     "@shuff57/reshape-sketch": "file:../reshape-cad/packages/sketch",

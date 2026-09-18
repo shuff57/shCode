@@ -140,5 +140,5 @@ if (asCsv) {
       + 'first hand-in was partial -- the LATEST row is the one scored above. A student '
       + 'with several hand-ins and no blanks is worth a look.');
   }
-  console.log('\nEach question is worth 5 points on the Chapter 1 PA: score x 5.');
+  console.log('\nEach question is worth 5 points: score x 5.');
 }

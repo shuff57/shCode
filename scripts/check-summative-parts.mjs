@@ -69,7 +69,12 @@ for (const [unit, entries] of byUnit) {
   const isTestUnit = entries.some(({ lesson }) =>
     gradedBlocks(lesson).some(([, block]) => block && block.summative === true),
   );
-  if (!isTestUnit) continue;
+  // A unit is an assessment unit iff its first token matches N.6 or N.7
+  // (e.g., "2.6", "2.7", "11.6", "11.7"). This avoids marking teaching units
+  // as test units just because they contain a summative module quiz.
+  const unitFirstToken = unit.split(' ')[0];
+  const isAssessmentUnit = /^\d+\.[67]$/.test(unitFirstToken);
+  if (!isAssessmentUnit) continue;
   unitsChecked++;
 
   for (const { dir, lesson } of entries) {

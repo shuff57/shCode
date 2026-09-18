@@ -84,7 +84,7 @@ export interface Requirement {
   tolerance?: number;
 }
 
-interface Grading {
+export interface Grading {
   totalPoints: number;
   passingScore: number;
   allowLateSubmit?: boolean;

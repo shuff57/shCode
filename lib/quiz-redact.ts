@@ -32,7 +32,8 @@
 // never rendered back to the student (see `result && !summative` in
 // WrittenGrader.tsx) even though the server does compute one.
 
-import type { AiGraderConfig, Lesson, QuizConfig, QuizQuestion } from './types';
+import type { AiGraderConfig, Grading, Lesson, QuizConfig, QuizQuestion, Requirement } from './types';
+import type { DiagramConfig } from './diagram-types';
 
 /** True when this quiz's key must not reach the browser. */
 export function isSummativeQuiz(quiz: QuizConfig | undefined): boolean {
@@ -55,6 +56,32 @@ export function redactQuiz(quiz: QuizConfig): QuizConfig {
 /** True when this written item's grading rubric must not reach the browser. */
 function isSummativeAiGrader(cfg: AiGraderConfig | undefined): boolean {
   return !!cfg?.summative;
+}
+
+/** True when this diagram's grader config must not reach the browser. */
+function isSummativeDiagramAiGrader(cfg: DiagramConfig | undefined): boolean {
+  return !!cfg?.summative;
+}
+
+/** True when a lesson's requirements contain the answer key for a summative assessment. */
+function isSummativeGrading(grading: Grading | undefined): boolean {
+  return !!grading?.summative;
+}
+
+/**
+ * The requirements as the student's browser may see them: enough to render
+ * the checklist (`title`, `description`, `hint`, `type`, `status`, etc.),
+ * with `pattern`, `expected`, `testFn`, `expect` removed — those are the
+ * answer key. Returns the input unchanged for a non-summative lesson.
+ */
+function redactRequirements(reqs: Requirement[]): Requirement[] {
+  return reqs.map((r) => ({
+    ...r,
+    pattern: undefined,
+    expected: undefined,
+    testFn: undefined,
+    expect: undefined,
+  }));
 }
 
 /**
@@ -88,6 +115,12 @@ export function redactLessonForClient(lesson: Lesson): Lesson {
   }
   if (isSummativeAiGrader(out.aiGrader)) {
     out = { ...out, aiGrader: redactAiGrader(out.aiGrader as AiGraderConfig) };
+  }
+  if (isSummativeDiagramAiGrader(out.diagram)) {
+    out = { ...out, diagram: { ...out.diagram, aiGrader: redactAiGrader(out.diagram!.aiGrader as AiGraderConfig) } };
+  }
+  if (isSummativeGrading(out.grading)) {
+    out = { ...out, requirements: redactRequirements(out.requirements ?? []) };
   }
   return out;
 }

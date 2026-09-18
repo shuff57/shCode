@@ -100,7 +100,7 @@ mkdirSync(dest, { recursive: true });
 
 // Compiled ONE PACKAGE AT A TIME, each with --rootDir set to that package's
 // own src/, so tsc's per-invocation common-root stays that one directory and
-// the output lands flat in `dest` across all three calls (filenames are
+// the output lands flat in `dest` across all calls (filenames are
 // unique across the whole set -- verified against PACKAGE_SOURCES above).
 // A single combined invocation would instead root at packages/ (the nearest
 // common ancestor across kernel+script+sketch) and nest the output
@@ -108,11 +108,20 @@ mkdirSync(dest, { recursive: true });
 // the flat /reshape/kernel/ paths dynamicImportKernel() hardcodes.
 for (const [pkg, files] of Object.entries(PACKAGE_SOURCES)) {
   const srcDir = path.join(reshapeCadRoot, pkg, 'src');
+  const existingFiles = files.filter((f) => existsSync(path.join(srcDir, f)));
+  const missing = files.filter((f) => !existsSync(path.join(srcDir, f)));
+  if (missing.length) {
+    console.log(`  [${pkg}] SKIPPING missing source files: ${missing.join(', ')}`);
+  }
+  if (existingFiles.length === 0) {
+    console.log(`  [${pkg}] No source files found, skipping package`);
+    continue;
+  }
   execFileSync(
     process.execPath,
     [
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      ...files.map((f) => path.join(srcDir, f)),
+      ...existingFiles.map((f) => path.join(srcDir, f)),
       '--outDir', dest,
       '--rootDir', srcDir,
       '--module', 'es2022',

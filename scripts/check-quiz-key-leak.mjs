@@ -51,6 +51,7 @@ for (const dir of fs.readdirSync(LESSONS)) {
   try { lesson = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { continue; }
   if (lesson.quiz?.summative) summative.push({ dir, lesson, kind: 'quiz' });
   if (lesson.aiGrader?.summative) summative.push({ dir, lesson, kind: 'aiGrader' });
+  if (lesson.grading?.summative) summative.push({ dir, lesson, kind: 'grading' });
 }
 
 if (summative.length === 0) {
@@ -142,7 +143,54 @@ if (fs.existsSync(home)) {
         if (q.explanation && html.includes(q.explanation.slice(0, 40))) {
           hits.push(`the explanation text of ${q.id}`);
           break;
+} else if (kind === 'grading') {
+    // Requirements-based grading: the answer key is in each requirement's
+    // `pattern` (regex), `expected`, `testFn`, or `expect` fields. Any of
+    // these in the built page means the answer key ships to the student.
+    for (const r of lesson.requirements ?? []) {
+      if (r.pattern && r.pattern.length >= 20 && html.includes(r.pattern.slice(0, 40))) {
+        hits.push(`the pattern of requirement "${r.id}"`);
+        break;
+      }
+      if (r.expected && r.expected.length >= 20 && html.includes(r.expected.slice(0, 40))) {
+        hits.push(`the expected value of requirement "${r.id}"`);
+        break;
+      }
+      if (r.testFn && r.testFn.length >= 20 && html.includes(r.testFn.slice(0, 40))) {
+        hits.push(`the test function of requirement "${r.id}"`);
+        break;
+      }
+      if (Array.isArray(r.expect) && r.expect.length) {
+        const expectJson = JSON.stringify(r.expect);
+        if (expectJson.length >= 20 && html.includes(expectJson.slice(0, 40))) {
+          hits.push(`the model expectation of requirement "${r.id}"`);
+          break;
+} else if (kind === 'grading') {
+    for (const r of lesson.requirements ?? []) {
+      if (r.pattern && r.pattern.length >= 20 && html.includes(r.pattern.slice(0, 40))) {
+        hits.push(`the pattern of requirement "${r.id}"`);
+        break;
+      }
+      if (r.expected && r.expected.length >= 20 && html.includes(r.expected.slice(0, 40))) {
+        hits.push(`the expected value of requirement "${r.id}"`);
+        break;
+      }
+      if (r.testFn && r.testFn.length >= 20 && html.includes(r.testFn.slice(0, 40))) {
+        hits.push(`the test function of requirement "${r.id}"`);
+        break;
+      }
+      if (Array.isArray(r.expect) && r.expect.length) {
+        const expectJson = JSON.stringify(r.expect);
+        if (expectJson.length >= 20 && html.includes(expectJson.slice(0, 40))) {
+          hits.push(`the model expectation of requirement "${r.id}"`);
+          break;
         }
+      }
+    }
+  }
+      }
+    }
+  }
       }
     } else {
       const prompt = lesson.aiGrader?.prompt ?? '';
