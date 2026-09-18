@@ -1,0 +1,61 @@
+{
+  "id": "2-7-2-ch2-individual-pa-own-words",
+  "title": "2.7.2 Individual PA Part 2: In Your Own Words",
+  "description": "Three short-answer questions. You explain the concepts in your own words. AI-graded.",
+  "type": "assignment",
+  "estimateMins": 7,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.7 Chapter 2 Individual Performance Assessment",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A2.7.2",
+  "aiGrader": {
+    "summative": true,
+    "rubricTitle": "Chapter 2 Individual PA Part 2: In Your Own Words",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "The student answers three short-answer questions in their own words. Grade each answer against its rubric. Be strict about correctness but generous with phrasing -- students are 14-year-olds explaining concepts in their own words. Do not deduct for minor grammar or spelling. Focus on whether the core idea is correct.\n\nQuestion 1: Explain the difference between `for` and `while` loops. When would you choose one over the other?\nExpected: `for` is for when you know how many iterations (or have a clear range with start, limit, step). `while` is for when you don't know the count in advance and loop until a condition changes. Key distinction: `for` packages the counter setup, condition, and step in the header; `while` only has the condition.",
+      "rubric": [
+        {
+          "id": "for-vs-while",
+          "title": "Explains when to use for vs while",
+          "description": "Student identifies that `for` is for known iteration counts/ranges, `while` for unknown counts/condition-driven loops. Mentions that `for` packages init/condition/step in the header.",
+          "points": 4
+        }
+      ],
+      {
+        "id": "strict-equality",
+        "title": "Explains why `===` is safer than `==`",
+        "description": "Student explains that `===` compares both value AND type (strict equality), while `==` does type coercion which can cause surprising results (e.g., `0 == false` is true). Recommends `===` as the default.",
+        "points": 3
+      },
+      {
+        "id": "throw-explains",
+        "title": "Explains what `throw` does differently from logging an error",
+        "description": "Student explains that `throw` stops the normal flow and jumps to the nearest `catch` (or crashes the program if uncaught), while `console.log` just prints and continues. `throw` is for signaling that something is wrong in a way the program can respond to; logging is just for humans to read.",
+        "points": 3
+      }
+    ],
+    "summative": true
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A2.7.2"
+}

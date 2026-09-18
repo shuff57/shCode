@@ -1,0 +1,272 @@
+{
+  "id": "2-6-2-ch2-group-pa-build",
+  "title": "2.6.2 Group PA Part 2: Build It",
+  "description": "Turn the chart you just passed into a documented, loop-driven program. Ten checks, all of them things Chapter 2 taught. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 42,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.6 Chapter 2 Group Performance Assessment",
+  "preview": "console",
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Fill in the header",
+      "instructions": "The top of script.js has three comment lines waiting: Problem, Partners, Date. Fill all three in. Both partners' names, on the Partners line, before anything else happens."
+    },
+    {
+      "id": "s2",
+      "title": "Copy your pseudocode in as comments",
+      "instructions": "Your chart from 2.6.1, written out one instruction per line as // comments, indented to show what sits inside the loop and the decision. Do this before you write a single line of JavaScript. If a line does not say what you meant on the chart, fix the wording now."
+    },
+    {
+      "id": "s3",
+      "title": "Declare the inputs and the limit",
+      "instructions": "One variable per number your problem takes in, plus one string for the name or label. Descriptive camelCase names -- itemsPerLocker, not p. The limit you are comparing against never changes, so it is a const in UPPER_SNAKE_CASE.",
+      "hints": [
+        "The limit is the fixed number in your problem statement: 2.00, 15.00, 70, or the trip distance",
+        "UPPER_SNAKE_CASE means GOOD_DEAL_LIMIT, not goodDealLimit",
+        "A name someone else can read is worth more marks here than a short one"
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Set up the loop",
+      "instructions": "Write the for-loop header that walks your input range. Use the loop-setup hexagon from your chart as a guide: the initialization, the condition, and the step all go in the hexagon. The body of the loop is everything indented inside it.",
+      "hints": [
+        "for (let i = 1; i <= n; i++) { -- the hexagon in your chart",
+        "If your problem uses a while loop, write the initialization, condition, and update as separate lines"
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Add the continue",
+      "instructions": "Inside the loop, write the continue that skips the iterations your rule excludes. The continue goes BEFORE the flip/accumulate logic so the skipped iterations are truly skipped.",
+      "hints": [
+        "if (i % 3 === 0) { continue; } -- skip multiples of 3",
+        "The continue goes at the TOP of the loop body, before any flip logic"
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Do the work inside the loop",
+      "instructions": "After the continue, write the logic that flips, accumulates, or counts. Name your variables for what they represent -- not what they store.",
+      "hints": [
+        "balance = balance + deposit; -- not b = b + d",
+        "flips = flips + 1; -- not f = f + 1"
+      ]
+    },
+    {
+      "id": "s7",
+      "title": "Add the break or continue that the brief forces",
+      "instructions": "One of the four problems forces a break; one forces a continue. Make sure yours is there and clearly marked with a comment.",
+      "hints": [
+        "Savings Run: break when balance >= target",
+        "Coin Drawer: break when drawer is empty",
+        "Locker Sweep and Word Audit: continue skips specific iterations"
+      ]
+    },
+    {
+      "id": "s8",
+      "title": "Add the switch classification",
+      "instructions": "After the loop, write a switch that classifies the final state / outcome / denomination. Every case needs a break. The default handles the remaining case.",
+      "hints": [
+        "switch (state) { case 'open': ... case 'closed': ... default: ... }",
+        "Every case ends with break; default has no break"
+      ]
+    },
+    {
+      "id": "s9",
+      "title": "Guard the bad input",
+      "instructions": "At the top of the program, before the loop, validate the one input that can be bad. Throw an Error with a descriptive message if it fails.",
+      "hints": [
+        "if (n < 1) throw new Error('n must be at least 1');",
+        "The throw goes BEFORE the loop, so the loop never runs on bad input"
+      ]
+    },
+    {
+      "id": "s10",
+      "title": "Report it",
+      "instructions": "At least three console.log calls, and at least one of them a template literal with a ${} in it so the numbers are inside the sentence. Also print typeof for one of your values.",
+      "hints": [
+        "console.log(`Total: ${total}`); -- template literal",
+        "console.log(typeof flips); -- prints the type"
+      ]
+    },
+    {
+      "id": "s11",
+      "title": "Read it back to each other",
+      "instructions": "Swap the keyboard. The partner who did not type reads the program out loud line by line while the other checks it against the chart. Every shape on the chart should appear once, in order. Fix what does not match, then run three sets of numbers through it -- you will need them for the demo writeup."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Both partners named in the header",
+      "description": "The Partners line at the top of script.js has names on it",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\S\\n]*Partners:[^\\S\\n]*\\S+",
+      "flags": "i",
+      "points": 0,
+      "hint": "Line 3 of script.js: // Partners: -- put both names after the colon.",
+      "stripComments": false
+    },
+    {
+      "id": "r2",
+      "title": "The problem is named in the header",
+      "description": "The Problem line says which of the four menu problems this is",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\S\\n]*Problem:[^\\S\\n]*\\S+",
+      "flags": "i",
+      "points": 0,
+      "hint": "Line 2 of script.js: // Problem: -- Locker Sweep, Word Audit, Savings Run, or Coin Drawer.",
+      "stripComments": false
+    },
+    {
+      "id": "r3",
+      "title": "The limit is an UPPER_SNAKE_CASE const",
+      "description": "The number that never changes is declared with const in UPPER_SNAKE_CASE",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "const\\s+[A-Z][A-Z0-9_]{2,}\\s*=",
+      "flags": "",
+      "points": 0,
+      "hint": "const GOOD_DEAL_LIMIT = 2.00; -- capitals and underscores, and const rather than let, because it never changes.",
+      "stripComments": false
+    },
+    {
+      "id": "r4",
+      "title": "A string variable is declared",
+      "description": "One variable holds text -- the name or label your problem talks about",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`$]*`)",
+      "flags": "",
+      "points": 0,
+      "hint": "Something like const pizzeriaName = \"Tony's\"; -- quotes make it a string.",
+      "stripComments": false
+    },
+    {
+      "id": "r5",
+      "title": "A number variable is declared",
+      "description": "At least one variable holds a number typed straight in",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*-?\\d",
+      "flags": "",
+      "points": 0,
+      "hint": "let sliceCount = 8; -- no quotes around a number, or it is a string.",
+      "stripComments": false
+    },
+    {
+      "id": "r6",
+      "title": "The loop uses a for or while",
+      "description": "A for or while loop is present and walks the input range",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(for|while)\\s*\\([^)]*\\)\\s*\\{",
+      "flags": "",
+      "points": 0,
+      "hint": "for (let i = 1; i <= n; i++) { or while (amount > 0) {",
+      "stripComments": false
+    },
+    {
+      "id": "r7",
+      "title": "The loop has a continue",
+      "description": "A continue statement appears inside the loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bcontinue\\s*;",
+      "flags": "",
+      "points": 0,
+      "hint": "continue; -- exactly that word, inside the loop body.",
+      "stripComments": false
+    },
+    {
+      "id": "r8",
+      "title": "The loop has a break or another continue",
+      "description": "The loop contains either a break or a second continue, as the brief forces",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(break|continue)\\s*;",
+      "flags": "",
+      "points": 0,
+      "hint": "Either break; or a second continue; -- the brief forces one of them.",
+      "stripComments": false
+    },
+    {
+      "id": "r9",
+      "title": "A switch classifies the outcome",
+      "description": "A switch statement with at least three cases and a default, every case has a break",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bswitch\\s*\\([^)]*\\)\\s*\\{[^}]*\\bcase\\b[^}]*\\bbreak\\s*;",
+      "flags": "",
+      "points": 0,
+      "hint": "switch (state) { case 'open': ... break; case 'closed': ... break; default: ... }",
+      "stripComments": false
+    },
+    {
+      "id": "r10",
+      "title": "The bad input is guarded with throw",
+      "description": "A throw statement guards the bad input before the loop runs",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "throw\\s+new\\s+Error\\s*\\([^)]*\\)",
+      "flags": "",
+      "points": 0,
+      "hint": "if (n < 1) throw new Error('n must be at least 1'); -- before the loop.",
+      "stripComments": false
+    },
+    {
+      "id": "r11",
+      "title": "A template literal reports the result",
+      "description": "At least one console.log uses backticks with ${} inside",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*`[^`]*\\$\\{",
+      "flags": "",
+      "points": 0,
+      "hint": "console.log(`Total: ${total}`); -- backticks, not quotes, and ${} around the variable.",
+      "stripComments": false
+    },
+    {
+      "id": "r12",
+      "title": "typeof is reported for one value",
+      "description": "The program prints the type of at least one of its values",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "typeof\\s+[A-Za-z_$]",
+      "flags": "",
+      "points": 0,
+      "hint": "console.log(typeof flips); -- prints the type of your counter/accumulator.",
+      "stripComments": false
+    },
+    {
+      "id": "r13",
+      "title": "A template literal prints the report",
+      "description": "The final report uses a template literal with the computed values inside the sentence",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*`[^`]*\\$\\{",
+      "flags": "",
+      "points": 0,
+      "hint": "console.log(`Locker 7 is ${state}.`); -- backticks and ${}.",
+      "stripComments": false
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "assignmentCode": "A2.6.2",
+  "planFrom": "2-6-1-ch2-group-pa-design-chart",
+  "planFromLabel": "2.6.1"
+}

@@ -1,0 +1,354 @@
+{
+  "id": "2-7-1-ch2-individual-pa-concepts",
+  "title": "2.7.1 Individual PA Part 1: Concepts and Traces",
+  "description": "Eight questions: three on the ideas of Chapter 2, five where you read a short program and say what it prints. One submission, nothing marked on screen.",
+  "type": "assignment",
+  "estimateMins": 16,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.7 Chapter 2 Individual Performance Assessment",
+  "preview": "quiz",
+  "slos": [
+    "SLO-1",
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A2.7.1",
+  "quiz": {
+    "summative": true,
+    "shuffle": true,
+    "variants": [
+      "a",
+      "b",
+      "c"
+    ],
+    "questions": [
+      {
+        "id": "c1-lifecycle-conditional",
+        "source": "2.1.18",
+        "question": "Chapter 2 added the first conditional to your toolkit. Which statement about `if (x == true)` is correct?",
+        "options": [
+          "It is the preferred way to test a boolean",
+          "It is redundant if x is already a boolean",
+          "It is required because `if (x)` doesn't work",
+          "It is the only way to check for truthiness"
+        ],
+        "answer": 1,
+        "explanation": "If a value is already a boolean, writing `if (x == true)` is redundant. The conditional directly uses the truthiness of x. Use `if (x)` instead.",
+        "sourceIds": [
+          "2-1-18-reading-always-true-condition"
+        ]
+      },
+      {
+        "id": "c2-paradigm-choice",
+        "source": "2.1.18",
+        "question": "You are writing a program that makes a decision based on a comparison. Which paradigm are you using?",
+        "options": [
+          "Functional programming",
+          "Object-oriented programming",
+          "Procedural/structured programming",
+          "Declarative programming"
+        ],
+        "answer": 2,
+        "explanation": "A straight-line script with conditionals and loops that runs top to bottom is procedural/structured programming. Object-oriented needs objects/classes; functional avoids mutable state; declarative describes what, not how.",
+        "sourceIds": [
+          "2-1-18-reading-always-true-condition"
+        ]
+      },
+      {
+        "id": "c3-chart-shape",
+        "source": "2.6.1",
+        "question": "You are drawing a flowchart for a program with a loop that has a decision inside it. Which shapes must appear?",
+        "options": [
+          "Oval, rectangle, diamond only",
+          "Oval, rectangle, diamond, hexagon",
+          "Oval, rectangle, diamond, parallelogram",
+          "Oval, rectangle, diamond, hexagon, parallelogram"
+        ],
+        "answer": 3,
+        "explanation": "The loop requires a hexagon (§2.2), the decision needs a diamond, steps need rectangles, Start/End need ovals, and I/O uses parallelograms. That's five shapes total.",
+        "sourceIds": [
+          "2-6-1-reading-design-chart"
+        ]
+      },
+      {
+        "id": "a-t1-equality",
+        "variant": "a",
+        "source": "2.1.7",
+        "question": "What does this program print?",
+        "code": "let count = 0;\nif (count == false) {\n  console.log('empty');\n} else {\n  console.log('has items');\n}",
+        "options": [
+          "empty",
+          "has items",
+          "Nothing -- the program stops with a TypeError",
+          "undefined"
+        ],
+        "answer": 0,
+        "explanation": "Loose equality `==` converts both sides to numbers. `0 == false` converts `false` to 0, so `0 == 0` is true. The program prints 'empty'.",
+        "sourceIds": [
+          "2-1-7-reading-comparison-operators"
+        ]
+      },
+      {
+        "id": "a-t2-coercion",
+        "variant": "a",
+        "source": "2.1.7",
+        "question": "What does this program print?",
+        "code": "let a = \"10\" + 5;\nlet b = \"10\" - 5;\nconsole.log(a, b);",
+        "options": [
+          "15 5",
+          "105 5",
+          "105 -5",
+          "15 -5"
+        ],
+        "answer": 1,
+        "explanation": "With text on one side, `+` joins rather than adds, so `\"10\" + 5` builds the text `105`. The `-` operator has no meaning for text, so JavaScript converts `\"10\"` to the number 10 and subtracts, giving 5.",
+        "sourceIds": [
+          "2-1-7-reading-operators-coercion"
+        ]
+      },
+      {
+        "id": "a-t3-typeof",
+        "variant": "a",
+        "source": "2.1.19",
+        "question": "What does this program print?",
+        "code": "console.log(typeof null, typeof NaN);",
+        "options": [
+          "null NaN",
+          "object number",
+          "null number",
+          "object NaN"
+        ],
+        "answer": 1,
+        "explanation": "`typeof null` reports `object` (a historical bug). `NaN` stands for Not a Number and is itself of type `number`.",
+        "sourceIds": [
+          "2-1-19-reading-typeof"
+        ]
+      },
+      {
+        "id": "a-t4-truthy",
+        "variant": "a",
+        "source": "2.1.8",
+        "question": "What does this program print?",
+        "code": "let items = [];\nif (items.length) {\n  console.log('has items');\n} else {\n  console.log('empty');\n}",
+        "options": [
+          "has items",
+          "empty",
+          "Nothing -- TypeError",
+          "undefined"
+        ],
+        "answer": 1,
+        "explanation": `items.length` is 0, which is falsy. The `else` branch runs and prints 'empty'. An empty array is truthy as an object, but its `.length` is 0 which is falsy.`,
+        "sourceIds": [
+          "2-1-8-reading-truthy-falsy"
+        ]
+      },
+      {
+        "id": "a-t5-template",
+        "variant": "a",
+        "source": "2.1.13",
+        "question": "What does this program print?",
+        "code": "const name = \"Ada\";\nconst boxes = 4;\nconsole.log(`${name} packed ${boxes * 3} mugs`);",
+        "options": [
+          "${name} packed ${boxes * 3} mugs",
+          "Ada packed 4 * 3 mugs",
+          "Ada packed 43 mugs",
+          "Ada packed 12 mugs"
+        ],
+        "answer": 3,
+        "explanation": "Backticks make a template literal, and `${...}` runs the expression inside the braces and drops the result into the text. `boxes * 3` is arithmetic, so 12 lands in the sentence.",
+        "sourceIds": [
+          "2-1-13-reading-template-literals"
+        ]
+      },
+      {
+        "id": "b-t1-equality",
+        "variant": "b",
+        "source": "2.1.7",
+        "question": "What does this program print?",
+        "code": "const SPEED_LIMIT = 55;\nif (SPEED_LIMIT == false) {\n  console.log('slow');\n} else {\n  console.log('fast');\n}",
+        "options": [
+          "slow",
+          "fast",
+          "Nothing -- TypeError",
+          "undefined"
+        ],
+        "answer": 1,
+        "explanation": `55 == false` converts `false` to 0, so `55 == 0` is false. The `else` branch prints 'fast'.",
+        "sourceIds": [
+          "2-1-7-reading-comparison-operators"
+        ]
+      },
+      {
+        "id": "b-t2-coercion",
+        "variant": "b",
+        "source": "2.1.7",
+        "question": "What does this program print?",
+        "code": "let a = \"3\" + 4;\nlet b = \"3\" * 4;\nconsole.log(a, b);",
+        "options": [
+          "34 12",
+          "7 12",
+          "34 7",
+          "7 -12"
+        ],
+        "answer": 0,
+        "explanation": "With text on one side, `+` joins rather than adds, so `\"3\" + 4` builds the text `34`. The `*` operator converts `\"3\"` to the number 3 and multiplies, giving 12.",
+        "sourceIds": [
+          "2-1-7-reading-operators-coercion"
+        ]
+      },
+      {
+        "id": "b-t3-typeof",
+        "variant": "b",
+        "source": "2.1.19",
+        "question": "What does this program print?",
+        "code": "let chosen = null;\nconsole.log(typeof chosen);",
+        "options": [
+          "undefined",
+          "empty",
+          "object",
+          "null"
+        ],
+        "answer": 2,
+        "explanation": "`typeof null` reports `object`. This is a historical bug in JavaScript: `null` is a primitive value, but `typeof` returns `object` for it.",
+        "sourceIds": [
+          "2-1-19-reading-typeof"
+        ]
+      },
+      {
+        "id": "b-t4-nan",
+        "variant": "b",
+        "source": "2.1.9",
+        "question": "What does this program print?",
+        "code": "let cost = Number(\"ten dollars\");\nlet doubled = cost + cost;\nconsole.log(doubled - 4);",
+        "options": [
+          "16",
+          "-4",
+          "0",
+          "NaN"
+        ],
+        "answer": 3,
+        "explanation": "`Number(\"ten dollars\")` produces `NaN`. Every arithmetic operation with `NaN` produces `NaN`, so it travels through the addition and subtraction unchanged.",
+        "sourceIds": [
+          "2-1-9-example-nan-is-sticky"
+        ]
+      },
+      {
+        "id": "b-t5-template",
+        "variant": "b",
+        "source": "2.1.13",
+        "question": "What does this program print?",
+        "code": "const pet = \"Rex\";\nconst pairs = 2;\nconsole.log(`${pet} has ${pairs * 2} legs`);",
+        "options": [
+          "Rex has 4 legs",
+          "${pet} has ${pairs * 2} legs",
+          "Rex has 2 * 2 legs",
+          "Rex has 22 legs"
+        ],
+        "answer": 0,
+        "explanation": "Backticks make a template literal, and `${...}` runs the expression inside the braces and drops the result into the text. `pairs * 2` is arithmetic, so 4 lands in the sentence.",
+        "sourceIds": [
+          "2-1-13-reading-template-literals"
+        ]
+      },
+      {
+        "id": "c-t1-equality",
+        "variant": "c",
+        "source": "2.1.7",
+        "question": "What does this program print?",
+        "code": "const COUNT = 0;\nif (COUNT == false) {\n  console.log('zero');\n} else {\n  console.log('non-zero');\n}",
+        "options": [
+          "zero",
+          "non-zero",
+          "Nothing -- TypeError",
+          "undefined"
+        ],
+        "answer": 0,
+        "explanation": "`0 == false` is true because `false` converts to 0. The program prints 'zero'. This is the loose-equality trap.",
+        "sourceIds": [
+          "2-1-7-reading-comparison-operators"
+        ]
+      },
+      {
+        "id": "c-t2-coercion",
+        "variant": "c",
+        "source": "2.1.7",
+        "question": "What does this program print?",
+        "code": "let a = \"8\" + 2;\nlet b = \"8\" - 2;\nconsole.log(a, b);",
+        "options": [
+          "82 6",
+          "10 6",
+          "82 8",
+          "10 -6"
+        ],
+        "answer": 0,
+        "explanation": "`\"8\" + 2` joins to `\"82\"`. The `-` operator converts `\"8\"` to the number 8 and subtracts 2, giving 6.",
+        "sourceIds": [
+          "2-1-7-reading-operators-coercion"
+        ]
+      },
+      {
+        "id": "c-t3-typeof",
+        "variant": "c",
+        "source": "2.1.19",
+        "question": "What does this program print?",
+        "code": "console.log(typeof undefined, typeof NaN);",
+        "options": [
+          "undefined NaN",
+          "undefined number",
+          "undefined object",
+          "undefined undefined"
+        ],
+        "answer": 1,
+        "explanation": "`typeof undefined` is `\"undefined\"`. `NaN` is of type `number`, so `typeof NaN` is `\"number\"`.",
+        "sourceIds": [
+          "2-1-19-reading-typeof"
+        ]
+      },
+      {
+        "id": "c-t4-nan",
+        "variant": "c",
+        "source": "2.1.9",
+        "question": "What does this program print?",
+        "code": "let age = Number(\"twenty\");\nlet nextYear = age + 1;\nconsole.log(nextYear + 10);",
+        "options": [
+          "NaN",
+          "11",
+          "1",
+          "11"
+        ],
+        "answer": 0,
+        "explanation": "`Number(\"twenty\")` produces `NaN`. Arithmetic with `NaN` always produces `NaN`.",
+        "sourceIds": [
+          "2-1-9-example-nan-is-sticky"
+        ]
+      },
+      {
+        "id": "c-t5-template",
+        "variant": "c",
+        "source": "2.1.13",
+        "question": "What does this program print?",
+        "code": "const city = \"Chico\";\nconst days = 5;\nconsole.log(`${city} in ${days + 2} days`);",
+        "options": [
+          "Chico in 52 days",
+          "Chico in 7 days",
+          "Chico in 5 + 2 days",
+          "Chico in 5 + 2 days"
+        ],
+        "answer": 1,
+        "explanation": "Backticks make a template literal. `days + 2` is arithmetic (5 + 2 = 7), so `Chico in 7 days` prints.",
+        "sourceIds": [
+          "2-1-13-reading-template-literals"
+        ]
+      }
+    ]
+  }
+}

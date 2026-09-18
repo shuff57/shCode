@@ -1,0 +1,20 @@
+flowchart TD
+  A([Start])
+  B[/Input stepsGoal and stepsSoFar/]
+  C{{i = 0 to 1}}
+  D{stepsSoFar >= goal?}
+  E[SET status = "met"]
+  F[SET status = "not reached"]
+  G[SET status = "exceeded"]
+  H{{status switch}}
+  I[/Print status/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -- Yes --> E
+  D -- No --> F
+  E --> H
+  F --> H
+  H --> I
+  I --> Z

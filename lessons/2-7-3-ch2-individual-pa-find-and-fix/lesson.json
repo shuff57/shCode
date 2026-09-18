@@ -1,0 +1,95 @@
+{
+  "id": "2-7-3-ch2-individual-pa-find-and-fix",
+  "title": "2.7.3 Individual PA Part 3: Find and Fix",
+  "description": "Four broken programs. You identify the bug, name its type (syntax / runtime / logic), and fix it. Summative.",
+  "type": "assignment",
+  "estimateMins": 11,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.7 Chapter 2 Individual Performance Assessment",
+  "preview": "console",
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Bug 1 -- the program does not run at all",
+      "description": "The file is valid JavaScript and reaches the end.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+itemName\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`]*`)\\s*;",
+      "flags": "",
+      "points": 0,
+      "hint": "The console names the line it gave up on. Go to that line and read it one character at a time.",
+      "stripComments": false
+    },
+    {
+      "id": "r2",
+      "title": "Bug 2 -- the program stops part way through",
+      "description": "Nothing in the file uses a name that was never declared.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*\\bbeforTax\\b)(?=[\\s\\S]*\\btotal\\s*=\\s*(?:beforeTax\\s*\\+\\s*tax|tax\\s*\\+\\s*beforeTax))",
+      "flags": "",
+      "points": 0,
+      "hint": "A ReferenceError always names the thing it could not find. That name is the clue.",
+      "stripComments": false
+    },
+    {
+      "id": "r3",
+      "title": "Bug 3 -- the loop prints the wrong thing",
+      "description": "The accumulator prints the correct final value.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+total\\s*=\\s*0\\s*;[\\s\\S]*for\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*total\\s*=\\s*total\\s*\\+\\s*[A-Za-z_$][A-Za-z0-9_$]*",
+      "flags": "",
+      "points": 0,
+      "hint": "Work out on paper what the accumulator should say, then compare. If the two disagree, ask what type each value being combined actually is.",
+      "stripComments": false
+    },
+    {
+      "id": "r4",
+      "title": "Bug 4 -- the inner loop counter never advances",
+      "description": "The inner loop variable increments on every iteration, even after a continue.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "while\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*if\\s*\\([^)]*\\)\\s*\\{\\s*continue\\s*;[^}]*\\}[\\s\\S]*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\+\\+",
+      "flags": "",
+      "points": 0,
+      "hint": "In a while loop, continue jumps past the increment. The increment must be before the continue, or use a for loop.",
+      "stripComments": false
+    },
+    {
+      "id": "r5",
+      "title": "All four bugs are named",
+      "description": "A comment beside each fix names its kind: syntax, runtime or logic.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*syntax)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*runtime)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*logic)",
+      "flags": "i",
+      "points": 0,
+      "hint": "Four fixes, four comments -- one per bug.",
+      "stripComments": false
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A2.7.3",
+  "grading": {
+    "summative": true
+  }
+}

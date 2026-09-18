@@ -1,0 +1,28 @@
+flowchart TD
+  A([Start])
+  B[/Input n and bankName/]
+  C{{i = 1 to n}}
+  D{Is i multiple of 3?}
+  E[Flip locker i]
+  F[If i == 7 record state]
+  G[/i = i + 1/]
+  H{{i <= n?}}
+  I[/Input lockerToCheck/]
+  J{state of locker?}
+  K[Switch: open / closed / never touched]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -- Yes --> G
+  D -- No --> E
+  E --> F
+  F --> G
+  G --> H
+  H -- Yes --> D
+  H -- No --> I
+  I --> J
+  J -- Open --> K
+  J -- Closed --> K
+  J -- Never touched --> K
+  K --> Z

@@ -1,0 +1,61 @@
+{
+  "id": "2-7-5-ch2-individual-pa-write-the-steps",
+  "title": "2.7.5 Individual PA Part 5: Write the Steps",
+  "description": "One problem, pick one of three, write the JavaScript that solves it. Nested loop, branch, and break/continue required. AI-graded, summative.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.7 Chapter 2 Individual Performance Assessment",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2",
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A2.7.5",
+  "aiGrader": {
+    "summative": true,
+    "rubricTitle": "Chapter 2 Individual PA Part 5: Write the Steps",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "The student writes a complete JavaScript program (no functions, no arrays, no objects) that solves one of three problems. The program must contain: a nested loop, a branch (if/else if/else), a break or continue, and a try/catch guard. The student picks one of three problems from a menu. The program reads inputs from hardcoded constants (no user input), computes a result, and reports it with console.log. The AI grader evaluates:\n\n1. Correctness: the program produces the correct output for the given test cases (provided in the rubric).\n2. Structure: contains a nested loop (for/while inside for/while), an if/else if/else branch, at least one break or continue, and a try/catch around the risky input.\n3. Documentation: header comment with Problem, Partners (N/A for individual), Date; UPPER_SNAKE_CASE const for the limit; camelCase variables; at least one template literal console.log; typeof reported for one value.\n4. No functions, no arrays, no objects. Iteration only from counters or string indexing (word[i], word.length).\n\nRubric (20 points total):\n- 8 pts: §2.1 branch (if/else if/else with && or ||)\n- 12 pts: §2.4 loop and nesting (nested loop with break/continue inside)\n\nThe AI should award partial credit for partial structure (e.g., has nested loop but missing break).",
+    "rubric": [
+      {
+        "id": "nested-loop",
+        "title": "Contains a nested loop",
+        "description": "The program has a for/while loop inside another for/while loop. The outer loop iterates a range; the inner loop iterates a different range or walks a string.",
+        "points": 8
+      },
+      {
+        "id": "branch-with-logic",
+        "title": "Has an if/else if/else with && or ||",
+        "description": "The program contains an if/else if/else chain with at least one compound condition using && or ||.",
+        "points": 8
+      },
+      {
+        "id": "break-or-continue",
+        "title": "Uses break or continue inside the loop",
+        "description": "The nested loop contains at least one break or continue that is not merely decorative (it affects control flow).",
+        "points": 4
+      }
+    ],
+    "summative": true
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A2.7.5"
+}

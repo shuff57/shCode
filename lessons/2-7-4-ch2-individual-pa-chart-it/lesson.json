@@ -1,0 +1,72 @@
+{
+  "id": "2-7-4-ch2-individual-pa-chart-it",
+  "title": "2.7.4 Individual PA Part 4: Chart It",
+  "description": "Hand-draw a flowchart for the stated problem, then write the JavaScript it describes. Summative.",
+  "type": "assignment",
+  "estimateMins": 7,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.7 Chapter 2 Individual Performance Assessment",
+  "preview": "diagram",
+  "slos": [
+    "SLO-2",
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
+    "rules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-process",
+        "count": 2,
+        "title": "Uses at least two task rectangles"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1,
+        "title": "Uses at least one decision diamond"
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "min-nodes",
+        "count": 8,
+        "title": "Uses at least eight flow shapes"
+      },
+      {
+        "id": "no-self-loop"
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A2.7.4",
+  "diagram": {
+    "summative": true
+  }
+}

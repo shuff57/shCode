@@ -1,0 +1,69 @@
+{
+  "id": "2-6-1-ch2-group-pa-design-chart",
+  "title": "2.6.1 Group PA Part 1: Design the Chart",
+  "description": "Pick one of four problems with your partner, settle it on a flowchart, and get all ten checks green. The build lesson does not open until this one does.",
+  "type": "assignment",
+  "estimateMins": 25,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.6 Chapter 2 Group Performance Assessment",
+  "preview": "diagram",
+  "slos": [
+    "SLO-1",
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
+    "rules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-process",
+        "count": 2,
+        "title": "Uses at least two task rectangles"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1,
+        "title": "Uses at least one decision diamond"
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "min-nodes",
+        "count": 8,
+        "title": "Uses at least eight flow shapes"
+      },
+      {
+        "id": "no-self-loop"
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A2.6.1"
+}

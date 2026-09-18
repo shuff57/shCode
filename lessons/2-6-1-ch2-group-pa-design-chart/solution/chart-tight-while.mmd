@@ -1,0 +1,20 @@
+flowchart TD
+  A([Start])
+  B[/Input n and bankName/]
+  C[SET i = 1]
+  D{i <= n?}
+  E{Is i multiple of 3?}
+  F[Flip locker i]
+  G[If i == 7 record state]
+  H[SET i = i + 1]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -- Yes --> E
+  D -- No --> Z
+  E -- Yes --> H
+  E -- No --> F
+  F --> G
+  G --> H
+  H --> D
