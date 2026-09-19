@@ -1,0 +1,52 @@
+{
+  "id": "3-10-5-ch3-individual-pa-write-the-steps",
+  "title": "3.10.5 Individual PA Part 5: Write the Steps",
+  "description": "One problem, pick one of three, write the JavaScript it describes: functions with parameters and returns, an array of records, map, spread, and a save/load round trip. One attempt, no Run button.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.10 Chapter 3 Individual Performance Assessment",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2",
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A3.10.5",
+  "aiGrader": {
+    "summative": true,
+    "rubricTitle": "Chapter 3 Individual PA, Part 5: Write the Steps",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "The student submitted one JavaScript program answering one of three Part 5 problems (Price Check, Reading Log, Watering Rota). Mark the CODE against the three criteria below. This is a summative, one-attempt item: mark what is on the paper, do not ask the student to run it.\n\nThe Chapter 3 ceiling: no classes, no `this`, no constructors. The array methods taught are map, slice, concat and spread only -- a program that uses filter, reduce, forEach or sort has gone past the chapter; credit any behaviour it produces, note the technique in feedback, and take the technique point from the criterion that needed it (the student met this in 3.7.19's named-but-not-taught list). Selecting a subset is taught as a loop and push (3.3.13); totalling is taught as a loop and an accumulator (3.3.9).\n\nCriterion 1 -- the functions and their returns (8 of the 20; 4 for 3.1 definition/call, 4 for 3.2 parameters/return). At least two named function declarations, each called at least once, each returning a value with return. Full credit: the functions decompose the problem (one for the record/total, one for the comparison or the report), parameters carry what the body needs, and nothing does its whole job by printing. Partial: functions exist and are called but at least one prints instead of returning (4), or one function exists and the other job is done at top level (5). Withhold: no function, or functions declared and never called.\n\nCriterion 2 -- the list and its objects (8 of the 20; 3 for 3.3, 2 for 3.5, 3 for 3.7). An array of record objects, walked with a loop, with at least one map() call carrying an arrow function and at least one spread copy. Full credit: the array literal holds object literals with matching fields, a for/for...of loop walks it, map() produces one line per record, and spread appears in a copy. Partial ladder: 6 for the loop and map both present but no spread; 4 for an array of objects with a loop but no map and no spread; 2 for an array of plain values (not records). Withhold: no array of records.\n\nCriterion 3 -- the save/load round trip (4 of the 20). The list (or the record) goes to localStorage with JSON.stringify under a key, and is read back with JSON.parse. Full credit: both directions present under one key. Partial 2: stringify without the parse-back, or parse without the save. Withhold: neither.\n\nAlso check, without changing the 20: the header comment names Problem and Date (Partners is N/A on an individual paper); the limit is a const in UPPER_SNAKE_CASE; at least one template-literal or concatenation console.log reports the result; typeof is reported for one value. Missing these are feedback lines, not point deductions -- the 20 points are the functions, the list and the round trip, and saying otherwise would re-weight the paper.",
+    "rubric": [
+      {
+        "id": "functions-and-returns",
+        "title": "Named functions, called, returning values",
+        "description": "Full credit 8: at least two function declarations, each called at least once, each returning with return; the decomposition matches the problem. Partial 4-5: functions exist but print instead of returning, or one job is done at top level. Withhold: no functions.",
+        "points": 8
+      },
+      {
+        "id": "list-and-records",
+        "title": "An array of records, walked; map() used; spread used",
+        "description": "Full credit 8: array-of-objects literal (2), a loop over it (3), a map() with an arrow producing per-record lines (3), and a spread copy. Partial 6: loop and map present, spread missing. Partial 4-5: records walked by loop, no map. Partial 2: an array of plain values. Withhold: no array.",
+        "points": 8
+      },
+      {
+        "id": "save-load",
+        "title": "A save/load round trip through localStorage and JSON",
+        "description": "Full credit 4: JSON.stringify into localStorage.setItem under a key, and JSON.parse of localStorage.getItem of that key. Partial 2: one direction only. Withhold: neither direction.",
+        "points": 4
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

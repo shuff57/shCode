@@ -1,0 +1,28 @@
+flowchart TD
+  A([Start])
+  B[/Load the stock list from storage/]
+  C[Set up the seed list and the reorder level]
+  D{{i = 0 to list.length - 1}}
+  E{Is qty below the reorder level?}
+  F[[lowStock list level]]
+  G[[totalValue list]]
+  H[[receiptLines list]]
+  I[Print total, low stock and receipt]
+  J[[sellItem list name]]
+  K[Show the new quantity]
+  L[[saveStock list]]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -- "More items" --> E
+  E -- "Low, select it" --> F
+  E -- "Stocked, keep it" --> D
+  F --> D
+  D -- "List is done" --> G
+  G --> H
+  H --> I
+  I --> J
+  J --> K
+  K --> L
+  L --> Z

@@ -1,0 +1,353 @@
+{
+  "id": "3-10-1-ch3-individual-pa-concepts",
+  "title": "3.10.1 Individual PA Part 1: Concepts and Traces",
+  "description": "Eight questions: three on the ideas of Chapter 3, five where you read a short program and say what it prints. One submission, nothing marked on screen.",
+  "type": "assignment",
+  "estimateMins": 16,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.10 Chapter 3 Individual Performance Assessment",
+  "preview": "quiz",
+  "slos": [
+    "SLO-1",
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A3.10.1",
+  "quiz": {
+    "summative": true,
+    "shuffle": true,
+    "variants": [
+      "a",
+      "b",
+      "c"
+    ],
+    "questions": [
+      {
+        "id": "c1-definition-vs-call",
+        "source": "3.1.2",
+        "question": "Which line CALLS a function rather than defining one?",
+        "options": [
+          "totalValue(stock);",
+          "function totalValue(list) { ... }",
+          "const totalValue = (list) => { ... };",
+          "return total;"
+        ],
+        "answer": 0,
+        "explanation": "A call is the name followed by parentheses as its own statement (3.1.2): totalValue(stock) runs the body. The function keyword, or an arrow assigned to a name, is a definition. Same words as 3.1.3's quiz.",
+        "sourceIds": [
+          "3-1-2-reading-function-basics"
+        ]
+      },
+      {
+        "id": "c2-dot-vs-bracket",
+        "source": "3.5.6",
+        "question": "A property name is held in a variable: const field = \"qty\". How do you read that property off an object called item?",
+        "options": [
+          "item[field]",
+          "item.field",
+          "item.\"field\"",
+          "item->field"
+        ],
+        "answer": 0,
+        "explanation": "Square brackets work the name out before reading (3.5.6): item[field] reads the property whose name is stored in field. Dot notation reads the property spelled exactly like the text after the dot, so item.field would look for a property literally called \"field\".",
+        "sourceIds": [
+          "3-5-6-reading-computed-keys"
+        ]
+      },
+      {
+        "id": "c3-nonmutating",
+        "source": "3.7.19",
+        "question": "One of these changes the array it is called on. Which one?",
+        "options": [
+          "push",
+          "map",
+          "slice",
+          "concat"
+        ],
+        "answer": 0,
+        "explanation": "push adds to the end of the array it is called on and changes it (3.3.2). map, slice and concat all build a NEW array and leave the original alone (3.7.4, 3.7.8, 3.7.10). §3.7's Key Terms call them non-mutating, and push is the chapter's counter-example.",
+        "sourceIds": [
+          "3-7-19-reading-what-else"
+        ]
+      },
+      {
+        "id": "a-t1-no-return",
+        "variant": "a",
+        "source": "3.2.11",
+        "question": "What does this program print?",
+        "code": "function setup(name) {\n  const label = \"Counter: \" + name;\n}\n\nconst out = setup(\"Gate A\");\nconsole.log(out);",
+        "options": [
+          "undefined",
+          "Counter: Gate A",
+          "The program stops with an error",
+          "\"out\""
+        ],
+        "answer": 0,
+        "explanation": "setup builds label but has no return (3.2.11), so the call evaluates to undefined and that is what prints. The label exists only inside the function and vanishes when the function ends.",
+        "sourceIds": [
+          "3-2-11-reading-return-ends-function"
+        ]
+      },
+      {
+        "id": "a-t2-mutation",
+        "variant": "a",
+        "source": "3.6.3",
+        "question": "What does this program print?",
+        "code": "function restock(shelf, n) {\n  shelf.count = shelf.count + n;\n}\n\nconst shelf = { name: \"Bolts\", count: 4 };\nrestock(shelf, 6);\nconsole.log(shelf.count);",
+        "options": [
+          "10",
+          "4",
+          "undefined",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "restock is handed a copy of the reference (3.6.2), so shelf inside the function and the const shelf outside are the same object. Changing count inside is visible outside (3.6.3), so the print says 10. The parameter name did not copy the object -- it shared it.",
+        "sourceIds": [
+          "3-6-3-example-mutating-array-param"
+        ]
+      },
+      {
+        "id": "a-t3-length",
+        "variant": "a",
+        "source": "3.3.2",
+        "question": "What does this program print?",
+        "code": "const readings = [12, 9, 15, 7];\nconsole.log(readings[readings.length - 1]);",
+        "options": [
+          "7",
+          "15",
+          "12",
+          "undefined"
+        ],
+        "answer": 0,
+        "explanation": "length is 4, so the highest index is 3 (one below length), and readings[3] is 7 (3.3.2). readings[4] would be undefined -- index counts from 0, length counts how many there are.",
+        "sourceIds": [
+          "3-2-2-reading-array-basics"
+        ]
+      },
+      {
+        "id": "a-t4-arrow-body",
+        "variant": "a",
+        "source": "3.4.8",
+        "question": "What does this program print?",
+        "code": "const double = (n) => {\n  n * 2;\n};\nconsole.log(double(6));",
+        "options": [
+          "undefined",
+          "12",
+          "6",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "Braces bring the return requirement back (3.4.8): an arrow with a block body returns undefined unless it says return. n * 2 is worked out and thrown away, so the print is undefined. Drop the braces -- const double = (n) => n * 2; -- and it would print 12.",
+        "sourceIds": [
+          "3-4-8-reading-shorthand-rules"
+        ]
+      },
+      {
+        "id": "a-t5-json",
+        "variant": "a",
+        "source": "3.8.6",
+        "question": "What does this program print?",
+        "code": "const item = { name: \"Bolt\", price: 0.4, note: undefined };\nconst text = JSON.stringify(item);\nconst back = JSON.parse(text);\nconsole.log(back.note, back.price);",
+        "options": [
+          "undefined 0.4",
+          "undefined undefined",
+          "0.4 0.4",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "A property whose value is undefined does not survive stringify (3.8.6) -- the text has no note in it at all, so the parsed object has no note property, and reading a missing property gives undefined. The number round-trips fine.",
+        "sourceIds": [
+          "3-8-6-reading-what-does-not-survive"
+        ]
+      },
+      {
+        "id": "b-t1-no-return",
+        "variant": "b",
+        "source": "3.2.11",
+        "question": "What does this program print?",
+        "code": "function greeting(name) {\n  const line = \"Hello \" + name;\n}\n\nconst out = greeting(\"Sam\");\nconsole.log(out);",
+        "options": [
+          "undefined",
+          "Hello Sam",
+          "\"Hello Sam\"",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "Same shape, different values: greeting builds line but returns nothing (3.2.11), so the call is undefined and undefined is what prints.",
+        "sourceIds": [
+          "3-2-11-reading-return-ends-function"
+        ]
+      },
+      {
+        "id": "b-t2-mutation",
+        "variant": "b",
+        "source": "3.6.3",
+        "question": "What does this program print?",
+        "code": "function addLap(entry, extra) {\n  entry.laps = entry.laps + extra;\n}\n\nconst entry = { name: \"Riley\", laps: 3 };\naddLap(entry, 2);\nconsole.log(entry.laps);",
+        "options": [
+          "5",
+          "3",
+          "undefined",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "The function changes the object it was handed (3.6.3). The const entry outside and entry inside the function are the same object, so the print says 5.",
+        "sourceIds": [
+          "3-6-3-example-mutating-array-param"
+        ]
+      },
+      {
+        "id": "b-t3-length",
+        "variant": "b",
+        "source": "3.3.2",
+        "question": "What does this program print?",
+        "code": "const seeds = [30, 22, 41];\nconsole.log(seeds[seeds.length - 1]);",
+        "options": [
+          "41",
+          "22",
+          "30",
+          "undefined"
+        ],
+        "answer": 0,
+        "explanation": "length is 3, so the highest index is 2 (one below length), and seeds[2] is 41 (3.3.2). Reading length as an index would give undefined -- index counts from 0.",
+        "sourceIds": [
+          "3-2-2-reading-array-basics"
+        ]
+      },
+      {
+        "id": "b-t4-arrow-body",
+        "variant": "b",
+        "source": "3.4.8",
+        "question": "What does this program print?",
+        "code": "const label = (name) => {\n  name + \": active\";\n};\nconsole.log(label(\"Tray 4\"));",
+        "options": [
+          "undefined",
+          "Tray 4: active",
+          "\"Tray 4: active\"",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "Same trap as form a: the block body never says return (3.4.8), so the call evaluates to undefined and that is what prints.",
+        "sourceIds": [
+          "3-4-8-reading-shorthand-rules"
+        ]
+      },
+      {
+        "id": "b-t5-json",
+        "variant": "b",
+        "source": "3.8.6",
+        "question": "What does this program print?",
+        "code": "const tray = { variety: \"Basil\", planted: 40, helper: undefined };\nconst text = JSON.stringify(tray);\nconst back = JSON.parse(text);\nconsole.log(back.helper, back.planted);",
+        "options": [
+          "undefined 40",
+          "undefined undefined",
+          "40 40",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "helper is undefined, and undefined does not survive stringify (3.8.6), so the parsed object has no helper property and reading it gives undefined. planted round-trips as 40.",
+        "sourceIds": [
+          "3-8-6-reading-what-does-not-survive"
+        ]
+      },
+      {
+        "id": "c-t1-no-return",
+        "variant": "c",
+        "source": "3.2.11",
+        "question": "What does this program print?",
+        "code": "function tag(item) {\n  const text = item.name + \" — \" + item.price;\n}\n\nconst out = tag({ name: \"Clip\", price: 1.2 });\nconsole.log(out);",
+        "options": [
+          "undefined",
+          "Clip — 1.2",
+          "\"Clip — 1.2\"",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "tag builds text and returns nothing (3.2.11), so out is undefined and undefined is what prints. Printing inside would not have helped: the caller would still receive undefined.",
+        "sourceIds": [
+          "3-2-11-reading-return-ends-function"
+        ]
+      },
+      {
+        "id": "c-t2-mutation",
+        "variant": "c",
+        "source": "3.6.3",
+        "question": "What does this program print?",
+        "code": "function checkOut(copy, n) {\n  copy.copies = copy.copies - n;\n}\n\nconst copy = { title: \"Dune\", copies: 6 };\ncheckOut(copy, 4);\nconsole.log(copy.copies);",
+        "options": [
+          "2",
+          "6",
+          "undefined",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "The callee changed the object through the shared reference (3.6.3), so the caller's print says 2. Reassigning the parameter instead would have changed nothing outside -- 3.6.6 is that lesson.",
+        "sourceIds": [
+          "3-6-3-example-mutating-array-param"
+        ]
+      },
+      {
+        "id": "c-t3-length",
+        "variant": "c",
+        "source": "3.3.2",
+        "question": "What does this program print?",
+        "code": "const laps = [51, 48, 53, 50, 47];\nconsole.log(laps[laps.length - 2]);",
+        "options": [
+          "50",
+          "53",
+          "47",
+          "undefined"
+        ],
+        "answer": 0,
+        "explanation": "length is 5, so the highest index is 4 (one below length), and one below that is 3. laps[3] is 50 (3.3.2). Reading length as an index would give undefined -- index counts from 0.",
+        "sourceIds": [
+          "3-2-2-reading-array-basics"
+        ]
+      },
+      {
+        "id": "c-t4-arrow-body",
+        "variant": "c",
+        "source": "3.4.8",
+        "question": "What does this program print?",
+        "code": "const initials = (first, last) => {\n  first[0] + \".\" + last[0] + \".\";\n};\nconsole.log(initials(\"Ada\", \"Lovelace\"));",
+        "options": [
+          "undefined",
+          "A.L.",
+          "\"A.L.\"",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "Block body, no return (3.4.8): the built string is discarded and the call is undefined.",
+        "sourceIds": [
+          "3-4-8-reading-shorthand-rules"
+        ]
+      },
+      {
+        "id": "c-t5-json",
+        "variant": "c",
+        "source": "3.8.6",
+        "question": "What does this program print?",
+        "code": "const cart = { title: \"Dune\", copies: 3, note: undefined };\nconst text = JSON.stringify(cart);\nconst back = JSON.parse(text);\nconsole.log(back.note, back.copies);",
+        "options": [
+          "undefined 3",
+          "undefined undefined",
+          "3 3",
+          "The program stops with an error"
+        ],
+        "answer": 0,
+        "explanation": "note is undefined and does not survive the round trip (3.8.6); copies survives as 3.",
+        "sourceIds": [
+          "3-8-6-reading-what-does-not-survive"
+        ]
+      }
+    ]
+  }
+}

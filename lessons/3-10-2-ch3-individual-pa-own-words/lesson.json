@@ -1,0 +1,51 @@
+{
+  "id": "3-10-2-ch3-individual-pa-own-words",
+  "title": "3.10.2 Individual PA Part 2: In Your Own Words",
+  "description": "Three short-answer questions. Explain the ideas in your own words. AI-graded, summative: one submission, nothing marked on screen.",
+  "type": "assignment",
+  "estimateMins": 7,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.10 Chapter 3 Individual Performance Assessment",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A3.10.2",
+  "aiGrader": {
+    "summative": true,
+    "rubricTitle": "Chapter 3 Individual PA, Part 2: In Your Own Words",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "The student answers three short-answer questions in their own words. Mark against the three criteria below. Grade strictly on correctness, generously on phrasing: these are 14-year-olds writing their own words under time pressure. Grammar and spelling are not being assessed. Each criterion is either credited, partially credited, or withheld -- say which in the feedback and why.\n\nQuestion 1 -- parameter vs argument, and what a function with no return hands back (worth 4).\nThe taught answers (3.2.5, 3.2.11): a parameter is the name in the function's definition, a placeholder with no value until the call; an argument is the actual value handed over at the call, assigned to the matching parameter by position. A function that finishes without running a return hands back undefined. Credit the distinction and the undefined; a concrete example of either strengthens the credit.\n\nQuestion 2 -- what the caller sees when a callee changes an object (worth 3).\nThe taught answer (3.6.2, 3.6.5): the parameter holds a copy of the reference, so the object inside and outside the function are the same object; changing a property inside is visible to the caller (mutation), while reassigning the parameter to a new object changes nothing outside. Credit any version of the reference idea; credit mutation-vs-reassignment if they bring it up.\n\nQuestion 3 -- what map() gives back, and why push() is different (worth 3).\nThe taught answers (3.7.4, 3.3.2): map() builds and returns a NEW array, one callback result per element, and leaves the original untouched; push() adds to the end of the array it is called on and changes it. Credit the new-array-vs-changed-original distinction; the words non-mutating and mutating are welcome but not required.\n\nAlso check, without changing the marks: each answer is in the student's own words. An answer that quotes the reading verbatim is not the skill -- say so in the feedback.",
+    "rubric": [
+      {
+        "id": "param-argument-return",
+        "title": "Question 1: parameter vs argument, and the no-return case",
+        "description": "Full credit 4: the distinction is right (parameter = the name in the definition, argument = the value handed over at the call) AND the no-return case is answered (undefined). Partial 2-3: one half correct, or the distinction right but the undefined case wrong. Withhold: the two terms are called interchangeable.",
+        "points": 4
+      },
+      {
+        "id": "caller-sees-mutation",
+        "title": "Question 2: what the caller sees when a callee changes an object",
+        "description": "Full credit 3: changes inside the function are visible to the caller, and the reason is the shared reference (copy of the reference, not a copy of the object). Bonus if they contrast reassignment. Partial 1-2: visible-outside asserted without the reference reason, or the reference idea right but mutation/confusion mixed. Withhold: says the caller sees nothing unless the value is returned.",
+        "points": 3
+      },
+      {
+        "id": "map-vs-push",
+        "title": "Question 3: map() vs push()",
+        "description": "Full credit 3: map builds and returns a new array and the original survives; push changes the array it is called on. Partial 1-2: one side explained. Withhold: says both return new arrays, or both mutate.",
+        "points": 3
+      }
+    ]
+  }
+}

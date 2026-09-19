@@ -1,0 +1,132 @@
+{
+  "id": "3-10-3-ch3-individual-pa-find-and-fix",
+  "title": "3.10.3 Individual PA Part 3: Find and Fix",
+  "description": "Four broken programs. Identify each bug, name its type (syntax / runtime / logic), and fix it. One sitting; the checklist shows which symptom remains.",
+  "type": "assignment",
+  "estimateMins": 11,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.10 Chapter 3 Individual Performance Assessment",
+  "preview": "console",
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "Press Run before you change anything. One bug stops the file before it starts, and the console names the line. Start there."
+    },
+    {
+      "id": "s2",
+      "title": "Fix all four",
+      "instructions": "Work the file top to bottom. Two of the four never produce an error message — one prints something untrue, one reports a number that never changes. Run after every fix."
+    },
+    {
+      "id": "s3",
+      "title": "Name each one",
+      "instructions": "Above each fix, add a comment naming the kind of bug it was: syntax, runtime or logic. A syntax bug means the file is not valid JavaScript. A runtime bug means it is valid, starts running, and then stops. A logic bug means it runs all the way through and tells you something untrue.",
+      "hints": [
+        "The kind is about WHEN it goes wrong, not about how hard it was to find",
+        "Two of these four are the same kind as each other"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Bug 1 — the program does not run at all",
+      "description": "The file is valid JavaScript and reaches the end.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[A-Za-z_$][\\w$]*\\s*:\\s*[0-9]",
+      "flags": "",
+      "points": 0,
+      "hint": "The console names the line it gave up on. Go to that line and read it one character at a time: what separates a property's name from its value (3.5.3)?",
+      "stripComments": false
+    },
+    {
+      "id": "r2",
+      "title": "Bug 2 — the program stops part way through",
+      "description": "Nothing in the file indexes an array with its own length.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*\\.length\\s*\\])(?=[\\s\\S]*lastItem)",
+      "flags": "",
+      "points": 0,
+      "hint": "An error always names the line and the position it gave up on. That line is the clue.",
+      "stripComments": false
+    },
+    {
+      "id": "r3",
+      "title": "Bug 3 — the price list is wrong",
+      "description": "The arrow's block body returns the built string.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return\\s+(?:[A-Za-z_$][\\w$]*\\s*\\+|[A-Za-z_$][\\w$]*\\s*===|item\\.)",
+      "flags": "",
+      "points": 0,
+      "hint": "Run it. The receipt prints undefined for every line. Work out on paper what three price lines should say, then compare. If they disagree, ask what an arrow with braces returns when it never says return (3.4.8).",
+      "stripComments": false
+    },
+    {
+      "id": "r4",
+      "title": "Bug 4 — the backup changes the original",
+      "description": "The copy is made before the change, and the original keeps its own values.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return\\s*\\{\\s*\\.\\.\\.[A-Za-z_$][\\w$]*",
+      "flags": "",
+      "points": 0,
+      "hint": "Run it. The report says the original item changed too, and nothing in the program changed it on purpose. What does { ...item } build, and where does the change go (3.6.9, 3.7.15)?",
+      "stripComments": false
+    },
+    {
+      "id": "r5",
+      "title": "All four bugs are named",
+      "description": "A comment beside each fix names its kind: syntax, runtime or logic.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\bsyntax\\b)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\bruntime\\b)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\blogic\\b)",
+      "flags": "i",
+      "points": 0,
+      "hint": "Four fixes, four comments -- one per bug.",
+      "stripComments": false
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true,
+    "summative": true
+  },
+  "assignmentCode": "A3.10.3",
+  "files": [
+    {
+      "id": "index.html",
+      "type": "file",
+      "name": "index.html",
+      "path": "index.html",
+      "language": "html",
+      "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>3.10.3 Chapter 3 Test, Part 3: Find and Fix</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <script src=\"script.js\"></script>\n</body>\n</html>\n"
+    },
+    {
+      "id": "style.css",
+      "type": "file",
+      "name": "style.css",
+      "path": "style.css",
+      "language": "css",
+      "content": "/* 3.10.3 Chapter 3 Test Part 3 styles */\n"
+    },
+    {
+      "id": "script.js",
+      "type": "file",
+      "name": "script.js",
+      "path": "script.js",
+      "language": "javascript",
+      "content": "// Chapter 3 Test, Part 3 of 5: Find and Fix.\n//\n// This file has four bugs in it. One stops the program before it\n// starts, one stops it part way through, one lets it run and prints\n// something untrue, and one changes data it was never supposed to\n// touch.\n//\n// Fix all four. Above each fix, write a comment naming what kind of\n// bug it was -- the three kinds are on the instructions beside this\n// editor.\n\nconst STORE_NAME = \"Corner Counter\";\n\n// Bug 1: the price list.\nconst PRICE_LIST = [\n  { name: \"Clip\", price 1.2 },\n  { name: \"Pad\", price 2.5 },\n  { name: \"Tape\", price 3.1 }\n];\n\n// Bug 2: the last item.\nconst lastItem = PRICE_LIST[PRICE_LIST.length];\n\n// Bug 3: the receipt lines.\nconst receiptLines = (list) => {\n  list.map((item) => {\n    item.name + \" — $\" + item.price;\n  });\n};\n\n// Bug 4: a backup that changes itself.\nfunction backupWithSale(item) {\n  item.price = item.price - 1;\n  return item;\n}\n\nconst backup = backupWithSale(PRICE_LIST[0]);\n\nconsole.log(\"Store: \" + STORE_NAME);\nconsole.log(\"Last item: \" + lastItem.name);\nconsole.log(receiptLines(PRICE_LIST));\nconsole.log(\"Original: \" + PRICE_LIST[0].name + \" at $\" + PRICE_LIST[0].price);\nconsole.log(\"Backup: \" + backup.name + \" at $\" + backup.price);\n"
+    }
+  ]
+}

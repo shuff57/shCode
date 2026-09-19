@@ -67,16 +67,27 @@ let partsChecked = 0;
 
 for (const [unit, entries] of byUnit) {
   // A unit is a TEST unit iff its name matches the individual chapter test
-  // pattern: "N.7 Chapter N Individual Performance Assessment". Keying on the
+  // pattern: "N.M Chapter N Individual Performance Assessment". Keying on the
   // bare number was wrong twice over: 3.7 Array Methods and 6.7 Advanced
-  // Input are teaching modules whose numbers merely end in .7, and N.6 units
-  // (the Group PAs) are deliberately NOT test units at all — their lessons
-  // are green-to-advance and set the flag nowhere (see 2.6's warning block —
+  // Input are teaching modules whose numbers merely end in .7, and the Group
+  // PA units are deliberately NOT test units at all — their lessons are
+  // green-to-advance and set the flag nowhere (see 2.6's warning block —
   // 2.6.1's chart is supposed to gate 2.6.2, and summative exists precisely
   // to switch that gating off). Keying on any-lesson-summative was wrong the
   // other way too: 2-1-39 and 1-3-21 are module quizzes legitimately marked
   // quiz.summative, and that dragged their whole teaching units in.
-  const isTestUnit = /^(\d+)\.7 Chapter \1 Individual Performance Assessment$/.test(unit);
+  //
+  // The section number is \d+ rather than a literal 7 because the assessment
+  // modules sit AFTER the chapter's book sections, and chapters are not all
+  // five sections long. Ch 1 and Ch 2 end at §N.5 so their tests are N.7;
+  // Chapter 3 has eight book sections, so its Group PA is 3.9 and its test is
+  // **3.10**. Against the old literal `\.7` that unit did not match, this
+  // whole check skipped it, and the five parts of a sat exam went unchecked —
+  // which is the exact failure this file exists to prevent (1.7, 2026-09-03:
+  // Parts 3 and 4 unflagged, so a student stuck on Part 3 could not reach
+  // Parts 4 and 5 at all). The chapter backreference and the two literal
+  // words still keep teaching modules and Group PAs out.
+  const isTestUnit = /^(\d+)\.\d+ Chapter \1 Individual Performance Assessment$/.test(unit);
   if (!isTestUnit) continue;
   unitsChecked++;
 

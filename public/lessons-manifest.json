@@ -3034,6 +3034,51 @@
       "week": 7
     },
     {
+      "id": "3-10-1-ch3-individual-pa-concepts",
+      "title": "3.10.1 Individual PA Part 1: Concepts and Traces",
+      "unit": "3.10 Chapter 3 Individual Performance Assessment",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "3-10-2-ch3-individual-pa-own-words",
+      "title": "3.10.2 Individual PA Part 2: In Your Own Words",
+      "unit": "3.10 Chapter 3 Individual Performance Assessment",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "3-10-3-ch3-individual-pa-find-and-fix",
+      "title": "3.10.3 Individual PA Part 3: Find and Fix",
+      "unit": "3.10 Chapter 3 Individual Performance Assessment",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "3-10-4-ch3-individual-pa-chart-it",
+      "title": "3.10.4 Individual PA Part 4: Chart It",
+      "unit": "3.10 Chapter 3 Individual Performance Assessment",
+      "preview": "diagram",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "3-10-5-ch3-individual-pa-write-the-steps",
+      "title": "3.10.5 Individual PA Part 5: Write the Steps",
+      "unit": "3.10 Chapter 3 Individual Performance Assessment",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "3-2-1-slides",
       "title": "3.3.1 Slides: Arrays",
       "unit": "3.3 Arrays",
@@ -4346,6 +4391,33 @@
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 10
+    },
+    {
+      "id": "3-9-1-ch3-group-pa-design-chart",
+      "title": "3.9.1 Group PA Part 1: Design the Chart",
+      "unit": "3.9 Chapter 3 Group Performance Assessment",
+      "preview": "diagram",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "3-9-2-ch3-group-pa-build",
+      "title": "3.9.2 Group PA Part 2: Build It",
+      "unit": "3.9 Chapter 3 Group Performance Assessment",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "3-9-3-ch3-group-pa-demo",
+      "title": "3.9.3 Group PA Part 3: Demo It",
+      "unit": "3.9 Chapter 3 Group Performance Assessment",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
     },
     {
       "id": "4-1-1-slides",

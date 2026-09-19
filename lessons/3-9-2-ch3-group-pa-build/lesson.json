@@ -1,0 +1,248 @@
+{
+  "id": "3-9-2-ch3-group-pa-build",
+  "title": "3.9.2 Group PA Part 2: Build It",
+  "description": "Turn the chart you just passed into five documented functions and a short main section. Eleven checks, all of them things Chapter 3 taught. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 42,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.9 Chapter 3 Group Performance Assessment",
+  "preview": "console",
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Fill in the header",
+      "instructions": "The top of script.js has three comment lines waiting: Problem, Partners, Date. Fill all three in. Both partners' names, on the Partners line, before anything else happens."
+    },
+    {
+      "id": "s2",
+      "title": "Copy your contracts in as comments",
+      "instructions": "Your contract table from 3.9.1, one function per line as // comments: name, what goes in, what comes back. Do this before you write a single line of JavaScript. If a contract does not say what you meant on the chart, fix the wording now."
+    },
+    {
+      "id": "s3",
+      "title": "Declare the seed data and the level",
+      "instructions": "Your list as an array of objects -- every record has the same three fields, in the same order. The threshold you compare against never changes, so it is a const in UPPER_SNAKE_CASE.",
+      "hints": [
+        "Snack Shack: [{ name: 'Popcorn', price: 3.5, qty: 12 }, ...]",
+        "UPPER_SNAKE_CASE means REORDER_LEVEL, not reorderLevel",
+        "Every record in the array needs the same three properties -- 3.5.3 is the shape"
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Write makeItem",
+      "instructions": "The function from the top of your contract table. It takes the same three values the record holds, builds an object literal with those properties, and returns it. Nothing prints.",
+      "hints": [
+        "return { name: name, price: price, qty: qty }; -- 3.5.3",
+        "A function that prints instead of returning is the 3.2.13 error",
+        "Call it once at the bottom of the file so you can see it work"
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Write totalValue",
+      "instructions": "An accumulator set to 0 before the loop, added to inside the loop, returned after it. §3.3.5 walks the list; §3.3.9 is the sum pattern. §3.7 has no method that combines a list into one value -- 3.7.19 only names the one that does. Do this by hand.",
+      "hints": [
+        "let total = 0;  for (const item of list) { total = total + item.price * item.qty; }  return total;",
+        "An accumulator is 'a variable set before a loop and updated inside it' -- 3.3.9 is the worked example"
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Write lowStock",
+      "instructions": "Start with an empty array, walk the list, and push the records that pass the comparison. Return the new array. §3.7 does not teach the method that does this -- 3.7.19 only names it -- so build it by hand, exactly as 3.3.13 does.",
+      "hints": [
+        "const short = [];  for ... if (...) { short.push(item); }  return short;",
+        "push adds to the END of the array -- 3.3.2",
+        "This one must NOT change the list it was handed"
+      ]
+    },
+    {
+      "id": "s7",
+      "title": "Write receiptLines",
+      "instructions": "One line per record, in the shape your problem statement gives. This is the one place §3.7 DOES hand you a tool: the map() method, given an arrow function as its callback (3.7.2, 3.4.12).",
+      "hints": [
+        "return list.map((item) => item.name + ' x' + item.qty);",
+        "map() builds a NEW array -- the original is untouched (3.7.4)",
+        "The arrow is the callback: 3.4.8 is the shorthand rules"
+      ]
+    },
+    {
+      "id": "s8",
+      "title": "Write sellItem",
+      "instructions": "Find the record whose name matches, lower its count by one, never below zero. This function is REQUIRED to change the list it was handed -- the caller holds the same array (3.6.2), so the change is already made when the function returns. Say so in a comment.",
+      "hints": [
+        "Walk the list, find the record, change its property -- 3.6.3 is the worked example",
+        "Never below zero: 3.2.12 is the guard-clause shape",
+        "The function may return nothing at all -- the caller already has the changed list"
+      ]
+    },
+    {
+      "id": "s9",
+      "title": "Write saveStock and loadStock",
+      "instructions": "Save: the list goes to localStorage as JSON text under a key you choose (3.8.15). Load: read the key back. A key that was never saved reads as null -- return the seed list then (3.8.15). Text you did not write can fail to parse, and 3.8.12 says what to do about it: do not let a bad value throw.",
+      "hints": [
+        "localStorage.setItem(KEY, JSON.stringify(list)); -- 3.8.4",
+        "const text = localStorage.getItem(KEY);  if (text === null) { ... } -- 3.8.15",
+        "Wrap the parse in try/catch -- 3.8.13 is the worked example"
+      ]
+    },
+    {
+      "id": "s10",
+      "title": "Write the main section",
+      "instructions": "Below the functions, five to eight lines that CALL each one in order and print the results: the total, the low-stock list, the receipt lines, one sale, one save and one load. The functions do the work; this section only arranges the calls. Copy the order from your chart."
+    },
+    {
+      "id": "s11",
+      "title": "Read it back to each other",
+      "instructions": "Swap the keyboard. The partner who did not type reads the program out loud, one function at a time, while the other checks it against the contract table. Every function on the chart should appear once. Fix what does not match, then run three sets of numbers through it -- you will need them for the demo writeup."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Both partners named in the header",
+      "description": "The Partners line at the top of script.js has names on it",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\S\\n]*Partners:[^\\S\\n]*\\S+",
+      "flags": "i",
+      "points": 0,
+      "hint": "Line 3 of script.js: // Partners: -- put both names after the colon.",
+      "stripComments": false
+    },
+    {
+      "id": "r2",
+      "title": "The problem is named in the header",
+      "description": "The Problem line says which of the four menu problems this is",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\S\\n]*Problem:[^\\S\\n]*\\S+",
+      "flags": "i",
+      "points": 0,
+      "hint": "Line 2 of script.js: // Problem: -- Snack Shack, Lap Times, Seed Tray, or Library Cart.",
+      "stripComments": false
+    },
+    {
+      "id": "r3",
+      "title": "The level is an UPPER_SNAKE_CASE const",
+      "description": "The threshold that never changes is declared with const in UPPER_SNAKE_CASE",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "const\\s+[A-Z][A-Z0-9_]{2,}\\s*=",
+      "flags": "",
+      "points": 0,
+      "hint": "const REORDER_LEVEL = 5; -- capitals and underscores, and const rather than let, because it never changes.",
+      "stripComments": false
+    },
+    {
+      "id": "r4",
+      "title": "A named function is declared",
+      "description": "At least one function is declared with the function keyword, the way 3.1.2 teaches",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+[a-z][A-Za-z0-9_$]*\\s*\\([^)]*\\)\\s*\\{",
+      "flags": "",
+      "points": 0,
+      "hint": "function totalValue(list) { -- the function keyword, a name, and the parameters it takes.",
+      "stripComments": false
+    },
+    {
+      "id": "r5",
+      "title": "A function returns a value",
+      "description": "At least one function hands a value back with return, rather than printing it",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return\\s+[A-Za-z_$(]",
+      "flags": "",
+      "points": 0,
+      "hint": "return total; -- 3.2.9. Printing is not returning (3.2.13): the value has to reach the caller.",
+      "stripComments": false
+    },
+    {
+      "id": "r6",
+      "title": "The data is an array of record objects",
+      "description": "The seed data is an array whose elements are object literals with the same properties",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "=\\s*\\[\\s*\\{[^\\]]*\\}\\s*\\]",
+      "flags": "",
+      "points": 0,
+      "hint": "const stock = [{ name: 'Popcorn', price: 3.5, qty: 12 }, ...]; -- square brackets around a list of { objects }.",
+      "stripComments": false
+    },
+    {
+      "id": "r7",
+      "title": "A loop walks the list",
+      "description": "A for or for...of loop is present, the way 3.3.5 teaches",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(for|while)\\s*\\([^)]*\\)\\s*\\{",
+      "flags": "",
+      "points": 0,
+      "hint": "for (const item of list) { -- the for...of form from 3.3.5, or the counted form.",
+      "stripComments": false
+    },
+    {
+      "id": "r8",
+      "title": "push builds a new list",
+      "description": "A new array is built up with the push method",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.push\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "hint": "short.push(item); -- 3.3.2. The lowStock array starts empty and grows.",
+      "stripComments": false
+    },
+    {
+      "id": "r9",
+      "title": "map() is called with an arrow function",
+      "description": "The map method is given an arrow function as its callback",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.map\\s*\\(\\s*\\(?\\s*[A-Za-z_$][\\w$]*\\s*(,[^)]*)?\\)?\\s*=>",
+      "flags": "",
+      "points": 0,
+      "hint": "list.map((item) => item.name + ' x' + item.qty) -- 3.7.2 for the method, 3.4.6 for the arrow.",
+      "stripComments": false
+    },
+    {
+      "id": "r10",
+      "title": "Spread copies a record",
+      "description": "A new object or array is built from an old one with the spread operator, the way 3.7.14 teaches",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\{\\s*\\.\\.\\.|\\.\\.\\.[A-Za-z_$][\\w$]*\\s*[,}]",
+      "flags": "",
+      "points": 0,
+      "hint": "return { ...item }; -- 3.7.15 is the worked example: 'everything in the old one', then any changes.",
+      "stripComments": false
+    },
+    {
+      "id": "r11",
+      "title": "Data is saved and loaded",
+      "description": "localStorage is used with JSON in both directions, the way 3.8.15 teaches",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?=[\\s\\S]*JSON\\.stringify)(?=[\\s\\S]*JSON\\.parse)[\\s\\S]*localStorage",
+      "flags": "",
+      "points": 0,
+      "hint": "localStorage.setItem(KEY, JSON.stringify(list)) in one function; JSON.parse(localStorage.getItem(KEY)) in the other -- 3.8.15.",
+      "stripComments": false
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "assignmentCode": "A3.9.2",
+  "planFrom": "3-9-1-ch3-group-pa-design-chart",
+  "planFromLabel": "3.9.1"
+}

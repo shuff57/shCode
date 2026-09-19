@@ -1,0 +1,70 @@
+{
+  "id": "3-9-3-ch3-group-pa-demo",
+  "title": "3.9.3 Group PA Part 3: Demo It",
+  "description": "The writeup that goes with the live demo: who did what, three test cases, and where all eight of Chapter 3's sections show up in your program. AI-graded with hints.",
+  "type": "assignment",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.9 Chapter 3 Group Performance Assessment",
+  "preview": "assignment",
+  "slos": [
+    "SLO-1",
+    "SLO-2",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Chapter 3 Group PA, demo third: AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Both partners write this together and both submit the same answer. Everything asked for is something you did in the last hour or read earlier in Chapter 3; go back and reread if you get stuck. Your own everyday words throughout.\n\nPart 1 -- Who did what. Name both partners. Then say who drove the keyboard for the chart (3.9.1), who drove it for the code (3.9.2), and one thing the partner who was not typing caught that the one typing had missed.\n\nPart 2 -- Three test cases. A table or three rows, each with the numbers you put in, what you expected to come out, and what actually came out. At least one of your three has to land on the other side of the comparison from the other two -- a test set that only ever proves one answer has not tested the decision. Worked example, if you are on Snack Shack: with a reorder level of 5, Pretzel (qty 3) is low stock and Popcorn (qty 12) is not. Those two land on opposite sides of the comparison, which is what is being asked for. Three items that all come out low is what does not count, however different the numbers look.\n\nPart 3 -- One thing you logged. Name one console.log you added while building that was there to check your work rather than to report the answer: what you printed, what it showed you, and what you changed because of it (3.2.10). If nothing was wrong, say what the print confirmed and how you would have known if it had been.\n\nPart 4 -- Lifecycle. Chapter 1 opened with the four framework activities (1.1.6). They are:\n  - inception -- the planning: deciding the goals and the overall scope\n  - elaboration -- working out the requirements and designing the thing\n  - construction -- writing and building it\n  - deployment -- releasing it to the people who will use it\nPick ONE of those four for each third of this period -- the chart (3.9.1), the code (3.9.2), this writeup (3.9.3) -- and name it. Then say in one sentence why the elaboration phase (the chart and the contracts) comes before the construction phase (the code) in the lifecycle, and how that helped your pair avoid a bug.\n\nPart 5 -- Chapter 3 checklist. Name the specific function where each of these first appeared in your program: the function definition and its call (3.1), the parameter list and the return value (3.2), the loop over the array (3.3), the arrow function (3.4), the object record and how you read its properties (3.5), the mutation the caller can see (3.6), the map() call (3.7), the save and load (3.8). If you did not use one, say so.\n\nPart 6 -- Extension. If you finished early, you were asked what your mutating function returns and what happens if the caller ignores it. Say what you answered, and why the change is already visible to the caller even though nothing is returned (3.6.2).",
+    "rubric": [
+      {
+        "id": "partners-and-roles",
+        "title": "Both partners named, with who drove which third",
+        "description": "Two names appear, and the response says who had the keyboard for the chart and who had it for the code. Credit generously -- any clear division counts, including 'we swapped every ten minutes' as long as both names are there and both thirds are accounted for. The catch-something-missed detail is a bonus; do not withhold the criterion for a thin one. Withhold only if fewer than two names appear, or if the division of work is not stated at all.",
+        "points": 0
+      },
+      {
+        "id": "three-test-cases",
+        "title": "Three test cases, with one landing on the other side of the comparison",
+        "description": "Three sets of inputs are given, each with an expected result and an actual result. Credit rough tables, bullet lists or prose equally -- format is not being assessed. The one thing that matters: at least one case has to come out on the opposite side of the comparison from the others, so that both answers of the decision are exercised. Credit that if the response makes it visible in any way, including just saying 'this one was not low stock'. If all three land on the same side, credit the criterion as partial and say why in the feedback.",
+        "points": 0
+      },
+      {
+        "id": "debugging-log",
+        "title": "One console.log used to check work, with what it showed",
+        "description": "The response names one specific thing they printed while building, what it showed, and what they did next. Credit a print that confirmed something was already right just as fully as one that found a bug -- the response is allowed to say nothing was wrong, as long as it says what the print told them. Withhold only if no specific printed value is named at all, or the answer is generic advice about debugging rather than something that happened.",
+        "points": 0
+      },
+      {
+        "id": "lifecycle-mapping",
+        "title": "Each third mapped onto a framework activity, and design-before-code justified",
+        "description": "The response assigns a lifecycle activity to each of the three thirds. Placements are allowed to be arguable -- the chart as elaboration or as inception, the writeup as deployment or as construction, are all defensible, and this criterion is about the mapping being attempted and reasoned, not about matching an answer key. Credit any three placements with any reasoning. The design-before-code sentence has to say something about catching problems early or about agreeing before typing; credit any version of that idea.",
+        "points": 0
+      },
+      {
+        "id": "chapter3-checklist",
+        "title": "All eight Chapter 3 sections located in the program",
+        "description": "The response identifies where the function definition and its call (3.1), the parameters and return (3.2), the loop over the array (3.3), the arrow function (3.4), the record object and its properties (3.5), the visible mutation (3.6), the map() call (3.7), and the save and load (3.8) appear in their program, by function name. If a section is not used, the response says so explicitly.",
+        "points": 0
+      },
+      {
+        "id": "extension-mutation",
+        "title": "The mutating function's return value, and why ignoring it is safe",
+        "description": "The response says what their mutating function returns (often nothing), and explains why the caller still sees the change: both names hold the same array, so a change inside is visible outside. Credit any version of the reference idea. Withhold only if the response claims the change would be lost unless it was returned.",
+        "points": 0
+      }
+    ],
+    "summative": false
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A3.9.3"
+}

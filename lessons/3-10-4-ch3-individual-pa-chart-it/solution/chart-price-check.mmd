@@ -1,0 +1,22 @@
+flowchart TD
+  A([Start])
+  B[/Read the cart and the limit/]
+  C[Set the total to zero]
+  D{{i = 0 to cart.length - 1}}
+  F[[totalOne item]]
+  G{Is total over the limit?}
+  H[/Report over the limit/]
+  I[Report at or under the limit]
+  J[[receiptLine item]]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -- "Yes, more to count" --> F
+  F --> D
+  D -- "No, the cart is done" --> G
+  G -- "Past the limit" --> H
+  G -- "At or under" --> I
+  H --> Z
+  I --> J
+  J --> Z
