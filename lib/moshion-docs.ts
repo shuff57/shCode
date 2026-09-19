@@ -1258,6 +1258,39 @@ function draw() {
 }`,
       },
       {
+        title: 'Touch: a finger drives the mouse',
+        body: `A single touch drives exactly the same mouse properties — mouse.x, mouse.y, mouse.presses(), mouse.pressing(), mouse.released(). A sketch written against the mouse works on a phone or tablet with no changes at all.
+
+Three things a tap does, all at once: it moves the cursor to where you touched, it starts a press (so mouse.presses() fires on that frame, reading the touch position), and it stops the page from scrolling or zooming out from under the canvas. Dragging a finger across the canvas keeps the press held and keeps mouse.x/y following the finger, like holding the left button down.
+
+Multi-touch is deliberately not mapped. A second finger changes nothing, and there is no touch gesture that stands in for the right mouse button — a sketch that needs two buttons needs a keyboard as well. mouse.isActive also turns true on the first touch, exactly as it does on the first mouse move.`,
+        code: `let dot;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+  dot = new Sprite(200, 200, 40);
+  dot.color = 'white';
+  dot.collider = 'none';
+}
+
+function update() {
+  dot.x = mouse.x;
+  dot.y = mouse.y;
+  dot.color = mouse.pressing() ? 'gold' : 'white';
+}
+
+function draw() {
+  background('#222');
+}
+
+function drawTop() {
+  fill('white');
+  textSize(14);
+  text('tap or drag anywhere', 14, 22);
+}`,
+      },
+      {
         title: 'Hit-testing with the mouse',
         body: `world.getSpriteAt(x, y) returns the top-most (highest layer) sprite at that world position, or undefined if nothing is there. It checks both circles (radius test) and rectangles (bounding box).
 
@@ -1579,11 +1612,11 @@ function draw() {
       },
       {
         title: "HUDs that don't scroll",
-        body: `When you move camera.x to follow the player, everything drawn inside draw() scrolls with the world — including your score text. That's rarely what you want for a HUD.
+        body: `When you move camera.x to follow the player, everything drawn inside draw() scrolls with the world — including your score text. And there is a second, quieter problem: the engine draws every sprite AFTER draw(), so anything draw() paints lands underneath the sprites — a score in the top-left corner disappears behind whatever wall happens to be up there.
 
-The simplest approach: draw your HUD at fixed screen coordinates before moving the camera. Since the camera starts at (0, 0) each frame, draw your HUD first, then update the camera position for the rest of the frame.
+drawTop() is the answer to both. It runs after the sprites are on the canvas, with the camera off for its duration, so text('Score: ' + score, 10, 24) means 10 pixels from the canvas edge and lands on top of the world. Define it like any other hook — the engine calls it every frame if it exists, and a sketch without it runs exactly as before.
 
-For a more robust approach, track the camera offset and subtract it when drawing HUD elements. But for most simple games, drawing the HUD at the top of draw() before any camera movement works fine.`,
+camera.off() around drawing inside draw() still works for positioning, and it is still the right tool when you want something under the sprites on purpose (a vignette, a floor grid). But a HUD wants drawTop().`,
         code: `let player;
 
 function setup() {
@@ -1602,7 +1635,9 @@ function update() {
 
 function draw() {
   background('#222');
+}
 
+function drawTop() {
   fill('white');
   textSize(16);
   text('x: ' + Math.round(player.x), 10, 24);

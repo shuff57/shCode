@@ -96,6 +96,23 @@ Key classes and where they live in `moshion.js`:
 - **`DistanceJoint.length` is settable post-construction** and wakes both
   bodies (planck doesn't wake on joint property changes — a settled body
   would keep its old separation forever).
+- **`render()` runs AFTER the user's `draw()`**, so anything a sketch draws with
+  primitives lands UNDERNEATH every sprite. That is what `drawTop()` exists for:
+  it runs after `render()`, with the camera off for its duration and restored
+  after. `camera.off()` alone fixes the position, not the z-order.
+- **A single touch drives the left-mouse counters** — mouse.x, mouse.presses()
+  and friends work on touch with no sketch changes. `touchstart` sets the
+  position BEFORE the press counter (a tap carries both in one event, no hover
+  first); both handlers `preventDefault()` with `{passive:false}` or the
+  browser replays the gesture as synthetic mouse events ~300ms later and
+  scrolls the page under the sketch; `touchend`/`touchcancel` live on window
+  and bail while touches remain. Multi-touch is deliberately unmapped.
+- **Pointer coords are divided by the canvas's displayed scale.** A host may
+  show the canvas at a size other than its backing store (`runner.html` scales
+  it down to fit a narrow frame; `?fit=1` opts into scaling UP, for curated
+  showcases only), so `_pointerTo()` converts through `CANVAS_.width /
+  rect.width`. A no-op at 1:1; without it aiming on a scaled canvas lands
+  short of the cursor by exactly the scale factor.
 - **`moshion.js` and `moshion.d.ts` ship together** — public API changes must be
   reflected in both. The `.d.ts` is hand-authored, not generated.
 - **The in-app docs** (`lib/moshion-docs.ts`, rendered at `/docs/moshion`) are
