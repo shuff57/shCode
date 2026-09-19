@@ -11,14 +11,14 @@
 // ---------------------------------------------------------------- data
 // Item 10: an array of game data that a loop reads. Adding a kind here is
 // the whole edit -- nothing below is written per-kind.
-const CRATE_KINDS = [
+const crateKinds = [
   { name: 'supply', color: '#6c9', points: 1, speed: 2.2, size: 30 },
   { name: 'medical', color: '#c67', points: 3, speed: 3.0, size: 24 },
   { name: 'fuel', color: '#fc6', points: 5, speed: 3.8, size: 20 },
 ];
 
-const SAVE_KEY = 'salvageRun.best';
-const MAX_MISSES = 3;
+const saveKey = 'salvageRun.best';
+const maxMisses = 3;
 
 // ---------------------------------------------------------------- class
 // Item 2: a class of my own, used to make many objects.
@@ -69,7 +69,7 @@ function setup() {
   collector.friction = 0;
 
   // Item 8: something that survives closing the tab.
-  let saved = getItem(SAVE_KEY);
+  let saved = getItem(saveKey);
   best = saved === null ? 0: saved;
 
   runTests();
@@ -85,9 +85,9 @@ function scoreFor(kind, comboCount) {
 
 function pickKind(roll) {
   // roll is 0..1. Rarer kinds are worth more.
-  if (roll > 0.85) return CRATE_KINDS[2];
-  if (roll > 0.55) return CRATE_KINDS[1];
-  return CRATE_KINDS[0];
+  if (roll > 0.85) return crateKinds[2];
+  if (roll > 0.55) return crateKinds[1];
+  return crateKinds[0];
 }
 
 function spawnCrate() {
@@ -110,7 +110,7 @@ function endRun() {
   state = 'gameover';
   if (score > best) {
     best = score;
-    storeItem(SAVE_KEY, best);
+    storeItem(saveKey, best);
   }
 }
 
@@ -156,7 +156,7 @@ function updatePlay() {
   }
   crates = survivors;
 
-  if (misses >= MAX_MISSES) endRun();
+  if (misses >= maxMisses) endRun();
 }
 
 function draw() {
@@ -170,7 +170,7 @@ function draw() {
       text('SALVAGE RUN', 300, 240);
       textSize(16);
       text('a / d to fly, catch the crates', 280, 285);
-      text('miss ' + MAX_MISSES + ' and the run ends', 285, 310);
+      text('miss ' + maxMisses + ' and the run ends', 285, 310);
       text('best so far: ' + best, 330, 345);
       text('press enter to launch', 300, 385);
       if (kb.presses('enter')) startRun();
@@ -179,7 +179,7 @@ function draw() {
     case 'play':
       updatePlay();
       text('score ' + score, 20, 30);
-      text('misses ' + misses + ' / ' + MAX_MISSES, 20, 55);
+      text('misses ' + misses + ' / ' + maxMisses, 20, 55);
       text('best ' + best, 700, 30);
       text('p pauses', 700, 55);
       break;
@@ -215,8 +215,8 @@ function check(label, got, want) {
 }
 
 function runTests() {
-  let supply = CRATE_KINDS[0];
-  let fuel = CRATE_KINDS[2];
+  let supply = crateKinds[0];
+  let fuel = crateKinds[2];
 
   check('a supply crate below combo is worth its face value', scoreFor(supply, 0), 1);
   check('combo doubles once the score reaches 3', scoreFor(fuel, 3), 10);

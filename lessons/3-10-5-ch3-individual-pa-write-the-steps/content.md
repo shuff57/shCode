@@ -13,8 +13,8 @@ must contain:
 - A **`map()` call** with an **arrow function** as its callback
 - At least one **spread** copy (`{ ...item }` or `[...list]`)
 - A **save/load round trip**: `JSON.stringify` into `localStorage`, and `JSON.parse` back
-- **Documentation:** header comment (Problem, Partners = N/A, Date), UPPER_SNAKE_CASE
-  const for the limit, camelCase variables, at least one `console.log` reporting the
+- **Documentation:** header comment (Problem, Partners = N/A, Date), a const for the
+  limit, camelCase names throughout, at least one `console.log` reporting the
   result, `typeof` for one value
 
 **Three problems. Pick one.** They are the same difficulty and the same shape. Adjacent
@@ -57,7 +57,7 @@ the total, and the watered copy. Save the rota under a key and load it back.
 - **The array methods you may use are `map`, `slice`, `concat` and spread.** 3.7.19 named
   the others without teaching them; anything outside the four goes past the chapter.
 - **Header comment:** Problem, Partners = N/A, Date.
-- **Limit** as `const UPPER_SNAKE_CASE`.
+- **Limit** as a `const`.
 - At least one `console.log` that reports a result.
 - **`typeof`** for one value.
 - **No Run button.** One attempt, paper locks on submit.

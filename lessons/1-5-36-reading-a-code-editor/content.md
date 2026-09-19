@@ -24,14 +24,14 @@ An editor plus a browser is a perfectly good **IDE** (integrated development env
 Two things an editor does for you that the console does not. Read the code and notice what would be harder without help.
 
 ```js live plain
-const TAX_RATE = 0.0725;
+const taxRate = 0.0725;
 
 let itemPrice = 19.99;
 let itemCount = 3;
 
 if (itemCount > 0) {
   let subtotal = itemPrice * itemCount;
-  let total = subtotal + subtotal * TAX_RATE;
+  let total = subtotal + subtotal * taxRate;
   console.log("Total: $" + total.toFixed(2));
 } else {
   console.log("Nothing in the basket");

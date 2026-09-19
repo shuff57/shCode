@@ -209,15 +209,15 @@ The fix is one line at the top of the file: "use strict". It turns the silent ac
         title: 'Naming rules and conventions',
         body: `A variable name can contain letters, digits, $ and _, and cannot start with a digit. It cannot be a reserved word like let, const, if or for.
 
-The course convention is camelCase: start with a lowercase letter, and capitalise the first letter of each following word — playerScore, totalCost, isGameOver. Constants that are truly fixed use UPPER_SNAKE_CASE: TAX_RATE, MAX_PLAYERS.
+The course convention is camelCase for every name: start with a lowercase letter, and capitalise the first letter of each following word — playerScore, totalCost, isGameOver. A value that is truly fixed is written the same way and declared with const: taxRate, maxPlayers.
 
 A name should say what the value is for. total is better than t, and a comment explaining a name usually means the name should be better.`,
-        code: `const TAX_RATE = 0.08;
+        code: `const taxRate = 0.08;
 let playerScore = 0;
 let isGameOver = false;
 
 playerScore = playerScore + 10;
-console.log(playerScore, isGameOver, TAX_RATE);`,
+console.log(playerScore, isGameOver, taxRate);`,
       },
     ],
   },

@@ -9,7 +9,7 @@ const ROTA = [
   { name: "Aloe", ml: 60, watered: false },
   { name: "Basil", ml: 90, watered: false }
 ];
-const CAN_ML = 250;
+const canMl = 250;
 
 // One function: the total (loop + accumulator, 3.3.9).
 function totalWater(plants) {

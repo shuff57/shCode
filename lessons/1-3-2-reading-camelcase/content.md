@@ -7,7 +7,7 @@ A variable name should tell a reader what the value means. The JavaScript habit 
 - Descriptive names (`unitPrice`) beat short mystery names (`p`).
 - The computer runs both versions the same: names are for humans.
 - A clear name often removes the need for a comment.
-- A value that never changes gets a different style: `UPPER_SNAKE_CASE`, like `TAX_RATE`.
+- A value that never changes is written the same way — `const` is what marks it.
 
 **Try it:**
 
@@ -25,34 +25,35 @@ let subtotal = unitPrice * quantity;
 console.log("Subtotal: $" + subtotal);
 ```
 
-## Values that never change get SHOUTED
+## Values that never change say so with `const`
 
-There is one other naming style in this course, and it exists to answer a question a reader
-always has: *is this value going to move?*
+There is a question a reader always has about a value: *is this one going to move?*
 
-When a value is set once and never changes again: a tax rate, the number of days in a week :
-write its name in **UPPER_SNAKE_CASE**: every letter capital, with an underscore between words.
+A value that is set once and never changes again — a tax rate, the number of days in a week —
+is declared with **`const`** instead of `let`. The name itself stays in ordinary camelCase. The
+keyword in front of it is what carries the message.
 
-| Style | Looks like | Used for |
+| Keyword | Looks like | Used for |
 |------|------|------|
-| camelCase | `unitPrice` | a value that can change while the program runs |
-| UPPER_SNAKE_CASE | `TAX_RATE` | a value that is set once and never changes |
+| `let` | `let unitPrice = 29.99;` | a value that can change while the program runs |
+| `const` | `const taxRate = 0.0725;` | a value that is set once and never changes |
 
-The capitals are a message to the person reading: *do not expect this to move.* That pairs with
-`const`, which says the same thing to the computer.
+`const` speaks to both audiences at once. The reader sees it in the first word of the line, and
+the computer refuses to let the value be reassigned.
 
 ```js live plain
-const DAYS_IN_WEEK = 7;
+const daysInWeek = 7;
 
 let weeksWorked = 3;
-let daysWorked = weeksWorked * DAYS_IN_WEEK;
+let daysWorked = weeksWorked * daysInWeek;
 
 console.log("Days worked: " + daysWorked);
 ```
 
-Both styles are conventions, not rules the computer enforces. `TAX_RATE` and `taxRate` run
-exactly the same. The capitals are there so a reader can tell the two kinds of value apart at a
-glance, without reading the rest of the program.
+So one naming style covers every value in this course: `taxRate` and `daysInWeek` are written
+exactly like `unitPrice`, and there is no second style to remember. What tells the two kinds of
+value apart is the keyword, not the spelling — and unlike a naming habit, the keyword is one the
+computer actually enforces.
 
 ---
 
@@ -61,6 +62,6 @@ glance, without reading the rest of the program.
 | Term | Meaning |
 |------|---------|
 | **camelCase** | Naming style: start lowercase, capitalize each later word (`firstName`) |
-| **UPPER_SNAKE_CASE** | Naming style for a value that never changes: all capitals, underscores between words (`TAX_RATE`) |
+| **`const`** | Declares a value that is set once and never changes (`const taxRate = 0.0725;`) |
 | **descriptive name** | A name that tells the reader what the value means (`unitPrice`, not `p`) |
 | **convention** | An agreed habit programmers follow that the computer does not enforce |

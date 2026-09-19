@@ -4,8 +4,8 @@
 // Date: 2026-11-02
 
 // STEP 1: The seed data and the level.
-const STOCK_KEY = "snack-shack-stock";
-const REORDER_LEVEL = 5;
+const stockKey = "snack-shack-stock";
+const reorderLevel = 5;
 
 const stock = [
   { name: "Popcorn", price: 3.5, qty: 12 },
@@ -63,11 +63,11 @@ function sellItem(list, name) {
 }
 
 function saveStock(list) {
-  localStorage.setItem(STOCK_KEY, JSON.stringify(list));
+  localStorage.setItem(stockKey, JSON.stringify(list));
 }
 
 function loadStock() {
-  const text = localStorage.getItem(STOCK_KEY);
+  const text = localStorage.getItem(stockKey);
   if (text === null) {
     return stock.map(copyItem);
   }
@@ -86,8 +86,8 @@ function copyItem(item) {
 
 // STEP 4: The main section -- calls in the order the chart says.
 console.log("Total inventory value: $" + totalValue(stock).toFixed(2));
-console.log("Low stock (under " + REORDER_LEVEL + "):");
-console.log(receiptLines(lowStock(stock, REORDER_LEVEL)).join("\n"));
+console.log("Low stock (under " + reorderLevel + "):");
+console.log(receiptLines(lowStock(stock, reorderLevel)).join("\n"));
 console.log("Receipt:");
 console.log(receiptLines(stock).join("\n"));
 

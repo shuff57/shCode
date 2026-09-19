@@ -33,11 +33,11 @@ used, because Chapter 2 never teaches it.
 // Date: 2026-09-30
 
 const ROWS = 5;
-const SEATS_PER_ROW = 10;
-const GROUP_SIZE = 3;
+const seatsPerRow = 10;
+const groupSize = 3;
 
 try {
-  if (ROWS < 1 || SEATS_PER_ROW < 1 || GROUP_SIZE < 1) {
+  if (ROWS < 1 || seatsPerRow < 1 || groupSize < 1) {
     throw new Error("R, S and G must all be at least 1");
   }
 
@@ -47,16 +47,16 @@ try {
 
   for (let r = 1; r <= ROWS; r++) {
     let consecutive = 0;
-    for (let s = 1; s <= SEATS_PER_ROW; s++) {
+    for (let s = 1; s <= seatsPerRow; s++) {
       // Seats 4 and 5 of every row are staff seats -- skip them.
       if (s === 4 || s === 5) {
         continue;
       }
       consecutive = consecutive + 1;
-      if (consecutive >= GROUP_SIZE && !found) {
+      if (consecutive >= groupSize && !found) {
         found = true;
         foundRow = r;
-        foundStart = s - GROUP_SIZE + 1;
+        foundStart = s - groupSize + 1;
       }
     }
   }
@@ -64,11 +64,11 @@ try {
   // Report with a branch, not a switch: two outcomes, and §2.3 teaches
   // that a two-outcome classification is an if/else.
   if (found) {
-    console.log(`Block found: row ${foundRow}, seats ${foundStart} to ${foundStart + GROUP_SIZE - 1}`);
+    console.log(`Block found: row ${foundRow}, seats ${foundStart} to ${foundStart + groupSize - 1}`);
   } else if (ROWS < 1) {
     console.log("No theater at all");
   } else {
-    console.log("No block of " + GROUP_SIZE + " free seats anywhere");
+    console.log("No block of " + groupSize + " free seats anywhere");
   }
 
   console.log(typeof found);
@@ -78,7 +78,7 @@ try {
 ```
 
 **Points earned (example):**
-- Branch with `&&`: 8/8 — `consecutive >= GROUP_SIZE && !found` is compound
+- Branch with `&&`: 8/8 — `consecutive >= groupSize && !found` is compound
 - Nested loop: 9/9 — seat sweep inside a row sweep, both run
 - Break/continue: 3/3 — `continue` past seats 4 and 5
 - **Total: 20/20**

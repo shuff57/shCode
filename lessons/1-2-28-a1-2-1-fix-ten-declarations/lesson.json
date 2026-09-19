@@ -75,11 +75,11 @@
     },
     {
       "id": "r5",
-      "title": "MAX_STUDENTS is a const",
+      "title": "maxStudents is a const",
       "description": "The value that never changes is declared with const",
       "type": "regex",
       "file": "script.js",
-      "pattern": "const\\s+MAX_STUDENTS\\s*=\\s*[\\d.]",
+      "pattern": "const\\s+(?:maxStudents|MAX_STUDENTS)\\s*=\\s*[\\d.]",
       "flags": "",
       "points": 0
     },

@@ -10,4 +10,4 @@ Press Run and the book title, the price before tax, and the final total appear i
 
 ## Know first?
 
-The tax rate is the TAX_RATE line at the top of script.js, and it is the one number you will have to change when the rate goes up.
+The tax rate is the taxRate line at the top of script.js, and it is the one number you will have to change when the rate goes up.

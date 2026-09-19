@@ -8,7 +8,7 @@
 // bug it was -- the three kinds are on the instructions beside this
 // editor.
 
-const TAX_RATE = 0.08;
+const taxRate = 0.08;
 
 let itemName = "Notebook;
 let unitPrice = 4.25;
@@ -19,7 +19,7 @@ let subtotal = unitPrice * count;
 let shipping = 5;
 let beforeTax = subtotal + shipping;
 
-let tax = beforeTax * TAX_RATE;
+let tax = beforeTax * taxRate;
 let total = beforTax + tax;
 
 // Bug 3: savings -- ten a week for four weeks, but week three is a

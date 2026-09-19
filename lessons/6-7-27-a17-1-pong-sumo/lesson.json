@@ -129,7 +129,7 @@
       "description": "A comparison against a winning number (e.g. p1Score >= 5) triggers the win condition.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "p[12]Score\\s*(?:>=|===|>)\\s*(?:\\d+|[A-Z][A-Z0-9_]*)",
+      "pattern": "p[12]Score\\s*(?:>=|===|>)\\s*(?:\\d+|[A-Za-z_$][A-Za-z0-9_$]*)",
       "flags": "",
       "points": 0
     },

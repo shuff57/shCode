@@ -25,7 +25,7 @@ better you are doing.
 
 `script.js` holds the whole game. Reading order that will make sense:
 
-- `CRATE_KINDS` at the top is the data the game is built from. Adding a
+- `crateKinds` at the top is the data the game is built from. Adding a
   fourth kind of crate is a one-line edit and nothing below it changes.
 - `class Crate` wraps a sprite with the things the game cares about: which
   kind it is, whether it has been counted, whether it has escaped.

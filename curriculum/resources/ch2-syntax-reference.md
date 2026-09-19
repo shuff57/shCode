@@ -17,9 +17,9 @@ let empty = null;        // null
 let notSet;              // undefined
 ```
 
-**UPPER_SNAKE_CASE** for constants that never change: `const MAX_SIZE = 100;`
+**camelCase** for every variable name: `let itemCount = 0;`
 
-**camelCase** for variables: `let itemCount = 0;`
+**`const`** for a value that never changes: `const maxSize = 100;`
 
 ---
 

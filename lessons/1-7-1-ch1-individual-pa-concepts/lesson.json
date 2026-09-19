@@ -84,7 +84,7 @@
         "variant": "a",
         "source": "1.2.2",
         "question": "What does this program print?",
-        "code": "const TAX_RATE = 0.08;\nTAX_RATE = 0.09;\nconsole.log(TAX_RATE);",
+        "code": "const taxRate = 0.08;\ntaxRate = 0.09;\nconsole.log(taxRate);",
         "options": [
           "0.09",
           "0.08",
@@ -175,7 +175,7 @@
         "variant": "b",
         "source": "1.2.2",
         "question": "What does this program print?",
-        "code": "const SPEED_LIMIT = 55;\nSPEED_LIMIT = 65;\nconsole.log(SPEED_LIMIT);",
+        "code": "const speedLimit = 55;\nspeedLimit = 65;\nconsole.log(speedLimit);",
         "options": [
           "Nothing — the program stops with a TypeError",
           "65",
@@ -266,7 +266,7 @@
         "variant": "c",
         "source": "1.2.2",
         "question": "What does this program print?",
-        "code": "const CLASS_SIZE = 24;\nCLASS_SIZE = CLASS_SIZE + 1;\nconsole.log(CLASS_SIZE);",
+        "code": "const classSize = 24;\nclassSize = classSize + 1;\nconsole.log(classSize);",
         "options": [
           "undefined",
           "Nothing — the program stops with a TypeError",

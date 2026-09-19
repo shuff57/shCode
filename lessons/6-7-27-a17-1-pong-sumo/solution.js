@@ -6,7 +6,7 @@
 let gameState = 'title';
 let p1, p2, ball;
 let p1Score = 0, p2Score = 0;
-const WIN_SCORE = 5;
+const winScore = 5;
 const W = 600, H = 400;
 
 function setup() {
@@ -57,7 +57,7 @@ function draw() {
       text('Pong-Sumo', W / 2, H / 2 - 40);
       textSize(16);
       text('Player 1: W / S        Player 2: Up / Down', W / 2, H / 2 + 10);
-      text('First to ' + WIN_SCORE + ' wins', W / 2, H / 2 + 40);
+      text('First to ' + winScore + ' wins', W / 2, H / 2 + 40);
       textSize(14);
       text('Press SPACE to start', W / 2, H / 2 + 80);
       if (kb.presses(' ')) {
@@ -94,8 +94,8 @@ function draw() {
       textAlign(RIGHT);
       text('P2: ' + p2Score, W - 20, 36);
 
-      // Win condition: using the WIN_SCORE constant declared at the top
-      if (p1Score >= WIN_SCORE || p2Score >= WIN_SCORE) {
+      // Win condition: using the winScore constant declared at the top
+      if (p1Score >= winScore || p2Score >= winScore) {
         gameState = 'win';
       }
       break;
@@ -104,7 +104,7 @@ function draw() {
       fill('white');
       textSize(28);
       textAlign(CENTER);
-      let winner = (p1Score >= WIN_SCORE) ? 'Player 1': 'Player 2';
+      let winner = (p1Score >= winScore) ? 'Player 1': 'Player 2';
       text(winner + ' wins!', W / 2, H / 2 - 20);
       textSize(16);
       text('Press R to play again', W / 2, H / 2 + 30);

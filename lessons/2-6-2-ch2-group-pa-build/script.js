@@ -5,7 +5,7 @@
 
 // STEP 1: Declare your inputs and your limit.
 // One variable per number, one for the name or label, and the fixed
-// limit as a const in UPPER_SNAKE_CASE (2.6.1 asked you to pick them).
+// limit as a const (2.6.1 asked you to pick them).
 
 // STEP 2: Copy the chart from 2.6.1 in as comments.
 // One chart shape per // line, in order, indented to show what sits

@@ -5,9 +5,9 @@
 
 // STEP 1: Inputs and limit.
 const N = 20;
-const BANK_NAME = "North Bank";
-const SKIP_MULTIPLE = 3;
-const REPORT_LOCKER = 7;
+const bankName = "North Bank";
+const skipMultiple = 3;
+const reportLocker = 7;
 
 // STEP 2: The chart from 2.6.1, as comments.
 // START
@@ -33,10 +33,10 @@ try {
 let locker7State = "never touched";
 
 for (let i = 1; i <= N; i++) {
-  if (i % SKIP_MULTIPLE === 0) {
+  if (i % skipMultiple === 0) {
     continue;
   }
-  if (i === REPORT_LOCKER) {
+  if (i === reportLocker) {
     if (i % 2 === 1) {
       locker7State = "open";
     } else {
@@ -50,13 +50,13 @@ for (let i = 1; i <= N; i++) {
 
 switch (locker7State) {
   case "open":
-    console.log(`Locker ${REPORT_LOCKER} at ${BANK_NAME} is open.`);
+    console.log(`Locker ${reportLocker} at ${bankName} is open.`);
     break;
   case "closed":
-    console.log(`Locker ${REPORT_LOCKER} at ${BANK_NAME} is closed.`);
+    console.log(`Locker ${reportLocker} at ${bankName} is closed.`);
     break;
   case "never touched":
-    console.log(`Locker ${REPORT_LOCKER} at ${BANK_NAME} was never touched.`);
+    console.log(`Locker ${reportLocker} at ${bankName} was never touched.`);
     break;
   default:
     console.log("Unknown state");

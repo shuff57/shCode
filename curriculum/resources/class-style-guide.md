@@ -34,7 +34,7 @@ let score = 0        // incorrect: missing semicolon
 |------|-----------|---------|
 | Variables | `camelCase` | `userName`, `totalCost` |
 | Functions | `camelCase` | `calculateTax`, `printResult` |
-| Constants | `UPPER_SNAKE_CASE` | `TAX_RATE`, `MAX_ITEMS` |
+| Constants | `camelCase`, declared with `const` | `taxRate`, `maxItems` |
 | Classes | `PascalCase` *(preview: Week 12)* | `ShoppingCart`, `GamePlayer` |
 
 - Names must be **descriptive**. Single-letter names are only allowed for loop counters (`i`, `j`, `k`).

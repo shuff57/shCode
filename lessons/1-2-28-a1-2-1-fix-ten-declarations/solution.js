@@ -13,7 +13,7 @@ let isEnrolled = true;
 const gradeLevel = 10;
 
 // 5. a school's maximum never changes during the program
-const MAX_STUDENTS = 30;
+const maxStudents = 30;
 
 // 6. what does "p" hold? rename it to unitPrice
 const unitPrice = 29.99;
@@ -31,4 +31,4 @@ const middleName = null;
 let finalScore;
 
 console.log(studentAge, firstName, isEnrolled, gradeLevel);
-console.log(MAX_STUDENTS, favouriteColour, middleName, finalScore);
+console.log(maxStudents, favouriteColour, middleName, finalScore);

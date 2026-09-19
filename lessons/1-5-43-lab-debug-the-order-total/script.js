@@ -5,16 +5,16 @@
 //
 // The order: 3 notebooks at 4.00 each, 10% off, then 8% tax.
 
-const DISCOUNT_RATE = 0.10;
-const TAX_RATE = 0.08;
+const discountRate = 0.10;
+const taxRate = 0.08;
 
 let unitPrice = 4.00;
 let quantity = 3;
 
 let subtotal = unitPrice + quantity;
-let discount = subtotal * DISCOUNT_RATE;
+let discount = subtotal * discountRate;
 let discounted = subtotal + discount;
-let tax = discounted * TAX_RATE;
+let tax = discounted * taxRate;
 let total = discounted - tax;
 
 console.log(total);

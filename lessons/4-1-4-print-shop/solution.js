@@ -1,7 +1,7 @@
 // Print Shop: Q1 Synthesis Project
 
 // Filament cost per gram, kept in one place so it's easy to change.
-const FILAMENT_COST_PER_GRAM = {
+const filamentCostPerGram = {
   PLA: 0.03,
   PETG: 0.04,
   ABS: 0.035,
@@ -9,9 +9,9 @@ const FILAMENT_COST_PER_GRAM = {
 
 // Rough estimates: about 15,000 cubic mm printed per hour, and about
 // 0.00124 grams of filament used per cubic mm of the part's bounding box.
-const HOURS_PER_CUBIC_MM = 1 / 15000;
-const GRAMS_PER_CUBIC_MM = 0.00124;
-const MACHINE_COST_PER_HOUR = 1.5;
+const hoursPerCubicMm = 1 / 15000;
+const gramsPerCubicMm = 0.00124;
+const machineCostPerHour = 1.5;
 
 // STEP 1: at least 5 orders, each an object with name/width/height/depth/filament/priority.
 const orders = [
@@ -25,16 +25,16 @@ const orders = [
 // STEP 2: estimated print time from the order's volume.
 function estimateHours(order) {
   const volume = order.width * order.height * order.depth;
-  return volume * HOURS_PER_CUBIC_MM;
+  return volume * hoursPerCubicMm;
 }
 
 // STEP 3: price = filament grams * cost/gram, plus machine time.
 function priceOf(order) {
   const volume = order.width * order.height * order.depth;
-  const grams = volume * GRAMS_PER_CUBIC_MM;
-  const costPerGram = FILAMENT_COST_PER_GRAM[order.filament] || FILAMENT_COST_PER_GRAM.PLA;
+  const grams = volume * gramsPerCubicMm;
+  const costPerGram = filamentCostPerGram[order.filament] || filamentCostPerGram.PLA;
   const materialCost = grams * costPerGram;
-  const machineCost = estimateHours(order) * MACHINE_COST_PER_HOUR;
+  const machineCost = estimateHours(order) * machineCostPerHour;
   return materialCost + machineCost;
 }
 
@@ -76,7 +76,7 @@ console.log("You made $" + totalMade.toFixed(2) + "; queue is " + totalHours.toF
 
 // STEP 8: three manual tests, one of them an edge case.
 const testCube = { name: "Test cube", width: 10, height: 10, depth: 10, filament: "PLA", priority: 1 };
-const expectedHours = (10 * 10 * 10) * HOURS_PER_CUBIC_MM;
+const expectedHours = (10 * 10 * 10) * hoursPerCubicMm;
 console.log(estimateHours(testCube) === expectedHours ? "PASS": "FAIL");
 
 const sortedSample = sortByPriority([

@@ -12,8 +12,8 @@ objects) that solves the problem you picked. It must contain:
 - A **break** or `continue` inside the loop
 - A **try/catch** around the one input that can be bad, reporting `err.message`
 - A `switch` that classifies the result (three outcomes)
-- **Documentation:** header comment (Problem, Partners = N/A, Date), UPPER_SNAKE_CASE
-  const for the limit, camelCase variables, at least one template literal `console.log`,
+- **Documentation:** header comment (Problem, Partners = N/A, Date), a const for the
+  limit, camelCase names throughout, at least one template literal `console.log`,
   `typeof` for one value
 
 **Three problems. Pick one.** They are the same difficulty and the same shape: take one
@@ -54,7 +54,7 @@ or negative gallons.
 - **No functions, no arrays, no objects.** Single script, top to bottom.
 - **Iteration** only from counters or string indexing (`word[i]`, `word.length`).
 - **Header comment:** Problem, Partners = N/A, Date.
-- **Limit** as `const UPPER_SNAKE_CASE`.
+- **Limit** as a `const`.
 - **Template literal** in at least one `console.log`.
 - **`typeof`** for one value.
 - **No Run button.** One attempt, paper locks on submit.

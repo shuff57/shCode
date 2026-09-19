@@ -2,7 +2,7 @@
 
 let gameState;
 let p1, p2, ball;
-const WIN_SCORE = 5;
+const winScore = 5;
 
 function setup() {
   // STEP 1: Create a canvas (try 600×400) and turn off gravity so sprites glide

@@ -2,22 +2,22 @@
 //
 // Reference solution. Each fix is marked with the bug kind it was.
 
-const STORE_NAME = "Corner Counter";
+const storeName = "Corner Counter";
 
 // BUG 1 — syntax: the file was not valid JavaScript. Each object
 // literal was missing the colon between the property name and its
 // value, so nothing in the file ran. Fix: `price: 1.2`.
-const PRICE_LIST = [
+const priceList = [
   { name: "Clip", price: 1.2 },
   { name: "Pad", price: 2.5 },
   { name: "Tape", price: 3.1 }
 ];
 
 // BUG 2 — runtime: the file was valid and started, then stopped.
-// PRICE_LIST.length is 3 and the last index is 2; indexing with length
+// priceList.length is 3 and the last index is 2; indexing with length
 // reads one past the end and throws "Cannot read properties of
 // undefined". Fix: length - 1, or .at(-1) from 3.3.2.
-const lastItem = PRICE_LIST[PRICE_LIST.length - 1];
+const lastItem = priceList[priceList.length - 1];
 
 // BUG 3 — logic: the program ran to the end and printed undefined for
 // every line. The arrow has a block body, and a block body returns
@@ -39,10 +39,10 @@ function backupWithSale(item) {
   return { ...item, price: item.price - 1 };
 }
 
-const backup = backupWithSale(PRICE_LIST[0]);
+const backup = backupWithSale(priceList[0]);
 
-console.log("Store: " + STORE_NAME);
+console.log("Store: " + storeName);
 console.log("Last item: " + lastItem.name);
-console.log(receiptLines(PRICE_LIST));
-console.log("Original: " + PRICE_LIST[0].name + " at $" + PRICE_LIST[0].price);
+console.log(receiptLines(priceList));
+console.log("Original: " + priceList[0].name + " at $" + priceList[0].price);
 console.log("Backup: " + backup.name + " at $" + backup.price);

@@ -6,8 +6,8 @@
 // requirement of the API -- it is what lets you see the saved shape, version
 // it, and refuse a save written by an older build.
 
-const SAVE_KEY = 'arcadeProfile';
-const SAVE_VERSION = 2;
+const saveKey = 'arcadeProfile';
+const saveVersion = 2;
 
 let profile;
 let score = 0;
@@ -21,7 +21,7 @@ function setup() {
 // stored yet, stored text that is not valid JSON, and a save written by an
 // older version of the game.
 function loadProfile() {
-  let raw = getItem(SAVE_KEY);
+  let raw = getItem(saveKey);
   if (raw === null) return freshProfile();
 
   let parsed;
@@ -32,16 +32,16 @@ function loadProfile() {
     return freshProfile();
   }
 
-  if (!parsed || parsed.version !== SAVE_VERSION) return freshProfile();
+  if (!parsed || parsed.version !== saveVersion) return freshProfile();
   return parsed;
 }
 
 function freshProfile() {
-  return { version: SAVE_VERSION, best: 0, runs: 0, history: [] };
+  return { version: saveVersion, best: 0, runs: 0, history: [] };
 }
 
 function saveProfile() {
-  storeItem(SAVE_KEY, JSON.stringify(profile));
+  storeItem(saveKey, JSON.stringify(profile));
 }
 
 function endRun() {

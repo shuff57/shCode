@@ -152,7 +152,7 @@ for (const id of Object.values(L)) {
   accept(L.fix10, 'age written as a decimal',
     edit(S, 'let studentAge = 16;', 'let studentAge = 16.5;'));
   accept(L.fix10, 'maximum written as an expression',
-    edit(S, 'const MAX_STUDENTS = 30;', 'const MAX_STUDENTS = 15 * 2;'));
+    edit(S, 'const maxStudents = 30;', 'const maxStudents = 15 * 2;'));
   accept(L.fix10, 'var throughout',
     { 'script.js': S['script.js'].replace(/\blet\b/g, 'var') });
   accept(L.fix10, 'no semicolons anywhere',
@@ -166,8 +166,8 @@ for (const id of Object.values(L)) {
     edit(S, 'let studentAge = 16;', 'let studentAge = "16";'));
   reject(L.fix10, 'finalScore assigned after all', 'r10',
     edit(S, 'let finalScore;', 'let finalScore = 0;'));
-  reject(L.fix10, 'MAX_STUDENTS left as let', 'r5',
-    edit(S, 'const MAX_STUDENTS = 30;', 'let MAX_STUDENTS = 30;'));
+  reject(L.fix10, 'maxStudents left as let', 'r5',
+    edit(S, 'const maxStudents = 30;', 'let maxStudents = 30;'));
   reject(L.fix10, 'snake_case name left alone', 'r8',
     edit(S, 'let favouriteColour = "blue";', 'let favourite_colour = "blue";'));
 }
@@ -360,22 +360,22 @@ for (const id of Object.values(L)) {
 // ---------------------------------------------------------------- 1.3.19
 {
   const S = solutionFiles(L.messy);
-  const total = 'const orderTotal = subtotal + subtotal * TAX_RATE; // price after tax is added';
+  const total = 'const orderTotal = subtotal + subtotal * taxRate; // price after tax is added';
   const readme = (body) => ({ ...S, 'README.md': body });
 
   accept(L.messy, 'tax kept in its own named variable',
     edit(S, total,
-      `const tax = subtotal * TAX_RATE; // the sales tax owed on this order${nl}` +
+      `const tax = subtotal * taxRate; // the sales tax owed on this order${nl}` +
       'const orderTotal = subtotal + tax; // price after tax is added'));
   accept(L.messy, 'tax written first in the sum',
-    edit(S, total, 'const orderTotal = TAX_RATE * subtotal + subtotal; // price after tax'));
-  accept(L.messy, 'total as subtotal * (1 + TAX_RATE)',
-    edit(S, total, 'const orderTotal = subtotal * (1 + TAX_RATE); // price after tax is added'));
+    edit(S, total, 'const orderTotal = taxRate * subtotal + subtotal; // price after tax'));
+  accept(L.messy, 'total as subtotal * (1 + taxRate)',
+    edit(S, total, 'const orderTotal = subtotal * (1 + taxRate); // price after tax is added'));
   accept(L.messy, 'title contains an apostrophe',
     edit(S, 'const bookTitle = "The Hobbit";',
       `const bookTitle = "Harry Potter and the Philosopher${AP}s Stone";`));
   accept(L.messy, 'rate written as a division',
-    edit(S, 'const TAX_RATE = 0.0725;', 'const TAX_RATE = 7.25 / 100;'));
+    edit(S, 'const taxRate = 0.0725;', 'const taxRate = 7.25 / 100;'));
   accept(L.messy, 'block comments instead of //',
     { ...S, 'script.js': S['script.js'].replace(/\/\/ ([^\n]*)/g, '/* $1 */') });
   accept(L.messy, 'a slash inside a printed string',
@@ -403,9 +403,9 @@ for (const id of Object.values(L)) {
   reject(L.messy, 'operators still crammed together', 'r7',
     edit(S, 'const subtotal = unitPrice * quantity;', 'const subtotal = unitPrice*quantity;'));
   reject(L.messy, 'rate is not a constant', 'r1',
-    edit(S, 'const TAX_RATE = 0.0725;', 'let taxRate = 0.0725;'));
+    edit(S, 'const taxRate = 0.0725;', 'let taxRate = 0.0725;'));
   reject(L.messy, 'rate holds text', 'r1',
-    edit(S, 'const TAX_RATE = 0.0725;', 'const TAX_RATE = "high";'));
+    edit(S, 'const taxRate = 0.0725;', 'const taxRate = "high";'));
   reject(L.messy, 'fewer than four comments', 'r8',
     { ...S, 'script.js': S['script.js'].replace(/ \/\/ [^\n]*/g, '') });
   reject(L.messy, 'README left as empty headings', 'r9',

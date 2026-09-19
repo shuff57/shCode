@@ -3,8 +3,8 @@
 // The order: 3 notebooks at 4.00 each, 10% off, then 8% tax.
 // STEP 1: expected total = 12.00 - 1.20 = 10.80, plus 8% tax (0.864) = 11.664 -> 11.66
 
-const DISCOUNT_RATE = 0.10;
-const TAX_RATE = 0.08;
+const discountRate = 0.10;
+const taxRate = 0.08;
 
 let unitPrice = 4.00;
 let quantity = 3;
@@ -12,11 +12,11 @@ let quantity = 3;
 let subtotal = unitPrice * quantity;
 console.log("subtotal: " + subtotal);
 
-let discount = subtotal * DISCOUNT_RATE;
+let discount = subtotal * discountRate;
 let discounted = subtotal - discount;
 console.log("discounted: " + discounted);
 
-let tax = discounted * TAX_RATE;
+let tax = discounted * taxRate;
 console.log("tax: " + tax);
 
 let total = discounted + tax;

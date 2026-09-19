@@ -28,8 +28,8 @@ let quantity = 4;
 let subtotal = unitPrice * quantity;
 
 // part 3: work out the tax
-const TAX_RATE = 0.0725;
-let tax = subtotal * TAX_RATE;
+const taxRate = 0.0725;
+let tax = subtotal * taxRate;
 
 // part 4: report it
 console.log(quantity + " x " + itemName);

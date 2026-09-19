@@ -3,7 +3,7 @@
 // Four bugs, one of each kind the course names, plus one repeat of the kind
 // that is hardest to see.
 
-const TAX_RATE = 0.08;
+const taxRate = 0.08;
 
 // syntax: the text had no closing quote, so nothing in the file ran at all.
 let itemName = "Notebook";
@@ -17,7 +17,7 @@ let subtotal = unitPrice * count;
 let shipping = 5;
 let beforeTax = subtotal + shipping;
 
-let tax = beforeTax * TAX_RATE;
+let tax = beforeTax * taxRate;
 // runtime: beforTax is a name that was never declared, so the program stopped
 // here with a ReferenceError once the quote was fixed.
 let total = beforeTax + tax;

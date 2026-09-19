@@ -26,10 +26,10 @@
     {
       "id": "s3",
       "title": "Declare the seed data and the level",
-      "instructions": "Your list as an array of objects -- every record has the same three fields, in the same order. The threshold you compare against never changes, so it is a const in UPPER_SNAKE_CASE.",
+      "instructions": "Your list as an array of objects -- every record has the same three fields, in the same order. The threshold you compare against never changes, so declare it with const.",
       "hints": [
         "Snack Shack: [{ name: 'Popcorn', price: 3.5, qty: 12 }, ...]",
-        "UPPER_SNAKE_CASE means REORDER_LEVEL, not reorderLevel",
+        "const reorderLevel = 5; -- const is what says it never moves, and the name stays camelCase like every other name",
         "Every record in the array needs the same three properties -- 3.5.3 is the shape"
       ]
     },
@@ -130,14 +130,14 @@
     },
     {
       "id": "r3",
-      "title": "The level is an UPPER_SNAKE_CASE const",
-      "description": "The threshold that never changes is declared with const in UPPER_SNAKE_CASE",
+      "title": "The level is a const",
+      "description": "The threshold that never changes is declared with const, not let",
       "type": "regex",
       "file": "script.js",
-      "pattern": "const\\s+[A-Z][A-Z0-9_]{2,}\\s*=",
+      "pattern": "const\\s+[a-z][A-Za-z0-9]*\\s*=\\s*\\d",
       "flags": "",
       "points": 0,
-      "hint": "const REORDER_LEVEL = 5; -- capitals and underscores, and const rather than let, because it never changes.",
+      "hint": "const reorderLevel = 5; -- const rather than let, because it never changes. The name is camelCase like every other name.",
       "stripComments": false
     },
     {

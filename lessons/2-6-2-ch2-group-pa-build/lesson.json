@@ -26,10 +26,10 @@
     {
       "id": "s3",
       "title": "Declare the inputs and the limit",
-      "instructions": "One variable per number your problem takes in, plus one string for the name or label. Descriptive camelCase names -- itemsPerLocker, not p. The limit you are comparing against never changes, so it is a const in UPPER_SNAKE_CASE.",
+      "instructions": "One variable per number your problem takes in, plus one string for the name or label. Descriptive camelCase names -- itemsPerLocker, not p. The limit you are comparing against never changes, so declare it with const.",
       "hints": [
         "The limit is the fixed number in your problem statement: 2.00, 15.00, 70, or the trip distance",
-        "UPPER_SNAKE_CASE means GOOD_DEAL_LIMIT, not goodDealLimit",
+        "const goodDealLimit = 2.00; -- const is what says it never moves, and the name stays camelCase like every other name",
         "A name someone else can read is worth more marks here than a short one"
       ]
     },
@@ -121,14 +121,14 @@
     },
     {
       "id": "r3",
-      "title": "The limit is an UPPER_SNAKE_CASE const",
-      "description": "The number that never changes is declared with const in UPPER_SNAKE_CASE",
+      "title": "The limit is a const",
+      "description": "The number that never changes is declared with const, not let",
       "type": "regex",
       "file": "script.js",
-      "pattern": "const\\s+[A-Z][A-Z0-9_]{2,}\\s*=",
+      "pattern": "const\\s+[a-z][A-Za-z0-9]*\\s*=\\s*\\d",
       "flags": "",
       "points": 0,
-      "hint": "const GOOD_DEAL_LIMIT = 2.00; -- capitals and underscores, and const rather than let, because it never changes.",
+      "hint": "const goodDealLimit = 2.00; -- const rather than let, because it never changes. The name is camelCase like every other name.",
       "stripComments": false
     },
     {

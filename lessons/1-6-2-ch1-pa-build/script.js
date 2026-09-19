@@ -20,7 +20,7 @@
 
 
 // STEP 3: the limit you are comparing against never changes, so declare it
-//         with const, in UPPER_SNAKE_CASE, on its own line with a comment
+//         with const, on its own line with a comment
 //         saying where the number came from.
 
 

@@ -26,10 +26,10 @@
     {
       "id": "s3",
       "title": "Declare the inputs",
-      "instructions": "One variable per number your problem takes in, plus one string for the name or label. Descriptive camelCase names -- pricePerPizza, not p. The limit you are comparing against never changes, so it is a const in UPPER_SNAKE_CASE.",
+      "instructions": "One variable per number your problem takes in, plus one string for the name or label. Descriptive camelCase names -- pricePerPizza, not p. The limit you are comparing against never changes, so declare it with const.",
       "hints": [
         "The limit is the fixed number in your problem statement: 2.00, 15.00, 70, or the trip distance",
-        "UPPER_SNAKE_CASE means GOOD_DEAL_LIMIT, not goodDealLimit",
+        "const goodDealLimit = 2.00; -- const is what says it never moves, and the name stays camelCase like every other name",
         "A name someone else can read is worth more marks here than a short one"
       ]
     },
@@ -41,7 +41,7 @@
     {
       "id": "s5",
       "title": "Answer the diamond without an if",
-      "instructions": "Your chart's diamond is a comparison, and a comparison produces a boolean (1.2.18). Store it: const meetsTheLimit = yourValue <= YOUR_LIMIT; That variable IS the diamond. Underneath it, write the two branches as pseudocode comments -- what the program would say on the yes side, and on the no side. Chapter 2 turns those comments into an if statement; today they stay comments.",
+      "instructions": "Your chart's diamond is a comparison, and a comparison produces a boolean (1.2.18). Store it: const meetsTheLimit = yourValue <= yourLimit; That variable IS the diamond. Underneath it, write the two branches as pseudocode comments -- what the program would say on the yes side, and on the no side. Chapter 2 turns those comments into an if statement; today they stay comments.",
       "hints": [
         "Which way round the comparison goes depends on your problem -- read your chart, not the example",
         "The two branch comments are graded. IF and ELSE, in capitals, one comment line each"
@@ -85,14 +85,14 @@
     },
     {
       "id": "r3",
-      "title": "The limit is an UPPER_SNAKE_CASE const",
-      "description": "The number that never changes is declared with const in UPPER_SNAKE_CASE",
+      "title": "The limit is a const",
+      "description": "The number that never changes is declared with const, not let",
       "type": "regex",
       "file": "script.js",
-      "pattern": "const\\s+[A-Z][A-Z0-9_]{2,}\\s*=",
+      "pattern": "const\\s+(?:[a-z][A-Za-z0-9]*\\s*=\\s*\\d|[A-Z][A-Z0-9_]{2,}\\s*=)",
       "flags": "",
       "points": 0,
-      "hint": "const GOOD_DEAL_LIMIT = 2.00; -- capitals and underscores, and const rather than let, because it never changes."
+      "hint": "const goodDealLimit = 2.00; -- const rather than let, because it never changes. The name is camelCase like every other name."
     },
     {
       "id": "r4",
@@ -136,7 +136,7 @@
       "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*(?:<=|>=|===|!==|<|>)",
       "flags": "",
       "points": 0,
-      "hint": "const meetsTheLimit = costPerSlice <= GOOD_DEAL_LIMIT; -- a comparison produces true or false (1.2.18)."
+      "hint": "const meetsTheLimit = costPerSlice <= goodDealLimit; -- a comparison produces true or false (1.2.18)."
     },
     {
       "id": "r8",

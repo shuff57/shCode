@@ -1012,7 +1012,7 @@
     ]
   },
   "1-3-18-reading-what-a-readme-is#0": {
-    "code": "const TAX_RATE = 0.0725;\n\nlet itemPrice = 19.99;\nlet itemCount = 3;\n\nlet subtotal = itemPrice * itemCount;\nlet total = subtotal + subtotal * TAX_RATE;\n\nconsole.log(`Subtotal: $${subtotal.toFixed(2)}`);\nconsole.log(`Total with tax: $${total.toFixed(2)}`);",
+    "code": "const taxRate = 0.0725;\n\nlet itemPrice = 19.99;\nlet itemCount = 3;\n\nlet subtotal = itemPrice * itemCount;\nlet total = subtotal + subtotal * taxRate;\n\nconsole.log(`Subtotal: $${subtotal.toFixed(2)}`);\nconsole.log(`Total with tax: $${total.toFixed(2)}`);",
     "output": [
       {
         "type": "log",
@@ -1038,7 +1038,7 @@
     ]
   },
   "1-3-2-reading-camelcase#1": {
-    "code": "const DAYS_IN_WEEK = 7;\n\nlet weeksWorked = 3;\nlet daysWorked = weeksWorked * DAYS_IN_WEEK;\n\nconsole.log(\"Days worked: \" + daysWorked);",
+    "code": "const daysInWeek = 7;\n\nlet weeksWorked = 3;\nlet daysWorked = weeksWorked * daysInWeek;\n\nconsole.log(\"Days worked: \" + daysWorked);",
     "output": [
       {
         "type": "log",
@@ -1656,7 +1656,7 @@
     ]
   },
   "1-5-36-reading-a-code-editor#0": {
-    "code": "const TAX_RATE = 0.0725;\n\nlet itemPrice = 19.99;\nlet itemCount = 3;\n\nif (itemCount > 0) {\n  let subtotal = itemPrice * itemCount;\n  let total = subtotal + subtotal * TAX_RATE;\n  console.log(\"Total: $\" + total.toFixed(2));\n} else {\n  console.log(\"Nothing in the basket\");\n}",
+    "code": "const taxRate = 0.0725;\n\nlet itemPrice = 19.99;\nlet itemCount = 3;\n\nif (itemCount > 0) {\n  let subtotal = itemPrice * itemCount;\n  let total = subtotal + subtotal * taxRate;\n  console.log(\"Total: $\" + total.toFixed(2));\n} else {\n  console.log(\"Nothing in the basket\");\n}",
     "output": [
       {
         "type": "log",
@@ -1770,7 +1770,7 @@
     ]
   },
   "1-5-8-reading-decomposition#0": {
-    "code": "// part 1: know what was bought and how much it costs\nlet itemName = \"Notebook\";\nlet unitPrice = 3.50;\nlet quantity = 4;\n\n// part 2: work out the cost before tax\nlet subtotal = unitPrice * quantity;\n\n// part 3: work out the tax\nconst TAX_RATE = 0.0725;\nlet tax = subtotal * TAX_RATE;\n\n// part 4: report it\nconsole.log(quantity + \" x \" + itemName);\nconsole.log(\"subtotal \" + subtotal.toFixed(2));\nconsole.log(\"tax      \" + tax.toFixed(2));\nconsole.log(\"total    \" + (subtotal + tax).toFixed(2));",
+    "code": "// part 1: know what was bought and how much it costs\nlet itemName = \"Notebook\";\nlet unitPrice = 3.50;\nlet quantity = 4;\n\n// part 2: work out the cost before tax\nlet subtotal = unitPrice * quantity;\n\n// part 3: work out the tax\nconst taxRate = 0.0725;\nlet tax = subtotal * taxRate;\n\n// part 4: report it\nconsole.log(quantity + \" x \" + itemName);\nconsole.log(\"subtotal \" + subtotal.toFixed(2));\nconsole.log(\"tax      \" + tax.toFixed(2));\nconsole.log(\"total    \" + (subtotal + tax).toFixed(2));",
     "output": [
       {
         "type": "log",

@@ -4,7 +4,7 @@
 
 let state = 'title';
 let player, score = 0;
-const LOSE_AT = 25;
+const loseAt = 25;
 
 function setup() {
   new Canvas(400, 400);
@@ -47,7 +47,7 @@ function draw() {
 
       if (kb.presses('p')) state = 'pause';
 
-      if (score >= LOSE_AT) {
+      if (score >= loseAt) {
         state = 'gameover';
         saveGame();
       }
