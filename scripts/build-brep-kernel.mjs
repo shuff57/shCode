@@ -200,6 +200,32 @@ for (const f of ['three.module.min.js', 'three.core.min.js']) {
 }
 console.log('  three.module.min.js, three.core.min.js, OrbitControls.js  (vendored from node_modules/three)');
 
+// brep-rs -- the Rust B-rep kernel, and per kernel/src/index.ts's own comment
+// "since brep-rs became the only engine", the one BrepViewportThree.tsx
+// actually loads at runtime. It is wasm-pack output (`wasm-pack build
+// --release --target web --out-dir pkg` in reshape-cad's packages/brep-rs),
+// which is gitignored THERE (rebuilt on demand, per reshape-cad's own CI) but
+// committed HERE under vendor/, same reasoning as the four npm packages
+// vendored alongside it: this repo has no Rust toolchain to rebuild it from
+// source, so a committed copy is the only way a bare shCode clone ends up
+// with a working kernel. BrepRsEngineAdapter (kernel/src/brep-rs-engine-
+// adapter.ts) fetches `${getKernelBaseUrl()}/brep-rs/brep_rs.js` and
+// `.../brep_rs_bg.wasm` -- getKernelBaseUrl() defaults to /reshape/kernel,
+// so the subdirectory name below is not cosmetic.
+//
+// To refresh after a brep-rs source change: run the wasm-pack command above
+// in a reshape-cad checkout, copy pkg/brep_rs.js and pkg/brep_rs_bg.wasm over
+// vendor/reshape-cad/packages/brep-rs/pkg/ here, and commit the new binary.
+{
+  const brepRsDest = path.join(dest, 'brep-rs');
+  mkdirSync(brepRsDest, { recursive: true });
+  const brepRsSrc = path.join(root, 'vendor', 'reshape-cad', 'packages', 'brep-rs', 'pkg');
+  for (const f of ['brep_rs.js', 'brep_rs_bg.wasm']) {
+    copyFileSync(path.join(brepRsSrc, f), path.join(brepRsDest, f));
+  }
+  console.log('  brep-rs/brep_rs.js, brep-rs/brep_rs_bg.wasm  (vendored from vendor/reshape-cad/packages/brep-rs/pkg)');
+}
+
 // THE CONTROL, and the reason it is a file rather than an argument.
 //
 // public/_headers grants Access-Control-Allow-Origin on /reshape/kernel/* and
