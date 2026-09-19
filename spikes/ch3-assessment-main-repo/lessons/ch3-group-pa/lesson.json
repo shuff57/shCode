@@ -1,0 +1,99 @@
+{
+  "id": "ch3-group-pa",
+  "title": "Chapter 3 Group PA — Snack Shack",
+  "description": "Paired performance assessment: design, build, and demo an inventory tool using functions, arrays, objects, map, and saved data.",
+  "difficulty": "intermediate",
+  "estimateMins": 50,
+  "locked": true,
+  "unlockCode": "MAPLE-7314",
+  "steps": [
+    { "id": "s1", "title": "Design: fill in plan.md with your partner (10 min)" },
+    { "id": "s2", "title": "Build: makeItem (3.5) and totalValue (3.3.5)" },
+    { "id": "s3", "title": "Build: lowStock (3.3.4) and receiptLines (3.7.1)" },
+    { "id": "s4", "title": "Build: sellItem (3.6)" },
+    { "id": "s5", "title": "Build: saveInventory and loadInventory (3.8)" },
+    { "id": "s6", "title": "Demo: run it and walk through your partner's functions" }
+  ],
+  "requirements": [
+    {
+      "id": "plan1",
+      "title": "Both partners named",
+      "description": "plan.md lists a name for Partner A and Partner B",
+      "file": "plan.md",
+      "pattern": "Partner A:[^\\S\\n]*[A-Za-z][\\s\\S]*Partner B:[^\\S\\n]*[A-Za-z]",
+      "flags": ""
+    },
+    {
+      "id": "plan2",
+      "title": "Function contracts written",
+      "description": "The contract table in plan.md describes what makeItem takes in",
+      "file": "plan.md",
+      "pattern": "\\|[^\\S\\n]*makeItem[^\\S\\n]*\\|[^\\S\\n]*[A-Za-z]",
+      "flags": ""
+    },
+    {
+      "id": "plan3",
+      "title": "Work split between partners",
+      "description": "plan.md says what Partner A will write",
+      "file": "plan.md",
+      "pattern": "Partner A will write:[^\\S\\n]*[A-Za-z]",
+      "flags": ""
+    },
+    {
+      "id": "plan4",
+      "title": "Test plan predicts a value",
+      "description": "plan.md predicts an expected return value before coding",
+      "file": "plan.md",
+      "pattern": "should return[^\\S\\n]*\\S",
+      "flags": ""
+    },
+    {
+      "id": "code1",
+      "title": "makeItem keeps its signature",
+      "description": "makeItem is still defined as makeItem(name, price, qty)",
+      "file": "script.js",
+      "pattern": "function\\s+makeItem\\s*\\(\\s*name\\s*,\\s*price\\s*,\\s*qty\\s*\\)",
+      "flags": ""
+    },
+    {
+      "id": "code2",
+      "title": "A loop walks a list",
+      "description": "3.3.5 — a for or for...of loop walks a list by hand",
+      "file": "script.js",
+      "pattern": "(for|while)\\s*\\(",
+      "flags": ""
+    },
+    {
+      "id": "code3",
+      "title": "push() builds a new list",
+      "description": "3.3.4 — a new array is built up with the push() method",
+      "file": "script.js",
+      "pattern": "\\.push\\s*\\(",
+      "flags": ""
+    },
+    {
+      "id": "code4",
+      "title": "map() is called with an arrow function",
+      "description": "3.7.1 and 3.4.3 — the map() method is given an arrow function callback",
+      "file": "script.js",
+      "pattern": "\\.map\\s*\\(\\s*\\(?\\s*[A-Za-z_$][\\w$]*\\s*(,[^)]*)?\\)?\\s*=>",
+      "flags": ""
+    },
+    {
+      "id": "code5",
+      "title": "Data is saved and loaded",
+      "description": "3.8 — localStorage is used with JSON in both directions",
+      "file": "script.js",
+      "pattern": "(?=[\\s\\S]*JSON\\.stringify)(?=[\\s\\S]*JSON\\.parse)[\\s\\S]*localStorage",
+      "flags": ""
+    },
+    {
+      "id": "code6",
+      "title": "No unfinished stubs",
+      "description": "Every TODO has been replaced — no 'YOUR CODE HERE' markers remain",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*YOUR CODE HERE)[\\s\\S]+$",
+      "flags": ""
+    }
+  ]
+}

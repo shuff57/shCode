@@ -1,0 +1,1106 @@
+diff --git a/app/globals.css b/app/globals.css
+index 69e91fa2..eed5a3bb 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -340,3 +340,63 @@ details.console > summary::-webkit-details-marker { display: none; }
+   font-weight: bold;
+ }
+ 
++/* Draft saving — see lib/drafts.js */
++#titleRow {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  flex-wrap: wrap;
++  gap: .75rem;
++}
++
++.draft-status {
++  display: flex;
++  align-items: center;
++  flex-wrap: wrap;
++  gap: .5rem 1rem;
++  font-size: .85rem;
++}
++
++.draft-status span {
++  display: inline-flex;
++  align-items: center;
++  gap: .35rem;
++}
++
++.draft-saved,
++.draft-idle {
++  color: color-mix(in srgb, var(--text) 70%, transparent);
++}
++
++.draft-warning {
++  color: #f59e0b;
++  font-weight: 600;
++}
++
++.draft-restored,
++.draft-confirm {
++  padding: .25rem .6rem;
++  border: 1px solid var(--border);
++  border-left: 3px solid var(--brand);
++  border-radius: 4px;
++  background: var(--muted);
++}
++
++.draft-status button {
++  display: inline-flex;
++  align-items: center;
++  gap: .35rem;
++  padding: .2rem .5rem;
++  border: 1px solid var(--border);
++  border-radius: 4px;
++  background: var(--card);
++  color: var(--text);
++  font-size: .85rem;
++  cursor: pointer;
++}
++
++.draft-status button:hover {
++  border-color: var(--brand);
++  color: var(--brand);
++}
++
+diff --git a/app/lesson/[lessonId]/page.tsx b/app/lesson/[lessonId]/page.tsx
+index d9f361fe..5796bffb 100644
+--- a/app/lesson/[lessonId]/page.tsx
++++ b/app/lesson/[lessonId]/page.tsx
+@@ -1,5 +1,8 @@
++import { cookies } from 'next/headers';
+ import LessonWorkspace from '../../../components/LessonWorkspace';
++import LessonLock from '../../../components/LessonLock';
+ import { getLesson } from '../../../lib/lessons';
++import { cookieName, isUnlocked, readLock } from '../../../lib/lock.js';
+ 
+ export default async function LessonPage({
+   params,
+@@ -10,5 +13,22 @@ export default async function LessonPage({
+   const lesson = await getLesson(lessonId);
+ 
+   if (!lesson) return <div className="p-4">Lesson not found</div>;
++
++  // Read lock state from disk, not from the lesson cache, so opening a lesson
++  // on test day does not need a restart.
++  const jar = await cookies();
++  const open = await isUnlocked(lesson.id, jar.get(cookieName(lesson.id))?.value);
++  if (!open) {
++    const { unlockCode } = await readLock(lesson.id);
++    return (
++      <LessonLock
++        lessonId={lesson.id}
++        title={lesson.title}
++        description={lesson.description}
++        hasCode={Boolean(unlockCode)}
++      />
++    );
++  }
++
+   return <LessonWorkspace lesson={lesson} />;
+ }
+diff --git a/app/page.tsx b/app/page.tsx
+index b29cec15..ea1f1db7 100644
+--- a/app/page.tsx
++++ b/app/page.tsx
+@@ -1,9 +1,31 @@
+ import LessonCard from '../components/LessonCard';
+ import { loadLessons } from '../lib/lessons';
++import { readLock } from '../lib/lock.js';
++
++const CHAPTER_3 = ['ch3-group-pa', 'ch3-test'];
++
++// Rendered per request so the lock badges reflect lesson.json right now, not
++// whatever was true at build time.
++export const dynamic = 'force-dynamic';
+ 
+ export default async function HomePage() {
+   const lessons = await loadLessons();
+ 
++  // Read lock state off disk rather than the lesson cache, so a lesson opened
++  // on test day shows as open without a restart.
++  const locks = await Promise.all(lessons.map((lesson) => readLock(lesson.id)));
++  const lockedIds = new Set(
++    lessons.filter((_, i) => locks[i].locked).map((lesson) => lesson.id)
++  );
++
++  const htmlLessons = lessons.filter(lesson => 
++    !CHAPTER_3.includes(lesson.id)
++  );
++
++  const chapter3Lessons = lessons.filter(lesson => 
++    CHAPTER_3.includes(lesson.id)
++  );
++
+   const basicHtmlLessons = lessons.filter(lesson => 
+     ['basic-html', 'html-intro', 'debug-pet-adoption', 'debug-camper-bot'].includes(lesson.id)
+   );
+@@ -28,7 +50,7 @@ export default async function HomePage() {
+       <details className="bg-card border-border border rounded w-2/3 mx-auto">
+         <summary className="py-4 px-8 w-full list-none cursor-pointer hover:bg-muted text-5xl flex justify-between items-center">
+           <span className="font-bold">HTML</span>
+-          <span className="text-lg">({lessons.length} lessons)</span>
++          <span className="text-lg">({htmlLessons.length} lessons)</span>
+         </summary>
+         <div className="p-4">
+           <details className="bg-card border-border border rounded mb-4">
+@@ -38,7 +60,7 @@ export default async function HomePage() {
+             </summary>
+             <div className="flex flex-col gap-4 p-4">
+               {basicHtmlLessons.map((lesson) => (
+-                <LessonCard key={lesson.id} lesson={lesson} />
++                <LessonCard key={lesson.id} lesson={lesson} locked={lockedIds.has(lesson.id)} />
+               ))}
+             </div>
+           </details>
+@@ -49,7 +71,7 @@ export default async function HomePage() {
+             </summary>
+             <div className="flex flex-col gap-4 p-4">
+               {semanticHtmlLessons.map((lesson) => (
+-                <LessonCard key={lesson.id} lesson={lesson} />
++                <LessonCard key={lesson.id} lesson={lesson} locked={lockedIds.has(lesson.id)} />
+               ))}
+             </div>
+           </details>
+@@ -60,7 +82,7 @@ export default async function HomePage() {
+             </summary>
+             <div className="flex flex-col gap-4 p-4">
+               {formsAndTablesLessons.map((lesson) => (
+-                <LessonCard key={lesson.id} lesson={lesson} />
++                <LessonCard key={lesson.id} lesson={lesson} locked={lockedIds.has(lesson.id)} />
+               ))}
+             </div>
+           </details>
+@@ -71,7 +93,26 @@ export default async function HomePage() {
+             </summary>
+             <div className="flex flex-col gap-4 p-4">
+               {accessibilityLessons.map((lesson) => (
+-                <LessonCard key={lesson.id} lesson={lesson} />
++                <LessonCard key={lesson.id} lesson={lesson} locked={lockedIds.has(lesson.id)} />
++              ))}
++            </div>
++          </details>
++        </div>
++      </details>
++      <details className="bg-card border-border border rounded w-2/3 mx-auto mt-4">
++        <summary className="py-4 px-8 w-full list-none cursor-pointer hover:bg-muted text-5xl flex justify-between items-center">
++          <span className="font-bold">Chapter 3</span>
++          <span className="text-lg">({chapter3Lessons.length} lessons)</span>
++        </summary>
++        <div className="p-4">
++          <details className="bg-card border-border border rounded">
++            <summary className="py-4 px-8 w-full list-none cursor-pointer hover:bg-muted flex justify-between items-center">
++              <span className="font-bold text-2xl">Functions and Data — Assessments</span>
++              <span className="text-sm">({chapter3Lessons.length} lessons)</span>
++            </summary>
++            <div className="flex flex-col gap-4 p-4">
++              {chapter3Lessons.map((lesson) => (
++                <LessonCard key={lesson.id} lesson={lesson} locked={lockedIds.has(lesson.id)} />
+               ))}
+             </div>
+           </details>
+diff --git a/components/DraftStatus.tsx b/components/DraftStatus.tsx
+new file mode 100644
+index 00000000..317d604b
+--- /dev/null
++++ b/components/DraftStatus.tsx
+@@ -0,0 +1,102 @@
++'use client';
++
++import { useEffect, useState } from 'react';
++import { AlertTriangle, Check, RotateCcw } from 'lucide-react';
++import { useLessonStore } from '../lib/store';
++
++function clockTime(stamp: number) {
++  return new Date(stamp).toLocaleTimeString([], {
++    hour: 'numeric',
++    minute: '2-digit',
++  });
++}
++
++export default function DraftStatus() {
++  const draft = useLessonStore((s) => s.draft);
++  const resetToStarter = useLessonStore((s) => s.resetToStarter);
++  const flushDraft = useLessonStore((s) => s.flushDraft);
++  const [confirming, setConfirming] = useState(false);
++  const [dismissed, setDismissed] = useState(false);
++
++  // A debounced save is still pending when a tab is closed or backgrounded.
++  // Write it out before the page goes away.
++  useEffect(() => {
++    const flush = () => flushDraft();
++    const onHide = () => {
++      if (document.visibilityState === 'hidden') flush();
++    };
++    window.addEventListener('pagehide', flush);
++    document.addEventListener('visibilitychange', onHide);
++    return () => {
++      window.removeEventListener('pagehide', flush);
++      document.removeEventListener('visibilitychange', onHide);
++      flush();
++    };
++  }, [flushDraft]);
++
++  // A new lesson clears restoredAt, so the restore notice comes back for it.
++  useEffect(() => {
++    setDismissed(false);
++    setConfirming(false);
++  }, [draft.restoredAt]);
++
++  return (
++    <div className="draft-status">
++      {draft.error ? (
++        <span className="draft-warning" role="alert">
++          <AlertTriangle size={14} aria-hidden="true" />
++          {draft.error}
++        </span>
++      ) : draft.savedAt ? (
++        <span className="draft-saved" aria-live="polite">
++          <Check size={14} aria-hidden="true" />
++          Work saved at {clockTime(draft.savedAt)}
++        </span>
++      ) : (
++        <span className="draft-idle">Your work saves automatically as you type</span>
++      )}
++
++      {confirming ? (
++        <span className="draft-confirm">
++          Delete your saved work and start over?
++          <button
++            type="button"
++            onClick={() => {
++              resetToStarter();
++              setConfirming(false);
++              setDismissed(true);
++            }}
++          >
++            Yes, reset
++          </button>
++          <button type="button" onClick={() => setConfirming(false)}>
++            Cancel
++          </button>
++        </span>
++      ) : (
++        <button
++          type="button"
++          className="draft-reset"
++          onClick={() => setConfirming(true)}
++        >
++          <RotateCcw size={14} aria-hidden="true" />
++          Reset to starter code
++        </button>
++      )}
++
++      {draft.restoredAt !== null && !dismissed ? (
++        <span className="draft-restored" role="status">
++          Picked up where you left off
++          {draft.restoredAt ? ` (saved ${clockTime(draft.restoredAt)})` : ''}. Not
++          your work?
++          <button type="button" onClick={() => setConfirming(true)}>
++            Start fresh
++          </button>
++          <button type="button" onClick={() => setDismissed(true)}>
++            Dismiss
++          </button>
++        </span>
++      ) : null}
++    </div>
++  );
++}
+diff --git a/components/LessonCard.tsx b/components/LessonCard.tsx
+index 1038f1e2..5c618d5e 100644
+--- a/components/LessonCard.tsx
++++ b/components/LessonCard.tsx
+@@ -1,14 +1,34 @@
+ import Link from 'next/link';
++import { Lock } from 'lucide-react';
+ import { Lesson } from '../lib/lessons';
+ 
+-export default function LessonCard({ lesson }: { lesson: Lesson }) {
++export default function LessonCard({
++  lesson,
++  locked,
++}: {
++  lesson: Lesson;
++  locked?: boolean;
++}) {
++  const isLocked = locked ?? Boolean(lesson.locked);
++
+   return (
+     <Link
+       href={`/lesson/${lesson.id}`}
+-      className="bg-card border-border border rounded p-4 hover:bg-muted block border-l-4 shadow-lg"
+-      style={{ borderLeftColor: 'var(--brand)' }}
++      aria-label={isLocked ? `${lesson.title} (locked)` : lesson.title}
++      className={`bg-card border-border border rounded p-4 hover:bg-muted block border-l-4 shadow-lg${
++        isLocked ? ' opacity-70' : ''
++      }`}
++      style={{ borderLeftColor: isLocked ? 'var(--border)' : 'var(--brand)' }}
+     >
+-      <h3 className="font-semibold text-text">{lesson.title}</h3>
++      <div className="flex items-center justify-between gap-3">
++        <h3 className="font-semibold text-text">{lesson.title}</h3>
++        {isLocked ? (
++          <span className="flex items-center gap-1 text-sm text-text/70 shrink-0">
++            <Lock size={14} aria-hidden="true" />
++            Locked
++          </span>
++        ) : null}
++      </div>
+       <p className="text-med text-text/70">{lesson.description}</p>
+     </Link>
+   );
+diff --git a/components/LessonLock.tsx b/components/LessonLock.tsx
+new file mode 100644
+index 00000000..4a6967c1
+--- /dev/null
++++ b/components/LessonLock.tsx
+@@ -0,0 +1,100 @@
++'use client';
++
++import { useState } from 'react';
++import Link from 'next/link';
++import { useRouter } from 'next/navigation';
++import { Lock } from 'lucide-react';
++
++export default function LessonLock({
++  lessonId,
++  title,
++  description,
++  hasCode,
++}: {
++  lessonId: string;
++  title: string;
++  description: string;
++  hasCode: boolean;
++}) {
++  const [code, setCode] = useState('');
++  const [error, setError] = useState('');
++  const [busy, setBusy] = useState(false);
++  const router = useRouter();
++
++  async function submit(event: React.FormEvent) {
++    event.preventDefault();
++    if (busy || !code.trim()) return;
++    setBusy(true);
++    setError('');
++    try {
++      const res = await fetch('/api/unlock', {
++        method: 'POST',
++        headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify({ lessonId, code }),
++      });
++      const data = await res.json();
++      if (data.ok) {
++        router.refresh();
++        return;
++      }
++      setError(data.message || 'That code is not right.');
++    } catch {
++      setError('Could not reach the server. Try again.');
++    }
++    setBusy(false);
++  }
++
++  return (
++    <div className="p-4 flex justify-center">
++      <div
++        className="bg-card border-border border rounded p-8 mt-12 w-full max-w-lg border-l-4 shadow-lg"
++        style={{ borderLeftColor: 'var(--brand)' }}
++      >
++        <div className="flex items-center gap-3 mb-2">
++          <Lock size={22} aria-hidden="true" />
++          <h1 className="text-2xl font-bold text-text">{title}</h1>
++        </div>
++        <p className="text-med text-text/70 mb-6">{description}</p>
++
++        {hasCode ? (
++          <form onSubmit={submit}>
++            <label htmlFor="unlockCode" className="block mb-2 text-text">
++              This assessment is locked. Enter the code your teacher gives you.
++            </label>
++            <div className="flex gap-2">
++              <input
++                id="unlockCode"
++                name="unlockCode"
++                value={code}
++                onChange={(e) => setCode(e.target.value)}
++                autoComplete="off"
++                autoFocus
++                placeholder="Unlock code"
++                aria-describedby={error ? 'unlockError' : undefined}
++                className="border border-border bg-muted text-text p-2 rounded flex-1"
++              />
++              <button type="submit" disabled={busy} className="border border-border p-2 rounded">
++                {busy ? 'Checking…' : 'Unlock'}
++              </button>
++            </div>
++            {error ? (
++              <p id="unlockError" role="alert" className="mt-3 text-text">
++                {error}
++              </p>
++            ) : null}
++          </form>
++        ) : (
++          <p className="text-text">
++            This assessment is closed. It opens on the day it is scheduled.
++          </p>
++        )}
++
++        <p className="mt-6">
++          <Link href="/" className="text-brand">
++            Back to lessons
++          </Link>
++        </p>
++      </div>
++    </div>
++  );
++}
+diff --git a/components/LessonWorkspace.tsx b/components/LessonWorkspace.tsx
+index 6c01b9af..d82af224 100644
+--- a/components/LessonWorkspace.tsx
++++ b/components/LessonWorkspace.tsx
+@@ -8,6 +8,7 @@ import CodeEditor from './CodeEditor';
+ import LivePreview from './LivePreview';
+ import RequirementsSection from './RequirementsSection';
+ import Console from './Console';
++import DraftStatus from './DraftStatus';
+ 
+ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
+   const setLesson = useLessonStore((s) => s.setLesson);
+@@ -201,6 +202,7 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
+     <>
+       <div id="titleRow">
+         <h1>{lesson.title}</h1>
++        <DraftStatus />
+       </div>
+       <div
+         id="sidebarHover"
+diff --git a/lib/drafts.js b/lib/drafts.js
+new file mode 100644
+index 00000000..e54f965f
+--- /dev/null
++++ b/lib/drafts.js
+@@ -0,0 +1,182 @@
++/**
++ * Student draft storage.
++ *
++ * shCode keeps file contents in a zustand store, which is memory only: a
++ * refresh, a crashed tab, or a laptop lid closing at the wrong moment throws
++ * away everything a student has typed. On a no-retake assessment that costs
++ * them the period, so every edit is mirrored into localStorage and restored
++ * when the lesson opens again.
++ *
++ * Drafts are keyed per lesson, so the Group PA and the Test never overwrite
++ * each other, and they are written only when a student actually edits
++ * something -- opening a lesson and typing nothing leaves no draft behind.
++ */
++
++const VERSION = 'v1';
++
++/**
++ * @typedef {Object} Draft
++ * @property {number} savedAt
++ * @property {string} [currentFile]
++ * @property {Record<string, string>} files
++ */
++
++/** @param {string} lessonId */
++export function draftKey(lessonId) {
++  return `shcode_draft_${VERSION}_${lessonId}`;
++}
++
++/**
++ * localStorage is missing during server rendering, and throws outright in some
++ * privacy modes. Every caller has to cope with getting nothing back.
++ *
++ * @returns {Storage | null}
++ */
++function storage() {
++  try {
++    if (typeof window === 'undefined') return null;
++    return window.localStorage || null;
++  } catch {
++    return null;
++  }
++}
++
++/**
++ * @param {string} lessonId
++ * @returns {Draft | null}
++ */
++export function readDraft(lessonId) {
++  const store = storage();
++  if (!store || !lessonId) return null;
++  try {
++    const raw = store.getItem(draftKey(lessonId));
++    if (!raw) return null;
++    const parsed = JSON.parse(raw);
++    if (!parsed || typeof parsed !== 'object') return null;
++    if (!parsed.files || typeof parsed.files !== 'object') return null;
++    // Drop anything that is not a plain path -> text pair, so one corrupt
++    // entry cannot take the editor down with it.
++    /** @type {Record<string, string>} */
++    const files = {};
++    for (const [path, content] of Object.entries(parsed.files)) {
++      if (typeof path === 'string' && typeof content === 'string') {
++        files[path] = content;
++      }
++    }
++    if (Object.keys(files).length === 0) return null;
++    return {
++      savedAt: typeof parsed.savedAt === 'number' ? parsed.savedAt : 0,
++      currentFile:
++        typeof parsed.currentFile === 'string' ? parsed.currentFile : undefined,
++      files,
++    };
++  } catch {
++    return null;
++  }
++}
++
++/**
++ * @param {string} lessonId
++ * @param {Record<string, string>} files
++ * @param {string} [currentFile]
++ * @returns {{ savedAt: number | null, error: string | null }}
++ */
++export function writeDraft(lessonId, files, currentFile) {
++  const store = storage();
++  if (!store || !lessonId) return { savedAt: null, error: null };
++  const savedAt = Date.now();
++  try {
++    store.setItem(
++      draftKey(lessonId),
++      JSON.stringify({ savedAt, currentFile, files })
++    );
++    return { savedAt, error: null };
++  } catch (e) {
++    // Quota exhaustion and privacy-mode refusals both land here. The edit is
++    // already in memory, so the session keeps working -- the student just
++    // needs to know a refresh will lose it.
++    return {
++      savedAt: null,
++      error:
++        'Could not save a backup of your work in this browser. Do not refresh the page.',
++    };
++  }
++}
++
++/** @param {string} lessonId */
++export function clearDraft(lessonId) {
++  const store = storage();
++  if (!store || !lessonId) return;
++  try {
++    store.removeItem(draftKey(lessonId));
++  } catch {
++    /* nothing useful to do */
++  }
++}
++
++/** @param {string} path */
++function basename(path) {
++  const cut = path.lastIndexOf('/');
++  return cut < 0 ? path : path.slice(cut + 1);
++}
++
++/**
++ * Overlay a saved draft on top of a lesson's starter files.
++ *
++ * The draft always wins for a path it holds. The extra basename pass covers
++ * one specific way work could otherwise vanish: a student who dragged
++ * script.js into a folder last session saved their work under
++ * "folder/script.js", but the file tree comes back from the server flat, so
++ * the editor would show starter content at "script.js" and their real work
++ * would sit in an unreachable key. Matching on filename pulls it back. It only
++ * ever fills a path the draft has no exact entry for, and only when exactly
++ * one saved file could be meant, so it can never overwrite a real answer.
++ *
++ * @param {Record<string, string>} starter
++ * @param {Draft | null} draft
++ * @returns {Record<string, string>}
++ */
++export function mergeDraft(starter, draft) {
++  const contents = { ...starter };
++  if (!draft) return contents;
++
++  for (const [path, content] of Object.entries(draft.files)) {
++    contents[path] = content;
++  }
++
++  for (const path of Object.keys(starter)) {
++    if (path in draft.files) continue;
++    const name = basename(path);
++    const candidates = Object.keys(draft.files).filter(
++      (saved) => basename(saved) === name && !(saved in starter)
++    );
++    if (candidates.length === 1) {
++      contents[path] = draft.files[candidates[0]];
++    }
++  }
++
++  return contents;
++}
++
++/**
++ * Read and apply whatever this browser has saved for a lesson.
++ *
++ * @param {string} lessonId
++ * @param {Record<string, string>} starter
++ * @param {string} [starterCurrentFile]
++ * @returns {{ contents: Record<string, string>, currentFile: string | undefined, restoredAt: number | null }}
++ */
++export function restoreDraft(lessonId, starter, starterCurrentFile) {
++  const draft = readDraft(lessonId);
++  const contents = mergeDraft(starter, draft);
++  // Only reopen the file they were last in if it is still a real file.
++  const currentFile =
++    draft && draft.currentFile && draft.currentFile in contents
++      ? draft.currentFile
++      : starterCurrentFile;
++  return {
++    contents,
++    currentFile,
++    restoredAt: draft ? draft.savedAt || 0 : null,
++  };
++}
+diff --git a/lib/lessons.ts b/lib/lessons.ts
+index 9ddee6b6..437076f1 100644
+--- a/lib/lessons.ts
++++ b/lib/lessons.ts
+@@ -31,6 +31,8 @@ export interface Lesson {
+   files: FileNode[];
+   steps: { id: string; title: string }[];
+   requirements: Requirement[];
++  /** Listed on the home page, but the workspace will not open. See lib/lock.js. */
++  locked?: boolean;
+ }
+ 
+ let cache: Lesson[] | null = null;
+@@ -71,13 +73,17 @@ export async function loadLessons(): Promise<Lesson[]> {
+   cache = await Promise.all(
+     dirs.map(async (id) => {
+       const base = path.join(lessonsDir, id);
+-      const meta = JSON.parse(
++      // unlockCode is pulled out and thrown away here on purpose: this object
++      // is serialized into the client bundle by LessonWorkspace, so anything
++      // left on it is readable from the browser.
++      const { unlockCode: _unlockCode, ...meta } = JSON.parse(
+         await fs.readFile(path.join(base, 'lesson.json'), 'utf8')
+       );
+       const files = await readFiles(base);
+       return {
+         ...meta,
+         files,
++        locked: Boolean(meta.locked),
+         steps: meta.steps || [],
+         requirements: (meta.requirements || []).map((r: any) => ({
+           ...r,
+diff --git a/lib/lock.js b/lib/lock.js
+new file mode 100644
+index 00000000..af57c77c
+--- /dev/null
++++ b/lib/lock.js
+@@ -0,0 +1,128 @@
++import crypto from 'crypto';
++import fs from 'fs/promises';
++import path from 'path';
++
++/**
++ * Lesson locking.
++ *
++ * A locked lesson still appears on the home page, but the workspace is never
++ * rendered until the visitor proves they know the lesson's unlock code. The
++ * check runs on the server, so a locked lesson's files and questions are never
++ * sent to the browser.
++ *
++ * Lock state is read from lesson.json on every request rather than from the
++ * loadLessons() cache, so flipping "locked" or rotating "unlockCode" takes
++ * effect immediately without restarting the server.
++ */
++
++/** Lesson ids come from the URL, so never let one wander outside lessons/. */
++const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
++
++/** @param {string} lessonId */
++export function isSafeLessonId(lessonId) {
++  return typeof lessonId === 'string' && SAFE_ID.test(lessonId) && !lessonId.includes('..');
++}
++
++/** @param {string} lessonId */
++export function cookieName(lessonId) {
++  return `shcode_unlock_${lessonId}`;
++}
++
++/**
++ * @param {string} lessonId
++ * @returns {Promise<{ locked: boolean, unlockCode: string }>}
++ */
++export async function readLock(lessonId) {
++  if (!isSafeLessonId(lessonId)) return { locked: false, unlockCode: '' };
++  try {
++    const file = path.join(process.cwd(), 'lessons', lessonId, 'lesson.json');
++    const meta = JSON.parse(await fs.readFile(file, 'utf8'));
++    return {
++      locked: Boolean(meta.locked),
++      unlockCode: typeof meta.unlockCode === 'string' ? meta.unlockCode : '',
++    };
++  } catch {
++    return { locked: false, unlockCode: '' };
++  }
++}
++
++/**
++ * Proof-of-code cookie value. Derived from the code itself, so it survives a
++ * restart but stops working the moment the teacher changes the code.
++ *
++ * @param {string} lessonId
++ * @param {string} unlockCode
++ */
++export function unlockToken(lessonId, unlockCode) {
++  return crypto
++    .createHmac('sha256', String(unlockCode))
++    .update(`unlock:${lessonId}`)
++    .digest('hex');
++}
++
++/**
++ * @param {string} a
++ * @param {string} b
++ */
++function equals(a, b) {
++  const left = Buffer.from(String(a));
++  const right = Buffer.from(String(b));
++  if (left.length !== right.length) return false;
++  return crypto.timingSafeEqual(left, right);
++}
++
++/** Codes are read off the board, so ignore case and stray spaces. */
++function normalize(code) {
++  return String(code == null ? '' : code).trim().toUpperCase();
++}
++
++/**
++ * May this request open the lesson?
++ *
++ * @param {string} lessonId
++ * @param {string | undefined} cookieValue
++ */
++export async function isUnlocked(lessonId, cookieValue) {
++  const { locked, unlockCode } = await readLock(lessonId);
++  if (!locked) return true;
++  // Locked with no code set is a hard lock: nobody gets in until the teacher
++  // adds a code or clears the flag.
++  if (!unlockCode) return false;
++  if (!cookieValue) return false;
++  return equals(cookieValue, unlockToken(lessonId, unlockCode));
++}
++
++/**
++ * @param {string} lessonId
++ * @param {unknown} submitted
++ * @returns {Promise<{ ok: boolean, token: string }>}
++ */
++export async function checkCode(lessonId, submitted) {
++  const { locked, unlockCode } = await readLock(lessonId);
++  if (!locked) return { ok: true, token: '' };
++  if (!unlockCode) return { ok: false, token: '' };
++  if (!equals(normalize(submitted), normalize(unlockCode))) {
++    return { ok: false, token: '' };
++  }
++  return { ok: true, token: unlockToken(lessonId, unlockCode) };
++}
++
++/**
++ * Minimal Cookie header parser, so server.js needs no extra dependency.
++ *
++ * @param {string | undefined} header
++ * @returns {Record<string, string>}
++ */
++export function parseCookies(header) {
++  /** @type {Record<string, string>} */
++  const out = {};
++  if (!header) return out;
++  for (const part of header.split(';')) {
++    const eq = part.indexOf('=');
++    if (eq < 0) continue;
++    const key = part.slice(0, eq).trim();
++    if (!key) continue;
++    out[key] = decodeURIComponent(part.slice(eq + 1).trim());
++  }
++  return out;
++}
+diff --git a/lib/store.ts b/lib/store.ts
+index c6623f2b..58b597c7 100644
+--- a/lib/store.ts
++++ b/lib/store.ts
+@@ -1,17 +1,28 @@
+ import { create } from 'zustand';
+ import { Lesson, Requirement, FileNode } from './lessons';
++import { clearDraft, restoreDraft, writeDraft } from './drafts.js';
+ 
+ interface UIState {
+   sidebarOpen: boolean;
+   activeSidebarTab: 'Files' | 'Steps';
+ }
+ 
++interface DraftState {
++  /** When this browser last backed the work up, or null if nothing is saved. */
++  savedAt: number | null;
++  /** Set when the browser refuses to store anything, so the UI can warn. */
++  error: string | null;
++  /** When the draft that opened this session was written, if there was one. */
++  restoredAt: number | null;
++}
++
+ interface LessonState {
+   lesson?: Lesson;
+   currentFile?: string;
+   fileContents: Record<string, string>;
+   requirements: Requirement[];
+   ui: UIState;
++  draft: DraftState;
+   setLesson: (lesson: Lesson) => void;
+   selectFile: (path: string) => void;
+   updateFile: (path: string, value: string) => void;
+@@ -19,46 +30,114 @@ interface LessonState {
+   setSidebarOpen: (open: boolean) => void;
+   setActiveTab: (tab: 'Files' | 'Steps') => void;
+   setRequirements: (reqs: Requirement[]) => void;
++  /** Throw this browser's saved work away and go back to the starter files. */
++  resetToStarter: () => void;
++  /** Write a pending edit right now, e.g. when the tab is closing. */
++  flushDraft: () => void;
+ }
+ 
+-export const useLessonStore = create<LessonState>((set) => ({
+-  lesson: undefined,
+-  currentFile: undefined,
+-  fileContents: {},
+-  requirements: [],
+-  ui: { sidebarOpen: false, activeSidebarTab: 'Files' },
+-  setLesson: (lesson) => {
+-    const flatten = (nodes: FileNode[]): FileNode[] =>
+-      nodes.flatMap((n) =>
+-        n.type === 'file' ? [n] : flatten(n.children || [])
+-      );
+-    const files = flatten(lesson.files);
+-    set({
+-      lesson,
+-      currentFile: files[0]?.path,
+-      fileContents: Object.fromEntries(
+-        files.map((f) => [f.path, f.content || ''])
+-      ),
+-      requirements: lesson.requirements,
+-    });
+-  },
+-  selectFile: (path) => set({ currentFile: path }),
+-  updateFile: (path, value) =>
++const flatten = (nodes: FileNode[]): FileNode[] =>
++  nodes.flatMap((n) => (n.type === 'file' ? [n] : flatten(n.children || [])));
++
++const starterContents = (lesson: Lesson) =>
++  Object.fromEntries(flatten(lesson.files).map((f) => [f.path, f.content || '']));
++
++// Saves are debounced so a fast typist is not hitting localStorage on every
++// keystroke, and flushed on pagehide so the last few characters still survive
++// a closed laptop lid. See lib/drafts.js.
++const SAVE_DEBOUNCE_MS = 400;
++let saveTimer: ReturnType<typeof setTimeout> | null = null;
++
++function cancelPendingSave() {
++  if (!saveTimer) return;
++  clearTimeout(saveTimer);
++  saveTimer = null;
++}
++
++export const useLessonStore = create<LessonState>((set, get) => {
++  const persist = () => {
++    const { lesson, fileContents, currentFile } = get();
++    if (!lesson) return;
++    const { savedAt, error } = writeDraft(lesson.id, fileContents, currentFile);
+     set((state) => ({
+-      fileContents: { ...state.fileContents, [path]: value },
+-    })),
+-  moveFile: (from, to) =>
+-    set((state) => {
+-      const contents = { ...state.fileContents };
+-      const content = contents[from];
+-      delete contents[from];
+-      contents[to] = content;
+-      const currentFile = state.currentFile === from ? to : state.currentFile;
+-      return { fileContents: contents, currentFile };
+-    }),
+-  setSidebarOpen: (open) =>
+-    set((state) => ({ ui: { ...state.ui, sidebarOpen: open } })),
+-  setActiveTab: (tab) =>
+-    set((state) => ({ ui: { ...state.ui, activeSidebarTab: tab } })),
+-  setRequirements: (reqs) => set({ requirements: reqs }),
+-}));
++      draft: {
++        ...state.draft,
++        savedAt: savedAt ?? state.draft.savedAt,
++        error,
++      },
++    }));
++  };
++
++  const schedulePersist = () => {
++    cancelPendingSave();
++    saveTimer = setTimeout(() => {
++      saveTimer = null;
++      persist();
++    }, SAVE_DEBOUNCE_MS);
++  };
++
++  return {
++    lesson: undefined,
++    currentFile: undefined,
++    fileContents: {},
++    requirements: [],
++    ui: { sidebarOpen: false, activeSidebarTab: 'Files' },
++    draft: { savedAt: null, error: null, restoredAt: null },
++    setLesson: (lesson) => {
++      // A queued save belongs to the lesson we are leaving, not this one.
++      cancelPendingSave();
++      const starter = starterContents(lesson);
++      const { contents, currentFile, restoredAt } = restoreDraft(
++        lesson.id,
++        starter,
++        flatten(lesson.files)[0]?.path
++      );
++      set({
++        lesson,
++        currentFile,
++        fileContents: contents,
++        requirements: lesson.requirements,
++        draft: { savedAt: restoredAt, error: null, restoredAt },
++      });
++    },
++    selectFile: (path) => set({ currentFile: path }),
++    updateFile: (path, value) => {
++      set((state) => ({
++        fileContents: { ...state.fileContents, [path]: value },
++      }));
++      schedulePersist();
++    },
++    moveFile: (from, to) => {
++      set((state) => {
++        const contents = { ...state.fileContents };
++        const content = contents[from];
++        delete contents[from];
++        contents[to] = content;
++        const currentFile = state.currentFile === from ? to : state.currentFile;
++        return { fileContents: contents, currentFile };
++      });
++      schedulePersist();
++    },
++    setSidebarOpen: (open) =>
++      set((state) => ({ ui: { ...state.ui, sidebarOpen: open } })),
++    setActiveTab: (tab) =>
++      set((state) => ({ ui: { ...state.ui, activeSidebarTab: tab } })),
++    setRequirements: (reqs) => set({ requirements: reqs }),
++    resetToStarter: () => {
++      const { lesson } = get();
++      if (!lesson) return;
++      cancelPendingSave();
++      clearDraft(lesson.id);
++      set({
++        currentFile: flatten(lesson.files)[0]?.path,
++        fileContents: starterContents(lesson),
++        draft: { savedAt: null, error: null, restoredAt: null },
++      });
++    },
++    flushDraft: () => {
++      if (!saveTimer) return;
++      cancelPendingSave();
++      persist();
++    },
++  };
++});
+diff --git a/server.js b/server.js
+index a071e2e5..4a8cf46b 100644
+--- a/server.js
++++ b/server.js
+@@ -2,6 +2,17 @@ import express from 'express';
+ import next from 'next';
+ import fs from 'fs/promises';
+ import path from 'path';
++import {
++  checkCode,
++  cookieName,
++  isSafeLessonId,
++  isUnlocked,
++  parseCookies,
++  readLock,
++} from './lib/lock.js';
++
++// An unlock lasts one school day, so a lesson re-locks itself overnight.
++const UNLOCK_MS = 8 * 60 * 60 * 1000;
+ 
+ const dev = process.env.NODE_ENV !== 'production';
+ const app = next({ dev });
+@@ -13,7 +24,13 @@ app.prepare().then(() => {
+ 
+   server.post('/api/grade', async (req, res) => {
+     const { lessonId, files } = req.body;
++    // lessonId reaches the filesystem below, so never trust it raw.
++    if (!isSafeLessonId(lessonId)) return res.status(400).json([]);
+     try {
++      const cookies = parseCookies(req.headers.cookie);
++      if (!(await isUnlocked(lessonId, cookies[cookieName(lessonId)]))) {
++        return res.status(403).json([]);
++      }
+       const lessonDir = path.join(process.cwd(), 'lessons', lessonId);
+       const meta = JSON.parse(
+         await fs.readFile(path.join(lessonDir, 'lesson.json'), 'utf8')
+@@ -34,6 +51,46 @@ app.prepare().then(() => {
+     }
+   });
+ 
++  // Lives here rather than in an app/api route because express.json() above
++  // drains the request body before Next ever sees it.
++  server.post('/api/unlock', async (req, res) => {
++    const { lessonId, code } = req.body || {};
++    if (!isSafeLessonId(lessonId)) {
++      return res.status(400).json({ ok: false, message: 'Unknown lesson.' });
++    }
++
++    const { locked, unlockCode } = await readLock(lessonId);
++    if (locked && !unlockCode) {
++      return res.status(403).json({
++        ok: false,
++        message: 'This lesson is closed. Your teacher has to open it.',
++      });
++    }
++
++    const { ok, token } = await checkCode(lessonId, code);
++    if (!ok) {
++      // Slow down anyone working through the keyspace.
++      await new Promise((resolve) => setTimeout(resolve, 500));
++      return res.status(403).json({
++        ok: false,
++        message: 'That code is not right. Check it and try again.',
++      });
++    }
++
++    if (token) {
++      res.cookie(cookieName(lessonId), token, {
++        httpOnly: true,
++        sameSite: 'lax',
++        path: '/',
++        // Flagged secure only when the request already is, so this still works
++        // on a plain-http classroom server.
++        secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
++        maxAge: UNLOCK_MS,
++      });
++    }
++    res.json({ ok: true });
++  });
++
+   server.all('*', (req, res) => {
+     return handle(req, res);
+   });
