@@ -559,6 +559,7 @@ app.prepare().then(() => {
       screenshot_id: screenshotId ?? null,
       screenshot_shared: 0,
       withdrawn_at: null,
+      resolution_note: null,
       created_at: typeof createdAt === 'number' && Number.isFinite(createdAt) ? createdAt : Date.now(),
     });
     console.log('  [dev] issue #' + devIssueSeq + ' [' + kind + '] ' + title.trim());
@@ -568,14 +569,20 @@ app.prepare().then(() => {
   server.post('/api/issue-reports/:id/status', express.json(), (req, res) => {
     const r = devIssues.find((x) => x.id === Number(req.params.id));
     if (!r) return res.status(404).json({ error: 'Report not found' });
-    const { status } = req.body || {};
+    const { status, note } = req.body || {};
     if (!['open', 'in-progress', 'fixed', 'deferred'].includes(status)) {
       return res.status(400).json({ error: 'status must be one of: open, in-progress, fixed, deferred' });
     }
     r.status = status;
     r.triaged_by = 'dev@local';
     r.triaged_at = Date.now();
-    res.json({ ok: true, id: r.id, status });
+    // Mirrors the real route: presence of the key decides whether to touch
+    // the note, not its value -- a plain status flip must leave it alone.
+    if (Object.prototype.hasOwnProperty.call(req.body || {}, 'note')) {
+      const trimmed = typeof note === 'string' ? note.trim() : '';
+      r.resolution_note = trimmed.length ? trimmed : null;
+    }
+    res.json({ ok: true, id: r.id, status, resolution_note: r.resolution_note });
   });
 
   server.post('/api/issue-reports/:id/withdraw', express.json(), (req, res) => {

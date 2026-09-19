@@ -47,7 +47,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
 
   const result = await env.DB.prepare(
     `SELECT id, reporter_email, kind, title, message, status, triaged_by, triaged_at, context_json,
-            screenshot_id, screenshot_shared, withdrawn_at, created_at
+            screenshot_id, screenshot_shared, withdrawn_at, resolution_note, created_at
        FROM issue_reports
       ORDER BY created_at DESC`,
   ).all<ReportRow>();
@@ -251,6 +251,9 @@ export function renderMarkdown(reports: ReportRow[]): string {
       lines.push(
         `- **Triaged:** by ${r.triaged_by}${r.triaged_at ? ` at ${new Date(r.triaged_at).toISOString()}` : ''}`,
       );
+    }
+    if (r.resolution_note) {
+      lines.push(`- **Reply:** ${r.resolution_note}`);
     }
     lines.push('', '### Report', '', r.message);
 

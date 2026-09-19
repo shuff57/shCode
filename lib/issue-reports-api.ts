@@ -40,6 +40,10 @@ export interface IssueReport {
   /** Student payloads only — true once the reporter (or staff) has
    *  withdrawn this report from the public queue. */
   withdrawn?: boolean;
+  /** Staff reply on the triage decision. Visible to everyone who can see the
+   *  report at all -- unlike triaged_by/triaged_at, this one is meant to be
+   *  read by the reporter, not just staff. */
+  resolution_note: string | null;
 }
 
 /** The serve route is public and id-keyed; the extension is cosmetic. */
@@ -129,12 +133,21 @@ export async function setScreenshotShared(id: number, shared: boolean): Promise<
   if (!res.ok) throw new Error(await readError(res));
 }
 
-export async function setIssueReportStatus(id: number, status: IssueStatus): Promise<void> {
+/** `note` is optional and independent of `status`: omit it to flip status
+ *  without touching the existing reply; pass a string (or '') to write one,
+ *  or null to clear it. */
+export async function setIssueReportStatus(
+  id: number,
+  status: IssueStatus,
+  note?: string | null,
+): Promise<void> {
+  const body: { status: IssueStatus; note?: string | null } = { status };
+  if (note !== undefined) body.note = note;
   const res = await fetch(`/api/issue-reports/${encodeURIComponent(String(id))}/status`, {
     method: 'POST',
     credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(await readError(res));
 }

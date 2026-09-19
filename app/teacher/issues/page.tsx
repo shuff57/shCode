@@ -231,7 +231,7 @@ const SORTERS: Record<SortKey, (a: IssueReport, b: IssueReport) => number> = {
  *  where from. The id is included as "#31" so both spellings find it. */
 function searchHaystack(r: IssueReport): string {
   const c = (r.context ?? {}) as Record<string, unknown>;
-  return [`#${r.id}`, r.title, r.message, r.reporter_email, r.kind, r.status, c.lessonId, c.lessonTitle, c.path]
+  return [`#${r.id}`, r.title, r.message, r.reporter_email, r.kind, r.status, r.resolution_note, c.lessonId, c.lessonTitle, c.path]
     .filter((v) => v !== null && v !== undefined)
     .join(' ')
     .toLowerCase();
@@ -259,6 +259,12 @@ function IssuesPageInner() {
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [copied, setCopied] = useState('');
+  // Keyed by report id. A draft only exists once staff starts typing;
+  // rendering falls back to the report's own resolution_note, so this never
+  // needs syncing on load the way a mirrored copy of server state would.
+  const [noteDrafts, setNoteDrafts] = useState<Record<number, string>>({});
+  const [noteBusy, setNoteBusy] = useState<Set<number>>(new Set());
+  const [noteErrors, setNoteErrors] = useState<Record<number, string>>({});
 
   useEffect(() => {
     getCurrentUser().then((u) => {
@@ -291,6 +297,35 @@ function IssuesPageInner() {
       await setIssueReportStatus(id, status);
     } catch {
       load();
+    }
+  }
+
+  // Independent of handleStatus: the per-card dropdown never sends `note`,
+  // so flipping status alone can never blow away an existing reply, and
+  // saving a reply alone (this) never touches status.
+  async function handleNote(id: number, note: string) {
+    const status = reports.find((r) => r.id === id)?.status ?? 'open';
+    setNoteBusy((prev) => new Set(prev).add(id));
+    setNoteErrors((prev) => {
+      const { [id]: _drop, ...rest } = prev;
+      return rest;
+    });
+    try {
+      await setIssueReportStatus(id, status, note);
+      const saved = note.trim() ? note.trim() : null;
+      setReports((prev) => prev.map((r) => (r.id === id ? { ...r, resolution_note: saved } : r)));
+      setNoteDrafts((prev) => {
+        const { [id]: _drop, ...rest } = prev;
+        return rest;
+      });
+    } catch (e) {
+      setNoteErrors((prev) => ({ ...prev, [id]: e instanceof Error ? e.message : String(e) }));
+    } finally {
+      setNoteBusy((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
   }
 
@@ -612,6 +647,20 @@ function IssuesPageInner() {
                 {r.reporter_email} · {fmtDate(r.created_at)}
               </span>
 
+              {r.resolution_note && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--brand)',
+                    border: '1px solid var(--brand)',
+                    borderRadius: 4,
+                    padding: '2px 8px',
+                  }}
+                >
+                  Replied
+                </span>
+              )}
+
               <IssueVoteControl
                 reportId={r.id}
                 vote={{ up: r.up, down: r.down, myVote: r.myVote }}
@@ -739,6 +788,45 @@ function IssuesPageInner() {
                     Show screenshot to students
                   </label>
                 )}
+
+                <div style={{ marginTop: 12 }}>
+                  <label
+                    htmlFor={`note-${r.id}`}
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: 'var(--text)',
+                      opacity: 0.7,
+                      display: 'block',
+                      marginBottom: 4,
+                    }}
+                  >
+                    Reply (shown to the reporter, and to anyone else viewing this report)
+                  </label>
+                  <textarea
+                    id={`note-${r.id}`}
+                    style={{ ...S.input, width: '100%', minHeight: 60, resize: 'vertical' }}
+                    value={noteDrafts[r.id] ?? r.resolution_note ?? ''}
+                    onChange={(e) => setNoteDrafts((prev) => ({ ...prev, [r.id]: e.target.value }))}
+                    placeholder="e.g. Fixed by loosening r2's regex to allow flavor text. Or: Deferred — reverting this broke something worse last time."
+                  />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6 }}>
+                    <button
+                      type="button"
+                      style={S.button}
+                      disabled={
+                        noteBusy.has(r.id) ||
+                        (noteDrafts[r.id] ?? r.resolution_note ?? '') === (r.resolution_note ?? '')
+                      }
+                      onClick={() => void handleNote(r.id, noteDrafts[r.id] ?? r.resolution_note ?? '')}
+                    >
+                      {noteBusy.has(r.id) ? 'Saving…' : 'Save reply'}
+                    </button>
+                    {noteErrors[r.id] && (
+                      <span style={{ color: '#dc2626', fontSize: 12 }}>{noteErrors[r.id]}</span>
+                    )}
+                  </div>
+                </div>
 
                 {r.triaged_by && (
                   <div style={{ fontSize: 12, color: 'var(--text)', opacity: 0.6, marginTop: 10 }}>

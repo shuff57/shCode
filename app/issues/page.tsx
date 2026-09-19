@@ -298,6 +298,23 @@ export default function IssuesPage() {
                 <p style={{ margin: '0 0 8px', fontSize: 13, whiteSpace: 'pre-wrap', color: 'var(--text)' }}>
                   {r.message}
                 </p>
+
+                {r.resolution_note && (
+                  <div
+                    style={{
+                      background: 'var(--bg)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 4,
+                      padding: '8px 10px',
+                      margin: '0 0 8px',
+                      fontSize: 13,
+                      whiteSpace: 'pre-wrap',
+                      color: 'var(--text)',
+                    }}
+                  >
+                    <strong>Staff reply:</strong> {r.resolution_note}
+                  </div>
+                )}
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: 12, opacity: 0.6 }}>
                   {context?.path && (
                     <Link href={context.path} style={{ color: 'var(--brand)' }}>

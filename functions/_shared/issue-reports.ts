@@ -23,6 +23,10 @@ export interface ReportRow {
   /** Set by the reporter (or staff) withdrawing the report from the public
    *  queue; NULL means it is still visible. Staff keep seeing it either way. */
   withdrawn_at: number | null;
+  /** Staff reply on the triage decision -- why deferred, what fixed it. NULL
+   *  until a status change includes one. See publicReport(): shown to a
+   *  student too, unlike triaged_by/triaged_at. */
+  resolution_note: string | null;
   created_at: number;
 }
 
@@ -51,6 +55,7 @@ export interface PublicReport {
   score: number;
   myVote: -1 | 0 | 1;
   context: PublicContext | null;
+  resolution_note: string | null;
   /** True when this viewer is the reporter. The only use of
    *  reporter_email anywhere in this module -- it never appears as a key. */
   mine: boolean;
@@ -94,6 +99,7 @@ export function publicReport(row: ReportRow, tally: VoteTally, viewerEmail: stri
     context: publicContext(row.context_json),
     mine: row.reporter_email === viewerEmail,
     withdrawn: row.withdrawn_at !== null,
+    resolution_note: row.resolution_note,
   };
 }
 
