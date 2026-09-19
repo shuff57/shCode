@@ -1,0 +1,37 @@
+{
+  "name": "@shuff57/reshape-kernel",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./config": "./dist/config.js",
+    "./engine-adapter": "./dist/engine-adapter.js",
+    "./brep-rs-engine-adapter": "./dist/brep-rs-engine-adapter.js",
+    "./sketch-session": "./dist/sketch-session.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": ["dist/*"]
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@shuff57/reshape-script": "file:../script",
+    "@shuff57/reshape-sketch": "file:../sketch"
+  },
+  "peerDependencies": {
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "three": "^0.185.1",
+    "@types/node": "^24.3.0",
+    "@types/three": "^0.185.4"
+  }
+}

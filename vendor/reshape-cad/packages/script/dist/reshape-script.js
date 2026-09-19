@@ -1,0 +1,1714 @@
+// reSHape Script -- the scripting side of the B-rep build. See
+// .gauntlet/SPEC-reshape-script.md for the language this file implements.
+//
+// THE ONE IDEA (repeated from the spec, because it is the whole design): a
+// reSHape script is the Build timeline written down. Every call below appends
+// one step to the same ModelDoc the Build tools produce (lib/model-types.ts),
+// using the SAME `new*` constructors and the SAME `nextId()` sequence a mouse
+// click would use, so a script and a sequence of toolbar clicks that "mean
+// the same thing" produce byte-comparable docs. There is no second geometry
+// representation here -- runScript() never touches a kernel, never emits
+// JSCAD or OpenCascade calls, and never draws anything. It only builds a
+// ModelDoc and a parameter list; lib/occt-build.ts is what turns that into a
+// solid, exactly as it already does for a doc the mouse built.
+//
+// WHY new Function() AND NOT eval(). Two reasons, both load-bearing. First,
+// this file has to run identically in two hosts: a plain Node process
+// (scripts/test-reshape-script.mjs, no DOM) and a sandboxed iframe compiled
+// through scripts/build-brep-kernel.mjs (public/reshape/script-runner.html).
+// eval() inside a module (this file compiles to one) is always the "indirect
+// eval" form when called as `(0, eval)(...)`, or inherits strict mode from
+// its caller otherwise -- new Function() sidesteps that ambiguity by always
+// producing an ordinary, non-strict function body, matching the JSCAD runners'
+// choice of a real <script> tag for the same reason (see runner.html's own
+// comment on this). Second, a Function body appended with a `//# sourceURL=`
+// comment gets its OWN name in a stack trace in both V8-based hosts (Node and
+// Chromium), which is what makes error line numbers possible below without a
+// parser of our own -- see lineOf().
+//
+// THE LINE-NUMBER OFFSET IS MEASURED, NOT ASSUMED. `new Function(a, body)`
+// synthesizes `function anonymous(a\n) {\n<body>\n}`, so V8 reports every
+// line inside <body> some fixed number of lines higher than it actually
+// sits. The exact gap changed 2026-09-13 when the vocabulary stopped being
+// passed as 37 separate parameters (see SCOPE_NAME below) and `body` itself
+// gained one extra leading line (`with(SCOPE){`) that <source> is nested
+// inside. Measured directly against THIS construction: a `throw` on source
+// line 3 is reported at line 6, regardless of how many lines <source> has
+// or what's in it. LINE_OFFSET encodes that gap in one place rather than as
+// a magic number wherever a stack is parsed.
+import { nextId, newShape, newHole, newHoleCorners, newShell, newMove, newPattern, newSketch, RECTANGLE_CONSTRAINTS, newExtrude, newRevolve, newGroove, newPocket, newMirror, newBlend, extentAlong, isRoundable, canRotate, whyCannotRound, whyCannotOrbit, } from './model-types.js';
+import { generatedParams, applyParam, pname } from './model-codegen.js';
+// addConstraintSettling is the SAME beginner-friendly settle a click on the
+// Rules panel runs through (components/model/SketchConstraints.tsx's own
+// settle()) -- reused rather than re-derived, so a script call and a click
+// that "mean the same thing" leave the sketch in the identical state: an
+// older rule quietly dropped when that resolves a fresh conflict, or the new
+// rule left in place, fighting, when it does not -- see SPEC-d2-rules-in-script.md.
+// `describe` is aliased -- this file already has its own local `describe()`
+// for error messages (line 296), unrelated to sketch-solve.ts's constraint-
+// naming one ("edge 1 = edge 2").
+import { addConstraintSettling, seedForNewRule, solveSketch, collapsedByRatio, describe as describeConstraint, } from '@shuff57/reshape-sketch/sketch-solve';
+/**
+ * Every top-level name a reSHape script can call, in the exact order
+ * runScript() installs them -- the single source of truth for "what is the
+ * DSL", read by scripts/test-reshape-docs.mjs's COVERAGE and DRIFT groups so
+ * they measure documentation coverage against what this file actually
+ * implements rather than a hand-maintained list that can fall out of step
+ * with it. `runScript()`'s own `globals` object below is built FROM this
+ * array (`Object.fromEntries(VOCABULARY.map(...))`) rather than the other
+ * way around, so the two cannot drift apart.
+ */
+// OFFICIAL NAMES. Every shape/operation has an OFFICIAL geometry name, which
+// is what the API teaches and what a student's variables get bound through:
+// cuboid, torus, fillet, chamfer, extrude, revolve, loft, shell, subtract,
+// union, intersect, linearPattern, polarPattern (SPEC-S2). The friendly
+// course words (box, ring, round, bevel, pull, spin, blend, hollow, cut, join,
+// keep, repeat, repeatAround) remain documented ALIASES pointing at the SAME
+// function — same reference, not a wrapper, so the two vocabularies can never
+// drift apart. OFFICIAL_NAMES fold lives here.
+export const VOCABULARY = [
+    // student words (course-facing, documented in the lesson pages)
+    'box', 'cylinder', 'sphere', 'cone', 'ring',
+    'prism', 'wedge', 'groove', 'pocket',
+    'hole', 'holes', 'hollow', 'round', 'bevel', 'repeat', 'repeatAround', 'mirror', 'move', 'turn',
+    'join', 'cut', 'keep', 'draft',
+    'sketch', 'pull', 'spin', 'blend',
+    'param',
+    // official geometry names (API-facing; same fns as their student alias)
+    'cuboid', 'torus', 'fillet', 'chamfer',
+    'shell', 'subtract', 'union', 'intersect',
+    'linearPattern', 'polarPattern',
+    'extrude', 'revolve', 'loft',
+];
+// ---------------------------------------------------------------------------
+// Error line recovery
+// ---------------------------------------------------------------------------
+const SOURCE_NAME = 'reshape-user-script.js';
+// The `with(SCOPE_NAME){...}` binding name below -- deliberately unlikely to
+// collide with a student's own variable (see runScript's "run it" section).
+const SCOPE_NAME = '__RESHAPE_SCOPE__';
+// See the file header: measured against `new Function(SCOPE_NAME, wrapped)`
+// on this exact engine family (V8 -- Node and Chromium both), not derived
+// from a spec. Bumped 2 -> 3 2026-09-13 for the `with(SCOPE){` wrapper line
+// -- see the header comment and SCOPE_NAME below.
+const LINE_OFFSET = 3;
+function lineOf(err) {
+    const stack = err instanceof Error ? err.stack : undefined;
+    if (!stack)
+        return null;
+    const rx = new RegExp(SOURCE_NAME.replace(/\./g, '\\.') + ':(\\d+):(\\d+)');
+    const m = rx.exec(stack);
+    if (!m)
+        return null;
+    const line = parseInt(m[1], 10) - LINE_OFFSET;
+    return line > 0 ? line : null;
+}
+function messageOf(err) {
+    if (err instanceof Error)
+        return err.message;
+    return String(err);
+}
+/** Classic edit distance -- insert, delete, substitute, each cost 1. Used
+ *  only to find the closest VOCABULARY word to a name a script misspelled;
+ *  nothing here needs to be fast, a script's undefined names are typed by
+ *  hand and the candidate set is VOCABULARY's length (37 since SPEC-S2 added
+ *  the official-name aliases) — small either way. */
+function levenshtein(a, b) {
+    const rows = a.length + 1;
+    const cols = b.length + 1;
+    const d = Array.from({ length: rows }, () => new Array(cols).fill(0));
+    for (let i = 0; i < rows; i++)
+        d[i][0] = i;
+    for (let j = 0; j < cols; j++)
+        d[0][j] = j;
+    for (let i = 1; i < rows; i++) {
+        for (let j = 1; j < cols; j++) {
+            d[i][j] = a[i - 1] === b[j - 1]
+                ? d[i - 1][j - 1]
+                : 1 + Math.min(d[i - 1][j - 1], d[i - 1][j], d[i][j - 1]);
+        }
+    }
+    return d[a.length][b.length];
+}
+/**
+ * Beginner-lens finding, 2026-09-04: a misspelled call (`boxx(10)`) surfaced
+ * the raw engine message -- "boxx is not defined" -- which is true and
+ * useless to someone who has never heard the word "defined" used that way.
+ * A ReferenceError of exactly that shape gets rewritten in the house voice,
+ * naming the nearest word in VOCABULARY by edit distance: the candidate set
+ * is small (VOCABULARY's length), so "nearest" is always cheap and, for an
+ * actual typo, always
+ * the right one. Every OTHER error (a validation throw, a plain JS bug in
+ * the student's own logic) passes through messageOf() unchanged -- this
+ * rewrite is narrowly scoped to the one error shape a name that does not
+ * exist produces.
+ *
+ * A misspelling FAR from every real name (a genuine undeclared variable, not
+ * a typo of a tool) drops the "Did you mean" half rather than guessing --
+ * offering `box()` for `totallyUnrelatedName` would be a worse answer than no
+ * answer. "Far" is edit distance beyond half the name's own length (floored
+ * at 2, so a short name like "abc" still gets a real cutoff rather than
+ * "distance > 1.5" rounding away to nothing) -- generous enough that any
+ * plausible one- or two-letter typo of a 3-24-letter word still qualifies,
+ * and tight enough that an unrelated word does not.
+ */
+function friendlyMessage(err) {
+    if (err instanceof ReferenceError) {
+        const m = /^([A-Za-z_$][\w$]*) is not defined$/.exec(err.message);
+        if (m) {
+            const name = m[1];
+            let nearest = VOCABULARY[0];
+            let best = Infinity;
+            for (const word of VOCABULARY) {
+                const d = levenshtein(name, word);
+                if (d < best) {
+                    best = d;
+                    nearest = word;
+                }
+            }
+            const closeEnough = best <= Math.max(2, Math.ceil(name.length / 2));
+            return closeEnough
+                ? `${name} is not a tool here. Did you mean ${nearest}()?`
+                : `${name} is not a tool here.`;
+        }
+        // 2026-09-13: `const box = box(40, 40, 20)` -- naming a variable the
+        // SAME word as the tool that builds it, the single most natural name
+        // to reach for. Legal in a Build-mouse-clicks world, illegal in JS: a
+        // `const`/`let` declares its name for the WHOLE enclosing block from
+        // the top, so the right-hand `box(...)` call is already inside that
+        // name's temporal dead zone before its own declaration finishes. No
+        // scope trick fixes this (measured -- see the shell session that
+        // produced this fix); the only real fix is a different name. VOCABULARY
+        // membership, not edit distance, decides this branch -- SCOPE's `set`
+        // trap below only ever throws Error, so a ReferenceError this exact
+        // shape is never anything BUT this.
+        // The trailing `\.?` is not cosmetic: V8 ends this message without a full
+        // stop and JavaScriptCore ends it with one (measured -- bun 1.4.2, which
+        // is JSC, reports "Cannot access 'box' before initialization."). Anchored
+        // without it, the whole rewrite below fired on Chrome and Firefox and
+        // silently did not on Safari, where a student got the raw TDZ text instead
+        // of the sentence telling them what to do about it.
+        const tdz = /^Cannot access '([A-Za-z_$][\w$]*)' before initialization\.?$/.exec(err.message);
+        if (tdz && VOCABULARY.includes(tdz[1])) {
+            const name = tdz[1];
+            return `You can't build ${name}() into a variable named "${name}" on the same line -- JS reserves that name for the whole line before ${name}(...) even runs. Give the result its own name instead, e.g. const my${name[0].toUpperCase()}${name.slice(1)} = ${name}(...).`;
+        }
+    }
+    return messageOf(err);
+}
+// ---------------------------------------------------------------------------
+// Boxed numbers -- how a named param() correlates to the doc slot it lands in
+// ---------------------------------------------------------------------------
+/**
+ * What param() returns. A subclass of Number rather than a bare number so it
+ * keeps working as a number everywhere ordinary JavaScript expects one --
+ * arithmetic, comparisons, template strings, Math.*, .toFixed() -- while
+ * still carrying which name produced it. Every place a DSL function reads a
+ * numeric argument unwraps through num()/unwrap() below, which also
+ * RECORDS the correlation (this value's name -> the exact doc slot it is
+ * about to fill) so the final params list can caption that slot with the
+ * student's own name instead of the Build tool's automatic one -- see
+ * PARAMS ASSEMBLY at the bottom of runScript().
+ */
+class ParamNumber extends Number {
+    paramName;
+    constructor(v, paramName) {
+        super(v);
+        this.paramName = paramName;
+    }
+}
+function paramNameOf(v) {
+    return v instanceof ParamNumber ? v.paramName : null;
+}
+function unwrap(v) {
+    return v instanceof ParamNumber ? v.valueOf() : v;
+}
+// ---------------------------------------------------------------------------
+// Validation, in the old JSCAD sugar layer's own voice (plain-English
+// sentence, names the thing that is wrong, never a stack trace) -- matching
+// the house style its requireNumbers()/readOptions() guards used, in the
+// now-deleted public/reshape/reshape.js. Not literally shared code even
+// then: those guards duck-typed a JSCAD geometry object, which does not
+// exist on this path at all (runScript never builds one), so a fresh,
+// smaller pair of guards is honest about what this layer actually has to
+// tell apart -- a number (boxed or not), a plain { } options object, and
+// everything else.
+// ---------------------------------------------------------------------------
+function isFiniteNumber(v) {
+    if (v instanceof ParamNumber)
+        return Number.isFinite(v.valueOf());
+    return typeof v === 'number' && Number.isFinite(v);
+}
+function describe(v) {
+    if (v === null)
+        return 'null';
+    if (v === undefined)
+        return 'nothing';
+    if (typeof v === 'string')
+        return `the text "${v}"`;
+    if (typeof v === 'boolean')
+        return String(v);
+    if (Array.isArray(v))
+        return `a list of ${v.length}`;
+    if (isTopoRef(v))
+        return v.name.cause === 'between' ? 'an edge' : 'a face';
+    if (isHandle(v))
+        return `a ${v.kind} from earlier in the script`;
+    if (typeof v === 'object')
+        return 'a { } object';
+    if (typeof v === 'function')
+        return 'a function';
+    return String(v);
+}
+function requiredNumber(fn, label, v) {
+    if (v === undefined) {
+        throw new Error(`${fn} needs a number for ${label}.`);
+    }
+    if (!isFiniteNumber(v)) {
+        throw new Error(`${fn}'s ${label} has to be a number, and you gave it ${describe(v)}.`);
+    }
+    return v; // caller unwraps via num() where the slot matters
+}
+function optionalNumber(fn, label, v) {
+    if (v === undefined)
+        return undefined;
+    if (!isFiniteNumber(v)) {
+        throw new Error(`${fn}'s ${label} has to be a number, and you gave it ${describe(v)}.`);
+    }
+    return v;
+}
+/**
+ * A dimension that has to be MORE than zero -- a size, a diameter, a wall
+ * thickness, a pocket depth. Silently building a 10 mm box from
+ * `box(-10, -10, -10)` (measured 2026-09-04: the advanced student lens found
+ * this on the first pass) is the same class of defect whyCannotRound() and
+ * its siblings exist to close elsewhere in this app -- a control that
+ * quietly does something other than what was asked, with nothing on screen
+ * saying so. `${fn}():` (with the parens) is a deliberately different
+ * template from the `${fn}'s ${label}` one requiredNumber() uses -- this is
+ * a distinct failure ("the number means something impossible"), not "not a
+ * number at all", and the two should never read as the same sentence
+ * reworded.
+ */
+function positiveNumber(fn, label, v) {
+    const n = requiredNumber(fn, label, v);
+    const val = unwrap(n);
+    if (!(val > 0)) {
+        throw new Error(`${fn}(): a size has to be a positive number -- got ${val} for ${label}.`);
+    }
+    return n; // still possibly boxed -- caller unwraps (and correlates) via num()
+}
+/**
+ * A count of copies -- repeat()/repeatAround(). Has to be a whole number of
+ * at least one; refused rather than silently rounded or clamped, the same
+ * stance positiveNumber() takes on a bad size.
+ */
+function wholeNumberAtLeastOne(fn, label, v) {
+    const n = requiredNumber(fn, label, v);
+    const val = unwrap(n);
+    if (!(val >= 1) || !Number.isInteger(val)) {
+        throw new Error(`${fn}(): ${label} has to be a whole number of at least 1 -- got ${val}.`);
+    }
+    return n;
+}
+/**
+ * A rule call's edge or corner number -- the Rules panel's own 1-based
+ * numbering (edgeCorners()/the panel's row index + 1), bounded to the
+ * sketch's actual edge count so `sk.across(9)` on a rectangle is refused
+ * the same way an out-of-range param() slot would be, rather than handed to
+ * the solver as a silently-wrapped index. Returns the 0-based design index
+ * sketch-solve.ts's Constraint shape stores.
+ */
+function wholeIndex(fn, label, v, count) {
+    const n = requiredNumber(fn, label, v);
+    const val = unwrap(n);
+    if (!Number.isInteger(val) || val < 1 || val > count) {
+        throw new Error(`${fn}'s ${label} has to be a whole number from 1 to ${count} -- you gave it ${val}.`);
+    }
+    return val - 1;
+}
+function isPlainOptions(v) {
+    return !!v && typeof v === 'object' && !Array.isArray(v) && !(v instanceof Number) && !isTopoRef(v) && !isHandle(v);
+}
+function readOptions(fn, allowed, given) {
+    if (given === undefined)
+        return {};
+    if (!isPlainOptions(given)) {
+        throw new Error(`${fn}'s extras go in a { } object at the end, like ${fn}(..., { ${allowed[0]}: ... }). ` +
+            `You gave it ${describe(given)}.`);
+    }
+    const out = {};
+    for (const key of Object.keys(given)) {
+        if (!allowed.includes(key)) {
+            throw new Error(`${fn} has no option called "${key}". It takes ${allowed.join(', ')}.`);
+        }
+        out[key] = given[key];
+    }
+    return out;
+}
+function readVec3(fn, label, v) {
+    if (!Array.isArray(v) || v.length !== 3) {
+        throw new Error(`${fn}'s ${label} needs three numbers, like [x, y, z]. You gave it ${describe(v)}.`);
+    }
+    return [
+        requiredNumber(fn, `${label} x`, v[0]),
+        requiredNumber(fn, `${label} y`, v[1]),
+        requiredNumber(fn, `${label} z`, v[2]),
+    ];
+}
+function readVec2(fn, label, v) {
+    if (!Array.isArray(v) || v.length !== 2) {
+        throw new Error(`${fn}'s ${label} needs two numbers, like [across, up]. You gave it ${describe(v)}.`);
+    }
+    return [
+        requiredNumber(fn, `${label} 1`, v[0]),
+        requiredNumber(fn, `${label} 2`, v[1]),
+    ];
+}
+const FACE_PARTS = {
+    top: '+z',
+    bottom: '-z',
+    front: '-y',
+    back: '+y',
+    left: '-x',
+    right: '+x',
+};
+/** Which axis a face word's normal runs along -- used to pick draft's pull
+ *  axis from a 'from' word, and to pick a hole's in-plane offset axes. */
+const FACE_AXIS = {
+    top: 'z', bottom: 'z', front: 'y', back: 'y', left: 'x', right: 'x',
+};
+function facePart(fn, word, allowSide) {
+    if (typeof word !== 'string') {
+        throw new Error(`${fn} needs a face word (top, bottom, front, back, left, right${allowSide ? ', or side' : ''}), and you gave it ${describe(word)}.`);
+    }
+    if (word === 'side') {
+        if (!allowSide)
+            throw new Error(`${fn}: "side" is the curved wall of a cylinder, not a flat face here.`);
+        return 'side';
+    }
+    const part = FACE_PARTS[word];
+    if (!part) {
+        throw new Error(`${fn} does not know the face "${word}". Faces are named top, bottom, front, back, left, right` +
+            (allowSide ? ', or side (a cylinder\'s curved wall)' : '') + '.');
+    }
+    return part;
+}
+function isHandle(v) {
+    return !!v && typeof v === 'object' && v.__reshapeHandle === true;
+}
+function isTopoRef(v) {
+    return !!v && typeof v === 'object' && v.__reshapeTopoRef === true;
+}
+function isSketchHandle(v) {
+    return !!v && typeof v === 'object' && v.__reshapeSketch === true;
+}
+function rootKindOf(kind) {
+    return kind === 'box' ? 'box' : kind === 'cylinder' ? 'cylinder' : 'other';
+}
+// ---------------------------------------------------------------------------
+// The interpreter itself
+// ---------------------------------------------------------------------------
+export function runScript(source, opts = {}) {
+    let features = [];
+    const namedParams = new Map();
+    // pname(id, slot) -> the param() name whose caption/bounds should win over
+    // the Build tool's automatic one for that slot. See num()'s own comment.
+    const slotOverrides = new Map();
+    const usedParamNames = new Set();
+    // See applyConstraint()'s own comment and RunResult.warnings.
+    const ruleWarnings = [];
+    const docNow = () => ({ version: 1, features });
+    /** Unwrap a possibly-boxed number, recording which slot it landed in so the
+     *  final params list can caption that slot with the student's own name
+     *  instead of the doc's automatic one -- see PARAMS ASSEMBLY below. Call
+     *  this exactly where a value is about to be written into a Feature field,
+     *  never earlier (an intermediate expression like `wall * 2` unwraps on
+     *  its own through Number's arithmetic coercion and loses the tag, which
+     *  is expected: the caption follows the NAMED value, not everything
+     *  downstream of it). */
+    function num(v, id, slot) {
+        const name = paramNameOf(v);
+        if (name)
+            slotOverrides.set(pname(id, slot), name);
+        return unwrap(v);
+    }
+    function pushFeature(f) {
+        features = [...features, f];
+        return f;
+    }
+    function replaceFeature(id, next) {
+        features = features.map((f) => (f.id === id ? next : f));
+    }
+    function findFeature(id) {
+        const f = features.find((x) => x.id === id);
+        if (!f)
+            throw new Error(`internal: feature "${id}" is missing from the document.`);
+        return f;
+    }
+    function makeSolidHandle(f, rootId = f.id) {
+        const handle = {
+            __reshapeHandle: true,
+            id: f.id,
+            rootId,
+            rootKind: rootKindOf(findFeature(rootId).kind),
+            kind: f.kind,
+            face(word) {
+                const allowSide = handle.rootKind === 'cylinder';
+                const part = facePart('.face()', word, allowSide);
+                return {
+                    __reshapeTopoRef: true,
+                    owner: handle,
+                    name: { cause: 'primitive', feature: handle.rootId, kind: 'face', part },
+                };
+            },
+            edge(a, b) {
+                const allowSide = handle.rootKind === 'cylinder';
+                const pa = facePart('.edge()', a, allowSide);
+                const pb = facePart('.edge()', b, allowSide);
+                if (pa === pb)
+                    throw new Error('.edge() needs two DIFFERENT faces to name the edge between them.');
+                return {
+                    __reshapeTopoRef: true,
+                    owner: handle,
+                    name: {
+                        cause: 'between',
+                        feature: handle.rootId,
+                        kind: 'edge',
+                        of: [
+                            { cause: 'primitive', feature: handle.rootId, kind: 'face', part: pa },
+                            { cause: 'primitive', feature: handle.rootId, kind: 'face', part: pb },
+                        ],
+                    },
+                };
+            },
+        };
+        return handle;
+    }
+    function mutateHandle(handle, next) {
+        handle.id = next.id;
+        handle.kind = next.kind;
+    }
+    // ---- shapes ---------------------------------------------------------
+    function placePrimitive(fn, kind, argNames, args, opts, setDims) {
+        for (let i = 0; i < argNames.length; i++)
+            positiveNumber(fn, argNames[i], args[i]);
+        const allowCorner = kind === 'box' || kind === 'cylinder';
+        const extra = readOptions(fn, allowCorner ? ['at', 'corner'] : ['at'], opts);
+        const base = newShape(docNow(), kind);
+        const id = base.id;
+        setDims(base, id);
+        if (extra.at !== undefined) {
+            const at = readVec3(fn, 'at', extra.at);
+            base.center = [
+                num(at[0], id, 'x'),
+                num(at[1], id, 'y'),
+                num(at[2], id, 'z'),
+            ];
+        }
+        if (allowCorner && extra.corner !== undefined) {
+            const c = positiveNumber(fn, 'corner', extra.corner);
+            base.round = num(c, id, 'round');
+        }
+        pushFeature(base);
+        return makeSolidHandle(base);
+    }
+    function box(w, d, h, opts) {
+        return placePrimitive('box', 'box', ['width', 'depth', 'height'], [w, d, h], opts, (f, id) => {
+            f.size = [num(w, id, 'width'), num(d, id, 'depth'), num(h, id, 'height')];
+        });
+    }
+    function cylinder(across, tall, opts) {
+        return placePrimitive('cylinder', 'cylinder', ['across', 'tall'], [across, tall], opts, (f, id) => {
+            const cf = f;
+            cf.radius = num(across, id, 'radius') / 2;
+            cf.height = num(tall, id, 'height');
+        });
+    }
+    function sphere(across, opts) {
+        return placePrimitive('sphere', 'sphere', ['across'], [across], opts, (f, id) => {
+            f.radius = num(across, id, 'radius') / 2;
+        });
+    }
+    // cone(across, tall) -- TWO arguments, not the spec's three. ConeFeature
+    // (lib/model-types.ts) carries exactly one radius: newShape('cone') and
+    // the kernel's coneOf() (lib/occt-build.ts) both build a pointed cone with
+    // no way to store a flat top radius at all, so the spec's
+    // `cone(across, acrossTop, tall)` frustum form has nothing to write its
+    // middle argument into. Implemented against what the Build tool
+    // actually produces rather than inventing a doc field the rest of the app
+    // does not read -- flagged in the build report as a deviation from the
+    // spec text, not silently narrowed.
+    function cone(across, tall, opts) {
+        return placePrimitive('cone', 'cone', ['across', 'tall'], [across, tall], opts, (f, id) => {
+            const cf = f;
+            cf.radius = num(across, id, 'radius') / 2;
+            cf.height = num(tall, id, 'height');
+        });
+    }
+    // ring(across, tubeAcross) -> ringRadius/tubeRadius. The formula is the one
+    // public/reshape/reshape.js's own header spells out for `ring`: ringRadius
+    // is (across - thick) / 2, not "across / 2" -- across is the OUTSIDE
+    // diameter of the whole donut, not the centreline the kernel's torus() call
+    // actually takes.
+    function ring(across, tubeAcross, opts) {
+        return placePrimitive('ring', 'torus', ['across', 'tubeAcross'], [across, tubeAcross], opts, (f, id) => {
+            const tf = f;
+            // Neither raw argument is stored verbatim (ringRadius/tubeRadius are
+            // both derived), so a named param() on either one is left uncorrelated
+            // here -- unwrap() only, not num() -- rather than mislabel a slot with
+            // bounds computed from the wrong number. See ring()'s own comment.
+            const a = unwrap(across);
+            const t = unwrap(tubeAcross);
+            tf.tubeRadius = t / 2;
+            tf.ringRadius = (a - t) / 2;
+        });
+    }
+    // prism(sides, across, tall) -> PrismFeature. `across` is the whole width
+    // across corners (the circumradius doubled), matching how every other
+    // student word names a diameter rather than a radius.
+    function prism(sides, across, tall, opts) {
+        return placePrimitive('prism', 'prism', ['sides', 'across', 'tall'], [sides, across, tall], opts, (f, id) => {
+            const pf = f;
+            const n = Math.round(unwrap(sides));
+            if (!(n >= 3 && n <= 12))
+                throw new Error('prism() needs 3 to 12 sides.');
+            pf.sides = n;
+            pf.radius = num(across, id, 'radius') / 2;
+            pf.height = num(tall, id, 'height');
+        });
+    }
+    // wedge(width, depth, tall) -> WedgeFeature: the right-triangle footprint
+    // the kernel extrudes along Z (occt-build's wedgeOf, matching FreeCAD's own
+    // PartDesign::Wedge default).
+    function wedge(width, depth, tall, opts) {
+        return placePrimitive('wedge', 'wedge', ['width', 'depth', 'height'], [width, depth, tall], opts, (f, id) => {
+            const wf = f;
+            wf.width = num(width, id, 'width');
+            wf.depth = num(depth, id, 'depth');
+            wf.height = num(tall, id, 'height');
+        });
+    }
+    // groove(sketch, target, angle): the subtractive revolve — spin the profile
+    // around the sketch plane's own normal and CUT the ring out of the target
+    // solid. Mirror of spin(), with the solid it cuts named.
+    function groove(sk, target, angle) {
+        if (!isSketchHandle(sk))
+            throw new Error('groove() needs a sketch: groove(sketch1, shape, angle).');
+        if (!isHandle(target))
+            throw new Error('groove() needs a shape to cut: groove(sketch1, shape, angle).');
+        requiredNumber('groove', 'angle', angle);
+        const f = newGroove(docNow(), sk.id, target.id);
+        f.angle = num(angle, f.id, 'angle');
+        pushFeature(f);
+        return makeSolidHandle(f);
+    }
+    // pocket(sketch, target, depth): the subtractive extrude — pull the profile
+    // straight into the target solid and CUT the block out. Mirror of pull(),
+    // with the solid it cuts named. Same argument order as groove() on purpose:
+    // profile first, victim second, number last.
+    function pocket(sk, target, depth) {
+        if (!isSketchHandle(sk))
+            throw new Error('pocket() needs a sketch: pocket(sketch1, shape, depth).');
+        if (!isHandle(target))
+            throw new Error('pocket() needs a shape to cut: pocket(sketch1, shape, depth).');
+        requiredNumber('pocket', 'depth', depth);
+        const f = newPocket(docNow(), sk.id, target.id);
+        f.depth = num(depth, f.id, 'depth');
+        pushFeature(f);
+        return makeSolidHandle(f);
+    }
+    // ---- sketches ---------------------------------------------------------
+    const PLANE_WORD = { top: 'xy', front: 'xz', side: 'yz' };
+    function sketch(planeWord, offset) {
+        if (typeof planeWord !== 'string' || !(planeWord in PLANE_WORD)) {
+            throw new Error(`sketch() needs a plane word: 'top', 'front' or 'side'. You gave it ${describe(planeWord)}.`);
+        }
+        const plane = PLANE_WORD[planeWord];
+        const f = newSketch(docNow(), plane);
+        if (offset !== undefined)
+            f.offset = num(requiredNumber('sketch', 'offset', offset), f.id, 'offset');
+        pushFeature(f);
+        return makeSketchHandle(f.id);
+    }
+    /** True when a and b are the same rule on the same edge(s)/corner --
+     *  used to make a rule call idempotent (calling across() a second time
+     *  is a no-op, not a toggle-off: a script re-run has to land on the same
+     *  doc every time, which a click-driven toggle cannot promise). */
+    function sameConstraint(a, b) {
+        if (a.kind !== b.kind)
+            return false;
+        if (a.kind === 'lock' && b.kind === 'lock')
+            return a.corner === b.corner;
+        if (a.kind === 'length' && b.kind === 'length')
+            return a.edge === b.edge && a.value === b.value;
+        if ((a.kind === 'horizontal' || a.kind === 'vertical') && 'edge' in b)
+            return a.edge === b.edge;
+        // No cross-kind branch here: `a.kind !== b.kind` at the top of this
+        // function already means a distanceX can never be compared with a
+        // distanceY. (Reviewed 2026-09-09: an earlier version tested for that
+        // pairing anyway, which read as if cross-kind matching were intended and
+        // was unreachable either way.) A distX and a distY on one pair are
+        // different rules; whether they can COEXIST is the solver's call, and
+        // addConstraintSettling drops one on a rectangle diagonal because fixing
+        // both dx and dy there over-constrains it -- measured, reported through
+        // `removed`, and long-standing.
+        if (a.kind === 'distanceX' && b.kind === 'distanceX') {
+            return a.a === b.a && a.b === b.b && a.value === b.value;
+        }
+        if (a.kind === 'distanceY' && b.kind === 'distanceY') {
+            return a.a === b.a && a.b === b.b && a.value === b.value;
+        }
+        if (a.kind === 'symmetric' && b.kind === 'symmetric') {
+            return a.a === b.a && a.b === b.b && a.center === b.center;
+        }
+        if (a.kind === 'angle' && b.kind === 'angle') {
+            return a.edge === b.edge && a.other === b.other && a.degrees === b.degrees;
+        }
+        if ('other' in a && 'other' in b)
+            return a.edge === b.edge && a.other === b.other;
+        return false;
+    }
+    /** Is c a pair rule (equal/parallel/perpendicular) already sitting on
+     *  this exact pair of edges, regardless of which of the three it is? Used
+     *  to replace rather than stack -- SketchConstraints.tsx's cyclePair() only
+     *  ever keeps one pair rule per pair, and a script call means the same
+     *  thing a click through that grid does. */
+    function isPairOn(c, edge, other) {
+        return (c.kind === 'equal' || c.kind === 'parallel' || c.kind === 'perpendicular')
+            && c.edge === edge && c.other === other;
+    }
+    /**
+     * Adds one rule to sketch sketchId, through the exact settling path the
+     * live Rules panel uses (addConstraintSettling) -- so a fresh conflict
+     * resolves itself by dropping an older rule when that fixes it, and is
+     * left in the constraint list, fighting, when it does not. Either way the
+     * result is written straight into the feature's constraints, same as
+     * SketchConstraints.tsx's own settle(); the POINTS are left for whatever
+     * already re-solves a doc on adoption (lib/model-codegen.ts's solveDoc) --
+     * this function only ever changes which rules apply, never the geometry.
+     *
+     * NEVER throws for a rule that simply cannot hold. That is a refusal a
+     * beginner asked for on purpose (equal/parallel/perpendicular/length can
+     * always disagree with an earlier rule), not a mistake in the call itself
+     * -- so the script keeps going, exactly like every other kernel-level
+     * refusal this file's own docs describe, and the sketch is left fighting
+     * for the Rules panel to show the moment you look at it, the same as a
+     * click would. RunResult.warnings carries the house sentence for a caller
+     * that never opens Build to look.
+     */
+    function applyConstraint(sketchId, added) {
+        const cur = findFeature(sketchId);
+        const existing = cur.constraints ?? [];
+        if (existing.some((c) => sameConstraint(c, added)))
+            return; // idempotent
+        let base = existing;
+        if (added.kind === 'horizontal' || added.kind === 'vertical') {
+            // Across and Up on one edge is a contradiction, not a stack -- same
+            // cleanup toggle() does before settling a fresh horizontal/vertical.
+            const opposite = added.kind === 'horizontal' ? 'vertical' : 'horizontal';
+            base = base.filter((c) => !(c.kind === opposite && 'edge' in c && c.edge === added.edge));
+        }
+        else if (added.kind === 'equal' || added.kind === 'parallel' || added.kind === 'perpendicular') {
+            base = base.filter((c) => !isPairOn(c, added.edge, added.other));
+        }
+        const next = [...base, added];
+        const points = cur.points.map((p) => [p[0], p[1]]);
+        const result = addConstraintSettling(points, next);
+        replaceFeature(sketchId, { ...cur, constraints: result.constraints });
+        // result.removed === null covers TWO cases: the rule fit cleanly (fine,
+        // nothing to say), or nothing removed made it fit (genuinely fighting).
+        // Tell them apart the same way addConstraintSettling's own isBad() does,
+        // rather than trusting removed === null to mean either on its own.
+        if (result.removed === null) {
+            const seed = seedForNewRule(points, result.constraints);
+            const solved = solveSketch(seed, result.constraints);
+            if (solved.overConstrained || collapsedByRatio(points, solved.points)) {
+                ruleWarnings.push(`${describeConstraint(added)} cannot hold along with the rules already on this sketch -- `
+                    + `the shape is as close as it can get to all of them. Remove one to settle it.`);
+            }
+        }
+    }
+    // -- soup row readers (SPEC-sketcher2 §2.3/§2.5) --------------------------
+    // The interpreter validates every row's SHAPE (the k discriminator and the
+    // fields that kind carries) so a malformed row refuses here, with a line
+    // number, instead of arriving in the kernel as a puzzle.
+    const GEOM_SHAPES = {
+        point: ['id', 'p'],
+        line: ['id', 'a', 'b'],
+        circle: ['id', 'c', 'r'],
+        arc: ['id', 'c', 'r', 'a', 'b', 'sense'],
+    };
+    const GEOM_KEYS = new Set(['k', ...Object.values(GEOM_SHAPES).flat(), 'construction']);
+    function readVec2(where, what, v) {
+        if (Array.isArray(v) && v.length === 2 &&
+            typeof v[0] === 'number' && Number.isFinite(v[0]) &&
+            typeof v[1] === 'number' && Number.isFinite(v[1])) {
+            return [v[0], v[1]];
+        }
+        throw new Error(`${where} needs ${what} as [u, v], got ${describe(v)}.`);
+    }
+    function readSoupGeom(where, v) {
+        if (!v || typeof v !== 'object' || Array.isArray(v)) {
+            throw new Error(`${where} needs geometry row objects like { k: 'line', id: 1, a: [0, 0], b: [40, 0] }, got ${describe(v)}.`);
+        }
+        const o = v;
+        const k = o.k;
+        const shape = typeof k === 'string' ? GEOM_SHAPES[k] : undefined;
+        if (!shape) {
+            throw new Error(`${where} row k must be one of point, line, circle, arc; got ${describe(k)}.`);
+        }
+        if (typeof o.id !== 'number' || !Number.isInteger(o.id) || o.id <= 0) {
+            throw new Error(`${where} row id must be a positive whole number, got ${describe(o.id)}.`);
+        }
+        for (const field of shape) {
+            if (o[field] === undefined) {
+                throw new Error(`${where} row ${k} needs a ${field}.`);
+            }
+        }
+        if (k === 'point') {
+            return { k, id: o.id, p: readVec2(where, 'p', o.p), ...(o.construction === true ? { construction: true } : {}) };
+        }
+        if (k === 'line') {
+            return {
+                k, id: o.id,
+                a: readVec2(where, 'a', o.a), b: readVec2(where, 'b', o.b),
+                ...(o.construction === true ? { construction: true } : {}),
+            };
+        }
+        const r = o.r;
+        // A radius may be a param() reference (§6.2) -- the wrapper unwraps
+        // through num() in the caller once the feature id is known. A plain
+        // number must still be positive HERE.
+        if (r instanceof ParamNumber) {
+            // shape-only check: the number itself is validated by num() below.
+        }
+        else if (typeof r !== 'number' || !(r > 0)) {
+            throw new Error(`${where} row ${k} needs a positive radius r, got ${describe(r)}.`);
+        }
+        if (k === 'circle') {
+            return { k, id: o.id, c: readVec2(where, 'c', o.c), r: r, ...(o.construction === true ? { construction: true } : {}) };
+        }
+        const sense = o.sense;
+        if (sense !== 'ccw' && sense !== 'cw') {
+            throw new Error(`${where} row arc needs sense 'ccw' or 'cw', got ${describe(sense)}.`);
+        }
+        return {
+            k: 'arc', id: o.id, c: readVec2(where, 'c', o.c), r: r,
+            a: readVec2(where, 'a', o.a), b: readVec2(where, 'b', o.b),
+            sense, ...(o.construction === true ? { construction: true } : {}),
+        };
+    }
+    const RULE_SHAPES = {
+        coincident: ['a', 'b'],
+        pointOnObject: ['a', 'b'],
+        horizontal: ['a'],
+        vertical: ['a'],
+        parallel: ['a', 'b'],
+        perpendicular: ['a', 'b'],
+        tangent: ['a', 'b'],
+        equal: ['a', 'b'],
+        symmetric: ['a', 'b', 'c'],
+        distance: ['a', 'b', 'value'],
+        distanceX: ['a', 'b', 'value'],
+        distanceY: ['a', 'b', 'value'],
+        radius: ['a', 'value'],
+        diameter: ['a', 'value'],
+        angle: ['a', 'b', 'value'],
+        lock: ['a'],
+    };
+    function readSoupRule(where, v) {
+        if (!v || typeof v !== 'object' || Array.isArray(v)) {
+            throw new Error(`${where} needs constraint row objects like { k: 'tangent', a: 2, aEnd: 'b', b: 3, bEnd: 'a' }, got ${describe(v)}.`);
+        }
+        const o = v;
+        const k = o.k;
+        const fields = typeof k === 'string' ? RULE_SHAPES[k] : undefined;
+        if (!fields) {
+            throw new Error(`${where} row k must be one of the 16 constraint kinds, got ${describe(k)}.`);
+        }
+        for (const field of fields) {
+            if (o[field] === undefined) {
+                throw new Error(`${where} row ${k} needs a ${field}.`);
+            }
+        }
+        for (const gref of ['a', 'b', 'c']) {
+            if (o[gref] !== undefined) {
+                if (typeof o[gref] !== 'number' || !Number.isInteger(o[gref])) {
+                    throw new Error(`${where} row ${k} names geometry by whole id, got ${describe(o[gref])}.`);
+                }
+            }
+        }
+        if (o.value !== undefined) {
+            if (typeof o.value !== 'number' && !(o.value instanceof ParamNumber)) {
+                throw new Error(`${where} row ${k} needs a number (or a param()) as value, got ${describe(o.value)}.`);
+            }
+        }
+        return o;
+    }
+    function makeSketchHandle(id) {
+        const handle = {
+            __reshapeSketch: true,
+            id,
+            rect(w, h, opts) {
+                requiredNumber('.rect()', 'width', w);
+                requiredNumber('.rect()', 'height', h);
+                const extra = readOptions('.rect()', ['at'], opts);
+                const [ax, ay] = extra.at !== undefined ? readVec2('.rect()', 'at', extra.at) : [0, 0];
+                const ww = num(w, id, 'width');
+                const hh = num(h, id, 'height');
+                const points = [
+                    [ax - ww / 2, ay - hh / 2],
+                    [ax + ww / 2, ay - hh / 2],
+                    [ax + ww / 2, ay + hh / 2],
+                    [ax - ww / 2, ay + hh / 2],
+                ];
+                const cur = findFeature(id);
+                // Same rules a Rectangle-tool sketch is born with (lib/model-types.ts
+                // RECTANGLE_CONSTRAINTS) -- set explicitly here rather than relying
+                // on `cur` already carrying them (it does, from sketch()'s own
+                // newSketch() call, but that inheritance breaks the moment .rect()
+                // follows a .polygon() or .circle() on the same handle).
+                replaceFeature(id, {
+                    ...cur, points, shape: undefined, rounds: undefined, chamfers: undefined, bulges: undefined,
+                    constraints: RECTANGLE_CONSTRAINTS.slice(),
+                });
+                return handle;
+            },
+            circle(d, opts) {
+                requiredNumber('.circle()', 'across', d);
+                const extra = readOptions('.circle()', ['at'], opts);
+                const [ax, ay] = extra.at !== undefined ? readVec2('.circle()', 'at', extra.at) : [0, 0];
+                const r = num(d, id, 'across') / 2;
+                const cur = findFeature(id);
+                replaceFeature(id, {
+                    ...cur,
+                    points: [[ax - r, ay], [ax + r, ay]],
+                    shape: 'circle',
+                    rounds: undefined,
+                    chamfers: undefined,
+                    bulges: undefined,
+                    // newCircleSketch() never carries a rule -- the Rules panel shows
+                    // only the plane row for a circle (no edges to rule). Explicit,
+                    // not inherited: `cur` may still be holding the rectangle set from
+                    // an earlier sketch('top') or .rect() on this same handle, and a
+                    // circle has no edge 0-3 for those to mean anything about.
+                    constraints: undefined,
+                });
+                return handle;
+            },
+            polygon(pointsArg) {
+                if (!Array.isArray(pointsArg) || pointsArg.length < 3) {
+                    throw new Error(`.polygon() needs a list of at least three [x, y] points. You gave it ${describe(pointsArg)}.`);
+                }
+                const points = pointsArg.map((p, i) => {
+                    if (!Array.isArray(p) || p.length !== 2) {
+                        throw new Error(`.polygon()'s point ${i + 1} needs two numbers [x, y]. You gave it ${describe(p)}.`);
+                    }
+                    return [requiredNumber('.polygon()', `point ${i + 1} x`, p[0]), requiredNumber('.polygon()', `point ${i + 1} y`, p[1])];
+                });
+                const cur = findFeature(id);
+                // newPolygonSketch() never carries a rule either, and the rectangle
+                // set specifically indexes edges 0-3 -- meaningless, and dangerous
+                // (an out-of-range edge index) once the shape has more or fewer
+                // sides than that. Explicit clear, same reasoning as .circle()'s own.
+                replaceFeature(id, {
+                    ...cur, points, shape: undefined, rounds: undefined, chamfers: undefined, bulges: undefined,
+                    constraints: undefined,
+                });
+                return handle;
+            },
+            round(corner, radius) {
+                const k = requiredNumber('.round()', 'corner', corner);
+                const r = requiredNumber('.round()', 'radius', radius);
+                const cur = findFeature(id);
+                const rounds = { ...(cur.rounds ?? {}), [k]: num(r, id, `r${k}`) };
+                replaceFeature(id, { ...cur, rounds });
+                return handle;
+            },
+            chamfer(corner, distance) {
+                const k = requiredNumber('.chamfer()', 'corner', corner);
+                const dist = requiredNumber('.chamfer()', 'distance', distance);
+                const cur = findFeature(id);
+                const chamfers = { ...(cur.chamfers ?? {}), [k]: dist };
+                replaceFeature(id, { ...cur, chamfers });
+                return handle;
+            },
+            across(edge) {
+                const cur = findFeature(id);
+                const e = wholeIndex('.across()', 'edge', edge, cur.points.length);
+                applyConstraint(id, { kind: 'horizontal', edge: e });
+                return handle;
+            },
+            up(edge) {
+                const cur = findFeature(id);
+                const e = wholeIndex('.up()', 'edge', edge, cur.points.length);
+                applyConstraint(id, { kind: 'vertical', edge: e });
+                return handle;
+            },
+            length(edge, value) {
+                const cur = findFeature(id);
+                const e = wholeIndex('.length()', 'edge', edge, cur.points.length);
+                const v = positiveNumber('.length()', 'value', value);
+                applyConstraint(id, { kind: 'length', edge: e, value: num(v, id, `len${e}`) });
+                return handle;
+            },
+            equal(edge, other) {
+                const cur = findFeature(id);
+                const count = cur.points.length;
+                const a = wholeIndex('.equal()', 'edge', edge, count);
+                const b = wholeIndex('.equal()', 'other', other, count);
+                if (a === b)
+                    throw new Error('.equal() needs two DIFFERENT edges.');
+                applyConstraint(id, { kind: 'equal', edge: Math.min(a, b), other: Math.max(a, b) });
+                return handle;
+            },
+            parallel(edge, other) {
+                const cur = findFeature(id);
+                const count = cur.points.length;
+                const a = wholeIndex('.parallel()', 'edge', edge, count);
+                const b = wholeIndex('.parallel()', 'other', other, count);
+                if (a === b)
+                    throw new Error('.parallel() needs two DIFFERENT edges.');
+                applyConstraint(id, { kind: 'parallel', edge: Math.min(a, b), other: Math.max(a, b) });
+                return handle;
+            },
+            perpendicular(edge, other) {
+                const cur = findFeature(id);
+                const count = cur.points.length;
+                const a = wholeIndex('.perpendicular()', 'edge', edge, count);
+                const b = wholeIndex('.perpendicular()', 'other', other, count);
+                if (a === b)
+                    throw new Error('.perpendicular() needs two DIFFERENT edges.');
+                applyConstraint(id, { kind: 'perpendicular', edge: Math.min(a, b), other: Math.max(a, b) });
+                return handle;
+            },
+            pin(corner) {
+                const cur = findFeature(id);
+                const c = wholeIndex('.pin()', 'corner', corner, cur.points.length);
+                applyConstraint(id, { kind: 'lock', corner: c });
+                return handle;
+            },
+            distX(a, b, value) {
+                const cur = findFeature(id);
+                const count = cur.points.length;
+                const i = wholeIndex('.distX()', 'corner', a, count);
+                const j = wholeIndex('.distX()', 'other', b, count);
+                if (i === j)
+                    throw new Error('.distX() needs two DIFFERENT corners.');
+                const v = requiredNumber('.distX()', 'value', value);
+                applyConstraint(id, {
+                    kind: 'distanceX', a: Math.min(i, j), b: Math.max(i, j),
+                    value: num(v, id, `dx${Math.min(i, j)}_${Math.max(i, j)}`),
+                });
+                return handle;
+            },
+            distY(a, b, value) {
+                const cur = findFeature(id);
+                const count = cur.points.length;
+                const i = wholeIndex('.distY()', 'corner', a, count);
+                const j = wholeIndex('.distY()', 'other', b, count);
+                if (i === j)
+                    throw new Error('.distY() needs two DIFFERENT corners.');
+                const v = requiredNumber('.distY()', 'value', value);
+                applyConstraint(id, {
+                    kind: 'distanceY', a: Math.min(i, j), b: Math.max(i, j),
+                    value: num(v, id, `dy${Math.min(i, j)}_${Math.max(i, j)}`),
+                });
+                return handle;
+            },
+            symmetric(a, b, center) {
+                const cur = findFeature(id);
+                const count = cur.points.length;
+                const i = wholeIndex('.symmetric()', 'corner', a, count);
+                const j = wholeIndex('.symmetric()', 'other', b, count);
+                const k = wholeIndex('.symmetric()', 'about corner', center, count);
+                if (i === j)
+                    throw new Error('.symmetric() needs two DIFFERENT corners.');
+                if (k === i || k === j) {
+                    throw new Error('.symmetric() needs the about corner to be a THIRD corner.');
+                }
+                // `center` is a corner INDEX, not a measurement, so it goes in raw --
+                // the same way pin() passes its corner. num() exists to register a
+                // param-name override for a bindable dimension; wrapping an index in
+                // it (behind a double cast, which was the tell) claims a student could
+                // put a slider on "which corner", which is not a thing.
+                applyConstraint(id, {
+                    kind: 'symmetric', a: Math.min(i, j), b: Math.max(i, j), center: k,
+                });
+                return handle;
+            },
+            angle(edge, other, degrees) {
+                const cur = findFeature(id);
+                const count = cur.points.length;
+                const i = wholeIndex('.angle()', 'edge', edge, count);
+                const j = wholeIndex('.angle()', 'other', other, count);
+                if (i === j)
+                    throw new Error('.angle() needs two DIFFERENT edges.');
+                const v = requiredNumber('.angle()', 'degrees', degrees);
+                applyConstraint(id, {
+                    kind: 'angle', edge: Math.min(i, j), other: Math.max(i, j),
+                    degrees: num(v, id, `ang${Math.min(i, j)}_${Math.max(i, j)}`),
+                });
+                return handle;
+            },
+            geom(rows) {
+                // SPEC-sketcher2 §2.1: ids are dense and 1-BASED, id == index + 1.
+                // The explicit id is validated, never silently renumbered: soup
+                // constraints reference geometry by id, so a round trip that
+                // renumbers dangles every constraint (§2.1).
+                if (!Array.isArray(rows))
+                    throw new Error('.geom() needs an array of geometry rows.');
+                const cur = findFeature(id);
+                const out = [];
+                rows.forEach((row, i) => {
+                    const g = readSoupGeom('.geom()', row);
+                    // A row's radius may be a param() reference (§6.2: any numeric
+                    // slot may hold one). num() records the slot-key -> name binding
+                    // that the round trip re-binds through; the doc keeps the RESOLVED
+                    // number, exactly like every other feature -- the kernel reads
+                    // these rows directly, so a string here is a refusal.
+                    if (g.k === 'circle') {
+                        num(g.r, id, `g${g.id}r`);
+                        g.r = unwrap(g.r);
+                    }
+                    if (g.k === 'arc') {
+                        num(g.r, id, `g${g.id}r`);
+                        g.r = unwrap(g.r);
+                    }
+                    if (g.id !== i + 1) {
+                        throw new Error(`.geom() row ${i + 1} says id ${g.id} but sits at position ${i + 1}. ` +
+                            'Soup ids are sketch-local and dense: row ' + (i + 1) + ' carries id ' + (i + 1) + '.');
+                    }
+                    out.push(g);
+                });
+                replaceFeature(id, { ...cur, geoms: out, geom: out });
+                return handle;
+            },
+            rules(rows) {
+                if (!Array.isArray(rows))
+                    throw new Error('.rules() needs an array of constraint rows.');
+                const cur = findFeature(id);
+                const geoms = cur.geoms ?? cur.geom ?? [];
+                const kindOf = new Map();
+                for (const g of geoms)
+                    kindOf.set(g.id, g.k);
+                // Built-ins are fixed by the kernel and nameable by every rule form
+                // that takes a line or a point.
+                const builtinKind = (gid) => {
+                    if (gid === -1)
+                        return 'point';
+                    if (gid === -2 || gid === -3)
+                        return 'line';
+                    return null;
+                };
+                const out = [];
+                rows.forEach((row, i) => {
+                    const r = readSoupRule('.rules()', row);
+                    // Point-ref validation (§2.2): a line exposes 'a' and 'b' only, a
+                    // circle only 'c' -- and the archived UI's latent NaN came from
+                    // exactly this check being missing (pointWorld() read line fields
+                    // for a Point and produced NaN silently).
+                    const check = (gref, end) => {
+                        if (end === undefined || end === null)
+                            return;
+                        const kind = builtinKind(gref) ?? kindOf.get(gref);
+                        if (!kind) {
+                            throw new Error(`.rules() row ${i + 1} names geometry ${gref}, which this sketch does not have.`);
+                        }
+                        const valid = (kind === 'point' && end === 'a') ||
+                            (kind === 'line' && (end === 'a' || end === 'b')) ||
+                            (kind === 'circle' && end === 'c') ||
+                            kind === 'arc';
+                        if (!valid) {
+                            throw new Error(`.rules() row ${i + 1} names point '${end}' on geometry ${gref}, but a ${kind} has no '${end}'.`);
+                        }
+                    };
+                    const rr = r;
+                    if (rr.a !== undefined)
+                        check(rr.a, rr.aEnd);
+                    if (rr.b !== undefined)
+                        check(rr.b, rr.bEnd);
+                    if (rr.c !== undefined)
+                        check(rr.c, rr.cEnd);
+                    // equal across kinds is refused, not coerced (O18): a radius is
+                    // not a length in the same sense, and picking a reading would be
+                    // guessing at what the user meant.
+                    if (r.k === 'equal') {
+                        const ka = builtinKind(r.a) ?? kindOf.get(r.a);
+                        const kb = builtinKind(r.b) ?? kindOf.get(r.b);
+                        const isLen = (t) => t === 'line';
+                        const isRad = (t) => t === 'circle' || t === 'arc';
+                        if (ka && kb && ((isLen(ka) && isRad(kb)) || (isRad(ka) && isLen(kb)))) {
+                            throw new Error('.rules() equal between a line and a circle is not defined; constrain lengths to lengths or radii to radii.');
+                        }
+                    }
+                    // Only a rule's numeric value becomes a panel slot, named
+                    // rule${i}-value with the 0-based rules index (D8). A param()
+                    // reference is stored IN THE DOC as the param's NAME (a string):
+                    // the whole reason rows beat a blob (§6.2) is that the doc keeps
+                    // the binding, so toScript can re-emit the name and a reload can
+                    // re-bind it. num() still runs for its slotOverride side effect.
+                    const value = r.value;
+                    if (value !== undefined) {
+                        // num() FIRST, always: its slotOverride side effect is the only
+                        // place the pname-key -> param-name correlation is recorded. The
+                        // doc keeps the RESOLVED NUMBER, like every other feature (a
+                        // cuboid's width, a ring's across): the emitter re-binds by slot
+                        // key through numText() (§6.2's own mechanism). Storing the NAME
+                        // here instead made the doc lie about its own types -- value is
+                        // number -- and three consumers measured tripping on it: the
+                        // kernel refused the build, the emitter wrote NaN for the radius,
+                        // and applyParam's slider no-op'd on typeof !== 'number'.
+                        const v0 = num(value, id, `rule${i}-value`);
+                        r.value = v0;
+                    }
+                    out.push(r);
+                });
+                replaceFeature(id, { ...cur, rules: out });
+                return handle;
+            },
+        };
+        return handle;
+    }
+    function pull(sk, height) {
+        if (!isSketchHandle(sk))
+            throw new Error(`pull() needs a sketch: pull(sketch('top'), height).`);
+        requiredNumber('pull', 'height', height);
+        const f = newExtrude(docNow(), sk.id);
+        f.height = num(height, f.id, 'height');
+        pushFeature(f);
+        return makeSolidHandle(f);
+    }
+    function spin(sk, angle) {
+        if (!isSketchHandle(sk))
+            throw new Error(`spin() needs a sketch: spin(sketch('top'), angle).`);
+        requiredNumber('spin', 'angle', angle);
+        const f = newRevolve(docNow(), sk.id);
+        f.angle = num(angle, f.id, 'angle');
+        pushFeature(f);
+        return makeSolidHandle(f);
+    }
+    // blend(a, b, gap): BlendFeature takes no numbers of its own -- the gap
+    // between the two sketches IS the difference in their own offsets (see
+    // BlendFeature's doc comment in lib/model-types.ts) -- so the script's
+    // third argument sets sk2's offset to sk1's offset + gap rather than being
+    // stored anywhere new. toScript() reverses this by emitting the CURRENT
+    // difference, so the two are exact inverses of each other.
+    function blend(a, b, gap) {
+        if (!isSketchHandle(a) || !isSketchHandle(b)) {
+            throw new Error('blend() needs two sketches: blend(sketch1, sketch2, gap).');
+        }
+        requiredNumber('blend', 'gap', gap);
+        const sa = findFeature(a.id);
+        let sb = findFeature(b.id);
+        const nextOffset = num(gap, b.id, 'offset') + sa.offset;
+        if (sb.offset !== nextOffset) {
+            sb = { ...sb, offset: nextOffset };
+            replaceFeature(b.id, sb);
+        }
+        const f = newBlend(docNow(), sa, sb);
+        pushFeature(f);
+        return makeSolidHandle(f);
+    }
+    // ---- holes --------------------------------------------------------------
+    /** `holeId` -- the hole FEATURE's own id, not the target's -- has to be
+     *  known before this runs, because HoleFeature.center is keyed
+     *  (pname(holeId, 'x'/'y'/'z'), per generatedParams()'s hole branch in
+     *  lib/model-codegen.ts) to the HOLE, not to the shape it drills into.
+     *  Correlating a param() here against target.id instead (the bug this
+     *  comment replaces, caught while wiring toScript's own {at} substitution
+     *  through the same slot names) would silently attach the caption/bounds
+     *  to the TARGET's unrelated position slider instead of the hole's. */
+    function holeAxisAndCenter(fn, holeId, opts) {
+        let axis = 'z';
+        if (opts.along !== undefined) {
+            if (opts.along !== 'x' && opts.along !== 'y' && opts.along !== 'z') {
+                throw new Error(`${fn}'s "along" has to be 'x', 'y' or 'z'. You gave it ${describe(opts.along)}.`);
+            }
+            axis = opts.along;
+        }
+        let center = [0, 0, 0];
+        if (opts.at !== undefined) {
+            const [a, b] = readVec2(fn, 'at', opts.at);
+            // The two in-plane axes, in the order a student would read a face:
+            // "which two numbers am I not choosing" -- see the file-level design
+            // note on this at the bottom of the file.
+            if (axis === 'z')
+                center = [num(a, holeId, 'x'), num(b, holeId, 'y'), 0];
+            else if (axis === 'y')
+                center = [num(a, holeId, 'x'), 0, num(b, holeId, 'z')];
+            else
+                center = [0, num(a, holeId, 'y'), num(b, holeId, 'z')];
+        }
+        return { axis, center };
+    }
+    function hole(target, opts) {
+        if (!isHandle(target))
+            throw new Error('hole() needs a shape to drill into: hole(shape, { across: 6 }).');
+        const extra = readOptions('hole', ['across', 'deep', 'at', 'along'], opts);
+        if (extra.across === undefined)
+            throw new Error('hole() needs { across: <number> } for the bit\'s diameter.');
+        const across = positiveNumber('hole', 'across', extra.across);
+        const base = newHole(docNow(), target.id);
+        const { axis, center } = holeAxisAndCenter('hole', base.id, extra);
+        base.axis = axis;
+        base.diameter = num(across, base.id, 'diameter');
+        if (extra.deep !== undefined) {
+            base.depth = num(positiveNumber('hole', 'deep', extra.deep), base.id, 'depth');
+        }
+        else {
+            const extent = extentAlong(docNow(), target.id, axis);
+            base.depth = extent != null ? extent + 2 : 10;
+        }
+        base.center = center;
+        pushFeature(base);
+        mutateHandle(target, base);
+        return target;
+    }
+    function holes(target, opts) {
+        if (!isHandle(target))
+            throw new Error('holes() needs a shape to drill into: holes(shape, { across: 6, apart: [15, 10] }).');
+        const extra = readOptions('holes', ['across', 'apart', 'at', 'along'], opts);
+        if (extra.across === undefined)
+            throw new Error('holes() needs { across: <number> } for the bit\'s diameter.');
+        if (extra.apart === undefined)
+            throw new Error('holes() needs { apart: [across, up] } for the corner-to-corner spacing.');
+        const across = positiveNumber('holes', 'across', extra.across);
+        const [spanX, spanY] = readVec2('holes', 'apart', extra.apart);
+        const base = newHoleCorners(docNow(), target.id);
+        const { axis, center } = holeAxisAndCenter('holes', base.id, extra);
+        base.axis = axis;
+        base.diameter = num(across, base.id, 'diameter');
+        if (extra.deep !== undefined) {
+            base.depth = num(positiveNumber('holes', 'deep', extra.deep), base.id, 'depth');
+        }
+        else {
+            const extent = extentAlong(docNow(), target.id, axis);
+            base.depth = extent != null ? extent + 2 : 10;
+        }
+        base.center = center;
+        base.corners = {
+            dx: num(spanX, base.id, 'dx') / 2,
+            dy: num(spanY, base.id, 'dy') / 2,
+        };
+        pushFeature(base);
+        mutateHandle(target, base);
+        return target;
+    }
+    // ---- hollow ---------------------------------------------------------------
+    function hollow(target, opts) {
+        if (!isHandle(target))
+            throw new Error('hollow() needs a shape: hollow(shape, { wall: 2 }).');
+        const extra = readOptions('hollow', ['wall', 'open'], opts);
+        if (extra.wall === undefined)
+            throw new Error('hollow() needs { wall: <number> } for the wall thickness.');
+        const wall = positiveNumber('hollow', 'wall', extra.wall);
+        let open;
+        if (extra.open !== undefined) {
+            const part = facePart('hollow', extra.open, false);
+            open = { cause: 'primitive', feature: target.rootId, kind: 'face', part };
+        }
+        const base = newShell(docNow(), target.id, open);
+        base.thickness = num(wall, base.id, 'thickness');
+        pushFeature(base);
+        mutateHandle(target, base);
+        return target;
+    }
+    // ---- round / bevel ----------------------------------------------------
+    function round(arg, size) {
+        const s = requiredNumber('round', 'size', size);
+        if (isTopoRef(arg)) {
+            if (arg.name.cause !== 'between') {
+                throw new Error('round() on a single reference needs an edge -- try round(shape.edge(faceA, faceB), size).');
+            }
+            const owner = arg.owner;
+            const id = nextId(docNow(), 'round');
+            const f = { id, kind: 'fillet', target: owner.id, edge: arg.name, size: num(s, id, 'size'), style: 'fillet' };
+            pushFeature(f);
+            mutateHandle(owner, f);
+            return owner;
+        }
+        if (!isHandle(arg))
+            throw new Error('round() needs a shape or an edge (shape.edge(a, b)) to round.');
+        const f = findFeature(arg.id);
+        if (!isRoundable(f)) {
+            throw new Error(whyCannotRound(f) ?? 'Rounding does not work on this shape.');
+        }
+        const next = { ...f, round: num(s, arg.id, 'round'), roundStyle: 'fillet' };
+        replaceFeature(arg.id, next);
+        arg.kind = next.kind;
+        return arg;
+    }
+    function bevel(arg, size) {
+        if (!isTopoRef(arg) || arg.name.cause !== 'between') {
+            throw new Error('bevel() needs one edge -- try bevel(shape.edge(faceA, faceB), size).');
+        }
+        const s = requiredNumber('bevel', 'size', size);
+        const owner = arg.owner;
+        const id = nextId(docNow(), 'bevel');
+        const f = { id, kind: 'fillet', target: owner.id, edge: arg.name, size: num(s, id, 'size'), style: 'chamfer' };
+        pushFeature(f);
+        mutateHandle(owner, f);
+        return owner;
+    }
+    // ---- repeat / repeatAround -------------------------------------------
+    function repeat(target, opts) {
+        if (!isHandle(target))
+            throw new Error('repeat() needs a shape: repeat(shape, { count: 3, step: 60 }).');
+        const extra = readOptions('repeat', ['count', 'step'], opts);
+        if (extra.count === undefined)
+            throw new Error('repeat() needs { count: <number> }.');
+        const count = wholeNumberAtLeastOne('repeat', 'count', extra.count);
+        const base = newPattern(docNow(), target.id, 'linear');
+        base.count = num(count, base.id, 'count');
+        if (extra.step !== undefined) {
+            if (typeof extra.step === 'number' || extra.step instanceof Number) {
+                base.step = [num(extra.step, base.id, 'stepx'), 0, 0];
+            }
+            else {
+                base.step = readVec3('repeat', 'step', extra.step);
+            }
+        }
+        pushFeature(base);
+        mutateHandle(target, base);
+        return target;
+    }
+    function repeatAround(target, opts) {
+        if (!isHandle(target))
+            throw new Error('repeatAround() needs a shape: repeatAround(shape, { count: 6, axis: "z" }).');
+        const extra = readOptions('repeatAround', ['count', 'axis', 'angle'], opts);
+        if (extra.count === undefined)
+            throw new Error('repeatAround() needs { count: <number> }.');
+        const count = wholeNumberAtLeastOne('repeatAround', 'count', extra.count);
+        const base = newPattern(docNow(), target.id, 'circular');
+        base.count = num(count, base.id, 'count');
+        if (extra.axis !== undefined) {
+            if (extra.axis !== 'x' && extra.axis !== 'y' && extra.axis !== 'z') {
+                throw new Error(`repeatAround()'s "axis" has to be 'x', 'y' or 'z'. You gave it ${describe(extra.axis)}.`);
+            }
+            base.axis = extra.axis;
+        }
+        if (extra.angle !== undefined) {
+            base.totalAngle = num(requiredNumber('repeatAround', 'angle', extra.angle), base.id, 'totalangle');
+        }
+        const f = findFeature(target.id);
+        const why = whyCannotOrbit(f, base.axis ?? 'z');
+        if (why)
+            throw new Error(why);
+        pushFeature(base);
+        mutateHandle(target, base);
+        return target;
+    }
+    // ---- mirror / move / turn -----------------------------------------------
+    const MIRROR_WORD = {
+        'left-right': 'yz',
+        'front-back': 'xz',
+        'top-bottom': 'xy',
+    };
+    function mirror(target, word) {
+        if (!isHandle(target))
+            throw new Error('mirror() needs a shape: mirror(shape, "left-right").');
+        if (typeof word !== 'string' || !(word in MIRROR_WORD)) {
+            throw new Error(`mirror() needs 'left-right', 'front-back' or 'top-bottom'. You gave it ${describe(word)}.`);
+        }
+        const f = newMirror(docNow(), target.id, MIRROR_WORD[word]);
+        pushFeature(f);
+        return makeSolidHandle(f, target.rootId);
+    }
+    function move(target, offset, opts) {
+        if (!isHandle(target))
+            throw new Error('move() needs a shape: move(shape, [x, y, z]).');
+        const extra = readOptions('move', ['copy'], opts);
+        const copy = extra.copy === true;
+        const off = readVec3('move', 'offset', offset);
+        const base = newMove(docNow(), target.id, copy);
+        base.offset = [num(off[0], base.id, 'x'), num(off[1], base.id, 'y'), num(off[2], base.id, 'z')];
+        pushFeature(base);
+        if (copy)
+            return makeSolidHandle(base, target.rootId);
+        mutateHandle(target, base);
+        return target;
+    }
+    function turn(target, angles) {
+        if (!isHandle(target))
+            throw new Error('turn() needs a shape: turn(shape, [rx, ry, rz]).');
+        const f = findFeature(target.id);
+        if (!canRotate(f)) {
+            throw new Error(`turn() only works on a shape you built directly with a tool like Box or Cylinder -- ` +
+                `not on the result of ${f.kind}.`);
+        }
+        const [rx, ry, rz] = readVec3('turn', 'angles', angles);
+        const next = { ...f, rotate: [num(rx, target.id, 'rx'), num(ry, target.id, 'ry'), num(rz, target.id, 'rz')] };
+        replaceFeature(target.id, next);
+        return target;
+    }
+    // ---- boolean combine ------------------------------------------------
+    function combine(fn, op, args) {
+        if (args.length < 2 || !args.every(isHandle)) {
+            throw new Error(`${fn}() needs two or more shapes: ${fn}(a, b).`);
+        }
+        const handles = args;
+        const id = nextId(docNow(), 'op');
+        const f = { id, kind: 'combine', op, targets: handles.map((h) => h.id) };
+        pushFeature(f);
+        return makeSolidHandle(f);
+    }
+    const join = (...args) => combine('join', 'union', args);
+    const cut = (...args) => combine('cut', 'subtract', args);
+    const keep = (...args) => combine('keep', 'intersect', args);
+    // ---- draft ------------------------------------------------------------
+    /** The bounding extreme of a primitive along one axis, in world units --
+     *  used to turn a 'from' word into DraftFeature.neutral. Only answerable
+     *  for a plain primitive (same scope extentAlong() already has); anything
+     *  else falls back to 0, which draft()'s {neutral} escape hatch exists to
+     *  override by hand. */
+    function primitiveExtreme(id, axis, dir) {
+        const f = findFeature(id);
+        const half = extentAlong(docNow(), id, axis);
+        const center = f.kind === 'box' || f.kind === 'cylinder' || f.kind === 'sphere' || f.kind === 'cone' || f.kind === 'torus'
+            ? f.center[axis === 'x' ? 0 : axis === 'y' ? 1 : 2]
+            : 0;
+        if (half == null)
+            return 0;
+        return dir === 'lo' ? center - half / 2 : center + half / 2;
+    }
+    function draft(arg, angle, opts) {
+        const a = requiredNumber('draft', 'angle', angle);
+        const extra = readOptions('draft', ['from', 'neutral', 'whole'], opts);
+        let owner;
+        let face;
+        let whole = false;
+        if (isTopoRef(arg)) {
+            if (arg.name.cause !== 'primitive')
+                throw new Error('draft() needs a flat face -- try draft(shape.face("right"), angle).');
+            owner = arg.owner;
+            face = arg.name;
+        }
+        else if (isHandle(arg)) {
+            owner = arg;
+            whole = true;
+        }
+        else {
+            throw new Error('draft() needs a face (shape.face("right")) or a whole shape to draft: draft(shape, angle, { whole: true }).');
+        }
+        if (extra.whole === true)
+            whole = true;
+        let pull = 'z';
+        let neutral = 0;
+        if (extra.from !== undefined) {
+            if (typeof extra.from !== 'string' || !(extra.from in FACE_AXIS)) {
+                throw new Error(`draft()'s "from" needs a face word (top, bottom, front, back, left, right). You gave it ${describe(extra.from)}.`);
+            }
+            pull = FACE_AXIS[extra.from];
+            const dir = extra.from === 'bottom' || extra.from === 'front' || extra.from === 'left' ? 'lo' : 'hi';
+            neutral = primitiveExtreme(owner.rootId, pull, dir);
+        }
+        if (extra.neutral !== undefined)
+            neutral = requiredNumber('draft', 'neutral', extra.neutral);
+        const id = nextId(docNow(), 'draft');
+        const f = { id, kind: 'draft', target: owner.id, angle: num(a, id, 'angle'), pull, neutral, whole: whole || undefined };
+        if (!whole && face)
+            f.face = face;
+        pushFeature(f);
+        mutateHandle(owner, f);
+        return owner;
+    }
+    // ---- param() ------------------------------------------------------------
+    function param(name, value, opts) {
+        if (typeof name !== 'string' || !name) {
+            throw new Error(`param() needs a name first: param("wall", 2). You gave it ${describe(name)}.`);
+        }
+        if (usedParamNames.has(name)) {
+            throw new Error(`param() already used the name "${name}" earlier in this script. Give each one its own name.`);
+        }
+        const v = requiredNumber('param', 'value', value);
+        const extra = readOptions('param', ['min', 'max', 'step', 'caption'], opts);
+        usedParamNames.add(name);
+        const min = optionalNumber('param', 'min', extra.min) ?? 0;
+        const max = optionalNumber('param', 'max', extra.max) ?? Math.max(100, Math.ceil(Math.abs(v) * 4) || 100);
+        const step = optionalNumber('param', 'step', extra.step) ?? 1;
+        const caption = typeof extra.caption === 'string' ? extra.caption : name;
+        namedParams.set(name, { name, caption, value: v, min, max, step });
+        return new ParamNumber(v, name);
+    }
+    // ---- run it ---------------------------------------------------------
+    // Built FROM VOCABULARY, not the other way around (see that constant's own
+    // comment) -- a name added to this local object without adding it there
+    // would be a DSL call this file can execute but scripts/test-reshape-docs.mjs
+    // has no way to count as implemented, which is exactly the drift that
+    // constant exists to close.
+    const fns = {
+        box, cylinder, sphere, cone, ring,
+        prism, wedge, groove, pocket,
+        hole, holes, hollow, round, bevel, repeat, repeatAround, mirror, move, turn,
+        join, cut, keep, draft,
+        sketch, pull, spin, blend,
+        param,
+        // Official names: SAME reference as their student alias (SPEC-S2) — an
+        // alias that wrapped instead would drift the moment the student word's
+        // implementation changed. tsc enforces every VOCABULARY entry has a key
+        // here, both directions.
+        cuboid: box, torus: ring, fillet: round, chamfer: bevel,
+        shell: hollow, subtract: cut, union: join, intersect: keep,
+        linearPattern: repeat, polarPattern: repeatAround,
+        extrude: pull, revolve: spin, loft: blend,
+    };
+    const globals = fns;
+    // scope is a `with()` base object, not a parameter list (changed
+    // 2026-09-13; see the file header and LINE_OFFSET's own comment for why).
+    // Passing the 37 VOCABULARY words as `new Function` PARAMETER names meant a
+    // student's own `const box = ...`, `let ring = ...`, or `class hollow {}`
+    // was a SyntaxError -- "Identifier 'box' has already been declared" --
+    // because `let`/`const`/`class` can never redeclare a name already bound
+    // as a parameter, in the SAME scope, even for a totally reasonable reason.
+    // `var box = 5` "worked" instead, silently reusing the parameter slot and
+    // permanently losing the tool for the rest of the script -- worse, not
+    // better. `with(scope){...}` fixes both: a `let`/`const`/`class`/function
+    // declaration of any tool's name creates its own LOCAL binding that simply
+    // shadows the tool, same as shadowing any other outer variable in JS.
+    // Only a BARE assignment with no declaring keyword still reaches the tool
+    // itself (`with` routes `box = ...` to the base object precisely because
+    // no local binding exists to catch it first) -- the `set` trap below turns
+    // that one remaining case into a clear error instead of silently
+    // overwriting the tool for the rest of the run (measured: an unguarded
+    // plain object let `box = 5` through, turning every LATER `box(...)` call
+    // in the same script into "box is not a function").
+    const scope = new Proxy(globals, {
+        set(_target, prop) {
+            const name = String(prop);
+            throw new Error(`"${name}" is already a reSHape tool here (you call it like ${name}(...)) -- you can't assign to it directly with "${name} = ...". ` +
+                `If you want your own value with that name, declare it first: "const ${name} = ...".`);
+        },
+    });
+    const wrapped = `with(${SCOPE_NAME}){\n${source}\n}\n//# sourceURL=${SOURCE_NAME}`;
+    // INTENTIONAL new Function(). `source` is a STUDENT PROGRAM, not untrusted
+    // input to be sanitized -- running arbitrary student JavaScript is this
+    // file's entire job, the same job runner-brep.html already does (and the
+    // now-deleted public/reshape/runner.html already did, for the JSCAD path)
+    // with a real <script> tag.
+    // The safety boundary is where this function is CALLED FROM, not how it
+    // evaluates its argument: public/reshape/script-runner.html runs
+    // runScript() inside an iframe sandboxed `allow-scripts` WITHOUT
+    // `allow-same-origin` (opaque origin, no cookies, no same-origin fetch to
+    // /api/*), and lib/reshape-script.ts must NEVER be imported into the main
+    // app's own origin to evaluate student text -- see SandboxWorkspace.tsx's
+    // comment on why Code -> Build only ever adopts a doc the sandboxed frame
+    // already produced, rather than calling this function directly. Nothing
+    // here is string-concatenated from a value an attacker chooses; `wrapped`
+    // is the source text itself, one fixed `with()` line, and one fixed
+    // comment -- `with` here binds a single trusted internal object, not user
+    // input, so it carries none of the usual "avoid with()" ambiguous-scope
+    // risk (that risk is about WHICH names resolve where in code someone else
+    // has to read later; there is exactly one base object, chosen by us).
+    const errors = [];
+    try {
+        const fn = new Function(SCOPE_NAME, wrapped);
+        fn(scope);
+    }
+    catch (err) {
+        errors.push({ message: friendlyMessage(err), line: lineOf(err) });
+    }
+    const doc = docNow();
+    // Value overrides from a slider drag -- applied to the doc the script's
+    // own literal defaults produced, via the exact same applyParam() a
+    // Build-mode drag already uses. See RunOptions.values's own comment for
+    // why this is a doc patch and not a second interpretation of the script.
+    let finalDoc = doc;
+    if (opts.values) {
+        for (const [key, value] of Object.entries(opts.values)) {
+            if (typeof value === 'number' && Number.isFinite(value)) {
+                finalDoc = applyParam(finalDoc, key, value);
+            }
+        }
+    }
+    // PARAMS ASSEMBLY. Start from the Build tool's own automatic list (every
+    // numeric slot in the doc, correctly captioned and bounded already), then
+    // let a script's own param() calls win the caption/bounds for whichever
+    // slot they actually filled -- see num()'s comment for how that
+    // correlation was recorded. A param() whose value never reached a doc
+    // field (used only in a comparison, say) still gets a row of its own,
+    // appended at the end, so naming a number is never silently lost.
+    const auto = generatedParams(finalDoc);
+    const consumedNames = new Set();
+    const params = auto.map((p) => {
+        const overrideName = slotOverrides.get(p.name);
+        const named = overrideName ? namedParams.get(overrideName) : undefined;
+        if (named) {
+            consumedNames.add(named.name);
+            // A soup rule's slot row carries NaN when the doc's value is the
+            // param's NAME (the binding itself, §6.2) -- the numeric default lives
+            // in the named param, so it substitutes here.
+            const value = Number.isFinite(p.value) ? p.value : named.value;
+            return { name: p.name, caption: named.caption, value, min: named.min, max: named.max, step: named.step };
+        }
+        return { name: p.name, caption: p.caption, value: p.value, min: p.min, max: p.max, step: p.step };
+    });
+    for (const def of namedParams.values()) {
+        if (!consumedNames.has(def.name))
+            params.push(def);
+    }
+    // Every doc slot (pname key) each NAMED param's value fed, grouped by the
+    // param's OWN name -- the inverse of slotOverrides, and what
+    // toScript(doc, namedParams) needs to know where to write `wall` instead
+    // of a literal. Built from slotOverrides rather than re-walking the doc:
+    // slotOverrides is recorded at the exact moment num() consumed a
+    // ParamNumber, which is the only place that correlation ever existed.
+    const slotsByParamName = new Map();
+    for (const [slotKey, paramName] of slotOverrides) {
+        const list = slotsByParamName.get(paramName);
+        if (list)
+            list.push(slotKey);
+        else
+            slotsByParamName.set(paramName, [slotKey]);
+    }
+    const namedParamsOut = [...namedParams.values()].map((def) => ({
+        ...def,
+        slots: slotsByParamName.get(def.name) ?? [],
+    }));
+    return {
+        doc: finalDoc, params, namedParams: namedParamsOut, errors,
+        ...(ruleWarnings.length > 0 ? { warnings: ruleWarnings } : {}),
+    };
+}
+// ---------------------------------------------------------------------------
+// DESIGN DECISIONS worth a reviewer's eye (kept here rather than only in a
+// chat message, so the next person to touch this file finds the reasoning
+// beside the code it explains):
+//
+// 1. RunOptions.values patches the doc AFTER the script runs its own literal
+//    defaults, rather than threading overrides back into param() so a drag
+//    could change which branch of an `if` executes. The spec's "a slider
+//    drag re-runs the script with the new value" reads as the more powerful,
+//    control-flow-aware version; this file ships the simpler one. Revisit if
+//    a lesson actually wants a param to gate which STEPS exist, not just
+//    their numbers.
+// 2. cone() takes two arguments (across, tall), not the spec's three --
+//    ConeFeature has no field for a flat top radius. See cone()'s own
+//    comment.
+// 3. holes()'s `apart` is read as full corner-to-corner spacing and halved
+//    into HoleFeature.corners' dx/dy (which the doc already defines as
+//    half-spacings) -- not passed through directly.
+// 4. sk.round()/sk.chamfer() are not in the spec's Language section. Without
+//    them, a sketch with a rounded or chamfered corner (which SketchFeature
+//    already supports, and the Rules panel already exposes) has no way to
+//    reach that state from a script at all -- so this file adds the two
+//    names rather than leave a real Build-mode capability unreachable from
+//    Code. Flagged as an addition, not a spec deviation.
+// 5. draft()'s {from} word is turned into a pull axis and a neutral value by
+//    reading the target's own bounding box (see primitiveExtreme()) --
+//    DraftFeature.neutral has no generatedParams() slider today, so nothing
+//    else in the app derives it this way yet. A {neutral: N} escape hatch is
+//    added alongside {from} so any doc (not only ones whose neutral sits
+//    exactly on a bounding-box extreme) still round-trips through toScript().
+// 6. A param() bound to MORE than one doc slot (`const s = param('s', 20);
+//    box(s, s, s)`) still gets one Dimensions-panel row PER SLOT (three, for
+//    that example), each independently draggable -- dragging one does not
+//    move the other two, even though toScript(doc, namedParams) will
+//    correctly regenerate all three as `s` on Code -> Build -> Code. A
+//    single slider driving every bound slot at once would need the PANEL
+//    (components/ReshapePreview.tsx / ReshapeParamsPanel.tsx), not this
+//    file, to collapse NamedParamDef.slots into one row -- out of scope for
+//    the fixes this note was added alongside (2026-09-04).
+// ---------------------------------------------------------------------------
+//# sourceMappingURL=reshape-script.js.map

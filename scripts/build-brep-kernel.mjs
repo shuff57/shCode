@@ -46,15 +46,17 @@ const dest = path.join(root, 'public', 'reshape', 'kernel');
 const argIdx = process.argv.indexOf('--occt');
 const occtDir = argIdx > -1 ? process.argv[argIdx + 1] : process.env.OCCT_DIR;
 
-// Our own layer moved to reshape-cad's packages/kernel, packages/script and
-// packages/sketch (B1 extraction, plan: freecad-browser.md). occt-build is
-// the entry; the rest are what it reaches. Grouped by package because each
+// Our own layer lives in vendor/reshape-cad/packages/kernel, packages/script
+// and packages/sketch (B1 extraction, plan: freecad-browser.md; vendored
+// in-repo so a bare clone can build both this bundle and the npm packages
+// -- see scripts/build-reshape-packages.mjs). occt-build is the entry; the
+// rest are what it reaches. Grouped by package because each
 // group is compiled with ITS OWN --rootDir (see below) -- a browser page has
 // no bundler and no import map (the NO BUNDLER note above), so every file
 // still has to land flat in `dest` and resolve every import as a plain
 // relative './x.js', including the ones that now cross a package boundary
 // as a '@shuff57/reshape-*' specifier.
-const reshapeCadRoot = path.join(root, '..', 'reshape-cad', 'packages');
+const reshapeCadRoot = path.join(root, 'vendor', 'reshape-cad', 'packages');
 const PACKAGE_SOURCES = {
   kernel: [
     'occt-build.ts',
