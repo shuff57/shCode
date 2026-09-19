@@ -176,6 +176,12 @@ export const PARITY_CHECKS = [
   {
     name: 'kb.pressing() returns the exact rising frame-count p5play uses, not a boolean',
     area: 'input',
+    informational: true,
+    // We intend to fail this one. Real p5play returns the raw counter; moSHion
+    // deliberately made pressing() a plain boolean (8729fe14: `if (...)` code
+    // in the curriculum reads it as one, and the count stays available through
+    // kb.holding()). Marked informational like the kb.space D13 check below it,
+    // so it prints as a DELTA every run instead of failing the gate.
     run({ createSandbox }) {
       // Real p5play InputDevice.pressing(inp) (p5play.js ~9655-9660) reads a
       // single signed counter that resets to 1 on the first down frame and

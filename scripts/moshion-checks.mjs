@@ -686,25 +686,28 @@ export const SEMANTIC_CHECKS = [
     run({ createSandbox }) {
       const box = createSandbox();
       box.run(`
-        log = [];
+        log = []; heldLog = [];
         function setup(){ new Canvas(200,200); }
-        function draw(){ log.push(kb.pressing('right')); }
+        function draw(){ log.push(kb.pressing('right')); heldLog.push(kb.holding('right')); }
       `);
       box.pump(1);
       box.input.keyDown('ArrowRight');
       box.input.keyDown('d');
-      box.pump(3);
+      box.pump(15); // past holdThreshold(12): kb.holding() exposes the count
       box.input.keyUp('d'); // ArrowRight is still physically down
       box.pump(3);
       const tail = box.sandbox.log.slice(-2);
-      if (tail.some((v) => !(v > 0))) {
+      if (tail.some((v) => !v)) {
         return "'right' dropped to " + JSON.stringify(tail) + " after releasing 'd', but " +
           'ArrowRight was never released — the shared direction alias needs to stay held ' +
           'while any key feeding it is down.';
       }
-      // and it must keep COUNTING, not restart — charge-up timers read this
-      if (tail[1] !== tail[0] + 1) {
-        return 'the hold count restarted (' + JSON.stringify(tail) + ') instead of continuing';
+      // and it must keep COUNTING, not restart — charge-up timers read this.
+      // pressing() is a boolean by design (8729fe14); the count lives in
+      // holding(), which returns it once past holdThreshold.
+      const held = box.sandbox.heldLog.slice(-2);
+      if (held[1] !== held[0] + 1) {
+        return 'the hold count restarted (' + JSON.stringify(held) + ') instead of continuing';
       }
       return true;
     },
@@ -772,7 +775,9 @@ export const SEMANTIC_CHECKS = [
       box.input.keyUp('ArrowRight');
       box.pump(3);
       const tail = box.sandbox.log.slice(-2);
-      if (tail.some((v) => v !== 0)) {
+      // pressing() is a boolean by design (8729fe14) — the old `v !== 0`
+      // comparison read a correct `false` as a stale count.
+      if (tail.some((v) => v !== false && v !== 0)) {
         return "'right' still read as " + JSON.stringify(tail) + " after ArrowRight was released — " +
           "the direction alias is not being decayed by keyup/the frame sweep";
       }
@@ -874,6 +879,80 @@ export const SEMANTIC_CHECKS = [
       return 'kb.space read ' + v + ' on the release frame; the reference API would give -1 or -2 ' +
         '(truthy). moSHion returns kb.pressing()\'s value so `if (kb.space)` cannot ' +
         'double-fire on key-up — deliberate, D13.';
+    },
+  },
+
+  // ---- lifecycle ------------------------------------------------------------
+  {
+    name: 'drawTop() runs after render(), in screen space, and is optional',
+    area: 'lifecycle',
+    // render() paints sprites AFTER the sketch's draw(), so primitives drawn
+    // in draw() land UNDERNEATH every sprite — a HUD built there is buried by
+    // the world (portal's left wall ate the first two letters of its timer
+    // before this hook existed). drawTop() must run AFTER render(), with the
+    // camera off for its duration, and a sketch without it must run normally.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        block = new Sprite(100, 100, 200, 200, 'static');
+        block.color = '#0000ff';
+        function setup(){ new Canvas(200,200); world.gravity.y = 0; block = new Sprite(100,100,200,200,'static'); block.color = '#0000ff'; }
+        function draw(){ noStroke(); fill('#00ff00'); rect(20,20,40,40); }
+        function drawTop(){ noStroke(); fill('#ff0000'); rect(120,20,40,40); }
+      `);
+      box.pump(4);
+      if (box.errors.length) return 'sketch threw: ' + box.errors[0].message;
+
+      // Ops from the last frame, in order.
+      const ops = box.ops.filter((o) => o.op === 'fillRect');
+      // the sprite's own body
+      const blue = ops.find((o) => o.fill === '#0000ff');
+      const green = ops.find((o) => o.fill === '#00ff00');
+      const red = ops.find((o) => o.fill === '#ff0000');
+      if (!blue || !green || !red) {
+        return 'missing draw ops: sprite/blue=' + !!blue + ' draw()/green=' + !!green +
+          ' drawTop()/red=' + !!red;
+      }
+      // draw() BEFORE the sprite (that is the bug drawTop exists to fix, pinned
+      // so the ordering cannot quietly flip back), drawTop() AFTER it.
+      const iGreen = box.ops.indexOf(green), iBlue = box.ops.indexOf(blue), iRed = box.ops.indexOf(red);
+      if (!(iGreen < iBlue && iBlue < iRed)) {
+        return 'draw order wrong: draw() at op ' + iGreen + ', sprite at ' + iBlue +
+          ', drawTop() at ' + iRed + ' — expected draw() < sprite < drawTop()';
+      }
+      // Screen space: with the camera scrolled far away, a world-space rect
+      // at (120,20) would land off-canvas. drawTop() must ignore the camera.
+      box.sandbox.camera.x = 5000;
+      box.sandbox.camera.y = 5000;
+      const nBefore = box.ops.filter((o) => o.op === 'fillRect' && o.fill === '#ff0000').length;
+      box.pump(2);
+      const movedRed = box.ops.filter((o) => o.op === 'fillRect' && o.fill === '#ff0000')
+        .filter((o) => !(o.args[0] === 120 && o.args[1] === 20))
+        .filter((o, i, a) => a.indexOf(o) !== i || true);
+      const after = box.ops.filter((o) => o.op === 'fillRect' && o.fill === '#ff0000')
+        .slice(nBefore);
+      if (after.some((o) => o.args[0] !== 120 || o.args[1] !== 20)) {
+        return 'drawTop() moved with a scrolled camera: ' + JSON.stringify(after) +
+          ' — the hook must run in screen space';
+      }
+      return true;
+    },
+  },
+  {
+    name: 'a sketch without drawTop() runs unchanged',
+    area: 'lifecycle',
+    // The hook is optional. Its absence must not throw, and must not change
+    // what the frame draws.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){ new Canvas(100,100); }
+        function draw(){ background('#111'); }
+      `);
+      box.pump(6);
+      if (box.errors.length) return 'sketch threw: ' + box.errors[0].message;
+      const cleared = box.ops.some((o) => o.op === 'fillRect');
+      return cleared ? true : 'nothing drew';
     },
   },
 
