@@ -2,8 +2,10 @@
 
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { getCurrentUser } from '../../../lib/auth';
 import {
+  IssueKind,
   IssueReport,
   IssueStatus,
   listIssueReports,
@@ -51,6 +53,18 @@ const S = {
     outline: 'none',
   } as React.CSSProperties,
 
+  input: {
+    background: 'var(--bg)',
+    border: '1px solid var(--border)',
+    borderRadius: 4,
+    color: 'var(--text)',
+    padding: '6px 10px',
+    fontSize: 13,
+    minWidth: 240,
+    outline: 'none',
+    fontFamily: 'inherit',
+  } as React.CSSProperties,
+
   button: {
     background: 'var(--muted)',
     border: '1px solid var(--border)',
@@ -70,6 +84,28 @@ const S = {
     padding: 0,
   } as React.CSSProperties,
 };
+
+/**
+ * A filter chip. Active is a ring rather than an inverted fill: the status
+ * colours are mid-tone, so light-text-on-colour is only legible in one of
+ * the two themes. Colour on --bg is the pairing the per-card status select
+ * already ships, so it is known to read in both.
+ */
+function chipStyle(active: boolean, color: string): React.CSSProperties {
+  return {
+    background: 'var(--bg)',
+    color,
+    border: `1px solid ${color}`,
+    boxShadow: active ? `inset 0 0 0 2px ${color}` : 'none',
+    opacity: active ? 1 : 0.65,
+    borderRadius: 999,
+    padding: '3px 12px',
+    fontSize: 12,
+    fontWeight: active ? 700 : 500,
+    cursor: 'pointer',
+    textTransform: 'capitalize',
+  };
+}
 
 const KIND_COLOR: Record<string, string> = {
   bug: '#f87171',
@@ -149,7 +185,13 @@ function buildAgentPrompt(reports: IssueReport[]): string {
   return out.join('\n');
 }
 
-type Filter = 'open' | 'all';
+// Status was 'open' | 'all' until the queue outgrew one screen. With four
+// statuses in use, "show me the deferred pile" — the view you want when
+// deciding whether a deferral still holds — was the one question the old
+// two-way switch could not ask.
+type StatusFilter = 'all' | IssueStatus;
+type KindFilter = 'all' | IssueKind;
+type SortKey = 'newest' | 'oldest' | 'votes' | 'status';
 
 // Issue #14: staff asked to filter the list by how old a report is, on top
 // of the existing open/all status filter. created_at is epoch ms and was
@@ -162,6 +204,47 @@ const AGE_FILTER_MS: Record<AgeFilter, number | null> = {
   '30d': 30 * 24 * 60 * 60 * 1000,
 };
 
+const KIND_ORDER: IssueKind[] = ['bug', 'quirk', 'enhancement'];
+
+const SORT_KEYS: SortKey[] = ['newest', 'oldest', 'votes', 'status'];
+const SORT_LABEL: Record<SortKey, string> = {
+  newest: 'Newest first',
+  oldest: 'Oldest first',
+  votes: 'Most voted',
+  status: 'By status',
+};
+
+// 'newest' is the default because it is the order the API already returns
+// (ORDER BY created_at DESC for a staff caller), so the page still opens on
+// the arrangement staff are used to and re-sorting stays opt-in. 'votes'
+// matches the student queue's rule, ties broken newest-first.
+const SORTERS: Record<SortKey, (a: IssueReport, b: IssueReport) => number> = {
+  newest: (a, b) => b.created_at - a.created_at,
+  oldest: (a, b) => a.created_at - b.created_at,
+  votes: (a, b) => b.score - a.score || b.created_at - a.created_at,
+  status: (a, b) =>
+    STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) || b.created_at - a.created_at,
+};
+
+/** What a search term is matched against: everything a staff member might
+ *  remember about a report — its headline, its body, who filed it, and
+ *  where from. The id is included as "#31" so both spellings find it. */
+function searchHaystack(r: IssueReport): string {
+  const c = (r.context ?? {}) as Record<string, unknown>;
+  return [`#${r.id}`, r.title, r.message, r.reporter_email, r.kind, r.status, c.lessonId, c.lessonTitle, c.path]
+    .filter((v) => v !== null && v !== undefined)
+    .join(' ')
+    .toLowerCase();
+}
+
+/** Every term must match, so a second word narrows rather than widens. */
+function matchesQuery(r: IssueReport, query: string): boolean {
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+  if (terms.length === 0) return true;
+  const hay = searchHaystack(r);
+  return terms.every((t) => hay.includes(t));
+}
+
 function IssuesPageInner() {
   const [user, setUser] = useState<Awaited<ReturnType<typeof getCurrentUser>>>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -169,8 +252,11 @@ function IssuesPageInner() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [voteError, setVoteError] = useState('');
-  const [filter, setFilter] = useState<Filter>('open');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('open');
+  const [kindFilter, setKindFilter] = useState<KindFilter>('all');
   const [ageFilter, setAgeFilter] = useState<AgeFilter>('any');
+  const [sortKey, setSortKey] = useState<SortKey>('newest');
+  const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [copied, setCopied] = useState('');
 
@@ -272,6 +358,32 @@ function IssuesPageInner() {
     });
   }
 
+  function toggleExpandAll() {
+    setExpanded(allExpanded ? new Set() : new Set(visible.map((r) => r.id)));
+  }
+
+  function resetFilters() {
+    setStatusFilter('open');
+    setKindFilter('all');
+    setAgeFilter('any');
+    setSortKey('newest');
+    setQuery('');
+  }
+
+  // The whole header row toggles its card, which puts every control in that
+  // row — the vote buttons, the status select, Delete, the chevron itself —
+  // inside the click target. Ignoring clicks that landed on a control beats
+  // stopPropagation on each one, which is the kind of thing the next control
+  // added to this row would quietly forget. The selection check is the other
+  // half of it: finishing a drag across the headline is not a request to
+  // collapse the card.
+  function onHeaderClick(e: React.MouseEvent<HTMLDivElement>, id: number) {
+    if ((e.target as Element).closest('button, select, input, a, label')) return;
+    const selection = window.getSelection();
+    if (selection && !selection.isCollapsed) return;
+    toggleExpand(id);
+  }
+
   if (!authChecked) return <div style={{ ...S.page, color: 'var(--text)', opacity: 0.55 }}>Loading…</div>;
 
   if (!user || user.role === 'student') {
@@ -283,14 +395,23 @@ function IssuesPageInner() {
     );
   }
 
+  // Narrow, then order. Every .filter() allocates, so the .sort() at the end
+  // is working on this chain's own array and never reorders `reports`.
   const maxAgeMs = AGE_FILTER_MS[ageFilter];
-  const visible = (filter === 'open' ? reports.filter((r) => r.status === 'open') : reports).filter(
-    (r) => maxAgeMs === null || Date.now() - r.created_at <= maxAgeMs,
-  );
-  const openCount = reports.filter((r) => r.status === 'open').length;
-  const counts = STATUS_ORDER.map(
-    (s) => `${s}: ${reports.filter((r) => r.status === s).length}`,
-  ).join(' · ');
+  const visible = reports
+    .filter((r) => statusFilter === 'all' || r.status === statusFilter)
+    .filter((r) => kindFilter === 'all' || r.kind === kindFilter)
+    .filter((r) => maxAgeMs === null || Date.now() - r.created_at <= maxAgeMs)
+    .filter((r) => matchesQuery(r, query))
+    .sort(SORTERS[sortKey]);
+
+  const allExpanded = visible.length > 0 && visible.every((r) => expanded.has(r.id));
+  const filtersActive =
+    statusFilter !== 'open' ||
+    kindFilter !== 'all' ||
+    ageFilter !== 'any' ||
+    sortKey !== 'newest' ||
+    query !== '';
 
   function download() {
     // The export endpoint sets Content-Disposition; a plain nav works and
@@ -302,15 +423,53 @@ function IssuesPageInner() {
     <div style={S.page}>
       <h1 style={S.h1}>Issue reports</h1>
 
-      <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <select
-          style={{ ...S.select, minWidth: 160 }}
-          value={filter}
-          onChange={(e) => setFilter(e.target.value as Filter)}
-          aria-label="Filter reports"
+      {/* The tally doubles as the status filter. It used to be a static
+          string, which made "deferred: 13" a fact you could read but not a
+          pile you could open. */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+        <button
+          type="button"
+          onClick={() => setStatusFilter('all')}
+          aria-pressed={statusFilter === 'all'}
+          style={chipStyle(statusFilter === 'all', 'var(--text)')}
         >
-          <option value="open">Open only ({openCount})</option>
-          <option value="all">All ({reports.length})</option>
+          all {reports.length}
+        </button>
+        {STATUS_ORDER.map((s) => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => setStatusFilter(statusFilter === s ? 'all' : s)}
+            aria-pressed={statusFilter === s}
+            style={chipStyle(statusFilter === s, STATUS_COLOR[s])}
+          >
+            {s} {reports.filter((r) => r.status === s).length}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <input
+          type="search"
+          style={S.input}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search text, reporter, lesson, #id"
+          aria-label="Search reports"
+        />
+
+        <select
+          style={{ ...S.select, minWidth: 140 }}
+          value={kindFilter}
+          onChange={(e) => setKindFilter(e.target.value as KindFilter)}
+          aria-label="Filter by kind"
+        >
+          <option value="all">Any kind</option>
+          {KIND_ORDER.map((k) => (
+            <option key={k} value={k}>
+              {k} ({reports.filter((r) => r.kind === k).length})
+            </option>
+          ))}
         </select>
 
         <select
@@ -325,6 +484,34 @@ function IssuesPageInner() {
           <option value="30d">Last 30 days</option>
         </select>
 
+        <select
+          style={{ ...S.select, minWidth: 140 }}
+          value={sortKey}
+          onChange={(e) => setSortKey(e.target.value as SortKey)}
+          aria-label="Sort reports"
+        >
+          {SORT_KEYS.map((k) => (
+            <option key={k} value={k}>
+              {SORT_LABEL[k]}
+            </option>
+          ))}
+        </select>
+
+        {filtersActive && (
+          <button type="button" style={S.button} onClick={resetFilters}>
+            Reset
+          </button>
+        )}
+
+        <span style={{ fontSize: 13, color: 'var(--text)', opacity: 0.55 }}>
+          Showing {visible.length} of {reports.length}
+        </span>
+      </div>
+
+      <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <button type="button" style={S.button} onClick={toggleExpandAll} disabled={visible.length === 0}>
+          {allExpanded ? 'Collapse all' : 'Expand all'}
+        </button>
         <button type="button" style={S.button} onClick={download}>
           Download report.md
         </button>
@@ -333,7 +520,7 @@ function IssuesPageInner() {
           style={S.button}
           onClick={() => void copyForAgent()}
           disabled={visible.length === 0}
-          title="Copy the reports shown below as a work order for Claude Code or opencode"
+          title="Copy the filtered reports shown below as a work order for Claude Code or opencode"
         >
           Copy for agent
         </button>
@@ -341,10 +528,7 @@ function IssuesPageInner() {
           Refresh
         </button>
 
-        <span style={{ fontSize: 13, color: 'var(--text)', opacity: 0.55 }}>{counts}</span>
-        {copied && (
-          <span style={{ fontSize: 13, color: '#22c55e' }}>{copied}</span>
-        )}
+        {copied && <span style={{ fontSize: 13, color: '#22c55e' }}>{copied}</span>}
       </div>
 
       {loading && <div style={{ color: 'var(--text)', opacity: 0.55 }}>Loading reports…</div>}
@@ -353,9 +537,11 @@ function IssuesPageInner() {
 
       {!loading && !loadError && visible.length === 0 && (
         <p style={{ color: 'var(--text)', opacity: 0.55, fontSize: 14 }}>
-          {filter === 'open'
-            ? 'Nothing open. Nice.'
-            : 'No reports yet. Students file these from the "Report an issue" button.'}
+          {reports.length === 0
+            ? 'No reports yet. Students file these from the "Report an issue" button.'
+            : filtersActive
+              ? 'No reports match these filters.'
+              : 'Nothing open. Nice.'}
         </p>
       )}
 
@@ -373,7 +559,36 @@ function IssuesPageInner() {
 
         return (
           <div key={r.id} style={S.card}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <div
+              onClick={(e) => onHeaderClick(e, r.id)}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', cursor: 'pointer' }}
+            >
+              {/* The row click is a mouse convenience; this button is the
+                  real control, so the card stays operable from the keyboard
+                  without nesting interactive elements inside one another. */}
+              <button
+                type="button"
+                onClick={() => toggleExpand(r.id)}
+                aria-expanded={isExpanded}
+                aria-controls={`report-${r.id}-detail`}
+                aria-label={`${isExpanded ? 'Collapse' : 'Expand'} report ${r.id}`}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text)',
+                  opacity: 0.7,
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'grid',
+                  placeItems: 'center',
+                }}
+              >
+                {isExpanded ? (
+                  <ChevronDown size={16} aria-hidden="true" />
+                ) : (
+                  <ChevronRight size={16} aria-hidden="true" />
+                )}
+              </button>
               <span
                 style={{
                   background: 'transparent',
@@ -423,21 +638,6 @@ function IssuesPageInner() {
 
               <button
                 type="button"
-                onClick={() => toggleExpand(r.id)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--brand)',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                  padding: 0,
-                }}
-              >
-                {isExpanded ? 'Less' : 'More'}
-              </button>
-
-              <button
-                type="button"
                 style={S.danger}
                 onClick={() => void handleDelete(r.id, reportHeadline(r))}
                 title="Delete this report permanently (for duplicates, misfires and test reports)"
@@ -447,7 +647,10 @@ function IssuesPageInner() {
             </div>
 
             {isExpanded && (
-              <div style={{ marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+              <div
+                id={`report-${r.id}-detail`}
+                style={{ marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 12 }}
+              >
                 <pre
                   style={{
                     whiteSpace: 'pre-wrap',

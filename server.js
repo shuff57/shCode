@@ -530,7 +530,7 @@ app.prepare().then(() => {
   });
 
   server.post('/api/issue-reports', express.json({ limit: '1mb' }), (req, res) => {
-    const { kind, title, message, context, screenshotId } = req.body || {};
+    const { kind, title, message, context, screenshotId, reporterEmail, createdAt } = req.body || {};
     if (!['bug', 'quirk', 'enhancement'].includes(kind)) {
       return res.status(400).json({ error: 'kind must be one of: bug, quirk, enhancement' });
     }
@@ -545,7 +545,10 @@ app.prepare().then(() => {
     devIssueSeq++;
     devIssues.push({
       id: devIssueSeq,
-      reporter_email: 'dev@local',
+      // Overridable so a seed script can spread reporters and ages across
+      // fake data -- the real route always derives these from the session
+      // and the clock, so a normal POST from the actual form never sends them.
+      reporter_email: typeof reporterEmail === 'string' && reporterEmail ? reporterEmail : 'dev@local',
       kind,
       title: title.trim(),
       message: message.trim(),
@@ -556,7 +559,7 @@ app.prepare().then(() => {
       screenshot_id: screenshotId ?? null,
       screenshot_shared: 0,
       withdrawn_at: null,
-      created_at: Date.now(),
+      created_at: typeof createdAt === 'number' && Number.isFinite(createdAt) ? createdAt : Date.now(),
     });
     console.log('  [dev] issue #' + devIssueSeq + ' [' + kind + '] ' + title.trim());
     res.status(201).json({ id: devIssueSeq, ok: true });
