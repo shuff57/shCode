@@ -2731,6 +2731,10 @@
     const setupFn = window.setup || (() => {});
     const updateFn = window.update || (() => {});
     const drawFn = window.draw || (() => {});
+    // Optional fourth lifecycle hook — see the call site in loop() for why a
+    // HUD needs one. Resolved here with the other three so the same rule
+    // applies: the sketch defines it before start() runs.
+    const drawTopFn = window.drawTop || (() => {});
 
     // Anchored immediately before setup() runs, matching real q5's own
     // `millisStart = performance.now()` placement right before `await
@@ -2773,11 +2777,22 @@
       );
       if (!stillHeld) _releaseKey(dir);
     });
-    CANVAS_.addEventListener('mousemove', (e) => {
+    // Canvas-relative pointer position, in sketch pixels. A host is free to
+    // display the canvas at a size other than its backing store — runner.html
+    // scales it to fit a narrow frame rather than cropping it. Divide the
+    // offset by the displayed scale so mouse.x/y stay in sketch pixels; at 1:1
+    // (r.width === CANVAS_.width) this is a no-op. Shared by the mouse and
+    // touch handlers below so the two can never drift apart.
+    const _pointerTo = (clientX, clientY) => {
       const r = CANVAS_.getBoundingClientRect();
-      MOUSE.x = e.clientX - r.left + _camLeft();
-      MOUSE.y = e.clientY - r.top + _camTop();
+      const sx = r.width ? CANVAS_.width / r.width : 1;
+      const sy = r.height ? CANVAS_.height / r.height : 1;
+      MOUSE.x = (clientX - r.left) * sx + _camLeft();
+      MOUSE.y = (clientY - r.top) * sy + _camTop();
       MOUSE._seen = true;
+    };
+    CANVAS_.addEventListener('mousemove', (e) => {
+      _pointerTo(e.clientX, e.clientY);
       // A mousemove on the canvas IS the cursor being over the canvas. Relying
       // on mouseenter alone left isOnCanvas false for a cursor already inside
       // the element when the sketch started (no enter event is ever fired for
@@ -2819,6 +2834,65 @@
       if (dragSlot && MOUSE[dragSlot] > 0) MOUSE[dragSlot] = -1;
     });
 
+    // ---- touch ----------------------------------------------------------
+    //
+    // The engine used to listen for mouse events only, so on a phone every
+    // sketch was dead: mouse.x/y stayed at their initial (0, 0) and
+    // mouse.presses() never once fired. A single touch drives the same
+    // counters as the left mouse button, which is what sketches already read —
+    // no new API, and `mouse` keeps its name because that is what the
+    // curriculum teaches.
+    //
+    // Multi-touch is deliberately not mapped. A second finger has no mouse
+    // button to be, and every gesture that could stand in for a right-click
+    // (two-finger tap, long press) needs a timing state machine that guesses
+    // wrong often enough to be worse than not offering it.
+    const _touchAt = (e) => (e.changedTouches && e.changedTouches[0]) || null;
+
+    CANVAS_.addEventListener('touchstart', (e) => {
+      const t = _touchAt(e);
+      if (!t) return;
+      _unlockAudio(); // same reason as keydown/mousedown above
+      // Position BEFORE the press counter, and not optional: a tap carries
+      // its position and its press in the same event — there is no hover
+      // first — so a sketch reading mouse.x on the frame it sees presses()
+      // would otherwise get the previous touch's spot, or (0, 0) on the very
+      // first tap of the session.
+      _pointerTo(t.clientX, t.clientY);
+      MOUSE._onCanvas = true;
+      if (!MOUSE._c || MOUSE._c < 0) MOUSE._c = 1;
+      if (!MOUSE._bl || MOUSE._bl < 0) MOUSE._bl = 1;
+      // Without this the browser replays the whole gesture as synthetic
+      // mousedown/mouseup about 300ms later — pressing everything a second
+      // time — and scrolls or zooms the page out from under the sketch.
+      // Needs the explicit passive:false to be allowed to.
+      e.preventDefault();
+    }, { passive: false });
+
+    CANVAS_.addEventListener('touchmove', (e) => {
+      const t = _touchAt(e);
+      if (!t) return;
+      _pointerTo(t.clientX, t.clientY);
+      MOUSE._onCanvas = true;
+      if (MOUSE._bl > 0) MOUSE._mvl = true; // drag tracking, as for the mouse
+      e.preventDefault();
+    }, { passive: false });
+
+    // On window, matching mouseup: a finger that slides off the canvas before
+    // it lifts still has to end the press, or the sketch is left holding it
+    // forever. touchcancel is the same event as far as a sketch is concerned
+    // (the OS took the gesture away — a call came in, the gesture became a
+    // system swipe); not handling it was the other way to get stuck holding.
+    const _endTouch = (e) => {
+      // A lift with fingers still down is not the end of the gesture.
+      if (e && e.touches && e.touches.length) return;
+      MOUSE._c = MOUSE._c >= mouse.holdThreshold ? -2 : MOUSE._c > 1 ? -1 : -3;
+      MOUSE._bl = MOUSE._bl >= mouse.holdThreshold ? -2 : MOUSE._bl > 1 ? -1 : -3;
+      if (MOUSE._dl > 0) MOUSE._dl = -1; // flat -1, as in the mouseup handler
+    };
+    window.addEventListener('touchend', _endTouch);
+    window.addEventListener('touchcancel', _endTouch);
+
     let last = performance.now();
     function loop(now) {
       if (!_loopRunning) return; // noLoop(): fully stop, don't idle-spin rAF
@@ -2848,6 +2922,21 @@
       }
       drawFn();
       render();
+      // drawTop(): the HUD hook. render() paints sprites AFTER the sketch's
+      // draw(), so anything draw() puts on the canvas with primitives ends up
+      // UNDERNEATH every sprite — a score at the top-left vanishes behind
+      // whatever wall happens to be there, which is not a bug a beginner can
+      // diagnose. drawTop() runs after the world is on the canvas.
+      //
+      // It also runs in SCREEN space: the camera is off for its duration, so
+      // text('SCORE ' + score, 14, 20) means 14px from the canvas's left edge
+      // no matter where the camera has scrolled to. The sketch's own camera
+      // state is saved and restored around it, so a sketch that drew with the
+      // camera off in draw() is not handed a surprise.
+      const camWasActive = camera._active;
+      camera._active = false;
+      drawTopFn();
+      camera._active = camWasActive;
 
       // Counter sweep AFTER this frame's update/draw ran, not before —
       // keydown/mousedown fire asynchronously between rAF calls, so
