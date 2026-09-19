@@ -1,8 +1,30 @@
 import LessonCard from '../components/LessonCard';
 import { loadLessons } from '../lib/lessons';
+import { readLock } from '../lib/lock.js';
+
+const CHAPTER_3 = ['ch3-group-pa', 'ch3-test'];
+
+// Rendered per request so the lock badges reflect lesson.json right now, not
+// whatever was true at build time.
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const lessons = await loadLessons();
+
+  // Read lock state off disk rather than the lesson cache, so a lesson opened
+  // on test day shows as open without a restart.
+  const locks = await Promise.all(lessons.map((lesson) => readLock(lesson.id)));
+  const lockedIds = new Set(
+    lessons.filter((_, i) => locks[i].locked).map((lesson) => lesson.id)
+  );
+
+  const htmlLessons = lessons.filter(lesson => 
+    !CHAPTER_3.includes(lesson.id)
+  );
+
+  const chapter3Lessons = lessons.filter(lesson => 
+    CHAPTER_3.includes(lesson.id)
+  );
 
   const basicHtmlLessons = lessons.filter(lesson => 
     ['basic-html', 'html-intro', 'debug-pet-adoption', 'debug-camper-bot'].includes(lesson.id)
@@ -28,7 +50,7 @@ export default async function HomePage() {
       <details className="bg-card border-border border rounded w-2/3 mx-auto">
         <summary className="py-4 px-8 w-full list-none cursor-pointer hover:bg-muted text-5xl flex justify-between items-center">
           <span className="font-bold">HTML</span>
-          <span className="text-lg">({lessons.length} lessons)</span>
+          <span className="text-lg">({htmlLessons.length} lessons)</span>
         </summary>
         <div className="p-4">
           <details className="bg-card border-border border rounded mb-4">
@@ -38,7 +60,7 @@ export default async function HomePage() {
             </summary>
             <div className="flex flex-col gap-4 p-4">
               {basicHtmlLessons.map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} />
+                <LessonCard key={lesson.id} lesson={lesson} locked={lockedIds.has(lesson.id)} />
               ))}
             </div>
           </details>
@@ -49,7 +71,7 @@ export default async function HomePage() {
             </summary>
             <div className="flex flex-col gap-4 p-4">
               {semanticHtmlLessons.map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} />
+                <LessonCard key={lesson.id} lesson={lesson} locked={lockedIds.has(lesson.id)} />
               ))}
             </div>
           </details>
@@ -60,7 +82,7 @@ export default async function HomePage() {
             </summary>
             <div className="flex flex-col gap-4 p-4">
               {formsAndTablesLessons.map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} />
+                <LessonCard key={lesson.id} lesson={lesson} locked={lockedIds.has(lesson.id)} />
               ))}
             </div>
           </details>
@@ -71,7 +93,26 @@ export default async function HomePage() {
             </summary>
             <div className="flex flex-col gap-4 p-4">
               {accessibilityLessons.map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} />
+                <LessonCard key={lesson.id} lesson={lesson} locked={lockedIds.has(lesson.id)} />
+              ))}
+            </div>
+          </details>
+        </div>
+      </details>
+      <details className="bg-card border-border border rounded w-2/3 mx-auto mt-4">
+        <summary className="py-4 px-8 w-full list-none cursor-pointer hover:bg-muted text-5xl flex justify-between items-center">
+          <span className="font-bold">Chapter 3</span>
+          <span className="text-lg">({chapter3Lessons.length} lessons)</span>
+        </summary>
+        <div className="p-4">
+          <details className="bg-card border-border border rounded">
+            <summary className="py-4 px-8 w-full list-none cursor-pointer hover:bg-muted flex justify-between items-center">
+              <span className="font-bold text-2xl">Functions and Data — Assessments</span>
+              <span className="text-sm">({chapter3Lessons.length} lessons)</span>
+            </summary>
+            <div className="flex flex-col gap-4 p-4">
+              {chapter3Lessons.map((lesson) => (
+                <LessonCard key={lesson.id} lesson={lesson} locked={lockedIds.has(lesson.id)} />
               ))}
             </div>
           </details>

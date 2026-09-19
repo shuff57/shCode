@@ -340,3 +340,63 @@ details.console > summary::-webkit-details-marker { display: none; }
   font-weight: bold;
 }
 
+/* Draft saving — see lib/drafts.js */
+#titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.draft-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+  font-size: .85rem;
+}
+
+.draft-status span {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.draft-saved,
+.draft-idle {
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+.draft-warning {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.draft-restored,
+.draft-confirm {
+  padding: .25rem .6rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brand);
+  border-radius: 4px;
+  background: var(--muted);
+}
+
+.draft-status button {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .2rem .5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--text);
+  font-size: .85rem;
+  cursor: pointer;
+}
+
+.draft-status button:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+

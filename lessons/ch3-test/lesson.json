@@ -1,0 +1,106 @@
+{
+  "id": "ch3-test",
+  "title": "Chapter 3 Test — Functions and Data",
+  "description": "Individual closed-book chapter test: write four functions and answer four written questions.",
+  "difficulty": "intermediate",
+  "estimateMins": 50,
+  "locked": true,
+  "unlockCode": "CEDAR-2895",
+  "steps": [
+    { "id": "s1", "title": "Read answers.md and script.js all the way through first" },
+    { "id": "s2", "title": "Code: average (3.3.5) and highest (3.7.4)" },
+    { "id": "s3", "title": "Code: passing (3.3.4) and addScore (3.7.5)" },
+    { "id": "s4", "title": "Written: answer Q1-Q4 in answers.md" },
+    { "id": "s5", "title": "Check the Console, then re-read your written answers" }
+  ],
+  "requirements": [
+    {
+      "id": "ans1",
+      "title": "Q1 answered",
+      "description": "A1 explains the difference between a parameter and an argument",
+      "file": "answers.md",
+      "pattern": "A1:[^\\n]{20,}",
+      "flags": ""
+    },
+    {
+      "id": "ans2",
+      "title": "Q2 answered",
+      "description": "A2 explains what happens to the caller's array, and what reassigning would do",
+      "file": "answers.md",
+      "pattern": "A2:[^\\n]{20,}",
+      "flags": ""
+    },
+    {
+      "id": "ans3",
+      "title": "Q3 answered",
+      "description": "A3 explains what a function with no return hands back, and why printing is not returning",
+      "file": "answers.md",
+      "pattern": "A3:[^\\n]{20,}",
+      "flags": ""
+    },
+    {
+      "id": "ans4",
+      "title": "Q4 answered",
+      "description": "A4 tells non-mutating from mutating and says why copying is easier to trust",
+      "file": "answers.md",
+      "pattern": "A4:[^\\n]{20,}",
+      "flags": ""
+    },
+    {
+      "id": "t1",
+      "title": "average keeps its signature",
+      "description": "average is still defined as average(scores)",
+      "file": "script.js",
+      "pattern": "function\\s+average\\s*\\(\\s*scores\\s*\\)",
+      "flags": ""
+    },
+    {
+      "id": "t2",
+      "title": "highest keeps its signature",
+      "description": "highest is still defined as highest(scores)",
+      "file": "script.js",
+      "pattern": "function\\s+highest\\s*\\(\\s*scores\\s*\\)",
+      "flags": ""
+    },
+    {
+      "id": "t3",
+      "title": "A loop walks a list",
+      "description": "3.3.5 — a for or for...of loop walks a list by hand",
+      "file": "script.js",
+      "pattern": "(for|while)\\s*\\(",
+      "flags": ""
+    },
+    {
+      "id": "t4",
+      "title": "push() builds a new list",
+      "description": "3.3.4 — a new array is built up with the push() method",
+      "file": "script.js",
+      "pattern": "\\.push\\s*\\(",
+      "flags": ""
+    },
+    {
+      "id": "t5",
+      "title": "An array is spread into arguments",
+      "description": "3.7.4 — Math.max is handed separate numbers using the spread operator",
+      "file": "script.js",
+      "pattern": "Math\\.max\\s*\\(\\s*\\.\\.\\.",
+      "flags": ""
+    },
+    {
+      "id": "t6",
+      "title": "An object is copied with spread",
+      "description": "3.7.5 — a new object is built from an old one with the spread operator",
+      "file": "script.js",
+      "pattern": "\\{\\s*\\.\\.\\.",
+      "flags": ""
+    },
+    {
+      "id": "t7",
+      "title": "No unfinished stubs",
+      "description": "Every TODO has been replaced — no 'YOUR CODE HERE' markers remain",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*YOUR CODE HERE)[\\s\\S]+$",
+      "flags": ""
+    }
+  ]
+}

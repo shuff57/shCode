@@ -8,6 +8,7 @@ import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import RequirementsSection from './RequirementsSection';
 import Console from './Console';
+import DraftStatus from './DraftStatus';
 
 export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
   const setLesson = useLessonStore((s) => s.setLesson);
@@ -201,6 +202,7 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
     <>
       <div id="titleRow">
         <h1>{lesson.title}</h1>
+        <DraftStatus />
       </div>
       <div
         id="sidebarHover"

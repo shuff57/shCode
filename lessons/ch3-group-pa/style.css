@@ -1,0 +1,57 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+  color: #1f2430;
+}
+
+h1 {
+  margin-bottom: 0.25rem;
+}
+
+h2 {
+  margin-top: 1.5rem;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5a6472;
+}
+
+.hint {
+  margin-top: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.summary {
+  padding: 0.6rem 0.8rem;
+  background: #eef2ff;
+  border-left: 4px solid #4f46e5;
+  font-weight: 600;
+}
+
+.lines {
+  white-space: pre-line;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95rem;
+  min-height: 1.2rem;
+  padding: 0.4rem 0.6rem;
+  border-left: 2px solid #e5e7eb;
+}
+
+.controls {
+  margin-top: 1.25rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+button {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #c7ccd6;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #f3f4f6;
+}

@@ -31,6 +31,8 @@ export interface Lesson {
   files: FileNode[];
   steps: { id: string; title: string }[];
   requirements: Requirement[];
+  /** Listed on the home page, but the workspace will not open. See lib/lock.js. */
+  locked?: boolean;
 }
 
 let cache: Lesson[] | null = null;
@@ -71,13 +73,17 @@ export async function loadLessons(): Promise<Lesson[]> {
   cache = await Promise.all(
     dirs.map(async (id) => {
       const base = path.join(lessonsDir, id);
-      const meta = JSON.parse(
+      // unlockCode is pulled out and thrown away here on purpose: this object
+      // is serialized into the client bundle by LessonWorkspace, so anything
+      // left on it is readable from the browser.
+      const { unlockCode: _unlockCode, ...meta } = JSON.parse(
         await fs.readFile(path.join(base, 'lesson.json'), 'utf8')
       );
       const files = await readFiles(base);
       return {
         ...meta,
         files,
+        locked: Boolean(meta.locked),
         steps: meta.steps || [],
         requirements: (meta.requirements || []).map((r: any) => ({
           ...r,
