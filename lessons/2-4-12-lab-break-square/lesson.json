@@ -41,7 +41,7 @@
       "description": "Inside the while (true) loop, n * n is compared to 50 and break runs when it is greater, with console.log also inside that check",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(\\s*\\(?\\s*true\\s*\\)?\\s*\\)\\s*\\{[^{}]*if\\s*\\([^)]*n\\s*\\*\\s*n\\s*>\\s*50[^)]*\\)\\s*\\{(?=[^{}]*console\\.log)(?=[^{}]*\\bbreak\\b)[^{}]*\\}[^{}]*\\}",
+      "pattern": "while\\s*\\(\\s*\\(?\\s*true\\s*\\)?\\s*\\)\\s*\\{[\\s\\S]*?if\\s*\\([^)]*n\\s*\\*\\s*n\\s*>\\s*50[^)]*\\)\\s*\\{(?=[^{}]*console\\.log)(?=[^{}]*\\bbreak\\b)[^{}]*\\}[\\s\\S]*?\\}",
       "flags": "i",
       "points": 0
     },

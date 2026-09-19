@@ -421,7 +421,17 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
-    return json({ error: msg }, 502);
+    console.error('ai-help upstream failure:', msg);
+    // The raw upstream error (e.g. "Ollama 429: {\"error\":\"you (accountname)
+    // have reached your weekly usage limit...\"}") names the server's own
+    // Ollama account and a billing URL -- never show that to a student.
+    if (/\b429\b|usage limit|rate.?limit/i.test(msg)) {
+      return json(
+        { error: 'AI help has hit its usage limit for now. Try again later.' },
+        503,
+      );
+    }
+    return json({ error: 'AI help is temporarily unavailable. Try again in a moment.' }, 502);
   }
 
   const filtered = trimLongCodeBlocks(raw, MAX_CODE_BLOCK_LINES);

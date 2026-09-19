@@ -31,7 +31,7 @@
       "description": "switch(...) wraps place in Number(...)/parseInt(...)/parseFloat(...), or place is reassigned from one of those before the switch",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:switch\\s*\\(\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*\\))|(?:place\\s*=\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))",
+      "pattern": "(?:switch\\s*\\(\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*\\))|(?:switch\\s*\\(\\s*\\+\\s*place\\s*\\))|(?:place\\s*=\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))|(?:place\\s*=\\s*\\+\\s*place[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))",
       "flags": "i",
       "points": 0
     },

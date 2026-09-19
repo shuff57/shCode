@@ -46,7 +46,7 @@
       "description": "A while (n <= 5) loop logs n and increments it inside its own body (n++, n += 1, or n = n + 1)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(\\s*n\\s*<=\\s*5\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\(\\s*n\\s*\\))(?=[^{}]*n\\s*(?:\\+\\+|\\+=\\s*1|=\\s*n\\s*\\+\\s*1))[^{}]*\\}",
+      "pattern": "while\\s*\\(\\s*n\\s*<=\\s*5\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\([^)]*\\bn\\b[^)]*\\))(?=[^{}]*n\\s*(?:\\+\\+|\\+=\\s*1|=\\s*n\\s*\\+\\s*1))[^{}]*\\}",
       "flags": "i",
       "points": 0
     },
@@ -56,7 +56,7 @@
       "description": "A for loop counts count down from 10 while it is greater than 0 (count--, count -= 1, or count = count - 1), logging count inside its own body",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+count\\s*=\\s*10\\s*;\\s*count\\s*>\\s*0\\s*;\\s*count\\s*(?:--|-=\\s*1|=\\s*count\\s*-\\s*1)\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\(\\s*count\\s*\\))[^{}]*\\}",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+count\\s*=\\s*10\\s*;\\s*count\\s*>\\s*0\\s*;\\s*count\\s*(?:--|-=\\s*1|=\\s*count\\s*-\\s*1)\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\([^)]*\\bcount\\b[^)]*\\))[^{}]*\\}",
       "flags": "i",
       "points": 0
     },
@@ -66,7 +66,7 @@
       "description": "A for loop counts i from 1 to 5 inclusive, logging i inside its own body",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+i\\s*=\\s*1\\s*;\\s*i\\s*<=\\s*5\\s*;\\s*i\\+\\+\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\(\\s*i\\s*\\))[^{}]*\\}",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+i\\s*=\\s*1\\s*;\\s*i\\s*<=\\s*5\\s*;\\s*i\\+\\+\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\([^)]*\\bi\\b[^)]*\\))[^{}]*\\}",
       "flags": "i",
       "points": 0
     },
@@ -76,7 +76,7 @@
       "description": "A for loop counts k from 1 to 5 inclusive, logging k inside its own body",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+k\\s*=\\s*1\\s*;\\s*k\\s*<=\\s*5\\s*;\\s*k\\+\\+\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\(\\s*k\\s*\\))[^{}]*\\}",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+k\\s*=\\s*1\\s*;\\s*k\\s*<=\\s*5\\s*;\\s*k\\+\\+\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\([^)]*\\bk\\b[^)]*\\))[^{}]*\\}",
       "flags": "i",
       "points": 0
     },

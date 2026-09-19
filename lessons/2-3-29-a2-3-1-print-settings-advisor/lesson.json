@@ -106,7 +106,7 @@
       "description": "A filament case's console.log call prints a recommended temperature",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s*['\"](?:PLA|ABS|PETG|TPU)['\"]\\s*:\\s*console\\.log\\s*\\([^)]*temp",
+      "pattern": "case\\s*['\"](?:PLA|ABS|PETG|TPU)['\"]\\s*:(?:(?!case\\s*['\"]|default\\s*:)[\\s\\S])*?console\\.log\\s*\\([^)]*temp",
       "flags": "i",
       "points": 0
     },
@@ -116,7 +116,7 @@
       "description": "A filament case's console.log call prints a recommended print speed",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s*['\"](?:PLA|ABS|PETG|TPU)['\"]\\s*:\\s*console\\.log\\s*\\([^)]*speed",
+      "pattern": "case\\s*['\"](?:PLA|ABS|PETG|TPU)['\"]\\s*:(?:(?!case\\s*['\"]|default\\s*:)[\\s\\S])*?console\\.log\\s*\\([^)]*speed",
       "flags": "i",
       "points": 0
     },

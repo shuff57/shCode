@@ -41,7 +41,7 @@
       "description": "A while loop doubles total on every pass until it exceeds 100",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(\\s*total\\s*<=\\s*100\\s*\\)\\s*\\{[^}]*total\\s*(?:=\\s*total\\s*\\*\\s*2|\\*=\\s*2)[^}]*\\}",
+      "pattern": "while\\s*\\(\\s*total\\s*<=?\\s*100\\s*\\)\\s*\\{[^}]*total\\s*(?:=\\s*total\\s*\\*\\s*2|\\*=\\s*2)[^}]*\\}",
       "flags": "i",
       "points": 0
     },

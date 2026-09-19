@@ -92,14 +92,14 @@ const darkTheme = EditorView.theme({
   // promote itself to its own GPU compositing layer by default, which is
   // the known-vulnerable shape for a Chromium/Windows tearing bug where a
   // scrollable region shares a stale raster tile with the page for one
-  // frame during fast scroll. This is the standard, purely additive
-  // mitigation (force its own layer) -- unverified against the original
-  // report (a single-frame compositor tear can't be captured after the
-  // fact by a screenshot), but it cannot make anything render differently
-  // when the bug ISN'T occurring, so there's no downside to leaving it on.
+  // frame during fast scroll. Issue #40 was the same bug's mirror image:
+  // `contain: paint` clips repaint invalidation to the layer's own bounds,
+  // so on a reading page with several of these panes the layer occasionally
+  // missed the page-scroll repaint and sat frozen for a frame instead of
+  // tearing. `will-change` gives the browser the same "promote to its own
+  // layer" hint without that repaint-isolation side effect.
   '.cm-scroller': {
-    transform: 'translateZ(0)',
-    contain: 'paint',
+    willChange: 'transform',
   },
 }, { dark: true });
 
