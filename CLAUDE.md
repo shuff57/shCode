@@ -507,13 +507,14 @@ private folder convention, teach that script about it too.
   `app/globals.css`. See `components/AuthButton.tsx`, `app/teacher/page.tsx` for
   the established look.
 - **Before assuming an authored `lesson.json` field reaches a student, check that
-  something imports the component that would render it.** `graphify explain
-  <Symbol>` prints the import/call edges and answers that in one shot; plain
-  `graphify query` is much weaker, so reach for `explain`. The graph under
-  `graphify-out/` is a point-in-time snapshot — run `graphify extract --force` if
-  it predates the code you are asking about. This is not hypothetical: `steps`
+  something imports the component that would render it.** `codegraph_explore`
+  answers that in one shot: name the field and the component that should render
+  it, and it returns both symbols' source plus the call path between them — which
+  is exactly the import/call edge you are checking for. (This said `graphify
+  explain` until 2026-09-19; graphify is retired and `graphify-out/` no longer
+  exists.) This is not hypothetical: `steps`
   and `aiGrader.prompt` both sat in `lesson.json` for months with no live
   renderer. Both are wired up now — `steps` through `components/LessonSteps.tsx`,
   mounted by `LessonWorkspace`, and `aiGrader.prompt` through
-  `ContentLessonView` and `DiagramAssignmentView` — so check the current graph
-  rather than trusting this sentence for the answer about any other field.
+  `ContentLessonView` and `DiagramAssignmentView` — so check the index rather
+  than trusting this sentence for the answer about any other field.

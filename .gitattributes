@@ -1,5 +1,3 @@
-graphify-out/graph.json merge=graphify
-
 # The moSHion preview runner. Forced LF so a CRLF checkout (Windows
 # core.autocrlf=true) cannot make the file read as changed for no reason.
 public/moshion/runner.html  text eol=lf

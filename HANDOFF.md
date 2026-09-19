@@ -1256,7 +1256,6 @@ will not be there.
 | `.dev.vars` | Local `wrangler pages dev` has no auth. Recreate with `AUTH_SECRET`, `ADMIN_EMAILS`, `OLLAMA_API_KEY`, `OLLAMA_HOST`. |
 | `.wrangler/` | No local D1 or R2 state; every local test account is gone. `wrangler d1 migrations apply shcode-commits --local`, then sign up again. |
 | `functions/_shared/*.generated.ts` | Solutions and starters resolve to nothing. Any `npm run build` or `npm test` regenerates them via prebuild. |
-| `graphify-out/` | `graphify explain` has no graph. `graphify extract --force`. |
 | `.msgbox/` | Cross-CLI message log and file claims reset. Nothing to do; that is correct. |
 
 Cold start:
