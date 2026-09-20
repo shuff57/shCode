@@ -57,7 +57,10 @@ function saveQueue() {
 
 function loadQueue() {
   const raw = localStorage.getItem("printQueue");
-  return raw ? JSON.parse(raw): [];
+  if (raw) {
+    return JSON.parse(raw);
+  }
+  return [];
 }
 
 // STEP 7: main program: everything above is definitions, this is what runs.

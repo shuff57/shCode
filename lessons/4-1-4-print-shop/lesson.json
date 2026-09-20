@@ -33,11 +33,13 @@
     },
     {
       "id": "s4",
-      "title": "fitsInVolume(order, maxW, maxH, maxD): three parameters"
+      "title": "fitsInVolume(order, maxW, maxH, maxD): three parameters",
+      "instructions": "Check each dimension against the build volume with a conditional."
     },
     {
       "id": "s5",
-      "title": "sortByPriority(list): most urgent first"
+      "title": "sortByPriority(list): most urgent first",
+      "instructions": "Walk the list with a loop, or write the comparison a built-in sort needs."
     },
     {
       "id": "s6",
@@ -148,6 +150,26 @@
       "file": "script.js",
       "pattern": "PASS[\\s\\S]{0,200}FAIL|FAIL[\\s\\S]{0,200}PASS",
       "flags": "",
+      "points": 0
+    },
+    {
+      "id": "req10",
+      "title": "Uses a loop",
+      "description": "A `for`, `while`, or `for...of` loop somewhere in the program (e.g. walking the orders array)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bfor\\s*\\(|\\bwhile\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req11",
+      "title": "Uses a conditional",
+      "description": "An `if` statement or `switch` statement somewhere in the program",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\(|\\bswitch\\s*\\(",
+      "flags": "i",
       "points": 0
     }
   ],

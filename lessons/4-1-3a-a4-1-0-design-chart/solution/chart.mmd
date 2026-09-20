@@ -1,0 +1,26 @@
+flowchart TD
+  A([Start])
+  B[[loadQueue]]
+  C{Is there a saved queue?}
+  D[/Use the starting order list/]
+  E[[sortByPriority]]
+  F{{Walk each order in the queue}}
+  G[[estimateHours]]
+  H[[priceOf]]
+  I[Add to the running totals]
+  J[[saveQueue]]
+  K[/Print the verdict line/]
+  Z([End])
+  A --> B
+  B --> C
+  C -- Yes, saved queue found --> E
+  C -- No, none saved --> D
+  D --> E
+  E --> F
+  F -- More orders --> G
+  G --> H
+  H --> I
+  I --> F
+  F -- Queue is done --> J
+  J --> K
+  K --> Z
