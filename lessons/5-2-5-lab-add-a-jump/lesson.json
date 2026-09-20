@@ -1,0 +1,77 @@
+{
+  "id": "5-2-5-lab-add-a-jump",
+  "title": "5.2.5 Lab: Add a Jump",
+  "description": "Gate a jump on a key press and a ground check. Auto-graded.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add a ground-gated jump",
+      "instructions": "In draw(), when the jump key is pressed (edge-triggered) AND the player is touching the ground, set the player's vertical velocity to a negative number so it launches upward.",
+      "hints": [
+        "Search the moSHion docs drawer for kb.presses and sprite.colliding."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Use an edge-triggered key check",
+      "description": "The jump key uses kb.presses(...), which fires once per press.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\.presses\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Check that the player is on the ground",
+      "description": "Somewhere in the sketch, the player is checked against another sprite with .colliding(...).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.colliding\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Combine both checks with &&",
+      "description": "The jump is guarded by both the key press and the ground check together, joined with &&, so the player can't jump in mid-air.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "kb\\.presses\\s*\\([^)]*\\)\\s*&&[\\s\\S]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*&&[\\s\\S]*?kb\\.presses\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "Launch the player upward",
+      "description": "Inside draw(), the player's vertical velocity is set to a negative number when the jump fires.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "\\.vel\\.y\\s*=\\s*-",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

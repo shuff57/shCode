@@ -1,0 +1,79 @@
+{
+  "id": "5-2-11-lab-reaching-the-goal",
+  "title": "5.2.11 Lab: Reaching the Goal",
+  "description": "A single-fire win check with delete(). Auto-graded.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Detect the goal, once",
+      "instructions": "Guard the whole check with if (goal), so it can only run while the goal still exists. Compute the distance between the player and the goal, and when it's small enough, delete the goal and set the goal variable to null so the check can never fire again.",
+      "hints": [
+        "Search the moSHion docs drawer for sprite.delete()."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Guard the check on the goal still existing",
+      "description": "The win check is wrapped in if (goal) so it stops running once the goal is gone.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "if\\s*\\(\\s*goal\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Compute the distance to the goal",
+      "description": "The distance between player and goal is computed with Math.sqrt.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "Math\\.sqrt\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Delete the goal on arrival",
+      "description": "When the player reaches the goal, goal.delete() is called.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "goal\\.delete\\s*\\(\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "Clear the goal variable",
+      "description": "After deleting, goal is set to null so the win check can never fire twice.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "goal\\s*=\\s*null",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

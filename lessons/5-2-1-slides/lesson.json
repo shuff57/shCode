@@ -1,0 +1,21 @@
+{
+  "id": "5-2-1-slides",
+  "title": "5.2.1 Slides: Physics Feel",
+  "description": "Gravity, ground-gated actions, bounciness and friction, forces, and cleanup slides. Placeholder until the deck is rebuilt from bookSHelf.",
+  "type": "lesson",
+  "estimateMins": 5,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "slides",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

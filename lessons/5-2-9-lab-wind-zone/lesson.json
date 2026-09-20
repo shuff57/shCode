@@ -1,0 +1,54 @@
+{
+  "id": "5-2-9-lab-wind-zone",
+  "title": "5.2.9 Lab: Wind Zone",
+  "description": "Push the player with applyForce inside a conditional zone. Auto-graded.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add a wind zone",
+      "instructions": "In draw(), when the player's y position is above the zone line, call applyForce on the player with an upward force so it pushes back against gravity instead of overriding the fall.",
+      "hints": [
+        "Search the moSHion docs drawer for sprite.applyForce."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Use applyForce on the player",
+      "description": "The player is pushed with .applyForce(fx, fy) somewhere in the sketch.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.applyForce\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Only apply the force inside a zone",
+      "description": "The applyForce call is guarded by a conditional (an if with a comparison), not called unconditionally every frame.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "if\\s*\\([^)]*[<>][^)]*\\)\\s*\\{[\\s\\S]*?\\.applyForce\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

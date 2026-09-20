@@ -1,0 +1,100 @@
+{
+  "id": "5-2-13-a5-2-1-pinball-scene",
+  "title": "5.2.13 A5.2.1 Pinball Scene",
+  "description": "Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 45,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn on gravity",
+      "instructions": "Set world.gravity.y to a non-zero value so the ball falls.",
+      "hints": [
+        "Search the moSHion docs drawer for world.gravity."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Build at least three static obstacles",
+      "instructions": "Create at least three static sprites: bumpers, ramps, or walls the ball can bounce off of. Give each one a shape, position, and color.",
+      "hints": [
+        "Check the Sprite section of the moSHion docs drawer for the 'static' argument."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Add a bouncy ball",
+      "instructions": "Create the ball as a dynamic sprite and set its bounciness above 0.8 so it feels lively, not sticky.",
+      "hints": [
+        "Look up sprite properties in the moSHion docs drawer."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Add a reset key",
+      "instructions": "When a key is pressed, move the ball back to a starting position near the top of the canvas.",
+      "hints": [
+        "Search the moSHion docs drawer for kb.presses."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Turn on gravity",
+      "description": "world.gravity.y is set to a non-zero value.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*-?[1-9]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Add at least three static obstacles",
+      "description": "At least three 'static' sprites exist in the scene.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sprite\\s*\\([^)]*['\"]static['\"][\\s\\S]*new\\s+Sprite\\s*\\([^)]*['\"]static['\"][\\s\\S]*new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Make the ball genuinely bouncy",
+      "description": "The ball's bounciness is set above 0.8.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.bounciness\\s*=\\s*(1(\\.0+)?\\b|0?\\.(8[1-9]|9\\d?))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "Add a reset key",
+      "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "kb\\.presses\\s*\\([^)]*\\)[\\s\\S]*?\\.(y|x)\\s*=",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

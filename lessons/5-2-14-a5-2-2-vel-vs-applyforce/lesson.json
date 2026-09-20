@@ -1,0 +1,51 @@
+{
+  "id": "5-2-14-a5-2-2-vel-vs-applyforce",
+  "title": "5.2.14 A5.2.2 Vel vs applyForce",
+  "description": "Why setting .vel every frame fights the physics engine, and when applyForce is the better tool. AI-graded with hints.",
+  "type": "assignment",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "assignment",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 3,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Vel vs applyForce: AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [
+      "physics"
+    ],
+    "prompt": "Everything you need is in 5.2.8 (Reading: Forces vs Velocity) and 5.2.9 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.8, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.8 and 5.2.9)",
+    "rubric": [
+      {
+        "id": "q1-fight-explanation",
+        "title": "Q1: Explains why .vel fights the physics engine",
+        "description": "Student explains that setting .vel directly every frame overrides whatever the physics engine (gravity, applyForce, collisions) already computed for that sprite that frame, so the engine's own influence gets thrown away and re-imposed instead of blending with it. Accept any everyday phrasing of overriding, resetting, or cancelling out the physics engine's own effect; it doesn't need textbook precision.",
+        "points": 1
+      },
+      {
+        "id": "q2-applyforce-scenario",
+        "title": "Q2: Describes a real scenario where applyForce is the better tool",
+        "description": "Student names a concrete scenario (wind, thrust, a magnet, a continuous push layered on top of gravity, etc.) where applyForce is the better tool, and gives a reason: it respects mass and adds to existing motion instead of replacing it. Credit any concrete scenario with a reason attached, even loosely worded.",
+        "points": 1
+      },
+      {
+        "id": "writing-clarity",
+        "title": "Writing clarity",
+        "description": "Response is clearly organized and easy to follow. Deduct this point only for significant issues: incoherent structure, or writing that makes it difficult to assess the content. Do not deduct for length.",
+        "points": 1
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 3,
+    "passingScore": 3,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

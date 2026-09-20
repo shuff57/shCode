@@ -1,0 +1,36 @@
+{
+  "id": "5-2-3-lab-tune-gravity",
+  "title": "5.2.3 Lab: Tune Gravity",
+  "description": "Try different world.gravity.y values on the same scene and describe how each one feels. Non-graded: discuss with a partner.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Try several gravity values",
+      "instructions": "Change world.gravity.y to 10, then 0, then -5, then 20. Run the sketch after each change and notice how the player moves.",
+      "hints": [
+        "Search the moSHion docs drawer for world.gravity."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Describe what you noticed",
+      "instructions": "For each value, describe in a sentence what it felt like: did the player fall, float, or drift upward? Fast or slow?",
+      "hints": []
+    }
+  ],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

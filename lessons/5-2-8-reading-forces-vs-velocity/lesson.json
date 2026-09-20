@@ -1,0 +1,24 @@
+{
+  "id": "5-2-8-reading-forces-vs-velocity",
+  "title": "5.2.8 Reading: Forces vs Velocity",
+  "description": "applyForce vs setting .vel directly. Read before 5.2.9 Lab: Wind Zone.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "reading",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/moshion",
+  "externalLinkLabel": "Open the in-app moSHion docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

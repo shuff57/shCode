@@ -1,0 +1,95 @@
+{
+  "id": "5-2-15-challenges",
+  "title": "5.2.15 Challenges: Optional Stretch",
+  "description": "Add a second, harder-to-reach goal and track a two-goal completion count. Auto-graded.",
+  "type": "challenge",
+  "estimateMins": 30,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a canvas",
+      "instructions": "Inside setup(), create a canvas of any size.",
+      "hints": [
+        "Open the moSHion docs drawer on the right and find the Canvas section."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Build a scene with two goals",
+      "instructions": "Build a player/ground scene, then add two separate goal sprites instead of one.",
+      "hints": [
+        "Check the Sprite section of the moSHion docs drawer for constructor arguments."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Track how many goals are collected",
+      "instructions": "Use a counter (or check how many goal variables remain) to know when both goals are gone.",
+      "hints": [
+        "content.md describes two acceptable ways to track this."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Print the finish message once",
+      "instructions": "Print \"All goals collected!\" only after both goals are gone, and only once.",
+      "hints": [
+        "Re-read 5.2.11 for the single-fire guard pattern."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Create a canvas",
+      "description": "A canvas is created when the sketch starts.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Canvas\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Build a scene with two goals",
+      "description": "At least three sprites are created (the player and two goals, at minimum).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sprite\\s*\\([\\s\\S]*new\\s+Sprite\\s*\\([\\s\\S]*new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Track collection progress",
+      "description": "Your code tracks how many goals have been collected, using any technique: an incrementing counter or a check against a collection's length.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\+\\+|\\+=\\s*1|\\.length\\s*===\\s*0",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Print the finish message",
+      "description": "\"All goals collected!\" is printed once both goals are gone.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*['\"]All goals collected!['\"]",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

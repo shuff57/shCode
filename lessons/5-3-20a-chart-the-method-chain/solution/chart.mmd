@@ -1,0 +1,13 @@
+flowchart TD
+  A([takeDamage(n) starts])
+  B[Subtract amount from health]
+  C{health <= 0?}
+  D[[die()]]
+  E[[flashRed()]]
+  Z([back to the caller])
+  A --> B
+  B --> C
+  C -- Yes, health is gone --> D
+  C -- No, still standing --> E
+  D --> E
+  E --> Z
