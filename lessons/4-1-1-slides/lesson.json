@@ -1,11 +1,11 @@
 {
   "id": "4-1-1-slides",
-  "title": "4.1.1 Slides: Print Shop (Q1 Synthesis)",
-  "description": "Print Shop (Q1 Synthesis) slides. Placeholder until the deck is built from the book.",
+  "title": "4.1.1 Slides: Q1 Synthesis Project",
+  "description": "Q1 Synthesis Project slides. Placeholder until the deck is built from the book.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "4.1 Print Shop (Q1 Synthesis)",
+  "unit": "4.1 Q1 Synthesis Project",
   "preview": "slides",
   "slos": [
     "SLO-1"

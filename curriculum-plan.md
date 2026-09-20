@@ -33,7 +33,7 @@ Each SLO must be covered by at least one graded assignment.
 |-----|-------------|-----------------|-----------------|
 | SLO 1 | Describe the software development life-cycle | §1.1 lecture + A1.1.1 written | §7.1 Arcade Cabinet capstone + §13.3 Mechanism capstone reflection |
 | SLO 2 | Describe principles of structured programming | §5.3–5.4 OOP + A5.4.2 written | §3.1–3.2 functions + §12.1 JSCAD modules |
-| SLO 3 | Describe, design, implement, and test structured programs | §7.1 Arcade Cabinet capstone + §13.1–13.3 Mechanism capstone | §4.1 Q1 synthesis (Print Shop) |
+| SLO 3 | Describe, design, implement, and test structured programs | §7.1 Arcade Cabinet capstone + §13.1–13.3 Mechanism capstone | §4.1 Q1 synthesis |
 | SLO 4 | Explain what an algorithm is and its importance | §2.2 algorithms + A2.2.1 written | §11.3 sort/search + moSHion collision logic (§6.2) |
 
 ### SLO Alignment Across Quarters
@@ -44,7 +44,7 @@ A term-by-term view of how each SLO is introduced, reinforced, and assessed. **B
 |-----|-------------------------------|------------------------------|-------------------------------|----------------------------------------|
 | **SLO 1** — SDLC | §1.1 lecture + **A1.1.1 written** (intro) | §7.1 Arcade Cabinet design/build/test/reflect cycle (A7.1.1) | §10.1 Fits-My-Stuff lifecycle observation | §13.1–13.3 full capstone lifecycle + **A13.3.2 closing reflection** |
 | **SLO 2** — Structured programming | §1.3 coding conventions; §3.1–3.2 functions; §3.6 pass-by-value/reference (A3.6.2) | **§5.3–5.4 OOP via moSHion + A5.4.2 written (primary artifact)**; §6.6 game-state machines | §8.1 libraries; §8.4 parameters as function args | §12.1 multi-file module design |
-| **SLO 3** — Design / implement / test | §4.1 Print Shop with manual tests (A4.1.1) | **§7.1 Arcade Cabinet capstone (A7.1.1 — primary Sem 1 evidence)**: design doc + code + testing log + reflection | §9.3 error handling (A9.3.1); §9.4 testing principles (A9.4.1) | **§13.1–13.3 Mechanism capstone (A13.3.1 — primary Sem 2 evidence)**: spec → build → test → print → present |
+| **SLO 3** — Design / implement / test | §4.1 Q1 Synthesis Project with manual tests (A4.1.1) | **§7.1 Arcade Cabinet capstone (A7.1.1 — primary Sem 1 evidence)**: design doc + code + testing log + reflection | §9.3 error handling (A9.3.1); §9.4 testing principles (A9.4.1) | **§13.1–13.3 Mechanism capstone (A13.3.1 — primary Sem 2 evidence)**: spec → build → test → print → present |
 | **SLO 4** — Algorithms | §2.2 algorithm definition + **A2.2.1 written** (intro) | §6.2 collision detection as algorithm; §6.3 physics tuning | §8.5 loops generating geometry | **§11.3 Sort/Search on part data (A11.3.1 — primary applied evidence)** |
 
 ### Assignment → SLO Trace
@@ -58,7 +58,7 @@ Each graded artifact that anchors an SLO appears at least twice (primary + backu
 | A2.2.0 / A3.1.0 / A4.1.0 / A10.1.0 / A13.1.2 | SLO 1 (design phase), SLO 3, SLO 4 | **Design-before-code evidence.** A chart dated before its code is the only artifact showing design as a *process* rather than a finished program |
 | A2.2.1 | SLO 4 | Primary intro (algorithm definition + JS) |
 | A3.6.2 | SLO 2, pass-by-ref | Written artifact |
-| A4.1.1 | SLO 3 | Q1 synthesis (Print Shop) |
+| A4.1.1 | SLO 3 | Q1 synthesis |
 | A5.4.2 | SLO 2, OOP vs procedural | **Primary written artifact** |
 | A6.5.1 | SLO 3, File I/O | Persistent storage (moSHion) |
 | A7.1.1 | SLO 1, SLO 2, SLO 3 | **Primary Sem 1 capstone evidence** |
@@ -133,7 +133,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### for the dense Q1 sections — §1.5 (980 lines), §2.1 (1110), §2.4 (1054) —
 ### plus §3.2 (748) and §3.3 (844) on pedagogical grounds. (§2.3, 1024 lines, was cut back to one
 ### meeting to help fund the semester-close blocks — see Part B.) That is **32 meetings across 14 weeks**,
-### ending with §4.1 Print Shop on Mon Nov 16, 2026. An earlier revision defaulted to 2 meetings per
+### ending with §4.1 Q1 Synthesis Project on Mon Nov 16, 2026. An earlier revision defaulted to 2 meetings per
 ### section from BOOK-TO-MODULE.md's line-count proxy — which that document labels a provisional
 ### estimate — and produced a phantom capacity shortfall; see Part B for the correction.
 
@@ -892,22 +892,22 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 
 ---
 
-## Unit 4: Synthesis — Print Shop (book Chapter 4)
-> **SLO focus:** **SLO 3 primary Q1 evidence (A4.1.1 Print Shop)** — first complete design/implement/test program. Also reinforces SLO 1, 2, 4 in a single cohesive project.
+## Unit 4: Synthesis — Q1 Synthesis Project (book Chapter 4)
+> **SLO focus:** **SLO 3 primary Q1 evidence (A4.1.1 Q1 Synthesis Project)** — first complete design/implement/test program. Also reinforces SLO 1, 2, 4 in a single cohesive project.
 
-### 4.1 Print Shop — Q1 Synthesis (~5.25 hrs)
+### 4.1 Q1 Synthesis Project (~5.25 hrs)
 **Contact hours:** 5.25 (3 class days, per BOOK-TO-MODULE.md's synthesis-project sizing)
-**Book section:** 4.1 Print Shop — Q1 Synthesis
+**Book section:** 4.1 Print Shop — Q1 Synthesis (book's own worked example; shCode's build is a generic requirements checklist, not a themed project — see Teacher Notes)
 **SLOs covered:** SLO 1, SLO 2, SLO 3 (design/implement/test — **PRIMARY SLO 3 EVIDENCE FOR SEMESTER 1**), SLO 4 (synthesis)
 **Reading:** Book §4.1 Print Shop — Q1 Synthesis (reviews §1.1–3.8)
 
 > **Promoted to Semester 1's primary SLO 3 artifact, 2026-08-14.** §7.1 Arcade Cabinet previously held
-> this role, but Part B's real dates place it in Semester 2 (see the note there). Print Shop lands
+> this role, but Part B's real dates place it in Semester 2 (see the note there). Q1 Synthesis lands
 > **Nov 6–16, 2026**, comfortably inside Semester 1, and already covers all four SLOs — so retain its
 > design docs, testing logs and reflections as accreditation evidence, not just as project artifacts.
 
 **Learning Objectives:**
-- Apply all Q1 concepts in a single cohesive program with real stakes, not an abstract admin exercise
+- Apply all Q1 concepts in a single cohesive program of the student's own design
 - Write documented, convention-following code independently
 - Debug a program of moderate complexity
 - Persist data across a session using the §3.8 JSON/localStorage pattern
@@ -919,26 +919,28 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - **Last two shapes (Appendix D): connectors and notes.** This is the first chart big enough to need them — a jump (`((A))` twice) instead of a long arrow across the page, and a bracket note for a decision a reader would otherwise question
 
 **In-Class Activities:**
-- **Day 1 is design day: chart before code.** Whole-period charting of the pricing and queue flow, teacher circulating. No JS is written on day 1.
+- **Day 1 is design day: chart before code.** Whole-period charting of the student's own program, teacher circulating. No JS is written on day 1.
 - Pair debugging challenge: 15-line program with 5 bugs of different types
 - Q1 concept map: students draw relationships between topics covered
 
 **Assignments:**
-- **A4.1.0 — Print Shop design chart (graded, 10% of the project):** A flowchart of the whole tool, drawn and submitted **on day 1, before any build time**. Must pass all eight structural checks, use at least one `[[ ]]` shape per planned function, and stay under 20 flow shapes — decompose with the double-rail if it doesn't. **Build days do not open until this is green** (Appendix D §D.1).
-- **A4.1.1 — Print Shop (Lab, major grade, SLO 3 primary):** Build a "Print Shop" pricing and queue tool in pure JS (no JSCAD). This is deliberately reframed from an office-admin chore into something with a real verdict: students run 10 shared printers starting in Q3, so this tool gets used. Requirements:
-  - Store at least 5 print orders as objects in an array. Each order has: name (string), width/height/depth (numbers), filament type (string), priority (number)
-  - Function to calculate estimated print time from volume, and a price from `grams × filament cost/gram + machine-time cost`
-  - Function to find all orders that fit within a given build volume (takes 3 parameters)
-  - Function to sort the queue by priority
-  - Save/load the order queue using `JSON.stringify`/`localStorage` from §3.8
-  - Main program that calls all functions and prints a formatted verdict: e.g. "you made \$14.20; queue is 6 hours"
+- **A4.1.0 — Q1 Synthesis design chart (graded, 10% of the project):** A flowchart of the whole program, drawn and submitted **on day 1, before any build time**. Must pass all eight structural checks, use at least one `[[ ]]` shape per planned function, and stay under 20 flow shapes — decompose with the double-rail if it doesn't. **Build days do not open until this is green** (Appendix D §D.1).
+- **A4.1.1 — Q1 Synthesis Project (Lab, major grade, SLO 3 primary):** Build a program in pure JS (no JSCAD) that meets a fixed checklist of requirements; the subject matter is the student's choice, like §7.1 Arcade Cabinet's checklist-not-theme design. Requirements:
+  - Store at least 5 objects of the student's own design in an array, each with multiple properties
+  - A function of the student's own with at least 3 parameters
+  - A function of the student's own that returns a computed value, used elsewhere in the program
+  - A sort over the array
+  - A loop that reads the array
+  - A conditional that makes a decision based on the data
+  - Save/load the data using `JSON.stringify`/`localStorage` from §3.8
+  - Main program that calls the student's functions and prints one formatted verdict line combining at least two computed results
   - Full documentation and style guide compliance, plus a README
-  - At least 3 manual test cases: call each key function with a known input, print PASS or FAIL against the expected result
+  - At least 3 manual test cases: call each key function with a known input, print PASS or FAIL against the expected result, including one edge case
   - **Chart fidelity:** the shipped code matches A4.1.0, or the chart was updated and the README says what changed and why. A design that survived contact with the build unchanged is rare and suspicious; a design that was silently abandoned is the actual deduction.
 
 **Teacher Notes:**
 - **Guard day 1.** The single failure mode of this project is a student who "just starts coding and will chart it after" — that produces a transcript, not a design, and it is visible in the grading (Appendix D §D.7). Day 1 is charting; the editors stay closed.
-- Realigned from the old "Print Job Manager" framing (abstract office admin) to a pricing/queue tool with real stakes, per the book's own redesign of this section — an office-admin chore motivates nobody at 14; a program that tells you what you earned and how long the queue is does. Same underlying structures (arrays of objects, functions, sorting), different narrative.
+- **Generalized from a fixed "Print Shop" pricing/queue theme to a free-topic checklist, 2026-09-20** (operator decision), matching §7.1 Arcade Cabinet's existing pattern: the checker verifies structural presence (an array, a 3-parameter function, a sort, etc.), never a name or a theme, so two students can satisfy every requirement with programs that share nothing in common. This traded the book's own printer narrative — still available as a worked/teacher reference (`lessons/4-1-4-print-shop/solution.js`) — for student ownership of the subject matter; the graded structures (arrays of objects, functions, sorting, save/load, tests) are unchanged.
 - Grade on: correctness, documentation, style guide compliance, README quality.
 - This is the "first complete program" for SLO 3 coverage documentation, and the first appearance of a text-only program delivering a verdict rather than a report — a deliberate console-only constraint before Q2 adds visuals.
 
@@ -1428,7 +1430,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 > **SLO 3 semester attribution — resolved 2026-08-14.** This section was labelled *PRIMARY SLO 3
 > EVIDENCE FOR SEMESTER 1*, but Part B's real dates put it at **Feb 5–10, 2027 — inside Semester 2**,
 > and no pacing option short of cutting six further meetings from Q1–Q2 moves it back. Semester 1's
-> primary SLO 3 evidence is therefore **§4.1 Print Shop (Mon Nov 9, 2026)**, with the Ch 5 Test and
+> primary SLO 3 evidence is therefore **§4.1 Q1 Synthesis Project (Mon Nov 9, 2026)**, with the Ch 5 Test and
 > Ch 5 Group PA (Dec 3 / Dec 7) as supporting individual evidence. Arcade Cabinet remains a major
 > SLO 3 artifact — it is simply Semester 2's first one, alongside §13.1–13.3 Mechanism.
 
@@ -1468,7 +1470,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
   - **Showcase:** 3-minute demo to the class
 
 **Teacher Notes:**
-- This is a major SLO 1/2/3 artifact — but it now lands in **Semester 2** (Feb 5–10, 2027), so Semester 1's SLO 1/2/3 artifacts are §4.1 Print Shop and the Semester 1 Review Project. Retain design docs, testing logs, and reflections for all three.
+- This is a major SLO 1/2/3 artifact — but it now lands in **Semester 2** (Feb 5–10, 2027), so Semester 1's SLO 1/2/3 artifacts are §4.1 Q1 Synthesis Project and the Semester 1 Review Project. Retain design docs, testing logs, and reflections for all three.
 - Students not finished by showcase day still present what they have — the testing log + reflection describe what they would fix. Iteration is a graded step.
 - The fixed checklist is a floor, not a ceiling — theme, art, and feel are entirely the student's; a custom class beyond the Group requirement, extra joints, or additional states are all welcome stretch goals.
 - Rubric weights: Implementation 40% / Testing log 15% / Reflection 15% / Showcase 10% / Commits 10% / **Design doc + state-machine chart 10%**.
@@ -1792,7 +1794,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - **AP CSP Discussion (15 min):** Cybersecurity basics. Error handling prevents crashes, but what about intentional attacks? Brief intro to PII, phishing, malware, and why input validation is also a security practice. "Never trust user input — it might be an attack, not a mistake."
 
 **Assignments:**
-- **A9.3.1 (Lab, Error Handling SLO):** Take your A4.1.1 Print Shop and add: input validation to every function (throw errors for invalid inputs), try/catch around the main execution block, at least one custom error type, and a user-facing error message for each possible failure mode.
+- **A9.3.1 (Lab, Error Handling SLO):** Take your A4.1.1 Q1 Synthesis Project and add: input validation to every function (throw errors for invalid inputs), try/catch around the main execution block, at least one custom error type, and a user-facing error message for each possible failure mode.
 - **A9.3.2 (Lab):** Add error handling to one JSCAD project from §8.1–9.2: validate all parameters (e.g., prevent negative dimensions, enforce min/max), add a try/catch around your main function, and display a meaningful message when parameters are invalid.
 
 **Teacher Notes:**
@@ -1829,7 +1831,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - Pair exercise: write tests for partner's A3.2.1 design calculator
 
 **Assignments:**
-- **A9.4.1 (Lab, Testing SLO):** Write a complete test suite for your A4.1.1 Print Shop functions. For each function, write at least 3 test cases: one normal input, one edge case (boundary value), one invalid input. Implement a simple test runner that reports pass/fail. Submit test results showing at least one test catching a real bug you then fixed.
+- **A9.4.1 (Lab, Testing SLO):** Write a complete test suite for your A4.1.1 Q1 Synthesis Project functions. For each function, write at least 3 test cases: one normal input, one edge case (boundary value), one invalid input. Implement a simple test runner that reports pass/fail. Submit test results showing at least one test catching a real bug you then fixed.
 - **A9.4.2 (Written):** Explain the difference between normal cases, edge cases, and error cases in testing. Why is it important to test all three?
 
 **Teacher Notes:**
@@ -2650,9 +2652,9 @@ the per-section **Sizing notes** in the main body — they inform teaching empha
 | 27 | 3 | Functions and Data | §3.8 Saving and Loading Data | 12 | Thu Oct 29, 2026 |
 | 28 | 3 | Functions and Data | **Ch 3 Group PA** | 13 | Mon Nov 02, 2026 |
 | 29 | 3 | Functions and Data | **Ch 3 Test** | 13 | Wed Nov 04, 2026 |
-| 30 | 4 | Synthesis — Print Shop | **§4.1 Print Shop — Q1 Synthesis (day 1/3)** | 13 | Fri Nov 06, 2026 |
-| 31 | 4 | Synthesis — Print Shop | **§4.1 Print Shop — Q1 Synthesis (day 2/3)** | 14 | Tue Nov 10, 2026 |
-| 32 | 4 | Synthesis — Print Shop | **§4.1 Print Shop — Q1 Synthesis (day 3/3)** | 14 | Fri Nov 13, 2026 |
+| 30 | 4 | Synthesis — Q1 Project | **§4.1 Q1 Synthesis Project (day 1/3)** | 13 | Fri Nov 06, 2026 |
+| 31 | 4 | Synthesis — Q1 Project | **§4.1 Q1 Synthesis Project (day 2/3)** | 14 | Tue Nov 10, 2026 |
+| 32 | 4 | Synthesis — Q1 Project | **§4.1 Q1 Synthesis Project (day 3/3)** | 14 | Fri Nov 13, 2026 |
 | 33 | 5 | moSHion Foundations | §5.1 Hello Sprite and Movement | 15 | Tue Nov 17, 2026 |
 | 34 | 5 | moSHion Foundations | §5.2 Physics Feel | 15 | Thu Nov 19, 2026 |
 | 35 | 5 | moSHion Foundations | §5.3 Classes and Instances + §5.4 Writing Your Own Classes (day 1/2) | 16 | Mon Nov 30, 2026 |
@@ -3157,7 +3159,7 @@ project *is* the assessment, and it is graded individually even when built in a 
 | 1 Foundations | ✅ | ✅ |   |
 | 2 Control Flow | ✅ | ✅ |   |
 | 3 Functions and Data | ✅ | ✅ |   |
-| 4 Print Shop | — | — |  Synthesis; project is the assessment  |
+| 4 Q1 Synthesis Project | — | — |  Synthesis; project is the assessment  |
 | 5 moSHion Foundations | ✅ | ✅ |   |
 | 6 Game Mechanics | ✅ | ✅ |   |
 | 7 Arcade Cabinet | — | — |  Synthesis  |
@@ -3241,7 +3243,7 @@ Function definition vs call; parameters vs arguments vs return value, and what a
 directions against a `function` declaration; object literal access with both dot and bracket notation;
 **pass-by-value vs pass-by-reference — at least one Part B trace where a function mutates a passed
 object**; `.map`/`.filter`/`.slice` on a supplied array; `JSON.stringify`/`parse` round-trip.
-**Assumes:** Ch 1–2. This is the heaviest test of Q1 and the last gate before the Print Shop project.
+**Assumes:** Ch 1–2. This is the heaviest test of Q1 and the last gate before the Q1 Synthesis project.
 
 **Ch 5 Test — moSHion Foundations** (§5.1–5.4) · *SLO 2, SLO 3*
 `setup()` vs `draw()` and what belongs in each; creating a sprite and moving it by velocity vs by
@@ -3421,7 +3423,7 @@ rejected, six meetings have to be found, and Part B's capacity note lists where 
 | **Individual Chapter Tests (8 total)** | **—** | **15%** |
 | Midterm Exams (6 total) | 15% | *retired* |
 | Final Exams (2 total) | 10% | 10% |
-| Q1 Synthesis (§4.1 Print Shop) | 5% | 5% |
+| Q1 Synthesis (§4.1) | 5% | 5% |
 | Q2 Synthesis (§7.1 Arcade Cabinet capstone) | 15% | 15% |
 | Q4 Synthesis (§13.1–13.3 Mechanism capstone + presentation) | 15% | 15% |
 
@@ -3461,7 +3463,7 @@ Exam weeks still include regular content. Plan for the exam to occupy the first 
 |-------------|-----------|-------------------|
 | SLO 1: Software lifecycle | §1.1 lecture (A1.1.1), §7.1 Arcade Cabinet capstone, §13.3 closing reflection | A1.1.1 written (intro), A13.3.2 written (closing) |
 | SLO 2: Structured programming / OOP | §1.2–1.3, §5.3–5.4 (moSHion OOP), A5.4.2, S1 Final, S2 Final | A5.4.2 written (primary), exam questions (backup) |
-| SLO 3: Design, implement, test programs | A4.1.1 (Print Shop synthesis), A7.1.1 (Arcade Cabinet capstone), A13.3.1 (Mechanism capstone) | All major projects |
+| SLO 3: Design, implement, test programs | A4.1.1 (Q1 Synthesis Project), A7.1.1 (Arcade Cabinet capstone), A13.3.1 (Mechanism capstone) | All major projects |
 | SLO 4: Algorithms | §2.2, A2.2.1 (intro), A11.3.1 (applied) | A2.2.1 written (intro), A11.3.1 lab (applied) |
 | Data types / variables | §1.2, A1.2.1, A1.2.2 | Lab assignments |
 | Arrays | §3.3 (intro), §6.1–6.2 (moSHion groups), §8.5 (JSCAD loops→geometry) | A3.3.1, A6.2.1, A8.5.1 |
@@ -3503,7 +3505,7 @@ capacity decision.
 - **Chapter 1** Foundations: JS1 Fundamentals; JS2 Ch 1→2; PY Ch 1→2; OpenStax CS Ch 1, Ch 9, Ch 3, Ch 7
 - **Chapter 2** Control Flow: JS1 Comparisons/Conditionals/Loops/switch/try-catch; JS2 Ch 2; OpenStax CS Ch 3
 - **Chapter 3** Functions and Data: JS1 Functions/Objects/Arrays/Array methods/JSON+LocalStorage (NOT File/FileReader — see §3.8's realignment note); JS2 Ch 3→4
-- **Chapter 4** Q1 Synthesis (Print Shop): openstax_cs Ch 9 (SDLC framing); reviews all of Ch 1-3
+- **Chapter 4** Q1 Synthesis Project: openstax_cs Ch 9 (SDLC framing); reviews all of Ch 1-3
 - **Chapter 5** moSHion Foundations: moSHion in-app docs; JS1 Functions, Classes; JS2 Ch 6
 - **Chapter 6** Game Mechanics: moSHion docs; JS1 Arrays/JSON methods + LocalStorage, Timing (setTimeout/setInterval); JS2 Ch 4, Ch 18
 - **Chapter 7** Q2 Synthesis (Arcade Cabinet): moSHion ch 8; JS2 Ch 16, Ch 8 (testing discipline); reviews all of Ch 5-6
@@ -3665,7 +3667,7 @@ Students may deviate from defaults with justification documented in their print 
 - Track quiz and midterm scores across the semester to identify trends.
 
 ### Catch-Up Opportunities
-- **§4.1** (Print Shop Synthesis): built-in review project. Use midterm results to target review topics.
+- **§4.1** (Q1 Synthesis Project): built-in review project. Use midterm results to target review topics.
 - **§6.3** (Physics Applications): consolidation week, no brand-new concepts. Use it to rescue students lagging on §5.1–5.4.
 - **§7.1** (Arcade Cabinet capstone): entire build window is supervised work time — easy to fold catch-up sessions in.
 - **§11.2** (Measurements): light content; use extra time for print queue rotation and individual help.

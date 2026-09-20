@@ -1,45 +1,28 @@
-// Print Shop: Q1 Synthesis Project
+// 4.1.6 Q1 Synthesis Project
 //
-// Everything prints to the console. There is no page to build: the whole
-// program ends by printing one line that says what you made and how long
-// the queue is. Write your code under each step.
-
-// STEP 1: Create an array called `orders` holding at least 5 print orders.
-//         Each order is an object with:
-//           name        (string)  the customer's job name
-//           width       (number)  mm
-//           height      (number)  mm
-//           depth       (number)  mm
-//           filament    (string)  "PLA", "PETG", ...
-//           priority    (number)  1 is most urgent
-
-// STEP 2: Write `estimateHours(order)`: return the estimated print time
-//         from the order's volume. Volume is width * height * depth.
-//         Pick a rate and comment why you chose it.
-
-// STEP 3: Write `priceOf(order)`: return the price:
-//           grams * filament cost per gram  +  machine-time cost
-//         Estimate grams from the volume. Keep the filament costs in one
-//         object at the top of the file so they are easy to change.
-
-// STEP 4: Write `fitsInVolume(order, maxW, maxH, maxD)`: three parameters
-//         for the build volume. Return true when the order fits.
-
-// STEP 5: Write `sortByPriority(list)`: return the queue sorted so the
-//         most urgent job comes first. Do not modify the original array.
-
-// STEP 6: Persist the queue between reloads, converting it to text on
-//         the way out and back on the way in, as you did in 3.8.
-//         `saveQueue()` writes it; `loadQueue()` reads it back.
-
-// STEP 7: The main program. Call your functions and print ONE formatted
-//         verdict line, for example:
-//           You made $14.20; queue is 6 hours
-//         Everything above this line is definitions; this is the part that
-//         actually runs.
-
-// STEP 8: Three manual tests. Call a function with an input whose answer
-//         you already know, compare against it, and report whether each
-//         check matched.
-//         A test that cannot fail is not a test: make one of them check
-//         an edge case, like an order that does not fit the build volume.
+// This is the last thing you build this quarter, and it is yours. There is
+// no starter program below and no steps to fill in, because the program is
+// not a thing I have in mind that you have to guess. The list is the whole
+// spec: ten things your program has to contain. Two people can tick every
+// box and hand in programs with nothing in common. That is the point.
+//
+// Write your pitch in README.md first. Then build.
+//
+//   1. An array you declared to hold your data.
+//   2. At least five objects in that array, each with your own properties.
+//   3. A function of your own with at least 3 parameters.
+//   4. A function of your own that returns a computed value, used
+//      elsewhere in the program.
+//   5. A sort over your array.
+//   6. A loop that reads your array.
+//   7. A conditional that makes a decision based on your data.
+//   8. Save and load your data with localStorage + JSON.
+//   9. One formatted console.log verdict line combining at least two
+//      things you calculated.
+//  10. Three PASS / FAIL tests of your own logic, including one edge case.
+//
+// The Quest panel checks all ten of those automatically. It checks that
+// the thing is THERE, never how you named it or where you put it. The
+// counting parts of 2 and 10 are read by a human.
+//
+// Everything below this line is yours to delete.

@@ -5,7 +5,7 @@
 - The note: a remark for the reader that takes no arrows
 - Why both of these only show up on charts this size
 
-These are the last two shapes. They arrive now because the Print Shop is the first chart you will draw that is too big to be tidy without them: which is exactly the right reason for a tool to arrive.
+These are the last two shapes. They arrive now because the Q1 Synthesis Project is the first chart you will draw that is too big to be tidy without them: which is exactly the right reason for a tool to arrive.
 
 ### The connector
 

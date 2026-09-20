@@ -1,11 +1,11 @@
 {
   "id": "4-1-4-print-shop",
-  "title": "4.1.6 Print Shop (Q1 Synthesis)",
-  "description": "Q1 synthesis: a console-only pricing and queue tool for the class printers. Arrays of objects, functions, sorting, save/load, and your own tests.",
+  "title": "4.1.6 Q1 Synthesis Project",
+  "description": "Q1 synthesis: build a program that meets a checklist of requirements. Arrays of objects, functions, sorting, save/load, and your own tests \u2014 the rest is your call.",
   "type": "project",
   "estimateMins": 180,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "4.1 Print Shop (Q1 Synthesis)",
+  "unit": "4.1 Q1 Synthesis Project",
   "preview": "console",
   "week": 9,
   "slos": [
@@ -18,112 +18,127 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Store at least 5 orders as objects in an array",
-      "instructions": "Each order needs name, width, height, depth, filament, and priority.",
+      "title": "Plan before you code",
+      "instructions": "A short pitch in README.md: what the program does. Written before any build time, so the rest of this list has something to serve.",
       "requiredCommit": true
     },
     {
       "id": "s2",
-      "title": "estimateHours(order): print time from volume"
+      "title": "An array of at least 5 objects of your own design, each with multiple properties"
     },
     {
       "id": "s3",
-      "title": "priceOf(order): grams x cost/gram + machine time",
-      "requiredCommit": true
+      "title": "A function of your own with at least 3 parameters"
     },
     {
       "id": "s4",
-      "title": "fitsInVolume(order, maxW, maxH, maxD): three parameters",
-      "instructions": "Check each dimension against the build volume with a conditional."
+      "title": "A function of your own that returns a computed value, used elsewhere in the program"
     },
     {
       "id": "s5",
-      "title": "sortByPriority(list): most urgent first",
-      "instructions": "Walk the list with a loop, or write the comparison a built-in sort needs."
+      "title": "A sort over your array"
     },
     {
       "id": "s6",
-      "title": "Save and load the queue with localStorage + JSON"
+      "title": "A loop that reads your array"
     },
     {
       "id": "s7",
-      "title": "Main program prints one formatted verdict",
-      "instructions": "e.g. \"You made $14.20; queue is 6 hours\".",
+      "title": "A conditional that makes a decision based on your data",
       "requiredCommit": true
     },
     {
       "id": "s8",
-      "title": "Three manual tests printing PASS or FAIL"
+      "title": "Save and load your data with localStorage + JSON"
     },
     {
       "id": "s9",
+      "title": "One formatted console.log verdict line combining at least two computed results"
+    },
+    {
+      "id": "s10",
+      "title": "Three PASS/FAIL manual tests of your own logic, including one edge case",
+      "requiredCommit": true
+    },
+    {
+      "id": "s11",
       "title": "README, comments, and style guide compliance",
-      "instructions": "Appendix A applies. The README says what the tool does and how to run it, and, per Appendix D: what changed from your A4.1.0 chart and why."
+      "instructions": "Appendix A applies. The README says what the program does, how to run it, and, per Appendix D: what changed from your A4.1.0 chart and why."
     }
   ],
   "requirements": [
     {
       "id": "req1",
-      "title": "orders array",
-      "description": "An `orders` array holding order objects",
+      "title": "An array of your own",
+      "description": "An array you declared to hold your data",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+orders\\s*=\\s*\\[",
-      "flags": "i",
+      "pattern": "(?:let|const)\\s+\\w+\\s*=\\s*\\[",
+      "flags": "",
       "points": 0
     },
     {
       "id": "req2",
-      "title": "Five orders stored",
-      "description": "At least five objects with a priority field",
+      "title": "Five objects stored",
+      "description": "At least five objects, each with your own properties. The checker cannot judge whether your object design is good; the teacher reads for that.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:priority\\s*:[\\s\\S]*?){5}",
-      "flags": "i",
+      "pattern": "(?:\\{[^{}]*:[^{}]*\\}[\\s\\S]*?){5}",
+      "flags": "",
       "points": 0
     },
     {
       "id": "req3",
-      "title": "estimateHours function",
-      "description": "Estimates print time from the order's volume",
+      "title": "A 3+ parameter function",
+      "description": "A function of your own with at least 3 parameters",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+estimateHours\\s*\\(|(?:let|const|var)\\s+estimateHours\\s*=\\s*(?:function\\s*)?\\(",
-      "flags": "i",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*\\w+\\s*,\\s*\\w+|(?:const|let|var)\\s+\\w+\\s*=\\s*(?:function\\s*)?\\(\\s*\\w+\\s*,\\s*\\w+\\s*,\\s*\\w+",
+      "flags": "",
       "points": 0
     },
     {
       "id": "req4",
-      "title": "priceOf function",
-      "description": "Calculates a price from filament grams and machine time",
+      "title": "A function that returns a value",
+      "description": "A function of your own that returns a computed value, used elsewhere in the program. A named function, an arrow, or a method all count.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+priceOf\\s*\\(|(?:let|const|var)\\s+priceOf\\s*=\\s*(?:function\\s*)?\\(",
-      "flags": "i",
+      "pattern": "(?:function\\s+\\w+\\s*\\(\\s*\\w|^[ \\t]*(?!(?:if|for|while|switch|catch|function|return|do)\\b)\\w+\\s*\\(\\s*\\w[^)\\n]*\\)\\s*\\{)[\\s\\S]*?\\breturn\\b\\s*[^;\\n]|(?:const|let|var)\\s+\\w+\\s*=\\s*(?:function\\s*\\(\\s*\\w[\\s\\S]*?\\breturn\\b\\s*[^;\\n]|\\(?\\s*\\w+[^)\\n]*\\)?\\s*=>\\s*(?:[^;{\\n]|\\{[\\s\\S]*?\\breturn\\b\\s*[^;\\n]))",
+      "flags": "m",
       "points": 0
     },
     {
       "id": "req5",
-      "title": "fitsInVolume takes three build-volume parameters",
-      "description": "fitsInVolume(order, maxW, maxH, maxD)",
+      "title": "A sort",
+      "description": "A sort over your array \u2014 a built-in .sort() or a sort you wrote by hand",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:function\\s+fitsInVolume\\s*\\(|(?:let|const|var)\\s+fitsInVolume\\s*=\\s*(?:function\\s*)?\\()\\s*\\w+\\s*,\\s*\\w+\\s*,\\s*\\w+\\s*,\\s*\\w+\\s*\\)",
-      "flags": "i",
+      "pattern": "\\.sort\\s*\\(",
+      "flags": "",
       "points": 0
     },
     {
       "id": "req6",
-      "title": "sortByPriority function",
-      "description": "Sorts the queue by priority",
+      "title": "Uses a loop",
+      "description": "A `for`, `while`, or `for...of` loop somewhere in the program (e.g. walking your array)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+sortByPriority\\s*\\(|(?:let|const|var)\\s+sortByPriority\\s*=\\s*(?:function\\s*)?\\(",
+      "pattern": "\\bfor\\s*\\(|\\bwhile\\s*\\(",
       "flags": "i",
       "points": 0
     },
     {
       "id": "req7",
+      "title": "Uses a conditional",
+      "description": "An `if` statement or `switch` statement somewhere in the program",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\(|\\bswitch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req8",
       "title": "Saves and loads with localStorage + JSON",
       "description": "Uses JSON.stringify/JSON.parse with localStorage",
       "type": "regex",
@@ -133,43 +148,23 @@
       "points": 0
     },
     {
-      "id": "req8",
-      "title": "Prints a formatted verdict",
-      "description": "A console.log that reports money and queue length together",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "console\\.log\\s*\\([\\s\\S]{0,200}(\\$|made)[\\s\\S]{0,200}(queue|hour)",
-      "flags": "i",
-      "points": 0
-    },
-    {
       "id": "req9",
-      "title": "Tests report PASS or FAIL",
-      "description": "A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests: three is on you, and the teacher reads for it.",
+      "title": "Prints a formatted verdict",
+      "description": "A console.log that prints one formatted line combining at least two things you calculated",
       "type": "regex",
       "file": "script.js",
-      "pattern": "PASS[\\s\\S]{0,200}FAIL|FAIL[\\s\\S]{0,200}PASS",
+      "pattern": "console\\.log\\s*\\([^\\n]*\\+[^\\n]*\\+[^\\n]*\\)|console\\.log\\s*\\(\\s*`[^`]*\\$\\{[^}]+\\}[^`]*\\$\\{[^}]+\\}",
       "flags": "",
       "points": 0
     },
     {
       "id": "req10",
-      "title": "Uses a loop",
-      "description": "A `for`, `while`, or `for...of` loop somewhere in the program (e.g. walking the orders array)",
+      "title": "Tests report PASS or FAIL",
+      "description": "A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests: three is on you, and the teacher reads for it.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bfor\\s*\\(|\\bwhile\\s*\\(",
-      "flags": "i",
-      "points": 0
-    },
-    {
-      "id": "req11",
-      "title": "Uses a conditional",
-      "description": "An `if` statement or `switch` statement somewhere in the program",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "\\bif\\s*\\(|\\bswitch\\s*\\(",
-      "flags": "i",
+      "pattern": "(['\"`][^'\"`\\n]*PASS[\\s\\S]{0,300}FAIL)|(['\"`][^'\"`\\n]*FAIL[\\s\\S]{0,300}PASS)",
+      "flags": "",
       "points": 0
     }
   ],
