@@ -1,12 +1,13 @@
 {
   "id": "5-2-13-a5-2-1-pinball-scene",
-  "title": "5.2.13 A5.2.1 Pinball Scene",
+  "title": "5.2.13 Pinball Scene",
   "description": "Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. Auto-graded.",
   "type": "assignment",
   "estimateMins": 45,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
   "preview": "moshion",
+  "assignmentCode": "A5.2.1",
   "week": 15,
   "slos": [
     "SLO-3"

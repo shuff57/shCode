@@ -1,12 +1,13 @@
 {
   "id": "5-2-14-a5-2-2-vel-vs-applyforce",
-  "title": "5.2.14 A5.2.2 Vel vs applyForce",
+  "title": "5.2.14 Vel vs applyForce",
   "description": "Why setting .vel every frame fights the physics engine, and when applyForce is the better tool. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
   "preview": "assignment",
+  "assignmentCode": "A5.2.2",
   "week": 15,
   "slos": [
     "SLO-3"
