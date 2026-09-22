@@ -4,6 +4,7 @@
 // co-teacher of the class.
 
 import { getCurrentExpirationDate } from '../_shared/schoolYear';
+import { checkRateLimit, rateLimitExceeded } from '../_shared/rateLimit';
 
 interface Env {
   DB: D1Database;
@@ -22,6 +23,14 @@ interface ClassRow {
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
   const { request, env, data } = context;
   if (data.role !== 'student') {
+    return json({ error: 'Only students can join a class by code' }, 403);
+  }
+
+  // Codes are 6 chars from a 32-symbol alphabet (~1B combinations) but that
+  // is brute-forceable without a per-IP throttle -- the only other guard is
+  // that the caller must already be signed in as a student.
+  const rateLimitResult = await checkRateLimit(env.DB, request, 'joinClass');
+  if (!rateLimitResult.allowed) return rateLimitExceeded(rateLimitResult.retryAfter);
     return json({ error: 'Only students can join a class by code' }, 403);
   }
 

@@ -7,8 +7,10 @@ import {
   isAdminEmail,
   isTeacherEmail,
   normalizeEmail,
+  SESSION_TTL_SECONDS,
   signSession,
 } from '../../_shared/auth';
+import { checkRateLimit, rateLimitExceeded } from '../../_shared/rateLimit';
 
 interface Env {
   DB: D1Database;
@@ -39,6 +41,9 @@ function cleanName(raw: string | undefined): string | null | 'too_long' {
 export const onRequestPost: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
   const { request, env } = context;
   if (!env.AUTH_SECRET) return json({ error: 'Server missing AUTH_SECRET' }, 500);
+
+  const rateLimitResult = await checkRateLimit(env.DB, request, 'signup');
+  if (!rateLimitResult.allowed) return rateLimitExceeded(rateLimitResult.retryAfter);
 
   let body: Body;
   try {
@@ -83,7 +88,7 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   const token = await signSession(email, role, env.AUTH_SECRET);
   const secure = new URL(request.url).protocol === 'https:';
   return json({ email, role, firstName, lastName }, 201, {
-    'Set-Cookie': buildSessionCookie(token, 60 * 60 * 24 * 30, secure),
+    'Set-Cookie': buildSessionCookie(token, SESSION_TTL_SECONDS, secure),
   });
 };
 

@@ -78,7 +78,12 @@ export async function verifyPassword(password: string, stored: string): Promise<
 
 // ---- Session JWT ----
 
-const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
+export const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
+// Shortened from 30 days on 2026-09-22: verifySession only checks the JWT
+// signature, never revocation, so a demoted/removed account keeps full
+// access until its token expires naturally. Existing tokens already signed
+// with the old 30-day expiry are unaffected -- this only shortens *new*
+// logins, so no current student is signed out or has to reset a password.
 
 function secretBytes(secret: string): Uint8Array {
   return new TextEncoder().encode(secret);
