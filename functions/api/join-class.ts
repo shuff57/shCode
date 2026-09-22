@@ -31,8 +31,6 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   // that the caller must already be signed in as a student.
   const rateLimitResult = await checkRateLimit(env.DB, request, 'joinClass');
   if (!rateLimitResult.allowed) return rateLimitExceeded(rateLimitResult.retryAfter);
-    return json({ error: 'Only students can join a class by code' }, 403);
-  }
 
   let body: { code?: string };
   try {
