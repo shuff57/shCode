@@ -1,3 +1,41 @@
+# Handoff — 2026-09-22 · The AI-tutor ML safety gate was dead in prod; fixed and verified, needs a deploy
+
+The client-side PII/injection gate (`lib/pii-guard-client.ts` → `/models/pii-guard-worker.js`)
+was failing open to regex-only in prod. Three stacked causes, all fixed on 2026-09-22:
+
+1. **Stale worker.** `scripts/build-pii-guard-models.mjs` skip-if-present'd the first-party worker,
+   so the staged copy still pointed everything at `/models/` after the `/models-files/` R2-route
+   edit — and it carried a stray `}` plus a lost `return piiPromise;`. The script now always
+   re-copies `pii-guard-worker.js` (node_modules-pinned assets still skip) and gained the missing
+   `mb()` helper that skip-if-present had masked.
+2. **transformers.js resolves EVERY model file from the model base.** The worker's
+   ``config: '/models/pii'`` idea was wrong — in the installed version that option is a config
+   OBJECT, not a path. All config/tokenizer/vocab files had to move onto the R2 route: the worker
+   bases are `/models-files/{prompt-guard,pii}`, and `functions/models-files/[[path]].ts`'s
+   KEY_TYPES grew the `pii/*.json` + `vocab.txt` entries plus the ORT `.mjs` glue
+   (`text/javascript`) and the plain `.wasm`.
+3. **The R2 objects did not exist.** All 15 `models/*` keys (3 over-limit ONNX/wasm, 3 ORT
+   `.mjs`/`.wasm`, 9 config/tokenizer files) are now in `shcode-uploads`, byte-verified against
+   `public/models/` and `.pii-guard-cache/`.
+
+Verified end-to-end through the real shipped worker against a prod-shaped local server
+(`/models/` static shape + `/models-files/` allowlist shape): benign → allow (BENIGN 0.999);
+"ignore all previous instructions…" → BLOCK MALICIOUS 0.999; password / driver's-license / IP
+probes → BLOCK 0.77 / 0.96 / 0.93; warm call 28 ms; zero unexpected 404s. `npm run test:pii-guard`
+41/41, `functions/tsconfig.json` typecheck clean, `npm run build` green, `out/` worker hash = `public/`
+(afd3c29d).
+
+**Deploy blocker:** the live prod bundle (79294f3, deployed 2026-09-22 07:47) predates
+`functions/models-files/`, so `/models-files/*` 404s on shcode.pages.dev today and the ML layer
+stays fail-open (regex-only) there. The next `npx wrangler pages deploy out --project-name shcode
+--branch cs-3d` ships the fixed worker + the Function; R2 is already in place. Local dev
+(`server.js`) also cannot serve `/models-files` — ML stays fail-open in dev; pre-existing, unchanged.
+
+Probe phrasing note: "my password is Sunshine123" scores ZERO spans; "Sunshine123!" scores 0.77.
+`scripts/probe-pii-guard.mjs` already uses the "!" form — keep it that way when editing the corpus.
+
+---
+
 # Handoff — 2026-09-18 · Chapter 2 assessment block is built; two steps need the teacher's own session
 
 The Chapter 2 assessments (2.6 Group PA, Sep 28; 2.7 Individual Test, Sep 30) are
