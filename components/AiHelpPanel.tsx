@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import AiAnswer from './AiAnswer';
+import { checkPromptSafety } from '../lib/pii-guard-client';
 import { useLessonStore } from '../lib/store';
 import type { Lesson } from '../lib/types';
 import { Sparkles, Square } from 'lucide-react';
@@ -27,6 +28,7 @@ export default function AiHelpPanel({ lesson }: Props) {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
   const [streaming, setStreaming] = useState(false);
+  const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quota, setQuota] = useState<{ limit: number; remaining: number } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -47,6 +49,16 @@ export default function AiHelpPanel({ lesson }: Props) {
   async function ask(userQuery: string) {
     if (streaming) return;
     setError(null);
+    setChecking(true);
+    // Safety gate (regex + on-device ML): blocks before any network call,
+    // before the response area is cleared, before anything changes except
+    // the checking indicator. The first send pays the one-time model download.
+    const safety = await checkPromptSafety(userQuery);
+    setChecking(false);
+    if (safety.blocked && safety.reason) {
+      setError(safety.reason);
+      return;
+    }
     setResponse('');
     setStreaming(true);
 
@@ -180,8 +192,8 @@ export default function AiHelpPanel({ lesson }: Props) {
         <button
           type="button"
           onClick={askDefault}
-          disabled={streaming}
-          style={btnPrimary(streaming)}
+          disabled={streaming || checking}
+          style={btnPrimary(streaming || checking)}
         >
           <Sparkles size={13} />
           {lastError ? 'Help me fix this' : 'Help me'}
@@ -229,8 +241,8 @@ export default function AiHelpPanel({ lesson }: Props) {
         <button
           type="button"
           onClick={submitQuery}
-          disabled={streaming || !query.trim()}
-          style={{ ...btnPrimary(streaming || !query.trim()), marginTop: 6 }}
+          disabled={streaming || checking || !query.trim()}
+          style={{ ...btnPrimary(streaming || checking || !query.trim()), marginTop: 6 }}
         >
           <Sparkles size={13} />
           Ask

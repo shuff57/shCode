@@ -19,6 +19,7 @@ import { useRef, useState } from 'react';
 import { Lightbulb, Sparkles, Square } from 'lucide-react';
 
 import AiAnswer from './AiAnswer';
+import { checkPromptSafety } from '../lib/pii-guard-client';
 import { describeDiagram } from '../lib/diagram-mermaid';
 import type { CheckResult } from '../lib/diagram-check';
 import type { DiagramDoc } from '../lib/diagram-types';
@@ -49,6 +50,7 @@ export default function DiagramHintPanel({ lessonTitle, unit, task, doc, checks,
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
   const [streaming, setStreaming] = useState(false);
+  const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quota, setQuota] = useState<{ limit: number; remaining: number } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -59,6 +61,15 @@ export default function DiagramHintPanel({ lessonTitle, unit, task, doc, checks,
     if (streaming) return;
     setOpen(true);
     setError(null);
+    setChecking(true);
+    // Safety gate (regex + on-device ML), same as AiHelpPanel: blocks before
+    // any network call and before the response area changes.
+    const safety = await checkPromptSafety(userQuery);
+    setChecking(false);
+    if (safety.blocked && safety.reason) {
+      setError(safety.reason);
+      return;
+    }
     setResponse('');
     setStreaming(true);
 
@@ -198,8 +209,8 @@ export default function DiagramHintPanel({ lessonTitle, unit, task, doc, checks,
             <button
               type="button"
               onClick={() => ask(DEFAULT_QUESTION)}
-              disabled={streaming}
-              style={smallButton(streaming)}
+              disabled={streaming || checking}
+              style={smallButton(streaming || checking)}
             >
               <Sparkles size={13} />
               Which shape next?
@@ -208,8 +219,8 @@ export default function DiagramHintPanel({ lessonTitle, unit, task, doc, checks,
               <button
                 type="button"
                 onClick={() => ask(FIX_QUESTION)}
-                disabled={streaming}
-                style={smallButton(streaming)}
+              disabled={streaming || checking}
+                style={smallButton(streaming || checking)}
               >
                 <Sparkles size={13} />
                 Why is my check failing?
@@ -255,8 +266,8 @@ export default function DiagramHintPanel({ lessonTitle, unit, task, doc, checks,
               const q = query.trim();
               if (q) ask(q);
             }}
-            disabled={streaming || !query.trim()}
-            style={{ ...smallButton(streaming || !query.trim()), marginTop: 6 }}
+            disabled={streaming || checking || !query.trim()}
+            style={{ ...smallButton(streaming || checking || !query.trim()), marginTop: 6 }}
           >
             <Sparkles size={13} />
             Ask

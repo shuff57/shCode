@@ -20,6 +20,7 @@
 
 import { findRelevantDocs, type RelevantDoc } from '../../lib/moshion-docs';
 import { chatStream } from '../../lib/ollama';
+import { findPII } from '../../lib/pii-check';
 
 interface Env {
   DB: D1Database;
@@ -357,6 +358,17 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   }
   if (!body.code.trim() && !body.error && !(body.query && body.query.trim())) {
     return json({ error: 'Nothing to help with — write some code or ask a question first.' }, 400);
+  }
+  // Server-side backstop for the client-side gate in AiHelpPanel/DiagramHintPanel.
+  // The client check can be bypassed (JS disabled, devtools, a direct fetch to
+  // this endpoint) -- this is what actually keeps structured PII off the wire
+  // to Ollama. Mirrors the client gate exactly: only the free-text `query`,
+  // never `code` (would false-positive on a student's own string literals).
+  if (body.query && findPII(body.query)) {
+    return json(
+      { error: 'Message blocked — it looks like it contains personal info. Remove it and try again.' },
+      400,
+    );
   }
 
   const unitKey = (body.unit || '').toString().slice(0, 120); // bucket key (defaults to '')
