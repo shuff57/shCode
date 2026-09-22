@@ -1,0 +1,247 @@
+- generic [active] [ref=f4e1]:
+  - banner [ref=f4e2]:
+    - generic [ref=f4e3]:
+      - link "shCode" [ref=f4e4] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=f4e5]:
+        - link "Lessons" [ref=f4e6] [cursor=pointer]:
+          - /url: /
+        - button "Learn" [ref=f4e8] [cursor=pointer]:
+          - text: Learn
+          - generic [aria-hidden] [ref=f4e9]: ▾
+        - button "Teach" [ref=f4e43] [cursor=pointer]:
+          - text: Teach
+          - generic [aria-hidden] [ref=f4e44]: ▾
+        - link "Gradebook" [ref=f4e45] [cursor=pointer]:
+          - /url: /teacher/?view=gradebook
+        - button "dev@local" [ref=f4e47] [cursor=pointer]:
+          - text: dev@local
+          - generic [aria-hidden] [ref=f4e48]: ▾
+    - generic [ref=f4e49]:
+      - 'link "← 1.1.1 Slides: Foundations" [ref=f4e50] [cursor=pointer]':
+        - /url: /lesson/1-1-1-slides
+        - generic [ref=f4e51]: ←
+        - generic [ref=f4e52]: "1.1.1 Slides: Foundations"
+      - link "1.1.3 Your First Statement →" [ref=f4e53] [cursor=pointer]:
+        - /url: /assignment/1-1-3-first-statement
+        - generic [ref=f4e54]: 1.1.3 Your First Statement
+        - generic [ref=f4e55]: →
+  - generic "Drawer":
+    - separator "Resize drawer"
+    - generic:
+      - generic:
+        - button "Close drawer": ×
+  - button "Docs tab" [ref=f4e57] [cursor=pointer]: Docs
+  - main [ref=f4e58]:
+    - navigation [ref=f4e59]:
+      - link "Home" [ref=f4e60] [cursor=pointer]:
+        - /url: /
+      - text: ›
+      - link "1.1 Software Lifecycle" [ref=f4e61] [cursor=pointer]:
+        - /url: /module/1.1
+      - text: "›1.1.2 Reading: Console: console.log & sequential execution"
+    - generic [ref=f4e62]:
+      - generic [ref=f4e63]: Reading
+      - generic [ref=f4e66]: ~10 min
+    - 'heading "1.1.2 Reading: Console: console.log & sequential execution" [level=1] [ref=f4e67]'
+    - paragraph [ref=f4e68]: How to print values with console.log and how JavaScript runs code top-to-bottom. Read before the A1.2 console lab.
+    - generic [ref=f4e69]:
+      - article [ref=f4e70]:
+        - heading "Printing with console.log" [level=2] [ref=f4e71]
+        - paragraph [ref=f4e72]:
+          - strong [ref=f4e73]: "What you'll learn from it:"
+        - list [ref=f4e74]:
+          - listitem [ref=f4e75]:
+            - code [ref=f4e76]: console.log()
+            - text: sends a value to the console output panel.
+          - listitem [ref=f4e77]:
+            - text: You can print text (called a
+            - strong [ref=f4e78]: string
+            - text: ), a number, or the result of a calculation.
+          - listitem [ref=f4e79]:
+            - text: "Putting text inside quotes:"
+            - code [ref=f4e80]: "\"like this\""
+            - text: ": tells JavaScript to treat it as text, not a command."
+          - listitem [ref=f4e81]: Printing a number (no quotes) lets JavaScript do math and print the result.
+          - listitem [ref=f4e82]:
+            - text: Printing a comparison like
+            - code [ref=f4e83]: 5 > 3
+            - text: prints
+            - code [ref=f4e84]: "true"
+            - text: or
+            - code [ref=f4e85]: "false"
+            - text: ": these are called"
+            - strong [ref=f4e86]: booleans
+            - text: .
+        - paragraph [ref=f4e87]:
+          - strong [ref=f4e88]: "Try it:"
+          - text: Run the block below. Then change the text on line 1 to your own name and click Run again.
+      - generic [ref=f4e89]:
+        - generic [ref=f4e90]:
+          - generic [ref=f4e94]:
+            - generic [ref=f4e96]:
+              - generic [ref=f4e97]: "1"
+              - generic [ref=f4e98]: "2"
+              - generic [ref=f4e99]: "3"
+            - textbox [ref=f4e100]:
+              - generic [ref=f4e101]: console.log("Hello, world!");
+              - generic [ref=f4e102]: console.log(2 + 2);
+              - generic [ref=f4e103]: console.log(10 > 5);
+          - generic [ref=f4e104]:
+            - generic [ref=f4e105]: Output
+            - generic [ref=f4e106]: Click Run to see output.
+        - generic [ref=f4e108]:
+          - button "Run" [ref=f4e109] [cursor=pointer]
+          - button "Reset" [ref=f4e112] [cursor=pointer]
+      - article [ref=f4e116]:
+        - separator [ref=f4e117]
+        - heading "Sequential execution (top to bottom)" [level=2] [ref=f4e118]
+        - paragraph [ref=f4e119]:
+          - strong [ref=f4e120]: "What you'll learn from it:"
+        - list [ref=f4e121]:
+          - listitem [ref=f4e122]: JavaScript runs each line in order, starting from the top.
+          - listitem [ref=f4e123]: Line 1 finishes before line 2 starts; line 2 finishes before line 3 starts.
+          - listitem [ref=f4e124]: "The order of your lines matters: swapping two lines can change the output."
+          - listitem [ref=f4e125]:
+            - text: This is called
+            - strong [ref=f4e126]: sequential execution
+            - text: and is true of almost every program you will ever write.
+        - paragraph [ref=f4e127]:
+          - strong [ref=f4e128]: "Try it:"
+          - text: Read the three lines below and predict what order they will print. Then run the block and check.
+      - generic [ref=f4e129]:
+        - generic [ref=f4e130]:
+          - generic [ref=f4e134]:
+            - generic [ref=f4e136]:
+              - generic [ref=f4e137]: "1"
+              - generic [ref=f4e138]: "2"
+              - generic [ref=f4e139]: "3"
+            - textbox [ref=f4e140]:
+              - generic [ref=f4e141]: "console.log(\"Step 1: I run first.\");"
+              - generic [ref=f4e142]: "console.log(\"Step 2: I run second.\");"
+              - generic [ref=f4e143]: "console.log(\"Step 3: I run third.\");"
+          - generic [ref=f4e144]:
+            - generic [ref=f4e145]: Output
+            - generic [ref=f4e146]: Click Run to see output.
+        - generic [ref=f4e148]:
+          - button "Run" [ref=f4e149] [cursor=pointer]
+          - button "Reset" [ref=f4e152] [cursor=pointer]
+      - article [ref=f4e156]:
+        - paragraph [ref=f4e157]: Try swapping lines 1 and 3 and run again. Notice the output order changes to match the new line order.
+        - separator [ref=f4e158]
+        - heading "Short glossary (quick reference)" [level=2] [ref=f4e159]
+        - table [ref=f4e160]:
+          - rowgroup [ref=f4e161]:
+            - row [ref=f4e162]:
+              - columnheader "Term" [ref=f4e163]
+              - columnheader "Meaning" [ref=f4e164]
+          - rowgroup [ref=f4e165]:
+            - row [ref=f4e166]:
+              - cell [ref=f4e167]:
+                - strong [ref=f4e168]:
+                  - code [ref=f4e169]: console.log()
+              - cell "JavaScript statement that prints a value to the console output panel." [ref=f4e170]
+            - row [ref=f4e171]:
+              - cell [ref=f4e172]:
+                - strong [ref=f4e173]: String
+              - cell [ref=f4e174]:
+                - text: "A text value written inside quotes:"
+                - code [ref=f4e175]: "\"hello\""
+                - text: or
+                - code [ref=f4e176]: "\"42\""
+                - text: .
+            - row [ref=f4e177]:
+              - cell [ref=f4e178]:
+                - strong [ref=f4e179]: Number
+              - cell [ref=f4e180]:
+                - text: "A numeric value with no quotes:"
+                - code [ref=f4e181]: "42"
+                - text: ","
+                - code [ref=f4e182]: "3.14"
+                - text: . JavaScript can do math with it.
+            - row [ref=f4e183]:
+              - cell [ref=f4e184]:
+                - strong [ref=f4e185]: Boolean
+              - cell [ref=f4e186]:
+                - text: A value that is either
+                - code [ref=f4e187]: "true"
+                - text: or
+                - code [ref=f4e188]: "false"
+                - text: . Comparisons like
+                - code [ref=f4e189]: 5 > 3
+                - text: produce booleans.
+            - row [ref=f4e190]:
+              - cell [ref=f4e191]:
+                - strong [ref=f4e192]: Sequential execution
+              - cell "Code runs one line at a time, top to bottom, in the order written." [ref=f4e193]
+    - generic [ref=f4e194]:
+      - heading "Mark complete to continue" [level=2] [ref=f4e195]
+      - generic [ref=f4e196]:
+        - generic [ref=f4e197]: Not complete yet
+        - button "✓ Mark as complete" [ref=f4e198] [cursor=pointer]
+      - generic [ref=f4e199]:
+        - heading "Mark as complete" [level=3] [ref=f4e200]
+        - paragraph [ref=f4e201]: Confirm you've read the material.
+        - generic [ref=f4e202]: Pending
+    - generic [ref=f4e207]:
+      - 'link "← 1.1.1 Slides: Foundations" [ref=f4e208] [cursor=pointer]':
+        - /url: /lesson/1-1-1-slides
+        - generic [ref=f4e209]: ←
+        - generic [ref=f4e210]: "1.1.1 Slides: Foundations"
+      - link "1.1.3 Your First Statement →" [ref=f4e211] [cursor=pointer]:
+        - /url: /assignment/1-1-3-first-statement
+        - generic [ref=f4e212]: 1.1.3 Your First Statement
+        - generic [ref=f4e213]: →
+  - generic [ref=f4e12]:
+    - link "Module 1.1" [ref=f4e13] [cursor=pointer]:
+      - /url: /module/1.1
+    - generic [ref=f4e14]: Lesson 2 of 22
+    - generic [ref=f4e15]:
+      - 'link "1.1.1 Slides: Foundations" [ref=f4e16] [cursor=pointer]':
+        - /url: /lesson/1-1-1-slides/
+      - 'link "1.1.2 Reading: Console: console.log & sequential execution" [ref=f4e17] [cursor=pointer]':
+        - /url: /lesson/1-1-2-reading-console-log/
+      - link "1.1.3 Your First Statement" [ref=f4e18] [cursor=pointer]:
+        - /url: /assignment/1-1-3-first-statement/
+      - link "1.1.4 What a Program Is" [ref=f4e19] [cursor=pointer]:
+        - /url: /assignment/1-1-4-sdlc-overview/
+      - 'link "1.1.5 Video: What is the SDLC?" [ref=f4e20] [cursor=pointer]':
+        - /url: /lesson/1-1-5-video-sdlc/
+      - 'link "1.1.6 Reading: The Four Phases" [ref=f4e21] [cursor=pointer]':
+        - /url: /lesson/1-1-6-reading-four-phases/
+      - link "1.1.7 Classify the Task" [ref=f4e22] [cursor=pointer]:
+        - /url: /assignment/1-1-7-classify-the-task/
+      - 'link "1.1.8 Worked Example: Greeting App Through Four Phases" [ref=f4e23] [cursor=pointer]':
+        - /url: /lesson/1-1-8-example-greeting-phases/
+      - 'link "1.1.10 Reading: Umbrella Activities" [ref=f4e24] [cursor=pointer]':
+        - /url: /lesson/1-1-10-reading-umbrella/
+      - link "1.1.11 Name That Umbrella" [ref=f4e25] [cursor=pointer]:
+        - /url: /assignment/1-1-11-name-that-umbrella/
+      - 'link "1.1.12 Reading: Software Engineering Actions" [ref=f4e26] [cursor=pointer]':
+        - /url: /lesson/1-1-12-reading-actions/
+      - 'link "1.1.13 Reading: Task Sets" [ref=f4e27] [cursor=pointer]':
+        - /url: /lesson/1-1-13-reading-task-sets/
+      - 'link "1.1.14 Worked Example: Task Set for a Loop Bug" [ref=f4e28] [cursor=pointer]':
+        - /url: /lesson/1-1-14-example-task-set-loop/
+      - link "1.1.15 Write a Task Set" [ref=f4e29] [cursor=pointer]:
+        - /url: /assignment/1-1-15-write-a-task-set/
+      - 'link "1.1.16 Reading: SDLC Methodologies" [ref=f4e30] [cursor=pointer]':
+        - /url: /lesson/1-1-16-reading-sdlc/
+      - 'link "1.1.17 Reading: The Four Ps" [ref=f4e31] [cursor=pointer]':
+        - /url: /lesson/1-1-17-reading-four-ps/
+      - link "1.1.18 Same Framework, Different Weight" [ref=f4e32] [cursor=pointer]:
+        - /url: /assignment/1-1-18-same-framework/
+      - 'link "1.1.19 Reading: Prescriptive Process Models" [ref=f4e33] [cursor=pointer]':
+        - /url: /lesson/1-1-19-reading-prescriptive/
+      - 'link "1.1.20 Reading: Where Prescriptive Models Break" [ref=f4e34] [cursor=pointer]':
+        - /url: /lesson/1-1-20-reading-prescriptive-limits/
+      - link "1.1.21 Does It Fit?" [ref=f4e35] [cursor=pointer]:
+        - /url: /assignment/1-1-21-does-it-fit/
+      - link "1.1.22 Describe the Lifecycle" [ref=f4e36] [cursor=pointer]:
+        - /url: /assignment/1-1-22-a1-2-describe-lifecycle/
+      - link "1.1.23 Unit 1.1 Quiz" [ref=f4e37] [cursor=pointer]:
+        - /url: /assignment/1-1-23-a3-3-unit-quiz/
+    - generic [ref=f4e38]: 0/22 · 0%
+  - button "Report an issue" [ref=f4e39] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=f4e219] [cursor=pointer]
+  - alert [ref=f4e223]

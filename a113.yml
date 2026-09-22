@@ -1,0 +1,139 @@
+- generic [active] [ref=f1e1]:
+  - banner [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - link "shCode" [ref=f1e4] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=f1e5]:
+        - link "Lessons" [ref=f1e6] [cursor=pointer]:
+          - /url: /
+        - button "Learn" [ref=f1e8] [cursor=pointer]:
+          - text: Learn
+          - generic [aria-hidden] [ref=f1e9]: ▾
+        - link "Issues" [ref=f1e42] [cursor=pointer]:
+          - /url: /issues/
+        - link "Gradebook" [ref=f1e43] [cursor=pointer]:
+          - /url: /progress/
+        - link "Join your class" [ref=f1e44] [cursor=pointer]:
+          - /url: /join-class/
+        - button "dev@local" [ref=f1e46] [cursor=pointer]:
+          - text: dev@local
+          - generic [aria-hidden] [ref=f1e47]: ▾
+    - generic [ref=f1e48]:
+      - 'link "← 1.1.2 Reading: Console: console.log & sequential execution" [ref=f1e49] [cursor=pointer]':
+        - /url: /lesson/1-1-2-reading-console-log
+        - generic [ref=f1e50]: ←
+        - generic [ref=f1e51]: "1.1.2 Reading: Console: console.log & sequential execution"
+      - generic "Get a green on this lesson before moving forward" [ref=f1e52]:
+        - generic [ref=f1e53]: 1.1.4 What a Program Is
+        - generic [aria-hidden] [ref=f1e54]: 🔒
+  - generic [ref=f1e11]:
+    - generic [aria-hidden] [ref=f1e55]: 🔒
+    - heading "Lesson locked" [level=1] [ref=f1e56]
+    - paragraph [ref=f1e57]: Finish the prior lessons in this module to unlock this one.
+    - generic [ref=f1e58]:
+      - generic [ref=f1e59]: 0 of 22 completed
+      - 'link "○ 1.1.1 Slides: Foundations" [ref=f1e60] [cursor=pointer]':
+        - /url: /lesson/1-1-1-slides/
+        - generic [ref=f1e61]:
+          - generic [ref=f1e62]: ○
+          - generic [ref=f1e63]: "1.1.1 Slides: Foundations"
+      - 'link "○ 1.1.2 Reading: Console: console.log & sequential execution" [ref=f1e64] [cursor=pointer]':
+        - /url: /lesson/1-1-2-reading-console-log/
+        - generic [ref=f1e65]:
+          - generic [ref=f1e66]: ○
+          - generic [ref=f1e67]: "1.1.2 Reading: Console: console.log & sequential execution"
+      - generic [ref=f1e69]:
+        - generic [ref=f1e70]: 🔒
+        - generic [ref=f1e71]: 1.1.3 Your First Statement
+      - generic [ref=f1e73]:
+        - generic [ref=f1e74]: ·
+        - generic [ref=f1e75]: 1.1.4 What a Program Is
+      - generic [ref=f1e77]:
+        - generic [ref=f1e78]: ·
+        - generic [ref=f1e79]: "1.1.5 Video: What is the SDLC?"
+      - generic [ref=f1e81]:
+        - generic [ref=f1e82]: ·
+        - generic [ref=f1e83]: "1.1.6 Reading: The Four Phases"
+      - generic [ref=f1e85]:
+        - generic [ref=f1e86]: ·
+        - generic [ref=f1e87]: 1.1.7 Classify the Task
+      - generic [ref=f1e89]:
+        - generic [ref=f1e90]: ·
+        - generic [ref=f1e91]: "1.1.8 Worked Example: Greeting App Through Four Phases"
+      - generic [ref=f1e93]:
+        - generic [ref=f1e94]: ·
+        - generic [ref=f1e95]: "1.1.10 Reading: Umbrella Activities"
+      - generic [ref=f1e97]:
+        - generic [ref=f1e98]: ·
+        - generic [ref=f1e99]: 1.1.11 Name That Umbrella
+      - generic [ref=f1e101]:
+        - generic [ref=f1e102]: ·
+        - generic [ref=f1e103]: "1.1.12 Reading: Software Engineering Actions"
+      - generic [ref=f1e105]:
+        - generic [ref=f1e106]: ·
+        - generic [ref=f1e107]: "1.1.13 Reading: Task Sets"
+      - generic [ref=f1e109]:
+        - generic [ref=f1e110]: ·
+        - generic [ref=f1e111]: "1.1.14 Worked Example: Task Set for a Loop Bug"
+      - generic [ref=f1e113]:
+        - generic [ref=f1e114]: ·
+        - generic [ref=f1e115]: 1.1.15 Write a Task Set
+      - generic [ref=f1e117]:
+        - generic [ref=f1e118]: ·
+        - generic [ref=f1e119]: "1.1.16 Reading: SDLC Methodologies"
+      - generic [ref=f1e121]:
+        - generic [ref=f1e122]: ·
+        - generic [ref=f1e123]: "1.1.17 Reading: The Four Ps"
+      - generic [ref=f1e125]:
+        - generic [ref=f1e126]: ·
+        - generic [ref=f1e127]: 1.1.18 Same Framework, Different Weight
+      - generic [ref=f1e129]:
+        - generic [ref=f1e130]: ·
+        - generic [ref=f1e131]: "1.1.19 Reading: Prescriptive Process Models"
+      - generic [ref=f1e133]:
+        - generic [ref=f1e134]: ·
+        - generic [ref=f1e135]: "1.1.20 Reading: Where Prescriptive Models Break"
+      - generic [ref=f1e137]:
+        - generic [ref=f1e138]: ·
+        - generic [ref=f1e139]: 1.1.21 Does It Fit?
+      - generic [ref=f1e141]:
+        - generic [ref=f1e142]: ·
+        - generic [ref=f1e143]: 1.1.22 Describe the Lifecycle
+      - generic [ref=f1e145]:
+        - generic [ref=f1e146]: ·
+        - generic [ref=f1e147]: 1.1.23 Unit 1.1 Quiz
+    - link "← Back to module 1.1" [ref=f1e148] [cursor=pointer]:
+      - /url: /module/1.1
+  - generic [ref=f1e12]:
+    - link "Module 1.1" [ref=f1e13] [cursor=pointer]:
+      - /url: /module/1.1
+    - generic [ref=f1e14]: Lesson 3 of 22
+    - generic [ref=f1e15]:
+      - 'link "1.1.1 Slides: Foundations" [ref=f1e16] [cursor=pointer]':
+        - /url: /lesson/1-1-1-slides/
+      - 'generic "1.1.2 Reading: Console: console.log & sequential execution (locked)" [ref=f1e149]'
+      - link "1.1.3 Your First Statement" [ref=f1e18] [cursor=pointer]:
+        - /url: /assignment/1-1-3-first-statement/
+      - generic "1.1.4 What a Program Is (locked)" [ref=f1e150]
+      - 'generic "1.1.5 Video: What is the SDLC? (locked)" [ref=f1e151]'
+      - 'generic "1.1.6 Reading: The Four Phases (locked)" [ref=f1e152]'
+      - generic "1.1.7 Classify the Task (locked)" [ref=f1e153]
+      - 'generic "1.1.8 Worked Example: Greeting App Through Four Phases (locked)" [ref=f1e154]'
+      - 'generic "1.1.10 Reading: Umbrella Activities (locked)" [ref=f1e155]'
+      - generic "1.1.11 Name That Umbrella (locked)" [ref=f1e156]
+      - 'generic "1.1.12 Reading: Software Engineering Actions (locked)" [ref=f1e157]'
+      - 'generic "1.1.13 Reading: Task Sets (locked)" [ref=f1e158]'
+      - 'generic "1.1.14 Worked Example: Task Set for a Loop Bug (locked)" [ref=f1e159]'
+      - generic "1.1.15 Write a Task Set (locked)" [ref=f1e160]
+      - 'generic "1.1.16 Reading: SDLC Methodologies (locked)" [ref=f1e161]'
+      - 'generic "1.1.17 Reading: The Four Ps (locked)" [ref=f1e162]'
+      - generic "1.1.18 Same Framework, Different Weight (locked)" [ref=f1e163]
+      - 'generic "1.1.19 Reading: Prescriptive Process Models (locked)" [ref=f1e164]'
+      - 'generic "1.1.20 Reading: Where Prescriptive Models Break (locked)" [ref=f1e165]'
+      - generic "1.1.21 Does It Fit? (locked)" [ref=f1e166]
+      - generic "1.1.22 Describe the Lifecycle (locked)" [ref=f1e167]
+      - generic "1.1.23 Unit 1.1 Quiz (locked)" [ref=f1e168]
+    - generic [ref=f1e38]: 0/22 · 0%
+  - button "Report an issue" [ref=f1e39] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=f1e174] [cursor=pointer]
+  - alert [ref=f1e178]

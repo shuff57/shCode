@@ -1,0 +1,142 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "shCode" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=e5]:
+        - link "Lessons" [ref=e6] [cursor=pointer]:
+          - /url: /
+        - button "Learn" [ref=e8] [cursor=pointer]:
+          - text: Learn
+          - generic [aria-hidden] [ref=e9]: ▾
+        - text: …
+  - generic [ref=e10]:
+    - generic [ref=e11]:
+      - heading "Choose a lesson" [level=1] [ref=e12]
+      - textbox "Search lessons" [ref=e13]
+    - group [ref=e14]:
+      - generic "Chapter 1JavaScript Fundamentals7 modules" [ref=e15]:
+        - generic [ref=e16]: Chapter 1
+        - text: JavaScript Fundamentals
+        - generic [ref=e17]: 7 modules
+      - generic [ref=e19]:
+        - group [ref=e20]:
+          - generic "1.1Software Lifecycle" [ref=e21]
+        - group [ref=e22]:
+          - generic "1.2Variables and Data Types" [ref=e23]
+        - group [ref=e24]:
+          - generic "1.3Documentation and Coding Conventions" [ref=e25]
+        - group [ref=e26]:
+          - generic "1.4Programming Paradigms and Languages" [ref=e27]
+        - group [ref=e28]:
+          - generic "1.5Program Design Tools and Environments" [ref=e29]
+        - group [ref=e30]:
+          - generic "1.6Chapter 1 Group Performance Assessment" [ref=e31]
+        - group [ref=e32]:
+          - generic "1.7Chapter 1 Individual Performance Assessment" [ref=e33]
+    - group [ref=e34]:
+      - generic "Chapter 2Control Flow7 modules" [ref=e35]:
+        - generic [ref=e36]: Chapter 2
+        - text: Control Flow
+        - generic [ref=e37]: 7 modules
+      - generic [ref=e39]:
+        - group [ref=e40]:
+          - generic "2.1Conditionals" [ref=e41]
+        - group [ref=e42]:
+          - generic "2.2Algorithms and Loops" [ref=e43]
+        - group [ref=e44]:
+          - generic "2.3The Switch Statement" [ref=e45]
+        - group [ref=e46]:
+          - generic "2.4Loop Control and Nested Loops" [ref=e47]
+        - group [ref=e48]:
+          - generic "2.5Handling Errors with try/catch" [ref=e49]
+        - group [ref=e50]:
+          - generic "2.6Chapter 2 Group Performance Assessment" [ref=e51]
+        - group [ref=e52]:
+          - generic "2.7Chapter 2 Individual Performance Assessment" [ref=e53]
+    - group [ref=e54]:
+      - generic "Chapter 3Functions and Data10 modules" [ref=e55]:
+        - generic [ref=e56]: Chapter 3
+        - text: Functions and Data
+        - generic [ref=e57]: 10 modules
+      - generic [ref=e59]:
+        - group [ref=e60]:
+          - 'generic "3.1Functions: Definition and Calls" [ref=e61]'
+        - group [ref=e62]:
+          - generic "3.2Parameters and Return Values" [ref=e63]
+        - group [ref=e64]:
+          - generic "3.3Arrays" [ref=e65]
+        - group [ref=e66]:
+          - generic "3.4Function Expressions and Arrow Functions" [ref=e67]
+        - group [ref=e68]:
+          - generic "3.5Objects and Properties" [ref=e69]
+        - group [ref=e70]:
+          - 'generic "3.6Functions: Pass by Value/Reference" [ref=e71]'
+        - group [ref=e72]:
+          - generic "3.7Array Methods" [ref=e73]
+        - group [ref=e74]:
+          - generic "3.8Saving and Loading Data" [ref=e75]
+        - group [ref=e76]:
+          - generic "3.9Chapter 3 Group Performance Assessment" [ref=e77]
+        - group [ref=e78]:
+          - generic "3.10Chapter 3 Individual Performance Assessment" [ref=e79]
+    - group [ref=e80]:
+      - generic "Chapter 4Q1 Synthesis1 module" [ref=e81]:
+        - generic [ref=e82]: Chapter 4
+        - text: Q1 Synthesis
+        - generic [ref=e83]: 1 module
+      - group [ref=e86]:
+        - generic "4.1Q1 Synthesis Project" [ref=e87]
+    - group [ref=e88]:
+      - generic "Chapter 5moshion — Game Development Foundations4 modules" [ref=e89]:
+        - generic [ref=e90]: Chapter 5
+        - text: moshion — Game Development Foundations
+        - generic [ref=e91]: 4 modules
+      - generic [ref=e93]:
+        - group [ref=e94]:
+          - generic "5.1Hello Sprite and Movement" [ref=e95]
+        - group [ref=e96]:
+          - generic "5.2Physics Feel" [ref=e97]
+        - group [ref=e98]:
+          - generic "5.3Classes and Instances" [ref=e99]
+        - group [ref=e100]:
+          - generic "5.4Writing Your Own Classes" [ref=e101]
+    - group [ref=e102]:
+      - generic "Chapter 6moshion — Game Mechanics8 modules" [ref=e103]:
+        - generic [ref=e104]: Chapter 6
+        - text: moshion — Game Mechanics
+        - generic [ref=e105]: 8 modules
+      - generic [ref=e107]:
+        - group [ref=e108]:
+          - generic "6.1Groups" [ref=e109]
+        - group [ref=e110]:
+          - generic "6.2Overlaps and Collisions" [ref=e111]
+        - group [ref=e112]:
+          - generic "6.3Physics Applications" [ref=e113]
+        - group [ref=e114]:
+          - generic "6.4Animated Sprites and Camera" [ref=e115]
+        - group [ref=e116]:
+          - generic "6.5Save and Load" [ref=e117]
+        - group [ref=e118]:
+          - generic "6.6Game State Machines" [ref=e119]
+        - group [ref=e120]:
+          - generic "6.7Advanced Input" [ref=e121]
+        - group [ref=e122]:
+          - generic "6.8Joints" [ref=e123]
+    - group [ref=e124]:
+      - generic "Chapter 7Q2 Synthesis — Game Capstone1 module" [ref=e125]:
+        - generic [ref=e126]: Chapter 7
+        - text: Q2 Synthesis — Game Capstone
+        - generic [ref=e127]: 1 module
+      - group [ref=e130]:
+        - 'generic "7.1Arcade Cabinet: Q2 Synthesis" [ref=e131]'
+    - group [ref=e132]:
+      - generic "Chapter 81 module" [ref=e133]:
+        - generic [ref=e134]: Chapter 8
+        - generic [ref=e135]: 1 module
+      - group [ref=e138]:
+        - generic "8.1Solid Shapes" [ref=e139]
+    - contentinfo [ref=e140]:
+      - generic [ref=e141]: © 2026 shCode
+      - text: LHD™
+  - button "Report an issue" [ref=e142] [cursor=pointer]
