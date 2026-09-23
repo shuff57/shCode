@@ -1,3 +1,49 @@
+# Handoff — 2026-09-22 (later) · login was 500ing in prod; migrations 0029/0030 were never applied
+
+Every login on shcode.pages.dev returned **500 `error code: 1101`** (Worker threw) while
+local/remote-linux logins worked — because the DB is the difference, not the device.
+
+**Cause.** `79294f30 "Harden auth"` shipped `functions/api/auth/login.ts` querying
+`login_attempts` and `functions/_shared/rateLimit.ts` querying `rate_limit`, but prod D1
+never had those tables. `login.ts` runs a **bare** `SELECT ... FROM login_attempts` with no
+try/catch, so the query threw and the Worker 500'd. `signup.ts` calls the same rate limiter
+but `checkRateLimit` **fails open** on any D1 error — which is why signup returned 400 and
+login returned 500, and why `curl /api/auth/login` on a local server (D1 already migrated)
+looked fine. Any student on any platform failed; Chromebooks were just where the class was.
+
+**Fix, applied and verified:** `npm run d1:migrate` (both additive `CREATE TABLE IF NOT
+EXISTS`). Prod `/api/auth/login` with bogus creds now returns **401**, not 500;
+`d1:status` shows nothing to apply. Swept every table the Functions reference against prod —
+`login_attempts`/`rate_limit` were the only two missing.
+
+**Trap.** A deploy that adds a query is not a deploy that adds its table. `wrangler pages
+deploy` and `d1:migrate` are two separate steps and nothing couples them — a migration left
+unapplied is invisible until the code path is hit, and the fail-open limiter hid it on the
+sibling endpoint. Migrate in the same breath as deploying any `functions/` change that names
+a new table. (The `1101` body is Cloudflare's generic throw; read the real error with
+`wrangler pages deployment tail`.)
+
+**Hardening (2026-09-22, later — committed 0ff2ecb4, not yet deployed).** Two follow-ups:
+
+1. `login.ts` now routes all three `login_attempts` touches through `loadLockout` /
+   `resetLockout` / `recordFailedLogin`, each wrapped to **fail open** like
+   `rateLimit.ts` already did. A missing or transiently-broken lockout table can no longer
+   500 every login; a present one still locks out at 429 as before.
+2. New `npm run deploy` = `check-pending-migrations && build && pages deploy`. It does NOT
+   auto-apply migrations. `wrangler d1 migrations apply` auto-confirms its prompt when
+   stdin is not a TTY, so chaining it into deploy would apply a destructive migration with
+   no human in the loop. The preflight (`scripts/check-pending-migrations.mjs`) instead
+   refuses to deploy while anything is pending and prints the command to run — a missing
+   table is a deliberate separate step. Fails closed if the ledger cannot be read.
+
+Guarded by `scripts/test-login-lockout.mjs` (wired into `npm test`): compiles the real
+handler, drives it with a D1 stub that throws `no such table: login_attempts`, asserts 401
+not 500, and asserts an active lockout still returns 429. Verified non-hollow — the pre-fix
+code exits 1 on the uncaught throw. Prod already has the tables, so no urgency, but the
+fail-open fix is not live until the next deploy.
+
+---
+
 # Handoff — 2026-09-22 · The AI-tutor ML safety gate was dead in prod; fixed and verified, needs a deploy
 
 The client-side PII/injection gate (`lib/pii-guard-client.ts` → `/models/pii-guard-worker.js`)

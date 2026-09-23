@@ -48,11 +48,7 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   if (!email || !password) return json({ error: 'Invalid email or password' }, 401);
 
   const now = Date.now();
-  const attempt = await env.DB.prepare(
-    'SELECT fail_count, locked_until FROM login_attempts WHERE email = ?',
-  )
-    .bind(email)
-    .first<{ fail_count: number; locked_until: number }>();
+  const attempt = await loadLockout(env.DB, email);
   if (attempt && attempt.locked_until > now) {
     const waitMin = Math.max(1, Math.ceil((attempt.locked_until - now) / 60000));
     return json(
@@ -79,7 +75,7 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
 
   // Reset the counter on success -- a typo streak should not carry into a
   // legitimate login later.
-  await env.DB.prepare('DELETE FROM login_attempts WHERE email = ?').bind(email).run();
+  await resetLockout(env.DB, email);
 
   const role: 'admin' | 'teacher' | 'student' =
     row.role === 'admin' || row.role === 'teacher' ? row.role : 'student';
@@ -90,19 +86,54 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   });
 };
 
+async function loadLockout(
+  db: D1Database,
+  email: string,
+): Promise<{ fail_count: number; locked_until: number } | null> {
+  try {
+    return await db
+      .prepare('SELECT fail_count, locked_until FROM login_attempts WHERE email = ?')
+      .bind(email)
+      .first<{ fail_count: number; locked_until: number }>();
+  } catch (error) {
+    console.error('Lockout read failed:', error);
+    // Fail OPEN, the same tradeoff rateLimit.ts makes: a lockout that
+    // hard-fails every login over a transient D1 error is worse than
+    // under-locking. This is what a deploy whose migration has not been
+    // applied yet needs -- without it, a missing login_attempts table 500s
+    // every sign-in.
+    return null;
+  }
+}
+
+async function resetLockout(db: D1Database, email: string): Promise<void> {
+  try {
+    await db.prepare('DELETE FROM login_attempts WHERE email = ?').bind(email).run();
+  } catch (error) {
+    // Best-effort: the password already verified, so never 500 on cleanup.
+    console.error('Lockout reset failed:', error);
+  }
+}
+
 async function recordFailedLogin(db: D1Database, email: string, now: number): Promise<void> {
   const lockUntil = now + LOCKOUT_MS;
-  await db
-    .prepare(
-      `INSERT INTO login_attempts (email, fail_count, locked_until, updated_at)
-       VALUES (?, 1, 0, ?)
-       ON CONFLICT(email) DO UPDATE SET
-         fail_count = fail_count + 1,
-         updated_at = ?,
-         locked_until = CASE WHEN fail_count + 1 >= ? THEN ? ELSE locked_until END`,
-    )
-    .bind(email, now, now, LOCKOUT_THRESHOLD, lockUntil)
-    .run();
+  try {
+    await db
+      .prepare(
+        `INSERT INTO login_attempts (email, fail_count, locked_until, updated_at)
+         VALUES (?, 1, 0, ?)
+         ON CONFLICT(email) DO UPDATE SET
+           fail_count = fail_count + 1,
+           updated_at = ?,
+           locked_until = CASE WHEN fail_count + 1 >= ? THEN ? ELSE locked_until END`,
+      )
+      .bind(email, now, now, LOCKOUT_THRESHOLD, lockUntil)
+      .run();
+  } catch (error) {
+    // Counting the failure is best-effort; never 500 because the counter
+    // could not be written.
+    console.error('Lockout write failed:', error);
+  }
 }
 
 function json(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
