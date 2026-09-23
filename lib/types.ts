@@ -155,6 +155,18 @@ export interface Lesson {
   planFrom?: string;
   /** Display label for `planFrom`, e.g. "1.5.30". */
   planFromLabel?: string;
+  /** Max quiz/written score for this lesson (quiz question count, or written
+   *  rubric point total) -- NOT authored in lesson.json. Computed by the home
+   *  page's card projection (app/page.tsx forCards) so UnitProgressBadge can
+   *  weight a quiz/written lesson's completion by its actual score instead of
+   *  a flat done/not-done. Absent or null means the lesson is binary: a
+   *  regex/inFunction/model requirement, or a pass/fail (zero-point) rubric.
+   *  See lib/progress.ts lessonPercent(). */
+  maxScore?: number | null;
+  /** Which kind of partial score `maxScore` counts -- 'quiz' or 'written'.
+   *  Drives the tooltip breakdown in UnitProgressBadge ("quiz 60%" vs
+   *  "written 60%"). Same computed-only rule as maxScore. */
+  scoreKind?: 'quiz' | 'written' | null;
 }
 
 export interface QuizQuestion {

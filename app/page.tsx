@@ -23,6 +23,28 @@ import type { Lesson } from '../lib/types';
 // If a card ever needs another field, add it here. Do not pass `lessons`
 // straight through, and do not reach for redactLessonForClient instead:
 // it would leave every FORMATIVE quiz's answer key in the payload.
+//
+// `maxScore` is the one exception to "never touches a quiz/rubric": it is a
+// single count (# of questions, or sum of rubric points), never the
+// questions or the rubric itself, so it carries no answer and is safe to
+// ship. It is what lets UnitProgressBadge weight a quiz/written lesson's
+// completion by actual score instead of flat done/not-done -- see
+// lib/progress.ts lessonPercent().
+function maxScoreFor(l: Lesson): number | null {
+  if (l.quiz && l.quiz.questions.length > 0) return l.quiz.questions.length;
+  if (l.aiGrader) {
+    const total = l.aiGrader.rubric.reduce((sum, r) => sum + r.points, 0);
+    if (total > 0) return total; // 0 = pass/fail rubric, treated as binary
+  }
+  return null;
+}
+
+function scoreKindFor(l: Lesson): 'quiz' | 'written' | null {
+  if (l.quiz && l.quiz.questions.length > 0) return 'quiz';
+  if (l.aiGrader && l.aiGrader.rubric.reduce((sum, r) => sum + r.points, 0) > 0) return 'written';
+  return null;
+}
+
 function forCards(l: Lesson): Lesson {
   return {
     id: l.id,
@@ -36,6 +58,8 @@ function forCards(l: Lesson): Lesson {
     files: [],
     steps: [],
     requirements: [],
+    maxScore: maxScoreFor(l),
+    scoreKind: scoreKindFor(l),
   };
 }
 

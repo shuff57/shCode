@@ -140,8 +140,8 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
 
         if (visibleModules.length === 0) return null;
 
-        const unitLessonIds = visibleModules.flatMap((u) =>
-          lessonsForModule(filteredLessons, u.id, u.category).map((l) => l.id),
+        const unitLessonRefs = visibleModules.flatMap((u) =>
+          lessonsForModule(filteredLessons, u.id, u.category).map((l) => ({ id: l.id, maxScore: l.maxScore, scoreKind: l.scoreKind })),
         );
 
         return (
@@ -154,7 +154,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
               <span className="text-2xl font-bold">Chapter {top}</span>
               {group.label && <span className="text-base opacity-80">{group.label}</span>}
               <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
-                <UnitProgressBadge lessonIds={unitLessonIds} label={`Chapter ${top}`} />
+                <UnitProgressBadge lessons={unitLessonRefs} label={`Chapter ${top}`} />
                 <span className="opacity-60">
                   {visibleModules.length} module{visibleModules.length === 1 ? '' : 's'}
                 </span>
@@ -164,6 +164,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
               {visibleModules.map((u) => {
                 const unitLessons = lessonsForModule(filteredLessons, u.id, u.category);
                 const moduleLessonIds = unitLessons.map((l) => l.id);
+                const moduleLessonRefs = unitLessons.map((l) => ({ id: l.id, maxScore: l.maxScore, scoreKind: l.scoreKind }));
                 return (
                   <details
                     key={u.id}
@@ -174,7 +175,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
                       <span className="font-bold">{u.id}</span>
                       <span className="text-base">{u.title}</span>
                       <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
-                        <UnitProgressBadge lessonIds={moduleLessonIds} label={`Module ${u.id}`} />
+                        <UnitProgressBadge lessons={moduleLessonRefs} label={`Module ${u.id}`} />
                         <ModuleDueChip
                           snap={teacherDue}
                           moduleId={u.id}
