@@ -144,6 +144,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
           lessonsForModule(filteredLessons, u.id, u.category).map((l) => ({
             id: l.id,
             title: l.title,
+            type: l.type,
             preview: l.preview,
             assignmentCode: l.assignmentCode,
             maxScore: l.maxScore,
@@ -174,6 +175,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
                 const moduleLessonRefs = unitLessons.map((l) => ({
                   id: l.id,
                   title: l.title,
+                  type: l.type,
                   preview: l.preview,
                   assignmentCode: l.assignmentCode,
                   maxScore: l.maxScore,
