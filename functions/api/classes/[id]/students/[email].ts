@@ -5,9 +5,12 @@
 
 import { canManageClass } from '../../../../_shared/classAuth';
 import { normalizeEmail } from '../../../../_shared/auth';
+import { loadLessonScopeMap } from '../../../../_shared/dueDates';
+import { loadClassWeights, studentGrading } from '../../../../_shared/grading';
 
 interface Env {
   DB: D1Database;
+  ASSETS?: Fetcher;
 }
 type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, 'id' | 'email', SessionData>;
@@ -33,7 +36,7 @@ interface SubmissionRow {
 export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = async (
   context: Ctx,
 ) => {
-  const { env, data, params } = context;
+  const { request, env, data, params } = context;
   const classId = params.id;
   const rawEmail = params.email;
 
@@ -130,6 +133,12 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
       response: row.response,
     };
   }
+  // Grade-weighted percentage + per-category breakdown, under THIS class's
+  // weights -- so opening a student from one class's roster shows that
+  // class's grading, not the curriculum default.
+  const scopeMap = await loadLessonScopeMap(env, request);
+  const weights = await loadClassWeights(env.DB, classId);
+  const grading = studentGrading(scopeMap, stateRows.results ?? [], weights);
 
   return json({
     student_email: studentEmail,
@@ -137,6 +146,7 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
     lastName: nameRow?.last_name ?? null,
     lessonState,
     latestSubmissions,
+    grading,
   });
 };
 

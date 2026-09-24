@@ -56,6 +56,8 @@ interface StudentProgress {
   started_count: number;
   last_active: number | null;
   total_score: number;
+  /** 0-100 grade-weighted percent under this class's weights. */
+  weightedPercent: number;
 }
 
 interface LessonStateEntry {
@@ -81,12 +83,53 @@ interface StudentDetail {
   lastName?: string | null;
   lessonState: Record<string, LessonStateEntry>;
   latestSubmissions: Record<string, SubmissionEntry>;
+  /** Absent when the class page's endpoint could not load the manifest. */
+  grading?: {
+    percent: number;
+    categories: Array<{ category: string; label: string; weight: number; percent: number; done: number; total: number }>;
+  };
 }
 
 /** "First Last", trimmed, handling either half being null/undefined. Null if both unset. */
 function fullName(first?: string | null, last?: string | null): string | null {
   const parts = [first, last].map((s) => (s || '').trim()).filter(Boolean);
   return parts.length > 0 ? parts.join(' ') : null;
+}
+
+/** 0-100 as a color. Green only at 100, amber once anything is done, dim
+ *  otherwise -- same thresholds the student's own badge uses, so a teacher
+ *  and a student read one colour code. */
+function pctColor(pct: number): string {
+  return pct >= 100 ? '#50fa7b' : pct > 0 ? '#f1fa8c' : '#6272a4';
+}
+
+/** The 80x6 bar from UnitProgressBadge, reused so the roster and the
+ *  student's own badge look like the same control. */
+function MiniBar({ pct }: { pct: number }) {
+  return (
+    <span
+      style={{
+        position: 'relative',
+        display: 'inline-block',
+        width: 80,
+        height: 6,
+        background: 'rgba(255,255,255,0.1)',
+        borderRadius: 3,
+        overflow: 'hidden',
+        flexShrink: 0,
+      }}
+    >
+      <span
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: `${Number.isFinite(pct) ? Math.min(100, Math.max(0, pct)) : 0}%`,
+          height: '100%',
+          background: pct >= 100 ? '#50fa7b' : '#8be9fd',
+        }}
+      />
+    </span>
+  );
 }
 
 interface LessonMeta {
@@ -574,6 +617,33 @@ function StudentDrawer({
         <div style={{ padding: '20px 24px', flex: 1 }}>
           {loading && <div style={{ color: '#6272a4' }}>Loading…</div>}
           {err && <div style={{ color: '#ff5555', fontSize: 13 }}>{err}</div>}
+          {detail?.grading && detail.grading.categories.length > 0 && (
+            <div style={{ marginBottom: 24, padding: 12, background: '#282a36', borderRadius: 6, border: '1px solid #44475a33' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <MiniBar pct={detail.grading.percent} />
+                <span style={{ fontSize: 14, fontWeight: 700, color: pctColor(detail.grading.percent) }}>
+                  {detail.grading.percent}% of grade
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {detail.grading.categories.map((c) => (
+                  <div key={c.category} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
+                    <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', background: pctColor(c.percent), flexShrink: 0 }} />
+                    <span style={{ flex: 1, color: '#f8f8f2' }}>
+                      {c.label}
+                      <span style={{ opacity: 0.6 }}> · {c.weight}% of grade</span>
+                    </span>
+                    <span style={{ color: '#6272a4' }}>
+                      {c.done}/{c.total}
+                    </span>
+                    <span style={{ color: pctColor(c.percent), fontWeight: 600, width: 40, textAlign: 'right' }}>
+                      {c.percent}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           {detail && unitGroups.length === 0 && (
             <p style={{ color: '#6272a4', fontSize: 14 }}>No lesson activity yet.</p>
           )}
@@ -1587,6 +1657,9 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {roster.map((row) => {
                 const prog = progressMap.get(row.student_email);
+                // A stale or older response can lack weightedPercent; a NaN
+                // here would render "NaN% of grade", so fall back to 0.
+                const wp = prog && Number.isFinite(prog.weightedPercent) ? prog.weightedPercent : 0;
                 return (
                   <div
                     key={row.student_email}
@@ -1602,6 +1675,15 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
                         </span>
                         {prog ? (
                           <>
+                            <span
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                              title={`${wp}% of grade under this class's weights`}
+                            >
+                              <MiniBar pct={wp} />
+                              <span style={{ color: pctColor(wp), fontWeight: 600 }}>
+                                {wp}% of grade
+                              </span>
+                            </span>
                             <span style={{ color: '#50fa7b' }}>{prog.completed_count} completed</span>
                             {prog.started_count > 0 && (
                               <span style={{ color: '#f1fa8c' }}>{prog.started_count} started</span>

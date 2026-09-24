@@ -48,8 +48,12 @@ export function readTeacherNotes(raw: string | null | undefined): TeacherNotes {
 
 export interface GradebookCell {
   state: 'completed' | 'started' | null;
-  /** lesson_state.score — the percent shown everywhere else. A teacher
-   *  override syncs into this column, so it is the authoritative number. */
+  /** lesson_state.score — RAW POINTS, not a percent. QuizView writes
+   *  correctCount and WrittenGrader writes totalEarned, so the percent is
+   *  score/possible (possible lives on lesson_submissions). This comment
+   *  said "the percent shown everywhere else" until 2026-09-23 and was
+   *  simply wrong; the writers are the proof. A teacher override syncs into
+   *  this same raw-points column. */
   score: number | null;
   /** Raw points off the LATEST submission, so "90%" can be shown as 18/20. */
   submittedScore: number | null;

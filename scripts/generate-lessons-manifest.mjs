@@ -28,18 +28,39 @@ const results = await Promise.all(
       return null;
     }
     const meta = JSON.parse(raw);
+    // maxScore: quiz question count, or the written/diagram rubric's point
+    // total. Null when every criterion is 0 points (a pass/fail rubric), which
+    // is most of them -- see lib/grade-pass.ts. Mirrors app/page.tsx's
+    // maxScoreFor()/scoreKindFor() so the Pages Functions can compute the same
+    // weighted grade percentage the student's own badge shows without being
+    // able to read lessons/*/lesson.json at runtime.
+    const rubric = meta.aiGrader?.rubric ?? meta.diagram?.aiGrader?.rubric;
+    const rubricPoints = Array.isArray(rubric)
+      ? rubric.reduce((sum, r) => sum + (r?.points ?? 0), 0)
+      : 0;
+    const quizCount =
+      meta.quiz && Array.isArray(meta.quiz.questions) && meta.quiz.questions.length > 0
+        ? meta.quiz.questions.length
+        : null;
+    const maxScore = quizCount ?? (rubricPoints > 0 ? rubricPoints : null);
     return {
       id: meta.id ?? id,
       title: meta.title ?? id,
       unit: meta.unit ?? null,
       preview: meta.preview ?? null,
       // type decides the route prefix (/assignment vs /lesson). Client-side
-      // navigation has no other way to know it — see lib/lesson-href.ts.
+      // navigation has no other way to know it -- see lib/lesson-href.ts.
       type: meta.type ?? 'lesson',
       // category is used client-side by HeaderLessonNav to scope prev/next
       // to lessons within the same unit.
       category: meta.category ?? null,
       week: typeof meta.week === 'number' ? meta.week : null,
+      // Grade-category classification inputs (lib/grading-weights.ts). A lab
+      // is recognised by its assignmentCode and nothing else, so leaving this
+      // out silently drops every lab from any weighted percentage.
+      assignmentCode: meta.assignmentCode ?? null,
+      maxScore,
+      scoreKind: quizCount != null ? 'quiz' : maxScore != null ? 'written' : null,
     };
   }),
 );

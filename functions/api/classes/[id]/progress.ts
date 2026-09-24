@@ -1,12 +1,16 @@
 // GET /api/classes/[id]/progress
 // Returns per-student progress summary (completed_count, started_count,
-// last_active, total_score) for all active enrollments in the class.
-// One SQL query via GROUP BY student_email.
+// last_active, total_score) for all active enrollments in the class, plus
+// each student's grade-weighted percentage under this class's weights
+// (class_grading_weights, defaulting per lib/grading-weights.ts).
 
 import { canManageClass } from '../../../_shared/classAuth';
+import { loadLessonScopeMap } from '../../../_shared/dueDates';
+import { loadClassWeights, studentGrading } from '../../../_shared/grading';
 
 interface Env {
   DB: D1Database;
+  ASSETS?: Fetcher;
 }
 type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, 'id', SessionData>;
@@ -19,8 +23,15 @@ interface ProgressRow {
   total_score: number;
 }
 
+/** The subset of lesson_state studentGrading() reads. */
+interface StateRow {
+  lesson_id: string;
+  state: 'started' | 'completed';
+  score: number | null;
+}
+
 export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (context: Ctx) => {
-  const { env, data, params } = context;
+  const { request, env, data, params } = context;
   const classId = params.id;
   if (typeof classId !== 'string' || !classId) return json({ error: 'classId required' }, 400);
 
@@ -59,7 +70,36 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
     .bind(classId, now)
     .all<ProgressRow>();
 
-  return json({ students: result.results ?? [] });
+  const rows = result.results ?? [];
+
+  // Grade-weighted percent per student. Fixed number of reads, not N: the
+  // scope map and the class weights are identical for every student, and the
+  // per-student state rows come back in one query grouped by email.
+  const scopeMap = await loadLessonScopeMap(env, request);
+  const weights = await loadClassWeights(env.DB, classId);
+  const statesByStudent = new Map<string, (StateRow & { student_email: string })[]>();
+  if (rows.length > 0) {
+    const stateResult = await env.DB.prepare(
+      `SELECT ls.student_email, ls.lesson_id, ls.state, ls.score
+         FROM lesson_state ls
+         JOIN enrollments e ON e.student_email = ls.student_email
+        WHERE e.class_id = ? AND e.expires_at > ?`
+    )
+      .bind(classId, now)
+      .all<StateRow & { student_email: string }>();
+    for (const r of stateResult.results ?? []) {
+      const list = statesByStudent.get(r.student_email);
+      if (list) list.push(r);
+      else statesByStudent.set(r.student_email, [r]);
+    }
+  }
+
+  return json({
+    students: rows.map((r) => ({
+      ...r,
+      weightedPercent: studentGrading(scopeMap, statesByStudent.get(r.student_email) ?? [], weights).percent,
+    })),
+  });
 };
 
 function json(body: unknown, status = 200): Response {

@@ -129,4 +129,37 @@ export function weightedGradePercent(
   }
   if (totalWeight === 0) return 0;
   return Math.round(weightedSum / totalWeight);
+  if (totalWeight === 0) return 0;
+  return Math.round(weightedSum / totalWeight);
+}
+
+// One lesson's completion as a 0-100 percent. Isomorphic, so the student's
+// own badge (lib/progress.ts re-exports this) and the teacher's per-student
+// view compute the identical number.
+//
+// `score` is RAW POINTS, not a percent: QuizView writes correctCount and
+// WrittenGrader writes totalEarned into lesson_state.score (see those
+// components). maxScore is the question count / rubric total from the
+// lessons manifest, so the fraction is score/maxScore.
+//
+// A completed lesson with no score -- a summative quiz whose key is stripped
+// client-side, or a pass/fail rubric -- reads as 100: green-to-advance
+// pending a teacher's mark.
+//
+// A score only counts once the lesson is completed. An unfinished lesson is 0
+// no matter what is in the score column -- that column records a finished,
+// graded submission, and crediting it early would show a grade for work not
+// handed in. (Unreachable today: every writer sets state='completed' with a
+// score. Locked anyway so a future writer cannot quietly make an in-progress
+// lesson count toward a grade.)
+export function lessonPercent(
+  state: 'started' | 'completed' | undefined | null,
+  score: number | undefined | null,
+  maxScore: number | null | undefined,
+): number {
+  if (state !== 'completed') return 0;
+  if (maxScore != null && maxScore > 0 && score != null) {
+    return Math.round(Math.min(1, Math.max(0, score / maxScore)) * 100);
+  }
+  return 100;
 }

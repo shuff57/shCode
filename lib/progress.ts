@@ -135,21 +135,8 @@ export async function resetLessonState(lessonId: string): Promise<void> {
   cache = { ...cache, states: nextStates, scores: nextScores };
   notify();
 }
-// A binary lesson (regex/inFunction/model requirement, or a pass/fail rubric)
-// is 0% or 100% -- there is nothing in between to weight. A quiz or written
-// response has a real partial score once it has one (see maxScore on the home
-// page's Lesson projection), so it weights by actual correctness instead.
-// A completed lesson with no recorded score (a summative quiz, whose answer
-// key is stripped client-side and never comes back as a fraction -- see
-// scripts/score-quiz.mjs) reads as 100%: green-to-advance already treats
-// "submitted" as done for that case, this just agrees with it.
-export function lessonPercent(
-  state: LessonState | undefined,
-  score: number | undefined,
-  maxScore: number | null | undefined,
-): number {
-  if (maxScore != null && maxScore > 0 && score != null) {
-    return Math.round(Math.min(1, Math.max(0, score / maxScore)) * 100);
-  }
-  return state === 'completed' ? 100 : 0;
-}
+// lessonPercent now lives in lib/grading-weights.ts so the Pages Functions
+// (which cannot import a 'use client' module) can compute the identical
+// number for the teacher's per-student view. Re-exported here because every
+// existing client caller imports it from this module.
+export { lessonPercent } from './grading-weights';

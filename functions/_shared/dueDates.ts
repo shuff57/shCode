@@ -21,6 +21,10 @@ interface ManifestLesson {
   id: string;
   title: string;
   category?: string | null;
+  preview?: string | null;
+  assignmentCode?: string | null;
+  maxScore?: number | null;
+  scoreKind?: 'quiz' | 'written' | null;
 }
 
 interface Manifest {
@@ -36,6 +40,12 @@ export interface LessonScope {
   title: string;
   moduleId: string | null;
   unitId: string | null;
+  // Grade-classification inputs, copied off the same manifest row. See
+  // lib/grading-weights.ts lessonGradeCategory().
+  preview: string | null;
+  assignmentCode: string | null;
+  maxScore: number | null;
+  scoreKind: 'quiz' | 'written' | null;
 }
 
 // lessonFolderId -> { title, moduleId, unitId }. Cached in module scope for
@@ -73,6 +83,10 @@ export async function loadLessonScopeMap(
       title: lesson.title ?? lesson.id,
       moduleId: moduleIdFromTitle(lesson.title ?? ''),
       unitId: lesson.category ?? null,
+      preview: lesson.preview ?? null,
+      assignmentCode: lesson.assignmentCode ?? null,
+      maxScore: lesson.maxScore ?? null,
+      scoreKind: lesson.scoreKind ?? null,
     });
   }
   scopeMapCache = map;
