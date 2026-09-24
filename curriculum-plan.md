@@ -3389,50 +3389,44 @@ demonstrated more than one whose part fit on the first try by luck.
 
 ---
 
-### Reconciling with the existing midterm/final structure — **decision needed**
+### Reconciling with the existing midterm/final structure — **adopted, 2026-09-23**
 
-The "Exam Scheduling Notes" table below defines **6 midterms** whose coverage bands were written before
-these chapter tests were specified, and they now overlap heavily — S1 Midterm 1 (§1.1–2.2) is almost
-exactly Ch 1 Test plus half of Ch 2 Test. Left as-is, the course runs **8 chapter tests + 6 midterms +
-2 finals = 16 individual assessments across 88 meetings**, roughly one meeting in five spent testing.
+The "Exam Scheduling Notes" table below defined 6 midterms whose coverage bands were written before
+these chapter tests were specified, and overlapped heavily with them. Left as originally written, the
+course would have run 8 chapter tests + 6 midterms + 2 finals = 16 individual assessments across 88
+meetings, roughly one meeting in five spent testing.
 
-**The 6 midterms are the only assessments still absent from Part B's calendar.** Both finals are now
-scheduled (meetings 41 and 89) and every chapter test and Group PA has a real date. **Part B has only
-2 spare meetings**, so six midterms cannot be added — scheduling them would push the Semester 2 final
-past the last day of school.
-
-**Recommendation: retire the 6 midterms; keep the 8 chapter tests + 2 semester finals.** The chapter
-tests give finer-grained, more frequent individual evidence at the natural content boundary, they are
-already scheduled against real dates, and the two cumulative finals still satisfy the Butte outline's
-requirement that mid-term and final examinations both be represented — the chapter tests *are* the
-mid-term examinations, just distributed. That would put individual assessment at **10 meetings, not 16**.
-
-This is a curriculum-author decision and is **not applied** — the midterm table below is unchanged. If
-it is adopted, the grading weights immediately below need the reallocation noted there. If it is
-rejected, six meetings have to be found, and Part B's capacity note lists where they could come from.
+**The 6 midterms are retired.** Only the 8 chapter tests and 2 semester finals remain as individual
+assessments — 10 meetings, not 16. The chapter tests give finer-grained, more frequent evidence at the
+natural content boundary, are already scheduled against real dates, and the two cumulative finals still
+satisfy the Butte outline's mid-term/final requirement (the chapter tests serve as the distributed
+mid-terms). The "Exam Scheduling Notes" midterm table below is now historical — none of the six were
+ever placed on Part B's calendar.
 
 ---
 
-## GRADING STRUCTURE (Suggested)
+## GRADING STRUCTURE
 
-| Category | Weight (as written) | Weight if midterms are retired |
-|----------|--------|--------|
-| Weekly Lab Assignments | 25% | 25% |
-| Written Assignments | 10% | 10% |
-| Quizzes (multiple, scattered per section) | 5% | 5% |
-| **Individual Chapter Tests (8 total)** | **—** | **15%** |
-| Midterm Exams (6 total) | 15% | *retired* |
-| Final Exams (2 total) | 10% | 10% |
-| Q1 Synthesis (§4.1) | 5% | 5% |
-| Q2 Synthesis (§7.1 Arcade Cabinet capstone) | 15% | 15% |
-| Q4 Synthesis (§13.1–13.3 Mechanism capstone + presentation) | 15% | 15% |
+| Category | Weight |
+|----------|--------|
+| Weekly Lab Assignments | 30% |
+| Written Assignments | 10% |
+| Quizzes (multiple, scattered per section) | 5% |
+| Individual Chapter Tests (8 total) | 15% |
+| Final Exams (2 total) | 10% |
+| Q1 Synthesis (§4.1) | 10% |
+| Q2 Synthesis (§7.1 Arcade Cabinet capstone) | 10% |
+| Q4 Synthesis (§13.1–13.3 Mechanism capstone + presentation) | 10% |
 
-> **Second column added 2026-08-14, not adopted.** It shows the weights if the "retire the 6 midterms"
-> recommendation in **Individual Chapter Assessments** above is taken: the midterms' 15% transfers
-> intact to the 8 chapter tests, so no other category moves and both columns still total 100%.
+> **Rebalanced 2026-09-23** from the prior "if midterms retired" draft (Lab 25% / Q1 5% / Q2 15% /
+> Q4 15%): Weekly Labs +5%, Q1 Synthesis +5%, Q2 Synthesis −5%, Q4 Synthesis −5%. Still totals 100%.
+> Superseded: the two-column "as written / if midterms retired" draft and its Midterm Exams row.
 >
-> **Note:** Quizzes, midterms, and finals are required evaluation methods per the Butte College CSCI 4 course outline. All four evaluation categories (quizzes, homework, lab projects, mid-term and final examinations) must be represented in grading. Under the second column the chapter tests serve as the distributed mid-term examinations; the two cumulative finals are unchanged.
-> **Category name updated 2026-08-14** — "8 total" quizzes removed since the exact count shifted with the renumber (quizzes now sit at §1.3, §2.3, §8.3, §8.4, §9.2, §9.4, §11.1, §12.2); recount once Part B's pacing question is settled.
+> **Note:** Quizzes and finals are required evaluation methods per the Butte College CSCI 4 course
+> outline; the chapter tests now serve as the required mid-term-examination category (decision above).
+> **Category name updated 2026-08-14** — "8 total" quizzes removed since the exact count shifted with
+> the renumber (quizzes now sit at §1.3, §2.3, §8.3, §8.4, §9.2, §9.4, §11.1, §12.2); recount once Part
+> B's pacing question is settled.
 
 ### Exam Scheduling Notes
 

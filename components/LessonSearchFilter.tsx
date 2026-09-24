@@ -141,7 +141,14 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
         if (visibleModules.length === 0) return null;
 
         const unitLessonRefs = visibleModules.flatMap((u) =>
-          lessonsForModule(filteredLessons, u.id, u.category).map((l) => ({ id: l.id, maxScore: l.maxScore, scoreKind: l.scoreKind })),
+          lessonsForModule(filteredLessons, u.id, u.category).map((l) => ({
+            id: l.id,
+            title: l.title,
+            preview: l.preview,
+            assignmentCode: l.assignmentCode,
+            maxScore: l.maxScore,
+            scoreKind: l.scoreKind,
+          })),
         );
 
         return (
@@ -164,7 +171,14 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
               {visibleModules.map((u) => {
                 const unitLessons = lessonsForModule(filteredLessons, u.id, u.category);
                 const moduleLessonIds = unitLessons.map((l) => l.id);
-                const moduleLessonRefs = unitLessons.map((l) => ({ id: l.id, maxScore: l.maxScore, scoreKind: l.scoreKind }));
+                const moduleLessonRefs = unitLessons.map((l) => ({
+                  id: l.id,
+                  title: l.title,
+                  preview: l.preview,
+                  assignmentCode: l.assignmentCode,
+                  maxScore: l.maxScore,
+                  scoreKind: l.scoreKind,
+                }));
                 return (
                   <details
                     key={u.id}

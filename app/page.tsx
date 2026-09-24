@@ -58,6 +58,7 @@ function forCards(l: Lesson): Lesson {
     files: [],
     steps: [],
     requirements: [],
+    assignmentCode: l.assignmentCode,
     maxScore: maxScoreFor(l),
     scoreKind: scoreKindFor(l),
   };

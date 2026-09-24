@@ -10,6 +10,7 @@ import { publicReport, rankReports, visibleToStudent } from './functions/_shared
 // scripts/test-lesson-solution-parity.mjs can compare the real dev behaviour
 // against the Pages Function rather than a reimplementation of it.
 import { resolveLessonDir as resolveLessonDirIn, readLessonSolution } from './lib/lesson-solution-fs.mjs';
+import { DEFAULT_WEIGHTS } from './lib/grading-weights.ts';
 
 // Who the dev auth stub pretends to be. `DEV_ROLE=student npm run dev` is the
 // only way to see the student half of anything here — the real session comes
@@ -148,6 +149,13 @@ app.prepare().then(() => {
   });
   server.get('/api/my-due-dates', (_req, res) => {
     res.json({ classes: [], overrides: [], dueWaivers: [] });
+  });
+  // Real route: functions/api/my-grading-weights.ts. Needs D1 (enrollments +
+  // class_grading_weights); this server has no binding, so it answers the
+  // well-formed no-override case -- the curriculum defaults, same shape as a
+  // student with no class_grading_weights row anywhere.
+  server.get('/api/my-grading-weights', (_req, res) => {
+    res.json({ weights: DEFAULT_WEIGHTS });
   });
   // Written-answer drafts. Real route: functions/api/lesson-drafts/[lessonId].ts
   // (D1 table lesson_drafts, one row per student+lesson). Held in memory here,
