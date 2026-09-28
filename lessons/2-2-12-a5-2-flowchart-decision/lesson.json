@@ -48,7 +48,7 @@
     ],
     "aiGrader": {
       "rubricTitle": "Ticket-price flowchart: AI-graded rubric",
-      "model": "deepseek-v4-flash:0731-cloud",
+      "model": "glm-5.3:cloud",
       "contextDocs": [],
       "prompt": "Draw a flowchart for this algorithm:\n\n1. Start.\n2. Get the customer's age.\n3. If the age is under 13, the ticket costs $8. Otherwise the ticket costs $14.\n4. Print the ticket price.\n5. End.\n\nUse an oval for Start and for End, a rectangle for each task, and a diamond for the decision. Label both arrows leaving the diamond so a reader knows which answer goes which way.",
       "rubric": [

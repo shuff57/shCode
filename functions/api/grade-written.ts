@@ -80,7 +80,7 @@ interface Env {
   // Self-hosted target. Must be a hostname Cloudflare can resolve.
   OLLAMA_LOCAL_HOST?: string;
   // Model id as the LOCAL server names it. Required: a lesson's `model` is a
-  // cloud id (e.g. deepseek-v4-flash:0731-cloud) that will not exist on the
+  // cloud id (e.g. glm-5.3:cloud) that will not exist on the
   // box, so guessing one would fail at grading time instead of at
   // configuration time. No default, deliberately.
   OLLAMA_LOCAL_MODEL?: string;
@@ -117,7 +117,7 @@ interface Env {
 // and a student who could reset it by flipping the dropdown would not be capped.
 const RATE_BUCKET = 'grade-written';
 const DEFAULT_DAILY_LIMIT = 30;
-const DEFAULT_CLOUD_MODEL = 'deepseek-v4-flash:0731-cloud';
+const DEFAULT_CLOUD_MODEL = 'glm-5.3:cloud';
 
 // Chosen by measurement, not by reputation -- see the benchmark note at the top
 // of this file. The burst result is the reason: an equally accurate frontier
