@@ -236,8 +236,10 @@ Cloudflare dashboard env vars pane (plain vars):
 | `OPENROUTER_ALLOWED_OWNER_EMAILS` | var (optional) | Comma-separated class-owner allowlist. A student only sees/can select `openrouter` when their class's `owner_email` (or their own email, for a teacher previewing a lesson) is listed here — checked independently in both the GET menu and the POST handler. |
 | `ADMIN_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='admin'` |
 | `TEACHER_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='teacher'` |
-| `AI_HELP_DAILY_LIMIT` | var (optional) | Per-student per-unit daily quota for `POST /api/ai-help`; default `10`. Each unit gets its own bucket. Teachers/admins are exempt. |
+| `AI_HELP_DAILY_LIMIT` | var (optional) | Per-student per-unit daily quota for `POST /api/ai-help`; default `10`. The unit in the key is resolved server-side from the build-time catalog — a request-supplied unit string never shapes a bucket (LEF-17). Teachers/admins are exempt. |
+| `AI_HELP_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/ai-help` across all students; default `5000`. The backstop that keeps one compromised account (or a signup burst — registration has no email verification yet) from exhausting the Ollama account's weekly allowance. |
 | `GRADE_WRITTEN_DAILY_LIMIT` | var (optional) | Per-student daily submission cap for `POST /api/grade-written`; default `30`. Teachers/admins are exempt. A runaway-cost stop, not a pedagogical one — the course allows unlimited retries, so raise it rather than let a student hit it. |
+| `GRADE_WRITTEN_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/grade-written`; default `10000`. Same backstop as `AI_HELP_GLOBAL_DAILY_LIMIT`, for the grader. |
 
 ## D1 schema
 
@@ -297,7 +299,15 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
 - `POST /api/ai-help` streams `text/plain`, trims code blocks to <=3 lines, and
-  is quota'd per student **per unit** per UTC day (`AI_HELP_DAILY_LIMIT`).
+  is quota'd per student **per unit** per UTC day (`AI_HELP_DAILY_LIMIT`). The
+  unit in the bucket key is resolved SERVER-SIDE from
+  `public/lessons-manifest.json` (`functions/_shared/lessonUnit.ts`); the
+  request contributes only a `lessonId` lookup hint, and a value the catalog
+  doesn't recognise buckets under the shared '' key. A body-supplied unit
+  string used to BE the key — a fresh random value per request reset the
+  allowance, so the quota bounded nothing (LEF-17). A global per-deploy daily
+  ceiling (`AI_HELP_GLOBAL_DAILY_LIMIT`) also counts every accepted request
+  under a reserved identity no session email can collide with.
 - `POST /api/grade-written?stream=1` answers **NDJSON**: zero or more `{stage}`
   lines while work happens, then exactly one terminal `{result}` or `{error}`
   line. Without the query param the response is one plain JSON object, byte for
@@ -354,7 +364,9 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   as trusted teacher context — a client-supplied rubric took an off-topic answer
   to full marks. The lookup **fails closed**. Adding a field here that the model
   is told to trust reopens that hole. Also quota'd per student per UTC day, in
-  the shared `ai_help_usage` table under the `grade-written` bucket.
+  the shared `ai_help_usage` table under the `grade-written` bucket, plus a
+  deploy-wide daily ceiling (`GRADE_WRITTEN_GLOBAL_DAILY_LIMIT`) so a stream of
+  fresh accounts cannot exhaust the model keys.
 - Owner-only class routes: `archive`, `regenerate-code`, `delete` (cascades to
   progress data for students enrolled nowhere else), and co-teacher management.
 
