@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
 import { isPassingGrade } from '../lib/grade-pass';
-import { navigateToNextLesson } from '../lib/lesson-neighbors';
+import { navigateToNextLesson, getHrefsByLessonNumber } from '../lib/lesson-neighbors';
+import { sourceHintNumbers, sourceHintParts } from '../lib/source-hint';
 import {
   fetchDraft,
   saveDraft,
@@ -118,6 +119,23 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   const [offline, setOffline] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  // The questions name the lessons to reread ("1.1.17"); the lesson index is
+  // what turns those numbers into hrefs. Same lookup the quiz's reread hints
+  // use, and for the same reason: a student mid-answer must be able to check
+  // the material without losing the draft they have typed.
+  const [sourceHrefs, setSourceHrefs] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    const numbers = sourceHintNumbers(prompt);
+    if (numbers.length === 0) return;
+    getHrefsByLessonNumber(numbers).then((hrefs) => {
+      if (!cancelled) setSourceHrefs(hrefs);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [prompt]);
 
   const progress = useLessonState();
   // Which grader marks this. Remembered per browser; see useGraderChoice.
@@ -334,7 +352,27 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
               whiteSpace: 'pre-wrap',
             }}
           >
-            {prompt.trim()}
+            {/* Lesson numbers in the questions link to the lesson that teaches
+                them, so a student can check the material mid-answer. The linkified
+                text is rendered here and never sent anywhere: the grader reads the
+                prompt from public/ai-graders.json, not from the browser. */}
+            {sourceHintParts(prompt.trim()).map((part, pi) => {
+              const href = part.isNumber ? sourceHrefs[part.text] : undefined;
+              return href ? (
+                <a
+                  key={pi}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Open this lesson in a new tab"
+                  style={{ color: '#8be9fd', textDecoration: 'underline' }}
+                >
+                  {part.text}
+                </a>
+              ) : (
+                <span key={pi}>{part.text}</span>
+              );
+            })}
           </div>
         </div>
       ) : null}
