@@ -260,3 +260,12 @@
 {"ts":"2026-09-16T15:30:55.882Z","kind":"release","from":"opencode","paths":["components/LessonProgressFooter.tsx"]}
 {"ts":"2026-09-16T16:07:45.402Z","kind":"claim","from":"opencode","paths":["components/LessonProgressFooter.tsx"]}
 {"ts":"2026-09-16T16:46:10.813Z","kind":"release","from":"opencode","all":true}
+{"ts":"2026-09-28T20:01:40.278Z","kind":"claim","from":"opencode","paths":["lib/js-runner-source.ts","components/SandboxWorkspace.tsx","components/LiveCodeBlock.tsx","components/DocLiveSnippet.tsx","components/LessonWorkspace.tsx","scripts/test-runner-error-line.mjs"]}
+{"ts":"2026-09-28T20:01:59.397Z","kind":"release","from":"opencode","paths":["lib/js-runner-source.ts","components/SandboxWorkspace.tsx","components/LiveCodeBlock.tsx","components/DocLiveSnippet.tsx","components/LessonWorkspace.tsx","scripts/test-runner-error-line.mjs"]}
+{"ts":"2026-09-28T20:01:59.415Z","kind":"claim","from":"claude","paths":["lib/js-runner-source.ts","components/SandboxWorkspace.tsx","components/LiveCodeBlock.tsx","components/DocLiveSnippet.tsx","components/LessonWorkspace.tsx","scripts/test-runner-error-line.mjs"]}
+{"ts":"2026-09-28T20:02:27.988Z","kind":"release","from":"claude","paths":["lib/js-runner-source.ts","components/SandboxWorkspace.tsx","components/LiveCodeBlock.tsx","components/DocLiveSnippet.tsx","components/LessonWorkspace.tsx","scripts/test-runner-error-line.mjs"]}
+{"ts":"2026-09-28T20:02:28.011Z","kind":"claim","from":"opencode","paths":["lib/js-runner-source.ts","components/SandboxWorkspace.tsx","components/LiveCodeBlock.tsx","components/DocLiveSnippet.tsx","components/LessonWorkspace.tsx","scripts/test-runner-error-line.mjs"]}
+{"ts":"2026-09-28T20:03:10.256Z","kind":"release","from":"opencode","paths":["lib/js-runner-source.ts","components/SandboxWorkspace.tsx","components/LiveCodeBlock.tsx","components/DocLiveSnippet.tsx","components/LessonWorkspace.tsx","scripts/test-runner-error-line.mjs"]}
+{"ts":"2026-09-28T20:03:10.270Z","kind":"claim","from":"claude","paths":["lib/js-runner-source.ts","components/SandboxWorkspace.tsx","components/LiveCodeBlock.tsx","components/DocLiveSnippet.tsx","components/LessonWorkspace.tsx","scripts/test-runner-error-line.mjs"]}
+{"ts":"2026-09-28T20:03:41.912Z","kind":"release","from":"claude","paths":["lib/js-runner-source.ts","components/SandboxWorkspace.tsx","components/LiveCodeBlock.tsx","components/DocLiveSnippet.tsx","components/LessonWorkspace.tsx","scripts/test-runner-error-line.mjs"]}
+{"ts":"2026-09-28T20:03:41.921Z","kind":"release","from":"opencode","all":true}
