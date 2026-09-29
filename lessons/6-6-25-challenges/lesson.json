@@ -42,7 +42,7 @@
     {
       "id": "r1",
       "title": "switch statement used",
-      "description": "A switch statement controls state routing.",
+      "description": "A switch statement controls state routing. Help: 2.3.3 (switch Statements)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -53,7 +53,7 @@
     {
       "id": "r2",
       "title": "Canvas created",
-      "description": "new Canvas() is called in setup().",
+      "description": "new Canvas() is called in setup(). Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new Canvas\\s*\\(",
@@ -63,7 +63,7 @@
     {
       "id": "r3",
       "title": "Multiple cases used",
-      "description": "The switch has at least two case blocks.",
+      "description": "The switch has at least two case blocks. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s+[^:]+:",

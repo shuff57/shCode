@@ -65,7 +65,7 @@
     {
       "id": "r1",
       "title": "switch statement used",
-      "description": "Inside draw(), a switch statement controls which screen renders.",
+      "description": "Inside draw(), a switch statement controls which screen renders. Help: 2.3.3 (switch Statements)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -76,7 +76,7 @@
     {
       "id": "r2",
       "title": "At least 3 case labels",
-      "description": "Inside draw(), the switch has at least three case labels for different states.",
+      "description": "Inside draw(), the switch has at least three case labels for different states. Help: 2.3.3 (switch Statements)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -87,7 +87,7 @@
     {
       "id": "r2b",
       "title": "Each case ends with break",
-      "description": "The switch uses break to exit each case (otherwise the cases fall through).",
+      "description": "The switch uses break to exit each case (otherwise the cases fall through). Help: 2.3.9 (break and Fall-Through)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -98,7 +98,7 @@
     {
       "id": "r3",
       "title": "storeItem used",
-      "description": "storeItem is called to persist save data.",
+      "description": "storeItem is called to persist save data. Help: 6.5.3 (storeItem: Save Game Data)",
       "type": "regex",
       "file": "script.js",
       "pattern": "storeItem\\s*\\(",
@@ -108,7 +108,7 @@
     {
       "id": "r4",
       "title": "JSON.stringify used",
-      "description": "Save data is serialized with JSON.stringify before storing.",
+      "description": "Save data is serialized with JSON.stringify before storing. Help: 3.8.4 (JSON.stringify)",
       "type": "regex",
       "file": "script.js",
       "pattern": "JSON\\.stringify\\s*\\(",
@@ -118,7 +118,7 @@
     {
       "id": "r5",
       "title": "JSON.parse used",
-      "description": "Save data is deserialized with JSON.parse when loading.",
+      "description": "Save data is deserialized with JSON.parse when loading. Help: 3.8.8 (JSON.parse)",
       "type": "regex",
       "file": "script.js",
       "pattern": "JSON\\.parse\\s*\\(",

@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "|| combines two real variables",
-      "description": "if statement condition uses || between two named variables, not hardcoded true/false literals",
+      "description": "if statement condition uses || between two named variables, not hardcoded true/false literals. Help: 2.1.29 (Logical Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\((?=[^{]*\\|\\|)(?:[^{]*\\b(?!true\\b|false\\b)[A-Za-z_$][A-Za-z0-9_$]*\\b){2,}[^{]*\\)",

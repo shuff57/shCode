@@ -42,7 +42,7 @@
     {
       "id": "r1",
       "title": "Bug 1 — the program does not run at all",
-      "description": "The file is valid JavaScript and reaches the end.",
+      "description": "The file is valid JavaScript and reaches the end. Help: 1.5.38 (Reading an Error Message)",
       "type": "regex",
       "file": "script.js",
       "pattern": "let\\s+itemName\\s*=\\s*(?:\"[^\"\\n]*\"|'[^'\\n]*'|`[^`\\n]*`)\\s*;",
@@ -54,7 +54,7 @@
     {
       "id": "r2",
       "title": "Bug 2 — the program stops part way through",
-      "description": "Nothing in the file uses a name that was never declared.",
+      "description": "Nothing in the file uses a name that was never declared. Help: 1.5.39 (Cause a ReferenceError on Purpose)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*\\bbeforTax\\b)(?=[\\s\\S]*\\btotal\\s*=\\s*(?:beforeTax\\s*\\+\\s*tax|tax\\s*\\+\\s*beforeTax))[\\s\\S]*$",
@@ -65,7 +65,7 @@
     {
       "id": "r3",
       "title": "Bug 3 — the Before tax line prints the wrong thing",
-      "description": "The total before tax is the sum of the values that make it up.",
+      "description": "The total before tax is the sum of the values that make it up. Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let\\s+shipping\\s*=\\s*5\\s*;|beforeTax\\s*=\\s*[^;\\n]*Number\\s*\\(\\s*shipping\\s*\\))",
@@ -76,7 +76,7 @@
     {
       "id": "r4",
       "title": "Bug 4 — the Ordered line prints the wrong thing",
-      "description": "The receipt reports the number of notebooks that were actually ordered.",
+      "description": "The receipt reports the number of notebooks that were actually ordered. Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*\\bcount\\s*=\\s*2\\b)(?=[\\s\\S]*\\b(?:let|const)\\s+([A-Za-z_$][A-Za-z0-9_$]*)\\s*=\\s*2\\s*;[\\s\\S]*\\bwrapFee\\s*=[^;\\n]*(?<![A-Za-z0-9_$])\\1(?![A-Za-z0-9_$]))[\\s\\S]*$",
@@ -87,7 +87,7 @@
     {
       "id": "r5",
       "title": "All four bugs are named",
-      "description": "A comment beside each fix names its kind: syntax, runtime or logic.",
+      "description": "A comment beside each fix names its kind: syntax, runtime or logic. Help: 1.5.38 (Reading an Error Message)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*syntax)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*runtime)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*logic[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*logic)[\\s\\S]*$",

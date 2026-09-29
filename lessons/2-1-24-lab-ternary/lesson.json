@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "ternary on isMember yields 20 : 0",
-      "description": "A ternary references isMember and chooses between 20 and 0, in that order",
+      "description": "A ternary references isMember and chooses between 20 and 0, in that order. Help: 2.1.20 (The Conditional Operator ?)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?<![\"'`])isMember[^;]*\\?[^;]*20[^;]*:[^;]*0",
@@ -37,7 +37,7 @@
     {
       "id": "r2",
       "title": "discount assigned from the isMember ternary",
-      "description": "discount is assigned using a ternary on isMember",
+      "description": "discount is assigned using a ternary on isMember. Help: 2.1.20 (The Conditional Operator ?)",
       "type": "regex",
       "file": "script.js",
       "pattern": "discount\\s*=(?!\\s*[\"'`])[^;]*isMember[^;]*\\?",

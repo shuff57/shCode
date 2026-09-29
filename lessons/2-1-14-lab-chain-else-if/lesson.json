@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "below 20 logs Low battery",
-      "description": "if condition checks batteryPercent < 20 and logs a message containing 'Low battery'",
+      "description": "if condition checks batteryPercent < 20 and logs a message containing 'Low battery'. Help: 2.1.3 (If / Else if / Else)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\(\\s*\\(?\\s*batteryPercent\\s*<\\s*20\\s*\\)?\\s*\\)\\s*(?:\\{[^}]*)?console\\.log\\s*\\([^)]*Low battery",
@@ -37,7 +37,7 @@
     {
       "id": "r2",
       "title": "below 50 logs Battery ok",
-      "description": "else if condition checks batteryPercent < 50 and logs a message containing 'Battery ok'",
+      "description": "else if condition checks batteryPercent < 50 and logs a message containing 'Battery ok'. Help: 2.1.3 (If / Else if / Else)",
       "type": "regex",
       "file": "script.js",
       "pattern": "else\\s+if\\s*\\(\\s*\\(?\\s*batteryPercent\\s*<\\s*50\\s*\\)?\\s*\\)\\s*(?:\\{[^}]*)?console\\.log\\s*\\([^)]*Battery ok",
@@ -46,7 +46,7 @@
     {
       "id": "r3",
       "title": "below 90 logs Battery good",
-      "description": "else if condition checks batteryPercent < 90 and logs a message containing 'Battery good'",
+      "description": "else if condition checks batteryPercent < 90 and logs a message containing 'Battery good'. Help: 2.1.3 (If / Else if / Else)",
       "type": "regex",
       "file": "script.js",
       "pattern": "else\\s+if\\s*\\(\\s*\\(?\\s*batteryPercent\\s*<\\s*90\\s*\\)?\\s*\\)\\s*(?:\\{[^}]*)?console\\.log\\s*\\([^)]*Battery good",
@@ -55,7 +55,7 @@
     {
       "id": "r4",
       "title": "final else logs Battery full",
-      "description": "the closing else branch logs a message containing 'Battery full'",
+      "description": "the closing else branch logs a message containing 'Battery full'. Help: 2.1.3 (If / Else if / Else)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:\\}|;)\\s*else\\s*(?:\\{[^}]*)?console\\.log\\s*\\([^)]*Battery full",

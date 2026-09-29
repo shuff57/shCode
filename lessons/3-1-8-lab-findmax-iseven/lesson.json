@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "findMax defined",
-      "description": "Code defines a function named findMax",
+      "description": "Code defines a function named findMax. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+findMax\\s*\\(",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "isEven defined",
-      "description": "Code defines a function named isEven",
+      "description": "Code defines a function named isEven. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+isEven\\s*\\(",

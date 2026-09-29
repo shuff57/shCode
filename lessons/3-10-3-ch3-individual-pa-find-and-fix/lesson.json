@@ -38,7 +38,7 @@
     {
       "id": "r1",
       "title": "Bug 1 — the program does not run at all",
-      "description": "The file is valid JavaScript and reaches the end.",
+      "description": "The file is valid JavaScript and reaches the end. Help: 1.5.38 (Reading an Error Message)",
       "type": "regex",
       "file": "script.js",
       "pattern": "[A-Za-z_$][\\w$]*\\s*:\\s*[0-9]",
@@ -50,7 +50,7 @@
     {
       "id": "r2",
       "title": "Bug 2 — the program stops part way through",
-      "description": "Nothing in the file indexes an array with its own length.",
+      "description": "Nothing in the file indexes an array with its own length. Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*\\.length\\s*\\])(?=[\\s\\S]*lastItem)",
@@ -62,7 +62,7 @@
     {
       "id": "r3",
       "title": "Bug 3 — the price list is wrong",
-      "description": "The arrow's block body returns the built string.",
+      "description": "The arrow's block body returns the built string. Help: 3.4.6 (Arrow Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "return\\s+(?:[A-Za-z_$][\\w$]*\\s*\\+|[A-Za-z_$][\\w$]*\\s*===|item\\.)",
@@ -74,7 +74,7 @@
     {
       "id": "r4",
       "title": "Bug 4 — the backup changes the original",
-      "description": "The copy is made before the change, and the original keeps its own values.",
+      "description": "The copy is made before the change, and the original keeps its own values. Help: 3.7.14 (Spreading into a New Array or Object)",
       "type": "regex",
       "file": "script.js",
       "pattern": "return\\s*\\{\\s*\\.\\.\\.[A-Za-z_$][\\w$]*",
@@ -86,7 +86,7 @@
     {
       "id": "r5",
       "title": "All four bugs are named",
-      "description": "A comment beside each fix names its kind: syntax, runtime or logic.",
+      "description": "A comment beside each fix names its kind: syntax, runtime or logic. Help: 1.5.38 (Reading an Error Message)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\bsyntax\\b)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\bruntime\\b)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\blogic\\b)",

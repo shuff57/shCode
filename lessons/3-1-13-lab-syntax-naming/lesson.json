@@ -32,7 +32,7 @@
     {
       "id": "r1",
       "title": "showTotal defined, camelCase, with parentheses",
-      "description": "Code defines a function named showTotal (not ShowTotal) with an empty parameter list",
+      "description": "Code defines a function named showTotal (not ShowTotal) with an empty parameter list. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+showTotal\\s*\\(\\s*\\)\\s*\\{",
@@ -52,7 +52,7 @@
     {
       "id": "r3",
       "title": "showTotal is called",
-      "description": "Code calls showTotal() as a statement",
+      "description": "Code calls showTotal() as a statement. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bshowTotal\\s*\\(\\s*\\)\\s*;",

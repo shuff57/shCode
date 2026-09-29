@@ -39,7 +39,7 @@
     {
       "id": "req1",
       "title": "greet function",
-      "description": "Declare a function called greet",
+      "description": "Declare a function called greet. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+greet\\s*\\(",
@@ -69,7 +69,7 @@
     {
       "id": "req4",
       "title": "Call greet",
-      "description": "Call the greet function",
+      "description": "Call the greet function. Help: 3.1.11 (The Function-Call Shape)",
       "type": "regex",
       "file": "script.js",
       "pattern": "greet\\s*\\(",
@@ -79,7 +79,7 @@
     {
       "id": "req5",
       "title": "Multiple functions",
-      "description": "Define at least 2 functions",
+      "description": "Define at least 2 functions. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(function\\s+\\w+\\s*\\(.*?\\)\\s*\\{.*?){2,}",

@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "&& combines with a real variable",
-      "description": "if condition uses && together with a named variable, not a hardcoded true/false",
+      "description": "if condition uses && together with a named variable, not a hardcoded true/false. Help: 2.1.30 (Combining conditions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\((?=[^{]*&&)(?=[^{]*\\b(?!true\\b|false\\b)[A-Za-z_$][A-Za-z0-9_$]*\\b)[^{]*\\)",
@@ -37,7 +37,7 @@
     {
       "id": "r2",
       "title": "|| compares the same variable on both sides",
-      "description": "if condition uses || between two comparisons on the same variable (a range check, e.g. age < 5 || age >= 65)",
+      "description": "if condition uses || between two comparisons on the same variable (a range check, e.g. age < 5 || age >= 65). Help: 2.1.30 (Combining conditions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\((?=[^{]*\\|\\|)(?:[^{]*\\b([A-Za-z_$][A-Za-z0-9_$]*)\\b\\s*(?:===|!==|==|!=|<=|>=|<|>)[^{]*\\|\\|[^{]*\\b\\1\\b\\s*(?:===|!==|==|!=|<=|>=|<|>))[^{]*\\)",
@@ -46,7 +46,7 @@
     {
       "id": "r3",
       "title": "! flips a real variable",
-      "description": "if condition uses ! directly on a named variable, not a hardcoded literal",
+      "description": "if condition uses ! directly on a named variable, not a hardcoded literal. Help: 2.1.30 (Combining conditions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\([^{]*!\\s*\\(?\\s*\\b(?!true\\b|false\\b)[A-Za-z_$][A-Za-z0-9_$]*\\b[^{]*\\)",
@@ -55,7 +55,7 @@
     {
       "id": "r4",
       "title": "all three combined in one condition",
-      "description": "A single if condition uses &&, a same-variable range check with ||, and ! together, not three separate ifs",
+      "description": "A single if condition uses &&, a same-variable range check with ||, and ! together, not three separate ifs. Help: 2.1.30 (Combining conditions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\((?=[^{]*&&)(?=[^{]*!\\s*\\(?\\s*\\b(?!true\\b|false\\b)[A-Za-z_$][A-Za-z0-9_$]*\\b)(?=[^{]*\\b([A-Za-z_$][A-Za-z0-9_$]*)\\b\\s*(?:===|!==|==|!=|<=|>=|<|>)[^{]*\\|\\|[^{]*\\b\\1\\b\\s*(?:===|!==|==|!=|<=|>=|<|>))[^{]*\\{",

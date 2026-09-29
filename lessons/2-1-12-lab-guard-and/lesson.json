@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "&& combines two real comparisons",
-      "description": "if statement condition uses && to combine two identifier-based comparisons, not just any two values",
+      "description": "if statement condition uses && to combine two identifier-based comparisons, not just any two values. Help: 2.1.29 (Logical Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\((?=[^{]*&&)(?:[^{]*\\b[A-Za-z_$][A-Za-z0-9_$]*\\b\\s*(?:===|!==|==|!=|<=|>=|<|>)){2,}[^{]*\\)",

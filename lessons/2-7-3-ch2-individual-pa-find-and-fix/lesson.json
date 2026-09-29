@@ -38,7 +38,7 @@
     {
       "id": "r1",
       "title": "Bug 1 — the program does not run at all",
-      "description": "The file is valid JavaScript and reaches the end.",
+      "description": "The file is valid JavaScript and reaches the end. Help: 1.5.38 (Reading an Error Message)",
       "type": "regex",
       "file": "script.js",
       "pattern": "let\\s+itemName\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`]*`)\\s*;",
@@ -50,7 +50,7 @@
     {
       "id": "r2",
       "title": "Bug 2 — the program stops part way through",
-      "description": "Nothing in the file uses a name that was never declared.",
+      "description": "Nothing in the file uses a name that was never declared. Help: 1.5.39 (Cause a ReferenceError on Purpose)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*\\bbeforTax\\b)(?=[\\s\\S]*\\btotal\\s*=\\s*(?:beforeTax\\s*\\+\\s*tax|tax\\s*\\+\\s*beforeTax))",
@@ -62,7 +62,7 @@
     {
       "id": "r3",
       "title": "Bug 3 — the savings total is wrong",
-      "description": "The deposit line sits above the skip inside the loop, so only the holiday week is skipped.",
+      "description": "The deposit line sits above the skip inside the loop, so only the holiday week is skipped. Help: 2.4.13 (Skipping a Round with continue)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+savings\\s*=\\s*0\\s*;[\\s\\S]*?for\\s*\\([^)]*\\)\\s*\\{(?![\\s\\S]*?continue[\\s\\S]*?savings\\s*=\\s*savings)[\\s\\S]*?savings\\s*=\\s*savings\\s*\\+\\s*[A-Za-z_$][A-Za-z0-9_$]*[\\s\\S]*?continue\\s*;",
@@ -74,7 +74,7 @@
     {
       "id": "r4",
       "title": "Bug 4 — the loop counter never advances",
-      "description": "The counter increments on every round, including the rounds that continue.",
+      "description": "The counter increments on every round, including the rounds that continue. Help: 2.4.16 (The continue Trap in a while Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "while\\s*\\([\\s\\S]*?\\)\\s*\\{[\\s\\S]*?\\bi\\s*(?:\\+\\+|\\+=\\s*1|=\\s*i\\s*\\+\\s*1)\\s*;[\\s\\S]*?continue\\s*;",
@@ -86,7 +86,7 @@
     {
       "id": "r5",
       "title": "All four bugs are named",
-      "description": "A comment beside each fix names its kind: syntax, runtime or logic.",
+      "description": "A comment beside each fix names its kind: syntax, runtime or logic. Help: 1.5.38 (Reading an Error Message)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\bsyntax\\b)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\bruntime\\b)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\blogic\\b)",

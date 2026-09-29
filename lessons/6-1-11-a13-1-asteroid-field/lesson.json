@@ -58,7 +58,7 @@
     {
       "id": "r1",
       "title": "Asteroid Group exists",
-      "description": "Create at least one Group with new Group()",
+      "description": "Create at least one Group with new Group(). Help: 6.1.3 (moSHion docs: Groups)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Group\\s*\\(",
@@ -68,7 +68,7 @@
     {
       "id": "r2",
       "title": "Asteroids have velocity",
-      "description": "Assign to .vel.x or .vel.y on a sprite",
+      "description": "Assign to .vel.x or .vel.y on a sprite. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.vel\\.(x|y)\\s*=",
@@ -78,7 +78,7 @@
     {
       "id": "r3",
       "title": "WASD ship input",
-      "description": "Use kb.pressing with one of 'a', 'd', 'w', 's' inside draw()",
+      "description": "Use kb.pressing with one of 'a', 'd', 'w', 's' inside draw(). Help: 5.1.14 (Keyboard Movement)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -89,7 +89,7 @@
     {
       "id": "r4",
       "title": "Overlap detection",
-      "description": "Use .overlaps() to detect a hit",
+      "description": "Use .overlaps() to detect a hit. Help: 6.2.1 (overlaps() boolean vs callback)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.overlaps\\s*\\(",
@@ -99,7 +99,7 @@
     {
       "id": "r5",
       "title": "Safe despawn loop",
-      "description": "Iterate backwards (i = length - 1) OR iterate a copy ([...group] via for…of, .forEach, .map, etc.)",
+      "description": "Iterate backwards (i = length - 1) OR iterate a copy ([...group] via for…of, .forEach, .map, etc.). Help: 6.1.4 (Iterating a Group)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:for\\s*\\(\\s*let\\s+\\w+\\s*=[^;]*\\.length\\s*-\\s*1)|(?:for\\s*\\(\\s*(?:(?:let|const|var)\\s+)?\\w+\\s+of\\s+\\[\\.\\.\\.\\w+\\])|(?:\\[\\.\\.\\.\\w+\\]\\.(forEach|map|some|filter))",

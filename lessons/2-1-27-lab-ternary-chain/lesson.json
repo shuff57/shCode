@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "90-or-above cutoff yields Excellent",
-      "description": "score >= 90 ? ... chooses Excellent",
+      "description": "score >= 90 ? ... chooses Excellent. Help: 2.1.23 (Chaining Multiple ? Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\(?\\s*score\\s*>=\\s*90\\s*\\)?\\s*\\?[^;]*Excellent",
@@ -37,7 +37,7 @@
     {
       "id": "r2",
       "title": "70-or-above cutoff yields Good, else Needs work",
-      "description": "score >= 70 ? chooses Good, otherwise Needs work",
+      "description": "score >= 70 ? chooses Good, otherwise Needs work. Help: 2.1.23 (Chaining Multiple ? Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\(?\\s*score\\s*>=\\s*70\\s*\\)?\\s*\\?[^;]*Good[^;]*:[^;]*Needs work",
@@ -46,7 +46,7 @@
     {
       "id": "r3",
       "title": "rating assigned by checking 90 before 70",
-      "description": "rating is assigned from a chain that checks the 90 cutoff before the 70 cutoff",
+      "description": "rating is assigned from a chain that checks the 90 cutoff before the 70 cutoff. Help: 2.1.23 (Chaining Multiple ? Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "rating\\s*=(?!\\s*[\"'`])[^;]*\\(?\\s*score\\s*>=\\s*90\\s*\\)?[^;]*\\?[^;]*\\(?\\s*score\\s*>=\\s*70\\s*\\)?",
