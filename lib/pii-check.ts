@@ -5,8 +5,9 @@
 // no upside here. Hard block, no override/review path -- regex-only has a low
 // enough false-positive rate that one isn't needed.
 //
-// ponytail: regex-only, no NER -- catches SSN/email/phone/CC/address-with-number.
-//           False positives on names/free text are out of scope by design.
+// ponytail: regex-only, no NER -- catches SSN/email/phone/CC/bank-account/
+//           address-with-number. False positives on names/free text are
+//           out of scope by design.
 //
 // OPEN FOLLOW-UP (not yet decided): a Luhn checksum on the credit-card pattern
 // would cut false positives on arbitrary 13-16 digit runs (unseparated phone
@@ -26,6 +27,15 @@ const PII_PATTERNS: PiiPattern[] = [
   {
     label: 'address',
     re: /\b\d{1,5}\s+\w+(\s\w+){0,3}\s+(street|st|avenue|ave|road|rd|drive|dr|lane|ln|blvd|court|ct)\b/i,
+  },
+  {
+    // A bare digit run has no shape of its own (unlike SSN/phone/CC), so this
+    // is context-triggered: the account/routing keyword plus a nearby 6-17
+    // digit run, mirroring the address pattern's number+keyword shape. A
+    // student's own bare numbers (quiz scores, IDs) never pass this without
+    // the keyword right next to them.
+    label: 'bank account number',
+    re: /\b(?:bank\s+account|checking\s+account|savings\s+account|routing\s+number|account\s+number)\b[^\d]{0,15}\d{6,17}\b/i,
   },
 ];
 
