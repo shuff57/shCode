@@ -469,7 +469,7 @@ body to the bottom of the canvas and the chart appeared to run upward.
 
 The essay grader at `POST /api/grade-written` calls `https://ollama.com/api/chat`
 with `Authorization: Bearer $OLLAMA_API_KEY`. Model comes from the lesson's
-`aiGrader.model` field (e.g. `deepseek-v4-flash:0731-cloud`). The key lives server-side
+`aiGrader.model` field (e.g. `glm-5.3:cloud`). The key lives server-side
 only — never exposed to the client.
 
 ## Reference solutions
