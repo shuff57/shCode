@@ -12,6 +12,44 @@ export const RUN_TIMEOUT_MS = 3000;
 // is the exact failure the Worker exists to prevent.
 export const RUN_MAX_LOGS = 1000;
 
+// The Function constructor's preamble is exactly two lines (see the parse in
+// RUNNER_SOURCE), so a V8 stack line is the student's line + 2.
+const FUNCTION_PREAMBLE_LINES = 2;
+
+// Every console surface renders an error the same way: name, message, then
+// where it happened. This is that one formatter, so a line number cannot be
+// quietly dropped by a caller that stringifies the payload on its own.
+export function errorWithLocation(
+  name?: string,
+  message?: string,
+  line?: number | null,
+  col?: number | null,
+): string {
+  const where = line ? ` (line ${line}${col ? `, col ${col}` : ''})` : '';
+  return `${name || 'Error'}: ${message || ''}${where}`;
+}
+
+// The no-Worker fallback (very old browsers) runs `new Function` on the main
+// thread, where there is no runner to do the parsing, so it parses here.
+//
+// The innermost frame is where the throw happened, and its spelling varies by
+// engine: `<anonymous>:3:18` in a browser Worker, `at blob:...:3:18`, or
+// `at anonymous (file:///x:3:18)` under node. Matching one exact format meant
+// a line number that silently never appeared in the browser, so this takes the
+// trailing line:col of the first frame that has one.
+//
+// Best-effort: a stack with no locatable frame gets no line rather than a
+// wrong one.
+export function lineColOf(err: unknown): { line: number | null; col: number | null } {
+  const stack = (err instanceof Error && err.stack) || '';
+  // slice(1) drops the "TypeError: message" line, which can itself hold colons.
+  const frame = String(stack).split('\n').slice(1).find((l) => /:\d+:\d+/.test(l));
+  const m = frame && frame.match(/:(\d+):(\d+)\)?\s*$/);
+  if (!m) return { line: null, col: null };
+  const line = parseInt(m[1], 10) - FUNCTION_PREAMBLE_LINES;
+  return line >= 1 ? { line, col: parseInt(m[2], 10) } : { line: null, col: null };
+}
+
 export const RUNNER_SOURCE = `
 const MAX = ${RUN_MAX_LOGS};
 let sent = 0;
@@ -55,16 +93,21 @@ self.onmessage = (e) => {
   } catch (err) {
     // The Function constructor wraps student code in a synthesized
     // "function anonymous(\\n) {\\n" preamble -- exactly two lines -- before
-    // the body starts, so a V8 stack frame's <anonymous>:LINE:COL maps back
-    // to the student's own source at LINE - 2 (issue #25). Best-effort:
-    // an engine whose stack doesn't match this shape just gets no line/col
-    // rather than a wrong one.
+    // the body starts, so a V8 stack frame's line maps back to the student's
+    // own source at LINE - 2 (issue #25).
+    //
+    // The innermost frame is where the throw happened. Its spelling varies by
+    // engine -- <anonymous>:3:18 in a browser Worker, at blob:...:3:18, at
+    // anonymous (file:///x:3:18) elsewhere -- so take the trailing line:col of
+    // the first frame that has one rather than matching one exact format, which
+    // is what kept a browser's line number from ever appearing.
     let line = null;
     let col = null;
     const stack = (err && err.stack) || '';
-    const m = stack.match(/<anonymous>:(\\d+):(\\d+)/);
+    const frame = String(stack).split('\\n').slice(1).find((l) => /:\\d+:\\d+/.test(l));
+    const m = frame && frame.match(/:(\\d+):(\\d+)\\)?\\s*$/);
     if (m) {
-      const rawLine = parseInt(m[1], 10) - 2;
+      const rawLine = parseInt(m[1], 10) - ${FUNCTION_PREAMBLE_LINES};
       if (rawLine >= 1) { line = rawLine; col = parseInt(m[2], 10); }
     }
     self.postMessage({

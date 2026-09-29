@@ -6,7 +6,7 @@ import { Play, RotateCcw } from 'lucide-react';
 import MoshionPreview from './MoshionPreview';
 import LiveConsole from './LiveConsole';
 import CodeMirrorPane from './CodeMirrorPane';
-import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
+import { RUNNER_SOURCE, RUN_TIMEOUT_MS, errorWithLocation, lineColOf } from '../lib/js-runner-source';
 
 interface Props {
   code: string;
@@ -72,7 +72,8 @@ function runPlainCode(code: string, done: (logs: PlainLogEntry[]) => void): () =
     } catch (e: unknown) {
       const name = e instanceof Error ? e.name : 'Error';
       const msg = e instanceof Error ? e.message : String(e);
-      push('error', `${name}: ${msg}`);
+      const { line, col } = lineColOf(e);
+      push('error', errorWithLocation(name, msg, line, col));
     }
     console.log = orig.log;
     console.warn = orig.warn;
@@ -107,13 +108,13 @@ function runPlainCode(code: string, done: (logs: PlainLogEntry[]) => void): () =
   }, RUN_TIMEOUT_MS);
 
   worker.onmessage = (e: MessageEvent) => {
-    const d = e.data as { kind: string; type?: PlainLogEntry['type']; message?: string; name?: string };
+    const d = e.data as { kind: string; type?: PlainLogEntry['type']; message?: string; name?: string; line?: number | null; col?: number | null };
     if (d.kind === 'log') {
       push(d.type || 'log', d.message || '');
       return;
     }
     if (d.kind === 'error') {
-      push('error', `${d.name || 'Error'}: ${d.message || ''}`);
+      push('error', errorWithLocation(d.name, d.message, d.line, d.col));
     }
     finish();
   };

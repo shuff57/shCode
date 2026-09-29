@@ -15,7 +15,7 @@ import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader
 import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-mode';
 import type { ModelDoc } from '../lib/model-types';
 
-import { RUNNER_SOURCE, RUN_MAX_LOGS, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
+import { RUNNER_SOURCE, RUN_MAX_LOGS, RUN_TIMEOUT_MS, errorWithLocation, lineColOf } from '../lib/js-runner-source';
 import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
@@ -373,6 +373,10 @@ export default function LessonWorkspace({
       } catch (e: unknown) {
         const name = e instanceof Error ? e.name : 'Error';
         const msg = e instanceof Error ? e.message : String(e);
+        const { line, col } = lineColOf(e);
+        const text = errorWithLocation(name, msg, line, col);
+        logs.push({ type: 'error', message: text, timestamp: time() });
+        setRuntimeError(text);
         logs.push({ type: 'error', message: msg, timestamp: time() });
         setRuntimeError(`${name}: ${msg}`);
       }
@@ -427,7 +431,13 @@ export default function LessonWorkspace({
         const where = d.line ? ` (line ${d.line}${d.col ? `, col ${d.col}` : ''})` : '';
         const msg = `${d.message || ''}${where}`;
         logs.push({ type: 'error', message: msg, timestamp: time() });
-        setRuntimeError(`${d.name || 'Error'}: ${msg}`);
+        // issue #25: a line/col from the worker's own stack parsing (see
+        // lib/js-runner-source.ts) rides along on the message -- this console
+        // has no clickable-jump machinery like Console.tsx's iframe path, so
+        // the line number goes in the text itself.
+        const text = errorWithLocation(d.name, d.message, d.line, d.col);
+        logs.push({ type: 'error', message: text, timestamp: time() });
+        setRuntimeError(text);
       }
       clearTimeout(killer);
       cleanup();
@@ -475,8 +485,10 @@ export default function LessonWorkspace({
     const handler = (event: MessageEvent) => {
       const data = event.data;
       if (data && data.source === 'preview-error' && data.error) {
-        const err = data.error as { name?: string; message?: string };
-        setRuntimeError(`${err.name || 'Error'}: ${err.message || ''}`);
+        // The moSHion / reSHape runners report a line already (their own frame
+        // parse); keep it rather than flattening the payload to a bare message.
+        const err = data.error as { name?: string; message?: string; line?: number | null; col?: number | null };
+        setRuntimeError(errorWithLocation(err.name, err.message, err.line, err.col));
       }
     };
     window.addEventListener('message', handler);

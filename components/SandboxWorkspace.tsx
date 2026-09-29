@@ -11,7 +11,7 @@ import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import TextureEditor from './TextureEditor';
 import DocsDrawer from './DocsDrawer';
-import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
+import { RUNNER_SOURCE, RUN_TIMEOUT_MS, errorWithLocation } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
   canUseBuild,
@@ -178,14 +178,14 @@ export default function SandboxWorkspace() {
     }, RUN_TIMEOUT_MS);
 
     worker.onmessage = (e: MessageEvent) => {
-      const d = e.data as { kind: string; type?: string; message?: string; name?: string };
+      const d = e.data as { kind: string; type?: string; message?: string; name?: string; line?: number | null; col?: number | null };
       if (d.kind === 'log') {
         collected.push({ type: d.type || 'log', message: d.message || '' });
         setLogs([...collected]);
         return;
       }
       if (d.kind === 'error') {
-        collected.push({ type: 'error', message: `${d.name || 'Error'}: ${d.message || ''}` });
+        collected.push({ type: 'error', message: errorWithLocation(d.name, d.message, d.line, d.col) });
         setLogs([...collected]);
       }
       clearTimeout(killer);
