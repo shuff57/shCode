@@ -38,7 +38,7 @@
     {
       "id": "r1",
       "title": "addScore defined",
-      "description": "Code defines a function named addScore",
+      "description": "Code defines a function named addScore. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+addScore\\s*\\(",
@@ -48,7 +48,7 @@
     {
       "id": "r2",
       "title": "new array built with spread",
-      "description": "addScore builds a new array using spread syntax",
+      "description": "addScore builds a new array using spread syntax. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\s*\\.\\.\\.",
@@ -58,7 +58,7 @@
     {
       "id": "r3",
       "title": "recordPlay defined",
-      "description": "Code defines a function named recordPlay",
+      "description": "Code defines a function named recordPlay. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+recordPlay\\s*\\(",
@@ -68,7 +68,7 @@
     {
       "id": "r4",
       "title": "plays property updated",
-      "description": "recordPlay assigns to the plays property",
+      "description": "recordPlay assigns to the plays property. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.plays\\s*=",
@@ -78,7 +78,7 @@
     {
       "id": "r5",
       "title": "copyBook defined with a deep copy",
-      "description": "Code defines copyBook and calls structuredClone",
+      "description": "Code defines copyBook and calls structuredClone. Help: 3.6.9 (Side Effects and Copies)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+copyBook\\s*\\(",
@@ -98,7 +98,7 @@
     {
       "id": "r7",
       "title": "results logged",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

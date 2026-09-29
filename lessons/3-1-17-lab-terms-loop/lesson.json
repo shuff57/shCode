@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "reads an answer with prompt",
-      "description": "terms() calls prompt() to read the user's answer",
+      "description": "terms() calls prompt() to read the user's answer. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "prompt\\s*\\(",
@@ -63,7 +63,7 @@
     {
       "id": "r4",
       "title": "for loop calls terms()",
-      "description": "A for loop calls terms() once per user",
+      "description": "A for loop calls terms() once per user. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\([^)]*\\)\\s*\\{[^}]*terms\\s*\\(\\s*\\)[^}]*\\}",

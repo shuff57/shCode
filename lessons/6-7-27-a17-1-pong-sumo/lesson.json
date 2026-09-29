@@ -76,7 +76,7 @@
     {
       "id": "r1",
       "title": "Two-player keyboard input",
-      "description": "Both players have keys assigned: kb.pressing is called with at least two different keys (one per player).",
+      "description": "Both players have keys assigned: kb.pressing is called with at least two different keys (one per player). Help: 5.1.14 (Keyboard Movement)",
       "type": "regex",
       "file": "script.js",
       "pattern": "kb\\.pressing\\s*\\(\\s*['\"](\\w+)['\"]\\s*\\)[\\s\\S]*?kb\\.pressing\\s*\\(\\s*['\"](?!\\1\\b)\\w+['\"]\\s*\\)",
@@ -86,7 +86,7 @@
     {
       "id": "r2",
       "title": "Independent per-player score variables",
-      "description": "p1Score and p2Score (or equivalent) are declared at module scope: one for each player.",
+      "description": "p1Score and p2Score (or equivalent) are declared at module scope: one for each player. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?=[\\s\\S]*p1Score)(?=[\\s\\S]*p2Score)",
@@ -96,7 +96,7 @@
     {
       "id": "r3",
       "title": "Push-collision physics tuned with bounciness",
-      "description": "At least one sprite has its bounciness set (e.g. ball.bounciness = 0.9).",
+      "description": "At least one sprite has its bounciness set (e.g. ball.bounciness = 0.9). Help: 6.7.14 (moSHion docs: sprite.bounciness)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\.bounciness\\s*=\\s*(?:0\\.[0-9]+|1(?:\\.0*)?)",
@@ -106,7 +106,7 @@
     {
       "id": "r4",
       "title": "Top-down arena: no gravity",
-      "description": "world.gravity.y is set to 0 so the sprites glide instead of falling.",
+      "description": "world.gravity.y is set to 0 so the sprites glide instead of falling. Help: 5.2.2 (Gravity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "world\\.gravity\\.y\\s*=\\s*0",
@@ -126,7 +126,7 @@
     {
       "id": "r6",
       "title": "Win condition fires on a threshold",
-      "description": "A comparison against a winning number (e.g. p1Score >= 5) triggers the win condition.",
+      "description": "A comparison against a winning number (e.g. p1Score >= 5) triggers the win condition. Help: 2.1.3 (If / Else if / Else)",
       "type": "regex",
       "file": "script.js",
       "pattern": "p[12]Score\\s*(?:>=|===|>)\\s*(?:\\d+|[A-Za-z_$][A-Za-z0-9_$]*)",
@@ -136,7 +136,7 @@
     {
       "id": "r7",
       "title": "At least one joint is used",
-      "description": "A DistanceJoint or HingeJoint is created somewhere in the game (boundary, obstacle, or attachment).",
+      "description": "A DistanceJoint or HingeJoint is created somewhere in the game (boundary, obstacle, or attachment). Help: 6.8.4 (moSHion docs: HingeJoint)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+(DistanceJoint|HingeJoint)\\s*\\(",

@@ -37,7 +37,7 @@
     {
       "id": "r1",
       "title": "Array declared",
-      "description": "Declares an array with square brackets",
+      "description": "Declares an array with square brackets. Help: 3.7.6 (Taking Part of a List with .slice())",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
@@ -47,7 +47,7 @@
     {
       "id": "r2",
       "title": "Two .slice() calls",
-      "description": "Calls .slice() at least twice",
+      "description": "Calls .slice() at least twice. Help: 3.7.6 (Taking Part of a List with .slice())",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:[\\s\\S]*\\.slice\\s*\\([\\s\\S]*\\.slice\\s*\\()",
@@ -57,7 +57,7 @@
     {
       "id": "r3",
       "title": "console.log present",
-      "description": "Calls console.log",
+      "description": "Calls console.log. Help: 3.7.6 (Taking Part of a List with .slice())",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

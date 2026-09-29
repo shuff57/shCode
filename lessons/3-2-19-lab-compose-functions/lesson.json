@@ -37,7 +37,7 @@
     {
       "id": "r1",
       "title": "double defined",
-      "description": "Code defines a function named double",
+      "description": "Code defines a function named double. Help: 3.2.16 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+double\\s*\\(",
@@ -47,7 +47,7 @@
     {
       "id": "r2",
       "title": "addTen defined",
-      "description": "Code defines a function named addTen",
+      "description": "Code defines a function named addTen. Help: 3.2.16 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+addTen\\s*\\(",
@@ -57,7 +57,7 @@
     {
       "id": "r3",
       "title": "returns a value",
-      "description": "Code contains a return statement",
+      "description": "Code contains a return statement. Help: 3.2.16 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "return\\s",
@@ -67,7 +67,7 @@
     {
       "id": "r4",
       "title": "one call nested in another",
-      "description": "A call to one function is written as the argument of the other",
+      "description": "A call to one function is written as the argument of the other. Help: 3.2.16 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(double|addTen)\\s*\\(\\s*(double|addTen)\\s*\\(",
@@ -77,7 +77,7 @@
     {
       "id": "r5",
       "title": "results are logged",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.2.16 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

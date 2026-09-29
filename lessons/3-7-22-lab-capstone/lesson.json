@@ -49,7 +49,7 @@
     {
       "id": "r1",
       "title": "Array built with .push()",
-      "description": "Declares an array and adds to it with .push()",
+      "description": "Declares an array and adds to it with .push(). Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[\\s\\S]*\\.push\\s*\\(",
@@ -59,7 +59,7 @@
     {
       "id": "r2",
       "title": ".map() used",
-      "description": "Calls .map() to transform the list",
+      "description": "Calls .map() to transform the list. Help: 3.7.2 (Transforming a List with .map())",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.map\\s*\\(",
@@ -69,7 +69,7 @@
     {
       "id": "r3",
       "title": ".slice() used",
-      "description": "Calls .slice() to copy a range",
+      "description": "Calls .slice() to copy a range. Help: 3.7.6 (Taking Part of a List with .slice())",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.slice\\s*\\(",
@@ -79,7 +79,7 @@
     {
       "id": "r4",
       "title": "Arrays joined",
-      "description": "Joins two arrays with .concat() or array spread",
+      "description": "Joins two arrays with .concat() or array spread. Help: 3.7.9 (Joining Lists with .concat())",
       "type": "regex",
       "file": "script.js",
       "pattern": "(\\.concat\\s*\\(|\\[[^\\]]*\\.\\.\\.)",
@@ -89,7 +89,7 @@
     {
       "id": "r5",
       "title": "Object spread with override",
-      "description": "Builds an object copy with a property written after the spread",
+      "description": "Builds an object copy with a property written after the spread. Help: 3.7.14 (Spreading into a New Array or Object)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\{\\s*\\.\\.\\.[^}]*,\\s*\\w+\\s*:",
@@ -99,7 +99,7 @@
     {
       "id": "r6",
       "title": "console.log present",
-      "description": "Calls console.log",
+      "description": "Calls console.log. Help: 3.7.2 (Transforming a List with .map())",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

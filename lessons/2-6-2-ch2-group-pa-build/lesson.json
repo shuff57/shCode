@@ -98,7 +98,7 @@
     {
       "id": "r1",
       "title": "Both partners named in the header",
-      "description": "The Partners line at the top of script.js has names on it",
+      "description": "The Partners line at the top of script.js has names on it. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\S\\n]*Partners:[^\\S\\n]*\\S+",
@@ -110,7 +110,7 @@
     {
       "id": "r2",
       "title": "The problem is named in the header",
-      "description": "The Problem line says which of the four menu problems this is",
+      "description": "The Problem line says which of the four menu problems this is. Help: 2.6.1 (Group PA Part 1: Design the Chart)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\S\\n]*Problem:[^\\S\\n]*\\S+",
@@ -122,7 +122,7 @@
     {
       "id": "r3",
       "title": "The limit is a const",
-      "description": "The number that never changes is declared with const, not let",
+      "description": "The number that never changes is declared with const, not let. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "const\\s+[a-z][A-Za-z0-9]*\\s*=\\s*\\d",
@@ -134,7 +134,7 @@
     {
       "id": "r4",
       "title": "A string variable is declared",
-      "description": "One variable holds text -- the name or label your problem talks about",
+      "description": "One variable holds text -- the name or label your problem talks about. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`$]*`)",
@@ -146,7 +146,7 @@
     {
       "id": "r5",
       "title": "A number variable is declared",
-      "description": "At least one variable holds a number typed straight in",
+      "description": "At least one variable holds a number typed straight in. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*-?\\d",
@@ -158,7 +158,7 @@
     {
       "id": "r6",
       "title": "The loop uses a for or while",
-      "description": "A for or while loop is present and walks the input range",
+      "description": "A for or while loop is present and walks the input range. Help: 2.2.13 (The while Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\b(for|while)\\s*\\([^)]*\\)\\s*\\{",
@@ -170,7 +170,7 @@
     {
       "id": "r7",
       "title": "The loop has a continue",
-      "description": "A continue statement appears inside the loop",
+      "description": "A continue statement appears inside the loop. Help: 2.4.13 (Skipping a Round with continue)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bcontinue\\s*;",
@@ -182,7 +182,7 @@
     {
       "id": "r8",
       "title": "A break AND a continue",
-      "description": "The loop contains both a continue and a break, as the brief forces — one skip and one stop.",
+      "description": "The loop contains both a continue and a break, as the brief forces — one skip and one stop. Help: 2.4.13 (Skipping a Round with continue)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bcontinue\\s*;[\\s\\S]*\\bbreak\\s*;|\\bbreak\\s*;[\\s\\S]*\\bcontinue\\s*;",
@@ -194,7 +194,7 @@
     {
       "id": "r9",
       "title": "A switch classifies the outcome",
-      "description": "A switch with at least three cases (each with a break) and a default.",
+      "description": "A switch with at least three cases (each with a break) and a default. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "switch\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?default\\s*:",
@@ -206,7 +206,7 @@
     {
       "id": "r10",
       "title": "The bad input is guarded with throw",
-      "description": "A throw statement guards the bad input before the loop runs",
+      "description": "A throw statement guards the bad input before the loop runs. Help: 2.5.1 (Handling Errors with try/catch)",
       "type": "regex",
       "file": "script.js",
       "pattern": "throw\\s+new\\s+Error\\s*\\([^)]*\\)",

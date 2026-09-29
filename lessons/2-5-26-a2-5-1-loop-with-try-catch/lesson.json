@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "for loop present",
-      "description": "Code loops over the three readings with a for loop",
+      "description": "Code loops over the three readings with a for loop. Help: 2.2.9 (The for Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "try/catch inside the loop",
-      "description": "The loop body has a try block and a catch block",
+      "description": "The loop body has a try block and a catch block. Help: 2.5.4 (try...catch: Attempt and Recover)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\([\\s\\S]*try\\s*\\{[\\s\\S]*catch\\s*\\(",
@@ -53,7 +53,7 @@
     {
       "id": "r3",
       "title": "checks for NaN",
-      "description": "Code checks the converted value with Number.isNaN",
+      "description": "Code checks the converted value with Number.isNaN. Help: 2.5.4 (try...catch: Attempt and Recover)",
       "type": "regex",
       "file": "script.js",
       "pattern": "Number\\.isNaN\\(",
@@ -63,7 +63,7 @@
     {
       "id": "r4",
       "title": "catch reports err.message",
-      "description": "The catch block logs a friendly message that includes err.message, not a generic string",
+      "description": "The catch block logs a friendly message that includes err.message, not a generic string. Help: 2.5.12 (Reading the Error Object)",
       "type": "regex",
       "file": "script.js",
       "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*err\\.message",

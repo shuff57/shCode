@@ -50,7 +50,7 @@
     {
       "id": "r1",
       "title": "Turn on gravity",
-      "description": "world.gravity.y is set to a non-zero value.",
+      "description": "world.gravity.y is set to a non-zero value. Help: 5.2.2 (Gravity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "world\\.gravity\\.y\\s*=\\s*-?[1-9]",
@@ -61,7 +61,7 @@
     {
       "id": "r2",
       "title": "Add at least three static obstacles",
-      "description": "At least three 'static' sprites exist in the scene.",
+      "description": "At least three 'static' sprites exist in the scene. Help: 5.2.6 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\([^)]*['\"]static['\"][\\s\\S]*new\\s+Sprite\\s*\\([^)]*['\"]static['\"][\\s\\S]*new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
@@ -72,7 +72,7 @@
     {
       "id": "r3",
       "title": "Make the ball genuinely bouncy",
-      "description": "The ball's bounciness is set above 0.8.",
+      "description": "The ball's bounciness is set above 0.8. Help: 5.2.6 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.bounciness\\s*=\\s*(1(\\.0+)?\\b|0?\\.(8[1-9]|9\\d?))",
@@ -83,7 +83,7 @@
     {
       "id": "r4",
       "title": "Add a reset key",
-      "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top.",
+      "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.6 (Bounciness and Friction)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

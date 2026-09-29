@@ -61,7 +61,7 @@
     {
       "id": "r2",
       "title": "Rectangle sprite (4-arg form)",
-      "description": "At least one `new Sprite(x, y, w, h)` call with four arguments.",
+      "description": "At least one `new Sprite(x, y, w, h)` call with four arguments. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\(\\s*[^,()]+,\\s*[^,()]+,\\s*[^,()]+,\\s*[^,)]+\\s*\\)",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "Circle sprite (3-arg form)",
-      "description": "At least one `new Sprite(x, y, diameter)` call with exactly three arguments.",
+      "description": "At least one `new Sprite(x, y, diameter)` call with exactly three arguments. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\(\\s*[^,()]+,\\s*[^,()]+,\\s*[^,)]+\\s*\\)",
@@ -81,7 +81,7 @@
     {
       "id": "r4",
       "title": "Property set on an instance",
-      "description": "At least one `.color` assignment on a sprite instance.",
+      "description": "At least one `.color` assignment on a sprite instance. Help: 5.3.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.color\\s*=",

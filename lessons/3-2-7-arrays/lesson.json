@@ -34,7 +34,7 @@
     {
       "id": "req1",
       "title": "Create array",
-      "description": "Declare an array using square brackets",
+      "description": "Declare an array using square brackets. Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
@@ -44,7 +44,7 @@
     {
       "id": "req2",
       "title": "Use push",
-      "description": "Add elements using .push()",
+      "description": "Add elements using .push(). Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.push\\(",
@@ -54,7 +54,7 @@
     {
       "id": "req3",
       "title": "Use pop or splice",
-      "description": "Remove elements using .pop() or .splice()",
+      "description": "Remove elements using .pop() or .splice(). Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.(pop|splice)\\(",
@@ -64,7 +64,7 @@
     {
       "id": "req4",
       "title": "Iterate array",
-      "description": "Loop through the array using for, forEach, or map",
+      "description": "Loop through the array using for, forEach, or map. Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(for\\s*\\(|\\.forEach\\(|\\.map\\()",
@@ -74,7 +74,7 @@
     {
       "id": "req5",
       "title": "Use find or includes",
-      "description": "Search the array using .find() or .includes()",
+      "description": "Search the array using .find() or .includes(). Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.(find|includes)\\(",

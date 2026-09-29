@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "prints the options line",
-      "description": "The function body logs the food/drink options",
+      "description": "The function body logs the food/drink options. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\([^)]*Popcorn[^)]*Candy[^)]*Soft drink[^)]*\\)",

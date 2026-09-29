@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "logs start before the throw",
-      "description": "Code logs \"start\" before the throw statement",
+      "description": "Code logs \"start\" before the throw statement. Help: 2.5.15 (Throwing Your Own Errors)",
       "type": "regex",
       "file": "script.js",
       "pattern": "[\"'`]start[\"'`][\\s\\S]*throw\\s+new\\s+Error\\(",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "throws with the exact message",
-      "description": "Throws new Error with the message stop right here",
+      "description": "Throws new Error with the message stop right here. Help: 2.5.15 (Throwing Your Own Errors)",
       "type": "regex",
       "file": "script.js",
       "pattern": "throw\\s+new\\s+Error\\(\\s*[\"'`]stop right here[\"'`]\\s*\\)",
@@ -53,7 +53,7 @@
     {
       "id": "r3",
       "title": "catch reports caught plus the message",
-      "description": "Catch block logs caught: followed by err.message",
+      "description": "Catch block logs caught: followed by err.message. Help: 2.5.15 (Throwing Your Own Errors)",
       "type": "regex",
       "file": "script.js",
       "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*[\"'`]caught:[\\s\\S]*err\\.message",

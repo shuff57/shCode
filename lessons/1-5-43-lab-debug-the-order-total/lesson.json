@@ -41,7 +41,7 @@
     {
       "id": "r1",
       "title": "subtotal multiplies price by quantity",
-      "description": "The quantity is actually used, with multiplication",
+      "description": "The quantity is actually used, with multiplication. Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
       "pattern": "subtotal\\s*=[^;]*unitPrice[^;]*\\*[^;]*quantity|subtotal\\s*=[^;]*quantity[^;]*\\*[^;]*unitPrice",
@@ -51,7 +51,7 @@
     {
       "id": "r2",
       "title": "The discount is subtracted",
-      "description": "The discounted amount is the subtotal minus the discount, not plus",
+      "description": "The discounted amount is the subtotal minus the discount, not plus. Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
       "pattern": "=\\s*subtotal\\s*-\\s*",
@@ -61,7 +61,7 @@
     {
       "id": "r3",
       "title": "Tax is added to the discounted amount",
-      "description": "The final total adds tax rather than subtracting it",
+      "description": "The final total adds tax rather than subtracting it. Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
       "pattern": "total\\s*=[^;]*\\+[^;]*tax",
@@ -71,7 +71,7 @@
     {
       "id": "r4",
       "title": "At least three labelled prints",
-      "description": "Three or more console.log calls whose text includes a label (string concatenation or a template literal both count)",
+      "description": "Three or more console.log calls whose text includes a label (string concatenation or a template literal both count). Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:[\\s\\S]*?console\\.log\\s*\\(\\s*(?:[\"'][^\"']+[\"']\\s*\\+|`[^`]*\\$\\{)){3}",
@@ -81,7 +81,7 @@
     {
       "id": "r5",
       "title": "A PASS/FAIL check is present",
-      "description": "An if/else comparing the total against the expected value and printing PASS or FAIL",
+      "description": "An if/else comparing the total against the expected value and printing PASS or FAIL. Help: 1.5.40 (Testing and Test Cases)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?=[\\s\\S]*if\\s*\\()(?=[\\s\\S]*[\"']PASS)(?=[\\s\\S]*[\"']FAIL)[\\s\\S]*",

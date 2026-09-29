@@ -62,7 +62,7 @@
     {
       "id": "r1",
       "title": "Both partners named in the header",
-      "description": "The Partners line at the top of script.js has names on it",
+      "description": "The Partners line at the top of script.js has names on it. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\S\\n]*Partners:[^\\S\\n]*\\S+",
@@ -74,7 +74,7 @@
     {
       "id": "r2",
       "title": "The problem is named in the header",
-      "description": "The Problem line says which of the four menu problems this is",
+      "description": "The Problem line says which of the four menu problems this is. Help: 1.6.1 (Group PA Part 1: Design the Chart)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\S\\n]*Problem:[^\\S\\n]*\\S+",
@@ -86,7 +86,7 @@
     {
       "id": "r3",
       "title": "The limit is a const",
-      "description": "The number that never changes is declared with const, not let",
+      "description": "The number that never changes is declared with const, not let. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "const\\s+(?:[a-z][A-Za-z0-9]*\\s*=\\s*\\d|[A-Z][A-Z0-9_]{2,}\\s*=)",
@@ -97,7 +97,7 @@
     {
       "id": "r4",
       "title": "A string variable is declared",
-      "description": "One variable holds text -- the name or label your problem talks about",
+      "description": "One variable holds text -- the name or label your problem talks about. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`$]*`)",
@@ -108,7 +108,7 @@
     {
       "id": "r5",
       "title": "A number variable is declared",
-      "description": "At least one variable holds a number typed straight in",
+      "description": "At least one variable holds a number typed straight in. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*-?\\d",
@@ -119,7 +119,7 @@
     {
       "id": "r6",
       "title": "The value is computed from the inputs",
-      "description": "A variable is assigned from arithmetic on other variables, not typed in by hand",
+      "description": "A variable is assigned from arithmetic on other variables, not typed in by hand. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*[A-Za-z_$][A-Za-z0-9_$.]*\\s*[-+*/]",
@@ -130,7 +130,7 @@
     {
       "id": "r7",
       "title": "The diamond is stored as a boolean",
-      "description": "A comparison is assigned to a variable, which is what the chart's diamond becomes",
+      "description": "A comparison is assigned to a variable, which is what the chart's diamond becomes. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*(?:<=|>=|===|!==|<|>)",
@@ -141,7 +141,7 @@
     {
       "id": "r8",
       "title": "Both branches written as pseudocode",
-      "description": "An IF comment line and an ELSE comment line, sitting below the stored comparison, say what happens on each side of the diamond",
+      "description": "An IF comment line and an ELSE comment line, sitting below the stored comparison, say what happens on each side of the diamond. Help: 1.6.1 (Group PA Part 1: Design the Chart)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*(?:<=|>=|===|!==|<|>)[\\s\\S]*?//[^\\n]*\\bIF\\b[\\s\\S]*?//[^\\n]*\\bELSE\\b",
@@ -153,7 +153,7 @@
     {
       "id": "r9",
       "title": "A template literal reports the result",
-      "description": "At least one console.log uses backticks with ${} inside",
+      "description": "At least one console.log uses backticks with ${} inside. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*`[^`]*\\$\\{",
@@ -164,7 +164,7 @@
     {
       "id": "r10",
       "title": "typeof is reported for one value",
-      "description": "The program prints the type of at least one of its values",
+      "description": "The program prints the type of at least one of its values. Help: 1.2.23 (The typeof Operator)",
       "type": "regex",
       "file": "script.js",
       "pattern": "typeof\\s+[A-Za-z_$]",

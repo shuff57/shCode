@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "for loop present",
-      "description": "A for loop counts from 1 up to 8 and logs inside its own body",
+      "description": "A for loop counts from 1 up to 8 and logs inside its own body. Help: 2.4.2 (for vs while: Choosing a Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\1\\s*(?:<=\\s*8|<\\s*9)[^)]*\\)\\s*\\{[^}]*console\\.log\\s*\\([^}]*\\}",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "while loop present",
-      "description": "A while loop doubles total on every pass until it exceeds 100",
+      "description": "A while loop doubles total on every pass until it exceeds 100. Help: 2.2.13 (The while Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "while\\s*\\(\\s*total\\s*<=?\\s*100\\s*\\)\\s*\\{[^}]*total\\s*(?:=\\s*total\\s*\\*\\s*2|\\*=\\s*2)[^}]*\\}",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 2.4.2 (for vs while: Choosing a Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

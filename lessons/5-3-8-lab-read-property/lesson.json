@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "Read b.color or b.size with console.log",
-      "description": "Call `console.log(b.color)` or `console.log(b.size)` inside `draw()` to read a property off the instance.",
+      "description": "Call `console.log(b.color)` or `console.log(b.size)` inside `draw()` to read a property off the instance. Help: 5.3.3 (Class and instance)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

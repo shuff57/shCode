@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "switch statement present",
-      "description": "Code contains a switch statement",
+      "description": "Code contains a switch statement. Help: 2.3.18 (switch Compares Strictly)",
       "type": "regex",
       "file": "script.js",
       "pattern": "switch\\s*\\(\\s*value\\s*\\)",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "case false present",
-      "description": "case false is directly followed by a console.log call",
+      "description": "case false is directly followed by a console.log call. Help: 2.3.18 (switch Compares Strictly)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s+false\\s*:\\s*console\\.log",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "case 0 present",
-      "description": "case 0 is directly followed by a console.log call",
+      "description": "case 0 is directly followed by a console.log call. Help: 2.3.18 (switch Compares Strictly)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s+0\\s*:\\s*console\\.log",
@@ -58,7 +58,7 @@
     {
       "id": "r4",
       "title": "case '0' present",
-      "description": "case '0' is directly followed by a console.log call",
+      "description": "case '0' is directly followed by a console.log call. Help: 2.3.18 (switch Compares Strictly)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]0['\"]\\s*:\\s*console\\.log",
@@ -68,7 +68,7 @@
     {
       "id": "r5",
       "title": "break present",
-      "description": "Code contains at least one break statement",
+      "description": "Code contains at least one break statement. Help: 2.3.9 (break and Fall-Through)",
       "type": "regex",
       "file": "script.js",
       "pattern": "break",

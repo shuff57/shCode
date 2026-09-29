@@ -36,7 +36,7 @@
     {
       "id": "r2",
       "title": "Check that the player is on the ground",
-      "description": "Somewhere in the sketch, the player is checked against another sprite with .colliding(...).",
+      "description": "Somewhere in the sketch, the player is checked against another sprite with .colliding(...). Help: 5.2.4 (Ground-Gated Actions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.colliding\\s*\\(",
@@ -47,7 +47,7 @@
     {
       "id": "r3",
       "title": "Combine both checks with &&",
-      "description": "The jump is guarded by both the key press and the ground check together, joined with &&, so the player can't jump in mid-air.",
+      "description": "The jump is guarded by both the key press and the ground check together, joined with &&, so the player can't jump in mid-air. Help: 2.1.29 (Logical Operators: && || !)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -59,7 +59,7 @@
     {
       "id": "r4",
       "title": "Launch the player upward",
-      "description": "Inside draw(), the player's vertical velocity is set to a negative number when the jump fires.",
+      "description": "Inside draw(), the player's vertical velocity is set to a negative number when the jump fires. Help: 5.2.2 (Gravity)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

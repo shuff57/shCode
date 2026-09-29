@@ -119,7 +119,7 @@
     {
       "id": "r2",
       "title": "The problem is named in the header",
-      "description": "The Problem line says which of the four menu problems this is",
+      "description": "The Problem line says which of the four menu problems this is. Help: 3.9.1 (Group PA Part 1: Design the Chart)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\S\\n]*Problem:[^\\S\\n]*\\S+",
@@ -131,7 +131,7 @@
     {
       "id": "r3",
       "title": "The level is a const",
-      "description": "The threshold that never changes is declared with const, not let",
+      "description": "The threshold that never changes is declared with const, not let. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "const\\s+[a-z][A-Za-z0-9]*\\s*=\\s*\\d",
@@ -155,7 +155,7 @@
     {
       "id": "r5",
       "title": "A function returns a value",
-      "description": "At least one function hands a value back with return, rather than printing it",
+      "description": "At least one function hands a value back with return, rather than printing it. Help: 3.2.2 (Parameters & Return Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "return\\s+[A-Za-z_$(]",
@@ -167,7 +167,7 @@
     {
       "id": "r6",
       "title": "The data is an array of record objects",
-      "description": "The seed data is an array whose elements are object literals with the same properties",
+      "description": "The seed data is an array whose elements are object literals with the same properties. Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "=\\s*\\[\\s*\\{[^\\]]*\\}\\s*\\]",
@@ -191,7 +191,7 @@
     {
       "id": "r8",
       "title": "push builds a new list",
-      "description": "A new array is built up with the push method",
+      "description": "A new array is built up with the push method. Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.push\\s*\\(",
@@ -203,7 +203,7 @@
     {
       "id": "r9",
       "title": "map() is called with an arrow function",
-      "description": "The map method is given an arrow function as its callback",
+      "description": "The map method is given an arrow function as its callback. Help: 3.4.6 (Arrow Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.map\\s*\\(\\s*\\(?\\s*[A-Za-z_$][\\w$]*\\s*(,[^)]*)?\\)?\\s*=>",

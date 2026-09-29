@@ -37,7 +37,7 @@
     {
       "id": "r1",
       "title": ".push used",
-      "description": "Code calls .push(",
+      "description": "Code calls .push(. Help: 3.3.6 (Adding and Removing from the Front)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.push\\s*\\(",
@@ -47,7 +47,7 @@
     {
       "id": "r2",
       "title": ".shift used",
-      "description": "Code calls .shift(",
+      "description": "Code calls .shift(. Help: 3.3.6 (Adding and Removing from the Front)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.shift\\s*\\(",
@@ -57,7 +57,7 @@
     {
       "id": "r3",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.3.6 (Adding and Removing from the Front)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

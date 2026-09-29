@@ -31,7 +31,7 @@
     {
       "id": "r1",
       "title": "subjectName replaces a",
-      "description": "Declares subjectName holding the subject text",
+      "description": "Declares subjectName holding the subject text. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bsubjectName\\s*=\\s*[\"'`]",
@@ -41,7 +41,7 @@
     {
       "id": "r2",
       "title": "finalGrade replaces b",
-      "description": "Declares finalGrade holding the number",
+      "description": "Declares finalGrade holding the number. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bfinalGrade\\s*=\\s*\\d",
@@ -51,7 +51,7 @@
     {
       "id": "r3",
       "title": "gradeReport replaces c",
-      "description": "Declares gradeReport built from the other two",
+      "description": "Declares gradeReport built from the other two. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?=[\\s\\S]*\\bgradeReport\\s*=)(?=[\\s\\S]*(?:subjectName[^;\\n]*finalGrade|finalGrade[^;\\n]*subjectName))[\\s\\S]*",
@@ -61,7 +61,7 @@
     {
       "id": "r4",
       "title": "hoursWorked replaces n",
-      "description": "Declares hoursWorked holding the number of hours",
+      "description": "Declares hoursWorked holding the number of hours. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bhoursWorked\\s*=\\s*[\\d.]",
@@ -71,7 +71,7 @@
     {
       "id": "r5",
       "title": "hourlyRate replaces d",
-      "description": "Declares hourlyRate holding the rate",
+      "description": "Declares hourlyRate holding the rate. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bhourlyRate\\s*=\\s*[\\d.]",
@@ -81,7 +81,7 @@
     {
       "id": "r6",
       "title": "totalPay replaces p",
-      "description": "Declares totalPay as hoursWorked times hourlyRate",
+      "description": "Declares totalPay as hoursWorked times hourlyRate. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?=[\\s\\S]*\\btotalPay\\s*=)(?=[\\s\\S]*(?:hoursWorked[^;\\n]*hourlyRate|hourlyRate[^;\\n]*hoursWorked))[\\s\\S]*",
@@ -91,7 +91,7 @@
     {
       "id": "r7",
       "title": "No single-letter variables left",
-      "description": "No declaration of a, b, c, n, d or p remains in the file",
+      "description": "No declaration of a, b, c, n, d or p remains in the file. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*(?:let|const|var)\\s+[abcndp]\\s*=)[\\s\\S]*$",

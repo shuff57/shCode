@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "try/catch/finally present",
-      "description": "Code has a try, catch, and finally block",
+      "description": "Code has a try, catch, and finally block. Help: 2.5.21 (Cleaning Up with finally)",
       "type": "regex",
       "file": "script.js",
       "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\([\\s\\S]*finally\\s*\\{",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "try block cannot fail",
-      "description": "The try block logs Work done. with nothing that can error",
+      "description": "The try block logs Work done. with nothing that can error. Help: 2.5.21 (Cleaning Up with finally)",
       "type": "regex",
       "file": "script.js",
       "pattern": "try\\s*\\{[^}]*Work done\\.[^}]*\\}",
@@ -53,7 +53,7 @@
     {
       "id": "r3",
       "title": "finally logs cleanup",
-      "description": "The finally block logs Cleanup ran.",
+      "description": "The finally block logs Cleanup ran. Help: 2.5.21 (Cleaning Up with finally)",
       "type": "regex",
       "file": "script.js",
       "pattern": "finally\\s*\\{[^}]*Cleanup ran\\.",

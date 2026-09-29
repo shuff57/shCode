@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "switch statement present",
-      "description": "Code contains a switch statement",
+      "description": "Code contains a switch statement. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "switch\\s*\\(\\s*light\\s*\\)",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "case 'green' present",
-      "description": "case 'green' is directly followed by a console.log call",
+      "description": "case 'green' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]green['\"]\\s*:\\s*console\\.log",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "case 'yellow' present",
-      "description": "case 'yellow' is directly followed by a console.log call",
+      "description": "case 'yellow' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]yellow['\"]\\s*:\\s*console\\.log",
@@ -58,7 +58,7 @@
     {
       "id": "r4",
       "title": "case 'red' present",
-      "description": "case 'red' is directly followed by a console.log call",
+      "description": "case 'red' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]red['\"]\\s*:\\s*console\\.log",
@@ -68,7 +68,7 @@
     {
       "id": "r5",
       "title": "default label present",
-      "description": "The default label is directly followed by a console.log call",
+      "description": "The default label is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "default\\s*:\\s*console\\.log",
@@ -78,7 +78,7 @@
     {
       "id": "r6",
       "title": "break present",
-      "description": "Code contains a break statement",
+      "description": "Code contains a break statement. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "break",

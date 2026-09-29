@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "moveRight(dx) mutates this.sprite.x",
-      "description": "Write a `moveRight(dx)` method that adds `dx` to `this.sprite.x` using `+=`.",
+      "description": "Write a `moveRight(dx)` method that adds `dx` to `this.sprite.x` using `+=`. Help: 5.4.7 (Why this.sprite, not extends Sprite)",
       "type": "regex",
       "file": "script.js",
       "pattern": "moveRight[\\s\\S]*?this\\.sprite\\.x\\s*(?:\\+=|=\\s*this\\.sprite\\.x\\s*\\+)",

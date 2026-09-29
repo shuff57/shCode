@@ -43,7 +43,7 @@
     {
       "id": "r1",
       "title": "Program 1 fixed: update added",
-      "description": "A while (n <= 5) loop logs n and increments it inside its own body (n++, n += 1, or n = n + 1)",
+      "description": "A while (n <= 5) loop logs n and increments it inside its own body (n++, n += 1, or n = n + 1). Help: 2.4.20 (Infinite Loops: Three Causes)",
       "type": "regex",
       "file": "script.js",
       "pattern": "while\\s*\\(\\s*n\\s*<=\\s*5\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\([^)]*\\bn\\b[^)]*\\))(?=[^{}]*n\\s*(?:\\+\\+|\\+=\\s*1|=\\s*n\\s*\\+\\s*1))[^{}]*\\}",
@@ -53,7 +53,7 @@
     {
       "id": "r2",
       "title": "Program 2 fixed: update moves the right way",
-      "description": "A for loop counts count down from 10 while it is greater than 0 (count--, count -= 1, or count = count - 1), logging count inside its own body",
+      "description": "A for loop counts count down from 10 while it is greater than 0 (count--, count -= 1, or count = count - 1), logging count inside its own body. Help: 2.4.20 (Infinite Loops: Three Causes)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(\\s*(?:let|var)\\s+count\\s*=\\s*10\\s*;\\s*count\\s*>\\s*0\\s*;\\s*count\\s*(?:--|-=\\s*1|=\\s*count\\s*-\\s*1)\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\([^)]*\\bcount\\b[^)]*\\))[^{}]*\\}",
@@ -63,7 +63,7 @@
     {
       "id": "r3",
       "title": "Program 3 fixed: inclusive comparison",
-      "description": "A for loop counts i from 1 to 5 inclusive, logging i inside its own body",
+      "description": "A for loop counts i from 1 to 5 inclusive, logging i inside its own body. Help: 2.4.20 (Infinite Loops: Three Causes)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(\\s*(?:let|var)\\s+i\\s*=\\s*1\\s*;\\s*i\\s*<=\\s*5\\s*;\\s*i\\+\\+\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\([^)]*\\bi\\b[^)]*\\))[^{}]*\\}",
@@ -73,7 +73,7 @@
     {
       "id": "r4",
       "title": "Program 4 fixed: starts at 1",
-      "description": "A for loop counts k from 1 to 5 inclusive, logging k inside its own body",
+      "description": "A for loop counts k from 1 to 5 inclusive, logging k inside its own body. Help: 2.4.20 (Infinite Loops: Three Causes)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(\\s*(?:let|var)\\s+k\\s*=\\s*1\\s*;\\s*k\\s*<=\\s*5\\s*;\\s*k\\+\\+\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\([^)]*\\bk\\b[^)]*\\))[^{}]*\\}",
@@ -83,7 +83,7 @@
     {
       "id": "r5",
       "title": "Program 5 fixed: do...while used",
-      "description": "A do...while loop logs something and its condition guarantees the body could otherwise be skipped (!greeted or greeted === false)",
+      "description": "A do...while loop logs something and its condition guarantees the body could otherwise be skipped (!greeted or greeted === false). Help: 2.4.5 (The do...while Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "do\\s*\\{(?=[^{}]*console\\.log)[^{}]*\\}\\s*while\\s*\\(\\s*(?:!\\s*greeted|greeted\\s*===?\\s*false)\\s*\\)",

@@ -42,7 +42,7 @@
     {
       "id": "r2",
       "title": "prints the total",
-      "description": "The function body logs the total",
+      "description": "The function body logs the total. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\([^)]*Total[^)]*42[^)]*\\)",

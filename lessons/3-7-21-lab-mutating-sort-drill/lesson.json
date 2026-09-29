@@ -38,7 +38,7 @@
     {
       "id": "r1",
       "title": "Array declared",
-      "description": "Declares an array with square brackets",
+      "description": "Declares an array with square brackets. Help: 3.7.19 (What Else Is Out There)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
@@ -48,7 +48,7 @@
     {
       "id": "r2",
       "title": "A mutating method is called",
-      "description": "Calls .push() (or another in-place method)",
+      "description": "Calls .push() (or another in-place method). Help: 3.7.19 (What Else Is Out There)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.(?:push|unshift|pop|shift|splice|sort|reverse)\\s*\\(",
@@ -58,7 +58,7 @@
     {
       "id": "r3",
       "title": "A non-mutating method is called",
-      "description": "Calls .map(), .slice() or .concat(), which return a new array",
+      "description": "Calls .map(), .slice() or .concat(), which return a new array. Help: 3.7.19 (What Else Is Out There)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.(?:map|slice|concat)\\s*\\(",
@@ -68,7 +68,7 @@
     {
       "id": "r4",
       "title": "console.log present",
-      "description": "Calls console.log to show before and after",
+      "description": "Calls console.log to show before and after. Help: 3.7.19 (What Else Is Out There)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

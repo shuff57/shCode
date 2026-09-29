@@ -37,7 +37,7 @@
     {
       "id": "r1",
       "title": "global variable declared",
-      "description": "A variable named score is declared with let",
+      "description": "A variable named score is declared with let. Help: 3.2.20 (Scope: Local vs Global)",
       "type": "regex",
       "file": "script.js",
       "pattern": "let\\s+score\\b",
@@ -47,7 +47,7 @@
     {
       "id": "r2",
       "title": "a local variable declared inside a function",
-      "description": "A variable named label is declared with let",
+      "description": "A variable named label is declared with let. Help: 3.2.20 (Scope: Local vs Global)",
       "type": "regex",
       "file": "script.js",
       "pattern": "let\\s+label\\b",
@@ -57,7 +57,7 @@
     {
       "id": "r3",
       "title": "two functions defined",
-      "description": "Code defines the functions showScore and describeScore",
+      "description": "Code defines the functions showScore and describeScore. Help: 3.2.20 (Scope: Local vs Global)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+(showScore|describeScore)\\s*\\(",
@@ -67,7 +67,7 @@
     {
       "id": "r4",
       "title": "calls are made",
-      "description": "The functions are called",
+      "description": "The functions are called. Help: 3.2.20 (Scope: Local vs Global)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(showScore|describeScore)\\s*\\(\\s*\\)",

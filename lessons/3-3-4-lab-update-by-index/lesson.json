@@ -32,7 +32,7 @@
     {
       "id": "r1",
       "title": "index assignment present",
-      "description": "Code assigns to an array index (non-comparison)",
+      "description": "Code assigns to an array index (non-comparison). Help: 3.3.3 (Changing an Item by Index)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\d+\\]\\s*=\\s*[^=]",
@@ -42,7 +42,7 @@
     {
       "id": "r2",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.3.3 (Changing an Item by Index)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

@@ -48,7 +48,7 @@
     {
       "id": "r1",
       "title": "array of records built",
-      "description": "An array literal holds object literals",
+      "description": "An array literal holds object literals. Help: 3.5.2 (Grouping Related Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\s*\\{[^}]*\\}",
@@ -58,7 +58,7 @@
     {
       "id": "r2",
       "title": "nested object present",
-      "description": "An object literal holds another object literal",
+      "description": "An object literal holds another object literal. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\{[^}]*\\{[^}]*\\}",
@@ -68,7 +68,7 @@
     {
       "id": "r3",
       "title": "dot access used",
-      "description": "Reads a property with a dot",
+      "description": "Reads a property with a dot. Help: 3.5.2 (Grouping Related Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\.\\w+",
@@ -78,7 +78,7 @@
     {
       "id": "r4",
       "title": "bracket access used",
-      "description": "Reads a property with square brackets",
+      "description": "Reads a property with square brackets. Help: 3.5.6 (Square Brackets and Computed Keys)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\[",
@@ -88,7 +88,7 @@
     {
       "id": "r5",
       "title": "loop present",
-      "description": "Contains a for loop",
+      "description": "Contains a for loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -98,7 +98,7 @@
     {
       "id": "r6",
       "title": "destructuring used",
-      "description": "Unpacks with a brace pattern",
+      "description": "Unpacks with a brace pattern. Help: 3.5.19 (Destructuring)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:const|let|var)\\s*\\{[^}]*\\}\\s*=",
@@ -108,7 +108,7 @@
     {
       "id": "r7",
       "title": "Object.keys used",
-      "description": "Walks the object's keys",
+      "description": "Walks the object's keys. Help: 3.5.2 (Grouping Related Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "Object\\.keys",
@@ -118,7 +118,7 @@
     {
       "id": "r8",
       "title": "output printed",
-      "description": "Calls console.log",
+      "description": "Calls console.log. Help: 3.5.2 (Grouping Related Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log",

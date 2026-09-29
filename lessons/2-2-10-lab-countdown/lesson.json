@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "while loop present",
-      "description": "Code contains a while loop",
+      "description": "Code contains a while loop. Help: 2.2.13 (The while Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "while\\s*\\(",

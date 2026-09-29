@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "for loop present",
-      "description": "Code contains a for loop",
+      "description": "Code contains a for loop. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",

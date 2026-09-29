@@ -32,7 +32,7 @@
     {
       "id": "r1",
       "title": "for loop present",
-      "description": "Code contains a for loop",
+      "description": "Code contains a for loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -42,7 +42,7 @@
     {
       "id": "r2",
       "title": ".length used",
-      "description": "Code uses .length",
+      "description": "Code uses .length. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.length",
@@ -52,7 +52,7 @@
     {
       "id": "r3",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

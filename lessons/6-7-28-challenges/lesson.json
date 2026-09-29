@@ -50,7 +50,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "A canvas is created when the sketch starts.",
+      "description": "A canvas is created when the sketch starts. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",

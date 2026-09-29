@@ -39,7 +39,7 @@
     {
       "id": "r1",
       "title": "Save function stores by key",
-      "description": "Calls localStorage.setItem",
+      "description": "Calls localStorage.setItem. Help: 3.8.15 (Saving by Key)",
       "type": "regex",
       "file": "script.js",
       "pattern": "localStorage\\.setItem\\s*\\(",
@@ -49,7 +49,7 @@
     {
       "id": "r2",
       "title": "State converted with stringify",
-      "description": "Calls JSON.stringify",
+      "description": "Calls JSON.stringify. Help: 3.8.4 (JSON.stringify — Object to Text)",
       "type": "regex",
       "file": "script.js",
       "pattern": "JSON\\.stringify\\s*\\(",
@@ -59,7 +59,7 @@
     {
       "id": "r3",
       "title": "Load reads the key",
-      "description": "Calls localStorage.getItem",
+      "description": "Calls localStorage.getItem. Help: 3.8.15 (Saving by Key)",
       "type": "regex",
       "file": "script.js",
       "pattern": "localStorage\\.getItem\\s*\\(",
@@ -69,7 +69,7 @@
     {
       "id": "r4",
       "title": "Missing key handled",
-      "description": "Tests the read value against null",
+      "description": "Tests the read value against null. Help: 3.8.15 (Saving by Key)",
       "type": "regex",
       "file": "script.js",
       "pattern": "===\\s*null|==\\s*null",
@@ -79,7 +79,7 @@
     {
       "id": "r5",
       "title": "Parse guarded",
-      "description": "Wraps JSON.parse in try and catch",
+      "description": "Wraps JSON.parse in try and catch. Help: 2.5.4 (try...catch: Attempt and Recover)",
       "type": "regex",
       "file": "script.js",
       "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\(",
@@ -89,7 +89,7 @@
     {
       "id": "r6",
       "title": "Restored state logged",
-      "description": "Calls console.log",
+      "description": "Calls console.log. Help: 3.8.15 (Saving by Key)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

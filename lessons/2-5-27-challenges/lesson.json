@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "throw present",
-      "description": "Code throws at least one error deliberately",
+      "description": "Code throws at least one error deliberately. Help: 2.5.15 (Throwing Your Own Errors)",
       "type": "regex",
       "file": "script.js",
       "pattern": "throw\\s+new\\s+Error\\(",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "finally present",
-      "description": "Code uses a finally block for cleanup",
+      "description": "Code uses a finally block for cleanup. Help: 2.5.15 (Throwing Your Own Errors)",
       "type": "regex",
       "file": "script.js",
       "pattern": "finally\\s*\\{",

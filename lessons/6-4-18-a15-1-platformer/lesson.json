@@ -81,7 +81,7 @@
     {
       "id": "r1",
       "title": "Two or more animation states",
-      "description": "Either two addAni registrations, OR two assignments to sprite.image with different values.",
+      "description": "Either two addAni registrations, OR two assignments to sprite.image with different values. Help: 6.4.3 (moSHion docs: Animation)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.addAni\\s*\\([^)]+\\)[\\s\\S]*\\.addAni\\s*\\(|\\.(image|img)\\s*=\\s*[^;\\n]+[\\s\\S]*\\.(image|img)\\s*=",
@@ -91,7 +91,7 @@
     {
       "id": "r2",
       "title": "Camera follows the player",
-      "description": "Inside draw(), assign camera.x from a sprite's x (or use lerp with both).",
+      "description": "Inside draw(), assign camera.x from a sprite's x (or use lerp with both). Help: 6.4.11 (moSHion docs: Camera)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -112,7 +112,7 @@
     {
       "id": "r4",
       "title": "Working ground-gated jump",
-      "description": "Inside draw(), gate kb.presses(jump key) on .colliding(...) inside a single condition (e.g. `kb.presses('w') && player.colliding(allSprites)`) so the player can only jump when touching ground or a platform.",
+      "description": "Inside draw(), gate kb.presses(jump key) on .colliding(...) inside a single condition (e.g. `kb.presses('w') && player.colliding(allSprites)`) so the player can only jump when touching ground or a platform. Help: 6.3.6 (Colliding + Ground Detection)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -123,7 +123,7 @@
     {
       "id": "r5",
       "title": "Goal detection + win message",
-      "description": "Inside draw(), call .overlaps(goal) and follow it with a text(...) call (within ~200 chars) so the win message is what the overlap triggers.",
+      "description": "Inside draw(), call .overlaps(goal) and follow it with a text(...) call (within ~200 chars) so the win message is what the overlap triggers. Help: 6.2.3 (moSHion docs: Collisions + Overlaps)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

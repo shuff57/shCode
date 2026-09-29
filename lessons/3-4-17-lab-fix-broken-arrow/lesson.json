@@ -32,7 +32,7 @@
     {
       "id": "r1",
       "title": "Parameters wrapped in parentheses",
-      "description": "An arrow function is written with parentheses around its parameter list",
+      "description": "An arrow function is written with parentheses around its parameter list. Help: 3.4.6 (Arrow Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\([^)]*\\)\\s*=>",
@@ -42,7 +42,7 @@
     {
       "id": "r2",
       "title": "Two parameters inside the parentheses",
-      "description": "The parenthesised parameter list holds two comma-separated parameters",
+      "description": "The parenthesised parameter list holds two comma-separated parameters. Help: 3.4.6 (Arrow Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\([^)]*,[^)]*\\)\\s*=>",
@@ -52,7 +52,7 @@
     {
       "id": "r3",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.4.6 (Arrow Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

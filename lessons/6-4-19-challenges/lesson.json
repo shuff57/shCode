@@ -50,7 +50,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "Use new Canvas(...) in setup().",
+      "description": "Use new Canvas(...) in setup(). Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -70,7 +70,7 @@
     {
       "id": "r3",
       "title": "Camera follows something",
-      "description": "Inside draw(), assign camera.x or camera.y in a way that depends on a sprite's position (or uses lerp).",
+      "description": "Inside draw(), assign camera.x or camera.y in a way that depends on a sprite's position (or uses lerp). Help: 6.4.11 (moSHion docs: Camera)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

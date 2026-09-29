@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "reads a property of null",
-      "description": "Code reads a property off a value set to null, inside try",
+      "description": "Code reads a property off a value set to null, inside try. Help: 1.2.19 (The null Value)",
       "type": "regex",
       "file": "script.js",
       "pattern": "=\\s*null[\\s\\S]*\\.\\w+",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "logs err.name",
-      "description": "Catch block logs err.name",
+      "description": "Catch block logs err.name. Help: 2.5.12 (Reading the Error Object)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*err\\.name\\s*\\)",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "logs err.message",
-      "description": "Catch block logs err.message",
+      "description": "Catch block logs err.message. Help: 2.5.12 (Reading the Error Object)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*err\\.message\\s*\\)",

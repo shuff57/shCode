@@ -37,7 +37,7 @@
     {
       "id": "r1",
       "title": "area defined",
-      "description": "Code defines a function named area",
+      "description": "Code defines a function named area. Help: 3.2.13 (Printing Is Not Returning)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+area\\s*\\(",
@@ -47,7 +47,7 @@
     {
       "id": "r2",
       "title": "return statement present",
-      "description": "Code contains a return statement",
+      "description": "Code contains a return statement. Help: 3.2.13 (Printing Is Not Returning)",
       "type": "regex",
       "file": "script.js",
       "pattern": "return\\s",
@@ -57,7 +57,7 @@
     {
       "id": "r3",
       "title": "result used in an expression",
-      "description": "Code multiplies the function result, proving a number came back",
+      "description": "Code multiplies the function result, proving a number came back. Help: 3.2.13 (Printing Is Not Returning)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\s*\\*\\s*2",
@@ -67,7 +67,7 @@
     {
       "id": "r4",
       "title": "results are logged",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.2.13 (Printing Is Not Returning)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

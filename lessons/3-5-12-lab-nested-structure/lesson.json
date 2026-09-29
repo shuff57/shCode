@@ -42,7 +42,7 @@
     {
       "id": "r1",
       "title": "nested object built",
-      "description": "An object literal holds another object literal",
+      "description": "An object literal holds another object literal. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\{[^}]*\\{[^}]*\\}",
@@ -52,7 +52,7 @@
     {
       "id": "r2",
       "title": "array of objects built",
-      "description": "An array literal holds at least one object literal",
+      "description": "An array literal holds at least one object literal. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\s*\\{[^}]*\\}",
@@ -62,7 +62,7 @@
     {
       "id": "r3",
       "title": "nested chain read",
-      "description": "Reads a.b.c with at least two dots",
+      "description": "Reads a.b.c with at least two dots. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\.\\w+\\.\\w+",
@@ -72,7 +72,7 @@
     {
       "id": "r4",
       "title": "index then field read",
-      "description": "Reads arr[i].field",
+      "description": "Reads arr[i].field. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\w+\\]\\.\\w+",
@@ -82,7 +82,7 @@
     {
       "id": "r5",
       "title": "loop present",
-      "description": "Contains a for loop",
+      "description": "Contains a for loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",

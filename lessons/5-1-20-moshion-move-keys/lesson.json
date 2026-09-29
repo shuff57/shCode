@@ -47,7 +47,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "A canvas is created when the sketch starts.",
+      "description": "A canvas is created when the sketch starts. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -58,7 +58,7 @@
     {
       "id": "r2",
       "title": "Create a sprite",
-      "description": "A sprite exists in the sketch.",
+      "description": "A sprite exists in the sketch. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\(",
@@ -69,7 +69,7 @@
     {
       "id": "r3",
       "title": "Horizontal keyboard input",
-      "description": "Left or right keys affect the sprite each frame.",
+      "description": "Left or right keys affect the sprite each frame. Help: 5.1.13 (kb.pressing(key))",
       "type": "inFunction",
       "function": [
         "update",
@@ -84,7 +84,7 @@
     {
       "id": "r4",
       "title": "Vertical keyboard input",
-      "description": "Up or down keys affect the sprite each frame.",
+      "description": "Up or down keys affect the sprite each frame. Help: 5.1.13 (kb.pressing(key))",
       "type": "inFunction",
       "function": [
         "update",
@@ -99,7 +99,7 @@
     {
       "id": "r5",
       "title": "Set horizontal velocity",
-      "description": "Horizontal velocity is set each frame.",
+      "description": "Horizontal velocity is set each frame. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "inFunction",
       "function": [
         "update",
@@ -114,7 +114,7 @@
     {
       "id": "r6",
       "title": "Set vertical velocity",
-      "description": "Vertical velocity is set each frame.",
+      "description": "Vertical velocity is set each frame. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "inFunction",
       "function": [
         "update",

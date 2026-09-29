@@ -81,7 +81,7 @@
     {
       "id": "r4",
       "title": "Implement one stretch challenge",
-      "description": "Pick any of the three challenges in content.md: a `lives` counter (Challenge 1), `Math.random()` driving a sprite property like .diameter / .color (Challenge 2), or a `function cull(...)` helper (Challenge 3).",
+      "description": "Pick any of the three challenges in content.md: a `lives` counter (Challenge 1), `Math.random()` driving a sprite property like .diameter / .color (Challenge 2), or a `function cull(...)` helper (Challenge 3). Help: 6.1.3 (moSHion docs: Groups)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\blives\\s*(?:=|--|\\+\\+|[-+*/]=)|(?:Math\\.random|\\brandom)\\s*\\([^)]*\\)[\\s\\S]{0,120}?\\.(diameter|width|height|color)\\s*=|\\.(diameter|width|height|color)\\s*=[\\s\\S]{0,120}?(?:Math\\.random|\\brandom)\\s*\\(|\\bfunction\\s+cull\\s*\\(",

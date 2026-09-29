@@ -25,7 +25,7 @@
     {
       "id": "r1",
       "title": "Guard the check on the goal still existing",
-      "description": "The win check is wrapped in if (goal) so it stops running once the goal is gone.",
+      "description": "The win check is wrapped in if (goal) so it stops running once the goal is gone. Help: 5.2.10 (Cleanup and Delete)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -37,7 +37,7 @@
     {
       "id": "r2",
       "title": "Compute the distance to the goal",
-      "description": "The distance between player and goal is computed with Math.sqrt.",
+      "description": "The distance between player and goal is computed with Math.sqrt. Help: 5.2.10 (Cleanup and Delete)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -49,7 +49,7 @@
     {
       "id": "r3",
       "title": "Delete the goal on arrival",
-      "description": "When the player reaches the goal, goal.delete() is called.",
+      "description": "When the player reaches the goal, goal.delete() is called. Help: 5.2.10 (Cleanup and Delete)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -61,7 +61,7 @@
     {
       "id": "r4",
       "title": "Clear the goal variable",
-      "description": "After deleting, goal is set to null so the win check can never fire twice.",
+      "description": "After deleting, goal is set to null so the win check can never fire twice. Help: 5.2.10 (Cleanup and Delete)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

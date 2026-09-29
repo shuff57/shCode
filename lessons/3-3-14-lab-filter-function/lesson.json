@@ -37,7 +37,7 @@
     {
       "id": "r1",
       "title": "function declaration present",
-      "description": "Code declares a function",
+      "description": "Code declares a function. Help: 3.3.12 (Arrays and Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+\\w+\\s*\\(",
@@ -47,7 +47,7 @@
     {
       "id": "r2",
       "title": "for loop present",
-      "description": "Code uses a for or for...of loop",
+      "description": "Code uses a for or for...of loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -57,7 +57,7 @@
     {
       "id": "r3",
       "title": ".push used",
-      "description": "Code calls .push(",
+      "description": "Code calls .push(. Help: 3.3.12 (Arrays and Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.push\\s*\\(",
@@ -67,7 +67,7 @@
     {
       "id": "r4",
       "title": "return present",
-      "description": "Code returns a value",
+      "description": "Code returns a value. Help: 3.3.12 (Arrays and Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "return",

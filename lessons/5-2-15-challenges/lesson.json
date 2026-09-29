@@ -49,7 +49,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "A canvas is created when the sketch starts.",
+      "description": "A canvas is created when the sketch starts. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -59,7 +59,7 @@
     {
       "id": "r2",
       "title": "Build a scene with two goals",
-      "description": "At least three sprites are created (the player and two goals, at minimum).",
+      "description": "At least three sprites are created (the player and two goals, at minimum). Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\([\\s\\S]*new\\s+Sprite\\s*\\([\\s\\S]*new\\s+Sprite\\s*\\(",
@@ -69,7 +69,7 @@
     {
       "id": "r3",
       "title": "Track collection progress",
-      "description": "Your code tracks how many goals have been collected, using any technique: an incrementing counter or a check against a collection's length.",
+      "description": "Your code tracks how many goals have been collected, using any technique: an incrementing counter or a check against a collection's length. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\+\\+|\\+=\\s*1|\\.length\\s*===\\s*0",
@@ -79,7 +79,7 @@
     {
       "id": "r4",
       "title": "Print the finish message",
-      "description": "\"All goals collected!\" is printed once both goals are gone.",
+      "description": "\"All goals collected!\" is printed once both goals are gone. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*['\"]All goals collected!['\"]",

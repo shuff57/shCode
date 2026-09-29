@@ -49,7 +49,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "A canvas is created when the sketch starts.",
+      "description": "A canvas is created when the sketch starts. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "Set a sprite color",
-      "description": "A sprite has a color.",
+      "description": "A sprite has a color. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.color\\s*=",

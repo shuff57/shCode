@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 2.1.15 (Comparison Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "logs a comparison expression",
-      "description": "At least one console.log directly prints the result of a comparison (e.g. console.log(5 > 3)), not just a plain value",
+      "description": "At least one console.log directly prints the result of a comparison (e.g. console.log(5 > 3)), not just a plain value. Help: 2.1.15 (Comparison Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\([^)]*(===|!==|==|!=|<=|>=|<|>)[^)]*\\)",

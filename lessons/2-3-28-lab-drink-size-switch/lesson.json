@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "switch statement present",
-      "description": "Code contains a switch statement",
+      "description": "Code contains a switch statement. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "switch\\s*\\(\\s*size\\s*\\)",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "case 'S' present",
-      "description": "case 'S' is directly followed by a console.log call",
+      "description": "case 'S' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]S['\"]\\s*:\\s*console\\.log",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "case 'M' present",
-      "description": "case 'M' is directly followed by a console.log call",
+      "description": "case 'M' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]M['\"]\\s*:\\s*console\\.log",
@@ -58,7 +58,7 @@
     {
       "id": "r4",
       "title": "case 'L' present",
-      "description": "case 'L' is directly followed by a console.log call",
+      "description": "case 'L' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]L['\"]\\s*:\\s*console\\.log",
@@ -68,7 +68,7 @@
     {
       "id": "r5",
       "title": "case 'XL' present",
-      "description": "case 'XL' is directly followed by a console.log call",
+      "description": "case 'XL' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]XL['\"]\\s*:\\s*console\\.log",
@@ -78,7 +78,7 @@
     {
       "id": "r6",
       "title": "default label present",
-      "description": "The default label is directly followed by a console.log call",
+      "description": "The default label is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "default\\s*:\\s*console\\.log",
@@ -88,7 +88,7 @@
     {
       "id": "r7",
       "title": "break present",
-      "description": "Code contains a break statement",
+      "description": "Code contains a break statement. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "break",

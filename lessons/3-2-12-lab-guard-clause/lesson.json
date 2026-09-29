@@ -37,7 +37,7 @@
     {
       "id": "r1",
       "title": "divide defined",
-      "description": "Code defines a function named divide",
+      "description": "Code defines a function named divide. Help: 3.2.9 (Getting a Value Back with return)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+divide\\s*\\(",
@@ -47,7 +47,7 @@
     {
       "id": "r2",
       "title": "if statement present",
-      "description": "Code contains an if condition",
+      "description": "Code contains an if condition. Help: 2.1.3 (If / Else if / Else)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\(",
@@ -57,7 +57,7 @@
     {
       "id": "r3",
       "title": "return statement present",
-      "description": "Code contains a return statement",
+      "description": "Code contains a return statement. Help: 3.2.9 (Getting a Value Back with return)",
       "type": "regex",
       "file": "script.js",
       "pattern": "return\\s",
@@ -67,7 +67,7 @@
     {
       "id": "r4",
       "title": "results are logged",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.2.9 (Getting a Value Back with return)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
