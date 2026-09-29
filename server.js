@@ -15,8 +15,16 @@ import { DEFAULT_WEIGHTS } from './lib/grading-weights.ts';
 // Who the dev auth stub pretends to be. `DEV_ROLE=student npm run dev` is the
 // only way to see the student half of anything here — the real session comes
 // from a JWT this server does not issue.
+//
+// The stubs are GATED, not just "not in production": they register only when
+// SHCODE_ENABLE_DEV_STUBS=1 is set AND the server is not running under
+// NODE_ENV=production. Fail-closed — a stub that must be switched on cannot
+// ship by accident, and a production boot cannot be talked into serving them
+// by forgetting an env var. `npm run dev` sets the flag for you (package.json).
 const DEV_EMAIL = 'dev@local';
 const DEV_ROLE = process.env.DEV_ROLE === 'student' ? 'student' : process.env.DEV_ROLE === 'admin' ? 'admin' : 'teacher';
+const DEV_STUBS_ENABLED =
+  process.env.NODE_ENV !== 'production' && process.env.SHCODE_ENABLE_DEV_STUBS === '1';
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -89,7 +97,16 @@ function stripJsComments(src) {
   return out;
 }
 
-app.prepare().then(() => {
+app.prepare().catch((err) => {
+  // `output: 'export'` refuses a production server(boot) by design — the built
+  // site is served by Cloudflare Pages from out/. A `NODE_ENV=production node
+  // server.js` boot would otherwise crash BEFORE the dev-stub gate is even
+  // registered, which is exactly the boot a probe (or an accident) would try.
+  // Log it and keep going: the Express server below still starts, the catch-all
+  // answers 500 for pages, and — the point — every stubbed /api/* route stays
+  // shut behind the gate either way.
+  console.error('[dev-stub-gate] app.prepare() failed to start a handler:', err.message);
+}).then(() => {
   const server = express();
 
   // ---- public/_headers, for the one prefix that cannot work without it ----
@@ -115,7 +132,22 @@ app.prepare().then(() => {
     next();
   });
 
-  // ---- Dev-only auth + lesson-state stubs --------------------------------
+  // ---- gated dev stubs: fail-closed, explicit opt-in ----------------------
+  // Everything between this if and its closing brace exists only to make
+  // local review possible without wrangler/D1. It registers ONLY when
+  // SHCODE_ENABLE_DEV_STUBS=1 and NODE_ENV is not 'production'; otherwise a
+  // probe to any stubbed route answers 410 Gone and nothing below runs.
+  // `npm run dev` sets the flag (package.json), so the interactive flow is
+  // unchanged. Fail-closed: a stub that must be switched ON cannot ship by
+  // accident, and NODE_ENV=production cannot be served the stubs by forgetting
+  // a var — the flag alone is not sufficient.
+  if (!DEV_STUBS_ENABLED) {
+    server.use('/api/*', (_req, res) => {
+      res.status(410).json({ error: 'Dev stubs disabled (SHCODE_ENABLE_DEV_STUBS=1 to enable)' });
+    });
+  }
+  if (DEV_STUBS_ENABLED) {
+    // ---- Dev-only auth + lesson-state stubs --------------------------------
   // The real /api/auth/* and /api/lesson-state* are Cloudflare Pages
   // Functions (functions/api/**), which this local Express server does NOT
   // emulate. Without these stubs every lesson past the first in a module
@@ -628,13 +660,18 @@ app.prepare().then(() => {
     console.log('  [dev] issue #' + gone.id + ' deleted' + (screenshotDeleted ? ' (+ screenshot)' : ''));
     res.json({ deleted: gone.id, screenshotDeleted });
   });
+  } // end DEV_STUBS_ENABLED
 
   server.all('*', (req, res) => {
     return handle(req, res);
   });
 
   const port = process.env.PORT || 3002;
-  server.listen(port, () => {
-    console.log(`> Ready on http://localhost:${port}`);
+  // `listen` RETURNS the underlying http.Server whose address() reports the
+  // ACTUAL bound port (the express app itself has none) — PORT=0 picks an
+  // ephemeral port, which scripts/test-dev-stub-gate.mjs relies on so it can
+  // never collide with a dev server someone already has running.
+  const httpServer = server.listen(port, () => {
+    console.log(`> Ready on http://localhost:${httpServer.address().port}`);
   });
 });

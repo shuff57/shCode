@@ -6,12 +6,12 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "dev": "node scripts/build-brep-kernel.mjs && node scripts/build-pii-guard-models.mjs && node server.js",
+    "dev": "node scripts/build-brep-kernel.mjs && node scripts/build-pii-guard-models.mjs && SHCODE_ENABLE_DEV_STUBS=1 node server.js",
     "prebuild": "node scripts/build-brep-kernel.mjs && node scripts/build-pii-guard-models.mjs && node scripts/check-lesson-numbers.mjs && node scripts/check-assignment-codes.mjs && node scripts/generate-module-docs.mjs && node scripts/generate-lessons-manifest.mjs && node scripts/generate-ai-graders.mjs && node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs && node scripts/check-moshion-textures.mjs && node scripts/check-solution-leak.mjs",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "test:occt": "node scripts/test-occt-adapter.mjs --occt public/reshape/kernel",
-    "test": "node scripts/check-lesson-numbers.mjs && node scripts/check-lesson-citations.mjs && node scripts/check-live-blocks.mjs && node scripts/check-starters.mjs && node scripts/audit-grader-tolerance.mjs --gate && node scripts/check-assignment-codes.mjs && node scripts/check-summative-parts.mjs && node scripts/test-find-and-fix.mjs && node scripts/test-diagram.mjs && node scripts/test-diagram-pseudocode.mjs && node scripts/check-flow-figures.mjs && node scripts/test-diagram-hint.mjs && node scripts/test-model-codegen.mjs && node scripts/test-panel-selection.mjs && node scripts/test-camera-fit.mjs && node scripts/test-model-types.mjs && node scripts/test-model-check.mjs && node scripts/test-format-number.mjs && node scripts/test-model-handles.mjs && node scripts/test-mesh-export.mjs && node scripts/test-lesson-mode.mjs && node scripts/test-pii-check.mjs && node scripts/test-pii-guard.mjs && node scripts/test-login-lockout.mjs && node scripts/test-least-squares.mjs && node scripts/test-topo-name.mjs && node scripts/test-model-deps.mjs && node scripts/test-script-surface.mjs && node scripts/test-occt-adapter.mjs --occt public/reshape/kernel && node scripts/test-topo-resolve.mjs --occt public/reshape/kernel && node scripts/test-reshape-script.mjs --occt public/reshape/kernel && node scripts/test-sketch-solve.mjs && node scripts/test-sketch-arc.mjs && node scripts/test-sketch-outline.mjs && node scripts/check-sketch-movers.mjs && node scripts/test-due-dates.mjs && node scripts/test-quiz.mjs && node scripts/test-quiz-variant.mjs && node scripts/check-quiz-key-leak.mjs --allow-missing && node scripts/test-grade-pass.mjs && node scripts/test-gradebook-cell.mjs && node scripts/test-grading.mjs && node scripts/test-console-labs.mjs && node scripts/test-plan-seed.mjs && node scripts/check-diagram-solutions.mjs && node scripts/test-lesson-solution-parity.mjs && node scripts/test-rubric-tolerance-2-1.mjs && node scripts/generate-ai-graders.mjs && node scripts/test-grader.mjs && node scripts/test-grade-stream.mjs && node scripts/test-grader-tolerance.mjs && node scripts/test-version-control.mjs && node scripts/check-solution-leak.mjs && node scripts/check-reshape-solutions.mjs && node scripts/test-runner-timeout.mjs && node scripts/test-capstone-requirements.mjs && node scripts/check-moshion-textures.mjs && node scripts/test-moshion.mjs && node scripts/test-uploads.mjs && node scripts/test-issue-votes.mjs && node scripts/check-reachable.mjs && node scripts/test-reshape-docs.mjs && node scripts/test-js-docs.mjs && node scripts/check-docs-prose.mjs && node scripts/check-sketch-compat.mjs --occt public/reshape/kernel && node scripts/check-onshape-parity.mjs && node scripts/check-constraint-ui.mjs && node scripts/check-dot-contrast.mjs",
+    "test": "node scripts/check-lesson-numbers.mjs && node scripts/check-lesson-citations.mjs && node scripts/check-live-blocks.mjs && node scripts/check-starters.mjs && node scripts/audit-grader-tolerance.mjs --gate && node scripts/check-assignment-codes.mjs && node scripts/check-summative-parts.mjs && node scripts/test-find-and-fix.mjs && node scripts/test-diagram.mjs && node scripts/test-diagram-pseudocode.mjs && node scripts/check-flow-figures.mjs && node scripts/test-diagram-hint.mjs && node scripts/test-model-codegen.mjs && node scripts/test-panel-selection.mjs && node scripts/test-camera-fit.mjs && node scripts/test-model-types.mjs && node scripts/test-model-check.mjs && node scripts/test-format-number.mjs && node scripts/test-model-handles.mjs && node scripts/test-mesh-export.mjs && node scripts/test-lesson-mode.mjs && node scripts/test-pii-check.mjs && node scripts/test-pii-guard.mjs && node scripts/test-login-lockout.mjs && node scripts/test-least-squares.mjs && node scripts/test-topo-name.mjs && node scripts/test-model-deps.mjs && node scripts/test-script-surface.mjs && node scripts/test-occt-adapter.mjs --occt public/reshape/kernel && node scripts/test-topo-resolve.mjs --occt public/reshape/kernel && node scripts/test-reshape-script.mjs --occt public/reshape/kernel && node scripts/test-sketch-solve.mjs && node scripts/test-sketch-arc.mjs && node scripts/test-sketch-outline.mjs && node scripts/check-sketch-movers.mjs && node scripts/test-due-dates.mjs && node scripts/test-quiz.mjs && node scripts/test-quiz-variant.mjs && node scripts/check-quiz-key-leak.mjs --allow-missing && node scripts/test-grade-pass.mjs && node scripts/test-gradebook-cell.mjs && node scripts/test-grading.mjs && node scripts/test-console-labs.mjs && node scripts/test-plan-seed.mjs && node scripts/check-diagram-solutions.mjs && node scripts/test-lesson-solution-parity.mjs && node scripts/test-rubric-tolerance-2-1.mjs && node scripts/generate-ai-graders.mjs && node scripts/test-grader.mjs && node scripts/test-grade-stream.mjs && node scripts/test-grader-tolerance.mjs && node scripts/test-version-control.mjs && node scripts/check-solution-leak.mjs && node scripts/check-reshape-solutions.mjs && node scripts/test-runner-timeout.mjs && node scripts/test-capstone-requirements.mjs && node scripts/check-moshion-textures.mjs && node scripts/test-moshion.mjs && node scripts/test-uploads.mjs && node scripts/test-issue-votes.mjs && node scripts/check-reachable.mjs && node scripts/test-reshape-docs.mjs && node scripts/test-js-docs.mjs && node scripts/check-docs-prose.mjs && node scripts/check-sketch-compat.mjs --occt public/reshape/kernel && node scripts/check-onshape-parity.mjs && node scripts/check-constraint-ui.mjs && node scripts/check-dot-contrast.mjs && node scripts/test-dev-stub-gate.mjs",
     "issues": "node scripts/pull-issues.mjs",
     "d1": "node scripts/d1.mjs",
     "d1:status": "node scripts/d1.mjs migrations list shcode-commits --remote",
@@ -55,7 +55,8 @@
     "test:outline": "node scripts/test-sketch-outline.mjs",
     "test:movers": "node scripts/check-sketch-movers.mjs",
     "test:contrast": "node scripts/check-dot-contrast.mjs",
-    "test:textures": "node scripts/check-moshion-textures.mjs"
+    "test:textures": "node scripts/check-moshion-textures.mjs",
+    "test:stubs": "node scripts/test-dev-stub-gate.mjs"
   },
   "type": "module",
   "dependencies": {
@@ -74,13 +75,13 @@
     "@shuff57/reshape-studio": "file:./vendor/reshape-cad/packages/studio",
     "@xyflow/react": "^12.11.3",
     "diff": "^9.0.0",
-    "express": "^4.21.2",
+    "express": "^4.22.3",
     "isomorphic-dompurify": "^3.19.0",
     "jose": "^5.9.6",
     "jszip": "^3.10.1",
     "lucide-react": "^0.539.0",
     "marked": "^18.0.9",
-    "next": "^15.4.6",
+    "next": "^15.5.26",
     "react": "^19.1.1",
     "react-arborist": "^3.4.3",
     "react-dom": "^19.1.1",
@@ -88,16 +89,16 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250424.0",
+    "@cloudflare/workers-types": "^4.20260702.1",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@types/three": "^0.185.4",
     "autoprefixer": "^10.4.14",
     "knip": "^6.34.0",
-    "postcss": "^8.4.31",
+    "postcss": "^8.5.28",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.4",
-    "wrangler": "^4.87.0"
+    "wrangler": "^4.143.0"
   }
 }
