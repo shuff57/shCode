@@ -136,5 +136,13 @@ check('the scan found pointers to check', pointerCount > 0, `pointerCount=${poin
 check('no pointer sends the student to a lesson they have not reached', forward.length === 0,
   forward.length ? `${forward.length} forward pointer(s): ${forward.slice(0, 8).join(', ')}` : '');
 
+// A pointer to the CURRENT lesson opens a second copy of the page the student is
+// already on. It used to be reported but never failed, so three of them sat in
+// the course for months: "the chart (1.6.1), the code (1.6.2), this writeup
+// (1.6.3)" -- where the words already say "this writeup" and the number is
+// redundant. Fixed editorially; this makes it a build failure.
+check('no pointer links a lesson to itself', self.length === 0,
+  self.length ? `${self.length} self-reference(s): ${self.slice(0, 8).join(', ')}` : '');
+
 console.log(`\n${failures === 0 ? 'ALL PASS' : `${failures} FAILED`}`);
 process.exit(failures === 0 ? 0 : 1);
