@@ -412,8 +412,10 @@ function chatHeaders(apiKey: string | null): Record<string, string> {
 // ---------------------------------------------------------------------------
 // Transports
 //
-// Both read a complete grade and report progress the same way. The difference
-// is only how bytes arrive: a bare NDJSON body for Ollama, SSE for OpenRouter.
+// One transport. It reads a complete grade and reports progress as it grows.
+// There used to be a second one here, for an API that framed its stream as
+// SSE and had no SLA of its own; both are gone, which is why this section is one
+// function and not two.
 
 // Carries a sentence already fit to show a student. Anything else thrown gets
 // the generic wrapper instead.
