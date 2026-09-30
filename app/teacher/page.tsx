@@ -226,6 +226,9 @@ interface GradeResponse {
   structural?: StructuralCheck[];
   /** Diagram assignments that also run the essay grader. */
   ai?: GradeResponse;
+  /** Multiple-choice quizzes: one { id, picked, correct? } per question. Its
+   *  presence is how the drawer tells a quiz from any other graded submission. */
+  quiz?: unknown[];
 }
 
 // Nearly every rubric in the course awards points: 0 per criterion and grades
@@ -462,6 +465,10 @@ function StudentDrawer({
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
   const [expandedSubs, setExpandedSubs] = useState<Set<string>>(new Set());
+  // Bumped after an unsubmit to re-run the fetch below; `unsubmitting` is the
+  // lesson id in flight, so its button can't be double-fired.
+  const [reloadKey, setReloadKey] = useState(0);
+  const [unsubmitting, setUnsubmitting] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -479,7 +486,7 @@ function StudentDrawer({
       setErr('Network error');
       setLoading(false);
     });
-  }, [classId, email]);
+  }, [classId, email, reloadKey]);
 
   function toggleSub(lessonId: string) {
     setExpandedSubs((prev) => {
@@ -488,6 +495,22 @@ function StudentDrawer({
       else next.add(lessonId);
       return next;
     });
+  }
+
+  // Reopen a submitted quiz: the student keeps their answers and can change
+  // them and resubmit. Removes the submission and its score, so confirm first.
+  async function unsubmit(lessonId: string, title: string) {
+    if (!window.confirm(`Unsubmit "${title}" for ${email}? Their submission and score are removed. They keep their answers and can change them and resubmit.`)) return;
+    setUnsubmitting(lessonId);
+    setErr('');
+    const res = await apiFetch<{ ok: true }>(`/api/classes/${classId}/lesson-unsubmit`, {
+      method: 'POST',
+      body: JSON.stringify({ studentEmail: email, lessonId }),
+    }).catch(() => null);
+    setUnsubmitting(null);
+    if (res === null) setErr('Network error');
+    else if (res.error !== null) setErr(res.error);
+    else setReloadKey((k) => k + 1);
   }
 
   // Group active lessons by unit. Only show lessons that have some state.
@@ -701,6 +724,15 @@ function StudentDrawer({
                             onClick={() => toggleSub(lesson.id)}
                           >
                             {isExpanded ? 'Hide' : 'View submission'}
+                          </button>
+                        )}
+                        {Array.isArray(gradeData?.quiz) && (
+                          <button
+                            style={{ background: 'none', border: '1px solid #ffb86c', borderRadius: 4, color: '#ffb86c', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0 }}
+                            disabled={unsubmitting === lesson.id}
+                            onClick={() => unsubmit(lesson.id, lesson.title)}
+                          >
+                            {unsubmitting === lesson.id ? 'Unsubmitting…' : 'Unsubmit'}
                           </button>
                         )}
                       </div>

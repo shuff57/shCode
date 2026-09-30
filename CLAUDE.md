@@ -357,6 +357,21 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   the shared `ai_help_usage` table under the `grade-written` bucket.
 - Owner-only class routes: `archive`, `regenerate-code`, `delete` (cascades to
   progress data for students enrolled nowhere else), and co-teacher management.
+- `POST /api/classes/[id]/lesson-unsubmit` — a manager of the class (or an admin)
+  reopens one student's submitted **multiple-choice** quiz. The `lesson_drafts`
+  row is rewritten to the **same answers with `graded: false`**, which is what
+  unlocks the radios in `components/QuizView.tsx` and beats a stale
+  `graded: true` left in that browser's localStorage; `lesson_state` drops back to
+  `started` with the score cleared (so the lessons after it re-gate); and the
+  `lesson_submissions` rows are **deleted**, which is what the drawer, the review
+  queue, the gradebook and `scripts/score-quiz.mjs` all read. One `DB.batch`, so a
+  half-reopened quiz is not a state the system can be left in. It 409s anything
+  whose `grade_json` carries no `quiz` array — a written answer, a diagram and
+  code live in the same table, and unsubmitting one would delete a graded essay.
+  The delete is deliberate and leaves **no audit trail**; keeping one needs a new
+  table plus a filter on every reader of `lesson_submissions`. Guarded by
+  `scripts/test-quiz-unsubmit.mjs` (wired into `npm test`), which drives the real
+  handler against a D1 stub.
 
 ### Image uploads
 - `GET /api/uploads` — caller's images + quota (40 files / 20 MB, 2 MB each)
