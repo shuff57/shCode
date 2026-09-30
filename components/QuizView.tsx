@@ -42,6 +42,29 @@ function saveState(lessonId: string, state: StoredState) {
     localStorage.setItem(STORAGE_PREFIX + lessonId, JSON.stringify(state));
   } catch {}
 }
+// The marking the server hands back after a summative hand-in, keyed by
+// question id. `answer` is the option's AUTHORED index, directly comparable
+// with a stored pick. The route refuses (403) until a submission row exists
+// for this student, so a null here just means "no marking yet".
+interface RevealAnswer {
+  id: string;
+  answer: number;
+  optionText: string;
+  explanation: string;
+}
+
+async function fetchReveal(lessonId: string): Promise<Record<string, RevealAnswer> | null> {
+  try {
+    const res = await fetch(`/api/quiz-reveal?lessonId=${encodeURIComponent(lessonId)}`, {
+      credentials: 'include',
+    });
+    if (!res.ok) return null; // 403 = not handed in yet — quiet, not an error
+    const data = (await res.json()) as { answers?: RevealAnswer[] };
+    return Object.fromEntries((data.answers ?? []).map((a) => [a.id, a]));
+  } catch {
+    return null;
+  }
+}
 
 export default function QuizView({ lessonId, config }: Props) {
   const [answers, setAnswers] = useState<Answers>({});
@@ -49,6 +72,7 @@ export default function QuizView({ lessonId, config }: Props) {
   const [loaded, setLoaded] = useState(false);
   const [sourceHrefs, setSourceHrefs] = useState<Record<string, string>>({});
   const [identity, setIdentity] = useState('guest');
+  const [reveal, setReveal] = useState<Record<string, RevealAnswer> | null>(null);
   const progress = useLessonState();
 
   // Which paper this student sits. Identical to the authored order unless the
@@ -60,6 +84,9 @@ export default function QuizView({ lessonId, config }: Props) {
   const questions = view.questions.map((v) => v.question);
   // A test, not a module quiz: see QuizConfig.summative.
   const summative = !!config.summative;
+  // Opt-in, and the generator only bakes a key for a quiz that asks. Off means
+  // no request is made at all rather than a request that is expected to fail.
+  const revealAfterSubmit = !!config.revealAfterSubmit;
   // A summative quiz arrives with its answer key stripped (lib/quiz-redact.ts),
   // so the browser cannot mark it and must not pretend to. Everything that
   // reports or records a score is switched off rather than left to report 0.
@@ -131,6 +158,20 @@ export default function QuizView({ lessonId, config }: Props) {
     saveState(lessonId, { answers, graded });
   }, [answers, graded, lessonId, loaded]);
 
+  // A test's marking is server-held: once this student has a hand-in the
+  // route returns the key for their form; before that it refuses. Both
+  // states stay quiet here — no marking yet is not an error on a live test.
+  useEffect(() => {
+    if (!revealAfterSubmit || !loaded) return;
+    let cancelled = false;
+    fetchReveal(lessonId).then((r) => {
+      if (!cancelled) setReveal(r);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [revealAfterSubmit, loaded, lessonId]);
+
   // `index` is the option's index in the AUTHORED options array, never where
   // it was drawn. That is what lets a shuffled quiz share its storage, its
   // grading and its submission record with an unshuffled one.
@@ -152,10 +193,16 @@ export default function QuizView({ lessonId, config }: Props) {
     // through their own exam.
     if (summative || correctCount >= needed) {
       await recordLessonCompleted(lessonId, hasKey ? correctCount : undefined);
-      setTimeout(() => navigateToNextLesson(lessonId), 1800);
+      // Skipped when the marking is about to be revealed. 1800ms is enough to
+      // notice a screen change and not enough to read eight answers and their
+      // explanations, so navigating here would take the paper away at exactly
+      // the moment it became worth reading. The part still unlocks -- it unlocked
+      // on the line above -- and the next-lesson nav is on the page.
+      if (!revealAfterSubmit) setTimeout(() => navigateToNextLesson(lessonId), 1800);
+
     }
     if (progress.authed) {
-      recordSubmission({
+      await recordSubmission({
         lessonId,
         response: payload,
         gradeJson: {
@@ -173,6 +220,10 @@ export default function QuizView({ lessonId, config }: Props) {
         possible: questions.length,
       });
       saveDraft(lessonId, payload);
+    }
+    if (revealAfterSubmit && progress.authed) {
+      // The row is in, so the route can hand back the marking for this form.
+      setReveal(await fetchReveal(lessonId));
     }
   }
 
@@ -209,10 +260,14 @@ export default function QuizView({ lessonId, config }: Props) {
 
       {view.questions.map(({ question: q, order }, qi) => {
         const picked = answers[q.id];
-        // Under summative marking nothing is revealed, so the card never
-        // turns green or red and no explanation is drawn.
-        const isCorrect = !summative && graded && picked === q.answer;
-        const isWrong = !summative && graded && picked !== undefined && picked !== q.answer;
+        // Summative marking comes from the server's reveal, not the stripped key.
+        const rv = summative ? reveal?.[q.id] : undefined;
+        // Marks draw only after a hand-in (graded) and, on a test, only once the
+        // server has handed back the key for this student's own form.
+        const showMarks = graded && (summative ? !!rv : true);
+        const answerIndex = rv ? rv.answer : q.answer;
+        const isCorrect = showMarks && picked === answerIndex;
+        const isWrong = showMarks && picked !== undefined && picked !== answerIndex;
         return (
           <div
             key={q.id}
@@ -265,8 +320,10 @@ export default function QuizView({ lessonId, config }: Props) {
                 // Green the right option only once it's been earned — either the
                 // student picked it, or they've passed. Marking it on a failed
                 // attempt turns "try again" into "click the green one".
-                const markAsAnswer = !summative && graded && oi === q.answer && (isCorrect || passed);
-                const markAsMistake = !summative && graded && selected && oi !== q.answer;
+                const markAsAnswer = graded && (summative
+                  ? !!rv && oi === rv.answer // after a test hand-in the right option is shown
+                  : oi === q.answer && (isCorrect || passed));
+                const markAsMistake = showMarks && selected && oi !== answerIndex;
                 return (
                   <label
                     key={oi}
@@ -304,7 +361,7 @@ export default function QuizView({ lessonId, config }: Props) {
               })}
             </div>
 
-            {graded && !summative ? (
+            {showMarks ? (
               <div
                 style={{
                   marginLeft: 30,
@@ -325,8 +382,8 @@ export default function QuizView({ lessonId, config }: Props) {
                   <CircleX size={16} color="#ff5555" style={{ flexShrink: 0, marginTop: 2 }} />
                 )}
                 <span>
-                  {withInlineCode(q.explanation ?? '')}
-                  {q.source ? (
+                  {withInlineCode((rv ? rv.explanation : q.explanation) ?? '')}
+                  {!summative && q.source ? (
                     <span style={{ color: '#6272a4' }}>
                       {' (reread '}
                       {sourceHintParts(q.source).map((part, pi) => {

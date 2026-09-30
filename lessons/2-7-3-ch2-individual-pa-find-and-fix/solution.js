@@ -2,8 +2,8 @@
 // Reference answer -- all four bugs repaired, each with a // comment
 // naming the kind it was.
 
-// Bug 1 -- syntax: the name on the first item line is missing its
-// closing quote, so the file is not valid JavaScript and nothing runs.
+// Bug 1 -- syntax: the string on the item line is missing its closing
+// quote, so the file is not valid JavaScript and not one line runs.
 const taxRate = 0.08;
 
 let itemName = "Notebook";
@@ -16,18 +16,19 @@ let shipping = 5;
 let beforeTax = subtotal + shipping;
 
 let tax = beforeTax * taxRate;
-let total = beforeTax + tax;
 
 // Bug 2 -- runtime: the total line names an identifier that was never
 // declared. It is a misspelling of the running total one line above,
-// and the misspelled form does not exist anywhere else in the file.
-// The fix is the spelling the declaration actually used.
+// and the misspelled form exists nowhere else in the file. The fix is
+// the spelling the declaration actually used.
+let total = beforeTax + tax;
 
-// Bug 3 -- logic: the skip sits above the update, so week three's
-// deposit never lands in the balance and the receipt reports 30
-// instead of 40. The skip belongs below the update -- or, read the
-// other way, the update belongs above the skip -- so week three is
-// credited and only the holiday week is skipped.
+// Bug 3 -- logic: continue jumps straight to the next round, so
+// anything written after it is skipped on the rounds that take it.
+// Week 3 takes it, so that week's deposit never lands and the receipt
+// says Savings: 30 instead of 40. The deposit has to happen every
+// week, so it moves above the skip -- the log line is what the skip is
+// for.
 const DEPOSIT = 10;
 let savings = 0;
 for (let w = 1; w <= 4; w++) {
@@ -35,10 +36,18 @@ for (let w = 1; w <= 4; w++) {
   if (w === 3) {
     continue;
   }
+  console.log("Week " + w + ": deposit of " + DEPOSIT);
 }
 
-// Bug 4 -- runtime: the update sits below a continue, so on the skipped
-// rounds the counter never moves and the walk never reaches its stop.
+console.log("Item: " + itemName);
+console.log("Ordered: " + count);
+console.log("Before tax: " + beforeTax);
+console.log("Savings: " + savings);
+console.log("Total: " + total);
+
+// Bug 4 -- runtime: the line that moves the counter sits below a
+// continue, so on the rounds the skip takes, the counter never moves.
+// The loop asks the same question forever and never reaches its stop.
 let i = 0;
 while (i < 5) {
   i++;
@@ -47,11 +56,5 @@ while (i < 5) {
   }
   console.log("Week " + i);
 }
-
-console.log("Item: " + itemName);
-console.log("Ordered: " + count);
-console.log("Before tax: " + beforeTax);
-console.log("Savings: " + savings);
-console.log("Total: " + total);
 
 // Four fixes: syntax, runtime, logic, runtime.

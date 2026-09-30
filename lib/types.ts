@@ -226,6 +226,17 @@ export interface QuizConfig {
    * is green-to-advance and a summative score is the teacher's to hand back.
    */
   summative?: boolean;
+  /**
+   * Release the correct answers and their explanations to the student once they
+   * have handed the paper in. Off by default, and that default is load-bearing:
+   * `summative` is set on five quizzes in the course, two of them module quizzes
+   * where marking is the entire point. A test opts in by asking.
+   *
+   * Delivery is server-side and after the attempt, never in the page -- see
+   * functions/api/quiz-reveal.ts. The attempt count is unchanged; this only
+   * decides whether the marking is shown once it is spent.
+   */
+  revealAfterSubmit?: boolean;
   questions: QuizQuestion[];
 }
 
@@ -235,8 +246,42 @@ export interface AiGraderConfig {
    * submission, no rubric feedback returned to the student, and the lesson
    * completes on submission. Rubric feedback on a graded test is the answer
    * key: it names the criterion that was missed, and the student resubmits.
+   * Either way the grading brief (`prompt`, `contextDocs`, rubric
+   * descriptions) stays out of the browser -- see lib/quiz-redact.ts.
+   * `revisable` lifts the first two.
    */
   summative?: boolean;
+  /**
+   * A summative item the student may revise: submit, read the grader's
+   * feedback, fix the answer, submit again, without limit. Lifts only the
+   * one-submission lock and the suppressed feedback panel. The brief still
+   * never reaches the browser and sitting the item still completes the lesson,
+   * so a student is not locked out of the rest of the test by a draft that has
+   * not passed yet.
+   *
+   * The price is the feedback itself: it names what a draft is missing and can
+   * paraphrase the accepted answer. Decided per item. Inert without `summative`.
+   */
+  revisable?: boolean;
+  /**
+   * How many graded attempts the student gets. Absent means unlimited, which
+   * is every formative assignment in the course. Counted from the server's own
+   * submission rows rather than from this browser -- see lib/attempt-cap.ts for
+   * why a client-side count is not a cap, and what it does not count.
+   *
+   * Only meaningful with `summative`. On a formative item it is inert: a
+   * practice assignment has no reason to stop somebody trying again.
+   */
+  maxSubmissions?: number;
+  /**
+   * What the student types into. 'text' (the default) is the prose textarea;
+   * 'code' is the CodeMirror JavaScript editor: line numbers, colour, bracket
+   * matching, auto-indent, and no Run button, lint or autocomplete, so the
+   * student still has to find their own mistakes. Presentation only: it passes
+   * through redaction (lib/quiz-redact.ts) because the widget needs it, and the
+   * grader never sees it -- it takes only `lessonId` and `response`.
+   */
+  input?: 'text' | 'code';
   rubricTitle?: string;
   model?: string;
   contextDocs?: string[];

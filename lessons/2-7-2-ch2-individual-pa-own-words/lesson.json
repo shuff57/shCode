@@ -1,7 +1,7 @@
 {
   "id": "2-7-2-ch2-individual-pa-own-words",
   "title": "2.7.2 Individual PA Part 2: In Your Own Words",
-  "description": "Three short-answer questions. Explain the ideas in your own words. AI-graded, summative: one submission, nothing marked on screen.",
+  "description": "Three short-answer questions. Explain the ideas in your own words. AI-graded: submit, read the feedback, and revise as many times as you like.",
   "type": "assignment",
   "estimateMins": 7,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -23,6 +23,8 @@
   "assignmentCode": "A2.7.2",
   "aiGrader": {
     "summative": true,
+    "revisable": true,
+    "maxSubmissions": 3,
     "rubricTitle": "Chapter 2 Individual PA, Part 2: In Your Own Words",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],

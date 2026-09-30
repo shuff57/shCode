@@ -48,11 +48,36 @@ function stripJsComments(src: string): string {
     if (inStr) {
       out += c;
       if (c === '\\' && i + 1 < n) { out += src[i + 1]; i += 2; continue; }
-      if (c === inStr) inStr = null;
+      // A " or ' string cannot span a raw newline, so an unterminated one
+      // ends at the end of its line instead of swallowing the rest of the
+      // file. Without this the scan desynchronizes on the first missing
+      // quote and never recovers: every comment below it survives as
+      // "string content", so a fix written in a comment satisfies the regex.
+      // Measured on 2.7.3, whose starter opens with an unterminated string.
+      if (c === inStr || ((inStr === '"' || inStr === "'") && c === '\n')) inStr = null;
       i++;
       continue;
     }
-    if (c === '"' || c === "'" || c === '`') { inStr = c; out += c; i++; continue; }
+    if (c === '"' || c === "'" || c === '`') {
+      // A " or ' string cannot span a raw newline. If this quote has no partner
+      // before the end of the line then the file is mid-syntax-error, and the
+      // rest of that line is CODE, not string content -- so say so and let the
+      // branch below strip a // that follows. Reading it as a string start is
+      // what let a fix hidden in a comment satisfy 2.7.3's r1: the comment sat
+      // inside the phantom string and survived verbatim. A ` template may span
+      // lines, so it keeps the old behaviour.
+      if (c !== '`') {
+        let j = i + 1;
+        let closed = false;
+        while (j < n && src[j] !== '\n') {
+          if (src[j] === '\\') { j += 2; continue; }
+          if (src[j] === c) { closed = true; break; }
+          j++;
+        }
+        if (!closed) { out += c; i++; continue; }
+      }
+      inStr = c; out += c; i++; continue;
+    }
     if (c === '/' && nx === '/') {
       while (i < n && src[i] !== '\n') i++;
       continue;
@@ -97,13 +122,21 @@ function extractFunctionBody(src: string, name: string): string | null {
 // you want case-insensitive. moSHion identifiers (Canvas, Sprite, kb,
 // world) are case-sensitive so strict is the right default.
 function checkRegex(req: Requirement, files: Record<string, string>): boolean {
+  // Fail closed. A summative lesson has `pattern` stripped from the copy the
+  // browser gets (lib/quiz-redact.ts -- the pattern IS the answer key), and
+  // `new RegExp('')` matches every string there is. Without this guard every
+  // requirement on every test part reported PASSED whatever the student wrote:
+  // measured on 2.7.3, where all five cards went green on the untouched
+  // starter. A check that could not run must not report a pass.
+  if (!req.pattern) return false;
   const raw = files[req.file || ''] || '';
   const content = req.stripComments === false ? raw : stripJsComments(raw);
-  const regex = new RegExp(req.pattern || '', req.flags ?? '');
+  const regex = new RegExp(req.pattern, req.flags ?? '');
   return regex.test(content);
 }
 
 function checkInFunction(req: Requirement, files: Record<string, string>): boolean {
+  if (!req.pattern) return false; // same fail-closed reason as checkRegex
   const raw = files[req.file || ''] || '';
   const content = stripJsComments(raw);
   const names = Array.isArray(req.function)

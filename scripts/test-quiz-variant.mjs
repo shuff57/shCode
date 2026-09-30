@@ -20,6 +20,8 @@ try {
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
       'lib/quiz-variant.ts',
       'lib/quiz-redact.ts',
+      'lib/attempt-cap.ts',
+      'lib/quiz-redact.ts',
       '--outDir', out,
       '--module', 'commonjs',
       '--target', 'es2022',

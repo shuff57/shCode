@@ -47,16 +47,26 @@ export async function saveDraft(lessonId: string, response: string): Promise<boo
   }
 }
 
-export async function fetchSubmissions(lessonId: string): Promise<SubmissionRecord[]> {
+export interface SubmissionFetch {
+  records: SubmissionRecord[];
+  /**
+   * False when the request failed, so a caller gating an integrity control can
+   * tell "no attempts yet" from "could not find out". `fetchDraft` below and the
+   * draft path can both swallow a failure; an attempt cap cannot.
+   */
+  loaded: boolean;
+}
+
+export async function fetchSubmissions(lessonId: string): Promise<SubmissionFetch> {
   try {
     const res = await fetch(`/api/lesson-submissions?lessonId=${encodeURIComponent(lessonId)}`, {
       credentials: 'include',
     });
-    if (!res.ok) return [];
+    if (!res.ok) return { records: [], loaded: false };
     const data = (await res.json()) as { submissions?: SubmissionRecord[] };
-    return data.submissions ?? [];
+    return { records: data.submissions ?? [], loaded: true };
   } catch {
-    return [];
+    return { records: [], loaded: false };
   }
 }
 

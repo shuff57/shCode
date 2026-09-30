@@ -580,10 +580,19 @@ export default function LessonWorkspace({
       context
     );
     setRequirements(
-      lesson.requirements.map((r) => ({
-        ...r,
-        ...report.results.find((d) => d.id === r.id),
-      }))
+      lesson.requirements.map((r) => {
+        const result = report.results.find((d) => d.id === r.id);
+        // A summative lesson's `pattern` is stripped from this copy
+        // (lib/quiz-redact.ts), so the grader cannot check it and now fails
+        // closed. Leaving `status` undefined renders the card in its third
+        // state -- grey, "not graded" -- which is the truth. Writing `failed`
+        // through would tell a student on a test that they had failed a part
+        // nobody is able to grade in the browser. Submit is unaffected:
+        // `canSubmit` is true outright for a summative part.
+        const patternCheck = !r.type || r.type === 'regex' || r.type === 'inFunction';
+        if (patternCheck && !r.pattern) return { ...r };
+        return { ...r, ...result };
+      })
     );
     setGradeReport(report);
   }

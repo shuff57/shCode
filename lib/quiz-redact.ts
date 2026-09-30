@@ -5,7 +5,7 @@
 // body is a client component, so the whole Lesson object — `quiz` and
 // `aiGrader` included — is serialised into the page's RSC payload. Every
 // hiding rule in QuizView (`isCorrect`, `markAsAnswer`, `graded && !summative`)
-// and in WrittenGrader (`result && !summative`) governs what is DRAWN, and
+// and in WrittenGrader (`result && !oneShot`) governs what is DRAWN, and
 // none of them governs what is SHIPPED. Measured 2026-09-02 on
 // 1-7-1-ch1-individual-pa-concepts: View Source on the built page returned all
 // three forms, all 18 `"answer"` indices and every `explanation`, verbatim,
@@ -29,8 +29,10 @@
 // turns quiz picks into marks afterwards; a summative written submission is
 // graded server-side in functions/api/grade-written.ts from the SAME
 // lesson.json this file redacts a copy of, and the result is deliberately
-// never rendered back to the student (see `result && !summative` in
-// WrittenGrader.tsx) even though the server does compute one.
+// never rendered back to the student (see `oneShot` in WrittenGrader.tsx)
+// even though the server does compute one. An item marked `revisable` is the
+// exception: its feedback is shown on purpose, so it keeps its criterion
+// titles (see `redactAiGrader`).
 
 import type { AiGraderConfig, Grading, Lesson, QuizConfig, QuizQuestion, Requirement } from './types';
 import type { DiagramConfig } from './diagram-types';
@@ -89,18 +91,33 @@ function redactRequirements(reqs: Requirement[]): Requirement[] {
  * the widget (`rubricTitle`, `model`), with `prompt` (the grading brief — it
  * names every accepted answer) and `contextDocs` removed. `rubric` becomes an
  * empty array rather than being dropped, because WrittenGrader still reduces
- * over it for a totals figure that is never displayed once `summative` is
- * true — every point value on every PA rubric is 0, so this changes nothing
- * that reaches the screen. Returns the input unchanged for a formative item.
+ * over it. Returns the input unchanged for a formative item.
+ *
+ * A `revisable` item is the exception to the empty rubric: its feedback is
+ * drawn, and WrittenGrader labels each verdict with the criterion title from
+ * this list. It gets `{id, title, points}` and nothing else. `description` is
+ * the key (it says what an accepted answer contains) and stays behind; the
+ * list is rebuilt field by field for the reason given in `stripKey`.
+ *
+ * `input` ('code' draws the JavaScript editor) says how the widget is drawn and
+ * carries no key. It has to be copied across by hand like everything else here,
+ * or a summative item silently falls back to the plain textarea.
  */
 function redactAiGrader(cfg: AiGraderConfig): AiGraderConfig {
   if (!isSummativeAiGrader(cfg)) return cfg;
-  return {
+  const out: AiGraderConfig = {
     summative: true,
     rubricTitle: cfg.rubricTitle,
     model: cfg.model,
     rubric: [],
   };
+  if (cfg.revisable) {
+    out.revisable = true;
+    out.rubric = (cfg.rubric ?? []).map(({ id, title, points }) => ({ id, title, points }));
+  }
+  if (typeof cfg.maxSubmissions === 'number') out.maxSubmissions = cfg.maxSubmissions;
+  if (cfg.input) out.input = cfg.input;
+  return out;
 }
 
 /**

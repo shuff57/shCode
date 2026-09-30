@@ -260,7 +260,79 @@ const { redactQuiz, redactLessonForClient, isSummativeQuiz } = require(LIB + '/q
   eq(redactLessonForClient(plain), plain, 'redact/lesson without a quiz');
 }
 
+// ---- attempt caps + a revisable item's redaction -----------------------------
+// 2.7.2 and 2.7.5 are `summative` + `revisable` + `maxSubmissions: 3`. Neither
+// half is visible in the UI, which is why they need pinning here. The redacted
+// config is rebuilt as a WHITELIST, so a field added to the type but not to that
+// rebuild is dropped in silence and the button quietly re-locks; and the count
+// has to come from rows that represent real attempts, or a grader outage spends a
+// student's three.
+const { countAttempts, ATTEMPT_CAPS_APPLIED } = require(LIB + '/attempt-cap.js');
+
+const brief = 'The taught answer (2.4.1): for is the loop whose header carries all three parts.';
+const key = 'Full credit: for suits a known range while while suits an unknown count.';
+
+{
+  const authored = {
+    summative: true,
+    revisable: true,
+    maxSubmissions: 3,
+    input: 'code',
+    rubricTitle: 'PA Part 2',
+    model: 'glm-5.3-flash:cloud',
+    contextDocs: ['2.4.1'],
+    prompt: brief,
+    rubric: [
+      { id: 'for-vs-while', title: 'Question 1: when to choose for vs while', description: key, points: 4 },
+    ],
+  };
+  const sent = redactLessonForClient({ id: 'l7', title: 'T7', aiGrader: authored }).aiGrader;
+  const blob = JSON.stringify(sent);
+
+  eq(sent.summative, true, 'cap/redacted keeps summative');
+  eq(sent.revisable, true, 'cap/redacted keeps revisable -- a dropped field re-locks Submit');
+  eq(sent.maxSubmissions, 3, 'cap/redacted keeps maxSubmissions -- a dropped field uncaps the item');
+  eq(sent.input, 'code', 'cap/redacted keeps input -- a dropped field draws the textarea where the editor belongs');
+  eq(sent.rubric.map((r) => r.id), ['for-vs-while'], 'cap/redacted keeps the criterion id');
+  eq(sent.rubric[0].title, 'Question 1: when to choose for vs while', 'cap/redacted keeps the label');
+  eq(sent.rubric[0].points, 4, 'cap/redacted keeps the points');
+  ok(!/"prompt"/.test(blob), 'cap/redacted/prompt', 'the grading brief survived redaction');
+  ok(!/contextDocs/.test(blob), 'cap/redacted/contextDocs', 'contextDocs survived redaction');
+  ok(!blob.includes(key), 'cap/redacted/description', 'the rubric description -- the answer key -- survived redaction');
+}
+
+{
+  // A one-shot item must not grow a cap or criterion labels by accident.
+  const oneShot = redactLessonForClient({
+    id: 'l8', title: 'T8',
+    aiGrader: {
+      summative: true, rubricTitle: 'x', model: 'm', prompt: brief,
+      rubric: [{ id: 'for-vs-while', title: 'Question 1: when to choose for vs while', description: key, points: 4 }],
+    },
+  }).aiGrader;
+  eq(oneShot.rubric, [], 'cap/one-shot rubric emptied');
+  eq(oneShot.revisable, undefined, 'cap/one-shot carries no revisable key');
+  eq(oneShot.maxSubmissions, undefined, 'cap/one-shot carries no maxSubmissions key');
+}
+
+{
+  const after = ATTEMPT_CAPS_APPLIED + 1000;
+  const row = (submittedAt, gradeJson) => ({ submittedAt, gradeJson });
+  eq(countAttempts([]), 0, 'cap/count none');
+  eq(countAttempts([row(after, { totalEarned: 5 })]), 1, 'cap/count one real attempt');
+  eq(countAttempts([row(after, null), row(after + 1, { totalEarned: 2 })]), 2, 'cap/count two');
+  // An outage is not an attempt. WrittenGrader records that row so the work still
+  // reaches the teacher, carrying this marker and a NULL score.
+  eq(countAttempts([row(after, { gradingFailed: true, error: 'grader offline' })]), 0, 'cap/count a failed grade is free');
+  eq(countAttempts([row(after, { gradingFailed: true }), row(after, { totalEarned: 5 })]), 1, 'cap/count failed plus real');
+  // Grandfathered: an attempt recorded before the cap shipped does not count.
+  eq(countAttempts([row(ATTEMPT_CAPS_APPLIED - 1, { totalEarned: 5 })]), 0, 'cap/count predates the cutoff');
+  eq(countAttempts([row(ATTEMPT_CAPS_APPLIED, { totalEarned: 5 })]), 1, 'cap/count exactly at the cutoff counts');
+  // A junk row must not take the count down with it.
+  eq(countAttempts([{ submittedAt: 'nope' }, row(after, { totalEarned: 1 })]), 1, 'cap/count ignores a junk row');
+  ok(Number.isFinite(ATTEMPT_CAPS_APPLIED) && ATTEMPT_CAPS_APPLIED > 0, 'cap/cutoff is a real timestamp', 'the cutoff is not a usable epoch ms');
+}
 console.log(
-  failures ? `\n${failures} FAILURE(S)` : '\nALL PASS  (quiz-variant: seeding, forms, shuffling, redaction)',
+  failures ? `\n${failures} FAILURE(S)` : '\nALL PASS  (quiz-variant: seeding, forms, shuffling, redaction, attempt caps)',
 );
 process.exit(failures ? 1 : 0);

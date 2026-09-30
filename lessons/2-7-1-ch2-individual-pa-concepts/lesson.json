@@ -24,6 +24,7 @@
   "assignmentCode": "A2.7.1",
   "quiz": {
     "summative": true,
+    "revealAfterSubmit": true,
     "shuffle": true,
     "variants": [
       "a",

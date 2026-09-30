@@ -13,9 +13,11 @@ import {
   fetchSubmissions,
   streamGrade,
 } from '../lib/written-grader-store';
+import { countAttempts } from '../lib/attempt-cap';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
 import GraderPicker, { hasGraderChoice, useGraderChoice } from './GraderPicker';
 import SolutionPanel from './SolutionPanel';
+import CodeMirrorPane from './CodeMirrorPane';
 
 interface AiRubricItem {
   id: string;
@@ -27,6 +29,12 @@ interface AiRubricItem {
 interface AiGraderConfig {
   /** Test mode -- one submission, no rubric feedback. See lib/types.ts. */
   summative?: boolean;
+  /** With `summative`: the student may revise after feedback. See lib/types.ts. */
+  revisable?: boolean;
+  /** Graded attempts allowed. See lib/types.ts and lib/attempt-cap.ts. */
+  maxSubmissions?: number;
+  /** 'code' draws the JavaScript editor in place of the prose textarea. See lib/types.ts. */
+  input?: 'text' | 'code';
   rubricTitle?: string;
   model?: string;
   contextDocs?: string[];
@@ -129,12 +137,29 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   const totalPossible = config.rubric.reduce((s, r) => s + r.points, 0);
   // A test, not a practice assignment: see AiGraderConfig.summative.
   const summative = !!config.summative;
+  // A revisable test is a practice assignment as far as the screen goes: no lock,
+  // feedback drawn, resubmit as often as wanted. `summative` itself stays true --
+  // it is what keeps the brief out of the page and completes the lesson on
+  // sitting -- so only the one-shot behaviours key off this.
+  const oneShot = summative && !config.revisable;
+  // Attempts allowed, or null for unlimited. Only summative items set it.
+  const maxSubmissions = typeof config.maxSubmissions === 'number' ? config.maxSubmissions : null;
+  // The JavaScript editor in place of the prose textarea. Presentation only.
+  const codeInput = config.input === 'code';
   // Submitted-before is answered by the SERVER, not by this browser. Seeding it
   // from the localStorage cache alone -- which is all this did until 2026-09-02
   // -- meant clearing site data, switching browser, or picking up a second
   // device handed the student a fresh unlocked Submit on a one-shot assessment.
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
-  const locked = summative && (!!result || alreadySubmitted);
+  // `null` means UNKNOWN, not zero: the request failed, so there is no honest
+  // count. A capped item refuses Submit while that is unknown rather than
+  // assuming the student has attempts left -- the same mistake a6006dd5 fixed,
+  // one level down. It costs a reload to recover, and the copy below says so.
+  const [attempts, setAttempts] = useState<number | null>(null);
+  const attemptsKnown = attempts !== null;
+  const capReached = maxSubmissions !== null && attemptsKnown && attempts >= maxSubmissions;
+  const capUnknown = maxSubmissions !== null && !attemptsKnown;
+  const locked = capUnknown || capReached || (oneShot && (!!result || alreadySubmitted));
 
   useEffect(() => {
     // Local cache is the always-available fallback; server draft is canonical
@@ -142,14 +167,21 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     let cancelled = false;
     const local = loadState(lessonId);
     (async () => {
-      const [serverDraft, priorSubmissions] = await Promise.all([
+      const [serverDraft, prior] = await Promise.all([
         progress.authed ? fetchDraft(lessonId) : Promise.resolve(null),
-        progress.authed && config.summative
+        // Only worth asking when the answer changes something: a one-shot lock or
+        // a cap. A formative item has neither and never made this call.
+        progress.authed && (oneShot || maxSubmissions !== null)
           ? fetchSubmissions(lessonId)
-          : Promise.resolve([]),
+          : Promise.resolve({ records: [], loaded: !progress.authed }),
       ]);
       if (cancelled) return;
-      if (priorSubmissions.length > 0) setAlreadySubmitted(true);
+      if (prior.records.length > 0) setAlreadySubmitted(true);
+      // Signed out there are no server rows to count and none to be had, which is
+      // an honest zero rather than an unknown.
+      if (oneShot || maxSubmissions !== null) {
+        setAttempts(prior.loaded ? countAttempts(prior.records) : null);
+      }
       if (serverDraft && serverDraft.response) {
         setResponse(serverDraft.response);
       } else {
@@ -161,7 +193,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     return () => {
       cancelled = true;
     };
-  }, [lessonId, progress.authed, config.summative]);
+  }, [lessonId, progress.authed, oneShot, maxSubmissions]);
 
   useEffect(() => {
     if (!loaded) return;
@@ -260,12 +292,23 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       // A successful grade supersedes any failed attempt for this text.
       lastFailedRef.current = null;
       setResult(data as GradeResult);
+      // One attempt just spent. Unknown stays unknown -- we know this one happened,
+      // not how many came before, and inventing a count would unlock a capped item.
+      setAttempts((n) => (n === null ? null : n + 1));
+      lastFailedRef.current = null;
+      setResult(data as GradeResult);
       const passed = isPassing(data as GradeResult);
       // On a test, sitting it is what unlocks the next part. Gating on the
       // grade would lock a student out of the rest of their own exam over an
       // answer the teacher has not even seen yet.
       if (summative || passed) {
-        await recordLessonCompleted(lessonId, data.totalEarned);
+        // BEST attempt, not last. The lesson_state upsert is `score =
+        // excluded.score`, so writing this draft's mark over a better one would
+        // erase it. Passing the running maximum keeps the row right whichever way
+        // this draft went, and needs no extra server round trip to do it.
+        const prior = progress.scores[lessonId];
+        const best = typeof prior === 'number' ? Math.max(prior, data.totalEarned) : data.totalEarned;
+        await recordLessonCompleted(lessonId, best);
       }
       if (progress.authed) {
         // Persist the submission + sync the draft so a resume shows the
@@ -301,10 +344,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         {config.rubricTitle ?? 'Written response — AI-graded'}
       </h2>
       <p style={{ color: '#888', fontSize: 13, margin: '0 0 12px' }}>
-        Answer in your own everyday words — you are graded on having the right idea, not on
-        exact wording, spelling or length. The AI grader checks each criterion and points you
-        back at the lesson to reread if something is missing. You can revise and resubmit as
-        many times as you want.
+        {codeInput
+          ? 'Write your answer as JavaScript. There is no Run button, so read it through the way the computer would before you submit.'
+          : 'Answer in your own everyday words — you are graded on having the right idea, not on exact wording, spelling or length. The AI grader checks each criterion and points you back at the lesson to reread if something is missing. You can revise and resubmit as many times as you want.'}
       </p>
 
       {prompt.trim() ? (
@@ -347,7 +389,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       ) : null}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <label style={{ fontSize: 13, color: '#aaa' }}>Your response</label>
+        <label style={{ fontSize: 13, color: '#aaa' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
         <SolutionPanel
           lessonId={lessonId}
           onInsert={(files) => {
@@ -356,36 +398,49 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           }}
         />
       </div>
-      <textarea
-        value={response}
-        onChange={(e) => setResponse(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key !== 'Tab') return;
-          e.preventDefault();
-          const el = e.currentTarget;
-          const start = el.selectionStart;
-          const end = el.selectionEnd;
-          const next = response.slice(0, start) + '  ' + response.slice(end);
-          setResponse(next);
-          requestAnimationFrame(() => {
-            el.selectionStart = el.selectionEnd = start + 2;
-          });
-        }}
-        placeholder="Write your response here. Full sentences preferred."
-        rows={10}
-        style={{
-          width: '100%',
-          background: '#282a36',
-          color: '#f8f8f2',
-          border: '1px solid #44475a',
-          borderRadius: 6,
-          padding: 12,
-          fontSize: 14,
-          fontFamily: 'system-ui, sans-serif',
-          lineHeight: 1.5,
-          resize: 'vertical',
-        }}
-      />
+      {codeInput ? (
+        // CodeMirrorPane fills its parent (height: 100%), so the parent needs a
+        // height of its own. No Run button, lint or autocomplete, on purpose:
+        // reading the program through is the skill this paper marks.
+        <div
+          role="group"
+          aria-label="Your program (JavaScript)"
+          style={{ height: 420, background: '#282a36', border: '1px solid #44475a', borderRadius: 6, overflow: 'hidden' }}
+        >
+          <CodeMirrorPane value={response} onChange={setResponse} fileKey={lessonId} language="javascript" />
+        </div>
+      ) : (
+        <textarea
+          value={response}
+          onChange={(e) => setResponse(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key !== 'Tab') return;
+            e.preventDefault();
+            const el = e.currentTarget;
+            const start = el.selectionStart;
+            const end = el.selectionEnd;
+            const next = response.slice(0, start) + '  ' + response.slice(end);
+            setResponse(next);
+            requestAnimationFrame(() => {
+              el.selectionStart = el.selectionEnd = start + 2;
+            });
+          }}
+          placeholder="Write your response here. Full sentences preferred."
+          rows={10}
+          style={{
+            width: '100%',
+            background: '#282a36',
+            color: '#f8f8f2',
+            border: '1px solid #44475a',
+            borderRadius: 6,
+            padding: 12,
+            fontSize: 14,
+            fontFamily: 'system-ui, sans-serif',
+            lineHeight: 1.5,
+            resize: 'vertical',
+          }}
+        />
+      )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
         <button
@@ -411,10 +466,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
               // the old wording when no stage arrived.
               stage
               ? `${GRADE_STAGE_LABELS[stage]}…`
-              : summative
+              : oneShot
                 ? 'Submitting…'
                 : 'Grading…'
-            : summative
+            : oneShot
               ? locked
                 ? 'Submitted'
                 : 'Submit my answer'
@@ -445,8 +500,19 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           {saveStatus === 'saved' ? 'Saved ✓' : saveStatus === 'error' ? 'Save failed' : 'Save draft'}
         </button>
         <span style={{ color: '#666', fontSize: 12 }}>
-          {response.trim().length} chars · {response.trim().split(/\s+/).filter(Boolean).length} words
+          {response.trim().length} chars{codeInput ? '' : ` · ${response.trim().split(/\s+/).filter(Boolean).length} words`}
         </span>
+        {maxSubmissions === null ? null : !attemptsKnown ? (
+          <span style={{ color: '#ffb86c', fontSize: 12 }}>
+            Couldn&apos;t check your attempts — reload to try again
+          </span>
+        ) : (
+          <span style={{ color: capReached ? '#ffb86c' : '#666', fontSize: 12 }}>
+            {capReached
+              ? 'No attempts left — your best one counts'
+              : `${maxSubmissions - attempts} of ${maxSubmissions} attempts left`}
+          </span>
+        )}
         {hasGraderChoice(graders) ? null : config.model ? (
           <code style={{ color: '#6272a4', fontSize: 11, marginLeft: 'auto' }}>
             model: {config.model}
@@ -487,7 +553,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         </div>
       )}
 
-      {(result || alreadySubmitted) && summative ? (
+      {(result || alreadySubmitted) && oneShot ? (
         <div
           style={{
             marginTop: 16,
@@ -506,7 +572,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         </div>
       ) : null}
 
-      {result && !summative && (() => {
+      {result && !oneShot && (() => {
         const passFail = result.totalPossible === 0;
         const passed = isPassing(result);
         const okCount = result.criteria.filter(
