@@ -1,0 +1,30 @@
+- generic [active] [ref=f1e1]:
+  - banner [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - link "shCode" [ref=f1e4] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=f1e5]:
+        - link "Lessons" [ref=f1e6] [cursor=pointer]:
+          - /url: /
+        - button "Learn" [ref=f1e8] [cursor=pointer]:
+          - text: Learn
+          - generic [aria-hidden] [ref=f1e9]: ▾
+        - text: …
+  - generic [ref=f1e10]: Checking access…
+  - generic [ref=f1e11]:
+    - link "Module 2.7" [ref=f1e12] [cursor=pointer]:
+      - /url: /module/2.7
+    - generic [ref=f1e13]: Lesson 3 of 5
+    - generic:
+      - 'link "2.7.1 Individual PA Part 1: Concepts and Traces"':
+        - /url: /assignment/2-7-1-ch2-individual-pa-concepts/
+      - 'link "2.7.2 Individual PA Part 2: In Your Own Words"':
+        - /url: /assignment/2-7-2-ch2-individual-pa-own-words/
+      - 'link "2.7.3 Individual PA Part 3: Find and Fix"':
+        - /url: /assignment/2-7-3-ch2-individual-pa-find-and-fix/
+      - 'link "2.7.4 Individual PA Part 4: Chart It"':
+        - /url: /assignment/2-7-4-ch2-individual-pa-chart-it/
+      - 'link "2.7.5 Individual PA Part 5: Write the Steps"':
+        - /url: /assignment/2-7-5-ch2-individual-pa-write-the-steps/
+    - generic [ref=f1e14]: 0/5 · 0%
+  - button "Report an issue" [ref=f1e15] [cursor=pointer]
