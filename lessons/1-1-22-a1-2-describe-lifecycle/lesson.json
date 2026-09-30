@@ -14,7 +14,7 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Describe the Lifecycle: AI-graded rubric",
-    "model": "glm-5.3:cloud",
+    "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
     "prompt": "Everything you need is in the 1.1.5 video, 1.1.6 (The Four Phases), the worked example in 1.1.8, and 1.1.10 (Umbrella Activities): go back and reread or rewatch if you get stuck. Your own everyday words throughout.\n\nPart 1: Describe the four framework activities: inception, elaboration, construction and deployment. One or two sentences each about what happens in that activity. (1.1.5 and 1.1.6)\n\nPart 2: Pick one real software product you actually use: Instagram, Spotify, Google Maps, Roblox, YouTube, Google Docs, anything. Name it, then walk it through all four activities, saying what you think happened in each one for that product. Best-guess reasoning is fine; no research needed. (1.1.8 shows this done for a greeting app)\n\nPart 3: Name at least one umbrella activity, and say in one sentence why it runs across all four phases instead of sitting inside one of them. (1.1.10)\n\nPart 4: Two namings, one lifecycle. The 1.1.5 video counts five phases (design, development, testing, deployment, maintenance); 1.1.6 counts four framework activities. They describe the same lifecycle. Name the two phases the four-activity list does not give a name of its own to, and say in one sentence each where that work happens in the four-activity view. (1.1.6, the table on this page)",
     "rubric": [

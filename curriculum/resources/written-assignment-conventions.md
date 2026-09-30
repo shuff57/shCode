@@ -35,7 +35,7 @@ Distinct from a moSHion lab (`preview: "moSHion"`) because there is no `script.j
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "<Lesson Name>: AI-graded rubric",
-    "model": "glm-5.3:cloud",
+    "model": "glm-5.3-flash:cloud",
     "contextDocs": ["overview", "sprite"],
     "prompt": "<the student-facing questions, exactly as shown>",
     "rubric": [
@@ -58,7 +58,7 @@ Distinct from a moSHion lab (`preview: "moSHion"`) because there is no `script.j
 ### Field-by-field
 
 - `preview`: **`"assignment"`**, not `"moSHion"`. This is what routes the lesson to `WrittenGrader` instead of the regex grader.
-- `aiGrader.model`: the Ollama cloud model id. Default to `"glm-5.3:cloud"`, which is what every written assignment currently uses and what `functions/api/grade-written.ts` falls back to. Don't invent model names. See the **Ollama grader** section of `CLAUDE.md` for the endpoint + secret wiring.
+- `aiGrader.model`: the Ollama cloud model id. Default to `"glm-5.3-flash:cloud"`, which is what every written assignment currently uses and what `functions/api/grade-written.ts` falls back to. Don't invent model names. See the **Ollama grader** section of `CLAUDE.md` for the endpoint + secret wiring.
 - `aiGrader.contextDocs`: array of moSHion doc keys (e.g. `"overview"`, `"sprite"`, `"input"`). These are interpolated into the grader's system prompt so the model knows the moSHion vocabulary. See `lib/moshion-docs.ts` for the valid keys.
 - `aiGrader.prompt`: the exact text the student sees as the question set, rendered in the **"What to answer"** box directly above the writing area. Use `\n\n` between questions. The grader sees this prompt + the student's response. See §2.5 for the required shape.
 - `aiGrader.rubric[].points`: either **`1` per item** (recommended default) or **`0` per item**. This value is not a weight: it's what selects which pass threshold `WrittenGrader.tsx`'s `isPassing()` applies (see §4). Don't assign different nonzero weights to different criteria; every row must be either all `1` or all `0` within a lesson.
@@ -206,7 +206,7 @@ The student-facing rubric preview in `content.md` does NOT show points or the th
 - **Do not assign different `points` values to different rubric rows within one lesson.** Every row is `1`, or every row is `0`, never mixed. See §4 for what each shape means for the pass threshold.
 - **Do not assume editing `grading.passingScore` changes the pass threshold.** It doesn't: see §4. The threshold is hardcoded in `WrittenGrader.tsx`.
 - **Do not show point columns in the student-facing rubric preview** in `content.md`. Use a `# | Criterion` two-column shape, not `Criterion | Pts`. Students see pass/fail per row, not weights.
-- **Do not invent Ollama model names.** Use the model already in production (`glm-5.3:cloud`) unless switching deliberately and coordinating with the `OLLAMA_*` env vars.
+- **Do not invent Ollama model names.** Use the model already in production (`glm-5.3-flash:cloud`) unless switching deliberately and coordinating with the `OLLAMA_*` env vars.
 - **Do not grade or require length.** No rubric criterion may deny/deduct for word count, and no prompt may state a target length (e.g. "~250-400 words", "one page", "half page"). AI grading is content-only: a short response that clearly hits every rubric point earns full credit. (Operator decision, 2026-08-13: removed from `1-1-3-a1-1-sdlc-writeup`, `1-1-22-a1-2-describe-lifecycle`, `1-3-5-why-documentation`, `5-1-22-a10-2-frame-loop`, `5-3-32-a12-2-oop-writeup`.)
 - **Do not put the prompt in `content.md`**: the grader reads from `aiGrader.prompt`. Duplicating invites drift.
 - **Do not include an example answer / model response in `content.md`.** No matter how you label it ("style guide", "do NOT copy"), a written-out answer is a cheat sheet. The rubric gives students what they're graded on; let them think the answer through.

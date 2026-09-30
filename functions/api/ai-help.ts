@@ -422,7 +422,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   let raw: ReadableStream<Uint8Array>;
   try {
     raw = await chatStream({
-      model: 'glm-5.3:cloud',
+      model: 'glm-5.3-flash:cloud',
       host: env.OLLAMA_HOST,
       apiKey: env.OLLAMA_API_KEY,
       temperature: 0.3,

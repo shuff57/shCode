@@ -50,7 +50,7 @@ const root = path.resolve(here, '..');
 
 const LIVE = process.argv.includes('--live');
 
-const MODEL = 'glm-5.3:cloud'; // the model functions/api/ai-help.ts asks for
+const MODEL = 'glm-5.3-flash:cloud'; // the model functions/api/ai-help.ts asks for
 const HOST = 'https://ollama.com';
 
 // ---------------------------------------------------------------- key lookup

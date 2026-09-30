@@ -15,7 +15,7 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Frame Loop Writeup: AI-graded rubric",
-    "model": "glm-5.3:cloud",
+    "model": "glm-5.3-flash:cloud",
     "contextDocs": [
       "overview",
       "sprite"
