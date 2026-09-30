@@ -299,38 +299,37 @@ export const GRADE_STAGE_LABELS: Record<GradeStage, string> = {
 // ---------------------------------------------------------------------------
 // Which grader runs the call
 //
-// Two targets, both server-side. `cloud` is the hosted Ollama the course has
-// always used; `local` is a self-hosted Ollama on the school's own hardware.
-// The student picks between them; the server owns everything else.
+// One target: the hosted Ollama on `glm-5.3-flash:cloud`. The student picks
+// nothing; the server owns everything.
 //
-// The choice is a client-supplied ENUM, and that is the whole reason it is
-// safe. It selects among hosts the deploy configured -- it never carries a
-// host, a key, a model name, or a rubric. The rule from the injection incident
-// still holds without exception: the only field a student controls is their
-// own answer.
+// `GraderId` survives as a single-member enum rather than a bare string
+// because the wire format still carries a `grader` field. That field is
+// accepted and ignored: a client from before the picker existed sends nothing,
+// and one holding a stale cached bundle may still name a retired target.
+// Both land on the one target rather than a 400.
+//
+// The rule from the injection incident still holds without exception: the only
+// field a student controls is their own answer. `grader` was never a host, a
+// key, a model name, or a rubric, and cannot become one.
 //
 // A target the deploy has not configured is reported unavailable rather than
-// hidden, so a class that expects the local grader and is not getting it can
-// see why instead of wondering where the menu went.
+// hidden, which is why removing a target needed no migration.
 
-export type GraderId = 'cloud' | 'local' | 'workersai' | 'openrouter';
+export type GraderId = 'cloud';
 
 
 /**
  * The grader used when the client names none, and the last-resort fallback.
  *
  * NOT the preference order -- that lives in the Function, which is the only
- * place that knows what this deploy actually has configured. A deploy with the
- * Workers AI binding prefers it (no host to keep alive, no key to rotate, and
- * it survives 25 submissions in the same minute where a 20-rpm model does not);
- * one without falls back through here. Keeping this constant at 'cloud' means
- * a deploy that loses its AI binding degrades to the target that has been
- * running all along rather than to a 503.
+ * place that knows what this deploy actually has configured. Keeping this
+ * constant at 'cloud' means a deploy with nothing configured degrades to the
+ * target that has been running all along rather than to a 503.
  */
 export const DEFAULT_GRADER: GraderId = 'cloud';
 
 export function isGraderId(v: unknown): v is GraderId {
-  return v === 'cloud' || v === 'local' || v === 'workersai' || v === 'openrouter';
+  return v === 'cloud';
 }
 
 /** One entry in the student's dropdown. Never carries the host or the key. */

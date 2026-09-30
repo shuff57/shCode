@@ -1,20 +1,19 @@
 'use client';
 
-// Lets a student choose which grader marks their written work: the hosted
-// cloud model, or the school's own machine. Shared by WrittenGrader and
-// DiagramAssignmentView so the two never drift into different wording.
+// Lets a student choose which grader marks their written work. There is now
+// only one grader, so this renders nothing -- see the note in the component.
 //
-// The menu is fetched from GET /api/grade-written rather than hardcoded, so a
-// deploy with no classroom box never offers one. When fewer than two targets
-// are actually runnable there is nothing to choose, and the picker renders
-// nothing at all -- a dropdown with one entry is furniture, not a choice.
+// The menu is fetched from GET /api/grade-written rather than hardcoded. When
+// fewer than two targets are actually runnable there is nothing to choose, and
+// the picker renders nothing at all -- a dropdown with one entry is furniture,
+// not a choice.
 //
-// What the student picks is an id ('workersai' | 'cloud' | 'local'). It is never a host, a
-// model, or a key: the server owns all three. See the target-resolution note
-// in functions/api/grade-written.ts for why that separation is load-bearing.
+// What the student picks is an id, never a host, a model, or a key: the server
+// owns all three. See the target-resolution note in
+// functions/api/grade-written.ts for why that separation is load-bearing.
 
 import { useEffect, useState } from 'react';
-import { Server, Cloud, Zap, Sparkles } from 'lucide-react';
+import { Cloud } from 'lucide-react';
 import {
   fetchGraders,
   loadGraderPref,
@@ -88,12 +87,12 @@ export default function GraderPicker({ graders, value, onChange, disabled, cloud
   if (!hasGraderChoice(graders)) return null;
 
   const selected = graders.find((g) => g.id === value);
-  const shownModel = value === 'cloud' ? (cloudModel || selected?.model) : selected?.model;
-  // One icon per target, so the row reads at a glance rather than needing the
-  // label. A shared cloud icon for both hosted graders made them look like the
-  // same thing with two names.
-  const Icon =
-    value === 'local' ? Server : value === 'workersai' ? Zap : value === 'openrouter' ? Sparkles : Cloud;
+  const shownModel = cloudModel || selected?.model;
+  // ponytail: with one target left, hasGraderChoice() is always false, so this
+  // whole component is dead code. Delete it with its two parents
+  // (WrittenGrader.tsx, DiagramAssignmentView.tsx) and the grader-pref half of
+  // lib/written-grader-store.ts, once WrittenGrader.tsx is free of other work.
+  const Icon = Cloud;
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
