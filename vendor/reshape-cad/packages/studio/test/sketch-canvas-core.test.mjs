@@ -10,6 +10,7 @@ import {
   arcFromClicks,
   arcEnds,
   nextGeomId,
+  migratedRules,
   renumber,
   readSolved,
   namedPointsOf,
@@ -29,6 +30,19 @@ import {
   mirrorSelection,
   copySelection,
   densifyIds,
+  findSnap,
+  geomMidpoint,
+  autoDimension,
+  dimensionValueError,
+  ruleGlyphAnchors,
+  filletPick,
+  maxFilletRadiusAt,
+  whyCannotFilletAt,
+  filletCornerAt,
+  applyEqualRadiusRule,
+  offsetChainOrder,
+  offsetChainPick,
+  offsetChain,
 } from '../dist/model/sketch-canvas-core.js';
 
 const LINE = { k: 'line', id: 1, a: [0, 0], b: [40, 0] };
@@ -324,4 +338,511 @@ test('19: every slot weld names two points that coincide', () => {
       `weld ${r.a}.${r.aEnd} <-> ${r.b}.${r.bEnd} names [${p}] and [${q}]`,
     );
   }
+});
+
+// 20: findSnap — the unified snap engine. Vertex/midpoint/center happy paths
+// and the rank order among them.
+test('20: findSnap ranks vertex over midpoint over onCurve within tolerance', () => {
+  const geoms = [
+    { k: 'line', id: 1, a: [0, 0], b: [40, 0] },
+    { k: 'circle', id: 2, c: [20, 20], r: 5 },
+  ];
+  // Vertex: the line's endpoint b.
+  const v = findSnap(geoms, { x: 40, y: 0.5 }, 1);
+  assert.equal(v.kind, 'vertex');
+  assert.equal(v.id, 1);
+  assert.equal(v.at, 'b');
+  assert.deepEqual(v.world, { x: 40, y: 0 });
+  // Midpoint of the line.
+  const m = findSnap(geoms, { x: 20, y: 0.5 }, 1);
+  assert.equal(m.kind, 'midpoint');
+  assert.deepEqual(m.world, { x: 20, y: 0 });
+  // Circle centre.
+  // Circle centre: it is ALSO a named point ('c'), so vertex (rank 1) wins
+  // over center (rank 2) per the decided rank table.
+  const c = findSnap(geoms, { x: 20, y: 20.5 }, 1);
+  assert.equal(c.kind, 'vertex');
+  assert.equal(c.at, 'c');
+  assert.equal(c.id, 2);
+  // The center kind itself, scoped:
+  const cOnly = findSnap(geoms, { x: 20, y: 20.5 }, 1, { kinds: ['center'] });
+  assert.equal(cOnly.kind, 'center');
+  assert.equal(cOnly.at, 'c');
+  assert.equal(cOnly.id, 2);
+  // onCurve: on the circle rim, away from any named point.
+  const o = findSnap(geoms, { x: 25, y: 20 }, 0.5);
+  assert.equal(o.kind, 'onCurve');
+  assert.ok(Math.hypot(o.world.x - 25, o.world.y - 20) < 1e-9);
+});
+
+// 21: intersections — line-line, line-circle, circle-circle; parallel lines
+// never report one.
+test('21: findSnap line-line, line-circle, circle-circle intersections', () => {
+  const lines = [
+    { k: 'line', id: 1, a: [0, 0], b: [40, 0] },
+    { k: 'line', id: 2, a: [20, -10], b: [20, 30] },
+  ];
+  const x = findSnap(lines, { x: 20, y: 0.5 }, 1);
+  assert.equal(x.kind, 'intersection');
+  assert.deepEqual(x.world, { x: 20, y: 0 });
+  // Parallel lines never cross (scoped to intersections: a midpoint of one
+  // of the lines is a legitimate hit here).
+  const par = [
+    { k: 'line', id: 1, a: [0, 0], b: [40, 0] },
+    { k: 'line', id: 2, a: [0, 5], b: [40, 5] },
+  ];
+  assert.equal(findSnap(par, { x: 20, y: 2.5 }, 3, { kinds: ['intersection'] }), null);
+  // Line-circle: the line y=20 crosses circle c=(20,20) r=5 at x=15 and x=25.
+  const lc = [
+    { k: 'line', id: 1, a: [0, 20], b: [40, 20] },
+    { k: 'circle', id: 2, c: [20, 20], r: 5 },
+  ];
+  const lcx = findSnap(lc, { x: 15, y: 20.5 }, 1);
+  assert.equal(lcx.kind, 'intersection');
+  assert.ok(Math.abs(lcx.world.x - 15) < 1e-9 && Math.abs(lcx.world.y - 20) < 1e-9);
+  // Circle-circle: c=(0,0) r=5 and c=(10,0) r=5 cross at (5, 0).
+  const cc = [
+    { k: 'circle', id: 1, c: [0, 0], r: 5 },
+    { k: 'circle', id: 2, c: [10, 0], r: 5 },
+  ];
+  const ccx = findSnap(cc, { x: 5, y: 0.5 }, 1);
+  assert.equal(ccx.kind, 'intersection');
+  assert.ok(Math.abs(ccx.world.x - 5) < 1e-9 && Math.abs(ccx.world.y) < 1e-9);
+});
+
+// 22: tolerance — null once past tolWorld; tolWorld=0 is exact-hit only.
+test('22: findSnap tolerance — null past tolWorld, exact at tolWorld=0', () => {
+  const geoms = [{ k: 'line', id: 1, a: [0, 0], b: [40, 0] }];
+  assert.equal(findSnap(geoms, { x: 20, y: 1.5 }, 1), null, 'past tolerance');
+  const exact = findSnap(geoms, { x: 20, y: 0 }, 0);
+  assert.ok(exact, 'an exact hit at tol 0 still snaps');
+  assert.equal(exact.kind, 'midpoint');
+  assert.equal(findSnap(geoms, { x: 20, y: 1e-9 }, 0), null, 'tol 0 admits nothing off the geometry');
+});
+
+// 23: an arc's midpoint snap respects the arc's actual sweep — a probe near
+// the full circle's geometric midpoint but outside the sweep does not snap.
+test('23: findSnap arc midpoint respects the sweep range', () => {
+  const geoms = [ARC]; // quarter arc ccw from +x to +y
+  const ang = arcAngles(ARC);
+  const mid = ang.a0 + ang.sweep / 2;
+  const midPt = { x: 10 * Math.cos(mid), y: 10 * Math.sin(mid) };
+  const hit = findSnap(geoms, { x: midPt.x + 0.3, y: midPt.y + 0.3 }, 1);
+  assert.equal(hit.kind, 'midpoint');
+  assert.ok(Math.hypot(hit.world.x - midPt.x, hit.world.y - midPt.y) < 1e-9);
+  // The full circle's geometric midpoint (180deg, (-10, 0)) is outside the
+  // arc's sweep: no midpoint, no onCurve, nothing.
+  assert.equal(findSnap(geoms, { x: -10 + 0.3, y: 0.3 }, 1), null);
+});
+
+// 24: onCurve never fires beyond a line segment's actual endpoints.
+test('24: findSnap onCurve stops at a line segment endpoint', () => {
+  const geoms = [{ k: 'line', id: 1, a: [0, 0], b: [40, 0] }];
+  const on = findSnap(geoms, { x: 10, y: 0.4 }, 0.5);
+  assert.equal(on.kind, 'onCurve');
+  assert.deepEqual(on.world, { x: 10, y: 0 });
+  // Far past the b endpoint: nothing within tolerance.
+  assert.equal(findSnap(geoms, { x: 45, y: 0 }, 2), null);
+});
+
+// 25: grid snaps only when gridStep is supplied.
+test('25: findSnap grid only when gridStep is given', () => {
+  const geoms = [{ k: 'line', id: 1, a: [0, 0], b: [40, 0] }];
+  assert.equal(findSnap(geoms, { x: 50, y: 50 }, 1), null, 'no gridStep, no grid snap');
+  const g = findSnap(geoms, { x: 50.3, y: 49.7 }, 1, { gridStep: 10 });
+  assert.equal(g.kind, 'grid');
+  assert.deepEqual(g.world, { x: 50, y: 50 });
+  assert.equal(g.id, undefined);
+  assert.equal(g.at, undefined);
+});
+
+// 26: snapVertex keeps its contract through the findSnap delegation.
+test('26: snapVertex still works through the findSnap delegation', () => {
+  const geoms = [LINE, CIRCLE];
+  const hit = snapVertex(geoms, { x: 40, y: 0 }, (p) => Math.hypot(p.x - 40, p.y - 0) * 2, 8);
+  assert.equal(hit.id, 1);
+  assert.equal(hit.at, 'b');
+  assert.equal(snapVertex(geoms, { x: 40, y: 0 }, () => 20, 8), null);
+});
+
+// --- on-canvas dimensions + constraint glyphs (SPEC-mouse-parity P2.7/P2.8) ---
+
+// 27: the midpoint a glyph or a dimension label hangs off, per geometry kind.
+test('27: geomMidpoint reads each geometry kind', () => {
+  assert.deepEqual(geomMidpoint(LINE), { x: 20, y: 0 });
+  assert.deepEqual(geomMidpoint(CIRCLE), { x: 20, y: 20 });
+  assert.deepEqual(geomMidpoint({ k: 'point', id: 9, p: [3, 4] }), { x: 3, y: 4 });
+  // The arc's mid-SWEEP point, not the chord's middle: a quarter arc from
+  // (10,0) to (0,10) about the origin peaks at 45 degrees.
+  const m = geomMidpoint(ARC);
+  assert.ok(Math.abs(m.x - 10 * Math.SQRT1_2) < 1e-9);
+  assert.ok(Math.abs(m.y - 10 * Math.SQRT1_2) < 1e-9);
+  assert.equal(geomMidpoint({ k: 'blob', id: 1 }), null);
+});
+
+// 28: a picked LINE auto-detects as the distance between its own endpoints.
+test('28: autoDimension turns a line pick into an endpoint distance', () => {
+  const d = autoDimension([LINE], { id: 1, at: null });
+  assert.equal(d.kind, 'distance');
+  assert.equal(d.value, 40);
+  assert.deepEqual(d.a, { id: 1, at: 'a' });
+  assert.deepEqual(d.b, { id: 1, at: 'b' });
+  assert.deepEqual(d.anchor, { x: 20, y: 0 });
+});
+
+// 29: a circle and an arc both auto-detect as RADIUS -- the convention
+// openDimFromSelection already uses, so the canvas and the ribbon agree.
+test('29: autoDimension reads a circle and an arc as radius', () => {
+  const c = autoDimension([CIRCLE], { id: 2, at: null });
+  assert.equal(c.kind, 'radius');
+  assert.equal(c.value, 5);
+  assert.equal(c.b, null);
+  const a = autoDimension([ARC], { id: 3, at: null });
+  assert.equal(a.kind, 'radius');
+  assert.equal(a.value, 10);
+});
+
+// 30: two picked POINTS auto-detect as a point-to-point distance.
+test('30: autoDimension turns two point picks into a point distance', () => {
+  const geoms = [LINE, { k: 'line', id: 4, a: [0, 30], b: [40, 30] }];
+  const d = autoDimension(geoms, { id: 1, at: 'a' }, { id: 4, at: 'a' });
+  assert.equal(d.kind, 'distance');
+  assert.equal(d.value, 30);
+  assert.deepEqual(d.anchor, { x: 0, y: 15 });
+});
+
+// 31: nothing to dimension -- a lone point pick waits for its partner, a
+// bare point row and a dangling id have no dimension at all.
+test('31: autoDimension refuses what it cannot measure', () => {
+  assert.equal(autoDimension([LINE], { id: 1, at: 'a' }), null, 'one point is not a distance');
+  assert.equal(autoDimension([LINE], { id: 99, at: null }), null, 'dangling id');
+  assert.equal(autoDimension([{ k: 'point', id: 1, p: [0, 0] }], { id: 1, at: null }), null);
+});
+
+// 32: the invalid values that must produce a status note and no doc change.
+test('32: dimensionValueError names every value the solver cannot take', () => {
+  assert.ok(dimensionValueError('distance', ''));
+  assert.ok(dimensionValueError('distance', '   '));
+  assert.ok(dimensionValueError('distance', 'abc'));
+  assert.ok(dimensionValueError('distance', '0'));
+  assert.ok(dimensionValueError('distance', '-5'));
+  assert.ok(dimensionValueError('radius', '-1'));
+  assert.ok(dimensionValueError('angle', '0'));
+  assert.equal(dimensionValueError('distance', '30'), null);
+  assert.equal(dimensionValueError('radius', '2.5'), null);
+  // distanceX/distanceY are SIGNED offsets: a negative one names the other
+  // direction and zero names a shared axis, so both are real answers.
+  assert.equal(dimensionValueError('distanceX', '-12'), null);
+  assert.equal(dimensionValueError('distanceY', '0'), null);
+});
+
+// 33: where each rule kind's glyph hangs -- one geometry's midpoint, the
+// midpoint of two, or the named point itself.
+test('33: ruleGlyphAnchors places a glyph per rule', () => {
+  const geoms = [LINE, { k: 'line', id: 4, a: [0, 30], b: [40, 30] }];
+  const [horiz, para, coin] = ruleGlyphAnchors(
+    geoms,
+    [
+      { k: 'horizontal', a: 1 },
+      { k: 'parallel', a: 1, b: 4 },
+      { k: 'coincident', a: 1, aEnd: 'b', b: 4, bEnd: 'b' },
+    ],
+    2,
+  );
+  assert.deepEqual(horiz, { x: 20, y: 0 }, 'a unary rule sits on its line');
+  assert.deepEqual(para, { x: 20, y: 15 }, 'a pair rule sits between the two');
+  assert.deepEqual(coin, { x: 40, y: 15 }, 'a point rule sits between the points');
+});
+
+// 34: rules that land on the SAME spot fan out, so a line carrying both a
+// horizontal and a distance shows two readable glyphs rather than one blur.
+test('34: ruleGlyphAnchors fans out rules that share an anchor', () => {
+  const anchors = ruleGlyphAnchors([LINE], [{ k: 'horizontal', a: 1 }, { k: 'distance', a: 1, aEnd: 'a', b: 1, bEnd: 'b', value: 40 }], 3);
+  assert.deepEqual(anchors[0], { x: 20, y: 0 });
+  assert.deepEqual(anchors[1], { x: 23, y: 0 });
+  // The array is INDEX-ALIGNED with the rules it was given: the glyph layer
+  // identifies a rule by its index, and a hole must stay a hole.
+  const withHole = ruleGlyphAnchors([LINE], [{ k: 'vertical', a: 77 }, { k: 'horizontal', a: 1 }], 3);
+  assert.equal(withHole.length, 2);
+  assert.equal(withHole[0], null, 'a rule naming geometry that is not here has no anchor');
+  assert.deepEqual(withHole[1], { x: 20, y: 0 });
+});
+
+// 35: symmetric names three geometries and averages all three.
+test('35: ruleGlyphAnchors averages a three-point symmetric rule', () => {
+  const geoms = [
+    { k: 'point', id: 1, p: [0, 0] },
+    { k: 'point', id: 2, p: [30, 0] },
+    { k: 'point', id: 3, p: [15, 30] },
+  ];
+  const [a] = ruleGlyphAnchors(geoms, [{ k: 'symmetric', a: 1, aEnd: 'a', b: 2, bEnd: 'a', c: 3, cEnd: 'a' }], 2);
+  assert.deepEqual(a, { x: 15, y: 10 });
+});
+
+// --- fillet (soup-native corner rounding, SPEC-fusion-parity-closure #13) --
+//
+// A right-angle corner: line 1 runs (0,10)->(0,0), line 2 runs (0,0)->(10,0),
+// sharing the point (0,0) at line 1's 'b' and line 2's 'a' -- exactly, per
+// the soup's own coincident convention, which is what filletPick's epsilon
+// match relies on.
+const SQUARE_CORNER_GEOMS = [
+  { k: 'line', id: 1, a: [0, 10], b: [0, 0] },
+  { k: 'line', id: 2, a: [0, 0], b: [10, 0] },
+];
+const SQUARE_CORNER_RULES = [{ k: 'coincident', a: 1, aEnd: 'b', b: 2, bEnd: 'a' }];
+
+// 36: filletPick finds the corner nearest the click, and only a corner
+// within tolWorld of it -- same shape of guard as trimPick.
+test('36: filletPick finds the shared endpoint nearest the click', () => {
+  const pick = filletPick(SQUARE_CORNER_GEOMS, { x: 1, y: 1 }, 5);
+  assert.ok(pick, 'the corner at (0,0) is within tolerance');
+  assert.equal(pick.lineA, 1);
+  assert.equal(pick.endA, 'b');
+  assert.equal(pick.lineB, 2);
+  assert.equal(pick.endB, 'a');
+  assert.deepEqual(pick.corner, { x: 0, y: 0 });
+  // Outside tolerance: no pick, even though the corner still exists.
+  assert.equal(filletPick(SQUARE_CORNER_GEOMS, { x: 1, y: 1 }, 0.5), null);
+  // Two lines that do NOT share a point offer no corner at all.
+  const disjoint = [
+    { k: 'line', id: 1, a: [0, 0], b: [10, 0] },
+    { k: 'line', id: 2, a: [0, 5], b: [10, 5] },
+  ];
+  assert.equal(filletPick(disjoint, { x: 5, y: 2 }, 10), null);
+});
+
+// 37 (task item a): a right-angle corner fillets into an arc of the expected
+// radius/center, and both lines' endpoints move to the correct trim points.
+test('37: filletCornerAt rounds a right-angle corner into the expected arc', () => {
+  const maxR = maxFilletRadiusAt(SQUARE_CORNER_GEOMS, 1, 'b', 2, 'a');
+  assert.ok(Math.abs(maxR - 5) < 1e-9, 'a 90deg corner on two length-10 edges caps at 5 (tan(45)=1)');
+  assert.equal(whyCannotFilletAt(SQUARE_CORNER_GEOMS, 1, 'b', 2, 'a'), null, 'a positive radius fits');
+
+  const out = filletCornerAt(SQUARE_CORNER_GEOMS, SQUARE_CORNER_RULES, 1, 'b', 2, 'a', 3);
+  assert.ok(out, 'a radius under the ceiling commits');
+  assert.equal(out.geoms.length, 3, 'one new arc row, no others added or removed');
+
+  const lineA = out.geoms.find((g) => g.id === 1);
+  const lineB = out.geoms.find((g) => g.id === 2);
+  const arc = out.geoms.find((g) => g.id === out.arcId);
+  assert.ok(arc && arc.k === 'arc');
+  // Both lines REUSE their own ids; only the corner-side end moved.
+  assert.deepEqual(lineA.a, [0, 10], 'the far end of line 1 is untouched');
+  assert.ok(Math.abs(lineA.b[0] - 0) < 1e-9 && Math.abs(lineA.b[1] - 3) < 1e-9, 'line 1 trims back 3 along its own edge');
+  assert.ok(Math.abs(lineB.a[0] - 3) < 1e-9 && Math.abs(lineB.a[1] - 0) < 1e-9, 'line 2 trims back 3 along its own edge');
+  assert.deepEqual(lineB.b, [10, 0], 'the far end of line 2 is untouched');
+  // Worked by hand (this file's own trig, ported from filletCorner()): a
+  // 90deg corner trimmed to (0,3) and (3,0) has its fillet centre at (3,3),
+  // radius 3 -- tangent to both axis-aligned edges at the trim points.
+  assert.ok(Math.abs(arc.r - 3) < 1e-9);
+  assert.ok(Math.abs(arc.c[0] - 3) < 1e-9 && Math.abs(arc.c[1] - 3) < 1e-9);
+  assert.ok(Math.abs(arc.a[0] - 0) < 1e-9 && Math.abs(arc.a[1] - 3) < 1e-9);
+  assert.ok(Math.abs(arc.b[0] - 3) < 1e-9 && Math.abs(arc.b[1] - 0) < 1e-9);
+  assert.equal(arc.sense, 'ccw');
+  // The sharp-corner coincident is gone, replaced by two welds to the arc.
+  assert.equal(out.rules.some((r) => r.k === 'coincident' && r.a === 1 && r.b === 2), false);
+  assert.ok(out.rules.some((r) => r.k === 'coincident' && r.a === 1 && r.aEnd === 'b' && r.b === out.arcId && r.bEnd === 'a'));
+  assert.ok(out.rules.some((r) => r.k === 'coincident' && r.a === out.arcId && r.aEnd === 'b' && r.b === 2 && r.bEnd === 'a'));
+});
+
+// 38 (task item b): two corners filleted at the SAME typed radius get an
+// `equal` rule between the resulting arcs -- the auto-equal-radius heuristic
+// the UI drives through applyEqualRadiusRule alongside the second commit.
+test('38: applyEqualRadiusRule ties two same-radius fillet arcs, once', () => {
+  // A square: corner 1 at (0,0) (lines 1,2), corner 2 at (10,10) (lines 2,3).
+  const square = [
+    { k: 'line', id: 1, a: [0, 10], b: [0, 0] },
+    { k: 'line', id: 2, a: [0, 0], b: [10, 0] },
+    { k: 'line', id: 3, a: [10, 0], b: [10, 10] },
+  ];
+  const first = filletCornerAt(square, [], 1, 'b', 2, 'a', 3);
+  assert.ok(first);
+  const second = filletCornerAt(first.geoms, first.rules, 2, 'b', 3, 'a', 3);
+  assert.ok(second, 'the second corner also fillets at the same 3mm radius');
+
+  let rules = applyEqualRadiusRule(second.rules, second.arcId, first.arcId);
+  assert.ok(rules.some((r) => r.k === 'equal' && r.a === second.arcId && r.b === first.arcId));
+  const equalCountAfterFirst = rules.filter((r) => r.k === 'equal').length;
+  assert.equal(equalCountAfterFirst, 1);
+  // Calling it again (either order) does not pile up a duplicate.
+  rules = applyEqualRadiusRule(rules, first.arcId, second.arcId);
+  assert.equal(rules.filter((r) => r.k === 'equal').length, 1, 'no duplicate in the reverse order either');
+});
+
+// 39 (task item c): a radius past the corner's ceiling clamps rather than
+// over-trims -- the trim distance never eats past HALF the shorter edge.
+test('39: filletCornerAt clamps an oversized radius instead of self-intersecting', () => {
+  // Asymmetric right angle: the short edge (line 1) is 4mm, the long edge
+  // (line 2) is 20mm -- min(lenIn,lenOut) is the short one.
+  const geoms = [
+    { k: 'line', id: 1, a: [0, 4], b: [0, 0] },
+    { k: 'line', id: 2, a: [0, 0], b: [20, 0] },
+  ];
+  const maxR = maxFilletRadiusAt(geoms, 1, 'b', 2, 'a');
+  assert.ok(Math.abs(maxR - 2) < 1e-9, 'min(4,20)/2 * tan(45) = 2');
+
+  const out = filletCornerAt(geoms, [], 1, 'b', 2, 'a', 100);
+  assert.ok(out, 'an oversized ask still commits, clamped');
+  const lineA = out.geoms.find((g) => g.id === 1);
+  const lineB = out.geoms.find((g) => g.id === 2);
+  const trimA = Math.hypot(lineA.b[0] - 0, lineA.b[1] - 0);
+  const trimB = Math.hypot(lineB.a[0] - 0, lineB.a[1] - 0);
+  assert.ok(trimA <= 4 && trimB <= 4, 'the trim never exceeds min(lenIn,lenOut)');
+  assert.ok(Math.abs(trimA - 2) < 1e-9 && Math.abs(trimB - 2) < 1e-9, 'clamped to the 2mm ceiling, not 100');
+  const arc = out.geoms.find((g) => g.id === out.arcId);
+  assert.ok(Math.abs(arc.r - 2) < 1e-9);
+});
+
+// 40 (task item d): a straight corner and a zero-length adjacent edge each
+// refuse with a plain-English sentence from whyCannotFilletAt, and
+// filletCornerAt returns null on both -- neither throws.
+test('40: whyCannotFilletAt names the refusal; filletCornerAt refuses without throwing', () => {
+  // A straight corner: both lines run along the same axis through (10,0).
+  const straight = [
+    { k: 'line', id: 1, a: [0, 0], b: [10, 0] },
+    { k: 'line', id: 2, a: [10, 0], b: [20, 0] },
+  ];
+  const whyStraight = whyCannotFilletAt(straight, 1, 'b', 2, 'a');
+  assert.equal(typeof whyStraight, 'string');
+  assert.match(whyStraight, /straight/i);
+  assert.equal(filletCornerAt(straight, [], 1, 'b', 2, 'a', 3), null);
+
+  // A zero-length adjacent edge: line 1's own two ends coincide.
+  const zeroLen = [
+    { k: 'line', id: 1, a: [0, 0], b: [0, 0] },
+    { k: 'line', id: 2, a: [0, 0], b: [10, 0] },
+  ];
+  const whyZero = whyCannotFilletAt(zeroLen, 1, 'b', 2, 'a');
+  assert.equal(typeof whyZero, 'string');
+  assert.match(whyZero, /no length/i);
+  assert.equal(filletCornerAt(zeroLen, [], 1, 'b', 2, 'a', 3), null);
+});
+
+// 41: trimLine preserves each endpoint's ORIGINAL LETTER -- it must not
+// relabel the surviving far point to whichever letter the split point took.
+test('41: trimLine keeps the surviving endpoint at its own letter, not relabeled to farPt', () => {
+  const geoms = [
+    { k: 'line', id: 1, a: [0, 0], b: [40, 0] },   // the clicked line
+    { k: 'line', id: 2, a: [20, -10], b: [20, 30] }, // crosses at (20, 0)
+  ];
+  const pick = trimPick(geoms, 1, { x: 5, y: 0 });
+  assert.ok(pick, 'a crossing exists');
+  // Click at x=5 (left of the split): the LEFT half (containing 'a') is
+  // deleted; 'a' moves to the split, 'b' survives UNTOUCHED at its own
+  // original coordinates AND letter. Before the fix, this always wrote
+  // farPt (here, b's own [40,0]) into the 'a' slot and the split into 'b'
+  // -- silently swapping which letter each value lived under.
+  const out = trimLine(geoms, [], 1, pick.at, { x: 5, y: 0 });
+  const one = out.geoms.find((g) => g.id === 1);
+  assert.deepEqual(one.a, [20, 0], "'a' is pulled to the split");
+  assert.deepEqual(one.b, [40, 0], "'b' keeps its own original letter and coordinates");
+});
+
+// 42: offsetChain on a single line produces a new parallel line at exactly
+// the typed distance; the original keeps its position but flips to
+// construction (Fusion's own offset behavior: source becomes reference).
+test('42: offsetChain offsets a single line by the exact distance, original untouched', () => {
+  const geoms = [{ k: 'line', id: 1, a: [0, 0], b: [40, 0] }];
+  const pick = offsetChainPick(geoms, [1], { x: 20, y: 5 }); // click ABOVE the line
+  assert.ok(pick, 'a single line is trivially its own chain');
+  assert.equal(pick.side, 1, 'click above a left-to-right line is the +side');
+  const out = offsetChain(geoms, [], pick.chain, pick.side, 10);
+  assert.ok(out, 'a positive distance succeeds');
+  assert.equal(out.geoms.length, 2, 'one new row, the original stays');
+  const original = out.geoms.find((g) => g.id === 1);
+  assert.deepEqual(original.a, [0, 0], 'original position untouched');
+  assert.deepEqual(original.b, [40, 0], 'original position untouched');
+  assert.equal(original.construction, true, 'original flips to construction, Fusion parity');
+  const fresh = out.geoms.find((g) => g.id === out.newIds[0]);
+  assert.deepEqual(fresh.a, [0, 10], 'offset above by exactly 10');
+  assert.deepEqual(fresh.b, [40, 10], 'offset above by exactly 10');
+});
+
+// 43: a zero or negative distance is degenerate and refused, not silently
+// creating a duplicate coincident edge.
+test('43: offsetChain refuses a zero or negative distance', () => {
+  const geoms = [{ k: 'line', id: 1, a: [0, 0], b: [40, 0] }];
+  const chain = offsetChainOrder(geoms, [1]);
+  assert.equal(offsetChain(geoms, [], chain, 1, 0), null, 'zero distance refused');
+  assert.equal(offsetChain(geoms, [], chain, 1, -5), null, 'negative distance refused');
+});
+
+// 44: two CONNECTED edges (an L corner) offset together stay mitered at a
+// sharp new corner, welded by a coincident rule -- not two independently
+// offset segments left with a gap.
+test('44: offsetChain miters a two-line connected chain at the new corner', () => {
+  const geoms = [
+    { k: 'line', id: 1, a: [0, 0], b: [10, 0] },   // horizontal leg
+    { k: 'line', id: 2, a: [10, 0], b: [10, 10] }, // vertical leg, shares (10,0)
+  ];
+  const pick = offsetChainPick(geoms, [1, 2], { x: 5, y: -2 }); // click below/outside the corner
+  assert.ok(pick, 'a shared-endpoint pair is a valid chain');
+  assert.deepEqual(pick.chain.map((s) => s.id), [1, 2], 'walked head to tail starting from the free end');
+  assert.equal(pick.side, -1);
+  const out = offsetChain(geoms, [], pick.chain, pick.side, 3);
+  assert.ok(out);
+  assert.equal(out.geoms.length, 4, 'two new rows, both originals kept');
+  const one = out.geoms.find((g) => g.id === 1);
+  const two = out.geoms.find((g) => g.id === 2);
+  assert.deepEqual(one.a, [0, 0], 'original leg 1 position untouched');
+  assert.deepEqual(two.b, [10, 10], 'original leg 2 position untouched');
+  assert.equal(one.construction, true, 'leg 1 flips to construction');
+  assert.equal(two.construction, true, 'leg 2 flips to construction');
+  const [idA, idB] = out.newIds;
+  const a = out.geoms.find((g) => g.id === idA);
+  const b = out.geoms.find((g) => g.id === idB);
+  assert.deepEqual(a.a, [0, -3], 'leg 1 pushed 3 away, far end untouched by the miter');
+  assert.deepEqual(a.b, [13, -3], 'leg 1 near end pulled to the mitered corner');
+  assert.deepEqual(b.a, [13, -3], 'leg 2 near end is the SAME mitered corner -- no gap');
+  assert.deepEqual(b.b, [13, 10], 'leg 2 far end pushed 3 away, untouched by the miter');
+  assert.ok(
+    out.rules.some((r) => r.k === 'coincident' && r.a === idA && r.aEnd === 'b' && r.b === idB && r.bEnd === 'a'),
+    'the new corner is welded, same convention as a fillet arc',
+  );
+});
+
+// 45: a selection that is not a single simple chain (disconnected pieces,
+// here) is refused rather than guessed at.
+test('45: offsetChainOrder refuses a disconnected selection', () => {
+  const geoms = [
+    { k: 'line', id: 1, a: [0, 0], b: [10, 0] },
+    { k: 'line', id: 2, a: [100, 100], b: [110, 100] }, // shares no endpoint with line 1
+  ];
+  assert.equal(offsetChainOrder(geoms, [1, 2]), null);
+  assert.equal(offsetChainPick(geoms, [1, 2], { x: 5, y: 5 }), null);
+});
+
+// 46: the points->soup migration owes the kernel corner welds (the soup arm
+// welds through coincident rules only -- empty rules reach it as four open
+// ends: "edge 1 has a loose end", the scaffold Pull bug) plus the scaffold's
+// H/V edges on their matching line ids. A circle has no corners to weld.
+test('46: migratedRules closes the loop and keeps the H/V edges', () => {
+  const points = [[0, 0], [40, 0], [40, 25], [0, 25]];
+  const geoms = points.map((p, i) => ({
+    k: 'line',
+    id: i + 1,
+    a: p,
+    b: points[(i + 1) % points.length],
+  }));
+  const constraints = [
+    { kind: 'horizontal', edge: 0 },
+    { kind: 'vertical', edge: 1 },
+    { kind: 'horizontal', edge: 2 },
+    { kind: 'vertical', edge: 3 },
+  ];
+  assert.deepEqual(migratedRules(constraints, geoms), [
+    { k: 'coincident', a: 1, aEnd: 'b', b: 2, bEnd: 'a' },
+    { k: 'coincident', a: 2, aEnd: 'b', b: 3, bEnd: 'a' },
+    { k: 'coincident', a: 3, aEnd: 'b', b: 4, bEnd: 'a' },
+    { k: 'coincident', a: 4, aEnd: 'b', b: 1, bEnd: 'a' },
+    { k: 'horizontal', a: 1 },
+    { k: 'vertical', a: 2 },
+    { k: 'horizontal', a: 3 },
+    { k: 'vertical', a: 4 },
+  ]);
+  assert.deepEqual(
+    migratedRules([{ kind: 'horizontal', edge: 0 }], [{ k: 'circle', id: 1, c: [0, 0], r: 10 }]),
+    [],
+    'a circle carries no corners to weld and no line edges',
+  );
 });

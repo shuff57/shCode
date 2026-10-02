@@ -807,7 +807,22 @@ export function defaultName(f, doc) {
 /** Features nothing else consumes — what the model actually shows. */
 export function topLevel(doc) {
     const consumed = new Set();
+    // Cuts naming one body apply cumulatively (PartDesign): each supersedes the
+    // previous cut on that body. Mirrors `heads` in brep-rs history.rs.
+    const heads = new Map();
+    const supersede = (body, id) => {
+        const from = heads.get(body) ?? body;
+        consumed.add(from);
+        for (const [k, v] of heads)
+            if (v === from)
+                heads.set(k, id);
+        heads.set(body, id);
+    };
     for (const f of doc.features) {
+        if (f.kind === 'hole')
+            supersede(f.target, f.id);
+        if (f.kind === 'pocket' || f.kind === 'groove')
+            supersede(f.into, f.id);
         if (f.kind === 'combine')
             f.targets.forEach((t) => consumed.add(t));
         if (f.kind === 'extrude')

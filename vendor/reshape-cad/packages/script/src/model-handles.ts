@@ -9,7 +9,7 @@
 // box grows both ways at once, so its face only keeps up with the pointer if
 // the width changes by twice the drag.
 
-import { isShape, sketchBBoxCentre, type Feature, type ModelDoc, type SketchPlane } from './model-types.js';
+import { isShape, extentAlong, sketchBBoxCentre, type Feature, type ModelDoc, type SketchPlane, type Vec3 } from './model-types.js';
 import { maxFilletRadius } from '@shuff57/reshape-sketch/sketch-arc';
 
 export type HandleKind = 'size' | 'move' | 'turn' | 'point' | 'radius';
@@ -406,6 +406,69 @@ function pocketHandles(f: Extract<Feature, { kind: 'pocket' }>, doc?: ModelDoc):
   }];
 }
 
+/**
+ * The three axis handles a Move feature drives: its offset's x/y/z
+ * (applyParam's move arm). The origin rides the TARGET's own centre
+ * (where the gizmo sits), pushed out along each axis by the offset so
+ * the arrows sit where the move has taken the part -- the same
+ * rides-its-value convention every size handle here uses. A copy-less
+ * move consumes its target in topLevel(), so the doc walk below reads
+ * the first shape the chain roots in, the same hop extentAlong() uses.
+ */
+function moveFeatureHandles(f: Extract<Feature, { kind: 'move' }>, doc?: ModelDoc): HandleSpec[] {
+  if (!doc) return [];
+  // Root the chain: walk target hops to the primitive whose centre the
+  // gizmo sits at (the same 16-hop discipline extentAlong uses).
+  let id: string | undefined = f.target;
+  let c: readonly number[] | null = null;
+  for (let hop = 0; hop < 16 && id; hop++) {
+    const t = doc.features.find((x) => x.id === id);
+    if (!t) return [];
+    if ('center' in t) { c = (t as { center: readonly number[] }).center; break; }
+    id = 'target' in t ? (t as { target: string }).target : undefined;
+  }
+  if (!c) return [];
+  const [ox, oy, oz] = f.offset;
+  const reach = Math.max(10, Math.hypot(ox, oy, oz) + 10);
+  return [
+    { kind: 'move', param: `${f.id}_x`, origin: [c[0] + ox + reach, c[1] + oy, c[2] + oz], axis: [1, 0, 0], scale: 1, label: 'move x' },
+    { kind: 'move', param: `${f.id}_y`, origin: [c[0] + ox, c[1] + oy + reach, c[2] + oz], axis: [0, 1, 0], scale: 1, label: 'move y' },
+    { kind: 'move', param: `${f.id}_z`, origin: [c[0] + ox, c[1] + oy, c[2] + oz + reach], axis: [0, 0, 1], scale: 1, label: 'move z' },
+  ];
+}
+
+/**
+ * The one handle a Draft carries: its angle, sitting on the solid the
+ * draft tilts, pointing along the PULL axis (the direction the wall leans
+ * around). `doc` is required for the same reason filletHandles()'s is --
+ * a draft has no geometry of its own; everything below comes from the
+ * shape it names. The scale converts drag pixels into DEGREES: 1px at the
+ * anchor's pxPerUnit moves the angle by pxPerUnit degrees is wrong --
+ * scale is deliberately 1 so the value box shows the raw drag number in
+ * degrees, and a fine drag is what a beginner needs for a 5-15 degree
+ * taper anyway. The HandleOverlay draws the arc beside this anchor.
+ */
+function draftHandles(f: Extract<Feature, { kind: 'draft' }>, doc?: ModelDoc): HandleSpec[] {
+  if (!doc) return [];
+  const target = doc.features.find((x) => x.id === f.target);
+  if (!target || !('center' in target)) return [];
+  const c = (target as { center: readonly number[] }).center;
+  const axis: [number, number, number] = f.pull === 'x' ? [1, 0, 0] : f.pull === 'y' ? [0, 1, 0] : [0, 0, 1];
+  // A whole draft tilts every side face, so one angle handle at the top
+  // of the pull axis is the honest single control. A face draft (f.face)
+  // tilts one named face -- same handle, same param, the angle is shared.
+  return [{
+    kind: 'size',
+    // Exactly the name generatedParams() should emit for this slot --
+    // pname(id, 'angle'), the same shape every other handle here uses.
+    param: `${f.id}_angle`,
+    origin: [c[0] + axis[0] * 10, c[1] + axis[1] * 10, c[2] + axis[2] * 10],
+    axis,
+    scale: 1,
+    label: f.whole ? 'body draft angle' : 'draft angle',
+  }];
+}
+
 export function handlesFor(f: Feature, doc?: ModelDoc): HandleSpec[] {
   // A sketch gets its own two-axis corner handles; see sketchHandles.
   if (f.kind === 'sketch') return sketchHandles(f);
@@ -420,6 +483,16 @@ export function handlesFor(f: Feature, doc?: ModelDoc): HandleSpec[] {
   // A pocket is not a shape either -- it names a sketch and a solid -- so it
   // has to be caught before the isShape() guard below.
   if (f.kind === 'pocket') return pocketHandles(f, doc);
+  // Phase 5.1 part 2 (todo 23): a draft's angle is the one angle-bearing
+  // parameter Phase 5.1 covers, so it gets its own handle the taper arc
+  // can ride -- without it a draft selection projected no anchor at all
+  // (handlesFor fell through isShape() to the empty return).
+  if (f.kind === 'draft') return draftHandles(f, doc);
+  // Phase 5.2 (todo 24): a Move carries its offset as three axis
+  // parameters (applyParam's move arm writes x/y/z), so it gets the three
+  // axis arrows a gizmo is made of -- the same moveHandles() the shapes
+  // get, at the TARGET's own centre, scaled to the offset's reach.
+  if (f.kind === 'move') return moveFeatureHandles(f, doc);
   if (!isShape(f)) return [];
   const [cx, cy, cz] = f.center;
   const size: HandleSpec[] = [];
@@ -501,5 +574,30 @@ export function featureCenter(f: Feature, doc: ModelDoc): [number, number, numbe
   if (f.kind === 'extrude') return extrudeHandles(f, doc)[0]?.origin ?? null;
   if (f.kind === 'pocket') return pocketHandles(f, doc)[0]?.origin ?? null;
   if (f.kind === 'fillet') return filletHandles(f, doc)[0]?.origin ?? null;
-  return null;
+// A hole's own point is its MOUTH: the target's representative point plus
+// the offset the doc stores (which is relative to that point -- see
+// HoleFeature.center), pushed out to the drilled face. This arm exists
+// because A2 put the counterbore/countersink verbs in the CONTEXT BAR, and
+// the bar needs an anchor to float over: while this returned null a hole
+// had none, so those two buttons could never appear for the only feature
+// kind they apply to. Measured 2026-10-02: selecting Box 1 rendered the bar,
+// selecting Hole 1 rendered nothing at all.
+//
+// `extentAlong` gives the target's full size along the drill axis, so half
+// of it lands the point on the face the bore enters. It returns null for a
+// rotated primitive or a non-primitive root; there the centre alone is
+// still a fair float, so the anchor degrades instead of disappearing.
+if (f.kind === 'hole') {
+const target = doc.features.find((t) => t.id === f.target);
+if (!target) return null;
+const base = featureCenter(target, doc);
+if (!base) return null;
+const p: Vec3 = [base[0] + f.center[0], base[1] + f.center[1], base[2] + f.center[2]];
+const half = (extentAlong(doc, f.target, f.axis) ?? 0) / 2;
+if (f.axis === 'x') p[0] += half;
+else if (f.axis === 'y') p[1] += half;
+else p[2] += half;
+return p;
+}
+return null;
 }

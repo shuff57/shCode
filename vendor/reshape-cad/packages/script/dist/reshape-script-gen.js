@@ -255,7 +255,7 @@ function ruleRowText(bindings, featureId, index, r) {
     const val = (value) => numText(bindings, featureId, `rule${index}-value`, lit9(value));
     const pt = (side, ref, end) => ` ${side}:${n(ref)}${end ? `, ${side}End:'${end}'` : ''}`;
     switch (r.k) {
-        case 'coincident': return `{ k:'coincident',${pt('a', r.a, r.aEnd)}${pt('b', r.b, r.bEnd)} }`;
+        case 'coincident': return `{ k:'coincident',${pt('a', r.a, r.aEnd)},${pt('b', r.b, r.bEnd)} }`;
         case 'pointOnObject': return `{ k:'pointOnObject', a:${n(r.a)}${r.aEnd ? `, aEnd:'${r.aEnd}'` : ''}, b:${n(r.b)} }`;
         case 'horizontal': return `{ k:'horizontal', a:${n(r.a)} }`;
         case 'vertical': return `{ k:'vertical', a:${n(r.a)} }`;
@@ -584,6 +584,19 @@ export function toScript(doc, namedParams) {
             const throughDepth = extent != null ? extent + 2 : null;
             if (throughDepth == null || !near(f.depth, throughDepth)) {
                 opts.push(optText(bindings, f.id, 'depth', 'deep', lit(f.depth)));
+            }
+            // Recesses (SPEC-brep-feature-provenance 5.2b). These leaves are NOT parameter
+            // slots: `optText` binds to a generated param on the feature, and a recess's numbers
+            // are nested fields with no slot of their own. So they are emitted as literals and a
+            // student's binding is not preserved for them, exactly as for any other literal in a
+            // regenerated script. The VALUE surviving is the part that matters -- it is what was
+            // silently lost for `deep` in A0, and losing a recess this way would be the same bug
+            // one level deeper: the hole would come back shallower and nothing would say so.
+            if (f.counterbore) {
+                opts.push(`counterbore: { across: ${lit(f.counterbore.diameter)}, deep: ${lit(f.counterbore.depth)} }`);
+            }
+            if (f.countersink) {
+                opts.push(`countersink: { across: ${lit(f.countersink.diameter)}, angle: ${lit(f.countersink.angleDeg)} }`);
             }
             if (f.axis !== 'z')
                 opts.push(`along: '${f.axis}'`);

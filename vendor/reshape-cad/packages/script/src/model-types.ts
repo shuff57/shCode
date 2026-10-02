@@ -517,6 +517,26 @@ export interface HoleFeature {
    * holes a student eyeballed into place one at a time.
    */
   corners?: { dx: number; dy: number };
+  /**
+   * A flat-bottomed recess at the hole's mouth, wider than the bore: a
+   * counterbore, so a bolt head sits flush instead of proud. The recess is
+   * cut from the mouth inward along the drill axis, so `depth` is measured
+   * from the same face as the bore and must be less than it.
+   *
+   * The kernel cuts this as ONE revolved stepped profile subtracted once,
+   * never as a boolean of two coaxial cylinders -- the two-diameter geometry
+   * lives in the profile, so the boolean never sees two coaxial tools.
+   */
+  counterbore?: { diameter: number; depth: number };
+  /**
+   * A conical recess at the hole's mouth, so a screw sits flush: a
+   * countersink. `diameter` is the recess's full width at the mouth and
+   * `angleDeg` the included angle of the cone (90 is the usual choice). The
+   * cone's depth follows from the two, so it is not given separately.
+   *
+   * Mutually exclusive with `counterbore`: one mouth, one shape.
+   */
+  countersink?: { diameter: number; angleDeg: number };
 }
 
 /**
@@ -1438,7 +1458,18 @@ export function defaultName(f: Feature, doc: ModelDoc): string {
 /** Features nothing else consumes — what the model actually shows. */
 export function topLevel(doc: ModelDoc): Feature[] {
   const consumed = new Set<string>();
+  // Cuts naming one body apply cumulatively (PartDesign): each supersedes the
+  // previous cut on that body. Mirrors `heads` in brep-rs history.rs.
+  const heads = new Map<string, string>();
+  const supersede = (body: string, id: string) => {
+    const from = heads.get(body) ?? body;
+    consumed.add(from);
+    for (const [k, v] of heads) if (v === from) heads.set(k, id);
+    heads.set(body, id);
+  };
   for (const f of doc.features) {
+    if (f.kind === 'hole') supersede(f.target, f.id);
+    if (f.kind === 'pocket' || f.kind === 'groove') supersede(f.into, f.id);
     if (f.kind === 'combine') f.targets.forEach((t) => consumed.add(t));
     if (f.kind === 'extrude') consumed.add(f.target);
     if (f.kind === 'revolve') consumed.add(f.target);

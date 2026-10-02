@@ -235,6 +235,25 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
         push('dx', 'in from each side (across)', insetX, { min: margin, max: 250, step: 0.5 });
         push('dy', 'in from each side (up)', insetY, { min: margin, max: 250, step: 0.5 });
       }
+      // SPEC-brep-feature-provenance 5.2b: a recess shows the way `corners`
+      // does -- only when the doc actually has one. The panel must not offer a
+      // recess the shape does not have.
+      //
+      // The min here is an absolute floor, NOT the bore's radius, and that is
+      // deliberate. A recess narrower or deeper than its bore is geometrically
+      // impossible, and by the split pinned in slice A1 that is a KERNEL refusal,
+      // not a clamp: clamping it here would silently turn a refusal into a
+      // different shape, which is the outcome this campaign exists to prevent.
+      if (f.counterbore) {
+        push('counterboreAcross', 'counterbore across', f.counterbore.diameter, { min: 0.5, max: 250, step: 0.5 });
+        push('counterboreDeep', 'counterbore deep', f.counterbore.depth, { min: 0.5, max: 250, step: 0.5 });
+      }
+      if (f.countersink) {
+        push('countersinkAcross', 'countersink across', f.countersink.diameter, { min: 0.5, max: 250, step: 0.5 });
+        // Included cone angle, so 90 is the ceiling. Same reasoning as above: an
+        // angle past 90 is refused by the script, so the panel stops there.
+        push('countersinkAngle', 'countersink angle', f.countersink.angleDeg, { min: 1, max: 90, step: 1 });
+      }
     } else if (f.kind === 'shell') {
       push('thickness', 'wall', f.thickness, { min: 0.5, max: 40, step: 0.5 });
     } else if (f.kind === 'move') {
@@ -259,6 +278,12 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
         max: Math.max(Math.floor(ceiling / 0.5) * 0.5, f.size),
         step: 0.5,
       });
+    }
+    // Phase 5.1 part 2 (todo 23): the draft's angle joins the panel the
+    // same way it joins the manipulator -- one slot, one caption family.
+    // |angle| < 90; negative leans in, 0 is "no taper" (identity).
+    if (f.kind === 'draft') {
+      push('angle', 'taper angle', f.angle, { min: -89.5, max: 89.5, step: 0.5 });
     }
     // mirror carries no numeric slot -- its only input is a plane choice.
   });
@@ -496,6 +521,16 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
         changed = true;
         return { ...f, center };
       }
+      if (f.counterbore && (slot === 'counterboreAcross' || slot === 'counterboreDeep')) {
+        const key = slot === 'counterboreAcross' ? 'diameter' : 'depth';
+        changed = true;
+        return { ...f, counterbore: { ...f.counterbore, [key]: value } };
+      }
+      if (f.countersink && (slot === 'countersinkAcross' || slot === 'countersinkAngle')) {
+        const key = slot === 'countersinkAcross' ? 'diameter' : 'angleDeg';
+        changed = true;
+        return { ...f, countersink: { ...f.countersink, [key]: value } };
+      }
       if (f.corners && (slot === 'dx' || slot === 'dy')) {
         // Inverse of generatedParams' inset conversion above: the panel
         // hands back "N in from the side", converted back to the stored
@@ -523,6 +558,7 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
       }
     }
     if (f.kind === 'fillet' && slot === 'size') { changed = true; return { ...f, size: value }; }
+    if (f.kind === 'draft' && slot === 'angle') { changed = true; return { ...f, angle: value }; }
     return f;
   });
 

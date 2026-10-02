@@ -7,6 +7,7 @@
 //
 // Soup coordinates: the same mm plane coordinates the doc stores in
 // SketchFeature.geoms. 'a'/'b'/'c' are the soup point refs (start/end/centre).
+import { arcFromBulge } from '@shuff57/reshape-sketch/sketch-arc';
 /** Which named points each geometry kind exposes. A point exposes only its
  *  own location; a line its two ends; a circle its centre; an arc all three
  *  plus both ends. The UI hit-tests ONLY the named points a kind really
@@ -48,26 +49,183 @@ export function pointWorld(g, at) {
     }
     return null;
 }
-// --- snapping (the archived UI's findSnapVertex) -----------------------------
-/** The nearest named point within `snapPx` screen pixels of the pointer, or
- *  null. Screen distance is decided by the caller-supplied `distPx`, so the
- *  projection stays the component's business. */
-export function snapVertex(geoms, target, distPx, snapPx) {
-    let best = null;
-    let bestDist = snapPx;
-    for (const g of geoms) {
-        for (const { at } of namedPointsOf(g)) {
-            const w = pointWorld(g, at);
-            if (!w)
-                continue;
-            const d = distPx(w);
-            if (d < bestDist) {
-                bestDist = d;
-                best = { id: g.id, at, world: w };
+// Rank: an intersection beats a vertex beats a midpoint/centre beats an
+// on-curve point beats the grid. Lower wins; ties break by distance.
+const SNAP_RANK = {
+    intersection: 0, vertex: 1, midpoint: 2, center: 2, onCurve: 3, grid: 4,
+};
+/** Standard line-circle intersection: parametrize the segment p->p+d, solve
+ *  the quadratic against the circle, keep roots within [0,1]. */
+export function lineCircleIntersections(p, d, c, r) {
+    const fx = p.x - c.x, fy = p.y - c.y;
+    const a = d.x * d.x + d.y * d.y;
+    if (a === 0)
+        return [];
+    const b = 2 * (fx * d.x + fy * d.y);
+    const cc = fx * fx + fy * fy - r * r;
+    const disc = b * b - 4 * a * cc;
+    if (disc < 0)
+        return [];
+    const sq = Math.sqrt(disc);
+    const out = [];
+    for (const t of [(-b - sq) / (2 * a), (-b + sq) / (2 * a)]) {
+        if (t >= -1e-9 && t <= 1 + 1e-9)
+            out.push({ x: p.x + t * d.x, y: p.y + t * d.y });
+    }
+    return out;
+}
+/** Standard two-circle intersection via the radical line; [] when the circles
+ *  do not meet (or coincide). */
+export function circleCircleIntersections(c1, r1, c2, r2) {
+    const dx = c2.x - c1.x, dy = c2.y - c1.y;
+    const d = Math.hypot(dx, dy);
+    if (d === 0 || d > r1 + r2 || d < Math.abs(r1 - r2))
+        return [];
+    const a = (r1 * r1 - r2 * r2 + d * d) / (2 * d);
+    const h2 = r1 * r1 - a * a;
+    const h = Math.sqrt(Math.max(0, h2));
+    const mx = c1.x + (a * dx) / d, my = c1.y + (a * dy) / d;
+    return [
+        { x: mx + (h * dy) / d, y: my - (h * dx) / d },
+        { x: mx - (h * dy) / d, y: my + (h * dx) / d },
+    ];
+}
+/** The best snap within `tolWorld` of `worldPt` over every kind: vertices,
+ *  midpoints, centres, intersections, on-curve points, and (when a gridStep is
+ *  given) grid crossings. Rank decides; distance breaks ties. `opts.kinds` and
+ *  `opts.dist` are the delegation seam snapVertex rides on. */
+export function findSnap(geoms, worldPt, tolWorld, opts = {}) {
+    const dist = opts.dist ?? ((p) => Math.hypot(p.x - worldPt.x, p.y - worldPt.y));
+    const want = (k) => !opts.kinds || opts.kinds.includes(k);
+    const cands = [];
+    const push = (h) => cands.push(h);
+    if (want('vertex')) {
+        for (const g of geoms) {
+            for (const { at } of namedPointsOf(g)) {
+                const w = pointWorld(g, at);
+                if (w)
+                    push({ kind: 'vertex', at, world: w, id: g.id });
             }
         }
     }
+    if (want('midpoint')) {
+        for (const g of geoms) {
+            if (g.k === 'line') {
+                push({ kind: 'midpoint', world: { x: (g.a[0] + g.b[0]) / 2, y: (g.a[1] + g.b[1]) / 2 }, id: g.id });
+            }
+            else if (g.k === 'arc') {
+                const ang = arcAngles(g);
+                if (!ang)
+                    continue;
+                const mid = ang.a0 + ang.sweep / 2;
+                push({ kind: 'midpoint', world: { x: g.c[0] + g.r * Math.cos(mid), y: g.c[1] + g.r * Math.sin(mid) }, id: g.id });
+            }
+        }
+    }
+    if (want('center')) {
+        for (const g of geoms) {
+            if (g.k === 'circle' || g.k === 'arc') {
+                push({ kind: 'center', at: 'c', world: { x: g.c[0], y: g.c[1] }, id: g.id });
+            }
+        }
+    }
+    if (want('intersection')) {
+        for (let i = 0; i < geoms.length; i++) {
+            for (let j = i + 1; j < geoms.length; j++) {
+                const g1 = geoms[i], g2 = geoms[j];
+                if (g1.k === 'line' && g2.k === 'line') {
+                    const x = segmentIntersection({ x: g1.a[0], y: g1.a[1] }, { x: g1.b[0], y: g1.b[1] }, { x: g2.a[0], y: g2.a[1] }, { x: g2.b[0], y: g2.b[1] });
+                    if (x)
+                        push({ kind: 'intersection', world: x });
+                }
+                else if (g1.k === 'line' && g2.k === 'circle') {
+                    for (const p of lineCircleIntersections({ x: g1.a[0], y: g1.a[1] }, { x: g1.b[0] - g1.a[0], y: g1.b[1] - g1.a[1] }, { x: g2.c[0], y: g2.c[1] }, g2.r))
+                        push({ kind: 'intersection', world: p });
+                }
+                else if (g1.k === 'circle' && g2.k === 'line') {
+                    for (const p of lineCircleIntersections({ x: g2.a[0], y: g2.a[1] }, { x: g2.b[0] - g2.a[0], y: g2.b[1] - g2.a[1] }, { x: g1.c[0], y: g1.c[1] }, g1.r))
+                        push({ kind: 'intersection', world: p });
+                }
+                else if (g1.k === 'circle' && g2.k === 'circle') {
+                    for (const p of circleCircleIntersections({ x: g1.c[0], y: g1.c[1] }, g1.r, { x: g2.c[0], y: g2.c[1] }, g2.r))
+                        push({ kind: 'intersection', world: p });
+                }
+                // Arcs are skipped: they still produce onCurve hits, which is the
+                // acceptable minimal scope (SPEC-mouse-parity Phase 2 item 3).
+            }
+        }
+    }
+    if (want('onCurve')) {
+        for (const g of geoms) {
+            if (g.k === 'line') {
+                const a = { x: g.a[0], y: g.a[1] };
+                const b = { x: g.b[0], y: g.b[1] };
+                const dx = b.x - a.x, dy = b.y - a.y;
+                const len2 = dx * dx + dy * dy;
+                if (len2 === 0)
+                    continue;
+                let t = ((worldPt.x - a.x) * dx + (worldPt.y - a.y) * dy) / len2;
+                t = Math.max(0, Math.min(1, t));
+                push({ kind: 'onCurve', world: { x: a.x + t * dx, y: a.y + t * dy }, id: g.id });
+            }
+            else if (g.k === 'circle') {
+                const c = { x: g.c[0], y: g.c[1] };
+                const hyp = Math.hypot(worldPt.x - c.x, worldPt.y - c.y);
+                if (hyp < 1e-12)
+                    continue;
+                push({ kind: 'onCurve', world: { x: c.x + (g.r * (worldPt.x - c.x)) / hyp, y: c.y + (g.r * (worldPt.y - c.y)) / hyp }, id: g.id });
+            }
+            else if (g.k === 'arc') {
+                const ang = arcAngles(g);
+                if (!ang)
+                    continue;
+                const c = { x: g.c[0], y: g.c[1] };
+                const hyp = Math.hypot(worldPt.x - c.x, worldPt.y - c.y);
+                if (hyp < 1e-12)
+                    continue;
+                let th = Math.atan2(worldPt.y - c.y, worldPt.x - c.x);
+                // Normalize the probe angle into [a0, a0+sweep] without wrapping
+                // past the arc's actual sweep.
+                const twoPi = Math.PI * 2;
+                th = th - Math.floor((th - ang.a0) / twoPi) * twoPi;
+                th = Math.max(ang.a0, Math.min(ang.a0 + ang.sweep, th));
+                push({ kind: 'onCurve', world: { x: c.x + g.r * Math.cos(th), y: c.y + g.r * Math.sin(th) }, id: g.id });
+            }
+        }
+    }
+    if (opts.gridStep && want('grid')) {
+        push({
+            kind: 'grid',
+            world: { x: Math.round(worldPt.x / opts.gridStep) * opts.gridStep, y: Math.round(worldPt.y / opts.gridStep) * opts.gridStep },
+        });
+    }
+    let best = null;
+    let bestRank = Infinity;
+    let bestDist = Infinity;
+    for (const cand of cands) {
+        if (!want(cand.kind))
+            continue;
+        const d = dist(cand.world);
+        if (d > tolWorld)
+            continue;
+        const rank = SNAP_RANK[cand.kind];
+        if (rank < bestRank || (rank === bestRank && d < bestDist)) {
+            best = cand;
+            bestRank = rank;
+            bestDist = d;
+        }
+    }
     return best;
+}
+/** The nearest named point within `snapPx` screen pixels of the pointer, or
+ *  null. Screen distance is decided by the caller-supplied `distPx`, so the
+ *  projection stays the component's business. Delegates to findSnap with the
+ *  vertex kind only -- one snap engine, no duplicated logic. */
+export function snapVertex(geoms, target, distPx, snapPx) {
+    const hit = findSnap(geoms, target, snapPx, { kinds: ['vertex'], dist: distPx });
+    if (!hit || hit.id === undefined || !hit.at)
+        return null;
+    return { id: hit.id, at: hit.at, world: hit.world };
 }
 // --- hit-testing (the archived UI's findShapeHit) ----------------------------
 export function distToSegment(p, a, b) {
@@ -244,6 +402,40 @@ export function readSolved(geoms, params) {
         return g;
     });
 }
+// --- legacy points -> soup migration ----------------------------------------
+/** The soup rules a migrated points outline owes the kernel: one coincident
+ *  per corner (line i's end meets line i+1's start, wrap included) plus each
+ *  horizontal/vertical edge as a soup row on its line. The soup arm welds
+ *  corners through RULES, not coordinates (wires.rs refuses coordinate-only
+ *  contact as a guess the student never sees), so a loop migrated with empty
+ *  rules arrives as open ends: "edge 1 has a loose end" -- the scaffold Pull
+ *  bug of 2026-10-01. A circle has no corners to weld: []. Length and the
+ *  other legacy kinds stay on `constraints` untranslated (ponytail: only H/V
+ *  ever reach the soup session; add the rest when a legacy doc needs them). */
+export function migratedRules(constraints, geoms) {
+    const rules = [];
+    const lines = geoms.filter((g) => g.k === 'line');
+    if (lines.length > 1 && lines.length === geoms.length) {
+        for (let i = 0; i < lines.length; i++) {
+            const a = lines[i].id;
+            const b = lines[(i + 1) % lines.length].id;
+            rules.push({ k: 'coincident', a, aEnd: 'b', b, bEnd: 'a' });
+        }
+    }
+    for (const c of constraints ?? []) {
+        if (c.kind === 'horizontal') {
+            const g = lines[c.edge];
+            if (g)
+                rules.push({ k: 'horizontal', a: g.id });
+        }
+        else if (c.kind === 'vertical') {
+            const g = lines[c.edge];
+            if (g)
+                rules.push({ k: 'vertical', a: g.id });
+        }
+    }
+    return rules;
+}
 // --- construction toggle (the archived UI's cConstr) -------------------------
 /** Majority toggle: if ANY selected shape is not construction, all become
  *  construction; only when they all already are does the toggle turn them
@@ -298,12 +490,21 @@ export function trimPick(geoms, clickedId, click) {
 }
 /** Trim the clicked line at `split`: the half UNDER the click is deleted
  *  (whichever half's midpoint sits closer to the click), the far half keeps
- *  the clicked row's id with its far endpoint pulled to the split. No new
- *  row, no weld: a trim that deletes a piece leaves the wire open, and wire
- *  discovery's refusals say exactly that. Rules referencing the clicked row
- *  keep working (the surviving half kept the id); a rule that referenced the
- *  deleted geometry may become unsatisfiable — the diagnosis badge surfaces
- *  that, the trim does not try to fix it. */
+ *  the clicked row's id with its far endpoint pulled to the split. The far
+ *  endpoint keeps its ORIGINAL LETTER ('a' stays 'a', 'b' stays 'b') --
+ *  earlier this always wrote `{a: farPt, b: split}` regardless of which
+ *  letter farPt actually was, so trimming the line back from its 'a' end
+ *  silently RELABELED the surviving far point from 'b' to 'a'. Any weld
+ *  (coincident) rule naming that endpoint by letter (e.g. `aEnd: 'b'`)
+ *  then silently pointed at the fresh split point instead of the corner it
+ *  was welded to -- not a dangling reference (the id still exists), a
+ *  SILENTLY WRONG one, which is worse: diagnose() has nothing to flag,
+ *  since the rule is perfectly satisfiable, just against the wrong point.
+ *  No new row: a trim that deletes a piece leaves the wire open, and wire
+ *  discovery's refusals say exactly that. Rules referencing the clicked
+ *  row's SURVIVING letter keep working correctly; a rule that referenced
+ *  the DELETED letter may become unsatisfiable -- the diagnosis badge
+ *  surfaces that, the trim does not try to fix it. */
 export function trimLine(geoms, rules, clickedId, split, click) {
     void nextIdUnused;
     const clicked = geoms.find((g) => g.id === clickedId);
@@ -315,11 +516,194 @@ export function trimLine(geoms, rules, clickedId, split, click) {
     const dA = Math.hypot((a.x + split.x) / 2 - click.x, (a.y + split.y) / 2 - click.y);
     const dB = Math.hypot((b.x + split.x) / 2 - click.x, (b.y + split.y) / 2 - click.y);
     const nearIsA = dA <= dB;
-    const farPt = nearIsA ? b : a;
-    const geomsOut = geoms.map((g) => g.id === clickedId ? { ...g, a: [farPt.x, farPt.y], b: [split.x, split.y] } : g);
+    // nearIsA: 'a' is under the click and gets pulled to the split; 'b'
+    // survives untouched at its original coordinates (and letter). Otherwise
+    // the reverse -- 'b' moves to the split, 'a' survives as-is.
+    const geomsOut = geoms.map((g) => g.id === clickedId
+        ? nearIsA
+            ? { ...g, a: [split.x, split.y], b: [b.x, b.y] }
+            : { ...g, a: [a.x, a.y], b: [split.x, split.y] }
+        : g);
     return { geoms: geomsOut, rules: [...rules] };
 }
 const nextIdUnused = undefined;
+// --- fillet (soup-native corner rounding, SPEC-fusion-parity-closure #13) ---
+//
+// trimLine's sibling: same pure-geometric-splice discipline, but a fillet
+// inserts brand-new geometry (an arc) between the two lines it rounds, and
+// that arc must stay visually welded to them, so this is the one place a
+// soup mover writes NEW coincident rules rather than only editing points.
+// The trig below is filletCorner()'s own (sketch-arc.ts), ported off the
+// legacy points[]/bulges{} shape onto soup lines read by id/end instead.
+const FILLET_STRAIGHT_TOL = 1e-6;
+// Soup lines meant to connect share EXACT coordinates by construction (the
+// BASE_RULES coincident convention) -- a corner match is a tight epsilon,
+// not a snap tolerance.
+const FILLET_COINCIDENT_TOL = 1e-6;
+function otherEnd(at) {
+    return at === 'a' ? 'b' : 'a';
+}
+/** The fillet-able corner nearest `click`: among every pair of DISTINCT
+ *  lines, the named ends that sit at (nearly) the same world point --
+ *  within `tolWorld` of the click. Only line-line corners are handled (v1);
+ *  circles/arcs are future work here, same precedent as trimPick. */
+export function filletPick(geoms, click, tolWorld) {
+    const lines = geoms.filter((g) => g.k === 'line');
+    let best = null;
+    let bestDist = tolWorld;
+    for (const a of lines) {
+        for (const b of lines) {
+            if (a.id === b.id)
+                continue;
+            for (const endA of ['a', 'b']) {
+                for (const endB of ['a', 'b']) {
+                    const pa = pointWorld(a, endA);
+                    const pb = pointWorld(b, endB);
+                    if (Math.hypot(pa.x - pb.x, pa.y - pb.y) > FILLET_COINCIDENT_TOL)
+                        continue;
+                    const d = Math.hypot(pa.x - click.x, pa.y - click.y);
+                    if (d < bestDist) {
+                        bestDist = d;
+                        best = { lineA: a.id, endA, lineB: b.id, endB, corner: pa };
+                    }
+                }
+            }
+        }
+    }
+    return best;
+}
+/** The two rays leaving a named corner, away from it: `c` at (lineA, endA)
+ *  (== (lineB, endB) by construction), `prev` at lineA's OTHER end, `next`
+ *  at lineB's OTHER end. Null when either row is missing or not a line. */
+function filletCornerRays(geoms, lineA, endA, lineB, endB) {
+    const ga = geoms.find((g) => g.id === lineA && g.k === 'line');
+    const gb = geoms.find((g) => g.id === lineB && g.k === 'line');
+    if (!ga || !gb)
+        return null;
+    const c = pointWorld(ga, endA);
+    const prev = pointWorld(ga, otherEnd(endA));
+    const next = pointWorld(gb, otherEnd(endB));
+    if (!c || !prev || !next)
+        return null;
+    return { c, prev, next };
+}
+/** The real ceiling on this corner's fillet radius -- maxFilletRadius()'s
+ *  own trig (sketch-arc.ts), reading the two lines' live coordinates
+ *  instead of a points array. 0 refuses: a zero-length adjacent edge, or a
+ *  corner that is straight within FILLET_STRAIGHT_TOL. */
+export function maxFilletRadiusAt(geoms, lineA, endA, lineB, endB) {
+    const rays = filletCornerRays(geoms, lineA, endA, lineB, endB);
+    if (!rays)
+        return 0;
+    const { c, prev, next } = rays;
+    const lenIn = Math.hypot(c.x - prev.x, c.y - prev.y);
+    const lenOut = Math.hypot(next.x - c.x, next.y - c.y);
+    if (lenIn === 0 || lenOut === 0)
+        return 0;
+    const vIn = { x: prev.x - c.x, y: prev.y - c.y };
+    const vOut = { x: next.x - c.x, y: next.y - c.y };
+    const cosInterior = (vIn.x * vOut.x + vIn.y * vOut.y) / (lenIn * lenOut);
+    const interior = Math.acos(Math.max(-1, Math.min(1, cosInterior)));
+    if (Math.PI - interior < FILLET_STRAIGHT_TOL)
+        return 0;
+    return (Math.min(lenIn, lenOut) / 2) * Math.tan(interior / 2);
+}
+/** Plain words for why this corner cannot take a fillet at all, or null
+ *  when some positive radius would work -- the soup-native mirror of
+ *  whyCannotRoundCorner()'s tone, written fresh (not imported) because the
+ *  soup has no bulges/curved-neighbour case to report. */
+export function whyCannotFilletAt(geoms, lineA, endA, lineB, endB) {
+    if (maxFilletRadiusAt(geoms, lineA, endA, lineB, endB) > 0)
+        return null;
+    const rays = filletCornerRays(geoms, lineA, endA, lineB, endB);
+    if (!rays)
+        return 'That corner is not two lines meeting at a shared point.';
+    const { c, prev, next } = rays;
+    const lenIn = Math.hypot(c.x - prev.x, c.y - prev.y);
+    const lenOut = Math.hypot(next.x - c.x, next.y - c.y);
+    if (lenIn === 0 || lenOut === 0) {
+        return 'One of the two edges at this corner has no length at all.';
+    }
+    return 'This corner is straight -- nothing to round.';
+}
+/** Round one line-line corner into an arc, mutating no row in place.
+ *
+ *  Clamps `radius` to maxFilletRadiusAt (never trusts the caller's number
+ *  past what the corner can take, same as filletCorner()); refuses (null)
+ *  when even the smallest positive radius has nowhere to go. Both lines
+ *  REUSE their own ids for the surviving trimmed ends (trimLine's own
+ *  convention); only the new arc gets a fresh id via nextGeomId(). The one
+ *  sharp-corner coincident (if any existed) is dropped and replaced by two
+ *  new coincidents welding the arc to both trimmed lines -- the one place
+ *  fillet must do more than trim, because it inserts geometry the corner
+ *  never had. */
+export function filletCornerAt(geoms, rules, lineA, endA, lineB, endB, radius) {
+    const rays = filletCornerRays(geoms, lineA, endA, lineB, endB);
+    if (!rays)
+        return null;
+    const { c, prev, next } = rays;
+    const lenIn = Math.hypot(c.x - prev.x, c.y - prev.y);
+    const lenOut = Math.hypot(next.x - c.x, next.y - c.y);
+    if (lenIn === 0 || lenOut === 0)
+        return null;
+    const vIn = { x: prev.x - c.x, y: prev.y - c.y };
+    const vOut = { x: next.x - c.x, y: next.y - c.y };
+    const cosInterior = (vIn.x * vOut.x + vIn.y * vOut.y) / (lenIn * lenOut);
+    const interior = Math.acos(Math.max(-1, Math.min(1, cosInterior)));
+    if (Math.PI - interior < FILLET_STRAIGHT_TOL)
+        return null;
+    const safeRadius = (Math.min(lenIn, lenOut) / 2) * Math.tan(interior / 2);
+    const clampedRadius = Math.min(Math.max(0, radius), safeRadius);
+    if (clampedRadius <= 0)
+        return null;
+    const trim = clampedRadius / Math.tan(interior / 2);
+    const pointIn = [c.x + (vIn.x / lenIn) * trim, c.y + (vIn.y / lenIn) * trim];
+    const pointOut = [c.x + (vOut.x / lenOut) * trim, c.y + (vOut.y / lenOut) * trim];
+    // Sign of the turn at C, filletCorner()'s own construction: inEdge is the
+    // direction ARRIVING at C (prev -> C), outEdge the direction LEAVING it
+    // (C -> next); the arc's sweep is the corner's exterior angle, signed by
+    // that turn.
+    const inEdge = { x: c.x - prev.x, y: c.y - prev.y };
+    const outEdge = { x: next.x - c.x, y: next.y - c.y };
+    const cross = inEdge.x * outEdge.y - inEdge.y * outEdge.x;
+    const sweep = Math.PI - interior;
+    const bulge = (cross >= 0 ? 1 : -1) * Math.tan(sweep / 4);
+    const { center, radius: r } = arcFromBulge(pointIn, pointOut, bulge);
+    const arcId = nextGeomId(geoms);
+    const geomsOut = geoms.map((g) => {
+        if (g.id === lineA && g.k === 'line')
+            return { ...g, [endA]: pointIn };
+        if (g.id === lineB && g.k === 'line')
+            return { ...g, [endB]: pointOut };
+        return g;
+    });
+    geomsOut.push({
+        k: 'arc', id: arcId,
+        c: [center[0], center[1]], r,
+        a: pointIn, b: pointOut,
+        sense: bulge >= 0 ? 'ccw' : 'cw',
+    });
+    // The rule that WAS the sharp corner (if one explicitly existed) has
+    // nothing left to name -- both lines moved off that shared point -- so it
+    // is dropped; a corner can be geometric-only with no explicit rule, and
+    // that is fine too (trimLine tolerates the same).
+    const namesSharpCorner = (rr) => rr.k === 'coincident' &&
+        ((rr.a === lineA && rr.aEnd === endA && rr.b === lineB && rr.bEnd === endB) ||
+            (rr.a === lineB && rr.aEnd === endB && rr.b === lineA && rr.bEnd === endA));
+    const rulesOut = rules.filter((rr) => !namesSharpCorner(rr));
+    rulesOut.push({ k: 'coincident', a: lineA, aEnd: endA, b: arcId, bEnd: 'a' });
+    rulesOut.push({ k: 'coincident', a: arcId, aEnd: 'b', b: lineB, bEnd: endB });
+    return { geoms: geomsOut, rules: rulesOut, arcId };
+}
+/** Append an `equal` rule tying two arcs' radii, unless one already does
+ *  (either order) -- the auto-equal-radius heuristic commits alongside a
+ *  second same-radius fillet and must not pile up duplicates on repeat. */
+export function applyEqualRadiusRule(rules, arcIdA, arcIdB) {
+    const already = rules.some((r) => r.k === 'equal' && ((r.a === arcIdA && r.b === arcIdB) || (r.a === arcIdB && r.b === arcIdA)));
+    if (already)
+        return rules;
+    return [...rules, { k: 'equal', a: arcIdA, b: arcIdB }];
+}
 /** Build a slot (obround) from three clicks: centre A, centre B, and a point
  *  whose distance from A is the radius. The four rows are two arcs and two
  *  tangent lines, welded by four line-arc tangencies and nothing else —
@@ -538,6 +922,177 @@ export function mirrorSelection(geoms, rules, ids, axis) {
 export function copySelection(geoms, rules, ids, dx, dy) {
     return dupRows(geoms, rules, ids, (p) => ({ x: p.x + dx, y: p.y + dy }), (old) => old + 100000);
 }
+// --- offset ------------------------------------------------------------------------
+// Fusion's sketch Offset: pick one or more CONNECTED edges, drag/type a
+// distance, get a new parallel chain on one side -- the originals untouched
+// (Fusion always keeps the source, offset never edits in place). v1 handles
+// lines only and a single simple open chain at a time, same "one case, not
+// every case" precedent as trimPick (lines only) and filletPick (line-line
+// corners only); circles/arcs and closed loops are future work.
+const OFFSET_COINCIDENT_TOL = 1e-6;
+/** Same math as segmentIntersection, but UNBOUNDED: the crossing of the two
+*  lines extended to infinity, not just within each segment. Offset needs
+*  this to miter adjacent offset segments back together at a sharp corner
+*  (the parallel-shifted segments no longer touch at the original joint).
+*  Kept private and separate from segmentIntersection on purpose -- trim and
+*  fillet both depend on that one staying bounded. */
+function infiniteLineIntersection(p1, p2, p3, p4) {
+    const d1x = p2.x - p1.x, d1y = p2.y - p1.y;
+    const d2x = p4.x - p3.x, d2y = p4.y - p3.y;
+    const den = d1x * d2y - d1y * d2x;
+    if (Math.abs(den) < 1e-12)
+        return null; // parallel: no single crossing
+    const t = ((p3.x - p1.x) * d2y - (p3.y - p1.y) * d2x) / den;
+    return { x: p1.x + t * d1x, y: p1.y + t * d1y };
+}
+/** Order the selected line ids into a single simple open chain, walking head
+*  to tail via shared (coincident, within tolerance) endpoints among ONLY
+*  the given ids. Refuses (null) branching (a T-junction), closed loops
+*  (every endpoint shared, no free end to start from), and disconnected
+*  pieces -- offsetting an ambiguous or non-chain selection is refused
+*  rather than guessed at. A lone id is trivially its own one-line chain. */
+export function offsetChainOrder(geoms, ids) {
+    if (ids.length === 0)
+        return null;
+    const lines = ids.map((id) => geoms.find((g) => g.id === id));
+    if (lines.some((g) => !g || g.k !== 'line'))
+        return null;
+    const rows = lines;
+    if (rows.length === 1) {
+        const g = rows[0];
+        return [{ id: g.id, from: pointWorld(g, 'a'), to: pointWorld(g, 'b') }];
+    }
+    const eq = (p, q) => Math.hypot(p.x - q.x, p.y - q.y) < OFFSET_COINCIDENT_TOL;
+    const ends = rows.map((g) => [pointWorld(g, 'a'), pointWorld(g, 'b')]);
+    const matchesOther = (i, p) => rows.some((_, j) => j !== i && (eq(p, ends[j][0]) || eq(p, ends[j][1])));
+    let startI = -1;
+    let startFrom = null;
+    let startTo = null;
+    for (let i = 0; i < rows.length; i++) {
+        if (!matchesOther(i, ends[i][0])) {
+            startI = i;
+            startFrom = ends[i][0];
+            startTo = ends[i][1];
+            break;
+        }
+        if (!matchesOther(i, ends[i][1])) {
+            startI = i;
+            startFrom = ends[i][1];
+            startTo = ends[i][0];
+            break;
+        }
+    }
+    if (startI === -1)
+        return null; // every endpoint shared: a closed loop, refused in v1
+    const placed = new Set([startI]);
+    const chain = [{ id: rows[startI].id, from: startFrom, to: startTo }];
+    let tail = startTo;
+    while (placed.size < rows.length) {
+        let nextI = -1, nextFrom = null, nextTo = null;
+        for (let j = 0; j < rows.length; j++) {
+            if (placed.has(j))
+                continue;
+            if (eq(tail, ends[j][0])) {
+                if (nextI !== -1)
+                    return null; // branching: two lines join at this joint
+                nextI = j;
+                nextFrom = ends[j][0];
+                nextTo = ends[j][1];
+            }
+            else if (eq(tail, ends[j][1])) {
+                if (nextI !== -1)
+                    return null;
+                nextI = j;
+                nextFrom = ends[j][1];
+                nextTo = ends[j][0];
+            }
+        }
+        if (nextI === -1)
+            return null; // dead end before every selected line was used: disconnected pieces
+        chain.push({ id: rows[nextI].id, from: nextFrom, to: nextTo });
+        placed.add(nextI);
+        tail = nextTo;
+    }
+    return chain;
+}
+/** Order the picked ids into a chain (offsetChainOrder) and decide which
+*  perpendicular side `click` sits on, relative to whichever chain segment
+*  the click lands nearest -- the same nearest-segment idea trimPick uses
+*  to pick a crossing. Returns null if the ids are not a single chain. */
+export function offsetChainPick(geoms, ids, click) {
+    const chain = offsetChainOrder(geoms, ids);
+    if (!chain || chain.length === 0)
+        return null;
+    let best = chain[0];
+    let bestDist = Infinity;
+    for (const seg of chain) {
+        const d = distToSegment(click, seg.from, seg.to);
+        if (d < bestDist) {
+            bestDist = d;
+            best = seg;
+        }
+    }
+    const dir = { x: best.to.x - best.from.x, y: best.to.y - best.from.y };
+    const rel = { x: click.x - best.from.x, y: click.y - best.from.y };
+    const cross = dir.x * rel.y - dir.y * rel.x;
+    const side = cross >= 0 ? 1 : -1;
+    return { chain, side };
+}
+/** Build the new offset chain at `distance` (> 0) on `side`: each segment
+*  is pushed perpendicular to its own direction, then adjacent offset
+*  segments are re-joined at their new mitered (infinite-line) intersection
+*  so the chain's corners stay sharp -- the same corner the ORIGINAL chain
+*  had, just pushed out by `distance`. Appends new line rows (fresh ids via
+*  nextGeomId) and welds each adjacent pair with the same coincident
+*  convention filletCornerAt's new arc uses. The originals keep their own
+*  position and id -- offset always creates new geometry alongside the
+*  source, never moves or deletes it -- but flip to construction=true
+*  (Fusion's own offset behavior: the source becomes a dashed reference,
+*  the new offset chain the real profile edge).
+*  `distance <= 0` is degenerate (a zero offset would duplicate the source
+*  in place) and is refused with null; the caller shows the message. */
+export function offsetChain(geoms, rules, chain, side, distance) {
+    if (!(distance > 0) || chain.length === 0)
+        return null;
+    const raw = chain.map((seg) => {
+        const len = Math.hypot(seg.to.x - seg.from.x, seg.to.y - seg.from.y);
+        if (len === 0)
+            return null; // a zero-length selected line has no direction to offset
+        const dx = (seg.to.x - seg.from.x) / len, dy = (seg.to.y - seg.from.y) / len;
+        const px = -dy * side * distance, py = dx * side * distance;
+        return { from: { x: seg.from.x + px, y: seg.from.y + py }, to: { x: seg.to.x + px, y: seg.to.y + py } };
+    });
+    if (raw.some((r) => r === null))
+        return null;
+    let nextId = nextGeomId(geoms);
+    const newIds = [];
+    const newLines = raw.map((r) => {
+        const id = nextId++;
+        newIds.push(id);
+        return { k: 'line', id, a: [r.from.x, r.from.y], b: [r.to.x, r.to.y] };
+    });
+    for (let i = 0; i < newLines.length - 1; i++) {
+        const A = newLines[i], B = newLines[i + 1];
+        const x = infiniteLineIntersection({ x: A.a[0], y: A.a[1] }, { x: A.b[0], y: A.b[1] }, { x: B.a[0], y: B.a[1] }, { x: B.b[0], y: B.b[1] });
+        if (x) {
+            A.b = [x.x, x.y];
+            B.a = [x.x, x.y];
+        }
+        // Parallel adjacent segments (a straight run split into two selected
+        // pieces) have no single crossing to miter at -- each keeps its own
+        // independent offset, which already lines up since they were parallel.
+    }
+    const chainIds = new Set(chain.map((seg) => seg.id));
+    const geomsOut = [
+        ...geoms.map((g) => (chainIds.has(g.id) ? { ...g, construction: true } : g)),
+        ...newLines,
+    ];
+    const rulesOut = [...rules];
+    for (let i = 0; i < newLines.length - 1; i++) {
+        rulesOut.push({ k: 'coincident', a: newLines[i].id, aEnd: 'b', b: newLines[i + 1].id, bEnd: 'a' });
+    }
+    return { geoms: geomsOut, rules: rulesOut, newIds };
+}
 /** Re-dense the ids after duplication: 100000-offset ids are a collision-
  *  free trick, not a representation. Renumber everything to 1..n and rewrite
  *  every rule reference through the map. */
@@ -559,5 +1114,166 @@ export function densifyIds(geoms, rules) {
         return out;
     });
     return { geoms: geomsOut, rules: rulesOut };
+}
+// --- on-canvas dimensions + constraint glyphs (SPEC-mouse-parity P2.7/P2.8) ---
+//
+// Both features need the same thing first: WHERE on the canvas a thing that
+// is not geometry belongs. A dimension label hangs off the geometry it
+// measures, a constraint glyph off the geometry (or geometries) its rule
+// names, and both answers are the midpoint of what they refer to. That is
+// one pure function of the solved rows, so it lives here rather than inline
+// in the component.
+/** The six rule kinds that carry a numeric `value`. They are drawn as a
+  * VALUE LABEL rather than an icon -- the number is the glyph -- which is
+  * also the set the on-canvas dimension flow can write. */
+export const DIMENSION_RULE_KINDS = ['distance', 'distanceX', 'distanceY', 'radius', 'diameter', 'angle'];
+export function isDimensionRule(k) {
+    return DIMENSION_RULE_KINDS.includes(k);
+}
+/** The middle of a geometry row: a line's halfway point, a circle's centre,
+  * an arc's MID-SWEEP point (not its chord's middle -- a label on the chord
+  * of a half circle sits nowhere near the curve), a point's own location.
+  * Returns null for anything that is not one of the four soup kinds. */
+export function geomMidpoint(g) {
+    switch (g.k) {
+        case 'point':
+            return { x: g.p[0], y: g.p[1] };
+        case 'line':
+            return { x: (g.a[0] + g.b[0]) / 2, y: (g.a[1] + g.b[1]) / 2 };
+        case 'circle':
+            return { x: g.c[0], y: g.c[1] };
+        case 'arc': {
+            const ang = arcAngles(g);
+            if (!ang)
+                return null;
+            const mid = ang.a0 + ang.sweep / 2;
+            return { x: g.c[0] + g.r * Math.cos(mid), y: g.c[1] + g.r * Math.sin(mid) };
+        }
+    }
+    return null;
+}
+/** What dimension does a pick (or a pair of point picks) ASK for? A line
+  * wants the distance between its own two ends; a circle or an arc wants its
+  * radius -- the convention SketchCanvas2D's own openDimFromSelection already
+  * uses, so the on-canvas flow and the ribbon buttons cannot disagree about
+  * what `D` on a circle means; two picked points want the distance between
+  * them.
+  *
+  * Returns null when there is nothing to measure: ONE point pick (it is half
+  * a dimension, and the caller waits for the other half), a bare point row,
+  * or an id that is not in `geoms`. */
+export function autoDimension(geoms, a, b = null) {
+    const ga = geoms.find((x) => x.id === a.id);
+    if (!ga)
+        return null;
+    if (b) {
+        const gb = geoms.find((x) => x.id === b.id);
+        if (!gb || a.at === null || b.at === null)
+            return null;
+        const pa = pointWorld(ga, a.at);
+        const pb = pointWorld(gb, b.at);
+        if (!pa || !pb)
+            return null;
+        return {
+            kind: 'distance',
+            value: Math.hypot(pb.x - pa.x, pb.y - pa.y),
+            anchor: { x: (pa.x + pb.x) / 2, y: (pa.y + pb.y) / 2 },
+            a,
+            b,
+        };
+    }
+    if (a.at !== null)
+        return null;
+    const anchor = geomMidpoint(ga);
+    if (!anchor)
+        return null;
+    if (ga.k === 'line') {
+        return {
+            kind: 'distance',
+            value: Math.hypot(ga.b[0] - ga.a[0], ga.b[1] - ga.a[1]),
+            anchor,
+            a: { id: ga.id, at: 'a' },
+            b: { id: ga.id, at: 'b' },
+        };
+    }
+    if (ga.k === 'circle' || ga.k === 'arc') {
+        return { kind: 'radius', value: ga.r, anchor, a: { id: ga.id, at: null }, b: null };
+    }
+    return null;
+}
+/** Why the solver cannot take this text, in a sentence, or null when it can.
+  * The caller shows the sentence on the status line and writes NOTHING --
+  * a refused dimension must not grow the undo stack.
+  *
+  * distanceX/distanceY are the only SIGNED kinds: a negative one names the
+  * other direction and a zero one names a shared axis, so neither is absurd
+  * there the way a zero-length distance or a negative radius is. */
+export function dimensionValueError(kind, text) {
+    const t = String(text ?? '').trim();
+    if (!t)
+        return 'dimension: type a number -- an empty box sets nothing';
+    const v = Number(t);
+    if (!Number.isFinite(v))
+        return `dimension: "${t}" is not a number`;
+    const signed = kind === 'distanceX' || kind === 'distanceY';
+    if (!signed && v <= 0)
+        return `dimension: a ${kind} of ${t} is not a shape -- give a positive number`;
+    return null;
+}
+/** The id/point-ref field pairs a rule row can carry. `symmetric` about a
+  * line is the widest: three geometries, the third of which has no end. */
+const RULE_REF_FIELDS = [
+    ['a', 'aEnd'],
+    ['b', 'bEnd'],
+    ['c', 'cEnd'],
+];
+/** The midpoint of everything one rule names: the named POINT where the rule
+  * names one (a coincident's two ends), the geometry's own midpoint where it
+  * does not (a parallel's two lines). Null when any reference is missing --
+  * the kernel's built-in ids (-1 origin, -2/-3 the axes) are never rows in
+  * `geoms`, so a rule against an axis has no on-canvas anchor and is skipped
+  * rather than drawn at the origin. */
+function ruleAnchor(geoms, r) {
+    let sx = 0;
+    let sy = 0;
+    let n = 0;
+    for (const [idField, endField] of RULE_REF_FIELDS) {
+        const id = r[idField];
+        if (typeof id !== 'number')
+            continue;
+        const g = geoms.find((x) => x.id === id);
+        if (!g)
+            return null;
+        const at = r[endField];
+        const p = at === 'a' || at === 'b' || at === 'c' ? pointWorld(g, at) : geomMidpoint(g);
+        if (!p)
+            return null;
+        sx += p.x;
+        sy += p.y;
+        n += 1;
+    }
+    if (n === 0)
+        return null;
+    return { x: sx / n, y: sy / n };
+}
+/** One anchor per rule, INDEX-ALIGNED with `rules` (a rule the canvas cannot
+  * place keeps its slot as null) because the glyph layer identifies a rule by
+  * its index and a shifted array would delete the wrong one.
+  *
+  * Rules that land on the same spot are fanned out along +x by `stepWorld`
+  * each: a rectangle's bottom edge carries a horizontal AND a distance, and
+  * stacked on one pixel they are one unreadable blur. */
+export function ruleGlyphAnchors(geoms, rules, stepWorld) {
+    const seen = new Map();
+    const q = stepWorld > 0 ? stepWorld : 1;
+    return rules.map((r) => {
+        const p = ruleAnchor(geoms, r);
+        if (!p)
+            return null;
+        const key = `${Math.round(p.x / q)}:${Math.round(p.y / q)}`;
+        const n = seen.get(key) ?? 0;
+        seen.set(key, n + 1);
+        return n === 0 ? p : { x: p.x + n * stepWorld, y: p.y };
+    });
 }
 //# sourceMappingURL=sketch-canvas-core.js.map
