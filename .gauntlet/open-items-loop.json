@@ -1,0 +1,45 @@
+{
+  "spec": ".gauntlet/SPEC-open-items-loop.md",
+  "started": "2026-10-03",
+  "caps": {
+    "roundsPerPhase": 4,
+    "cleanRoundsToExit": 2,
+    "parallelJudges": 3
+  },
+  "phases": {
+    "0": {
+      "status": "running",
+      "rounds": [
+        {
+          "round": 1,
+          "gate": {
+            "leak_check_public_and_out": "ok (26 probes, out/ 3160 files; out/ is from an earlier build, not a fresh --require-build)",
+            "prod_ai-graders.json_noauth": "200 (still leaking, fix not deployed)",
+            "npm_test": "4 failures, all pre-existing reshape tooling reading files that no longer exist or moved: test-sketch-arc, test-sketch-outline, check-constraint-ui (missing studio/src/model files), check-docs-prose (7 pages still teaching the real API)"
+          },
+          "status": "gate not green: waiting on human approval to push and deploy"
+        }
+      ]
+    },
+    "2": {
+      "status": "pending",
+      "rounds": []
+    },
+    "1": {
+      "status": "pending",
+      "rounds": []
+    },
+    "4": {
+      "status": "pending",
+      "rounds": []
+    },
+    "3": {
+      "status": "pending",
+      "rounds": []
+    },
+    "5": {
+      "status": "pending",
+      "rounds": []
+    }
+  }
+}
