@@ -216,6 +216,14 @@ interface Props {
     /** Ids of datum planes currently selected (timeline), drawn brighter. A
      *  datum has no mesh, so the viewport cannot learn this from a pick. */
     selectedDatumIds?: string[];
+    /** A click that lands on a datum plane and on no solid face or edge. Datums
+     *  have no mesh, so this is separate from `onPick`; the modifiers say whether
+     *  the click accumulates (Ctrl/Shift/Cmd) or replaces the selection. */
+    onDatumPick?: (datumId: string, mods: {
+        ctrlKey: boolean;
+        shiftKey: boolean;
+        metaKey: boolean;
+    }) => void;
     /**
      * How many pixels of docked UI panel currently sit to one side of the
      * canvas -- the Rules panel's own width while a sketch is being viewed
@@ -365,6 +373,6 @@ interface Props {
  * Incremental (feature-level) rebuild is NOT here: every doc change rebuilds
  * every feature from scratch through the adapter's build().
  */
-export default function BrepViewportThree({ doc, deflection, onStats, onPick, pick, selectedCount, selectionLabel, anchors, onAnchors, onMesh, registerPickAt, sketchPlane, selectedDatumIds, panelOcclusionPx, ruleActivityAt, onEngine, badgesInStatusBar, onNavHint, filters, onFiltersChange, onBoxSelect, onFeatureDoubleClick, onSelectAll, onDeleteSelected, onUndo, onRedo, onStartSketch, onRepeat, onMoveHotkey, preview, }: Props): import("react/jsx-runtime").JSX.Element;
+export default function BrepViewportThree({ doc, deflection, onStats, onPick, pick, selectedCount, selectionLabel, anchors, onAnchors, onMesh, registerPickAt, sketchPlane, selectedDatumIds, onDatumPick, panelOcclusionPx, ruleActivityAt, onEngine, badgesInStatusBar, onNavHint, filters, onFiltersChange, onBoxSelect, onFeatureDoubleClick, onSelectAll, onDeleteSelected, onUndo, onRedo, onStartSketch, onRepeat, onMoveHotkey, preview, }: Props): import("react/jsx-runtime").JSX.Element;
 export {};
 //# sourceMappingURL=BrepViewportThree.d.ts.map

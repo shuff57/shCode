@@ -1150,7 +1150,15 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
                                                     primary: item,
                                                 };
                                             });
-                                        } : () => { }, pick: showBrep && primaryPick?.kind === 'edge' && primaryPick.name ? { target: primaryPick.target, name: primaryPick.name } : null, selectedCount: showBrep ? selected.length : 0, selectionLabel: showBrep ? selectionLabel : null, sketchPlane: activeSketchPlane, selectedDatumIds: selected.filter((id) => doc.features.some((f) => f.id === id && f.kind === 'datum')), anchors: specs, onAnchors: setAnchors, onMesh: (m) => {
+                                        } : () => { }, pick: showBrep && primaryPick?.kind === 'edge' && primaryPick.name ? { target: primaryPick.target, name: primaryPick.name } : null, selectedCount: showBrep ? selected.length : 0, selectionLabel: showBrep ? selectionLabel : null, sketchPlane: activeSketchPlane, selectedDatumIds: selected.filter((id) => doc.features.some((f) => f.id === id && f.kind === 'datum')), onDatumPick: showBrep ? (id, m) => setSelection((prev) => {
+                                            // The same state change a timeline row makes: a plain click
+                                            // replaces the selection with this plane, Ctrl/Shift/Cmd
+                                            // toggles it in or out of the current feature ids.
+                                            const add = m.ctrlKey || m.metaKey || m.shiftKey;
+                                            const ids = featuresOf(prev);
+                                            const next = add ? (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]) : [id];
+                                            return withFeatureIds(add ? prev : clearSelection(prev), next);
+                                        }) : undefined, anchors: specs, onAnchors: setAnchors, onMesh: (m) => {
                                             meshRef.current = m;
                                             setHasMesh(m !== null);
                                         }, onEngine: () => setEngineReady(true), badgesInStatusBar: true, onNavHint: setNavHintText, 
