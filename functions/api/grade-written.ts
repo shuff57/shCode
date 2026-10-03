@@ -58,7 +58,7 @@ import {
 } from '../../lib/grade-written-core';
 import { isLessonAccessible, lockedResponse, type SessionData } from '../_shared/lessonAccess';
 import { loadAiGrader } from '../_shared/aiGraders';
-import { capFor, kindFor, attemptsUsed, recordGraded } from '../_shared/attempts';
+import { capFor, kindFor, attemptsUsed, recordGraded, recordOutage } from '../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -224,6 +224,20 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     ? (result: { totalEarned: number; totalPossible: number }) =>
         recordGraded(env, request, data.email, body.lessonId, cap as number, body.response, result)
     : undefined;
+  // A grade that could not be produced (grader down or busy, or a model reply with
+  // no usable grade). The SERVER writes the free marker so the work still reaches
+  // the teacher: the browser's marker is refused on a capped part, because a row a
+  // student can post at will is a free row. See recordOutage for its limits. Never
+  // throws, never blocks the response.
+  const fail = capped
+    ? async (reason: string, status: number): Promise<void> => {
+        try {
+          await recordOutage(env, request, data.email, body.lessonId, cap as number, body.response, reason, status);
+        } catch {
+          /* the failure message below is still what the student sees */
+        }
+      }
+    : undefined;
 
   // ----- Pick the target -----
   //
@@ -238,6 +252,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   if (!isAvailable(target)) {
     // 503 + offline:true is the shape the client's error branch already knows;
     // it saves the answer and hands it to the teacher rather than losing it.
+    if (fail) await fail('The grader is not set up on this site.', 503);
     return json(
       {
         ok: false,
@@ -319,6 +334,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
       rubric: config.rubric,
       grader: requested,
       record,
+      fail,
     });
   }
 
@@ -335,6 +351,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     if (/3021|rate limit|busy right now/i.test(msg)) {
+      if (fail) await fail('The grader was busy.', 503);
       return json(
         {
           ok: false,
@@ -348,6 +365,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     // sentence -- only an unexpected throw gets the generic wrapper. Mirrors the
     // streaming path's identical check.
     const errorText = e instanceof GraderError ? msg : `Grader call failed: ${msg}`;
+    if (fail) await fail(errorText, 502);
     return json({ ok: false, error: errorText, grader: requested }, 502);
   } finally {
     clearTimeout(timeout);
@@ -355,15 +373,12 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
 
   const parsed = parseModelJson(raw);
   if (!parsed) {
-    return json(
-      {
-        ok: false,
-        error: 'Model did not return JSON. Try again.',
-        raw: raw.slice(0, 500),
-        grader: requested,
-      },
-      502,
-    );
+    // The model's own text is NEVER sent to the client. It used to be (`raw`), and
+    // a crafted answer can steer a model into JSON that quotes the rubric it was
+    // given; logging it here keeps it for the teacher and out of the page.
+    console.warn('[grade-written] model reply was not JSON', body.lessonId, raw.slice(0, 500));
+    if (fail) await fail('Model did not return JSON.', 502);
+    return json({ ok: false, error: 'Model did not return JSON. Try again.', grader: requested }, 502);
   }
 
   // A reply that parses but carries no criteria used to sail through:
@@ -371,15 +386,9 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   // scoreless grade with no explanation and no error. Surface it as a retry
   // instead of a silent zero.
   if (!Array.isArray(parsed.criteria) || parsed.criteria.length === 0) {
-    return json(
-      {
-        ok: false,
-        error: 'Grader returned an empty result. Try submitting again.',
-        raw: raw.slice(0, 500),
-        grader: requested,
-      },
-      502,
-    );
+    console.warn('[grade-written] model reply carried no criteria', body.lessonId, raw.slice(0, 500));
+    if (fail) await fail('Grader returned an empty result.', 502);
+    return json({ ok: false, error: 'Grader returned an empty result. Try submitting again.', grader: requested }, 502);
   }
 
   const result = { ...shapeResult(parsed, config.rubric), grader: requested, graderModel: model };
@@ -556,9 +565,11 @@ interface StreamArgs {
   grader: GraderId;
   /** Capped parts: spend the try. False = every try was already spent. */
   record?: (result: { totalEarned: number; totalPossible: number }) => Promise<boolean>;
+  /** Capped parts: write the server's free grader-outage marker. Never throws. */
+  fail?: (reason: string, status: number) => Promise<void>;
 }
 
-function streamGrade({ target, model, system, user, rubric, grader, record }: StreamArgs): Response {
+function streamGrade({ target, model, system, user, rubric, grader, record, fail }: StreamArgs): Response {
   const host = target.host as string;
   const apiKey = target.apiKey;
   const encoder = new TextEncoder();
@@ -591,14 +602,16 @@ function streamGrade({ target, model, system, user, rubric, grader, record }: St
         // otherwise hand back a scoreless grade with empty feedback and no error.
         const parsed = parseModelJson(raw);
         if (!parsed) {
-          send({ error: 'Model did not return JSON. Try again.', raw: raw.slice(0, 500) });
+          // The model's text stays on the server (see the non-streaming path).
+          console.warn('[grade-written] model reply was not JSON', raw.slice(0, 500));
+          if (fail) await fail('Model did not return JSON.', 502);
+          send({ error: 'Model did not return JSON. Try again.' });
           return;
         }
         if (!Array.isArray(parsed.criteria) || parsed.criteria.length === 0) {
-          send({
-            error: 'Grader returned an empty result. Try submitting again.',
-            raw: raw.slice(0, 500),
-          });
+          console.warn('[grade-written] model reply carried no criteria', raw.slice(0, 500));
+          if (fail) await fail('Grader returned an empty result.', 502);
+          send({ error: 'Grader returned an empty result. Try submitting again.' });
           return;
         }
 
@@ -612,7 +625,9 @@ function streamGrade({ target, model, system, user, rubric, grader, record }: St
         // A GraderError already carries a student-readable sentence; anything
         // else is an unexpected throw and gets the generic wrapper.
         const msg = e instanceof Error ? e.message : String(e);
-        send({ error: e instanceof GraderError ? msg : `Grader call failed: ${msg}` });
+        const errorText = e instanceof GraderError ? msg : `Grader call failed: ${msg}`;
+        if (fail) await fail(errorText, 502);
+        send({ error: errorText });
       } finally {
         clearTimeout(timeout);
         controller.close();

@@ -154,6 +154,20 @@ export function scoreQuiz(
   return { correct, total: mine.length };
 }
 
+/**
+ * Has this student handed in ANYTHING for the part: a counted try, or the server's
+ * own grader-outage marker? A capped part may only be COMPLETED after that. Without
+ * it `POST /api/lesson-state` {completed} stored a NULL score for a part nobody sat,
+ * and lessonPercent() reads a completed lesson with no score as 100.
+ */
+export async function hasAnyRow(db: AttemptDb, email: string, lessonId: string): Promise<boolean> {
+  const res = await db
+    .prepare('SELECT 1 AS n FROM lesson_submissions WHERE student_email = ? AND lesson_id = ? LIMIT 1')
+    .bind(email, lessonId)
+    .all<{ n: number }>();
+  return (res.results ?? []).length > 0;
+}
+
 /** The best score over the rows that spent a try, or null when none carries one. */
 export async function bestCountedScore(db: AttemptDb, email: string, lessonId: string): Promise<number | null> {
   let best: number | null = null;
@@ -252,4 +266,65 @@ export async function recordGraded(
     },
     cap,
   );
+}
+
+/**
+ * The grader-outage marker, written by the SERVER (grade-written) when it could not
+ * get a usable grade out of the model. It keeps the student's work in front of the
+ * teacher and is FREE (it spends no try). It used to be written by the browser, which
+ * made the "free" row a thing a student could post at will; now the browser's marker
+ * is refused on a capped part (lesson-submissions) and only a real failure here
+ * produces one.
+ *
+ * Three limits, all in ONE statement so a race cannot widen them:
+ *   - not once every try is spent (a marker is never the way to put a fourth answer
+ *     in front of the teacher after the reveal);
+ *   - at most `cap` markers per student per part, so a student who can provoke the
+ *     model into non-answers cannot flood the review queue;
+ *   - not twice for the same text, so five Submits against a dead grader are one row.
+ * A refusal is not an error: the caller just does not write a row.
+ */
+export async function recordOutage(
+  env: { DB: AttemptDb },
+  request: Request,
+  email: string,
+  lessonId: string,
+  cap: number,
+  response: string,
+  reason: string,
+  httpStatus: number,
+): Promise<boolean> {
+  let dueAt: number | null = null;
+  try {
+    dueAt = await resolveDueForStudent(env as never, request, email, lessonId);
+  } catch {
+    dueAt = null;
+  }
+  const marker = JSON.stringify({ gradingFailed: true, error: reason.slice(0, 300), httpStatus });
+  const res = await env.DB
+    .prepare(
+      `INSERT INTO lesson_submissions
+         (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at, due_at_submit)
+       SELECT ?, ?, ?, ?, ?, NULL, NULL, ?, ?
+       WHERE (SELECT COUNT(*) FROM lesson_submissions
+               WHERE student_email = ? AND lesson_id = ? AND submitted_at >= ?
+                 AND (grade_json IS NULL
+                      OR CASE WHEN json_valid(grade_json)
+                              THEN json_type(grade_json, '$.gradingFailed') IS NOT 'true'
+                              ELSE 1 END)) < ?
+         AND (SELECT COUNT(*) FROM lesson_submissions
+               WHERE student_email = ? AND lesson_id = ? AND submitted_at >= ?
+                 AND json_valid(grade_json) AND json_type(grade_json, '$.gradingFailed') IS 'true') < ?
+         AND NOT EXISTS (SELECT 1 FROM lesson_submissions
+               WHERE student_email = ? AND lesson_id = ? AND response = ?
+                 AND json_valid(grade_json) AND json_type(grade_json, '$.gradingFailed') IS 'true')`,
+    )
+    .bind(
+      `gw-${crypto.randomUUID()}`, email, lessonId, response, marker, Date.now(), dueAt,
+      email, lessonId, COUNT_SINCE, cap,
+      email, lessonId, COUNT_SINCE, cap,
+      email, lessonId, response,
+    )
+    .run();
+  return (res.meta?.changes ?? 0) === 1;
 }

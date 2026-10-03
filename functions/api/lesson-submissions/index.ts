@@ -149,19 +149,20 @@ async function recordCapped(
   });
   const done = { ok: true, submittedAt: now, dueAtSubmit, late: dueAtSubmit !== null && now > dueAtSubmit };
 
-  // The grading-failure marker: the answer still reaches the teacher, and it is
-  // free. Reduced to the bare marker, with no score and nothing to score. It goes
-  // in through the SAME conditional insert as a counted row, so once every try is
-  // spent a marker is refused too (409): otherwise a student who had read the
-  // solution could post a polished answer as a "failed" row, which the teacher is
-  // then asked to hand-grade as a fourth try.
-  if (g && g.gradingFailed === true) {
-    const error = typeof g.error === 'string' ? g.error.slice(0, 300) : undefined;
-    const marker = row({ gradingFailed: true, ...(error ? { error } : {}) }, null, null);
-    if (!(await insertCounted(env.DB, marker, cap))) {
-      return json({ error: `All ${cap} tries are already used.`, capReached: true, cap }, 409);
+  // The grading-failure marker is the SERVER's to write, and only on a capped part's
+  // real grader failure (functions/api/grade-written.ts, recordOutage). A marker the
+  // browser posts is a free row a student can send at will: each one reaches the
+  // review queue as "AI grading failed, needs a manual grade", turns the gradebook
+  // cell pending and lets the teacher's override write lesson_state.score, which is
+  // a hand-graded extra try. So on a capped part the browser's marker is refused:
+  // acknowledged and dropped for an AI part (the server already wrote its own if the
+  // grader failed, so a stale page is not an error), a 400 for a quiz or a
+  // deterministic part, where no grader exists to fail.
+  if (g && (g.gradingFailed === true || findMarkerKey(g))) {
+    if (kindFor(body.lessonId) === 'ai' && g.gradingFailed === true) {
+      return json({ ...done, recorded: 'server' }, 200);
     }
-    return json(done, 201);
+    return json({ error: 'A grading failure on this part is recorded by the server, not the browser.' }, 400);
   }
 
   // Past this point a row is never a marker, so no key anywhere in what the

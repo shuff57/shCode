@@ -107,6 +107,28 @@ for (const [unit, entries] of byUnit) {
   }
 }
 
+// A chart's AI grader is a key (its prompt and rubric name the accepted logic), and
+// lib/quiz-redact.ts only strips a grader that says it is summative. So a chart in a
+// test, or in any Performance Assessment (the group charts are NOT test units: they
+// gate the build), whose aiGrader forgets `summative: true` would ship that brief to
+// the browser. Every lesson, not just test units.
+let chartGraders = 0;
+for (const entries of byUnit.values()) {
+  for (const { dir, lesson } of entries) {
+    const g = lesson.diagram && lesson.diagram.aiGrader;
+    if (!g) continue;
+    chartGraders++;
+    const secret = lesson.diagram.summative === true || /Performance Assessment/.test(lesson.unit || '');
+    if (secret && g.summative !== true) {
+      problems.push(
+        `${dir}\n    diagram.aiGrader does not set "summative": true, but this chart is `
+          + `${lesson.diagram.summative === true ? 'summative' : 'in a Performance Assessment'}: `
+          + `its grading brief and rubric would reach the browser.`,
+      );
+    }
+  }
+}
+
 if (problems.length > 0) {
   console.error('[check-summative-parts] FAIL\n');
   for (const p of problems) console.error('  ' + p + '\n');
@@ -118,5 +140,5 @@ if (problems.length > 0) {
 
 console.log(
   `[check-summative-parts] ok — ${partsChecked} graded part(s) across `
-    + `${unitsChecked} test unit(s) are all marked summative`,
+    + `${unitsChecked} test unit(s) are all marked summative; ${chartGraders} chart grader(s) checked`,
 );

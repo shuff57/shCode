@@ -10,7 +10,7 @@
 // completion on a lesson whose prior siblings aren't done.
 
 import { isLessonAccessible, lockedResponse, type SessionData } from '../../_shared/lessonAccess';
-import { capFor, bestCountedScore } from '../../_shared/attempts';
+import { capFor, bestCountedScore, hasAnyRow } from '../../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -64,9 +64,21 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async 
     // formative retake may legitimately replace its score -- but a score must be
     // a finite number >= 0 there too.
     const capped = capFor(lessonId) !== undefined;
+    const staff = data.role === 'teacher' || data.role === 'admin';
     let score: number | null;
     if (capped) {
-      score = await bestCountedScore(env.DB, data.email, lessonId);
+      // A capped part is completed by HANDING SOMETHING IN, never by asking. With no
+      // row at all there is nothing to complete: the old path stored a NULL score,
+      // and lessonPercent() reads a completed lesson with no score as 100, so a
+      // student who never sat the part outscored one who sat it and lost points.
+      // A teacher or admin previewing the part has no hand-in to make.
+      if (!staff && !(await hasAnyRow(env.DB, data.email, lessonId))) {
+        return json({ error: 'Hand in a try before this part can be completed.', needsTry: true }, 409);
+      }
+      // 0, never NULL, when no counted try carries a score (a hand-in that spent no
+      // try because the grader was down). NULL would grade as 100; the teacher's
+      // mark from the review queue, or the next real try, replaces the 0.
+      score = (await bestCountedScore(env.DB, data.email, lessonId)) ?? 0;
     } else if (body.score === undefined || body.score === null) {
       score = null;
     } else if (typeof body.score === 'number' && Number.isFinite(body.score) && body.score >= 0 && body.score <= 100000) {
@@ -103,6 +115,13 @@ export const onRequestDelete: PagesFunction<Env, 'lessonId', SessionData> = asyn
 
   if (!(await isLessonAccessible(env, request, data.role, data.email, lessonId))) {
     return lockedResponse();
+  }
+
+  // A capped part is reopened by the teacher (lesson-unsubmit), not by the student.
+  // The row may carry a mark the teacher wrote from the review queue, and deleting
+  // it let a student erase that mark and then re-complete the part (see POST).
+  if (capFor(lessonId) !== undefined && data.role !== 'teacher' && data.role !== 'admin') {
+    return json({ error: 'Ask your teacher to reopen this part.' }, 409);
   }
 
   await env.DB.prepare(

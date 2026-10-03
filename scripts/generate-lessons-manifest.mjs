@@ -38,9 +38,17 @@ const results = await Promise.all(
     const rubricPoints = Array.isArray(rubric)
       ? rubric.reduce((sum, r) => sum + (r?.points ?? 0), 0)
       : 0;
+    // One student's paper, not every form's questions: a variant quiz is answered
+    // as a single form, and its stored score is correct-out-of-that-form (see
+    // formQuestionCount in lib/quiz-variant.ts, which this mirrors).
+    const formCount = (quiz) => {
+      const qs = quiz.questions;
+      if (!Array.isArray(quiz.variants) || quiz.variants.length === 0) return qs.length;
+      return Math.min(...quiz.variants.map((v) => qs.filter((q) => !q.variant || q.variant === v).length));
+    };
     const quizCount =
       meta.quiz && Array.isArray(meta.quiz.questions) && meta.quiz.questions.length > 0
-        ? meta.quiz.questions.length
+        ? formCount(meta.quiz)
         : null;
     const maxScore = quizCount ?? (rubricPoints > 0 ? rubricPoints : null);
     return {

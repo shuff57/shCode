@@ -207,7 +207,7 @@
       ]
     },
     "round3": {
-      "status": "fixing",
+      "status": "fixed; awaiting a round 4 judge",
       "findings": [
         "1 HIGH: POST /api/lesson-state completed on a capped part with no counted row stores score NULL; lessonPercent(completed,null,max) = 100, so a student who never sat the part grades 100% (and one with only free marker rows). test-attempt-reveal asserts that no-score state, locking the bug in.",
         "2 HIGH: capped variant quiz stores correct-of-own-form (8) but lessons-manifest maxScore counts every variant question (18): a perfect paper grades 44%. Before the feature a summative quiz completed with no score = 100%.",
@@ -215,6 +215,18 @@
         "4 MEDIUM-LOW: the browser can post any {gradingFailed:true} marker on a capped part (quiz/client kinds included) before the cap: free extra rows that reach the review queue as manual-grade work, turn the gradebook cell pending, and let the teacher override write lesson_state.score.",
         "L1 LOW: DELETE /api/lesson-state/<id> by the student erases a teacher hand grade on a marker row; re-completing then falls back to counted best or NULL (=100%).",
         "L2 LOW: quiz-redact treats a chart as summative only by diagram.summative; a chart with diagram.summative true whose aiGrader lacks summative would ship prompt/rubric. No lesson is set up that way; nothing checks it stays so."
+      ],
+      "fixes": [
+        "1: lesson-state POST completed on a capped part is refused 409 for a student with no row at all (teacher/admin preview exempt); with only the server outage marker it completes with score 0 (never NULL, which grades 100%); best counted score otherwise.",
+        "2: maxScore for a variant quiz is ONE form (formQuestionCount in lib/quiz-variant.ts, mirrored in generate-lessons-manifest.mjs and app/page.tsx): a perfect paper grades 100 not 44. Test covers every variant quiz and the generated manifest.",
+        "3: grade-written never returns the model text (raw) on either path; it logs it server-side. A non-answer is not a free probe: nothing comes back from it, and each costs one of the 30 daily calls.",
+        "4: the browser may not post gradingFailed on a capped part (ai kind: acknowledged and dropped; quiz/client: 400). The server writes the marker (recordOutage in attempts.ts) on a real grader failure: not once every try is spent, at most cap per part, once per distinct text. WrittenGrader skips its marker on a capped part but still saves the draft and unlocks the next part.",
+        "L1: a student DELETE on a capped part is 409 (teacher/admin still can); L2: quiz-redact forces summative on a summative chart grader; check-summative-parts fails a chart grader in a Performance Assessment or summative chart without summative:true."
+      ],
+      "tests": "scripts/test-attempt-reveal.mjs extended; 13 mutations of the new guards all break it.",
+      "not_done": [
+        "LessonWorkspace and DiagramAssignmentView do not complete the part on a grader outage (they never did); the work reaches the teacher through the server marker only.",
+        "x.6.2 group builds: the browser relays the score (kind client, clamped); the server cannot re-run the requirement checks."
       ]
     }
   },

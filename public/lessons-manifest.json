@@ -1749,7 +1749,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.7.1",
-      "maxScore": 18,
+      "maxScore": 8,
       "scoreKind": "quiz"
     },
     {
@@ -1773,8 +1773,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.7.3",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 20,
+      "scoreKind": "written"
     },
     {
       "id": "1-7-4-ch1-individual-pa-chart-it",
@@ -1785,8 +1785,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.7.4",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 10,
+      "scoreKind": "written"
     },
     {
       "id": "1-7-5-ch1-individual-pa-write-the-steps",
@@ -3717,7 +3717,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A2.7.1",
-      "maxScore": 18,
+      "maxScore": 8,
       "scoreKind": "quiz"
     },
     {
@@ -3741,8 +3741,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A2.7.3",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 20,
+      "scoreKind": "written"
     },
     {
       "id": "2-7-4-ch2-individual-pa-chart-it",
@@ -3753,8 +3753,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A2.7.4",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 10,
+      "scoreKind": "written"
     },
     {
       "id": "2-7-5-ch2-individual-pa-write-the-steps",
@@ -4053,7 +4053,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.10.1",
-      "maxScore": 18,
+      "maxScore": 8,
       "scoreKind": "quiz"
     },
     {
@@ -4077,8 +4077,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.10.3",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 20,
+      "scoreKind": "written"
     },
     {
       "id": "3-10-4-ch3-individual-pa-chart-it",
@@ -4089,8 +4089,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.10.4",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 10,
+      "scoreKind": "written"
     },
     {
       "id": "3-10-5-ch3-individual-pa-write-the-steps",

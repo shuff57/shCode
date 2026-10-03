@@ -222,6 +222,20 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
 
   async function recordFailedAttempt(reason: string, httpStatus: number) {
     if (!progress.authed) return;
+    // On a CAPPED part the server writes the marker itself, when the grader really
+    // failed (functions/_shared/attempts.ts recordOutage): a marker the browser can
+    // post is a free row a student can send at will, so the route refuses it. The
+    // draft is still saved here, and the work is already in front of the teacher.
+    // A network drop (no reply at all) writes nothing anywhere: the student retries.
+    if (maxSubmissions !== null) {
+      await saveDraft(lessonId, response);
+      // Still unlock the next part after a grader outage (it is ours, not the
+      // student's). The server only completes a capped part once a row exists, and
+      // the marker it wrote is that row; with no reply at all there is none, the
+      // POST is refused and the student simply tries again.
+      if (progress.states[lessonId] !== 'completed') await recordLessonCompleted(lessonId);
+      return;
+    }
     // A student who hits Submit four times against a dead grader should not
     // land four identical rows in the teacher's queue. Same text = one row.
     if (lastFailedRef.current === response) return;

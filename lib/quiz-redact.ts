@@ -137,7 +137,13 @@ export function redactLessonForClient(lesson: Lesson): Lesson {
     out = { ...out, aiGrader: redactAiGrader(out.aiGrader as AiGraderConfig) };
   }
   if (isSummativeDiagramAiGrader(out.diagram)) {
-    out = { ...out, diagram: { ...out.diagram, aiGrader: redactAiGrader(out.diagram!.aiGrader as AiGraderConfig) } };
+    // A summative chart's grader is a key whether or not ITS OWN `summative` is set:
+    // redactAiGrader only strips when the config it is handed says so, so a chart
+    // with diagram.summative true and an aiGrader that forgot the flag shipped its
+    // prompt, rubric and contextDocs to the browser. Force it here, and
+    // scripts/check-summative-parts.mjs fails a lesson authored that way.
+    const g = out.diagram!.aiGrader;
+    if (g) out = { ...out, diagram: { ...out.diagram, aiGrader: redactAiGrader({ ...(g as AiGraderConfig), summative: true }) } };
   }
   if (isSummativeGrading(out.grading)) {
     out = { ...out, requirements: redactRequirements(out.requirements ?? []) };
