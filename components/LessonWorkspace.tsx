@@ -15,7 +15,7 @@ import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader
 import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-mode';
 import type { ModelDoc } from '../lib/model-types';
 
-import { RUNNER_SOURCE, RUN_MAX_LOGS, RUN_TIMEOUT_MS, errorWithLocation, lineColOf } from '../lib/js-runner-source';
+import { RUN_MAX_LOGS, RUN_TIMEOUT_MS, errorWithLocation, lineColOf, runStudentCode } from '../lib/js-runner-source';
 import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
@@ -65,9 +65,10 @@ export default function LessonWorkspace({
   const getDirtyCount = useLessonStore((s) => s.getDirtyCount);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // Live console-lesson runner, so a re-run or an unmount can terminate it.
-  const workerRef = useRef<Worker | null>(null);
-  useEffect(() => () => { workerRef.current?.terminate(); }, []);
+  // Live console-lesson runner, so a re-run or an unmount can stop it — including
+  // one sitting on an open prompt() dialog.
+  const runRef = useRef<{ kill: () => void } | null>(null);
+  useEffect(() => () => { runRef.current?.kill(); }, []);
 
   const handleDownload = () => {
     if (!currentFile) return;
@@ -341,7 +342,9 @@ export default function LessonWorkspace({
   // Worker can be terminated, and synchronous JS cannot be interrupted any
   // other way. Module 2.4 teaches infinite loops deliberately, so students
   // now write `while (true)` on purpose — on the main thread that locked the
-  // tab and cost them everything they had typed.
+  // tab and cost them everything they had typed. That guarantee is also why
+  // prompt() is bridged rather than moved into a frame: see
+  // lib/js-runner-source.ts.
   function runCode() {
     setRuntimeError(null);
     const scriptContent = files['script.js'] || '';
@@ -356,13 +359,15 @@ export default function LessonWorkspace({
       setTimeout(() => runTests(), 200);
     };
 
-    // A previous run may still be spinning; never leave two alive at once.
-    workerRef.current?.terminate();
-    workerRef.current = null;
+    // A previous run may still be spinning, or waiting on a dialog; never
+    // leave two alive at once.
+    runRef.current?.kill();
+    runRef.current = null;
 
+    // The no-Worker fallback (very old browser): the direct call, which is the
+    // path that can hang. Fallback only, never the default. No prompt() here —
+    // there is nothing to raise a dialog with — but no lesson needs one.
     if (typeof Worker === 'undefined') {
-      // No Worker (very old browser): fall back to the direct call. This is
-      // the path that can hang, so it is the fallback and not the default.
       const orig = { log: console.log, warn: console.warn, error: console.error };
       const capture = (type: string) => (...args: unknown[]) => {
         logs.push({ type, message: args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' '), timestamp: time() });
@@ -377,82 +382,57 @@ export default function LessonWorkspace({
         const text = errorWithLocation(name, msg, line, col);
         logs.push({ type: 'error', message: text, timestamp: time() });
         setRuntimeError(text);
-        logs.push({ type: 'error', message: msg, timestamp: time() });
-        setRuntimeError(`${name}: ${msg}`);
       }
       console.log = orig.log; console.warn = orig.warn; console.error = orig.error;
       finish();
       return;
     }
 
-    const url = URL.createObjectURL(new Blob([RUNNER_SOURCE], { type: 'text/javascript' }));
-    const worker = new Worker(url);
-    workerRef.current = worker;
-
-    const cleanup = () => {
-      worker.terminate();
-      URL.revokeObjectURL(url);
-      if (workerRef.current === worker) workerRef.current = null;
-    };
-
-    const killer = setTimeout(() => {
-      // On a summative part the stop message reports the stop only. The
-      // practice-path message names the repair ("check that the value in the
-      // condition actually changes"), which on 2.7.3's while-continue bug is
-      // the answer, handed over by the platform on the one Part C item that
-      // can trigger it — the same giveaway the 2026-09-02 checklist narrowing
-      // stripped out of Part C's hints. The runtimeError banner keeps the
-      // diagnosis on both paths: it is the teacher's screen, and the paper
-      // locks on submit anyway.
-      const summative = lesson.grading?.summative === true;
-      logs.push({
-        type: 'error',
-        message: summative
-          ? `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped.`
-          : `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
-        timestamp: time(),
-      });
-      setRuntimeError('Stopped: your code ran too long (likely an infinite loop)');
-      cleanup();
-      finish();
-    }, RUN_TIMEOUT_MS);
-
-    worker.onmessage = (e: MessageEvent) => {
-      const d = e.data as { kind: string; type?: string; message?: string; name?: string; line?: number | null; col?: number | null };
-      if (d.kind === 'log') {
-        logs.push({ type: d.type || 'log', message: d.message || '', timestamp: time() });
-        return;
-      }
-      if (d.kind === 'error') {
-        // issue #25: a line/col from the worker's own stack parsing (see
-        // lib/js-runner-source.ts) gets appended right on the message --
-        // this console has no clickable-jump machinery like Console.tsx's
-        // iframe path, so the line number goes in the text itself.
-        const where = d.line ? ` (line ${d.line}${d.col ? `, col ${d.col}` : ''})` : '';
-        const msg = `${d.message || ''}${where}`;
-        logs.push({ type: 'error', message: msg, timestamp: time() });
-        // issue #25: a line/col from the worker's own stack parsing (see
-        // lib/js-runner-source.ts) rides along on the message -- this console
-        // has no clickable-jump machinery like Console.tsx's iframe path, so
-        // the line number goes in the text itself.
-        const text = errorWithLocation(d.name, d.message, d.line, d.col);
-        logs.push({ type: 'error', message: text, timestamp: time() });
-        setRuntimeError(text);
-      }
-      clearTimeout(killer);
-      cleanup();
-      finish();
-    };
-
-    worker.onerror = (e: ErrorEvent) => {
-      clearTimeout(killer);
-      logs.push({ type: 'error', message: e.message || 'Error', timestamp: time() });
-      setRuntimeError(e.message || 'Error');
-      cleanup();
-      finish();
-    };
-
-    worker.postMessage(scriptContent);
+    const run = runStudentCode(
+      scriptContent,
+      (d) => {
+        if (d.kind === 'log') {
+          logs.push({ type: d.type || 'log', message: d.message || '', timestamp: time() });
+          return;
+        }
+        if (d.kind === 'error') {
+          // issue #25: a line/col parsed out of the run's own stack (see
+          // lib/js-runner-source.ts) rides along on the message. This console
+          // has no clickable-jump machinery like Console.tsx's iframe path, so
+          // the line number goes in the text itself.
+          const text = errorWithLocation(d.name, d.message, d.line, d.col);
+          logs.push({ type: 'error', message: text, timestamp: time() });
+          setRuntimeError(text);
+        }
+        finish();
+      },
+      () => {
+        // On a summative part the stop message reports the stop only. The
+        // practice-path message names the repair ("check that the value in the
+        // condition actually changes"), which on 2.7.3's while-continue bug is
+        // the answer, handed over by the platform on the one Part C item that
+        // can trigger it — the same giveaway the 2026-09-02 checklist narrowing
+        // stripped out of Part C's hints. The runtimeError banner keeps the
+        // diagnosis on both paths: it is the teacher's screen, and the paper
+        // locks on submit anyway.
+        const summative = lesson.grading?.summative === true;
+        logs.push({
+          type: 'error',
+          message: summative
+            ? `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped.`
+            : `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
+          timestamp: time(),
+        });
+        setRuntimeError('Stopped: your code ran too long (likely an infinite loop)');
+        finish();
+      },
+      () => {
+        // A prompt() answer restarts the run, and the new pass reprints what
+        // this one printed. Drop it rather than showing every line twice.
+        logs.length = 0;
+      },
+    );
+    runRef.current = run;
   }
 
   // For moSHion lessons: snapshot the current code and bump runKey to reload the iframe.

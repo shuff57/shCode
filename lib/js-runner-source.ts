@@ -1,6 +1,26 @@
 // Worker source for plain-JavaScript runs: no DOM, no canvas, console only.
-// Lives here rather than inline because two callers need it now — the console
-// lessons in LessonWorkspace and the sandbox's "JavaScript" mode.
+// Lives here rather than inline because four callers need it — the console
+// lessons in LessonWorkspace, the sandbox's "JavaScript" mode, the live blocks
+// in the book, and the docs-drawer snippets.
+//
+// WHERE IT RUNS, AND WHY NOT AN IFRAME. Student code runs in a Worker because
+// that is the only way to stop synchronous JS: a runaway loop cannot be
+// interrupted by a timeout, so module 2.4's `while (true)` lesson needs
+// something that can be terminated. An iframe was tried and rejected — a
+// sandboxed frame is an opaque origin, and Chromium schedules those in the
+// PARENT's process, so a spinning frame froze the whole lesson page for the
+// full duration with the kill timer unable to fire (measured: 60s spin, 60s
+// frozen tab; `credentialless` did not change it). The Worker's terminate() is
+// the guarantee, so the Worker stays.
+//
+// WHAT THAT COSTS: a Worker has no window, so `prompt` does not exist in here.
+// 3.1.9's Terms and Conditions Loop — student code, reference solution and a
+// graded requirement — died on `ReferenceError: prompt is not defined`, and a
+// synchronous prompt() cannot be bridged out of a Worker either, because the
+// Worker blocks inside the call and so cannot receive the answer. Hence the
+// prompt() handshake below: the run stops at the first unanswered prompt(),
+// the HOST raises the real dialog, and the run restarts with one more answer in
+// the list. See NEEDS_INPUT for the whole mechanism.
 
 // How long student code may run before we stop it. Generous for anything a
 // beginner writes on purpose; short enough that a runaway loop does not feel
@@ -8,8 +28,8 @@
 export const RUN_TIMEOUT_MS = 3000;
 
 // Ceiling on logs streamed back from the runner. `while (true) console.log(i)`
-// would otherwise post millions of messages and lock the main thread — which
-// is the exact failure the Worker exists to prevent.
+// would otherwise post millions of messages and lock the main thread — which is
+// the exact failure the Worker exists to prevent.
 export const RUN_MAX_LOGS = 1000;
 
 // The Function constructor's preamble is exactly two lines (see the parse in
@@ -27,6 +47,28 @@ export function errorWithLocation(
 ): string {
   const where = line ? ` (line ${line}${col ? `, col ${col}` : ''})` : '';
   return `${name || 'Error'}: ${message || ''}${where}`;
+}
+
+// What a host sends: the script, plus the answers collected so far and which
+// attempt this is. A bare string is still accepted, which is what the node
+// harnesses in scripts/ post.
+export interface RunnerRequest {
+  code: string;
+  answers?: string[];
+  attempt?: number;
+}
+
+// What a host gets back. `needs-input` is the prompt handshake; `attempt` is on
+// every message because a re-run re-prints what the last one printed, and the
+// host keeps only the newest attempt's lines.
+export interface RunnerMessage {
+  kind: 'log' | 'needs-input' | 'done' | 'error';
+  attempt?: number;
+  type?: 'log' | 'warn' | 'error';
+  message?: string;
+  name?: string;
+  line?: number | null;
+  col?: number | null;
 }
 
 // The no-Worker fallback (very old browsers) runs `new Function` on the main
@@ -50,9 +92,92 @@ export function lineColOf(err: unknown): { line: number | null; col: number | nu
   return line >= 1 ? { line, col: parseInt(m[2], 10) } : { line: null, col: null };
 }
 
+/**
+ * Run student code in the shared runner and read the results.
+ *
+ * Owns the prompt handshake so no caller has to: each `needs-input` raises the
+ * browser's own dialog and re-runs with the answer.
+ *
+ * That re-run REPRINTS everything the last one printed, so `onSuperseded` fires
+ * when an answer restarts the run and the caller drops what it has already
+ * shown. It lives here rather than in each caller because forgetting it means
+ * the student watches the same lines appear three times — silent, and easy to
+ * miss in review.
+ *
+ * The 3-second kill timer is the caller's (each surface words its own message),
+ * but it is NOT reset while a dialog is up: a modal blocks the page anyway, so
+ * a student who walks away from a prompt lab comes back to the dialog waiting.
+ */
+export function runStudentCode(
+  code: string,
+  onMessage: (m: RunnerMessage) => void,
+  onTimeout: () => void,
+  onSuperseded: () => void,
+): { kill: () => void } {
+  const url = URL.createObjectURL(new Blob([RUNNER_SOURCE], { type: 'text/javascript' }));
+  const worker = new Worker(url);
+  const answers: string[] = [];
+  let attempt = 1;
+
+  const killer = setTimeout(onTimeout, RUN_TIMEOUT_MS);
+  const cleanup = () => {
+    clearTimeout(killer);
+    worker.terminate();
+    URL.revokeObjectURL(url);
+  };
+
+  worker.onmessage = (e: MessageEvent) => {
+    const d = e.data as RunnerMessage;
+    // A newer attempt supersedes everything printed by the one before it.
+    if (d.attempt && d.attempt !== attempt) {
+      attempt = d.attempt;
+      answers.length = 0;
+    }
+    if (d.kind === 'needs-input') {
+      // Everything printed so far belongs to a run that is about to happen
+      // again; the caller's lines go with it.
+      onSuperseded();
+      // Cancel returns null; '' keeps the rest of the program running instead
+      // of turning a dismissed dialog into a crash.
+      answers.push(window.prompt(d.message || '') ?? '');
+      attempt += 1;
+      worker.postMessage({ code, answers: answers.slice(), attempt } satisfies RunnerRequest);
+      return;
+    }
+    // A log is not the end of the run. Only `done`, `error` and `needs-input`
+    // are, and needs-input has returned above -- so anything that is not a log
+    // tears the worker down. Getting this wrong kills the run after its first
+    // line, which shows the student an empty panel and no clue why.
+    onMessage(d);
+    if (d.kind !== 'log') cleanup();
+  };
+  worker.onerror = (e: ErrorEvent) => {
+    cleanup();
+    onMessage({ kind: 'error', message: e.message || 'Error' });
+  };
+
+  worker.postMessage({ code, answers: [], attempt } satisfies RunnerRequest);
+  return { kill: cleanup };
+}
+
 export const RUNNER_SOURCE = `
 const MAX = ${RUN_MAX_LOGS};
 let sent = 0;
+// Which pass of the script this is. A prompt() answer restarts the run, so the
+// host is told which pass each message belongs to and keeps only the last.
+let attempt = 1;
+let answers = [];
+let promptMessage = '';
+// Thrown to unwind out of the student's prompt() call. A Worker has no window,
+// so prompt() cannot be answered from in here; the host asks and re-runs.
+const NEEDS_INPUT = { needInput: true };
+self.prompt = function (message) {
+  if (answers.length === 0) {
+    promptMessage = message === undefined ? '' : String(message);
+    throw NEEDS_INPUT;
+  }
+  return answers.shift();
+};
 const ser = (a) => {
   if (typeof a !== 'object' || a === null) return String(a);
   try { return JSON.stringify(a, null, 2); } catch (_) { return String(a); }
@@ -62,6 +187,7 @@ const cap = (type) => (...args) => {
   sent++;
   self.postMessage({
     kind: 'log',
+    attempt,
     type,
     message: sent === MAX
       ? '… output stopped after ' + MAX + ' lines. If you did not mean to print this much, check your loop.'
@@ -128,15 +254,27 @@ function locateSyntaxError(code, message) {
   return null;
 }
 self.onmessage = (e) => {
+  // {code, answers, attempt} from a browser host; a bare string from the node
+  // harnesses in scripts/, which have no dialog to raise.
+  const req = typeof e.data === 'string' ? { code: e.data } : (e.data || {});
+  answers = Array.isArray(req.answers) ? req.answers.slice() : [];
+  attempt = req.attempt || 1;
+  sent = 0;
   let compiled = false;
   let codeText = '';
   try {
-    codeText = e.data;
+    codeText = req.code;
     const runStudent = new Function(codeText); // a compile error is thrown HERE, before any student line runs
     compiled = true;
     runStudent(); // student code execution (educational tool)
-    self.postMessage({ kind: 'done' });
+    self.postMessage({ kind: 'done', attempt });
   } catch (err) {
+    if (err === NEEDS_INPUT) {
+      // Not a crash: the run is paused at a prompt() waiting for the host to
+      // raise the dialog and post the script back with one more answer.
+      self.postMessage({ kind: 'needs-input', message: promptMessage, attempt });
+      return;
+    }
     // The Function constructor wraps student code in a synthesized
     // "function anonymous(\\n) {\\n" preamble -- exactly two lines -- before
     // the body starts, so a V8 stack frame's line maps back to the student's
@@ -166,6 +304,7 @@ self.onmessage = (e) => {
     }
     self.postMessage({
       kind: 'error',
+      attempt,
       name: (err && err.name) || 'Error',
       message: (err && err.message) || String(err),
       line,

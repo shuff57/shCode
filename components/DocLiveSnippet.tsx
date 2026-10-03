@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import CodeMirrorPane from './CodeMirrorPane';
-import { RUNNER_SOURCE, RUN_TIMEOUT_MS, errorWithLocation } from '../lib/js-runner-source';
+import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode } from '../lib/js-runner-source';
 
 interface Props {
   initialCode: string;
@@ -16,15 +16,17 @@ interface LogEntry {
 }
 
 // Editor + output pair for plain-JavaScript snippets in the docs drawer.
-// Runs in a Worker with a kill timer, exactly like the console lessons and
-// the sandbox's JavaScript mode — a docs page that teaches an infinite loop
-// (it does; see Loops > Infinite loops) must not be able to freeze the tab.
+// Runs through the shared runner with a kill timer, exactly like the console
+// lessons and the sandbox's JavaScript mode — a docs page that teaches an
+// infinite loop (it does; see Loops > Infinite loops) must not be able to
+// freeze the tab.
 //
-// The Worker has no window, so localStorage does not exist there. The runner
-// itself now injects a small in-memory stand-in (see lib/js-runner-source.ts),
-// so the JSON & Storage section's save-by-key pattern runs for real here
-// without this component adding anything. The "survives the page closing"
-// half cannot be shown in a console runner, and the page body says so.
+// The runner injects a small in-memory localStorage stand-in (see
+// lib/js-runner-source.ts), so the JSON & Storage section's save-by-key
+// pattern runs for real here without this component adding anything, and it
+// raises prompt() for real, so the Input section's own example runs. The
+// "survives the page closing" half cannot be shown in a console runner, and
+// the page body says so.
 
 export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
   const [code, setCode] = useState(initialCode);
@@ -43,49 +45,45 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
     setRunning(true);
 
     const collected: LogEntry[] = [];
-    const url = URL.createObjectURL(new Blob([RUNNER_SOURCE], { type: 'text/javascript' }));
-    const worker = new Worker(url);
-
-    const cleanup = () => {
-      worker.terminate();
-      URL.revokeObjectURL(url);
+    const finish = () => {
       cancelRef.current = null;
       setRunning(false);
     };
+    cancelRef.current = finish;
 
-    const killer = setTimeout(() => {
-      collected.push({
-        type: 'error',
-        message: `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
-      });
-      setLogs([...collected]);
-      cleanup();
-    }, RUN_TIMEOUT_MS);
-
-    worker.onmessage = (e: MessageEvent) => {
-      const d = e.data as { kind: string; type?: LogEntry['type']; message?: string; name?: string; line?: number | null; col?: number | null };
-      if (d.kind === 'log') {
-        collected.push({ type: d.type || 'log', message: d.message || '' });
+    const run = runStudentCode(
+      code,
+      (d) => {
+        if (d.kind === 'log') {
+          collected.push({ type: d.type || 'log', message: d.message || '' });
+          setLogs([...collected]);
+          return;
+        }
+        if (d.kind === 'error') {
+          collected.push({ type: 'error', message: errorWithLocation(d.name, d.message, d.line, d.col) });
+          setLogs([...collected]);
+        }
+        finish();
+      },
+      () => {
+        collected.push({
+          type: 'error',
+          message: `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
+        });
         setLogs([...collected]);
-        return;
-      }
-      if (d.kind === 'error') {
-        collected.push({ type: 'error', message: errorWithLocation(d.name, d.message, d.line, d.col) });
-        setLogs([...collected]);
-      }
-      clearTimeout(killer);
-      cleanup();
+        finish();
+      },
+      () => {
+        collected.length = 0;
+      },
+    );
+    // Stopping a run that is waiting on an open prompt() dialog has to work too,
+    // so cancelling means killing, not just clearing the button state.
+    const cancel = () => {
+      run.kill();
+      finish();
     };
-
-    worker.onerror = (e: ErrorEvent) => {
-      clearTimeout(killer);
-      collected.push({ type: 'error', message: e.message || 'Error' });
-      setLogs([...collected]);
-      cleanup();
-    };
-
-    worker.postMessage(code);
-    cancelRef.current = cleanup;
+    cancelRef.current = cancel;
   };
 
   const handleReset = () => {
