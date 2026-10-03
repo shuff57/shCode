@@ -5,9 +5,9 @@
 import { readFileSync } from 'node:fs';
 import { dslVocabulary } from './reshape-docs-text.mjs';
 
-// Moved to reshape-cad's packages/script (B1 extraction, plan:
-// freecad-browser.md).
-const SRC = new URL('../../reshape-cad/packages/script/src/reshape-docs.ts', import.meta.url);
+// Moved to reshape-cad's packages/script (B1 extraction); read the vendored
+// copy so no sibling checkout is needed.
+const SRC = new URL('../vendor/reshape-cad/packages/script/src/reshape-docs.ts', import.meta.url);
 const text = readFileSync(SRC, 'utf8');
 
 // Since 2026-09-03 the code beside the prose is reSHape Script (box, hole,
@@ -46,6 +46,8 @@ const BOILERPLATE = [
 const NAMING = /Underneath|[Tt]he library|JSCAD version|jscad\.app/;
 
 
+const RESHAPE_NAMES = dslVocabulary();
+
 // Extracted pages: title + body + code, in source order.
 function pages(src) {
   const out = [];
@@ -83,6 +85,11 @@ function hits(body) {
       if (part.includes(name)) push(name);
     }
     for (const name of REPLACED_SOFT) {
+      // A name the language now has is a real call, not drift. The official
+      // geometry names (cuboid, torus, union, subtract, intersect, extrude,
+      // revolve, ...) joined VOCABULARY after this list was written; the list
+      // only ever meant calls reSHape Script does NOT have.
+      if (RESHAPE_NAMES.includes(name)) continue;
       let at = part.indexOf(name + '(');
       while (at !== -1) {
         const before = at === 0 ? ' ' : part[at - 1];
@@ -99,7 +106,6 @@ function hits(body) {
 // has no name for any of them, so their own names are the only ones there are.
 const NOT_TAUGHT = 'beyond';
 
-const RESHAPE_NAMES = dslVocabulary();
 
 /**
  * A comment is prose that happens to sit inside the code block, so it drifts

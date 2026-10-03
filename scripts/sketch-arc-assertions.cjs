@@ -257,7 +257,7 @@ module.exports = function run(dir) {
   // model-handles.ts moved to reshape-cad's packages/script (B1 extraction,
   // plan: freecad-browser.md).
   const handlesSrc = fs.readFileSync(
-    path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'script', 'src', 'model-handles.ts'), 'utf8');
+    path.join(__dirname, '..', 'vendor', 'reshape-cad', 'packages', 'script', 'src', 'model-handles.ts'), 'utf8');
   check('#D1 ...and "drag the corner" is a remedy that actually exists',
     /kind:\s*'point'\s*as const/.test(handlesSrc) && /f\.points\.map/.test(handlesSrc),
     'sketchHandles() no longer emits a per-corner point handle, so the message tells a ' +
@@ -536,22 +536,21 @@ module.exports = function run(dir) {
 
   console.log('\n=== the three call sites that have to ASK about bulges ===');
 
-  // A library that refuses correctly and a UI that never passes the bulges
-  // is the same defect wearing a different hat: the panel would keep
-  // offering a ceiling for a corner that cannot be rounded.
-  // SketchConstraints.tsx and ModelEditor.tsx moved to reshape-cad's
-  // packages/studio (B1 extraction, plan: freecad-browser.md).
-  const panelSrc = fs.readFileSync(
-    path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'SketchConstraints.tsx'), 'utf8');
-  check('the Rules panel asks maxFilletRadius with the bulges, not just the points',
-    /maxFilletRadius\(\s*points\s*,\s*i\s*,\s*bulges\s*\)/.test(panelSrc),
-    'SketchConstraints.tsx still calls maxFilletRadius(points, i) -- the ceiling it shows is for ' +
-    'a straight-edged sketch that is not the one on screen');
-  const editorSrc = fs.readFileSync(
-    path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx'), 'utf8');
-  check('...and the editor asks whyCannotRoundCorner with them too',
-    /whyCannotRoundCorner\(\s*f\.points\s*,\s*corner\s*,\s*f\.bulges\s*\)/.test(editorSrc),
-    'ModelEditor.tsx still calls whyCannotRoundCorner(f.points, corner)');
+  // A library that refuses correctly and a UI that never asks it is the same
+  // defect wearing a different hat: the editor would keep offering a radius
+  // for a corner that cannot be rounded. The Rules panel (SketchConstraints.tsx)
+  // and ModelEditor's corner-round path that this used to read were retired in
+  // reshape-cad 2b19a05; SketchCanvas2D's Fillet tool is the only corner-round
+  // UI now (vendored copy, so no sibling checkout is needed).
+  const canvasSrc = fs.readFileSync(
+    path.join(__dirname, '..', 'vendor', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'SketchCanvas2D.tsx'), 'utf8');
+  check('the Fillet tool asks whether the corner can be rounded before offering a radius',
+    /const why = whyCannotFilletAt\(/.test(canvasSrc)
+      && /if \(why\) \{\s*setStatus\(why\);\s*return;/.test(canvasSrc),
+    'SketchCanvas2D.tsx no longer refuses an unroundable corner with its reason');
+  check('...and shows the real ceiling (maxFilletRadiusAt over the live geometry), not a guess',
+    /maxFilletRadiusAt\(\s*geoms as CoreGeom\[\]/.test(canvasSrc) && /maxR/.test(canvasSrc),
+    'SketchCanvas2D.tsx never asks for the ceiling');
 
   console.log('\n=== two states that used to be explained wrongly, or not at all ===');
 
@@ -570,18 +569,15 @@ module.exports = function run(dir) {
 
   // The over-radius clamp used to be both silent AND unobservable: the panel
   // pre-clamped, so filletCorner received 10 whether the student typed 10 or
-  // 500, and no caller could tell a clamp had happened. Named by the blind
-  // judge as the biggest remaining gap, round 3. filletCorner still clamps
-  // internally as a floor -- unchanged and deliberate -- so what these check
-  // is the WIRING, which is the only place the difference now exists.
-  check('the panel passes the typed radius through rather than pre-clamping it away',
-    !/onRound\(i,\s*Math\.min\(/.test(panelSrc),
-    'SketchConstraints.tsx clamps before calling onRound, so 500 and 10 arrive identically '
-      + 'and nothing downstream can report that a clamp happened');
-  check('...and the editor compares against the ceiling and says so',
-    /maxFilletRadius\(f\.points,\s*corner,\s*f\.bulges\)/.test(editorSrc)
-      && /radius\s*>\s*ceiling/.test(editorSrc),
-    'ModelEditor.tsx never asks for the ceiling, so an over-radius round is still silent');
+  // 500, and no caller could tell a clamp had happened. In the current editor
+  // the typed radius goes to filletCornerAt unclamped, and a radius that does
+  // not fit comes back null and is SAID, never silently shrunk.
+  check('the Fillet tool passes the typed radius through rather than pre-clamping it away',
+    !/filletCornerAt\([^)]*Math\.min\(/.test(canvasSrc),
+    'SketchCanvas2D.tsx clamps before calling filletCornerAt, so 500 and 10 arrive identically');
+  check('...and a radius that does not fit is reported out loud',
+    /if \(!out\) \{\s*setStatus\('fillet: that radius does not fit this corner'\);/.test(canvasSrc),
+    'SketchCanvas2D.tsx never says when a fillet radius is refused');
 
 
   {

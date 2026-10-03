@@ -463,15 +463,11 @@ module.exports = async function run(load) {
   console.log('\n=== the wiring, because a fix that never reaches a click is half a fix ===');
 
   const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-  const editorSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx');
+  const editorSrc = read('vendor', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx');
   // The reSHape half of SandboxWorkspace moved into ReshapeStudio.tsx on
   // 2026-09-04 (SPEC-A1); the wiring under test lives there now.
-  const wsSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'ReshapeStudio.tsx');
-  const panelSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'SketchConstraints.tsx');
+  const wsSrc = read('vendor', 'reshape-cad', 'packages', 'studio', 'src', 'ReshapeStudio.tsx');
 
-  check('Round a corner writes a request, not geometry',
-    /rounds: \{ \.\.\.\(f\.rounds \?\? \{\}\), \[corner\]: radius \}/.test(editorSrc),
-    'ModelEditor.tsx does not record the radius on the feature');
   // The import line, not a grep for the name -- the comment above that code
   // deliberately says what it USED to call, and a substring check would read
   // its own explanation as the defect it describes.
@@ -494,22 +490,14 @@ module.exports = async function run(load) {
   check('...and so does the live-preview doc a drag puts on screen',
     /previewDocRef\.current = foldParams\(/.test(wsSrc),
     'the preview doc is built without the gate the committed one goes through');
-  // `!outline.ok` alone only catches a TRUE zero-length collapse -- a rule
-  // can satisfy every residual by squeezing the shape to a sliver well short
-  // of that (S09, 2026-09-04), so the toggle's refusal condition grew a
-  // second half, `collapsedByRatio`, alongside it rather than in place of it.
-  check('...the constraint toggle refuses a collapsing rule out loud',
-    /outlineOf\(\{ \.\.\.f, points \}\)/.test(editorSrc)
-      && /if \(!outline\.ok \|\| shrunk\)/.test(editorSrc)
-      && /collapsedByRatio\(rawPoints, points\)/.test(editorSrc),
-    'ModelEditor.setConstraints applies any rule the solver will accept, collapse included');
-  check('...the Round box shows the radius currently set, so it can be edited or cleared',
-    /defaultValue=\{set !== undefined \? String\(set\) : ''\}/.test(panelSrc),
-    'SketchConstraints.tsx always renders the Round box empty, so nothing shows the radius');
-  check('...and a Length already set on a curved edge stays clearable',
-    /disabled=\{curved && !fixed\}/.test(panelSrc),
-    'the note says "remove one to settle it" while the box that removes it is disabled');
-
+  // Four wiring checks that read the retired Rules panel and ModelEditor's
+  // corner/constraint path were removed here, not weakened: reshape-cad
+  // 2b19a05 deleted SketchConstraints.tsx, ModelEditor's `rounds` request
+  // write and `setConstraints` (with its collapsedByRatio refusal), and the
+  // Round / Length boxes. None of that code exists to be wired any more. The
+  // library-level guarantees (outlineOf, bulges, roundings, rejecting a
+  // collapsing outline) are still asserted above; the foldParams gate checks
+  // below still read ReshapeStudio.tsx.
 
   // ---- reading an outline back as design edges and treated corners --------
   //
