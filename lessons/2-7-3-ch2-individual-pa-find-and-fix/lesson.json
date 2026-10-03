@@ -27,7 +27,7 @@
     {
       "id": "s3",
       "title": "Say what kind each one was",
-      "instructions": "Above each fix, add a comment naming the kind: **syntax**, **runtime** or **logic**.\n\n* **syntax** — the file is not valid JavaScript, so nothing runs.\n* **runtime** — it is valid, it starts, and then it stops with an error.\n* **logic** — it runs all the way through and prints something untrue.",
+      "instructions": "Above each fix, add a comment naming the kind: **syntax**, **runtime** or **logic**.\n\n* **syntax** — the file is not valid JavaScript, so nothing runs.\n* **runtime** — it is valid and it starts, and then it goes wrong while running: it stops with an error, or it never stops.\n* **logic** — it runs all the way through and prints something untrue.",
       "hints": [
         "The kind is about WHEN it goes wrong, not about how hard it was to find",
         "Two of these four are the same kind as each other"

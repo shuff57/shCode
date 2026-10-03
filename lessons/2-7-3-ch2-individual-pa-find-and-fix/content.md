@@ -23,7 +23,7 @@ program yourself to check each fix before you submit.
 | Kind | What it means |
 |---|---|
 | **syntax** | The file is not valid JavaScript, so the whole thing refuses to start. |
-| **runtime** | It is valid, it starts, and then it stops with an error. |
+| **runtime** | It is valid and it starts, and then it goes wrong while running: it stops with an error, or it never stops. |
 | **logic** | It runs all the way through and prints something untrue. |
 
 The kind is about **when** it goes wrong, not about how hard it was to find.

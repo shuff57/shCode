@@ -22,24 +22,28 @@ pair next to you first — two adjacent tables should not build the same one.
 You are deciding whether a pizza is worth it. You know the pizza's price, how many
 slices it is cut into, and the name of the place selling it. Work out the **cost per
 slice**, and compare it against a good-deal limit of **$2.00 a slice**.
+At or under $2.00 a slice is a good deal; a pizza that costs exactly $2.00 a slice counts.
 
 **2. Split the Check**
 
 A group is splitting a restaurant bill. You know the bill total, the tip percentage
 they agreed on, and how many people are paying. Work out the **cost per person after
 tip**, and compare it against the **$15.00** each person said they were willing to spend.
+At or under $15.00 is fine; over it is not.
 
 **3. Grade Forecast**
 
 A course grade is three categories with different weights: homework is 30%, labs are
 30%, and the test is 40%. You know the student's percentage in each. Work out the
 **weighted course average**, and compare it against the passing mark of **70**.
+A 70 or more passes.
 
 **4. Fuel Stop**
 
 You are checking whether a road trip needs a gas stop. You know the car's miles per
 gallon and how many gallons the tank holds. Work out **how far one full tank goes**,
 and compare it against the trip you have already committed to: **275 miles**.
+If the tank goes 275 miles or more, no stop is needed.
 
 Whichever you pick, your program also needs one piece of **text** — the name of the
 pizzeria, the restaurant, the student, or the car. Pick one and write it down now;
