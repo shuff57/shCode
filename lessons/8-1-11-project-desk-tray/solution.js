@@ -2,4 +2,4 @@
 
 const b = box(80, 50, 20)
 hollow(b, { wall: 2.5, open: 'top' })
-round(b.edge('front', 'right'), 3)
+hole(b, { across: 12, along: 'y' })

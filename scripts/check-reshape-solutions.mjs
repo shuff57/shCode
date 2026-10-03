@@ -19,6 +19,9 @@
 // BuildResult.refusals). A reference the kernel refuses can never pass in the
 // app, so it must never pass this gate either.
 //
+// It ALSO builds on brep-rs, the engine the browser really runs; see the
+// comment at brepRefusals below.
+//
 // Run: node scripts/check-reshape-solutions.mjs [--occt <dir>]
 //      (also part of `npm test`; --occt defaults to public/reshape/kernel)
 import { readFileSync, readdirSync, existsSync } from 'fs';
@@ -94,10 +97,22 @@ try {
 
   // Flattened the way lib/model-check.ts's `Refusals` type wants it: plain
   // object, feature id -> the kernel's own sentence for why it dropped it.
-  const kernelRefusals = (doc) => {
+  const occtRefusals = (doc) => {
     const built = buildOnKernel(oc, doc, arc);
     return Object.fromEntries(built.refusals ?? new Map());
   };
+
+  // The engine the BROWSER runs is brep-rs (public/reshape/kernel/brep-rs), not
+  // the OCCT build above. They disagree: 8.1.11 built clean on OCCT while
+  // brep-rs refused its round-after-hollow, so a student could never finish it
+  // and this gate printed PASS. A reference must build on BOTH, so refusals are
+  // the union, with brep-rs's sentence winning when both refuse a feature.
+  const BREP_DIR = path.join(occtDir, 'brep-rs');
+  const brep = await import(pathToFileURL(path.join(BREP_DIR, 'brep_rs.js')).href);
+  brep.initSync({ module: readFileSync(path.join(BREP_DIR, 'brep_rs_bg.wasm')) });
+  const brepRefusals = (doc) => JSON.parse(brep.build_doc_json(JSON.stringify(doc))).refusals ?? {};
+
+  const kernelRefusals = (doc) => ({ ...occtRefusals(doc), ...brepRefusals(doc) });
 
   for (const id of readdirSync(lessonsDir).sort()) {
     const cfgPath = path.join(lessonsDir, id, 'lesson.json');
