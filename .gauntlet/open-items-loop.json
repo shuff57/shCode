@@ -33,12 +33,27 @@
       ]
     },
     "2": {
-      "status": "pending",
-      "rounds": []
+      "status": "gate green (judge review pending)",
+      "rounds": [
+        {
+          "round": 1,
+          "gate": {
+            "mutation": "scripts/test-brep-refusal-gate.mjs: round-after-hollow refused, hollow-after-round refused, hollow+hole accepted",
+            "known_bad": "check-reshape-solutions failed old 8.1.11 on brep-rs: 'brep-rs can only round an edge of a box yet'",
+            "fixed": "check-reshape-solutions PASS 8-1-11 (box+hollow+hole); check-starters green"
+          },
+          "note": "test-brep-refusal-gate not yet in npm test: package.json carries the user's uncommitted edit"
+        }
+      ]
     },
     "1": {
-      "status": "pending",
-      "rounds": []
+      "status": "gate green, browser judge running",
+      "rounds": [
+        {
+          "round": 1,
+          "fix": "abd1bc37 8.1.11 redesigned box+hollow+hole"
+        }
+      ]
     },
     "4": {
       "status": "pending",
