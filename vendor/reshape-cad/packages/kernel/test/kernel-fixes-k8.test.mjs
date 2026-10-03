@@ -84,18 +84,32 @@ test('overshoot and exact tools agree on box, prism, cylinder', () => {
   }
 });
 
-test('cone: overshoot and exact behave identically (both an honest refusal; pointed-cone bore is a kernel gap)', () => {
+test('cone: overshoot and exact tools agree, and both build (the bore on a pointed cone\'s own axis is a circle on the wall)', () => {
   const over = script('const c = cone(15, 20); hole(c, { across: 6 })');
   const exact = script('const c = cone(15, 20); hole(c, { across: 6, deep: 20 })');
-  assert.equal(over.s, undefined);
-  assert.equal(exact.s, undefined);
-  assert.match(over.refusals.hole1, /cannot cut this hole yet/);
-  assert.equal(over.refusals.hole1, exact.refusals.hole1);
+  assert.deepEqual(over.refusals, {});
+  assert.deepEqual(exact.refusals, {});
+  // R = 7.5, H = 20, r = 3: the cone narrows to the bore at zc = 12. Left =
+  // frustum below zc minus the bore there = pi R^2 H/3 (1 - (1 - zc/H)^3) - pi r^2 zc.
+  const want = Math.PI * 7.5 * 7.5 * 20 / 3 * (1 - (1 - 12 / 20) ** 3) - Math.PI * 9 * 12;
+  near(over.s.volume, want, 1e-9);
+  near(over.s.volume, exact.s.volume, 1e-9);
+  assert.equal(over.s.faces, exact.s.faces);
 });
 
-test('a transverse bore through a cylinder side still refuses plainly', () => {
+test('a transverse bore through a cylinder side builds exactly (it used to refuse); a bore as wide as the part still refuses plainly', () => {
   const doc = { version: 1, features: [{ id: 'c', kind: 'cylinder', radius: 7.5, height: 20 }, { id: 'h', kind: 'hole', target: 'c', diameter: 6, depth: 40, axis: 'x' }] };
   const { refusals, s } = run(doc, 'h');
-  assert.equal(s, undefined);
-  assert.match(refusals.h, /^hole h: brep-rs cannot cut this hole yet -- h is shown without it\.$/);
+  assert.deepEqual(refusals, {});
+  // removed = 4 * integral_{-r}^{r} sqrt(r^2 - y^2) sqrt(R^2 - y^2) dy, y = r sin(t): Simpson, no kernel code.
+  const R = 7.5, r = 3, n = 200000, h = PI / n;
+  const g = (t) => 2 * r * r * Math.cos(t) ** 2 * 2 * Math.sqrt(R * R - (r * Math.sin(t)) ** 2);
+  let acc = g(-PI / 2) + g(PI / 2);
+  for (let i = 1; i < n; i++) acc += g(-PI / 2 + h * i) * (i % 2 ? 4 : 2);
+  near(s.volume, PI * R * R * 20 - (acc * h) / 3, 1e-9);
+  assert.equal(s.faces, 4);
+  const wide = { version: 1, features: [{ id: 'c', kind: 'cylinder', radius: 7.5, height: 20 }, { id: 'h', kind: 'hole', target: 'c', diameter: 15, depth: 40, axis: 'x' }] };
+  const w = run(wide, 'h');
+  assert.equal(w.s, undefined);
+  assert.match(w.refusals.h, /^hole h: a bore across the side of a round part builds only when it runs at right angles straight through the part's axis, .* -- h is shown without it\.$/);
 });

@@ -893,7 +893,7 @@ export declare function extentBoundAlong(doc: ModelDoc, featureId: string, axis:
  * is enough: the tool is centred on the part, so a hole longer than the part
  * cuts only air. Unlike extentAlong() (a default-picker that ignores patterns
  * and mirrors) this refuses to guess: null for anything it cannot prove -- a
- * rotated primitive, a polar pattern, an intersect, a sketch that is not on a
+ * rotated cone or prism, a polar pattern of a derived shape, an intersect, a sketch that is not on a
  * world-aligned plane -- so hole() can say so instead of drilling a blind hole
  * the student never asked for.
  */
