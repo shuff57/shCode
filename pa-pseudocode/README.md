@@ -21,6 +21,15 @@ longer a solution. Only this README is tracked.
 - **Back them up.** They are not in git. A private repo cloned into this folder works
   (a nested `.git` here is ignored by the parent).
 
+## Release: students see it only when you release it
+
+A student sees a solution only after they have used all their tries **and** their teacher
+has released that part for their class. Nothing is released until you do it: on
+`/teacher?class=<id>`, under **Release solutions**, pick **Release now**, or a date and
+time and it opens by itself then (school time, no one needs to be at the keyboard). You
+can release a whole test at once and still hold back or re-time a single part. Teachers
+and admins always see the solution, so you can preview it as a student will.
+
 ## Format
 
 Plain Markdown, at least a few lines, numbered steps, no code fences needed:

@@ -21,9 +21,11 @@
 import { assignVariant, hashSeed } from '../../lib/quiz-variant';
 import { QUIZ_KEYS } from '../_shared/quiz-keys.generated';
 import { countedRows, scoreQuiz, mayReadAnswer } from '../_shared/attempts';
+import { studentReleaseStatus } from '../_shared/solutionRelease';
 
 interface Env {
   DB: D1Database;
+  ASSETS?: Fetcher;
 }
 type Ctx = EventContext<Env, string, { email: string; role?: string }>;
 
@@ -46,32 +48,52 @@ export const onRequestGet: PagesFunction<Env, string, { email: string; role?: st
   // computed here, from this student's own rows and the baked key.
   const variantFor = assignVariant(key.variants, hashSeed(`${lessonId}:${data.email}`));
   if (typeof key.maxSubmissions === 'number') {
-    // Totals and, after the last try, the key: only for a teacher/admin or a
-    // student enrolled in a live class that has this part open (mayReadAnswer).
-    // Signup takes any email, so without this a throwaway account could spend the
-    // tries on junk and read the key. Not applied to the older one-row path below:
-    // that quiz is one-shot by design and its fixtures predate enrollment.
-    if (!(await mayReadAnswer(env, request, data.email, data.role, lessonId))) {
-      return json({ error: 'Your result is shown to students enrolled in a class that has opened this part.' }, 403);
+    // Totals and, after the last try AND the teacher's release, the key. A teacher or
+    // admin always previews the key; a student needs to be enrolled in a live class
+    // that has this part open (mayReadAnswer). Signup takes any email, so without this
+    // a throwaway account could spend the tries on junk and read the key. Not applied
+    // to the older one-row path below: that quiz is one-shot by design and its
+    // fixtures predate enrollment.
+    const staff = data.role === 'teacher' || data.role === 'admin';
+    if (!staff && !(await mayReadAnswer(env, request, data.email, data.role, lessonId))) {
+      return json({ error: 'Your result is shown to students enrolled in a class that has opened this part.', reason: 'enrollment' }, 403);
     }
     const rows = await countedRows(env.DB, data.email, lessonId);
-    if (rows.length === 0) return json({ error: 'Your result appears after you hand in the test.' }, 403);
+    if (rows.length === 0 && !staff) return json({ error: 'Your result appears after you hand in the test.', reason: 'tries' }, 403);
     const marks = rows.map((r) => scoreQuiz(key, variantFor, r.gradeJson));
-    const best = marks.reduce((a, b) => (b.correct > a.correct ? b : a));
+    const none = { correct: 0, total: variantFor === null ? key.questions.length : key.questions.filter((q) => !q.variant || q.variant === variantFor).length };
+    const best = marks.length === 0 ? none : marks.reduce((a, b) => (b.correct > a.correct ? b : a));
     const spent = rows.length >= key.maxSubmissions;
     const summary = {
       variant: variantFor,
       attempts: rows.length,
       maxSubmissions: key.maxSubmissions,
-      last: marks[marks.length - 1],
+      last: marks.length === 0 ? none : marks[marks.length - 1],
       best,
     };
-    if (!spent) return json(summary);
     const mineCapped = variantFor === null ? key.questions : key.questions.filter((q) => !q.variant || q.variant === variantFor);
-    return json({
-      ...summary,
-      answers: mineCapped.map((q) => ({ id: q.id, answer: q.answer, optionText: q.optionText, explanation: q.explanation })),
-    });
+    const withKey = { ...summary, answers: mineCapped.map((q) => ({ id: q.id, answer: q.answer, optionText: q.optionText, explanation: q.explanation })) };
+    if (staff) return json(withKey);
+    if (!spent) return json(summary);
+
+    // Every try is spent. The student keeps their totals either way; the key and the
+    // explanations additionally need the teacher's release (class_solution_releases,
+    // migration 0032), checked against the server clock on this request. A database
+    // error withholds the key and says nothing else: it fails closed.
+    const now = Date.now();
+    let release: { released: boolean; scheduledAt: number | null } = { released: false, scheduledAt: null };
+    try {
+      release = await studentReleaseStatus(env, request, data.email, lessonId, now);
+    } catch {
+      /* withheld */
+    }
+    if (!release.released) {
+      return json({
+        ...summary,
+        answersWithheld: { reason: 'not-released', scheduledAt: release.scheduledAt, now, cap: key.maxSubmissions },
+      });
+    }
+    return json(withKey);
   }
 
   // The whole gate: no recorded attempt, no marking. One row is enough —

@@ -26,6 +26,10 @@
 //   a grading-failure marker is refused once every try is spent (no hand-graded 4th)
 //   an answer (pseudocode, quiz key) is only for a teacher/admin or an enrolled
 //     student whose class has the part open: a throwaway account gets nothing
+//   the teacher's RELEASE (migration 0032): every try spent AND a live class of the
+//     student has released the part (now, or a date that has arrived); teachers and
+//     admins bypass both; module inheritance, a held-back part, several classes,
+//     un-release, a DB error that fails closed, and the teacher API's auth
 //
 // Run: node scripts/test-attempt-reveal.mjs
 
@@ -62,6 +66,7 @@ const entries = [
   'functions/api/lesson-submissions/index.ts',
   'functions/api/lesson-state/[lessonId].ts',
   'functions/api/grade-written.ts',
+  'functions/api/classes/[id]/solution-releases/index.ts',
 ].map((f) => join(root, f));
 try {
   execFileSync('node', [
@@ -101,7 +106,7 @@ const QKEY = {
 };
 writeFileSync(join(outDir, 'functions/_shared/quiz-keys.generated.js'), `exports.QUIZ_KEYS = ${JSON.stringify({ 'fx-quiz': QKEY })};`);
 
-for (const f of ['functions/api/grade-written.js', 'functions/api/attempt-reveal.js', 'functions/api/quiz-reveal.js', 'functions/api/lesson-submissions/index.js', 'functions/api/lesson-state/[lessonId].js']) {
+for (const f of ['functions/api/grade-written.js', 'functions/api/attempt-reveal.js', 'functions/api/quiz-reveal.js', 'functions/api/lesson-submissions/index.js', 'functions/api/lesson-state/[lessonId].js', 'functions/api/classes/[id]/solution-releases/index.js']) {
   if (!existsSync(join(outDir, f))) { fail(`tsc did not emit ${f}`); process.exit(1); }
 }
 const attemptReveal = require(join(outDir, 'functions/api/attempt-reveal.js')).onRequestGet;
@@ -109,10 +114,16 @@ const quizReveal = require(join(outDir, 'functions/api/quiz-reveal.js')).onReque
 const submissionsPost = require(join(outDir, 'functions/api/lesson-submissions/index.js')).onRequestPost;
 const stateMod = require(join(outDir, 'functions/api/lesson-state/[lessonId].js'));
 const gradeWritten = require(join(outDir, 'functions/api/grade-written.js')).onRequestPost;
+const releaseApi = require(join(outDir, 'functions/api/classes/[id]/solution-releases/index.js'));
+const core = require(join(outDir, 'lib/solution-release-core.js'));
+const dueCore = require(join(outDir, 'lib/due-dates-core.js'));
 const { COUNT_SINCE, TRIES_APPLIED } = require(join(outDir, 'lib/attempt-cap.js'));
 
 // --- an in-memory SQLite dressed as D1 ---
-function makeDb() {
+// `released` (default true): class c1 has already released every fixture part, so every
+// older case below, which is about something else, still runs as a student who may see
+// the solution. The release cases pass { released: false } and set rows themselves.
+function makeDb({ released = true } = {}) {
   const sql = new Database(':memory:');
   sql.run(`CREATE TABLE lesson_submissions (id TEXT PRIMARY KEY, student_email TEXT, lesson_id TEXT,
     response TEXT, grade_json TEXT, score REAL, possible REAL, submitted_at INTEGER, due_at_submit INTEGER)`);
@@ -120,20 +131,35 @@ function makeDb() {
   sql.run(`CREATE TABLE lesson_state (student_email TEXT, lesson_id TEXT, state TEXT, started_at INTEGER,
     completed_at INTEGER, score REAL, PRIMARY KEY (student_email, lesson_id))`);
   // What mayReadAnswer reads: an enrolment in a live class, and the open-date gate.
-  sql.run('CREATE TABLE classes (id TEXT PRIMARY KEY, name TEXT, archived_at INTEGER)');
+  sql.run('CREATE TABLE classes (id TEXT PRIMARY KEY, name TEXT, archived_at INTEGER, owner_email TEXT)');
+  sql.run('CREATE TABLE class_teachers (class_id TEXT, teacher_email TEXT)');
+  sql.run(`CREATE TABLE class_solution_releases (class_id TEXT, scope TEXT, scope_id TEXT, release_at INTEGER,
+    set_by TEXT, set_at INTEGER, PRIMARY KEY (class_id, scope, scope_id))`);
   sql.run('CREATE TABLE enrollments (class_id TEXT, student_email TEXT, expires_at INTEGER, PRIMARY KEY (class_id, student_email))');
   sql.run('CREATE TABLE class_due_dates (class_id TEXT, scope TEXT, scope_id TEXT, due_at INTEGER)');
   sql.run('CREATE TABLE class_open_dates (class_id TEXT, scope TEXT, scope_id TEXT, open_at INTEGER)');
   sql.run('CREATE TABLE lesson_access_overrides (class_id TEXT, student_email TEXT, lesson_id TEXT)');
-  sql.run("INSERT INTO classes (id, name, archived_at) VALUES ('c1', 'Period 1', NULL)");
+  sql.run("INSERT INTO classes (id, name, archived_at, owner_email) VALUES ('c1', 'Period 1', NULL, 't@example.invalid')");
+  sql.run("INSERT INTO classes (id, name, archived_at, owner_email) VALUES ('c2', 'Period 2', NULL, 'other@example.invalid')");
   const FAR = 4102444800000;
   // Two ordinary students are enrolled by default, so every case below that is not
   // about the enrolment gate runs as a real student in a real class.
   for (const e of ['a@example.invalid', 'b@example.invalid']) {
     sql.run('INSERT INTO enrollments (class_id, student_email, expires_at) VALUES (?, ?, ?)', ['c1', e, FAR]);
   }
+  if (released) {
+    for (const id of ['fx-written', 'fx-nopseudo', 'fx-quiz', 'fx-client']) {
+      sql.run("INSERT INTO class_solution_releases (class_id, scope, scope_id, release_at, set_by, set_at) VALUES ('c1', 'lesson', ?, 1, 't@example.invalid', 1)", [id]);
+    }
+  }
   const db = {
     raw: sql,
+    // D1's batch: the statements run in order, all or nothing.
+    async batch(stmts) {
+      sql.run('BEGIN');
+      try { for (const q of stmts) await q.run(); sql.run('COMMIT'); } catch (e) { sql.run('ROLLBACK'); throw e; }
+      return [];
+    },
     prepare(text) {
       let args = [];
       const stmt = sql.query(text);
@@ -161,7 +187,14 @@ const B = 'b@example.invalid';
 // The manifest the due-date lookup asks for. Served from here so the tests never
 // touch the network (an unreachable manifest reads as "no open date", which would
 // make the open-date cases pass vacuously).
-const ASSETS = { fetch: async () => new Response(JSON.stringify({ lessons: [] }), { status: 200 }) };
+// The fixtures sit in two modules so a whole-test release has something to inherit
+// from. The lookup is cached per isolate, so this must be right the first time.
+const ASSETS = { fetch: async () => new Response(JSON.stringify({ lessons: [
+  { id: 'fx-written', title: '9.1.1 Written' },
+  { id: 'fx-nopseudo', title: '9.1.2 NoPseudo' },
+  { id: 'fx-client', title: '9.1.3 Client' },
+  { id: 'fx-quiz', title: '9.2.1 Quiz' },
+] }), { status: 200 }) };
 const call = (handler, db, url, email = A, role = 'student', init = {}, params = {}) =>
   handler({ request: new Request(`https://example.test${url}`, init), env: { DB: db, ASSETS }, params, data: email ? { email, role } : {}, next: async () => new Response(null) });
 const reveal = (db, lessonId, email = A) => call(attemptReveal, db, `/api/attempt-reveal${lessonId === null ? '' : `?lessonId=${lessonId}`}`, email);
@@ -538,6 +571,234 @@ const stored = (db, lessonId) => db.raw.query('SELECT score FROM lesson_state WH
   if (!(rec.phase5_todo || []).some((t) => /TRIES_APPLIED/.test(t))) fail('the loop record must list "set TRIES_APPLIED to the deploy time" under phase5_todo');
   else ok('phase 5 todo lists setting TRIES_APPLIED');
   if (typeof TRIES_APPLIED !== 'number') fail('TRIES_APPLIED not exported');
+}
+
+
+// ============ the teacher's RELEASE: every try spent AND a live class has released the part ============
+const T = 't@example.invalid';      // owns c1
+const OTHER = 'other@example.invalid'; // owns c2, no part in c1
+const spend = (db, email = A, lessonId = 'fx-written', n = CAP) => { for (let i = 0; i < n; i++) addRow(db, { email, lessonId, gradeJson: { score: 1 }, at: NOW + i }); };
+const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
+  `INSERT INTO class_solution_releases (class_id, scope, scope_id, release_at, set_by, set_at) VALUES (?, ?, ?, ?, 't', 1)
+   ON CONFLICT (class_id, scope, scope_id) DO UPDATE SET release_at = excluded.release_at`, [classId, scope, scopeId, at]);
+{
+  const db = makeDb({ released: false });
+  spend(db);
+  const r0 = await reveal(db, 'fx-written');
+  const b0 = await r0.json();
+  eq([r0.status, b0.reason, b0.pseudocode], [403, 'not-released', undefined], 'release: every try spent but nothing released -> 403 not-released, no pseudocode');
+  eq(b0.scheduledAt, null, '...with no scheduled date when the teacher set none');
+  const fewer = makeDb({ released: false });
+  spend(fewer, A, 'fx-written', CAP - 1);
+  setRelease(fewer, 'c1', 'lesson', 'fx-written', 1);
+  const r1 = await reveal(fewer, 'fx-written');
+  eq([r1.status, (await r1.json()).reason], [403, 'tries'], 'release: released but a try is unspent -> 403 tries');
+  setRelease(db, 'c1', 'lesson', 'fx-written', 1);
+  const r2 = await reveal(db, 'fx-written');
+  eq([r2.status, typeof (await r2.json()).pseudocode], [200, 'string'], 'release: every try spent AND released -> 200 with the pseudocode');
+  // released by a class the student is not in
+  const other = makeDb({ released: false });
+  spend(other);
+  setRelease(other, 'c2', 'lesson', 'fx-written', 1);
+  eq((await reveal(other, 'fx-written')).status, 403, "release: a release by a class the student is NOT in does not open it");
+}
+{
+  // The instant, against the server clock, with the boundary exact.
+  const realNow = Date.now;
+  const T0 = NOW + 5_000_000;
+  try {
+    Date.now = () => T0;
+    const db = makeDb({ released: false });
+    spend(db);
+    setRelease(db, 'c1', 'lesson', 'fx-written', T0 + 1);
+    const closed = await reveal(db, 'fx-written');
+    const cb = await closed.json();
+    eq([closed.status, cb.reason, cb.scheduledAt, cb.now, cb.cap], [403, 'not-released', T0 + 1, T0, CAP], 'release: one millisecond before release_at -> 403 and the body names the scheduled instant');
+    setRelease(db, 'c1', 'lesson', 'fx-written', T0);
+    eq((await reveal(db, 'fx-written')).status, 200, 'release: at exactly release_at -> 200 (released when release_at <= now)');
+    Date.now = () => T0 - 1;
+    eq((await reveal(db, 'fx-written')).status, 403, '...and the millisecond before is closed again (the clock decides, no cron)');
+    Date.now = () => T0 + 86_400_000;
+    eq((await reveal(db, 'fx-written')).status, 200, '...and a day later it is open without anyone touching it');
+  } finally { Date.now = realNow; }
+}
+{
+  // Module inheritance, a part override, a held-back part.
+  const db = makeDb({ released: false });
+  spend(db);
+  setRelease(db, 'c1', 'module', '9.1', 1);
+  eq((await reveal(db, 'fx-written')).status, 200, 'release: a module row releases a part that has no row of its own');
+  setRelease(db, 'c1', 'lesson', 'fx-written', Date.now() + 86_400_000);
+  eq((await reveal(db, 'fx-written')).status, 403, 'release: a part row with a FUTURE time overrides a released module');
+  setRelease(db, 'c1', 'lesson', 'fx-written', core.HELD_BACK);
+  const held = await reveal(db, 'fx-written');
+  const hb = await held.json();
+  eq([held.status, hb.reason, hb.scheduledAt], [403, 'not-released', null], 'release: a held-back part stays closed under a released module, and shows no date');
+  db.raw.run("DELETE FROM class_solution_releases WHERE scope = 'lesson'");
+  eq((await reveal(db, 'fx-written')).status, 200, 'release: remove the part row and it inherits the module again');
+  setRelease(db, 'c1', 'module', '9.1', Date.now() + 86_400_000);
+  setRelease(db, 'c1', 'lesson', 'fx-written', 1);
+  eq((await reveal(db, 'fx-written')).status, 200, 'release: a part released NOW beats a module scheduled for later');
+  const wrongModule = makeDb({ released: false });
+  spend(wrongModule);
+  setRelease(wrongModule, 'c1', 'module', '9.2', 1);
+  eq((await reveal(wrongModule, 'fx-written')).status, 403, "release: another test's module row does not release this part");
+}
+{
+  // Several classes, an expired enrolment, an archived class.
+  const db = makeDb({ released: false });
+  spend(db);
+  db.raw.run("INSERT INTO enrollments (class_id, student_email, expires_at) VALUES ('c2', ?, ?)", [A, 4102444800000]);
+  setRelease(db, 'c2', 'lesson', 'fx-written', 1);
+  eq((await reveal(db, 'fx-written')).status, 200, 'release: a student in two classes is released by ANY class that released it');
+  db.raw.run("UPDATE enrollments SET expires_at = 1 WHERE class_id = 'c2'");
+  eq((await reveal(db, 'fx-written')).status, 403, 'release: an EXPIRED enrolment in the releasing class does not count');
+  db.raw.run("UPDATE enrollments SET expires_at = 4102444800000 WHERE class_id = 'c2'");
+  db.raw.run("UPDATE classes SET archived_at = 1 WHERE id = 'c2'");
+  eq((await reveal(db, 'fx-written')).status, 403, 'release: an ARCHIVED releasing class does not count');
+  db.raw.run('UPDATE classes SET archived_at = NULL');
+  const future = Date.now() + 3 * 86_400_000;
+  setRelease(db, 'c1', 'lesson', 'fx-written', future + 86_400_000);
+  setRelease(db, 'c2', 'lesson', 'fx-written', future);
+  const sched = await reveal(db, 'fx-written');
+  const sb = await sched.json();
+  eq([sched.status, sb.scheduledAt], [403, future], 'release: with two scheduled classes the body reports the SOONEST release');
+}
+{
+  // Teacher and admin bypass both conditions; a database error fails closed.
+  const db = makeDb({ released: false });
+  const t = await call(attemptReveal, db, '/api/attempt-reveal?lessonId=fx-written', 'nobody@example.invalid', 'teacher');
+  const ad = await call(attemptReveal, db, '/api/attempt-reveal?lessonId=fx-written', 'nobody@example.invalid', 'admin');
+  eq([t.status, ad.status], [200, 200], 'release: a teacher or admin sees it with zero tries and nothing released (preview)');
+  const st = await call(attemptReveal, db, '/api/attempt-reveal?lessonId=fx-written', A, 'student');
+  eq(st.status, 403, '...a student with zero tries and nothing released does not');
+  const broken = makeDb({ released: false });
+  spend(broken);
+  setRelease(broken, 'c1', 'lesson', 'fx-written', 1);
+  const realPrepare = broken.prepare.bind(broken);
+  broken.prepare = (text) => { if (text.includes('class_solution_releases')) throw new Error('D1 is down'); return realPrepare(text); };
+  const down = await reveal(broken, 'fx-written');
+  const downText = await down.text();
+  eq(down.status, 503, 'release: a database error reading the release rows -> 503 (fails closed)');
+  if (downText.includes('SET total')) fail('the 503 carries the pseudocode'); else ok('...and the body carries nothing');
+}
+{
+  // Un-release closes it again, through the real teacher API.
+  const db = makeDb({ released: false });
+  spend(db);
+  const put = (entries, email = T, role = 'teacher', classId = 'c1') => call(releaseApi.onRequestPut, db, `/api/classes/${classId}/solution-releases`, email, role, { method: 'PUT', body: JSON.stringify({ entries }) }, { id: classId });
+  const get = (email = T, role = 'teacher', classId = 'c1') => call(releaseApi.onRequestGet, db, `/api/classes/${classId}/solution-releases`, email, role, {}, { id: classId });
+  const r1 = await put([{ scope: 'lesson', scopeId: 'fx-written', now: true }]);
+  eq([r1.status, (await r1.json()).written], [200, 1], 'api: release now -> 200');
+  eq((await reveal(db, 'fx-written')).status, 200, 'api: ...and the student sees it');
+  const r2 = await put([{ scope: 'lesson', scopeId: 'fx-written', date: null }]);
+  eq([r2.status, (await r2.json()).cleared], [200, 1], 'api: take back (date: null) -> 200');
+  eq((await reveal(db, 'fx-written')).status, 403, 'api: ...and the student no longer does');
+
+  // auth
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-written', now: true }], A, 'student')).status, 403, 'api: a STUDENT cannot release');
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-written', now: true }], OTHER, 'teacher')).status, 403, 'api: a teacher who does not manage the class cannot release for it');
+  eq((await get(A, 'student')).status, 403, 'api: a student cannot read the release list');
+  eq((await get(OTHER, 'teacher')).status, 403, 'api: another class\'s teacher cannot read it');
+  eq((await put([], T, 'teacher', 'no-such-class')).status, 404, 'api: an unknown class -> 404');
+  db.raw.run("INSERT INTO class_teachers (class_id, teacher_email) VALUES ('c1', 'co@example.invalid')");
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-written', now: true }], 'co@example.invalid', 'teacher')).status, 200, 'api: a co-teacher can release');
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-written', now: true }], 'root@example.invalid', 'admin')).status, 200, 'api: an admin can release');
+  eq(db.raw.query("SELECT set_by FROM class_solution_releases WHERE scope_id = 'fx-written'").get().set_by, 'root@example.invalid', 'api: set_by is the session email, not anything sent');
+
+  // validation
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-uncapped', now: true }])).status, 400, 'api: a lesson with no cap is not releasable (400)');
+  eq((await put([{ scope: 'lesson', scopeId: '__proto__', now: true }])).status, 400, 'api: __proto__ is not a lesson (400)');
+  eq((await put([{ scope: 'module', scopeId: '1.1', now: true }])).status, 400, 'api: a module with no capped part is not a test (400)');
+  eq((await put([{ scope: 'unit', scopeId: 'Unit 1', now: true }])).status, 400, 'api: the unit scope does not exist (400)');
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-written', now: true, hold: true }])).status, 400, 'api: two actions in one entry (400)');
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-written' }])).status, 400, 'api: no action (400)');
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-written', date: '2026-13-45' }])).status, 400, 'api: a nonsense date (400)');
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-written', date: '2026-02-30' }])).status, 400, 'api: a day that does not exist is refused, not rolled into March (400)');
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-written', date: '2026-11-06', time: '25:00' }])).status, 400, 'api: a nonsense time (400)');
+  eq((await put([{ scope: 'lesson', scopeId: 'fx-written', date: '9999-12-31', time: '23:59' }])).status, 400, 'api: a date at the held-back sentinel is refused (400)');
+  eq((await put(new Array(101).fill({ scope: 'lesson', scopeId: 'fx-written', now: true }))).status, 400, 'api: more than 100 entries (400)');
+
+  // dates: the school-timezone instant, shared with the due-date code, DST included
+  await put([{ scope: 'lesson', scopeId: 'fx-written', date: '2026-11-06', time: '15:00' }]);
+  const row = db.raw.query("SELECT release_at FROM class_solution_releases WHERE scope_id = 'fx-written'").get();
+  eq(row.release_at, dueCore.schoolInstant('2026-11-06', '15:00'), 'api: a date + time is the SCHOOL-timezone instant (same function as due/open dates)');
+  await put([{ scope: 'lesson', scopeId: 'fx-written', date: '2026-11-06' }]);
+  eq(db.raw.query("SELECT release_at FROM class_solution_releases WHERE scope_id = 'fx-written'").get().release_at, dueCore.startOfSchoolDay('2026-11-06'), 'api: no time -> the start of the school day');
+  await put([{ scope: 'lesson', scopeId: 'fx-written', date: '2026-03-08', time: '01:00' }]);
+  const pre = db.raw.query("SELECT release_at FROM class_solution_releases WHERE scope_id = 'fx-written'").get().release_at;
+  await put([{ scope: 'lesson', scopeId: 'fx-written', date: '2026-03-08', time: '03:00' }]);
+  const post = db.raw.query("SELECT release_at FROM class_solution_releases WHERE scope_id = 'fx-written'").get().release_at;
+  eq(post - pre, 3_600_000, 'api: across the spring-forward gap 01:00 -> 03:00 school time is ONE hour, not two');
+  await put([{ scope: 'lesson', scopeId: 'fx-written', date: '2026-11-01', time: '00:30' }]);
+  const fa = db.raw.query("SELECT release_at FROM class_solution_releases WHERE scope_id = 'fx-written'").get().release_at;
+  await put([{ scope: 'lesson', scopeId: 'fx-written', date: '2026-11-02', time: '00:30' }]);
+  const fb = db.raw.query("SELECT release_at FROM class_solution_releases WHERE scope_id = 'fx-written'").get().release_at;
+  eq(fb - fa, 25 * 3_600_000, 'api: the fall-back day is 25 hours long');
+
+  // a whole-test release in one batch, then the GET shape
+  const wr = await put([{ scope: 'module', scopeId: '9.1', now: true }, { scope: 'lesson', scopeId: 'fx-written', date: null }]);
+  eq((await wr.json()).ok, true, 'api: release a whole test and drop a part override in one batch');
+  eq((await reveal(db, 'fx-written')).status, 200, 'api: ...and the part reads as released through its module');
+  await put([{ scope: 'lesson', scopeId: 'fx-written', hold: true }]);
+  eq((await reveal(db, 'fx-written')).status, 403, 'api: hold on one part -> that part closes while the module stays released');
+  const g = await (await get()).json();
+  const written = g.parts.find((p) => p.lessonId === 'fx-written');
+  eq([written.cap, written.moduleId, written.usedAll, g.enrolled], [CAP, '9.1', 1, 2], 'api: GET lists the capped parts with the module and how many students used every try');
+  eq(g.releases.filter((r) => r.held).map((r) => r.scopeId), ['fx-written'], 'api: GET marks the held-back row');
+  // a part's count excludes the grading-failure marker
+  addRow(db, { email: B, lessonId: 'fx-written', gradeJson: { gradingFailed: true }, at: NOW + 7 });
+  spend(db, B, 'fx-written', CAP - 1);
+  const g2 = await (await get()).json();
+  eq(g2.parts.find((p) => p.lessonId === 'fx-written').usedAll, 1, 'api: a marker row does not count towards "used all tries"');
+}
+
+// ============ the quiz key needs the release too, and the totals do not ============
+{
+  const db = makeDb({ released: false });
+  await submitQuiz(db, [['q1', 1], ['q2', 0]]);
+  await submitQuiz(db, [['q1', 0], ['q2', 0]]);
+  const res = await call(quizReveal, db, '/api/quiz-reveal?lessonId=fx-quiz', A);
+  const text = await res.text();
+  const body = JSON.parse(text);
+  eq([res.status, body.attempts, body.best.correct, body.answers], [200, 2, 2, undefined], 'quiz: every try spent but NOT released -> the totals, and no key');
+  eq(body.answersWithheld && body.answersWithheld.reason, 'not-released', '...with a machine-readable reason');
+  if (text.includes('EXPLAIN-')) fail('the withheld quiz response carries an explanation'); else ok('...and no explanation text anywhere');
+  setRelease(db, 'c1', 'module', '9.2', 1);
+  const open = await (await call(quizReveal, db, '/api/quiz-reveal?lessonId=fx-quiz', A)).json();
+  eq([Array.isArray(open.answers), open.answersWithheld], [true, undefined], 'quiz: released through its module -> the key arrives');
+  const early = makeDb({ released: true });
+  await submitQuiz(early, [['q1', 1], ['q2', 0]]);
+  const e = await (await call(quizReveal, early, '/api/quiz-reveal?lessonId=fx-quiz', A)).json();
+  eq([e.answers, e.answersWithheld], [undefined, undefined], 'quiz: released but a try is unspent -> still totals only');
+  const staff = makeDb({ released: false });
+  const sr = await call(quizReveal, staff, '/api/quiz-reveal?lessonId=fx-quiz', 'nobody@example.invalid', 'teacher');
+  const sbody = await sr.json();
+  eq([sr.status, Array.isArray(sbody.answers), sbody.attempts], [200, true, 0], 'quiz: a teacher previews the key with no tries and nothing released');
+  const broken = makeDb({ released: false });
+  await submitQuiz(broken, [['q1', 1], ['q2', 0]]);
+  await submitQuiz(broken, [['q1', 1], ['q2', 0]]);
+  const rp = broken.prepare.bind(broken);
+  broken.prepare = (t) => { if (t.includes('class_solution_releases')) throw new Error('D1 is down'); return rp(t); };
+  const bb = await (await call(quizReveal, broken, '/api/quiz-reveal?lessonId=fx-quiz', A)).json();
+  eq([bb.answers, bb.answersWithheld && bb.answersWithheld.reason], [undefined, 'not-released'], 'quiz: a database error withholds the key (fails closed)');
+}
+
+// ============ the pure rules ============
+{
+  const rows = [{ scope: 'module', scopeId: '3.10', releaseAt: 100 }, { scope: 'lesson', scopeId: 'p1', releaseAt: 500 }];
+  const ids = (lessonId) => ({ lessonId, moduleId: '3.10', unitId: null });
+  eq([core.resolveReleaseAt(rows, ids('p1')), core.resolveReleaseAt(rows, ids('p2')), core.resolveReleaseAt([], ids('p1'))], [500, 100, null], 'core: a part row beats its module, a part with no row inherits, no rows = not released');
+  eq([core.isReleased(100, 100), core.isReleased(100, 99), core.isReleased(null, 1e15), core.isReleased(core.HELD_BACK, 1e15)], [true, false, false, false], 'core: released at exactly release_at; absent and held-back are never released');
+  eq(core.describeRelease(null, 1), 'Not released', 'core: wording, none');
+  eq(core.describeRelease(core.HELD_BACK, 1), 'Not released', 'core: wording, held back reads as not released');
+  eq(core.describeRelease(1, 2), 'Released', 'core: wording, released');
+  const at = dueCore.schoolInstant('2026-11-06', '15:00');
+  eq(core.describeRelease(at, at - 1), 'Releases Fri Nov 6, 3:00 PM', 'core: wording, a scheduled release names the day and the time');
+  eq(core.studentWaitMessage(at, at - 1, 3), 'You have used all 3 tries. Your teacher releases the solution on Fri Nov 6, 3:00 PM.', 'core: the student message with a date');
+  eq(core.studentWaitMessage(null, 5, 3), 'You have used all 3 tries. Your teacher will release the solution.', 'core: the student message with no date');
+  // ...and a date that has already passed is NOT worded as scheduled
+  eq(core.studentWaitMessage(1, 5, 3), 'You have used all 3 tries. Your teacher will release the solution.', 'core: a past instant is not announced as an upcoming date');
 }
 
 // ============ the browser's count fails CLOSED ============

@@ -11,13 +11,18 @@
 // is 404 and a lesson with no pseudocode written yet is 404, none of them 200.
 //
 // Sibling of functions/api/quiz-reveal.ts. A quiz's answer key is released there.
+// Both are released the same way: every try spent AND the teacher's per-class release
+// (spec "Release"), and a 403 here carries a machine-readable `reason`:
+// 'enrollment' | 'tries' | 'not-released'.
 
 import { decideReveal } from '../../lib/attempt-cap';
 import { ATTEMPT_CAPS, PA_PSEUDOCODE } from '../_shared/pa-pseudocode.generated';
 import { attemptsUsed, mayReadAnswer } from '../_shared/attempts';
+import { studentReleaseStatus } from '../_shared/solutionRelease';
 
 interface Env {
   DB: D1Database;
+  ASSETS?: Fetcher;
 }
 type Ctx = EventContext<Env, string, { email: string; role?: string }>;
 
@@ -37,16 +42,46 @@ export const onRequestGet: PagesFunction<Env, string, { email: string; role?: st
     return json({ error: 'No solution is available for this part.' }, 404);
   }
 
-  // Who may be handed an answer at all: a teacher/admin, or a student enrolled in
-  // a live class that has this lesson open (mayReadAnswer). Checked before the
-  // count, so an account that is not in a class learns nothing about its tries.
+  // A teacher or admin can always preview: neither the tries nor the release applies,
+  // so a teacher (or a self-hosting teacher with no class) can read what a student
+  // will see.
+  if (data.role === 'teacher' || data.role === 'admin') return json({ pseudocode: text });
+
+  // Who may be handed an answer at all: a student enrolled in a live class that has
+  // this lesson open (mayReadAnswer). Checked before the count, so an account that is
+  // not in a class learns nothing about its tries.
   if (!(await mayReadAnswer(env, request, data.email, data.role, lessonId))) {
-    return json({ error: 'The solution is shown to students enrolled in a class that has opened this part.' }, 403);
+    return json({
+      error: 'The solution is shown to students enrolled in a class that has opened this part.',
+      reason: 'enrollment',
+    }, 403);
   }
 
+  // Two conditions, both required. First every try is spent...
   const used = await attemptsUsed(env.DB, data.email, lessonId);
   if (decideReveal(cap, used, true) !== 'open') {
-    return json({ error: 'The solution appears after your last try.' }, 403);
+    return json({ error: 'The solution appears after your last try.', reason: 'tries' }, 403);
+  }
+
+  // ...then one of the student's live classes must have released this part
+  // (class_solution_releases, migration 0032: "release now" or a date that has
+  // arrived, compared with the server clock here on every request). A database error
+  // fails closed: no solution and no guess about why.
+  const now = Date.now();
+  let release;
+  try {
+    release = await studentReleaseStatus(env, request, data.email, lessonId, now);
+  } catch {
+    return json({ error: 'Could not check whether your teacher has released this. Try again.' }, 503);
+  }
+  if (!release.released) {
+    return json({
+      error: 'Your teacher has not released the solution yet.',
+      reason: 'not-released',
+      scheduledAt: release.scheduledAt,
+      now,
+      cap,
+    }, 403);
   }
   return json({ pseudocode: text });
 };

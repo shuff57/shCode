@@ -255,9 +255,11 @@ retries Cloudflare's transient failures; bare `wrangler` does not).
   difference is what they mean — a due date is advisory, an open date
   **locks**. Two tables rather than one nullable column because
   `class_due_dates.due_at` is NOT NULL and SQLite cannot relax that in place.
-  **A lesson-id rename migration must UPDATE BOTH tables** where
-  `scope = 'lesson'`; an orphaned due row only loses a badge, but an orphaned
-  open row leaves a lesson locked with no findable date holding it shut.
+  **A lesson-id rename migration must UPDATE ALL THREE tables** (`class_due_dates`,
+  `class_open_dates` and `class_solution_releases`, 0032) where `scope = 'lesson'`;
+  an orphaned due row only loses a badge, an orphaned open row leaves a lesson
+  locked with no findable date holding it shut, and an orphaned release row
+  quietly withholds a solution nobody can find the row for.
 - Both `due_at` and `open_at` now carry a real time of day. Every row written
   before 0023 sits at 23:59:59.999, and the due-dates route special-cases the
   `23:59` an `<input type="time">` reads back so re-saving one does not
@@ -275,6 +277,22 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 - `GET|PUT /api/classes/[id]/open-dates` is the "available after" editor, the
   deliberate sibling of `due-dates` (same auth, same entries array, same
   batching). Both entry shapes take an optional `time: 'HH:MM'`.
+- `GET|PUT /api/classes/[id]/solution-releases` is the teacher's per-class release of
+  a capped performance-assessment part's solution (the pseudocode shown after the
+  last try, and a capped quiz's answer key). Same auth, batching and school-timezone
+  `time: 'HH:MM'` shape as `open-dates`, but an entry takes exactly one action:
+  `{ now: true }`, `{ date, time? }`, `{ hold: true }` (a lesson row at `HELD_BACK`,
+  which beats an inherited module date) or `{ date: null }` (delete). Rows hold a
+  `release_at` instant compared with the server clock on every reveal request, so a
+  scheduled release needs no cron; **no row means NOT released** (the opposite of an
+  open date). `GET /api/attempt-reveal` and the capped path of `GET /api/quiz-reveal`
+  need BOTH every try spent AND a live class of the student that has released the
+  part (a lesson row overrides its module row, any class suffices, an expired or
+  archived one does not count); a database error fails closed. Teachers and admins
+  bypass both so they can preview. A 403 from attempt-reveal carries
+  `reason: 'enrollment' | 'tries' | 'not-released'`; a spent but unreleased capped
+  quiz still returns the student's totals with `answersWithheld` and no key. Rules in
+  `lib/solution-release-core.ts`, reads in `functions/_shared/solutionRelease.ts`.
 - `GET /api/my-due-dates` carries BOTH kinds — `rows` (due) and `openRows`
   (open) — per class. One endpoint, because a lesson's lock state must not
   flicker because one of two fetches landed first.

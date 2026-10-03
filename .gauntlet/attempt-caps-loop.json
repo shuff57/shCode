@@ -154,9 +154,28 @@
         "demos": "aiGrader.maxSubmissions"
       },
       "not_done": "Independent judge (cs-student-advanced lens) against one chart and one find-and-fix rubric; the two-clean-rounds exit is therefore not claimed."
+    },
+    "1b": {
+      "status": "built; not yet judged",
+      "decision": "user: solution after every try AND teacher release; release now or by date/time, opens by itself",
+      "built": [
+        "migrations/0032_solution_releases.sql (class_solution_releases, applied locally only)",
+        "lib/solution-release-core.ts + functions/_shared/solutionRelease.ts",
+        "functions/api/classes/[id]/solution-releases (GET/PUT, auth like open-dates)",
+        "gate in attempt-reveal and quiz-reveal (capped path); teacher/admin bypass; DB error fails closed",
+        "components/SolutionReleasePanel.tsx on /teacher; SolutionWait + re-check on focus in AttemptCap/QuizView",
+        "scripts/test-attempt-reveal.mjs extended (release matrix, API auth/validation/DST, quiz, pure rules)"
+      ],
+      "mutation_check": "14 of 14 mutations broke the test (release check skipped x2, boundary, held-back, expired/archived enrolment, fail-open, teacher bypass, release-API auth x2, uncapped lesson, roll-over dates, part override, any-class rule)",
+      "findings_by_own_tests": [
+        "schoolInstant rolls '2026-13-45' over into another day; the release route now refuses non-existent days (isRealDate). due/open routes still accept them (not touched)",
+        "Intl short date reads 'Fri, Nov 6'; formatRelease builds 'Fri Nov 6, 3:00 PM' from parts"
+      ]
     }
   },
   "phase5_todo": [
-    "set TRIES_APPLIED in lib/attempt-cap.ts to the deploy instant (it is the instant the mechanism was written; test-attempt-reveal asserts it is a fixed literal)"
+    "set TRIES_APPLIED in lib/attempt-cap.ts to the deploy instant (it is the instant the mechanism was written; test-attempt-reveal asserts it is a fixed literal)",
+    "apply migration 0032 to prod BEFORE the deploy (npm run d1:migrate) - the deploy preflight refuses with it pending",
+    "populate pa-pseudocode/ on the deploy machine (git-ignored); deploy runs check-pa-attempts --require-pseudocode"
   ]
 }

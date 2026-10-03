@@ -103,3 +103,36 @@ rounds cap it, as in `SPEC-open-items-loop.md`.
 - **Open for the owner:** the repository is public and the generated server modules
   (`quiz-keys`, `ai-graders`, `pa-pseudocode`) are committed, as are `solution.js` files.
   A student who finds the repo can read answers no matter what the app serves.
+
+## Release (decided 2026-10-03)
+
+A judge showed that "solution after the last try" lets an early finisher, or a
+throwaway account, pass the answer on while the test is still open for everyone else.
+The user chose: **the solution appears after every try is spent AND the teacher has
+released it for the student's class.** Then added: a release can be **now or a date and
+time**, opening by itself.
+
+- **Table** `class_solution_releases` (migration 0032): `(class_id, scope, scope_id)` ->
+  `release_at` epoch ms. Scopes `module` (a whole test) and `lesson` (a part); a part row
+  beats its module row, the same inheritance as `class_open_dates`. No `unit` scope.
+  **No row means not released** (the opposite of an open date).
+- **One instant, no cron.** Released when `release_at <= now`, compared with the server
+  clock on every reveal request. "Release now" writes `now`; a date writes the
+  school-timezone instant through `lib/due-dates-core.ts` (DST-correct, same `time`
+  shape as the due/open dates). Take back = delete the row; to close one part under a
+  released module, a lesson row at `HELD_BACK` (year 9999).
+- **Gate.** `attempt-reveal` and the capped path of `quiz-reveal` need both conditions.
+  Any live class of the student that released it suffices; expired and archived classes
+  do not count. Teachers and admins bypass both (preview). A DB error fails closed (503
+  on attempt-reveal, key withheld on quiz-reveal).
+- **What a student sees.** attempt-reveal answers 403 `{reason: 'not-released',
+  scheduledAt, now, cap}`; the panel says "You have used all 3 tries. Your teacher
+  releases the solution on Fri Nov 6, 3:00 PM." (or "...will release the solution.")
+  with a Check again button and a re-check on focus (no polling). A capped quiz keeps
+  showing the total, with `answersWithheld` in place of the key.
+- **Teacher UI.** `/teacher?class=<id>` -> "Release solutions": per test and per part,
+  Release now / date + time / Take back, state in words ("Released", "Releases Fri Nov
+  6, 3:00 PM", "Not released"), and "N of M students have used all 3 tries".
+- **Known gap, out of scope:** `schoolInstant` in `lib/due-dates-core.ts` rolls
+  '2026-13-45' over into a different day; the release route refuses non-existent days
+  itself (`isRealDate`), the due and open routes still accept them.
