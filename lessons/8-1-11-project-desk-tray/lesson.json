@@ -25,14 +25,14 @@
    "title": "Hollow it into a tray",
    "instructions": "Click the top face, then press Hollow. In the Dimensions panel, wall reads 2 - type 2.5, so the walls are 2.5 mm thick.",
    "hints": [
-    "A message under the 3D view should read \"Hollow 1 is open at the top face.\" That's what makes it a tray instead of a sealed block.",
+    "A message at the bottom right of the studio should read \"Hollow 1 is open at the top face.\" That's what makes it a tray instead of a sealed block.",
     "On the Code side, hollow(b, { wall: 2.5, open: 'top' }) is the same step. open takes a face word in quotes. Without it you get a sealed block, and the Quest will complain about the hollow even though it shows a 2.5 wall."
    ]
   },
   {
    "id": "s3",
    "title": "Drill a drain hole through the floor",
-   "instructions": "Click the long front wall of the tray in the 3D view, then press the Hole tool. A hole appears going down through the floor of the tray. In the Dimensions panel, the diameter reads 6 - type 12.",
+   "instructions": "Click the long wall facing you in the 3D view (the bottom-left label then reads \"+y face\"; zoom in with the scroll wheel if you keep picking an edge), then press the Hole tool. A hole appears going down through the floor of the tray. In the Dimensions panel, the diameter reads 6 - type 12.",
    "hints": [
     "Click on the outside of the long front wall, near the middle. The hole still goes straight down through the floor, not into the wall you clicked: Hole always drills from the top.",
     "The new step shows up in the timeline as \"Hole 1\" (it may be drawn in capitals).",

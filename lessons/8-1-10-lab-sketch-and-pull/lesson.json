@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Finish the sketch",
-      "instructions": "Press the Done button at the left of the toolbar to leave the sketch editor and go back to the 3D view. The toolbar goes back to Sketch, Box, Pull, Spin ... and Sketch 1 shows in the timeline at the bottom.",
+      "instructions": "Press the Done button (the left-arrow icon in the SKETCH group of the toolbar) to leave the sketch editor and go back to the 3D view. The toolbar goes back to Sketch, Box, Pull, Spin ... and Sketch 1 shows in the timeline at the bottom.",
       "hints": [
         "Done is the button with the left arrow, next to the Sketch group of the toolbar.",
         "If the toolbar still shows Line, Rect and Circle, you are still inside the sketch editor. Press Done."
