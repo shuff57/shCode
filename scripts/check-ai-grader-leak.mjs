@@ -71,13 +71,38 @@ for (const id of fs.readdirSync(LESSONS)) {
 // and an empty one FAILS rather than skips: a check that finds nothing to look
 // for must say so, not pass. README.md is the folder's tracked how-to, not a
 // solution.
+//
+// A line the lesson's OWN published prose already says (content.md is rendered into
+// every student's page) is not a leak of the solution when it turns up in out/: it
+// was public before the pseudocode existed. Pseudocode written from a problem
+// statement repeats that statement's sentences, and probing them made the build
+// fail on the lesson page itself. Such a line is not probed. The rest still are.
+const PROSE = [];
+for (const id of fs.readdirSync(LESSONS)) {
+  const f = path.join(LESSONS, id, 'content.md');
+  if (fs.existsSync(f)) PROSE.push(fs.readFileSync(f, 'utf8'));
+  // The lesson's steps, description and requirement titles/hints are drawn on the page too
+  // (the group builds have no content.md: their instructions are the steps). Never the
+  // grader, the quiz key or a requirement's pattern: those are the secrets.
+  const lj = path.join(LESSONS, id, 'lesson.json');
+  if (fs.existsSync(lj)) {
+    try {
+      const l = JSON.parse(fs.readFileSync(lj, 'utf8'));
+      PROSE.push(l.description || '', JSON.stringify(l.steps || []));
+      for (const r of l.requirements || []) PROSE.push(r.title || '', r.description || '', r.hint || '');
+    } catch { /* check-lesson-numbers owns malformed JSON */ }
+  }
+}
+const publicProse = PROSE.join('\n');
 const PSEUDO = path.join(ROOT, 'pa-pseudocode');
 if (fs.existsSync(PSEUDO)) {
   for (const f of fs.readdirSync(PSEUDO)) {
     if (!f.endsWith('.md') || f === 'README.md') continue;
     const id = f.slice(0, -3);
     const lines = fs.readFileSync(path.join(PSEUDO, f), 'utf8').split('\n').map((l) => l.trim()).filter(Boolean);
-    const long = lines.filter((l) => l.length >= 25);
+    // Probe the first 70 characters (what is searched for); skip it when the lesson's
+    // own prose already contains that text.
+    const long = lines.filter((l) => l.length >= 25 && !publicProse.includes(l.slice(0, 70)));
     if (long.length) {
       for (const l of long) probes.push({ id, what: 'pseudocode', text: l.slice(0, 70) });
     } else if (lines.length) {
