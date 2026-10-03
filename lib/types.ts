@@ -89,6 +89,14 @@ export interface Grading {
   passingScore: number;
   allowLateSubmit?: boolean;
   /**
+   * Tries the student gets at this part, counted server-side from their own
+   * lesson_submissions rows (lib/attempt-cap.ts). Absent = unlimited. The best
+   * score counts, and once the last try is spent the part's solution is shown
+   * as pseudocode (functions/api/attempt-reveal.ts). See
+   * .gauntlet/SPEC-attempt-caps.md. Only meaningful on a performance assessment.
+   */
+  maxSubmissions?: number;
+  /**
    * This item is one part of a test the student sits in one sitting.
    *
    * On a practice assignment Submit is the reward for getting everything
@@ -237,6 +245,14 @@ export interface QuizConfig {
    * decides whether the marking is shown once it is spent.
    */
   revealAfterSubmit?: boolean;
+  /**
+   * Tries the student gets at this part, counted server-side from their own
+   * lesson_submissions rows (lib/attempt-cap.ts). Absent = unlimited. The best
+   * score counts, and once the last try is spent the part's solution is shown
+   * as pseudocode (functions/api/attempt-reveal.ts). See
+   * .gauntlet/SPEC-attempt-caps.md. Only meaningful on a performance assessment.
+   */
+  maxSubmissions?: number;
   questions: QuizQuestion[];
 }
 

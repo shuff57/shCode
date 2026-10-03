@@ -17,6 +17,8 @@ export interface QuizKeyQuestion {
 }
 
 export interface QuizKey {
+  /** Set on a capped quiz: answers are held back until this many tries are spent. */
+  maxSubmissions?: number;
   variants?: string[];
   questions: QuizKeyQuestion[];
 }

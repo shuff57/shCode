@@ -62,6 +62,17 @@ for (const id of fs.readdirSync(LESSONS)) {
     }
   }
 }
+// 2b. The solution pseudocode shown after the last try (pa-pseudocode/<id>.md) is
+// the answer to a graded part. It is baked into the worker and must never be a
+// static file. One probe per file: its first line long enough to be distinctive.
+const PSEUDO = path.join(ROOT, 'pa-pseudocode');
+if (fs.existsSync(PSEUDO)) {
+  for (const f of fs.readdirSync(PSEUDO)) {
+    if (!f.endsWith('.md')) continue;
+    const line = fs.readFileSync(path.join(PSEUDO, f), 'utf8').split('\n').map((l) => l.trim()).find((l) => l.length >= 40);
+    if (line) probes.push({ id: f.slice(0, -3), what: 'pseudocode', text: line.slice(0, 70) });
+  }
+}
 if (probes.length === 0) problems.push('found no summative grader to probe for -- the check would pass vacuously');
 
 const TEXT = /\.(json|js|mjs|html|txt|md|css|ts|map|xml|csv)$/i;

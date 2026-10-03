@@ -267,7 +267,9 @@ const { redactQuiz, redactLessonForClient, isSummativeQuiz } = require(LIB + '/q
 // rebuild is dropped in silence and the button quietly re-locks; and the count
 // has to come from rows that represent real attempts, or a grader outage spends a
 // student's three.
-const { countAttempts, ATTEMPT_CAPS_APPLIED } = require(LIB + '/attempt-cap.js');
+// COUNT_SINCE is the effective cutoff (the later of the Chapter 2 cap date and the
+// three-tries go-live, lib/attempt-cap.ts), which is what countAttempts defaults to.
+const { countAttempts, ATTEMPT_CAPS_APPLIED, COUNT_SINCE } = require(LIB + '/attempt-cap.js');
 
 const brief = 'The taught answer (2.4.1): for is the loop whose header carries all three parts.';
 const key = 'Full credit: for suits a known range while while suits an unknown count.';
@@ -316,7 +318,7 @@ const key = 'Full credit: for suits a known range while while suits an unknown c
 }
 
 {
-  const after = ATTEMPT_CAPS_APPLIED + 1000;
+  const after = COUNT_SINCE + 1000;
   const row = (submittedAt, gradeJson) => ({ submittedAt, gradeJson });
   eq(countAttempts([]), 0, 'cap/count none');
   eq(countAttempts([row(after, { totalEarned: 5 })]), 1, 'cap/count one real attempt');
@@ -326,11 +328,11 @@ const key = 'Full credit: for suits a known range while while suits an unknown c
   eq(countAttempts([row(after, { gradingFailed: true, error: 'grader offline' })]), 0, 'cap/count a failed grade is free');
   eq(countAttempts([row(after, { gradingFailed: true }), row(after, { totalEarned: 5 })]), 1, 'cap/count failed plus real');
   // Grandfathered: an attempt recorded before the cap shipped does not count.
-  eq(countAttempts([row(ATTEMPT_CAPS_APPLIED - 1, { totalEarned: 5 })]), 0, 'cap/count predates the cutoff');
-  eq(countAttempts([row(ATTEMPT_CAPS_APPLIED, { totalEarned: 5 })]), 1, 'cap/count exactly at the cutoff counts');
+  eq(countAttempts([row(COUNT_SINCE - 1, { totalEarned: 5 })]), 0, 'cap/count predates the cutoff');
+  eq(countAttempts([row(COUNT_SINCE, { totalEarned: 5 })]), 1, 'cap/count exactly at the cutoff counts');
   // A junk row must not take the count down with it.
   eq(countAttempts([{ submittedAt: 'nope' }, row(after, { totalEarned: 1 })]), 1, 'cap/count ignores a junk row');
-  ok(Number.isFinite(ATTEMPT_CAPS_APPLIED) && ATTEMPT_CAPS_APPLIED > 0, 'cap/cutoff is a real timestamp', 'the cutoff is not a usable epoch ms');
+  ok(Number.isFinite(ATTEMPT_CAPS_APPLIED) && ATTEMPT_CAPS_APPLIED > 0 && COUNT_SINCE >= ATTEMPT_CAPS_APPLIED, 'cap/cutoff is a real timestamp', 'the cutoff is not a usable epoch ms');
 }
 console.log(
   failures ? `\n${failures} FAILURE(S)` : '\nALL PASS  (quiz-variant: seeding, forms, shuffling, redaction, attempt caps)',

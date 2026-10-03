@@ -8,6 +8,9 @@
 // and reaches the teacher's review queue instead of dying in localStorage.
 
 import { resolveDueForStudent } from '../../_shared/dueDates';
+import { assignVariant, hashSeed } from '../../../lib/quiz-variant';
+import { QUIZ_KEYS } from '../../_shared/quiz-keys.generated';
+import { scoreQuiz } from '../../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -83,6 +86,22 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
     dueAtSubmit = null;
   }
 
+  // A capped quiz is scored HERE, from the baked key, and whatever score the
+  // browser sent is discarded: the browser has no key, and a number it supplied
+  // would decide the best score. Only a hand-in that carries picks is scored; a
+  // grading-failure marker (no `quiz` array) keeps the NULLs it came with.
+  let score = body.score ?? null;
+  let possible = body.possible ?? null;
+  const key = Object.prototype.hasOwnProperty.call(QUIZ_KEYS, body.lessonId) ? QUIZ_KEYS[body.lessonId] : undefined;
+  if (key && typeof key.maxSubmissions === 'number') {
+    const g = body.gradeJson as { quiz?: unknown } | undefined;
+    if (g && Array.isArray(g.quiz)) {
+      const marks = scoreQuiz(key, assignVariant(key.variants, hashSeed(`${body.lessonId}:${data.email}`)), g);
+      score = marks.correct;
+      possible = marks.total;
+    }
+  }
+
   await env.DB.prepare(
     `INSERT INTO lesson_submissions
        (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at, due_at_submit)
@@ -94,8 +113,8 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
       body.lessonId,
       body.response,
       body.gradeJson !== undefined ? JSON.stringify(body.gradeJson) : null,
-      body.score ?? null,
-      body.possible ?? null,
+      score,
+      possible,
       now,
       dueAtSubmit,
     )

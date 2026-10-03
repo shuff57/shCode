@@ -20,6 +20,7 @@
 
 import { assignVariant, hashSeed } from '../../lib/quiz-variant';
 import { QUIZ_KEYS } from '../_shared/quiz-keys.generated';
+import { countedRows, scoreQuiz } from '../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -38,6 +39,33 @@ export const onRequestGet: PagesFunction<Env, string, { email: string }> = async
   const key = QUIZ_KEYS[lessonId];
   if (!key) return json({ error: 'No reveal exists for this lesson.' }, 403);
 
+  // A CAPPED quiz (maxSubmissions) is gated by tries, not by one row: between
+  // tries the student gets their TOTAL and nothing else, so three tries cannot be
+  // used to read the key off question by question. The answers and explanations
+  // are released only once every try is spent. The count and the marks are both
+  // computed here, from this student's own rows and the baked key.
+  const variantFor = assignVariant(key.variants, hashSeed(`${lessonId}:${data.email}`));
+  if (typeof key.maxSubmissions === 'number') {
+    const rows = await countedRows(env.DB, data.email, lessonId);
+    if (rows.length === 0) return json({ error: 'Your result appears after you hand in the test.' }, 403);
+    const marks = rows.map((r) => scoreQuiz(key, variantFor, r.gradeJson));
+    const best = marks.reduce((a, b) => (b.correct > a.correct ? b : a));
+    const spent = rows.length >= key.maxSubmissions;
+    const summary = {
+      variant: variantFor,
+      attempts: rows.length,
+      maxSubmissions: key.maxSubmissions,
+      last: marks[marks.length - 1],
+      best,
+    };
+    if (!spent) return json(summary);
+    const mineCapped = variantFor === null ? key.questions : key.questions.filter((q) => !q.variant || q.variant === variantFor);
+    return json({
+      ...summary,
+      answers: mineCapped.map((q) => ({ id: q.id, answer: q.answer, optionText: q.optionText, explanation: q.explanation })),
+    });
+  }
+
   // The whole gate: no recorded attempt, no marking. One row is enough —
   // a partial hand-in is a row too, and the paper stays open by design.
   const row = await env.DB.prepare(
@@ -49,7 +77,7 @@ export const onRequestGet: PagesFunction<Env, string, { email: string }> = async
 
   // The form this student sat, resolved exactly as the client does — same
   // lib, same seed — so the marking is against their own paper.
-  const variant = assignVariant(key.variants, hashSeed(`${lessonId}:${data.email}`));
+  const variant = variantFor;
   const mine = variant === null ? key.questions : key.questions.filter((q) => !q.variant || q.variant === variant);
   return json({
     variant,

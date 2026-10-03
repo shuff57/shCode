@@ -178,6 +178,14 @@ export interface DiagramConfig {
    */
   summative?: boolean;
   /**
+   * Tries the student gets at this part, counted server-side from their own
+   * lesson_submissions rows (lib/attempt-cap.ts). Absent = unlimited. The best
+   * score counts, and once the last try is spent the part's solution is shown
+   * as pseudocode (functions/api/attempt-reveal.ts). See
+   * .gauntlet/SPEC-attempt-caps.md. Only meaningful on a performance assessment.
+   */
+  maxSubmissions?: number;
+  /**
    * When present, "Submit for feedback" also sends the Mermaid text to the
    * Ollama grader through the existing /api/grade-written endpoint.
    */

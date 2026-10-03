@@ -30,6 +30,20 @@
  */
 export const ATTEMPT_CAPS_APPLIED = 1790804940000;
 
+/**
+ * Epoch ms when three tries on every Performance Assessment part went live
+ * (.gauntlet/SPEC-attempt-caps.md). Attempts before it are free, so every
+ * student starts with a full set of tries on a part that is capped from here,
+ * including Chapter 1 and 2 parts they already sat once. Phase 5 sets this to
+ * the deploy instant; until then it is the instant the mechanism was written,
+ * which is what a local test run needs. Never move it earlier than a deploy
+ * that students have already used: that confiscates tries.
+ */
+export const TRIES_APPLIED = 1791065875120;
+
+/** The instant from which attempts count: the later of the two cutoffs. */
+export const COUNT_SINCE = Math.max(ATTEMPT_CAPS_APPLIED, TRIES_APPLIED);
+
 /** The columns `countAttempts` needs. `SubmissionRecord` satisfies it. */
 export interface AttemptRow {
   submittedAt: number;
@@ -50,7 +64,7 @@ function wasGradingFailure(gradeJson: unknown): boolean {
  */
 export function countAttempts(
   rows: AttemptRow[],
-  since: number = ATTEMPT_CAPS_APPLIED,
+  since: number = COUNT_SINCE,
 ): number {
   return rows.filter(
     (r) =>
@@ -58,4 +72,21 @@ export function countAttempts(
       r.submittedAt >= since &&
       !wasGradingFailure(r.gradeJson),
   ).length;
+}
+
+/**
+ * What the reveal gate decides, as one pure function so the Pages Function and
+ * the local dev stub cannot disagree. `cap` is the part's maxSubmissions
+ * (undefined = not capped, so nothing to reveal).
+ */
+export type RevealDecision = 'not-capped' | 'no-solution' | 'locked' | 'open';
+
+export function decideReveal(
+  cap: number | undefined,
+  used: number,
+  hasSolution: boolean,
+): RevealDecision {
+  if (typeof cap !== 'number') return 'not-capped';
+  if (!hasSolution) return 'no-solution';
+  return used >= cap ? 'open' : 'locked';
 }

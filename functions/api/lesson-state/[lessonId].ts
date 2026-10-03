@@ -10,6 +10,7 @@
 // completion on a lesson whose prior siblings aren't done.
 
 import { isLessonAccessible, lockedResponse, type SessionData } from '../../_shared/lessonAccess';
+import { ATTEMPT_CAPS } from '../../_shared/pa-pseudocode.generated';
 
 interface Env {
   DB: D1Database;
@@ -52,13 +53,29 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async 
       .run();
   } else {
     // Upsert to completed. Preserve started_at if a prior row exists.
+    //
+    // On a CAPPED part the best try counts (spec: .gauntlet/SPEC-attempt-caps.md),
+    // so the stored score can only go up: a worse later try, or a scoreless
+    // grading-failure row, leaves it alone. The browser already sends its own
+    // running maximum, but that is a courtesy: this is the rule, and it holds
+    // when a second device or a stale tab sends a lower number. Uncapped lessons
+    // keep `score = excluded.score`, because a formative retake may legitimately
+    // replace its score.
+    const capped = Object.prototype.hasOwnProperty.call(ATTEMPT_CAPS, lessonId);
+    const scoreSql = capped
+      ? `CASE
+           WHEN excluded.score IS NULL THEN lesson_state.score
+           WHEN lesson_state.score IS NULL THEN excluded.score
+           ELSE MAX(lesson_state.score, excluded.score)
+         END`
+      : 'excluded.score';
     await env.DB.prepare(
       `INSERT INTO lesson_state (student_email, lesson_id, state, started_at, completed_at, score)
        VALUES (?, ?, 'completed', ?, ?, ?)
        ON CONFLICT(student_email, lesson_id) DO UPDATE SET
          state = 'completed',
          completed_at = excluded.completed_at,
-         score = excluded.score`,
+         score = ${scoreSql}`,
     )
       .bind(data.email, lessonId, now, now, body.score ?? null)
       .run();

@@ -47,7 +47,9 @@ for (const id of readdirSync(lessonsDir)) {
   // `summative` alone would silently switch on "here are the correct answers"
   // for the Chapter 1 and Chapter 3 tests as well -- a policy change nobody
   // decided. So a quiz earns a reveal by asking for one.
-  if (!quiz || !quiz.summative || quiz.revealAfterSubmit !== true) continue;
+  // A capped quiz (maxSubmissions) is also emitted: the server scores each try
+  // from this key and holds the answers back until the last try is spent.
+  if (!quiz || !quiz.summative || (quiz.revealAfterSubmit !== true && typeof quiz.maxSubmissions !== 'number')) continue;
 
   const questions = (quiz.questions ?? []).map((q) => {
     if (typeof q.answer !== 'number') {
@@ -74,6 +76,7 @@ for (const id of readdirSync(lessonsDir)) {
   if (errors.length) break;
 
   out[id] = {
+    ...(typeof quiz.maxSubmissions === 'number' ? { maxSubmissions: quiz.maxSubmissions } : {}),
     ...(quiz.variants ? { variants: quiz.variants } : {}),
     questions,
   };
@@ -110,6 +113,8 @@ export interface QuizKeyQuestion {
 }
 
 export interface QuizKey {
+  /** Set on a capped quiz: answers are held back until this many tries are spent. */
+  maxSubmissions?: number;
   variants?: string[];
   questions: QuizKeyQuestion[];
 }
