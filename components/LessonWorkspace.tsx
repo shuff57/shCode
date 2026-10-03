@@ -484,6 +484,15 @@ export default function LessonWorkspace({
   useEffect(() => {
     const handler = (event: MessageEvent) => {
       const data = event.data;
+      // A reSHape script that builds posts `reshape-doc`. That is the only
+      // "run again" a reSHape lesson has (ReshapeStudio owns its own Run), and
+      // nothing else clears runtimeError there: runCode()/runQ5() never run, so
+      // a fixed script left "Run your code again" on screen and Submit disabled
+      // until a page reload.
+      if (data && data.source === 'reshape-doc') {
+        setRuntimeError(null);
+        return;
+      }
       if (data && data.source === 'preview-error' && data.error) {
         // The moSHion / reSHape runners report a line already (their own frame
         // parse); keep it rather than flattening the payload to a bare message.
