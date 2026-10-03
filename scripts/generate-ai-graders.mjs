@@ -86,6 +86,7 @@ for (const id of readdirSync(lessonsDir)) {
       rubric: g.rubric,
       ...(g.model ? { model: g.model } : {}),
       ...(g.contextDocs ? { contextDocs: g.contextDocs } : {}),
+      ...(g.strict ? { strict: true } : {}),
     };
   }
 }

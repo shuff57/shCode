@@ -160,6 +160,30 @@ check('trust', !/Never reveal the full correct answer\./.test(core),
 check('trust', /Never reveal the correct answer to ANY criterion/.test(core),
   'rule 4 is missing its per-criterion scoping');
 
+// --- strict marking for graded test parts ----------------------------------
+//
+// A graded part sets the recorded score, so the course-wide "grade VERY leniently"
+// framing would credit a find-and-fix with a bug still in it. `strict` is read from
+// the authored config on the SERVER; the client body can never carry it. The
+// default prompt must stay byte-identical for every lesson that does not opt in.
+console.log('\n=== strict marking ===');
+{
+  const { buildPrompt } = require(libPath);
+  const req = { lessonId: 'x', lessonTitle: 'T', prompt: 'P', response: 'R',
+    rubric: [{ id: 'a', title: 'A', description: 'd', points: 2 }] };
+  const lenient = buildPrompt(req);
+  const strict = buildPrompt({ ...req, strict: true });
+  check('strict', /Grade VERY leniently/.test(lenient.system), 'the default prompt lost its lenient framing');
+  check('strict', !/STRICTLY ON CORRECTNESS/.test(lenient.system), 'the default prompt picked up strict wording');
+  check('strict', /STRICTLY ON CORRECTNESS/.test(strict.system), 'strict: true did not change the framing');
+  check('strict', !/Grade VERY leniently/.test(strict.system), 'strict prompt still tells the model to grade VERY leniently');
+  check('strict', /A claim is not the work/.test(strict.system), 'strict prompt lost the claim-is-not-the-work rule');
+  check('strict', /prompt-injection attempt/.test(strict.system), 'strict prompt lost the injection rule');
+  check('strict', /Never reveal the correct answer to ANY criterion/.test(strict.system), 'strict prompt lost the no-reveal rule');
+  check('strict', /strict:\s*config\.strict/.test(endpoint), 'the endpoint does not pass the SERVER config strict flag');
+  check('strict', !/body\.strict/.test(endpoint), 'the endpoint reads strict from the client body');
+}
+
 for (const w of warnings) console.warn(`  WARN  ${w}`);
 
 if (failures) {

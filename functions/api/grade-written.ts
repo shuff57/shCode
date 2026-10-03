@@ -307,6 +307,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     prompt: config.prompt,
     rubric: config.rubric,
     contextDocs: config.contextDocs,
+    strict: config.strict,
   });
 
   if (wantsStream) {

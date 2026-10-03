@@ -23,6 +23,8 @@ export interface AiGraderConfig {
   rubric: RubricItem[];
   model?: string;
   contextDocs?: string[];
+  /** Graded test part: the strict marking framing instead of the lenient default. */
+  strict?: boolean;
 }
 
 // `env` and `request` are no longer needed (there is nothing to fetch) but the

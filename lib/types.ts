@@ -258,6 +258,13 @@ export interface QuizConfig {
 
 export interface AiGraderConfig {
   /**
+   * Strict marking for a graded test part (correctness first, phrasing generous)
+   * instead of the course's lenient practice framing. Authored here, read ONLY on
+   * the server (functions/_shared/aiGraders.ts); lib/quiz-redact.ts rebuilds the
+   * client copy field by field and never carries it.
+   */
+  strict?: boolean;
+  /**
    * Test mode, the written-response twin of QuizConfig.summative. One
    * submission, no rubric feedback returned to the student, and the lesson
    * completes on submission. Rubric feedback on a graded test is the answer
