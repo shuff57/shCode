@@ -12,7 +12,7 @@ import { sourceHintNumbers, sourceHintParts } from '../lib/source-hint';
 import { buildQuizView } from '../lib/quiz-variant';
 import { getCurrentUser } from '../lib/auth';
 import SolutionPanel from './SolutionPanel';
-import { AttemptBanner, PseudocodePanel } from './AttemptCap';
+import { AttemptBanner, PseudocodePanel, SolutionWait, parseRevealWait, type RevealWait } from './AttemptCap';
 import { useAttemptCap } from '../lib/use-attempt-cap';
 
 interface Props {
@@ -66,6 +66,8 @@ interface TriesSummary {
 interface RevealResult {
   answers: Record<string, RevealAnswer> | null;
   summary: TriesSummary | null;
+  /** Every try is spent but the teacher has not released the key (`answersWithheld`). */
+  wait: RevealWait | null;
 }
 
 async function fetchReveal(lessonId: string): Promise<RevealResult> {
@@ -73,14 +75,15 @@ async function fetchReveal(lessonId: string): Promise<RevealResult> {
     const res = await fetch(`/api/quiz-reveal?lessonId=${encodeURIComponent(lessonId)}`, {
       credentials: 'include',
     });
-    if (!res.ok) return { answers: null, summary: null }; // 403 = not handed in yet — quiet, not an error
-    const data = (await res.json()) as { answers?: RevealAnswer[] } & Partial<TriesSummary>;
+    if (!res.ok) return { answers: null, summary: null, wait: null }; // 403 = not handed in yet — quiet, not an error
+    const data = (await res.json()) as { answers?: RevealAnswer[]; answersWithheld?: unknown } & Partial<TriesSummary>;
     return {
       answers: data.answers ? Object.fromEntries(data.answers.map((a) => [a.id, a])) : null,
       summary: typeof data.attempts === 'number' ? (data as TriesSummary) : null,
+      wait: parseRevealWait(data.answersWithheld),
     };
   } catch {
-    return { answers: null, summary: null };
+    return { answers: null, summary: null, wait: null };
   }
 }
 
@@ -93,6 +96,8 @@ export default function QuizView({ lessonId, config }: Props) {
   const [reveal, setReveal] = useState<Record<string, RevealAnswer> | null>(null);
   // Capped quiz only: the server's running totals, between tries.
   const [tries, setTries] = useState<TriesSummary | null>(null);
+  // Capped quiz, every try spent, key not yet released by the teacher.
+  const [wait, setWait] = useState<RevealWait | null>(null);
   const progress = useLessonState();
   // Tries, counted on the server. A capped quiz replaces the one-shot lock.
   const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed);
@@ -194,6 +199,7 @@ export default function QuizView({ lessonId, config }: Props) {
       if (cancelled) return;
       setReveal(r.answers);
       setTries(r.summary);
+      setWait(r.wait);
     });
     return () => {
       cancelled = true;
@@ -264,6 +270,7 @@ export default function QuizView({ lessonId, config }: Props) {
       const r = await fetchReveal(lessonId);
       setReveal(r.answers);
       setTries(r.summary);
+      setWait(r.wait);
       // Best try counts. The server derives it from the stored rows and the
       // lesson_state upsert never lowers it (functions/api/lesson-state).
       //
@@ -562,6 +569,12 @@ export default function QuizView({ lessonId, config }: Props) {
           </span>
         ) : null}
       </div>
+      {wait ? (
+        <SolutionWait
+          wait={wait}
+          onRefresh={() => void fetchReveal(lessonId).then((r) => { setReveal(r.answers); setTries(r.summary); setWait(r.wait); })}
+        />
+      ) : null}
       <PseudocodePanel lessonId={lessonId} show={capped && cap.reached} />
     </section>
   );

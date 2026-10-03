@@ -9,6 +9,7 @@ import { SubmissionQueue } from '../../components/SubmissionQueue';
 import { AnnouncementsPanel } from '../../components/AnnouncementsPanel';
 import DueDatesPanel from '../../components/DueDatesPanel';
 import GradingWeightsPanel from '../../components/GradingWeightsPanel';
+import SolutionReleasePanel from '../../components/SolutionReleasePanel';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
@@ -1887,6 +1888,12 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
       <div style={S.card}>
         <h2 style={S.h2}>Due dates</h2>
         <DueDatesPanel classId={classId} />
+      </div>
+
+      {/* Solution release */}
+      <div style={S.card}>
+        <h2 style={S.h2}>Release solutions</h2>
+        <SolutionReleasePanel classId={classId} />
       </div>
 
       {/* Grading weights */}
