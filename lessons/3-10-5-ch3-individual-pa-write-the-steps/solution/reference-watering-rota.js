@@ -9,6 +9,7 @@ const rota = [
   { name: "Aloe", ml: 60, watered: false },
   { name: "Basil", ml: 90, watered: false }
 ];
+// The limit: the can holds 250 ml.
 const canMl = 250;
 
 // One function: the total (loop + accumulator, 3.3.9).
@@ -42,6 +43,7 @@ console.log("Total water needed: " + totalWater(rota) + " ml");
 const after = waterOne(rota, "Fern");
 console.log("After watering Fern: " + after[0].name + " watered = " + after[0].watered);
 console.log("Original untouched: " + rota[0].watered);
+console.log(totalWater(rota) <= canMl ? "One fill is enough" : "One fill is not enough");
 
 // The round trip (3.8.15).
 localStorage.setItem("rota", JSON.stringify(after));

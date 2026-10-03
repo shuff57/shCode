@@ -15,7 +15,7 @@ must contain:
 - At least one **spread** copy (`{ ...item }` or `[...list]`)
 - A **save/load round trip**: `JSON.stringify` into `localStorage`, and `JSON.parse` back
 - **Documentation:** header comment (Problem, Partners = N/A, Date), a const for the
-  limit, camelCase names throughout, at least one `console.log` reporting the
+  problem's limit (budget, weekly goal or can size, below), camelCase names throughout, at least one `console.log` reporting the
   result, `typeof` for one value
 
 **Three problems. Pick one.** They are the same difficulty and the same shape. Adjacent
@@ -29,7 +29,8 @@ Your cart is an array of items, each `{ name, price, qty }`. Write `totalCost` (
 the total over the whole cart), `receiptLine` (takes one item, returns its
 `"name xqty"` line), and `discountOne` (takes the cart, a name and a percent off, marks
 that item's `price` down on its own copy, and returns the copy without changing the
-original). Print the receipt lines, the total, and the discounted copy. Save the cart to
+original). Keep a `const` budget (pick a number) and print whether the total is over it.
+Print the receipt lines, the total, and the discounted copy. Save the cart to
 localStorage under a key and load it back.
 
 ---
@@ -39,7 +40,8 @@ localStorage under a key and load it back.
 Your week is an array of days, each `{ day, minutes }`. Write `totalMinutes` (returns the
 week's total), `logLine` (takes one day, returns its `"Mon: 30 min"` line), and
 `addMinutes` (takes the week, a day name and extra minutes, adds them to that day on its
-own copy, and returns the copy without changing the original). Print the log, the total,
+own copy, and returns the copy without changing the original). Keep a `const` weekly
+goal (pick a number) and print whether the total reaches it. Print the log, the total,
 and the updated copy. Save the week under a key and load it back.
 
 ---
@@ -49,8 +51,10 @@ and the updated copy. Save the week under a key and load it back.
 Your rota is an array of plants, each `{ name, ml, watered }`. Write `totalWater`
 (returns the total millilitres), `label` (takes one plant, returns its `"name — ml ml"`
 label), and `waterOne` (takes the rota and a name, marks that plant's `watered` as true
-on its own copy, and returns the copy without changing the original). Print the labels,
-the total, and the watered copy. Save the rota under a key and load it back.
+on its own copy, and returns the copy without changing the original). Keep a `const`
+for the watering can's size in millilitres (pick a number) and print whether one fill
+is enough for the total. Print the labels, the total, and the watered copy. Save the
+rota under a key and load it back.
 
 ---
 
@@ -61,7 +65,8 @@ the total, and the watered copy. Save the rota under a key and load it back.
   spread.** 3.7.19 named the others without teaching them; anything outside that list goes
   past the chapter.
 - **Header comment:** Problem, Partners = N/A, Date.
-- **Limit** as a `const`.
+- **Limit** (the budget, weekly goal or can size your problem names) as a `const`, and
+  used: print whether the total is over, reaches, or fits it.
 - At least one `console.log` that reports a result.
 - **`typeof`** for one value.
 - **No Run button.** Three tries; your best one counts.
