@@ -92,7 +92,7 @@ for (const id of readdirSync(lessonsDir).sort()) {
 const pseudocode = {};
 if (existsSync(pseudoDir)) {
   for (const f of readdirSync(pseudoDir).sort()) {
-    if (!f.endsWith('.md')) continue;
+    if (!f.endsWith('.md') || f === 'README.md') continue;
     const id = f.slice(0, -3);
     if (!known.has(id)) {
       errors.push(`pa-pseudocode/${f}: no lesson called ${id}`);

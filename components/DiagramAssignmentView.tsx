@@ -207,9 +207,11 @@ export default function DiagramAssignmentView({
     // Structure-only lesson: the checks are the whole grade.
     if (!config.aiGrader) {
       const passedCount = results.filter((r) => r.passed).length;
-      await recordLessonCompleted(lessonId, capped ? bestOf(passedCount) : 0);
       if (progress.authed) {
-        recordSubmission({
+        // Record the try BEFORE completing the part: on a capped part the server
+        // derives the stored best from the counted rows, so completing first
+        // would leave the current try out of it.
+        await recordSubmission({
           lessonId,
           response: JSON.stringify(doc),
           gradeJson: { structural: results },
@@ -223,6 +225,7 @@ export default function DiagramAssignmentView({
         saveDraft(lessonId, JSON.stringify(doc));
         if (capped) cap.spend();
       }
+      await recordLessonCompleted(lessonId, capped ? bestOf(passedCount) : 0);
       // A capped part stays on the page so the student can use their other tries.
       if (!capped) setTimeout(() => navigateToNextLesson(lessonId), 1200);
       return;
