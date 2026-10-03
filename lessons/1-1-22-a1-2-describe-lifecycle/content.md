@@ -1,4 +1,4 @@
-Write your response in the box below. Describe the four framework activities in your own words, walk a real product you use through all four phases, then line them up against the five-phase naming. Every criterion in the rubric below must be met for the lesson to count as complete.
+Write your response in the box below. Describe the four framework activities in your own words, walk a real product you use through all four phases, then line them up against the five-phase naming. Aim to cover every criterion in the rubric below; the lesson counts as complete once the grader finds at least half of them met, and you can revise and resubmit as many times as you like.
 
 ---
 
