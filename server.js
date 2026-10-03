@@ -330,6 +330,19 @@ app.prepare().then(() => {
   // re-implemented them would pass while the route was wrong). Only the SQL these
   // three routes issue is understood; anything else throws, which the handlers
   // that wrap it already tolerate (the due-date lookup).
+  // The teacher's per-class release (migrations/0032_solution_releases.sql). The dev
+  // server has no teacher UI for it, so a test sets it here: POST
+  // /api/dev/solution-release { lessonId, releaseAt } (epoch ms; omit or null to take
+  // it back). Absent = not released, as in production.
+  const devReleases = [];
+  server.post('/api/dev/solution-release', express.json(), (req, res) => {
+    const { lessonId, releaseAt } = req.body || {};
+    if (typeof lessonId !== 'string') return res.status(400).json({ error: 'lessonId required' });
+    const i = devReleases.findIndex((r) => r.lessonId === lessonId);
+    if (i >= 0) devReleases.splice(i, 1);
+    if (typeof releaseAt === 'number') devReleases.push({ lessonId, releaseAt });
+    res.json({ ok: true, releases: devReleases });
+  });
   const devDb = (email) => ({
     prepare(sql) {
       let args = [];
@@ -347,6 +360,11 @@ app.prepare().then(() => {
               }))
               .sort((a, b) => a.submitted_at - b.submitted_at);
             return { results: rows };
+          }
+          if (/FROM class_solution_releases r\s+JOIN enrollments e/.test(sql)) {
+            // studentReleaseStatus: the dev student is enrolled in one dev class, and
+            // devReleases (set through POST /api/dev/solution-release) are its rows.
+            return { results: devReleases.map((r) => ({ class_id: 'dev-class', scope: 'lesson', scope_id: r.lessonId, release_at: r.releaseAt })) };
           }
           if (/FROM enrollments e JOIN classes c/.test(sql)) {
             // mayReadAnswer's enrollment check: the dev student is treated as
