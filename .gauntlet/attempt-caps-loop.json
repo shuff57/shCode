@@ -205,6 +205,17 @@
         "no blind judge round was run on phase 4 (a fork cannot spawn agents): the lead should run the student lenses on one chapter test",
         "the committed ai-graders/quiz-keys/module-docs generated files go stale between commits; consider gitignoring them like solutions.generated.ts (prebuild and npm test regenerate)"
       ]
+    },
+    "round3": {
+      "status": "fixing",
+      "findings": [
+        "1 HIGH: POST /api/lesson-state completed on a capped part with no counted row stores score NULL; lessonPercent(completed,null,max) = 100, so a student who never sat the part grades 100% (and one with only free marker rows). test-attempt-reveal asserts that no-score state, locking the bug in.",
+        "2 HIGH: capped variant quiz stores correct-of-own-form (8) but lessons-manifest maxScore counts every variant question (18): a perfect paper grades 44%. Before the feature a summative quiz completed with no score = 100%.",
+        "3 MEDIUM: grade-written returns raw model output (raw.slice(0,500)) on its empty-result branches (stream and non-stream) and records no try: a crafted answer makes the model emit JSON with the rubric in it, and every non-answer is a free feedback probe (30/day is not a cap).",
+        "4 MEDIUM-LOW: the browser can post any {gradingFailed:true} marker on a capped part (quiz/client kinds included) before the cap: free extra rows that reach the review queue as manual-grade work, turn the gradebook cell pending, and let the teacher override write lesson_state.score.",
+        "L1 LOW: DELETE /api/lesson-state/<id> by the student erases a teacher hand grade on a marker row; re-completing then falls back to counted best or NULL (=100%).",
+        "L2 LOW: quiz-redact treats a chart as summative only by diagram.summative; a chart with diagram.summative true whose aiGrader lacks summative would ship prompt/rubric. No lesson is set up that way; nothing checks it stays so."
+      ]
     }
   },
   "phase5_todo": [
