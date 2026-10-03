@@ -28,7 +28,7 @@
       "hints": [
         "Width and depth already read 40 — that's fine, those are the numbers you want. Height reads 20; type 30 to change it.",
         "Each field has a slider above it and a number box below it. Click the number box and type to change it exactly.",
-        "Click inside the height field before typing. Pressing Enter with the Box button still highlighted adds a second box, and the Quest will say it found a box 91.5 wide."
+        "Click inside the height field before typing. Pressing Enter with the Box button still highlighted adds a second box (Box 2). If that happens, delete Box 2 from the timeline and edit Box 1 again."
       ]
     },
     {
