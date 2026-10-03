@@ -41,10 +41,10 @@
     {
       "id": "s4",
       "title": "Drive with WASD",
-      "instructions": "In draw(), use kb.pressing('a') / kb.pressing('d') to drive the car: either set chassis.vel.x (positive = right, negative = left, 0 = stop) or set each wheel's .angularVelocity. The grader looks for an assignment to .vel.x or .angularVelocity.",
+      "instructions": "In draw(), use kb.pressing('a') / kb.pressing('d') to set chassis.vel.x (positive = right, negative = left, 0 = stop). The grader looks for an assignment to .vel.x (or an applyForce call).",
       "hints": [
         "Open the Input docs chapter for kb.pressing. Don't use arrow keys: they scroll the editor.",
-        "vel.x sets horizontal velocity directly each frame; angularVelocity spins a wheel so friction pushes the car along."
+        "vel.x sets horizontal velocity directly each frame; the wheels will roll from friction as the chassis moves. Spinning the wheels alone does not move the car."
       ]
     }
   ],
@@ -103,10 +103,10 @@
     {
       "id": "r6",
       "title": "Drives the car",
-      "description": "Assign to a sprite's .vel.x (or a wheel's .angularVelocity) to move the car. Help: 5.1.15 (Velocity: vel.x and vel.y)",
+      "description": "Assign to the chassis's .vel.x (or call applyForce on it) to move the car. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.(?:vel\\.x|angularVelocity)\\s*=",
+      "pattern": "\\.vel\\.x\\s*[-+]?=(?!=)|\\.applyForce\\s*\\(",
       "flags": "",
       "points": 0
     }

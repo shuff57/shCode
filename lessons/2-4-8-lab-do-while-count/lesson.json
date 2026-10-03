@@ -31,7 +31,7 @@
       "description": "A do...while loop logs and increments a counter up through 5. Help: 2.4.5 (The do...while Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "do\\s*\\{(?=[^}]*console\\.log)(?=[^}]*(?:\\+\\+|\\+=\\s*1|=\\s*[A-Za-z_$]\\w*\\s*\\+\\s*1))[^}]*\\}\\s*while\\s*\\(\\s*\\(?\\s*[A-Za-z_$]\\w*\\s*(?:<=\\s*5|<\\s*6)\\s*\\)?\\s*\\)",
+      "pattern": "do\\s*\\{(?=[^}]*console\\.log)(?=[^}]*(?:\\+\\+|\\+=\\s*1|=\\s*[A-Za-z_$]\\w*\\s*\\+\\s*1))[^}]*\\}\\s*while\\s*\\(\\s*\\(?\\s*[A-Za-z_$]\\w*\\s*(?:<=\\s*5|<\\s*[56])\\s*\\)?\\s*\\)",
       "flags": "i",
       "points": 0
     },

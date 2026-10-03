@@ -59,7 +59,7 @@
       "description": "A comment naming precedence, order of operations, or that multiplication happens first. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?://|/\\*)[^\\n]*(?:precedence|priorit\\w*|order of operations|pemdas|bodmas|bidmas|bedmas|(?:multipl\\w*|times|\\*)[^\\n]*(?:first|before)|(?:brackets?|parenthes\\w*)[^\\n]*(?:first|change|before)|(?:change|first|before)[^\\n]*(?:brackets?|parenthes\\w*))",
+      "pattern": "//[^\\n]*(?:precedence|priorit\\w*|order of operations|pemdas|bodmas|bidmas|bedmas|(?:multipl\\w*|times)[^\\n]*(?:first|before)|(?:brackets?|parenthes\\w*)[^\\n]*(?:first|change|before)|(?:change|first|before)[^\\n]*(?:brackets?|parenthes\\w*)|\\*[^\\n]*(?:first|before))|/\\*[\\s\\S]*?(?:precedence|priorit\\w*|order of operations|pemdas|bodmas|bidmas|bedmas|(?:multipl\\w*|times)[^\\n]*(?:first|before)|(?:brackets?|parenthes\\w*)[^\\n]*(?:first|change|before)|(?:change|first|before)[^\\n]*(?:brackets?|parenthes\\w*))[\\s\\S]*?\\*/",
       "flags": "i",
       "stripComments": false,
       "points": 0

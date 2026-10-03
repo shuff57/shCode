@@ -61,7 +61,7 @@
     },
     {
       "id": "r3",
-      "title": "Bug 3 — the price list is wrong",
+      "title": "Bug 3 — the receipt lines are wrong",
       "description": "The arrow's block body returns the built string. Help: 3.4.6 (Arrow Functions)",
       "type": "regex",
       "file": "script.js",

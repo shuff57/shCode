@@ -56,7 +56,7 @@
       "description": "The test function parameter is called inside the helper. Help: 3.4.11 (Passing a Function to a Function)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\(?\\s*\\w+\\s*\\(",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*(\\w+)\\s*\\)[\\s\\S]*?\\b\\1\\s*\\(",
       "flags": "i",
       "points": 0
     },

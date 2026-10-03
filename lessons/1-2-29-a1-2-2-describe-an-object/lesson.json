@@ -99,7 +99,7 @@
       "description": "Logs the type of at least one variable; the typeof may be labelled or stored in a variable first. Help: 1.2.23 (The typeof Operator)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\([^;]*\\btypeof\\s|(?:let|const|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*typeof\\s",
+      "pattern": "console\\.log\\s*\\([^;]*\\btypeof\\s*\\(?\\s*[A-Za-z_$]|(?:let|const|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*typeof\\s*\\(?\\s*[A-Za-z_$]",
       "flags": "",
       "points": 0
     }

@@ -15,19 +15,23 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Create an array"
+      "title": "Create an array",
+      "instructions": "Declare an array called fruits with at least three items, written in square brackets."
     },
     {
       "id": "s2",
-      "title": "Add and remove elements"
+      "title": "Add and remove elements",
+      "instructions": "Add one more item to the end of the array with push, then remove one item with pop."
     },
     {
       "id": "s3",
-      "title": "Iterate with a loop"
+      "title": "Iterate with a loop",
+      "instructions": "Use a for loop to visit every item in the array and log each one."
     },
     {
       "id": "s4",
-      "title": "Search with a loop"
+      "title": "Search with a loop",
+      "instructions": "Write a loop that compares each item to the one you want with ===, and log whether it was found."
     }
   ],
   "requirements": [

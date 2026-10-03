@@ -54,7 +54,7 @@
       "description": "Declares gradeReport built from the other two. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?=[\\s\\S]*\\bgradeReport\\s*=)(?=[\\s\\S]*(?:subjectName[^;]*finalGrade|finalGrade[^;]*subjectName))[\\s\\S]*",
+      "pattern": "\\bgradeReport\\s*=\\s*(?:(?!;|\\n[ \\t]*(?:let|const|var|console)\\b)[\\s\\S])*?(?:subjectName\\b(?:(?!;|\\n[ \\t]*(?:let|const|var|console)\\b)[\\s\\S])*?finalGrade\\b|finalGrade\\b(?:(?!;|\\n[ \\t]*(?:let|const|var|console)\\b)[\\s\\S])*?subjectName\\b)",
       "flags": "",
       "points": 0
     },
@@ -84,7 +84,7 @@
       "description": "Declares totalPay as hoursWorked times hourlyRate. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?=[\\s\\S]*\\btotalPay\\s*=)(?=[\\s\\S]*(?:hoursWorked[^;]*hourlyRate|hourlyRate[^;]*hoursWorked))[\\s\\S]*",
+      "pattern": "\\btotalPay\\s*=\\s*(?:(?!;|\\n[ \\t]*(?:let|const|var|console)\\b)[\\s\\S])*?(?:hoursWorked\\b(?:(?!;|\\n[ \\t]*(?:let|const|var|console)\\b)[\\s\\S])*?hourlyRate\\b|hourlyRate\\b(?:(?!;|\\n[ \\t]*(?:let|const|var|console)\\b)[\\s\\S])*?hoursWorked\\b)",
       "flags": "",
       "points": 0
     },

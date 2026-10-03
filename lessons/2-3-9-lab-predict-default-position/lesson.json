@@ -47,18 +47,18 @@
     },
     {
       "id": "r3",
-      "title": "default written before a later case",
-      "description": "The second switch writes default (with a console.log) before its last case label",
+      "title": "default written before a case in the second switch",
+      "description": "The second switch writes default (with a console.log) before one of its case labels.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "default\\s*:\\s*console\\.log[^{}]*?\\bcase\\s",
+      "pattern": "switch\\s*\\(\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\)\\s*\\{[\\s\\S]*switch\\s*\\(\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\)\\s*\\{(?:[^{}]|\\$\\{[^}]*?\\})*default\\s*:\\s*console\\.log(?:[^{}]|\\$\\{[^}]*?\\})*\\bcase\\s",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r4",
-      "title": "break present",
-      "description": "Code contains a break statement",
+      "title": "at least three breaks",
+      "description": "Code contains at least three break statements (the A and B cases of the first switch, and a case in the second).",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:\\bbreak\\b[\\s\\S]*){3}",

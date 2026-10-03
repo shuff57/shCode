@@ -84,7 +84,7 @@
       "description": "Your sketch uses a SliderJoint, a HingeJoint chain (3+ linked sprites, a loop of new HingeJoint(prev, curr) counts), or a trebuchet combining DistanceJoint and HingeJoint.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+SliderJoint\\s*\\(|new\\s+HingeJoint\\s*\\([^)]+\\)[^]*new\\s+HingeJoint\\s*\\(|new\\s+DistanceJoint\\s*\\([^)]*\\)[^]*new\\s+HingeJoint\\s*\\(|new\\s+HingeJoint\\s*\\([^)]*\\)[^]*new\\s+DistanceJoint\\s*\\(|(?:for|while)\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?new\\s+HingeJoint\\s*\\(",
+      "pattern": "new\\s+SliderJoint\\s*\\(|new\\s+HingeJoint\\s*\\([^)]+\\)[^]*new\\s+HingeJoint\\s*\\(|new\\s+DistanceJoint\\s*\\([^)]*\\)[^]*new\\s+HingeJoint\\s*\\(|new\\s+HingeJoint\\s*\\([^)]*\\)[^]*new\\s+DistanceJoint\\s*\\(|(?:for|while)\\s*\\([^)]*\\)\\s*\\{[^}]*new\\s+HingeJoint\\s*\\(",
       "flags": "",
       "points": 0
     }

@@ -53,7 +53,7 @@
     {
       "id": "r3",
       "title": "checks for NaN",
-      "description": "Code checks the converted value with Number.isNaN. Help: 2.5.4 (try...catch: Attempt and Recover)",
+      "description": "Code checks the converted value with Number.isNaN(...) or isNaN(...). Help: 2.5.4 (try...catch: Attempt and Recover)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:Number\\.)?isNaN\\(",

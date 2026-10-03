@@ -87,8 +87,8 @@
     },
     {
       "id": "r7",
-      "title": "break present",
-      "description": "Code contains a break statement. Help: 2.3.3 (switch Statements)",
+      "title": "four breaks, one per case",
+      "description": "Code contains four break statements, one for each of the S, M, L and XL cases. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:\\bbreak\\b[\\s\\S]*){4}",

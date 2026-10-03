@@ -167,7 +167,7 @@
       "description": "The program prints the type of at least one of its values. Help: 1.2.23 (The typeof Operator)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "typeof\\s+[A-Za-z_$]",
+      "pattern": "typeof\\s*\\(?\\s*[A-Za-z_$]",
       "flags": "",
       "points": 0,
       "hint": "console.log(typeof costPerSlice); -- 1.2.23. Say what type your computed value actually is."

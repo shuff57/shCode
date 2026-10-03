@@ -68,10 +68,10 @@
     {
       "id": "r2",
       "title": "Asteroids have velocity",
-      "description": "Give each asteroid its own velocity: assign .vel.x / .vel.y right after you spawn it (or set it from random), or set it as a Group default. The ship's own velocity does not count. Help: 5.1.15 (Velocity: vel.x and vel.y)",
+      "description": "Give each asteroid its own velocity: assign .vel.x / .vel.y on the sprite you just spawned (or on each asteroid in a loop), or set it from random. Set it on the sprite, not on the Group (a Group has no .vel). The ship's own velocity does not count. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+\\w+\\.Sprite\\s*\\([^;]*;[\\s\\S]{0,200}?\\.(?:vel\\.[xy]|speed)\\s*=|\\.vel\\.[xy]\\s*=\\s*[^;\\n]*random|\\b(?!ship\\b|player\\b)\\w*[Aa]steroid\\w*\\.(?:vel\\.[xy]|speed)\\s*=",
+      "pattern": "(?:let|const|var)?\\s*(\\w+)\\s*=\\s*new\\s+\\w+\\.Sprite\\s*\\([^;]*;[\\s\\S]{0,300}?\\b\\1\\.(?:vel\\.[xy]|speed)\\s*=|for\\s*\\(\\s*(?:let|const|var)\\s+(\\w+)\\s+of\\s+[^)]*\\)\\s*\\{?[\\s\\S]{0,200}?\\b\\2\\.(?:vel\\.[xy]|speed)\\s*=|\\.vel\\.[xy]\\s*=\\s*[^;\\n]*random|\\w*[Aa]steroid\\w*\\[[^\\]]*\\]\\.(?:vel\\.[xy]|speed)\\s*=",
       "flags": "",
       "points": 0
     },

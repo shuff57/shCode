@@ -47,8 +47,8 @@
     },
     {
       "id": "r3",
-      "title": "break present",
-      "description": "Code contains at least one break statement. Help: 2.3.3 (switch Statements)",
+      "title": "at least two breaks",
+      "description": "Code contains at least two break statements (the second and third cases each end in one). Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:\\bbreak\\b[\\s\\S]*){2}",

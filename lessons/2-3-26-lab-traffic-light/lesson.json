@@ -77,8 +77,8 @@
     },
     {
       "id": "r6",
-      "title": "break present",
-      "description": "Code contains a break statement. Help: 2.3.3 (switch Statements)",
+      "title": "three breaks, one per case",
+      "description": "Code contains three break statements, one for each of the green, yellow and red cases. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:\\bbreak\\b[\\s\\S]*){3}",

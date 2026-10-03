@@ -57,8 +57,8 @@
     },
     {
       "id": "r4",
-      "title": "break present",
-      "description": "Code contains a break statement",
+      "title": "at least two breaks, one per case",
+      "description": "Code contains at least two break statements, one after each case body.",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:\\bbreak\\b[\\s\\S]*){2}",

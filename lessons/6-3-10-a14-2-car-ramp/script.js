@@ -20,6 +20,6 @@ function draw() {
   background('#222');
 
   // STEP 4: WASD-driven car: read WASD with kb.pressing and set
-  // chassis.vel.x, or set each wheel's angularVelocity.
+  // chassis.vel.x (spinning the wheels alone does not move the car).
 
 }

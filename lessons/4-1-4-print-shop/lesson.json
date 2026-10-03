@@ -153,7 +153,7 @@
       "description": "A console.log that prints one formatted line combining at least two things you calculated (joined with +, a template string, or comma-separated arguments). Help: 1.2.15 (Greeting with Backticks)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\([^;]*\\+[^;]*\\+[^;]*\\)|console\\.log\\s*\\((?:[^\\n,]*,){2,}[^\\n]*\\)|console\\.log\\s*\\(\\s*`[^`]*\\$\\{[^}]+\\}[^`]*\\$\\{[^}]+\\}",
+      "pattern": "console\\.log\\s*\\((?:(?:\"[^\"\\n]*\"|'[^'\\n]*')|[^;\"'`])*\\+(?:(?:\"[^\"\\n]*\"|'[^'\\n]*')|[^;\"'`])*\\+(?:(?:\"[^\"\\n]*\"|'[^'\\n]*')|[^;\"'`])*\\)|console\\.log\\s*\\((?:\\s*(?:\"[^\"\\n]*\"|'[^'\\n]*')\\s*,)*\\s*[A-Za-z_$][^,\"'\\n]*,(?:\\s*(?:\"[^\"\\n]*\"|'[^'\\n]*')\\s*,)*\\s*[A-Za-z_$][^,\"'\\n]*(?:,[^\\n]*)?\\)|console\\.log\\s*\\(\\s*`[^`]*\\$\\{[^}]+\\}[^`]*\\$\\{[^}]+\\}",
       "flags": "",
       "points": 0
     },
