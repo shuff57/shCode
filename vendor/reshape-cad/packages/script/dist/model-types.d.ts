@@ -829,6 +829,17 @@ export declare function newMirror(doc: ModelDoc, target: string, plane: SketchPl
  * deliberately ignores that.
  */
 export declare function extentAlong(doc: ModelDoc, featureId: string, axis: Axis3): number | null;
+/**
+ * An UPPER BOUND on how far the named feature's solid reaches along one axis,
+ * for a hole that has to go all the way through. A bound is enough: the drill
+ * starts at the top face, so a hole deeper than the part cuts only air. Unlike
+ * extentAlong() (a default-picker that deliberately ignores patterns and
+ * mirrors) this refuses to guess: it returns null for anything it cannot
+ * bound -- a rotated primitive, a pattern/mirror/move-copy, an extrude,
+ * revolve, blend or combine -- so hole() can say so instead of drilling a
+ * blind 10 mm hole the student never asked for.
+ */
+export declare function throughExtentAlong(doc: ModelDoc, featureId: string, axis: Axis3): number | null;
 export declare function newPattern(doc: ModelDoc, target: string, mode?: 'linear' | 'circular'): PatternFeature;
 /** center: [0, 0, 0] is not world zero -- see HoleFeature.center. It is "no
  *  offset," so the kernel (lib/occt-build.ts) reads it against the TARGET's

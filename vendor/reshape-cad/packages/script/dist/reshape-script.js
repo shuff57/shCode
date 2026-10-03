@@ -36,7 +36,7 @@
 // line 3 is reported at line 6, regardless of how many lines <source> has
 // or what's in it. LINE_OFFSET encodes that gap in one place rather than as
 // a magic number wherever a stack is parsed.
-import { nextId, newShape, newHole, newHoleCorners, newShell, newMove, newPattern, newSketch, RECTANGLE_CONSTRAINTS, newExtrude, newRevolve, newGroove, newPocket, newMirror, newBlend, extentAlong, isRoundable, canRotate, whyCannotRound, whyCannotOrbit, } from './model-types.js';
+import { nextId, newShape, newHole, newHoleCorners, newShell, newMove, newPattern, newSketch, RECTANGLE_CONSTRAINTS, newExtrude, newRevolve, newGroove, newPocket, newMirror, newBlend, extentAlong, throughExtentAlong, isRoundable, canRotate, whyCannotRound, whyCannotOrbit, } from './model-types.js';
 import { generatedParams, applyParam, pname } from './model-codegen.js';
 // addConstraintSettling is the SAME beginner-friendly settle a click on the
 // Rules panel runs through (components/model/SketchConstraints.tsx's own
@@ -1295,6 +1295,16 @@ export function runScript(source, opts = {}) {
             };
         }
     }
+    /** Depth for a hole with no deep: -- it must go THROUGH. Never a guess: a
+     *  shape whose thickness cannot be bounded is a script error, because the
+     *  old flat 10 mm default silently drilled a blind hole into thicker parts. */
+    function throughDepth(fn, target, axis) {
+        const extent = throughExtentAlong(docNow(), target.id, axis);
+        if (extent == null) {
+            throw new Error(`${fn}() cannot find how thick this ${findFeature(target.rootId).kind} is along ${axis} yet, so it cannot drill all the way through. Give it a depth: ${fn}(shape, { across: 4, deep: 20 }).`);
+        }
+        return extent + 2;
+    }
     function hole(target, opts) {
         if (!isHandle(target))
             throw new Error('hole() needs a shape to drill into: hole(shape, { across: 6 }).');
@@ -1310,8 +1320,7 @@ export function runScript(source, opts = {}) {
             base.depth = num(positiveNumber('hole', 'deep', extra.deep), base.id, 'depth');
         }
         else {
-            const extent = extentAlong(docNow(), target.id, axis);
-            base.depth = extent != null ? extent + 2 : 10;
+            base.depth = throughDepth('hole', target, axis);
         }
         base.center = center;
         applyRecess('hole', base, extra);
@@ -1337,8 +1346,7 @@ export function runScript(source, opts = {}) {
             base.depth = num(positiveNumber('holes', 'deep', extra.deep), base.id, 'depth');
         }
         else {
-            const extent = extentAlong(docNow(), target.id, axis);
-            base.depth = extent != null ? extent + 2 : 10;
+            base.depth = throughDepth('holes', target, axis);
         }
         base.center = center;
         base.corners = {
@@ -1395,6 +1403,9 @@ export function runScript(source, opts = {}) {
         return arg;
     }
     function bevel(arg, size) {
+        if (isHandle(arg)) {
+            throw new Error('bevel() of a whole shape is not supported yet -- chamfer one edge with bevel(shape.edge(faceA, faceB), size), or round the whole box or cylinder with fillet(shape, size).');
+        }
         if (!isTopoRef(arg) || arg.name.cause !== 'between') {
             throw new Error('bevel() needs one edge -- try bevel(shape.edge(faceA, faceB), size).');
         }
