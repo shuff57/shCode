@@ -171,6 +171,22 @@
         "schoolInstant rolls '2026-13-45' over into another day; the release route now refuses non-existent days (isRealDate). due/open routes still accept them (not touched)",
         "Intl short date reads 'Fri, Nov 6'; formatRelease builds 'Fri Nov 6, 3:00 PM' from parts"
       ]
+    },
+    "4": {
+      "status": "running",
+      "rounds": [
+        {
+          "round": 1,
+          "findings": [
+            "check-pa-attempts lists 10 lessons with no maxSubmissions: group builds 1-6-2/2-6-2/3-9-2, quizzes 1-7-1/2-7-1/3-10-1, written 1-7-2/1-7-5/3-10-2/3-10-5",
+            "GROUP BUILDS: a non-summative console part gates Submit on every requirement being green (LessonWorkspace canSubmitByWork). A try therefore only exists when the build is already fully green, so a cap of 3 changes nothing about WHAT a student can submit and the best score is already the maximum on try 1. kind is 'client' (deterministic; the browser's report is the only score, clamped). Decision: give them the cap anyway (spec table) and keep the gate; the cost is that a student who passed first time must submit twice more before the 3-try solution unlocks; recorded as a decision for the user, not hidden",
+            "stale text that contradicts the caps: 1-7-1 ('You submit once... locks'), 1-7-2 and 1-7-5 ('One submission. It locks, nothing comes back'), 3-10-5 ('You submit once; paper locks', 'One attempt'), 3-10-3 and 2-7-3 ('one sitting', 'Your teacher marks it'), and chart parts say 'the teacher grades the submitted chart'",
+            "quizzes: 2-7-1 already sets revealAfterSubmit; a capped quiz implies it (QuizView revealAfterSubmit = config || capped), so it is redundant but harmless and kept",
+            "dev stub in server.js does not know class_solution_releases, so capped parts error on the dev server",
+            "module docs 1.7/2.7/3.10 carry stale 'unlimited'/'one attempt' tables; 2.7 has two contradictory attempts tables"
+          ]
+        }
+      ]
     }
   },
   "phase5_todo": [
