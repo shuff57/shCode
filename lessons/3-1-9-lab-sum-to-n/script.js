@@ -1,4 +1,4 @@
-// 1.3.1h Sum 1 to N
+// 3.2.23 Sum 1 to N
 
 // STEP 1: Define a function called sumToN that takes one parameter: n.
 //         Inside the function, create a variable to hold the running total.

@@ -1,11 +1,11 @@
 {
   "id": "3-1-9-lab-sum-to-n",
-  "title": "3.1.16 Preview: Sum 1 to N",
+  "title": "3.2.23 Lab: Sum 1 to N",
   "description": "Define sumToN(n) that uses a for loop to add every integer from 1 to n and returns the total. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "3.1 Functions: Definition and Calls",
+  "unit": "3.2 Parameters and Return Values",
   "preview": "console",
   "week": 7,
   "slos": [
@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "sumToN defined",
-      "description": "Code defines a function named sumToN. Help: 3.1.2 (Defining & Calling a Function)",
+      "description": "Code defines a function named sumToN. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+sumToN\\s*\\(",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "for loop present",
-      "description": "Code contains a for loop. Help: 3.1.2 (Defining & Calling a Function)",
+      "description": "Code contains a for loop. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",

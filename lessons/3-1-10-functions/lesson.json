@@ -1,13 +1,13 @@
 {
   "id": "3-1-10-functions",
-  "title": "3.1.17 Preview: Functions with Parameters and Arrow Syntax",
+  "title": "3.4.21 Lab: Parameters, Return Values, and Arrow Syntax",
   "description": "Group code into reusable logic blocks with parameters and return values.",
   "type": "assignment",
   "estimateMins": 40,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "3.1 Functions: Definition and Calls",
+  "unit": "3.4 Function Expressions and Arrow Functions",
   "preview": "console",
-  "week": 7,
+  "week": 8,
   "slos": [
     "SLO-2",
     "SLO-6"
@@ -39,7 +39,7 @@
     {
       "id": "req1",
       "title": "greet function",
-      "description": "Declare a function called greet. Help: 3.1.2 (Defining & Calling a Function)",
+      "description": "Declare a function called greet. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+greet\\s*\\(",
@@ -59,7 +59,7 @@
     {
       "id": "req3",
       "title": "Arrow function",
-      "description": "Write an arrow function",
+      "description": "Write an arrow function. Help: 3.4.6 (Arrow Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "=>\\s*",
@@ -79,7 +79,7 @@
     {
       "id": "req5",
       "title": "Multiple functions",
-      "description": "Define at least 2 functions. Help: 3.1.2 (Defining & Calling a Function)",
+      "description": "Define at least 2 functions. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(function\\s+\\w+\\s*\\(.*?\\)\\s*\\{.*?){2,}",

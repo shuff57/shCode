@@ -3782,12 +3782,12 @@
     },
     {
       "id": "3-1-10-functions",
-      "title": "3.1.17 Preview: Functions with Parameters and Arrow Syntax",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.4.21 Lab: Parameters, Return Values, and Arrow Syntax",
+      "unit": "3.4 Function Expressions and Arrow Functions",
       "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7,
+      "week": 8,
       "assignmentCode": null,
       "maxScore": null,
       "scoreKind": null
@@ -3914,7 +3914,7 @@
     },
     {
       "id": "3-1-20-quiz",
-      "title": "3.1.18 Functions: Definition and Calls",
+      "title": "3.1.15 Functions: Definition and Calls",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "quiz",
       "type": "assignment",
@@ -4022,8 +4022,8 @@
     },
     {
       "id": "3-1-8-lab-findmax-iseven",
-      "title": "3.1.15 Preview: findMax & isEven",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.2.22 Lab: findMax & isEven",
+      "unit": "3.2 Parameters and Return Values",
       "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -4034,8 +4034,8 @@
     },
     {
       "id": "3-1-9-lab-sum-to-n",
-      "title": "3.1.16 Preview: Sum 1 to N",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.2.23 Lab: Sum 1 to N",
+      "unit": "3.2 Parameters and Return Values",
       "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -4274,7 +4274,7 @@
     },
     {
       "id": "3-2-22-parameters-return-quiz",
-      "title": "3.2.22 Parameters and Return Values",
+      "title": "3.2.24 Parameters and Return Values",
       "unit": "3.2 Parameters and Return Values",
       "preview": "quiz",
       "type": "assignment",
@@ -4718,7 +4718,7 @@
     },
     {
       "id": "3-4-21-arrow-functions-quiz",
-      "title": "3.4.21 Function Expressions and Arrow Functions",
+      "title": "3.4.22 Function Expressions and Arrow Functions",
       "unit": "3.4 Function Expressions and Arrow Functions",
       "preview": "quiz",
       "type": "assignment",

@@ -7,4 +7,10 @@ for (let i = 0; i < fruits.length; i++) {
   console.log(fruits[i]);
 }
 
-console.log(fruits.includes("banana"));
+let found = false;
+for (let i = 0; i < fruits.length; i++) {
+  if (fruits[i] === "banana") {
+    found = true;
+  }
+}
+console.log(found);

@@ -1,7 +1,7 @@
 {
   "id": "3-2-7-lab-rectangle-area",
   "title": "3.2.7 Lab: findRectangleArea (multi-parameter)",
-  "description": "Define findRectangleArea(width, height) that returns the area, then call it and log the result. Auto-graded.",
+  "description": "Define findRectangleArea(width, height) that works out the area and prints it, then call it twice. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -19,13 +19,13 @@
     },
     {
       "id": "s2",
-      "title": "Return the area",
-      "instructions": "Inside the function, hand back the area by returning width multiplied by height. Use return, not console.log, so the caller receives a number."
+      "title": "Print the area",
+      "instructions": "Inside the function, multiply width by height and print the answer with console.log, for example \"Area: 12\"."
     },
     {
       "id": "s3",
-      "title": "Call it and log the result",
-      "instructions": "Call findRectangleArea with two numbers, store or pass the result, and use console.log to print it. Try a second call with different numbers."
+      "title": "Call it twice",
+      "instructions": "Call findRectangleArea with two numbers, then call it again with two different numbers. Each call prints its own area."
     }
   ],
   "requirements": [
@@ -51,22 +51,22 @@
     },
     {
       "id": "r3",
-      "title": "returns a value",
-      "description": "Code contains a return statement. Help: 3.2.2 (Parameters & Return Values)",
+      "title": "prints the area",
+      "description": "The function body prints with console.log. Help: 3.2.3 (Passing Information In)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "return\\s",
+      "pattern": "function\\s+findRectangleArea\\s*\\([^)]*\\)\\s*\\{[^}]*console\\.log\\s*\\(",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r4",
-      "title": "result is logged",
-      "description": "Code calls console.log. Help: 3.2.2 (Parameters & Return Values)",
+      "title": "called with two numbers",
+      "description": "findRectangleArea is called with two arguments. Help: 3.2.5 (Parameters and Arguments)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(",
-      "flags": "i",
+      "pattern": "^\\s*findRectangleArea\\s*\\(\\s*[\\w.]+\\s*,\\s*[\\w.]+\\s*\\)",
+      "flags": "im",
       "points": 0
     }
   ],

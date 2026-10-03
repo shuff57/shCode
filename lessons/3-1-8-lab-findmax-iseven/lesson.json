@@ -1,11 +1,11 @@
 {
   "id": "3-1-8-lab-findmax-iseven",
-  "title": "3.1.15 Preview: findMax & isEven",
-  "description": "A look ahead at Module 3.2: define two functions, findMax(a, b) and isEven(n), that take parameters and return a value. Auto-graded.",
+  "title": "3.2.22 Lab: findMax & isEven",
+  "description": "Define two functions, findMax(a, b) and isEven(n), that take parameters and return a value. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "3.1 Functions: Definition and Calls",
+  "unit": "3.2 Parameters and Return Values",
   "preview": "console",
   "week": 7,
   "slos": [
@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "findMax defined",
-      "description": "Code defines a function named findMax. Help: 3.1.2 (Defining & Calling a Function)",
+      "description": "Code defines a function named findMax. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+findMax\\s*\\(",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "isEven defined",
-      "description": "Code defines a function named isEven. Help: 3.1.2 (Defining & Calling a Function)",
+      "description": "Code defines a function named isEven. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+isEven\\s*\\(",

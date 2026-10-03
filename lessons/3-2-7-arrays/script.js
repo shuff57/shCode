@@ -10,5 +10,6 @@
 // Step 3: Visit every item in the array in turn
 //         and log each item.
 
-// Step 4: Search the array for one particular item.
-//         Log whether the item was found.
+// Step 4: Search the array for one particular item. Inside a loop,
+//         compare each item to the one you want with ===, and log
+//         whether it was found.
