@@ -18,6 +18,17 @@
             "npm_test": "4 failures, all pre-existing reshape tooling reading files that no longer exist or moved: test-sketch-arc, test-sketch-outline, check-constraint-ui (missing studio/src/model files), check-docs-prose (7 pages still teaching the real API)"
           },
           "status": "gate not green: waiting on human approval to push and deploy"
+        },
+        {
+          "round": 2,
+          "gate": {
+            "push": "cs-3d dac36d80",
+            "deploy": "99a08b67 (Production, cs-3d); check-ai-grader-leak --require-build ok",
+            "origin_ai-graders.json": "404 (cache-busted request, and the deployment URL)",
+            "edge_cache_alias": "shcode.pages.dev/ai-graders.json still 200 from CDN cache (s-maxage=604800, age ~1460s); needs purge or expiry",
+            "git_integration_build_b8dc8041": "Failure (the push also triggers a Cloudflare git build; it cannot copy the gitignored kernel wasm)"
+          },
+          "status": "origin fixed; edge cache still serving the old file"
         }
       ]
     },
