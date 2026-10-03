@@ -67,3 +67,7 @@ _workspace/
 # build time, never committed. The gate fails open when absent (regex-only).
 public/models/
 .pii-guard-cache/
+
+# The grader prompts/rubrics are server-only (functions/_shared/ai-graders.generated.ts).
+# A public/ copy is downloadable by anyone, so never commit or serve one.
+public/ai-graders.json

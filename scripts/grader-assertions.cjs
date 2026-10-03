@@ -134,11 +134,16 @@ check('trust', !/buildPrompt\(body\)/.test(endpoint), 'endpoint passes the raw r
 check('trust', !/shapeResult\(parsed,\s*body\.rubric\)/.test(endpoint), 'endpoint shapes against the CLIENT rubric');
 check('trust', !/body\.model/.test(endpoint), 'endpoint still takes the model from the client');
 
-const graders = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '..', 'public', 'ai-graders.json'), 'utf8'),
-);
+// The graders live in a server-only module now (public/ai-graders.json was
+// fetchable by anyone). The generated file is `export const AI_GRADERS = <json>;`,
+// so lift the JSON literal out of it.
+const gradersTs = fs.readFileSync(
+  path.join(__dirname, '..', 'functions', '_shared', 'ai-graders.generated.ts'), 'utf8');
+const graders = JSON.parse(gradersTs.slice(gradersTs.indexOf('= {') + 2, gradersTs.lastIndexOf(';')));
 check('trust', Object.keys(graders).length === rubrics.length,
-  `ai-graders.json has ${Object.keys(graders).length} graders but the repo authors ${rubrics.length}`);
+  `ai-graders.generated.ts has ${Object.keys(graders).length} graders but the repo authors ${rubrics.length}`);
+check('trust', !fs.existsSync(path.join(__dirname, '..', 'public', 'ai-graders.json')),
+  'public/ai-graders.json exists: every grader prompt and rubric is downloadable without logging in');
 for (const [id, g] of Object.entries(graders)) {
   if (!g.prompt) check('trust', false, `${id}: published grader has no prompt`);
   if (!Array.isArray(g.rubric) || !g.rubric.length) check('trust', false, `${id}: published grader has no rubric`);

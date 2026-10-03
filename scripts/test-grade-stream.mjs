@@ -115,6 +115,26 @@ try {
     { cwd: root, stdio: 'pipe' },
   );
   writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
+  // loadAiGrader reads the bundled ai-graders.generated module (it is not a
+  // fetchable asset any more), so replace the compiled one with a single test
+  // grader BEFORE the Function below is imported: the import pulls it in.
+  writeFileSync(
+    path.join(out, 'functions', '_shared', 'ai-graders.generated.js'),
+    'Object.defineProperty(exports, "__esModule", { value: true });\nexports.AI_GRADERS = ' +
+      JSON.stringify({
+        'test-lesson': {
+          lessonTitle: 'Test lesson',
+          prompt: 'Explain two things.',
+          rubric: [
+            { id: 'a', title: 'First thing', description: '', points: 0 },
+            { id: 'b', title: 'Second thing', description: '', points: 0 },
+          ],
+          model: 'stub-model',
+          contextDocs: [],
+        },
+      }) +
+      ';\n',
+  );
 
   const modPath = path.join(out, 'functions', 'api', 'grade-written.js');
   const { onRequestPost, onRequestGet } = await import('file://' + modPath.split(path.sep).join('/'));
@@ -124,17 +144,7 @@ try {
     { id: 'b', title: 'Second thing', description: '', points: 0 },
   ];
 
-  // Minimal fakes for the bits the Function reaches for. loadAiGrader reads
-  // through env.ASSETS, so serve the generated graders file from memory.
-  const graderJson = JSON.stringify({
-    'test-lesson': {
-      lessonTitle: 'Test lesson',
-      prompt: 'Explain two things.',
-      rubric: RUBRIC,
-      model: 'stub-model',
-      contextDocs: [],
-    },
-  });
+  // Minimal fakes for the bits the Function reaches for.
 
 
   function makeEnv({
@@ -146,15 +156,13 @@ try {
       OLLAMA_API_KEY: cloudKey,
       OLLAMA_HOST: host,
       GRADE_WRITTEN_DAILY_LIMIT: '30',
-      // Both loadAiGrader and isLessonAccessible read static JSON through
-      // env.ASSETS, so the stub has to route by pathname -- handing the
-      // graders file to the manifest fetch makes the access gate throw.
+      // isLessonAccessible reads the lessons manifest through env.ASSETS.
       ASSETS: {
         fetch: async (req) => {
           const p = new URL(typeof req === 'string' ? req : req.url).pathname;
           const body = p.includes('lessons-manifest')
             ? JSON.stringify({ lessons: [{ id: 'test-lesson', title: '1.1.1 Test lesson' }] })
-            : graderJson;
+            : '{}';
           return new Response(body, { headers: { 'Content-Type': 'application/json' } });
         },
       },
