@@ -62,7 +62,10 @@ function isSummativeAiGrader(cfg: AiGraderConfig | undefined): boolean {
 
 /** True when this diagram's grader config must not reach the browser. */
 function isSummativeDiagramAiGrader(cfg: DiagramConfig | undefined): boolean {
-  return !!cfg?.summative;
+  // The grader's own `summative` counts too: a group chart keeps its structural
+  // gate (the diagram is not `summative`, so Build opens only on a green chart)
+  // but its AI grading brief is still a key and must not ship to the browser.
+  return !!cfg?.summative || !!cfg?.aiGrader?.summative;
 }
 
 /** True when a lesson's requirements contain the answer key for a summative assessment. */

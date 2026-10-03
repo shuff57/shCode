@@ -57,7 +57,9 @@
         "points": 0
       }
     ],
-    "summative": false
+    "summative": true,
+    "revisable": true,
+    "maxSubmissions": 3
   },
   "grading": {
     "totalPoints": 0,

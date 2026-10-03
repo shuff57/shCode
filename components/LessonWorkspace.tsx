@@ -7,9 +7,10 @@ import { useLessonStore, flattenFiles } from '../lib/store';
 import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
-import { recordSubmission } from '../lib/written-grader-store';
+import { recordSubmission, streamGrade } from '../lib/written-grader-store';
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
+import AiGradeResultPanel, { type AiGradeResultData } from './AiGradeResultPanel';
 import { useAttemptCap } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { grade } from '../lib/grader';
@@ -141,6 +142,15 @@ export default function LessonWorkspace({
   const lessonProgress = useLessonState();
   const cap = useAttemptCap(lesson.id, lesson.grading?.maxSubmissions, lessonProgress.authed);
   const capped = cap.max !== null;
+  // A graded test part that is marked by the AI instead of by requirement patterns
+  // (the find-and-fix parts: nothing scores them on the server). The browser sends
+  // the student's file to /api/grade-written, which holds the rubric and is the
+  // source of the score; see .gauntlet/SPEC-attempt-caps.md.
+  const aiGraded = !!(lesson.grading?.summative && lesson.aiGrader);
+  const [aiResult, setAiResult] = useState<AiGradeResultData | null>(null);
+  const [aiGrading, setAiGrading] = useState(false);
+  const [aiStage, setAiStage] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
   const [gradeReport, setGradeReport] = useState<GradeReportType | null>(null);
   // Set true when an admin/teacher inserts the reference solution; pauses
   // localStorage autosave so their progress record stays clean. Cleared by
@@ -618,7 +628,60 @@ export default function LessonWorkspace({
     }
   };
 
+  const runAiGrade = async () => {
+    if (!lesson.aiGrader || aiGrading || cap.unknown || cap.reached) return;
+    setAiGrading(true);
+    setAiError(null);
+    setAiResult(null);
+    try {
+      const code = useLessonStore.getState().fileContents['script.js'] || '';
+      const { status, data } = await streamGrade(
+        {
+          lessonId: lesson.id,
+          lessonTitle: lesson.title,
+          // The server reads the rubric and prompt by lessonId and ignores these.
+          prompt: '',
+          response: code,
+          rubric: lesson.aiGrader.rubric,
+        },
+        (stage) => setAiStage(stage),
+      );
+      if (data === null) {
+        setAiError(`The grader returned something we could not read (HTTP ${status}). Ask your teacher.`);
+        return;
+      }
+      if (!data.ok) {
+        setAiError(data.error || `Grading failed (HTTP ${status}).`);
+        return;
+      }
+      setAiResult(data as AiGradeResultData);
+      if (lessonProgress.authed) {
+        // On a capped part /api/grade-written records the counted submission itself,
+        // with its own totals, so the browser must not post a second row (it would
+        // spend two tries per grade) or relay a score. An uncapped part has no
+        // server-side row, so the work is recorded here, without a score.
+        if (!capped) {
+          await recordSubmission({ lessonId: lesson.id, response: code, gradeJson: { ai: data } });
+        }
+        // Best try counts; the lesson_state upsert also refuses to lower it.
+        const prior = lessonProgress.scores[lesson.id];
+        const earned = (data as AiGradeResultData).totalEarned;
+        await recordLessonCompleted(lesson.id, typeof prior === 'number' ? Math.max(prior, earned) : earned);
+        if (capped) cap.spend();
+      }
+    } catch (e) {
+      setAiError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setAiGrading(false);
+      setAiStage(null);
+    }
+  };
+
   const handleSubmit = () => {
+    if (aiGraded) {
+      void runAiGrade();
+      return;
+    }
     const report = runClientGrade();
     setGradeReport(report);
     setSubmitOpen(true);
@@ -1086,6 +1149,16 @@ export default function LessonWorkspace({
           )}
         </div>
       </div>
+      {aiGraded ? (
+        <AiGradeResultPanel
+          title={lesson.aiGrader?.rubricTitle ?? 'AI feedback on your fixes'}
+          titles={Object.fromEntries((lesson.aiGrader?.rubric ?? []).map((r) => [r.id, r.title]))}
+          result={aiResult}
+          grading={aiGrading}
+          stage={aiStage}
+          error={aiError}
+        />
+      ) : null}
       {capped ? <PseudocodePanel lessonId={lesson.id} show={cap.reached} /> : null}
       {submitted && gradeReport && (
         <GradeReportView

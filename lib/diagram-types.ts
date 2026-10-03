@@ -195,5 +195,10 @@ export interface DiagramConfig {
     contextDocs?: string[];
     prompt?: string;
     rubric: Array<{ id: string; title: string; description?: string; points: number }>;
+    /** Same meanings as on lib/types.ts AiGraderConfig: the brief stays server-side,
+     *  the part is revisable up to its cap, and `strict` is read only on the server. */
+    summative?: boolean;
+    revisable?: boolean;
+    strict?: boolean;
   };
 }

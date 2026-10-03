@@ -125,6 +125,35 @@
           }
         }
       ]
+    },
+    "2": {
+      "status": "gate green, live fixtures clean, no independent judge run yet (the worker that built it cannot spawn one)",
+      "decision": "user chose AI marking for the three find-and-fix parts (nothing scores them on the server); charts and demos AI-graded as specified; group builds and Part 1 quizzes untouched",
+      "rounds": [
+        {
+          "round": 1,
+          "findings": [
+            "ROOT: the course-wide grader preamble says 'Grade VERY leniently ... a vague gesture counts'. That is right for practice feedback and wrong for a part whose AI score is now the recorded score: a find-and-fix with a bug still in it could be marked fixed. The earlier Phase 5 note ('summative items are not AI-graded, so leniency never meets a strict rubric') stops being true once these parts are AI-graded. Fix: server-only `strict` flag on the authored aiGrader (default prompt byte-identical, verified), set on the 9 chart and find-and-fix graders; the 3 demos keep the lenient framing (process write-ups).",
+            "The three GROUP chart parts have no `diagram.summative` (their structural gate must stay, so Build opens only on a green chart), and lib/quiz-redact.ts keyed diagram redaction on diagram.summative alone: a new AI brief there would have shipped to the browser. Found by test-pa-ai-graders offline invariants (17 failures). Fix: redaction also keys on diagram.aiGrader.summative.",
+            "grade-written.ts now records the counted row itself on a capped AI part (fix agent). A client that also POSTs recordSubmission after streamGrade spends two tries per grade. The new console path posts no row when capped; DiagramAssignmentView and WrittenGrader still do (not edited here, flagged to the lead).",
+            "check-ai-grader-leak / check-quiz-key-leak fail against the stale out/ because the demos are now summative: the old build ships their brief. Dev-server pages for all 12 parts are clean; a rebuild clears it."
+          ],
+          "live": "39 fixtures on glm-5.3-flash:cloud: every reference passed, every gaming fixture failed (unchanged starter, claimed-fix comments, injected instruction in a comment, kind names swapped, Start-box-End chart, sandwich chart, chart label asking for credit)"
+        },
+        {
+          "round": 2,
+          "findings": [
+            "second gaming set, find-and-fix only: fixes deleted with only comments and print lines kept: 0/20 on all three. Claimed-fix comments re-run: 0 to 3 of 20.",
+            "MEASURED, accepted: naming every kind 'logic' while fixing all four still scores 16/20 (Ch1, Ch3) and 14/20 (Ch2), so the kind is 2 of each bug's 5 points. Decision for the user: raise the weight of the kind if that is too generous."
+          ]
+        }
+      ],
+      "caps": {
+        "charts": "diagram.maxSubmissions",
+        "find_and_fix": "grading.maxSubmissions",
+        "demos": "aiGrader.maxSubmissions"
+      },
+      "not_done": "Independent judge (cs-student-advanced lens) against one chart and one find-and-fix rubric; the two-clean-rounds exit is therefore not claimed."
     }
   },
   "phase5_todo": [
