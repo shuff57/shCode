@@ -24,6 +24,7 @@
   "assignmentCode": "A1.7.1",
   "quiz": {
     "summative": true,
+    "maxSubmissions": 3,
     "shuffle": true,
     "variants": [
       "a",

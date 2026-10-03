@@ -2,7 +2,8 @@
 
 **This is the coding part of the test, and you are doing it alone.** One problem, pick
 one of three, write the JavaScript. **20 points**, about **12 minutes**. No Run button.
-You submit once; the paper locks on submit.
+
+**You get three tries.** Submit, read the feedback on each criterion, fix the code and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
 
 **What you write:** A single JavaScript program that solves the problem you picked. It
 must contain:
@@ -63,4 +64,4 @@ the total, and the watered copy. Save the rota under a key and load it back.
 - **Limit** as a `const`.
 - At least one `console.log` that reports a result.
 - **`typeof`** for one value.
-- **No Run button.** One attempt, paper locks on submit.
+- **No Run button.** Three tries; your best one counts.

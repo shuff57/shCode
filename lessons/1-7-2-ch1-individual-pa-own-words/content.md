@@ -2,9 +2,9 @@
 
 **10 points. Three short answers, two or three sentences each.**
 
-- One submission. It locks, and nothing comes back on screen: no score and no
-  feedback. The page only records that you submitted; your teacher marks the 10 points
-  afterwards.
+- **You get three tries.** Submit, read the feedback on each question, improve your
+  answer and submit again. Your best try is the one that counts. After your third try
+  you can see how it is solved, once your teacher releases it.
 - Submitting is what opens Part 3.
 - Your own everyday words. A repeated definition scores lower than a plain
   answer that shows what the idea is *for*.

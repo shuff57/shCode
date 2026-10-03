@@ -23,6 +23,8 @@
   "assignmentCode": "A3.10.2",
   "aiGrader": {
     "summative": true,
+    "revisable": true,
+    "maxSubmissions": 3,
     "rubricTitle": "Chapter 3 Individual PA, Part 2: In Your Own Words",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],

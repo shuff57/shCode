@@ -4,6 +4,8 @@
 The chart and the build are done; now you write the report and run the program for the
 teacher. This part is worth **25%**.
 
+**You get three tries.** Each partner submits their own; submit, read the feedback on each criterion, improve and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
+
 ### Part 1: Who did what
 
 Name both partners. Then say who drove the keyboard for the chart (3.9.1), who drove it

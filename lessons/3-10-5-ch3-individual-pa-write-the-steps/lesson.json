@@ -19,6 +19,8 @@
   "assignmentCode": "A3.10.5",
   "aiGrader": {
     "summative": true,
+    "revisable": true,
+    "maxSubmissions": 3,
     "rubricTitle": "Chapter 3 Individual PA, Part 5: Write the Steps",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],

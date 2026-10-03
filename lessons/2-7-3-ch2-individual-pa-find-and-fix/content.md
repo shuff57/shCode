@@ -3,8 +3,10 @@
 **This is the debugging part of the test, and you are doing it alone.** One file,
 four bugs in it, **20 points**, about **11 minutes**.
 
-**This part is summative:** one sitting, no score shown. Nothing in the browser turns
-green on this part, so run the program yourself to check each fix. Your teacher marks it afterwards.
+**You get three tries.** Submit, read the feedback on each bug, fix what is still wrong and
+submit again. Your best try counts. After your third try you can see how it is solved, once
+your teacher releases it. Nothing in the browser turns green on this part, so run the
+program yourself to check each fix before you submit.
 
 ---
 

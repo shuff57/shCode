@@ -23,6 +23,8 @@
   "assignmentCode": "A1.7.5",
   "aiGrader": {
     "summative": true,
+    "revisable": true,
+    "maxSubmissions": 3,
     "rubricTitle": "Chapter 1 Test, Part 5: pseudocode",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],

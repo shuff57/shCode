@@ -107,6 +107,8 @@ line of your program that does not look like arithmetic.
 
 ### Before you submit
 
+**You get three tries.** Each partner submits their own: submit, read the feedback on whether the chart answers your problem, redraw and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
+
 Press **Check my diagram**. Everything runs in your browser and tells you which shape is
 wrong. Fix anything red and press it again — there is no penalty for redrawing, exactly
 as in 1.5.30.

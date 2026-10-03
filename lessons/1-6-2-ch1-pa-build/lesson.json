@@ -1,7 +1,7 @@
 {
   "id": "1-6-2-ch1-pa-build",
   "title": "1.6.2 Group PA Part 2: Build It",
-  "description": "Turn the chart you just passed into a documented, straight-line program. Ten checks, all of them things Chapter 1 taught. Auto-graded.",
+  "description": "Turn the chart you just passed into a documented, straight-line program. Ten checks, all of them things Chapter 1 taught. Auto-graded: submit up to three times and your best counts. After your third try you can see how it is solved, once your teacher releases it.",
   "type": "assignment",
   "estimateMins": 40,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -176,7 +176,8 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "maxSubmissions": 3
   },
   "assignmentCode": "A1.6.2",
   "planFrom": "1-6-1-ch1-pa-design-chart",

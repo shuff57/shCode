@@ -4,9 +4,10 @@
 bugs in it, **20 points total**, about **11 minutes**. You run the program, read what
 happens, find each bug, name its type (syntax / runtime / logic), and fix it.
 
-**This part is summative:** one sitting, no marking shown, no explanations shown, score
-not shown. Nothing in the browser turns green on this part, so run the program yourself
-to check each fix. The teacher reviews your submission afterwards.
+**You get three tries.** Submit, read the feedback on each bug, fix what is still wrong and
+submit again. Your best try counts. After your third try you can see how it is solved, once
+your teacher releases it. Nothing in the browser turns green on this part, so run the
+program yourself to check each fix before you submit.
 
 ---
 

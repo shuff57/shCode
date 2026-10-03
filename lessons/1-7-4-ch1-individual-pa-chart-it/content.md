@@ -8,6 +8,9 @@
   nothing.
 - The checks say whether it is a *legal* flowchart, never whether it answers the
   problem. A green chart of the wrong problem still scores nothing.
+- **You get three tries.** Submit, read the feedback on whether the chart answers your
+  problem, redraw and submit again. Your best try counts. After your third try you can see
+  how it is solved, once your teacher releases it.
 
 | Shape | Use it for |
 | --- | --- |

@@ -1,7 +1,7 @@
 {
   "id": "1-7-3-ch1-individual-pa-find-and-fix",
   "title": "1.7.3 Individual PA Part 3: Find and Fix",
-  "description": "A book-order receipt with four bugs in it. Repair all four and name what kind each one was. Auto-checked.",
+  "description": "A book-order receipt with four bugs in it. Repair all four and name what kind each one was. Three tries, feedback on each bug, and your best try counts.",
   "type": "assignment",
   "estimateMins": 11,
   "category": "Unit 1: JavaScript Fundamentals",

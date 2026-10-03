@@ -4,8 +4,11 @@
 one of three, draw the flowchart, **10 points**, about **7 minutes**. You draw the chart
 in the editor below, press **Check my diagram** as many times as you like, and submit.
 The checker judges whether your drawing is a legal flowchart -- never whether it answers
-the problem. Whether the functions are right is for you to read; the teacher grades the
-submitted chart.
+the problem. Whether the functions are right is for you to read, and each time you
+submit you get feedback on whether the chart answers the problem you picked.
+
+**You get three tries.** Submit, read the feedback, redraw and submit again. Your best try
+counts. After your third try you can see how it is solved, once your teacher releases it.
 
 **Six shapes are legal on this chart** (Appendix D §D.2): oval, rectangle, diamond,
 parallelogram, the loop-setup hexagon (§2.2), and the **double-rail subroutine**

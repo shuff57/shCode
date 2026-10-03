@@ -1,7 +1,7 @@
 {
   "id": "3-9-2-ch3-group-pa-build",
   "title": "3.9.2 Group PA Part 2: Build It",
-  "description": "Turn the chart you just passed into five documented functions and a short main section. Eleven checks, all of them things Chapter 3 taught. Auto-graded.",
+  "description": "Turn the chart you just passed into five documented functions and a short main section. Eleven checks, all of them things Chapter 3 taught. Auto-graded: submit up to three times and your best counts. After your third try you can see how it is solved, once your teacher releases it.",
   "type": "assignment",
   "estimateMins": 42,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -240,7 +240,8 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "maxSubmissions": 3
   },
   "assignmentCode": "A3.9.2",
   "planFrom": "3-9-1-ch3-group-pa-design-chart",
