@@ -1,4 +1,4 @@
-// 2.1.5 Hello Sprite: your first moSHion sketch.
+// 5.1.11 Hello Sprite: your first moSHion sketch.
 
 let player;
 

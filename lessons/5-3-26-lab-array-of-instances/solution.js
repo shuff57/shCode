@@ -1,4 +1,4 @@
-// 2.2.8b Lab: An array of Enemies (reference solution).
+// 5.4.12 Lab: An array of Enemies (reference solution).
 // A for loop is a valid alternative: the grader accepts both forms.
 
 class Enemy {

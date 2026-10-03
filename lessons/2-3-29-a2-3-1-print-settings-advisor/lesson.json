@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Write the switch",
-      "instructions": "Write a switch on filamentType with a case for 'PLA', 'ABS', 'PETG', and 'TPU'. Each case must print a recommended temperature and a recommended print speed for that filament: you choose reasonable numbers. Add a default that prints a message for a filament type you don't recognize. End every case with a break."
+      "instructions": "Write a switch on filamentType with a case for 'PLA', 'ABS', 'PETG', and 'TPU'. Each case must print a recommended temperature and a recommended print speed for that filament, and what you print must include the words \"temperature\" and \"speed\": you choose reasonable numbers. Add a default that prints a message for a filament type you don't recognize. End every case with a break."
     },
     {
       "id": "s3",
@@ -96,7 +96,7 @@
       "description": "Code contains at least one break statement. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "break",
+      "pattern": "(?:\\bbreak\\b[\\s\\S]*){4}",
       "flags": "i",
       "points": 0
     },

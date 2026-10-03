@@ -25,6 +25,8 @@ You meet this style properly in Chapter 3, where you write functions that take v
 
 `.filter` produces a new list of the items that pass a test. Watch what happens to the original.
 
+*(Read it, do not write it yet: `[58, 72, ...]` is a list, and `function (t) { return t > 70; }` is a small rule that answers true or false for one value `t`. `.filter` keeps the values for which the rule answers true. Chapter 3 teaches functions.)*
+
 ```js live plain
 let temps = [58, 72, 91, 64, 88, 45];
 

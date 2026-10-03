@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Detect the goal, once",
-      "instructions": "Guard the whole check with if (goal), so it can only run while the goal still exists. Compute the distance between the player and the goal, and when it's small enough, delete the goal and set the goal variable to null so the check can never fire again.",
+      "instructions": "Guard the whole check with if (goal), so it can only run while the goal still exists. Compute the distance between the player and the goal (the Pythagorean distance: Math.sqrt(dx * dx + dy * dy), or player.distanceTo(goal) from the Sprite docs), and when it's small enough, delete the goal and set the goal variable to null so the check can never fire again.",
       "hints": [
         "Search the moSHion docs drawer for sprite.delete()."
       ]
@@ -37,11 +37,11 @@
     {
       "id": "r2",
       "title": "Compute the distance to the goal",
-      "description": "The distance between player and goal is computed with Math.sqrt. Help: 5.2.10 (Cleanup and Delete)",
+      "description": "The distance between player and goal is computed: Math.sqrt(dx * dx + dy * dy), Math.hypot(dx, dy), dist(...), or player.distanceTo(goal). Help: 5.2.10 (Cleanup and Delete)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "Math\\.sqrt\\s*\\(",
+      "pattern": "Math\\.(?:sqrt|hypot)\\s*\\(|\\bdist\\s*\\(|\\.distanceTo\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

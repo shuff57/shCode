@@ -51,7 +51,7 @@
       "description": "The second switch writes default (with a console.log) before its last case label",
       "type": "regex",
       "file": "script.js",
-      "pattern": "default\\s*:\\s*console\\.log[\\s\\S]*?case\\s",
+      "pattern": "default\\s*:\\s*console\\.log[^{}]*?\\bcase\\s",
       "flags": "i",
       "points": 0
     },
@@ -61,7 +61,7 @@
       "description": "Code contains a break statement",
       "type": "regex",
       "file": "script.js",
-      "pattern": "break",
+      "pattern": "(?:\\bbreak\\b[\\s\\S]*){3}",
       "flags": "i",
       "points": 0
     }

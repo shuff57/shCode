@@ -52,7 +52,7 @@
       "description": "A name is used that was never declared. Help: 1.5.39 (Cause a ReferenceError on Purpose)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?![\\s\\S]*\\bbeforTax\\b)(?=[\\s\\S]*\\btotal\\s*=\\s*(?:beforeTax\\s*\\+\\s*tax|tax\\s*\\+\\s*beforeTax))",
+      "pattern": "^(?![\\s\\S]*\\bbeforTax\\b)(?=[\\s\\S]*\\btotal\\s*=\\s*\\(?\\s*(?:beforeTax\\s*\\+\\s*tax|tax\\s*\\+\\s*beforeTax))",
       "flags": "",
       "points": 0,
       "hint": "The console prints the exact word it could not find. Spell it the way the line above spelled it, then press Run — the next line may have been waiting behind this one."

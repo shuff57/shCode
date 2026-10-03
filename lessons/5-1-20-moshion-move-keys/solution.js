@@ -1,4 +1,4 @@
-// 2.1.9 Make it Move (reference solution).
+// 5.1.20 Make it Move (reference solution).
 // Arrow-key control with else-to-zero so the sprite stops cleanly.
 
 let player;

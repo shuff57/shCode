@@ -31,7 +31,7 @@
       "description": "switch(...) wraps place in Number(...)/parseInt(...)/parseFloat(...), or place is reassigned from one of those before the switch. Help: 2.3.18 (switch Compares Strictly)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:switch\\s*\\(\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*\\))|(?:switch\\s*\\(\\s*\\+\\s*place\\s*\\))|(?:place\\s*=\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))|(?:place\\s*=\\s*\\+\\s*place[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))",
+      "pattern": "(?:switch\\s*\\(\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*\\))|(?:switch\\s*\\(\\s*\\+\\s*place\\s*\\))|(?:place\\s*=\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))|(?:place\\s*=\\s*\\+\\s*place[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))|(?:(?:const|let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*;[\\s\\S]*?switch\\s*\\(\\s*\\1\\s*\\))",
       "flags": "i",
       "points": 0
     },

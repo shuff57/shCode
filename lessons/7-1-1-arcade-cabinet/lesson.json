@@ -45,7 +45,7 @@
     {
       "id": "s7",
       "title": "At least three game states, and a way to get between them",
-      "instructions": "Title, play, and game over is the usual three. Pause, win, and shop are all fair game too.",
+      "instructions": "Title, play, and game over is the usual three. Pause, win, and shop are all fair game too. Keep the current state in a variable named like state, gameState, mode or scene, set to a word such as 'title'.",
       "requiredCommit": true
     },
     {
@@ -123,20 +123,20 @@
     {
       "id": "req5",
       "title": "Motion tuned on purpose",
-      "description": "gravity, friction, bounciness, drag, or a velocity you set yourself. Help: 5.2.8 (Forces vs Velocity)",
+      "description": "gravity, friction, bounciness, drag, a velocity you set yourself, or applyForce. Help: 5.2.8 (Forces vs Velocity)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "world\\s*\\.\\s*gravity|\\.\\s*(friction|bounciness|drag|rotationDrag|rotationSpeed)\\s*=|\\.\\s*vel\\s*(\\.\\s*[xy])?\\s*=|\\.\\s*speed\\s*=",
+      "pattern": "world\\s*\\.\\s*gravity|\\.\\s*(friction|bounciness|drag|rotationDrag|rotationSpeed)\\s*=|\\.\\s*vel\\s*(\\.\\s*[xy])?\\s*[-+*/]?=(?!=)|\\.\\s*speed\\s*=|\\.\\s*applyForce\\s*\\(",
       "flags": "",
       "points": 0
     },
     {
       "id": "req6",
       "title": "Game states",
-      "description": "A state variable set to a named state: 'title', 'play', 'gameover', or whatever you called yours. The checker cannot count your states; the teacher reads for three. Help: 2.3.3 (switch Statements)",
+      "description": "A variable holding the current state (named with state, mode, scene, screen or phase), set to a named state: 'title', 'play', 'gameover', or whatever you called yours. The checker cannot count your states; the teacher reads for three. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "state\\w*\\s*=\\s*['\"`]\\w+['\"`]",
+      "pattern": "\\w*(?:state|mode|scene|screen|phase)\\w*\\s*=\\s*['\"`]\\w+['\"`]",
       "flags": "i",
       "points": 0
     },
@@ -166,17 +166,17 @@
       "description": "An array you filled with more than one thing. Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[^\\]]*,",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[^\\]]*,|(?:let|const|var)\\s+\\w+\\s*=\\s*\\[\\s*\\][\\s\\S]*\\.push\\s*\\(",
       "flags": "",
       "points": 0
     },
     {
       "id": "req10",
       "title": "A loop that reads it",
-      "description": "for, for...of, or forEach: an array nobody loops over is just storage. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "description": "for, while, for...of, forEach, map or filter: an array nobody loops over is just storage. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bfor\\s*\\(|\\.\\s*forEach\\s*\\(",
+      "pattern": "\\bfor\\s*\\(|\\bwhile\\s*\\(|\\.\\s*(forEach|map|filter)\\s*\\(",
       "flags": "",
       "points": 0
     },

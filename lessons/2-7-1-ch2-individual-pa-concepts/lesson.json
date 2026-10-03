@@ -43,7 +43,7 @@
           "It treats the line as text and checks whether it spells true"
         ],
         "answer": 0,
-        "explanation": "if converts whatever is inside the parentheses to a boolean (2.1.18). Zero, an empty string, null, undefined, NaN and false convert to false; everything else converts to true. That is why if (x == true) is redundant when x is already a boolean -- if (x) does the same job.",
+        "explanation": "if converts whatever is inside the parentheses to a boolean (2.1.12). Zero, an empty string, null, undefined, NaN and false convert to false; everything else converts to true. That is why if (x == true) is redundant when x is already a boolean -- if (x) does the same job.",
         "sourceIds": [
           "2-1-18-reading-truthy-falsy"
         ]

@@ -41,7 +41,7 @@
     {
       "id": "s5",
       "title": "Answer the diamond without an if",
-      "instructions": "Your chart's diamond is a comparison, and a comparison produces a boolean (1.2.18). Store it: const meetsTheLimit = yourValue <= yourLimit; That variable IS the diamond. Underneath it, write the two branches as pseudocode comments -- what the program would say on the yes side, and on the no side. Chapter 2 turns those comments into an if statement; today they stay comments.",
+      "instructions": "Your chart's diamond is a comparison, and a comparison produces a boolean (1.2.18). Store it: const meetsTheLimit = yourValue <= yourLimit; That variable IS the diamond. Underneath it, write the two branches as pseudocode comments, one starting IF and one starting ELSE, both in capital letters -- what the program would say on the yes side, and on the no side. Chapter 2 turns those comments into an if statement; today they stay comments.",
       "hints": [
         "Which way round the comparison goes depends on your problem -- read your chart, not the example",
         "The two branch comments are graded. IF and ELSE, in capitals, one comment line each"
@@ -122,7 +122,7 @@
       "description": "A variable is assigned from arithmetic on other variables, not typed in by hand. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*[A-Za-z_$][A-Za-z0-9_$.]*\\s*[-+*/]",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*[A-Za-z_$][A-Za-z0-9_$.]*\\s*[-+*/]|(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*[-+*/]\\s*[A-Za-z_$]",
       "flags": "",
       "points": 0,
       "hint": "const costPerSlice = pizzaPrice / sliceCount; -- the answer has to be worked out, not written down."

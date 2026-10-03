@@ -40,7 +40,7 @@
       "description": "Use the + operator with numbers. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\s*\\+\\s*\\w+",
+      "pattern": "(?=[\\s\\S]*(?:let|const|var)\\s+[\\w$]+\\s*=\\s*-?[\\d.]+(?:[\\s\\S]*?(?:,\\s*[\\w$]+\\s*=|(?:let|const|var)\\s+[\\w$]+\\s*=)\\s*-?[\\d.]+))[\\s\\S]*\\w+\\s*\\+\\s*\\w+",
       "flags": "i",
       "points": 0
     },

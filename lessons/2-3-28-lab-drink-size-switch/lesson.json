@@ -91,7 +91,7 @@
       "description": "Code contains a break statement. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "break",
+      "pattern": "(?:\\bbreak\\b[\\s\\S]*){4}",
       "flags": "i",
       "points": 0
     }

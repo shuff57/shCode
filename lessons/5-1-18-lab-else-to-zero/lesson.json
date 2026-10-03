@@ -53,7 +53,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "else\\s+player\\.vel\\.x\\s*=\\s*0",
+      "pattern": "else[\\s{]*player\\.vel\\.x\\s*=\\s*0",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -65,7 +65,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "else\\s+player\\.vel\\.y\\s*=\\s*0",
+      "pattern": "else[\\s{]*player\\.vel\\.y\\s*=\\s*0",
       "flags": "",
       "points": 0,
       "status": "pending"

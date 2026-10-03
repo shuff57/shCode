@@ -54,7 +54,7 @@
       "type": "inFunction",
       "function": "setup",
       "file": "script.js",
-      "pattern": "new\\s+Canvas\\s*\\(\\s*\\d+\\s*,\\s*\\d+\\s*\\)",
+      "pattern": "new\\s+Canvas\\s*\\(\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+(?:,[^)]*)?\\)",
       "flags": "",
       "points": 0
     },
@@ -64,7 +64,7 @@
       "description": "At least one `new Sprite(x, y, w, h)` call with four arguments. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Sprite\\s*\\(\\s*[^,()]+,\\s*[^,()]+,\\s*[^,()]+,\\s*[^,)]+\\s*\\)",
+      "pattern": "new\\s+Sprite\\s*\\(\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+\\s*\\)",
       "flags": "",
       "points": 0
     },
@@ -74,7 +74,7 @@
       "description": "At least one `new Sprite(x, y, diameter)` call with exactly three arguments. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Sprite\\s*\\(\\s*[^,()]+,\\s*[^,()]+,\\s*[^,)]+\\s*\\)",
+      "pattern": "new\\s+Sprite\\s*\\(\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+\\s*\\)",
       "flags": "",
       "points": 0
     },

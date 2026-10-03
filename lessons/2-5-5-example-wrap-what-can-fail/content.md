@@ -4,6 +4,8 @@
 
 This program totals three sensor readings, then tries to log a sensor name that was never declared.
 
+A quick preview: `readings` is a list of three numbers (an array, which you meet properly in Section 3.3). `readings.length` is how many there are (3) and `readings[i]` is the one at position `i`. For now, read the loop as "add up 12, 7 and 19".
+
 ```js live plain
 const readings = [12, 7, 19];
 let total = 0;

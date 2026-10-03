@@ -35,6 +35,8 @@ Does anything choose a path? **Yes**: the `if`. Two of those lines run only when
 
 ## Program 3: a receipt for a whole cart
 
+*(New to read here: `[8, 25, 3]` is a list of values, `prices[i]` is the item at position `i` counting from 0, and `prices.length` is how many items it holds.)*
+
 ```js live plain
 let prices = [8, 25, 3];
 let total = 0;

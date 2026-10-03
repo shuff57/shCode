@@ -10,6 +10,8 @@ Eleven items, in no order, with no relationship to each other. This is what raw 
 
 ## Step 2: Recognise patterns: group them
 
+*(Read it, do not write it yet: `[ ... ]` is a list of values, `actions[i]` is the item at position `i` counting from 0, `.length` is how many items there are, and `for` repeats its block once per position. Chapter 2 teaches all of this.)*
+
 ```js live plain
 let ingredients = ["bread", "jam", "butter"];
 let equipment = ["plate", "knife"];

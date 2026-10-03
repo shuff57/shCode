@@ -15,10 +15,10 @@
     {
       "id": "s1",
       "title": "Ground + ramp",
-      "instructions": "Two static sprites: a flat ground and a tilted ramp. Set the ramp's .rotation in radians to tilt it.",
+      "instructions": "Two static sprites: a flat ground and a tilted ramp. Set the ramp's .rotation in degrees to tilt it (moSHion rotation is in degrees, not radians).",
       "hints": [
         "The Sprite docs chapter (right drawer → Docs tab) covers static colliders.",
-        "ramp.rotation = -Math.PI / 8 tilts up to the right; positive values tilt the other way."
+        "ramp.rotation = -20 tilts up to the right; positive values tilt the other way."
       ]
     },
     {
@@ -33,7 +33,7 @@
     {
       "id": "s3",
       "title": "Join the wheels with WheelJoint",
-      "instructions": "new WheelJoint(chassis, leftWheel) and again for the right wheel.",
+      "instructions": "new WheelJoint(chassis, leftWheel) and again for the right wheel. A WheelJoint is a joint made for vehicles: it pins a wheel to the chassis so the wheel can spin freely.",
       "hints": [
         "The Joints docs chapter covers WheelJoint, including suspension travel options."
       ]
@@ -41,10 +41,10 @@
     {
       "id": "s4",
       "title": "Drive with WASD",
-      "instructions": "In draw(), use kb.pressing('a') / kb.pressing('d') to set chassis.vel.x (positive = right, negative = left, 0 = stop).",
+      "instructions": "In draw(), use kb.pressing('a') / kb.pressing('d') to drive the car: either set chassis.vel.x (positive = right, negative = left, 0 = stop) or set each wheel's .angularVelocity. The grader looks for an assignment to .vel.x or .angularVelocity.",
       "hints": [
         "Open the Input docs chapter for kb.pressing. Don't use arrow keys: they scroll the editor.",
-        "vel.x sets horizontal velocity directly each frame; the wheels will roll from friction as the chassis moves."
+        "vel.x sets horizontal velocity directly each frame; angularVelocity spins a wheel so friction pushes the car along."
       ]
     }
   ],
@@ -52,7 +52,7 @@
     {
       "id": "r1",
       "title": "Uses WheelJoint",
-      "description": "Create at least one WheelJoint. Help: 5.2.2 (Gravity)",
+      "description": "Create at least one WheelJoint. Help: 6.3.8 (Worked Example: Swinging Pendulum)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+WheelJoint\\s*\\(",
@@ -62,7 +62,7 @@
     {
       "id": "r2",
       "title": "Static geometry exists",
-      "description": "Create at least one 'static' sprite (ground or ramp). Help: 5.2.2 (Gravity)",
+      "description": "Create at least one 'static' sprite (ground or ramp). Help: 5.2.6 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
@@ -102,11 +102,11 @@
     },
     {
       "id": "r6",
-      "title": "Sets horizontal velocity",
-      "description": "Assign to a sprite's .vel.x to move the car. Help: 5.1.15 (Velocity: vel.x and vel.y)",
+      "title": "Drives the car",
+      "description": "Assign to a sprite's .vel.x (or a wheel's .angularVelocity) to move the car. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.vel\\.x\\s*=",
+      "pattern": "\\.(?:vel\\.x|angularVelocity)\\s*=",
       "flags": "",
       "points": 0
     }

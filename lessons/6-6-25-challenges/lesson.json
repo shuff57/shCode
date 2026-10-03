@@ -56,7 +56,7 @@
       "description": "new Canvas() is called in setup(). Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new Canvas\\s*\\(",
+      "pattern": "new\\s+Canvas\\s*\\(",
       "flags": "",
       "points": 0
     },

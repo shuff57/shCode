@@ -56,7 +56,7 @@
       "description": "An outer for loop (from 0) contains a nested inner for loop (from 0) whose bound is the cols variable, the outer's bound is the rows variable, and the row is logged after the inner loop closes (any consistent counter names accepted, e.g. i/j). Help: 2.4.24 (Nested Loops)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*0\\s*;\\s*\\1\\s*<\\s*rows\\s*;\\s*\\1\\+\\+\\s*\\)\\s*\\{[^{}]*for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*0\\s*;\\s*\\2\\s*<\\s*cols\\s*;\\s*\\2\\+\\+\\s*\\)\\s*\\{[^{}]*\\}(?=[^{}]*console\\.log)[^{}]*\\}",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*0\\s*;\\s*\\1\\s*<\\s*rows\\s*;\\s*\\1\\+\\+\\s*\\)\\s*\\{[^{}]*for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*0\\s*;\\s*\\2\\s*<\\s*cols\\s*;\\s*\\2\\+\\+\\s*\\)\\s*\\{[^{}]*\\}(?=(?:[^{}]|\\$\\{[^}]*\\})*console\\.log)(?:[^{}]|\\$\\{[^}]*\\})*\\}",
       "flags": "i",
       "points": 0
     },

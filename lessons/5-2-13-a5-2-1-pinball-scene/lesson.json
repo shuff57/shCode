@@ -53,7 +53,7 @@
       "description": "world.gravity.y is set to a non-zero value. Help: 5.2.2 (Gravity)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "world\\.gravity\\.y\\s*=\\s*-?[1-9]",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*-?(?:[1-9]|0?\\.\\d*[1-9])",
       "flags": "",
       "points": 0,
       "status": "pending"

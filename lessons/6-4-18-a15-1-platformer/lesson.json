@@ -123,11 +123,11 @@
     {
       "id": "r5",
       "title": "Goal detection + win message",
-      "description": "Inside draw(), call .overlaps(goal) and follow it with a text(...) call (within ~200 chars) so the win message is what the overlap triggers. Help: 6.2.3 (moSHion docs: Collisions + Overlaps)",
+      "description": "Inside draw(), call .overlaps(goal) and follow it with a text(...) call (within ~400 characters) so the win message is what the overlap triggers. Help: 6.2.3 (moSHion docs: Collisions + Overlaps)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "\\.overlaps\\s*\\([^)]*\\)[\\s\\S]{0,200}?\\btext\\s*\\(",
+      "pattern": "\\.overlaps\\s*\\([^)]*\\)[\\s\\S]{0,400}?\\btext\\s*\\(",
       "flags": "",
       "points": 0
     },

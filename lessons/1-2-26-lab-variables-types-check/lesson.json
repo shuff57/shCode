@@ -59,7 +59,7 @@
       "description": "Use typeof to check a variable's type. Help: 1.2.3 (Every Value Has a Type)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "typeof\\s+",
+      "pattern": "typeof\\s*\\(?\\s*[A-Za-z_$]",
       "flags": "i",
       "points": 0
     },

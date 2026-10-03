@@ -76,10 +76,10 @@
     {
       "id": "r5",
       "title": "Two different string methods used",
-      "description": "Uses two string operations -- .length, .toUpperCase(), .includes(), .trim(), .replace() and others all count. Help: 1.2.14 (String Methods in Practice)",
+      "description": "Uses two different string operations -- .length, .toUpperCase(), .includes(), .trim(), .replace() and others all count. Help: 1.2.14 (String Methods in Practice)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.(length|toUpperCase|toLowerCase|includes|indexOf|slice|trim|charAt|at|replace|replaceAll|split|startsWith|endsWith|substring|concat|repeat|padStart|padEnd)\\b[\\s\\S]*?\\.(length|toUpperCase|toLowerCase|includes|indexOf|slice|trim|charAt|at|replace|replaceAll|split|startsWith|endsWith|substring|concat|repeat|padStart|padEnd)\\b",
+      "pattern": "\\.(length|toUpperCase|toLowerCase|includes|indexOf|slice|trim|charAt|at|replace|replaceAll|split|startsWith|endsWith|substring|concat|repeat|padStart|padEnd)\\b[\\s\\S]*?\\.(?!\\1\\b)(?:length|toUpperCase|toLowerCase|includes|indexOf|slice|trim|charAt|at|replace|replaceAll|split|startsWith|endsWith|substring|concat|repeat|padStart|padEnd)\\b",
       "flags": "",
       "points": 0
     },

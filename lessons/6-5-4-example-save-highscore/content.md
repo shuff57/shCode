@@ -2,7 +2,7 @@
 
 ## Step 1: A player, an enemy, and a score
 
-The player moves with WASD. An enemy sprite bounces off the walls. The score counts how many frames the player survives. When the enemy touches the player, the game freezes: game over.
+The player moves with WASD. An enemy sprite bounces off the walls. The score counts how many frames the player survives. When the enemy touches the player, the game freezes: game over. (`createVector(x, y)` makes an object with `.x` and `.y`; here it gives each sprite its starting velocity.)
 
 ```js live
 let player, enemy;

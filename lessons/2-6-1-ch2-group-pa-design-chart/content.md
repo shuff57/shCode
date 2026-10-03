@@ -50,7 +50,7 @@ report the final balance. `throw` on a negative target.
 
 **4. Coin Drawer**
 
-You are making change from an amount. The drawer has an unlimited supply of quarters,
+You are making change from an amount. The drawer has a limited supply of quarters,
 dimes, nickels, and pennies. A `while` loop dispenses the largest denomination that
 fits until the amount reaches zero or the drawer runs dry (`break` when the drawer is
 empty). The `switch` names each denomination as it is dispensed. Report the count of
@@ -67,7 +67,7 @@ and write it down now; Part 2 asks for it.
 ### Step 2: pseudocode it, on paper, together
 
 Before anyone touches the canvas. Both of you, one sheet, out loud. Use the keywords
-from 2.2 and the flowchart conventions from 2.2.6 and 2.2.12.
+from 2.2 and the flowchart conventions from 2.2.4 and 2.2.7.
 
 ```
 START
@@ -130,7 +130,7 @@ is one shape that means "this is a loop header with its setup inside it."
 
 Press **Check my diagram**. Everything runs in your browser and tells you which shape is
 wrong. Fix anything red and press it again — there is no penalty for redrawing, exactly
-as in 2.2.12.
+as in 2.2.7.
 
 Green means your drawing is a legal flowchart. Whether it solves *your* problem is for
 the two of you to read. Before you call it done, walk one set of real numbers through it

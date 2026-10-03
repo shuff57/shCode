@@ -51,7 +51,7 @@
       "description": "Code contains at least one break statement. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "break",
+      "pattern": "(?:\\bbreak\\b[\\s\\S]*){2}",
       "flags": "i",
       "points": 0
     },
@@ -64,6 +64,16 @@
       "pattern": "case[^:]*:\\s*console\\.log",
       "flags": "i",
       "points": 0
+    },
+    {
+      "type": "regex",
+      "file": "script.js",
+      "points": 0,
+      "id": "r5",
+      "title": "first case left without a break",
+      "description": "The first case has no break, so it falls through into the second.",
+      "pattern": "case[^:]*:\\s*console\\.log\\s*\\([^)]*\\)\\s*;?\\s*case",
+      "flags": "i"
     }
   ],
   "grading": {

@@ -24,6 +24,8 @@ Algorithms are most commonly written as either **pseudocode** or a **flowchart**
 
 The same algorithm: "add up the numbers from 1 to 5": written twice.
 
+*(Read it, do not write it yet: `for (let i = 1; i <= 5; i = i + 1) { ... }` repeats its block while the condition is true, adding 1 to `i` each time. Chapter 2 teaches loops.)*
+
 ```js live plain
 // As a plan, in words:
 //   1. set total to 0

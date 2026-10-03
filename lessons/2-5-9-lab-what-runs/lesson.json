@@ -56,9 +56,19 @@
       "description": "\"D\" is logged after the catch block closes. Help: 2.5.4 (try...catch: Attempt and Recover)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "catch[\\s\\S]*[\"'`]D[\"'`]",
+      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\$\\{[^}]*\\})*\\}[\\s\\S]*[\"'`]D[\"'`]",
       "flags": "i",
       "points": 0
+    },
+    {
+      "type": "regex",
+      "file": "script.js",
+      "points": 0,
+      "id": "r4",
+      "title": "logs B after the risky line",
+      "description": "console.log(\"B\") appears right after console.log(boom).",
+      "pattern": "console\\.log\\s*\\(\\s*boom\\s*\\)\\s*;?\\s*console\\.log\\s*\\(\\s*[\"'`]B[\"'`]",
+      "flags": "i"
     }
   ],
   "grading": {

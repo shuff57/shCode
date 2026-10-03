@@ -40,7 +40,7 @@
     {
       "id": "s4",
       "title": "Detect overlaps and collect",
-      "instructions": "In `draw()`, iterate the `collectibles` array. When the player overlaps a collectible's sprite, call its `collect()` method, add the returned value to `totalScore`, and remove that item from the array.",
+      "instructions": "In `draw()`, iterate the `collectibles` array. When the player overlaps a collectible's sprite (player.overlaps(c.sprite)), call its `collect()` method, add the returned value to `totalScore`, and remove that item from the array.",
       "hints": [
         "Check the Sprite section of the moSHion docs drawer for the overlap check.",
         "Removing items while iterating forwards skips neighbours: search for 'iterate backwards to splice' if you hit that bug."
@@ -91,11 +91,11 @@
     {
       "id": "r5",
       "title": "Overlap detection",
-      "description": "The code checks for overlap between player and a sprite.",
+      "description": "The code checks for overlap between player and a sprite (.overlaps() or .overlapping()).",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "\\.overlaps\\s*\\(",
+      "pattern": "\\.overlap(?:s|ping)\\s*\\(",
       "flags": "",
       "points": 0
     }

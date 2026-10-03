@@ -8,4 +8,5 @@
 //         below 50   -> log "Battery ok"
 //         below 90   -> log "Battery good"
 //         otherwise  -> log "Battery full"
-//         Check the highest cutoff first, same as the grade chain example.
+//         Check the lowest cutoff first (this chain uses <, the opposite
+//         order from the grade chain example, which uses >=).

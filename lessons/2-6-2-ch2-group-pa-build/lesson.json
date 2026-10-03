@@ -182,7 +182,7 @@
     {
       "id": "r8",
       "title": "A break AND a continue",
-      "description": "The loop contains both a continue and a break, as the brief forces — one skip and one stop. Help: 2.4.13 (Skipping a Round with continue)",
+      "description": "A continue statement and a break statement both appear in the program. The break may be the one that ends a switch case.",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bcontinue\\s*;[\\s\\S]*\\bbreak\\s*;|\\bbreak\\s*;[\\s\\S]*\\bcontinue\\s*;",
@@ -194,10 +194,10 @@
     {
       "id": "r9",
       "title": "A switch classifies the outcome",
-      "description": "A switch with at least three cases (each with a break) and a default. Help: 2.3.3 (switch Statements)",
+      "description": "A switch with at least two case groups (each ending in a break) and a default. Grouped cases count as one group.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "switch\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?default\\s*:",
+      "pattern": "switch\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?default\\s*:",
       "flags": "",
       "points": 0,
       "hint": "Three case labels -- the lesson text says your classification names three outcomes -- every one closed with break, and a default that catches the rest.",

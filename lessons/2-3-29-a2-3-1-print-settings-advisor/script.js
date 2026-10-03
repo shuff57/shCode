@@ -6,7 +6,8 @@
 // STEP 2: Write a switch on filamentType with a case for each of the
 //         four filament types above. Each case must print a
 //         recommended temperature AND a recommended print speed for
-//         that filament: pick reasonable numbers. Add a default for
+//         that filament: pick reasonable numbers. What you print must
+//         include the words "temperature" and "speed". Add a default for
 //         a filament type you do not recognize. End every branch the
 //         way the readings showed.
 

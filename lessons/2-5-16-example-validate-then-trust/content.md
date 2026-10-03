@@ -2,7 +2,7 @@
 
 ## Step 1: Convert and check for NaN
 
-`typed` holds text. `Number(typed)` converts it, but if the text isn't a valid number, the result is `NaN`, and `Number()` does **not** throw on its own. That's exactly the kind of silent wrongness a deliberate `throw` turns into something you can't ignore.
+`typed` holds text. `Number(typed)` converts it, but if the text isn't a valid number, the result is `NaN`, and `Number()` does **not** throw on its own. `Number.isNaN(quantity)` is `true` only when `quantity` is `NaN`; you cannot write `quantity === NaN`, because NaN is never equal to anything, itself included. That's exactly the kind of silent wrongness a deliberate `throw` turns into something you can't ignore.
 
 ```js live plain
 const typed = "abc";

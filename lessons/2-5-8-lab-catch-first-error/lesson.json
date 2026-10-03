@@ -56,7 +56,7 @@
       "description": "Welcome! is logged after the catch block closes. Help: 2.5.4 (try...catch: Attempt and Recover)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "catch[\\s\\S]*Welcome!",
+      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\$\\{[^}]*\\})*\\}[\\s\\S]*Welcome!",
       "flags": "i",
       "points": 0
     }

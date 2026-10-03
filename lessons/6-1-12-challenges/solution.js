@@ -1,4 +1,4 @@
-// 2.3.12 Challenges: reference solution.
+// 6.2.7 Challenges: reference solution.
 // Combines all three Groups stretches: Challenge 1 (lives counter via a
 // rocks Group), Challenge 2 (varied-size/value apples driven by Math.random),
 // Challenge 3 (`cull()` helper replacing the manual backwards loop).

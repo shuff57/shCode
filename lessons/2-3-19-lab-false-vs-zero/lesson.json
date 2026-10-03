@@ -71,7 +71,7 @@
       "description": "Code contains at least one break statement. Help: 2.3.9 (break and Fall-Through)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "break",
+      "pattern": "(?:\\bbreak\\b[\\s\\S]*){3}",
       "flags": "i",
       "points": 0
     }

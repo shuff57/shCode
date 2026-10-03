@@ -61,7 +61,7 @@
       "description": "Code contains a break statement",
       "type": "regex",
       "file": "script.js",
-      "pattern": "break",
+      "pattern": "(?:\\bbreak\\b[\\s\\S]*){2}",
       "flags": "i",
       "points": 0
     }

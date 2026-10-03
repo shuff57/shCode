@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Write the equivalent switch",
-      "instructions": "Below the comment, write a switch on light with cases for 'green', 'yellow', and 'red', plus a default for anything else. Match the same messages as the original chain."
+      "instructions": "First create a variable called light set to \"green\", \"yellow\" or \"red\". Below the comment, write a switch on light with cases for 'green', 'yellow', and 'red', plus a default for anything else. Match the same messages as the original chain."
     }
   ],
   "requirements": [
@@ -81,7 +81,7 @@
       "description": "Code contains a break statement. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "break",
+      "pattern": "(?:\\bbreak\\b[\\s\\S]*){3}",
       "flags": "i",
       "points": 0
     }

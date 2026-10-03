@@ -8,6 +8,8 @@ The cost is not paid when you write it. You know what `d` means right now. It is
 
 Half-abbreviations are the sneakier version. `usrNm`, `calcTot`, `btnClk`: these save four keystrokes and cost the reader a translation step every time. Write `userName`, `calculateTotal`, `buttonClicked`. Nobody has ever opened a file and wished the names were shorter.
 
+Two more bad habits belong in the same pile. A **numbered name** like `a1` or `item2` says nothing about what it holds, only that there were at least two of something. And a name like `myVariable` sounds harmless because it is a real word, but it is meaningless: every variable is a variable, and it is yours, so the name tells the reader nothing.
+
 **What you'll learn from it:**
 - Single letters tell the reader nothing, not even what kind of thing it is.
 - The cost is paid by the next reader, which is usually you.

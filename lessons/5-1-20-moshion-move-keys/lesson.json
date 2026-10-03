@@ -23,7 +23,7 @@
     {
       "id": "s2",
       "title": "Horizontal movement",
-      "instructions": "In update(), if kb.pressing('left') set player.vel.x = -4; else if kb.pressing('right') set +4; else set it to 0.",
+      "instructions": "In update() (it runs every frame, just before draw()), if kb.pressing('left') set player.vel.x = -4; else if kb.pressing('right') set +4; else set it to 0. WASD ('a' / 'd') works the same way and is what the graded labs use.",
       "hints": [
         "vel.x is pixels per frame. Positive = right, negative = left."
       ]
@@ -31,7 +31,7 @@
     {
       "id": "s3",
       "title": "Vertical movement",
-      "instructions": "Same pattern with 'up' / 'down' on player.vel.y. Remember: in screen coords, up is negative y.",
+      "instructions": "Same pattern with 'up' / 'down' (or 'w' / 's') on player.vel.y. Remember: in screen coords, up is negative y.",
       "hints": [
         "Always reset vel.y to 0 in the else branch or the sprite will coast forever."
       ]
@@ -69,14 +69,14 @@
     {
       "id": "r3",
       "title": "Horizontal keyboard input",
-      "description": "Left or right keys affect the sprite each frame. Help: 5.1.13 (kb.pressing(key))",
+      "description": "Left/right (or A/D) keys affect the sprite each frame. Help: 5.1.13 (kb.pressing(key))",
       "type": "inFunction",
       "function": [
         "update",
         "draw"
       ],
       "file": "script.js",
-      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:left|right)['\"]",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:left|right|a|d)['\"]",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -84,14 +84,14 @@
     {
       "id": "r4",
       "title": "Vertical keyboard input",
-      "description": "Up or down keys affect the sprite each frame. Help: 5.1.13 (kb.pressing(key))",
+      "description": "Up/down (or W/S) keys affect the sprite each frame. Help: 5.1.13 (kb.pressing(key))",
       "type": "inFunction",
       "function": [
         "update",
         "draw"
       ],
       "file": "script.js",
-      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:up|down)['\"]",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:up|down|w|s)['\"]",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -26,7 +26,7 @@ function draw() {
   else                       player.vel.x = 0;
 
   // Only allow jump when in contact with ground.
-  // NOTE: pass a literal space ' ' to kb.presses: the string 'space' is not recognized.
+  // NOTE: 'space' and ' ' both name the space bar.
   if (kb.presses(' ') && player.colliding(ground)) {
     player.vel.y = -12;
   }
@@ -139,7 +139,7 @@ When tuning, change **one** value at a time. If you change gravity AND impulse t
 
 ## Key takeaways
 
-- The ground-gated jump pattern is one line: `if (kb.presses(' ') && player.colliding(ground)) player.vel.y = -<n>;`. The space arg must be a literal space character: `'space'` is not recognized.
+- The ground-gated jump pattern is one line: `if (kb.presses('space') && player.colliding(ground)) player.vel.y = -<n>;`. The key name `'space'` and a literal `' '` both work.
 - `kb.presses` handles "fire once per tap." `colliding` handles "are you allowed to fire?" Both gates matter.
 - `colliding` works with a single sprite OR a Group: same idiom, scales for free.
 - Tune gravity, jump impulse, and run speed **one knob at a time**: otherwise you can't tell which one fixed the feel.

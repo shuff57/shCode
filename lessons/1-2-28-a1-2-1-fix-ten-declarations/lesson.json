@@ -59,7 +59,7 @@
       "description": "isEnrolled holds a real boolean -- true, false, or a comparison that produces one -- not quoted text. Help: 1.2.17 (The boolean Type)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const|var)\\s+isEnrolled\\s*=\\s*(?!\\s)(?![\"'`])(?!\\d[\\d.]*\\s*[;\\n])[^;\\n]+",
+      "pattern": "(?:let|const|var)\\s+isEnrolled\\s*=\\s*(?:!*(?:true|false)\\b|Boolean\\s*\\(|[^;\\n\"'`]*(?:===|!==|==|!=|<=|>=|<|>))",
       "flags": "",
       "points": 0
     },

@@ -49,7 +49,7 @@
       "description": "console.log is called with the discount variable. Help: 2.1.20 (The Conditional Operator ?)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*discount\\s*\\)",
+      "pattern": "console\\.log\\s*\\([^)]*\\bdiscount\\b",
       "points": 0
     }
   ],

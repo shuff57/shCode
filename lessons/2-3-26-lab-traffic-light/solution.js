@@ -5,11 +5,11 @@ switch (light) {
     console.log('Go');
     break;
   case 'yellow':
-    console.log('Caution');
+    console.log('Slow down');
     break;
   case 'red':
     console.log('Stop');
     break;
   default:
-    console.log('Invalid light');
+    console.log('Broken light');
 }

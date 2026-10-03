@@ -29,7 +29,7 @@
     {
       "id": "s4",
       "title": "Now try it with single quotes",
-      "instructions": "Log the same text again using single quotes instead of backticks. Read both outputs and note the difference."
+      "instructions": "Log the same text again using single quotes instead of backticks, keeping the ${myName} part inside the single quotes. Read both outputs and note the difference."
     }
   ],
   "requirements": [

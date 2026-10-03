@@ -66,7 +66,7 @@ function draw() {
 
 ## Step 3: Add player movement in the play state
 
-Now the play state has real gameplay: a player sprite that moves with arrow keys. Score keeps incrementing.
+Now the play state has real gameplay: a player sprite that moves with arrow keys. Score keeps incrementing. (`floor(n)` rounds a number down to a whole number.)
 
 ```js live
 let state = 'title';

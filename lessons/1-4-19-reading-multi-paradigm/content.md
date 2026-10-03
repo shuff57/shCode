@@ -24,6 +24,8 @@ So "what paradigm is this program?" is often the wrong question. "What paradigm 
 
 Three styles, one program, and no errors. Read each block's comment and check you can see why it earns its label.
 
+*(A preview, read only: `{ ... }` bundles named values, `[ ... ]` is a list, `.filter(function ...)` keeps the items that pass a rule, and `for` repeats a block. Chapters 2, 3 and 5 teach these.)*
+
 ```js live plain
 // Object-oriented: data bundled into one value
 let player = { name: "Ada", scores: [8, 25, 3] };

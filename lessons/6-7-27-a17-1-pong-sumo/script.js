@@ -1,4 +1,4 @@
-// 2.7.26 A17.1 Two-Player Pong-Sumo: two players, one ball, first to 5.
+// 6.8.14 A17.1 Two-Player Pong-Sumo: two players, one ball, first to 5.
 
 let gameState;
 let p1, p2, ball;

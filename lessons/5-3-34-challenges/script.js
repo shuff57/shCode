@@ -1,4 +1,4 @@
-// 2.2.13 Challenges: pick at least one OOP stretch from content.md.
+// 5.4.21 Challenges: pick at least one OOP stretch from content.md.
 // You are graded on four things: defining a class, giving it a constructor,
 // building an object from it, and using one further OOP feature. The content
 // page lists which features count.

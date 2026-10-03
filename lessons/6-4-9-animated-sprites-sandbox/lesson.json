@@ -52,7 +52,7 @@
       "description": "Assign sprite.image (or sprite.img) somewhere in your sketch.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.(image|img)\\s*=",
+      "pattern": "\\.(image|img)\\s*=|\\.addAni\\s*\\(",
       "flags": "",
       "points": 0
     },

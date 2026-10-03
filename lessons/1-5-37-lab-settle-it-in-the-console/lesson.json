@@ -56,10 +56,10 @@
     {
       "id": "r3",
       "title": "The rule is stated in a comment",
-      "description": "A comment naming precedence, order of operations, or that multiplication happens first. Help: 1.5.19 (Pseudocode and Flowcharts)",
+      "description": "A comment naming precedence, order of operations, or that multiplication happens first. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "//[^\\n]*(?:precedence|order of operations|pemdas|bodmas|bidmas|(?:multipl\\w*|times)[^\\n]*(?:first|before)|(?:brackets?|parenthes\\w*)[^\\n]*(?:first|change|before))",
+      "pattern": "(?://|/\\*)[^\\n]*(?:precedence|priorit\\w*|order of operations|pemdas|bodmas|bidmas|bedmas|(?:multipl\\w*|times|\\*)[^\\n]*(?:first|before)|(?:brackets?|parenthes\\w*)[^\\n]*(?:first|change|before)|(?:change|first|before)[^\\n]*(?:brackets?|parenthes\\w*))",
       "flags": "i",
       "stripComments": false,
       "points": 0

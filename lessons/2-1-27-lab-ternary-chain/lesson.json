@@ -58,7 +58,7 @@
       "description": "console.log is called with the rating variable. Help: 2.1.23 (Chaining Multiple ? Operators)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*rating\\s*\\)",
+      "pattern": "console\\.log\\s*\\([^)]*\\brating\\b",
       "points": 0
     }
   ],

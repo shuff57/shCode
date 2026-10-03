@@ -45,7 +45,7 @@
       "description": "The file is valid JavaScript and reaches the end. Help: 1.5.38 (Reading an Error Message)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "let\\s+itemName\\s*=\\s*(?:\"[^\"\\n]*\"|'[^'\\n]*'|`[^`\\n]*`)\\s*;",
+      "pattern": "(?:let|const|var)\\s+itemName\\s*=\\s*(?:\"[^\"\\n]*\"|'[^'\\n]*'|`[^`\\n]*`)\\s*;",
       "flags": "",
       "stripComments": false,
       "hint": "The console names the line it gave up on. Go to that line and read it one character at a time.",
@@ -57,7 +57,7 @@
       "description": "Nothing in the file uses a name that was never declared. Help: 1.5.39 (Cause a ReferenceError on Purpose)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?![\\s\\S]*\\bbeforTax\\b)(?=[\\s\\S]*\\btotal\\s*=\\s*(?:beforeTax\\s*\\+\\s*tax|tax\\s*\\+\\s*beforeTax))[\\s\\S]*$",
+      "pattern": "^(?![\\s\\S]*\\bbeforTax\\b)(?=[\\s\\S]*\\btotal\\s*=\\s*(?:beforeTax\\s*\\+\\s*tax|tax\\s*\\+\\s*beforeTax|subtotal\\s*\\+\\s*shipping\\s*\\+\\s*tax))[\\s\\S]*$",
       "flags": "",
       "hint": "A ReferenceError always names the thing it could not find. That name is the clue.",
       "points": 0
@@ -68,7 +68,7 @@
       "description": "The total before tax is the sum of the values that make it up. Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let\\s+shipping\\s*=\\s*5\\s*;|beforeTax\\s*=\\s*[^;\\n]*Number\\s*\\(\\s*shipping\\s*\\))",
+      "pattern": "(?:let|const|var)\\s+shipping\\s*=\\s*(?:5(?:\\.0+)?\\s*(?:;|\\n|$)|(?:Number|parseFloat|parseInt)\\s*\\(\\s*[\"']5[\"']\\s*\\))|beforeTax\\s*=\\s*[^;\\n]*(?:(?:Number|parseFloat|parseInt)\\s*\\(\\s*shipping\\s*\\)|\\+\\s*\\+\\s*shipping)",
       "flags": "",
       "hint": "Work out on paper what that line should say, then compare. If the two disagree, ask what type each value being combined actually is.",
       "points": 0

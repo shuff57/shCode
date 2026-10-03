@@ -29,6 +29,8 @@ The mistake is on the first line: `price` holds *text*. But nothing complains th
 
 The `$` is what does it. `*` tries to turn both sides into numbers first (`1.2.7 Reading: Arithmetic Operators and Type Coercion`), and `"12.99"` would survive that: it is text, but it is text that reads as a number. `"$12.99"` does not, so the conversion fails and you get `NaN`.
 
+`Number()` is the function that does that conversion on purpose: `Number("12.99")` gives the number `12.99`, while `Number("$12.99")` or `Number("three")` cannot read the text as a number, so it gives `NaN`.
+
 Change `"$12.99"` to `12.99`: no quotes and no dollar sign, and run it again. Everything downstream repairs itself, because the problem was never downstream.
 
 ## Step 3: The one exception

@@ -81,14 +81,10 @@
     {
       "id": "r4",
       "title": "Use at least one stretch joint feature",
-      "description": "Your sketch uses a SliderJoint, a HingeJoint chain (3+ linked sprites), or a trebuchet combining DistanceJoint and HingeJoint.",
-      "type": "inFunction",
-      "function": [
-        "setup",
-        "draw"
-      ],
+      "description": "Your sketch uses a SliderJoint, a HingeJoint chain (3+ linked sprites, a loop of new HingeJoint(prev, curr) counts), or a trebuchet combining DistanceJoint and HingeJoint.",
+      "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+SliderJoint\\s*\\(|new\\s+HingeJoint\\s*\\([^)]+\\)[^]*new\\s+HingeJoint\\s*\\(|new\\s+DistanceJoint\\s*\\([^)]*\\)[^]*new\\s+HingeJoint\\s*\\(|new\\s+HingeJoint\\s*\\([^)]*\\)[^]*new\\s+DistanceJoint\\s*\\(",
+      "pattern": "new\\s+SliderJoint\\s*\\(|new\\s+HingeJoint\\s*\\([^)]+\\)[^]*new\\s+HingeJoint\\s*\\(|new\\s+DistanceJoint\\s*\\([^)]*\\)[^]*new\\s+HingeJoint\\s*\\(|new\\s+HingeJoint\\s*\\([^)]*\\)[^]*new\\s+DistanceJoint\\s*\\(|(?:for|while)\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?new\\s+HingeJoint\\s*\\(",
       "flags": "",
       "points": 0
     }

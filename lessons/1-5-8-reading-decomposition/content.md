@@ -18,6 +18,8 @@ In the jam sandwich example, decomposition means identifying every ingredient re
 
 "Print a receipt" is one task until you take it apart. Each comment below is a part small enough to be obviously right or obviously wrong on its own.
 
+*(`.toFixed(2)` rounds a number to two decimal places, as in 1.3.18.)*
+
 ```js live plain
 // part 1: know what was bought and how much it costs
 let itemName = "Notebook";

@@ -32,7 +32,7 @@
     {
       "id": "s3",
       "title": "Pick a stretch from content.md",
-      "instructions": "Implement at least one: a parallax background (a second sprite at a lower layer that moves slower), mirroring the sprite with mirrorX when walking left, or vertical camera follow.",
+      "instructions": "Implement at least one: a parallax background (a second sprite at a lower layer that moves slower), mirroring the sprite (sprite.scale.x = -1) when walking left, or vertical camera follow.",
       "hints": [
         "content.md describes three stretches with hints for each: pick whichever interests you."
       ]

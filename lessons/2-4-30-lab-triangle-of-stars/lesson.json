@@ -36,7 +36,7 @@
       "description": "An outer for loop (1 to 5) contains an inner for loop whose upper bound is the outer loop's own counter, and the row is logged after the inner loop closes. Help: 2.4.24 (Nested Loops)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\1\\s*(?:<=\\s*5|<\\s*6)\\s*;\\s*\\1\\+\\+\\s*\\)\\s*\\{[^{}]*for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\2\\s*<=\\s*\\1\\s*;\\s*\\2\\+\\+\\s*\\)\\s*\\{[^{}]*\\}(?=[^{}]*console\\.log)[^{}]*\\}",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\1\\s*(?:<=\\s*5|<\\s*6)\\s*;\\s*\\1\\+\\+\\s*\\)\\s*\\{[^{}]*for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\2\\s*<=\\s*\\1\\s*;\\s*\\2\\+\\+\\s*\\)\\s*\\{[^{}]*\\}(?=(?:[^{}]|\\$\\{[^}]*\\})*console\\.log)(?:[^{}]|\\$\\{[^}]*\\})*\\}",
       "flags": "i",
       "points": 0
     },
