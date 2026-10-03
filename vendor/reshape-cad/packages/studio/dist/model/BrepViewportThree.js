@@ -1,5 +1,5 @@
 'use client';
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 // The three.js twin of components/model/BrepViewport.tsx -- same OpenCascade
 // kernel, same ModelDoc, same props, a different renderer underneath. Built
 // alongside the JSCAD/regl viewport rather than in place of it so the two can
@@ -263,6 +263,16 @@ const FILTER_CHIPS = [
  */
 export default function BrepViewportThree({ doc, deflection, onStats, onPick, pick, selectedCount, selectionLabel, anchors, onAnchors, onMesh, registerPickAt, sketchPlane, selectedDatumIds, onDatumPick, panelOcclusionPx, ruleActivityAt, onEngine, badgesInStatusBar = false, onNavHint, filters, onFiltersChange, onBoxSelect, onFeatureDoubleClick, onSelectAll, onDeleteSelected, onUndo, onRedo, onStartSketch, onRepeat, onMoveHotkey, preview, }) {
     const [phase, setPhase] = useState('loading');
+    // Section view: a display-only clipping plane. The kernel and the model are
+    // untouched, so volume and exports never change. `t` is 0..1 along the part's
+    // own extent on `axis`; `flip` keeps the other side.
+    const [section, setSection] = useState({ on: false, axis: 1, t: 0.5, flip: false });
+    const sectionRef = useRef(section);
+    sectionRef.current = section;
+    useEffect(() => { if (phase === 'ready')
+        applySectionRef.current(); }, [section, phase]);
+    const applySectionRef = useRef(() => { });
+    applySectionRef.current = applySection;
     // Which view-strip preset the camera is sitting on, or null once the
     // student has dragged away from it. A blind judge could not tell the
     // Underneath view from Top -- straight up and straight down look alike --
@@ -1158,6 +1168,21 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             }
             return { distPx: bestDistPx, depth: bestDepth };
         }
+        // Section view: the plane only hides pixels, so the raycaster still hits
+        // the cut-away wall in front of the inside. Drop hits on the hidden side,
+        // and hits on a back face (the inside of the cut wall), so a click lands
+        // on what is drawn.
+        const clipOut = (p) => {
+            const pl = renderer.clippingPlanes;
+            return !!pl && pl.length > 0 && pl[0].distanceToPoint(p) < 0;
+        };
+        const lineClipped = (line) => {
+            const pos = line.geometry.getAttribute('position');
+            if (!pos || !sectionRef.current.on)
+                return false;
+            return [0, pos.count >> 1, pos.count - 1].every((i) => clipOut(new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i)).applyMatrix4(line.matrixWorld)));
+        };
+        const sectionFilter = (hits, dir) => !sectionRef.current.on ? hits : hits.filter((h) => !clipOut(h.point) && !(h.face && h.face.normal.dot(dir) > 0));
         function hitAt(clientX, clientY) {
             const filters = filtersRef.current;
             const rect = renderer.domElement.getBoundingClientRect();
@@ -1170,7 +1195,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             // edge/vertex occlusion checks below -- which kind actually gets
             // RETURNED depends on `filters` and the priority order below (vertex,
             // then edge, then face, then body), not on this test order.
-            const faceHits = raycaster.intersectObjects(solidGroup.children, false);
+            const faceHits = sectionFilter(raycaster.intersectObjects(solidGroup.children, false), raycaster.ray.direction);
             const faceHit = faceHits.find((h) => h.faceIndex != null);
             const camDist = camera.position.distanceTo(controls.target);
             const occlusionMaxDepth = faceHit
@@ -1199,6 +1224,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                         continue;
                     for (let i = 0; i < pos.count; i++) {
                         const world = new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i)).applyMatrix4(mesh.matrixWorld);
+                        if (clipOut(world))
+                            continue;
                         const depth = camera.position.distanceTo(world);
                         const proj = world.clone().project(camera);
                         const distPx = Math.hypot(cursor.x - (proj.x * 0.5 + 0.5) * rect.width, cursor.y - (1 - (proj.y * 0.5 + 0.5)) * rect.height);
@@ -1236,6 +1263,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             if (filters.edge) {
                 const candidates = [];
                 for (const line of edgePickLinesRef.current) {
+                    if (lineClipped(line))
+                        continue;
                     const { distPx, depth } = closestEdgeScreenDist(line, rect.width, rect.height, cursor);
                     if (distPx <= EDGE_HIT_BAND_PX)
                         candidates.push({ distPx, depth, line });
@@ -1349,7 +1378,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             const cursor = { x: clientX - rect.left, y: clientY - rect.top };
             const ndc = new THREE.Vector2((cursor.x / rect.width) * 2 - 1, -(cursor.y / rect.height) * 2 + 1);
             raycaster.setFromCamera(ndc, camera);
-            const faceHits = raycaster.intersectObjects(solidGroup.children, false);
+            const faceHits = sectionFilter(raycaster.intersectObjects(solidGroup.children, false), raycaster.ray.direction);
             const faceHit = faceHits.find((h) => h.faceIndex != null);
             const camDist = camera.position.distanceTo(controls.target);
             const occlusionMaxDepth = faceHit
@@ -1363,6 +1392,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                         continue;
                     for (let i = 0; i < pos.count; i++) {
                         const world = new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i)).applyMatrix4(mesh.matrixWorld);
+                        if (clipOut(world))
+                            continue;
                         const depth = camera.position.distanceTo(world);
                         const proj = world.clone().project(camera);
                         const distPx = Math.hypot(cursor.x - (proj.x * 0.5 + 0.5) * rect.width, cursor.y - (1 - (proj.y * 0.5 + 0.5)) * rect.height);
@@ -1379,6 +1410,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             if (filters.edge) {
                 const edgeCandidates = [];
                 for (const line of edgePickLinesRef.current) {
+                    if (lineClipped(line))
+                        continue;
                     const { distPx, depth } = closestEdgeScreenDist(line, rect.width, rect.height, cursor);
                     if (distPx <= EDGE_HIT_BAND_PX)
                         edgeCandidates.push({ distPx, depth, line });
@@ -2992,6 +3025,43 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             tube.visible = true;
         }
     }
+    /** Apply the section state to the renderer and to every drawn solid. Safe to
+     *  call at any time: it does nothing until the scene exists. */
+    function applySection() {
+        const three = threeRef.current;
+        const group = solidGroupRef.current;
+        const renderer = rendererRef.current;
+        const scene = sceneRef.current;
+        const camera = cameraRef.current;
+        if (!three || !group || !renderer || !scene || !camera)
+            return;
+        const { THREE } = three;
+        const sec = sectionRef.current;
+        let on = sec.on;
+        if (on) {
+            const box = new THREE.Box3().setFromObject(group);
+            if (box.isEmpty())
+                on = false;
+            else {
+                const lo = box.min.getComponent(sec.axis);
+                const hi = box.max.getComponent(sec.axis);
+                const at = lo + sec.t * (hi - lo);
+                const n = new THREE.Vector3();
+                n.setComponent(sec.axis, sec.flip ? 1 : -1);
+                renderer.clippingPlanes = [new THREE.Plane(n, sec.flip ? -at : at)];
+            }
+        }
+        if (!on)
+            renderer.clippingPlanes = [];
+        for (const m of group.children) {
+            const mat = m.material;
+            if (mat) {
+                mat.side = on ? THREE.DoubleSide : THREE.FrontSide;
+                mat.needsUpdate = true;
+            }
+        }
+        renderer.render(scene, camera);
+    }
     /** Replace the drawn solids and render exactly one frame. Never called from
      *  inside a loop -- see the render-on-demand note above. Returns the meshes
      *  it created so the caller can re-apply a persisted selection against
@@ -3036,6 +3106,11 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         const material = new THREE.MeshStandardMaterial({
             color: 0xff6600, roughness: 0.6, metalness: 0.1,
         });
+        // Seen only through a section cut: the inside of the outer wall shows as a
+        // flat cap colour, so the cut reads as solid material rather than a hole.
+        material.onBeforeCompile = (shader) => {
+            shader.fragmentShader = shader.fragmentShader.replace('#include <dithering_fragment>', 'if (!gl_FrontFacing) gl_FragColor = vec4(0.36, 0.62, 0.82, 1.0);\n#include <dithering_fragment>');
+        };
         // Phase 5.3 (todo 25): while a preview is active the rebuilt meshes
         // are drawn TRANSLUCENT in the op's colour, not the committed orange --
         // the colour says "not committed yet", the opacity says "computed",
@@ -3104,6 +3179,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             }
         }
         renderer.render(scene, camera);
+        applySection();
         return meshes;
     }
     /**
@@ -3734,7 +3810,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                         }, "data-cube-menu": "1", title: "Camera options (perspective / orthographic, set Home / Front / Top)", onClick: () => setCubeMenu((v) => !v), children: "\u2699" })] })), cubeMenu && (_jsxs("div", { style: {
                     position: 'fixed', left: gearPos?.x ?? 0, top: gearPos?.y ?? 0, zIndex: 5, padding: 6, display: 'flex', flexDirection: 'column', gap: 4,
                     background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 6,
-                }, "data-cube-menu-root": "1", children: [_jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => applyCameraModeAndToggle(CameraMode.PERSPECTIVE), children: "Perspective" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => applyCameraModeAndToggle(CameraMode.ORTHOGRAPHIC), children: "Orthographic" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => { fitToModel(HOME_DIR); setPreset('home'); setCubeMenu(false); }, children: "Set as Home" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => { lookFrom(FRONT_DIR); setPreset('front'); setCubeMenu(false); }, children: "Set as Front" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => { lookFrom(TOP_DIR); setPreset('top'); setCubeMenu(false); }, children: "Set as Top" })] })), phase === 'ready' && !badgesInStatusBar && (hoveringEdge && !pick || !!selectedCount) && (_jsxs("div", { style: topRightStackStyle, children: [hoveringEdge && !pick && (_jsx("div", { style: edgeHintStyle, children: "Click this edge to round or bevel just it" })), !!selectedCount && (_jsx("div", { style: selectionBadgeStyle, children: selectionLabel ?? (pick ? '1 edge picked' : `${selectedCount} Selected`) }))] }))] }));
+                }, "data-cube-menu-root": "1", children: [_jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => applyCameraModeAndToggle(CameraMode.PERSPECTIVE), children: "Perspective" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => applyCameraModeAndToggle(CameraMode.ORTHOGRAPHIC), children: "Orthographic" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => { fitToModel(HOME_DIR); setPreset('home'); setCubeMenu(false); }, children: "Set as Home" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => { lookFrom(FRONT_DIR); setPreset('front'); setCubeMenu(false); }, children: "Set as Front" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => { lookFrom(TOP_DIR); setPreset('top'); setCubeMenu(false); }, children: "Set as Top" })] })), phase === 'ready' && (_jsxs("div", { style: sectionPanelStyle, "data-section-panel": "1", children: [_jsx("button", { type: "button", title: "Cut the view with a plane to see inside the part (display only: the model is unchanged)", style: section.on ? viewStripActiveStyle : viewStripButtonStyle, "aria-pressed": section.on, onClick: () => setSection((s) => ({ ...s, on: !s.on })), children: "Section" }), section.on && (_jsxs(_Fragment, { children: [[0, 1, 2].map((a) => (_jsx("button", { type: "button", title: `Cut across ${'xyz'[a]}`, style: section.axis === a ? viewStripActiveStyle : viewStripButtonStyle, "aria-pressed": section.axis === a, onClick: () => setSection((s) => ({ ...s, axis: a })), children: 'XYZ'[a] }, a))), _jsx("input", { type: "range", min: 0, max: 1, step: 0.005, value: section.t, "aria-label": "Section position", style: { width: 120 }, onChange: (e) => { const t = Number(e.target.value); setSection((s) => ({ ...s, t })); } }), _jsx("button", { type: "button", title: "Keep the other side of the cut", style: viewStripButtonStyle, onClick: () => setSection((s) => ({ ...s, flip: !s.flip })), children: "Flip" })] }))] })), phase === 'ready' && !badgesInStatusBar && (hoveringEdge && !pick || !!selectedCount) && (_jsxs("div", { style: topRightStackStyle, children: [hoveringEdge && !pick && (_jsx("div", { style: edgeHintStyle, children: "Click this edge to round or bevel just it" })), !!selectedCount && (_jsx("div", { style: selectionBadgeStyle, children: selectionLabel ?? (pick ? '1 edge picked' : `${selectedCount} Selected`) }))] }))] }));
 }
 const overlayStyle = {
     position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -3765,6 +3841,10 @@ const errorPanelStyle = {
 // in the model tree (selectedCount > 0) while the student hovers one of its
 // edges before clicking. Stacking avoids the two pills drawing on top of
 // each other in that case; either can also appear alone.
+// Above the view strip (left 12, bottom 12) so the two never overlap.
+const sectionPanelStyle = {
+    position: 'absolute', left: 12, bottom: 104, display: 'flex', gap: 6, alignItems: 'center',
+};
 const topRightStackStyle = {
     position: 'absolute', top: 12, right: 12, display: 'flex', flexDirection: 'column',
     alignItems: 'flex-end', gap: 6, pointerEvents: 'none',

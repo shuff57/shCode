@@ -448,7 +448,7 @@ A 20 × 20 × 10 box moved and then rotated.
 
 `intersect(a, b)` keeps only the part where a and b overlap. The result is their intersection—the shape where both exist.
 
-The first argument is the one you keep. `subtract(a, b)` removes b from a; `subtract(b, a)` removes a from b. The order matters.
+The first argument is the one you keep. `subtract(a, b)` removes b from a; `subtract(b, a)` removes a from b. The order matters. It also works on a part that is already hollow, an open-top cup, or a part with a flat-sided pocket: a 60 × 30 × 40 box laid over half of a hollowed 40 × 40 × 20 box (`shell(b, { wall: 2 })`) takes away exactly half, leaving 11264 ÷ 2 = 5632 mm³. A part with a round hole cut into it cannot take a second `subtract` yet, and the panel says so.
 
 ```js join-shapes
 const base = cuboid(40, 40, 10, { at: [0, 0, 5] })
