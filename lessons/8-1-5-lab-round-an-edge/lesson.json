@@ -19,7 +19,8 @@
       "hints": [
         "Look for the thin line along the top of the box where two faces meet. Slide the mouse across it until it lights up light blue, then click without moving. Pink means it is selected.",
         "If the label reads \"top face\" instead of \"edge\", you clicked a little too far from the line. Try again, right on it.",
-        "Hard to see the edge? Drag in the 3D view to turn the box, or press Home to fit it."
+        "Hard to see the edge? Drag in the 3D view to turn the box, or press Home to fit it.",
+        "If the \"BOX 1 · EDGE\" label is not on screen, close the Quest tab (it narrows the 3D view) and look again at the bottom-left of the 3D view."
       ]
     },
     {
