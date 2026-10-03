@@ -91,6 +91,12 @@ export function generatedParams(doc) {
             pushCentre(out, f.id, label, f.center);
             pushTurn(out, f.id, label, f.rotate);
         }
+        else if (f.kind === 'datum') {
+            // A named plane's offset is a slot (the sketches on it follow it); a
+            // literal frame has none -- its origin/u/v are frozen numbers.
+            if (!f.frame)
+                push('offset', 'offset', f.offset ?? 0, { min: -500, max: 500, step: 1 });
+        }
         else if (f.kind === 'groove') {
             push('angle', 'angle', f.angle);
         }
@@ -136,7 +142,8 @@ export function generatedParams(doc) {
                         step: 1,
                     });
                 }
-                push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
+                if (!f.onDatum)
+                    push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
                 return out;
             }
             if (f.shape === 'circle' && f.points.length === 2) {
@@ -189,7 +196,8 @@ export function generatedParams(doc) {
                     });
                 }
             }
-            push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
+            if (!f.onDatum)
+                push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
         }
         else if (f.kind === 'extrude') {
             push('height', 'height', f.height);
@@ -452,6 +460,12 @@ export function applyParam(doc, name, value) {
                 return { ...f, height: value };
             }
         }
+        if (f.kind === 'datum') {
+            if (slot === 'offset' && !f.frame) {
+                changed = true;
+                return { ...f, offset: value };
+            }
+        }
         if (f.kind === 'groove') {
             if (slot === 'angle') {
                 changed = true;
@@ -649,7 +663,18 @@ export function applyParam(doc, name, value) {
         }
         return f;
     });
-    return changed ? { ...doc, features } : doc;
+    if (!changed)
+        return doc;
+    // A datum plane moved: every sketch sitting on it follows, because the
+    // sketch carries its own copy of the placement (the kernel reads that).
+    const moved = features.find((f) => f.id === id);
+    if (moved && moved.kind === 'datum' && slot === 'offset') {
+        return {
+            ...doc,
+            features: features.map((f) => f.kind === 'sketch' && f.onDatum === id && !f.frame ? { ...f, offset: moved.offset ?? 0 } : f),
+        };
+    }
+    return { ...doc, features };
 }
 /**
  * Make every constrained sketch in a doc obey its own rules.

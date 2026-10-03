@@ -1,4 +1,4 @@
-import { type Feature, type ModelDoc, type SketchPlane } from './model-types.js';
+import { type SketchFrame, type Feature, type ModelDoc, type SketchPlane } from './model-types.js';
 export type HandleKind = 'size' | 'move' | 'turn' | 'point' | 'radius';
 export interface HandleSpec {
     kind: HandleKind;
@@ -18,6 +18,27 @@ export interface HandleSpec {
 export declare function planeAxes(plane: string): {
     u: [number, number, number];
     v: [number, number, number];
+};
+/**
+ * Where a sketch sits and which way Pull carries it, from the ONE resolver
+ * (sketchFrameOf) -- so a sketch with a `frame` (sketch-on-a-face, or on a
+ * datum plane) is handled on its real plane, not on the placeholder 'xy' its
+ * `plane` field holds. SPEC-datum-family Stage 1c.
+ *
+ * `u`/`v`/`origin` are the frame. `w` is the pull direction: a named plane
+ * keeps its MEASURED sweep (n * SWEEP_DIR, so xz pulls -Y); a literal frame
+ * pulls along u x v, exactly as the kernel's sketch_frame does.
+ */
+export declare function placementOf(sk: {
+    plane?: SketchPlane;
+    offset?: number;
+    frame?: SketchFrame;
+}): {
+    u: [number, number, number];
+    v: [number, number, number];
+    origin: [number, number, number];
+    n: [number, number, number];
+    w: [number, number, number];
 };
 /**
  * A single anchor at a sketch plane's own origin -- what a click-to-draw
@@ -45,4 +66,12 @@ export declare function handlesFor(f: Feature, doc?: ModelDoc): HandleSpec[];
  * nothing.
  */
 export declare function featureCenter(f: Feature, doc: ModelDoc): [number, number, number] | null;
+/**
+ * The named plane to look straight down when this feature is selected, or null.
+ * A sketch with a literal `frame` (sketch-on-a-face, or on a frame datum) has
+ * no named plane -- its `plane` field is a placeholder 'xy' -- so it returns
+ * null rather than looking down the wrong axis (SPEC-datum-family 1c).
+ * A datum is not a sketch: null.
+ */
+export declare function flatViewPlane(f: Feature | undefined | null): SketchPlane | null;
 //# sourceMappingURL=model-handles.d.ts.map

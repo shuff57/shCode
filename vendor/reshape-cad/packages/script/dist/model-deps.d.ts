@@ -1,4 +1,4 @@
-import type { ModelDoc } from './model-types.js';
+import type { Feature, ModelDoc } from './model-types.js';
 /**
  * Every feature that could not be built if `ids` were removed -- the ids
  * themselves plus everything that leans on them, however far down the chain.
@@ -61,4 +61,15 @@ export declare function danglingRefs(doc: ModelDoc): DanglingRef[];
  * during a delete would be a second, invisible edit.
  */
 export declare function withoutFeatures(doc: ModelDoc, ids: string[]): ModelDoc;
+/**
+ * The first feature in `features` that sits before something it depends on, or
+ * null when the order is buildable. The timeline's reorder guard (move() and
+ * moveTo() in ModelEditor.tsx) is this loop; it lives here so it can be tested
+ * without React. Because dependsOn() includes a sketch's datum plane, a sketch
+ * cannot move above its plane and a plane cannot move below a sketch on it.
+ */
+export declare function firstOrderViolation(features: Feature[]): {
+    feature: string;
+    missing: string[];
+} | null;
 //# sourceMappingURL=model-deps.d.ts.map

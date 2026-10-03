@@ -34,7 +34,7 @@ export function sketchFrameOf(f) {
         ];
         return { origin, u, v, n };
     }
-    const a = NAMED_PLANE_FRAMES[f.plane] ?? NAMED_PLANE_FRAMES.xy;
+    const a = NAMED_PLANE_FRAMES[f.plane ?? 'xy'] ?? NAMED_PLANE_FRAMES.xy;
     const offset = f.offset ?? 0;
     return {
         origin: [a.n[0] * offset, a.n[1] * offset, a.n[2] * offset],
@@ -61,11 +61,18 @@ export function dependsOn(f) {
     // variable references. Deleting the solid used to leave the cut pointing
     // at an undeclared name -- the exact ReferenceError this file exists for.
     const into = 'into' in f && typeof f.into === 'string' ? [f.into] : [];
+    const datum = datumRefs(f);
     if ('targets' in f)
-        return [...new Set([...f.targets, ...into, ...named])];
+        return [...new Set([...f.targets, ...into, ...named, ...datum])];
     if ('target' in f)
-        return [...new Set([f.target, ...into, ...named])];
-    return [...new Set([...into, ...named])];
+        return [...new Set([f.target, ...into, ...named, ...datum])];
+    return [...new Set([...into, ...named, ...datum])];
+}
+/** The datum plane a sketch sits on (SPEC-datum-family Stage 3). A separate
+ *  field from `target` on purpose: reusing `target` would collide with every
+ *  `'target' in f` consumer. */
+export function datumRefs(f) {
+    return f.kind === 'sketch' && f.onDatum ? [f.onDatum] : [];
 }
 /**
  * Feature ids a feature reaches through a TopoName rather than through a
@@ -114,7 +121,7 @@ export function isDerived(f) {
  * unblocks.
  */
 export function isSketchOnly(doc) {
-    return doc.features.length === 0 || doc.features.every((f) => f.kind === 'sketch');
+    return doc.features.length === 0 || doc.features.every((f) => f.kind === 'sketch' || f.kind === 'datum');
 }
 export const EMPTY_DOC = { version: 1, features: [] };
 /** A positioned primitive: has a centre, and can carry handles. Listed
@@ -323,6 +330,17 @@ export function newSketchOnFace(doc, frame, points = [[0, 0], [40, 0], [40, 25],
         points: points.map((p) => [p[0], p[1]]),
         constraints: RECTANGLE_CONSTRAINTS.slice(),
     };
+}
+/** The words a timeline row shows for where a sketch or datum sits: the named
+ *  plane, or 'custom plane' for a literal frame (whose `plane` field is only a
+ *  placeholder and would otherwise read 'xy'). */
+export function placementLabel(f) {
+    return f.frame ? 'custom plane' : (f.plane ?? 'xy');
+}
+/** A datum plane with no placement yet; the caller sets `plane`+`offset` or
+ *  `frame`. Ids are pl1, pl2, ... */
+export function newDatum(doc) {
+    return { id: nextId(doc, 'pl'), kind: 'datum', type: 'plane' };
 }
 /** A circle, drawn as the two ends of a diameter -- see SketchFeature.shape.
  *  Not a rectangle-with-round-corners and not four points: the tag is the
@@ -808,38 +826,39 @@ function labelOf(f) {
         return f.op === 'union' ? 'Join' : f.op === 'subtract' ? 'Cut' : 'Overlap';
     }
     return f.kind === 'sketch' ? 'Sketch'
-        : f.kind === 'extrude' ? 'Pull'
-            : f.kind === 'revolve' ? 'Spin'
-                : f.kind === 'mirror' ? 'Mirror'
-                    // Match the toolbar's own two labels (ModelEditor.tsx's patternLabel) --
-                    // this used to collapse both modes to plain "Repeat", so a circular
-                    // Repeat Around step showed up in the timeline as "Repeat 1", the same
-                    // name a linear Repeat would get.
-                    : f.kind === 'pattern' ? (f.mode === 'circular' ? 'Repeat Around' : 'Repeat')
-                        : f.kind === 'hole' ? 'Hole'
-                            : f.kind === 'shell' ? 'Hollow'
-                                // Match the toolbar's own two labels (ModelEditor.tsx's moveLabel) --
-                                // this used to always say "Move", so a Copy step showed up in the
-                                // timeline as "Move 2" with nothing marking it as a copy.
-                                : f.kind === 'move' ? (f.copy ? 'Copy' : 'Move')
-                                    : f.kind === 'box' ? 'Box'
-                                        : f.kind === 'cylinder' ? 'Cylinder'
-                                            : f.kind === 'cone' ? 'Cone'
-                                                : f.kind === 'torus' ? 'Ring'
-                                                    : f.kind === 'prism' ? 'Prism'
-                                                        : f.kind === 'wedge' ? 'Wedge'
-                                                            : f.kind === 'groove' ? 'Groove'
-                                                                : f.kind === 'pocket' ? 'Pocket'
-                                                                    : f.kind === 'blend' ? 'Blend'
-                                                                        : f.kind === 'sphere' ? 'Sphere'
-                                                                            // Decision: reference.md and studentWord() (lib/model-check.ts) both
-                                                                            // call this "bevel", and the toolbar's own button (ModelEditor.tsx's
-                                                                            // roundLabel) now says "Bevel" too -- one word for the tool everywhere
-                                                                            // a student meets it, not the three-way split ("Angled Corner" on the
-                                                                            // button, "bevel" in messages and the reference) this used to be.
-                                                                            : f.kind === 'fillet' ? (f.style === 'chamfer' ? 'Bevel' : 'Round')
-                                                                                : f.kind === 'draft' ? (f.whole ? 'Body draft' : 'Draft')
-                                                                                    : nameless(f);
+        : f.kind === 'datum' ? (f.frame ? 'Custom plane' : 'Plane')
+            : f.kind === 'extrude' ? 'Pull'
+                : f.kind === 'revolve' ? 'Spin'
+                    : f.kind === 'mirror' ? 'Mirror'
+                        // Match the toolbar's own two labels (ModelEditor.tsx's patternLabel) --
+                        // this used to collapse both modes to plain "Repeat", so a circular
+                        // Repeat Around step showed up in the timeline as "Repeat 1", the same
+                        // name a linear Repeat would get.
+                        : f.kind === 'pattern' ? (f.mode === 'circular' ? 'Repeat Around' : 'Repeat')
+                            : f.kind === 'hole' ? 'Hole'
+                                : f.kind === 'shell' ? 'Hollow'
+                                    // Match the toolbar's own two labels (ModelEditor.tsx's moveLabel) --
+                                    // this used to always say "Move", so a Copy step showed up in the
+                                    // timeline as "Move 2" with nothing marking it as a copy.
+                                    : f.kind === 'move' ? (f.copy ? 'Copy' : 'Move')
+                                        : f.kind === 'box' ? 'Box'
+                                            : f.kind === 'cylinder' ? 'Cylinder'
+                                                : f.kind === 'cone' ? 'Cone'
+                                                    : f.kind === 'torus' ? 'Ring'
+                                                        : f.kind === 'prism' ? 'Prism'
+                                                            : f.kind === 'wedge' ? 'Wedge'
+                                                                : f.kind === 'groove' ? 'Groove'
+                                                                    : f.kind === 'pocket' ? 'Pocket'
+                                                                        : f.kind === 'blend' ? 'Blend'
+                                                                            : f.kind === 'sphere' ? 'Sphere'
+                                                                                // Decision: reference.md and studentWord() (lib/model-check.ts) both
+                                                                                // call this "bevel", and the toolbar's own button (ModelEditor.tsx's
+                                                                                // roundLabel) now says "Bevel" too -- one word for the tool everywhere
+                                                                                // a student meets it, not the three-way split ("Angled Corner" on the
+                                                                                // button, "bevel" in messages and the reference) this used to be.
+                                                                                : f.kind === 'fillet' ? (f.style === 'chamfer' ? 'Bevel' : 'Round')
+                                                                                    : f.kind === 'draft' ? (f.whole ? 'Body draft' : 'Draft')
+                                                                                        : nameless(f);
 }
 /**
  * Every Feature kind must be named above. This takes `never`, so adding a
@@ -946,6 +965,6 @@ export function topLevel(doc) {
     // handing one to the renderer draws nothing -- the outline is drawn as an
     // overlay instead, so an un-extruded sketch is still visible while being
     // honestly absent from the model.
-    return doc.features.filter((f) => !consumed.has(f.id) && f.kind !== 'sketch');
+    return doc.features.filter((f) => !consumed.has(f.id) && f.kind !== 'sketch' && f.kind !== 'datum');
 }
 //# sourceMappingURL=model-types.js.map

@@ -27,7 +27,7 @@ import ContextBar from './model/ContextBar.js';
 import { writeSTL, writeOBJ, write3MF } from './mesh-export.js';
 import { add as addSelection, bodiesOf, clear as clearSelection, edgesOf, emptySelection, facesOf, featuresOf, ownerScoped, primaryOf, replace as replaceSelection, selectAllFeatures, toggle as toggleSelection, verticesOf, } from './selection-model.js';
 import { outlineOf } from '@shuff57/reshape-sketch/sketch-arc';
-import { handlesFor, featureCenter } from '@shuff57/reshape-script/model-handles';
+import { handlesFor, featureCenter, flatViewPlane } from '@shuff57/reshape-script/model-handles';
 import { previewTint } from './model/manipulator-core.js';
 import { EMPTY_DOC, isSketchOnly, nameMap, newSketch } from '@shuff57/reshape-script/model-types';
 import { ownerOf } from '@shuff57/reshape-script/model-selection';
@@ -716,7 +716,7 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
         if (selected.length !== 1)
             return null;
         const f = doc.features.find((x) => x.id === selected[0]);
-        return f && f.kind === 'sketch' ? (f.plane ?? 'xy') : null;
+        return flatViewPlane(f);
     }, [selected, doc]);
     const outlines = useMemo(() => {
         return doc.features
@@ -1150,7 +1150,7 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
                                                     primary: item,
                                                 };
                                             });
-                                        } : () => { }, pick: showBrep && primaryPick?.kind === 'edge' && primaryPick.name ? { target: primaryPick.target, name: primaryPick.name } : null, selectedCount: showBrep ? selected.length : 0, selectionLabel: showBrep ? selectionLabel : null, sketchPlane: activeSketchPlane, anchors: specs, onAnchors: setAnchors, onMesh: (m) => {
+                                        } : () => { }, pick: showBrep && primaryPick?.kind === 'edge' && primaryPick.name ? { target: primaryPick.target, name: primaryPick.name } : null, selectedCount: showBrep ? selected.length : 0, selectionLabel: showBrep ? selectionLabel : null, sketchPlane: activeSketchPlane, selectedDatumIds: selected.filter((id) => doc.features.some((f) => f.id === id && f.kind === 'datum')), anchors: specs, onAnchors: setAnchors, onMesh: (m) => {
                                             meshRef.current = m;
                                             setHasMesh(m !== null);
                                         }, onEngine: () => setEngineReady(true), badgesInStatusBar: true, onNavHint: setNavHintText, 

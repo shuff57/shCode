@@ -67,6 +67,7 @@ import {
   newPattern,
   newSketch,
   newSketchOnFace,
+  newDatum,
   type SketchFrame,
   RECTANGLE_CONSTRAINTS,
   newExtrude,
@@ -190,7 +191,7 @@ export const VOCABULARY = [
   'prism', 'wedge', 'groove', 'pocket',
   'hole', 'holes', 'hollow', 'round', 'bevel', 'repeat', 'repeatAround', 'mirror', 'move', 'turn',
   'join', 'cut', 'keep', 'draft',
-  'sketch', 'pull', 'spin', 'blend',
+  'sketch', 'plane', 'pull', 'spin', 'blend',
   'param',
   // official geometry names (API-facing; same fns as their student alias)
   'cuboid', 'torus', 'fillet', 'chamfer',
@@ -245,8 +246,8 @@ function messageOf(err: unknown): string {
 /** Classic edit distance -- insert, delete, substitute, each cost 1. Used
  *  only to find the closest VOCABULARY word to a name a script misspelled;
  *  nothing here needs to be fast, a script's undefined names are typed by
- *  hand and the candidate set is VOCABULARY's length (37 since SPEC-S2 added
- *  the official-name aliases) — small either way. */
+ *  hand and the candidate set is VOCABULARY's length (38: SPEC-S2's official-name
+ *  aliases, then SPEC-datum-family's plane) — small either way. */
 function levenshtein(a: string, b: string): number {
   const rows = a.length + 1;
   const cols = b.length + 1;
@@ -455,6 +456,17 @@ function wholeIndex(fn: string, label: string, v: unknown, count: number): numbe
     throw new Error(`${fn}'s ${label} has to be a whole number from 1 to ${count} -- you gave it ${val}.`);
   }
   return val - 1;
+}
+
+/** What plane() returns. Plain data in a class only so sketch() can tell it
+ *  from a hand-written frame; it is never stored in the doc. */
+class PlaneValue {
+  constructor(
+    readonly datumId: string,
+    readonly plane: SketchPlane | null,
+    readonly offset: number | undefined,
+    readonly frame: SketchFrame | null,
+  ) {}
 }
 
 function isPlainOptions(v: unknown): v is Record<string, unknown> {
@@ -870,17 +882,17 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
   // (it flips the normal) -- the student must see that, so it is documented
   // in the error and nothing here guesses. Plain numbers only (no param()).
   const FRAME_TOL = 1e-6;
-  function readFrame(given: Record<string, unknown>): SketchFrame {
-    const o = readOptions('sketch', ['origin', 'u', 'v'], given);
+  function readFrame(given: Record<string, unknown>, fn = 'sketch'): SketchFrame {
+    const o = readOptions(fn, ['origin', 'u', 'v'], given);
     for (const k of ['origin', 'u', 'v']) {
       if (o[k] === undefined) {
-        throw new Error(`sketch({ ... }) needs origin, u and v: sketch({ origin: [0, 0, 0], u: [1, 0, 0], v: [0, 1, 0] }). It is missing ${k}.`);
+        throw new Error(`${fn}({ ... }) needs origin, u and v: ${fn}({ origin: [0, 0, 0], u: [1, 0, 0], v: [0, 1, 0] }). It is missing ${k}.`);
       }
     }
     const vec = (label: string): Vec3 => {
-      const raw = readVec3('sketch', label, o[label]).map((n) => unwrap(n as number)) as Vec3;
+      const raw = readVec3(fn, label, o[label]).map((n) => unwrap(n as number)) as Vec3;
       if (!raw.every((n) => Number.isFinite(n))) {
-        throw new Error(`sketch()'s ${label} needs three finite numbers, like [x, y, z].`);
+        throw new Error(`${fn}()'s ${label} needs three finite numbers, like [x, y, z].`);
       }
       return raw;
     };
@@ -891,19 +903,62 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     for (const [label, a] of [['u', u], ['v', v]] as const) {
       if (Math.abs(len(a) - 1) > FRAME_TOL) {
         throw new Error(
-          `sketch()'s ${label} has to be a unit-length direction (its length is ${len(a)}, not 1). `
+          `${fn}()'s ${label} has to be a unit-length direction (its length is ${len(a)}, not 1). `
             + `Divide it by its length -- sketches are never silently rescaled.`,
         );
       }
     }
     const dot = u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
     if (Math.abs(dot) > FRAME_TOL) {
-      throw new Error(`sketch()'s u and v have to be at right angles to each other (their dot product is ${dot}, not 0).`);
+      throw new Error(`${fn}()'s u and v have to be at right angles to each other (their dot product is ${dot}, not 0).`);
     }
     return { origin, u, v };
   }
 
+  // plane(...): creates a `datum` feature (SPEC-datum-family Stage 3), which
+  // shows in the timeline and has no geometry. A named plane keeps its NAMED
+  // path (never a cross product: xz's u x v is -Y but it sweeps -Y on
+  // purpose); a literal frame is validated by the same readFrame
+  // sketch({...}) uses. The returned PlaneValue carries the datum id, so
+  // sketch(plane(...)) can both point at the datum (onDatum) and copy its
+  // placement into the sketch's own plane/offset/frame -- every reader and
+  // the kernel keep working from those, and the kernel ignores onDatum.
+  function plane(spec: unknown, offset?: unknown): PlaneValue {
+    if (isPlainOptions(spec) && !(spec instanceof PlaneValue)) {
+      if (offset !== undefined) {
+        throw new Error('plane({ origin, u, v }) takes no offset: the origin already says where the plane sits.');
+      }
+      const frame = readFrame(spec, 'plane');
+      const d = newDatum(docNow());
+      d.frame = frame;
+      pushFeature(d);
+      return new PlaneValue(d.id, null, 0, frame);
+    }
+    if (typeof spec !== 'string' || !(spec in PLANE_WORD)) {
+      throw new Error(`plane() needs a plane word: 'top', 'front' or 'side' (or a frame { origin, u, v }). You gave it ${describe(spec)}.`);
+    }
+    const d = newDatum(docNow());
+    d.plane = PLANE_WORD[spec];
+    // Canonical: a named datum always carries its offset (0 when none was
+    // given), so plane('top') and plane('top', 0) are the same doc.
+    d.offset = offset === undefined ? 0 : num(requiredNumber('plane', 'offset', offset), d.id, 'offset');
+    pushFeature(d);
+    return new PlaneValue(d.id, d.plane, d.offset, null);
+  }
+
   function sketch(planeWord: unknown, offset?: unknown): SketchHandle {
+    if (planeWord instanceof PlaneValue) {
+      if (offset !== undefined) {
+        throw new Error('sketch(plane(...)) takes no offset: give the offset to plane(), like plane(\'top\', 10).');
+      }
+      const f = planeWord.frame
+        ? newSketchOnFace(docNow(), { origin: [...planeWord.frame.origin], u: [...planeWord.frame.u], v: [...planeWord.frame.v] })
+        : newSketch(docNow(), planeWord.plane!);
+      if (!planeWord.frame) f.offset = planeWord.offset ?? 0;
+      f.onDatum = planeWord.datumId;
+      pushFeature(f);
+      return makeSketchHandle(f.id);
+    }
     if (isPlainOptions(planeWord)) {
       if (offset !== undefined) {
         throw new Error('sketch({ origin, u, v }) takes no offset: the origin already says where the plane sits.');
@@ -1979,7 +2034,7 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     prism, wedge, groove, pocket,
     hole, holes, hollow, round, bevel, repeat, repeatAround, mirror, move, turn,
     join, cut, keep, draft,
-    sketch, pull, spin, blend,
+    sketch, plane, pull, spin, blend,
     param,
     // Official names: SAME reference as their student alias (SPEC-S2) — an
     // alias that wrapped instead would drift the moment the student word's
@@ -1994,7 +2049,7 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
 
   // scope is a `with()` base object, not a parameter list (changed
   // 2026-09-13; see the file header and LINE_OFFSET's own comment for why).
-  // Passing the 37 VOCABULARY words as `new Function` PARAMETER names meant a
+  // Passing the VOCABULARY words (38 at the time of writing) as `new Function` PARAMETER names meant a
   // student's own `const box = ...`, `let ring = ...`, or `class hollow {}`
   // was a SyntaxError -- "Identifier 'box' has already been declared" --
   // because `let`/`const`/`class` can never redeclare a name already bound

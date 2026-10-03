@@ -158,7 +158,29 @@ export interface ResolvedSketchFrame {
  * sketch with `frame` gets its normal as u x v (normalised), so an arbitrary
  * planar face is expressible while the right-handed convention is preserved.
  */
-export declare function sketchFrameOf(f: Pick<SketchFeature, 'plane' | 'offset' | 'frame'>): ResolvedSketchFrame;
+export declare function sketchFrameOf(f: {
+    plane?: SketchPlane;
+    offset?: number;
+    frame?: SketchFrame;
+}): ResolvedSketchFrame;
+/**
+ * A datum plane (SPEC-datum-family Stage 3): a named place a sketch can sit,
+ * shown in the timeline. It has NO geometry: the kernel builds nothing for it.
+ *
+ * Placement mirrors SketchFeature exactly -- a named `plane` plus `offset`, or
+ * a literal `frame` -- so sketchFrameOf() resolves either one. As on a sketch,
+ * a `frame` wins and `plane`/`offset` are then ignored. A literal frame is
+ * frozen: it does not follow a solid that later changes.
+ */
+export interface DatumFeature {
+    id: string;
+    kind: 'datum';
+    name?: string;
+    type: 'plane';
+    plane?: SketchPlane;
+    offset?: number;
+    frame?: SketchFrame;
+}
 /** A closed outline, drawn flat. Not a solid until something extrudes it. */
 export interface SketchFeature {
     id: string;
@@ -174,6 +196,14 @@ export interface SketchFeature {
      * every sketch saved before frames existed. See [`SketchFrame`] and
      * [`sketchFrameOf`]. */
     frame?: SketchFrame;
+    /**
+     * The datum plane (a `datum` feature id) this sketch sits on, when it was
+     * made with sketch(plane(...)). `plane`/`offset`/`frame` above are ALSO
+     * filled from the datum so every reader and the kernel keep working
+     * unchanged; the kernel ignores this field. It exists for dependsOn(), the
+     * emitter and the timeline.
+     */
+    onDatum?: string;
     /**
      * The DESIGN corners, in plane coordinates and in order -- the points the
      * student actually placed, and the only ones any mover may touch. The
@@ -654,7 +684,7 @@ export interface MoveFeature {
     offset: Vec3;
     copy: boolean;
 }
-export type Feature = BoxFeature | CylinderFeature | SphereFeature | ConeFeature | TorusFeature | PrismFeature | WedgeFeature | SketchFeature | ExtrudeFeature | CombineFeature | BlendFeature | RevolveFeature | GrooveFeature | PocketFeature | MirrorFeature | PatternFeature | HoleFeature | ShellFeature | MoveFeature | FilletFeature | DraftFeature;
+export type Feature = BoxFeature | CylinderFeature | SphereFeature | ConeFeature | TorusFeature | PrismFeature | WedgeFeature | SketchFeature | DatumFeature | ExtrudeFeature | CombineFeature | BlendFeature | RevolveFeature | GrooveFeature | PocketFeature | MirrorFeature | PatternFeature | HoleFeature | ShellFeature | MoveFeature | FilletFeature | DraftFeature;
 /**
  * Ids of earlier features this one is built from directly.
  *
@@ -666,6 +696,10 @@ export type Feature = BoxFeature | CylinderFeature | SphereFeature | ConeFeature
  * does -- rather than needing a human to remember to add it to a list.
  */
 export declare function dependsOn(f: Feature): string[];
+/** The datum plane a sketch sits on (SPEC-datum-family Stage 3). A separate
+ *  field from `target` on purpose: reusing `target` would collide with every
+ *  `'target' in f` consumer. */
+export declare function datumRefs(f: Feature): string[];
 /**
  * Feature ids a feature reaches through a TopoName rather than through a
  * target field.
@@ -769,6 +803,16 @@ export declare function newSketch(doc: ModelDoc, plane?: SketchPlane): SketchFea
  * be a second source of truth that could drift.
  */
 export declare function newSketchOnFace(doc: ModelDoc, frame: SketchFrame, points?: Array<[number, number]>): SketchFeature;
+/** The words a timeline row shows for where a sketch or datum sits: the named
+ *  plane, or 'custom plane' for a literal frame (whose `plane` field is only a
+ *  placeholder and would otherwise read 'xy'). */
+export declare function placementLabel(f: {
+    plane?: SketchPlane;
+    frame?: SketchFrame;
+}): string;
+/** A datum plane with no placement yet; the caller sets `plane`+`offset` or
+ *  `frame`. Ids are pl1, pl2, ... */
+export declare function newDatum(doc: ModelDoc): DatumFeature;
 /** A circle, drawn as the two ends of a diameter -- see SketchFeature.shape.
  *  Not a rectangle-with-round-corners and not four points: the tag is the
  *  only thing that makes it a circle, so the data says so directly.

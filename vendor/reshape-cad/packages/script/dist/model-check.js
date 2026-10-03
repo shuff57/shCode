@@ -118,6 +118,7 @@ export function studentWord(kind, style) {
         case 'extrude': return 'pull';
         case 'revolve': return 'spin';
         case 'combine': return 'join';
+        case 'datum': return 'plane';
         default: return kind;
     }
 }
