@@ -173,7 +173,7 @@
       ]
     },
     "4": {
-      "status": "running",
+      "status": "gate green (full npm test exit 0 on a fresh build of HEAD); one design decision pending on group builds; judge round for phase 4 not run (forks cannot spawn)",
       "rounds": [
         {
           "round": 1,
@@ -184,8 +184,26 @@
             "quizzes: 2-7-1 already sets revealAfterSubmit; a capped quiz implies it (QuizView revealAfterSubmit = config || capped), so it is redundant but harmless and kept",
             "dev stub in server.js does not know class_solution_releases, so capped parts error on the dev server",
             "module docs 1.7/2.7/3.10 carry stale 'unlimited'/'one attempt' tables; 2.7 has two contradictory attempts tables"
+          ],
+          "fixes": [
+            "maxSubmissions: 3 added to 1-6-2/2-6-2/3-9-2 (grading), 1-7-1/2-7-1/3-10-1 (quiz), 1-7-2/1-7-5/3-10-2/3-10-5 (aiGrader, revisable). check-pa-attempts is green and runs in npm test",
+            "every stale line removed from the 24 PA lessons: content.md, lesson.json descriptions (quizzes, written parts, find-and-fix, group builds) and the WrittenGrader sentence \"revise and resubmit as many times as you want\" now says N tries when capped",
+            "module docs 1.7/2.7/3.10: attempts rows, reveal tables (2.7 had contradictory duplicates) and the \"attempts: one\" notes rewritten; 1.6/2.6/3.9 gained a tries section",
+            "server.js dev stub understands the class_solution_releases query; POST /api/dev/solution-release sets a release for walks",
+            "FOUND BY FRESH CHECKOUT: test-quiz-reveal passed in the main tree and failed in a worktree. The committed quiz-keys.generated.ts was stale (no caps), so the capped 2.7.1 never reached mayReadAnswer. Fixed: the test runs the one-row path on an uncapped copy of 2.7.1, and the regenerated keys are committed",
+            "FOUND: Bun transpile cache served a stale compile of attempt-reveal.ts to node server.js (the reveal answered 404 for a lesson with pseudocode; BUN_RUNTIME_TRANSPILER_CACHE_PATH=0 fixed it). Restart a dev server that shows that with the cache off"
           ]
         }
+      ],
+      "browser_walk": {
+        "quiz 3-10-1": "banner before try 1; 2 of 3 / 1 of 3 / All 3 tries used; total only between tries; GET lesson-state shows completed with best 2; quiz-reveal withheld (not-released) then released through the dev endpoint and the explanations rendered",
+        "group build 3-9-2 (client kind)": "locked until 3.9.1 completed (sibling gating works); banner before try 1; Submit needs all 11 checks green; three Confirm Submission clicks recorded 3 rows, header Submit disabled afterwards; 4th POST 409 capReached; attempt-reveal: tries -> not-released (null, then scheduledAt) -> released with the pseudocode; another student at 0 tries gets reason tries; the panel \"How this is solved\" rendered",
+        "written 3-10-2": "banner before try 1 and the new \"You get 3 tries\" sentence render; NOT walked to used-all because /api/grade-written (the AI) is not served by the dev server; the server side of that path is covered by test-attempt-reveal and test-pa-ai-graders"
+      },
+      "open": [
+        "GROUP BUILDS: a try only exists when every check is green (Submit is gated), so a student who passes first time must submit twice more to unlock the solution. Options: keep (done, documented in 1.6/2.6/3.9), or reveal on one full-marks row (the browser score is forgeable on a client-kind part, so it would be a weak key), or drop the cap on builds (check-pa-attempts then needs an exemption)",
+        "no blind judge round was run on phase 4 (a fork cannot spawn agents): the lead should run the student lenses on one chapter test",
+        "the committed ai-graders/quiz-keys/module-docs generated files go stale between commits; consider gitignoring them like solutions.generated.ts (prebuild and npm test regenerate)"
       ]
     }
   },
