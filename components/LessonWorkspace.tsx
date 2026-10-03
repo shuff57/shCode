@@ -8,7 +8,9 @@ import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission } from '../lib/written-grader-store';
-import { recordLessonCompleted } from '../lib/progress';
+import { recordLessonCompleted, useLessonState } from '../lib/progress';
+import { AttemptBanner, PseudocodePanel } from './AttemptCap';
+import { useAttemptCap } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader';
@@ -134,6 +136,11 @@ export default function LessonWorkspace({
   const [historyOpen, setHistoryOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  // Tries on a capped performance-assessment part, counted on the server
+  // (lib/use-attempt-cap.ts). Absent maxSubmissions = uncapped, nothing changes.
+  const lessonProgress = useLessonState();
+  const cap = useAttemptCap(lesson.id, lesson.grading?.maxSubmissions, lessonProgress.authed);
+  const capped = cap.max !== null;
   const [gradeReport, setGradeReport] = useState<GradeReportType | null>(null);
   // Set true when an admin/teacher inserts the reference solution; pauses
   // localStorage autosave so their progress record stays clean. Cleared by
@@ -644,7 +651,16 @@ export default function LessonWorkspace({
         alert('Submission could not be recorded on the server. Please reload and try again.');
         return;
       }
-      await recordLessonCompleted(lesson.id, gradeReport.totalScore);
+      // Best try counts; the lesson_state upsert also refuses to lower it.
+      const prior = lessonProgress.scores[lesson.id];
+      const best = capped && typeof prior === 'number' ? Math.max(prior, gradeReport.totalScore) : gradeReport.totalScore;
+      await recordLessonCompleted(lesson.id, best);
+    }
+    // A capped part is not final and does not walk the student away: they stay
+    // to use their other tries, and the banner shows what is left.
+    if (capped) {
+      cap.spend();
+      return;
     }
     setSubmitted(true);
     navigateToNextLesson(lesson.id);
@@ -687,12 +703,13 @@ export default function LessonWorkspace({
   // both satisfy their regexes and then crash by design, so the generic
   // "don't ship code that crashes" rule made them permanently unsubmittable.
   const expectsRuntimeError = !!lesson.grading?.expectsRuntimeError;
-  const canSubmit =
+  const canSubmitByWork =
     isSummative ||
     ((!runtimeError || expectsRuntimeError) &&
       (isMoshionMode || isNoPoints
         ? allRequirementsPassed
         : totalScore >= (lesson.grading?.passingScore ?? 0)));
+  const canSubmit = canSubmitByWork && !cap.unknown && !cap.reached;
   // Any lesson with graded criteria keeps the score header, not just the
   // assignment routes — ch2's labs are `type: "lesson"` but still scored.
   const showAssignmentHeader = isAssignment || isMoshionMode || totalCriteria > 0;
@@ -849,6 +866,7 @@ export default function LessonWorkspace({
           <h1>{lesson.title}</h1>
         </div>
       )}
+      {capped ? <AttemptBanner max={cap.max} used={cap.used} /> : null}
       {lesson.planFrom && (
         <PlanChartPanel
           planFrom={lesson.planFrom}
@@ -1068,6 +1086,7 @@ export default function LessonWorkspace({
           )}
         </div>
       </div>
+      {capped ? <PseudocodePanel lessonId={lesson.id} show={cap.reached} /> : null}
       {submitted && gradeReport && (
         <GradeReportView
           report={gradeReport}

@@ -37,6 +37,8 @@ const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   loading: () => <EditorPlaceholder height={570} />,
 });
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
+import { AttemptBanner, PseudocodePanel } from './AttemptCap';
+import { useAttemptCap } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { fetchDraft, saveDraft, recordSubmission, streamGrade } from '../lib/written-grader-store';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
@@ -125,6 +127,9 @@ export default function DiagramAssignmentView({
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   const progress = useLessonState();
+  // Tries on a capped part, counted on the server. See lib/use-attempt-cap.ts.
+  const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed);
+  const capped = cap.max !== null;
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ---- load: server draft wins over the local cache, starter is the floor
@@ -184,7 +189,15 @@ export default function DiagramAssignmentView({
     setTimeout(() => setSaveStatus('idle'), 2000);
   }
 
+  // Best try counts: the stored score can only go up (and the server's
+  // lesson_state upsert enforces the same on a capped part).
+  function bestOf(score: number): number {
+    const prior = progress.scores[lessonId];
+    return typeof prior === 'number' ? Math.max(prior, score) : score;
+  }
+
   async function submit() {
+    if (cap.unknown || cap.reached) return;
     const results = runChecks();
     // On a test the structural checks stop being a gate: a student who cannot
     // get a second exit off their diamond would otherwise never reach Part 5.
@@ -193,7 +206,8 @@ export default function DiagramAssignmentView({
 
     // Structure-only lesson: the checks are the whole grade.
     if (!config.aiGrader) {
-      await recordLessonCompleted(lessonId, 0);
+      const passedCount = results.filter((r) => r.passed).length;
+      await recordLessonCompleted(lessonId, capped ? bestOf(passedCount) : 0);
       if (progress.authed) {
         recordSubmission({
           lessonId,
@@ -207,8 +221,10 @@ export default function DiagramAssignmentView({
           possible: results.length,
         });
         saveDraft(lessonId, JSON.stringify(doc));
+        if (capped) cap.spend();
       }
-      setTimeout(() => navigateToNextLesson(lessonId), 1200);
+      // A capped part stays on the page so the student can use their other tries.
+      if (!capped) setTimeout(() => navigateToNextLesson(lessonId), 1200);
       return;
     }
 
@@ -244,7 +260,11 @@ export default function DiagramAssignmentView({
         return;
       }
       setResult(data as GradeResult);
-      if (isPassing(data as GradeResult)) {
+      // On a capped part every graded try is a sitting: it completes the part with
+      // the best score so far and does not walk the student away from their tries.
+      if (capped) {
+        await recordLessonCompleted(lessonId, bestOf(data.totalEarned));
+      } else if (isPassing(data as GradeResult)) {
         await recordLessonCompleted(lessonId, data.totalEarned);
         setTimeout(() => navigateToNextLesson(lessonId), 1500);
       }
@@ -257,6 +277,7 @@ export default function DiagramAssignmentView({
           possible: data.totalPossible,
         });
         saveDraft(lessonId, JSON.stringify(doc));
+        if (capped) cap.spend();
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -283,6 +304,8 @@ export default function DiagramAssignmentView({
           {promptText}
         </p>
       ) : null}
+
+      <AttemptBanner max={cap.max} used={cap.used} />
 
       <DiagramEditor
         value={doc}
@@ -343,7 +366,7 @@ export default function DiagramAssignmentView({
 
         <button
           onClick={submit}
-          disabled={grading || doc.nodes.length === 0}
+          disabled={grading || doc.nodes.length === 0 || cap.unknown || cap.reached}
           style={{
             padding: '8px 16px',
             borderRadius: 6,
@@ -589,6 +612,7 @@ export default function DiagramAssignmentView({
           )}
         </div>
       )}
+      <PseudocodePanel lessonId={lessonId} show={capped && cap.reached} />
     </section>
   );
 }

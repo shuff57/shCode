@@ -12,6 +12,8 @@ import { sourceHintNumbers, sourceHintParts } from '../lib/source-hint';
 import { buildQuizView } from '../lib/quiz-variant';
 import { getCurrentUser } from '../lib/auth';
 import SolutionPanel from './SolutionPanel';
+import { AttemptBanner, PseudocodePanel } from './AttemptCap';
+import { useAttemptCap } from '../lib/use-attempt-cap';
 
 interface Props {
   lessonId: string;
@@ -53,16 +55,32 @@ interface RevealAnswer {
   explanation: string;
 }
 
-async function fetchReveal(lessonId: string): Promise<Record<string, RevealAnswer> | null> {
+// What the reveal route returns. On a CAPPED quiz it answers between tries with
+// the totals only (`answers` absent) and adds the key once the last try is spent.
+interface TriesSummary {
+  attempts: number;
+  maxSubmissions: number;
+  last: { correct: number; total: number };
+  best: { correct: number; total: number };
+}
+interface RevealResult {
+  answers: Record<string, RevealAnswer> | null;
+  summary: TriesSummary | null;
+}
+
+async function fetchReveal(lessonId: string): Promise<RevealResult> {
   try {
     const res = await fetch(`/api/quiz-reveal?lessonId=${encodeURIComponent(lessonId)}`, {
       credentials: 'include',
     });
-    if (!res.ok) return null; // 403 = not handed in yet — quiet, not an error
-    const data = (await res.json()) as { answers?: RevealAnswer[] };
-    return Object.fromEntries((data.answers ?? []).map((a) => [a.id, a]));
+    if (!res.ok) return { answers: null, summary: null }; // 403 = not handed in yet — quiet, not an error
+    const data = (await res.json()) as { answers?: RevealAnswer[] } & Partial<TriesSummary>;
+    return {
+      answers: data.answers ? Object.fromEntries(data.answers.map((a) => [a.id, a])) : null,
+      summary: typeof data.attempts === 'number' ? (data as TriesSummary) : null,
+    };
   } catch {
-    return null;
+    return { answers: null, summary: null };
   }
 }
 
@@ -73,7 +91,12 @@ export default function QuizView({ lessonId, config }: Props) {
   const [sourceHrefs, setSourceHrefs] = useState<Record<string, string>>({});
   const [identity, setIdentity] = useState('guest');
   const [reveal, setReveal] = useState<Record<string, RevealAnswer> | null>(null);
+  // Capped quiz only: the server's running totals, between tries.
+  const [tries, setTries] = useState<TriesSummary | null>(null);
   const progress = useLessonState();
+  // Tries, counted on the server. A capped quiz replaces the one-shot lock.
+  const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed);
+  const capped = cap.max !== null;
 
   // Which paper this student sits. Identical to the authored order unless the
   // lesson opts into `shuffle` or `variants`; see lib/quiz-variant.ts.
@@ -86,7 +109,8 @@ export default function QuizView({ lessonId, config }: Props) {
   const summative = !!config.summative;
   // Opt-in, and the generator only bakes a key for a quiz that asks. Off means
   // no request is made at all rather than a request that is expected to fail.
-  const revealAfterSubmit = !!config.revealAfterSubmit;
+  // A capped quiz always reveals: totals between tries, the key after the last.
+  const revealAfterSubmit = !!config.revealAfterSubmit || capped;
   // A summative quiz arrives with its answer key stripped (lib/quiz-redact.ts),
   // so the browser cannot mark it and must not pretend to. Everything that
   // reports or records a score is switched off rather than left to report 0.
@@ -96,11 +120,13 @@ export default function QuizView({ lessonId, config }: Props) {
   // On a test, Submit is never withheld for blanks -- see Grading.summative.
   // A student who cannot do question 4 must still be able to hand in 1-3 and
   // reach the next part, or the lock costs them the marks they had.
-  const canSubmit = summative ? answeredCount > 0 : allAnswered;
+  const canSubmit = summative ? answeredCount > 0 && !cap.unknown && !cap.reached : allAnswered;
   // ...and the paper only becomes final once it is FULLY answered. Locking on
   // a partial hand-in would trade one trap for another: submit five of eight
   // to unlock Part 2, then never be allowed back to finish the other three.
-  const locked = summative && graded && allAnswered;
+  // On a capped quiz the paper stays open until the last try is spent, and a
+  // hand-in is never final before that: the lock is the try count.
+  const locked = capped ? cap.reached : summative && graded && allAnswered;
   const correctCount = countCorrect(questions, answers);
   const needed = passThreshold(questions.length, config.passPercent);
   const passed = graded && correctCount >= needed;
@@ -165,7 +191,9 @@ export default function QuizView({ lessonId, config }: Props) {
     if (!revealAfterSubmit || !loaded) return;
     let cancelled = false;
     fetchReveal(lessonId).then((r) => {
-      if (!cancelled) setReveal(r);
+      if (cancelled) return;
+      setReveal(r.answers);
+      setTries(r.summary);
     });
     return () => {
       cancelled = true;
@@ -190,8 +218,9 @@ export default function QuizView({ lessonId, config }: Props) {
 
     // Green-to-advance on a test means "you sat it", never "you passed it".
     // Gating the next part behind a score would strand a student halfway
-    // through their own exam.
-    if (summative || correctCount >= needed) {
+    // through their own exam. A capped quiz records its completion AFTER the
+    // row is in, because the score it records is the server's best total.
+    if (!capped && (summative || correctCount >= needed)) {
       await recordLessonCompleted(lessonId, hasKey ? correctCount : undefined);
       // Skipped when the marking is about to be revealed. 1800ms is enough to
       // notice a screen change and not enough to read eight answers and their
@@ -216,14 +245,23 @@ export default function QuizView({ lessonId, config }: Props) {
         // No key in the browser means no score from the browser. The row goes
         // in unscored, which is what the teacher queue already renders as
         // "needs marking"; scripts/score-quiz.mjs turns the picks into marks.
+        // (A capped quiz is the exception: the server scores it on the way in.)
         ...(hasKey ? { score: correctCount } : {}),
         possible: questions.length,
       });
       saveDraft(lessonId, payload);
+      if (capped) cap.spend();
     }
     if (revealAfterSubmit && progress.authed) {
       // The row is in, so the route can hand back the marking for this form.
-      setReveal(await fetchReveal(lessonId));
+      const r = await fetchReveal(lessonId);
+      setReveal(r.answers);
+      setTries(r.summary);
+      // Best try counts. The server computed it from the stored picks; the
+      // lesson_state upsert also refuses to lower it (functions/api/lesson-state).
+      if (capped && r.summary) await recordLessonCompleted(lessonId, r.summary.best.correct);
+    } else if (capped) {
+      await recordLessonCompleted(lessonId);
     }
   }
 
@@ -253,10 +291,21 @@ export default function QuizView({ lessonId, config }: Props) {
         )}
       </div>
       <p style={{ color: '#888', fontSize: 13, margin: '0 0 20px' }}>
-        {summative
+        {capped
+          ? `Answer all ${questions.length}. After each try you see your total, not which ones were wrong. Submit what you have if one has you stuck: the next part unlocks and you can come back and use your other tries.`
+          : summative
           ? `Answer all ${questions.length}. Nothing is marked here — your teacher hands the score back. If one has you stuck, submit what you have and move on: the next part unlocks and you can come back to this one. Once all ${questions.length} are answered, submitting is final.`
           : `Pick the answer that fits best for each question. You need ${needed} of ${questions.length} right to move on, and you can change your answers and try again as many times as you like.`}
       </p>
+      <AttemptBanner
+        max={cap.max}
+        used={cap.used}
+        note={
+          capped && tries
+            ? `Last try: ${tries.last.correct} of ${tries.last.total}. Best so far: ${tries.best.correct} of ${tries.best.total}.`
+            : undefined
+        }
+      />
 
       {view.questions.map(({ question: q, order }, qi) => {
         const picked = answers[q.id];
@@ -430,7 +479,9 @@ export default function QuizView({ lessonId, config }: Props) {
         >
           {summative
             ? locked
-              ? 'Submitted'
+              ? capped
+                ? 'No tries left'
+                : 'Submitted'
               : allAnswered
                 ? 'Submit my answers'
                 : `Submit what I have (${answeredCount} of ${questions.length})`
@@ -458,7 +509,11 @@ export default function QuizView({ lessonId, config }: Props) {
             }}
           >
             <CircleCheck size={16} />
-            {allAnswered
+            {capped
+              ? cap.reached
+                ? 'Last try handed in. Your best one is your score.'
+                : `Try ${cap.used ?? '?'} of ${cap.max} handed in.${allAnswered ? '' : ` ${answeredCount} of ${questions.length} answered.`}`
+              : allAnswered
               ? `Submitted — all ${questions.length} answers are with your teacher.`
               : `Submitted ${answeredCount} of ${questions.length}. The next part is unlocked, and this one stays open — come back and answer the rest if you have time.`}
           </span>
@@ -483,6 +538,7 @@ export default function QuizView({ lessonId, config }: Props) {
           </span>
         ) : null}
       </div>
+      <PseudocodePanel lessonId={lessonId} show={capped && cap.reached} />
     </section>
   );
 }

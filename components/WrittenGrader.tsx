@@ -17,6 +17,7 @@ import { countAttempts } from '../lib/attempt-cap';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
 import GraderPicker, { hasGraderChoice, useGraderChoice } from './GraderPicker';
 import SolutionPanel from './SolutionPanel';
+import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import CodeMirrorPane from './CodeMirrorPane';
 
 interface AiRubricItem {
@@ -398,6 +399,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           }}
         />
       </div>
+      <AttemptBanner max={maxSubmissions} used={attempts} />
       {codeInput ? (
         // CodeMirrorPane fills its parent (height: 100%), so the parent needs a
         // height of its own. No Run button, lint or autocomplete, on purpose:
@@ -533,6 +535,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           cloudModel={config.model}
         />
       </div>
+
+      <PseudocodePanel lessonId={lessonId} show={capReached} />
 
       {error && (
         <div

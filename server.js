@@ -11,6 +11,10 @@ import { publicReport, rankReports, visibleToStudent } from './functions/_shared
 // against the Pages Function rather than a reimplementation of it.
 import { resolveLessonDir as resolveLessonDirIn, readLessonSolution } from './lib/lesson-solution-fs.mjs';
 import { DEFAULT_WEIGHTS } from './lib/grading-weights.ts';
+import { ATTEMPT_CAPS } from './functions/_shared/pa-pseudocode.generated.ts';
+import { onRequestGet as attemptRevealGet } from './functions/api/attempt-reveal.ts';
+import { onRequestGet as quizRevealGet } from './functions/api/quiz-reveal.ts';
+import { onRequestPost as submissionsPost } from './functions/api/lesson-submissions/index.ts';
 
 // Who the dev auth stub pretends to be. `DEV_ROLE=student npm run dev` is the
 // only way to see the student half of anything here — the real session comes
@@ -270,7 +274,12 @@ app.prepare().then(() => {
     const { state, score } = req.body || {};
     if (state === 'completed') {
       st.states[lessonId] = 'completed';
-      if (typeof score === 'number') st.scores[lessonId] = score;
+      // A capped part keeps the BEST score, as the real route does
+      // (functions/api/lesson-state/[lessonId].ts); anything else replaces it.
+      if (typeof score === 'number') {
+        const keep = ATTEMPT_CAPS[lessonId] !== undefined && typeof st.scores[lessonId] === 'number';
+        st.scores[lessonId] = keep ? Math.max(st.scores[lessonId], score) : score;
+      }
     } else if (state === 'started' && !st.states[lessonId]) {
       st.states[lessonId] = 'started';
     }
@@ -302,11 +311,67 @@ app.prepare().then(() => {
       ),
     });
   });
-  server.post('/api/lesson-submissions', express.json({ limit: '1mb' }), (req, res) => {
-    const body = req.body || {};
-    devSubmissions.push({ ...body, studentEmail: devIdentity(req), submittedAt: Date.now() });
-    res.json({ ok: true, id: body.id });
+  // The REAL handlers for lesson-submissions POST, quiz-reveal and attempt-reveal
+  // run here over a D1-shaped view of devSubmissions, so the dev server exercises
+  // the same counting, scoring and gating production does (a stub that
+  // re-implemented them would pass while the route was wrong). Only the SQL these
+  // three routes issue is understood; anything else throws, which the handlers
+  // that wrap it already tolerate (the due-date lookup).
+  const devDb = (email) => ({
+    prepare(sql) {
+      let args = [];
+      const q = {
+        bind(...a) { args = a; return q; },
+        async all() {
+          if (/FROM lesson_submissions WHERE student_email = \? AND lesson_id = \?/.test(sql)) {
+            const rows = devSubmissions
+              .filter((r) => r.studentEmail === args[0] && r.lessonId === args[1])
+              .map((r) => ({
+                grade_json: r.gradeJson === undefined ? null : JSON.stringify(r.gradeJson),
+                submitted_at: r.submittedAt,
+              }))
+              .sort((a, b) => a.submitted_at - b.submitted_at);
+            return { results: rows };
+          }
+          throw new Error('dev D1: unsupported all(): ' + sql);
+        },
+        async first() {
+          if (/SELECT id FROM lesson_submissions/.test(sql)) {
+            const r = devSubmissions.find((x) => x.studentEmail === args[0] && x.lessonId === args[1]);
+            return r ? { id: r.id } : null;
+          }
+          throw new Error('dev D1: unsupported first(): ' + sql);
+        },
+        async run() {
+          if (/INSERT INTO lesson_submissions/.test(sql)) {
+            const [id, studentEmail, lessonId, response, gradeJson, score, possible, submittedAt] = args;
+            devSubmissions.push({
+              id, studentEmail, lessonId, response,
+              gradeJson: gradeJson ? JSON.parse(gradeJson) : undefined,
+              score, possible, submittedAt,
+            });
+            return { success: true };
+          }
+          throw new Error('dev D1: unsupported run(): ' + sql);
+        },
+      };
+      return q;
+    },
   });
+  const runRoute = (handler) => async (req, res) => {
+    const email = devIdentity(req);
+    const url = `http://localhost${req.originalUrl}`;
+    const request = new Request(url, {
+      method: req.method,
+      headers: { 'content-type': 'application/json' },
+      body: req.method === 'GET' ? undefined : JSON.stringify(req.body ?? {}),
+    });
+    const out = await handler({ request, env: { DB: devDb(email) }, params: {}, data: { email, role: DEV_ROLE } });
+    res.status(out.status).type('application/json').send(await out.text());
+  };
+  server.post('/api/lesson-submissions', express.json({ limit: '1mb' }), runRoute(submissionsPost));
+  server.get('/api/quiz-reveal', runRoute(quizRevealGet));
+  server.get('/api/attempt-reveal', runRoute(attemptRevealGet));
   // The student gradebook on /progress. The real route is
   // functions/api/my-gradebook.ts, reading lesson_state + lesson_submissions
   // out of D1, which this server does not have. Without a stub the page shows

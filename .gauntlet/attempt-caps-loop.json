@@ -1,7 +1,11 @@
 {
   "spec": ".gauntlet/SPEC-attempt-caps.md",
   "started": "2026-10-03",
-  "caps": { "roundsPerPhase": 4, "cleanRoundsToExit": 2, "parallelJudges": 3 },
+  "caps": {
+    "roundsPerPhase": 4,
+    "cleanRoundsToExit": 2,
+    "parallelJudges": 3
+  },
   "decisions": {
     "score": "best try counts (matches WrittenGrader today)",
     "scope": "Chapters 1-3 now, every PA this semester via check-pa-attempts.mjs",
@@ -24,6 +28,38 @@
           "round": 1,
           "gate": "scripts/check-pa-attempts.mjs fails: 24 of 24 PA lessons, 52 gaps. 2-7-2 and 2-7-5 already cap at 3 and lack only pseudocode; chart parts (1-6-1, 1-7-4, 2-6-1, 2-7-4, 3-9-1, 3-10-4) lack an aiGrader",
           "note": "not yet in npm test: it would fail the suite until phase 4"
+        }
+      ]
+    },
+    "1": {
+      "status": "running",
+      "rounds": [
+        {
+          "round": 1,
+          "findings": [
+            "lesson_state upsert is `score = excluded.score`: best-of was only a client courtesy (WrittenGrader sends its own running max); a stale tab or second device can lower the stored best. Fix: MAX in SQL for capped lessons, server-owned cap table.",
+            "summative quiz ships with no key, so the browser cannot show a total between tries and records the row unscored. Fix: server scores each try from the baked key (lesson-submissions POST overrides client score for capped quizzes; quiz-reveal returns totals only until the cap is spent).",
+            "spec gap: summative console parts (x.7.3) have their requirement patterns stripped for the client and nothing server-side scores them, so 'deterministic grading' is the symptom checklist plus the teacher. Mechanism here covers count, banner, best-of, reveal; a score for those parts is not computed in this phase.",
+            "spec gap: the local dev server (server.js) emulates routes with in-memory stubs, no D1; the new routes need stubs sharing the pure decision code (lib/attempt-cap.ts decideReveal) or the browser verification has nothing to call.",
+            "countAttempts default cutoff was ATTEMPT_CAPS_APPLIED (Sep 30); assumption 3 (fresh tries) needs a go-live cutoff, added as TRIES_APPLIED, set to deploy instant in phase 5."
+          ],
+          "fixes": [
+            "functions/_shared/pa-pseudocode.generated.ts (ATTEMPT_CAPS + PA_PSEUDOCODE, from lesson.json and pa-pseudocode/<id>.md, scripts/generate-pa-pseudocode.mjs in prebuild)",
+            "functions/api/attempt-reveal.ts: 401/400/404 fail closed, 403 until counted tries >= cap, then the text; counting in functions/_shared/attempts.ts shares lib/attempt-cap.ts rules",
+            "quiz-reveal: capped quiz returns totals only until the cap is spent; lesson-submissions POST scores a capped quiz from the baked key and discards the browser's score",
+            "lesson-state upsert: MAX(stored, new) with NULL-safe handling for capped lessons only",
+            "lib/attempt-cap.ts: TRIES_APPLIED/COUNT_SINCE go-live cutoff, decideReveal; lib/use-attempt-cap.ts + components/AttemptCap.tsx shared by quiz, diagram, console; WrittenGrader gets the banner and panel",
+            "server.js: dev routes run the REAL lesson-submissions POST, quiz-reveal and attempt-reveal handlers over a D1-shaped view of the in-memory submissions",
+            "check-ai-grader-leak probes pa-pseudocode/ text in public/ and out/ (mutation: a copy in public/ fails)"
+          ],
+          "gate": {
+            "scripts/test-attempt-reveal.mjs (in npm test)": "28 cases pass against SQLite standing in for D1; 6 of 7 mutations fail the test (7th crashed on a bad bind, also exit 1)",
+            "full npm test": "exit 0",
+            "tsc --noEmit": "clean",
+            "browser (dev server, scratch caps on 2-7-1, 2-7-3, 2-7-4, since reverted)": "banner before try 1 on quiz, console and chart; counts down 3 -> 2 -> 1 -> used all; quiz shows total only until try 3 then explanations; pseudocode absent from the DOM and 403 before try 3, shown after; Submit disabled at the cap; a fresh browser and a reload see the same count; a second student is untouched; quiz best score recorded in lesson_state"
+          },
+          "judge": "not run in this round (spec: reviewer hunting an early path to the pseudocode is still to do)",
+          "status": "gate green; needs one judge pass and a second clean round"
         }
       ]
     }
