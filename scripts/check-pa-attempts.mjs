@@ -7,7 +7,7 @@
 // `1-6-*-ch1-pa-*` and a name regex missed them. A PA written later joins the
 // check by being in a PA unit, which is what carries the rule forward.
 //
-// Per lesson this requires:
+// Per lesson this requires (quiz parts are exempt from 2: quiz-reveal shows the key):
 //   1. maxSubmissions === 3 in the config block its renderer reads
 //      (quiz / aiGrader / diagram / grading). `summative` alone caps nothing.
 //   2. pa-pseudocode/<id>.md, non-empty, ONLY with --require-pseudocode (the files are
@@ -86,7 +86,10 @@ for (const id of fs.readdirSync(LESSONS).sort()) {
   if (lesson.quiz && 'maxSubmissions' in lesson.quiz && lesson.quiz.summative !== true) gaps.push('a capped quiz must set quiz.summative');
 
   const pseudo = path.join(PSEUDO, `${id}.md`);
-  const pseudoGap = !fs.existsSync(pseudo)
+  // Part 1 quizzes (concepts and traces) have no solution to write as pseudocode: after the
+  // last try the server releases the answers and explanations itself (quiz-reveal).
+  const isQuiz = !!(lesson.quiz && typeof lesson.quiz === 'object');
+  const pseudoGap = isQuiz ? null : !fs.existsSync(pseudo)
     ? 'no pa-pseudocode/<id>.md'
     : fs.readFileSync(pseudo, 'utf8').trim().length < 40 ? 'pa-pseudocode/<id>.md is empty' : null;
   if (pseudoGap) (requirePseudocode ? gaps : warnings).push(...(requirePseudocode ? [pseudoGap] : [`${id}: ${pseudoGap}`]));
