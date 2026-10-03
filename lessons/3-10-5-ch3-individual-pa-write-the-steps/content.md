@@ -26,9 +26,10 @@ tables should not pick the same one.
 
 Your cart is an array of items, each `{ name, price, qty }`. Write `totalCost` (returns
 the total over the whole cart), `receiptLine` (takes one item, returns its
-`"name xqty"` line), and `mostExpensive` (returns the item with the highest price). Print
-the receipt lines, the total, and the most expensive item. Save the cart to localStorage
-under a key and load it back.
+`"name xqty"` line), and `discountOne` (takes the cart, a name and a percent off, marks
+that item's `price` down on its own copy, and returns the copy without changing the
+original). Print the receipt lines, the total, and the discounted copy. Save the cart to
+localStorage under a key and load it back.
 
 ---
 
@@ -36,8 +37,9 @@ under a key and load it back.
 
 Your week is an array of days, each `{ day, minutes }`. Write `totalMinutes` (returns the
 week's total), `logLine` (takes one day, returns its `"Mon: 30 min"` line), and
-`longestDay` (returns the day with the most minutes). Print the log, the total, and the
-longest day. Save the week under a key and load it back.
+`addMinutes` (takes the week, a day name and extra minutes, adds them to that day on its
+own copy, and returns the copy without changing the original). Print the log, the total,
+and the updated copy. Save the week under a key and load it back.
 
 ---
 
