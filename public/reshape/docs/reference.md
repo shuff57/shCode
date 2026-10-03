@@ -579,6 +579,32 @@ const shape = extrude(sk, 10)
 
 A 30 × 20 block extruded 10 mm from a plane placed at [5, 6, 7].
 
+`plane('top')`, `plane('front')` and `plane('side')` name a flat surface, and `plane('top', 10)` slides it 10 mm along its own normal. `plane({ origin: [x, y, z], u: [...], v: [...] })` describes one yourself, with the same rules as a frame in `sketch()`: `u` and `v` each exactly unit length and at right angles, or a plain sentence says which is wrong. Draw on it with `sketch(pl)`. `plane()` makes the surface a step of its own: it shows up in the timeline as Plane 1 (or Custom plane, for one you described yourself) and the sketches that use it are drawn on it, but it adds no material to the part by itself. Deleting a plane also deletes every sketch on it and everything built from those sketches, and the delete tells you so first. A plane is frozen: it is a place in space, not a face of anything, so it does not move when a box height param changes. This sketches a 40 × 25 rectangle on the plane at z = 10 and pulls it 12: a 40 × 25 × 12 = 12000 mm³ slab spanning z from 10 to 22.
+
+```js sketch-plane
+const top = plane({ origin: [0, 0, 10], u: [1, 0, 0], v: [0, 1, 0] })
+const sk = sketch(top)
+sk.rect(40, 25)
+const slab = extrude(sk, 12)
+```
+
+A slab built on a plane you described, 10 mm above the top plane.
+
+One named plane can carry two sketches, and both stay level with each other. Here `plane('top', 10)` carries a 20 × 10 rectangle pulled 6 and a circle 5 across pulled 6 beside it, joined: 1200 + 37.5π = 1317.81 mm³, spanning z from 10 to 16.
+
+```js sketch-plane-shared
+const level = plane('top', 10)
+const a = sketch(level)
+a.rect(20, 10, { at: [-20, 0] })
+const slab = extrude(a, 6)
+const b = sketch(level)
+b.circle(5, { at: [20, 0] })
+const post = extrude(b, 6)
+join(slab, post)
+```
+
+Two sketches on one plane, joined into a slab and a post.
+
 `sk.geom([...])` draws a sketch from rows instead of one call per shape. Each row says what it is with `k`: `'point'` (`p: [x, y]`), `'line'` (`a` and `b`, its two ends), `'circle'` (`c` for the centre, `r` for the radius) or `'arc'` (`c`, `r`, `a`, `b` and `sense`). Every row has an `id`, a positive whole number. A row marked `construction: true` is scaffolding for rules and is left out of the outline. `sk.rules([...])` ties rows together, for example `{ k: 'coincident', a: 1, aEnd: 'b', b: 2, bEnd: 'a' }` welds the end of line 1 to the start of line 2. Here four lines make a 40 × 25 rectangle with a circle of radius 5 cut out of it: 10000 − 250π = 9214.60 mm³.
 
 ```js sketch-geom
