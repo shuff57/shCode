@@ -1,7 +1,7 @@
 {
   "id": "1-7-1-ch1-individual-pa-concepts",
   "title": "1.7.1 Individual PA Part 1: Concepts and Traces",
-  "description": "Eight questions: three on the ideas of Chapter 1, five where you read a short program and say what it prints. One submission, nothing marked on screen.",
+  "description": "Eight questions: three on the ideas of Chapter 1, five where you read a short program and say what it prints. Three tries: you see your total after each one, your best try counts, and the marking appears after the last.",
   "type": "assignment",
   "estimateMins": 16,
   "category": "Unit 1: JavaScript Fundamentals",
