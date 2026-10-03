@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CircleCheck, CircleX, Circle, ListChecks } from 'lucide-react';
 import type { QuizConfig } from '../lib/types';
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
@@ -230,8 +230,9 @@ export default function QuizView({ lessonId, config }: Props) {
       if (!revealAfterSubmit) setTimeout(() => navigateToNextLesson(lessonId), 1800);
 
     }
+    let recorded = false;
     if (progress.authed) {
-      await recordSubmission({
+      recorded = await recordSubmission({
         lessonId,
         response: payload,
         gradeJson: {
@@ -250,20 +251,43 @@ export default function QuizView({ lessonId, config }: Props) {
         possible: questions.length,
       });
       saveDraft(lessonId, payload);
-      if (capped) cap.spend();
+      // Only a row the server accepted spends a try. A refusal (409: every try is
+      // already used, e.g. from a second tab) spends nothing here, and the count is
+      // re-read so the page shows what the server holds.
+      if (capped) {
+        if (recorded) cap.spend();
+        else cap.refresh();
+      }
     }
     if (revealAfterSubmit && progress.authed) {
       // The row is in, so the route can hand back the marking for this form.
       const r = await fetchReveal(lessonId);
       setReveal(r.answers);
       setTries(r.summary);
-      // Best try counts. The server computed it from the stored picks; the
-      // lesson_state upsert also refuses to lower it (functions/api/lesson-state).
-      if (capped && r.summary) await recordLessonCompleted(lessonId, r.summary.best.correct);
-    } else if (capped) {
+      // Best try counts. The server derives it from the stored rows and the
+      // lesson_state upsert never lowers it (functions/api/lesson-state).
+      //
+      // Completion follows the RECORDED ROW, not the reveal fetch: a transient
+      // failure of the reveal must not strand the student with the next part
+      // locked. (The mount effect below repairs the same case after a reload.)
+      if (capped && recorded) await recordLessonCompleted(lessonId, r.summary?.best.correct);
+    } else if (capped && recorded) {
       await recordLessonCompleted(lessonId);
     }
   }
+
+  // A capped quiz completes when a counted row exists on the server. If the
+  // hand-in landed but the completion call did not (a dropped request, a closed
+  // tab), the next part would stay locked with no way forward except spending
+  // another try. Repair it once per mount; the server keeps the best score.
+  const repairedRef = useRef(false);
+  useEffect(() => {
+    if (!capped || !loaded || !progress.authed || repairedRef.current) return;
+    if (cap.used === null || cap.used < 1) return;
+    if (progress.states[lessonId] === 'completed') return;
+    repairedRef.current = true;
+    void recordLessonCompleted(lessonId);
+  }, [capped, loaded, progress.authed, progress.states, cap.used, lessonId]);
 
   if (!loaded) return null;
   if (!questions.length) return null;

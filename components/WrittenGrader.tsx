@@ -283,6 +283,14 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         await recordFailedAttempt(reason, res.status);
         return;
       }
+      if (data && !data.ok && (data as { capReached?: boolean }).capReached === true) {
+        // Every try is spent (a second tab, a stale page). That is the server
+        // doing its job, not a grader outage: NOT written as a failed attempt, which
+        // would put an unmarked fourth answer in front of the teacher.
+        if (maxSubmissions !== null) setAttempts(maxSubmissions);
+        setError(data.error || 'All your tries on this part are already used.');
+        return;
+      }
       if (!data || !data.ok) {
         const reason = data?.error || `Grading failed (HTTP ${res.status}).`;
         setError(`${reason} Your answer has been saved and sent to your teacher for marking.`);

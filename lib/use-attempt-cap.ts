@@ -28,11 +28,14 @@ export interface AttemptCap {
   unknown: boolean;
   /** One try was just recorded. Unknown stays unknown. */
   spend: () => void;
+  /** Re-read the count from the server (after a refused 409, say). */
+  refresh: () => void;
 }
 
 export function useAttemptCap(lessonId: string, max: number | null | undefined, authed: boolean): AttemptCap {
   const cap = typeof max === 'number' ? max : null;
   const [used, setUsed] = useState<number | null>(null);
+  const [nonce, setNonce] = useState(0);
 
   useEffect(() => {
     if (cap === null) return;
@@ -52,9 +55,10 @@ export function useAttemptCap(lessonId: string, max: number | null | undefined, 
     return () => {
       cancelled = true;
     };
-  }, [lessonId, cap, authed]);
+  }, [lessonId, cap, authed, nonce]);
 
   const spend = useCallback(() => setUsed((n) => (n === null ? null : n + 1)), []);
+  const refresh = useCallback(() => setNonce((n) => n + 1), []);
   const known = used !== null;
   return {
     max: cap,
@@ -64,5 +68,6 @@ export function useAttemptCap(lessonId: string, max: number | null | undefined, 
     reached: cap !== null && known && (used as number) >= cap,
     unknown: cap !== null && !known,
     spend,
+    refresh,
   };
 }
