@@ -21,6 +21,11 @@
 //     the browser's relay is a no-op, and grade-written refuses once the cap is spent
 //   a deterministic ('client') part clamps the score it is handed
 //   TRIES_APPLIED stays a fixed literal (phase 5 sets it to the deploy instant)
+//   ONE counting rule in SQL and JS: a lookalike marker key is refused (400), and a
+//     row the SQL calls free is exactly a row the JS calls free
+//   a grading-failure marker is refused once every try is spent (no hand-graded 4th)
+//   an answer (pseudocode, quiz key) is only for a teacher/admin or an enrolled
+//     student whose class has the part open: a throwaway account gets nothing
 //
 // Run: node scripts/test-attempt-reveal.mjs
 
@@ -114,6 +119,19 @@ function makeDb() {
   sql.run('CREATE TABLE ai_help_usage (student_email TEXT, unit TEXT, day TEXT, count INTEGER, PRIMARY KEY (student_email, unit, day))');
   sql.run(`CREATE TABLE lesson_state (student_email TEXT, lesson_id TEXT, state TEXT, started_at INTEGER,
     completed_at INTEGER, score REAL, PRIMARY KEY (student_email, lesson_id))`);
+  // What mayReadAnswer reads: an enrolment in a live class, and the open-date gate.
+  sql.run('CREATE TABLE classes (id TEXT PRIMARY KEY, name TEXT, archived_at INTEGER)');
+  sql.run('CREATE TABLE enrollments (class_id TEXT, student_email TEXT, expires_at INTEGER, PRIMARY KEY (class_id, student_email))');
+  sql.run('CREATE TABLE class_due_dates (class_id TEXT, scope TEXT, scope_id TEXT, due_at INTEGER)');
+  sql.run('CREATE TABLE class_open_dates (class_id TEXT, scope TEXT, scope_id TEXT, open_at INTEGER)');
+  sql.run('CREATE TABLE lesson_access_overrides (class_id TEXT, student_email TEXT, lesson_id TEXT)');
+  sql.run("INSERT INTO classes (id, name, archived_at) VALUES ('c1', 'Period 1', NULL)");
+  const FAR = 4102444800000;
+  // Two ordinary students are enrolled by default, so every case below that is not
+  // about the enrolment gate runs as a real student in a real class.
+  for (const e of ['a@example.invalid', 'b@example.invalid']) {
+    sql.run('INSERT INTO enrollments (class_id, student_email, expires_at) VALUES (?, ?, ?)', ['c1', e, FAR]);
+  }
   const db = {
     raw: sql,
     prepare(text) {
@@ -140,8 +158,12 @@ const BEFORE = COUNT_SINCE - 1000;
 const A = 'a@example.invalid';
 const B = 'b@example.invalid';
 
+// The manifest the due-date lookup asks for. Served from here so the tests never
+// touch the network (an unreachable manifest reads as "no open date", which would
+// make the open-date cases pass vacuously).
+const ASSETS = { fetch: async () => new Response(JSON.stringify({ lessons: [] }), { status: 200 }) };
 const call = (handler, db, url, email = A, role = 'student', init = {}, params = {}) =>
-  handler({ request: new Request(`https://example.test${url}`, init), env: { DB: db }, params, data: email ? { email, role } : {}, next: async () => new Response(null) });
+  handler({ request: new Request(`https://example.test${url}`, init), env: { DB: db, ASSETS }, params, data: email ? { email, role } : {}, next: async () => new Response(null) });
 const reveal = (db, lessonId, email = A) => call(attemptReveal, db, `/api/attempt-reveal${lessonId === null ? '' : `?lessonId=${lessonId}`}`, email);
 
 // ============ attempt-reveal ============
@@ -267,6 +289,146 @@ const submitQuiz = (db, picks, email = A, extra = {}) =>
   });
   eq(noPicks.status, 400, 'a capped quiz hand-in without picks is refused, not stored with the browser score');
   eq(db.raw.query('SELECT COUNT(*) AS n FROM lesson_submissions').get().n, 0, '...and nothing was stored');
+}
+
+// ============ ONE counting rule: lookalike marker keys are refused, SQL and JS agree ============
+{
+  const db = makeDb();
+  const post = (gradeJson, lessonId = 'fx-client') => call(submissionsPost, db, '/api/lesson-submissions', A, 'student', {
+    method: 'POST', body: JSON.stringify({ id: `m${++rowSeq}`, lessonId, response: 'x', score: 1, possible: 2, gradeJson }),
+  });
+  const lookalikes = {
+    'GRADINGFAILED': { GRADINGFAILED: true },
+    'gradingfailed': { gradingfailed: true },
+    'a nested copy': { a: { gradingFailed: true } },
+    'a fullwidth letter': { 'ｇradingFailed': true },
+    'grading_failed': { grading_failed: true },
+    'inside an array': { list: [{ GradingFailed: true }] },
+    'a non-true value': { gradingFailed: 1 },
+  };
+  for (const [name, gj] of Object.entries(lookalikes)) {
+    const res = await post(gj);
+    eq(res.status, 400, `a marker lookalike (${name}) on a capped part is refused 400`);
+  }
+  eq(db.raw.query('SELECT COUNT(*) AS n FROM lesson_submissions').get().n, 0, '...and not one of them was stored (six POSTs can no longer all get in)');
+  // The JS spelling of the marker (a unicode escape in the wire JSON) is just the marker.
+  const esc = await call(submissionsPost, db, '/api/lesson-submissions', A, 'student', {
+    method: 'POST', body: '{"id":"u1","lessonId":"fx-client","response":"x","gradeJson":{"gradingF\\u0061iled":true}}',
+  });
+  const er = db.raw.query("SELECT score, grade_json FROM lesson_submissions WHERE id = 'u1'").get();
+  eq([esc.status, er.score, er.grade_json], [201, null, '{"gradingFailed":true}'], 'a unicode-escaped marker key is the marker: stored bare, NULL score, free');
+}
+{
+  // The SQL count and the JS count must call the same rows free. Rows that merely
+  // LOOK like a marker (written some other way) are COUNTED by both.
+  for (const [name, gj] of [['GRADINGFAILED', { GRADINGFAILED: true }], ['gradingFailed: 1', { gradingFailed: 1 }], ['gradingFailed: "true"', { gradingFailed: 'true' }]]) {
+    const db = makeDb();
+    for (let i = 0; i < CAP; i++) addRow(db, { email: A, lessonId: 'fx-written', gradeJson: gj, at: NOW + i });
+    eq((await reveal(db, 'fx-written')).status, 200, `JS count: ${CAP} rows carrying {${name}} are ${CAP} tries (reveal opens)`);
+    const m = await call(submissionsPost, db, '/api/lesson-submissions', A, 'student', {
+      method: 'POST', body: JSON.stringify({ id: `z${++rowSeq}`, lessonId: 'fx-written', response: 'x', gradeJson: { gradingFailed: true } }),
+    });
+    eq(m.status, 409, `SQL count agrees: a marker after those ${CAP} rows is refused (they spent the tries)`);
+  }
+  // ...and a genuine marker row is free to BOTH.
+  const db = makeDb();
+  for (let i = 0; i < CAP - 1; i++) addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { score: 1 }, at: NOW + i });
+  for (let i = 0; i < 5; i++) addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { gradingFailed: true }, at: NOW + 10 + i });
+  eq((await reveal(db, 'fx-written')).status, 403, 'JS count: five genuine markers do not spend a try');
+  const last = await call(submissionsPost, db, '/api/lesson-submissions', A, 'student', {
+    method: 'POST', body: JSON.stringify({ id: `z${++rowSeq}`, lessonId: 'fx-client', response: 'x', score: 1, possible: 2, gradeJson: { r: 1 } }),
+  });
+  eq(last.status, 201, 'SQL count: and a part with only markers on it still has its tries (fx-client is a different lesson, so a plain try is accepted)');
+}
+
+// ============ a grading-failure marker is refused once every try is spent ============
+{
+  const marker = (db, lessonId, extra = {}) => call(submissionsPost, db, '/api/lesson-submissions', A, 'student', {
+    method: 'POST', body: JSON.stringify({ id: `k${++rowSeq}`, lessonId, response: 'a polished answer written after the reveal', gradeJson: { gradingFailed: true, error: 'down' }, ...extra }),
+  });
+  for (const [lessonId, label] of [['fx-written', "'ai'"], ['fx-client', "'client'"], ['fx-quiz', "'quiz'"]]) {
+    const db = makeDb();
+    const below = await marker(db, lessonId);
+    eq(below.status, 201, `${label} kind: a marker below the cap is accepted (an outage must not lose the answer)`);
+    const cap = lessonId === 'fx-quiz' ? 2 : CAP;
+    for (let i = 0; i < cap; i++) addRow(db, { email: A, lessonId, gradeJson: lessonId === 'fx-quiz' ? { quiz: [] } : { score: 1 }, at: NOW + 100 + i, score: 1, possible: 2 });
+    const rowsBefore = db.raw.query('SELECT COUNT(*) AS n FROM lesson_submissions').get().n;
+    const after = await marker(db, lessonId);
+    eq([after.status, (await after.json()).capReached], [409, true], `${label} kind: a marker once every try is spent is refused 409`);
+    eq(db.raw.query('SELECT COUNT(*) AS n FROM lesson_submissions').get().n, rowsBefore, '...and nothing was stored (no unmarked answer reaches the teacher queue)');
+  }
+  // the same statement as a counted try: racing markers at cap-1 cannot both get in either
+  const db = makeDb();
+  for (let i = 0; i < CAP - 1; i++) addRow(db, { email: A, lessonId: 'fx-client', gradeJson: { score: 1 }, at: NOW + i, score: 1, possible: 2 });
+  const race = await Promise.all([marker(db, 'fx-client'), marker(db, 'fx-client'), marker(db, 'fx-client')]);
+  eq(race.map((r) => r.status).sort(), [201, 201, 201], 'markers at cap-1 are free and do not spend the last try (all three accepted)');
+  const real = await call(submissionsPost, db, '/api/lesson-submissions', A, 'student', {
+    method: 'POST', body: JSON.stringify({ id: `k${++rowSeq}`, lessonId: 'fx-client', response: 'x', score: 1, possible: 2, gradeJson: { r: 1 } }),
+  });
+  eq(real.status, 201, '...and the student still gets their last real try');
+}
+{
+  // WrittenGrader: a refusal for "tries spent" is the server doing its job, not a grader outage.
+  const wg = readFileSync(join(root, 'components/WrittenGrader.tsx'), 'utf8');
+  const capIdx = wg.indexOf('capReached === true');
+  const failIdx = wg.indexOf('if (!data || !data.ok)');
+  if (capIdx === -1) fail('WrittenGrader no longer handles a capReached refusal');
+  else if (failIdx !== -1 && capIdx > failIdx) fail('WrittenGrader records a failed attempt before it has checked for capReached');
+  else {
+    const branch = wg.slice(capIdx, wg.indexOf('return;', capIdx));
+    if (/recordFailedAttempt/.test(branch)) fail('WrittenGrader writes a failed-attempt marker for a capReached refusal');
+    else ok('WrittenGrader treats capReached as "tries spent", not as an outage (no marker written)');
+  }
+  const qv = readFileSync(join(root, 'components/QuizView.tsx'), 'utf8').replace(/\/\/.*$/gm, '');
+  if (!/if \(recorded\) cap\.spend\(\);\s*else cap\.refresh\(\);/.test(qv)) fail('QuizView must spend a try only for a row the server accepted, and re-read the count after a refusal');
+  else if (!/capped && recorded\) await recordLessonCompleted/.test(qv)) fail('QuizView must complete a capped quiz from the RECORDED row, not from the reveal fetch');
+  else if (!/repairedRef/.test(qv)) fail('QuizView lost the on-mount completion repair');
+  else ok('QuizView: a 409 spends nothing, completion follows the recorded row, and a lost completion is repaired on mount');
+}
+
+// ============ an answer is only for a teacher/admin or an enrolled student whose class has the part open ============
+{
+  const C = 'throwaway@example.invalid';
+  const db = makeDb();
+  for (let i = 0; i < CAP; i++) addRow(db, { email: C, lessonId: 'fx-written', gradeJson: { score: 1 }, at: NOW + i });
+  const res = await reveal(db, 'fx-written', C);
+  const text = await res.text();
+  eq(res.status, 403, 'a throwaway account with every try spent but NO enrolment gets 403');
+  if (text.includes('SET total')) fail('the 403 for an unenrolled account carries the pseudocode');
+  else ok('...and the body carries nothing');
+  const asTeacher = await call(attemptReveal, db, '/api/attempt-reveal?lessonId=fx-written', C, 'teacher');
+  const asAdmin = await call(attemptReveal, db, '/api/attempt-reveal?lessonId=fx-written', C, 'admin');
+  eq([asTeacher.status, asAdmin.status], [200, 200], 'a teacher or admin with no class can still read it (a self-hosting teacher tests their own part)');
+  db.raw.run("INSERT INTO enrollments (class_id, student_email, expires_at) VALUES ('c1', ?, ?)", [C, 4102444800000]);
+  eq((await reveal(db, 'fx-written', C)).status, 200, 'enrolled in a live class -> 200');
+  db.raw.run("UPDATE classes SET archived_at = 1 WHERE id = 'c1'");
+  eq((await reveal(db, 'fx-written', C)).status, 403, 'the class archived -> 403');
+  db.raw.run('UPDATE classes SET archived_at = NULL');
+  db.raw.run('UPDATE enrollments SET expires_at = 1 WHERE student_email = ?', [C]);
+  eq((await reveal(db, 'fx-written', C)).status, 403, 'enrolment expired -> 403');
+}
+{
+  const db = makeDb();
+  for (let i = 0; i < CAP; i++) addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { score: 1 }, at: NOW + i });
+  db.raw.run("INSERT INTO class_open_dates (class_id, scope, scope_id, open_at) VALUES ('c1', 'lesson', 'fx-written', ?)", [Date.now() + 86400000]);
+  eq((await reveal(db, 'fx-written')).status, 403, 'the part is not open yet for the student (open date in the future) -> 403');
+  db.raw.run("INSERT INTO lesson_access_overrides (class_id, student_email, lesson_id) VALUES ('c1', ?, 'fx-written')", [A]);
+  eq((await reveal(db, 'fx-written')).status, 200, '...unless the teacher granted this student early access -> 200');
+  db.raw.run('DELETE FROM lesson_access_overrides');
+  db.raw.run('UPDATE class_open_dates SET open_at = ?', [Date.now() - 1000]);
+  eq((await reveal(db, 'fx-written')).status, 200, 'open date passed -> 200');
+}
+{
+  const C = 'throwaway@example.invalid';
+  const db = makeDb();
+  await submitQuiz(db, [['q1', 1], ['q2', 0]], C);
+  await submitQuiz(db, [['q1', 1], ['q2', 0]], C);
+  const res = await call(quizReveal, db, '/api/quiz-reveal?lessonId=fx-quiz', C);
+  const text = await res.text();
+  eq(res.status, 403, 'capped quiz: an unenrolled account that spent every try gets 403, not the key');
+  if (text.includes('EXPLAIN-')) fail('the quiz 403 carries the key'); else ok('...and no explanation text');
+  const t = await call(quizReveal, db, '/api/quiz-reveal?lessonId=fx-quiz', C, 'teacher');
+  eq(t.status, 200, 'capped quiz: a teacher with no class can read it');
 }
 
 // ============ the cap on writes: 409, and exactly one of two racers ============

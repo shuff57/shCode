@@ -64,13 +64,27 @@ for (const id of fs.readdirSync(LESSONS)) {
 }
 // 2b. The solution pseudocode shown after the last try (pa-pseudocode/<id>.md) is
 // the answer to a graded part. It is baked into the worker and must never be a
-// static file. One probe per file: its first line long enough to be distinctive.
+// static file. EVERY line of 25 characters or more is a probe: pseudocode lines
+// are short ("SET total TO 0"), so probing only a first line of 40+ left a file
+// with no such line, and a leak of it, silently unprobed. A file that yields no
+// probe at all (empty, or nothing but short lines) is probed as a whole instead,
+// and an empty one FAILS rather than skips: a check that finds nothing to look
+// for must say so, not pass. README.md is the folder's tracked how-to, not a
+// solution.
 const PSEUDO = path.join(ROOT, 'pa-pseudocode');
 if (fs.existsSync(PSEUDO)) {
   for (const f of fs.readdirSync(PSEUDO)) {
-    if (!f.endsWith('.md')) continue;
-    const line = fs.readFileSync(path.join(PSEUDO, f), 'utf8').split('\n').map((l) => l.trim()).find((l) => l.length >= 40);
-    if (line) probes.push({ id: f.slice(0, -3), what: 'pseudocode', text: line.slice(0, 70) });
+    if (!f.endsWith('.md') || f === 'README.md') continue;
+    const id = f.slice(0, -3);
+    const lines = fs.readFileSync(path.join(PSEUDO, f), 'utf8').split('\n').map((l) => l.trim()).filter(Boolean);
+    const long = lines.filter((l) => l.length >= 25);
+    if (long.length) {
+      for (const l of long) probes.push({ id, what: 'pseudocode', text: l.slice(0, 70) });
+    } else if (lines.length) {
+      probes.push({ id, what: 'pseudocode', text: lines.join('\n').slice(0, 70) });
+    } else {
+      problems.push(`pa-pseudocode/${f} is empty: nothing to probe for`);
+    }
   }
 }
 if (probes.length === 0) problems.push('found no summative grader to probe for -- the check would pass vacuously');

@@ -14,14 +14,14 @@
 
 import { decideReveal } from '../../lib/attempt-cap';
 import { ATTEMPT_CAPS, PA_PSEUDOCODE } from '../_shared/pa-pseudocode.generated';
-import { attemptsUsed } from '../_shared/attempts';
+import { attemptsUsed, mayReadAnswer } from '../_shared/attempts';
 
 interface Env {
   DB: D1Database;
 }
-type Ctx = EventContext<Env, string, { email: string }>;
+type Ctx = EventContext<Env, string, { email: string; role?: string }>;
 
-export const onRequestGet: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
+export const onRequestGet: PagesFunction<Env, string, { email: string; role?: string }> = async (context: Ctx) => {
   const { request, env, data } = context;
   if (!data.email) return json({ error: 'Not signed in' }, 401);
 
@@ -35,6 +35,13 @@ export const onRequestGet: PagesFunction<Env, string, { email: string }> = async
   // read, so the response says nothing about the student's attempts either.
   if (decideReveal(cap, Number.MAX_SAFE_INTEGER, text !== undefined) !== 'open') {
     return json({ error: 'No solution is available for this part.' }, 404);
+  }
+
+  // Who may be handed an answer at all: a teacher/admin, or a student enrolled in
+  // a live class that has this lesson open (mayReadAnswer). Checked before the
+  // count, so an account that is not in a class learns nothing about its tries.
+  if (!(await mayReadAnswer(env, request, data.email, data.role, lessonId))) {
+    return json({ error: 'The solution is shown to students enrolled in a class that has opened this part.' }, 403);
   }
 
   const used = await attemptsUsed(env.DB, data.email, lessonId);

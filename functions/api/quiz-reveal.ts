@@ -20,14 +20,14 @@
 
 import { assignVariant, hashSeed } from '../../lib/quiz-variant';
 import { QUIZ_KEYS } from '../_shared/quiz-keys.generated';
-import { countedRows, scoreQuiz } from '../_shared/attempts';
+import { countedRows, scoreQuiz, mayReadAnswer } from '../_shared/attempts';
 
 interface Env {
   DB: D1Database;
 }
-type Ctx = EventContext<Env, string, { email: string }>;
+type Ctx = EventContext<Env, string, { email: string; role?: string }>;
 
-export const onRequestGet: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
+export const onRequestGet: PagesFunction<Env, string, { email: string; role?: string }> = async (context: Ctx) => {
   const { request, env, data } = context;
   if (!data.email) return json({ error: 'Not signed in' }, 401);
 
@@ -46,6 +46,14 @@ export const onRequestGet: PagesFunction<Env, string, { email: string }> = async
   // computed here, from this student's own rows and the baked key.
   const variantFor = assignVariant(key.variants, hashSeed(`${lessonId}:${data.email}`));
   if (typeof key.maxSubmissions === 'number') {
+    // Totals and, after the last try, the key: only for a teacher/admin or a
+    // student enrolled in a live class that has this part open (mayReadAnswer).
+    // Signup takes any email, so without this a throwaway account could spend the
+    // tries on junk and read the key. Not applied to the older one-row path below:
+    // that quiz is one-shot by design and its fixtures predate enrollment.
+    if (!(await mayReadAnswer(env, request, data.email, data.role, lessonId))) {
+      return json({ error: 'Your result is shown to students enrolled in a class that has opened this part.' }, 403);
+    }
     const rows = await countedRows(env.DB, data.email, lessonId);
     if (rows.length === 0) return json({ error: 'Your result appears after you hand in the test.' }, 403);
     const marks = rows.map((r) => scoreQuiz(key, variantFor, r.gradeJson));

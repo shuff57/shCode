@@ -10,7 +10,7 @@
 import { resolveDueForStudent } from '../../_shared/dueDates';
 import { assignVariant, hashSeed } from '../../../lib/quiz-variant';
 import { QUIZ_KEYS } from '../../_shared/quiz-keys.generated';
-import { scoreQuiz, capFor, kindFor, insertCounted } from '../../_shared/attempts';
+import { scoreQuiz, capFor, kindFor, insertCounted, findMarkerKey } from '../../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -150,17 +150,26 @@ async function recordCapped(
   const done = { ok: true, submittedAt: now, dueAtSubmit, late: dueAtSubmit !== null && now > dueAtSubmit };
 
   // The grading-failure marker: the answer still reaches the teacher, and it is
-  // free. Reduced to the bare marker, with no score and nothing to score.
+  // free. Reduced to the bare marker, with no score and nothing to score. It goes
+  // in through the SAME conditional insert as a counted row, so once every try is
+  // spent a marker is refused too (409): otherwise a student who had read the
+  // solution could post a polished answer as a "failed" row, which the teacher is
+  // then asked to hand-grade as a fourth try.
   if (g && g.gradingFailed === true) {
     const error = typeof g.error === 'string' ? g.error.slice(0, 300) : undefined;
-    await env.DB.prepare(
-      `INSERT INTO lesson_submissions
-         (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at, due_at_submit)
-       VALUES (?, ?, ?, ?, ?, NULL, NULL, ?, ?)`,
-    )
-      .bind(body.id, email, body.lessonId, body.response, JSON.stringify({ gradingFailed: true, ...(error ? { error } : {}) }), now, dueAtSubmit)
-      .run();
+    const marker = row({ gradingFailed: true, ...(error ? { error } : {}) }, null, null);
+    if (!(await insertCounted(env.DB, marker, cap))) {
+      return json({ error: `All ${cap} tries are already used.`, capReached: true, cap }, 409);
+    }
     return json(done, 201);
+  }
+
+  // Past this point a row is never a marker, so no key anywhere in what the
+  // browser sent may LOOK like one ("GRADINGFAILED", a fullwidth letter, a nested
+  // copy). The count's rule is exact, so a lookalike would be free to one reader
+  // and a counted try to another. No honest report carries such a key.
+  if (body.gradeJson !== undefined && findMarkerKey(body.gradeJson)) {
+    return json({ error: 'gradeJson may not carry a gradingFailed-style key.' }, 400);
   }
 
   const kind = kindFor(body.lessonId);
@@ -183,11 +192,6 @@ async function recordCapped(
     const marks = scoreQuiz(key, assignVariant(key.variants, hashSeed(`${body.lessonId}:${email}`)), clean);
     stored = row(clean, marks.correct, marks.total);
   } else {
-    // A nested copy of the marker would hide the row from the SQL count while the
-    // browser's count (top level only) still saw it. No honest report carries it.
-    if (body.gradeJson !== undefined && JSON.stringify(body.gradeJson).includes('"gradingFailed":true')) {
-      return json({ error: 'gradeJson may not carry a gradingFailed marker below the top level.' }, 400);
-    }
     const ok = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 10000;
     const score = ok(body.score) && ok(body.possible) && body.score <= body.possible ? body.score : null;
     stored = row(body.gradeJson, score, score === null ? null : (body.possible as number));

@@ -9,7 +9,7 @@
 import { countAttempts, COUNT_SINCE } from '../../lib/attempt-cap';
 import type { QuizKey } from './quiz-keys.generated';
 import { ATTEMPT_CAPS, ATTEMPT_KINDS } from './pa-pseudocode.generated';
-import { resolveDueForStudent } from './dueDates';
+import { resolveDueForStudent, isLessonAvailableForStudent } from './dueDates';
 
 interface AttemptDb {
   prepare(sql: string): {
@@ -47,6 +47,61 @@ function parse(raw: string | null): unknown | null {
     return JSON.parse(raw);
   } catch {
     return null;
+  }
+}
+
+/**
+ * True when ANY key anywhere in `value` looks like the grading-failure marker
+ * (NFKC-folded, case-folded, letters only: "GRADINGFAILED", "grading_failed",
+ * "gradingFailed" spelled with a fullwidth letter). The counting rule is exact
+ * (see insertCounted), so a lookalike would be an uncounted row to one reader and
+ * a counted one to another; no honest report carries such a key, so the routes
+ * refuse them instead of trying to count them. Depth-limited so a hostile body
+ * cannot make this walk forever.
+ */
+export function findMarkerKey(value: unknown, depth = 0): boolean {
+  if (depth > 20 || value === null || typeof value !== 'object') return false;
+  if (Array.isArray(value)) return value.some((v) => findMarkerKey(v, depth + 1));
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    if (k.normalize('NFKC').toLowerCase().replace(/[^a-z]/g, '').includes('gradingfailed')) return true;
+    if (findMarkerKey(v, depth + 1)) return true;
+  }
+  return false;
+}
+
+/**
+ * May this caller be handed an answer (the quiz key or the pseudocode)? A teacher
+ * or admin, always: a self-hosting teacher with no class still has to be able to
+ * try the part. A student only while enrolled in a live class (not expired, not
+ * archived) AND the lesson is open for them (the "available after" gate, which
+ * the lesson page enforces client-side only). Without this, signup takes any
+ * email, so a throwaway account could spend three junk tries on a part nobody
+ * has opened for it and read the answer. NOT a due-date gate: releasing the
+ * answer only after the part closes is a separate decision, see the spec.
+ */
+export async function mayReadAnswer(
+  env: { DB: AttemptDb },
+  request: Request,
+  email: string,
+  role: string | undefined,
+  lessonId: string,
+): Promise<boolean> {
+  if (role === 'teacher' || role === 'admin') return true;
+  const res = await env.DB
+    .prepare(
+      `SELECT 1 AS ok FROM enrollments e JOIN classes c ON c.id = e.class_id
+        WHERE e.student_email = ? AND e.expires_at > ? AND c.archived_at IS NULL LIMIT 1`,
+    )
+    .bind(email, Date.now())
+    .all<{ ok: number }>();
+  if ((res.results ?? []).length === 0) return false;
+  try {
+    return await isLessonAvailableForStudent(env as never, request, email, lessonId);
+  } catch {
+    // The lookup is a gate on a gate: an outage in the due-date tables must not
+    // lock an enrolled student out of an answer they have earned. Fail OPEN here
+    // only; the enrollment check above already ran.
+    return true;
   }
 }
 
@@ -113,7 +168,7 @@ export interface NewSubmission {
   email: string;
   lessonId: string;
   response: string;
-  /** Already JSON.stringify'd, so the compact form the count's LIKE expects. */
+  /** Already JSON.stringify'd. */
   gradeJson: string | null;
   score: number | null;
   possible: number | null;
@@ -122,17 +177,24 @@ export interface NewSubmission {
 }
 
 /**
- * Record ONE row that spends a try, or refuse because every try is spent. The
- * check and the insert are a single statement (INSERT ... SELECT ... WHERE count
- * < cap), so two requests racing at cap-1 cannot both get in: SQLite serialises
- * the statement, and the loser's WHERE sees the winner's row. A count read in one
- * query and an insert in another would let both through.
+ * Record ONE row, or refuse because every try is spent. The check and the insert
+ * are a single statement (INSERT ... SELECT ... WHERE count < cap), so two
+ * requests racing at cap-1 cannot both get in: SQLite serialises the statement,
+ * and the loser's WHERE sees the winner's row. A count read in one query and an
+ * insert in another would let both through.
  *
- * The SQL count is the same rule as countAttempts: rows since COUNT_SINCE that
- * are not a grading-failure marker. Every counted row is written by this server
- * with JSON.stringify, so the marker has exactly one spelling and the LIKE
- * cannot be fooled by text inside a string (a quote inside a JSON string is
- * escaped, which breaks the match).
+ * The same statement writes the bare grading-failure MARKER (score NULL): it is
+ * free, but it is refused once every try is spent, so a marker can never be the
+ * way to put a fourth answer in front of the teacher after the reveal.
+ *
+ * ONE COUNTING RULE, in SQL and in JS. A row is free exactly when its grade_json
+ * is valid JSON whose top-level `gradingFailed` is the JSON value true -- which is
+ * what lib/attempt-cap.ts wasGradingFailure tests with `=== true`. The SQL used to
+ * be LIKE '%"gradingFailed":true%', which is case-INSENSITIVE: a row written as
+ * {"GRADINGFAILED":true} was free to the SQL count and counted by the JS one, so
+ * six POSTs were all admitted. json_type is exact about both the key and the type
+ * (1, "true" and "TRUE" are not the value true). The routes also refuse any
+ * lookalike key outright (findMarkerKey), so the two rules never get to differ.
  */
 export async function insertCounted(db: AttemptDb, row: NewSubmission, cap: number): Promise<boolean> {
   const res = await db
@@ -142,11 +204,14 @@ export async function insertCounted(db: AttemptDb, row: NewSubmission, cap: numb
        SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?
        WHERE (SELECT COUNT(*) FROM lesson_submissions
                WHERE student_email = ? AND lesson_id = ? AND submitted_at >= ?
-                 AND (grade_json IS NULL OR grade_json NOT LIKE ?)) < ?`,
+                 AND (grade_json IS NULL
+                      OR CASE WHEN json_valid(grade_json)
+                              THEN json_type(grade_json, '$.gradingFailed') IS NOT 'true'
+                              ELSE 1 END)) < ?`,
     )
     .bind(
       row.id, row.email, row.lessonId, row.response, row.gradeJson, row.score, row.possible, row.at, row.dueAt,
-      row.email, row.lessonId, COUNT_SINCE, '%"gradingFailed":true%', cap,
+      row.email, row.lessonId, COUNT_SINCE, cap,
     )
     .run();
   return (res.meta?.changes ?? 0) === 1;

@@ -71,10 +71,17 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
     .first();
   if (!enrolled) return json({ error: 'Student not found in this class' }, 404);
 
+  // The latest real hand-in. A grading-failure marker row (the answer saved through
+  // an outage) is not the hand-in: left in, a stray marker on a capped quiz hid the
+  // hand-in beneath it and made the unsubmit 409.
   const latest = await env.DB
     .prepare(
       `SELECT response, grade_json FROM lesson_submissions
         WHERE student_email = ? AND lesson_id = ?
+          AND (grade_json IS NULL
+               OR CASE WHEN json_valid(grade_json)
+                       THEN json_type(grade_json, '$.gradingFailed') IS NOT 'true'
+                       ELSE 1 END)
         ORDER BY submitted_at DESC LIMIT 1`,
     )
     .bind(email, lessonId)

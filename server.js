@@ -348,6 +348,11 @@ app.prepare().then(() => {
               .sort((a, b) => a.submitted_at - b.submitted_at);
             return { results: rows };
           }
+          if (/FROM enrollments e JOIN classes c/.test(sql)) {
+            // mayReadAnswer's enrollment check: the dev student is treated as
+            // enrolled, so the dev server can walk a capped part to the reveal.
+            return { results: [{ ok: 1 }] };
+          }
           throw new Error('dev D1: unsupported all(): ' + sql);
         },
         async first() {
@@ -362,17 +367,11 @@ app.prepare().then(() => {
             // The capped insert (functions/_shared/attempts.ts insertCounted): the
             // row, then the count's bind values. One synchronous block, so it is
             // as atomic here as the single statement is in D1.
-            const [id, studentEmail, lessonId, response, gradeJson, score, possible, submittedAt, , email, lid, since, , cap] = args;
+            const [id, studentEmail, lessonId, response, gradeJson, score, possible, submittedAt, , email, lid, since, cap] = args;
             const spent = devSubmissions.filter((r) => r.studentEmail === email && r.lessonId === lid
               && r.submittedAt >= since && !(r.gradeJson && r.gradeJson.gradingFailed === true)).length;
             if (spent >= cap) return { success: true, meta: { changes: 0 } };
             devSubmissions.push({ id, studentEmail, lessonId, response, gradeJson: gradeJson ? JSON.parse(gradeJson) : undefined, score, possible, submittedAt });
-            return { success: true, meta: { changes: 1 } };
-          }
-          if (/INSERT INTO lesson_submissions[\s\S]*NULL, NULL/.test(sql)) {
-            // The grading-failure marker row: score and possible are literal NULLs.
-            const [id, studentEmail, lessonId, response, gradeJson, submittedAt] = args;
-            devSubmissions.push({ id, studentEmail, lessonId, response, gradeJson: gradeJson ? JSON.parse(gradeJson) : undefined, score: null, possible: null, submittedAt });
             return { success: true, meta: { changes: 1 } };
           }
           if (/INSERT INTO lesson_submissions/.test(sql)) {
