@@ -51,7 +51,7 @@
       "description": "Tests the read value against null. Help: 3.8.15 (Saving by Key)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "===\\s*null|==\\s*null|!\\s*\\w+",
+      "pattern": "===\\s*null|==\\s*null|!==?\\s*null|!\\s*[A-Za-z_$]\\w*|if\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*\\)",
       "flags": "i",
       "points": 0
     },

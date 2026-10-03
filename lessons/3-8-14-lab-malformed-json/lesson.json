@@ -36,7 +36,7 @@
       "description": "Defines a function. Help: 3.8.12 (Parsing Can Fail)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+\\w+\\s*\\(",
+      "pattern": "function\\s+\\w+\\s*\\(|(?:const|let)\\s+\\w+\\s*=\\s*(?:function\\s*\\(|\\([^)]*\\)\\s*=>|[A-Za-z_$][\\w$]*\\s*=>)",
       "flags": "i",
       "points": 0
     },

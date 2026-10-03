@@ -29,7 +29,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*goal\\s*\\)",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*goal\\s*\\)?\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -46,7 +46,7 @@
       "description": "One property's value is a function. Help: 3.8.6 (What Does Not Survive)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\s*:\\s*function\\s*\\(",
+      "pattern": "\\w+\\s*:\\s*(?:function\\s*\\(|\\([^)]*\\)\\s*=>|[A-Za-z_$][\\w$]*\\s*=>)",
       "flags": "i",
       "points": 0
     },

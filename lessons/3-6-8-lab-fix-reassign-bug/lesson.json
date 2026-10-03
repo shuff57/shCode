@@ -45,7 +45,7 @@
       "description": "Code assigns into the array parameter by index. Help: 3.3.3 (Changing an Item by Index)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\s*\\[\\s*\\w+\\s*\\]\\s*=",
+      "pattern": "\\w+\\s*\\[\\s*\\w+\\s*\\]\\s*(?:[-+*/]?=(?!=)|\\+\\+|--)",
       "flags": "i",
       "points": 0
     },
@@ -56,6 +56,16 @@
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "parameter not reassigned",
+      "description": "The function writes into the array instead of pointing its parameter at a new one. Help: 3.6.5 (Changing vs. Reassigning)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*function\\s+addOne\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?(?<![\\w$.])\\1\\s*=(?!=))",
       "flags": "i",
       "points": 0
     }

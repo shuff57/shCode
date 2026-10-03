@@ -46,7 +46,7 @@
       "description": "Uses options.property in the body. Help: 3.5.16 (Objects as Named Arguments)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "options\\.\\w+",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{[\\s\\S]*?\\b\\1\\.\\w+",
       "flags": "i",
       "points": 0
     },

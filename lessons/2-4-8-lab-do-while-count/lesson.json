@@ -31,7 +31,7 @@
       "description": "A do...while loop logs and increments a counter up through 5. Help: 2.4.5 (The do...while Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "do\\s*\\{(?=[^}]*console\\.log)(?=[^}]*(?:\\+\\+|\\+=\\s*1))[^}]*\\}\\s*while\\s*\\(\\s*[A-Za-z_$]\\w*\\s*(?:<=\\s*5|<\\s*6)\\s*\\)",
+      "pattern": "do\\s*\\{(?=[^}]*console\\.log)(?=[^}]*(?:\\+\\+|\\+=\\s*1))[^}]*\\}\\s*while\\s*\\(\\s*\\(?\\s*[A-Za-z_$]\\w*\\s*(?:<=\\s*5|<\\s*6)\\s*\\)?\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -41,7 +41,7 @@
       "description": "A second do...while loop logs something with a condition that is already false before the loop starts. Help: 2.4.5 (The do...while Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "do\\s*\\{(?=[^}]*console\\.log)[^}]*\\}\\s*while\\s*\\(\\s*(?:false|[A-Za-z_$]\\w*\\s*<\\s*-?\\d+)\\s*\\)",
+      "pattern": "do\\s*\\{(?=[^}]*console\\.log)[^}]*\\}\\s*while\\s*\\(\\s*\\(?\\s*(?:false|[A-Za-z_$]\\w*\\s*<\\s*-?\\d+)\\s*\\)?\\s*\\)",
       "flags": "i",
       "points": 0
     },

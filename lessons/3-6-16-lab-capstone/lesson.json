@@ -71,7 +71,7 @@
       "description": "recordPlay assigns to the plays property. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.plays\\s*=",
+      "pattern": "\\.plays\\s*(?:[-+*/]?=(?!=)|\\+\\+|--)",
       "flags": "i",
       "points": 0
     },

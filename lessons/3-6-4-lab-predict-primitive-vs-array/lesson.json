@@ -15,12 +15,12 @@
     {
       "id": "s1",
       "title": "Write a function that reassigns a number parameter",
-      "instructions": "Define a function that takes one parameter and reassigns it to a different number inside the body. This models a primitive argument arriving as a copy."
+      "instructions": "Define a function called changeNum that takes one parameter and reassigns it to a different number inside the body. This models a primitive argument arriving as a copy."
     },
     {
       "id": "s2",
       "title": "Write a function that mutates an array parameter",
-      "instructions": "Define a second function that takes one parameter and adds an item to it with .push. This models an array argument arriving as a copy of a reference."
+      "instructions": "Define a second function called changeArr that takes one parameter and adds an item to it with .push. This models an array argument arriving as a copy of a reference."
     },
     {
       "id": "s3",

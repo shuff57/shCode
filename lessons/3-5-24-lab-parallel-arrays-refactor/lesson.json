@@ -45,7 +45,7 @@
       "description": "Reads arr[i].field. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\[\\w+\\]\\.\\w+",
+      "pattern": "\\[\\s*\\w+\\s*\\]\\s*\\.\\s*\\w+|(?:const|let)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*\\w+\\s*\\[\\s*\\w+\\s*\\][\\s\\S]*?\\b\\1\\.\\w+",
       "flags": "i",
       "points": 0
     },

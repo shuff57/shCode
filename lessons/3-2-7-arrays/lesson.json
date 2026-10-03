@@ -53,11 +53,11 @@
     },
     {
       "id": "req3",
-      "title": "Use pop or splice",
-      "description": "Remove elements using .pop() or .splice(). Help: 3.3.2 (Array Basics: Index, push, pop)",
+      "title": "Use pop",
+      "description": "Remove an element using .pop(). Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.(pop|splice)\\(",
+      "pattern": "\\.pop\\(",
       "flags": "i",
       "points": 5
     },

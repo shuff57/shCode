@@ -35,7 +35,7 @@
       "description": "Code assigns to an array index (non-comparison). Help: 3.3.3 (Changing an Item by Index)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\[\\d+\\]\\s*=\\s*[^=]",
+      "pattern": "\\[\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\]\\s*=\\s*[^=]",
       "flags": "i",
       "points": 0
     },

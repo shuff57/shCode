@@ -1,4 +1,4 @@
-// 3.3.14 Lab: Write a Function That Filters an Array
+// 3.3.14 Lab: Write a Function That Returns a New Array
 
 // STEP 1: Write a function declaration (your own name, e.g. doubled
 //         or bigger) that takes an array parameter.

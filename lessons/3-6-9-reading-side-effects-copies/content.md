@@ -9,7 +9,7 @@ When a function changes an object it was given, that change is a **side effect**
 
 Side effects are not automatically bad. `arr.sort()` exists precisely to rearrange the array you handed it. The trouble is an *unexpected* one: the damage happens inside a function you may not have written, on data you thought was safe.
 
-**Try it:** `sort` mutates in place. Run it and watch the caller's array change without any line outside the function touching it.
+**Try it:** `sort` mutates in place. Run it and watch the caller's array change without any line outside the function touching it. (The `function (a, b) { return b - a; }` inside `sort` just means "biggest first"; you only need to read it for now, and Module 3.7 covers it.)
 
 ```js live plain
 function sortScores(scores) {

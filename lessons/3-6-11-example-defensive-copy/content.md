@@ -51,6 +51,8 @@ console.log(highestThree(original));
 console.log(original);
 ```
 
+Two pieces here are new, and you only need to read them. `function (a, b) { return b - a; }` tells `sort` to put the biggest numbers first; you will write your own in Module 3.7. `copy.slice(0, 3)` hands back the first three items as another new array.
+
 ## Key takeaways
 
 - Any function that calls a mutating method (`push`, `sort`, `pop`) changes the caller's object unless it copies first.

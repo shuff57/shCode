@@ -92,7 +92,7 @@
       "description": "Builds an object copy with a property written after the spread. Help: 3.7.14 (Spreading into a New Array or Object)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\{\\s*\\.\\.\\.[^}]*,\\s*\\w+\\s*:",
+      "pattern": "\\{\\s*\\.\\.\\.[^}]*,\\s*[\"\\']?\\w+[\"\\']?\\s*:",
       "flags": "i",
       "points": 0
     },

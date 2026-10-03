@@ -61,7 +61,7 @@
       "description": "Writes a property after the spread so the override wins. Help: 3.7.14 (Spreading into a New Array or Object)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.\\.\\.[^}]*,\\s*\\w+\\s*:",
+      "pattern": "\\.\\.\\.[^}]*,\\s*[\"\\']?\\w+[\"\\']?\\s*:",
       "flags": "i",
       "points": 0
     },

@@ -46,7 +46,7 @@
       "description": "A while (n <= 5) loop logs n and increments it inside its own body (n++, n += 1, or n = n + 1). Help: 2.4.20 (Infinite Loops: Three Causes)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(\\s*n\\s*<=\\s*5\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\([^)]*\\bn\\b[^)]*\\))(?=[^{}]*n\\s*(?:\\+\\+|\\+=\\s*1|=\\s*n\\s*\\+\\s*1))[^{}]*\\}",
+      "pattern": "while\\s*\\(\\s*\\(?\\s*n\\s*<=\\s*5\\s*\\)?\\s*\\)\\s*\\{(?=[^{}]*console\\.log\\s*\\([^)]*\\bn\\b[^)]*\\))(?=[^{}]*n\\s*(?:\\+\\+|\\+=\\s*1|=\\s*n\\s*\\+\\s*1))[^{}]*\\}",
       "flags": "i",
       "points": 0
     },
@@ -86,7 +86,7 @@
       "description": "A do...while loop logs something and its condition guarantees the body could otherwise be skipped (!greeted or greeted === false). Help: 2.4.5 (The do...while Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "do\\s*\\{(?=[^{}]*console\\.log)[^{}]*\\}\\s*while\\s*\\(\\s*(?:!\\s*greeted|greeted\\s*===?\\s*false)\\s*\\)",
+      "pattern": "do\\s*\\{(?=[^{}]*console\\.log)[^{}]*\\}\\s*while\\s*\\(\\s*\\(?\\s*(?:!\\s*\\(?\\s*greeted\\s*\\)?|greeted\\s*===?\\s*false)\\s*\\)?\\s*\\)",
       "flags": "i",
       "points": 0
     }

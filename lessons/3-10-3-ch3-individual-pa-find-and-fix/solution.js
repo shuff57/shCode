@@ -16,7 +16,7 @@ const priceList = [
 // BUG 2 — runtime: the file was valid and started, then stopped.
 // priceList.length is 3 and the last index is 2; indexing with length
 // reads one past the end and throws "Cannot read properties of
-// undefined". Fix: length - 1, or .at(-1) from 3.3.2.
+// undefined". Fix: length - 1.
 const lastItem = priceList[priceList.length - 1];
 
 // BUG 3 — logic: the program ran to the end and printed undefined for

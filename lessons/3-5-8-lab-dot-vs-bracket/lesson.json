@@ -75,7 +75,7 @@
       "description": "Uses the loop variable inside brackets. Help: 3.5.6 (Square Brackets and Computed Keys)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\[\\s*key",
+      "pattern": "\\w+\\[\\s*[A-Za-z_$][\\w$]*\\s*[\\]\\[]",
       "flags": "i",
       "points": 0
     }

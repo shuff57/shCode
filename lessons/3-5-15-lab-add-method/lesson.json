@@ -35,7 +35,7 @@
       "description": "A property is assigned a function. Help: 3.5.13 (Methods)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\s*:\\s*function\\s*\\(",
+      "pattern": "\\w+\\s*:\\s*function\\s*\\(|\\.\\w+\\s*=\\s*function\\s*\\(",
       "flags": "i",
       "points": 0
     },

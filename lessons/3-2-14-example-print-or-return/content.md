@@ -51,7 +51,7 @@ reportOrder(3, 4);
 reportOrder(5, 2);
 ```
 
-Here the point is the message, not a number for the program to use later. There is nothing to return, because nothing else needs the value.
+Here the point is the message, not a number for the program to use later. (`total.toFixed(2)` just shows the number with two decimal places, like money; you only need to read it.) There is nothing to return, because nothing else needs the value.
 
 ## Step 4: The mixed case, done well
 

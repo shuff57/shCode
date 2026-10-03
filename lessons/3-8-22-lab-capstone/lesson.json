@@ -32,7 +32,7 @@
     {
       "id": "s4",
       "title": "Round-trip it and print the result",
-      "instructions": "Call save with your state, then call load and use console.log to print a property of the restored object. Run it again and note the value persists between runs."
+      "instructions": "Call save with your state, then call load and use console.log to print a property of the restored object. Check that the value you print is the one you saved."
     }
   ],
   "requirements": [
@@ -72,7 +72,7 @@
       "description": "Tests the read value against null. Help: 3.8.15 (Saving by Key)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "===\\s*null|==\\s*null",
+      "pattern": "===\\s*null|==\\s*null|!==?\\s*null|!\\s*[A-Za-z_$]\\w*|if\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*\\)",
       "flags": "i",
       "points": 0
     },

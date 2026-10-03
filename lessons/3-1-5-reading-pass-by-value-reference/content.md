@@ -27,7 +27,7 @@ function tryToDouble(n) {
   console.log("inside function, n =", n);
 }
 
-var myNumber = 5;
+let myNumber = 5;
 tryToDouble(myNumber);
 console.log("after function, myNumber =", myNumber); // still 5
 
@@ -36,7 +36,7 @@ function addItem(arr) {
   arr.push("new item");
 }
 
-var myList = ["apple", "banana"];
+let myList = ["apple", "banana"];
 addItem(myList);
 console.log("after function, myList =", myList); // has "new item"
 ```

@@ -4466,7 +4466,7 @@
     },
     {
       "id": "3-3-14-lab-filter-function",
-      "title": "3.3.14 Lab: Write a Function That Filters an Array",
+      "title": "3.3.14 Lab: Write a Function That Returns a New Array",
       "unit": "3.3 Arrays",
       "preview": "console",
       "type": "assignment",

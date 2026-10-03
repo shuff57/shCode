@@ -38,7 +38,7 @@ skill the part exists to assess.
 
 ### Before you submit
 
-- **Run it.** Every fix you make should be checked by running, and Part C is the one
+- **Run it.** Every fix you make should be checked by running, and Part 3 is the one
   part of this paper where running is allowed.
 - Four fixes, four comments: **syntax**, **runtime**, **logic**, in the words above.
 - The checklist goes green only when the checker can see the fix in the code — naming

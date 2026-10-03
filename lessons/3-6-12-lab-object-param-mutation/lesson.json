@@ -45,7 +45,7 @@
       "description": "Code assigns to a property on the parameter object. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.\\w+\\s*=",
+      "pattern": "\\.\\w+\\s*(?:[-+*/]?=(?!=)|\\+\\+|--)",
       "flags": "i",
       "points": 0
     },

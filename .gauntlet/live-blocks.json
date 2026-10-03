@@ -3876,7 +3876,7 @@
     ]
   },
   "3-1-5-reading-pass-by-value-reference#0": {
-    "code": "// --- Pass by VALUE (number) ---\nfunction tryToDouble(n) {\n  n = n * 2;\n  console.log(\"inside function, n =\", n);\n}\n\nvar myNumber = 5;\ntryToDouble(myNumber);\nconsole.log(\"after function, myNumber =\", myNumber); // still 5\n\n// --- Pass by REFERENCE (array) ---\nfunction addItem(arr) {\n  arr.push(\"new item\");\n}\n\nvar myList = [\"apple\", \"banana\"];\naddItem(myList);\nconsole.log(\"after function, myList =\", myList); // has \"new item\"",
+    "code": "// --- Pass by VALUE (number) ---\nfunction tryToDouble(n) {\n  n = n * 2;\n  console.log(\"inside function, n =\", n);\n}\n\nlet myNumber = 5;\ntryToDouble(myNumber);\nconsole.log(\"after function, myNumber =\", myNumber); // still 5\n\n// --- Pass by REFERENCE (array) ---\nfunction addItem(arr) {\n  arr.push(\"new item\");\n}\n\nlet myList = [\"apple\", \"banana\"];\naddItem(myList);\nconsole.log(\"after function, myList =\", myList); // has \"new item\"",
     "output": [
       {
         "type": "log",
@@ -3893,7 +3893,7 @@
     ]
   },
   "3-1-6-reading-defensive-copying#0": {
-    "code": "var scores = [90, 85, 78];\n\n// Make a copy, then change the copy\nvar scoresCopy = [...scores];\nscoresCopy.push(100);\n\nconsole.log(\"original:\", scores);    // [90, 85, 78]: unchanged\nconsole.log(\"copy:\", scoresCopy);    // [90, 85, 78, 100]\n\n// Object copy works the same way\nvar student = { name: \"Alex\", grade: \"A\" };\nvar studentCopy = { ...student };\nstudentCopy.grade = \"B\";\n\nconsole.log(\"original student:\", student.grade);   // A: unchanged\nconsole.log(\"copy student:\", studentCopy.grade);   // B",
+    "code": "let scores = [90, 85, 78];\n\n// Make a copy, then change the copy\nlet scoresCopy = [...scores];\nscoresCopy.push(100);\n\nconsole.log(\"original:\", scores);    // [90, 85, 78]: unchanged\nconsole.log(\"copy:\", scoresCopy);    // [90, 85, 78, 100]\n\n// Object copy works the same way\nlet student = { name: \"Alex\", grade: \"A\" };\nlet studentCopy = { ...student };\nstudentCopy.grade = \"B\";\n\nconsole.log(\"original student:\", student.grade);   // A: unchanged\nconsole.log(\"copy student:\", studentCopy.grade);   // B",
     "output": [
       {
         "type": "log",
