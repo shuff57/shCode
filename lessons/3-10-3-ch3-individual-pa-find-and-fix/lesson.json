@@ -22,7 +22,7 @@
     {
       "id": "s2",
       "title": "Fix all four",
-      "instructions": "Work the file top to bottom. Two of the four never produce an error message — one prints something untrue, one reports a number that never changes. Run after every fix."
+      "instructions": "Work the file top to bottom. Two of the four never produce an error message — one prints something untrue, one changes data it was never supposed to touch. Run after every fix."
     },
     {
       "id": "s3",
@@ -38,7 +38,7 @@
     {
       "id": "r1",
       "title": "Bug 1 — the program does not run at all",
-      "description": "The file is valid JavaScript and reaches the end. Help: 1.5.38 (Reading an Error Message)",
+      "description": "The file is valid JavaScript and reaches the end. Help: 2.5.2 (What an Error Actually Does)",
       "type": "regex",
       "file": "script.js",
       "pattern": "[A-Za-z_$][\\w$]*\\s*:\\s*[0-9]",
@@ -86,7 +86,7 @@
     {
       "id": "r5",
       "title": "All four bugs are named",
-      "description": "A comment beside each fix names its kind: syntax, runtime or logic. Help: 1.5.38 (Reading an Error Message)",
+      "description": "A comment beside each fix names its kind: syntax, runtime or logic. Help: 2.5.2 (What an Error Actually Does)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\bsyntax\\b)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\bruntime\\b)(?=[\\s\\S]*(?:\\/\\/|\\/\\*)[^\\n]*\\blogic\\b)",

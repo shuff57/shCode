@@ -4,7 +4,7 @@
 // Date: 2026-11-04
 
 // The rota as an array of record objects.
-const ROTA = [
+const rota = [
   { name: "Fern", ml: 120, watered: false },
   { name: "Aloe", ml: 60, watered: false },
   { name: "Basil", ml: 90, watered: false }
@@ -34,12 +34,14 @@ function waterOne(plants, name) {
 
 // The main section: calls in order.
 console.log("Labels:");
-console.log(ROTA.map(label).join("\n"));
-console.log("Total water needed: " + totalWater(ROTA) + " ml");
+for (const plant of rota) {
+  console.log(label(plant));
+}
+console.log("Total water needed: " + totalWater(rota) + " ml");
 
-const after = waterOne(ROTA, "Fern");
+const after = waterOne(rota, "Fern");
 console.log("After watering Fern: " + after[0].name + " watered = " + after[0].watered);
-console.log("Original untouched: " + ROTA[0].watered);
+console.log("Original untouched: " + rota[0].watered);
 
 // The round trip (3.8.15).
 localStorage.setItem("rota", JSON.stringify(after));

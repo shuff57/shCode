@@ -4198,6 +4198,23 @@
       }
     ]
   },
+  "3-2-2-reading-array-basics#1": {
+    "code": "let fruits = [\"apple\", \"banana\", \"cherry\"];\n\nconsole.log(fruits.length);\nconsole.log(fruits[fruits.length - 1]);\nconsole.log(fruits[fruits.length]);",
+    "output": [
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "cherry"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      }
+    ]
+  },
   "3-2-3-reading-array-iteration#0": {
     "code": "let scores = [10, 20, 30, 40, 50];\n\n// Sum using a for loop (needs the index to accumulate)\nlet total = 0;\nfor (let i = 0; i < scores.length; i++) {\n    total = total + scores[i];\n}\nconsole.log(\"Total:\", total);      // 150\n\n// Print each item using for...of (no index needed)\nfor (const score of scores) {\n    console.log(\"Score:\", score);\n}",
     "output": [
