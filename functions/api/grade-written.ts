@@ -58,6 +58,7 @@ import {
 } from '../../lib/grade-written-core';
 import { isLessonAccessible, lockedResponse, type SessionData } from '../_shared/lessonAccess';
 import { loadAiGrader } from '../_shared/aiGraders';
+import { capFor, kindFor, attemptsUsed, recordGraded } from '../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -202,6 +203,28 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     );
   }
 
+  // ----- Tries (capped Performance Assessment parts only) -----
+  //
+  // On a capped, AI-graded part THIS route spends the try: it records the counted
+  // lesson_submissions row itself, with the grader's own totals, once a grade
+  // exists (see `record` below). So the AI cannot be used as free practice
+  // before a row is written, a score the browser relays is never what counts,
+  // and once every try is spent no further call reaches the model. Refused here,
+  // before the rate limit and before any model cost. Applies to every role: the
+  // cap is about the part, and a teacher who needs a clean slate can unsubmit.
+  const cap = capFor(body.lessonId);
+  const capped = cap !== undefined && kindFor(body.lessonId) === 'ai';
+  if (capped && (await attemptsUsed(env.DB, data.email, body.lessonId)) >= (cap as number)) {
+    return json(
+      { ok: false, error: `All ${cap} tries on this part are already used.`, capReached: true, cap },
+      409,
+    );
+  }
+  const record = capped
+    ? (result: { totalEarned: number; totalPossible: number }) =>
+        recordGraded(env, request, data.email, body.lessonId, cap as number, body.response, result)
+    : undefined;
+
   // ----- Pick the target -----
   //
   // An unrecognised value falls back rather than erroring. The field is
@@ -294,6 +317,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
       user,
       rubric: config.rubric,
       grader: requested,
+      record,
     });
   }
 
@@ -357,7 +381,14 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     );
   }
 
-  return json({ ...shapeResult(parsed, config.rubric), grader: requested, graderModel: model });
+  const result = { ...shapeResult(parsed, config.rubric), grader: requested, graderModel: model };
+  // A racing request may have taken the last try while the model ran: the
+  // conditional insert refuses it, and the grade is withheld rather than given
+  // away free.
+  if (record && !(await record(result))) {
+    return json({ ok: false, error: `All ${cap} tries on this part are already used.`, capReached: true, cap }, 409);
+  }
+  return json(result);
 };
 
 // Shared Ollama /api/chat call (non-streaming): the only path a grade takes.
@@ -522,9 +553,11 @@ interface StreamArgs {
   user: string;
   rubric: Parameters<typeof shapeResult>[1];
   grader: GraderId;
+  /** Capped parts: spend the try. False = every try was already spent. */
+  record?: (result: { totalEarned: number; totalPossible: number }) => Promise<boolean>;
 }
 
-function streamGrade({ target, model, system, user, rubric, grader }: StreamArgs): Response {
+function streamGrade({ target, model, system, user, rubric, grader, record }: StreamArgs): Response {
   const host = target.host as string;
   const apiKey = target.apiKey;
   const encoder = new TextEncoder();
@@ -568,7 +601,12 @@ function streamGrade({ target, model, system, user, rubric, grader }: StreamArgs
           return;
         }
 
-        send({ result: { ...shapeResult(parsed, rubric), grader, graderModel: model } });
+        const result = { ...shapeResult(parsed, rubric), grader, graderModel: model };
+        if (record && !(await record(result))) {
+          send({ error: 'All tries on this part are already used.' });
+          return;
+        }
+        send({ result });
       } catch (e: unknown) {
         // A GraderError already carries a student-readable sentence; anything
         // else is an unexpected throw and gets the generic wrapper.

@@ -12,6 +12,7 @@ import { publicReport, rankReports, visibleToStudent } from './functions/_shared
 import { resolveLessonDir as resolveLessonDirIn, readLessonSolution } from './lib/lesson-solution-fs.mjs';
 import { DEFAULT_WEIGHTS } from './lib/grading-weights.ts';
 import { ATTEMPT_CAPS } from './functions/_shared/pa-pseudocode.generated.ts';
+import { COUNT_SINCE } from './lib/attempt-cap.ts';
 import { onRequestGet as attemptRevealGet } from './functions/api/attempt-reveal.ts';
 import { onRequestGet as quizRevealGet } from './functions/api/quiz-reveal.ts';
 import { onRequestPost as submissionsPost } from './functions/api/lesson-submissions/index.ts';
@@ -276,9 +277,21 @@ app.prepare().then(() => {
       st.states[lessonId] = 'completed';
       // A capped part keeps the BEST score, as the real route does
       // (functions/api/lesson-state/[lessonId].ts); anything else replaces it.
-      if (typeof score === 'number') {
-        const keep = ATTEMPT_CAPS[lessonId] !== undefined && typeof st.scores[lessonId] === 'number';
-        st.scores[lessonId] = keep ? Math.max(st.scores[lessonId], score) : score;
+      if (ATTEMPT_CAPS[lessonId] !== undefined) {
+        // On a capped part the score is derived from the counted submission rows
+        // and the browser's number is ignored, exactly as the real route does.
+        const me = devIdentity(req);
+        const counted = devSubmissions
+          .filter((r) => r.studentEmail === me && r.lessonId === lessonId
+            && r.submittedAt >= COUNT_SINCE && !(r.gradeJson && r.gradeJson.gradingFailed === true)
+            && typeof r.score === 'number')
+          .map((r) => r.score);
+        if (counted.length) {
+          const best = Math.max(...counted);
+          st.scores[lessonId] = typeof st.scores[lessonId] === 'number' ? Math.max(st.scores[lessonId], best) : best;
+        }
+      } else if (typeof score === 'number') {
+        st.scores[lessonId] = score;
       }
     } else if (state === 'started' && !st.states[lessonId]) {
       st.states[lessonId] = 'started';
@@ -329,6 +342,8 @@ app.prepare().then(() => {
               .map((r) => ({
                 grade_json: r.gradeJson === undefined ? null : JSON.stringify(r.gradeJson),
                 submitted_at: r.submittedAt,
+                score: r.score ?? null,
+                possible: r.possible ?? null,
               }))
               .sort((a, b) => a.submitted_at - b.submitted_at);
             return { results: rows };
@@ -343,6 +358,23 @@ app.prepare().then(() => {
           throw new Error('dev D1: unsupported first(): ' + sql);
         },
         async run() {
+          if (/INSERT INTO lesson_submissions[\s\S]*SELECT/.test(sql)) {
+            // The capped insert (functions/_shared/attempts.ts insertCounted): the
+            // row, then the count's bind values. One synchronous block, so it is
+            // as atomic here as the single statement is in D1.
+            const [id, studentEmail, lessonId, response, gradeJson, score, possible, submittedAt, , email, lid, since, , cap] = args;
+            const spent = devSubmissions.filter((r) => r.studentEmail === email && r.lessonId === lid
+              && r.submittedAt >= since && !(r.gradeJson && r.gradeJson.gradingFailed === true)).length;
+            if (spent >= cap) return { success: true, meta: { changes: 0 } };
+            devSubmissions.push({ id, studentEmail, lessonId, response, gradeJson: gradeJson ? JSON.parse(gradeJson) : undefined, score, possible, submittedAt });
+            return { success: true, meta: { changes: 1 } };
+          }
+          if (/INSERT INTO lesson_submissions[\s\S]*NULL, NULL/.test(sql)) {
+            // The grading-failure marker row: score and possible are literal NULLs.
+            const [id, studentEmail, lessonId, response, gradeJson, submittedAt] = args;
+            devSubmissions.push({ id, studentEmail, lessonId, response, gradeJson: gradeJson ? JSON.parse(gradeJson) : undefined, score: null, possible: null, submittedAt });
+            return { success: true, meta: { changes: 1 } };
+          }
           if (/INSERT INTO lesson_submissions/.test(sql)) {
             const [id, studentEmail, lessonId, response, gradeJson, score, possible, submittedAt] = args;
             devSubmissions.push({
@@ -350,7 +382,7 @@ app.prepare().then(() => {
               gradeJson: gradeJson ? JSON.parse(gradeJson) : undefined,
               score, possible, submittedAt,
             });
-            return { success: true };
+            return { success: true, meta: { changes: 1 } };
           }
           throw new Error('dev D1: unsupported run(): ' + sql);
         },

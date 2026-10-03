@@ -32,12 +32,22 @@ export const ATTEMPT_CAPS_APPLIED = 1790804940000;
 
 /**
  * Epoch ms when three tries on every Performance Assessment part went live
- * (.gauntlet/SPEC-attempt-caps.md). Attempts before it are free, so every
- * student starts with a full set of tries on a part that is capped from here,
- * including Chapter 1 and 2 parts they already sat once. Phase 5 sets this to
- * the deploy instant; until then it is the instant the mechanism was written,
- * which is what a local test run needs. Never move it earlier than a deploy
- * that students have already used: that confiscates tries.
+ * (.gauntlet/SPEC-attempt-caps.md). Attempts before it are free: every student
+ * starts with a FULL set of tries on a part that is capped from here.
+ *
+ * THIS RESETS THE TWO PARTS THAT WERE ALREADY CAPPED (2.7.2 and 2.7.5, capped
+ * from ATTEMPT_CAPS_APPLIED) and gives every student a fresh 3 on Chapter 1 and 2
+ * parts they already sat once -- up to six tries in total on 2.7.2 and 2.7.5 for
+ * a student who spent three before. That is the owner's decision (spec
+ * assumption 3, "attempts spent before go-live are free"), recorded here so it
+ * is never mistaken for a bug. The best score they had stays on the record.
+ *
+ * Until deploy this is the instant the mechanism was written, which is what a
+ * local test run needs. PHASE 5 MUST SET IT TO THE DEPLOY INSTANT (it is the
+ * first item of `phase5_todo` in .gauntlet/attempt-caps-loop.json, and
+ * scripts/test-attempt-reveal.mjs fails if it stops being a fixed literal).
+ * Never move it earlier than a deploy students have already used: that
+ * confiscates tries.
  */
 export const TRIES_APPLIED = 1791065875120;
 

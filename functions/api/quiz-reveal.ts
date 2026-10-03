@@ -93,6 +93,8 @@ export const onRequestGet: PagesFunction<Env, string, { email: string }> = async
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    // The key (and, on a capped quiz, the marks) is per student and per moment:
+    // a shared cache must never hold it.
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
   });
 }

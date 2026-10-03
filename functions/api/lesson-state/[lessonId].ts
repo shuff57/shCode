@@ -10,7 +10,7 @@
 // completion on a lesson whose prior siblings aren't done.
 
 import { isLessonAccessible, lockedResponse, type SessionData } from '../../_shared/lessonAccess';
-import { ATTEMPT_CAPS } from '../../_shared/pa-pseudocode.generated';
+import { capFor, bestCountedScore } from '../../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -54,14 +54,26 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async 
   } else {
     // Upsert to completed. Preserve started_at if a prior row exists.
     //
-    // On a CAPPED part the best try counts (spec: .gauntlet/SPEC-attempt-caps.md),
-    // so the stored score can only go up: a worse later try, or a scoreless
-    // grading-failure row, leaves it alone. The browser already sends its own
-    // running maximum, but that is a courtesy: this is the rule, and it holds
-    // when a second device or a stale tab sends a lower number. Uncapped lessons
-    // keep `score = excluded.score`, because a formative retake may legitimately
-    // replace its score.
-    const capped = Object.prototype.hasOwnProperty.call(ATTEMPT_CAPS, lessonId);
+    // On a CAPPED part the best try counts (spec: .gauntlet/SPEC-attempt-caps.md)
+    // and the score is NOT the browser's: it is the best score over the rows that
+    // spent a try, read here from lesson_submissions. `body.score` is ignored. A
+    // number the browser sent could not be checked, and because a capped score
+    // can only rise, a forged one would have been permanent. The stored value
+    // still only ever goes up (a failed grade or an unsubmit-less re-completion
+    // leaves it alone). Uncapped lessons keep `score = excluded.score`, because a
+    // formative retake may legitimately replace its score -- but a score must be
+    // a finite number >= 0 there too.
+    const capped = capFor(lessonId) !== undefined;
+    let score: number | null;
+    if (capped) {
+      score = await bestCountedScore(env.DB, data.email, lessonId);
+    } else if (body.score === undefined || body.score === null) {
+      score = null;
+    } else if (typeof body.score === 'number' && Number.isFinite(body.score) && body.score >= 0 && body.score <= 100000) {
+      score = body.score;
+    } else {
+      return json({ error: 'score must be a finite number between 0 and 100000' }, 400);
+    }
     const scoreSql = capped
       ? `CASE
            WHEN excluded.score IS NULL THEN lesson_state.score
@@ -77,7 +89,7 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async 
          completed_at = excluded.completed_at,
          score = ${scoreSql}`,
     )
-      .bind(data.email, lessonId, now, now, body.score ?? null)
+      .bind(data.email, lessonId, now, now, score)
       .run();
   }
 

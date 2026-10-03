@@ -10,7 +10,7 @@
 import { resolveDueForStudent } from '../../_shared/dueDates';
 import { assignVariant, hashSeed } from '../../../lib/quiz-variant';
 import { QUIZ_KEYS } from '../../_shared/quiz-keys.generated';
-import { scoreQuiz } from '../../_shared/attempts';
+import { scoreQuiz, capFor, kindFor, insertCounted } from '../../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -86,21 +86,8 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
     dueAtSubmit = null;
   }
 
-  // A capped quiz is scored HERE, from the baked key, and whatever score the
-  // browser sent is discarded: the browser has no key, and a number it supplied
-  // would decide the best score. Only a hand-in that carries picks is scored; a
-  // grading-failure marker (no `quiz` array) keeps the NULLs it came with.
-  let score = body.score ?? null;
-  let possible = body.possible ?? null;
-  const key = Object.prototype.hasOwnProperty.call(QUIZ_KEYS, body.lessonId) ? QUIZ_KEYS[body.lessonId] : undefined;
-  if (key && typeof key.maxSubmissions === 'number') {
-    const g = body.gradeJson as { quiz?: unknown } | undefined;
-    if (g && Array.isArray(g.quiz)) {
-      const marks = scoreQuiz(key, assignVariant(key.variants, hashSeed(`${body.lessonId}:${data.email}`)), g);
-      score = marks.correct;
-      possible = marks.total;
-    }
-  }
+  const cap = capFor(body.lessonId);
+  if (cap !== undefined) return recordCapped(env, data.email, body, cap, now, dueAtSubmit);
 
   await env.DB.prepare(
     `INSERT INTO lesson_submissions
@@ -113,8 +100,8 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
       body.lessonId,
       body.response,
       body.gradeJson !== undefined ? JSON.stringify(body.gradeJson) : null,
-      score,
-      possible,
+      body.score ?? null,
+      body.possible ?? null,
       now,
       dueAtSubmit,
     )
@@ -122,6 +109,95 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
 
   return json({ ok: true, submittedAt: now, dueAtSubmit, late: dueAtSubmit !== null && now > dueAtSubmit }, 201);
 };
+
+// ---------------------------------------------------------------------------
+// A CAPPED part (maxSubmissions; .gauntlet/SPEC-attempt-caps.md). Everything the
+// browser could use to buy a try, a score or a peek is decided here.
+//
+// What the browser may NOT do on a capped part:
+//   * mark a row as a grading failure and thereby make it free. Such a row is
+//     stored as a bare marker with NULL score, so it can be neither a probe nor
+//     a mark; the server never scores it.
+//   * supply a score the server cannot re-derive. A quiz is scored from the
+//     baked key; an AI-graded part's counted row is written by
+//     functions/api/grade-written.ts with the grader's own totals, so the
+//     browser's relay of it is acknowledged and dropped; a deterministic
+//     console part ('client') has no server-side check to re-run -- its report
+//     is the only score there is, so it is clamped to a sane range and
+//     nothing more. That is the limit of what the server can know there.
+//   * make a fourth row: the insert is one conditional statement (see
+//     insertCounted), so the cap holds under races and stale tabs.
+async function recordCapped(
+  env: Env,
+  email: string,
+  body: CreateBody,
+  cap: number,
+  now: number,
+  dueAtSubmit: number | null,
+): Promise<Response> {
+  const g = body.gradeJson && typeof body.gradeJson === 'object' ? (body.gradeJson as Record<string, unknown>) : null;
+  const row = (gradeJson: unknown, score: number | null, possible: number | null) => ({
+    id: body.id,
+    email,
+    lessonId: body.lessonId,
+    response: body.response,
+    gradeJson: gradeJson === undefined ? null : JSON.stringify(gradeJson),
+    score,
+    possible,
+    at: now,
+    dueAt: dueAtSubmit,
+  });
+  const done = { ok: true, submittedAt: now, dueAtSubmit, late: dueAtSubmit !== null && now > dueAtSubmit };
+
+  // The grading-failure marker: the answer still reaches the teacher, and it is
+  // free. Reduced to the bare marker, with no score and nothing to score.
+  if (g && g.gradingFailed === true) {
+    const error = typeof g.error === 'string' ? g.error.slice(0, 300) : undefined;
+    await env.DB.prepare(
+      `INSERT INTO lesson_submissions
+         (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at, due_at_submit)
+       VALUES (?, ?, ?, ?, ?, NULL, NULL, ?, ?)`,
+    )
+      .bind(body.id, email, body.lessonId, body.response, JSON.stringify({ gradingFailed: true, ...(error ? { error } : {}) }), now, dueAtSubmit)
+      .run();
+    return json(done, 201);
+  }
+
+  const kind = kindFor(body.lessonId);
+
+  if (kind === 'ai') {
+    // grade-written recorded this try itself, with the grader's score.
+    return json({ ...done, recorded: 'server' }, 200);
+  }
+
+  let stored: ReturnType<typeof row>;
+  if (kind === 'quiz') {
+    const key = Object.prototype.hasOwnProperty.call(QUIZ_KEYS, body.lessonId) ? QUIZ_KEYS[body.lessonId] : undefined;
+    if (!key || !g || !Array.isArray(g.quiz)) return json({ error: 'A hand-in for this quiz must carry its answers.' }, 400);
+    // Only the picks are kept: nothing else in the browser's gradeJson is a fact.
+    const picks = g.quiz
+      .filter((p): p is { id: unknown; picked: unknown } => !!p && typeof p === 'object')
+      .slice(0, 200)
+      .map((p) => ({ id: String(p.id).slice(0, 80), picked: typeof p.picked === 'number' || typeof p.picked === 'string' ? p.picked : null }));
+    const clean = { quiz: picks };
+    const marks = scoreQuiz(key, assignVariant(key.variants, hashSeed(`${body.lessonId}:${email}`)), clean);
+    stored = row(clean, marks.correct, marks.total);
+  } else {
+    // A nested copy of the marker would hide the row from the SQL count while the
+    // browser's count (top level only) still saw it. No honest report carries it.
+    if (body.gradeJson !== undefined && JSON.stringify(body.gradeJson).includes('"gradingFailed":true')) {
+      return json({ error: 'gradeJson may not carry a gradingFailed marker below the top level.' }, 400);
+    }
+    const ok = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 10000;
+    const score = ok(body.score) && ok(body.possible) && body.score <= body.possible ? body.score : null;
+    stored = row(body.gradeJson, score, score === null ? null : (body.possible as number));
+  }
+
+  if (!(await insertCounted(env.DB, stored, cap))) {
+    return json({ error: `All ${cap} tries are already used.`, capReached: true, cap }, 409);
+  }
+  return json(done, 201);
+}
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
