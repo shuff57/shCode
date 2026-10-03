@@ -33,7 +33,7 @@
       ]
     },
     "2": {
-      "status": "gate green (judge review pending)",
+      "status": "done: gate green; mutation test passes; judge review folded into phase 1 walks",
       "rounds": [
         {
           "round": 1,
@@ -47,11 +47,33 @@
       ]
     },
     "1": {
-      "status": "gate green, browser judge running",
+      "status": "round 3 clean apart from wording (fixed); needs one more clean round, folded into the phase 4 walk",
       "rounds": [
         {
           "round": 1,
-          "fix": "abd1bc37 8.1.11 redesigned box+hollow+hole"
+          "findings": [
+            "hole goes through floor in Build, text said wall",
+            "hint labels not on screen",
+            "Code names missing",
+            "stale-error latch"
+          ],
+          "fix": "abd1bc37, 8.1.11 redesigned"
+        },
+        {
+          "round": 2,
+          "findings": [
+            "hint 3 vs step text",
+            "stale latch reproducible"
+          ],
+          "fix": "hole hint; LessonWorkspace clears runtimeError on reshape-doc"
+        },
+        {
+          "round": 3,
+          "findings": [
+            "step says 'click the tray', hint says wall",
+            "'Hole 1' vs HOLE 1 case"
+          ],
+          "fix": "wording; latch fix verified in browser (typo, refused, on-load)"
         }
       ]
     },

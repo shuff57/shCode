@@ -32,10 +32,10 @@
   {
    "id": "s3",
    "title": "Drill a drain hole through the floor",
-   "instructions": "Click the tray in the 3D view, then press the Hole tool. A hole appears going down through the floor of the tray. In the Dimensions panel, the diameter reads 6 - type 12.",
+   "instructions": "Click the long front wall of the tray in the 3D view, then press the Hole tool. A hole appears going down through the floor of the tray. In the Dimensions panel, the diameter reads 6 - type 12.",
    "hints": [
     "Click on the outside of the long front wall, near the middle. The hole still goes straight down through the floor, not into the wall you clicked: Hole always drills from the top.",
-    "The new step shows up in the timeline as \"HOLE 1\".",
+    "The new step shows up in the timeline as \"Hole 1\" (it may be drawn in capitals).",
     "On the Code side the same step is one line: hole(b, { across: 12 })."
    ]
   }
