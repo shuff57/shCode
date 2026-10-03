@@ -15,7 +15,7 @@
   {
    "id": "s1",
    "title": "Add the box",
-   "instructions": "Press the Box tool. In the Dimensions panel, type 80 in width, 50 in depth, and 20 in height.",
+   "instructions": "Press the Box tool. In the Dimensions panel, type 80 in width and 50 in depth. Height already reads 20, so leave it. (On the Code side this step is one line: const b = box(80, 50, 20).)",
    "hints": [
     "This is the same first step as every box you've built this unit - just three different numbers."
    ]
@@ -25,17 +25,18 @@
    "title": "Hollow it into a tray",
    "instructions": "Click the top face, then press Hollow. In the Dimensions panel, wall reads 2 - type 2.5, so the walls are 2.5 mm thick.",
    "hints": [
-    "A message under the 3D view should read \"Hollow 1 is open at the top face.\" That's what makes it a tray instead of a sealed block."
+    "A message under the 3D view should read \"Hollow 1 is open at the top face.\" That's what makes it a tray instead of a sealed block.",
+    "On the Code side, hollow(b, { wall: 2.5, open: 'top' }) is the same step. open takes a face word in quotes. Without it you get a sealed block, and the Quest will complain about the hollow even though it shows a 2.5 wall."
    ]
   },
   {
    "id": "s3",
-   "title": "Drill a cable hole through the front",
-   "instructions": "Click the front face of the tray (the long wall facing you), then press the Hole tool. In the Dimensions panel, the diameter reads 6 - type 12. The hole goes straight through the front wall and the back wall, a gap for a charging cable.",
+   "title": "Drill a drain hole through the floor",
+   "instructions": "Click the tray in the 3D view, then press the Hole tool. A hole appears going down through the floor of the tray. In the Dimensions panel, the diameter reads 6 - type 12.",
    "hints": [
-    "The label above the Dimensions panel should read \"Box 1 · front face\" before you press Hole. If it reads a hollow or top name, click the outside of the long wall again.",
-    "The new step shows up in the timeline as \"Hole 1\".",
-    "In the Code side the same step is one line: hole(b, { across: 12, along: 'y' })."
+    "Click on the outside of the long front wall, near the middle.",
+    "The new step shows up in the timeline as \"HOLE 1\".",
+    "On the Code side the same step is one line: hole(b, { across: 12 })."
    ]
   }
  ],
@@ -43,7 +44,7 @@
   {
    "id": "r1",
    "title": "An 80 x 50 x 20 tray with 2.5 mm walls and a 12 mm hole",
-   "description": "An 80 x 50 x 20 mm box, hollowed to 2.5 mm walls with the top open, with a 12 mm hole drilled through the front and back walls.",
+   "description": "An 80 x 50 x 20 mm box, hollowed to 2.5 mm walls with the top open, with a 12 mm hole drilled through the floor.",
    "type": "model",
    "expect": [
     {
@@ -64,7 +65,7 @@
      "diameter": 12
     }
    ],
-   "hint": "Box 80 x 50 x 20, Hollow wall 2.5 open top, then click the front face and press Hole with diameter 12.",
+   "hint": "Box 80 x 50 x 20, Hollow wall 2.5 open top, then Hole with diameter 12.",
    "points": 0
   }
  ],

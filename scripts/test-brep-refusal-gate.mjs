@@ -29,7 +29,7 @@ const refused = (code) => {
 const cases = [
   ['round after hollow is refused', "const b = box(80, 50, 20)\nhollow(b, { wall: 2.5, open: 'top' })\nround(b.edge('front', 'right'), 3)", true],
   ['hollow after round is refused', "const b = box(80, 50, 20)\nround(b.edge('front', 'right'), 3)\nhollow(b, { wall: 2.5, open: 'top' })", true],
-  ['hollow then hole is accepted', "const b = box(80, 50, 20)\nhollow(b, { wall: 2.5, open: 'top' })\nhole(b, { across: 12, along: 'y' })", false],
+  ['hollow then hole is accepted', "const b = box(80, 50, 20)\nhollow(b, { wall: 2.5, open: 'top' })\nhole(b, { across: 12 })", false],
 ];
 let bad = 0;
 for (const [name, code, want] of cases) {
