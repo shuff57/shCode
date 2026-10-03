@@ -113,6 +113,47 @@ console.log('console runner: errors carry the line they happened on\n');
     d && d.line === null, `got ${d && d.line}`);
 }
 
+// 3b. A COMPILE error (SyntaxError) is raised by `new Function` before any
+// student line runs, so its stack holds only the runner's own frame. Parsing
+// that stack gave every syntax error in every file the same "line 59, col 5"
+// (the runner's own call site), and 1.7.3's hint tells students the console
+// names the line. The line has to come from the code itself.
+{
+  const pad = (n) => Array.from({ length: n }, (_, i) => `// filler ${i + 1}`);
+  const cases = [
+    ['an unclosed quote on line 13 of a 33-line file',
+      [...pad(12), 'const bad = "oops;', ...pad(20)].join('\n'), 13],
+    ['a bare `= ;` on line 2', ['let a = 1;', 'let x = ;', 'console.log(a);'].join('\n'), 2],
+    ['a missing comma inside a multi-line array, on line 3',
+      ['const priceList = [', '  { name: "Clip", price: 1.2 },', '  { name: "Pad", price 2.5 },', '  { name: "Tape", price: 3.1 }', '];'].join('\n'), 3],
+    ['a call missing its closing parenthesis, on line 2',
+      ['let a = 1;', 'console.log("a" "b");', 'let c = 3;'].join('\n'), 2],
+    ['an unclosed brace at the end of the file (reported on its last line)',
+      ['function f() {', '  return 1;', '', ''].join('\n'), 2],
+  ];
+  // JavaScriptCore (Bun, Safari) words an unclosed brace and an unterminated
+  // string the same way, so on that engine those two cases may report no line.
+  // They must still never report a WRONG one.
+  const jsc = !!process.versions.bun;
+  const ambiguous = new Set(['an unclosed quote on line 13 of a 33-line file',
+    'an unclosed brace at the end of the file (reported on its last line)']);
+  for (const [name, code, want] of cases) {
+    const d = await run(code);
+    const ok = d && d.kind === 'error' && d.name === 'SyntaxError'
+      && (d.line === want || (jsc && ambiguous.has(name) && d.line === null));
+    check(`${name} reports line ${want}${jsc && ambiguous.has(name) ? ' (or none on JavaScriptCore)' : ''}`, ok,
+      `got ${JSON.stringify(d && { name: d.name, line: d.line })}`);
+  }
+  const d = await run(['let a = 1;', 'let x = ;'].join('\n'));
+  check('a compile error carries no column rather than the runner\'s', d && d.col === null,
+    `got ${d && d.col}`);
+  // A SyntaxError raised WHILE the program runs (JSON.parse) has a real stack
+  // frame inside the student's code, and must keep using it.
+  const r = await run(['let a = 1;', 'let b = 2;', 'JSON.parse("{bad");'].join('\n'));
+  check('a run-time SyntaxError (JSON.parse) still reports its own line',
+    r && r.name === 'SyntaxError' && r.line === 3, `got ${JSON.stringify(r && { name: r.name, line: r.line })}`);
+}
+
 // 4. The formatter. Same shape in, location on the end.
 {
   check('name, message and line all appear',

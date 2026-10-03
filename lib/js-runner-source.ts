@@ -86,9 +86,55 @@ const localStorage = {
   removeItem: (k) => { __store.delete(String(k)); },
   clear: () => { __store.clear(); },
 };
+// Where a compile error is. V8 reports a SyntaxError from the Function
+// constructor without a position in the student's code, so ask the engine
+// instead: the error is on the first line whose prefix already fails with the
+// SAME message as the whole file. An error that is only about the code ending
+// too soon (an unclosed brace or template) is reported on the last line that
+// has anything on it, which is where the closing half is missing.
+function locateSyntaxError(code, message) {
+  const lines = String(code).split('\\n');
+  if (lines.length > 2000) return null;
+  // JavaScriptCore says "Unexpected EOF" for an unclosed brace AND for an
+  // unterminated string, so there it is not possible to tell which line is meant:
+  // no line is better than the wrong one.
+  if (/unexpected eof/i.test(message)) return null;
+  const lastLine = () => {
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (lines[i].trim() !== '') return i + 1;
+    }
+    return null;
+  };
+  if (/end of (input|script)|unterminated template/i.test(message)) return lastLine();
+  // V8's Function constructor closes the body with a synthetic "}" of its own, so
+  // an unclosed brace or bracket swallows it and surfaces as "Unexpected token ')'"
+  // instead of "end of input". If appending a closer makes the file parse, the
+  // file simply ends too soon. A stray ")" the student really typed does not
+  // parse with a closer added, so it falls through to the line-by-line search.
+  const closers = ['}', ')', ']', '}}', '})', '}]', '))', ')}'];
+  for (let c = 0; c < closers.length; c++) {
+    try {
+      new Function(String(code) + '\\n' + closers[c]);
+      return lastLine();
+    } catch (e) { /* not this closer */ }
+  }
+  for (let k = 1; k <= lines.length; k++) {
+    try {
+      new Function(lines.slice(0, k).join('\\n'));
+    } catch (e) {
+      if (e && e.name === 'SyntaxError' && e.message === message) return k;
+    }
+  }
+  return null;
+}
 self.onmessage = (e) => {
+  let compiled = false;
+  let codeText = '';
   try {
-    new Function(e.data)(); // student code execution (educational tool)
+    codeText = e.data;
+    const runStudent = new Function(codeText); // a compile error is thrown HERE, before any student line runs
+    compiled = true;
+    runStudent(); // student code execution (educational tool)
     self.postMessage({ kind: 'done' });
   } catch (err) {
     // The Function constructor wraps student code in a synthesized
@@ -109,6 +155,14 @@ self.onmessage = (e) => {
     if (m) {
       const rawLine = parseInt(m[1], 10) - ${FUNCTION_PREAMBLE_LINES};
       if (rawLine >= 1) { line = rawLine; col = parseInt(m[2], 10); }
+    }
+    // A SyntaxError thrown by the Function constructor is raised before any
+    // student line runs, so its stack holds only THIS runner's own frame: every
+    // compile error used to read "line 59, col 5" whatever the file said.
+    // The real position is not in the error, so it is found from the code.
+    if (!compiled && err && err.name === 'SyntaxError') {
+      line = locateSyntaxError(codeText, String(err.message));
+      col = null;
     }
     self.postMessage({
       kind: 'error',
