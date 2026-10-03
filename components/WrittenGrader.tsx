@@ -355,7 +355,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       <p style={{ color: '#888', fontSize: 13, margin: '0 0 12px' }}>
         {codeInput
           ? 'Write your answer as JavaScript. There is no Run button, so read it through the way the computer would before you submit.'
-          : 'Answer in your own everyday words — you are graded on having the right idea, not on exact wording, spelling or length. The AI grader checks each criterion and points you back at the lesson to reread if something is missing. You can revise and resubmit as many times as you want.'}
+          : 'Answer in your own everyday words — you are graded on having the right idea, not on exact wording, spelling or length. The AI grader checks each criterion and points you back at the lesson to reread if something is missing.' +
+            (maxSubmissions === null
+              ? ' You can revise and resubmit as many times as you want.'
+              : ` You get ${maxSubmissions} tries: revise and resubmit, and your best one counts.`)}
       </p>
 
       {prompt.trim() ? (

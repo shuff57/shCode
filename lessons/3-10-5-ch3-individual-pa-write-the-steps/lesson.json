@@ -1,7 +1,7 @@
 {
   "id": "3-10-5-ch3-individual-pa-write-the-steps",
   "title": "3.10.5 Individual PA Part 5: Write the Steps",
-  "description": "One problem, pick one of three, write the JavaScript it describes: functions with parameters and returns, an array of records, map, spread, and a save/load round trip. One attempt, no Run button.",
+  "description": "One problem, pick one of three, write the JavaScript it describes: functions with parameters and returns, an array of records, map, spread, and a save/load round trip. Three tries with feedback on each criterion; no Run button.",
   "type": "assignment",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",

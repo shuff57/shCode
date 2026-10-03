@@ -1,7 +1,7 @@
 {
   "id": "1-7-2-ch1-individual-pa-own-words",
   "title": "1.7.2 Individual PA Part 2: In Your Own Words",
-  "description": "Three short answers: umbrella activities, what is wrong with a badly written program that also computes the wrong answer, and high-level against low-level languages. One submission, no feedback on screen.",
+  "description": "Three short answers: umbrella activities, what is wrong with a badly written program that also computes the wrong answer, and high-level against low-level languages. Three tries with feedback on each question; your best try counts.",
   "type": "assignment",
   "estimateMins": 7,
   "category": "Unit 1: JavaScript Fundamentals",
