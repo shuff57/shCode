@@ -46,11 +46,40 @@ for (const code of patterns) {
   });
 }
 
-test('not provable stays null: a cone target spun about another axis', () => {
-  const r = runScript("const b = cone(6, 12, { at: [25, 0, 0] }); polarPattern(b, { count: 3, axis: 'y' })");
+test('not provable stays null: a wedge target spun about another axis', () => {
+  const r = runScript("const b = wedge(6, 8, 12, { at: [25, 0, 0] }); polarPattern(b, { count: 3, axis: 'y' })");
   assert.deepEqual(r.errors, []);
   assert.equal(extentBoundAlong(r.doc, r.doc.features.at(-1).id, 'x'), null);
 });
+
+// K-4 (PLAN-next): cone, torus and prism have a closed-form reach, so a turned one and a
+// polar copy of one are exact too (a cone's is the kernel's symmetric box, not its tight hull). The kernel's own
+// bbox is the oracle; the formula never checks itself.
+const hull = [];
+for (const rot of ['[0, 0, 0]', '[30, 0, 0]', '[0, 40, 0]', '[25, 35, 50]', '[90, 0, 0]']) {
+  hull.push(`const b = cone(6, 12, { at: [3, -2, 5] }); turn(b, ${rot})`);
+  hull.push(`const b = torus(14, 4, { at: [3, -2, 5] }); turn(b, ${rot})`);
+}
+// turn() refuses a prism, so a prism is only ever axis-aligned or spun by a pattern
+for (const n of [3, 4, 5, 6, 7, 12]) hull.push(`const b = prism(${n}, 7, 9, { at: [3, -2, 5] })`);
+for (const [shape, at] of [['cone(6, 12', '[25, 0, 0]'], ['torus(14, 4', '[25, 0, 0]'], ['prism(5, 7, 9', '[25, 4, 2]']]) {
+  for (const ax of ['x', 'y', 'z']) hull.push(`const b = ${shape}, { at: ${ax === 'x' ? '[0, 25, 3]' : at} }); polarPattern(b, { count: 3, axis: '${ax}' })`);
+  hull.push(`const b = ${shape}, { at: ${at} }); ${shape.startsWith('prism') ? '' : 'turn(b, [20, 30, 40]); '}polarPattern(b, { count: 4, axis: 'y', angle: 200 })`);
+}
+for (const code of hull) {
+  test(`K-4 extent matches the kernel bbox on x, y, z: ${code}`, () => {
+    const r = runScript(code);
+    assert.deepEqual(r.errors, [], code);
+    const id = r.doc.features.at(-1).id;
+    const m = measure(r.doc, id);
+    assert.ok(m, 'built');
+    AX.forEach((ax, i) => {
+      const e = extentBoundAlong(r.doc, id, ax);
+      assert.ok(e && e.exact, `${ax} not exact for ${code}`);
+      near(e.extent, m.bbox[1][i] - m.bbox[0][i], 1e-6);
+    });
+  });
+}
 
 // The kernel centres a hole's tool on the PATTERN's bbox centre plus `at`, so aim
 // at a copy by subtracting that centre (read from the kernel, not computed).
@@ -97,11 +126,9 @@ test('through hole along z, pattern about y, into the 6-thick copy at z = 0', ()
   assert.equal(after.faces, 24 + 1);
 });
 
-test('blind hole on a multi-copy pattern: the offset is flush with the measured top, and the kernel refuses rather than float a cavity', () => {
-  // The kernel (not this slice) refuses a blind hole in a body of several
-  // separate copies, linear patterns included. What is checkable on the real
-  // wasm: our start offset puts the tool's top on the kernel-measured top face,
-  // and no wrong solid comes back -- the hole is simply not applied.
+test('blind hole on a multi-copy pattern: the offset is flush with the measured top, and the hole is cut into the copy it lands in (K-3)', () => {
+  // Our start offset puts the tool's top on the kernel-measured top face; the kernel
+  // cuts the one copy the tool lands in (K-3) and the volume is the closed form.
   const base = Y4;
   const pre = runScript(base);
   const patId = pre.doc.features.at(-1).id;
@@ -112,7 +139,8 @@ test('blind hole on a multi-copy pattern: the offset is flush with the measured 
   const h = t.doc.features.at(-1);
   near(h.center[2] + 4 / 2, (bb[1][2] - bb[0][2]) / 2); // tool top - bbox centre = half extent
   const out = JSON.parse(brep.build_doc_json(JSON.stringify(t.doc)));
-  assert.match(out.refusals[h.id], /cannot cut this hole yet/);
+  assert.deepEqual(out.refusals, {});
+  near(measure(t.doc, h.id).volume, 2400 - Math.PI * 4 * 4); // pi r^2 d, r = 2, d = 4
 });
 
 test('blind hole in a one-copy polar pattern about y is cut for real, from the top face', () => {
