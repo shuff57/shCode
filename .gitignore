@@ -71,3 +71,9 @@ public/models/
 # The grader prompts/rubrics are server-only (functions/_shared/ai-graders.generated.ts).
 # A public/ copy is downloadable by anyone, so never commit or serve one.
 public/ai-graders.json
+
+# Teacher-private PA solutions (pseudocode shown after the last try). The repo is
+# public so other teachers can self-host; only the README here is tracked.
+# See pa-pseudocode/README.md. The generated server module is rebuilt by prebuild.
+pa-pseudocode/*
+!pa-pseudocode/README.md

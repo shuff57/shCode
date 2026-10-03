@@ -16,7 +16,7 @@
     "d1": "node scripts/d1.mjs",
     "d1:status": "node scripts/d1.mjs migrations list shcode-commits --remote",
     "d1:migrate": "node scripts/d1.mjs migrations apply shcode-commits --remote",
-    "deploy": "node scripts/check-pending-migrations.mjs && npm run build && node scripts/check-ai-grader-leak.mjs --require-build && npx wrangler pages deploy out --project-name shcode --branch cs-3d",
+    "deploy": "node scripts/check-pending-migrations.mjs && node scripts/check-pa-attempts.mjs --require-pseudocode && npm run build && node scripts/check-ai-grader-leak.mjs --require-build && npx wrangler pages deploy out --project-name shcode --branch cs-3d",
     "test:book-refs": "node scripts/check-book-refs.mjs",
     "test:lessons": "node scripts/check-lesson-numbers.mjs",
     "test:codes": "node scripts/check-assignment-codes.mjs",

@@ -10,7 +10,8 @@
 // Per lesson this requires:
 //   1. maxSubmissions === 3 in the config block its renderer reads
 //      (quiz / aiGrader / diagram / grading). `summative` alone caps nothing.
-//   2. pa-pseudocode/<id>.md, non-empty. A top-level folder rather than
+//   2. pa-pseudocode/<id>.md, non-empty, ONLY with --require-pseudocode (the files are
+//      git-ignored, see pa-pseudocode/README.md). A top-level folder rather than
 //      lessons/<id>/solution/ on purpose: a lesson with both solution.js and a
 //      solution/ directory fails the build, and lib/lessons.ts ships anything it
 //      finds under lessons/. check-solution-leak must learn this folder in phase 3.
@@ -33,6 +34,11 @@ const LESSONS = path.join(ROOT, 'lessons');
 const PSEUDO = path.join(ROOT, 'pa-pseudocode');
 const WANT = 3;
 const listOnly = process.argv.includes('--list');
+// The pseudocode is git-ignored (the repo is public; see pa-pseudocode/README.md), so a
+// fresh clone has none. Without this flag a missing file is reported but does not fail:
+// a self-hosting teacher's `npm test` must stay green. The deploy passes the flag.
+const requirePseudocode = process.argv.includes('--require-pseudocode');
+const warnings = [];
 
 const BLOCKS = ['quiz', 'aiGrader', 'diagram', 'grading'];
 
@@ -80,8 +86,10 @@ for (const id of fs.readdirSync(LESSONS).sort()) {
   if (lesson.quiz && 'maxSubmissions' in lesson.quiz && lesson.quiz.summative !== true) gaps.push('a capped quiz must set quiz.summative');
 
   const pseudo = path.join(PSEUDO, `${id}.md`);
-  if (!fs.existsSync(pseudo)) gaps.push('no pa-pseudocode/<id>.md');
-  else if (fs.readFileSync(pseudo, 'utf8').trim().length < 40) gaps.push('pa-pseudocode/<id>.md is empty');
+  const pseudoGap = !fs.existsSync(pseudo)
+    ? 'no pa-pseudocode/<id>.md'
+    : fs.readFileSync(pseudo, 'utf8').trim().length < 40 ? 'pa-pseudocode/<id>.md is empty' : null;
+  if (pseudoGap) (requirePseudocode ? gaps : warnings).push(...(requirePseudocode ? [pseudoGap] : [`${id}: ${pseudoGap}`]));
 
   if (needsAi(id) && !hasAi(lesson)) gaps.push('chart/demo part has no aiGrader');
 
@@ -104,4 +112,5 @@ if (problems.length) {
   for (const p of problems) console.error('  ' + p);
   process.exit(1);
 }
+if (warnings.length) console.log(`[check-pa-attempts] ${warnings.length} PA lesson(s) have no pseudocode (git-ignored; pass --require-pseudocode to fail on this)`);
 console.log(`[check-pa-attempts] ok -- ${rows.length} PA lessons, ${WANT} tries and a pseudocode file each`);
