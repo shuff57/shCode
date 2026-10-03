@@ -45,7 +45,8 @@ lifecycle, and how that helped your pair avoid a bug.
 
 ### Part 5: Chapter 3 checklist
 
-Name the specific **function** where each of these first appeared in your program:
+Name the specific **function** where each of these first appeared in your program, and
+quote one line of your own code from it (not just the section number):
 
 - the function definition and its call (3.1)
 - the parameter list and the return value (3.2)
@@ -58,8 +59,8 @@ Name the specific **function** where each of these first appeared in your progra
 
 If you didn't use one, say so.
 
-### Part 6: Extension — the mutating function's return value
+### Part 6: Extension — the mutating function's return value (optional)
 
-If you finished early, you were asked what your mutating function returns, and what
+Optional: if you finished early, you were asked what your mutating function returns, and what
 happens if the caller ignores the return value. Say what you answered, and why the
 change is already visible to the caller even though nothing comes back (3.6.2).

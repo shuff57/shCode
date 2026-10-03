@@ -33,7 +33,7 @@ export const QUIZ_KEYS: Record<string, QuizKey> = {
           "id": "c1-if-decides",
           "answer": 0,
           "optionText": "It converts it to true or false, using the six falsy values",
-          "explanation": "if converts whatever is inside the parentheses to a boolean (2.1.18). Zero, an empty string, null, undefined, NaN and false convert to false; everything else converts to true. That is why if (x == true) is redundant when x is already a boolean -- if (x) does the same job."
+          "explanation": "if converts whatever is inside the parentheses to a boolean (2.1.12). Zero, an empty string, null, undefined, NaN and false convert to false; everything else converts to true. That is why if (x == true) is redundant when x is already a boolean -- if (x) does the same job."
         },
         {
           "id": "c2-switch-equality",

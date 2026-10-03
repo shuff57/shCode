@@ -56,7 +56,8 @@
         "description": "The two IF/ELSE comment lines from their program appear, quoted or paraphrased. Then one sentence about what is still missing -- the expected answer is the if statement, which is Chapter 2. Credit any answer that points at conditionals, if/else, or 'we have not learned that syntax yet'. Withhold only if the branches do not appear at all.",
         "points": 0
       }
-    ]
+    ],
+    "summative": false
   },
   "grading": {
     "totalPoints": 0,

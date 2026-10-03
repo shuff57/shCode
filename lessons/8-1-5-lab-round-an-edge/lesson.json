@@ -27,7 +27,7 @@
       "title": "Round it to 3",
       "instructions": "Press the Round tool in the toolbar. A new \"Round 1\" step appears in the timeline. In the Dimensions panel, type 3 in the radius field.",
       "hints": [
-        "If instead every edge of the box rounds at once, you selected the whole box rather than one edge — undo (Ctrl+Z) and try Step 1 again.",
+        "If every edge of the box looks rounded at once, you selected the whole box rather than one edge, and the Quest tab will not count it as a round — undo (Ctrl+Z) and try Step 1 again.",
         "Look for the field named \"Round 1 radius\" in the Dimensions panel."
       ]
     }

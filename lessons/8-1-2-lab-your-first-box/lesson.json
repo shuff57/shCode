@@ -15,10 +15,10 @@
     {
       "id": "s1",
       "title": "Add a box",
-      "instructions": "Press the Box tool in the toolbar (the cube icon), then click anywhere in the 3D view to place it.",
+      "instructions": "Press the Box tool in the toolbar (the cube icon). A box appears in the 3D view right away, and its numbers show in the Dimensions panel.",
       "hints": [
         "The Box tool's tooltip reads \"Add a box\" when you hover it.",
-        "A box appears at the center once you click in the 3D view."
+        "The box is placed at the center as soon as you press the tool - you do not need to click in the 3D view."
       ]
     },
     {
@@ -48,7 +48,7 @@
       "expect": [
         { "kind": "box", "size": [40, 40, 30] }
       ],
-      "hint": "Press the Box tool, click in the 3D view, then check that width, depth, and height read 40, 40, 30 in the Dimensions panel.",
+      "hint": "Press the Box tool, then check that width, depth, and height read 40, 40, 30 in the Dimensions panel.",
       "points": 0
     }
   ],

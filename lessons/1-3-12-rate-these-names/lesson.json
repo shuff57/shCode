@@ -16,7 +16,7 @@
     "rubricTitle": "Rate These Names: AI-graded rubric",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "prompt": "Everything you need is in 1.3.6, 1.3.7, 1.3.8 and the worked example in 1.3.10: go back and reread them if you get stuck. A sentence per name is plenty, in your own everyday words.\n\nHere are six variable names. For each one, say whether it is a good name or a bad one, and why: name the rule it follows or breaks. (1.3.6, 1.3.7 and 1.3.8)\n\n  let x = 5;\n  let numberOfStudents = 5;\n  let d = \"Monday\";\n  let currentDay = \"Monday\";\n  let temp = 98.6;\n  let bodyTemperature = 98.6;\n\nThen answer two more:\n\n7. One of those six is genuinely arguable rather than clearly good or clearly bad. Which one, and what makes it arguable? (1.3.8)\n\n8. Match each of these four names: temp, x, a1, myVariable, to its problem: too generic, an abbreviation with no context, a numbered name that says nothing, and meaningless but harmless-sounding. (1.3.7)",
+    "prompt": "Everything you need is in 1.3.6, 1.3.7, 1.3.8 and the worked example in 1.3.10: go back and reread them if you get stuck. A sentence per name is plenty, in your own everyday words.\n\nHere are six variable names. For each one, say whether it is a good name or a bad one, and why: name the rule it follows or breaks. (1.3.6, 1.3.7 and 1.3.8)\n\n  let x = 5;\n  let numberOfStudents = 5;\n  let d = \"Monday\";\n  let currentDay = \"Monday\";\n  let temp = 98.6;\n  let bodyTemperature = 98.6;\n\nThen answer two more:\n\n7. One of those six is genuinely arguable rather than clearly good or clearly bad. Which one, and what makes it arguable? (1.3.8)\n\n8. Match each of these four names: temp, x, a1, myVariable, to its problem: too vague, a single letter, a numbered name that says nothing, and meaningless but harmless-sounding. (1.3.7 and 1.3.8)",
     "rubric": [
       {
         "id": "all-six-judged",
@@ -39,7 +39,7 @@
       {
         "id": "matching-correct",
         "title": "Q8: the four problems are matched correctly",
-        "description": "Expected matching: temp = too generic; x = abbreviation with no context; a1 = numbered name that says nothing; myVariable = meaningless but harmless-sounding. Accept any phrasing that captures the same idea, even loosely worded. Credit three or four correct; two or fewer is a genuine miss on the matching itself, not just phrasing.",
+        "description": "Expected matching: temp = too vague; x = a single letter; a1 = numbered name that says nothing; myVariable = meaningless but harmless-sounding. Also accept the defensible swap of temp and x, i.e. temp described as an abbreviation with no context or too generic and x described as too vague or generic, since 1.3.7 and 1.3.8 use these words loosely. Accept any phrasing that captures the same idea, even loosely worded. Credit three or four correct; two or fewer is a genuine miss on the matching itself, not just phrasing.",
         "points": 0
       }
     ]

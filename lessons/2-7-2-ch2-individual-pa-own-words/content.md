@@ -6,8 +6,6 @@
 **You get three attempts.** Submit, read the feedback on each question, fix your answer,
 and submit again — three tries in total, and your best one is the mark that counts. The marks
 you see are feedback; your teacher reviews what you send.
-submit again as many times as you like. The marks you see are feedback; your teacher
-reviews what you send.
 
 ### Question 1: `for` vs `while` (4 points)
 
@@ -19,6 +17,7 @@ the other?
 ### Question 2: `===` vs `==` (3 points)
 
 Why does the course teach you to use `===` instead of `==`? What can go wrong with `==`?
+Give one example of a surprising result.
 
 *Type your answer here.*
 

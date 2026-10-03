@@ -55,7 +55,7 @@
       {
         "id": "plain-language",
         "title": "Plain language, one instruction per line",
-        "description": "Written in English rather than JavaScript, with no line doing two things at once.",
+        "description": "Written in plain English with no line doing two things at once. Real JavaScript is not marked down when the logic is right and readable.",
         "points": 0
       }
     ]

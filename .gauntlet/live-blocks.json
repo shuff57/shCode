@@ -4342,6 +4342,23 @@
       }
     ]
   },
+  "3-2-4-reading-split-lines#1": {
+    "code": "let fruits = [\"apple\", \"banana\", \"cherry\"];\n\nconsole.log(fruits.join(\", \"));\nconsole.log(fruits.join(\" and \"));\nconsole.log(fruits.join(\"\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "apple, banana, cherry"
+      },
+      {
+        "type": "log",
+        "text": "apple and banana and cherry"
+      },
+      {
+        "type": "log",
+        "text": "applebananacherry"
+      }
+    ]
+  },
   "3-2-5-reading-parameters-arguments#0": {
     "code": "function priceWithTax(price) {   // price is the PARAMETER\n  console.log(price * 1.08);\n}\n\npriceWithTax(50);\npriceWithTax(20);",
     "output": [
@@ -4450,6 +4467,28 @@
       {
         "type": "log",
         "text": "-7"
+      }
+    ]
+  },
+  "3-2-6-reading-order-matters#2": {
+    "code": "function greet(name) {\n  console.log(\"Hello, \" + name + \"!\");\n}\n\ngreet();",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, undefined!"
+      }
+    ]
+  },
+  "3-2-6-reading-order-matters#3": {
+    "code": "function greet(name = \"friend\") {\n  console.log(\"Hello, \" + name + \"!\");\n}\n\ngreet();\ngreet(\"Priya\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, friend!"
+      },
+      {
+        "type": "log",
+        "text": "Hello, Priya!"
       }
     ]
   },

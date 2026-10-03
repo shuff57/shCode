@@ -54,8 +54,9 @@ the total, and the watered copy. Save the rota under a key and load it back.
 ### Rules
 
 - **No classes, no `this`.** Plain functions over plain objects and arrays.
-- **The array methods you may use are `map`, `slice`, `concat` and spread.** 3.7.19 named
-  the others without teaching them; anything outside the four goes past the chapter.
+- **The array methods you may use are `push`, `pop` (3.3.2), `map`, `slice`, `concat` and
+  spread.** 3.7.19 named the others without teaching them; anything outside that list goes
+  past the chapter.
 - **Header comment:** Problem, Partners = N/A, Date.
 - **Limit** as a `const`.
 - At least one `console.log` that reports a result.

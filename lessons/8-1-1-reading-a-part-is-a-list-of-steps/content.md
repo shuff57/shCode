@@ -8,7 +8,7 @@ Here's the surprising part: that list isn't frozen. Click any earlier step in th
 
 Every number in reSHape is in **millimetres (mm)** — width, depth, hole size, all of it. A box that is `40, 40, 20` is 40 mm wide, 40 mm deep, 20 mm tall: about the size of a deck of cards.
 
-reSHape shows this list two ways. **Build** is buttons: a toolbar (Box, Hole, Round, Hollow...) and a Dimensions panel where you type numbers for the selected step. **Code** shows the same list as text, one line per step:
+reSHape shows this list two ways. **Build** is buttons: a toolbar (Box, Hole, Round, Hollow...) and a Dimensions panel where you type numbers for the selected step. **Code** shows the same list as text, one line per step. The next few labs (8.1.2 to 8.1.6) are Build only; you meet Code for real in 8.1.8. Here is what it looks like:
 
 ```js
 const b = box(40, 40, 20)
