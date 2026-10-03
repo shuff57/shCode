@@ -74,6 +74,23 @@ const c = cylinder(30, 80, { corner: 2 })
 
 A cylinder 30 mm across, 80 mm tall, with edges rounded.
 
+A **prism** is a straight post with 3 to 12 equal sides. `prism(6, 20, 10)` is a hexagon 20 mm across its corners and 10 mm tall. The width is the whole distance corner to corner, a diameter like every other width here. Its volume is (sides / 2) × (across / 2)² × sin(360 / sides) × tall: the hexagon is 2598.08 mm³ and a triangle of the same size is 1299.04 mm³. Place one with `at: [x, y, z]`.
+
+```js shape-prism
+const hex = prism(6, 20, 10)
+const tri = prism(3, 20, 10, { at: [30, 0, 0] })
+```
+
+A hexagonal post and a triangular post beside it.
+
+A **wedge** is a block cut corner to corner along its height, so the end is a right triangle: a ramp, a stop or a gusset. `wedge(10, 20, 30)` is exactly half of a 10 × 20 × 30 block, so its volume is 10 × 20 × 30 / 2 = 3000 mm³. It is centred on the origin until you place it with `{ at: [x, y, z] }` or slide it later with `move(w, [x, y, z])`.
+
+```js shape-wedge
+const a = wedge(10, 20, 30, { at: [20, 0, 0] })
+```
+
+One ramp, 3000 mm³, placed 20 mm along x.
+
 ## Placing things at a location
 
 When you build multiple shapes, they all start at the origin, the point where the red, green, and blue lines meet. That means they land inside each other. Move shapes out of the way with `at: [x, y, z]` when you create them.
@@ -289,6 +306,15 @@ chamfer(b.edge('bottom', 'front'), 2)
 
 A 40 × 40 × 20 box with selective rounding and bevelling.
 
+A **draft** tilts the side walls so a part can release from a mould, or come away cleanly from a print. `draft(shape, angle, { whole: true })` leans every side wall by `angle` degrees. The wall at the middle height stays where it was; the top leans in and the bottom flares out. For a 40 × 40 × 20 block drafted 8 degrees the volume is 32000 + (8/3) × 10³ × tan(8°)² = 32052.67 mm³. A very steep angle collapses a wall, and then the panel tells you so in a sentence.
+
+```js draft-whole
+const b = cuboid(40, 40, 20)
+draft(b, 8, { whole: true })
+```
+
+A 40 × 40 × 20 block with all four walls drafted 8 degrees.
+
 ## Repeating and patterns
 
 A **repeat** copies a shape in a line, spaced apart. A **repeatAround** spins copies around a central axis, like petals around a flower.
@@ -330,7 +356,7 @@ Six boxes arranged in a circle around the z-axis.
 ```js repeat-around-with-hole
 const b = cuboid(6, 20, 6, { at: [20, 0, 0] })
 polarPattern(b, { count: 4, axis: 'z' })
-hole(b, { across: 3 })
+hole(b, { across: 3, deep: 6 })
 ```
 
 Four boxes in a circle, each with a hole drilled through.
@@ -510,6 +536,31 @@ const shape = loft(sk1, sk2, 30)
 
 A cone-like shape blended from one circle to another.
 
+`pocket(sk, shape, depth)` is `extrude` in reverse: it pushes the sketch into a shape and takes that block away instead of adding one. Say the sketch first, then the shape it cuts, then how deep. A 10 × 10 pocket 5 mm deep leaves 40 × 40 × 20 − 10 × 10 × 5 = 31500 mm³. A second pocket can cut the result of the first: the 10 × 10 × 8 corner brings it to 31500 − 800 = 30700 mm³.
+
+```js sketch-pocket
+const b = cuboid(40, 40, 20)
+const s1 = sketch('top')
+s1.rect(10, 10, { at: [-10, -10] })
+const p = pocket(s1, b, 5)
+const s2 = sketch('top')
+s2.rect(10, 10, { at: [10, 10] })
+pocket(s2, p, 8)
+```
+
+Two rectangular pockets cut into a block, one 5 mm deep and one 8 mm deep.
+
+`groove(sk, shape, angle)` is `revolve` in reverse: it spins the sketch around the middle line of its plane and takes the ring it sweeps out of the shape. Say the sketch, the shape, then the turn in degrees. The ring has to sit fully inside the shape. A 3 × 8 profile with its middle 4.5 mm from the axis spans radius 3 to 6, so a full turn removes π × (6² − 3²) × 8 = 216π mm³ from the 32000 mm³ block, leaving 31321.42 mm³.
+
+```js sketch-groove
+const b = cuboid(40, 40, 20)
+const sk = sketch('front', 0)
+sk.rect(3, 8, { at: [4.5, 0] })
+groove(sk, b, 360)
+```
+
+A ring-shaped groove cut into a block by spinning a small rectangle.
+
 ```js sketch-complex
 const sk = sketch('front')
 sk.rect(30, 10, { at: [0, 5] })
@@ -659,7 +710,7 @@ const height = param('height', 20, { min: 10, max: 40 })
 const count = param('holes', 3, { min: 1, max: 6 })
 const b = cuboid(width, 40, height, { at: [60, 0, 0] })
 polarPattern(b, { count: count, axis: 'z' })
-hole(b, { across: 4 })
+hole(b, { across: 4, deep: 40 })
 ```
 
 A parametric box with adjustable dimensions and hole count.
