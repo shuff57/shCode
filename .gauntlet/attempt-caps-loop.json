@@ -236,7 +236,7 @@
     "populate pa-pseudocode/ on the deploy machine (git-ignored); deploy runs check-pa-attempts --require-pseudocode"
   ],
   "reference_pass": {
-    "status": "running",
+    "status": "done",
     "findings_before_fix": [
       "3.10.5 page asks for 'a const for the limit' but no problem has a limit; reference declares canMl and never uses it; grader prompt says 'one-attempt item' (stale)",
       "3.10.3 reference comments wrong: Bug2 'throws' (really undefined, TypeError at .name); Bug3 'every line prints undefined' (one undefined); Bug4 '$0.2' (prints 0.19999999999999996); same wording may be in aiGrader prompt/rubric",
@@ -249,6 +249,23 @@
       "1.6 problems Split the Check / Grade Forecast / Fuel Stop do not state the limit direction",
       "2.7.3 Bug 4 (infinite loop) labelled runtime but the lesson defines runtime as 'stops with an error'",
       "1.7.3 aiGrader prompt mentions 'Bug 1' headings the starter lacks"
-    ]
+    ],
+    "fixed": [
+      "3.10.5 page: each problem has a limit const (budget / weekly goal / can size) and prints a comparison; reference uses canMl; grader prompt says three tries and checks the limit is used",
+      "3.10.3 reference comments (Bug 2/3/4) and the aiGrader Bug 3 wording corrected; starter unchanged",
+      "reference charts rewritten and diagram checks green: 3.9.1 (whole-list functions called once after the loop, load/make/save double-rails), 3.10.4 (three outcomes, accumulating loop), 2.6.1 x2 (n<1 guard, locker 7 chained diamonds, no redundant diamond), 2.7.4 (met vs not reached, per-day input)",
+      "2.7.4 page: a switch is drawn as chained diamonds",
+      "2.6.2 Locker Sweep solution: every visited locker ends open; N=0 comment fixed",
+      "2.7.5 Seat Map reference: run resets after a blocked seat, breaks when found, switch on a label",
+      "1.6.1 page states the limit direction for all four problems",
+      "2.7.3 runtime definition covers a loop that never stops (page, steps, pseudocode); rubric label unchanged",
+      "1.7.3 grader prompt no longer mentions starter 'Bug 1' headings",
+      "package.json: the pseudocode generator runs first in npm test (fresh clones failed test-quiz-reveal because the module is git-ignored)"
+    ],
+    "declined": [
+      "2.6.2 requirement patterns and the 2.7.5 rubric were left alone: both are structural (loop, continue, switch, throw / branch, nested loop, loop control) and do not encode the wrong behaviour",
+      "no rubric criterion, weight or passing rule changed on any Chapter 1 or 2 part"
+    ],
+    "gates": "check-starters, check-diagram-solutions, test-lesson-solution-parity, test-find-and-fix, test-2-7-3-comments, test-pa-ai-graders, test-grader, test-grade-stream, audit-grader-tolerance --gate, check-solution-leak, check-summative-parts, check-pa-attempts --require-pseudocode, check-lesson-citations, tsc: green. Full npm test exit 0 from a fresh worktree of HEAD; check-quiz-key-leak (41 pages) and check-ai-grader-leak --require-build (882 probes) OK on that worktree's fresh build. Live glm-5.3-flash: references pass and no gaming fixture passes on 3-10-3, 3-10-4, 3-9-1, 2-7-4, 2-6-1."
   }
 }
