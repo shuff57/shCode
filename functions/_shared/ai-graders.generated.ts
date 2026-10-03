@@ -650,24 +650,24 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "3-10-2-ch3-individual-pa-own-words": {
     "lessonTitle": "3.10.2 Individual PA Part 2: In Your Own Words",
-    "prompt": "The student answers three short-answer questions in their own words. Mark against the three criteria below. Grade strictly on correctness, generously on phrasing: these are 14-year-olds writing their own words under time pressure. Grammar and spelling are not being assessed. Each criterion is either credited, partially credited, or withheld -- say which in the feedback and why.\n\nQuestion 1 -- parameter vs argument, and what a function with no return hands back (worth 4).\nThe taught answers (3.2.5 for parameter and argument, 3.2.13 for the no-return case): a parameter is the name in the function's definition, a placeholder with no value until the call; an argument is the actual value handed over at the call, assigned to the matching parameter by position. A function that finishes without running a return hands back undefined. Credit the distinction and the undefined; a concrete example of either strengthens the credit.\n\nQuestion 2 -- what the caller sees when a callee changes an object (worth 3).\nThe taught answer (3.6.2, 3.6.5): the parameter holds a copy of the reference, so the object inside and outside the function are the same object; changing a property inside is visible to the caller (mutation), while reassigning the parameter to a new object changes nothing outside. Credit any version of the reference idea; credit mutation-vs-reassignment if they bring it up.\n\nQuestion 3 -- what map() gives back, and why push() is different (worth 3).\nThe taught answers (3.7.2, 3.3.2): map() builds and returns a NEW array, one callback result per element, and leaves the original untouched; push() adds to the end of the array it is called on and changes it. Credit the new-array-vs-changed-original distinction; the words non-mutating and mutating are welcome but not required.\n\nAlso check, without changing the marks: each answer is in the student's own words. An answer that quotes the reading verbatim is not the skill -- say so in the feedback.",
+    "prompt": "The student answers three short-answer questions in their own words. Mark against the three criteria below. Grade strictly on correctness, generously on phrasing: these are 14-year-olds writing their own words under time pressure. Grammar and spelling are not being assessed. Each criterion is either credited, partially credited, or withheld -- say which in the feedback and why.\n\nQuestion 1 -- printing vs returning (worth 4).\nThe taught answers (3.2.9 for return, 3.2.13 for printing instead of returning): a function that prints only displays text and the call evaluates to undefined, so the caller gets nothing to use; a function that returns hands a value back to the caller (and ends the function). A returned value can be stored in a variable, used in an expression or condition, or passed to another function. Credit the distinction AND at least one concrete use of the returned value.\n\nQuestion 2 -- working on a copy (worth 3).\nThe taught answer (3.6.11 defensive copy, 3.6.9; the copying tools are slice, 3.7.6, and spread, 3.7.14): make a copy first and work on the copy, so the caller's original array is untouched. Credit any correct copying approach (spread, slice, concat) and the reason it works (a copy is a different array; without it the parameter and the caller's variable are the same array).\n\nQuestion 3 -- slice() vs pop() (worth 3).\nThe taught answers (3.7.6, 3.3.2): slice() returns a NEW array holding the requested part and leaves the original untouched; pop() removes the last element from the array it is called on (the original gets shorter) and hands that element back. Credit both halves for each method; the words non-mutating and mutating are welcome but not required.\n\nAlso check, without changing the marks: each answer is in the student's own words. An answer that quotes the reading verbatim is not the skill -- say so in the feedback.",
     "rubric": [
       {
-        "id": "param-argument-return",
-        "title": "Question 1: parameter vs argument, and the no-return case",
-        "description": "Full credit 4: the distinction is right (parameter = the name in the definition, argument = the value handed over at the call) AND the no-return case is answered (undefined). Partial 2-3: one half correct, or the distinction right but the undefined case wrong. Withhold: the two terms are called interchangeable.",
+        "id": "print-vs-return",
+        "title": "Question 1: printing vs returning",
+        "description": "Full credit 4: says a returning function hands a value back to the caller while a printing one only displays it (caller gets nothing), AND names a real use of the returned value (store it, use it in an expression, pass it on). Partial 2-3: the distinction is right but no use is given, or a use is given with a muddled distinction. Withhold: says printing and returning are the same thing.",
         "points": 4
       },
       {
-        "id": "caller-sees-mutation",
-        "title": "Question 2: what the caller sees when a callee changes an object",
-        "description": "Full credit 3: changes inside the function are visible to the caller, and the reason is the shared reference (copy of the reference, not a copy of the object). Bonus if they contrast reassignment. Partial 1-2: visible-outside asserted without the reference reason, or the reference idea right but mutation/confusion mixed. Withhold: says the caller sees nothing unless the value is returned.",
+        "id": "copy-then-work",
+        "title": "Question 2: working on a copy",
+        "description": "Full credit 3: copy the array first (spread, slice or similar) and work on the copy, with the reason (a copy is a separate array, so the original is not touched). Partial 1-2: a correct copy method with no reason, or the right idea without naming a way. Withhold: says to just change it and return it, or that the caller's array is safe without a copy.",
         "points": 3
       },
       {
-        "id": "map-vs-push",
-        "title": "Question 3: map() vs push()",
-        "description": "Full credit 3: map builds and returns a new array and the original survives; push changes the array it is called on. Partial 1-2: one side explained. Withhold: says both return new arrays, or both mutate.",
+        "id": "slice-vs-pop",
+        "title": "Question 3: slice() vs pop()",
+        "description": "Full credit 3: slice returns a new array and the original survives; pop removes the last element from the original and returns it. Partial 1-2: one method explained, or the effect on the original right without the return value. Withhold: says both change the original, or neither does.",
         "points": 3
       }
     ],

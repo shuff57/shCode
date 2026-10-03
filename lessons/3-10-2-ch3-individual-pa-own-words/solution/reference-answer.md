@@ -1,16 +1,16 @@
-Chapter 3 Individual PA, Part 2 — reference answers
+Chapter 3 Individual PA, Part 2 -- reference answers
 
-Q1. A parameter is the name written in the function's definition; it has no value until
-the function is called. An argument is the actual value handed over at the call, and it
-is assigned to the matching parameter by position. A function that finishes without
-running a return hands back undefined.
+Q1. A function that prints only shows text in the console; the call itself evaluates to
+undefined, so the caller gets nothing back. A function that returns hands a value back to
+the caller and ends the function. A returned value can be stored in a variable, used in
+an expression or a condition, or passed into another function (3.2.9, 3.2.13).
 
-Q2. Yes, the caller sees the change: the parameter holds a copy of the reference, so the
-object inside the function and the one outside are the same object. Changing a property
-inside changes the one the caller holds. If the function had reassigned the parameter to
-a brand-new object instead, the caller would see nothing -- that only points the name
-inside the function somewhere else (3.6.6).
+Q2. Make a copy first and work on the copy: a spread copy ([...items]) or items.slice().
+The copy is a different array, so changing it does not touch the caller's array. Without
+the copy, the parameter and the caller's variable point at the same array and a change is
+visible to the caller (3.6.9, 3.6.11, 3.7.6, 3.7.14).
 
-Q3. map() builds and returns a NEW array, one callback result per element, and leaves
-the original array untouched. push() adds a value to the end of the array it is called
-on and changes that array. map is non-mutating; push is mutating.
+Q3. slice() returns a NEW array holding the part you asked for and leaves the original
+untouched. pop() removes the last element from the array it is called on, so the original
+gets shorter, and hands that removed element back (3.7.6, 3.3.2). slice is non-mutating;
+pop is mutating.
