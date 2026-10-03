@@ -606,7 +606,19 @@ export function runScript(source, opts = {}) {
     // groove(sketch, target, angle): the subtractive revolve — spin the profile
     // around the sketch plane's own normal and CUT the ring out of the target
     // solid. Mirror of spin(), with the solid it cuts named.
-    function groove(sk, target, angle) {
+    /** A word that takes no options object: a surplus argument is named, not
+     *  silently dropped. Aliases share the implementation, so the error names
+     *  the base word. */
+    function noExtraArgs(word, takes, max, extra, hint = '') {
+        if (extra.length === 0)
+            return;
+        const ord = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'];
+        const n = max + 1;
+        const which = ord[n - 1] ?? `${n}th`;
+        throw new Error(`${word}() takes ${takes}; the ${which} argument (${describe(extra[0])}) was ignored.${hint ? ' ' + hint : ''}`);
+    }
+    function groove(sk, target, angle, ...extra) {
+        noExtraArgs('groove', 'a sketch, a shape and an angle', 3, extra);
         if (!isSketchHandle(sk))
             throw new Error('groove() needs a sketch: groove(sketch1, shape, angle).');
         if (!isHandle(target))
@@ -621,7 +633,8 @@ export function runScript(source, opts = {}) {
     // straight into the target solid and CUT the block out. Mirror of pull(),
     // with the solid it cuts named. Same argument order as groove() on purpose:
     // profile first, victim second, number last.
-    function pocket(sk, target, depth) {
+    function pocket(sk, target, depth, ...extra) {
+        noExtraArgs('pocket', 'a sketch, a shape and a depth', 3, extra);
         if (!isSketchHandle(sk))
             throw new Error('pocket() needs a sketch: pocket(sketch1, shape, depth).');
         if (!isHandle(target))
@@ -702,7 +715,8 @@ export function runScript(source, opts = {}) {
         pushFeature(d);
         return new PlaneValue(d.id, d.plane, d.offset, null);
     }
-    function sketch(planeWord, offset) {
+    function sketch(planeWord, offset, ...extra) {
+        noExtraArgs('sketch', 'a plane and an optional offset', 2, extra);
         if (planeWord instanceof PlaneValue) {
             if (offset !== undefined) {
                 throw new Error('sketch(plane(...)) takes no offset: give the offset to plane(), like plane(\'top\', 10).');
@@ -1306,7 +1320,8 @@ export function runScript(source, opts = {}) {
         };
         return handle;
     }
-    function pull(sk, height) {
+    function pull(sk, height, ...extra) {
+        noExtraArgs('pull', 'a sketch and a height', 2, extra, 'To move the result, use move(...).');
         if (!isSketchHandle(sk))
             throw new Error(`pull() needs a sketch: pull(sketch('top'), height).`);
         requiredNumber('pull', 'height', height);
@@ -1315,7 +1330,8 @@ export function runScript(source, opts = {}) {
         pushFeature(f);
         return makeSolidHandle(f);
     }
-    function spin(sk, angle) {
+    function spin(sk, angle, ...extra) {
+        noExtraArgs('spin', 'a sketch and an angle', 2, extra, 'To move the result, use move(...).');
         if (!isSketchHandle(sk))
             throw new Error(`spin() needs a sketch: spin(sketch('top'), angle).`);
         requiredNumber('spin', 'angle', angle);
@@ -1330,7 +1346,8 @@ export function runScript(source, opts = {}) {
     // third argument sets sk2's offset to sk1's offset + gap rather than being
     // stored anywhere new. toScript() reverses this by emitting the CURRENT
     // difference, so the two are exact inverses of each other.
-    function blend(a, b, gap) {
+    function blend(a, b, gap, ...extra) {
+        noExtraArgs('blend', 'two sketches and a gap', 3, extra);
         if (!isSketchHandle(a) || !isSketchHandle(b)) {
             throw new Error('blend() needs two sketches: blend(sketch1, sketch2, gap).');
         }
@@ -1549,7 +1566,8 @@ export function runScript(source, opts = {}) {
         return target;
     }
     // ---- round / bevel ----------------------------------------------------
-    function round(arg, size) {
+    function round(arg, size, ...extra) {
+        noExtraArgs('round', 'a shape or edge and a size', 2, extra, 'To pick the edge, use shape.edge(faceA, faceB).');
         const s = requiredNumber('round', 'size', size);
         if (isTopoRef(arg)) {
             if (arg.name.cause !== 'between') {
@@ -1642,7 +1660,8 @@ export function runScript(source, opts = {}) {
         'front-back': 'xz',
         'top-bottom': 'xy',
     };
-    function mirror(target, word) {
+    function mirror(target, word, ...extra) {
+        noExtraArgs('mirror', 'a shape and a direction word', 2, extra);
         if (!isHandle(target))
             throw new Error('mirror() needs a shape: mirror(shape, "left-right").');
         if (typeof word !== 'string' || !(word in MIRROR_WORD)) {
@@ -1666,7 +1685,8 @@ export function runScript(source, opts = {}) {
         mutateHandle(target, base);
         return target;
     }
-    function turn(target, angles) {
+    function turn(target, angles, ...extra) {
+        noExtraArgs('turn', 'a shape and a list of angles', 2, extra);
         if (!isHandle(target))
             throw new Error('turn() needs a shape: turn(shape, [rx, ry, rz]).');
         const f = findFeature(target.id);
