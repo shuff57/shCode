@@ -36,7 +36,7 @@
 // line 3 is reported at line 6, regardless of how many lines <source> has
 // or what's in it. LINE_OFFSET encodes that gap in one place rather than as
 // a magic number wherever a stack is parsed.
-import { nextId, newShape, newHole, newHoleCorners, newShell, newMove, newPattern, newSketch, RECTANGLE_CONSTRAINTS, newExtrude, newRevolve, newGroove, newPocket, newMirror, newBlend, extentAlong, throughExtentAlong, isRoundable, canRotate, whyCannotRound, whyCannotOrbit, } from './model-types.js';
+import { nextId, newShape, newHole, newHoleCorners, newShell, newMove, newPattern, newSketch, newSketchOnFace, RECTANGLE_CONSTRAINTS, newExtrude, newRevolve, newGroove, newPocket, newMirror, newBlend, extentAlong, throughExtentAlong, holeAxialOffset, isRoundable, canRotate, whyCannotRound, whyCannotOrbit, } from './model-types.js';
 import { generatedParams, applyParam, pname } from './model-codegen.js';
 // addConstraintSettling is the SAME beginner-friendly settle a click on the
 // Rules panel runs through (components/model/SketchConstraints.tsx's own
@@ -47,7 +47,7 @@ import { generatedParams, applyParam, pname } from './model-codegen.js';
 // `describe` is aliased -- this file already has its own local `describe()`
 // for error messages (line 296), unrelated to sketch-solve.ts's constraint-
 // naming one ("edge 1 = edge 2").
-import { addConstraintSettling, seedForNewRule, solveSketch, collapsedByRatio, describe as describeConstraint, } from '@shuff57/reshape-sketch/sketch-solve';
+import { addConstraintSettling, seedForNewRule, solveSketch, collapsedByRatio, describe as describeConstraint, buildSlotRows, } from '@shuff57/reshape-sketch/sketch-solve';
 /**
  * Every top-level name a reSHape script can call, in the exact order
  * runScript() installs them -- the single source of truth for "what is the
@@ -620,9 +620,55 @@ export function runScript(source, opts = {}) {
     }
     // ---- sketches ---------------------------------------------------------
     const PLANE_WORD = { top: 'xy', front: 'xz', side: 'yz' };
+    // The frame form: sketch({ origin: [x,y,z], u: [..], v: [..] }). The normal
+    // is u x v (right-handed), exactly as SketchFeature.frame defines it. A
+    // frame that is not unit-length and orthogonal is REFUSED rather than
+    // normalised or re-orthogonalised: either repair would silently change the
+    // sketch's scale or skew its outline, and a swapped u/v mirrors the part
+    // (it flips the normal) -- the student must see that, so it is documented
+    // in the error and nothing here guesses. Plain numbers only (no param()).
+    const FRAME_TOL = 1e-6;
+    function readFrame(given) {
+        const o = readOptions('sketch', ['origin', 'u', 'v'], given);
+        for (const k of ['origin', 'u', 'v']) {
+            if (o[k] === undefined) {
+                throw new Error(`sketch({ ... }) needs origin, u and v: sketch({ origin: [0, 0, 0], u: [1, 0, 0], v: [0, 1, 0] }). It is missing ${k}.`);
+            }
+        }
+        const vec = (label) => {
+            const raw = readVec3('sketch', label, o[label]).map((n) => unwrap(n));
+            if (!raw.every((n) => Number.isFinite(n))) {
+                throw new Error(`sketch()'s ${label} needs three finite numbers, like [x, y, z].`);
+            }
+            return raw;
+        };
+        const origin = vec('origin');
+        const u = vec('u');
+        const v = vec('v');
+        const len = (a) => Math.hypot(a[0], a[1], a[2]);
+        for (const [label, a] of [['u', u], ['v', v]]) {
+            if (Math.abs(len(a) - 1) > FRAME_TOL) {
+                throw new Error(`sketch()'s ${label} has to be a unit-length direction (its length is ${len(a)}, not 1). `
+                    + `Divide it by its length -- sketches are never silently rescaled.`);
+            }
+        }
+        const dot = u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+        if (Math.abs(dot) > FRAME_TOL) {
+            throw new Error(`sketch()'s u and v have to be at right angles to each other (their dot product is ${dot}, not 0).`);
+        }
+        return { origin, u, v };
+    }
     function sketch(planeWord, offset) {
+        if (isPlainOptions(planeWord)) {
+            if (offset !== undefined) {
+                throw new Error('sketch({ origin, u, v }) takes no offset: the origin already says where the plane sits.');
+            }
+            const f = newSketchOnFace(docNow(), readFrame(planeWord));
+            pushFeature(f);
+            return makeSketchHandle(f.id);
+        }
         if (typeof planeWord !== 'string' || !(planeWord in PLANE_WORD)) {
-            throw new Error(`sketch() needs a plane word: 'top', 'front' or 'side'. You gave it ${describe(planeWord)}.`);
+            throw new Error(`sketch() needs a plane word: 'top', 'front' or 'side' (or a frame { origin, u, v }). You gave it ${describe(planeWord)}.`);
         }
         const plane = PLANE_WORD[planeWord];
         const f = newSketch(docNow(), plane);
@@ -1168,6 +1214,38 @@ export function runScript(source, opts = {}) {
                 replaceFeature(id, { ...cur, rules: out });
                 return handle;
             },
+            slot(a, b, r) {
+                const cA = readVec2('.slot()', 'a (one end cap centre)', a);
+                const cB = readVec2('.slot()', 'b (the other end cap centre)', b);
+                const rp = positiveNumber('.slot()', 'radius', r);
+                const rv = unwrap(rp);
+                if (cA[0] === cB[0] && cA[1] === cB[1]) {
+                    throw new Error(`.slot() needs two different end centres -- a and b are both [${cA[0]}, ${cA[1]}], which holds no slot.`);
+                }
+                const cur = findFeature(id);
+                const geoms = (cur.geoms ?? cur.geom ?? []);
+                // Continue the sketch's dense 1-based ids (SPEC-sketcher2 §2.1).
+                const base = geoms.reduce((m, g) => Math.max(m, g.id), 0) + 1;
+                const built = buildSlotRows(cA, cB, rv, base);
+                if (!built) {
+                    throw new Error(`.slot() could not build a slot from centres [${cA}] and [${cB}] with radius ${rv}.`);
+                }
+                // r may be a param(): num() records the slot-key -> name binding the
+                // round trip re-binds through, one per arc (both arcs share the value).
+                for (const g of built.geoms) {
+                    if (g.k === 'arc') {
+                        num(rp, id, `g${g.id}r`);
+                        g.r = rv;
+                    }
+                }
+                const rules = (cur.rules ?? []);
+                const outGeoms = [...geoms, ...built.geoms];
+                replaceFeature(id, {
+                    ...cur, geoms: outGeoms, geom: outGeoms,
+                    rules: [...rules, ...built.rules],
+                });
+                return handle;
+            },
         };
         return handle;
     }
@@ -1305,10 +1383,43 @@ export function runScript(source, opts = {}) {
         }
         return extent + 2;
     }
+    /** A blind `deep:` must START AT THE DRILLED FACE: the kernel centres a hole's
+     *  tool on the target's bbox centre, so the axial component of center is set
+     *  to (thickness - deep) / 2 (see holeAxialOffset). Where the thickness cannot
+     *  be bounded (an extrude, a rotated primitive ...) the offset stays 0: that is
+     *  the pinned "explicit deep: always works" contract, and throughDepth()'s own
+     *  error tells the student to give a deep: -- erroring here too would leave no
+     *  way to drill such a shape at all. */
+    function blindOffset(target, axis, deep, center) {
+        const off = holeAxialOffset(docNow(), target.id, axis, deep);
+        if (off != null)
+            center[axis === 'x' ? 0 : axis === 'y' ? 1 : 2] = off;
+    }
+    // ISO 273 medium-fit clearance diameters (mm), M3..M12. A CLEARANCE table
+    // (the bolt passes through), not a tap drill. `size:` is interpret-time
+    // sugar: it resolves to `across` here and the name is never persisted, so
+    // toScript emits the resolved across, like the name aliases.
+    const HOLE_SIZES = {
+        M3: 3.4, M4: 4.5, M5: 5.5, M6: 6.6, M8: 9, M10: 11, M12: 13.5,
+    };
+    function resolveHoleSize(fn, extra) {
+        if (extra.size === undefined)
+            return;
+        if (extra.across !== undefined) {
+            throw new Error(`${fn}() takes { size: 'M6' } OR { across: 6.6 }, not both -- size is a name for an across.`);
+        }
+        const key = typeof extra.size === 'string' ? extra.size.trim().toUpperCase() : '';
+        if (!Object.prototype.hasOwnProperty.call(HOLE_SIZES, key)) {
+            throw new Error(`${fn}() does not know the size ${describe(extra.size)}. Sizes are ${Object.keys(HOLE_SIZES).join(', ')} (clearance holes), or give { across: <number> }.`);
+        }
+        extra.across = HOLE_SIZES[key];
+        delete extra.size;
+    }
     function hole(target, opts) {
         if (!isHandle(target))
             throw new Error('hole() needs a shape to drill into: hole(shape, { across: 6 }).');
-        const extra = readOptions('hole', ['across', 'deep', 'at', 'along', 'counterbore', 'countersink'], opts);
+        const extra = readOptions('hole', ['across', 'size', 'deep', 'at', 'along', 'counterbore', 'countersink'], opts);
+        resolveHoleSize('hole', extra);
         if (extra.across === undefined)
             throw new Error('hole() needs { across: <number> } for the bit\'s diameter.');
         const across = positiveNumber('hole', 'across', extra.across);
@@ -1318,6 +1429,7 @@ export function runScript(source, opts = {}) {
         base.diameter = num(across, base.id, 'diameter');
         if (extra.deep !== undefined) {
             base.depth = num(positiveNumber('hole', 'deep', extra.deep), base.id, 'depth');
+            blindOffset(target, axis, base.depth, center);
         }
         else {
             base.depth = throughDepth('hole', target, axis);
@@ -1331,7 +1443,8 @@ export function runScript(source, opts = {}) {
     function holes(target, opts) {
         if (!isHandle(target))
             throw new Error('holes() needs a shape to drill into: holes(shape, { across: 6, apart: [15, 10] }).');
-        const extra = readOptions('holes', ['across', 'apart', 'at', 'along', 'deep', 'counterbore', 'countersink'], opts);
+        const extra = readOptions('holes', ['across', 'size', 'apart', 'at', 'along', 'deep', 'counterbore', 'countersink'], opts);
+        resolveHoleSize('holes', extra);
         if (extra.across === undefined)
             throw new Error('holes() needs { across: <number> } for the bit\'s diameter.');
         if (extra.apart === undefined)
@@ -1344,6 +1457,7 @@ export function runScript(source, opts = {}) {
         base.diameter = num(across, base.id, 'diameter');
         if (extra.deep !== undefined) {
             base.depth = num(positiveNumber('holes', 'deep', extra.deep), base.id, 'depth');
+            blindOffset(target, axis, base.depth, center);
         }
         else {
             base.depth = throughDepth('holes', target, axis);

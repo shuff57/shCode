@@ -117,6 +117,7 @@ export interface SketchHandle {
     angle(edge: unknown, other: unknown, degrees: unknown): SketchHandle;
     geom(rows: unknown): SketchHandle;
     rules(rows: unknown): SketchHandle;
+    slot(a: unknown, b: unknown, r: unknown): SketchHandle;
 }
 export declare function runScript(source: string, opts?: RunOptions): RunResult;
 //# sourceMappingURL=reshape-script.d.ts.map

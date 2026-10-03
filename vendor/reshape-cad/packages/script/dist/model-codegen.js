@@ -14,7 +14,7 @@
 // ModelDoc directly, through lib/occt-build.ts, with no text in between.
 import { solveSketch, collapsedByRatio } from '@shuff57/reshape-sketch/sketch-solve';
 import { maxFilletRadius, outlineOf } from '@shuff57/reshape-sketch/sketch-arc';
-import { canRotate, extentAlong, isRoundable, isShape, maxRound, nameMap, } from './model-types.js';
+import { canRotate, extentAlong, isRoundable, isShape, maxRound, nameMap, withHoleDepth, } from './model-types.js';
 import { rootFeature } from './topo-name.js';
 const AXIS = ['width', 'depth', 'height'];
 /** Param names must survive an edit, or pushing values into a live frame
@@ -212,7 +212,7 @@ export function generatedParams(doc) {
         else if (f.kind === 'hole') {
             push('diameter', 'diameter', f.diameter);
             push('depth', 'depth', f.depth);
-            pushCentre(out, f.id, label, f.center);
+            pushCentre(out, f.id, label, f.center, f.axis === 'x' ? 0 : f.axis === 'y' ? 1 : 2);
             // Item P: "corner spacing" (HoleFeature.corners' own stored dx/dy --
             // half the distance BETWEEN two opposite holes, i.e. measured from
             // the CENTRE) reads as "inset from the edge" only when the target's
@@ -316,8 +316,10 @@ function pushTurn(out, id, label, r) {
         });
     });
 }
-function pushCentre(out, id, label, c) {
+function pushCentre(out, id, label, c, skip = -1) {
     ['x', 'y', 'z'].forEach((a, i) => {
+        if (i === skip)
+            return;
         out.push({
             name: pname(id, a),
             caption: `${label} ${a}`,
@@ -589,10 +591,13 @@ export function applyParam(doc, name, value) {
             }
             if (slot === 'depth') {
                 changed = true;
-                return { ...f, depth: value };
+                return withHoleDepth(doc, f, value);
             }
             const holeAx = slot === 'x' ? 0 : slot === 'y' ? 1 : slot === 'z' ? 2 : null;
-            if (holeAx !== null) {
+            // The component along the drill axis is derived from depth (see
+            // withHoleDepth), so a typed value for it is ignored, not stored.
+            const drillAx = f.axis === 'x' ? 0 : f.axis === 'y' ? 1 : 2;
+            if (holeAx !== null && holeAx !== drillAx) {
                 const center = [...f.center];
                 center[holeAx] = value;
                 changed = true;

@@ -568,7 +568,11 @@ export function featureCenter(f, doc) {
         const base = featureCenter(target, doc);
         if (!base)
             return null;
-        const p = [base[0] + f.center[0], base[1] + f.center[1], base[2] + f.center[2]];
+        // The axial component of center is the blind-hole offset (it moves the TOOL,
+        // not the mouth), so only the two in-plane components apply here.
+        const c = [...f.center];
+        c[f.axis === 'x' ? 0 : f.axis === 'y' ? 1 : 2] = 0;
+        const p = [base[0] + c[0], base[1] + c[1], base[2] + c[2]];
         const half = (extentAlong(doc, f.target, f.axis) ?? 0) / 2;
         if (f.axis === 'x')
             p[0] += half;

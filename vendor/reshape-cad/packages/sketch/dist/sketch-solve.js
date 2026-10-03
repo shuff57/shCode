@@ -814,4 +814,43 @@ export function losingEdges(pts, constraints) {
     });
     return [...out].sort((a, b) => a - b);
 }
+/** Rows for a slot with cap centres `cA` and `cB` and cap radius `r` (width
+ *  2r), ids starting at `baseId` (arc1, arc2, top, bottom). Null when `r` or
+ *  the centre distance is degenerate. */
+export function buildSlotRows(cA, cB, r, baseId) {
+    if (!(r > 1e-9))
+        return null;
+    const dx = cB[0] - cA[0];
+    const dy = cB[1] - cA[1];
+    const len = Math.hypot(dx, dy);
+    if (!(len > 1e-9))
+        return null;
+    const px = -dy / len;
+    const py = dx / len;
+    const arc1a = [cA[0] + px * r, cA[1] + py * r];
+    const arc1b = [cA[0] - px * r, cA[1] - py * r];
+    const arc2a = [cB[0] - px * r, cB[1] - py * r];
+    const arc2b = [cB[0] + px * r, cB[1] + py * r];
+    const arc1 = baseId;
+    const arc2 = baseId + 1;
+    const top = baseId + 2; // the +perp side line
+    const bottom = baseId + 3; // the -perp side line
+    const geoms = [
+        { k: 'arc', id: arc1, c: [cA[0], cA[1]], r, a: arc1b, b: arc1a, sense: 'cw' },
+        { k: 'arc', id: arc2, c: [cB[0], cB[1]], r, a: arc2b, b: arc2a, sense: 'cw' },
+        { k: 'line', id: top, a: arc1a, b: arc2b },
+        { k: 'line', id: bottom, a: arc2a, b: arc1b },
+    ];
+    const rules = [
+        { k: 'coincident', a: top, aEnd: 'a', b: arc1, bEnd: 'b' },
+        { k: 'tangent', a: top, aEnd: 'a', b: arc1, bEnd: 'b' },
+        { k: 'coincident', a: top, aEnd: 'b', b: arc2, bEnd: 'a' },
+        { k: 'tangent', a: top, aEnd: 'b', b: arc2, bEnd: 'a' },
+        { k: 'coincident', a: bottom, aEnd: 'a', b: arc2, bEnd: 'b' },
+        { k: 'tangent', a: bottom, aEnd: 'a', b: arc2, bEnd: 'b' },
+        { k: 'coincident', a: bottom, aEnd: 'b', b: arc1, bEnd: 'a' },
+        { k: 'tangent', a: bottom, aEnd: 'b', b: arc1, bEnd: 'a' },
+    ];
+    return { geoms, rules, ids: { arc1, arc2, top, bottom } };
+}
 //# sourceMappingURL=sketch-solve.js.map

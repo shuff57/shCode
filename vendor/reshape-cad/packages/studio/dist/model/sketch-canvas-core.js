@@ -8,6 +8,7 @@
 // Soup coordinates: the same mm plane coordinates the doc stores in
 // SketchFeature.geoms. 'a'/'b'/'c' are the soup point refs (start/end/centre).
 import { arcFromBulge } from '@shuff57/reshape-sketch/sketch-arc';
+import { buildSlotRows } from '@shuff57/reshape-sketch/sketch-slot';
 /** Which named points each geometry kind exposes. A point exposes only its
  *  own location; a line its two ends; a circle its centre; an arc all three
  *  plus both ends. The UI hit-tests ONLY the named points a kind really
@@ -716,66 +717,13 @@ export function applyEqualRadiusRule(rules, arcIdA, arcIdB) {
  *  the other's matching extreme, on the same side). */
 export function slotRows(cA, cB, rPoint, baseId) {
     const r = Math.hypot(rPoint.x - cA.x, rPoint.y - cA.y);
-    if (r <= 1e-9)
+    // The row-building (cw arcs, reversed end order, coincident + tangent at
+    // each junction, and the long comment on why) lives in packages/sketch so
+    // the script's sk.slot() builds the very same rows.
+    const out = buildSlotRows([cA.x, cA.y], [cB.x, cB.y], r, baseId);
+    if (!out)
         return null;
-    const dx = cB.x - cA.x;
-    const dy = cB.y - cA.y;
-    const len = Math.hypot(dx, dy);
-    if (len <= 1e-9)
-        return null;
-    // Unit perpendicular of the A->B axis.
-    const px = -dy / len;
-    const py = dx / len;
-    // Arc 1 (at A): ends at A + r*(+perp) and A + r*(-perp).
-    // Arc 2 (at B): ends at B + r*(-perp) and B + r*(+perp).
-    const arc1a = [cA.x + px * r, cA.y + py * r];
-    const arc1b = [cA.x - px * r, cA.y - py * r];
-    const arc2a = [cB.x - px * r, cB.y - py * r];
-    const arc2b = [cB.x + px * r, cB.y + py * r];
-    // WHICH END IS `a` IS THE DIRECTION, and it is what decides whether a cap
-    // bulges away from the axis (an obround) or into it (a notch). A cw arc
-    // runs from `a` DOWN in angle to `b`, so cap A must start at -perp and end
-    // at +perp to sweep the far side; starting at +perp sweeps the near side
-    // and bites a semicircle out of the slot instead.
-    //
-    // This shipped the near way round. Measured 2026-09-18 through the canvas's
-    // own arcAngles + sampleArc and then through the kernel: the drawn outline
-    // spanned x over [0, 40] for centres at x=0 and x=40 with r=10 -- it must
-    // reach [-10, 50] -- and the extrude measured 4858.407346 where an obround
-    // is 11141.592654, a 56% error a student could SEE.
-    //
-    // Flipping `sense` to ccw is NOT the fix: it draws the right shape and then
-    // refuses ("edge 3 and arc 1 meet in a point rather than running smoothly;
-    // reverse one of them"), because the ends' ORDER, not the sense, is what
-    // the wire walk reads as travel direction. The refusal named the fix; it was
-    // read as a verdict on the sense. Reversing both caps' ends builds the
-    // obround exactly, on the same cw sense, with no refusal.
-    const arc1 = baseId;
-    const arc2 = baseId + 1;
-    const top = baseId + 2; // the +perp side line
-    const bottom = baseId + 3; // the -perp side line
-    const geoms = [
-        { k: 'arc', id: arc1, c: [cA.x, cA.y], r, a: arc1b, b: arc1a, sense: 'cw' },
-        { k: 'arc', id: arc2, c: [cB.x, cB.y], r, a: arc2b, b: arc2a, sense: 'cw' },
-        { k: 'line', id: top, a: arc1a, b: arc2b },
-        { k: 'line', id: bottom, a: arc2a, b: arc1b },
-    ];
-    // Four junctions, TWO rows each. The weld is a coincident — wire
-    // discovery walks coincident classes and nothing else (wires.rs's header
-    // states it as the definition of "same vertex") — and the DIRECTION is an
-    // endpoint tangent, whose residual carries no sigma (the simple form's
-    // side-blindness is what made a side-less tangency drift the solve).
-    const rules = [
-        { k: 'coincident', a: top, aEnd: 'a', b: arc1, bEnd: 'b' },
-        { k: 'tangent', a: top, aEnd: 'a', b: arc1, bEnd: 'b' },
-        { k: 'coincident', a: top, aEnd: 'b', b: arc2, bEnd: 'a' },
-        { k: 'tangent', a: top, aEnd: 'b', b: arc2, bEnd: 'a' },
-        { k: 'coincident', a: bottom, aEnd: 'a', b: arc2, bEnd: 'b' },
-        { k: 'tangent', a: bottom, aEnd: 'a', b: arc2, bEnd: 'b' },
-        { k: 'coincident', a: bottom, aEnd: 'b', b: arc1, bEnd: 'a' },
-        { k: 'tangent', a: bottom, aEnd: 'b', b: arc1, bEnd: 'a' },
-    ];
-    return { geoms, rules, ids: { arc1, arc2, top, bottom } };
+    return { geoms: out.geoms, rules: out.rules, ids: out.ids };
 }
 // --- circle-in-mixed-wire canonicalization (kernel §5.3.10 v2 support) ------
 //

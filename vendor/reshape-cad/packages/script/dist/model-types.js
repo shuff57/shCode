@@ -558,6 +558,35 @@ export function throughExtentAlong(doc, featureId, axis) {
     }
     return null;
 }
+/**
+ * Where a hole's tool must sit ALONG its axis so a blind hole starts at the
+ * drilled face. The kernel contract (and the OCCT referee) centres the tool on
+ * the target's bounding-box centre plus HoleFeature.center, with `depth` as the
+ * tool's length -- so a blind `depth` shorter than the part would float a sealed
+ * cavity in the middle. Shifting the tool toward the +axis face by
+ * (extent - depth) / 2 puts its top flush with that face.
+ *
+ * 0 when the hole goes through (depth >= extent). null when the thickness along
+ * the axis cannot be bounded (see throughExtentAlong), so callers can say so.
+ */
+export function holeAxialOffset(doc, target, axis, depth) {
+    const extent = throughExtentAlong(doc, target, axis);
+    if (extent == null)
+        return null;
+    return depth >= extent ? 0 : (extent - depth) / 2;
+}
+/** The hole with `depth` set AND its axial offset kept in step. The axial
+ *  component of `center` is DERIVED from depth + target thickness (never typed,
+ *  never emitted as `at:`), so every writer of depth goes through here. When the
+ *  thickness is unknown the axial component is left as it was. */
+export function withHoleDepth(doc, f, depth) {
+    const off = holeAxialOffset(doc, f.target, f.axis, depth);
+    if (off == null)
+        return { ...f, depth };
+    const center = [...f.center];
+    center[f.axis === 'x' ? 0 : f.axis === 'y' ? 1 : 2] = off;
+    return { ...f, depth, center };
+}
 export function newPattern(doc, target, mode = 'linear') {
     const id = nextId(doc, 'pat');
     if (mode === 'linear') {

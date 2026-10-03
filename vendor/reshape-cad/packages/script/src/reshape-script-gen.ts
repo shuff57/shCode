@@ -287,9 +287,9 @@ function ruleRowText(bindings: Map<string, string>, featureId: string, index: nu
     case 'parallel': return `{ k:'parallel', a:${n(r.a)}, b:${n(r.b)} }`;
     case 'perpendicular': return `{ k:'perpendicular', a:${n(r.a)}, b:${n(r.b)} }`;
     case 'tangent': {
-      const ends = r.aEnd !== undefined || r.bEnd !== undefined
-        ? `${r.aEnd ? `, aEnd:'${r.aEnd}'` : ''}${r.bEnd ? `, bEnd:'${r.bEnd}'` : ''}`
-        : '';
+      // aEnd goes between a and b; bEnd follows b (it was also emitted here,
+      // so a tangent row came out with bEnd twice -- harmless JS, ugly text).
+      const ends = r.aEnd ? `, aEnd:'${r.aEnd}'` : '';
       const side = r.side !== undefined ? `, side:${n(r.side)}` : '';
       const mode = r.mode ? `, mode:'${r.mode}'` : '';
       return `{ k:'tangent', a:${n(r.a)}${ends}, b:${n(r.b)}${r.bEnd ? `, bEnd:'${r.bEnd}'` : ''}${side}${mode} }`;
@@ -456,9 +456,16 @@ export function toScript(doc: ModelDoc, namedParams?: readonly ScriptParamRef[])
       return;
     }
     if (f.kind === 'sketch') {
-      const plane = PLANE_WORD[f.plane] ?? 'top';
-      const offsetArg = f.offset !== 0 ? `, ${lit(f.offset)}` : '';
-      lines.push(`const ${f.id} = sketch('${plane}'${offsetArg})`);
+      if (f.frame) {
+        // A framed sketch ignores plane/offset (model-types.ts SketchFrame),
+        // so the frame IS the whole placement. Normal = u x v.
+        const vec3 = (a: readonly number[]) => `[${a.map((n) => lit(n)).join(', ')}]`;
+        lines.push(`const ${f.id} = sketch({ origin: ${vec3(f.frame.origin)}, u: ${vec3(f.frame.u)}, v: ${vec3(f.frame.v)} })`);
+      } else {
+        const plane = PLANE_WORD[f.plane] ?? 'top';
+        const offsetArg = f.offset !== 0 ? `, ${lit(f.offset)}` : '';
+        lines.push(`const ${f.id} = sketch('${plane}'${offsetArg})`);
+      }
       // A soup sketch emits its rows INSTEAD of the polygon language: the
       // soup is the newer representation and the one the kernel solves from
       // (SPEC-sketcher2 §6). If a doc somehow carries both, the soup wins --

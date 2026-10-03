@@ -508,7 +508,11 @@ export interface HoleFeature {
     /** Where the hole's mouth sits, as an offset from `target`'s own
      *  bounding-box centre -- not an absolute world position. [0, 0, 0]
      *  means "dead centre on the target," wherever the target actually is;
-     *  the kernel (lib/occt-build.ts) resolves that offset at build time. */
+     *  the kernel (lib/occt-build.ts) resolves that offset at build time.
+     *  The component ALONG `axis` is derived, not typed: for a blind hole it is
+     *  (thickness - depth) / 2 toward +axis so the bore starts at the drilled
+     *  face (holeAxialOffset / withHoleDepth); 0 for a through hole. toScript
+     *  never emits it as `at:`. */
     center: Vec3;
     /** Which way the drill points. 'z' bores straight down, matching a hole
      *  placed on a flat top face without any tilt. */
@@ -840,6 +844,23 @@ export declare function extentAlong(doc: ModelDoc, featureId: string, axis: Axis
  * blind 10 mm hole the student never asked for.
  */
 export declare function throughExtentAlong(doc: ModelDoc, featureId: string, axis: Axis3): number | null;
+/**
+ * Where a hole's tool must sit ALONG its axis so a blind hole starts at the
+ * drilled face. The kernel contract (and the OCCT referee) centres the tool on
+ * the target's bounding-box centre plus HoleFeature.center, with `depth` as the
+ * tool's length -- so a blind `depth` shorter than the part would float a sealed
+ * cavity in the middle. Shifting the tool toward the +axis face by
+ * (extent - depth) / 2 puts its top flush with that face.
+ *
+ * 0 when the hole goes through (depth >= extent). null when the thickness along
+ * the axis cannot be bounded (see throughExtentAlong), so callers can say so.
+ */
+export declare function holeAxialOffset(doc: ModelDoc, target: string, axis: Axis3, depth: number): number | null;
+/** The hole with `depth` set AND its axial offset kept in step. The axial
+ *  component of `center` is DERIVED from depth + target thickness (never typed,
+ *  never emitted as `at:`), so every writer of depth goes through here. When the
+ *  thickness is unknown the axial component is left as it was. */
+export declare function withHoleDepth(doc: ModelDoc, f: HoleFeature, depth: number): HoleFeature;
 export declare function newPattern(doc: ModelDoc, target: string, mode?: 'linear' | 'circular'): PatternFeature;
 /** center: [0, 0, 0] is not world zero -- see HoleFeature.center. It is "no
  *  offset," so the kernel (lib/occt-build.ts) reads it against the TARGET's
