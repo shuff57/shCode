@@ -24,7 +24,141 @@ export interface QuizKey {
 }
 
 export const QUIZ_KEYS: Record<string, QuizKey> = {
+    "1-7-1-ch1-individual-pa-concepts": {
+      "maxSubmissions": 3,
+      "variants": [
+        "a",
+        "b",
+        "c"
+      ],
+      "questions": [
+        {
+          "id": "c1-lifecycle-order",
+          "answer": 0,
+          "optionText": "inception, elaboration, construction, deployment",
+          "explanation": "Deciding the goals and scope (inception) has to happen before working out requirements and designing the thing (elaboration), which has to happen before writing it (construction), which has to happen before releasing it to the people who will use it (deployment). Building something nobody has scoped is how a project ships the wrong program."
+        },
+        {
+          "id": "c2-paradigm-oo",
+          "answer": 1,
+          "optionText": "Object-oriented programming",
+          "explanation": "Object-oriented programming puts values and the operations on those values into one object. Procedural code keeps its data in variables that separate statements reach into from outside; functional programming builds a program out of functions that take values in and hand values back; structured programming is about being built only from sequence, selection and repetition."
+        },
+        {
+          "id": "c3-chart-or-pseudocode",
+          "answer": 2,
+          "optionText": "A flowchart",
+          "explanation": "A flowchart draws branching as shapes and arrows, so where the paths split and rejoin is visible without reading. Pseudocode suits a long straight run of steps, a README explains a finished program to whoever has to use it, and a test-case table records what you tried and what came out."
+        },
+        {
+          "id": "a-t1-const",
+          "answer": 3,
+          "optionText": "Nothing — the program stops with a TypeError",
+          "explanation": "A name declared with const cannot be pointed at a new value. The reassignment throws a TypeError and the program stops there, so console.log never runs. Use let for a value that is meant to change.",
+          "variant": "a"
+        },
+        {
+          "id": "a-t2-coercion",
+          "answer": 0,
+          "optionText": "52 3",
+          "explanation": "With text on one side, + joins rather than adds, so \"5\" + 2 builds the text 52. The - operator has no meaning for text, so JavaScript converts \"5\" into the number 5 and subtracts, giving 3. Same two values, two different answers, depending on the operator.",
+          "variant": "a"
+        },
+        {
+          "id": "a-t3-typeof",
+          "answer": 1,
+          "optionText": "object number",
+          "explanation": "typeof null reports object. That is a bug baked into JavaScript in 1995 and never repaired, because too much code now depends on it. NaN stands for Not a Number and is itself of type number — that is the point of it: the number type's way of saying an arithmetic answer does not exist.",
+          "variant": "a"
+        },
+        {
+          "id": "a-t4-nan",
+          "answer": 2,
+          "optionText": "NaN",
+          "explanation": "Number(\"three\") cannot build a number out of that text, so it produces NaN. Every piece of arithmetic that touches NaN produces NaN, so it travels through the multiplication and the addition and comes out of the print unchanged.",
+          "variant": "a"
+        },
+        {
+          "id": "a-t5-template",
+          "answer": 3,
+          "optionText": "Ada packed 12 mugs",
+          "explanation": "Backticks make a template literal, and ${...} runs the expression inside the braces and drops the result into the text. boxes * 3 is arithmetic, so 12 lands in the sentence.",
+          "variant": "a"
+        },
+        {
+          "id": "b-t1-const",
+          "answer": 0,
+          "optionText": "Nothing — the program stops with a TypeError",
+          "explanation": "A name declared with const cannot be pointed at a new value. The reassignment throws a TypeError and the program stops there, so console.log never runs. Use let for a value that is meant to change.",
+          "variant": "b"
+        },
+        {
+          "id": "b-t2-coercion",
+          "answer": 1,
+          "optionText": "205 15",
+          "explanation": "With text on one side, + joins rather than adds, so \"20\" + 5 builds the text 205. The - operator has no meaning for text, so JavaScript converts \"20\" into the number 20 and subtracts, giving 15. Same two values, two different answers, depending on the operator.",
+          "variant": "b"
+        },
+        {
+          "id": "b-t3-typeof",
+          "answer": 2,
+          "optionText": "object",
+          "explanation": "typeof null reports object. That is a bug baked into JavaScript in 1995 and never repaired, because too much code now depends on it. null is a value you assign on purpose to mean \"deliberately nothing\", and typeof is not able to tell you so.",
+          "variant": "b"
+        },
+        {
+          "id": "b-t4-nan",
+          "answer": 3,
+          "optionText": "NaN",
+          "explanation": "Number(\"ten dollars\") cannot build a number out of that text, so it produces NaN. Every piece of arithmetic that touches NaN produces NaN, so it travels through the addition and the subtraction and comes out of the print unchanged.",
+          "variant": "b"
+        },
+        {
+          "id": "b-t5-template",
+          "answer": 0,
+          "optionText": "Rex has 4 legs",
+          "explanation": "Backticks make a template literal, and ${...} runs the expression inside the braces and drops the result into the text. pairs * 2 is arithmetic, so 4 lands in the sentence.",
+          "variant": "b"
+        },
+        {
+          "id": "c-t1-const",
+          "answer": 1,
+          "optionText": "Nothing — the program stops with a TypeError",
+          "explanation": "A name declared with const cannot be pointed at a new value, and adding one to it is still pointing it at a new value. The reassignment throws a TypeError and the program stops there, so console.log never runs.",
+          "variant": "c"
+        },
+        {
+          "id": "c-t2-coercion",
+          "answer": 2,
+          "optionText": "73 21",
+          "explanation": "With text on one side, + joins rather than adds, so \"7\" + 3 builds the text 73. The * operator has no meaning for text, so JavaScript converts \"7\" into the number 7 and multiplies, giving 21. Only + is ambiguous; every other arithmetic operator converts.",
+          "variant": "c"
+        },
+        {
+          "id": "c-t3-typeof",
+          "answer": 3,
+          "optionText": "number",
+          "explanation": "Dividing by text that is not a number produces NaN, and NaN is of type number — Not a Number is the number type's way of saying an arithmetic answer does not exist. typeof reports the type, not the value, so it says number rather than NaN.",
+          "variant": "c"
+        },
+        {
+          "id": "c-t4-nan",
+          "answer": 0,
+          "optionText": "NaN",
+          "explanation": "Number(\"wide\") cannot build a number out of that text, so it produces NaN. Every piece of arithmetic that touches NaN produces NaN, so it travels through the multiplication and the addition and comes out of the print unchanged.",
+          "variant": "c"
+        },
+        {
+          "id": "c-t5-template",
+          "answer": 1,
+          "optionText": "Chico in 7 days",
+          "explanation": "Backticks make a template literal, and ${...} runs the expression inside the braces and drops the result into the text. days + 2 is arithmetic on two numbers, so 7 lands in the sentence.",
+          "variant": "c"
+        }
+      ]
+    },
     "2-7-1-ch2-individual-pa-concepts": {
+      "maxSubmissions": 3,
       "variants": [
         "a",
         "b",
@@ -152,6 +286,139 @@ export const QUIZ_KEYS: Record<string, QuizKey> = {
           "answer": 0,
           "optionText": "P, Q late, R, S",
           "explanation": "P prints, the throw jumps to catch, Q prints with the message, finally prints R whether or not there was an error, and the line after the statement prints S.",
+          "variant": "c"
+        }
+      ]
+    },
+    "3-10-1-ch3-individual-pa-concepts": {
+      "maxSubmissions": 3,
+      "variants": [
+        "a",
+        "b",
+        "c"
+      ],
+      "questions": [
+        {
+          "id": "c1-definition-vs-call",
+          "answer": 0,
+          "optionText": "totalValue(stock);",
+          "explanation": "A call is the name followed by parentheses as its own statement (3.1.2): totalValue(stock) runs the body. The function keyword, or an arrow assigned to a name, is a definition. Same words as 3.1.3's quiz."
+        },
+        {
+          "id": "c2-dot-vs-bracket",
+          "answer": 0,
+          "optionText": "item[field]",
+          "explanation": "Square brackets work the name out before reading (3.5.6): item[field] reads the property whose name is stored in field. Dot notation reads the property spelled exactly like the text after the dot, so item.field would look for a property literally called \"field\"."
+        },
+        {
+          "id": "c3-nonmutating",
+          "answer": 0,
+          "optionText": "push",
+          "explanation": "push adds to the end of the array it is called on and changes it (3.3.2). map, slice and concat all build a NEW array and leave the original alone (3.7.4, 3.7.8, 3.7.10). §3.7's Key Terms call them non-mutating, and push is the chapter's counter-example."
+        },
+        {
+          "id": "a-t1-no-return",
+          "answer": 0,
+          "optionText": "undefined",
+          "explanation": "setup builds label but has no return (3.2.11), so the call evaluates to undefined and that is what prints. The label exists only inside the function and vanishes when the function ends.",
+          "variant": "a"
+        },
+        {
+          "id": "a-t2-mutation",
+          "answer": 0,
+          "optionText": "10",
+          "explanation": "restock is handed a copy of the reference (3.6.2), so shelf inside the function and the const shelf outside are the same object. Changing count inside is visible outside (3.6.3), so the print says 10. The parameter name did not copy the object -- it shared it.",
+          "variant": "a"
+        },
+        {
+          "id": "a-t3-length",
+          "answer": 0,
+          "optionText": "7",
+          "explanation": "length is 4, so the highest index is 3 (one below length), and readings[3] is 7 (3.3.2). readings[4] would be undefined -- index counts from 0, length counts how many there are.",
+          "variant": "a"
+        },
+        {
+          "id": "a-t4-arrow-body",
+          "answer": 0,
+          "optionText": "undefined",
+          "explanation": "Braces bring the return requirement back (3.4.8): an arrow with a block body returns undefined unless it says return. n * 2 is worked out and thrown away, so the print is undefined. Drop the braces -- const double = (n) => n * 2; -- and it would print 12.",
+          "variant": "a"
+        },
+        {
+          "id": "a-t5-json",
+          "answer": 0,
+          "optionText": "undefined 0.4",
+          "explanation": "A property whose value is undefined does not survive stringify (3.8.6) -- the text has no note in it at all, so the parsed object has no note property, and reading a missing property gives undefined. The number round-trips fine.",
+          "variant": "a"
+        },
+        {
+          "id": "b-t1-no-return",
+          "answer": 0,
+          "optionText": "undefined",
+          "explanation": "Same shape, different values: greeting builds line but returns nothing (3.2.11), so the call is undefined and undefined is what prints.",
+          "variant": "b"
+        },
+        {
+          "id": "b-t2-mutation",
+          "answer": 0,
+          "optionText": "5",
+          "explanation": "The function changes the object it was handed (3.6.3). The const entry outside and entry inside the function are the same object, so the print says 5.",
+          "variant": "b"
+        },
+        {
+          "id": "b-t3-length",
+          "answer": 0,
+          "optionText": "41",
+          "explanation": "length is 3, so the highest index is 2 (one below length), and seeds[2] is 41 (3.3.2). Reading length as an index would give undefined -- index counts from 0.",
+          "variant": "b"
+        },
+        {
+          "id": "b-t4-arrow-body",
+          "answer": 0,
+          "optionText": "undefined",
+          "explanation": "Same trap as form a: the block body never says return (3.4.8), so the call evaluates to undefined and that is what prints.",
+          "variant": "b"
+        },
+        {
+          "id": "b-t5-json",
+          "answer": 0,
+          "optionText": "undefined 40",
+          "explanation": "helper is undefined, and undefined does not survive stringify (3.8.6), so the parsed object has no helper property and reading it gives undefined. planted round-trips as 40.",
+          "variant": "b"
+        },
+        {
+          "id": "c-t1-no-return",
+          "answer": 0,
+          "optionText": "undefined",
+          "explanation": "tag builds text and returns nothing (3.2.11), so out is undefined and undefined is what prints. Printing inside would not have helped: the caller would still receive undefined.",
+          "variant": "c"
+        },
+        {
+          "id": "c-t2-mutation",
+          "answer": 0,
+          "optionText": "2",
+          "explanation": "The callee changed the object through the shared reference (3.6.3), so the caller's print says 2. Reassigning the parameter instead would have changed nothing outside -- 3.6.6 is that lesson.",
+          "variant": "c"
+        },
+        {
+          "id": "c-t3-length",
+          "answer": 0,
+          "optionText": "50",
+          "explanation": "length is 5, so the highest index is 4 (one below length), and one below that is 3. laps[3] is 50 (3.3.2). Reading length as an index would give undefined -- index counts from 0.",
+          "variant": "c"
+        },
+        {
+          "id": "c-t4-arrow-body",
+          "answer": 0,
+          "optionText": "undefined",
+          "explanation": "Block body, no return (3.4.8): the built string is discarded and the call is undefined.",
+          "variant": "c"
+        },
+        {
+          "id": "c-t5-json",
+          "answer": 0,
+          "optionText": "undefined 3",
+          "explanation": "note is undefined and does not survive the round trip (3.8.6); copies survives as 3.",
           "variant": "c"
         }
       ]

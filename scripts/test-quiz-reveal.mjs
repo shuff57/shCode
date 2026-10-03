@@ -62,6 +62,15 @@ if (typeof onRequestGet !== 'function') {
 }
 const { buildQuizView } = require(join(outDir, 'lib/quiz-variant.js'));
 
+// 2.7.1 is capped at three tries now (spec .gauntlet/SPEC-attempt-caps.md), and a capped
+// quiz is gated by tries, enrolment and the teacher's release, which
+// scripts/test-attempt-reveal.mjs covers. THIS file guards the older one-row path that
+// still serves an UNCAPPED summative quiz, so the fixture is the same key with its cap
+// taken off, in the compiled copy only.
+const { QUIZ_KEYS } = require(join(outDir, 'functions/_shared/quiz-keys.generated.js'));
+const CAPPED_LESSON = '2-7-1-ch2-individual-pa-concepts';
+if (QUIZ_KEYS[CAPPED_LESSON] && 'maxSubmissions' in QUIZ_KEYS[CAPPED_LESSON]) delete QUIZ_KEYS[CAPPED_LESSON].maxSubmissions;
+
 // --- Fixtures ---
 const LESSON_ID = '2-7-1-ch2-individual-pa-concepts';
 const EMAIL = 'student@example.invalid';
