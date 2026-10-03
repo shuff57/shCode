@@ -877,17 +877,31 @@ export declare function newMirror(doc: ModelDoc, target: string, plane: SketchPl
  * deliberately ignores that.
  */
 export declare function extentAlong(doc: ModelDoc, featureId: string, axis: Axis3): number | null;
+/** The sweep sign of each NAMED plane: MEASURED, not derived (xz pulls -Y). A
+ *  sketch with a literal `frame` always pulls along u x v. Shared with
+ *  model-handles.ts so there is one table. */
+export declare const SWEEP_DIR: Record<SketchPlane, number>;
+/** How far the named feature's solid reaches along an axis, and whether that is
+ *  its EXACT extent or only an upper bound. null when nothing can be proved. */
+export declare function extentBoundAlong(doc: ModelDoc, featureId: string, axis: Axis3): {
+    extent: number;
+    exact: boolean;
+} | null;
 /**
- * An UPPER BOUND on how far the named feature's solid reaches along one axis,
- * for a hole that has to go all the way through. A bound is enough: the drill
- * starts at the top face, so a hole deeper than the part cuts only air. Unlike
- * extentAlong() (a default-picker that deliberately ignores patterns and
- * mirrors) this refuses to guess: it returns null for anything it cannot
- * bound -- a rotated primitive, a pattern/mirror/move-copy, an extrude,
- * revolve, blend or combine -- so hole() can say so instead of drilling a
- * blind 10 mm hole the student never asked for.
+ * An UPPER BOUND (or the exact value) on how far the named feature's solid
+ * reaches along one axis, for a hole that has to go all the way through. A bound
+ * is enough: the tool is centred on the part, so a hole longer than the part
+ * cuts only air. Unlike extentAlong() (a default-picker that ignores patterns
+ * and mirrors) this refuses to guess: null for anything it cannot prove -- a
+ * rotated primitive, a polar pattern, an intersect, a sketch that is not on a
+ * world-aligned plane -- so hole() can say so instead of drilling a blind hole
+ * the student never asked for.
  */
 export declare function throughExtentAlong(doc: ModelDoc, featureId: string, axis: Axis3): number | null;
+/** The EXACT extent along an axis, or null when only a bound (or nothing) is
+ *  known. A blind hole's start offset needs this: an over-long extent would
+ *  start the hole short of the face. */
+export declare function exactExtentAlong(doc: ModelDoc, featureId: string, axis: Axis3): number | null;
 /**
  * Where a hole's tool must sit ALONG its axis so a blind hole starts at the
  * drilled face. The kernel contract (and the OCCT referee) centres the tool on

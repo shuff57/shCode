@@ -20,6 +20,22 @@ export declare function planeAxes(plane: string): {
     v: [number, number, number];
 };
 /**
+ * Which way an extrude actually PULLS, as a multiple of planeNormal().
+ *
+ * NOT the same thing as planeNormal() itself, which is the OFFSET direction --
+ * occt-build.ts's own PLANE_AXES (occt-build.ts:339) carries both, and its
+ * `dir` is -1 on 'xz' because that basis is LEFT-handed (u x v = -n). The
+ * FreeCAD engine reaches the identical direction by a different route:
+ * sketchNewPlaced() derives the sketch's local Z as u x v and PartDesign::Pad
+ * runs along it (emit.pad sets Length only -- Reversed and Midplane stay
+ * False). So the two engines agree, and this one table is engine-neutral like
+ * the rest of this file.
+ *
+ * MEASURED, not derived: docs/specs/SPEC-blend.md fixture 24 pads a 30x5
+ * RECT 12mm on five plane/offset combinations and asserts the world bbox.
+ * xz@0 comes out [[0,-12,0],[30,0,5]] -- the cap at y = -12, not +12.
+ */
+/**
  * Where a sketch sits and which way Pull carries it, from the ONE resolver
  * (sketchFrameOf) -- so a sketch with a `frame` (sketch-on-a-face, or on a
  * datum plane) is handled on its real plane, not on the placeholder 'xy' its

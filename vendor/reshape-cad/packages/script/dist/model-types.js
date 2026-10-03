@@ -6,7 +6,7 @@
 // An ordered feature list IS a program: each row is a statement, each number a
 // value, and subtract(a, b) is not subtract(b, a). That is the whole reason the
 // visual mode belongs in a CS course rather than beside one.
-import { splitEdge } from '@shuff57/reshape-sketch/sketch-arc';
+import { splitEdge, circleOf, outlineOf, arcFromBulge } from '@shuff57/reshape-sketch/sketch-arc';
 import { featureChain } from './topo-name.js';
 /** The named planes' world axes, matching PLANE_AXES in occt-build.ts and
  *  plane_frame in brep-rs/src/wasm.rs. Kept as the one JS copy so a frame
@@ -513,68 +513,236 @@ export function extentAlong(doc, featureId, axis) {
     }
     return null;
 }
-/**
- * An UPPER BOUND on how far the named feature's solid reaches along one axis,
- * for a hole that has to go all the way through. A bound is enough: the drill
- * starts at the top face, so a hole deeper than the part cuts only air. Unlike
- * extentAlong() (a default-picker that deliberately ignores patterns and
- * mirrors) this refuses to guess: it returns null for anything it cannot
- * bound -- a rotated primitive, a pattern/mirror/move-copy, an extrude,
- * revolve, blend or combine -- so hole() can say so instead of drilling a
- * blind 10 mm hole the student never asked for.
- */
-export function throughExtentAlong(doc, featureId, axis) {
-    let id = featureId;
-    for (let hop = 0; hop < 16 && id; hop++) {
-        const f = doc.features.find(feat => feat.id === id);
-        if (!f)
-            return null;
-        const spun = 'rotate' in f && f.rotate && f.rotate.some(v => v !== 0);
-        switch (f.kind) {
-            case 'box':
-                if (spun)
-                    return null;
-                return axis === 'x' ? f.size[0] : axis === 'y' ? f.size[1] : f.size[2];
-            case 'cylinder':
-                if (spun)
-                    return null;
-                return axis === 'z' ? f.height : f.radius * 2;
-            case 'cone':
-                if (spun)
-                    return null;
-                return axis === 'z' ? f.height : f.radius * 2;
-            case 'prism':
-                if (spun)
-                    return null;
-                return axis === 'z' ? f.height : f.radius * 2;
-            case 'sphere':
-                return f.radius * 2;
-            case 'torus':
-                if (spun)
-                    return null;
-                return axis === 'z' ? f.tubeRadius * 2 : (f.ringRadius + f.tubeRadius) * 2;
-            case 'wedge':
-                // Which edge runs along which axis is the kernel's business; the
-                // longest edge bounds every axis.
-                if (spun)
-                    return null;
-                return Math.max(f.width, f.depth, f.height);
-            case 'hole':
-            case 'shell':
-            case 'fillet':
-            case 'draft':
-                id = f.target;
-                break;
-            case 'move':
-                if (f.copy)
-                    return null;
-                id = f.target;
-                break;
-            default:
-                return null;
+/** The sweep sign of each NAMED plane: MEASURED, not derived (xz pulls -Y). A
+ *  sketch with a literal `frame` always pulls along u x v. Shared with
+ *  model-handles.ts so there is one table. */
+export const SWEEP_DIR = { xy: 1, xz: -1, yz: 1 };
+const AXIS_INDEX = { x: 0, y: 1, z: 2 };
+/** The plane-coordinate bounding box [uLo, uHi, vLo, vHi] of a plain sketch's
+ *  real outline: circle by centre and radius, arcs by their true extremes,
+ *  rounds and chamfers by outlineOf (the same outline the kernel builds).
+ *  null for a soup sketch or a collapsed outline -- not provable. */
+function sketchBounds2D(f) {
+    if ((f.geoms && f.geoms.length) || (f.geom && f.geom.length) || (f.rules && f.rules.length))
+        return null;
+    const circle = circleOf(f);
+    if (circle) {
+        const [cx, cy] = circle.center;
+        return [cx - circle.radius, cx + circle.radius, cy - circle.radius, cy + circle.radius];
+    }
+    if (f.shape === 'circle' || f.points.length < 3)
+        return null;
+    const o = outlineOf(f);
+    if (!o.ok || o.points.length < 3)
+        return null;
+    let uLo = Infinity, uHi = -Infinity, vLo = Infinity, vHi = -Infinity;
+    const take = (u, v) => {
+        if (u < uLo)
+            uLo = u;
+        if (u > uHi)
+            uHi = u;
+        if (v < vLo)
+            vLo = v;
+        if (v > vHi)
+            vHi = v;
+    };
+    const n = o.points.length;
+    for (let i = 0; i < n; i++) {
+        const a = o.points[i], b = o.points[(i + 1) % n];
+        take(a[0], a[1]);
+        const bulge = o.bulges?.[i];
+        if (!bulge)
+            continue;
+        const { center, radius, startAngle, endAngle } = arcFromBulge(a, b, bulge);
+        let sweep = endAngle - startAngle;
+        if (bulge > 0 && sweep < 0)
+            sweep += Math.PI * 2;
+        if (bulge < 0 && sweep > 0)
+            sweep -= Math.PI * 2;
+        for (let k = 0; k < 4; k++) {
+            const theta = (k * Math.PI) / 2;
+            // How far round from the start, in the arc's own direction of travel.
+            let d = sweep >= 0 ? theta - startAngle : startAngle - theta;
+            d = ((d % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+            if (d <= Math.abs(sweep))
+                take(center[0] + radius * Math.cos(theta), center[1] + radius * Math.sin(theta));
+        }
+    }
+    if (![uLo, uHi, vLo, vHi].every(Number.isFinite))
+        return null;
+    return [uLo, uHi, vLo, vHi];
+}
+const unitAxisOf = (v) => {
+    for (const i of [0, 1, 2]) {
+        if (Math.abs(Math.abs(v[i]) - 1) < 1e-9 && v.every((c, j) => j === i || Math.abs(c) < 1e-9)) {
+            return { i, sign: v[i] > 0 ? 1 : -1 };
         }
     }
     return null;
+};
+/** Where an extruded sketch sits along one world axis: its outline's extent for
+ *  an in-plane axis, the pull depth for the sweep axis. null unless the frame's
+ *  u, v and normal are all world axes. */
+function extrudeRange(sk, height, axis) {
+    const bounds = sketchBounds2D(sk);
+    if (!bounds || !(height > 0))
+        return null;
+    const fr = sketchFrameOf(sk);
+    const ui = unitAxisOf(fr.u), vi = unitAxisOf(fr.v), ni = unitAxisOf(fr.n);
+    if (!ui || !vi || !ni)
+        return null;
+    const i = AXIS_INDEX[axis];
+    const o = fr.origin[i];
+    if (ni.i === i) {
+        const dir = sk.frame ? 1 : (SWEEP_DIR[sk.plane ?? 'xy'] ?? 1);
+        const far = o + ni.sign * dir * height;
+        return { lo: Math.min(o, far), hi: Math.max(o, far), exact: true };
+    }
+    const [lo, hi, w] = ui.i === i ? [bounds[0], bounds[1], ui.sign] : [bounds[2], bounds[3], vi.sign];
+    const a = o + w * lo, b = o + w * hi;
+    return { lo: Math.min(a, b), hi: Math.max(a, b), exact: true };
+}
+/** Axis-aligned range of a revolved sketch. The kernel spins a profile about
+ *  the sketch plane's NORMAL axis, reading u as the radius and v as the height
+ *  along that axis (measured on the wasm: xz and yz, 360 degrees). Only that
+ *  case is claimed; a profile with a negative u, a partial sweep, an offset or
+ *  a frame is not provable and stays null. */
+function revolveRange(sk, angle, axis) {
+    if (angle !== 360 || sk.frame || sk.offset !== 0 || (sk.plane !== 'xz' && sk.plane !== 'yz'))
+        return null;
+    const bounds = sketchBounds2D(sk);
+    if (!bounds || bounds[0] < 0)
+        return null;
+    const normal = sk.plane === 'xz' ? 'y' : 'x';
+    if (axis === normal)
+        return { lo: bounds[2], hi: bounds[3], exact: true };
+    return { lo: -bounds[1], hi: bounds[1], exact: true };
+}
+/** World range of a feature along an axis, or null when it cannot be bounded.
+ *  Follows targets at most 16 hops deep at each level of nesting (combine,
+ *  pattern copies recurse with a shared budget). */
+function rangeOf(doc, featureId, axis, budget = { n: 64 }) {
+    const f = doc.features.find(feat => feat.id === featureId);
+    if (!f || budget.n-- <= 0)
+        return null;
+    const i = AXIS_INDEX[axis];
+    const spun = 'rotate' in f && f.rotate && f.rotate.some(v => v !== 0);
+    const around = (c, half, exact = true) => ({ lo: c - half, hi: c + half, exact });
+    const rec = (id) => rangeOf(doc, id, axis, budget);
+    switch (f.kind) {
+        case 'box': return spun ? null : around(f.center[i], f.size[i] / 2);
+        case 'cylinder':
+        case 'cone':
+            return spun ? null : around(f.center[i], (axis === 'z' ? f.height : f.radius * 2) / 2);
+        case 'prism':
+            // z is the height; across the corners the extent depends on which way the
+            // polygon points, so 2R only BOUNDS it.
+            return spun ? null : around(f.center[i], (axis === 'z' ? f.height : f.radius * 2) / 2, axis === 'z');
+        case 'sphere': return around(f.center[i], f.radius);
+        case 'torus':
+            return spun ? null : around(f.center[i], axis === 'z' ? f.tubeRadius : f.ringRadius + f.tubeRadius);
+        case 'wedge':
+            // MEASURED on the wasm: the bbox is exactly width x depth x height about center.
+            return spun ? null : around(f.center[i], (axis === 'x' ? f.width : axis === 'y' ? f.depth : f.height) / 2);
+        case 'hole':
+        case 'shell':
+        case 'fillet':
+        case 'draft':
+            return rec(f.target);
+        case 'move': {
+            const r = rec(f.target);
+            if (!r)
+                return null;
+            const d = f.offset[i];
+            // A copy's own result is ONLY the translated duplicate (measured: the
+            // original stays a separate top-level shape), so both forms shift.
+            return { ...r, lo: r.lo + d, hi: r.hi + d };
+        }
+        case 'extrude': {
+            const sk = doc.features.find(feat => feat.id === f.target);
+            return sk && sk.kind === 'sketch' ? extrudeRange(sk, f.height, axis) : null;
+        }
+        case 'revolve': {
+            const sk = doc.features.find(feat => feat.id === f.target);
+            return sk && sk.kind === 'sketch' ? revolveRange(sk, f.angle, axis) : null;
+        }
+        case 'groove':
+        case 'pocket': {
+            // A cut can only shrink the part, so the target solid's range CONTAINS the
+            // result; it is exact only if nothing sliced an end off, which is not
+            // provable here.
+            const r = rec(f.into);
+            return r ? { ...r, exact: false } : null;
+        }
+        case 'combine': {
+            if (f.targets.length === 0)
+                return null;
+            if (f.op === 'intersect')
+                return null;
+            if (f.op === 'subtract') {
+                const r = rec(f.targets[0]);
+                return r ? { ...r, exact: false } : null;
+            }
+            let lo = Infinity, hi = -Infinity, exact = true;
+            for (const t of f.targets) {
+                const r = rec(t);
+                if (!r)
+                    return null;
+                lo = Math.min(lo, r.lo);
+                hi = Math.max(hi, r.hi);
+                exact = exact && r.exact;
+            }
+            return { lo, hi, exact };
+        }
+        case 'pattern': {
+            if (f.mode !== 'linear' || !f.step || !(f.count >= 1))
+                return null;
+            const r = rec(f.target);
+            if (!r)
+                return null;
+            const d = f.step[i] * (f.count - 1);
+            return { lo: Math.min(r.lo, r.lo + d), hi: Math.max(r.hi, r.hi + d), exact: r.exact };
+        }
+        case 'mirror': {
+            const r = rec(f.target);
+            if (!r)
+                return null;
+            // Across the mirror's own axis the result doubles about a plane the
+            // kernel picks (the part's nearest face, not the origin), which is not
+            // something to promise from here: null. Along the other two axes the
+            // reflection leaves the range exactly as it was.
+            const across = f.plane === 'xy' ? 'z' : f.plane === 'xz' ? 'y' : 'x';
+            return across === axis ? null : r;
+        }
+        default:
+            return null;
+    }
+}
+/** How far the named feature's solid reaches along an axis, and whether that is
+ *  its EXACT extent or only an upper bound. null when nothing can be proved. */
+export function extentBoundAlong(doc, featureId, axis) {
+    const r = rangeOf(doc, featureId, axis);
+    return r ? { extent: r.hi - r.lo, exact: r.exact } : null;
+}
+/**
+ * An UPPER BOUND (or the exact value) on how far the named feature's solid
+ * reaches along one axis, for a hole that has to go all the way through. A bound
+ * is enough: the tool is centred on the part, so a hole longer than the part
+ * cuts only air. Unlike extentAlong() (a default-picker that ignores patterns
+ * and mirrors) this refuses to guess: null for anything it cannot prove -- a
+ * rotated primitive, a polar pattern, an intersect, a sketch that is not on a
+ * world-aligned plane -- so hole() can say so instead of drilling a blind hole
+ * the student never asked for.
+ */
+export function throughExtentAlong(doc, featureId, axis) {
+    return extentBoundAlong(doc, featureId, axis)?.extent ?? null;
+}
+/** The EXACT extent along an axis, or null when only a bound (or nothing) is
+ *  known. A blind hole's start offset needs this: an over-long extent would
+ *  start the hole short of the face. */
+export function exactExtentAlong(doc, featureId, axis) {
+    const e = extentBoundAlong(doc, featureId, axis);
+    return e && e.exact ? e.extent : null;
 }
 /**
  * Where a hole's tool must sit ALONG its axis so a blind hole starts at the
@@ -588,10 +756,12 @@ export function throughExtentAlong(doc, featureId, axis) {
  * the axis cannot be bounded (see throughExtentAlong), so callers can say so.
  */
 export function holeAxialOffset(doc, target, axis, depth) {
-    const extent = throughExtentAlong(doc, target, axis);
-    if (extent == null)
+    const e = extentBoundAlong(doc, target, axis);
+    if (!e)
         return null;
-    return depth >= extent ? 0 : (extent - depth) / 2;
+    if (depth >= e.extent)
+        return 0; // through, even if extent is only a bound
+    return e.exact ? (e.extent - depth) / 2 : null;
 }
 /** The hole with `depth` set AND its axial offset kept in step. The axial
  *  component of `center` is DERIVED from depth + target thickness (never typed,

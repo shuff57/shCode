@@ -8,7 +8,7 @@
 // `scale` is how much the dimension moves per unit the handle moves. A centred
 // box grows both ways at once, so its face only keeps up with the pointer if
 // the width changes by twice the drag.
-import { isShape, extentAlong, sketchBBoxCentre, sketchFrameOf } from './model-types.js';
+import { isShape, extentAlong, SWEEP_DIR, sketchBBoxCentre, sketchFrameOf } from './model-types.js';
 import { maxFilletRadius } from '@shuff57/reshape-sketch/sketch-arc';
 const AXES = [
     { n: 'x', v: [1, 0, 0] },
@@ -82,7 +82,6 @@ function planeNormal(plane) {
  * RECT 12mm on five plane/offset combinations and asserts the world bbox.
  * xz@0 comes out [[0,-12,0],[30,0,5]] -- the cap at y = -12, not +12.
  */
-const SWEEP_DIR = { xy: 1, xz: -1, yz: 1 };
 /**
  * Where a sketch sits and which way Pull carries it, from the ONE resolver
  * (sketchFrameOf) -- so a sketch with a `frame` (sketch-on-a-face, or on a
