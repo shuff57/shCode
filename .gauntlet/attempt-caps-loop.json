@@ -1,0 +1,31 @@
+{
+  "spec": ".gauntlet/SPEC-attempt-caps.md",
+  "started": "2026-10-03",
+  "caps": { "roundsPerPhase": 4, "cleanRoundsToExit": 2, "parallelJudges": 3 },
+  "decisions": {
+    "score": "best try counts (matches WrittenGrader today)",
+    "scope": "Chapters 1-3 now, every PA this semester via check-pa-attempts.mjs",
+    "ai": "charts and demos; coding parts stay deterministic",
+    "assumptions_pending_confirm": [
+      "Part 5 write-the-steps stays AI-graded",
+      "quiz shows total only until try 3",
+      "attempts spent before go-live are free"
+    ]
+  },
+  "findings": [
+    "spec said 21 PA lessons; there are 24 (found by unit title, 1-6 is named ch1-pa-*)",
+    "solution/pseudocode.md collides with solution.js on 2-7-3 and the group builds; moved to top-level pa-pseudocode/<id>.md"
+  ],
+  "phases": {
+    "0": {
+      "status": "done",
+      "rounds": [
+        {
+          "round": 1,
+          "gate": "scripts/check-pa-attempts.mjs fails: 24 of 24 PA lessons, 52 gaps. 2-7-2 and 2-7-5 already cap at 3 and lack only pseudocode; chart parts (1-6-1, 1-7-4, 2-6-1, 2-7-4, 3-9-1, 3-10-4) lack an aiGrader",
+          "note": "not yet in npm test: it would fail the suite until phase 4"
+        }
+      ]
+    }
+  }
+}
