@@ -257,7 +257,11 @@ function oracleFixtures() {
     ),
     'hole-blind': doc(
       { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
-      { id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 10, center: [0, 0, 0], axis: 'z' },
+      // A blind hole must START AT THE DRILLED FACE: the kernel centres a hole's tool on the
+      // part's centre plus this offset, so top face (z=10) minus half the depth (5) is z=5.
+      // [0,0,0] built a sealed internal cavity (right volume, no opening) and this fixture
+      // passed on it because the referee built the same cavity.
+      { id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 10, center: [0, 0, 5], axis: 'z' },
     ),
     'hole-corners': doc(
       { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
@@ -945,6 +949,14 @@ if (!occtDir || !existsSync(path.join(occtDir, 'replicad_single.js'))) {
       const result = script.runScript(code);
       if (result.errors.length) {
         check(label, false, 'runScript() threw: ' + result.errors[0].message);
+        return;
+      }
+      // The OCCT referee builds polygon sketches only; a sketch made of geom()/rules() rows
+      // (lines, circles, arcs with constraints) has no shape in occt-build. Those pages are
+      // measured on brep-rs by reshape-cad's own packages/kernel/test/docs-examples.test.mjs
+      // (closed-form volumes and pinned face counts). Say so out loud: a skip, never a pass.
+      if (result.doc.features.some((f) => f.kind === 'sketch' && Array.isArray(f.geoms) && f.geoms.length > 0)) {
+        console.log(`  SKIP  ${label} (the OCCT referee cannot build geom()/rules() sketches; measured on brep-rs by reshape-cad's docs-examples test)`);
         return;
       }
       let m;
