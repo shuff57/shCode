@@ -51,6 +51,10 @@ a `switch` to classify the outcome.
 - **Five shapes only:** oval, rectangle, diamond, parallelogram, hexagon.
 - **Loop setup uses the hexagon** — your chart must include a `for` or `while` loop.
 - **At least one decision diamond** — the comparison against the limit.
+- **A `switch` is drawn as chained diamonds.** A flowchart has no switch shape, so draw one
+  diamond per case, each with both exits labeled: the first asks about one outcome, and its
+  "no" exit leads to the next diamond, which asks about the next. Three outcomes need two
+  diamonds.
 - **At least two task rectangles** (the hexagon does not count).
 - **Both exits of every diamond labeled** (yes/no, true/false, etc.).
 - **No `[[ ]]` double-rail, no connectors, no comments** — not released yet.

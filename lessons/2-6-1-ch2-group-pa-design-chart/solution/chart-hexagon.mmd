@@ -1,20 +1,35 @@
 flowchart TD
   A([Start])
   B[/Input n and bankName/]
-  C{{i = 1 to n}}
-  D{i <= n?}
-  E{Is i a multiple of 3?}
-  F[Flip locker i]
-  G[Set final state of locker 7]
-  H[/Print state and open count/]
+  C{Is n less than 1?}
+  D[/Report a bad n/]
+  E{{i = 1 to n}}
+  F{Is i a multiple of 3?}
+  G[Flip locker i]
+  H[Look up the state of locker 7]
+  I{Is locker 7 open?}
+  J[Set the verdict to open]
+  K{Is locker 7 closed?}
+  L[Set the verdict to closed]
+  M[Set the verdict to never touched]
+  N[/Print the verdict and the open count/]
   Z([End])
   A --> B
   B --> C
-  C --> D
-  D -- Yes, enter the row --> E
-  D -- No, row is done --> G
-  E -- Multiple of 3, skip --> C
-  E -- Not a multiple --> F
-  F --> C
-  G --> H
-  H --> Z
+  C -- "Yes, bad n" --> D
+  C -- "No, n is fine" --> E
+  D --> Z
+  E -- "Next locker" --> F
+  F -- "Multiple of 3, skip" --> E
+  F -- "Not a multiple" --> G
+  G --> E
+  E -- "Row is done" --> H
+  H --> I
+  I -- "Open" --> J
+  I -- "Not open" --> K
+  K -- "Closed" --> L
+  K -- "Never touched" --> M
+  J --> N
+  L --> N
+  M --> N
+  N --> Z
