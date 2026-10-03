@@ -64,7 +64,7 @@ import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-run
 // clicking one never draws geometry underneath it.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { angleInArcRange, arcEnds, arcFromClicks, autoDimension, dimensionValueError, distToCircleStroke, distToSegment, findSnap as findSnapCore, inferLineConstraint, isDimensionRule, migratedRules, namedPointsOf, nextGeomId, filletPick, maxFilletRadiusAt, whyCannotFilletAt, filletCornerAt, applyEqualRadiusRule, offsetChainPick, offsetChain, pointWorld, readSolved, renumber, ruleGlyphAnchors, sampleArc, snapAxis, slotRows, arcAngles, toggleConstruction, trimLine, trimPick, splitWeldedCircles, mirrorSelection, copySelection, densifyIds, } from './sketch-canvas-core.js';
+import { angleInArcRange, arcEnds, arcFromClicks, autoDimension, dimensionValueError, distToCircleStroke, distToSegment, findSnap as findSnapCore, inferLineConstraint, isDimensionRule, migratedRules, namedPointsOf, nextGeomId, filletPick, maxFilletRadiusAt, whyCannotFilletAt, filletCornerAt, applyEqualRadiusRule, offsetChainPick, offsetChain, pointWorld, readSolved, solveRows, renumber, ruleGlyphAnchors, sampleArc, snapAxis, slotRows, arcAngles, toggleConstruction, trimLine, trimPick, splitWeldedCircles, mirrorSelection, copySelection, densifyIds, } from './sketch-canvas-core.js';
 import { pointSlots } from '@shuff57/reshape-kernel/sketch-session';
 import { applyWheelZoom, fitView, panByPx, screenPxToWorld, worldToScreen, } from '../sketch-view.js';
 import { marqueeKind, marqueeSelect } from '../marquee-select.js';
@@ -259,6 +259,25 @@ export default function SketchCanvas2D({ sketch, doc, onChange, onExit }) {
     // slots, a whole-entity drag queues one per named point of the row and the
     // solve applies them in order, each warm-starting from the last.
     const pendingDrag = useRef(null);
+    const scratchRef = useRef(null);
+    const scratchReady = useRef(false);
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            const { SketchSession2D } = await import('@shuff57/reshape-kernel/sketch-session');
+            const s = new SketchSession2D();
+            await s.load();
+            if (cancelled)
+                return;
+            scratchRef.current = s;
+            scratchReady.current = true;
+        })().catch(() => {
+            // no wasm: edits are stored as drawn, exactly as before
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
     const writeDoc = useCallback((rawGeoms, rawRules) => {
         // Circle-in-mixed-wire canonicalization (kernel §5.3.10's own advice,
         // applied mechanically): a circle welded to lines by 2 tangencies
@@ -266,8 +285,15 @@ export default function SketchCanvas2D({ sketch, doc, onChange, onExit }) {
         // walks it like any other curve. Sketches without such a circle pass
         // through untouched.
         const split = splitWeldedCircles(rawGeoms, rawRules);
-        const nextGeoms = split.geoms;
         const nextRules = split.rules;
+        // Store the SOLVED rows (model-types.ts's contract for `geoms`): a typed
+        // dimension must move the stored coordinates, not only the built solid.
+        // A scratch session, so the live one (mid-drag warm start) is not
+        // reopened; if its wasm has not loaded yet the rows go in as drawn.
+        const scratch = scratchRef.current;
+        const nextGeoms = (scratch && scratchReady.current
+            ? solveRows(scratch, split.geoms, nextRules)
+            : split.geoms);
         onChange({
             ...doc,
             features: doc.features.map((f) => f.id === sketch.id ? { ...f, geoms: nextGeoms, geom: nextGeoms, rules: nextRules } : f),

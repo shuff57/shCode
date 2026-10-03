@@ -403,6 +403,30 @@ export function readSolved(geoms, params) {
         return g;
     });
 }
+/** The rows the doc should STORE: the rule-satisfying (solved) state.
+ *
+ *  model-types.ts says a sketch's `geoms` are the SOLVED coordinates, but a
+ *  canvas edit writes the rows it drew plus the new rule, and the kernel only
+ *  re-solves at build time. Left alone, a typed dimension changed the built
+ *  solid while the doc's own rows (all a `model` requirement can read, see
+ *  model-check.ts) still described the old size. Solving here, inside the same
+ *  write, keeps one onChange = one undo entry.
+ *
+ *  Falls back to the rows as given when the session refuses or cannot solve
+ *  (the canvas already shows that in its status line), and keeps a row's
+ *  original numbers when the solve moved nothing, so a plain edit never drifts
+ *  the stored coordinates by float noise. */
+export function solveRows(session, geoms, rules) {
+    if (!geoms.length)
+        return geoms;
+    if (session.open(geoms, rules))
+        return geoms;
+    if (!session.solve())
+        return geoms;
+    const solved = readSolved(geoms, session.params);
+    const same = (a, b) => JSON.stringify(a, (_, v) => (typeof v === 'number' ? Math.round(v * 1e9) : v)) === JSON.stringify(b, (_, v) => (typeof v === 'number' ? Math.round(v * 1e9) : v));
+    return solved.map((g, i) => (same(g, geoms[i]) ? geoms[i] : g));
+}
 // --- legacy points -> soup migration ----------------------------------------
 /** The soup rules a migrated points outline owes the kernel: one coincident
  *  per corner (line i's end meets line i+1's start, wrap included) plus each

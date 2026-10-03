@@ -108,6 +108,27 @@ export declare function renumber(geoms: CoreGeom[], rules: Record<string, any>[]
  *  kernel's slot layout (built-ins 10, then point 2 / line 4 / circle 3 /
  *  arc 7 per row in id order). Rows carry their construction flag through. */
 export declare function readSolved(geoms: CoreGeom[], params: Float64Array | number[]): CoreGeom[];
+/** The slice of SketchSession2D `solveRows` needs (kept structural so this
+ *  file stays free of the wasm import). */
+export interface SoupSolver {
+    open(geoms: any[], rules: any[]): string | null;
+    solve(): boolean;
+    params: Float64Array | number[];
+}
+/** The rows the doc should STORE: the rule-satisfying (solved) state.
+ *
+ *  model-types.ts says a sketch's `geoms` are the SOLVED coordinates, but a
+ *  canvas edit writes the rows it drew plus the new rule, and the kernel only
+ *  re-solves at build time. Left alone, a typed dimension changed the built
+ *  solid while the doc's own rows (all a `model` requirement can read, see
+ *  model-check.ts) still described the old size. Solving here, inside the same
+ *  write, keeps one onChange = one undo entry.
+ *
+ *  Falls back to the rows as given when the session refuses or cannot solve
+ *  (the canvas already shows that in its status line), and keeps a row's
+ *  original numbers when the solve moved nothing, so a plain edit never drifts
+ *  the stored coordinates by float noise. */
+export declare function solveRows<G extends CoreGeom>(session: SoupSolver, geoms: G[], rules: unknown[]): G[];
 /** A soup geometry row minus its id, distributively over the union so each
  *  kind keeps its own fields (a plain Omit<SoupGeom,'id'> does not). */
 import type { SketchConstraint, SoupGeom, SoupRule } from '@shuff57/reshape-script/model-types';

@@ -78,7 +78,7 @@
       ]
     },
     "4": {
-      "status": "round 1 fixed, round 2 walk pending",
+      "status": "done: round 3 walk of 8.1.2/8.1.5/8.1.11 zero text mismatches",
       "rounds": [
         {
           "round": 1,
@@ -93,11 +93,8 @@
       ]
     },
     "3": {
-      "status": "blocked: upstream reshape-cad fix, not applied",
-      "root_cause": "SketchCanvas2D.writeDoc stores unsolved geoms + the new rule; grader (model-check.ts:83-92) reads sketch `points`; kernel re-solves at build. Dim chip typed 60 -> solid 61.5 wide, Quest still green.",
-      "repro": "8.1.10: Sketch > Dim > click top edge > click empty space > type 60 Enter > Done > Pull > 10. Quest green.",
-      "proposed_fix": "(1) SketchCanvas2D: write solved geoms back to the doc after solve (doc contract in model-types.ts says geoms are SOLVED state), (2) model-check: read geoms soup bbox when present. Needs an undo-entry decision. See agent report; not applied because it changes studio undo behaviour in another repo.",
-      "impact": "low: a student must deliberately retype the sketch size to pass with a wrong one; step text says leave it."
+      "status": "done: fixed upstream reshape-cad 7664acb, re-vendored; browser-verified (typed 60 red, 40 green, drag/circle/undo no glitch)",
+      "note": "undo seems to take one press per selection change and Ctrl+Z can leave the sketch editor; not shown to predate or follow this change"
     },
     "5": {
       "status": "done",
@@ -106,5 +103,11 @@
         "pass_rule_text": "9 pass/fail-rubric lessons now say 'aim to cover every criterion; completes once the grader finds at least half met'; 5.2.14 keeps 'every criterion' (1-point rubric, 70% = all 3)"
       }
     }
-  }
+  },
+  "open": [
+    "edge-cache purge of /ai-graders.json (user)",
+    "delete old deployments (awaiting confirm)",
+    "rotate six chapter-test rubrics (user decision)",
+    "test-reshape-script 2 docs pages: docs ahead of vendored kernel; clears on next re-vendor of reshape-cad HEAD"
+  ]
 }
