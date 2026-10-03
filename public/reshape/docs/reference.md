@@ -132,13 +132,13 @@ A small box at the origin and a larger box placed clear of it.
 
 A **hole** is a pocket or a through-hole drilled into a shape. Specify how wide across and (optionally) how deep.
 
-`hole(b, { across: 6 })` drills a hole 6 mm across, all the way through. The hole's depth is calculated to go through the whole shape—an extent of 2 mm beyond each side ensures it reaches the far surface.
+`hole(b, { across: 6 })` drills a hole 6 mm across, all the way through. A through-hole needs to know how thick the part is. It does for boxes, cylinders, cones, prisms, spheres, tori and wedges you have not turned. For a shape pulled from a sketch, a union, or a turned box, the script stops with "cannot find how thick" and asks you for a depth: on a 30 × 20 × 20 pulled shape, `hole(t, { across: 6, deep: 20 })` drills right through and leaves 12000 − 180π = 11434.51 mm³.
 
-`hole(b, { across: 6, deep: 10 })` drills a pocket 6 mm across and exactly 10 mm deep. The depth is measured from the face you pick, or the first face it encounters if you don't specify one.
+`hole(b, { across: 6, deep: 10 })` drills a pocket 6 mm across and exactly 10 mm deep. The depth is measured from the face the hole is drilled into: a blind `deep:` hole starts at that face, so the pocket is open there and never a sealed cavity inside the part.
 
 **`at` places the hole on the face.** `hole(b, { across: 6, at: [10, 0] })` drills the hole 10 mm to the right of the shape's centre on the first face. The coordinates are local to that face: x and y only, no z.
 
-**`along` drills perpendicular to a different face.** `hole(b, { across: 6, along: 'x' })` drills from the right or left face (perpendicular to the x-axis) rather than from the top. The hole still goes across 6 mm and through (depth extends beyond the shape by 2 mm).
+**`along` drills perpendicular to a different face.** `hole(b, { across: 6, along: 'x' })` drills from the right or left face (perpendicular to the x-axis) rather than from the top. The hole still goes across 6 mm and through.
 
 **`holes` drills multiple holes at once in a rectangular pattern.** `holes(b, { across: 6, apart: [15, 10] })` drills four holes—spacing 15 mm apart left-right and 10 mm apart front-back. The pattern is centred on the shape.
 
@@ -155,6 +155,15 @@ hole(b, { across: 6, deep: 10 })
 ```
 
 A 40 × 40 × 20 box with a 6 mm pocket 10 mm deep on the top face.
+
+**`size` names a bolt instead of a width.** `hole(b, { size: 'M6' })` looks up the clearance hole that bolt passes through, in millimetres (the ISO medium fit): M3 3.4, M4 4.5, M5 5.5, M6 6.6, M8 9, M10 11, M12 13.5. The name is not case-sensitive, so `'m6'` works. `size` is another way to say `across`: give one or the other, never both. A size that is not in the list stops the script, with the valid names in the message. An M6 hole through a 40 × 40 × 20 block leaves 32000 − 217.8π = 31315.76 mm³.
+
+```js hole-size
+const b = cuboid(40, 40, 20)
+hole(b, { size: 'M6' })
+```
+
+A 40 × 40 × 20 box with an M6 clearance hole (6.6 mm across) through it.
 
 ```js hole-offset
 const b = cuboid(40, 40, 20)
@@ -536,30 +545,63 @@ const shape = loft(sk1, sk2, 30)
 
 A cone-like shape blended from one circle to another.
 
-`pocket(sk, shape, depth)` is `extrude` in reverse: it pushes the sketch into a shape and takes that block away instead of adding one. Say the sketch first, then the shape it cuts, then how deep. A 10 × 10 pocket 5 mm deep leaves 40 × 40 × 20 − 10 × 10 × 5 = 31500 mm³. A second pocket can cut the result of the first: the 10 × 10 × 8 corner brings it to 31500 − 800 = 30700 mm³.
+`pocket(sk, shape, depth)` is `extrude` in reverse: it pushes the sketch into a shape and takes that block away instead of adding one. Say the sketch first, then the shape it cuts, then how deep. A 10 × 10 pocket 5 mm deep leaves 40 × 40 × 20 − 10 × 10 × 5 = 31500 mm³. The sketch has to sit on the face you cut from, because the cut runs from the sketch plane down into the shape. `sketch('top')` alone is the plane through the middle of a shape centred on the origin, so a pocket there would be a sealed cavity inside the part. The second argument of `sketch()` moves the plane: a 20 mm tall box centred on the origin has its top face at z = +10, so `sketch('top', 10)` puts the sketch on it. The pocket has 11 faces (the 6 of the box, 4 pocket walls and a floor). One pocket per shape: a second pocket cut into a shape that already has one stops the script today, with "not fully enclosed".
 
 ```js sketch-pocket
 const b = cuboid(40, 40, 20)
-const s1 = sketch('top')
-s1.rect(10, 10, { at: [-10, -10] })
-const p = pocket(s1, b, 5)
-const s2 = sketch('top')
-s2.rect(10, 10, { at: [10, 10] })
-pocket(s2, p, 8)
+const sk = sketch('top', 10)
+sk.rect(10, 10)
+pocket(sk, b, 5)
 ```
 
-Two rectangular pockets cut into a block, one 5 mm deep and one 8 mm deep.
+A rectangular pocket 5 mm deep, open on the top face of a block.
 
-`groove(sk, shape, angle)` is `revolve` in reverse: it spins the sketch around the middle line of its plane and takes the ring it sweeps out of the shape. Say the sketch, the shape, then the turn in degrees. The ring has to sit fully inside the shape. A 3 × 8 profile with its middle 4.5 mm from the axis spans radius 3 to 6, so a full turn removes π × (6² − 3²) × 8 = 216π mm³ from the 32000 mm³ block, leaving 31321.42 mm³.
+`groove(sk, shape, angle)` is `revolve` in reverse: it spins the sketch around the vertical middle line of its plane (the world y axis, for a `'front'` sketch) and takes the solid it sweeps out away from the shape. Say the sketch, the shape, then the turn in degrees. The profile has to reach the part's surface, or the cut stays sealed inside the part instead of opening onto a face. The kernel builds a groove whose profile touches the axis (a solid disc, not a ring) and runs past a face, with a full 360 degree turn; a ring-shaped groove, and a partial turn other than a half turn, are not supported yet. Here the 6 × 8 profile spans radius 0 to 6 from the axis and height 14 to 22, and the 40 × 40 × 20 block ends at y = +20, so the profile pokes 2 mm out of that face. A full turn removes a cylinder of radius 6 and length 6: π × 6² × 6 = 216π mm³ from the 32000 mm³ block, leaving 31321.42 mm³. The result is a round blind hole in the face, with 8 faces and 16 edges.
 
 ```js sketch-groove
 const b = cuboid(40, 40, 20)
 const sk = sketch('front', 0)
-sk.rect(3, 8, { at: [4.5, 0] })
+sk.rect(6, 8, { at: [3, 18] })
 groove(sk, b, 360)
 ```
 
-A ring-shaped groove cut into a block by spinning a small rectangle.
+A disc groove cut through the top face of a block by spinning a small rectangle.
+
+`sk.slot([x1, y1], [x2, y2], r)` draws a rounded slot: the two points are the centres of the two end caps and `r` is the cap radius, so the slot is 2r wide. Centres 40 apart with radius 5 give a 40 × 10 rectangle plus two half-discs, and extruded 10 mm it is 4000 + 250π = 4785.40 mm³.
+
+`sketch({ origin: [x, y, z], u: [...], v: [...] })` draws on a plane you describe instead of a named one. `origin` is where the sketch's (0, 0) sits; `u` is the direction its x runs and `v` the direction its y runs. `u` and `v` must each be exactly unit length and at right angles to each other, or the script stops with a sentence saying which is wrong. The sketch faces u × v, and `extrude` pushes along that direction. Swapping `u` and `v` turns the part the other way. This part is 30 × 20 × 10 = 6000 mm³, spanning x from −10 to 20, y from −4 to 16 and z from 7 to 17.
+
+```js sketch-frame
+const sk = sketch({ origin: [5, 6, 7], u: [1, 0, 0], v: [0, 1, 0] })
+sk.rect(30, 20)
+const shape = extrude(sk, 10)
+```
+
+A 30 × 20 block extruded 10 mm from a plane placed at [5, 6, 7].
+
+`sk.geom([...])` draws a sketch from rows instead of one call per shape. Each row says what it is with `k`: `'point'` (`p: [x, y]`), `'line'` (`a` and `b`, its two ends), `'circle'` (`c` for the centre, `r` for the radius) or `'arc'` (`c`, `r`, `a`, `b` and `sense`). Every row has an `id`, a positive whole number. A row marked `construction: true` is scaffolding for rules and is left out of the outline. `sk.rules([...])` ties rows together, for example `{ k: 'coincident', a: 1, aEnd: 'b', b: 2, bEnd: 'a' }` welds the end of line 1 to the start of line 2. Here four lines make a 40 × 25 rectangle with a circle of radius 5 cut out of it: 10000 − 250π = 9214.60 mm³.
+
+```js sketch-geom
+const sk = sketch('top')
+sk.geom([
+  { k: 'line', id: 1, a: [0, 0], b: [40, 0] },
+  { k: 'line', id: 2, a: [40, 0], b: [40, 25] },
+  { k: 'line', id: 3, a: [40, 25], b: [0, 25] },
+  { k: 'line', id: 4, a: [0, 25], b: [0, 0] },
+  { k: 'circle', id: 5, c: [20, 12.5], r: 5 }
+])
+sk.rules([
+  { k: 'coincident', a: 1, aEnd: 'b', b: 2, bEnd: 'a' },
+  { k: 'coincident', a: 2, aEnd: 'b', b: 3, bEnd: 'a' },
+  { k: 'coincident', a: 3, aEnd: 'b', b: 4, bEnd: 'a' },
+  { k: 'coincident', a: 4, aEnd: 'b', b: 1, bEnd: 'a' }
+])
+const shape = extrude(sk, 10)
+```
+
+A rectangle drawn from rows, with a circular hole.
+
+An arc row is `{ k: 'arc', id, c, r, a, b, sense }`: a centre, a radius, two ends on the circle and a sense, `'cw'` or `'ccw'`. The order of the ends sets the direction of travel around the outline, and the sense alone does not. A `'cw'` arc must start at its lower point and end at its upper one to round the outer side of a slot's end; the fix for a wrong curve is to reverse the ends, not the sense.
 
 ```js sketch-complex
 const sk = sketch('front')
