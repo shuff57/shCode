@@ -636,10 +636,10 @@ module.exports = async function run(load) {
     !libSrc.includes('no way to round a corner'));
 
   const overlaySrc = fs.readFileSync(path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx'), 'utf8');
-  check('#14 the sketch tool group is searchable by "Circle" -- sketchVisible includes it',
-    /sketchVisible\s*=\s*\[[^\]]*'Circle'[^\]]*\]/.test(overlaySrc),
-    'a stale sketchVisible list would hide the whole sketch group, including the button being searched for, ' +
-    'the moment a student typed "circle" into Search tools');
+  check('#14 the sketch tool group is searchable by its own button name -- sketchVisible matches "Sketch"',
+    /sketchVisible\s*=\s*matches\('Sketch'\)/.test(overlaySrc),
+    'the group is one button, "Sketch" (the circle/line tools live inside sketch mode); a sketchVisible ' +
+    'that stops matching that name would hide the button the moment a student typed "sketch" into Search tools');
 
   console.log('\n=== sketch build 1: addCorner on a ROUNDED edge keeps the outline ===');
 
