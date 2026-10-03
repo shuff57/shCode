@@ -211,5 +211,21 @@
     "set TRIES_APPLIED in lib/attempt-cap.ts to the deploy instant (it is the instant the mechanism was written; test-attempt-reveal asserts it is a fixed literal)",
     "apply migration 0032 to prod BEFORE the deploy (npm run d1:migrate) - the deploy preflight refuses with it pending",
     "populate pa-pseudocode/ on the deploy machine (git-ignored); deploy runs check-pa-attempts --require-pseudocode"
-  ]
+  ],
+  "reference_pass": {
+    "status": "running",
+    "findings_before_fix": [
+      "3.10.5 page asks for 'a const for the limit' but no problem has a limit; reference declares canMl and never uses it; grader prompt says 'one-attempt item' (stale)",
+      "3.10.3 reference comments wrong: Bug2 'throws' (really undefined, TypeError at .name); Bug3 'every line prints undefined' (one undefined); Bug4 '$0.2' (prints 0.19999999999999996); same wording may be in aiGrader prompt/rubric",
+      "3.9.1 reference chart draws lowStock inside the per-item loop (contract: one double-rail after the loop), no makeItem/loadStock double-rails",
+      "3.10.4 reference chart has two outcomes where the problem names three; loop body never accumulates",
+      "2.6.1 reference chart has no classification step for locker 7, no n<1 guard, redundant diamond after the hexagon",
+      "2.7.4 reference chart merges 'met' and 'not reached' into one print; page says use a switch AND five shapes only",
+      "2.6.2 Locker Sweep solution.js marks odd open/even closed and counts odd numbers: wrong, every visited locker ends open",
+      "2.7.5 Seat Map reference never resets the run after a blocked seat, no break, if-chain instead of switch",
+      "1.6 problems Split the Check / Grade Forecast / Fuel Stop do not state the limit direction",
+      "2.7.3 Bug 4 (infinite loop) labelled runtime but the lesson defines runtime as 'stops with an error'",
+      "1.7.3 aiGrader prompt mentions 'Bug 1' headings the starter lacks"
+    ]
+  }
 }
