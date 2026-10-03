@@ -14,6 +14,11 @@
 //      lessons/<id>/solution/ on purpose: a lesson with both solution.js and a
 //      solution/ directory fails the build, and lib/lessons.ts ships anything it
 //      finds under lessons/. check-solution-leak must learn this folder in phase 3.
+//      The block must be the one the part's renderer READS, because a cap anywhere
+//      else is enforced by the server but invisible in the browser (no banner,
+//      page navigates away): quiz -> quiz, chart -> diagram, console -> grading or
+//      aiGrader, written -> aiGrader. A capped quiz must also be summative, or its
+//      key is never baked and nothing scores it server-side.
 //   3. A chart or demo part (design-chart, chart-it, demo) carries an aiGrader.
 //      The coding parts (build, find-and-fix) keep their deterministic checks.
 //
@@ -30,6 +35,10 @@ const WANT = 3;
 const listOnly = process.argv.includes('--list');
 
 const BLOCKS = ['quiz', 'aiGrader', 'diagram', 'grading'];
+
+// The block(s) each renderer reads maxSubmissions from, by lesson.preview.
+const READS = { quiz: ['quiz'], diagram: ['diagram'], console: ['grading', 'aiGrader'] };
+const readsFor = (lesson) => READS[lesson.preview] || ['aiGrader'];
 
 function capOf(lesson) {
   const found = [];
@@ -61,7 +70,14 @@ for (const id of fs.readdirSync(LESSONS).sort()) {
   const gaps = [];
   const caps = capOf(lesson);
   if (caps.length === 0) gaps.push('no maxSubmissions');
-  else if (!caps.some((c) => c.value === WANT)) gaps.push(`maxSubmissions is ${caps.map((c) => c.value).join('/')}, want ${WANT}`);
+  else {
+    if (!caps.some((c) => c.value === WANT)) gaps.push(`maxSubmissions is ${caps.map((c) => c.value).join('/')}, want ${WANT}`);
+    const reads = readsFor(lesson);
+    const stray = caps.filter((c) => !reads.includes(c.block));
+    if (stray.length) gaps.push(`maxSubmissions sits in ${stray.map((c) => c.block).join(', ')}, which the ${lesson.preview || 'written'} renderer does not read (it reads ${reads.join(' or ')})`);
+    if (!caps.some((c) => reads.includes(c.block))) gaps.push(`maxSubmissions is not in ${reads.join(' or ')}`);
+  }
+  if (lesson.quiz && 'maxSubmissions' in lesson.quiz && lesson.quiz.summative !== true) gaps.push('a capped quiz must set quiz.summative');
 
   const pseudo = path.join(PSEUDO, `${id}.md`);
   if (!fs.existsSync(pseudo)) gaps.push('no pa-pseudocode/<id>.md');

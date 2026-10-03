@@ -90,3 +90,16 @@ rounds cap it, as in `SPEC-open-items-loop.md`.
 - The three assumptions above.
 - Chapter 4 and later: which assessments exist yet? Only Chapters 1-3 have PA units
   today, so "forward" is carried by the standing check and not by lessons.
+
+## Decisions recorded after the phase 1 judge
+
+- **A teacher's unsubmit returns the tries.** `lesson-unsubmit` deletes the submission
+  rows, so the count resets and the earlier best score is not kept. Accepted: it is
+  teacher-only, and it is the way to give one student a clean slate.
+- **The count and the score are the server's.** A capped part's counted row is written
+  by the server (the quiz from its key, an AI part by `grade-written`, a deterministic
+  console part clamped). `lesson_state.score` on a capped part is derived from those
+  rows; the browser's number is ignored.
+- **Open for the owner:** the repository is public and the generated server modules
+  (`quiz-keys`, `ai-graders`, `pa-pseudocode`) are committed, as are `solution.js` files.
+  A student who finds the repo can read answers no matter what the app serves.

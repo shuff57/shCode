@@ -37,12 +37,15 @@ export function useAttemptCap(lessonId: string, max: number | null | undefined, 
   useEffect(() => {
     if (cap === null) return;
     let cancelled = false;
-    // Signed out there are no server rows to count and none to be had: an honest
-    // zero rather than an unknown.
-    if (!authed) {
-      setUsed(0);
-      return;
-    }
+    // The count is whatever the SERVER's submission rows say, or it is unknown.
+    // There is deliberately no "signed out, so zero" shortcut: `authed` is false
+    // both for a real 401 and while the lesson-state load is pending or has
+    // failed, so treating it as zero tries used enabled Submit (and showed a full
+    // "3 tries" banner) for a student who had spent every one. A 401 from the
+    // submissions route is unknown too -- the part is not sittable without an
+    // account, and the server refuses a fourth row regardless. `authed` stays a
+    // dependency only so the count is re-read once sign-in settles.
+    setUsed(null);
     fetchSubmissions(lessonId).then((r) => {
       if (!cancelled) setUsed(r.loaded ? countAttempts(r.records) : null);
     });

@@ -60,8 +60,46 @@
           },
           "judge": "not run in this round (spec: reviewer hunting an early path to the pseudocode is still to do)",
           "status": "gate green; needs one judge pass and a second clean round"
+        },
+        {
+          "round": 1,
+          "gate": "built and green (ad6ca919, b34ed94d); blind judge verdict: FAIL",
+          "findings": [
+            "1 CRITICAL quiz key readable early: forged gradingFailed:true + quiz picks is scored by the server but uncounted, GET returns the score -> unlimited free probes",
+            "2 CRITICAL no server cap on writes: POST lesson-submissions never refuses a 4th row, grade-written never checks the cap -> perfect try after the reveal; unlimited AI practice; races",
+            "3 HIGH lesson_state.score is client-sent and the capped MAX makes a forged score permanent",
+            "4 HIGH capped quiz without picks stores the client score/possible",
+            "5 HIGH non-quiz capped parts store client-relayed scores (LessonWorkspace totalScore, AI numbers through the browser)",
+            "6 MEDIUM use-attempt-cap fails OPEN while lesson-state is loading or failed",
+            "7 MEDIUM COUNT_SINCE move resets live 2.7.2/2.7.5 caps (user approved: fresh 3 for everyone; make explicit; phase 5 must set TRIES_APPLIED to deploy time)",
+            "8 MEDIUM repo is PUBLIC and pa-pseudocode + generated modules are committed (also quiz-keys, ai-graders, solution.js already are): USER DECISION, not acted on",
+            "9 LOW diagram.aiGrader.maxSubmissions read by generator but not by DiagramAssignmentView; capped non-summative quiz silently uncapped",
+            "10 LOW teacher unsubmit gives tries back: accepted, recorded in the spec",
+            "11 LOW quiz-reveal key response lacks no-store; check-solution-leak does not know pa-pseudocode/"
+          ],
+          "design": "ATTEMPT_KINDS baked next to ATTEMPT_CAPS: quiz (server scores from key), ai (grade-written writes the counted row itself, score from shapeResult; a client row is a no-op unless it is a gradingFailed marker, which is forced to NULL score), client (deterministic console part: counted row, score clamped, trust limit documented). Counted insert is ONE conditional INSERT...SELECT WHERE count < cap (atomic) -> 409 when spent. lesson_state score on a capped part is derived from the counted rows, body.score ignored.",
+          "fix": {
+            "1": "fixed: on a capped lesson a client gradingFailed is stored as a bare marker with NULL score and discarded picks; quiz rows are scored only from sanitised picks and always counted; a nested marker is refused 400",
+            "2": "fixed: POST lesson-submissions uses one conditional INSERT...SELECT WHERE count<cap (insertCounted) -> 409; grade-written refuses with 409 before the model once spent, records the counted row itself (recordGraded) and withholds the grade from a racer that loses the insert",
+            "3": "fixed: capped lesson_state score = best counted row (bestCountedScore), body.score ignored; uncapped scores must be finite 0..100000 else 400",
+            "4": "fixed: capped quiz hand-in without picks is 400, nothing stored",
+            "5": "fixed: contract below",
+            "6": "fixed: hook has no zero-by-default path; unknown until a submissions fetch succeeds (401 and failures are unknown); source assertion in the test",
+            "7": "fixed: constant comment says plainly it resets 2.7.2/2.7.5; phase5_todo; test asserts a fixed 13-digit literal",
+            "8": "NOT ACTED ON: user decision (public repo)",
+            "9": "fixed: generator rejects diagram.aiGrader.maxSubmissions and a capped non-summative quiz; check-pa-attempts requires the cap in the block the renderer reads (quiz->quiz, diagram->diagram, console->grading|aiGrader, written->aiGrader)",
+            "10": "accepted and recorded in the spec",
+            "11": "fixed: quiz-reveal responses are Cache-Control: no-store; check-solution-leak proves no pa-pseudocode text is in the starters bundle"
+          },
+          "contract_for_phase_2": "ATTEMPT_KINDS decides who writes the counted row. kind ai (any lesson with aiGrader or diagram.aiGrader): the ONLY counted row is the one grade-written writes with the grader totals; the browser POST to /api/lesson-submissions for the same try is acknowledged (200, recorded:\"server\") and NOT stored, except a gradingFailed marker (stored, NULL score, free). So an AI-graded console/chart part must call /api/grade-written for every graded try and must not rely on its own recordSubmission for the score or the count. kind client (no aiGrader, e.g. group builds): counted row from recordSubmission, score clamped to 0..possible else NULL. kind quiz: server scores. lesson_state score is always server-derived on a capped part.",
+          "status": "fixed, awaiting judge round 2",
+          "tests": "scripts/test-attempt-reveal.mjs: 7 mutations of the new guards all fail the test (atomic cap, forged marker, state score, grade-written guard, relay stored, grade-written record, hook open)",
+          "out_of_scope_seen": "check-ai-grader-leak and check-quiz-key-leak fail on the stale out/ build because the phase 2 agent made the group demo parts summative while out/ was built before; not caused by this round"
         }
       ]
     }
-  }
+  },
+  "phase5_todo": [
+    "set TRIES_APPLIED in lib/attempt-cap.ts to the deploy instant (it is the instant the mechanism was written; test-attempt-reveal asserts it is a fixed literal)"
+  ]
 }
