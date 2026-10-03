@@ -3,8 +3,8 @@
 // Four bugs are hiding in this file. Fix all four, and above each fix
 // write a comment naming what kind of bug it was. The three kinds are
 // spelled out in the instructions beside this editor -- do not copy
-// them from here, or the last checklist item reads green before you
-// have started.
+// them from here: writing them yourself is how you show you can
+// name the bug.
 //
 // Press Run after every single fix.
 //

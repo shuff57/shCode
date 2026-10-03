@@ -3,8 +3,8 @@
 **This is the debugging part of the test, and you are doing it alone.** One file,
 four bugs in it, **20 points**, about **11 minutes**.
 
-**This part is summative:** one sitting, no score shown. The checklist tells you which
-symptom is still there — never what to type. Your teacher marks it afterwards.
+**This part is summative:** one sitting, no score shown. Nothing in the browser turns
+green on this part, so run the program yourself to check each fix. Your teacher marks it afterwards.
 
 ---
 
@@ -67,5 +67,5 @@ Week 5
 
 - **Run it.** That output is the one to aim for.
 - Four fixes, four comments: **syntax**, **runtime**, **logic**, in the words above.
-- The checklist goes green only when the checker can see the fix in the code, so
-  naming the bug is part of the fix, not an afterthought.
+- Your teacher marks the fix in the code, so naming the bug is part of the fix, not an
+  afterthought.

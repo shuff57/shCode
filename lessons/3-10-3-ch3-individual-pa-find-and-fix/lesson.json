@@ -1,7 +1,7 @@
 {
   "id": "3-10-3-ch3-individual-pa-find-and-fix",
   "title": "3.10.3 Individual PA Part 3: Find and Fix",
-  "description": "Four broken programs. Identify each bug, name its type (syntax / runtime / logic), and fix it. One sitting; the checklist shows which symptom remains.",
+  "description": "Four broken programs. Identify each bug, name its type (syntax / runtime / logic), and fix it. One sitting; your teacher marks it afterwards.",
   "type": "assignment",
   "estimateMins": 11,
   "category": "Unit 1: JavaScript Fundamentals",

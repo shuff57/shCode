@@ -5,8 +5,8 @@ bugs in it, **20 points total**, about **11 minutes**. You run the program, read
 happens, find each bug, name its type (syntax / runtime / logic), and fix it.
 
 **This part is summative:** one sitting, no marking shown, no explanations shown, score
-not shown. The checklist tells you which symptom remains — never what to type. The
-teacher reviews your submission afterwards.
+not shown. Nothing in the browser turns green on this part, so run the program yourself
+to check each fix. The teacher reviews your submission afterwards.
 
 ---
 
@@ -21,7 +21,7 @@ through and tells you something untrue.
 
 ---
 
-### The four bugs, in the order the checklist looks for them
+### The four bugs, in the order your teacher looks for them
 
 1. **The program does not run at all.** The console names the line it gave up on.
 2. **The program stops part way through.** The report never gets as far as the last
@@ -31,7 +31,7 @@ through and tells you something untrue.
 4. **The backup changes the original.** The report says the original item was sold down,
    and nothing in the program meant to touch the original at all.
 
-The checklist names the symptom, never the repair. The diagnosis is yours — that is the
+The list above names the symptom, never the repair. The diagnosis is yours — that is the
 skill the part exists to assess.
 
 ---
@@ -41,5 +41,5 @@ skill the part exists to assess.
 - **Run it.** Every fix you make should be checked by running, and Part 3 is the one
   part of this paper where running is allowed.
 - Four fixes, four comments: **syntax**, **runtime**, **logic**, in the words above.
-- The checklist goes green only when the checker can see the fix in the code — naming
-  the bug is part of the fix, not an afterthought.
+- Your teacher marks the fix in the code — naming the bug is part of the fix, not an
+  afterthought.
