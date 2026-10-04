@@ -87,6 +87,7 @@ for (const id of readdirSync(lessonsDir)) {
       ...(g.model ? { model: g.model } : {}),
       ...(g.contextDocs ? { contextDocs: g.contextDocs } : {}),
       ...(g.strict ? { strict: true } : {}),
+      ...(lesson.diagram && Array.isArray(lesson.diagram.rules) ? { diagramRules: lesson.diagram.rules } : {}),
     };
   }
 }

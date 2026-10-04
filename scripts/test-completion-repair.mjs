@@ -88,5 +88,31 @@ check('WrittenGrader mounts the repair loop', /useRepairLoop\(/.test(src('compon
 check('the stream race-lost refusal carries capReached', /All tries on this part are already used\.', capReached: true/.test(src('functions/api/grade-written.ts')));
 check('streamGrade passes capReached through', /capReached: evt\.capReached/.test(src('lib/written-grader-store.ts')));
 
+// Round 7: one submission that cannot be drawn must not take the teacher page down.
+// SubmissionBoundary shows that submission's own text and leaves the siblings alone.
+{
+  const { default: SubmissionBoundary } = await import('../components/SubmissionBoundary.tsx');
+  const Bomb = () => { throw new Error('docToFlow exploded'); };
+  const origError = console.error; const origWarn = console.warn;
+  console.error = () => {}; console.warn = () => {}; // React logs the caught error; expected here
+  const host = document.createElement('div');
+  document.body.appendChild(host);
+  const root = createRoot(host);
+  await act(async () => {
+    root.render(
+      React.createElement('div', null,
+        React.createElement(SubmissionBoundary, { raw: 'the student\'s raw answer text' }, React.createElement(Bomb)),
+        React.createElement('p', { id: 'sibling' }, 'another card'),
+      ),
+    );
+  });
+  console.error = origError; console.warn = origWarn;
+  const html = host.innerHTML;
+  check('boundary: the failed card says it could not be displayed', /could not be displayed/.test(html));
+  check('boundary: ...and shows the submission\'s raw text instead', /the student&#39;s raw answer text|the student's raw answer text/.test(html));
+  check('boundary: ...while the sibling card still renders', /another card/.test(html));
+  await act(async () => { root.unmount(); });
+}
+
 if (failed) { console.error(`[test-completion-repair] ${failed} failure(s)`); process.exit(1); }
 console.log('[test-completion-repair] ok');

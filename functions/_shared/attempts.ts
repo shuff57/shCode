@@ -8,6 +8,10 @@
 
 import { countAttempts, COUNT_SINCE } from '../../lib/attempt-cap';
 import { criteriaScore } from '../../lib/grade-pass';
+import { sanitizeDiagramDoc } from '../../lib/diagram-artifact';
+import { checkDiagram } from '../../lib/diagram-check';
+import { describeDiagram } from '../../lib/diagram-mermaid';
+import type { DiagramDoc, DiagramRule } from '../../lib/diagram-types';
 import type { QuizKey } from './quiz-keys.generated';
 import { ATTEMPT_CAPS, ATTEMPT_KINDS } from './pa-pseudocode.generated';
 import { resolveDueForStudent, isLessonAvailableForStudent } from './dueDates';
@@ -100,7 +104,9 @@ export function findMarkerKey(value: unknown, depth = 0): boolean {
 export function stripOverrideKeys<T>(value: T, depth = 0): T {
   if (depth > 20 || value === null || typeof value !== 'object') return value;
   if (Array.isArray(value)) return value.map((v) => stripOverrideKeys(v, depth + 1)) as unknown as T;
-  const out: Record<string, unknown> = {};
+  // A null-prototype copy: assigning a '__proto__' key onto {} re-parents the copy instead of
+  // adding a key (round 7). Here it is an ordinary own property, which JSON.stringify then writes.
+  const out: Record<string, unknown> = Object.create(null);
   for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
     const folded = k.normalize('NFKC').toLowerCase().replace(/[^a-z]/g, '');
     if (folded.startsWith('teacher') || folded.startsWith('override') || folded === 'aiscore') continue;
@@ -309,76 +315,47 @@ export async function scoreOverride(db: AttemptDb, email: string, lessonId: stri
   return typeof o === 'number' && Number.isFinite(o) ? o : null;
 }
 
-/** The shapes a chart may use (lib/diagram-types.ts FlowShape; kept in step by test-attempt-reveal). */
-const FLOW_SHAPES = new Set(['terminal', 'process', 'decision', 'io', 'subroutine', 'preparation', 'connector', 'comment']);
-export interface ArtifactNode { id: string; shape: string; label: string; x: number; y: number }
-export interface ArtifactEdge { id: string; from: string; to: string; label?: string; fromSide?: string; toSide?: string }
-
 /** The most JSON a stored artifact may be (a 200-shape chart with its checks is a few KB). */
 export const MAX_ARTIFACT_CHARS = 60_000;
 
-/**
- * What a flowchart part may hand the grader besides its text: the drawn chart and the
- * browser-side structural checks, so the teacher can SEE what was graded (the counted row's
- * `response` is the Mermaid text the model read, and the browser's own copy of the chart is
- * dropped on an AI-graded capped part). It is DISPLAY ONLY: bounded, shape-checked, stored under
- * grade_json.artifact, never used for scoring and never put in the model's prompt. Anything that
- * does not fit is dropped (the grade is unaffected), never trusted.
- */
-export function cleanArtifact(raw: unknown): { doc: { version: 1; nodes: ArtifactNode[]; edges: ArtifactEdge[] }; checks: unknown[] } | undefined {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
-  const a = raw as { doc?: unknown; checks?: unknown };
-  const doc = a.doc as { nodes?: unknown; edges?: unknown } | undefined;
-  if (!doc || typeof doc !== 'object' || !Array.isArray(doc.nodes) || !Array.isArray(doc.edges)) return undefined;
-  if (doc.nodes.length > 200 || doc.edges.length > 400) return undefined;
-  const str = (v: unknown, n: number) => (typeof v === 'string' ? v.slice(0, n) : '');
-  const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+export interface Artifact {
+  doc: DiagramDoc;
+  checks: Array<{ id: string; title: string; passed: boolean; detail: string; offenders: string[] }>;
+}
 
-  // The REAL DiagramDoc shape (lib/diagram-types.ts): a node is {id, shape, label, x, y} and an
-  // arrow is {id, from, to, label?, fromSide?, toSide?}. Rebuilt from the known keys only, so
-  // nothing else a browser sends is stored. (Round 6: this once checked {source, target}, which
-  // no chart has, so every chart with an arrow was dropped and the teacher never saw it.)
-  const nodes: ArtifactNode[] = [];
-  const ids = new Set<string>();
-  for (const n of doc.nodes) {
-    if (!n || typeof n !== 'object') return undefined;
-    const k = n as { id?: unknown; shape?: unknown; label?: unknown; x?: unknown; y?: unknown };
-    if (typeof k.id !== 'string' || k.id.length === 0 || k.id.length > 80) return undefined;
-    if (typeof k.shape !== 'string' || !FLOW_SHAPES.has(k.shape)) return undefined;
-    if (ids.has(k.id)) return undefined;
-    ids.add(k.id);
-    nodes.push({ id: k.id, shape: k.shape, label: str(k.label, 300), x: num(k.x), y: num(k.y) });
-  }
-  const sides = new Set(['t', 'r', 'b', 'l']);
-  const edges: ArtifactEdge[] = [];
-  for (const e of doc.edges) {
-    if (!e || typeof e !== 'object') return undefined;
-    const k = e as { id?: unknown; from?: unknown; to?: unknown; label?: unknown; fromSide?: unknown; toSide?: unknown };
-    if (typeof k.id !== 'string' || k.id.length === 0 || k.id.length > 80) return undefined;
-    if (typeof k.from !== 'string' || typeof k.to !== 'string' || !ids.has(k.from) || !ids.has(k.to)) return undefined;
-    const edge: ArtifactEdge = { id: k.id, from: k.from, to: k.to };
-    if (typeof k.label === 'string' && k.label) edge.label = k.label.slice(0, 100);
-    if (typeof k.fromSide === 'string' && sides.has(k.fromSide)) edge.fromSide = k.fromSide;
-    if (typeof k.toSide === 'string' && sides.has(k.toSide)) edge.toSide = k.toSide;
-    edges.push(edge);
-  }
-  const checks: unknown[] = [];
-  if (Array.isArray(a.checks)) {
-    if (a.checks.length > 40) return undefined;
-    for (const c of a.checks) {
-      if (!c || typeof c !== 'object') return undefined;
-      const k = c as { id?: unknown; title?: unknown; passed?: unknown; detail?: unknown; offenders?: unknown };
-      if (typeof k.passed !== 'boolean') return undefined;
-      checks.push({
-        id: str(k.id, 40),
-        title: str(k.title, 200),
-        passed: k.passed,
-        detail: str(k.detail, 500),
-        offenders: Array.isArray(k.offenders) ? k.offenders.filter((o): o is string => typeof o === 'string').slice(0, 50).map((o) => o.slice(0, 80)) : [],
-      });
-    }
-  }
-  const out = { doc: { version: 1 as const, nodes, edges }, checks };
+/**
+ * What a flowchart part may hand the grader besides its text: the drawn chart, so the teacher can
+ * SEE what was graded (the counted row's `response` is the Mermaid text the model read, and the
+ * browser's own copy of the chart is dropped on an AI-graded capped part). It is DISPLAY ONLY:
+ * bounded, rebuilt from the known keys (lib/diagram-artifact.ts, the validator every reader of a
+ * stored chart uses too), stored under grade_json.artifact, never used for scoring and never put
+ * in the model's prompt.
+ *
+ * Two rules tie it to what the model actually graded (round 7; before it the student controlled
+ * both halves independently, so the AI scored text X while the teacher's card showed a clean
+ * chart Y):
+ *   1. the artifact is KEPT only when describeDiagram(its rebuilt doc) equals `response` exactly.
+ *      A chart that lost a shape or arrow to the validator, or whose labels were cut at the
+ *      length cap, no longer describes the graded text and falls back to the text alone;
+ *   2. the structural `checks` are RECOMPUTED here from that doc and the lesson's own rules (the
+ *      browser's copy is never read, so "all checks passed" cannot be invented).
+ * Anything that does not fit is dropped (the grade is unaffected), never trusted.
+ */
+export function cleanArtifact(raw: unknown, response: string, rules: DiagramRule[]): Artifact | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
+  const doc = sanitizeDiagramDoc((raw as { doc?: unknown }).doc);
+  if (!doc) return undefined;
+  if (typeof response !== 'string' || describeDiagram(doc) !== response) return undefined;
+
+  const str = (v: unknown, n: number) => (typeof v === 'string' ? v.slice(0, n) : '');
+  const checks = checkDiagram(doc, rules).map((c) => ({
+    id: str(c.id, 40),
+    title: str(c.title, 200),
+    passed: c.passed === true,
+    detail: str(c.detail, 500),
+    offenders: Array.isArray(c.offenders) ? c.offenders.filter((o): o is string => typeof o === 'string').slice(0, 50).map((o) => o.slice(0, 80)) : [],
+  }));
+  const out: Artifact = { doc, checks };
   // A key anywhere that looks like the grading-failure marker is never honest, and the count
   // rule must not be able to see one inside a row the server wrote either. (Checked on the
   // INPUT too: rebuilding from known keys already drops a stray key, but a lookalike in the

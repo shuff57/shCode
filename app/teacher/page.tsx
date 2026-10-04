@@ -716,6 +716,14 @@ function StudentDrawer({
                       if (gradeData && !gradeData.structural && Array.isArray(kept) && kept.length > 0) {
                         gradeData = { ...gradeData, structural: kept };
                       }
+                      // The check list is whatever the student's browser sent on some routes; the
+                      // list below reads `.passed` off every entry, so keep only real objects.
+                      if (gradeData && Array.isArray(gradeData.structural)) {
+                        gradeData = {
+                          ...gradeData,
+                          structural: gradeData.structural.filter((c): c is StructuralCheck => !!c && typeof c === 'object'),
+                        };
+                      }
                     } catch {
                       // malformed grade_json — skip
                     }

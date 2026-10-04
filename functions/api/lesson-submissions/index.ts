@@ -198,8 +198,18 @@ async function recordCapped(
     stored = row(clean, marks.correct, marks.total);
   } else {
     const ok = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 10000;
-    const score = ok(body.score) && ok(body.possible) && body.score <= body.possible ? body.score : null;
-    stored = row(body.gradeJson, score, score === null ? null : (body.possible as number));
+    // A deterministic part's score is the browser's report, so it is accepted only as an honest
+    // pointed pair: 0 <= score <= possible AND possible > 0. A pair with possible <= 0 used to
+    // store as 0/0, and rowScore then read a `criteria` array the browser wrote as the score
+    // (10,000 'met' entries made a best of 10,000, round 7). Such a row stores NO score and no
+    // criteria list, so it can neither raise the best nor stand in for a grade.
+    const honest = ok(body.score) && ok(body.possible) && body.possible > 0 && body.score <= body.possible;
+    let gradeJson = body.gradeJson;
+    if (!honest && gradeJson && typeof gradeJson === 'object' && !Array.isArray(gradeJson)) {
+      const { criteria: _dropped, ...rest } = gradeJson as Record<string, unknown>;
+      gradeJson = rest;
+    }
+    stored = row(gradeJson, honest ? (body.score as number) : null, honest ? (body.possible as number) : null);
   }
 
   if (!(await insertCounted(env.DB, stored, cap))) {

@@ -58,6 +58,7 @@ import {
 } from '../../lib/grade-written-core';
 import { isLessonAccessible, lockedResponse, type SessionData } from '../_shared/lessonAccess';
 import { loadAiGrader } from '../_shared/aiGraders';
+import { DEFAULT_RULES } from '../../lib/diagram-types';
 import { capFor, kindFor, attemptsUsed, recordGraded, recordOutage, isStaff, effectiveCap, cleanArtifact } from '../_shared/attempts';
 
 interface Env {
@@ -220,7 +221,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   const capped = cap !== undefined && kindFor(body.lessonId) === 'ai';
   const tryCap = cap === undefined ? undefined : effectiveCap(cap, data.role);
   // Display-only copy of what was drawn, kept with the counted row for the teacher's view.
-  const artifact = cleanArtifact((body as { artifact?: unknown }).artifact);
+  const artifact = cleanArtifact((body as { artifact?: unknown }).artifact, body.response, config.diagramRules ?? DEFAULT_RULES);
   if (capped && !isStaff(data.role) && (await attemptsUsed(env.DB, data.email, body.lessonId)) >= (cap as number)) {
     return json(
       { ok: false, error: `All ${cap} tries on this part are already used.`, capReached: true, cap },

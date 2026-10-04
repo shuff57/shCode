@@ -107,7 +107,12 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
     .bind(classId, now)
     .all<SubmissionRow>();
 
-  const submissions = await Promise.all((result.results ?? []).map(async (r) => ({ ...r, limit: await rowLimit(env, request, r) })));
+  // `capped` tells the form whether the ceiling is ENFORCED: only a part with a try limit has one
+  // (the POST below refuses a mark above it there); on any other part the unit is a label and a
+  // teacher may still give extra credit (round 7).
+  const submissions = await Promise.all(
+    (result.results ?? []).map(async (r) => ({ ...r, limit: await rowLimit(env, request, r), capped: capFor(r.lesson_id) !== undefined })),
+  );
   return json({ submissions });
 };
 

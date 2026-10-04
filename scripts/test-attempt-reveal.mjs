@@ -72,6 +72,8 @@ const entries = [
   'lib/quiz-variant.ts',
   'lib/diagram-submission.ts',
   'lib/diagram-flow.ts',
+  'lib/diagram-artifact.ts',
+  'lib/diagram-check.ts',
   'lib/diagram-mermaid.ts',
   'functions/api/classes/[id]/lesson-unsubmit/index.ts',
 ].map((f) => join(root, f));
@@ -89,10 +91,10 @@ writeFileSync(join(outDir, 'package.json'), '{"type":"commonjs"}');
 const CAP = 3;
 const attemptCapsMod = join(outDir, 'functions/_shared/pa-pseudocode.generated.js');
 writeFileSync(attemptCapsMod, `exports.ATTEMPT_CAPS = ${JSON.stringify({
-  'fx-written': CAP, 'fx-nopseudo': CAP, 'fx-quiz': 2, 'fx-client': CAP, 'fx-passfail': CAP,
+  'fx-written': CAP, 'fx-nopseudo': CAP, 'fx-quiz': 2, 'fx-client': CAP, 'fx-passfail': CAP, 'fx-chart': CAP,
 })};
 exports.ATTEMPT_KINDS = ${JSON.stringify({
-  'fx-written': 'ai', 'fx-nopseudo': 'ai', 'fx-quiz': 'quiz', 'fx-client': 'client', 'fx-passfail': 'ai',
+  'fx-written': 'ai', 'fx-nopseudo': 'ai', 'fx-quiz': 'quiz', 'fx-client': 'client', 'fx-passfail': 'ai', 'fx-chart': 'ai',
 })};
 exports.PA_PSEUDOCODE = ${JSON.stringify({
   'fx-written': 'SET total TO 0\nFOR each item IN cart\n  ADD item.price TO total\nRETURN total',
@@ -102,6 +104,11 @@ writeFileSync(join(outDir, 'functions/_shared/ai-graders.generated.js'), `export
   'fx-written': {
     lessonTitle: 'fx', prompt: 'grade it', model: 'fx-model',
     rubric: [{ id: 'a', title: 'A', description: 'a', points: 5 }, { id: 'b', title: 'B', description: 'b', points: 5 }],
+  },
+  'fx-chart': {
+    lessonTitle: 'fx chart', prompt: 'grade it', model: 'fx-model',
+    rubric: [{ id: 'a', title: 'A', description: 'a', points: 5 }, { id: 'b', title: 'B', description: 'b', points: 5 }],
+    diagramRules: [{ id: 'one-start' }, { id: 'has-end' }],
   },
   'fx-passfail': {
     lessonTitle: 'fx pass/fail', prompt: 'grade it', model: 'fx-model',
@@ -1458,15 +1465,20 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   const flow = require(join(outDir, 'lib/diagram-flow.js'));
   const real = mer.fromMermaid('flowchart TD\n  A([Start ARTIFACT-SENTINEL])\n  B[/Read the cart/]\n  C{Over the limit?}\n  D[Say over]\n  Z([End])\n  A --> B\n  B --> C\n  C -->|yes| D\n  C -->|no| Z\n  D --> Z');
   eq([real.nodes.length, real.edges.length, Object.keys(real.edges[0]).sort().join(',').includes('from')], [5, 5, true], 'the fixture chart really is a browser-built DiagramDoc with arrows (from/to)');
+  const realText = mer.describeDiagram(real);
+  const dart = require(join(outDir, 'lib/diagram-artifact.js'));
+  const att = require(join(outDir, 'functions/_shared/attempts.js'));
+  const { DEFAULT_RULES } = require(join(outDir, 'lib/diagram-types.js'));
+  // what a lying browser claims about its own checks: one passed check. The server must not read it.
   const checks = [{ id: 'one-start', title: 'One start', passed: true, detail: 'ok', offenders: [] }];
   const art = { doc: real, checks };
   const last = () => JSON.parse(db.raw.query("SELECT grade_json FROM lesson_submissions ORDER BY rowid DESC LIMIT 1").get().grade_json);
-  let r = await gw(art);
+  let r = await gw(art, realText);
   eq(r.status, 200, 'artifact: the grade is returned as before');
   const kept = last().artifact;
-  eq([kept?.doc?.nodes?.length, kept?.doc?.edges?.length, kept?.checks?.[0]?.passed, last().totalEarned], [5, 5, true, 10], '...the counted row keeps the chart WITH ITS ARROWS and its checks beside the grade (round 6: a chart with an arrow used to be dropped)');
+  eq([kept?.doc?.nodes?.length, kept?.doc?.edges?.length, kept?.checks?.length, last().totalEarned], [5, 5, DEFAULT_RULES.length, 10], '...the counted row keeps the chart WITH ITS ARROWS beside the grade, and its checks are the SERVER\'s: one per rule of the lesson (the browser claimed one), not the browser\'s list');
   eq(kept?.doc?.edges?.map((e) => [e.from, e.to, e.label ?? '']), real.edges.map((e) => [e.from, e.to, e.label ?? '']), '...every arrow keeps its from, to and label');
-  eq(sent.some((b) => b.includes('ARTIFACT-SENTINEL')), false, '...and the chart text never reached the model prompt');
+  eq(sent.some((b) => b.includes('\\"shape\\":\\"terminal\\"') || b.includes('\\"nodes\\"')), false, '...and the stored artifact (the chart JSON) never reached the model prompt; the model reads only the described text');
   // the teacher's read path, end to end: stored row -> parseDiagramArtifact -> docToFlow (what the canvas draws)
   const sub = require(join(outDir, 'lib/diagram-submission.js'));
   const rowJson = db.raw.query("SELECT grade_json FROM lesson_submissions ORDER BY rowid DESC LIMIT 1").get().grade_json;
@@ -1476,15 +1488,17 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   // unknown keys are dropped: only what a chart is
   const dirty = JSON.parse(JSON.stringify(real));
   dirty.nodes[0].evil = '<img src=x onerror=1>'; dirty.edges[0].evil = 1; dirty.extra = { a: 1 };
-  r = await gw({ doc: dirty, checks }, 'a chart with stray keys that is long enough', 'e@example.invalid');
+  r = await gw({ doc: dirty, checks }, realText, 'e@example.invalid');
   const k2 = last().artifact;
   eq([k2?.doc?.nodes?.[0]?.evil, k2?.doc?.edges?.[0]?.evil, k2?.doc?.extra, Object.keys(k2?.doc?.nodes?.[0] ?? {}).sort().join(',')], [undefined, undefined, undefined, 'id,label,shape,x,y'], 'unknown keys on a node, an arrow or the doc are dropped (the artifact is rebuilt from the known keys)');
-  // bounded and shape-checked: anything that does not fit is dropped, the grade is unaffected
+  // bounded: a chart over the size cap is dropped (called directly with the matching text, since the
+  // route also bounds the response; the grade itself is unaffected either way)
   const bigNodes = Array.from({ length: 200 }, (_, i) => ({ id: `n${i}`, shape: 'process', label: 'x'.repeat(300), x: i, y: i }));
   const bigEdges = Array.from({ length: 199 }, (_, i) => ({ id: `e${i}`, from: `n${i}`, to: `n${i + 1}`, label: 'y'.repeat(100) }));
-  const checksBig = Array.from({ length: 40 }, (_, i) => ({ id: `c${i}`, title: 't'.repeat(200), passed: true, detail: 'd'.repeat(500), offenders: Array.from({ length: 50 }, () => 'o'.repeat(80)) }));
-  r = await gw({ doc: { version: 1, nodes: bigNodes, edges: bigEdges }, checks: checksBig }, 'a second chart answer long enough');
-  eq([r.status, last().artifact], [200, undefined], 'an artifact over the size cap is dropped; the grade is still given');
+  const bigDoc = { version: 1, nodes: bigNodes, edges: bigEdges };
+  eq(att.cleanArtifact({ doc: bigDoc }, mer.describeDiagram(bigDoc), DEFAULT_RULES), undefined, 'an artifact over the size cap is dropped');
+  r = await gw({ doc: real, checks }, 'a text that does not describe the chart at all, long enough');
+  eq([r.status, last().artifact], [200, undefined], 'an artifact whose chart does not describe the graded text is dropped (round 7); the grade is still given');
   r = await gw({ doc: { nodes: 'not an array', edges: [] }, checks: [] }, 'a third chart answer long enough');
   eq([r.status, last().artifact], [200, undefined], 'an artifact that is not a chart is dropped');
   // element-level shape
@@ -1512,11 +1526,11 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   eq(typeof last().gradingFailed, 'undefined', '...and the row is a normal counted grade');
   // the outage marker keeps the chart too, so the teacher can see what was handed in
   reply = () => new Response(JSON.stringify({ message: { content: '{"nope":1}' } }), { status: 200 });
-  r = await gw(art, 'a chart answer while the model says nothing', C2);
-  const mk = JSON.parse(db.raw.query("SELECT grade_json FROM lesson_submissions WHERE response = 'a chart answer while the model says nothing'").get().grade_json);
+  r = await gw(art, realText, C2);
+  const mk = JSON.parse(db.raw.query('SELECT grade_json FROM lesson_submissions ORDER BY rowid DESC LIMIT 1').get().grade_json);
   eq([r.status, mk.gradingFailed, mk.artifact?.doc?.nodes?.length, mk.artifact?.doc?.edges?.length], [502, true, 5, 5], 'the server-written outage marker keeps the chart (with its arrows) as well');
   // the teacher's reader finds the checks as well
-  eq([sub.parseDiagramArtifact(rowJson)?.nodes?.length, sub.parseDiagramGrade(rowJson)?.structural?.length], [5, 1], 'the teacher-side readers recover the chart (parseDiagramArtifact) and its checks (parseDiagramGrade)');
+  eq([sub.parseDiagramArtifact(rowJson)?.nodes?.length, sub.parseDiagramGrade(rowJson)?.structural?.length], [5, DEFAULT_RULES.length], 'the teacher-side readers recover the chart (parseDiagramArtifact) and its checks (parseDiagramGrade)');
   eq(sub.parseDiagramArtifact('{"totalEarned":1}'), null, '...and return null for a row with no artifact');
   globalThis.fetch = realFetch;
   const src = readFileSync(join(root, 'components/DiagramAssignmentView.tsx'), 'utf8');
@@ -1525,8 +1539,128 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   // the shapes the server accepts are the shapes the editor draws
   const types = readFileSync(join(root, 'lib/diagram-types.ts'), 'utf8');
   const declared = [...types.match(/export type FlowShape =([^;]+);/)[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]).sort();
-  const accepted = [...readFileSync(join(root, 'functions/_shared/attempts.ts'), 'utf8').match(/const FLOW_SHAPES = new Set\(\[([^\]]+)\]/)[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]).sort();
-  eq(accepted, declared, 'cleanArtifact accepts exactly the shapes lib/diagram-types.ts declares');
+  const accepted = [...readFileSync(join(root, 'lib/diagram-artifact.ts'), 'utf8').match(/FLOW_SHAPES[^=]*= new Set\(\[([^\]]+)\]/)[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]).sort();
+  eq(accepted, declared, 'the chart validator accepts exactly the shapes lib/diagram-types.ts declares');
+}
+
+// ============ round 7 / M1: the artifact is tied to the text the model graded, and its checks are the server's ============
+{
+  const db = makeDb();
+  const realFetch = globalThis.fetch;
+  const sentBodies = [];
+  const good = JSON.stringify({ message: { content: JSON.stringify({ criteria: [{ id: 'a', earned: 5, verdict: 'met', feedback: 'f' }, { id: 'b', earned: 5, verdict: 'met', feedback: 'f' }], summary: 's', hints: [] }) } });
+  globalThis.fetch = async (url, init) => {
+    if (String(url).endsWith('/api/chat')) { sentBodies.push(String(init?.body ?? '')); return new Response(good, { status: 200 }); }
+    return realFetch(url, init);
+  };
+  const mer = require(join(outDir, 'lib/diagram-mermaid.js'));
+  const att = require(join(outDir, 'functions/_shared/attempts.js'));
+  const { DEFAULT_RULES } = require(join(outDir, 'lib/diagram-types.js'));
+  const gw = (artifact, text, email) => gradeWritten({
+    request: new Request('https://example.test/api/grade-written', { method: 'POST', body: JSON.stringify({ lessonId: 'fx-written', response: text, artifact }) }),
+    env: { DB: db, OLLAMA_API_KEY: 'k' }, params: {}, data: { email, role: 'student' }, next: async () => new Response(null),
+  });
+  const lastRow = () => JSON.parse(db.raw.query("SELECT grade_json FROM lesson_submissions ORDER BY rowid DESC LIMIT 1").get().grade_json);
+  const lastResp = () => db.raw.query("SELECT response FROM lesson_submissions ORDER BY rowid DESC LIMIT 1").get().response;
+  const chartX = mer.fromMermaid('flowchart TD\n  A([Start])\n  B[Do the work]\n  Z([End])\n  A --> B\n  B --> Z');
+  const chartY = mer.fromMermaid('flowchart TD\n  A([Start])\n  B[Something completely different]\n  C[More]\n  Z([End])\n  A --> B\n  B --> C\n  C --> Z');
+  const textX = mer.describeDiagram(chartX);
+  const E1 = 'm1a@example.invalid', E2 = 'm1b@example.invalid', E3 = 'm1c@example.invalid';
+  for (const e of [E1, E2, E3]) db.raw.run('INSERT INTO enrollments (class_id, student_email, expires_at) VALUES (?, ?, ?)', ['c1', e, 4102444800000]);
+
+  // the judge's repro: the AI grades text X, the card would have shown chart Y with 'all checks passed'
+  let r = await gw({ doc: chartY, checks: [{ id: 'x', title: 'All good', passed: true, detail: '', offenders: [] }] }, textX, E1);
+  eq([r.status, lastResp() === textX, lastRow().artifact], [200, true, undefined], 'M1: an artifact whose chart does not describe the graded text is DROPPED; the row keeps the text the AI read');
+  // the honest case keeps it
+  r = await gw({ doc: chartX, checks: [] }, textX, E2);
+  eq([lastRow().artifact?.doc?.nodes?.length, lastRow().artifact?.doc?.edges?.length], [3, 2], 'M1: an honest chart (its own description is the graded text) is kept');
+  // the checks are the server's: a chart with NO end shape, a browser claiming every check passed
+  const noEnd = mer.fromMermaid('flowchart TD\n  A([Start])\n  B[Do the work]\n  A --> B');
+  r = await gw({ doc: noEnd, checks: DEFAULT_RULES.map((x) => ({ id: x.id, title: 'ok', passed: true, detail: '', offenders: [] })) }, mer.describeDiagram(noEnd), E3);
+  const ck = lastRow().artifact?.checks ?? [];
+  eq([ck.length, ck.some((c) => c.passed === false), ck.find((c) => c.id === 'has-end')?.passed], [DEFAULT_RULES.length, true, false], 'M1: the stored checks are recomputed on the server from the doc and the lesson\'s rules; "all passed" from the browser is never read');
+  // the lesson's OWN rules (baked server-side) decide the checks: this lesson declares two
+  const rr = await gradeWritten({
+    request: new Request('https://example.test/api/grade-written', { method: 'POST', body: JSON.stringify({ lessonId: 'fx-chart', response: textX, artifact: { doc: chartX, checks: [] } }) }),
+    env: { DB: db, OLLAMA_API_KEY: 'k' }, params: {}, data: { email: E1, role: 'student' }, next: async () => new Response(null),
+  });
+  eq([rr.status, lastRow().artifact?.checks?.map((c) => c.id)], [200, ['one-start', 'has-end']], "M1: the checks follow the lesson's own diagram rules baked into the server config (here two), not a fixed list");
+  // a label over the cap no longer matches the graded text, so the artifact falls back to the text
+  const longLabel = { version: 1, nodes: [{ id: 'a', shape: 'terminal', label: 'L'.repeat(400), x: 0, y: 0 }, { id: 'z', shape: 'terminal', label: 'End', x: 0, y: 100 }], edges: [{ id: 'e', from: 'a', to: 'z' }] };
+  eq(att.cleanArtifact({ doc: longLabel }, mer.describeDiagram(longLabel), DEFAULT_RULES), undefined, 'M1: a label over the length cap falls back to the text alone (the display copy would not describe what was graded)');
+  // the model prompt never carries the artifact
+  eq(sentBodies.some((b) => b.includes('Something completely different')), false, 'M1: the chart Y never reached the model');
+  // lesson rules reach the server: the baked config carries diagramRules for a flowchart lesson
+  const gen = readFileSync(join(root, 'functions/_shared/ai-graders.generated.ts'), 'utf8');
+  if (!/"diagramRules"/.test(gen)) fail('ai-graders.generated.ts carries no diagramRules (generate-ai-graders must bake lesson.diagram.rules)');
+  else ok('the server-only grader config carries the diagram rules the checks are recomputed from');
+  globalThis.fetch = realFetch;
+}
+
+// ============ round 7 / M2: every reader of a stored chart is tolerant; a bad row cannot throw in docToFlow ============
+{
+  const dart = require(join(outDir, 'lib/diagram-artifact.js'));
+  const sub = require(join(outDir, 'lib/diagram-submission.js'));
+  const flow = require(join(outDir, 'lib/diagram-flow.js'));
+  const mer = require(join(outDir, 'lib/diagram-mermaid.js'));
+  // the judge's exact repro: edges:[null], label:5
+  const evilDoc = { nodes: [{ id: 'a', shape: 'process', label: 5 }, { id: 'b', shape: 'terminal', label: 'End' }], edges: [null, { id: 'e1', from: 'a', to: 'b' }, 7, { id: 'e1', from: 'b', to: 'a' }] };
+  const d = dart.sanitizeDiagramDoc(evilDoc);
+  eq([d?.nodes?.length, d?.edges?.length, d?.nodes?.[0]?.label, d?.nodes?.[0]?.x], [2, 1, '', 0], 'sanitizeDiagramDoc drops null/number arrows and a repeated arrow id, and coerces a numeric label and missing coordinates');
+  let threw = null;
+  try { flow.docToFlow(sub.parseDiagramResponse(JSON.stringify(evilDoc))); } catch (e) { threw = e; }
+  eq(threw, null, 'M2: parseDiagramResponse then docToFlow on the judge\'s repro no longer throws');
+  threw = null;
+  try { flow.docToFlow(sub.parseDiagramArtifact(JSON.stringify({ artifact: { doc: evilDoc } }))); } catch (e) { threw = e; }
+  eq(threw, null, '...and neither does the artifact reader');
+  const big = dart.sanitizeDiagramDoc({ nodes: [{ id: 'a', shape: 'process', label: 'x', x: 1e308, y: -1e308 }], edges: [] });
+  eq([big.nodes[0].x, big.nodes[0].y], [dart.MAX_COORD, -dart.MAX_COORD], 'huge coordinates are clamped');
+  const wild = dart.sanitizeDiagramDoc({ nodes: [{ id: '__proto__', shape: 'process', label: 'p' }, { id: 'constructor', shape: 'terminal', label: 'c' }], edges: [{ id: '__proto__', from: '__proto__', to: 'constructor' }] });
+  eq([wild.nodes.length, wild.edges.length, Object.getPrototypeOf(wild.nodes[0]) === Object.prototype], [2, 1, true], '__proto__ / constructor as ids are ordinary strings and re-parent nothing');
+  eq([dart.sanitizeDiagramDoc({ nodes: [null, 5], edges: [] }), dart.sanitizeDiagramDoc({ nodes: [{ id: 1, shape: 'x' }], edges: [] }), dart.sanitizeDiagramDoc('{}'), dart.sanitizeDiagramDoc({ nodes: [], edges: [] })?.nodes?.length], [null, null, null, 0], 'a {nodes, edges} object that is not a chart is null (falls back to the text); an empty chart stays empty');
+  const honest = mer.fromMermaid('flowchart TD\n  A([Start])\n  B[x]\n  Z([End])\n  A --> B\n  B --> Z');
+  eq(dart.sanitizeDiagramDoc(JSON.parse(JSON.stringify(honest))), honest, 'an honest browser-built chart passes through unchanged (what the server compares against the graded text)');
+  // the stored check list: a null entry no longer reaches the renderer
+  const g = sub.parseDiagramGrade(JSON.stringify({ structural: [null, 5, { id: 'one-start', title: 'One start', passed: true }, { passed: 'yes' }] }));
+  eq([g?.structural?.length, g?.structural?.map((c) => c.passed)], [2, [true, false]], 'M2: a stored check list keeps only real entries (null / number entries dropped, a non-boolean passed reads as not passed), so the renderer cannot throw on one')
+}
+
+// ============ round 7 / lows ============
+{
+  const att = require(join(outDir, 'functions/_shared/attempts.js'));
+  // L1: a __proto__ key must not re-parent the stripped copy
+  const parsed = JSON.parse('{"__proto__":{"teacherOverriddenAt":1,"x":1},"ok":1,"aiScore":99}');
+  const out = att.stripOverrideKeys(parsed);
+  eq([Object.getPrototypeOf(out), out.teacherOverriddenAt, out.ok, out.aiScore, JSON.stringify(out).includes('teacherOverriddenAt')], [null, undefined, 1, undefined, false], 'L1: stripOverrideKeys copies onto a null-prototype object: a __proto__ key re-parents nothing and the teacher keys inside it are stripped');
+  // L2: a 'client' row with possible <= 0 must not invent a best from a browser-written criteria list
+  const db = makeDb();
+  const post = (body) => call(submissionsPost, db, '/api/lesson-submissions', A, 'student', { method: 'POST', body: JSON.stringify({ id: `l2${++rowSeq}`, lessonId: 'fx-client', response: 'x', ...body }) });
+  const fake = Array.from({ length: 10000 }, () => ({ verdict: 'met' }));
+  let r = await post({ score: 0, possible: 0, gradeJson: { criteria: fake, note: 'keep me' } });
+  const row = db.raw.query("SELECT score, possible, grade_json FROM lesson_submissions WHERE lesson_id = 'fx-client' ORDER BY rowid DESC LIMIT 1").get();
+  const gj = JSON.parse(row.grade_json);
+  eq([r.status, row.score, row.possible, gj.criteria, gj.note], [201, null, null, undefined, 'keep me'], "L2: possible:0 stores NO score and drops the browser's criteria list (the rest of its report is kept)");
+  eq(att.rowScore({ score: row.score, possible: row.possible, gradeJson: gj }), null, '...so the row is worth nothing toward the best (it was 10,000)');
+  r = await post({ score: 3, possible: 4, gradeJson: { report: 1 } });
+  const honest = db.raw.query("SELECT score, possible FROM lesson_submissions WHERE lesson_id = 'fx-client' ORDER BY rowid DESC LIMIT 1").get();
+  eq([honest.score, honest.possible], [3, 4], '...and an honest pointed report (3 of 4) is stored as before');
+  // L4: the queue says which rows have an ENFORCED ceiling; extra credit stays possible elsewhere
+  const T = 't@example.invalid';
+  const qdb = makeDb();
+  addRow(qdb, { email: A, lessonId: 'fx-written', gradeJson: { score: 3 }, at: NOW, score: 3, possible: 10 });
+  addRow(qdb, { email: A, lessonId: 'fx-uncapped', gradeJson: { score: 3 }, at: NOW + 1, score: 3, possible: 10 });
+  const q = (await (await call(queueApi.onRequestGet, qdb, '/api/classes/c1/submission-queue', T, 'teacher', {}, { id: 'c1' })).json()).submissions;
+  eq(q.map((x) => [x.lesson_id, x.capped]).sort(), [['fx-uncapped', false], ['fx-written', true]], 'L4: the review queue marks a row capped only when its part has a try limit');
+  const ui = readFileSync(join(root, 'components/SubmissionQueue.tsx'), 'utf8');
+  if (!/enforceMax && unitTotal !== null && parsedScore > unitTotal/.test(ui) || !/enforceMax && unitTotal === null && pointsMax !== null && parsedScore > pointsMax/.test(ui)) fail('SubmissionQueue enforces the ceiling on rows that are not capped (extra credit blocked)');
+  else ok('L4: the override form enforces its ceiling only on capped rows (extra credit is possible again on the rest)');
+  if (!/enforceMax=\{sub\.capped === true\}/.test(ui)) fail('SubmissionQueue does not pass sub.capped to the override form');
+  else ok('...and takes that from the server');
+  const sq = readFileSync(join(root, 'components/SubmissionQueue.tsx'), 'utf8');
+  if (!/<SubmissionBoundary raw=\{sub\.response\}>/.test(sq)) fail('SubmissionQueue does not wrap the chart/response in SubmissionBoundary');
+  else ok('M2: the review card wraps its chart/response in the error boundary');
+  if (!/What the AI read/.test(sq)) fail('SubmissionQueue does not show the graded text beside the chart');
+  else ok('M1: the review card shows the text the AI read beside the chart');
 }
 
 // ============ round 5 / finding 4: a pass/fail mark has a unit and a ceiling ============

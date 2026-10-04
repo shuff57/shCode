@@ -15,6 +15,7 @@
 // copy. Falling back is the exact hole this module exists to close.
 
 import type { RubricItem } from '../../lib/grade-written-core';
+import type { DiagramRule } from '../../lib/diagram-types';
 import { AI_GRADERS } from './ai-graders.generated';
 
 export interface AiGraderConfig {
@@ -25,6 +26,12 @@ export interface AiGraderConfig {
   contextDocs?: string[];
   /** Graded test part: the strict marking framing instead of the lenient default. */
   strict?: boolean;
+  /**
+   * A flowchart part's own structural rules (lesson.diagram.rules), so the server can recompute the
+   * checks it keeps beside a graded chart instead of trusting the browser's. Not secret: the page
+   * shows the same list to the student. Absent = DEFAULT_RULES.
+   */
+  diagramRules?: DiagramRule[];
 }
 
 // `env` and `request` are no longer needed (there is nothing to fetch) but the

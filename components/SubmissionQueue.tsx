@@ -6,6 +6,7 @@ import { CircleCheck, CircleX } from 'lucide-react';
 import { parseDiagramArtifact, parseDiagramGrade, parseDiagramResponse } from '../lib/diagram-submission';
 import { criteriaScore } from '../lib/grade-pass';
 import { diagramFrameHeight } from '../lib/diagram-types';
+import SubmissionBoundary from './SubmissionBoundary';
 
 // Only pulled in when a flowchart submission is actually on screen — a class
 // with no diagram assignments never downloads React Flow.
@@ -59,6 +60,8 @@ interface SubmissionItem {
    * pass/fail part. Present even for a grader-outage row, which has no criteria list of its own.
    */
   limit?: { max: number; unit: 'points' | 'criteria' } | null;
+  /** The part has a try limit, so the server refuses a mark above `limit` (round 7). */
+  capped?: boolean;
 }
 
 interface Props {
@@ -134,6 +137,8 @@ interface OverrideFormProps {
   unitTotal: number | null;
   /** A pointed part: the mark is points, out of this many. Null: unknown. */
   pointsMax?: number | null;
+  /** The ceiling is enforced (a capped part). Elsewhere the unit is a label and extra credit is allowed. */
+  enforceMax?: boolean;
   onOverride: () => void;
 }
 
@@ -144,7 +149,7 @@ function markUnit(g: GradeJson | null): { total: number } | null {
   return { total: g.criteria.length };
 }
 
-function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, onOverride }: OverrideFormProps) {
+function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, enforceMax = false, onOverride }: OverrideFormProps) {
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
   // Capped parts only matter, but the box is harmless elsewhere (the server ignores it).
@@ -180,11 +185,11 @@ function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, onOv
       setMsg({ type: 'error', text: 'Enter a valid score.' });
       return;
     }
-    if (unitTotal !== null && parsedScore > unitTotal) {
+    if (enforceMax && unitTotal !== null && parsedScore > unitTotal) {
       setMsg({ type: 'error', text: `This part is marked in criteria met, out of ${unitTotal}. Enter 0 to ${unitTotal}.` });
       return;
     }
-    if (unitTotal === null && pointsMax !== null && parsedScore > pointsMax) {
+    if (enforceMax && unitTotal === null && pointsMax !== null && parsedScore > pointsMax) {
       setMsg({ type: 'error', text: `This part is marked in points, out of ${pointsMax}. Enter 0 to ${pointsMax}.` });
       return;
     }
@@ -243,7 +248,7 @@ function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, onOv
           id={`override-score-${submissionId}`}
           type="number"
           min={0}
-          max={unitTotal ?? pointsMax ?? undefined}
+          max={enforceMax ? unitTotal ?? pointsMax ?? undefined : undefined}
           step={0.5}
           value={score}
           onChange={(e) => setScore(e.target.value)}
@@ -560,36 +565,60 @@ export function SubmissionQueue({ classId }: Props) {
               <div style={{ fontWeight: 600, color: '#f8f8f2', fontSize: '0.82rem', marginBottom: 4 }}>
                 {diagram ? 'Student diagram' : 'Student response'}
               </div>
-              {diagram ? (
-                <>
-                  <DiagramEditor
-                    value={diagram}
-                    readOnly
-                    height={diagramFrameHeight(diagram, 300, 560)}
-                    // A review card is short by design, so let the fit shrink
-                    // far enough to show the whole diagram; the teacher can
-                    // scroll-zoom into anything they need to read closely.
-                    fitMinZoom={0.3}
-                  />
-                  <div style={{ color: '#6272a4', fontSize: '0.76rem', marginTop: 5 }}>
-                    {diagram.nodes.length} shapes · {diagram.edges.length} arrows · scroll to zoom,
-                    drag to pan
+              <SubmissionBoundary raw={sub.response}>
+                {diagram ? (
+                  <>
+                    <DiagramEditor
+                      value={diagram}
+                      readOnly
+                      height={diagramFrameHeight(diagram, 300, 560)}
+                      // A review card is short by design, so let the fit shrink
+                      // far enough to show the whole diagram; the teacher can
+                      // scroll-zoom into anything they need to read closely.
+                      fitMinZoom={0.3}
+                    />
+                    <div style={{ color: '#6272a4', fontSize: '0.76rem', marginTop: 5 }}>
+                      {diagram.nodes.length} shapes · {diagram.edges.length} arrows · scroll to zoom,
+                      drag to pan
+                    </div>
+                    {/* The text the AI actually graded, beside the drawing: the chart is a display
+                        copy, and the teacher must always be able to see what the model read. */}
+                    {parseDiagramResponse(sub.response) === null && sub.response ? (
+                      <div style={{ marginTop: 8 }}>
+                        <div style={{ color: '#6272a4', fontSize: '0.76rem', marginBottom: 3 }}>What the AI read</div>
+                        <div
+                          style={{
+                            color: '#f8f8f2',
+                            fontSize: '0.78rem',
+                            lineHeight: 1.45,
+                            whiteSpace: 'pre-wrap',
+                            maxHeight: 160,
+                            overflowY: 'auto',
+                            background: '#1e1f29',
+                            borderRadius: 4,
+                            padding: '6px 8px',
+                          }}
+                        >
+                          {sub.response}
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      color: '#f8f8f2',
+                      fontSize: '0.85rem',
+                      lineHeight: 1.5,
+                      whiteSpace: 'pre-wrap',
+                      maxHeight: 160,
+                      overflowY: 'auto',
+                    }}
+                  >
+                    {sub.response || '(no response)'}
                   </div>
-                </>
-              ) : (
-                <div
-                  style={{
-                    color: '#f8f8f2',
-                    fontSize: '0.85rem',
-                    lineHeight: 1.5,
-                    whiteSpace: 'pre-wrap',
-                    maxHeight: 160,
-                    overflowY: 'auto',
-                  }}
-                >
-                  {sub.response || '(no response)'}
-                </div>
-              )}
+                )}
+              </SubmissionBoundary>
             </div>
 
             {/* Structural checks — only a flowchart submission records these. */}
@@ -625,7 +654,7 @@ export function SubmissionQueue({ classId }: Props) {
             )}
 
             {/* Override form */}
-            <OverrideForm classId={classId} submissionId={sub.id} unitTotal={unit?.total ?? null} pointsMax={sub.limit?.unit === 'points' ? sub.limit.max : null} onOverride={handleOverride} />
+            <OverrideForm classId={classId} submissionId={sub.id} unitTotal={unit?.total ?? null} pointsMax={sub.limit?.unit === 'points' ? sub.limit.max : null} enforceMax={sub.capped === true} onOverride={handleOverride} />
           </div>
         );
       })}

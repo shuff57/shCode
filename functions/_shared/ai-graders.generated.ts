@@ -341,7 +341,43 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "strict": true
+    "strict": true,
+    "diagramRules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-process",
+        "count": 3,
+        "title": "Uses at least three task rectangles"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1,
+        "title": "Uses at least one decision diamond"
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
+    ]
   },
   "1-6-3-ch1-pa-demo": {
     "lessonTitle": "1.6.3 Group PA Part 3: Demo It",
@@ -471,7 +507,43 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "strict": true
+    "strict": true,
+    "diagramRules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-process",
+        "count": 3,
+        "title": "Uses at least three task rectangles"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1,
+        "title": "Uses at least one decision diamond"
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
+    ]
   },
   "1-7-5-ch1-individual-pa-write-the-steps": {
     "lessonTitle": "1.7.5 Individual PA Part 5: Write the Steps",
@@ -547,7 +619,37 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ],
     "model": "glm-5.3-flash:cloud",
-    "contextDocs": []
+    "contextDocs": [],
+    "diagramRules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
+    ]
   },
   "2-2-4-a5-1-algorithm-writeup": {
     "lessonTitle": "2.2.8 Algorithm in Plain English (Part A)",
@@ -638,7 +740,48 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "strict": true
+    "strict": true,
+    "diagramRules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-process",
+        "count": 2,
+        "title": "Uses at least two task rectangles"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1,
+        "title": "Uses at least one decision diamond"
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "min-nodes",
+        "count": 8,
+        "title": "Uses at least eight flow shapes"
+      },
+      {
+        "id": "no-self-loop"
+      }
+    ]
   },
   "2-6-3-ch2-group-pa-demo": {
     "lessonTitle": "2.6.3 Group PA Part 3: Demo It",
@@ -768,7 +911,48 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "strict": true
+    "strict": true,
+    "diagramRules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-process",
+        "count": 2,
+        "title": "Uses at least two task rectangles"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1,
+        "title": "Uses at least one decision diamond"
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "min-nodes",
+        "count": 8,
+        "title": "Uses at least eight flow shapes"
+      },
+      {
+        "id": "no-self-loop"
+      }
+    ]
   },
   "2-7-5-ch2-individual-pa-write-the-steps": {
     "lessonTitle": "2.7.5 Individual PA Part 5: Write the Steps",
@@ -906,7 +1090,48 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "strict": true
+    "strict": true,
+    "diagramRules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-process",
+        "count": 2,
+        "title": "Uses at least two task rectangles"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1,
+        "title": "Uses at least one decision diamond"
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "min-nodes",
+        "count": 10,
+        "title": "Uses at least ten flow shapes"
+      },
+      {
+        "id": "no-self-loop"
+      }
+    ]
   },
   "3-10-5-ch3-individual-pa-write-the-steps": {
     "lessonTitle": "3.10.5 Individual PA Part 5: Write the Steps",
@@ -965,7 +1190,48 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "strict": true
+    "strict": true,
+    "diagramRules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-process",
+        "count": 2,
+        "title": "Uses at least two task rectangles"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1,
+        "title": "Uses at least one decision diamond"
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "min-nodes",
+        "count": 10,
+        "title": "Uses at least ten flow shapes"
+      },
+      {
+        "id": "no-self-loop"
+      }
+    ]
   },
   "3-9-3-ch3-group-pa-demo": {
     "lessonTitle": "3.9.3 Group PA Part 3: Demo It",

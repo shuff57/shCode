@@ -424,7 +424,7 @@
   },
   "round7": {
     "source": "delta judge round 7 (blind, HEAD fe69cb77)",
-    "status": "findings written before the fix",
+    "status": "all findings fixed and mutation-checked; full suite verified from a fresh worktree (see results)",
     "findings": [
       {
         "id": "M1",
@@ -462,6 +462,15 @@
         "id": "accepted",
         "what": "stamp --allow-old on a shallow clone with a typo'd ancient stamp passes with two warnings"
       }
-    ]
+    ],
+    "results": {
+      "M1": "cleanArtifact(raw, response, rules) keeps the artifact only if describeDiagram(rebuilt doc) === response; checks recomputed server-side from the lesson's diagramRules (baked into ai-graders.generated.ts by generate-ai-graders, else DEFAULT_RULES); the browser's checks are never read; the queue shows 'What the AI read' beside the chart.",
+      "M2": "lib/diagram-artifact.ts sanitizeDiagramDoc is the one validator (cleanArtifact, parseDiagramResponse, parseDiagramArtifact); parseDiagramGrade filters the stored check list; app/teacher drawer filters it too; components/SubmissionBoundary.tsx wraps the review card's chart/response.",
+      "L1": "stripOverrideKeys copies onto a null-prototype object.",
+      "L2": "a 'client' row stores a score only as an honest pointed pair (possible > 0); otherwise NULL score and the browser's criteria list is dropped.",
+      "L3": "validator de-duplicates edge ids and clamps coordinates to +-100000.",
+      "L4": "the queue returns capped per row; the override form enforces its ceiling only on capped rows (extra credit possible again elsewhere).",
+      "mutations": "12 guards broken one at a time, each fails the tests; one candidate (null arrow check) is an equivalent mutant because validId already drops it."
+    }
   }
 }
