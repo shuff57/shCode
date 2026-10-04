@@ -468,6 +468,10 @@ npx wrangler r2 bucket create shcode-uploads
 - **Migrations 0033 (`lesson_try_resets`) and 0034 (`lesson_state.score_override`)** likewise.
   0034 must be applied BEFORE the deploy: the new code reads `score_override`, and a Function
   that selects a column the database does not have 500s.
+- **Grandfather backfill, once at go-live, after 0032-0034 and the stamp.** Most PA parts had no
+  `maxScore` before, so a completed one read 100% and holds a stored score of 0/NULL; with the new max it
+  would show 0% until reopened. `node scripts/backfill-grandfather-scores.mjs` is a read-only dry run
+  (215 parts on 2026-10-04); `--emit-sql f.sql` writes guarded UPDATEs for the owner to review and run.
 - **The stamp goes stale.** `--check` also refuses a stamp more than 24 hours old (the deploy
   slipped, and attempts between the stamp and the deploy would count against the cap before the
   rule was live). Re-stamp at the real go-live, or pass `--allow-old` knowingly.
