@@ -377,5 +377,41 @@
       }
     ],
     "mutation_check": "25 guards broken one at a time plus one combined; every one fails test-attempt-reveal alone except two single-layer mutations of the lesson-state override (the SQL CASE and the derivation mask each other; broken together the test fails). The 24h stamp guard is caught by test-stamp-tries-applied."
+  },
+  "round6": {
+    "source": "blind judge round 6 on HEAD 1d3bc13b (fresh archive, empty pa-pseudocode/)",
+    "status": "findings recorded before any edit; fixes in progress",
+    "findings": [
+      {
+        "n": 1,
+        "severity": "medium",
+        "what": "cleanArtifact (functions/_shared/attempts.ts) checks edges for {source,target}; the browser sends {from,to} (lib/diagram-types.ts FlowEdge). Any chart with an arrow is silently dropped, so the teacher never sees the drawing. Tests used edges: [] and the wrong arrow keys, so they missed it.",
+        "fix": "validate the real DiagramDoc shape (nodes {id,shape,label,x,y}, edges {id,from,to,label?,fromSide?,toSide?}), rebuild from known keys only, edges must reference existing nodes, keep the size cap; fixtures built the way the browser builds them; end-to-end with a real arrow"
+      },
+      {
+        "n": 2,
+        "severity": "medium",
+        "what": "lesson-unsubmit clears score but not score_override (migration 0034): a teacher override of 0 survives the unsubmit, a retake of 2/2 stays at 0.",
+        "fix": "set score_override = NULL in the unsubmit UPDATE; audit every other lesson_state reset path (tries-reset reset, lesson-state DELETE by staff, teacher reopen) for the same omission"
+      },
+      {
+        "n": 3,
+        "severity": "low",
+        "what": "a grader-outage row on a pass/fail capped part has no criteria list so SubmissionQueue markUnit returns nothing: the form says New score: with no maximum, while the server limit is the rubric criteria count.",
+        "fix": "submission-queue API returns the row limit (criteria count or points) for every row; the form always shows out of N"
+      },
+      {
+        "n": 4,
+        "severity": "low",
+        "what": "x.6.2 group build (\"client\" kind): the browser report is stored as sent, so {teacherOverriddenAt, aiScore: 99999} is accepted, read by scoreForBest as 99999 and shown as Teacher score in the queue. No grade effect today (no maxScore) but it is a forged teacher mark.",
+        "fix": "strip teacher*/ai*/override-looking keys from client-supplied gradeJson on the client kind; scoreForBest ignores them"
+      },
+      {
+        "n": 5,
+        "severity": "low",
+        "what": "stamp-tries-applied --check fails on a shallow clone: git log -S finds only the shallow root commit, so the stamp looks earlier than the commit that introduced it.",
+        "fix": "detect git rev-parse --is-shallow-repository; skip the introduced-by comparison with a loud warning (and say how to unshallow)"
+      }
+    ]
   }
 }
