@@ -17,7 +17,15 @@ const eq = (got, want, label) => (JSON.stringify(got) === JSON.stringify(want) ?
 
 mkdirSync(join(tmp, 'lib'));
 mkdirSync(join(tmp, 'scripts'));
-copyFileSync(join(root, 'lib/attempt-cap.ts'), join(tmp, 'lib/attempt-cap.ts'));
+// The test starts from the UNSTAMPED development state whatever the real file says: once the go-live
+// instant is stamped for real (committed 2026-10-04), copying it as-is made every case below start
+// from a stamped repo and fail.
+writeFileSync(
+  join(tmp, 'lib/attempt-cap.ts'),
+  readFileSync(join(root, 'lib/attempt-cap.ts'), 'utf8')
+    .replace(/TRIES_GO_LIVE_STAMPED = true;/, 'TRIES_GO_LIVE_STAMPED = false;')
+    .replace(/TRIES_APPLIED = \d{13};/, 'TRIES_APPLIED = 1791065875120;'),
+);
 copyFileSync(join(root, 'scripts/stamp-tries-applied.mjs'), join(tmp, 'scripts/stamp-tries-applied.mjs'));
 const git = (...a) => execFileSync('git', a, { cwd: tmp, stdio: 'pipe' });
 git('init', '-q');
