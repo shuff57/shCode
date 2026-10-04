@@ -137,6 +137,22 @@ time**, opening by itself.
   '2026-13-45' over into a different day; the release route refuses non-existent days
   itself (`isRealDate`), the due and open routes still accept them.
 
+## Accepted after the phase 2 gaming judge (2026-10-03)
+
+- **The chart legality gate is browser-only.** `grade-written` grades whatever text arrives,
+  so a hand-typed illegal chart can be scored. The browser shows the red checks and asks for
+  confirmation before a red chart spends a counted try. Accepted as low: the AI feedback and the
+  best-of score are all that is at stake.
+- **Burst risk, not built.** Under six parallel requests the judge saw 60-114 s per grade and one
+  180 s abort (no row written, no try spent). A class submitting inside one minute is the real
+  deploy risk. Cheapest first: a 25-parallel burst test against ollama.com before test day;
+  ask students to submit when ready; jittered client retry on 429/502 only if the burst fails.
+- **A find-and-fix part is a code lesson with an AI grader**, not a written answer. `lib/lesson-view.ts`
+  keeps `console`/`moshion`/`reshape` previews in the workspace even when they carry an `aiGrader`
+  (`scripts/test-lesson-view.mjs` guards it).
+- **A chart that fails the legality checks may still be handed in on a capped part**, after an
+  explicit confirm that it uses a try. A student stuck on one check is not locked out.
+
 ## Round 4: the final judge's findings (2026-10-03)
 
 - **A 0-point (pass/fail) capped part grades a REAL percent.** The group demos and charts,

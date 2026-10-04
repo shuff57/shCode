@@ -228,6 +228,25 @@
         "LessonWorkspace and DiagramAssignmentView do not complete the part on a grader outage (they never did); the work reaches the teacher through the server marker only.",
         "x.6.2 group builds: the browser relays the score (kind client, clamped); the server cannot re-run the requirement checks."
       ]
+    },
+    "2_judge1": {
+      "status": "fixing (round judge-1)",
+      "findings_before_fix": [
+        "A HIGH regression: 1-7-3/2-7-3/3-10-3 render as the prose WrittenGrader panel (lib/lesson-view.ts rendersAsContent true for any aiGrader): no editor, no Run, no tries banner/count, panel says revise as many times as you want. (fix started before this record was written: lib/lesson-view.ts)",
+        "B rubric ids/titles in the page payload name the bug kinds ('Bug 1 (nothing runs): fixed, and named as a syntax error'); failed-try feedback confirms the kind label and names the cause of bugs 3 and 4",
+        "C chart rubrics: swapped branches, missing at-the-limit outcome, comparison inside loop, wrong-problem outcome words, empty-body hexagon, junk-label skeleton all score 8/10 and pass; one-call chart capped at 8 by an unstated two-call rule",
+        "D a chart failing the structural legality checks goes to the AI and spends a counted try",
+        "F stale text: 3-10-4, 3-9-1 and the 1.7.4/2.7.4/1.6.1/2.6.1 equivalents say the chart is graded as a legal drawing / read by the teacher",
+        "G 'We could not check how many you have used' shows while the count is merely loading",
+        "accepted/low: the legality gate is browser-only (a forged illegal chart text passes grade-written, 8/10)",
+        "note: 60-114 s grade latency under six parallel requests, one 180 s abort (HTTP 502, no row written)",
+        "R4-1 MEDIUM-HIGH: on a grader outage DiagramAssignmentView (~254-263) and LessonWorkspace (~653) only show the error; the server wrote a free outage marker so lesson-state would accept a completion, but nothing asks for one: the NEXT part stays locked for the whole outage (WrittenGrader ~230-237 handles it on purpose). Second path in all three AI renderers: grade arrives on the last try but the completion POST fails; Submit is then disabled and only QuizView repairs on mount (~290). Fix: one shared hook repairing completion on mount and after an error, keyed on 'any row exists (counted or marker)'.",
+        "R4-6 LOW: the streaming race-lost refusal (grade-written ~620) is sent without capReached so WrittenGrader says the answer was saved and sent to the teacher (false); neither DiagramAssignmentView nor LessonWorkspace calls cap.refresh() after a 409 so banner/Submit go stale. Fix: send capReached on that path, refresh after 409, fix the WrittenGrader message."
+      ],
+      "accepted_low": [
+        "The chart legality gate is browser-only: grade-written grades whatever text arrives, so a hand-typed illegal chart text can score (8/10 in the judge's probe). The browser still shows the red checks and, on a capped part, asks for confirmation before a red chart spends a try. A server-side re-check needs the diagram parser on the server (lib/diagram-mermaid.ts is pure TS and could be bundled); not built, nothing is scored from the checker, only feedback and a best-of score the teacher sees."
+      ],
+      "latency_note": "Grade latency: 60-114 s per call with six parallel requests in the judge's harness, one 180 s abort (HTTP 502, no row written, so no try spent). grade-written aborts the Ollama call at 180 s on both paths (the NDJSON stream keeps the connection alive, so a Pages Function CPU limit is not the constraint; the model queue is). A class of 25-30 submitting inside one minute is the real deploy risk: CLAUDE.md measured the same class of thing on the removed Workers AI path (25 simultaneous gave 20/25). Not built. Suggested, cheapest first: (1) run a 25-parallel burst against ollama.com with the real model before test day and read the failure rate; (2) tell students to submit when ready rather than on the bell, and stagger parts; (3) a failed or aborted grade already costs no try, so the student retry is safe; (4) if the burst fails, add client-side jittered retry on 429/502 in streamGrade and a 'grading is busy, trying again' stage label; (5) only then consider a queue."
     }
   },
   "phase5_todo": [
