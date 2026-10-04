@@ -71,6 +71,12 @@ const STATUS_COLOR: Record<CellStatus, string> = {
 function scoreText(cell: GradebookCell, maxScore: number | null | undefined): string | null {
   const hasPoints = cell.possible != null && cell.possible > 0 && cell.submittedScore != null;
   const percent = cell.state === 'completed' ? lessonPercent(cell.state, cell.score, maxScore) : null;
+  // The recorded grade is the BEST attempt (lesson_state.score), so when the lesson has a max the
+  // points shown are that best score out of the max, never the latest attempt's: "3/8 \u00b7 50%"
+  // paired the last try's 3 with the best try's 4-of-8.
+  if (percent != null && maxScore != null && maxScore > 0 && cell.score != null) {
+    return `${Math.round(cell.score * 100) / 100}/${maxScore} \u00b7 ${percent}%`;
+  }
   if (hasPoints && percent != null) return `${cell.submittedScore}/${cell.possible} · ${percent}%`;
   if (hasPoints) return `${cell.submittedScore}/${cell.possible}`;
   if (percent != null) return `${percent}%`;
