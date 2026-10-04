@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
-import { recordLessonCompleted, useLessonState } from '../lib/progress';
+import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { isPassingGrade } from '../lib/grade-pass';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import LessonNumberLinks, { useSourceHrefs } from './LessonNumberLinks';
@@ -145,7 +145,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   // sitting -- so only the one-shot behaviours key off this.
   const oneShot = summative && !config.revisable;
   // Attempts allowed, or null for unlimited. Only summative items set it.
-  const maxSubmissions = typeof config.maxSubmissions === 'number' ? config.maxSubmissions : null;
+  // A teacher or admin previewing the part is never refused by the server (effectiveCap), so for
+  // them there is no cap to count down.
+  const maxSubmissions =
+    typeof config.maxSubmissions === 'number' && !bypassesLessonLock(progress.role) ? config.maxSubmissions : null;
   // The JavaScript editor in place of the prose textarea. Presentation only.
   const codeInput = config.input === 'code';
   // Submitted-before is answered by the SERVER, not by this browser. Seeding it
@@ -282,6 +285,17 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     }
   }
 
+  // Re-read how many tries the SERVER holds. A stream that drops mid-grade, a refused request or a
+  // grader outage can leave the server with a row (or without one) that this page did not see, so
+  // the banner would say one try too many or too few. The server is always right; this re-reads it.
+  async function refreshAttempts() {
+    if (maxSubmissions === null) return;
+    const prior = await fetchSubmissions(lessonId);
+    if (!prior.loaded) return;
+    setAttempts(countAttempts(prior.records));
+    setAnyRow(prior.records.length > 0);
+  }
+
   async function submit() {
     setLoading(true);
     setError(null);
@@ -305,6 +319,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         const reason = `Grader returned a non-JSON response (HTTP ${res.status}).`;
         setError(`${reason} Ask your teacher — the Ollama key or endpoint may not be configured. ${maxSubmissions !== null ? 'Your draft is saved and this did not use one of your tries.' : 'Your answer has been saved and sent to your teacher for marking.'}`);
         await recordFailedAttempt(reason, res.status);
+        await refreshAttempts();
         return;
       }
       if (data && !data.ok && (data as { capReached?: boolean }).capReached === true) {
@@ -320,6 +335,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         setError(`${reason} ${maxSubmissions !== null ? 'Your draft is saved and this did not use one of your tries. Try again in a minute.' : 'Your answer has been saved and sent to your teacher for marking.'}`);
         if (data?.offline) setOffline(true);
         await recordFailedAttempt(reason, res.status);
+        await refreshAttempts();
         return;
       }
       // A successful grade supersedes any failed attempt for this text.
@@ -363,6 +379,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       // recordFailedAttempt leaves the retry guard clear so the next submit
       // tries again.
       await recordFailedAttempt(reason, 0);
+      await refreshAttempts();
     } finally {
       setLoading(false);
       setStage(null);

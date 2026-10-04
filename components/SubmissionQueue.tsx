@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { CircleCheck, CircleX } from 'lucide-react';
-import { parseDiagramGrade, parseDiagramResponse } from '../lib/diagram-submission';
+import { parseDiagramArtifact, parseDiagramGrade, parseDiagramResponse } from '../lib/diagram-submission';
+import { criteriaScore } from '../lib/grade-pass';
 import { diagramFrameHeight } from '../lib/diagram-types';
 
 // Only pulled in when a flowchart submission is actually on screen — a class
@@ -124,10 +125,19 @@ function hasTeacherReview(raw: string): boolean {
 interface OverrideFormProps {
   classId: string;
   submissionId: string;
+  /** Pass/fail part: the mark is CRITERIA MET out of this many. Null: a pointed or unknown part. */
+  unitTotal: number | null;
   onOverride: () => void;
 }
 
-function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) {
+/** A pass/fail rubric's grade unit (criteria met out of the criteria count), or null for a pointed one. */
+function markUnit(g: GradeJson | null): { total: number } | null {
+  if (!g || !Array.isArray(g.criteria) || g.criteria.length === 0) return null;
+  if (typeof g.totalPossible === 'number' && g.totalPossible > 0) return null;
+  return { total: g.criteria.length };
+}
+
+function OverrideForm({ classId, submissionId, unitTotal, onOverride }: OverrideFormProps) {
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
   // Capped parts only matter, but the box is harmless elsewhere (the server ignores it).
@@ -135,11 +145,36 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Drop a "use this as the score" choice made earlier: the part goes back to the best its rows give.
+  async function handleClear() {
+    setSubmitting(true);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/classes/${encodeURIComponent(classId)}/submission-queue`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submissionId, clearOverride: true }),
+      });
+      if (!res.ok) throw new Error((await res.text().catch(() => '')) || `${res.status}`);
+      setMsg({ type: 'success', text: 'Cleared. The score is now the student\u2019s best again.' });
+      onOverride();
+    } catch (err) {
+      setMsg({ type: 'error', text: err instanceof Error ? err.message : 'Clear failed' });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function handleOverride(e: React.FormEvent) {
     e.preventDefault();
     const parsedScore = Number(score);
     if (isNaN(parsedScore) || parsedScore < 0) {
       setMsg({ type: 'error', text: 'Enter a valid score.' });
+      return;
+    }
+    if (unitTotal !== null && parsedScore > unitTotal) {
+      setMsg({ type: 'error', text: `This part is marked in criteria met, out of ${unitTotal}. Enter 0 to ${unitTotal}.` });
       return;
     }
 
@@ -169,7 +204,13 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
         throw new Error(errMsg || `${res.status}`);
       }
 
-      setMsg({ type: 'success', text: 'Grade overridden successfully.' });
+      const out = (await res.json().catch(() => null)) as { overrideActive?: boolean; stateScore?: number } | null;
+      setMsg({
+        type: 'success',
+        text: out && out.overrideActive && !replaceBest
+          ? `Saved on this try. A score you set earlier is still in force (${out.stateScore}); tick the box to change it.`
+          : 'Grade overridden successfully.',
+      });
       onOverride();
     } catch (err) {
       setMsg({ type: 'error', text: err instanceof Error ? err.message : 'Override failed' });
@@ -185,12 +226,13 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <label htmlFor={`override-score-${submissionId}`} style={{ fontSize: '0.82rem', color: '#f8f8f2' }}>
-          New score:
+          {unitTotal !== null ? `New mark (criteria met, out of ${unitTotal}):` : 'New score:'}
         </label>
         <input
           id={`override-score-${submissionId}`}
           type="number"
           min={0}
+          max={unitTotal ?? undefined}
           step={0.5}
           value={score}
           onChange={(e) => setScore(e.target.value)}
@@ -232,7 +274,7 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
 
       <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#6272a4' }}>
         <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
-        Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit)
+        Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit). This stays until you change or clear it; the student&apos;s later tries do not undo it.
       </label>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -252,6 +294,15 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
           }}
         >
           {submitting ? 'Overriding...' : 'Override grade'}
+        </button>
+        <button
+          type="button"
+          onClick={handleClear}
+          disabled={submitting}
+          title="Drop a 'use this as the score' choice you made earlier on this part"
+          style={{ background: 'none', border: '1px solid #44475a', borderRadius: 4, color: '#6272a4', padding: '5px 10px', fontSize: '0.78rem', cursor: submitting ? 'not-allowed' : 'pointer' }}
+        >
+          Clear my score choice
         </button>
 
         {msg && (
@@ -370,7 +421,10 @@ export function SubmissionQueue({ classId }: Props) {
                 criteria: diagramGrade.ai.criteria,
               }
             : null);
-        const diagram = parseDiagramResponse(sub.response);
+        // A capped AI-graded chart's `response` is the Mermaid text the model read; the drawn chart
+        // itself is kept in grade_json.artifact.
+        const diagram = parseDiagramResponse(sub.response) ?? parseDiagramArtifact(sub.grade_json);
+        const unit = markUnit(gradeData);
         // The row's own score, not the marker, decides. An override writes a
         // score onto the row but leaves gradingFailed in place, so keying on
         // the marker alone kept a graded submission reading "Needs manual
@@ -412,9 +466,15 @@ export function SubmissionQueue({ classId }: Props) {
               >
                 {failed
                   ? 'Needs manual grade'
-                  : hasTeacherReview(sub.grade_json)
-                    ? `Teacher score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
-                    : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
+                  : unit
+                    ? // A pass/fail rubric stores 0 of 0, so the stored numbers say nothing. Its grade is
+                      // criteria met out of the criteria count, and that is what a mark is in.
+                      hasTeacherReview(sub.grade_json)
+                      ? `Teacher mark: ${sub.score ?? '—'} of ${unit.total} criteria`
+                      : `AI: ${criteriaScore(gradeData?.criteria as Array<{ verdict: string }>)} of ${unit.total} criteria met`
+                    : hasTeacherReview(sub.grade_json)
+                      ? `Teacher score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
+                      : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
               </div>
             </div>
 
@@ -552,7 +612,7 @@ export function SubmissionQueue({ classId }: Props) {
             )}
 
             {/* Override form */}
-            <OverrideForm classId={classId} submissionId={sub.id} onOverride={handleOverride} />
+            <OverrideForm classId={classId} submissionId={sub.id} unitTotal={unit?.total ?? null} onOverride={handleOverride} />
           </div>
         );
       })}

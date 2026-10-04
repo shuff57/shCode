@@ -37,8 +37,15 @@ export interface AttemptCap {
   refresh: () => void;
 }
 
-export function useAttemptCap(lessonId: string, max: number | null | undefined, authed: boolean): AttemptCap {
-  const cap = typeof max === 'number' ? max : null;
+export function useAttemptCap(
+  lessonId: string,
+  max: number | null | undefined,
+  authed: boolean,
+  /** A teacher or admin previewing the part: the server never refuses their rows, so there is
+   *  no cap to count down and no banner (see effectiveCap in functions/_shared/attempts.ts). */
+  exempt = false,
+): AttemptCap {
+  const cap = typeof max === 'number' && !exempt ? max : null;
   const [used, setUsed] = useState<number | null>(null);
   const [nonce, setNonce] = useState(0);
   const [settled, setSettled] = useState(false);

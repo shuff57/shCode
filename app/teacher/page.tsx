@@ -710,6 +710,12 @@ function StudentDrawer({
                   if (sub?.grade_json) {
                     try {
                       gradeData = JSON.parse(sub.grade_json) as GradeResponse;
+                      // A capped AI-graded chart keeps its browser-side checks beside the grade
+                      // (grade_json.artifact.checks); show them as the structure list again.
+                      const kept = (gradeData as { artifact?: { checks?: StructuralCheck[] } }).artifact?.checks;
+                      if (gradeData && !gradeData.structural && Array.isArray(kept) && kept.length > 0) {
+                        gradeData = { ...gradeData, structural: kept };
+                      }
                     } catch {
                       // malformed grade_json — skip
                     }
@@ -854,7 +860,7 @@ function StudentDrawer({
                           {sub.response && (
                             <div>
                               <div style={{ fontSize: 11, color: '#6272a4', marginBottom: 4 }}>
-                                {asDiagramMermaid(sub.response) ? 'Their chart' : 'Their answer'}
+                                {asDiagramMermaid(sub.response) || (gradeData as { artifact?: unknown } | null)?.artifact ? 'Their chart' : 'Their answer'}
                               </div>
                               <pre style={{ margin: 0, maxHeight: 260, overflow: 'auto', background: '#1e1f29', borderRadius: 4, padding: '8px 10px', fontSize: 11, color: '#f8f8f2', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                                 {asDiagramMermaid(sub.response) ?? sub.response}

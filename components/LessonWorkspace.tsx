@@ -8,7 +8,7 @@ import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission, streamGrade } from '../lib/written-grader-store';
-import { recordLessonCompleted, useLessonState } from '../lib/progress';
+import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import AiGradeResultPanel, { type AiGradeResultData } from './AiGradeResultPanel';
 import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
@@ -140,7 +140,7 @@ export default function LessonWorkspace({
   // Tries on a capped performance-assessment part, counted on the server
   // (lib/use-attempt-cap.ts). Absent maxSubmissions = uncapped, nothing changes.
   const lessonProgress = useLessonState();
-  const cap = useAttemptCap(lesson.id, lesson.grading?.maxSubmissions, lessonProgress.authed);
+  const cap = useAttemptCap(lesson.id, lesson.grading?.maxSubmissions, lessonProgress.authed, bypassesLessonLock(lessonProgress.role));
   const capped = cap.max !== null;
   // A grader outage (or a lost completion call) must not leave the NEXT part locked.
   useCompletionRepair(lesson.id, cap, lessonProgress);

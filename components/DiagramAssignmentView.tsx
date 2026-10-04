@@ -36,7 +36,7 @@ const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   ssr: false,
   loading: () => <EditorPlaceholder height={570} />,
 });
-import { recordLessonCompleted, useLessonState } from '../lib/progress';
+import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
@@ -128,7 +128,7 @@ export default function DiagramAssignmentView({
 
   const progress = useLessonState();
   // Tries on a capped part, counted on the server. See lib/use-attempt-cap.ts.
-  const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed);
+  const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed, bypassesLessonLock(progress.role));
   const capped = cap.max !== null;
   // A grader outage (or a lost completion call) must not leave the NEXT part locked.
   useCompletionRepair(lessonId, cap, progress);
@@ -259,6 +259,9 @@ export default function DiagramAssignmentView({
           model: config.aiGrader.model,
           contextDocs: config.aiGrader.contextDocs,
           grader,
+          // What the teacher will see beside the grade: the drawn chart and the browser-side
+          // checks. Display only; the server bounds it and never scores or prompts from it.
+          artifact: { doc, checks: results },
         },
         setStage,
       );

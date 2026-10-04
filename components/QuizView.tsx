@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CircleCheck, CircleX, Circle, ListChecks } from 'lucide-react';
 import type { QuizConfig } from '../lib/types';
-import { recordLessonCompleted, useLessonState } from '../lib/progress';
+import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { getHrefsByLessonNumber, navigateToNextLesson } from '../lib/lesson-neighbors';
 import { fetchDraft, saveDraft, recordSubmission } from '../lib/written-grader-store';
 import { countCorrect, passThreshold } from '../lib/quiz-grade';
@@ -100,7 +100,7 @@ export default function QuizView({ lessonId, config }: Props) {
   const [wait, setWait] = useState<RevealWait | null>(null);
   const progress = useLessonState();
   // Tries, counted on the server. A capped quiz replaces the one-shot lock.
-  const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed);
+  const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed, bypassesLessonLock(progress.role));
   const capped = cap.max !== null;
 
   // Which paper this student sits. Identical to the authored order unless the

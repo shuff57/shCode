@@ -111,11 +111,13 @@ function ReleaseOn({
   disabled,
 }: {
   label: string;
-  onApply: (date: string, time: string | null) => void;
+  onApply: (date: string, time: string) => void;
   disabled: boolean;
 }) {
   const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  // A date always carries a time. Default 3:00 PM (after the school day), never midnight: a date
+  // with no time used to open the solution at 12:00 AM, before the test was even sat.
+  const [time, setTime] = useState('15:00');
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
       <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={field} aria-label={`Release date for ${label}`} />
@@ -125,14 +127,15 @@ function ReleaseOn({
         onChange={(e) => setTime(e.target.value)}
         style={{ ...field, width: 116 }}
         aria-label={`Release time for ${label}`}
-        title="Leave blank for the start of the day"
+        title="School time. Defaults to 3:00 PM so the solution never opens before the test day is over."
+        required
       />
       <button
         type="button"
-        disabled={disabled || date === ''}
-        onClick={() => onApply(date, time === '' ? null : time)}
-        style={btn(C.accent, disabled || date === '')}
-        title={date === '' ? 'Pick a date first' : 'The solution opens on its own at this time'}
+        disabled={disabled || date === '' || time === ''}
+        onClick={() => onApply(date, time)}
+        style={btn(C.accent, disabled || date === '' || time === '')}
+        title={date === '' ? 'Pick a date first' : time === '' ? 'Pick a time' : 'The solution opens on its own at this date and time (school time)'}
       >
         Release on this date
       </button>
@@ -244,7 +247,7 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
       <p style={{ color: C.dim, fontSize: 13, margin: '0 0 6px 0' }}>
         A student sees how a part is solved only after they have used all their tries <strong>and</strong> you release it
         here. Nothing is released until you say so. Pick <strong>Release now</strong>, or a date and time and it opens by
-        itself then. All times are school time.
+        itself then. A date always needs a time (it starts at 3:00 PM, school time). All times are school time.
       </p>
       <p style={{ color: C.dim, fontSize: 13, margin: '0 0 14px 0' }}>
         Releasing a whole test releases each of its parts; a single part can still be held back or given its own time.

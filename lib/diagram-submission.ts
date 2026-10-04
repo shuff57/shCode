@@ -32,6 +32,23 @@ export function parseDiagramResponse(raw: string | null | undefined): DiagramDoc
   }
 }
 
+/**
+ * The chart a capped AI-graded flowchart part kept with its counted row
+ * (grade_json.artifact, written by grade-written from cleanArtifact). The row's `response` is
+ * the Mermaid text the model read, so the drawn chart lives here. Null when absent or malformed.
+ */
+export function parseDiagramArtifact(raw: string | null | undefined): DiagramDoc | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    const doc = parsed && typeof parsed === 'object' ? (parsed as { artifact?: { doc?: unknown } }).artifact?.doc : null;
+    if (!doc || typeof doc !== 'object') return null;
+    return parseDiagramResponse(JSON.stringify(doc));
+  } catch {
+    return null;
+  }
+}
+
 export interface DiagramGradeJson {
   structural?: CheckResult[];
   ai?: {
@@ -61,11 +78,13 @@ export function parseDiagramGrade(raw: string | null | undefined): DiagramGradeJ
   try {
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return null;
-    const hasStructural = Array.isArray(parsed.structural);
+    // A capped AI part keeps its browser-side checks beside the grade, under `artifact.checks`.
+    const artifactChecks = parsed.artifact && Array.isArray(parsed.artifact.checks) ? parsed.artifact.checks : null;
+    const hasStructural = Array.isArray(parsed.structural) || (artifactChecks !== null && artifactChecks.length > 0);
     const hasAi = parsed.ai && Array.isArray(parsed.ai.criteria);
     if (!hasStructural && !hasAi) return null;
     return {
-      structural: hasStructural ? parsed.structural : undefined,
+      structural: hasStructural ? (Array.isArray(parsed.structural) ? parsed.structural : artifactChecks) : undefined,
       ai: hasAi ? parsed.ai : undefined,
     };
   } catch {
