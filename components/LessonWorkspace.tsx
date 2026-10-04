@@ -11,7 +11,7 @@ import { recordSubmission, streamGrade } from '../lib/written-grader-store';
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import AiGradeResultPanel, { type AiGradeResultData } from './AiGradeResultPanel';
-import { useAttemptCap } from '../lib/use-attempt-cap';
+import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader';
@@ -142,6 +142,8 @@ export default function LessonWorkspace({
   const lessonProgress = useLessonState();
   const cap = useAttemptCap(lesson.id, lesson.grading?.maxSubmissions, lessonProgress.authed);
   const capped = cap.max !== null;
+  // A grader outage (or a lost completion call) must not leave the NEXT part locked.
+  useCompletionRepair(lesson.id, cap, lessonProgress);
   // A graded test part that is marked by the AI instead of by requirement patterns
   // (the find-and-fix parts: nothing scores them on the server). The browser sends
   // the student's file to /api/grade-written, which holds the rubric and is the
@@ -648,10 +650,16 @@ export default function LessonWorkspace({
       );
       if (data === null) {
         setAiError(`The grader returned something we could not read (HTTP ${status}). Ask your teacher.`);
+        // The server may have written its free outage marker: re-read the rows so
+        // the completion repair can unlock the next part.
+        if (capped) cap.refresh();
         return;
       }
       if (!data.ok) {
         setAiError(data.error || `Grading failed (HTTP ${status}).`);
+        // A refused fourth try (409), a lost race or an outage marker all change
+        // what the server holds: re-read it so the banner and Submit are not stale.
+        if (capped) cap.refresh();
         return;
       }
       setAiResult(data as AiGradeResultData);
@@ -671,6 +679,7 @@ export default function LessonWorkspace({
       }
     } catch (e) {
       setAiError(e instanceof Error ? e.message : String(e));
+      if (capped) cap.refresh();
     } finally {
       setAiGrading(false);
       setAiStage(null);
@@ -929,7 +938,7 @@ export default function LessonWorkspace({
           <h1>{lesson.title}</h1>
         </div>
       )}
-      {capped ? <AttemptBanner max={cap.max} used={cap.used} /> : null}
+      {capped ? <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} /> : null}
       {lesson.planFrom && (
         <PlanChartPanel
           planFrom={lesson.planFrom}

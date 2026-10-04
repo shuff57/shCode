@@ -11,23 +11,27 @@ interface BannerProps {
   max: number | null;
   /** Tries spent; null while unknown. */
   used: number | null;
+  /** The count has not come back yet: say so instead of reporting a failure. */
+  loading?: boolean;
   /** Optional extra line, e.g. the running total on a quiz. */
   note?: string;
 }
 
-export function AttemptBanner({ max, used, note }: BannerProps) {
+export function AttemptBanner({ max, used, loading, note }: BannerProps) {
   if (max === null) return null;
   const word = max === 1 ? 'try' : 'tries';
   let text: string;
-  if (used === null) {
+  if (used === null && loading) {
+    text = `You get ${max} ${word} on this part, and your best one counts. Checking how many you have used...`;
+  } else if (used === null) {
     text = `You get ${max} ${word} on this part, and your best one counts. We could not check how many you have used, so Submit is off. Reload the page to try again.`;
   } else if (used === 0) {
-    text = `You get ${max} ${word} on this part. Your best one counts. After the last one, you will see how it is solved.`;
+    text = `You get ${max} ${word} on this part. Your best one counts. After the last one, you can see how it is solved once your teacher releases it.`;
   } else if (used >= max) {
     text = `All ${max} ${word} used. Your best one is your score.`;
   } else {
     const left = max - used;
-    text = `${left} of ${max} ${max === 1 ? 'try' : 'tries'} left. Your best one counts. After the last one, you will see how it is solved.`;
+    text = `${left} of ${max} ${max === 1 ? 'try' : 'tries'} left. Your best one counts. After the last one, you can see how it is solved once your teacher releases it.`;
   }
   return (
     <div

@@ -331,6 +331,7 @@ export default function QuizView({ lessonId, config }: Props) {
       <AttemptBanner
         max={cap.max}
         used={cap.used}
+        loading={cap.loading}
         note={
           capped && tries
             ? `Last try: ${tries.last.correct} of ${tries.last.total}. Best so far: ${tries.best.correct} of ${tries.best.total}.`

@@ -171,7 +171,7 @@ export async function streamGrade(
     } else if ('result' in evt) {
       terminal = evt.result;
     } else if ('error' in evt) {
-      terminal = { ok: false, error: evt.error, offline: evt.offline, raw: evt.raw };
+      terminal = { ok: false, error: evt.error, offline: evt.offline, raw: evt.raw, capReached: evt.capReached };
     }
   };
 

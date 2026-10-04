@@ -617,7 +617,7 @@ function streamGrade({ target, model, system, user, rubric, grader, record, fail
 
         const result = { ...shapeResult(parsed, rubric), grader, graderModel: model };
         if (record && !(await record(result))) {
-          send({ error: 'All tries on this part are already used.' });
+          send({ error: 'All tries on this part are already used.', capReached: true });
           return;
         }
         send({ result });

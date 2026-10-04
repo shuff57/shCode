@@ -18,6 +18,7 @@ import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
 import GraderPicker, { hasGraderChoice, useGraderChoice } from './GraderPicker';
 import SolutionPanel from './SolutionPanel';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
+import { useRepairLoop } from '../lib/use-attempt-cap';
 import CodeMirrorPane from './CodeMirrorPane';
 
 interface AiRubricItem {
@@ -157,9 +158,17 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   // assuming the student has attempts left -- the same mistake a6006dd5 fixed,
   // one level down. It costs a reload to recover, and the copy below says so.
   const [attempts, setAttempts] = useState<number | null>(null);
+  // Any row at all (counted or the server's free outage marker): what a completion repair keys on.
+  const [anyRow, setAnyRow] = useState(false);
   const attemptsKnown = attempts !== null;
   const capReached = maxSubmissions !== null && attemptsKnown && attempts >= maxSubmissions;
   const capUnknown = maxSubmissions !== null && !attemptsKnown;
+  // The grade arrived but the completion call did not (or a grader outage left the next
+  // part locked): repair it, as the other capped renderers do.
+  useRepairLoop(
+    lessonId,
+    maxSubmissions !== null && attemptsKnown && anyRow && progress.authed && progress.states[lessonId] !== 'completed',
+  );
   const locked = capUnknown || capReached || (oneShot && (!!result || alreadySubmitted));
 
   useEffect(() => {
@@ -182,6 +191,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       // an honest zero rather than an unknown.
       if (oneShot || maxSubmissions !== null) {
         setAttempts(prior.loaded ? countAttempts(prior.records) : null);
+        setAnyRow(prior.loaded && prior.records.length > 0);
       }
       if (serverDraft && serverDraft.response) {
         setResponse(serverDraft.response);
@@ -293,7 +303,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       const res = { status };
       if (data === null) {
         const reason = `Grader returned a non-JSON response (HTTP ${res.status}).`;
-        setError(`${reason} Ask your teacher — the Ollama key or endpoint may not be configured. Your answer has been saved and sent to your teacher for marking.`);
+        setError(`${reason} Ask your teacher — the Ollama key or endpoint may not be configured. ${maxSubmissions !== null ? 'Your draft is saved and this did not use one of your tries.' : 'Your answer has been saved and sent to your teacher for marking.'}`);
         await recordFailedAttempt(reason, res.status);
         return;
       }
@@ -307,7 +317,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       }
       if (!data || !data.ok) {
         const reason = data?.error || `Grading failed (HTTP ${res.status}).`;
-        setError(`${reason} Your answer has been saved and sent to your teacher for marking.`);
+        setError(`${reason} ${maxSubmissions !== null ? 'Your draft is saved and this did not use one of your tries. Try again in a minute.' : 'Your answer has been saved and sent to your teacher for marking.'}`);
         if (data?.offline) setOffline(true);
         await recordFailedAttempt(reason, res.status);
         return;
@@ -318,6 +328,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       // One attempt just spent. Unknown stays unknown -- we know this one happened,
       // not how many came before, and inventing a count would unlock a capped item.
       setAttempts((n) => (n === null ? null : n + 1));
+      setAnyRow(true);
       lastFailedRef.current = null;
       setResult(data as GradeResult);
       const passed = isPassing(data as GradeResult);
@@ -424,7 +435,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           }}
         />
       </div>
-      <AttemptBanner max={maxSubmissions} used={attempts} />
+      <AttemptBanner max={maxSubmissions} used={attempts} loading={!loaded} />
       {codeInput ? (
         // CodeMirrorPane fills its parent (height: 100%), so the parent needs a
         // height of its own. No Run button, lint or autocomplete, on purpose:
@@ -531,7 +542,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         </span>
         {maxSubmissions === null ? null : !attemptsKnown ? (
           <span style={{ color: '#ffb86c', fontSize: 12 }}>
-            Couldn&apos;t check your attempts — reload to try again
+            {loaded ? 'Couldn\u2019t check your attempts — reload to try again' : 'Checking your attempts…'}
           </span>
         ) : (
           <span style={{ color: capReached ? '#ffb86c' : '#666', fontSize: 12 }}>

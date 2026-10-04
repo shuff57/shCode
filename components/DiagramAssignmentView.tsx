@@ -38,7 +38,7 @@ const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
 });
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
-import { useAttemptCap } from '../lib/use-attempt-cap';
+import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { fetchDraft, saveDraft, recordSubmission, streamGrade } from '../lib/written-grader-store';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
@@ -130,6 +130,8 @@ export default function DiagramAssignmentView({
   // Tries on a capped part, counted on the server. See lib/use-attempt-cap.ts.
   const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed);
   const capped = cap.max !== null;
+  // A grader outage (or a lost completion call) must not leave the NEXT part locked.
+  useCompletionRepair(lessonId, cap, progress);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ---- load: server draft wins over the local cache, starter is the floor
@@ -203,6 +205,16 @@ export default function DiagramAssignmentView({
     // get a second exit off their diamond would otherwise never reach Part 5.
     // See DiagramConfig.summative.
     if (!allPassed(results) && !summative) return;
+    // A summative chart may be handed in with red checks (a student stuck on one
+    // check must not be locked out), but on a capped part that hand-in is a counted
+    // try. Say so and let them choose: an accidental click must not spend one.
+    if (!allPassed(results) && capped && typeof window !== 'undefined') {
+      const left = cap.left;
+      const ok = window.confirm(
+        `Some checks are still red. Handing in now uses one of your tries${left !== null ? ` (you have ${left} left)` : ''}, and the feedback will be about an unfinished chart.\n\nFix the red checks first, or press OK to hand it in anyway.`,
+      );
+      if (!ok) return;
+    }
 
     // Structure-only lesson: the checks are the whole grade.
     if (!config.aiGrader) {
@@ -255,11 +267,17 @@ export default function DiagramAssignmentView({
         setError(
           `Grader returned a non-JSON response (HTTP ${res.status}). Ask your teacher — the Ollama key or endpoint may not be configured.`,
         );
+        // The server may have written its free outage marker: re-read the rows so
+        // the completion repair can unlock the next part.
+        if (capped) cap.refresh();
         return;
       }
       if (!data || !data.ok) {
         setError(data?.error || `Grading failed (HTTP ${res.status}).`);
         if (data?.offline) setOffline(true);
+        // A refused fourth try (409), a lost race or an outage marker all change
+        // what the server holds: re-read it so the banner and Submit are not stale.
+        if (capped) cap.refresh();
         return;
       }
       setResult(data as GradeResult);
@@ -284,6 +302,7 @@ export default function DiagramAssignmentView({
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
+      if (capped) cap.refresh();
     } finally {
       setGrading(false);
       setStage(null);
@@ -308,7 +327,7 @@ export default function DiagramAssignmentView({
         </p>
       ) : null}
 
-      <AttemptBanner max={cap.max} used={cap.used} />
+      <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} />
 
       <DiagramEditor
         value={doc}

@@ -305,6 +305,8 @@ interface GradeErrorEvent {
   /** Mirrors the non-streaming body so the client's error path is shared. */
   offline?: boolean;
   raw?: string;
+  /** Every try on a capped part is spent (a lost race): not a grader outage. */
+  capReached?: boolean;
 }
 
 export type GradeStreamEvent = GradeStageEvent | GradeResultEvent | GradeErrorEvent;
