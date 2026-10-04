@@ -70,7 +70,7 @@ import { CUBE_ZONE_CELL, cubeZoneAt, cubeZoneDirs } from './cube-zone.js';
 import { loadSchemeName, navHint, saveSchemeName, schemeToMouseButtons, schemeToTouches } from '../camera-controls.js';
 import { CameraMode, loadCameraMode, orthoFrustumFromPerspective, saveCameraMode } from '../ortho-camera.js';
 import { computeSelectionFit, computeWindowZoomFit } from '../window-zoom-fit.js';
-import { nearestVisible, nextCycleIndex, shouldHandleViewportDelete } from '../pick-helpers.js';
+import { nearestVisible, nextCycleIndex, shouldHandleViewportDelete, solidBounds } from '../pick-helpers.js';
 import { HOLD_CYCLE_DELAY_MS, HOLD_CYCLE_DEAD_ZONE_PX } from '../input-threshold.js';
 import MarkingMenu from './MarkingMenu.js';
 import { classifyGesture, wedgesForMode } from './marking-menu-core.js';
@@ -2409,7 +2409,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         if (!three || !group)
             return null;
         const { THREE } = three;
-        const box = new THREE.Box3().setFromObject(group);
+        const box = solidBounds(group, () => new THREE.Box3());
         for (const f of doc.features) {
             if (f.kind !== 'sketch')
                 continue;
@@ -3039,7 +3039,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         const sec = sectionRef.current;
         let on = sec.on;
         if (on) {
-            const box = new THREE.Box3().setFromObject(group);
+            const box = solidBounds(group, () => new THREE.Box3());
             if (box.isEmpty())
                 on = false;
             else {
@@ -3174,6 +3174,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                 const tube = new THREE.Mesh(pos ? edgeTubeGeometry(THREE, pos.array, EDGE_TUBE_RADIUS) : new THREE.BufferGeometry(), hoverEdgeMaterialRef.current);
                 tube.visible = false;
                 tube.renderOrder = 2;
+                // Highlight-only: must not count toward the model's size (solidBounds).
+                tube.userData.excludeFromBounds = true;
                 mesh.add(tube);
                 line.userData.tubeMesh = tube;
             }

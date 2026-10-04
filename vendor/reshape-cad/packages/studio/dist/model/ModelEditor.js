@@ -27,7 +27,7 @@ import { withoutFeatures, orphanedBy, firstOrderViolation } from '@shuff57/resha
 import { canRotate, extentAlong, isRoundable, maxRound, nameMap, newExtrude, newHole, newHoleCorners, newBlend, newMirror, newPattern, newRevolve, newShape, newShell, newSketch, shellInsertion, whyCannotBlend, newMove, nextId, topLevel, whyCannotOrbit, whyCannotRound, placementLabel, } from '@shuff57/reshape-script/model-types';
 import { partWordFor } from '@shuff57/reshape-script/topo-name';
 import { ownerOf } from '@shuff57/reshape-script/model-selection';
-import { edgesOf, featuresOf, ownerScoped, primaryOf } from '../selection-model.js';
+import { edgesOf, featuresOf, mixedSelectionNote, ownerScoped, primaryOf } from '../selection-model.js';
 import { withRecess, whyCannotRecess } from './hole-recess.js';
 function shapeIcon(kind) {
     if (kind === 'box')
@@ -433,21 +433,6 @@ export default function ModelEditor({ doc, onChange, selection, onSelect, onSele
         setSelected([f.id]);
         setMenu(null);
         say(null);
-    }
-    /** SPEC-mouse-parity.md Phase 3 item 3 (mixed selection): fillet only ever
-     *  consumes edges -- a face/vertex/body riding along in the same selection
-     *  (Ctrl/Shift-picked alongside the edges, same owning solid) is used by
-     *  nothing here, so round() must say so rather than silently drop it, the
-     *  same way every other refusal in this file is a sentence, not a no-op. */
-    function mixedSelectionNote(scoped) {
-        const ignored = scoped.filter((i) => i.kind !== 'edge');
-        if (!ignored.length)
-            return null;
-        const counts = new Map();
-        for (const i of ignored)
-            counts.set(i.kind, (counts.get(i.kind) ?? 0) + 1);
-        const parts = [...counts.entries()].map(([kind, n]) => `${n} ${kind}${n > 1 ? 's' : ''}`);
-        return `fillet: ignoring ${parts.join(', ')} — edges only`;
     }
     /** Give the chosen hole a recess -- a counterbore (flat bottom) or a countersink
      *  (cone) -- or take it back off if it already has one.

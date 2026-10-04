@@ -117,4 +117,17 @@ export declare function bodiesOf(state: SelectionState): SelectionItem[];
  *  itself rather than re-implementing its rootFeature-then-target
  *  fallback, so the two can never drift apart. */
 export declare function ownerScoped(state: SelectionState, doc: ModelDoc, ownerId: string): SelectionItem[];
+/** SPEC-mouse-parity.md Phase 3 item 3 (mixed selection): fillet only ever
+ *  consumes edges -- a face/vertex/body riding along in the same selection
+ *  (Ctrl/Shift-picked alongside the edges, same owning solid) is used by
+ *  nothing there, so round() must say so rather than silently drop it.
+ *
+ *  'feature' items are NOT counted: every viewport pick also lists its
+ *  owning solid as a feature item (ReshapeStudio's withFeatureIds), so a
+ *  plain edge click is always [edge, feature]. That item is bookkeeping for
+ *  the timeline highlight, not something the student picked and not
+ *  something a fillet "ignores" -- counting it made a plain single-edge
+ *  Round say "ignoring 1 feature". Returns null when nothing real is left
+ *  over. */
+export declare function mixedSelectionNote(scoped: SelectionItem[]): string | null;
 //# sourceMappingURL=selection-model.d.ts.map

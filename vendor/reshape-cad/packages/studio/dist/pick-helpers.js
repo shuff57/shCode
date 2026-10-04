@@ -52,4 +52,31 @@ export function shouldHandleViewportDelete(activeElementTagName) {
     const tag = activeElementTagName.toUpperCase();
     return tag !== 'INPUT' && tag !== 'TEXTAREA';
 }
+/** The world-space box of the drawn solid ONLY. three's Box3.setFromObject
+ *  measures every descendant with geometry, visible or not, and each mesh
+ *  carries one invisible hover/selected edge-highlight tube per topological
+ *  edge (radius EDGE_TUBE_RADIUS) -- those stick out half a radius past
+ *  every face, so the status bar read a 40x40x20 box as 41.5x41.5x21.5 (and
+ *  the section plane's range was equally fat). Objects flagged
+ *  `userData.excludeFromBounds` are skipped, along with their subtree.
+ *  `makeBox` builds an empty THREE.Box3. */
+export function solidBounds(root, makeBox) {
+    const out = makeBox();
+    const visit = (o) => {
+        if (o.userData.excludeFromBounds)
+            return;
+        if (o.geometry) {
+            if (o.geometry.boundingBox === null)
+                o.geometry.computeBoundingBox();
+            if (o.geometry.boundingBox) {
+                o.updateWorldMatrix(true, false);
+                out.union(makeBox().copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld));
+            }
+        }
+        for (const c of o.children)
+            visit(c);
+    };
+    visit(root);
+    return out;
+}
 //# sourceMappingURL=pick-helpers.js.map

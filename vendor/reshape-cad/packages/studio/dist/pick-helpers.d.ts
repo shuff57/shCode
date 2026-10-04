@@ -36,4 +36,20 @@ export declare function nextCycleIndex(currentIndex: number, candidateCount: num
  *  so it is testable under node --test without a DOM, the same convention
  *  nearestVisible()/nextCycleIndex() above follow. */
 export declare function shouldHandleViewportDelete(activeElementTagName: string): boolean;
+interface BoundsBox<B> {
+    isEmpty(): boolean;
+    copy(b: unknown): B;
+    applyMatrix4(m: unknown): B;
+    union(b: B): B;
+}
+/** The world-space box of the drawn solid ONLY. three's Box3.setFromObject
+ *  measures every descendant with geometry, visible or not, and each mesh
+ *  carries one invisible hover/selected edge-highlight tube per topological
+ *  edge (radius EDGE_TUBE_RADIUS) -- those stick out half a radius past
+ *  every face, so the status bar read a 40x40x20 box as 41.5x41.5x21.5 (and
+ *  the section plane's range was equally fat). Objects flagged
+ *  `userData.excludeFromBounds` are skipped, along with their subtree.
+ *  `makeBox` builds an empty THREE.Box3. */
+export declare function solidBounds<B extends BoundsBox<B>>(root: unknown, makeBox: () => B): B;
+export {};
 //# sourceMappingURL=pick-helpers.d.ts.map
