@@ -12,6 +12,7 @@ import {
   recordSubmission,
   fetchSubmissions,
   streamGrade,
+  type SubmissionRecord,
 } from '../lib/written-grader-store';
 import { countAttempts } from '../lib/attempt-cap';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
@@ -66,6 +67,21 @@ interface GradeResult {
   criteria: CriterionResult[];
   summary: string;
   hints: string[];
+}
+
+/** The best of a student's graded tries (a rubric row with criteria), for showing what they earned. */
+function bestGradedTry(records: SubmissionRecord[]): GradeResult | null {
+  let best: GradeResult | null = null;
+  let bestScore = -1;
+  for (const r of records) {
+    const g = r.gradeJson as Partial<GradeResult> | null;
+    if (!g || typeof g !== 'object' || !Array.isArray(g.criteria) || g.criteria.length === 0) continue;
+    if ((g as { gradingFailed?: unknown }).gradingFailed === true) continue;
+    const s = typeof g.totalPossible === 'number' && g.totalPossible > 0 ? Number(g.totalEarned ?? 0) : criteriaScore(g.criteria);
+    // records are oldest-first, so >= keeps the LATEST of equal tries
+    if (s >= bestScore) { best = g as GradeResult; bestScore = s; }
+  }
+  return best;
 }
 
 const STORAGE_PREFIX = 'shCode:written:';
@@ -125,6 +141,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   // a stage nobody reported.
   const [stage, setStage] = useState<GradeStage | null>(null);
   const [result, setResult] = useState<GradeResult | null>(null);
+  // The result on screen was rebuilt from the server's best try (a return visit, another device),
+  // not just graded, so the page says whose it is.
+  const [resultIsBest, setResultIsBest] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -201,7 +220,19 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       } else {
         setResponse(local.response);
       }
-      if (local.lastResult) setResult(local.lastResult);
+      // On a capped part the page must still show what the student EARNED when they come back
+      // (another day, another device, a cleared cache): the locked box used to say "your best one is
+      // your score" and show no score and none of the feedback. Once every try is spent the best
+      // try is the part's grade, so that is what is shown; before then the last try on this device
+      // stays, and the best one stands in only when this device has nothing.
+      if (maxSubmissions !== null && prior.loaded) {
+        const best = bestGradedTry(prior.records);
+        const spent = countAttempts(prior.records) >= maxSubmissions;
+        if (best && (spent || !local.lastResult)) {
+          setResult(best);
+          setResultIsBest(true);
+        } else if (local.lastResult) setResult(local.lastResult);
+      } else if (local.lastResult) setResult(local.lastResult);
       setLoaded(true);
     })();
     return () => {
@@ -341,6 +372,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       // A successful grade supersedes any failed attempt for this text.
       lastFailedRef.current = null;
       setResult(data as GradeResult);
+      setResultIsBest(false);
       // One attempt just spent. Unknown stays unknown -- we know this one happened,
       // not how many came before, and inventing a count would unlock a capped item.
       setAttempts((n) => (n === null ? null : n + 1));
@@ -641,6 +673,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         ).length;
         return (
         <div style={{ marginTop: 20 }}>
+          {resultIsBest ? (
+            <div style={{ marginBottom: 8, color: '#8be9fd', fontSize: 13 }}>This is your best try, the one that counts.</div>
+          ) : null}
           <div
             style={{
               display: 'flex',
