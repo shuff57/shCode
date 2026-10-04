@@ -312,5 +312,58 @@
       "9": "fixed: check-pa-attempts reports missing pseudocode files; banner says 'once your teacher releases it' in both states (test asserts both).",
       "mutations": "M1 criteria read, M2 enrolled-before, M3 tries-reset auth, M4 override best-of, M5 manifest criteria count, M6 give-back-one removes all, M7 score range: every one makes test-attempt-reveal fail. M8 (banner promise) was first missed (one of two occurrences left); the assertion now requires both."
     }
+  },
+  "round5": {
+    "source": "final judge, round 5 (blind, HEAD e4e14943)",
+    "status": "findings recorded before any edit",
+    "findings": [
+      {
+        "id": 1,
+        "severity": "medium",
+        "what": "replaceBest (teacher 'use this as the score even if lower') is undone by the next lesson-state completion: the stored score is rebuilt from the tries (best counted, never lowered). Repro: tries 4/4 and 1/4, teacher marks the second 0 with the box ticked -> stored 0; student POSTs completed with curl -> back to 4."
+      },
+      {
+        "id": 2,
+        "severity": "medium",
+        "what": "tries-reset recomputes the score from post-go-live rows only and logs a wrong best_score_before. Repro: pre-go-live 4/4, then post-go-live 1 then 2; give back one -> stored 1 (should stay 4), best_score_before logged 2 (should be 4). Giving back the LAST try leaves the part 'started' with no score and the page-level completion repair re-completes it at 0 within seconds."
+      },
+      {
+        "id": 3,
+        "severity": "low-medium",
+        "what": "capped AI chart rows lose the diagram for the teacher: the counted row grade-written writes holds only the Mermaid/walk text; the browser's own copy (diagram doc + structural checks) is dropped, so the review queue and the drawer show prose."
+      },
+      {
+        "id": 4,
+        "severity": "low-medium",
+        "what": "pass/fail capped parts store 0 of 0 so the queue shows 'AI score: 0 / 0'; a teacher's mark has no stated unit (criteria met out of N) and replaces that try's own score before best-of, so it can lower the grade without replaceBest."
+      },
+      {
+        "id": 5,
+        "severity": "low",
+        "what": "teachers/admins are capped at 3 tries on every capped part with no way back: tries-reset and lesson-unsubmit need an enrolled student and teachers cannot enroll; the comment at grade-written ~214 is wrong."
+      },
+      {
+        "id": 6,
+        "severity": "low (accepted trust model)",
+        "what": "any teacher can add any student to their class and then reset tries / override / release for them; comments at tries-reset ~29-30 and lesson-unsubmit claim the enrollment check prevents this. Decision: ACCEPTED (audit table records who). Fix the comments, record in the spec."
+      },
+      {
+        "id": 7,
+        "severity": "low",
+        "what": "a release DATE with no time opens at 00:00 school time (startOfSchoolDay), so period-1 finishers see the solution before period 3 sits."
+      },
+      {
+        "id": "minor-a",
+        "what": "stamp-tries-applied --check accepts a stamp of any age; a slipped deploy would count every attempt in the gap against the cap."
+      },
+      {
+        "id": "minor-b",
+        "what": "CLAUDE.md contradicts itself: 'ALWAYS npm run deploy' vs self-hosters need only d1:migrate; deploy is hard-wired to shcode / shcode-commits."
+      },
+      {
+        "id": "minor-c",
+        "what": "WrittenGrader: a stream dropped mid-grade does not re-read the try count, so the banner can show one try too many (server stays correct)."
+      }
+    ]
   }
 }
