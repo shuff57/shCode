@@ -564,7 +564,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
               ? locked
                 ? 'Submitted'
                 : 'Submit my answer'
-              : result
+              : capReached
+                ? 'No tries left'
+                : result
                 ? 'Re-submit for feedback'
                 : 'Submit for feedback'}
         </button>
@@ -778,7 +780,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
                 Continue to next lesson →
               </button>
               <p style={{ margin: '8px 0 0', color: '#888', fontSize: 12 }}>
-                You've passed — keep revising to push your score higher if you want, or move on whenever you're ready.
+                {capReached
+                  ? "You've passed. All your tries are used, so this is your final score. Move on whenever you're ready."
+                  : "You've passed — keep revising to push your score higher if you want, or move on whenever you're ready."}
               </p>
             </div>
           )}
