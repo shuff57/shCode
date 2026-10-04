@@ -651,6 +651,11 @@ function ownSupport(t, d) {
     switch (t.kind) {
         case 'torus':
             return t.ringRadius * side + t.tubeRadius;
+        case 'cone':
+            // base disk (z = -H/2, radius R) or the apex (z = +H/2): the kernel's box of a cone is
+            // the exact hull of those two (it used to be the cylinder's symmetric box, which a cut
+            // or a turn left loose).
+            return Math.max(-d[2] * t.height / 2 + t.radius * side, d[2] * t.height / 2);
         case 'prism': {
             let best = -Infinity;
             for (let k = 0; k < t.sides; k++) {
@@ -699,7 +704,7 @@ function polarRange(doc, f, axis, rec) {
     for (let k = 0; k < f.count; k++) {
         const R = axisRotation(spin, (total / f.count) * k);
         const c = R[i].reduce((a, r, j) => a + r * t.center[j], 0);
-        if (t.kind === 'torus' || t.kind === 'prism') {
+        if (t.kind === 'torus' || t.kind === 'prism' || t.kind === 'cone') {
             const h = hullRange(t, matMul(R, own), c, i);
             if (!h)
                 return null;
@@ -712,8 +717,6 @@ function polarRange(doc, f, axis, rec) {
             half = t.radius;
         else {
             const M = matMul(R, own);
-            // A cone's box is the kernel's, symmetric about its centre like a cylinder's
-            // (measured: a turned cone's bbox is NOT its tight hull), so it shares the formula.
             half = t.kind === 'box'
                 ? M[i].reduce((a, m, j) => a + Math.abs(m) * t.size[j] / 2, 0)
                 : t.height / 2 * Math.abs(M[i][2]) + t.radius * Math.sqrt(Math.max(0, 1 - M[i][2] * M[i][2]));
@@ -742,13 +745,15 @@ function rangeOf(doc, featureId, axis, budget = { n: 64 }) {
             const R = rotationMatrix(f.rotate);
             return around(f.center[i], snap(R[i].reduce((t, r, j) => t + Math.abs(r) * f.size[j] / 2, 0)));
         }
-        case 'cylinder':
         case 'cone':
+            // The kernel's box of a cone is its exact hull: the base disk and the apex.
             if (!spun)
                 return around(f.center[i], (axis === 'z' ? f.height : f.radius * 2) / 2);
-            // A turned cylinder or cone: half the height times the axis' lean, plus the disc's
-            // reach sideways. For a cone this is the KERNEL's bbox, symmetric about the centre
-            // (measured: not the tight hull), which is what a centred tool needs.
+            return hullRange(f, rotationMatrix(f.rotate), f.center[i], i);
+        case 'cylinder':
+            if (!spun)
+                return around(f.center[i], (axis === 'z' ? f.height : f.radius * 2) / 2);
+            // A turned cylinder: half the height times the axis' lean, plus the disc's reach sideways.
             {
                 const d = rotationMatrix(f.rotate)[i][2];
                 return around(f.center[i], snap(f.height / 2 * Math.abs(d) + f.radius * Math.sqrt(Math.max(0, 1 - d * d))));

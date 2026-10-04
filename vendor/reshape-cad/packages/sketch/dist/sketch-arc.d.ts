@@ -203,7 +203,7 @@ export declare function splitEdge<T extends SketchLike>(f: T, index: number): T;
  * trim distance from the radius and then, on top of the trimmed outline,
  * writes the arc's bulge.
  */
-export declare function filletCorner<T extends SketchLike>(f: T, corner: number, radius: number): T;
+export declare function filletCorner<T extends SketchLike>(f: T, corner: number, radius: number, ceilingOverride?: number): T;
 /**
  * Slice one sharp corner off flat: trim both adjacent edges back by `distance`
  * and drop the corner, leaving a straight edge between the two trim points.
@@ -214,7 +214,7 @@ export declare function filletCorner<T extends SketchLike>(f: T, corner: number,
  * absent" means in `bulges` per this file's top-of-file convention. So the
  * reindexed result with the trimmed `points` is the whole answer.
  */
-export declare function chamferCorner<T extends SketchLike>(f: T, corner: number, distance: number): T;
+export declare function chamferCorner<T extends SketchLike>(f: T, corner: number, distance: number, ceilingOverride?: number): T;
 /**
  * The outline in plane coordinates, curves sampled into short straight runs
  * -- what the preview overlay and (conceptually) the generated geometry both

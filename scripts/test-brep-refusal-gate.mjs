@@ -27,7 +27,10 @@ const refused = (code) => {
 };
 
 const cases = [
-  ['round after hollow is refused', "const b = box(80, 50, 20)\nhollow(b, { wall: 2.5, open: 'top' })\nround(b.edge('front', 'right'), 3)", true],
+  // The kernel learned round-after-hollow (reshape-cad S4: it builds the round and the cavity together),
+  // so that case moved to the accepted side; a blind hole under a hollow is still a refusal.
+  ['hollow a part with a blind hole is refused', "const b = box(80, 50, 20)\nhole(b, { across: 12, deep: 8 })\nhollow(b, { wall: 2.5, open: 'top' })", true],
+  ['round after hollow is accepted', "const b = box(80, 50, 20)\nhollow(b, { wall: 2.5, open: 'top' })\nround(b.edge('front', 'right'), 3)", false],
   ['hollow after round is refused', "const b = box(80, 50, 20)\nround(b.edge('front', 'right'), 3)\nhollow(b, { wall: 2.5, open: 'top' })", true],
   ['hollow then hole is accepted', "const b = box(80, 50, 20)\nhollow(b, { wall: 2.5, open: 'top' })\nhole(b, { across: 12 })", false],
 ];

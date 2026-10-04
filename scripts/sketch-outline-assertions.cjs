@@ -246,16 +246,21 @@ module.exports = async function run(load) {
     unrounded.points.length === 4 && Math.abs(area(unrounded.points) - 1000) < 1e-6,
     `${unrounded.points.length} points, area ${area(unrounded.points).toFixed(2)}`);
 
-  // The clamp has to report the number the outline USED, not the number this
-  // corner could have taken on its own: corner 2's round eats part of the edge
-  // corner 1 wanted, so 12.5 comes back as 8.5 and the message has to say 8.5.
+  // Every corner's share is decided on the DESIGN polygon, not on a polygon a
+  // neighbour already trimmed (reshape-cad f89d5ef: the old rule held the corner
+  // visited second to half of what its neighbour left, so the outline depended on
+  // the order the corners were visited). Corners 1 and 2 share the 25 mm edge:
+  // 12.5 + 8 = 20.5 fits, so both rounds come back whole and nothing is reported.
   const shared = arc.outlineOf(sk({ rounds: { 1: 12.5, 2: 8 } }));
-  check('...a round clamped by its NEIGHBOUR is reported at the shared number',
-    shared.notes.length === 1 && shared.notes[0].corner === 1
-      && Math.abs(shared.notes[0].want - 12.5) < 1e-9
-      && Math.abs(shared.notes[0].got - 8.5) < 1e-6,
-    `${JSON.stringify(shared.notes)} -- 12.5 is the design-only ceiling, which the student `
-      + 'cannot actually have here');
+  check('...two rounds that fit their shared edge are both taken whole, with no note',
+    shared.notes.length === 0, JSON.stringify(shared.notes));
+  // Two chamfers that want more than the shared 25 mm edge give way in
+  // proportion, and the note reports the number the outline USED (12.5 each).
+  const squeezed = arc.outlineOf(sk({ chamfers: { 1: 20, 2: 20 } }));
+  check('...two chamfers that want more than their shared edge are reported at the shared number',
+    squeezed.notes.length === 2
+      && squeezed.notes.every((n) => Math.abs(n.want - 20) < 1e-9 && Math.abs(n.got - 12.5) < 1e-6),
+    JSON.stringify(squeezed.notes));
 
   // `rounds` is keyed by CORNER while `bulges` is keyed by EDGE, and reindex()
   // has to shift them on their own rules. Pressing Corner splits edge 0, which

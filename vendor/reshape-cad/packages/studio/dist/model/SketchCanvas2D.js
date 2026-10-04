@@ -1740,7 +1740,7 @@ export default function SketchCanvas2D({ sketch, doc, onChange, onExit }) {
             ? 'Over-constrained'
             : diagnosis.dof === 0
                 ? 'Fully constrained ✓'
-                : `${diagnosis.dof} DoF`
+                : `${diagnosis.dof} free to move`
         : '';
     // --- the constraint layer (P2.8) + the dimension chips (P2.7) ------------
     // One anchor per rule, index-aligned with `rules`, fanned out where several

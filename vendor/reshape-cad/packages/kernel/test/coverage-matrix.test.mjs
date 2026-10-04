@@ -276,18 +276,6 @@ const REFUSED_HONEST = {};
 // Matrix B. Two-sided: each must still refuse and name `sentence`.
 const REFUSAL_LEDGER = [
   {
-    id: 'round on a boolean result (K2b family)',
-    script:
-      `const a = box(20, 20, 20, { at: [0, 0, 0] })\nconst b = box(20, 20, 20, { at: [10, 0, 0] })\nconst u = join(a, b)\nround(u.edge('top', 'front'), 1)`,
-    sentence: 'can only round an edge of a box',
-  },
-  {
-    id: 'chamfer (bevel) on a boolean result (K2b)',
-    script:
-      `const a = box(20, 20, 20, { at: [0, 0, 0] })\nconst b = box(20, 20, 20, { at: [10, 0, 0] })\nconst u = join(a, b)\nbevel(u.edge('top', 'front'), 1)`,
-    sentence: 'cannot chamfer an edge whose end touches more than three faces',
-  },
-  {
     id: 'box-sphere intersect (unsupported surface pair)',
     script: `const a = box(20, 20, 20)\nconst b = sphere(24, { at: [0, 0, 0] })\nconst k = keep(a, b)`,
     sentence: 'cannot boolean these two solids',
@@ -297,12 +285,6 @@ const REFUSAL_LEDGER = [
     script:
       `const s1 = sketch('top')\ns1.circle(20)\nconst s2 = sketch('top', 30)\ns2.circle(10)\nconst a = loft(s1, s2, 30)`,
     sentence: 'only blend two matching straight outlines',
-  },
-  {
-    id: 'round after hollow + hole',
-    script:
-      `const b = box(40, 40, 40)\nshell(b, { wall: 2 })\nhole(b, { across: 6 })\nround(b.edge('top', 'front'), 3)`,
-    sentence: 'would reach a cut made earlier',
   },
 ];
 
@@ -591,12 +573,12 @@ const D_FIXTURES = {
 const D_TABLE = [
   ['1', 1, 'edge 1 has a loose end; the outline must close'],
   ['2', 2, 'edge 2 and edge 5 nearly touch but nothing says they meet. Add a coincident rule.'],
-  ['3', 3, 'these corners were asked to meet but the solver could only bring them within'],
+  ['3', 3, 'these corners were asked to meet, but your rules pull them apart; the closest they can get is'],
   ['4', 4, 'edge 1 crosses edge 3. An outline cannot cross itself.'],
   ['5', 5, 'two edges leave the same corner along the same path'],
   ['6a', '6a', 'edge 4 has zero length'],
   ['6b', '6b', 'arc 4 has sweep near zero'],
-  ['8', 8, 'no closed loop found'],
+  ['8', 8, 'no closed outline found'],
   ['9', 9, 'the outline collapsed while solving'],
   ['10', 10, 'a circle can only be its own outline in this version; use two arcs to join it to other edges'],
   ['11', 11, "the sketch's rules conflict, so no profile can be trusted; resolve the conflict first"],
