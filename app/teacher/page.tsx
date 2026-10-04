@@ -14,6 +14,7 @@ import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
 import { criteriaScore } from '../../lib/grade-pass';
+import { lessonPercent } from '../../lib/grading-weights';
 import { toMermaid } from '../../lib/diagram-mermaid';
 
 // ---------------------------------------------------------------------------
@@ -161,6 +162,8 @@ interface LessonMeta {
   type?: string | null;
   /** The part's try limit, or null/absent when it has none (lessons-manifest.json). */
   maxSubmissions?: number | null;
+  /** Quiz questions, rubric points, or pass/fail criteria; null = completion is the grade. */
+  maxScore?: number | null;
 }
 
 /**
@@ -1016,7 +1019,7 @@ function GradebookView({
     );
   }
 
-  function cellContent(cell: GradebookCell | undefined): React.ReactNode {
+  function cellContent(cell: GradebookCell | undefined, maxScore?: number | null): React.ReactNode {
     // Checked before every other branch. A grader outage leaves the row
     // completed with a NULL score, which reads as a plain green tick, and it
     // leaves submitted_score NULL, which reads as the same "·" a student who
@@ -1035,16 +1038,15 @@ function GradebookView({
       return withLate(cell, <span style={{ color: cell?.late ? '#ff5555' : '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
     }
     if (cell.state === 'completed') {
-      if (cell.score !== null) {
-        const hasSubDiff = cell.submitted_score !== null && cell.submitted_score !== cell.score;
+      // The PERCENT the grade is built from (lessonPercent, the function functions/_shared/grading.ts
+      // uses), not lesson_state.score, which is raw points in the part's own units. The raw number
+      // read "0" on a chart lesson that grades 100, and "3" meant 3 of 4 on one lesson and 3 of 10 on
+      // the next. The latest attempt's raw points are still in the tooltip (cellTitle).
+      const pct = lessonPercent(cell.state, cell.score, maxScore);
+      if (pct < 100) {
         return withLate(cell, (
-          <span style={{ color: '#50fa7b', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>
-            {cell.score}
-            {hasSubDiff && (
-              <sub style={{ color: '#8be9fd', fontSize: 9, marginLeft: 2 }}>
-                s{cell.submitted_score}
-              </sub>
-            )}
+          <span style={{ color: pct >= 70 ? '#50fa7b' : '#f1fa8c', fontFamily: 'monospace', fontWeight: 700, fontSize: 12 }}>
+            {pct}
           </span>
         ));
       }
@@ -1289,7 +1291,7 @@ function GradebookView({
                         router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(student.email)}&lesson=${encodeURIComponent(lesson.id)}`);
                       } : undefined}
                     >
-                      {cellContent(cell)}
+                      {cellContent(cell, lesson.maxScore)}
                     </td>
                   );
                 })}
