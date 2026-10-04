@@ -20,20 +20,26 @@
 // the class and the best score before, in the same batch. That is the audit trail
 // lesson-unsubmit deliberately did not have.
 //
-// lesson_state follows: after a reset it is 'started' with no score. After a give-back it
-// keeps its state and takes the best score over the rows that remain (the same per-row
-// rule as the server's own derivation, rowScore in functions/_shared/attempts.ts); with no
-// counted row left it is 'started' with no score. A capped quiz's draft is rewritten to
-// graded:false (answers kept), as lesson-unsubmit does, so the radios unlock.
+// lesson_state follows: after a reset it is 'started' with no score and no override. After a
+// give-back it keeps its state and takes the best score over EVERY row that remains (the same
+// per-row rule as the server's own derivation, rowScore in functions/_shared/attempts.ts, so a
+// pre-go-live best and a teacher's mark on an outage row still count), unless the teacher has
+// persisted a score_override, which a give-back never touches. Giving back the last counted try
+// when nothing with a score remains also removes the leftover outage markers (audited), so the
+// part is 'started' and stays there: a stray marker made the page's completion repair complete it
+// again at 0. A capped quiz's draft is rewritten to graded:false (answers kept), as
+// lesson-unsubmit does, so the radios unlock.
 //
-// Auth: owner / co-teacher of the class, or an admin; the student must be actively
-// enrolled in that class (or any teacher could reset any student by naming their own).
+// Auth: owner / co-teacher of the class, or an admin; the student must be actively enrolled in
+// that class. That is NOT a barrier against a teacher acting on a student who is not theirs: a
+// teacher can add any student to their own class (the enrollments route), and then this applies.
+// The accepted trust model is that teachers are trusted; the audit table records who did it.
 // Only the rows this request READ are deleted (by id), so a try the student submits while
 // the teacher is clicking is never swept up by it.
 
 import { canManageClass } from '../../../../_shared/classAuth';
 import { normalizeEmail } from '../../../../_shared/auth';
-import { capFor, kindFor, rowScore } from '../../../../_shared/attempts';
+import { capFor, kindFor, scoreForBest } from '../../../../_shared/attempts';
 import { COUNT_SINCE, countAttempts } from '../../../../../lib/attempt-cap';
 
 interface Env {
@@ -107,21 +113,49 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
   const counted = all.filter(
     (r) => countAttempts([{ submittedAt: r.submitted_at, gradeJson: parse(r.grade_json) }], COUNT_SINCE) === 1,
   );
-  const removed: Row[] = action === 'reset' ? all : counted.slice(-1);
-  if (removed.length === 0) return json({ error: 'No counted try to give back' }, 409);
-  const removedIds = new Set(removed.map((r) => r.id));
-  const remaining = counted.filter((r) => !removedIds.has(r.id));
+  const scoreOfRow = (r: Row) => scoreForBest({ score: r.score, possible: r.possible, gradeJson: parse(r.grade_json) });
+  const bestOf = (rows: Row[]): number | null => {
+    let best: number | null = null;
+    for (const r of rows) {
+      const sc = scoreOfRow(r);
+      if (sc !== null && (best === null || sc > best)) best = sc;
+    }
+    return best;
+  };
 
-  let bestBefore: number | null = null;
-  for (const r of counted) {
-    const sc = rowScore({ score: r.score, possible: r.possible, gradeJson: parse(r.grade_json) });
-    if (sc !== null && (bestBefore === null || sc > bestBefore)) bestBefore = sc;
+  const state = await env.DB
+    .prepare('SELECT score, score_override AS override FROM lesson_state WHERE student_email = ? AND lesson_id = ?')
+    .bind(email, lessonId)
+    .first<{ score: number | null; override: number | null }>();
+  const override = typeof state?.override === 'number' ? state.override : null;
+
+  let removed: Row[] = action === 'reset' ? all : counted.slice(-1);
+  if (removed.length === 0) return json({ error: 'No counted try to give back' }, 409);
+  let removedIds = new Set(removed.map((r) => r.id));
+  const remainingCounted = counted.filter((r) => !removedIds.has(r.id));
+
+  // What the part was worth BEFORE: the stored score if it has one (it can be the pre-go-live
+  // best, or a teacher's mark), else the best over every row. Counted rows alone read a
+  // pre-go-live 4/4 as nothing, and logged the later try's 2 as the best before.
+  const rowsBest = bestOf(all);
+  const bestBefore = state && typeof state.score === 'number' && rowsBest !== null
+    ? Math.max(state.score, rowsBest)
+    : (state && typeof state.score === 'number' ? state.score : rowsBest);
+
+  // What it is worth AFTER: the teacher's persisted override if there is one (a give-back
+  // never touches it), else the best over EVERY row that remains -- the tries still on file,
+  // the pre-go-live best, and a teacher's mark on an outage row -- and not just the counted ones.
+  let bestAfter: number | null = bestOf(all.filter((r) => !removedIds.has(r.id)));
+
+  // Giving back the LAST counted try must leave the part 'started' and keep it there. If
+  // nothing with a score is left, only the server's free outage markers can remain, and a
+  // marker makes the page's completion repair complete the part again (at 0) within seconds.
+  // So those go too, in the same audited batch, and the part is genuinely back to unsat.
+  if (action === 'give-back-one' && remainingCounted.length === 0 && bestAfter === null && override === null) {
+    removed = all;
+    removedIds = new Set(removed.map((r) => r.id));
   }
-  let bestAfter: number | null = null;
-  for (const r of remaining) {
-    const sc = rowScore({ score: r.score, possible: r.possible, gradeJson: parse(r.grade_json) });
-    if (sc !== null && (bestAfter === null || sc > bestAfter)) bestAfter = sc;
-  }
+  const remaining = all.filter((r) => !removedIds.has(r.id));
 
   const now = Date.now();
   const placeholders = removed.map(() => '?').join(', ');
@@ -142,21 +176,23 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
   ];
 
   if (action === 'reset' || remaining.length === 0) {
+    // As if never sat: the teacher's override goes with the rows.
     statements.push(
       env.DB
         .prepare(
-          `UPDATE lesson_state SET state = 'started', completed_at = NULL, score = NULL
+          `UPDATE lesson_state SET state = 'started', completed_at = NULL, score = NULL, score_override = NULL
             WHERE student_email = ? AND lesson_id = ?`,
         )
         .bind(email, lessonId),
     );
-  } else {
+  } else if (override === null) {
     statements.push(
       env.DB
         .prepare('UPDATE lesson_state SET score = ? WHERE student_email = ? AND lesson_id = ?')
         .bind(bestAfter ?? 0, email, lessonId),
     );
   }
+  // (an override stays exactly as the teacher left it: lesson_state.score already is it)
 
   // A capped quiz hydrates from its draft: unlock the radios, keep the answers.
   if (kindFor(lessonId) === 'quiz') {
@@ -177,7 +213,7 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
   }
 
   await env.DB.batch(statements);
-  return json({ ok: true, action, rowsRemoved: removed.length, triesLeft: Math.max(0, cap - remaining.length) });
+  return json({ ok: true, action, rowsRemoved: removed.length, triesLeft: Math.max(0, cap - counted.filter((r) => !removedIds.has(r.id)).length) });
 };
 
 function savedAnswers(response: string): unknown {

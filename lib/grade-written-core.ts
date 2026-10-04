@@ -36,6 +36,13 @@ export interface GradeRequest {
    * byte for byte.
    */
   strict?: boolean;
+  /**
+   * Flowchart parts: the drawn chart and its structural checks, kept with the counted row so
+   * the teacher can see what was graded. DISPLAY ONLY: bounded and shape-checked by
+   * cleanArtifact (functions/_shared/attempts.ts), never used for scoring and never part of
+   * the model's prompt (buildPrompt reads named fields only).
+   */
+  artifact?: unknown;
 }
 
 interface CriterionResult {

@@ -20,10 +20,12 @@
 // `quiz` array -- what components/QuizView.tsx writes. A written answer, a
 // diagram or code 409s: the delete below would destroy a graded essay.
 //
-// Auth: owner / co-teacher of the class, or an admin. The student must also
-// be actively enrolled, or any teacher could reopen any student's quiz just
-// by naming their own class. Progress is keyed by student, not class, so a
-// student in two classes is reopened in both.
+// Auth: owner / co-teacher of the class, or an admin. The student must also be actively
+// enrolled in THAT class. This is not a barrier against a teacher acting on a student who is not
+// theirs: a teacher can add any student to their own class (the enrollments route) and then this
+// applies. The accepted trust model is that teachers are trusted (round 5 finding 6; the try-reset
+// route records who did what in lesson_try_resets, this one keeps no trail). Progress is keyed by
+// student, not class, so a student in two classes is reopened in both.
 //
 // ponytail: submissions are deleted outright, no audit trail. Keeping one
 // needs a new column or table (migration 0032) and a filter on every reader

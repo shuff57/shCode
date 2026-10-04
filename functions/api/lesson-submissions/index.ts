@@ -10,13 +10,13 @@
 import { resolveDueForStudent } from '../../_shared/dueDates';
 import { assignVariant, hashSeed } from '../../../lib/quiz-variant';
 import { QUIZ_KEYS } from '../../_shared/quiz-keys.generated';
-import { scoreQuiz, capFor, kindFor, insertCounted, findMarkerKey } from '../../_shared/attempts';
+import { scoreQuiz, capFor, kindFor, insertCounted, findMarkerKey, effectiveCap } from '../../_shared/attempts';
 
 interface Env {
   DB: D1Database;
   ASSETS?: Fetcher;
 }
-type Ctx = EventContext<Env, string, { email: string }>;
+type Ctx = EventContext<Env, string, { email: string; role?: string }>;
 
 interface Row {
   id: string;
@@ -37,7 +37,7 @@ interface CreateBody {
   possible?: number;
 }
 
-export const onRequestGet: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
+export const onRequestGet: PagesFunction<Env, string, { email: string; role?: string }> = async (context: Ctx) => {
   const { request, env, data } = context;
   const lessonId = new URL(request.url).searchParams.get('lessonId');
   if (!lessonId) return json({ error: 'lessonId required' }, 400);
@@ -61,7 +61,7 @@ export const onRequestGet: PagesFunction<Env, string, { email: string }> = async
   });
 };
 
-export const onRequestPost: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
+export const onRequestPost: PagesFunction<Env, string, { email: string; role?: string }> = async (context: Ctx) => {
   const { request, env, data } = context;
   let body: CreateBody;
   try {
@@ -87,7 +87,8 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   }
 
   const cap = capFor(body.lessonId);
-  if (cap !== undefined) return recordCapped(env, data.email, body, cap, now, dueAtSubmit);
+  // A teacher or admin previewing a capped part is never refused (see effectiveCap).
+  if (cap !== undefined) return recordCapped(env, data.email, body, effectiveCap(cap, data.role), now, dueAtSubmit);
 
   await env.DB.prepare(
     `INSERT INTO lesson_submissions

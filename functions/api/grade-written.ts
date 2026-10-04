@@ -58,7 +58,7 @@ import {
 } from '../../lib/grade-written-core';
 import { isLessonAccessible, lockedResponse, type SessionData } from '../_shared/lessonAccess';
 import { loadAiGrader } from '../_shared/aiGraders';
-import { capFor, kindFor, attemptsUsed, recordGraded, recordOutage } from '../_shared/attempts';
+import { capFor, kindFor, attemptsUsed, recordGraded, recordOutage, isStaff, effectiveCap, cleanArtifact } from '../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -210,11 +210,18 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   // exists (see `record` below). So the AI cannot be used as free practice
   // before a row is written, a score the browser relays is never what counts,
   // and once every try is spent no further call reaches the model. Refused here,
-  // before the rate limit and before any model cost. Applies to every role: the
-  // cap is about the part, and a teacher who needs a clean slate can unsubmit.
+  // before the rate limit and before any model cost. Applies to STUDENTS only: a teacher or
+  // admin who opens the part is previewing it (checking a rubric, a burst test before test
+  // day), and the cap is about what a student may spend. Their rows are recorded but never
+  // refused (tryCap is unlimited for them), and they never reach a class gradebook or the
+  // review queue because those read enrolled students only. A student who needs a clean slate
+  // is given one by a teacher (POST /api/classes/[id]/tries-reset), not by unsubmit.
   const cap = capFor(body.lessonId);
   const capped = cap !== undefined && kindFor(body.lessonId) === 'ai';
-  if (capped && (await attemptsUsed(env.DB, data.email, body.lessonId)) >= (cap as number)) {
+  const tryCap = cap === undefined ? undefined : effectiveCap(cap, data.role);
+  // Display-only copy of what was drawn, kept with the counted row for the teacher's view.
+  const artifact = cleanArtifact((body as { artifact?: unknown }).artifact);
+  if (capped && !isStaff(data.role) && (await attemptsUsed(env.DB, data.email, body.lessonId)) >= (cap as number)) {
     return json(
       { ok: false, error: `All ${cap} tries on this part are already used.`, capReached: true, cap },
       409,
@@ -222,7 +229,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   }
   const record = capped
     ? (result: { totalEarned: number; totalPossible: number }) =>
-        recordGraded(env, request, data.email, body.lessonId, cap as number, body.response, result)
+        recordGraded(env, request, data.email, body.lessonId, tryCap as number, body.response, result, artifact)
     : undefined;
   // A grade that could not be produced (grader down or busy, or a model reply with
   // no usable grade). The SERVER writes the free marker so the work still reaches
@@ -232,7 +239,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   const fail = capped
     ? async (reason: string, status: number): Promise<void> => {
         try {
-          await recordOutage(env, request, data.email, body.lessonId, cap as number, body.response, reason, status);
+          await recordOutage(env, request, data.email, body.lessonId, tryCap as number, body.response, reason, status, artifact);
         } catch {
           /* the failure message below is still what the student sees */
         }

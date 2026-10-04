@@ -10,7 +10,7 @@
 // completion on a lesson whose prior siblings aren't done.
 
 import { isLessonAccessible, lockedResponse, type SessionData } from '../../_shared/lessonAccess';
-import { capFor, bestCountedScore, hasAnyRow } from '../../_shared/attempts';
+import { capFor, bestScoreOverAllRows, scoreOverride, hasAnyRow } from '../../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -55,8 +55,8 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async 
     // Upsert to completed. Preserve started_at if a prior row exists.
     //
     // On a CAPPED part the best try counts (spec: .gauntlet/SPEC-attempt-caps.md)
-    // and the score is NOT the browser's: it is the best score over the rows that
-    // spent a try, read here from lesson_submissions. `body.score` is ignored. A
+    // and the score is NOT the browser's: it is the best score over the student's rows
+    // (or the teacher's persisted override), read here from the server's own tables. `body.score` is ignored. A
     // number the browser sent could not be checked, and because a capped score
     // can only rise, a forged one would have been permanent. The stored value
     // still only ever goes up (a failed grade or an unsubmit-less re-completion
@@ -75,10 +75,15 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async 
       if (!staff && !(await hasAnyRow(env.DB, data.email, lessonId))) {
         return json({ error: 'Hand in a try before this part can be completed.', needsTry: true }, 409);
       }
-      // 0, never NULL, when no counted try carries a score (a hand-in that spent no
-      // try because the grader was down). NULL would grade as 100; the teacher's
-      // mark from the review queue, or the next real try, replaces the 0.
-      score = (await bestCountedScore(env.DB, data.email, lessonId)) ?? 0;
+      // A teacher's "use this as the score" (replaceBest) is persisted in
+      // lesson_state.score_override and WINS: a student's completion request must not undo it
+      // (round 5 finding 1: a 0 the teacher set was back to 4 after one curl). Otherwise the
+      // best score over EVERY row (tries, the pre-go-live best, a teacher's mark on an
+      // outage row), 0 -- never NULL -- when none carries a score. NULL would grade as 100;
+      // the teacher's mark from the review queue, or the next real try, replaces the 0.
+      score = (await scoreOverride(env.DB, data.email, lessonId))
+        ?? (await bestScoreOverAllRows(env.DB, data.email, lessonId))
+        ?? 0;
     } else if (body.score === undefined || body.score === null) {
       score = null;
     } else if (typeof body.score === 'number' && Number.isFinite(body.score) && body.score >= 0 && body.score <= 100000) {
@@ -88,6 +93,7 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async 
     }
     const scoreSql = capped
       ? `CASE
+           WHEN lesson_state.score_override IS NOT NULL THEN lesson_state.score_override
            WHEN excluded.score IS NULL THEN lesson_state.score
            WHEN lesson_state.score IS NULL THEN excluded.score
            ELSE MAX(lesson_state.score, excluded.score)

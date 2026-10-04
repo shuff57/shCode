@@ -42,6 +42,24 @@ export function kindFor(lessonId: string): AttemptKind {
   return has(ATTEMPT_KINDS, lessonId) ? ATTEMPT_KINDS[lessonId] : 'client';
 }
 
+/** A cap no real student reaches: what a previewing teacher or admin is held to. */
+export const UNLIMITED_TRIES = 1_000_000;
+
+/**
+ * A teacher or admin who opens a capped part is PREVIEWING it (checking a rubric, running a
+ * burst test before test day). Their rows are recorded but never refused, so the cap passed to
+ * insertCounted / recordGraded / recordOutage is UNLIMITED for them. They are never enrolled in
+ * a class, so the gradebook and the review queue (both read enrolled students only) never see
+ * their rows.
+ */
+export function isStaff(role: string | undefined): boolean {
+  return role === 'teacher' || role === 'admin';
+}
+
+export function effectiveCap(cap: number, role: string | undefined): number {
+  return isStaff(role) ? UNLIMITED_TRIES : cap;
+}
+
 function parse(raw: string | null): unknown | null {
   if (!raw) return null;
   try {
@@ -181,13 +199,38 @@ export function rowScore(r: { score: number | null; possible: number | null; gra
   // A row a teacher has MARKED (the review queue's override) carries the teacher's number in
   // `score`, in the units of the part's maxScore, so it is read as stored, never re-derived
   // from the AI's criteria.
-  const g = r.gradeJson && typeof r.gradeJson === 'object' ? (r.gradeJson as { teacherOverriddenAt?: unknown; teacherReviewedAt?: unknown }) : null;
+  const g = r.gradeJson && typeof r.gradeJson === 'object'
+    ? (r.gradeJson as { teacherOverriddenAt?: unknown; teacherReviewedAt?: unknown; aiScore?: unknown; teacherReplace?: unknown })
+    : null;
   const teacherMarked = !!g && (typeof g.teacherOverriddenAt === 'number' || typeof g.teacherReviewedAt === 'number');
   if (!pointed && !teacherMarked) {
     const criteria = r.gradeJson && typeof r.gradeJson === 'object' ? (r.gradeJson as { criteria?: unknown }).criteria : null;
     if (Array.isArray(criteria) && criteria.length > 0) return criteriaScore(criteria as Array<{ verdict: string }>);
   }
-  return typeof r.score === 'number' && Number.isFinite(r.score) ? r.score : null;
+  const stored = typeof r.score === 'number' && Number.isFinite(r.score) ? r.score : null;
+  // A teacher's mark replaces the AI's score on that row, but it must not LOWER the part's
+  // grade unless the teacher said so (replaceBest, which also sets lesson_state.score_override).
+  // The row keeps the AI's own score as `aiScore` when first marked, and the row reads as the
+  // higher of the two, so any recompute from the rows (a give-back, a completion, clearing an
+  // override) lands on the same number the review queue showed.
+  if (teacherMarked && g && g.teacherReplace !== true && typeof g.aiScore === 'number' && Number.isFinite(g.aiScore)) {
+    return stored === null ? g.aiScore : Math.max(stored, g.aiScore);
+  }
+  return stored;
+}
+
+/**
+ * A stored row's score as it counts toward the part's BEST. A grading-failure marker counts only
+ * once a teacher has marked it by hand (the review queue writes the teacher's number onto it); an
+ * unmarked marker carries no score, and one that somehow does (a forged insert) must not raise the
+ * best. Every recompute from the rows (lesson-state, tries-reset, the review queue) reads this.
+ */
+export function scoreForBest(r: { score: number | null; possible: number | null; gradeJson: unknown | null }): number | null {
+  const g = r.gradeJson && typeof r.gradeJson === 'object'
+    ? (r.gradeJson as { gradingFailed?: unknown; teacherOverriddenAt?: unknown; teacherReviewedAt?: unknown })
+    : null;
+  if (g && g.gradingFailed === true && typeof g.teacherOverriddenAt !== 'number' && typeof g.teacherReviewedAt !== 'number') return null;
+  return rowScore(r);
 }
 
 /** The best score over the rows that spent a try, or null when none carries one. */
@@ -198,6 +241,97 @@ export async function bestCountedScore(db: AttemptDb, email: string, lessonId: s
     if (sc !== null && (best === null || sc > best)) best = sc;
   }
   return best;
+}
+
+/**
+ * The best score over EVERY row the student has for the part: tries since go-live, rows from
+ * before it (their score is the part's old best, which the spec keeps), and a teacher's mark on
+ * a grader-outage row. A row with no score (the bare outage marker) contributes nothing.
+ * `exclude` leaves out rows a tries-reset is about to delete, so the recompute is the score
+ * AFTER the reset. This is what lesson_state.score is rebuilt from; bestCountedScore (tries
+ * only) is kept for callers that mean "what the counted tries earned".
+ */
+export async function bestScoreOverAllRows(
+  db: AttemptDb,
+  email: string,
+  lessonId: string,
+  exclude: ReadonlySet<string> = new Set(),
+): Promise<number | null> {
+  const res = await db
+    .prepare('SELECT id, grade_json, score, possible FROM lesson_submissions WHERE student_email = ? AND lesson_id = ?')
+    .bind(email, lessonId)
+    .all<{ id: string; grade_json: string | null; score: number | null; possible: number | null }>();
+  let best: number | null = null;
+  for (const r of res.results ?? []) {
+    if (exclude.has(r.id)) continue;
+    const sc = scoreForBest({ score: r.score, possible: r.possible, gradeJson: parse(r.grade_json) });
+    if (sc !== null && (best === null || sc > best)) best = sc;
+  }
+  return best;
+}
+
+/** The teacher's persisted "this is the score" for the part, or null (see migration 0034). */
+export async function scoreOverride(db: AttemptDb, email: string, lessonId: string): Promise<number | null> {
+  const res = await db
+    .prepare('SELECT score_override AS o FROM lesson_state WHERE student_email = ? AND lesson_id = ?')
+    .bind(email, lessonId)
+    .all<{ o: number | null }>();
+  const o = (res.results ?? [])[0]?.o;
+  return typeof o === 'number' && Number.isFinite(o) ? o : null;
+}
+
+/** The most JSON a stored artifact may be (a 200-shape chart with its checks is a few KB). */
+export const MAX_ARTIFACT_CHARS = 60_000;
+
+/**
+ * What a flowchart part may hand the grader besides its text: the drawn chart and the
+ * browser-side structural checks, so the teacher can SEE what was graded (the counted row's
+ * `response` is the Mermaid text the model read, and the browser's own copy of the chart is
+ * dropped on an AI-graded capped part). It is DISPLAY ONLY: bounded, shape-checked, stored under
+ * grade_json.artifact, never used for scoring and never put in the model's prompt. Anything that
+ * does not fit is dropped (the grade is unaffected), never trusted.
+ */
+export function cleanArtifact(raw: unknown): { doc: { version: 1; nodes: unknown[]; edges: unknown[] }; checks: unknown[] } | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
+  const a = raw as { doc?: unknown; checks?: unknown };
+  const doc = a.doc as { nodes?: unknown; edges?: unknown } | undefined;
+  if (!doc || typeof doc !== 'object' || !Array.isArray(doc.nodes) || !Array.isArray(doc.edges)) return undefined;
+  if (doc.nodes.length > 200 || doc.edges.length > 400) return undefined;
+  const nodesOk = doc.nodes.every(
+    (n) => !!n && typeof n === 'object' && typeof (n as { id?: unknown }).id === 'string' && typeof (n as { shape?: unknown }).shape === 'string',
+  );
+  const edgesOk = doc.edges.every(
+    (e) => !!e && typeof e === 'object' && typeof (e as { source?: unknown }).source === 'string' && typeof (e as { target?: unknown }).target === 'string',
+  );
+  if (!nodesOk || !edgesOk) return undefined;
+  const str = (v: unknown, n: number) => (typeof v === 'string' ? v.slice(0, n) : '');
+  const checks: unknown[] = [];
+  if (Array.isArray(a.checks)) {
+    if (a.checks.length > 40) return undefined;
+    for (const c of a.checks) {
+      if (!c || typeof c !== 'object') return undefined;
+      const k = c as { id?: unknown; title?: unknown; passed?: unknown; detail?: unknown; offenders?: unknown };
+      if (typeof k.passed !== 'boolean') return undefined;
+      checks.push({
+        id: str(k.id, 40),
+        title: str(k.title, 200),
+        passed: k.passed,
+        detail: str(k.detail, 500),
+        offenders: Array.isArray(k.offenders) ? k.offenders.filter((o): o is string => typeof o === 'string').slice(0, 50).map((o) => o.slice(0, 80)) : [],
+      });
+    }
+  }
+  const out = { doc: { version: 1 as const, nodes: doc.nodes, edges: doc.edges }, checks };
+  // A key anywhere that looks like the grading-failure marker is never honest, and the count
+  // rule must not be able to see one inside a row the server wrote either.
+  if (findMarkerKey(out)) return undefined;
+  let size = 0;
+  try {
+    size = JSON.stringify(out).length;
+  } catch {
+    return undefined;
+  }
+  return size > MAX_ARTIFACT_CHARS ? undefined : out;
 }
 
 export interface NewSubmission {
@@ -267,6 +401,7 @@ export async function recordGraded(
   cap: number,
   response: string,
   result: { totalEarned: number; totalPossible: number },
+  artifact?: unknown,
 ): Promise<boolean> {
   let dueAt: number | null = null;
   try {
@@ -281,7 +416,9 @@ export async function recordGraded(
       email,
       lessonId,
       response,
-      gradeJson: JSON.stringify(result),
+      // `artifact` is what the teacher needs to SEE (the drawn chart and its structural
+      // checks). It is stored beside the grade and nothing reads it for scoring.
+      gradeJson: JSON.stringify(artifact === undefined ? result : { ...result, artifact }),
       score: result.totalEarned,
       possible: result.totalPossible,
       at: Date.now(),
@@ -316,6 +453,7 @@ export async function recordOutage(
   response: string,
   reason: string,
   httpStatus: number,
+  artifact?: unknown,
 ): Promise<boolean> {
   let dueAt: number | null = null;
   try {
@@ -323,7 +461,11 @@ export async function recordOutage(
   } catch {
     dueAt = null;
   }
-  const marker = JSON.stringify({ gradingFailed: true, error: reason.slice(0, 300), httpStatus });
+  const marker = JSON.stringify(
+    artifact === undefined
+      ? { gradingFailed: true, error: reason.slice(0, 300), httpStatus }
+      : { gradingFailed: true, error: reason.slice(0, 300), httpStatus, artifact },
+  );
   const res = await env.DB
     .prepare(
       `INSERT INTO lesson_submissions

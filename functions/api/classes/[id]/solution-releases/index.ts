@@ -209,12 +209,17 @@ export const onRequestPut: PagesFunction<Env, 'id', SessionData> = async (contex
       if (typeof entry.date !== 'string' || !DATE_RE.test(entry.date) || !isRealDate(entry.date)) {
         return json({ error: `date must be YYYY-MM-DD or null, got ${JSON.stringify(entry.date)}` }, 400);
       }
-      if (entry.time != null && (typeof entry.time !== 'string' || !TIME_RE.test(entry.time))) {
-        return json({ error: `time must be HH:MM or null, got ${JSON.stringify(entry.time)}` }, 400);
+      // A release DATE needs an explicit TIME. Without one the instant defaulted to 00:00
+      // school time, so a teacher who picked the test day meaning "after the test" opened the
+      // solution at midnight and period 1's finishers could pass it on before period 3 sat.
+      // (Unlike due and open dates, where a bare date is the start/end of a day for good reason,
+      // a release is a one-way door.) 'Release now' needs no time.
+      if (typeof entry.time !== 'string' || !TIME_RE.test(entry.time)) {
+        return json({ error: `A release date needs a time (HH:MM, school time); got ${JSON.stringify(entry.time ?? null)}`, needsTime: true }, 400);
       }
-      const time = entry.time as string | null | undefined; // validated above
+      const time = entry.time;
       try {
-        releaseAt = time == null ? startOfSchoolDay(entry.date) : schoolInstant(entry.date, time);
+        releaseAt = schoolInstant(entry.date, time);
       } catch {
         return json({ error: `Invalid date ${JSON.stringify(entry.date)}` }, 400);
       }
