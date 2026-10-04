@@ -670,13 +670,16 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       {result && !oneShot && (() => {
         const passFail = result.totalPossible === 0;
         const passed = isPassing(result);
-        const okCount = result.criteria.filter(
-          (c) => c.verdict === 'met' || c.verdict === 'partial',
-        ).length;
+        // The score a pass/fail part RECORDS: met = 1, partly met = half (criteriaScore). It used to
+        // read "3 / 3 criteria met" for an answer that was partial on all three, which a student
+        // reads as full marks while the recorded score is 1.5 of 3.
+        const earnedCriteria = criteriaScore(result.criteria);
         return (
         <div style={{ marginTop: 20 }}>
           {resultIsBest ? (
             <div style={{ marginBottom: 8, color: '#8be9fd', fontSize: 13 }}>This is your best try, the one that counts.</div>
+          ) : maxSubmissions !== null ? (
+            <div style={{ marginBottom: 8, color: '#8be9fd', fontSize: 13 }}>This is your latest try. Your best try is the one that counts.</div>
           ) : null}
           <div
             style={{
@@ -691,7 +694,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
             <span>
               <strong style={{ color: '#f8f8f2', fontSize: 16 }}>
                 {passFail
-                  ? `${okCount} / ${result.criteria.length} criteria met`
+                  ? `${Math.round(earnedCriteria * 10) / 10} / ${result.criteria.length} criteria (partly met counts half)`
                   : `${result.totalEarned} / ${result.totalPossible}`}
               </strong>
               {!passFail && (
