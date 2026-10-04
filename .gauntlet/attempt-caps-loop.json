@@ -380,7 +380,7 @@
   },
   "round6": {
     "source": "blind judge round 6 on HEAD 1d3bc13b (fresh archive, empty pa-pseudocode/)",
-    "status": "findings recorded before any edit; fixes in progress",
+    "status": "all five findings fixed; mutation-checked; full suite verified from a fresh worktree (see results)",
     "findings": [
       {
         "n": 1,
@@ -412,6 +412,14 @@
         "what": "stamp-tries-applied --check fails on a shallow clone: git log -S finds only the shallow root commit, so the stamp looks earlier than the commit that introduced it.",
         "fix": "detect git rev-parse --is-shallow-repository; skip the introduced-by comparison with a loud warning (and say how to unshallow)"
       }
-    ]
+    ],
+    "results": {
+      "1": "cleanArtifact rebuilt on the real DiagramDoc shape (nodes {id,shape,label,x,y}; arrows {id,from,to,label?,fromSide?,toSide?}); unknown keys dropped, repeated ids / unknown shapes / dangling arrows refused, size cap and marker-key refusal kept (marker key also checked on the raw input). docToFlow moved to lib/diagram-flow.ts so the teacher read path (stored row -> parseDiagramArtifact -> docToFlow) is tested without a browser. Fixtures are built by fromMermaid, the way the browser builds a chart. A test asserts the accepted shapes equal lib/diagram-types.ts FlowShape.",
+      "2": "lesson-unsubmit now sets score_override = NULL. Audit of every lesson_state writer: tries-reset reset (already cleared), lesson-state DELETE (whole row, refused for students on capped parts), class delete (purges), tries-reset give-back (keeps the override on purpose), submission-queue mark (the writer). Judge repro as a test: override 0, unsubmit, retake 2/2 -> completed, score 2. A source assertion fails if any reset to started stops clearing the override.",
+      "3": "submission-queue exports one rowLimit(row): points when the row has possible, else the criteria it carries, else the part rubric (an outage row has neither); GET returns limit {max,unit} on every row, POST enforces exactly that ceiling; the form says criteria met, out of N or points, out of N for any row.",
+      "4": "stripOverrideKeys removes every teacher*/override*/aiScore key (NFKC-folded, any depth, in arrays) from browser-supplied gradeJson at the one write entry (lesson-submissions POST, capped and uncapped); rowScore never returns more than a pointed row possible, so a forged row written before this fix cannot lift the best past its own maximum. A real teacher mark through the queue still works.",
+      "5": "stamp-tries-applied --check detects a shallow repository, skips ONLY the introduced-by comparison with a loud warning that says to git fetch --unshallow, and keeps every other check (future, stale, uncommitted, unstamped). Test uses a real depth-1 clone."
+    },
+    "mutation_check": "14 mutations, each breaks the named test: 1a any arrowed chart dropped, 1b unknown node keys kept, 1c unknown shape accepted, 1d dangling arrow accepted, 1e repeated id accepted, 2 unsubmit keeps override, 3a no rubric fallback for outage rows, 3b server stops enforcing the limit, 3c queue GET drops limit, 4a strip not applied, 4b teacher* not stripped, 4c nested not stripped, 4d no clamp, 5 shallow clone not handled."
   }
 }
