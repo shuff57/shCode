@@ -49,7 +49,7 @@ export const ATTEMPT_CAPS_APPLIED = 1790804940000;
  * Never move it earlier than a deploy students have already used: that
  * confiscates tries.
  */
-export const TRIES_APPLIED = 1791065875120;
+export const TRIES_APPLIED = 1791125019914;
 
 /**
  * Has the go-live instant above been set on purpose? FALSE until the human runs
@@ -59,7 +59,7 @@ export const TRIES_APPLIED = 1791065875120;
  * deploy can no longer go out with the development-time placeholder above and silently
  * hand out (or confiscate) tries from the wrong instant.
  */
-export const TRIES_GO_LIVE_STAMPED = false;
+export const TRIES_GO_LIVE_STAMPED = true;
 
 /** The instant from which attempts count: the later of the two cutoffs. */
 export const COUNT_SINCE = Math.max(ATTEMPT_CAPS_APPLIED, TRIES_APPLIED);
