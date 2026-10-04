@@ -82,6 +82,9 @@ export function parseRevealWait(body: unknown): RevealWait | null {
 
 /** "You have used all 3 tries. Your teacher will release the solution." (or "...releases it on <date>."). */
 export function SolutionWait({ wait, onRefresh }: { wait: RevealWait; onRefresh?: () => void }) {
+  // The button used to do nothing visible when the answer was still withheld, so a student could
+  // not tell a re-check from a dead button. If the release arrives this whole panel is replaced.
+  const [checked, setChecked] = useState(false);
   const cap = wait.cap ?? 0;
   const message = wait.cap === null
     ? 'Your teacher will release the solution.'
@@ -96,12 +99,13 @@ export function SolutionWait({ wait, onRefresh }: { wait: RevealWait; onRefresh?
       {onRefresh ? (
         <button
           type="button"
-          onClick={onRefresh}
+          onClick={() => { setChecked(true); onRefresh(); }}
           style={{ marginLeft: 12, background: 'none', border: '1px solid #44475a', borderRadius: 4, color: '#8be9fd', cursor: 'pointer', fontSize: 13, padding: '2px 8px' }}
         >
           Check again
         </button>
       ) : null}
+      {checked ? <span style={{ marginLeft: 10, color: '#8be9fd', fontSize: 13 }}>Checked just now: not released yet.</span> : null}
     </section>
   );
 }

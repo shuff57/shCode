@@ -786,9 +786,12 @@ export default function LessonWorkspace({
   // assignment routes — ch2's labs are `type: "lesson"` but still scored.
   const showAssignmentHeader = isAssignment || isMoshionMode || totalCriteria > 0;
   // q5 grading is binary/completion-based — show criteria counts, not points.
-  const headerScore = isMoshionMode ? passedCriteria : totalScore;
-  const headerTotal = isMoshionMode ? totalCriteria : totalPossible;
-  const headerUnitLabel = isMoshionMode ? '' : 'pts';
+  // A lesson whose criteria are all worth 0 points (find-and-fix, most console labs) read "0/0 pts"
+  // for the whole lesson; count the criteria passed instead, as moSHion mode already does.
+  const countCriteria = isMoshionMode || isNoPoints;
+  const headerScore = countCriteria ? passedCriteria : totalScore;
+  const headerTotal = countCriteria ? totalCriteria : totalPossible;
+  const headerUnitLabel = countCriteria ? '' : 'pts';
 
   return (
     <>

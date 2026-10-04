@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getCurrentUser, type CurrentUser } from '../../lib/auth';
 import { useLessonState } from '../../lib/progress';
+import { lessonPercent } from '../../lib/grading-weights';
 import { sortLessons } from '../../lib/lesson-order';
 import StudentGradebook from '../../components/StudentGradebook';
 
@@ -12,6 +13,8 @@ interface ManifestLesson {
   title: string;
   unit?: string;
   category?: string;
+  /** Quiz questions, rubric points, or pass/fail criteria; null = completion is the grade. */
+  maxScore?: number | null;
 }
 
 interface ManifestData {
@@ -68,10 +71,17 @@ export default function ProgressPage() {
   const totalLessons = manifest.lessons.length;
   const completionPct = totalLessons > 0 ? Math.round((completedIds.length / totalLessons) * 100) : 0;
 
-  // Average score across completed lessons that have a score
-  const scoredIds = completedIds.filter((id) => progress.scores[id] !== undefined);
-  const avgScore = scoredIds.length > 0
-    ? Math.round(scoredIds.reduce((sum, id) => sum + (progress.scores[id] ?? 0), 0) / scoredIds.length)
+  // lesson_state.score is raw POINTS in each lesson's own units (a quiz's correct count, a rubric's
+  // earned points, a pass/fail rubric's criteria met), never a percent. Every percent on this page
+  // is lessonPercent() over the manifest's maxScore, the function the synced grade is built from;
+  // printing the raw score with a "%" read "Completed 3%" for a quiz scored 3 of 8.
+  const pctFor = (l: ManifestLesson) => lessonPercent(progress.states[l.id], progress.scores[l.id], l.maxScore);
+  // Average over completed lessons that are actually scored (have points or a stored score).
+  const scoredLessons = manifest.lessons.filter(
+    (l) => progress.states[l.id] === 'completed' && (l.maxScore != null || progress.scores[l.id] !== undefined),
+  );
+  const avgScore = scoredLessons.length > 0
+    ? Math.round(scoredLessons.reduce((sum, l) => sum + pctFor(l), 0) / scoredLessons.length)
     : null;
 
   // Both lists below slice a SEQUENCE, so they need course order, not the
@@ -151,7 +161,7 @@ export default function ProgressPage() {
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {recentlyCompleted.map((l) => {
-                const score = progress.scores[l.id];
+                const score = progress.scores[l.id] !== undefined || l.maxScore != null ? pctFor(l) : undefined;
                 return (
                   <li key={l.id} style={listItemStyle}>
                     <span style={{ flex: 1, fontWeight: 500 }}>{l.title}</span>
