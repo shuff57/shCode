@@ -231,7 +231,7 @@
     }
   },
   "phase5_todo": [
-    "run `node scripts/stamp-tries-applied.mjs --set-now` ONCE at go-live and commit lib/attempt-cap.ts (npm run deploy refuses until it is stamped)",
+    "set TRIES_APPLIED (lib/attempt-cap.ts) to the go-live instant: run `node scripts/stamp-tries-applied.mjs --set-now` ONCE at go-live and commit lib/attempt-cap.ts (npm run deploy refuses until it is stamped)",
     "apply migrations 0032 (class_solution_releases) AND 0033 (lesson_try_resets) to prod BEFORE the deploy (npm run d1:migrate); the deploy preflight refuses with them pending",
     "deploy from a worktree with pa-pseudocode/ populated (git-ignored); npm run deploy runs check-pa-attempts --require-pseudocode",
     "teacher release: nothing is released until a teacher presses Release; tell teachers",
