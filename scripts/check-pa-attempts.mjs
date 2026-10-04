@@ -39,6 +39,7 @@ const listOnly = process.argv.includes('--list');
 // a self-hosting teacher's `npm test` must stay green. The deploy passes the flag.
 const requirePseudocode = process.argv.includes('--require-pseudocode');
 const warnings = [];
+let needPseudo = 0; // parts that CAN have a pseudocode file (quiz parts show their key instead)
 
 const BLOCKS = ['quiz', 'aiGrader', 'diagram', 'grading'];
 
@@ -89,6 +90,7 @@ for (const id of fs.readdirSync(LESSONS).sort()) {
   // Part 1 quizzes (concepts and traces) have no solution to write as pseudocode: after the
   // last try the server releases the answers and explanations itself (quiz-reveal).
   const isQuiz = !!(lesson.quiz && typeof lesson.quiz === 'object');
+  if (!isQuiz) needPseudo++;
   const pseudoGap = isQuiz ? null : !fs.existsSync(pseudo)
     ? 'no pa-pseudocode/<id>.md'
     : fs.readFileSync(pseudo, 'utf8').trim().length < 40 ? 'pa-pseudocode/<id>.md is empty' : null;
@@ -115,5 +117,7 @@ if (problems.length) {
   for (const p of problems) console.error('  ' + p);
   process.exit(1);
 }
-if (warnings.length) console.log(`[check-pa-attempts] ${warnings.length} PA lesson(s) have no pseudocode (git-ignored; pass --require-pseudocode to fail on this)`);
-console.log(`[check-pa-attempts] ok -- ${rows.length} PA lessons, ${WANT} tries and a pseudocode file each`);
+const tail = warnings.length
+  ? `${warnings.length} of ${needPseudo} pseudocode files are MISSING (git-ignored, so a clone has none: students will see no solution; \`--require-pseudocode\`, which deploy passes, fails on this)`
+  : `${needPseudo} of ${needPseudo} pseudocode files present`;
+console.log(`[check-pa-attempts] ok -- ${rows.length} PA lessons, ${WANT} tries each; ${tail}`);

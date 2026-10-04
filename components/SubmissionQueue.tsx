@@ -130,6 +130,8 @@ interface OverrideFormProps {
 function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) {
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
+  // Capped parts only matter, but the box is harmless elsewhere (the server ignores it).
+  const [replaceBest, setReplaceBest] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -158,6 +160,7 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
           submissionId,
           score: parsedScore,
           feedback: feedback || undefined,
+          replaceBest: replaceBest || undefined,
         }),
       });
 
@@ -226,6 +229,11 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
           }}
         />
       </div>
+
+      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#6272a4' }}>
+        <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
+        Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit)
+      </label>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <button

@@ -7,6 +7,7 @@
 // lesson_submissions for the SESSION's email, never from anything the client sent.
 
 import { countAttempts, COUNT_SINCE } from '../../lib/attempt-cap';
+import { criteriaScore } from '../../lib/grade-pass';
 import type { QuizKey } from './quiz-keys.generated';
 import { ATTEMPT_CAPS, ATTEMPT_KINDS } from './pa-pseudocode.generated';
 import { resolveDueForStudent, isLessonAvailableForStudent } from './dueDates';
@@ -168,11 +169,33 @@ export async function hasAnyRow(db: AttemptDb, email: string, lessonId: string):
   return (res.results ?? []).length > 0;
 }
 
+/**
+ * One counted row's score as it enters the grade. A row with points (`possible > 0`,
+ * a quiz or a pointed rubric) is its stored `score`. A pass/fail rubric's row stores
+ * `possible` 0 and `score` 0 whatever the verdicts were, so its score is read from the
+ * criteria it carries (met 1, partial half): see criteriaScore in lib/grade-pass.ts.
+ * Without that, every pass/fail part's best is 0 or NULL and grades 100 on completion.
+ */
+export function rowScore(r: { score: number | null; possible: number | null; gradeJson: unknown | null }): number | null {
+  const pointed = typeof r.possible === 'number' && r.possible > 0;
+  // A row a teacher has MARKED (the review queue's override) carries the teacher's number in
+  // `score`, in the units of the part's maxScore, so it is read as stored, never re-derived
+  // from the AI's criteria.
+  const g = r.gradeJson && typeof r.gradeJson === 'object' ? (r.gradeJson as { teacherOverriddenAt?: unknown; teacherReviewedAt?: unknown }) : null;
+  const teacherMarked = !!g && (typeof g.teacherOverriddenAt === 'number' || typeof g.teacherReviewedAt === 'number');
+  if (!pointed && !teacherMarked) {
+    const criteria = r.gradeJson && typeof r.gradeJson === 'object' ? (r.gradeJson as { criteria?: unknown }).criteria : null;
+    if (Array.isArray(criteria) && criteria.length > 0) return criteriaScore(criteria as Array<{ verdict: string }>);
+  }
+  return typeof r.score === 'number' && Number.isFinite(r.score) ? r.score : null;
+}
+
 /** The best score over the rows that spent a try, or null when none carries one. */
 export async function bestCountedScore(db: AttemptDb, email: string, lessonId: string): Promise<number | null> {
   let best: number | null = null;
   for (const r of await countedRows(db, email, lessonId)) {
-    if (typeof r.score === 'number' && Number.isFinite(r.score) && (best === null || r.score > best)) best = r.score;
+    const sc = rowScore(r);
+    if (sc !== null && (best === null || sc > best)) best = sc;
   }
   return best;
 }

@@ -50,12 +50,9 @@ function eq(got, want, label) {
   else fail(`${label}\n  want ${JSON.stringify(want)}\n  got  ${JSON.stringify(got)}`);
 }
 
-let Database;
-try { ({ Database } = await import('bun:sqlite')); } catch { /* fall through */ }
-if (!Database) {
-  console.log('SKIP test-attempt-reveal: bun:sqlite is not available in this runtime');
-  process.exit(0);
-}
+import { requireSqlite, openMemoryDb } from './lib/sqlite-adapter.mjs';
+const engine = requireSqlite('test-attempt-reveal');
+console.log(`test-attempt-reveal: SQLite engine ${engine}`);
 
 // --- compile the handlers and their real imports to CJS ---
 rmSync(outDir, { recursive: true, force: true });
@@ -67,7 +64,10 @@ const entries = [
   'functions/api/lesson-state/[lessonId].ts',
   'functions/api/grade-written.ts',
   'functions/api/classes/[id]/solution-releases/index.ts',
+  'functions/api/classes/[id]/tries-reset/index.ts',
+  'functions/api/classes/[id]/submission-queue/index.ts',
   'lib/grading-weights.ts',
+  'functions/_shared/grading.ts',
   'lib/quiz-redact.ts',
   'lib/quiz-variant.ts',
 ].map((f) => join(root, f));
@@ -85,10 +85,10 @@ writeFileSync(join(outDir, 'package.json'), '{"type":"commonjs"}');
 const CAP = 3;
 const attemptCapsMod = join(outDir, 'functions/_shared/pa-pseudocode.generated.js');
 writeFileSync(attemptCapsMod, `exports.ATTEMPT_CAPS = ${JSON.stringify({
-  'fx-written': CAP, 'fx-nopseudo': CAP, 'fx-quiz': 2, 'fx-client': CAP,
+  'fx-written': CAP, 'fx-nopseudo': CAP, 'fx-quiz': 2, 'fx-client': CAP, 'fx-passfail': CAP,
 })};
 exports.ATTEMPT_KINDS = ${JSON.stringify({
-  'fx-written': 'ai', 'fx-nopseudo': 'ai', 'fx-quiz': 'quiz', 'fx-client': 'client',
+  'fx-written': 'ai', 'fx-nopseudo': 'ai', 'fx-quiz': 'quiz', 'fx-client': 'client', 'fx-passfail': 'ai',
 })};
 exports.PA_PSEUDOCODE = ${JSON.stringify({
   'fx-written': 'SET total TO 0\nFOR each item IN cart\n  ADD item.price TO total\nRETURN total',
@@ -109,7 +109,7 @@ const QKEY = {
 };
 writeFileSync(join(outDir, 'functions/_shared/quiz-keys.generated.js'), `exports.QUIZ_KEYS = ${JSON.stringify({ 'fx-quiz': QKEY })};`);
 
-for (const f of ['functions/api/grade-written.js', 'functions/api/attempt-reveal.js', 'functions/api/quiz-reveal.js', 'functions/api/lesson-submissions/index.js', 'functions/api/lesson-state/[lessonId].js', 'functions/api/classes/[id]/solution-releases/index.js']) {
+for (const f of ['functions/api/grade-written.js', 'functions/api/attempt-reveal.js', 'functions/api/quiz-reveal.js', 'functions/api/lesson-submissions/index.js', 'functions/api/lesson-state/[lessonId].js', 'functions/api/classes/[id]/solution-releases/index.js', 'functions/api/classes/[id]/tries-reset/index.js', 'functions/api/classes/[id]/submission-queue/index.js']) {
   if (!existsSync(join(outDir, f))) { fail(`tsc did not emit ${f}`); process.exit(1); }
 }
 const attemptReveal = require(join(outDir, 'functions/api/attempt-reveal.js')).onRequestGet;
@@ -118,6 +118,8 @@ const submissionsPost = require(join(outDir, 'functions/api/lesson-submissions/i
 const stateMod = require(join(outDir, 'functions/api/lesson-state/[lessonId].js'));
 const gradeWritten = require(join(outDir, 'functions/api/grade-written.js')).onRequestPost;
 const releaseApi = require(join(outDir, 'functions/api/classes/[id]/solution-releases/index.js'));
+const queueApi = require(join(outDir, 'functions/api/classes/[id]/submission-queue/index.js'));
+const triesReset = require(join(outDir, 'functions/api/classes/[id]/tries-reset/index.js')).onRequestPost;
 const core = require(join(outDir, 'lib/solution-release-core.js'));
 const dueCore = require(join(outDir, 'lib/due-dates-core.js'));
 const { COUNT_SINCE, TRIES_APPLIED } = require(join(outDir, 'lib/attempt-cap.js'));
@@ -127,7 +129,7 @@ const { COUNT_SINCE, TRIES_APPLIED } = require(join(outDir, 'lib/attempt-cap.js'
 // older case below, which is about something else, still runs as a student who may see
 // the solution. The release cases pass { released: false } and set rows themselves.
 function makeDb({ released = true } = {}) {
-  const sql = new Database(':memory:');
+  const sql = openMemoryDb();
   sql.run(`CREATE TABLE lesson_submissions (id TEXT PRIMARY KEY, student_email TEXT, lesson_id TEXT,
     response TEXT, grade_json TEXT, score REAL, possible REAL, submitted_at INTEGER, due_at_submit INTEGER)`);
   sql.run('CREATE TABLE ai_help_usage (student_email TEXT, unit TEXT, day TEXT, count INTEGER, PRIMARY KEY (student_email, unit, day))');
@@ -138,7 +140,9 @@ function makeDb({ released = true } = {}) {
   sql.run('CREATE TABLE class_teachers (class_id TEXT, teacher_email TEXT)');
   sql.run(`CREATE TABLE class_solution_releases (class_id TEXT, scope TEXT, scope_id TEXT, release_at INTEGER,
     set_by TEXT, set_at INTEGER, PRIMARY KEY (class_id, scope, scope_id))`);
-  sql.run('CREATE TABLE enrollments (class_id TEXT, student_email TEXT, expires_at INTEGER, PRIMARY KEY (class_id, student_email))');
+  sql.run('CREATE TABLE enrollments (class_id TEXT, student_email TEXT, enrolled_at INTEGER NOT NULL DEFAULT 0, expires_at INTEGER, PRIMARY KEY (class_id, student_email))');
+  sql.run('CREATE TABLE lesson_drafts (student_email TEXT, lesson_id TEXT, response TEXT, updated_at INTEGER, PRIMARY KEY (student_email, lesson_id))');
+  sql.run('CREATE TABLE lesson_try_resets (id TEXT PRIMARY KEY, class_id TEXT, student_email TEXT, lesson_id TEXT, action TEXT, rows_removed INTEGER, best_score_before REAL, rows_json TEXT, reset_by TEXT, reset_at INTEGER)');
   sql.run('CREATE TABLE class_due_dates (class_id TEXT, scope TEXT, scope_id TEXT, due_at INTEGER)');
   sql.run('CREATE TABLE class_open_dates (class_id TEXT, scope TEXT, scope_id TEXT, open_at INTEGER)');
   sql.run('CREATE TABLE lesson_access_overrides (class_id TEXT, student_email TEXT, lesson_id TEXT)');
@@ -970,6 +974,255 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   };
   eq([run(false), run(true)], [1, 0], 'check-summative-parts fails a chart grader in a Performance Assessment that forgot summative, and passes it once set');
   rmSync(tmp, { recursive: true, force: true });
+}
+
+// ============ round 4 / finding 2: a pass/fail (0-point) capped part grades a REAL percent ============
+// All eight 0-point capped parts (the group charts and demos, 1.7.2, 1.7.5) stored score 0 and
+// graded 100% on completion (maxScore null). Now the best is criteria met out of criteria total
+// and the manifest's maxScore is the criteria count.
+{
+  const lp = require(join(outDir, 'lib/grading-weights.js')).lessonPercent;
+  const { criteriaScore } = require(join(outDir, 'lib/grade-pass.js'));
+  const verdicts = (...v) => ({ criteria: v.map((x, i) => ({ id: `c${i}`, verdict: x, earned: 0, max: 0 })), totalEarned: 0, totalPossible: 0 });
+  const sit = async (rows) => {
+    const db = makeDb();
+    rows.forEach((g, i) => addRow(db, { email: A, lessonId: 'fx-passfail', gradeJson: g, at: NOW + i, score: 0, possible: 0 }));
+    await call(stateMod.onRequestPost, db, '/api/lesson-state/fx-passfail', A, 'student', { method: 'POST', body: JSON.stringify({ state: 'completed', score: 6 }) }, { lessonId: 'fx-passfail' });
+    return stored(db, 'fx-passfail');
+  };
+  const N = 3;
+  eq(criteriaScore([{ verdict: 'met' }, { verdict: 'partial' }, { verdict: 'missing' }]), 1.5, 'criteriaScore: met 1, partial half, missing 0');
+  const junk = await sit([verdicts('missing', 'missing', 'missing')]);
+  eq([junk, lp('completed', junk, N)], [0, 0], 'a junk demo (every criterion missing) stores 0 and grades 0%, not 100%');
+  const one = await sit([verdicts('met', 'missing', 'missing')]);
+  eq([one, lp('completed', one, N)], [1, 33], 'one of three criteria met grades 33%');
+  const half = await sit([verdicts('partial', 'partial', 'missing')]);
+  eq([half, lp('completed', half, N)], [1, 33], 'two partials count as one criterion');
+  const strong = await sit([verdicts('met', 'met', 'met')]);
+  eq([strong, lp('completed', strong, N)], [3, 100], 'a strong demo (all met) grades 100%');
+  const best = await sit([verdicts('met', 'met', 'met'), verdicts('missing', 'missing', 'missing')]);
+  eq(best, 3, 'best of a strong try then a junk one is the strong one');
+  const later = await sit([verdicts('missing', 'missing', 'missing'), verdicts('met', 'met', 'missing')]);
+  eq(later, 2, 'a better later try replaces a worse earlier one');
+  // a pointed row keeps its own score; the criteria read applies only when possible is 0
+  const db = makeDb();
+  addRow(db, { email: A, lessonId: 'fx-passfail', gradeJson: { criteria: [{ verdict: 'met' }] }, at: NOW, score: 14, possible: 20 });
+  await call(stateMod.onRequestPost, db, '/api/lesson-state/fx-passfail', A, 'student', { method: 'POST', body: '{"state":"completed"}' }, { lessonId: 'fx-passfail' });
+  eq(stored(db, 'fx-passfail'), 14, 'a row with points keeps its stored score (the criteria read is only for pass/fail rows)');
+
+  // grading.ts: the category percent a teacher sees moves with the criteria, in one student's grading
+  const { studentGrading } = require(join(outDir, 'functions/_shared/grading.js'));
+  const { DEFAULT_WEIGHTS } = require(join(outDir, 'lib/grading-weights.js'));
+  const scope = (maxScore) => new Map([['fx-passfail', { title: '9.1.3 Demo', preview: 'assignment', scoreKind: maxScore ? 'written' : null, assignmentCode: 'A9.1.3', maxScore }]]);
+  const pct = (score, maxScore) => studentGrading(scope(maxScore), [{ lesson_id: 'fx-passfail', state: 'completed', score }], DEFAULT_WEIGHTS).percent;
+  eq([pct(0, N), pct(3, N), pct(1, N)], [0, 100, 33], 'grading.ts: a junk demo is 0, a strong one 100, one-in-three 33 in the student grade');
+  eq(pct(0, null), 100, '(and with the old null maxScore the same junk demo was 100: the bug this closes)');
+
+  // the manifest the Pages Functions read: every CAPPED pass/fail AI rubric carries its criteria count
+  execFileSync('node', [join(root, 'scripts/generate-lessons-manifest.mjs')], { cwd: root, stdio: 'ignore' });
+  const manifest = JSON.parse(readFileSync(join(root, 'public/lessons-manifest.json'), 'utf8'));
+  const list = Array.isArray(manifest) ? manifest : manifest.lessons;
+  const byId = new Map(list.map((l) => [l.id, l]));
+  let checked = 0, wrong = 0;
+  const { readdirSync } = await import('node:fs');
+  for (const id of readdirSync(join(root, 'lessons'))) {
+    const f = join(root, 'lessons', id, 'lesson.json');
+    if (!existsSync(f)) continue;
+    const l = JSON.parse(readFileSync(f, 'utf8'));
+    const g = l.aiGrader ?? l.diagram?.aiGrader;
+    if (!g || !Array.isArray(g.rubric) || g.rubric.length === 0) continue;
+    if (g.rubric.some((r) => (r.points ?? 0) > 0)) continue; // pointed: unchanged
+    const capped = [l.quiz, l.aiGrader, l.diagram, l.grading].some((b) => b && typeof b.maxSubmissions === 'number');
+    const want = capped ? g.rubric.length : null;
+    const got = byId.get(l.id ?? id)?.maxScore ?? null;
+    checked++;
+    if (got !== want) { wrong++; fail(`manifest ${id}: maxScore ${got}, want ${want} (${capped ? 'capped' : 'uncapped'} pass/fail rubric)`); }
+    // the grade CATEGORY must not move: scoreKind stays null for a pass/fail rubric (a 'written' one would pull a group demo out of Lab)
+    const kind = byId.get(l.id ?? id)?.scoreKind ?? null;
+    if (kind !== null) { wrong++; fail(`manifest ${id}: scoreKind ${kind} on a pass/fail rubric would change its grade category`); }
+  }
+  if (checked === 0) fail('found no pass/fail rubric to check the manifest against');
+  else if (!wrong) ok(`manifest: ${checked} pass/fail rubrics, capped ones carry their criteria count, uncapped stay binary`);
+  const page = readFileSync(join(root, 'app/page.tsx'), 'utf8');
+  if (!/isCapped\(l\)[\s\S]{0,120}g\.rubric\.length/.test(page)) fail('app/page.tsx maxScoreFor() no longer mirrors the manifest (capped pass/fail -> criteria count)');
+  else ok('app/page.tsx maxScoreFor() mirrors the manifest rule');
+}
+
+// ============ round 4 / finding 4: only a student who was in the class before it released ============
+{
+  const T0 = Date.now();
+  const mk = () => {
+    const db = makeDb({ released: false });
+    db.raw.run("DELETE FROM enrollments WHERE student_email = ?", [A]);
+    db.raw.run("DELETE FROM enrollments WHERE student_email = ?", [B]);
+    for (let i = 0; i < CAP; i++) addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { score: 1 }, at: NOW + i, score: 1, possible: 4 });
+    return db;
+  };
+  const enrol = (db, email, at) => db.raw.run('INSERT INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, ?, ?)', ['c1', email, at, 4102444800000]);
+  const release = (db, at) => db.raw.run("INSERT OR REPLACE INTO class_solution_releases (class_id, scope, scope_id, release_at, set_by, set_at) VALUES ('c1', 'lesson', 'fx-written', ?, 't@example.invalid', ?)", [at, at]);
+  const reveal = (db) => call(attemptReveal, db, '/api/attempt-reveal?lessonId=fx-written', A, 'student');
+  // the period-5 student who joins period 1 AFTER period 1 released: nothing
+  let db = mk();
+  release(db, T0 - 60_000);
+  enrol(db, A, T0 - 1_000);
+  eq((await reveal(db)).status, 403, 'a student who joined the releasing class AFTER the release: 403 (the throwaway-account join)');
+  // a student who was already in the class: the release counts
+  db = mk();
+  enrol(db, A, T0 - 3_600_000);
+  release(db, T0 - 60_000);
+  eq((await reveal(db)).status, 200, 'a student who was in the class before the release: 200');
+  // the teacher releasing again after a late joiner includes them
+  db = mk();
+  release(db, T0 - 60_000);
+  enrol(db, A, T0 - 1_000);
+  release(db, T0 - 500);
+  eq((await reveal(db)).status, 200, 'releasing again after the late joiner enrolled includes them');
+  // a scheduled release: enrolled before it is due counts, enrolled after it is not
+  db = mk();
+  enrol(db, A, T0 - 5_000);
+  release(db, T0 - 100);
+  eq((await reveal(db)).status, 200, 'enrolled at 5s ago, release at 0.1s ago: 200');
+  // two classes: the one they joined late does not count, the one they were in does
+  db = mk();
+  db.raw.run('INSERT INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, ?, ?)', ['c1', A, T0 - 1_000, 4102444800000]);
+  db.raw.run('INSERT INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, ?, ?)', ['c2', A, T0 - 9_000_000, 4102444800000]);
+  release(db, T0 - 60_000); // c1, joined late
+  eq((await reveal(db)).status, 403, 'two classes, only the late-joined one released: 403');
+  db.raw.run("INSERT INTO class_solution_releases (class_id, scope, scope_id, release_at, set_by, set_at) VALUES ('c2', 'lesson', 'fx-written', ?, 'o@example.invalid', 1)", [T0 - 60_000]);
+  eq((await reveal(db)).status, 200, '...and the class they were already in releasing opens it');
+}
+
+// ============ round 4 / finding 7: a teacher gives tries back on ANY capped part ============
+{
+  const T = 't@example.invalid';
+  const reset = (db, body, email = T, role = 'teacher', classId = 'c1') =>
+    call(triesReset, db, `/api/classes/${classId}/tries-reset`, email, role, { method: 'POST', body: JSON.stringify(body) }, { id: classId });
+  const seed = (scores) => {
+    const db = makeDb();
+    scores.forEach((sc, i) => addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { score: sc }, at: NOW + i, score: sc, possible: 10 }));
+    db.raw.run("INSERT INTO lesson_state (student_email, lesson_id, state, started_at, completed_at, score) VALUES (?, 'fx-written', 'completed', 1, 2, ?)", [A, Math.max(...scores)]);
+    return db;
+  };
+  const rowsLeft = (db) => db.raw.query("SELECT COUNT(*) AS n FROM lesson_submissions WHERE student_email = ? AND lesson_id = 'fx-written'").get(A).n;
+  const state = (db) => db.raw.query("SELECT state, score FROM lesson_state WHERE student_email = ? AND lesson_id = 'fx-written'").get(A);
+
+  // who may
+  let db = seed([5, 8, 3]);
+  eq((await reset(db, { studentEmail: A, lessonId: 'fx-written', action: 'reset' }, A, 'student')).status, 403, 'a student cannot give themselves tries back (403)');
+  eq((await reset(db, { studentEmail: A, lessonId: 'fx-written', action: 'reset' }, 'o@example.invalid', 'teacher')).status, 403, "another teacher cannot reset a class they do not manage (403)");
+  eq(rowsLeft(db), 3, '...and nothing was deleted by the refusals');
+  eq((await reset(db, { studentEmail: A, lessonId: 'fx-written', action: 'reset' }, T, 'teacher', 'nope')).status, 404, 'an unknown class is 404');
+  eq((await reset(db, { studentEmail: 'x@example.invalid', lessonId: 'fx-written', action: 'reset' })).status, 404, 'a student not enrolled in the class is 404');
+  eq((await reset(db, { studentEmail: A, lessonId: 'fx-written', action: 'sideways' })).status, 400, 'an unknown action is 400');
+  eq((await reset(db, { studentEmail: A, lessonId: 'fx-uncapped', action: 'reset' })).status, 400, 'an uncapped part has no tries to give back (400)');
+
+  // give back one: the newest counted try goes, the best of the rest stands
+  let r = await reset(db, { studentEmail: A, lessonId: 'fx-written', action: 'give-back-one' });
+  let body = await r.json();
+  eq([r.status, body.rowsRemoved, body.triesLeft], [200, 1, 1], 'give-back-one: 200, one row removed, one try left');
+  eq(rowsLeft(db), 2, '...two rows remain');
+  eq(state(db), { state: 'completed', score: 8 }, '...the best of the rest (8) stands and the part stays completed');
+  const audit = db.raw.query('SELECT * FROM lesson_try_resets').all();
+  eq([audit.length, audit[0].action, audit[0].reset_by, audit[0].rows_removed, audit[0].best_score_before, audit[0].class_id], [1, 'give-back-one', T, 1, 8, 'c1'], 'the audit row records who, what, how many and the best score before');
+  eq(JSON.parse(audit[0].rows_json).length, 1, '...and keeps the removed row itself');
+  // the part really has a try left: the solution closed again (two counted rows of three), and a
+  // third row fits under the cap
+  eq((await call(attemptReveal, db, '/api/attempt-reveal?lessonId=fx-written', A)).status, 403, 'after a give-back the solution is closed again (a try is left)');
+  addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { score: 1 }, at: NOW + 40, score: 1, possible: 10 });
+  eq((await call(attemptReveal, db, '/api/attempt-reveal?lessonId=fx-written', A)).status, 200, '...and spending the given-back try opens it again');
+  db.raw.run("DELETE FROM lesson_submissions WHERE submitted_at = ?", [NOW + 40]);
+  // removing a second one lowers the best honestly
+  r = await reset(db, { studentEmail: A, lessonId: 'fx-written', action: 'give-back-one' });
+  eq(state(db).score, 5, 'give back the 8 too: the best of what remains (5) is the stored score');
+
+  // reset: everything, including markers, and the part is as if never sat
+  db = seed([5, 8]);
+  addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { gradingFailed: true }, at: NOW + 50 });
+  r = await reset(db, { studentEmail: A, lessonId: 'fx-written', action: 'reset' });
+  body = await r.json();
+  eq([r.status, body.rowsRemoved, body.triesLeft], [200, 3, CAP], 'reset: every row incl. the outage marker is removed, every try is back');
+  eq([rowsLeft(db), state(db)], [0, { state: 'started', score: null }], '...and the state is started with the score cleared');
+  eq(JSON.parse(db.raw.query('SELECT rows_json FROM lesson_try_resets').get().rows_json).length, 3, '...the audit row keeps all three removed rows');
+
+  // an admin who does not own the class may
+  db = seed([4]);
+  eq((await reset(db, { studentEmail: A, lessonId: 'fx-written', action: 'reset' }, 'admin@example.invalid', 'admin')).status, 200, 'an admin may reset any class');
+  // nothing to give back
+  eq((await reset(db, { studentEmail: A, lessonId: 'fx-written', action: 'give-back-one' })).status, 404, 'no submission left: 404');
+  // only a marker left: nothing counted to give back
+  db = makeDb();
+  addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { gradingFailed: true }, at: NOW });
+  eq((await reset(db, { studentEmail: A, lessonId: 'fx-written', action: 'give-back-one' })).status, 409, 'only an outage marker: give-back-one has no counted try to remove (409)');
+
+  // a capped quiz: the draft unlocks with the answers kept
+  db = makeDb();
+  addRow(db, { email: A, lessonId: 'fx-quiz', gradeJson: { quiz: [{ id: 'q1', picked: 1 }] }, at: NOW, score: 1, possible: 2 });
+  db.raw.run("UPDATE lesson_submissions SET response = ? WHERE lesson_id = 'fx-quiz'", [JSON.stringify({ answers: { q1: 1 }, graded: true })]);
+  db.raw.run("INSERT INTO lesson_drafts (student_email, lesson_id, response, updated_at) VALUES (?, 'fx-quiz', ?, 1)", [A, JSON.stringify({ answers: { q1: 1 }, graded: true })]);
+  r = await reset(db, { studentEmail: A, lessonId: 'fx-quiz', action: 'give-back-one' });
+  const draft = JSON.parse(db.raw.query("SELECT response FROM lesson_drafts WHERE student_email = ? AND lesson_id = 'fx-quiz'").get(A).response);
+  eq([r.status, draft], [200, { answers: { q1: 1 }, graded: false }], 'a capped quiz: give-back-one unlocks the radios (graded:false) and keeps the answers');
+}
+
+// ============ round 4 / finding 9: the banner no longer promises a solution the teacher has not released ============
+{
+  const src = readFileSync(join(root, 'components/AttemptCap.tsx'), 'utf8');
+  if (/you will see how it is solved/.test(src)) fail('the banner still promises "you will see how it is solved" unconditionally');
+  else if ((src.match(/once your teacher releases it/g) || []).length < 2) fail('the banner does not say the teacher releases the solution in BOTH the before-try-1 and the tries-left states');
+  else ok('the banner says the solution comes once the teacher releases it (before try 1 and while tries are left)');
+}
+
+// ============ round 4 / finding 8: a teacher's override respects "best try counts" ============
+{
+  const T = 't@example.invalid';
+  const mark = (db, body, email = T, role = 'teacher') =>
+    call(queueApi.onRequestPost, db, '/api/classes/c1/submission-queue', email, role, { method: 'POST', body: JSON.stringify(body) }, { id: 'c1' });
+  const idOf = (db, at) => db.raw.query('SELECT id FROM lesson_submissions WHERE submitted_at = ?').get(at).id;
+  const stateScore = (db, lessonId) => db.raw.query('SELECT score FROM lesson_state WHERE student_email = ? AND lesson_id = ?').get(A, lessonId)?.score ?? null;
+  const rowScoreOf = (db, id) => db.raw.query('SELECT score FROM lesson_submissions WHERE id = ?').get(id).score;
+  const seed = () => {
+    const db = makeDb();
+    addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { score: 8 }, at: NOW, score: 8, possible: 10 });
+    addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { gradingFailed: true, error: 'down' }, at: NOW + 1 });
+    db.raw.run("INSERT INTO lesson_state (student_email, lesson_id, state, started_at, completed_at, score) VALUES (?, 'fx-written', 'completed', 1, 2, 8)", [A]);
+    return db;
+  };
+  // the stranded outage-marker row marked 5 must not drag the best of 8 down
+  let db = seed();
+  let r = await mark(db, { submissionId: idOf(db, NOW + 1), score: 5 });
+  eq([r.status, rowScoreOf(db, idOf(db, NOW + 1)), stateScore(db, 'fx-written')], [200, 5, 8], 'capped: marking the stranded marker row 5 sets THAT row to 5 and leaves the stored best at 8');
+  // a higher mark raises it
+  db = seed();
+  await mark(db, { submissionId: idOf(db, NOW + 1), score: 9 });
+  eq(stateScore(db, 'fx-written'), 9, 'capped: a higher teacher mark (9) becomes the stored score');
+  // an explicit replace wins even when lower
+  db = seed();
+  await mark(db, { submissionId: idOf(db, NOW + 1), score: 5, replaceBest: true });
+  eq(stateScore(db, 'fx-written'), 5, 'capped + replaceBest: the teacher mark (5) is the stored score even though it is lower');
+  // a pass/fail row the teacher marked carries the teacher's number for THAT row (the AI's read of it
+  // is superseded: a teacher may mark a lenient grade down)
+  db = makeDb();
+  const three = { criteria: [{ verdict: 'met' }, { verdict: 'met' }, { verdict: 'met' }] };
+  addRow(db, { email: A, lessonId: 'fx-passfail', gradeJson: three, at: NOW, score: 0, possible: 0 });
+  await mark(db, { submissionId: idOf(db, NOW), score: 1 });
+  eq(stateScore(db, 'fx-passfail'), 1, 'pass/fail part: the teacher marks the AI\'s 3-of-3 row down to 1: that row, and so the stored score, is 1');
+  // ...but with a better counted try beside it, lowering ONE row does not lower the best
+  addRow(db, { email: A, lessonId: 'fx-passfail', gradeJson: three, at: NOW + 1, score: 0, possible: 0 });
+  await mark(db, { submissionId: idOf(db, NOW), score: 1 });
+  eq(stateScore(db, 'fx-passfail'), 3, '...but beside a second counted try the AI read 3 of 3, the best (3) stands');
+  await mark(db, { submissionId: idOf(db, NOW + 1), score: 2, replaceBest: true });
+  eq(stateScore(db, 'fx-passfail'), 2, '...and replaceBest makes the mark (2) the stored score');
+  // uncapped: the mark is the score, exactly as before
+  db = makeDb();
+  addRow(db, { email: A, lessonId: 'fx-uncapped', gradeJson: { score: 9 }, at: NOW, score: 9, possible: 10 });
+  db.raw.run("INSERT INTO lesson_state (student_email, lesson_id, state, started_at, completed_at, score) VALUES (?, 'fx-uncapped', 'completed', 1, 2, 9)", [A]);
+  await mark(db, { submissionId: idOf(db, NOW), score: 4 });
+  eq(stateScore(db, 'fx-uncapped'), 4, 'uncapped: the teacher mark replaces the score, as it always did');
+  // validation and auth
+  db = seed();
+  const sid = idOf(db, NOW + 1);
+  eq([(await mark(db, { submissionId: sid, score: -1 })).status, (await mark(db, { submissionId: sid, score: 1e9 })).status, (await mark(db, { submissionId: sid, score: 'x' })).status], [400, 400, 400], 'a negative, absurd or non-numeric mark is 400');
+  eq((await mark(db, { submissionId: sid, score: 5 }, A, 'student')).status, 403, 'a student cannot override a grade (403)');
 }
 
 rmSync(outDir, { recursive: true, force: true });

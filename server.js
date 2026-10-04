@@ -364,7 +364,7 @@ app.prepare().then(() => {
           if (/FROM class_solution_releases r\s+JOIN enrollments e/.test(sql)) {
             // studentReleaseStatus: the dev student is enrolled in one dev class, and
             // devReleases (set through POST /api/dev/solution-release) are its rows.
-            return { results: devReleases.map((r) => ({ class_id: 'dev-class', scope: 'lesson', scope_id: r.lessonId, release_at: r.releaseAt })) };
+            return { results: devReleases.map((r) => ({ class_id: 'dev-class', scope: 'lesson', scope_id: r.lessonId, release_at: r.releaseAt, enrolled_at: 0 })) };
           }
           if (/FROM enrollments e JOIN classes c/.test(sql)) {
             // mayReadAnswer's enrollment check: the dev student is treated as

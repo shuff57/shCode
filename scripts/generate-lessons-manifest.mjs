@@ -50,7 +50,22 @@ const results = await Promise.all(
       meta.quiz && Array.isArray(meta.quiz.questions) && meta.quiz.questions.length > 0
         ? formCount(meta.quiz)
         : null;
-    const maxScore = quizCount ?? (rubricPoints > 0 ? rubricPoints : null);
+    // A CAPPED pass/fail rubric (every criterion 0 points: the group demos and charts,
+    // 1.7.2, 1.7.5) is scored as criteria met out of criteria total (criteriaScore in
+    // lib/grade-pass.ts; the server stores that as the part's best). Without a maxScore a
+    // completed such part read as 100 whatever the AI found, so three junk demos were full
+    // marks. An UNcapped pass/fail rubric keeps maxScore null: completing it on a pass
+    // is still its whole grade. Mirrors app/page.tsx maxScoreFor().
+    const capped = [meta.quiz, meta.aiGrader, meta.diagram, meta.grading].some(
+      (b) => b && typeof b === 'object' && typeof b.maxSubmissions === 'number',
+    );
+    const capLimit =
+      [meta.quiz, meta.aiGrader, meta.diagram, meta.grading]
+        .map((b) => (b && typeof b === 'object' ? b.maxSubmissions : undefined))
+        .find((n) => typeof n === 'number') ?? null;
+    const passFailCount =
+      capped && Array.isArray(rubric) && rubric.length > 0 && rubricPoints === 0 ? rubric.length : null;
+    const maxScore = quizCount ?? (rubricPoints > 0 ? rubricPoints : passFailCount);
     return {
       id: meta.id ?? id,
       title: meta.title ?? id,
@@ -68,7 +83,13 @@ const results = await Promise.all(
       // out silently drops every lab from any weighted percentage.
       assignmentCode: meta.assignmentCode ?? null,
       maxScore,
-      scoreKind: quizCount != null ? 'quiz' : maxScore != null ? 'written' : null,
+      // The part's try limit (null = unlimited). Not secret; the teacher drawer reads it to offer
+      // 'Give back a try' on the parts that have one.
+      maxSubmissions: capLimit,
+      // scoreKind decides the GRADE CATEGORY (lib/grading-weights.ts: 'written' beats an
+      // assignmentCode's 'lab'), so it stays rubric-POINTS based: a capped pass/fail rubric
+      // gets a maxScore for its percent but must not move from Lab to Written.
+      scoreKind: quizCount != null ? 'quiz' : rubricPoints > 0 ? 'written' : null,
     };
   }),
 );

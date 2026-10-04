@@ -141,6 +141,8 @@ interface LessonMeta {
   /** 'lesson' | 'assignment' | 'project'. Decides the /lesson vs /assignment
    *  prefix — see lib/lesson-href.ts for why guessing it is not safe. */
   type?: string | null;
+  /** The part's try limit, or null/absent when it has none (lessons-manifest.json). */
+  maxSubmissions?: number | null;
 }
 
 /**
@@ -470,6 +472,8 @@ function StudentDrawer({
   // lesson id in flight, so its button can't be double-fired.
   const [reloadKey, setReloadKey] = useState(0);
   const [unsubmitting, setUnsubmitting] = useState<string | null>(null);
+  // lesson id whose tries are being given back, so its buttons can't be double-fired.
+  const [givingBack, setGivingBack] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -509,6 +513,26 @@ function StudentDrawer({
       body: JSON.stringify({ studentEmail: email, lessonId }),
     }).catch(() => null);
     setUnsubmitting(null);
+    if (res === null) setErr('Network error');
+    else if (res.error !== null) setErr(res.error);
+    else setReloadKey((k) => k + 1);
+  }
+
+  // Give tries back on a capped part. 'give-back-one' removes the newest try (the
+  // earlier ones and their best score stay); 'reset' clears the part so every try is
+  // back. What is removed is kept in an audit table (migration 0033), so confirm first.
+  async function giveBack(lessonId: string, title: string, action: 'give-back-one' | 'reset') {
+    const what = action === 'reset'
+      ? `Reset ALL tries on "${title}" for ${email}? Every submission and the score are removed and they get all their tries back. What was removed is kept in an audit log.`
+      : `Give ${email} one try back on "${title}"? Their newest try is removed; their other tries and best score stay. What was removed is kept in an audit log.`;
+    if (!window.confirm(what)) return;
+    setGivingBack(lessonId);
+    setErr('');
+    const res = await apiFetch<{ ok: true }>(`/api/classes/${classId}/tries-reset`, {
+      method: 'POST',
+      body: JSON.stringify({ studentEmail: email, lessonId, action }),
+    }).catch(() => null);
+    setGivingBack(null);
     if (res === null) setErr('Network error');
     else if (res.error !== null) setErr(res.error);
     else setReloadKey((k) => k + 1);
@@ -726,6 +750,26 @@ function StudentDrawer({
                           >
                             {isExpanded ? 'Hide' : 'View submission'}
                           </button>
+                        )}
+                        {sub && typeof lesson.maxSubmissions === 'number' && (
+                          <>
+                            <button
+                              style={{ background: 'none', border: '1px solid #ffb86c', borderRadius: 4, color: '#ffb86c', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0 }}
+                              disabled={givingBack === lesson.id}
+                              title="Remove their newest try; their other tries and best score stay."
+                              onClick={() => giveBack(lesson.id, lesson.title, 'give-back-one')}
+                            >
+                              {givingBack === lesson.id ? 'Working…' : 'Give back a try'}
+                            </button>
+                            <button
+                              style={{ background: 'none', border: '1px solid #ff5555', borderRadius: 4, color: '#ff5555', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0 }}
+                              disabled={givingBack === lesson.id}
+                              title="Clear every submission on this part so they get all their tries back."
+                              onClick={() => giveBack(lesson.id, lesson.title, 'reset')}
+                            >
+                              Reset tries
+                            </button>
+                          </>
                         )}
                         {Array.isArray(gradeData?.quiz) && (
                           <button

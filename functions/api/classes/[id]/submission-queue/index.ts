@@ -11,6 +11,7 @@
 // Auth: caller must be an owner / co-teacher of the class OR an admin.
 
 import { canManageClass } from '../../../../_shared/classAuth';
+import { bestCountedScore, capFor } from '../../../../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -33,6 +34,9 @@ interface OverrideBody {
   submissionId: string;
   score: number;
   feedback?: string;
+  /** Capped parts only: make this mark THE stored score even when it is lower than the
+   *  student's best counted try. Absent/false keeps the higher of the two. */
+  replaceBest?: boolean;
 }
 
 // GET — return the 50 most recent AI-graded submissions for this class.
@@ -94,8 +98,8 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (
   if (!body.submissionId || typeof body.submissionId !== 'string') {
     return json({ error: 'submissionId required' }, 400);
   }
-  if (typeof body.score !== 'number') {
-    return json({ error: 'score (number) required' }, 400);
+  if (typeof body.score !== 'number' || !Number.isFinite(body.score) || body.score < 0 || body.score > 100000) {
+    return json({ error: 'score must be a finite number between 0 and 100000' }, 400);
   }
 
   // Fetch the submission to verify it belongs to an enrolled student.
@@ -167,13 +171,25 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (
   // completed — a teacher setting a score by hand is the act of finishing the
   // lesson, and green-to-advance needs it to unlock the next one. On conflict
   // only the score moves, so an existing row's state is left exactly as it was.
+  //
+  // On a CAPPED part "the best try counts" (.gauntlet/SPEC-attempt-caps.md), and a mark
+  // written straight through used to bypass that: a student with a best of 8 and a stranded
+  // outage-marker row the teacher marked 5 dropped to 5, until the next completion put the
+  // 8 back. Here the teacher's mark is the score of THAT row only, and the part's stored
+  // score is the higher of that mark and the best counted try. A teacher who really means
+  // "this is the grade, lower or not" sends replaceBest: true.
+  let stateScore = body.score;
+  if (capFor(submission.lesson_id) !== undefined && body.replaceBest !== true) {
+    const counted = await bestCountedScore(env.DB, submission.student_email, submission.lesson_id);
+    if (counted !== null && counted > stateScore) stateScore = counted;
+  }
   await env.DB.prepare(
     `INSERT INTO lesson_state (student_email, lesson_id, state, started_at, completed_at, score)
      VALUES (?1, ?2, 'completed', ?3, ?3, ?4)
      ON CONFLICT (student_email, lesson_id)
      DO UPDATE SET score = excluded.score`,
   )
-    .bind(submission.student_email, submission.lesson_id, now, body.score)
+    .bind(submission.student_email, submission.lesson_id, now, stateScore)
     .run();
 
   return json({
@@ -181,6 +197,7 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (
     student_email: submission.student_email,
     lesson_id: submission.lesson_id,
     score: body.score,
+    stateScore,
     grade_json: updatedGradeJson,
   });
 };

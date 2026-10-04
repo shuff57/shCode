@@ -5,7 +5,7 @@
 //
 // A student may see a capped part's solution only when every try is spent AND at
 // least one class they are CURRENTLY enrolled in (not expired, not archived) has
-// released it. Teachers and admins are checked by the caller, not here.
+// released it, having joined that class before the release took effect. Teachers and admins are checked by the caller, not here.
 
 import {
   isHeldBack,
@@ -31,6 +31,8 @@ interface Row {
   scope: string;
   scope_id: string;
   release_at: number;
+  /** The student's enrollment time in that class (studentReleaseStatus only). */
+  enrolled_at?: number;
 }
 
 export async function loadClassReleaseRows(db: ReleaseDb, classId: string): Promise<ReleaseRow[]> {
@@ -68,7 +70,8 @@ export async function studentReleaseStatus(
 ): Promise<ReleaseStatus> {
   const res = await env.DB
     .prepare(
-      `SELECT r.class_id AS class_id, r.scope AS scope, r.scope_id AS scope_id, r.release_at AS release_at
+      `SELECT r.class_id AS class_id, r.scope AS scope, r.scope_id AS scope_id, r.release_at AS release_at,
+              e.enrolled_at AS enrolled_at
          FROM class_solution_releases r
          JOIN enrollments e ON e.class_id = r.class_id
          JOIN classes c ON c.id = r.class_id
@@ -90,16 +93,23 @@ export async function studentReleaseStatus(
     /* keep the strict ids */
   }
 
-  const byClass = new Map<string, ReleaseRow[]>();
+  const byClass = new Map<string, { rows: ReleaseRow[]; enrolledAt: number }>();
   for (const r of rows) {
-    const list = byClass.get(r.class_id) ?? [];
-    list.push({ scope: r.scope as ReleaseRow['scope'], scopeId: r.scope_id, releaseAt: r.release_at });
-    byClass.set(r.class_id, list);
+    const entry = byClass.get(r.class_id) ?? { rows: [], enrolledAt: typeof r.enrolled_at === 'number' ? r.enrolled_at : Infinity };
+    entry.rows.push({ scope: r.scope as ReleaseRow['scope'], scopeId: r.scope_id, releaseAt: r.release_at });
+    byClass.set(r.class_id, entry);
   }
 
   let scheduledAt: number | null = null;
-  for (const list of byClass.values()) {
+  for (const { rows: list, enrolledAt } of byClass.values()) {
     const at = resolveReleaseAt(list, ids);
+    // A class's release counts only for a student who was ALREADY in it when the release
+    // took effect. Students join a class themselves with its code, so without this a
+    // student from another period joins period 1 after it has released, spends three
+    // junk tries and reads the solution while their own period has not sat the test.
+    // A genuine late joiner is included by the teacher releasing again (a later
+    // release_at than their enrolled_at); see the spec's Release section.
+    if (at !== null && enrolledAt > at) continue;
     if (isReleased(at, now)) return { released: true, scheduledAt: null };
     if (at !== null && at > now && !isHeldBack(at) && (scheduledAt === null || at < scheduledAt)) scheduledAt = at;
   }
