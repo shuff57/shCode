@@ -1042,7 +1042,7 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   eq([pct(0, N), pct(3, N), pct(1, N)], [0, 100, 33], 'grading.ts: a junk demo is 0, a strong one 100, one-in-three 33 in the student grade');
   eq(pct(0, null), 100, '(and with the old null maxScore the same junk demo was 100: the bug this closes)');
 
-  // the manifest the Pages Functions read: every CAPPED pass/fail AI rubric carries its criteria count
+  // the manifest the Pages Functions read: every pass/fail AI rubric, capped or not, carries its criteria count
   execFileSync('node', [join(root, 'scripts/generate-lessons-manifest.mjs')], { cwd: root, stdio: 'ignore' });
   const manifest = JSON.parse(readFileSync(join(root, 'public/lessons-manifest.json'), 'utf8'));
   const list = Array.isArray(manifest) ? manifest : manifest.lessons;
@@ -1057,7 +1057,7 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
     if (!g || !Array.isArray(g.rubric) || g.rubric.length === 0) continue;
     if (g.rubric.some((r) => (r.points ?? 0) > 0)) continue; // pointed: unchanged
     const capped = [l.quiz, l.aiGrader, l.diagram, l.grading].some((b) => b && typeof b.maxSubmissions === 'number');
-    const want = capped ? g.rubric.length : null;
+    const want = g.rubric.length;
     const got = byId.get(l.id ?? id)?.maxScore ?? null;
     checked++;
     if (got !== want) { wrong++; fail(`manifest ${id}: maxScore ${got}, want ${want} (${capped ? 'capped' : 'uncapped'} pass/fail rubric)`); }
@@ -1066,9 +1066,9 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
     if (kind !== null) { wrong++; fail(`manifest ${id}: scoreKind ${kind} on a pass/fail rubric would change its grade category`); }
   }
   if (checked === 0) fail('found no pass/fail rubric to check the manifest against');
-  else if (!wrong) ok(`manifest: ${checked} pass/fail rubrics, capped ones carry their criteria count, uncapped stay binary`);
+  else if (!wrong) ok(`manifest: ${checked} pass/fail rubrics, capped or not, carry their criteria count`);
   const page = readFileSync(join(root, 'app/page.tsx'), 'utf8');
-  if (!/isCapped\(l\)[\s\S]{0,120}g\.rubric\.length/.test(page)) fail('app/page.tsx maxScoreFor() no longer mirrors the manifest (capped pass/fail -> criteria count)');
+  if (!/rubric\.length > 0\) return g\.rubric\.length/.test(page)) fail('app/page.tsx maxScoreFor() no longer mirrors the manifest (pass/fail -> criteria count)');
   else ok('app/page.tsx maxScoreFor() mirrors the manifest rule');
 }
 

@@ -14,6 +14,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight, MessageSquare } from 'lucide-react';
 import { formatDue } from '../lib/due-dates-core';
 import { sortLessons } from '../lib/lesson-order';
+import { lessonPercent } from '../lib/grading-weights';
 // Status derivation is shared with the endpoint that builds these cells, so
 // the page and the teacher's gradebook can never disagree about whether a
 // student is behind. See lib/gradebook-cell.ts.
@@ -29,6 +30,8 @@ interface ManifestLesson {
   title: string;
   unit?: string;
   type?: string;
+  /** Quiz questions, rubric points, or pass/fail criteria; null = completion is the grade. */
+  maxScore?: number | null;
 }
 
 interface Props {
@@ -57,15 +60,20 @@ const STATUS_COLOR: Record<CellStatus, string> = {
 
 /** Score text for one cell.
  *
- *  Most rubrics in this course grade pass/fail with every criterion worth 0
- *  points (see lib/grade-pass.ts), so `possible` is 0 far more often than it is
- *  a real total. "17/0" would be worse than showing nothing, so raw points
- *  appear only when there are points to show. */
-function scoreText(cell: GradebookCell): string | null {
+ *  The percent is lessonPercent() -- the SAME function the grade the teacher syncs is built
+ *  from (functions/_shared/grading.ts) -- over lesson_state.score, which is raw POINTS (see
+ *  lib/gradebook-cell.ts), so it is never printed as if it were already a percent. It used to
+ *  be: a chart lesson stored 0 points and showed "9/9 · 0%" beside a grade of 100.
+ *
+ *  Raw points of the latest attempt appear only when there are points to show: most rubrics
+ *  grade pass/fail with every criterion worth 0 points (lib/grade-pass.ts), so `possible` is 0
+ *  far more often than it is a real total, and "17/0" would be worse than showing nothing. */
+function scoreText(cell: GradebookCell, maxScore: number | null | undefined): string | null {
   const hasPoints = cell.possible != null && cell.possible > 0 && cell.submittedScore != null;
-  if (hasPoints && cell.score != null) return `${cell.submittedScore}/${cell.possible} · ${cell.score}%`;
+  const percent = cell.state === 'completed' ? lessonPercent(cell.state, cell.score, maxScore) : null;
+  if (hasPoints && percent != null) return `${cell.submittedScore}/${cell.possible} · ${percent}%`;
   if (hasPoints) return `${cell.submittedScore}/${cell.possible}`;
-  if (cell.score != null) return `${cell.score}%`;
+  if (percent != null) return `${percent}%`;
   return null;
 }
 
@@ -169,7 +177,7 @@ export default function StudentGradebook({ lessons }: Props) {
             <tbody>
               {shown.map(({ lesson, cell, status }) => {
                 const due = dueDates[lesson.id];
-                const score = scoreText(cell);
+                const score = scoreText(cell, lesson.maxScore);
                 const hasFeedback = !!cell.teacherFeedback;
                 const open = hasFeedback && !!expanded[lesson.id];
                 return (

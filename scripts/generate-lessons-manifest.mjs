@@ -50,21 +50,18 @@ const results = await Promise.all(
       meta.quiz && Array.isArray(meta.quiz.questions) && meta.quiz.questions.length > 0
         ? formCount(meta.quiz)
         : null;
-    // A CAPPED pass/fail rubric (every criterion 0 points: the group demos and charts,
-    // 1.7.2, 1.7.5) is scored as criteria met out of criteria total (criteriaScore in
-    // lib/grade-pass.ts; the server stores that as the part's best). Without a maxScore a
-    // completed such part read as 100 whatever the AI found, so three junk demos were full
-    // marks. An UNcapped pass/fail rubric keeps maxScore null: completing it on a pass
-    // is still its whole grade. Mirrors app/page.tsx maxScoreFor().
-    const capped = [meta.quiz, meta.aiGrader, meta.diagram, meta.grading].some(
-      (b) => b && typeof b === 'object' && typeof b.maxSubmissions === 'number',
-    );
+    // A pass/fail rubric (every criterion 0 points) is scored as criteria met out of criteria
+    // total (criteriaScore in lib/grade-pass.ts), capped or not. Without a maxScore a completed
+    // such part read as 100 whatever the AI found, so three junk demos were full marks.
+    // 2026-10-04: uncapped pass/fail lessons get the same fraction, with students who completed
+    // them before then grandfathered at full by scripts/backfill-passfail-fraction.mjs.
+    // Mirrors app/page.tsx maxScoreFor().
     const capLimit =
       [meta.quiz, meta.aiGrader, meta.diagram, meta.grading]
         .map((b) => (b && typeof b === 'object' ? b.maxSubmissions : undefined))
         .find((n) => typeof n === 'number') ?? null;
     const passFailCount =
-      capped && Array.isArray(rubric) && rubric.length > 0 && rubricPoints === 0 ? rubric.length : null;
+      Array.isArray(rubric) && rubric.length > 0 && rubricPoints === 0 ? rubric.length : null;
     const maxScore = quizCount ?? (rubricPoints > 0 ? rubricPoints : passFailCount);
     return {
       id: meta.id ?? id,

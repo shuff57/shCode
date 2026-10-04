@@ -13,6 +13,7 @@ import SolutionReleasePanel from '../../components/SolutionReleasePanel';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
+import { criteriaScore } from '../../lib/grade-pass';
 import { toMermaid } from '../../lib/diagram-mermaid';
 
 // ---------------------------------------------------------------------------
@@ -100,6 +101,23 @@ function fullName(first?: string | null, last?: string | null): string | null {
 /** 0-100 as a color. Green only at 100, amber once anything is done, dim
  *  otherwise -- same thresholds the student's own badge uses, so a teacher
  *  and a student read one colour code. */
+// A pass/fail rubric stores score 0 of possible 0 whatever the verdicts were (lib/grade-pass.ts),
+// so "Score: 0 / 0" said nothing and read as a zero. Its result is the criteria met out of the
+// criteria count, which the row carries; a pointed row shows its points.
+function submissionScoreLabel(sub: { score: number | null; possible: number | null; grade_json?: string | null }): string | null {
+  if (sub.score !== null && sub.possible !== null && sub.possible > 0) return `Score: ${sub.score} / ${sub.possible}`;
+  if (!sub.grade_json) return null;
+  try {
+    const criteria = (JSON.parse(sub.grade_json) as { criteria?: unknown }).criteria;
+    if (Array.isArray(criteria) && criteria.length > 0) {
+      return `Criteria met: ${criteriaScore(criteria as Array<{ verdict: string }>)} of ${criteria.length}`;
+    }
+  } catch {
+    // an unparseable blob has no result to show
+  }
+  return null;
+}
+
 function pctColor(pct: number): string {
   return pct >= 100 ? '#50fa7b' : pct > 0 ? '#f1fa8c' : '#6272a4';
 }
@@ -801,9 +819,9 @@ function StudentDrawer({
                         <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #44475a33' }}>
                           <div style={{ fontSize: 11, color: '#6272a4', marginBottom: 8 }}>
                             Submitted: {fmtTs(sub.submitted_at)}
-                            {sub.score !== null && sub.possible !== null && (
+                            {submissionScoreLabel(sub) && (
                               <span style={{ marginLeft: 12, color: '#f1fa8c' }}>
-                                Score: {sub.score} / {sub.possible}
+                                {submissionScoreLabel(sub)}
                               </span>
                             )}
                           </div>

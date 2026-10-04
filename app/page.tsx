@@ -37,22 +37,15 @@ function maxScoreFor(l: Lesson): number | null {
   if (g) {
     const total = g.rubric.reduce((sum, r) => sum + r.points, 0);
     if (total > 0) return total;
-    // 0 = pass/fail rubric. Uncapped: binary (completing it on a pass is its grade).
-    // Capped: criteria met out of criteria total, the same number the server stores
-    // as the best (lib/grade-pass.ts criteriaScore; scripts/generate-lessons-manifest.mjs).
-    if (isCapped(l) && g.rubric.length > 0) return g.rubric.length;
+    // 0 = pass/fail rubric: criteria met out of criteria total, the same number the server
+    // stores as the best (lib/grade-pass.ts criteriaScore; scripts/generate-lessons-manifest.mjs).
+    if (g.rubric.length > 0) return g.rubric.length;
   }
   return null;
 }
 
-function isCapped(l: Lesson): boolean {
-  return [l.quiz, l.aiGrader, l.diagram, l.grading].some(
-    (b) => !!b && typeof (b as { maxSubmissions?: unknown }).maxSubmissions === 'number',
-  );
-}
-
 // scoreKind decides the GRADE CATEGORY (lib/grading-weights.ts: 'written' beats an
-// assignmentCode's 'lab'), so it stays rubric-POINTS based: a capped pass/fail rubric gets a
+// assignmentCode's 'lab'), so it stays rubric-POINTS based: a pass/fail rubric gets a
 // maxScore for its percent (above) but must not move from Lab to Written.
 function scoreKindFor(l: Lesson): 'quiz' | 'written' | null {
   if (l.quiz && l.quiz.questions.length > 0) return 'quiz';

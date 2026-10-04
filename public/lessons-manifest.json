@@ -87,7 +87,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 2,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -191,7 +191,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.1.2",
-      "maxScore": null,
+      "maxScore": 6,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -464,7 +464,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 4,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -737,7 +737,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 4,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -802,7 +802,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 4,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -1036,7 +1036,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 4,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -1166,7 +1166,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.4.1",
-      "maxScore": null,
+      "maxScore": 5,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -1374,7 +1374,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.5.2",
-      "maxScore": null,
+      "maxScore": 5,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -1816,7 +1816,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 5,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -2557,7 +2557,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6,
       "assignmentCode": "A2.2.0",
-      "maxScore": null,
+      "maxScore": 5,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -2713,7 +2713,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6,
       "assignmentCode": "A2.2.1",
-      "maxScore": null,
+      "maxScore": 4,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -3051,7 +3051,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 3,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -4338,7 +4338,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 4,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -6470,7 +6470,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 3,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -6665,7 +6665,7 @@
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 3,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -7315,7 +7315,7 @@
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 5,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -9096,7 +9096,7 @@
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 18,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 3,
       "maxSubmissions": null,
       "scoreKind": null
     },

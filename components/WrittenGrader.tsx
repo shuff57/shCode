@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
-import { isPassingGrade } from '../lib/grade-pass';
+import { isPassingGrade, criteriaScore } from '../lib/grade-pass';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import LessonNumberLinks, { useSourceHrefs } from './LessonNumberLinks';
 import {
@@ -356,8 +356,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         // excluded.score`, so writing this draft's mark over a better one would
         // erase it. Passing the running maximum keeps the row right whichever way
         // this draft went, and needs no extra server round trip to do it.
+        // A pass/fail rubric's totalEarned is always 0, so its score is the criteria met (1 each,
+        // partial half), out of the rubric's length: the same number the manifest's maxScore
+        // divides by (lib/grade-pass.ts criteriaScore).
+        const earned = data.totalPossible === 0 ? criteriaScore(data.criteria) : data.totalEarned;
         const prior = progress.scores[lessonId];
-        const best = typeof prior === 'number' ? Math.max(prior, data.totalEarned) : data.totalEarned;
+        const best = typeof prior === 'number' ? Math.max(prior, earned) : earned;
         await recordLessonCompleted(lessonId, best);
       }
       if (progress.authed) {
