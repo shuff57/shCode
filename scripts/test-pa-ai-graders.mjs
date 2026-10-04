@@ -212,6 +212,34 @@ try {
       fixtures.push({ id, name: 'chart whose label asks for credit', text: describe(INJECT), want: false });
     }
 
+    // ---- chart calibration (phase 2 judge: logically wrong charts used to pass at 8/10)
+    // Built from 3-10-4's own reference (chart-price-check.mmd) so there is nothing to
+    // keep in step by hand. The first group must keep passing (a different but correct
+    // way of drawing the same run); the second must not (the arrows or the words are wrong).
+    {
+      const id = '3-10-4-ch3-individual-pa-chart-it';
+      const ref = read(id + '/solution', 'chart-price-check.mmd').replace(/\r\n?/g, '\n');
+      const swap = (text, a, b) => { if (!text.includes(a)) throw new Error('fixture anchor missing: ' + a); return text.replace(a, b); };
+      const cal = (name, text, want) => fixtures.push({ id, name: 'calibration: ' + name, text: describe(text), want });
+
+      // must pass: correct in a different style
+      cal('equal-first order, terse labels', swap(swap(swap(swap(ref,
+        'H{Is the total over the limit?}', 'H{Is the total exactly the limit?}'),
+        'J{Is the total exactly the limit?}', 'J{Is the total over the limit?}'),
+        'H -- "Over" --> I\n  H -- "Not over" --> J', 'H -- "Exactly" --> K\n  H -- "Not exactly" --> J'),
+        'J -- "Exactly" --> K\n  J -- "Under" --> L', 'J -- "Over" --> I\n  J -- "Under" --> L'), true);
+      cal('terse labels with limit < total', swap(swap(swap(ref, 'Is the total over the limit?', 'limit < total?'), 'Is the total exactly the limit?', 'limit = total?'), 'i = 0 to cart.length - 1', 'each item'), true);
+      cal('leftover phrasing, limit - total', swap(swap(ref, 'Is the total over the limit?', 'limit - total below zero?'), 'Is the total exactly the limit?', 'limit - total is zero?'), true);
+
+      // must not pass: the run is wrong
+      cal('yes/no exits swapped on both diamonds', swap(swap(ref, 'H -- "Over" --> I\n  H -- "Not over" --> J', 'H -- "Over" --> J\n  H -- "Not over" --> I'), 'J -- "Exactly" --> K\n  J -- "Under" --> L', 'J -- "Exactly" --> L\n  J -- "Under" --> K'), false);
+      cal('no at-the-limit outcome', swap(swap(ref, 'H -- "Not over" --> J', 'H -- "Not over" --> L'), 'J -- "Exactly" --> K\n  J -- "Under" --> L\n  ', ''), false);
+      cal('comparison inside the loop', swap(ref, 'F --> G\n  G --> D', 'F --> H\n  G --> D'), false);
+      cal('outcome words from a different problem', swap(swap(swap(ref, 'Report over the limit', 'Report beaten'), 'Report at the limit', 'Report on the nose'), 'Report under the limit', 'Report short'), false);
+      cal('junk-label skeleton behind two good function names', 'flowchart TD\n  A([Start])\n  B[[readCart]]\n  C{{loop}}\n  D[x]\n  E[[lineCost]]\n  F[y]\n  G{?}\n  H[/over/]\n  I[/under/]\n  J[z]\n  Z([End])\n  A --> B\n  B --> C\n  C -- go --> D\n  D --> E\n  E --> F\n  F --> C\n  C -- done --> G\n  G -- yes --> H\n  G -- no --> I\n  H --> J\n  I --> J\n  J --> Z', false);
+      cal('hexagon with an empty body', 'flowchart TD\n  A([Start])\n  B[[totalCost]]\n  C{{loop}}\n  D[x]\n  G{Is the total over the limit?}\n  H[/over/]\n  I[/under/]\n  Z([End])\n  A --> B\n  B --> C\n  C -- go --> D\n  D --> C\n  C -- done --> G\n  G -- Over --> H\n  G -- Not over --> I\n  H --> Z\n  I --> Z', false);
+    }
+
     console.log(`\n=== live: ${fixtures.length} fixtures, glm-5.3-flash:cloud ===`);
     for (const f of fixtures.filter((x) => !filterArg || x.id.includes(filterArg) || x.name.includes(filterArg))) {
       let res;
