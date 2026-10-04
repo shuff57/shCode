@@ -38,32 +38,11 @@ import {
 
 import type { DiagramDoc, FlowShape, SideId } from '../../lib/diagram-types';
 import { SHAPE_HINTS, SHAPE_LABELS } from '../../lib/diagram-types';
+import { docToFlow } from '../../lib/diagram-flow';
 import { nodeTypes, SHAPE_COLORS, SHAPE_SIZE } from './FlowShapeNodes';
 import { edgeTypes } from './EditableEdge';
 
 // ---- doc <-> react-flow ----
-
-function docToFlow(doc: DiagramDoc): { nodes: Node[]; edges: Edge[] } {
-  const known = new Set(doc.nodes.map((n) => n.id));
-  return {
-    nodes: doc.nodes.map((n) => ({
-      id: n.id,
-      type: n.shape,
-      position: { x: n.x, y: n.y },
-      data: { label: n.label, shape: n.shape },
-    })),
-    edges: doc.edges
-      .filter((e) => known.has(e.from) && known.has(e.to))
-      .map((e) => ({
-        id: e.id,
-        source: e.from,
-        target: e.to,
-        ...(e.label ? { label: e.label } : {}),
-        ...(e.fromSide ? { sourceHandle: `s-${e.fromSide}` } : {}),
-        ...(e.toSide ? { targetHandle: `t-${e.toSide}` } : {}),
-      })),
-  };
-}
 
 /** `s-b` / `t-r` -> `b` / `r`. Null for an auto-routed edge. */
 function sideOf(handle: string | null | undefined): SideId | undefined {

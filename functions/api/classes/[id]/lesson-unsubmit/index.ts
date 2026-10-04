@@ -93,6 +93,8 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
     return json({ error: 'Only a multiple-choice quiz can be unsubmitted' }, 409);
   }
 
+  // The teacher's persisted "use this as the score" (migration 0034, score_override) goes with the
+  // score: unsubmit is a clean slate, so a fresh sitting must be able to change the grade (round 6).
   // One batch = one transaction: a half-reopened quiz (unlocked but still
   // counted as submitted, or the reverse) is worse than either end state.
   await env.DB.batch([
@@ -106,7 +108,7 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
       .bind(email, lessonId, JSON.stringify({ answers: savedAnswers(latest.response), graded: false }), Date.now()),
     env.DB
       .prepare(
-        `UPDATE lesson_state SET state = 'started', completed_at = NULL, score = NULL
+        `UPDATE lesson_state SET state = 'started', completed_at = NULL, score = NULL, score_override = NULL
           WHERE student_email = ? AND lesson_id = ?`,
       )
       .bind(email, lessonId),

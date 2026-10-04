@@ -54,6 +54,11 @@ interface SubmissionItem {
   possible: number | null;
   grade_json: string;
   response: string;
+  /**
+   * What a teacher's mark on this row is out of (the server's rowLimit): points, or criteria met on a
+   * pass/fail part. Present even for a grader-outage row, which has no criteria list of its own.
+   */
+  limit?: { max: number; unit: 'points' | 'criteria' } | null;
 }
 
 interface Props {
@@ -127,6 +132,8 @@ interface OverrideFormProps {
   submissionId: string;
   /** Pass/fail part: the mark is CRITERIA MET out of this many. Null: a pointed or unknown part. */
   unitTotal: number | null;
+  /** A pointed part: the mark is points, out of this many. Null: unknown. */
+  pointsMax?: number | null;
   onOverride: () => void;
 }
 
@@ -137,7 +144,7 @@ function markUnit(g: GradeJson | null): { total: number } | null {
   return { total: g.criteria.length };
 }
 
-function OverrideForm({ classId, submissionId, unitTotal, onOverride }: OverrideFormProps) {
+function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, onOverride }: OverrideFormProps) {
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
   // Capped parts only matter, but the box is harmless elsewhere (the server ignores it).
@@ -175,6 +182,10 @@ function OverrideForm({ classId, submissionId, unitTotal, onOverride }: Override
     }
     if (unitTotal !== null && parsedScore > unitTotal) {
       setMsg({ type: 'error', text: `This part is marked in criteria met, out of ${unitTotal}. Enter 0 to ${unitTotal}.` });
+      return;
+    }
+    if (unitTotal === null && pointsMax !== null && parsedScore > pointsMax) {
+      setMsg({ type: 'error', text: `This part is marked in points, out of ${pointsMax}. Enter 0 to ${pointsMax}.` });
       return;
     }
 
@@ -226,13 +237,13 @@ function OverrideForm({ classId, submissionId, unitTotal, onOverride }: Override
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <label htmlFor={`override-score-${submissionId}`} style={{ fontSize: '0.82rem', color: '#f8f8f2' }}>
-          {unitTotal !== null ? `New mark (criteria met, out of ${unitTotal}):` : 'New score:'}
+          {unitTotal !== null ? `New mark (criteria met, out of ${unitTotal}):` : pointsMax !== null ? `New score (points, out of ${pointsMax}):` : 'New score:'}
         </label>
         <input
           id={`override-score-${submissionId}`}
           type="number"
           min={0}
-          max={unitTotal ?? undefined}
+          max={unitTotal ?? pointsMax ?? undefined}
           step={0.5}
           value={score}
           onChange={(e) => setScore(e.target.value)}
@@ -424,7 +435,9 @@ export function SubmissionQueue({ classId }: Props) {
         // A capped AI-graded chart's `response` is the Mermaid text the model read; the drawn chart
         // itself is kept in grade_json.artifact.
         const diagram = parseDiagramResponse(sub.response) ?? parseDiagramArtifact(sub.grade_json);
-        const unit = markUnit(gradeData);
+        // The row's own criteria say it first; a grader-outage row has none, so the server's
+        // limit carries the unit (round 6: the form must always say what the mark is out of).
+        const unit = markUnit(gradeData) ?? (sub.limit?.unit === 'criteria' ? { total: sub.limit.max } : null);
         // The row's own score, not the marker, decides. An override writes a
         // score onto the row but leaves gradingFailed in place, so keying on
         // the marker alone kept a graded submission reading "Needs manual
@@ -612,7 +625,7 @@ export function SubmissionQueue({ classId }: Props) {
             )}
 
             {/* Override form */}
-            <OverrideForm classId={classId} submissionId={sub.id} unitTotal={unit?.total ?? null} onOverride={handleOverride} />
+            <OverrideForm classId={classId} submissionId={sub.id} unitTotal={unit?.total ?? null} pointsMax={sub.limit?.unit === 'points' ? sub.limit.max : null} onOverride={handleOverride} />
           </div>
         );
       })}

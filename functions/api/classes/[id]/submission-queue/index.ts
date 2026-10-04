@@ -46,11 +46,41 @@ interface OverrideBody {
   clearOverride?: boolean;
 }
 
+/**
+ * What a teacher's mark on a row is OUT OF, so the form can always say so (round 6: an outage row
+ * has no criteria list, and a form that said only "New score:" let a teacher who typed 1 meaning
+ * "pass" give 1/N). The row's own denominator first (what it was graded out of: points), then the
+ * criteria it carries (pass/fail: criteria met), then the part's rubric (an outage row has
+ * neither). Null where nothing says (an unknown lesson with an outage row).
+ */
+export type RowLimit = { max: number; unit: 'points' | 'criteria' };
+async function rowLimit(
+  env: Env,
+  request: Request,
+  row: { lesson_id: string; grade_json: string | null; possible: number | null },
+): Promise<RowLimit | null> {
+  let existing: Record<string, unknown> = {};
+  try {
+    existing = row.grade_json ? (JSON.parse(row.grade_json) as Record<string, unknown>) : {};
+  } catch {
+    existing = {};
+  }
+  if (typeof row.possible === 'number' && row.possible > 0) return { max: row.possible, unit: 'points' };
+  const rowCriteria = existing && typeof existing === 'object' && Array.isArray(existing.criteria) ? existing.criteria.length : 0;
+  if (rowCriteria > 0) return { max: rowCriteria, unit: 'criteria' };
+  const grader = await loadAiGrader(env, request, row.lesson_id);
+  if (grader && grader.rubric.length > 0) {
+    const pts = grader.rubric.reduce((n, r) => n + (typeof r.points === 'number' && r.points > 0 ? r.points : 0), 0);
+    return pts > 0 ? { max: pts, unit: 'points' } : { max: grader.rubric.length, unit: 'criteria' };
+  }
+  return null;
+}
+
 // GET — return the 50 most recent AI-graded submissions for this class.
 export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
   context: Ctx,
 ) => {
-  const { env, data, params } = context;
+  const { env, data, params, request } = context;
   const classId = params.id;
 
   if (typeof classId !== 'string' || !classId) return json({ error: 'classId required' }, 400);
@@ -77,7 +107,8 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
     .bind(classId, now)
     .all<SubmissionRow>();
 
-  return json({ submissions: result.results ?? [] });
+  const submissions = await Promise.all((result.results ?? []).map(async (r) => ({ ...r, limit: await rowLimit(env, request, r) })));
+  return json({ submissions });
 };
 
 // POST — teacher overrides an AI grade.
@@ -144,26 +175,11 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (
     existing = {};
   }
 
-  // The mark's UNIT. A pass/fail part (an all-0-point rubric) is graded as criteria met out of
-  // criteria total, so that is what the teacher is marking and the ceiling is the criteria
-  // count: "AI score: 0 / 0" and a bare number with no unit let a teacher who typed 1 meaning
-  // "pass" give 1/6. A pointed part's ceiling is its points. Where nothing says (an outage row on
-  // an uncapped part) the old 0..100000 range stands.
-  // The row's own denominator first (what it was actually graded out of), then the criteria it
-  // carries (pass/fail), then the part's rubric (an outage row has neither).
-  let ceiling: number | null = null;
-  const rowCriteria = Array.isArray(existing.criteria) ? existing.criteria.length : 0;
-  if (typeof submission.possible === 'number' && submission.possible > 0) {
-    ceiling = submission.possible;
-  } else if (rowCriteria > 0) {
-    ceiling = rowCriteria;
-  } else {
-    const grader = await loadAiGrader(env, request, submission.lesson_id);
-    if (grader && grader.rubric.length > 0) {
-      const pts = grader.rubric.reduce((n, r) => n + (typeof r.points === 'number' && r.points > 0 ? r.points : 0), 0);
-      ceiling = pts > 0 ? pts : grader.rubric.length;
-    }
-  }
+  // The mark's UNIT and ceiling: the same rowLimit the queue shows the teacher, so what the form
+  // says "out of N" is exactly what the server enforces. Where nothing says, the old
+  // 0..100000 range stands.
+  const limit = await rowLimit(env, request, submission);
+  const ceiling: number | null = limit ? limit.max : null;
   if (!clearOnly && ceiling !== null && capped && (body.score as number) > ceiling) {
     return json({ error: `score must be between 0 and ${ceiling}`, ceiling }, 400);
   }

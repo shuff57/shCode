@@ -60,6 +60,32 @@ writeFileSync(join(tmp, 'lib/attempt-cap.ts'), cap().replace(/TRIES_APPLIED = \d
 git('add', '-A'); git('commit', '-q', '-m', 'fresh');
 eq(run('--check'), 0, 'a fresh stamp passes again');
 
+// Round 6: a SHALLOW clone (CI, a worktree made from a depth-1 clone) cannot see the commit that
+// introduced TRIES_APPLIED; `git log -S` finds only the shallow root, dated when the clone was
+// taken. A correct stamp made a few minutes before its commit then looked "earlier than the commit
+// that introduced it" and the deploy refused. It must skip that one comparison, loudly, and still
+// run every other check.
+{
+  writeFileSync(join(tmp, 'lib/attempt-cap.ts'), cap().replace(/TRIES_APPLIED = \d{13};/, `TRIES_APPLIED = ${Date.now() - 2 * 3_600_000};`));
+  git('add', '-A'); git('commit', '-q', '-m', 'stamp made two hours before its commit');
+  eq(run('--check'), 0, 'full history: a stamp two hours before its commit passes (it is after the feature commit ten days ago)');
+  const shallow = mkdtempSync(join(tmpdir(), 'stamp-tries-shallow-'));
+  execFileSync('git', ['clone', '-q', '--depth', '1', `file://${tmp}`, join(shallow, 'c')], { stdio: 'pipe' });
+  const rs = (flag) => spawnSync('node', [join(shallow, 'c/scripts/stamp-tries-applied.mjs'), flag], { cwd: join(shallow, 'c'), encoding: 'utf8' });
+  const sh = execFileSync('git', ['rev-parse', '--is-shallow-repository'], { cwd: join(shallow, 'c'), encoding: 'utf8' }).trim();
+  eq(sh, 'true', 'the clone really is shallow');
+  const r = rs('--check');
+  eq(r.status, 0, 'shallow clone: the same correct stamp passes (the introduced-by comparison is skipped, not failed)');
+  if (!/shallow clone/.test(r.stderr) || !/unshallow/.test(r.stderr)) fail('the shallow skip did not warn loudly and say how to unshallow'); else ok('...with a loud warning that says how to unshallow');
+  // every OTHER check still runs on the shallow clone: a future stamp is refused, an uncommitted edit is refused
+  writeFileSync(join(shallow, 'c/lib/attempt-cap.ts'), readFileSync(join(shallow, 'c/lib/attempt-cap.ts'), 'utf8').replace(/TRIES_APPLIED = \d{13};/, `TRIES_APPLIED = ${Date.now() + 86_400_000};`));
+  eq(rs('--check').status, 1, 'shallow clone: a stamp in the future is still refused');
+  rmSync(shallow, { recursive: true, force: true });
+  // back to a fresh committed stamp for the cases below
+  writeFileSync(join(tmp, 'lib/attempt-cap.ts'), cap().replace(/TRIES_APPLIED = \d{13};/, `TRIES_APPLIED = ${Date.now()};`));
+  git('add', '-A'); git('commit', '-q', '-m', 'fresh again');
+}
+
 writeFileSync(join(tmp, 'lib/attempt-cap.ts'), cap().replace(/TRIES_APPLIED = \d{13};/, `TRIES_APPLIED = ${Date.now() + 86_400_000};`));
 git('add', '-A'); git('commit', '-q', '-m', 'future');
 eq(run('--check'), 1, 'a go-live instant in the future: refuses');

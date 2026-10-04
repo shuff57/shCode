@@ -89,6 +89,27 @@ export function findMarkerKey(value: unknown, depth = 0): boolean {
 }
 
 /**
+ * A teacher's mark, an AI score or an override is written by the SERVER (the review queue,
+ * grade-written), never by the browser. The browser's own report on a deterministic part (the
+ * group builds, 'client' kind) is stored as sent, so a student could post
+ * {teacherOverriddenAt: 1, aiScore: 99999}: rowScore reads that as a teacher mark and the review
+ * queue shows "Teacher score" with invented feedback (round 6). Every key anywhere in a
+ * browser-supplied gradeJson that looks like one of those (NFKC-folded, case-folded, letters only:
+ * teacher*, override*, aiScore) is removed before the row is stored. Returns a copy.
+ */
+export function stripOverrideKeys<T>(value: T, depth = 0): T {
+  if (depth > 20 || value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) return value.map((v) => stripOverrideKeys(v, depth + 1)) as unknown as T;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    const folded = k.normalize('NFKC').toLowerCase().replace(/[^a-z]/g, '');
+    if (folded.startsWith('teacher') || folded.startsWith('override') || folded === 'aiscore') continue;
+    out[k] = stripOverrideKeys(v, depth + 1);
+  }
+  return out as T;
+}
+
+/**
  * May this caller be handed an answer (the quiz key or the pseudocode)? A teacher
  * or admin, always: a self-hosting teacher with no class still has to be able to
  * try the part. A student only while enrolled in a live class (not expired, not
@@ -195,6 +216,14 @@ export async function hasAnyRow(db: AttemptDb, email: string, lessonId: string):
  * Without that, every pass/fail part's best is 0 or NULL and grades 100 on completion.
  */
 export function rowScore(r: { score: number | null; possible: number | null; gradeJson: unknown | null }): number | null {
+  const v = rowScoreRaw(r);
+  // A pointed row is never worth more than the points it was out of: a forged aiScore or a stale
+  // teacher key on a row the browser wrote cannot lift the best past the row's own maximum.
+  if (v !== null && typeof r.possible === 'number' && r.possible > 0 && v > r.possible) return r.possible;
+  return v;
+}
+
+function rowScoreRaw(r: { score: number | null; possible: number | null; gradeJson: unknown | null }): number | null {
   const pointed = typeof r.possible === 'number' && r.possible > 0;
   // A row a teacher has MARKED (the review queue's override) carries the teacher's number in
   // `score`, in the units of the part's maxScore, so it is read as stored, never re-derived
@@ -280,6 +309,11 @@ export async function scoreOverride(db: AttemptDb, email: string, lessonId: stri
   return typeof o === 'number' && Number.isFinite(o) ? o : null;
 }
 
+/** The shapes a chart may use (lib/diagram-types.ts FlowShape; kept in step by test-attempt-reveal). */
+const FLOW_SHAPES = new Set(['terminal', 'process', 'decision', 'io', 'subroutine', 'preparation', 'connector', 'comment']);
+export interface ArtifactNode { id: string; shape: string; label: string; x: number; y: number }
+export interface ArtifactEdge { id: string; from: string; to: string; label?: string; fromSide?: string; toSide?: string }
+
 /** The most JSON a stored artifact may be (a 200-shape chart with its checks is a few KB). */
 export const MAX_ARTIFACT_CHARS = 60_000;
 
@@ -291,20 +325,43 @@ export const MAX_ARTIFACT_CHARS = 60_000;
  * grade_json.artifact, never used for scoring and never put in the model's prompt. Anything that
  * does not fit is dropped (the grade is unaffected), never trusted.
  */
-export function cleanArtifact(raw: unknown): { doc: { version: 1; nodes: unknown[]; edges: unknown[] }; checks: unknown[] } | undefined {
+export function cleanArtifact(raw: unknown): { doc: { version: 1; nodes: ArtifactNode[]; edges: ArtifactEdge[] }; checks: unknown[] } | undefined {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
   const a = raw as { doc?: unknown; checks?: unknown };
   const doc = a.doc as { nodes?: unknown; edges?: unknown } | undefined;
   if (!doc || typeof doc !== 'object' || !Array.isArray(doc.nodes) || !Array.isArray(doc.edges)) return undefined;
   if (doc.nodes.length > 200 || doc.edges.length > 400) return undefined;
-  const nodesOk = doc.nodes.every(
-    (n) => !!n && typeof n === 'object' && typeof (n as { id?: unknown }).id === 'string' && typeof (n as { shape?: unknown }).shape === 'string',
-  );
-  const edgesOk = doc.edges.every(
-    (e) => !!e && typeof e === 'object' && typeof (e as { source?: unknown }).source === 'string' && typeof (e as { target?: unknown }).target === 'string',
-  );
-  if (!nodesOk || !edgesOk) return undefined;
   const str = (v: unknown, n: number) => (typeof v === 'string' ? v.slice(0, n) : '');
+  const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+
+  // The REAL DiagramDoc shape (lib/diagram-types.ts): a node is {id, shape, label, x, y} and an
+  // arrow is {id, from, to, label?, fromSide?, toSide?}. Rebuilt from the known keys only, so
+  // nothing else a browser sends is stored. (Round 6: this once checked {source, target}, which
+  // no chart has, so every chart with an arrow was dropped and the teacher never saw it.)
+  const nodes: ArtifactNode[] = [];
+  const ids = new Set<string>();
+  for (const n of doc.nodes) {
+    if (!n || typeof n !== 'object') return undefined;
+    const k = n as { id?: unknown; shape?: unknown; label?: unknown; x?: unknown; y?: unknown };
+    if (typeof k.id !== 'string' || k.id.length === 0 || k.id.length > 80) return undefined;
+    if (typeof k.shape !== 'string' || !FLOW_SHAPES.has(k.shape)) return undefined;
+    if (ids.has(k.id)) return undefined;
+    ids.add(k.id);
+    nodes.push({ id: k.id, shape: k.shape, label: str(k.label, 300), x: num(k.x), y: num(k.y) });
+  }
+  const sides = new Set(['t', 'r', 'b', 'l']);
+  const edges: ArtifactEdge[] = [];
+  for (const e of doc.edges) {
+    if (!e || typeof e !== 'object') return undefined;
+    const k = e as { id?: unknown; from?: unknown; to?: unknown; label?: unknown; fromSide?: unknown; toSide?: unknown };
+    if (typeof k.id !== 'string' || k.id.length === 0 || k.id.length > 80) return undefined;
+    if (typeof k.from !== 'string' || typeof k.to !== 'string' || !ids.has(k.from) || !ids.has(k.to)) return undefined;
+    const edge: ArtifactEdge = { id: k.id, from: k.from, to: k.to };
+    if (typeof k.label === 'string' && k.label) edge.label = k.label.slice(0, 100);
+    if (typeof k.fromSide === 'string' && sides.has(k.fromSide)) edge.fromSide = k.fromSide;
+    if (typeof k.toSide === 'string' && sides.has(k.toSide)) edge.toSide = k.toSide;
+    edges.push(edge);
+  }
   const checks: unknown[] = [];
   if (Array.isArray(a.checks)) {
     if (a.checks.length > 40) return undefined;
@@ -321,9 +378,12 @@ export function cleanArtifact(raw: unknown): { doc: { version: 1; nodes: unknown
       });
     }
   }
-  const out = { doc: { version: 1 as const, nodes: doc.nodes, edges: doc.edges }, checks };
+  const out = { doc: { version: 1 as const, nodes, edges }, checks };
   // A key anywhere that looks like the grading-failure marker is never honest, and the count
-  // rule must not be able to see one inside a row the server wrote either.
+  // rule must not be able to see one inside a row the server wrote either. (Checked on the
+  // INPUT too: rebuilding from known keys already drops a stray key, but a lookalike in the
+  // shape the browser sent says the browser is not honest, so the artifact goes entirely.)
+  if (findMarkerKey(raw)) return undefined;
   if (findMarkerKey(out)) return undefined;
   let size = 0;
   try {

@@ -10,7 +10,7 @@
 import { resolveDueForStudent } from '../../_shared/dueDates';
 import { assignVariant, hashSeed } from '../../../lib/quiz-variant';
 import { QUIZ_KEYS } from '../../_shared/quiz-keys.generated';
-import { scoreQuiz, capFor, kindFor, insertCounted, findMarkerKey, effectiveCap } from '../../_shared/attempts';
+import { scoreQuiz, capFor, kindFor, insertCounted, findMarkerKey, effectiveCap, stripOverrideKeys } from '../../_shared/attempts';
 
 interface Env {
   DB: D1Database;
@@ -72,6 +72,9 @@ export const onRequestPost: PagesFunction<Env, string, { email: string; role?: s
   if (!body.id || !body.lessonId || typeof body.response !== 'string') {
     return json({ error: 'id, lessonId, and response required' }, 400);
   }
+  // Teacher marks, AI scores and overrides are the server's to write: whatever the browser sends
+  // that looks like one is removed before anything reads or stores it (round 6).
+  if (body.gradeJson !== undefined) body.gradeJson = stripOverrideKeys(body.gradeJson);
 
   const now = Date.now();
 

@@ -8,7 +8,8 @@
 //                                                     current instant and flips the flag; commit it
 //
 // --check refuses when: TRIES_GO_LIVE_STAMPED is false; TRIES_APPLIED is in the future; it is
-// earlier than the commit that introduced it (a stamp that predates the feature is a typo); more
+// earlier than the commit that introduced it (a stamp that predates the feature is a typo; skipped
+// with a loud warning on a shallow clone, where that commit cannot be found); more
 // than 24 hours old (the deploy slipped; --allow-old overrides, loudly); or
 // lib/attempt-cap.ts differs from HEAD (a deploy worktree is built from HEAD, so an uncommitted
 // stamp would not ship). Never move a stamped value EARLIER once students have used the
@@ -56,7 +57,15 @@ if (Date.now() - applied > STALE_MS) {
   console.error(`[stamp-tries-applied] WARNING: --allow-old. The stamp is ${Math.round((Date.now() - applied) / 3600000)} hours old; every attempt since ${new Date(applied).toISOString()} counts against the cap.`);
 }
 try {
-  const first = execFileSync('git', ['log', '-S', 'TRIES_APPLIED', '--format=%ct', '--reverse', '--', rel], { cwd: root, encoding: 'utf8' }).trim().split('\n')[0];
+  // On a SHALLOW clone `git log -S` can only see the shallow root commit, whose date is the clone's,
+  // not the feature's: a correct stamp made a minute after --set-now looked earlier than "the
+  // commit that introduced it" and the deploy refused (round 6). Say so loudly and skip that one
+  // comparison; every other check (set, not in the future, not stale, committed) still runs.
+  const shallow = execFileSync('git', ['rev-parse', '--is-shallow-repository'], { cwd: root, encoding: 'utf8' }).trim() === 'true';
+  if (shallow) {
+    console.error('[stamp-tries-applied] WARNING: this is a shallow clone, so the "earlier than the commit that introduced it" check is SKIPPED (git history is cut off). Run `git fetch --unshallow` to restore it.');
+  }
+  const first = shallow ? '' : execFileSync('git', ['log', '-S', 'TRIES_APPLIED', '--format=%ct', '--reverse', '--', rel], { cwd: root, encoding: 'utf8' }).trim().split('\n')[0];
   if (first && applied < Number(first) * 1000 - 60_000) die(`TRIES_APPLIED (${new Date(applied).toISOString()}) is earlier than the commit that introduced it: a stamp that predates the feature is a typo.`);
   const dirty = execFileSync('git', ['status', '--porcelain', '--', rel], { cwd: root, encoding: 'utf8' }).trim();
   if (dirty) die('lib/attempt-cap.ts has uncommitted changes: the deploy worktree is built from HEAD, so the stamp would not ship. Commit it first.');

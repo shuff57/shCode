@@ -71,6 +71,9 @@ const entries = [
   'lib/quiz-redact.ts',
   'lib/quiz-variant.ts',
   'lib/diagram-submission.ts',
+  'lib/diagram-flow.ts',
+  'lib/diagram-mermaid.ts',
+  'functions/api/classes/[id]/lesson-unsubmit/index.ts',
 ].map((f) => join(root, f));
 try {
   execFileSync('node', [
@@ -100,6 +103,10 @@ writeFileSync(join(outDir, 'functions/_shared/ai-graders.generated.js'), `export
     lessonTitle: 'fx', prompt: 'grade it', model: 'fx-model',
     rubric: [{ id: 'a', title: 'A', description: 'a', points: 5 }, { id: 'b', title: 'B', description: 'b', points: 5 }],
   },
+  'fx-passfail': {
+    lessonTitle: 'fx pass/fail', prompt: 'grade it', model: 'fx-model',
+    rubric: [{ id: 'a', title: 'A', description: 'a', points: 0 }, { id: 'b', title: 'B', description: 'b', points: 0 }, { id: 'c', title: 'C', description: 'c', points: 0 }],
+  },
 })};`);
 const QKEY = {
   maxSubmissions: 2,
@@ -110,7 +117,7 @@ const QKEY = {
 };
 writeFileSync(join(outDir, 'functions/_shared/quiz-keys.generated.js'), `exports.QUIZ_KEYS = ${JSON.stringify({ 'fx-quiz': QKEY })};`);
 
-for (const f of ['functions/api/grade-written.js', 'functions/api/attempt-reveal.js', 'functions/api/quiz-reveal.js', 'functions/api/lesson-submissions/index.js', 'functions/api/lesson-state/[lessonId].js', 'functions/api/classes/[id]/solution-releases/index.js', 'functions/api/classes/[id]/tries-reset/index.js', 'functions/api/classes/[id]/submission-queue/index.js']) {
+for (const f of ['functions/api/grade-written.js', 'functions/api/attempt-reveal.js', 'functions/api/quiz-reveal.js', 'functions/api/lesson-submissions/index.js', 'functions/api/lesson-state/[lessonId].js', 'functions/api/classes/[id]/solution-releases/index.js', 'functions/api/classes/[id]/tries-reset/index.js', 'functions/api/classes/[id]/submission-queue/index.js', 'functions/api/classes/[id]/lesson-unsubmit/index.js']) {
   if (!existsSync(join(outDir, f))) { fail(`tsc did not emit ${f}`); process.exit(1); }
 }
 const attemptReveal = require(join(outDir, 'functions/api/attempt-reveal.js')).onRequestGet;
@@ -120,6 +127,7 @@ const stateMod = require(join(outDir, 'functions/api/lesson-state/[lessonId].js'
 const gradeWritten = require(join(outDir, 'functions/api/grade-written.js')).onRequestPost;
 const releaseApi = require(join(outDir, 'functions/api/classes/[id]/solution-releases/index.js'));
 const queueApi = require(join(outDir, 'functions/api/classes/[id]/submission-queue/index.js'));
+const unsubmitApi = require(join(outDir, 'functions/api/classes/[id]/lesson-unsubmit/index.js')).onRequestPost;
 const triesReset = require(join(outDir, 'functions/api/classes/[id]/tries-reset/index.js')).onRequestPost;
 const core = require(join(outDir, 'lib/solution-release-core.js'));
 const dueCore = require(join(outDir, 'lib/due-dates-core.js'));
@@ -1284,6 +1292,107 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   eq((await mark(db, { submissionId: idOf(db, NOW), clearOverride: true }, A, 'student')).status, 403, 'a student cannot clear or set an override (403)');
 }
 
+// ============ round 6 / finding 2: unsubmit is a clean slate, override included ============
+{
+  const T = 't@example.invalid';
+  const mark = (db, body) =>
+    call(queueApi.onRequestPost, db, '/api/classes/c1/submission-queue', T, 'teacher', { method: 'POST', body: JSON.stringify(body) }, { id: 'c1' });
+  const unsub = (db, email = T, role = 'teacher') =>
+    call(unsubmitApi, db, '/api/classes/c1/lesson-unsubmit', email, role, { method: 'POST', body: JSON.stringify({ studentEmail: A, lessonId: 'fx-quiz' }) }, { id: 'c1' });
+  const complete = (db) =>
+    call(stateMod.onRequestPost, db, '/api/lesson-state/fx-quiz', A, 'student', { method: 'POST', body: JSON.stringify({ state: 'completed' }) }, { lessonId: 'fx-quiz' });
+  const st = (db) => db.raw.query("SELECT state, score, score_override AS o FROM lesson_state WHERE student_email = ? AND lesson_id = 'fx-quiz'").get(A);
+  const db = makeDb();
+  // the judge's repro: a capped quiz, one try; the teacher marks it 0 with "use this as the score"
+  eq((await submitQuiz(db, [['q1', 1], ['q2', 0]])).status, 201, 'unsubmit repro: the student hands in the quiz (2 of 2)');
+  await complete(db);
+  const sid = db.raw.query("SELECT id FROM lesson_submissions WHERE student_email = ? AND lesson_id = 'fx-quiz'").get(A).id;
+  eq((await mark(db, { submissionId: sid, score: 0, replaceBest: true })).status, 200, '...the teacher marks it 0 and ticks "use this as the score"');
+  eq([st(db).score, st(db).o], [0, 0], '...the stored score is 0 and the override is persisted');
+  eq((await unsub(db, A, 'student')).status, 403, 'a student cannot unsubmit (403)');
+  const r = await unsub(db);
+  eq([r.status, st(db).state, st(db).score, st(db).o], [200, 'started', null, null], 'unsubmit clears the score AND the persisted override (clean slate)');
+  eq((await submitQuiz(db, [['q1', 1], ['q2', 0]])).status, 201, '...the student sits again and gets 2 of 2');
+  await complete(db);
+  eq([st(db).state, st(db).score, st(db).o], ['completed', 2, null], '...and the part grades 2, not the old teacher 0 (the fresh sitting can change the grade)');
+  // every other place that rewrites lesson_state: none keeps an override the teacher did not just set
+  const files = ['functions/api/classes/[id]/tries-reset/index.ts', 'functions/api/classes/[id]/lesson-unsubmit/index.ts'];
+  for (const f of files) {
+    const src = readFileSync(join(root, f), 'utf8');
+    const resets = src.match(/UPDATE lesson_state SET state = 'started'[^`]*`/g) ?? [];
+    if (resets.length === 0 || resets.some((x) => !/score_override = NULL/.test(x))) fail(`${f}: a lesson_state reset to 'started' that does not clear score_override`);
+    else ok(`${f}: every reset to 'started' clears score_override`);
+  }
+}
+
+// ============ round 6 / finding 3: the queue always says what a mark is out of ============
+{
+  const T = 't@example.invalid';
+  const list = async (db) => (await (await call(queueApi.onRequestGet, db, '/api/classes/c1/submission-queue', T, 'teacher', {}, { id: 'c1' })).json()).submissions;
+  const mark = (db, body) =>
+    call(queueApi.onRequestPost, db, '/api/classes/c1/submission-queue', T, 'teacher', { method: 'POST', body: JSON.stringify(body) }, { id: 'c1' });
+  const db = makeDb();
+  // a grader-outage row has no criteria list of its own: a pass/fail part, a pointed part, and an unknown lesson
+  addRow(db, { email: A, lessonId: 'fx-passfail', gradeJson: { gradingFailed: true }, at: NOW, score: null, possible: null });
+  addRow(db, { email: A, lessonId: 'fx-written', gradeJson: { gradingFailed: true }, at: NOW + 1, score: null, possible: null });
+  addRow(db, { email: A, lessonId: 'fx-nograder', gradeJson: { gradingFailed: true }, at: NOW + 2, score: null, possible: null });
+  addRow(db, { email: A, lessonId: 'fx-uncapped', gradeJson: { criteria: [{ verdict: 'met' }, { verdict: 'met' }, { verdict: 'met' }, { verdict: 'met' }] }, at: NOW + 3, score: 0, possible: 0 });
+  addRow(db, { email: A, lessonId: 'fx-uncapped', gradeJson: { score: 7 }, at: NOW + 4, score: 7, possible: 10 });
+  const by = Object.fromEntries((await list(db)).map((r) => [r.submitted_at - NOW, r.limit]));
+  eq(by[0], { max: 3, unit: 'criteria' }, 'an outage row on a pass/fail part: the queue says the mark is criteria met, out of 3 (the rubric)');
+  eq(by[1], { max: 10, unit: 'points' }, 'an outage row on a pointed part: points, out of 10');
+  eq(by[2], null, 'an outage row on a lesson with no grader: no limit is claimed (null)');
+  eq(by[3], { max: 4, unit: 'criteria' }, 'a graded pass/fail row: criteria met, out of the 4 it carries');
+  eq(by[4], { max: 10, unit: 'points' }, 'a graded pointed row: points, out of its 10');
+  // the server enforces exactly the number the form shows
+  const id0 = db.raw.query('SELECT id FROM lesson_submissions WHERE submitted_at = ?').get(NOW).id;
+  let r = await mark(db, { submissionId: id0, score: 4 });
+  eq([r.status, (await r.json()).ceiling], [400, 3], 'a mark above the shown 3 is refused, and the refusal names the ceiling');
+  eq((await mark(db, { submissionId: id0, score: 2 })).status, 200, '...and a mark within it is taken');
+  // the form reads it: the SubmissionQueue source shows the unit from the row's limit when it has no criteria
+  const ui = readFileSync(join(root, 'components/SubmissionQueue.tsx'), 'utf8');
+  if (!/sub\.limit\?\.unit === 'criteria'/.test(ui) || !/pointsMax=\{sub\.limit\?\.unit === 'points'/.test(ui)) fail('SubmissionQueue does not take the form unit from the row limit');
+  else ok('SubmissionQueue takes the override form unit (criteria met or points, out of N) from the server limit');
+}
+
+// ============ round 6 / finding 4: the browser cannot write a teacher mark ============
+{
+  const T = 't@example.invalid';
+  const post = (db, lessonId, gradeJson, extra = {}) => call(submissionsPost, db, '/api/lesson-submissions', A, 'student', {
+    method: 'POST', body: JSON.stringify({ id: `f${++rowSeq}`, lessonId, response: 'code', gradeJson, ...extra }),
+  });
+  const stored = (db, lessonId) => JSON.parse(db.raw.query('SELECT grade_json FROM lesson_submissions WHERE lesson_id = ? ORDER BY rowid DESC LIMIT 1').get(lessonId).grade_json);
+  const forged = { totalScore: 3, teacherOverriddenAt: 1, teacherOverriddenBy: 'boss@example.invalid', teacherFeedback: 'Great work', teacherReviewedAt: 2, aiScore: 99999, nested: { TeacherReplace: true, 'ａiScore': 5, ok: 1 }, list: [{ overrideScore: 9, keep: 'yes' }] };
+  // fx-client is the third part of its test: the earlier parts are done, so it is open
+  const open = (d) => { for (const id of ['fx-written', 'fx-nopseudo']) d.raw.run("INSERT OR IGNORE INTO lesson_state (student_email, lesson_id, state, started_at, completed_at, score) VALUES (?, ?, 'completed', 1, 2, 5)", [A, id]); return d; };
+  const db = open(makeDb());
+  let r = await post(db, 'fx-client', forged, { score: 3, possible: 10 });
+  eq(r.status, 201, "a deterministic ('client') part's report carrying teacher-looking keys is still accepted...");
+  const g = stored(db, 'fx-client');
+  eq([g.teacherOverriddenAt, g.teacherOverriddenBy, g.teacherFeedback, g.teacherReviewedAt, g.aiScore, g.nested.TeacherReplace, g.nested['ａiScore'], g.list[0].overrideScore], [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined], '...but every teacher*/override*/aiScore key is stripped before it is stored (top level, nested, in arrays, case and fullwidth folded)');
+  eq([g.totalScore, g.nested.ok, g.list[0].keep], [3, 1, 'yes'], '...and the honest fields of the report are untouched');
+  await call(stateMod.onRequestPost, db, '/api/lesson-state/fx-client', A, 'student', { method: 'POST', body: JSON.stringify({ state: 'completed' }) }, { lessonId: 'fx-client' });
+  eq(db.raw.query("SELECT score FROM lesson_state WHERE student_email = ? AND lesson_id = 'fx-client'").get(A).score, 3, 'the part is worth the 3 the report honestly carried, never the forged 99999');
+  const q = (await (await call(queueApi.onRequestGet, db, '/api/classes/c1/submission-queue', T, 'teacher', {}, { id: 'c1' })).json()).submissions;
+  eq(q.some((x) => /teacher(Overridden|Reviewed)/.test(x.grade_json ?? '')), false, 'the review queue shows no teacher mark on the row (nothing for it to read as "Teacher score")');
+  // the uncapped path strips them too (a formative lesson stores the browser's report as sent)
+  r = await post(db, 'fx-uncapped', forged, { score: 3, possible: 10 });
+  const gu = stored(db, 'fx-uncapped');
+  eq([r.status, gu.teacherOverriddenAt, gu.aiScore, gu.totalScore], [201, undefined, undefined, 3], 'an uncapped part strips them as well');
+  // a row ALREADY carrying a forged mark (written before this fix) cannot lift the best past its own maximum
+  const db2 = open(makeDb());
+  addRow(db2, { email: A, lessonId: 'fx-client', gradeJson: { teacherOverriddenAt: 1, aiScore: 99999 }, at: NOW, score: 3, possible: 10 });
+  await call(stateMod.onRequestPost, db2, '/api/lesson-state/fx-client', A, 'student', { method: 'POST', body: JSON.stringify({ state: 'completed' }) }, { lessonId: 'fx-client' });
+  eq(db2.raw.query("SELECT score FROM lesson_state WHERE student_email = ? AND lesson_id = 'fx-client'").get(A).score, 10, 'a pre-existing forged row (aiScore 99999) is clamped to the row\'s own points (10), not 99999');
+  // a real teacher mark still works (it is written by the server AFTER the strip)
+  const db3 = makeDb();
+  await post(db3, 'fx-client', { totalScore: 2 }, { score: 2, possible: 10 });
+  const sid = db3.raw.query('SELECT id FROM lesson_submissions').get().id;
+  r = await call(queueApi.onRequestPost, db3, '/api/classes/c1/submission-queue', T, 'teacher', { method: 'POST', body: JSON.stringify({ submissionId: sid, score: 7, feedback: 'good' }) }, { id: 'c1' });
+  const gt = stored(db3, 'fx-client');
+  eq([r.status, typeof gt.teacherReviewedAt, gt.teacherFeedback, db3.raw.query('SELECT score FROM lesson_submissions').get().score], [200, 'number', 'good', 7], "a teacher's own mark through the queue is still written and still counts");
+}
+
 // ============ round 5 / finding 2: tries-reset recomputes from EVERY row ============
 {
   const T = 't@example.invalid';
@@ -1328,7 +1437,7 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   eq(st(db).score, 2, 'a forged score on an unmarked outage marker never raises the best');
 }
 
-// ============ round 5 / finding 3: a capped AI chart keeps the drawn chart for the teacher ============
+// ============ round 5 / finding 3 + round 6 / finding 1: a capped AI chart keeps the drawn chart for the teacher ============
 {
   const db = makeDb();
   const realFetch = globalThis.fetch;
@@ -1343,28 +1452,56 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
     request: new Request('https://example.test/api/grade-written', { method: 'POST', body: JSON.stringify({ lessonId: 'fx-written', response: text, artifact }) }),
     env: { DB: db, OLLAMA_API_KEY: 'k' }, params: {}, data: { email, role }, next: async () => new Response(null),
   });
-  const art = { doc: { version: 1, nodes: [{ id: 'n1', shape: 'terminal', data: { label: 'ARTIFACT-SENTINEL start' } }], edges: [] }, checks: [{ id: 'one-start', title: 'One start', passed: true, detail: 'ok', offenders: [] }] };
+  // A chart built the way the browser builds one: the lesson starter parsed by fromMermaid
+  // (nodes {id, shape, label, x, y}, arrows {id, from, to, label?}), NOT a hand-made fixture.
+  const mer = require(join(outDir, 'lib/diagram-mermaid.js'));
+  const flow = require(join(outDir, 'lib/diagram-flow.js'));
+  const real = mer.fromMermaid('flowchart TD\n  A([Start ARTIFACT-SENTINEL])\n  B[/Read the cart/]\n  C{Over the limit?}\n  D[Say over]\n  Z([End])\n  A --> B\n  B --> C\n  C -->|yes| D\n  C -->|no| Z\n  D --> Z');
+  eq([real.nodes.length, real.edges.length, Object.keys(real.edges[0]).sort().join(',').includes('from')], [5, 5, true], 'the fixture chart really is a browser-built DiagramDoc with arrows (from/to)');
+  const checks = [{ id: 'one-start', title: 'One start', passed: true, detail: 'ok', offenders: [] }];
+  const art = { doc: real, checks };
   const last = () => JSON.parse(db.raw.query("SELECT grade_json FROM lesson_submissions ORDER BY rowid DESC LIMIT 1").get().grade_json);
   let r = await gw(art);
   eq(r.status, 200, 'artifact: the grade is returned as before');
-  eq([last().artifact?.doc?.nodes?.[0]?.id, last().artifact?.checks?.[0]?.passed, last().totalEarned], ['n1', true, 10], '...the counted row keeps the chart and its checks beside the grade');
+  const kept = last().artifact;
+  eq([kept?.doc?.nodes?.length, kept?.doc?.edges?.length, kept?.checks?.[0]?.passed, last().totalEarned], [5, 5, true, 10], '...the counted row keeps the chart WITH ITS ARROWS and its checks beside the grade (round 6: a chart with an arrow used to be dropped)');
+  eq(kept?.doc?.edges?.map((e) => [e.from, e.to, e.label ?? '']), real.edges.map((e) => [e.from, e.to, e.label ?? '']), '...every arrow keeps its from, to and label');
   eq(sent.some((b) => b.includes('ARTIFACT-SENTINEL')), false, '...and the chart text never reached the model prompt');
+  // the teacher's read path, end to end: stored row -> parseDiagramArtifact -> docToFlow (what the canvas draws)
+  const sub = require(join(outDir, 'lib/diagram-submission.js'));
+  const rowJson = db.raw.query("SELECT grade_json FROM lesson_submissions ORDER BY rowid DESC LIMIT 1").get().grade_json;
+  const seen = sub.parseDiagramArtifact(rowJson);
+  const drawn = seen ? flow.docToFlow(seen) : null;
+  eq([drawn?.nodes?.length, drawn?.edges?.length, drawn?.edges?.map((e) => `${e.source}>${e.target}`).sort().join(' ')], [5, 5, real.edges.map((e) => `${e.from}>${e.to}`).sort().join(' ')], 'the teacher render path (parseDiagramArtifact then docToFlow) draws every shape AND every arrow of the stored chart');
+  // unknown keys are dropped: only what a chart is
+  const dirty = JSON.parse(JSON.stringify(real));
+  dirty.nodes[0].evil = '<img src=x onerror=1>'; dirty.edges[0].evil = 1; dirty.extra = { a: 1 };
+  r = await gw({ doc: dirty, checks }, 'a chart with stray keys that is long enough', 'e@example.invalid');
+  const k2 = last().artifact;
+  eq([k2?.doc?.nodes?.[0]?.evil, k2?.doc?.edges?.[0]?.evil, k2?.doc?.extra, Object.keys(k2?.doc?.nodes?.[0] ?? {}).sort().join(',')], [undefined, undefined, undefined, 'id,label,shape,x,y'], 'unknown keys on a node, an arrow or the doc are dropped (the artifact is rebuilt from the known keys)');
   // bounded and shape-checked: anything that does not fit is dropped, the grade is unaffected
-  const huge = { doc: { version: 1, nodes: [{ id: 'n1', shape: 'terminal', data: { label: 'x'.repeat(90_000) } }], edges: [] }, checks: [] };
-  r = await gw(huge, 'a second chart answer long enough');
+  const bigNodes = Array.from({ length: 200 }, (_, i) => ({ id: `n${i}`, shape: 'process', label: 'x'.repeat(300), x: i, y: i }));
+  const bigEdges = Array.from({ length: 199 }, (_, i) => ({ id: `e${i}`, from: `n${i}`, to: `n${i + 1}`, label: 'y'.repeat(100) }));
+  const checksBig = Array.from({ length: 40 }, (_, i) => ({ id: `c${i}`, title: 't'.repeat(200), passed: true, detail: 'd'.repeat(500), offenders: Array.from({ length: 50 }, () => 'o'.repeat(80)) }));
+  r = await gw({ doc: { version: 1, nodes: bigNodes, edges: bigEdges }, checks: checksBig }, 'a second chart answer long enough');
   eq([r.status, last().artifact], [200, undefined], 'an artifact over the size cap is dropped; the grade is still given');
   r = await gw({ doc: { nodes: 'not an array', edges: [] }, checks: [] }, 'a third chart answer long enough');
   eq([r.status, last().artifact], [200, undefined], 'an artifact that is not a chart is dropped');
-  // element-level shape: a node with a numeric id, an edge with no source, a check that is not a boolean pass
+  // element-level shape
   const D = 'd@example.invalid';
   db.raw.run('INSERT INTO enrollments (class_id, student_email, expires_at) VALUES (?, ?, ?)', ['c1', D, 4102444800000]);
-  r = await gw({ doc: { version: 1, nodes: [{ id: 7, shape: 'terminal' }], edges: [] }, checks: [] }, 'a chart whose node id is a number', D);
-  eq([r.status, last().artifact], [200, undefined], 'an artifact whose node has a non-string id is dropped (element shape checked, not only the arrays)');
-  await db.raw.run("DELETE FROM lesson_submissions WHERE rowid IN (SELECT rowid FROM lesson_submissions ORDER BY rowid DESC LIMIT 1)");
-  r = await gw({ doc: { version: 1, nodes: [{ id: 'n1', shape: 'terminal' }], edges: [{ id: 'e1', target: 'n1' }] }, checks: [] }, 'a chart whose edge has no source', D);
-  eq([r.status, last().artifact], [200, undefined], 'an artifact whose edge has no source is dropped');
-  await db.raw.run("DELETE FROM lesson_submissions WHERE rowid IN (SELECT rowid FROM lesson_submissions ORDER BY rowid DESC LIMIT 1)");
-  const evil = { doc: { version: 1, nodes: [{ id: 'n1', shape: 'terminal', gradingFailed: true }], edges: [] }, checks: [] };
+  const drop = async (art2, text, why) => {
+    r = await gw(art2, text, D);
+    eq([r.status, last().artifact], [200, undefined], why);
+    await db.raw.run("DELETE FROM lesson_submissions WHERE rowid IN (SELECT rowid FROM lesson_submissions ORDER BY rowid DESC LIMIT 1)");
+  };
+  await drop({ doc: { version: 1, nodes: [{ id: 7, shape: 'terminal' }], edges: [] }, checks: [] }, 'a chart whose node id is a number', 'an artifact whose node has a non-string id is dropped');
+  await drop({ doc: { version: 1, nodes: [{ id: 'n1', shape: 'not-a-shape', label: '', x: 0, y: 0 }], edges: [] }, checks: [] }, 'a chart with an unknown shape', 'an artifact with a shape the editor does not draw is dropped');
+  await drop({ doc: { version: 1, nodes: [{ id: 'n1', shape: 'terminal', label: '', x: 0, y: 0 }], edges: [{ id: 'e1', to: 'n1' }] }, checks: [] }, 'a chart whose edge has no from', 'an artifact whose arrow has no from is dropped');
+  await drop({ doc: { version: 1, nodes: [{ id: 'n1', shape: 'terminal', label: '', x: 0, y: 0 }], edges: [{ id: 'e1', from: 'n1', to: 'ghost' }] }, checks: [] }, 'a chart whose arrow points at nothing', 'an artifact whose arrow points at a shape that is not there is dropped');
+  await drop({ doc: { version: 1, nodes: [{ id: 'n1', shape: 'terminal', label: '', x: 0, y: 0 }, { id: 'n1', shape: 'process', label: '', x: 0, y: 0 }], edges: [] }, checks: [] }, 'a chart with a repeated id', 'an artifact with a repeated shape id is dropped');
+  await drop({ doc: { version: 1, nodes: [{ id: 'n1', shape: 'terminal', label: '', x: 0, y: 0 }], edges: [{ id: 'e1', source: 'n1', target: 'n1' }] }, checks: [] }, 'a chart in the old wrong arrow format', 'source/target arrows (the shape no chart has) are not accepted either');
+  const evil = { doc: { version: 1, nodes: [{ id: 'n1', shape: 'terminal', label: '', x: 0, y: 0, gradingFailed: true }], edges: [] }, checks: [] };
   const db2count = db.raw.query('SELECT COUNT(*) AS n FROM lesson_submissions').get().n;
   r = await gw(evil, 'a chart that carries a lookalike key');
   eq([r.status, db.raw.query('SELECT COUNT(*) AS n FROM lesson_submissions').get().n], [409, db2count], '(the cap is spent now: three counted rows)');
@@ -1377,16 +1514,19 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   reply = () => new Response(JSON.stringify({ message: { content: '{"nope":1}' } }), { status: 200 });
   r = await gw(art, 'a chart answer while the model says nothing', C2);
   const mk = JSON.parse(db.raw.query("SELECT grade_json FROM lesson_submissions WHERE response = 'a chart answer while the model says nothing'").get().grade_json);
-  eq([r.status, mk.gradingFailed, mk.artifact?.doc?.nodes?.[0]?.id], [502, true, 'n1'], 'the server-written outage marker keeps the chart as well');
-  // the teacher's reader finds it
-  const sub = require(join(outDir, 'lib/diagram-submission.js'));
-  const row = JSON.stringify({ ...JSON.parse(db.raw.query("SELECT grade_json FROM lesson_submissions WHERE student_email = ? AND score = 10").get(A).grade_json) });
-  eq([sub.parseDiagramArtifact(row)?.nodes?.length, sub.parseDiagramGrade(row)?.structural?.length], [1, 1], 'the teacher-side readers recover the chart (parseDiagramArtifact) and its checks (parseDiagramGrade)');
+  eq([r.status, mk.gradingFailed, mk.artifact?.doc?.nodes?.length, mk.artifact?.doc?.edges?.length], [502, true, 5, 5], 'the server-written outage marker keeps the chart (with its arrows) as well');
+  // the teacher's reader finds the checks as well
+  eq([sub.parseDiagramArtifact(rowJson)?.nodes?.length, sub.parseDiagramGrade(rowJson)?.structural?.length], [5, 1], 'the teacher-side readers recover the chart (parseDiagramArtifact) and its checks (parseDiagramGrade)');
   eq(sub.parseDiagramArtifact('{"totalEarned":1}'), null, '...and return null for a row with no artifact');
   globalThis.fetch = realFetch;
   const src = readFileSync(join(root, 'components/DiagramAssignmentView.tsx'), 'utf8');
   if (!/artifact: \{ doc, checks: results \}/.test(src)) fail('DiagramAssignmentView does not send the chart as an artifact');
   else ok('DiagramAssignmentView sends the chart and its checks as an artifact with the grade request');
+  // the shapes the server accepts are the shapes the editor draws
+  const types = readFileSync(join(root, 'lib/diagram-types.ts'), 'utf8');
+  const declared = [...types.match(/export type FlowShape =([^;]+);/)[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]).sort();
+  const accepted = [...readFileSync(join(root, 'functions/_shared/attempts.ts'), 'utf8').match(/const FLOW_SHAPES = new Set\(\[([^\]]+)\]/)[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]).sort();
+  eq(accepted, declared, 'cleanArtifact accepts exactly the shapes lib/diagram-types.ts declares');
 }
 
 // ============ round 5 / finding 4: a pass/fail mark has a unit and a ceiling ============
