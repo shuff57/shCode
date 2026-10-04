@@ -417,10 +417,14 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 # Local dev (Next dev server + Pages Functions emulated)
 npm run dev            # port 3002
 
-# Prod build + deploy: ALWAYS `npm run deploy`, never `npm run build` + bare wrangler.
-# `deploy` runs, in order: check-pending-migrations, check-pa-attempts
-# --require-pseudocode, stamp-tries-applied --check, the build, check-ai-grader-leak
-# --require-build, then wrangler. Bare wrangler skips every one of those guards.
+# Prod build + deploy (THE ORIGINAL AUTHOR'S deploy of shcode.pages.dev): ALWAYS
+# `npm run deploy`, never `npm run build` + bare wrangler. `deploy` runs, in order:
+# check-pending-migrations, check-pa-attempts --require-pseudocode,
+# stamp-tries-applied --check, the build, check-ai-grader-leak --require-build, then
+# wrangler. Bare wrangler skips every one of those guards.
+# It is specific to this deployment: the Pages project `shcode`, branch `cs-3d`, the D1
+# database `shcode-commits`, the author's committed go-live stamp, and the author's local
+# pa-pseudocode/ files. A SELF-HOSTING teacher does not run it (see "Self-hosting" below).
 npm run deploy
 npm run build                                                   # build only (local checks)
 
@@ -461,9 +465,33 @@ npx wrangler r2 bucket create shcode-uploads
   uncommitted. Do not move it afterwards: an earlier instant confiscates tries.
 - **Migration 0032** (`class_solution_releases`) must be applied (`npm run d1:migrate`)
   before the deploy; the migration preflight refuses with it pending.
-- A self-hosting teacher with an empty `pa-pseudocode/` needs none of this except
-  `npm run d1:migrate`: tries, AI feedback and best score work without the files;
-  students just never see a solution (see `pa-pseudocode/README.md`).
+- **Migrations 0033 (`lesson_try_resets`) and 0034 (`lesson_state.score_override`)** likewise.
+  0034 must be applied BEFORE the deploy: the new code reads `score_override`, and a Function
+  that selects a column the database does not have 500s.
+- **The stamp goes stale.** `--check` also refuses a stamp more than 24 hours old (the deploy
+  slipped, and attempts between the stamp and the deploy would count against the cap before the
+  rule was live). Re-stamp at the real go-live, or pass `--allow-old` knowingly.
+
+### Self-hosting (another teacher running their own copy)
+
+`npm run deploy` is the original author's script and is not meant to be reused as is: it names
+the author's Pages project and D1 database, refuses without the author's `pa-pseudocode/` files,
+and checks the author's committed go-live stamp (which is old by the time you fork). Use your own
+commands instead:
+
+```bash
+npx wrangler d1 create <your-db>            # then put its id in wrangler.toml
+npx wrangler d1 migrations apply <your-db> --remote
+npm run build                               # runs prebuild: generators + the leak checks it can
+node scripts/check-ai-grader-leak.mjs --require-build
+npx wrangler pages deploy out --project-name <your-project>
+```
+
+Set your own `AUTH_SECRET`, `OLLAMA_API_KEY`, `ADMIN_EMAILS` and `TEACHER_EMAILS` (the table above).
+With an empty `pa-pseudocode/` the three tries, AI feedback and best score all work; students just
+never see a solution (see `pa-pseudocode/README.md`). Write your own pseudocode files to turn that
+on, and set your own `TRIES_APPLIED` (run `node scripts/stamp-tries-applied.mjs --set-now` once,
+before your students first use a capped part, and commit it).
 
 ## Static-export gotcha
 

@@ -24,7 +24,13 @@ git('init', '-q');
 git('config', 'user.email', 't@example.invalid');
 git('config', 'user.name', 't');
 git('add', '-A');
-git('commit', '-q', '-m', 'init');
+// The feature commit is ten days old, so a two-day-old stamp below is "stale" and not "predates the
+// feature" (two different refusals).
+execFileSync('git', ['commit', '-q', '-m', 'init'], {
+  cwd: tmp,
+  stdio: 'pipe',
+  env: { ...process.env, GIT_COMMITTER_DATE: new Date(Date.now() - 10 * 86_400_000).toISOString(), GIT_AUTHOR_DATE: new Date(Date.now() - 10 * 86_400_000).toISOString() },
+});
 const run = (flag) => spawnSync('node', [join(tmp, 'scripts/stamp-tries-applied.mjs'), flag], { cwd: tmp, encoding: 'utf8' }).status;
 const cap = () => readFileSync(join(tmp, 'lib/attempt-cap.ts'), 'utf8');
 
@@ -39,6 +45,20 @@ git('add', '-A');
 git('commit', '-q', '-m', 'stamp');
 eq(run('--check'), 0, 'stamped and committed: the deploy check passes');
 eq(run('--set-now'), 1, 'stamping twice is refused (moving the instant gives or takes tries)');
+
+// A stamp more than 24 hours old (the deploy slipped): refuses, unless --allow-old.
+writeFileSync(join(tmp, 'lib/attempt-cap.ts'), cap().replace(/TRIES_APPLIED = \d{13};/, `TRIES_APPLIED = ${Date.now() - 2 * 86_400_000};`));
+git('add', '-A'); git('commit', '-q', '-m', 'stale');
+eq(run('--check'), 1, 'a stamp two days old: refuses (the deploy slipped; attempts in the gap would count)');
+{
+  const r = spawnSync('node', [join(tmp, 'scripts/stamp-tries-applied.mjs'), '--check', '--allow-old'], { cwd: tmp, encoding: 'utf8' });
+  eq(r.status, 0, 'a stamp two days old with --allow-old: passes');
+  if (!/WARNING: --allow-old/.test(r.stderr)) fail('--allow-old did not warn loudly'); else ok('--allow-old warns loudly on stderr');
+}
+// back to a fresh stamp for the cases below
+writeFileSync(join(tmp, 'lib/attempt-cap.ts'), cap().replace(/TRIES_APPLIED = \d{13};/, `TRIES_APPLIED = ${Date.now()};`));
+git('add', '-A'); git('commit', '-q', '-m', 'fresh');
+eq(run('--check'), 0, 'a fresh stamp passes again');
 
 writeFileSync(join(tmp, 'lib/attempt-cap.ts'), cap().replace(/TRIES_APPLIED = \d{13};/, `TRIES_APPLIED = ${Date.now() + 86_400_000};`));
 git('add', '-A'); git('commit', '-q', '-m', 'future');

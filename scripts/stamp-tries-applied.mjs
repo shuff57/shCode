@@ -8,7 +8,8 @@
 //                                                     current instant and flips the flag; commit it
 //
 // --check refuses when: TRIES_GO_LIVE_STAMPED is false; TRIES_APPLIED is in the future; it is
-// earlier than the commit that introduced it (a stamp that predates the feature is a typo); or
+// earlier than the commit that introduced it (a stamp that predates the feature is a typo); more
+// than 24 hours old (the deploy slipped; --allow-old overrides, loudly); or
 // lib/attempt-cap.ts differs from HEAD (a deploy worktree is built from HEAD, so an uncommitted
 // stamp would not ship). Never move a stamped value EARLIER once students have used the
 // deploy: that confiscates tries (see the comment in lib/attempt-cap.ts).
@@ -44,6 +45,16 @@ if (mode === 'set') {
 const applied = Number(m[1]);
 if (f[1] !== 'true') die('TRIES_GO_LIVE_STAMPED is false: TRIES_APPLIED is still the development placeholder. At go-live run `node scripts/stamp-tries-applied.mjs --set-now`, commit, then deploy.');
 if (applied > Date.now()) die(`TRIES_APPLIED (${new Date(applied).toISOString()}) is in the future: every attempt until then would be free.`);
+// A stamp that is days old means the deploy slipped: every attempt between the stamp and the deploy
+// counts against the cap although the rule was not live yet. Re-stamp at the real go-live, or pass
+// --allow-old to say you know (the students' tries in that gap are the cost).
+const STALE_MS = 24 * 3600 * 1000;
+if (Date.now() - applied > STALE_MS) {
+  if (!process.argv.includes('--allow-old')) {
+    die(`TRIES_APPLIED (${new Date(applied).toISOString()}) is more than 24 hours old: the deploy slipped, and attempts made between the stamp and the deploy would count against the cap before the rule was live. Un-stamp it (set TRIES_GO_LIVE_STAMPED back to false and the literal to the placeholder, in a commit) and run --set-now again at the real go-live, or pass --allow-old to deploy anyway.`);
+  }
+  console.error(`[stamp-tries-applied] WARNING: --allow-old. The stamp is ${Math.round((Date.now() - applied) / 3600000)} hours old; every attempt since ${new Date(applied).toISOString()} counts against the cap.`);
+}
 try {
   const first = execFileSync('git', ['log', '-S', 'TRIES_APPLIED', '--format=%ct', '--reverse', '--', rel], { cwd: root, encoding: 'utf8' }).trim().split('\n')[0];
   if (first && applied < Number(first) * 1000 - 60_000) die(`TRIES_APPLIED (${new Date(applied).toISOString()}) is earlier than the commit that introduced it: a stamp that predates the feature is a typo.`);
