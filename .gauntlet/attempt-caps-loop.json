@@ -231,9 +231,11 @@
     }
   },
   "phase5_todo": [
-    "set TRIES_APPLIED in lib/attempt-cap.ts to the deploy instant (it is the instant the mechanism was written; test-attempt-reveal asserts it is a fixed literal)",
-    "apply migration 0032 to prod BEFORE the deploy (npm run d1:migrate) - the deploy preflight refuses with it pending",
-    "populate pa-pseudocode/ on the deploy machine (git-ignored); deploy runs check-pa-attempts --require-pseudocode"
+    "run `node scripts/stamp-tries-applied.mjs --set-now` ONCE at go-live and commit lib/attempt-cap.ts (npm run deploy refuses until it is stamped)",
+    "apply migrations 0032 (class_solution_releases) AND 0033 (lesson_try_resets) to prod BEFORE the deploy (npm run d1:migrate); the deploy preflight refuses with them pending",
+    "deploy from a worktree with pa-pseudocode/ populated (git-ignored); npm run deploy runs check-pa-attempts --require-pseudocode",
+    "teacher release: nothing is released until a teacher presses Release; tell teachers",
+    "burst test: ~25 parallel grade-written calls against ollama.com before test day (see the spec's accepted risks)"
   ],
   "reference_pass": {
     "status": "done",
@@ -267,5 +269,29 @@
       "no rubric criterion, weight or passing rule changed on any Chapter 1 or 2 part"
     ],
     "gates": "check-starters, check-diagram-solutions, test-lesson-solution-parity, test-find-and-fix, test-2-7-3-comments, test-pa-ai-graders, test-grader, test-grade-stream, audit-grader-tolerance --gate, check-solution-leak, check-summative-parts, check-pa-attempts --require-pseudocode, check-lesson-citations, tsc: green. Full npm test exit 0 from a fresh worktree of HEAD; check-quiz-key-leak (41 pages) and check-ai-grader-leak --require-build (882 probes) OK on that worktree's fresh build. Live glm-5.3-flash: references pass and no gaming fixture passes on 3-10-3, 3-10-4, 3-9-1, 2-7-4, 2-6-1."
+  },
+  "round4": {
+    "judge": "final round 4 (read-only, HEAD)",
+    "findings_written_before_fix": [
+      "2 MEDIUM grades: x.6.3 demos became summative:true for the cap; all-0-point rubric + null maxScore -> lessonPercent 100 for any completed part, so junk demos are 100%. Same latent rule on 1-7-2, 1-7-5 and the x.6.* parts.",
+      "3 MEDIUM test-attempt-reveal.mjs prints SKIP and exits 0 without bun:sqlite: a self-hoster on real Node gets a green suite that ran nothing.",
+      "4 MEDIUM studentReleaseStatus counts a release from ANY live class; students self-join with a code, so a throwaway account joining period 1 reads the solution before period 5 sits the test.",
+      "5 LOW-MEDIUM documented deploy (CLAUDE.md) is bare wrangler: skips check-pa-attempts --require-pseudocode and check-pending-migrations; a clean worktree has no pa-pseudocode/ so every reveal 404s; TRIES_APPLIED is never enforced at deploy time.",
+      "7 LOW lesson-unsubmit only handles quizzes: 21 of 24 capped parts have no teacher remedy to give tries back.",
+      "8 LOW submission-queue override writes score = excluded.score, bypassing best-of: marking a stranded outage-marker row 5 drops a best of 8 to 5.",
+      "9 COSMETIC check-pa-attempts says 'and a pseudocode file each' when files are missing; banner promises 'you will see how it is solved' though release is now the teacher's.",
+      "1 and 6 (renderer outage completion repair, race-lost message) belong to the other agent; not touched here."
+    ],
+    "status": "fixed; awaiting a judge round (no fork can launch one)",
+    "results": {
+      "2": "fixed: criteriaScore (met 1, partial half) in lib/grade-pass.ts; attempts.ts rowScore reads it for pass/fail rows (teacher-marked rows read as stored); manifest + app/page.tsx maxScore = criteria count for a CAPPED pass/fail rubric; scoreKind unchanged (category stays Lab). Completion stays on any hand-in (test-mode rule), decided and written in the spec. Tests: junk demo 0%, one-in-three 33%, strong 100%, best-of, grading.ts category math, manifest agrees for all 25 pass/fail rubrics.",
+      "3": "fixed: scripts/lib/sqlite-adapter.mjs (bun:sqlite or node:sqlite) and requireSqlite() fail loudly without an engine (ALLOW_SKIP_SQLITE=1 opts out); passes under bun:sqlite and under node:sqlite (SQLITE_ENGINE=node:sqlite on Bun). Real Node was NOT available on this machine (node is a Bun shim), so the node:sqlite path ran under Bun's node:sqlite. test-attempt-reveal was the only bun:sqlite test.",
+      "4": "fixed: studentReleaseStatus skips a class whose enrolled_at is after the release; a teacher releasing again includes a late joiner. Remaining limit accepted: joining BEFORE the release.",
+      "5": "fixed: scripts/stamp-tries-applied.mjs (--check in npm run deploy, --set-now once at go-live), lib/attempt-cap.ts TRIES_GO_LIVE_STAMPED, test-stamp-tries-applied.mjs, CLAUDE.md deploy section. check-pa-attempts --require-pseudocode and check-pending-migrations were already in deploy.",
+      "7": "fixed: POST /api/classes/[id]/tries-reset (give-back-one | reset), migration 0033 lesson_try_resets (audit: rows kept as JSON), teacher drawer buttons, manifest carries maxSubmissions. Tests: student/other teacher refused, admin allowed, audit row, lesson_state recompute, capped quiz draft unlocked.",
+      "8": "fixed: submission-queue override on a capped part stores max(mark, best counted try) unless replaceBest; the mark is that row's score; score validated finite 0..100000. UI checkbox in the override form.",
+      "9": "fixed: check-pa-attempts reports missing pseudocode files; banner says 'once your teacher releases it' in both states (test asserts both).",
+      "mutations": "M1 criteria read, M2 enrolled-before, M3 tries-reset auth, M4 override best-of, M5 manifest criteria count, M6 give-back-one removes all, M7 score range: every one makes test-attempt-reveal fail. M8 (banner promise) was first missed (one of two occurrences left); the assertion now requires both."
+    }
   }
 }

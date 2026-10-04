@@ -51,6 +51,16 @@ export const ATTEMPT_CAPS_APPLIED = 1790804940000;
  */
 export const TRIES_APPLIED = 1791065875120;
 
+/**
+ * Has the go-live instant above been set on purpose? FALSE until the human runs
+ * `node scripts/stamp-tries-applied.mjs --set-now` once at go-live (it writes the real
+ * instant into TRIES_APPLIED and flips this to true; commit the result). `npm run deploy`
+ * runs `stamp-tries-applied.mjs --check` and refuses to ship while this is false, so a
+ * deploy can no longer go out with the development-time placeholder above and silently
+ * hand out (or confiscate) tries from the wrong instant.
+ */
+export const TRIES_GO_LIVE_STAMPED = false;
+
 /** The instant from which attempts count: the later of the two cutoffs. */
 export const COUNT_SINCE = Math.max(ATTEMPT_CAPS_APPLIED, TRIES_APPLIED);
 

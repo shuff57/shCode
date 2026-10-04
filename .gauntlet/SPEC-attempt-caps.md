@@ -136,3 +136,40 @@ time**, opening by itself.
 - **Known gap, out of scope:** `schoolInstant` in `lib/due-dates-core.ts` rolls
   '2026-13-45' over into a different day; the release route refuses non-existent days
   itself (`isRealDate`), the due and open routes still accept them.
+
+## Round 4: the final judge's findings (2026-10-03)
+
+- **A 0-point (pass/fail) capped part grades a REAL percent.** The group demos and charts,
+  1.7.2 and 1.7.5 stored score 0 and, with a null `maxScore`, graded 100% on completion. Now the
+  part's best is **criteria met out of criteria total** (met 1, partial half; `criteriaScore` in
+  `lib/grade-pass.ts`) and the manifest's `maxScore` is the criteria count for a CAPPED pass/fail
+  rubric (`scripts/generate-lessons-manifest.mjs`, mirrored in `app/page.tsx`). An uncapped pass/fail
+  rubric stays binary. `scoreKind` stays rubric-points based so a group demo does not move from
+  Lab to Written. **Completion rule, decided:** every capped part completes on ANY hand-in (the
+  test-mode rule: a part nobody can pass must not lock the next one), so the group demos keep
+  their original intent (they used to complete only on a pass) in effect, because a junk demo now
+  earns 0%, not 100%. The pass rule (ceil(n/2) criteria) still decides "struggling" in the review queue.
+- **A release counts only for a student who was in the class when it took effect**
+  (`enrolled_at <= release_at`, `functions/_shared/solutionRelease.ts`). Students join a class
+  themselves with its code; without this a student from another period joins period 1 after it
+  released and reads the solution early. **A genuine late joiner is included by the teacher releasing
+  again** (the upsert moves `release_at` to now, which is after their `enrolled_at`). Remaining limit,
+  accepted: a student who joins the releasing class BEFORE it releases is indistinguishable from a
+  member; rotate the class code (`regenerate-code`) if that is a worry.
+- **Teachers can give tries back on any capped part** (`POST /api/classes/[id]/tries-reset`, migration
+  0033, buttons in the student drawer): `give-back-one` removes the newest counted try, `reset` removes
+  every row so all tries are back. **Audit trail, decided:** the rows are deleted (every reader of
+  `lesson_submissions` reads the part as it now is) but copied as JSON into `lesson_try_resets`
+  with who, when, the class and the best score before, in the same batch. This supersedes the earlier
+  "unsubmit leaves no audit trail" for capped parts; quiz `lesson-unsubmit` itself is unchanged.
+- **A teacher's override respects best-of** on a capped part: the mark is THAT row's score (a marked row
+  is read as stored, not re-derived from the AI criteria) and the stored score is the higher of the
+  mark and the best counted try, unless the teacher ticks "use this as the score even if lower"
+  (`replaceBest`). Uncapped parts are unchanged.
+- **Deploy guards.** `npm run deploy` now also runs `stamp-tries-applied.mjs --check`: it refuses until
+  the human has run `stamp-tries-applied.mjs --set-now` once at go-live and committed it. CLAUDE.md's
+  Build + deploy section says to deploy with `npm run deploy` from a worktree that has `pa-pseudocode/`
+  populated.
+- **No silent test skips.** `test-attempt-reveal.mjs` needs an in-memory SQLite (`bun:sqlite`, or
+  `node:sqlite` on Node >= 22.5, `scripts/lib/sqlite-adapter.mjs`) and FAILS without one unless
+  `ALLOW_SKIP_SQLITE=1`. It passes on both engines under Bun; real Node was not available to run it.

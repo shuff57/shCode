@@ -417,9 +417,12 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 # Local dev (Next dev server + Pages Functions emulated)
 npm run dev            # port 3002
 
-# Prod build + deploy
-npm run build                                                   # static export to ./out
-npx wrangler pages deploy out --project-name shcode --branch cs-3d
+# Prod build + deploy: ALWAYS `npm run deploy`, never `npm run build` + bare wrangler.
+# `deploy` runs, in order: check-pending-migrations, check-pa-attempts
+# --require-pseudocode, stamp-tries-applied --check, the build, check-ai-grader-leak
+# --require-build, then wrangler. Bare wrangler skips every one of those guards.
+npm run deploy
+npm run build                                                   # build only (local checks)
 
 # D1 migrations. Go through scripts/d1.mjs, not bare wrangler -- it retries the
 # transient Cloudflare failures and, when retries run out, tells you whether the
@@ -442,6 +445,25 @@ npx wrangler r2 bucket create shcode-uploads
 # Functions -> R2 bucket bindings -> binding name "UPLOADS". wrangler.toml
 # alone covers local dev; production reads the dashboard binding.
 ```
+
+### Deploying the three-tries feature (read before the first deploy)
+
+- **Deploy from a clean worktree that HAS `pa-pseudocode/` populated.** The solutions
+  are git-ignored (the repo is public so other teachers can self-host), so a plain
+  `git worktree add` has none. Copy the folder in the way `public/reshape/kernel` is
+  copied. An empty one fails `check-pa-attempts --require-pseudocode` and stops the
+  deploy; if you bypassed that, every solution reveal would answer 404.
+- **The go-live instant must be stamped once.** `TRIES_APPLIED` in
+  `lib/attempt-cap.ts` is the instant before which attempts are free. It is a
+  development placeholder (`TRIES_GO_LIVE_STAMPED = false`) until you run
+  `node scripts/stamp-tries-applied.mjs --set-now` at go-live and commit the result;
+  `deploy` refuses while it is unstamped, in the future, older than the feature, or
+  uncommitted. Do not move it afterwards: an earlier instant confiscates tries.
+- **Migration 0032** (`class_solution_releases`) must be applied (`npm run d1:migrate`)
+  before the deploy; the migration preflight refuses with it pending.
+- A self-hosting teacher with an empty `pa-pseudocode/` needs none of this except
+  `npm run d1:migrate`: tries, AI feedback and best score work without the files;
+  students just never see a solution (see `pa-pseudocode/README.md`).
 
 ## Static-export gotcha
 
