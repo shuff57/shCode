@@ -254,7 +254,8 @@
     "apply migrations 0032 (class_solution_releases) AND 0033 (lesson_try_resets) to prod BEFORE the deploy (npm run d1:migrate); the deploy preflight refuses with them pending",
     "deploy from a worktree with pa-pseudocode/ populated (git-ignored); npm run deploy runs check-pa-attempts --require-pseudocode",
     "teacher release: nothing is released until a teacher presses Release; tell teachers",
-    "burst test: ~25 parallel grade-written calls against ollama.com before test day (see the spec's accepted risks)"
+    "burst test: ~25 parallel grade-written calls against ollama.com before test day (see the spec's accepted risks)",
+    "apply migration 0034 (lesson_state.score_override) BEFORE the deploy: the new code selects that column"
   ],
   "reference_pass": {
     "status": "done",
@@ -315,55 +316,66 @@
   },
   "round5": {
     "source": "final judge, round 5 (blind, HEAD e4e14943)",
-    "status": "findings recorded before any edit",
+    "status": "fixed and committed; full npm test from a fresh worktree at the final commit",
     "findings": [
       {
         "id": 1,
         "severity": "medium",
-        "what": "replaceBest (teacher 'use this as the score even if lower') is undone by the next lesson-state completion: the stored score is rebuilt from the tries (best counted, never lowered). Repro: tries 4/4 and 1/4, teacher marks the second 0 with the box ticked -> stored 0; student POSTs completed with curl -> back to 4."
+        "what": "replaceBest (teacher 'use this as the score even if lower') is undone by the next lesson-state completion: the stored score is rebuilt from the tries (best counted, never lowered). Repro: tries 4/4 and 1/4, teacher marks the second 0 with the box ticked -> stored 0; student POSTs completed with curl -> back to 4.",
+        "status": "fixed: lesson_state.score_override persists the teacher choice; lesson-state, tries-reset and the queue respect it; clearOverride and reset drop it"
       },
       {
         "id": 2,
         "severity": "medium",
-        "what": "tries-reset recomputes the score from post-go-live rows only and logs a wrong best_score_before. Repro: pre-go-live 4/4, then post-go-live 1 then 2; give back one -> stored 1 (should stay 4), best_score_before logged 2 (should be 4). Giving back the LAST try leaves the part 'started' with no score and the page-level completion repair re-completes it at 0 within seconds."
+        "what": "tries-reset recomputes the score from post-go-live rows only and logs a wrong best_score_before. Repro: pre-go-live 4/4, then post-go-live 1 then 2; give back one -> stored 1 (should stay 4), best_score_before logged 2 (should be 4). Giving back the LAST try leaves the part 'started' with no score and the page-level completion repair re-completes it at 0 within seconds.",
+        "status": "fixed: recompute over every row (pre-go-live best, teacher mark on an outage row); best_score_before from the stored score; the last give-back removes leftover markers so the part stays started"
       },
       {
         "id": 3,
         "severity": "low-medium",
-        "what": "capped AI chart rows lose the diagram for the teacher: the counted row grade-written writes holds only the Mermaid/walk text; the browser's own copy (diagram doc + structural checks) is dropped, so the review queue and the drawer show prose."
+        "what": "capped AI chart rows lose the diagram for the teacher: the counted row grade-written writes holds only the Mermaid/walk text; the browser's own copy (diagram doc + structural checks) is dropped, so the review queue and the drawer show prose.",
+        "status": "fixed: grade-written accepts a bounded, shape-checked artifact (doc + checks) stored in grade_json.artifact on the counted row and the outage marker; never scored, never in the prompt; queue and drawer render it"
       },
       {
         "id": 4,
         "severity": "low-medium",
-        "what": "pass/fail capped parts store 0 of 0 so the queue shows 'AI score: 0 / 0'; a teacher's mark has no stated unit (criteria met out of N) and replaces that try's own score before best-of, so it can lower the grade without replaceBest."
+        "what": "pass/fail capped parts store 0 of 0 so the queue shows 'AI score: 0 / 0'; a teacher's mark has no stated unit (criteria met out of N) and replaces that try's own score before best-of, so it can lower the grade without replaceBest.",
+        "status": "fixed: criteria-met unit in the queue/override form, ceiling validation (row possible, criteria count, rubric), a plain mark never lowers the part (aiScore floor)"
       },
       {
         "id": 5,
         "severity": "low",
-        "what": "teachers/admins are capped at 3 tries on every capped part with no way back: tries-reset and lesson-unsubmit need an enrolled student and teachers cannot enroll; the comment at grade-written ~214 is wrong."
+        "what": "teachers/admins are capped at 3 tries on every capped part with no way back: tries-reset and lesson-unsubmit need an enrolled student and teachers cannot enroll; the comment at grade-written ~214 is wrong.",
+        "status": "fixed: teacher/admin exempt from the cap in grade-written and lesson-submissions (effectiveCap), the client hooks skip the countdown for them; their rows never reach a class"
       },
       {
         "id": 6,
         "severity": "low (accepted trust model)",
-        "what": "any teacher can add any student to their class and then reset tries / override / release for them; comments at tries-reset ~29-30 and lesson-unsubmit claim the enrollment check prevents this. Decision: ACCEPTED (audit table records who). Fix the comments, record in the spec."
+        "what": "any teacher can add any student to their class and then reset tries / override / release for them; comments at tries-reset ~29-30 and lesson-unsubmit claim the enrollment check prevents this. Decision: ACCEPTED (audit table records who). Fix the comments, record in the spec.",
+        "status": "accepted trust model; the false comments in tries-reset and lesson-unsubmit corrected; recorded in the spec"
       },
       {
         "id": 7,
         "severity": "low",
-        "what": "a release DATE with no time opens at 00:00 school time (startOfSchoolDay), so period-1 finishers see the solution before period 3 sits."
+        "what": "a release DATE with no time opens at 00:00 school time (startOfSchoolDay), so period-1 finishers see the solution before period 3 sits.",
+        "status": "fixed: a release date requires a time (API 400 needsTime; panel defaults to 15:00)"
       },
       {
         "id": "minor-a",
-        "what": "stamp-tries-applied --check accepts a stamp of any age; a slipped deploy would count every attempt in the gap against the cap."
+        "what": "stamp-tries-applied --check accepts a stamp of any age; a slipped deploy would count every attempt in the gap against the cap.",
+        "status": "fixed: stamp-tries-applied --check refuses a stamp over 24h old; --allow-old warns loudly"
       },
       {
         "id": "minor-b",
-        "what": "CLAUDE.md contradicts itself: 'ALWAYS npm run deploy' vs self-hosters need only d1:migrate; deploy is hard-wired to shcode / shcode-commits."
+        "what": "CLAUDE.md contradicts itself: 'ALWAYS npm run deploy' vs self-hosters need only d1:migrate; deploy is hard-wired to shcode / shcode-commits.",
+        "status": "fixed: CLAUDE.md says npm run deploy is the original author script and gives a self-hosting recipe"
       },
       {
         "id": "minor-c",
-        "what": "WrittenGrader: a stream dropped mid-grade does not re-read the try count, so the banner can show one try too many (server stays correct)."
+        "what": "WrittenGrader: a stream dropped mid-grade does not re-read the try count, so the banner can show one try too many (server stays correct).",
+        "status": "fixed: WrittenGrader re-reads the server count after a non-JSON reply, a refused grade and a dropped stream"
       }
-    ]
+    ],
+    "mutation_check": "25 guards broken one at a time plus one combined; every one fails test-attempt-reveal alone except two single-layer mutations of the lesson-state override (the SQL CASE and the derivation mask each other; broken together the test fails). The 24h stamp guard is caught by test-stamp-tries-applied."
   }
 }

@@ -189,3 +189,28 @@ time**, opening by itself.
 - **No silent test skips.** `test-attempt-reveal.mjs` needs an in-memory SQLite (`bun:sqlite`, or
   `node:sqlite` on Node >= 22.5, `scripts/lib/sqlite-adapter.mjs`) and FAILS without one unless
   `ALLOW_SKIP_SQLITE=1`. It passes on both engines under Bun; real Node was not available to run it.
+
+## Round 5 decisions (final judge)
+
+- **A teacher's "use this as the score" (`replaceBest`) is persisted** in `lesson_state.score_override`
+  (migration 0034) and sticks until a teacher changes it: a student's completion request, a later try
+  or a give-back never touch it. A plain mark leaves an override in force and says so
+  (`overrideActive`); `clearOverride` or a tries-reset `reset` drops it. A plain mark never lowers
+  the part (the row keeps the AI's score as `aiScore` and reads as the higher of the two).
+- **`lesson_state.score` on a capped part is the best over EVERY row** (tries, the pre-go-live best, a
+  teacher's mark on an outage row), not only counted tries. An unmarked outage marker never counts.
+- **Giving back the last counted try** with nothing scored left removes the leftover outage markers too
+  (audited), so the part is `started` and stays there.
+- **A pass/fail mark is criteria met out of the criteria count**; the review queue says so and refuses
+  a mark above the ceiling (a pointed row: its own points; an outage row: the rubric's total).
+- **A capped AI chart keeps the drawn chart** (`grade_json.artifact`, bounded and shape-checked,
+  display only: never scored, never in the model's prompt) so the teacher sees it again.
+- **Teachers and admins are not capped** on a capped part (they are previewing; rows are recorded, never
+  refused, and never reach a class because the gradebook and review queue read enrolled students).
+- **A release date needs an explicit time** (the panel defaults to 3:00 PM). "Release now" needs none.
+- **Accepted trust model:** a teacher can add any student to their own class and then reset tries,
+  override a mark or release solutions for them. Teachers are trusted; `lesson_try_resets` records who
+  did what. (The old comments claiming the enrollment check prevents this were wrong and are fixed.)
+- **Deploy:** `stamp-tries-applied --check` also refuses a stamp more than 24 hours old
+  (`--allow-old` overrides, loudly). `npm run deploy` is the original author's script; a self-hosting
+  teacher uses the commands in CLAUDE.md ("Self-hosting").
