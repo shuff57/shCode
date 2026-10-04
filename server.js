@@ -94,7 +94,7 @@ function stripJsComments(src) {
   return out;
 }
 
-app.prepare().then(() => {
+app.prepare().then(async () => {
   const server = express();
 
   // ---- public/_headers, for the one prefix that cannot work without it ----
@@ -134,6 +134,12 @@ app.prepare().then(() => {
     const m = /(?:^|;\s*)dev_student=([^;]+)/.exec(req.headers.cookie || '');
     return m ? decodeURIComponent(m[1]) : DEV_EMAIL;
   };
+  // DEV_REAL_DB=1: the real tries handlers over an in-memory SQLite with a fake AI grader
+  // (scripts/dev-demo-api.mjs). Mounted before the stubs below, so these routes win.
+  if (process.env.DEV_REAL_DB === '1') {
+    const { mountDemoApi } = await import('./scripts/dev-demo-api.mjs');
+    mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, root: process.cwd() });
+  }
   server.get('/api/me', (req, res) => {
     res.json({ email: devIdentity(req), role: DEV_ROLE });
   });
