@@ -421,5 +421,47 @@
       "5": "stamp-tries-applied --check detects a shallow repository, skips ONLY the introduced-by comparison with a loud warning that says to git fetch --unshallow, and keeps every other check (future, stale, uncommitted, unstamped). Test uses a real depth-1 clone."
     },
     "mutation_check": "14 mutations, each breaks the named test: 1a any arrowed chart dropped, 1b unknown node keys kept, 1c unknown shape accepted, 1d dangling arrow accepted, 1e repeated id accepted, 2 unsubmit keeps override, 3a no rubric fallback for outage rows, 3b server stops enforcing the limit, 3c queue GET drops limit, 4a strip not applied, 4b teacher* not stripped, 4c nested not stripped, 4d no clamp, 5 shallow clone not handled."
+  },
+  "round7": {
+    "source": "delta judge round 7 (blind, HEAD fe69cb77)",
+    "status": "findings written before the fix",
+    "findings": [
+      {
+        "id": "M1",
+        "severity": "medium",
+        "what": "grade-written stores body.artifact (doc + checks) beside body.response, but nothing ties the two: a student edits the fetch body so the AI grades text X while the teacher's card shows chart Y with 'all checks passed' from the student's own artifact.checks (queue shows the artifact INSTEAD of the graded text once every honest chart is stored).",
+        "fix": "server recomputes describeDiagram(cleaned doc) and keeps the artifact only if it equals body.response exactly; checks are recomputed server-side from the lesson's diagram rules (baked into the server-only ai-graders module, else DEFAULT_RULES), never taken from the client; the queue shows the graded text beside the chart."
+      },
+      {
+        "id": "M2",
+        "severity": "medium (pre-existing)",
+        "what": "parseDiagramResponse/parseDiagramArtifact check only node id/shape: a row written by the uncapped or 'client' route with edges:[null] or label:5 makes docToFlow throw during render and takes down the whole /teacher page.",
+        "fix": "one pure lib/ validator (sanitizeDiagramDoc) run by every reader and by cleanArtifact; error boundary around the card's chart/response so a bad row shows 'this submission could not be displayed' plus the raw text."
+      },
+      {
+        "id": "L1",
+        "what": "stripOverrideKeys copies with {}: a __proto__ key re-parents the copy",
+        "fix": "Object.create(null) copy"
+      },
+      {
+        "id": "L2",
+        "what": "clamp skipped when possible <= 0: a 'client' row with possible:0 invents a best",
+        "fix": "a client row with possible <= 0 stores score null"
+      },
+      {
+        "id": "L3",
+        "what": "edge ids may repeat and coordinates may be +-1e308",
+        "fix": "validator de-duplicates edge ids, clamps coordinates"
+      },
+      {
+        "id": "L4",
+        "what": "UI regression: the override form now caps uncapped pointed rows at pointsMax, so extra credit is impossible through the UI; the server only enforces the ceiling on capped parts",
+        "fix": "server tells the queue which rows are capped; the form's ceiling applies to capped rows only (the unit label stays)"
+      },
+      {
+        "id": "accepted",
+        "what": "stamp --allow-old on a shallow clone with a typo'd ancient stamp passes with two warnings"
+      }
+    ]
   }
 }
