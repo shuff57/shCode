@@ -1,8 +1,8 @@
-# Handoff — 2026-10-04 (night) · gradebook + teacher-panel overhaul is LIVE; 12 commits not pushed
+# Handoff — 2026-10-04 (night) · gradebook + teacher-panel overhaul is LIVE; 14 commits not pushed
 
 Four phases shipped to shcode.pages.dev tonight (deployment `5f50e210` = commit `e7777a3a`) and were
 checked on the live site signed in as a throwaway teacher. Everything is committed on the local branch
-`gradebook-ux` (now also the local `cs-3d`), **12 commits ahead of the `origin/cs-3d` they were built on, and not pushed; origin has since gained 3 reshape commits (see item 3)** (a push also triggers Cloudflare's own git
+`cs-3d` (rebased onto GitHub's tip on 2026-10-05; `gradebook-ux` still points at the old pre-rebase commits), **14 commits ahead of `origin/cs-3d`, not pushed** (a push also triggers Cloudflare's own git
 build, which fails on the missing kernel wasm. Noise only, the wrangler-deployed site is unaffected.).
 Working tree is clean except `functions/_shared/module-docs.generated.ts`, which the build regenerates and
 which was deliberately never committed. All test data on prod was deleted (classes 26/31/1 students untouched).
@@ -19,13 +19,38 @@ which was deliberately never committed. All test data on prod was deleted (class
    `cd ~/Documents/GitHub/shCode-r7 && git checkout --detach gradebook-ux && TRIES_STAMP_ALLOW_OLD=1 npm run deploy`
    (that worktree holds the git-ignored `pa-pseudocode/`, kernel wasm, models and node_modules symlinks; its
    `*.generated.ts` files show as dirty after a build, which is normal). Never move the stamp itself.
-3. **Decide whether to push, and integrate `origin/cs-3d` first.** As of 2026-10-05 the 12 commits are merged into the
-   local `cs-3d` (fast-forward from `gradebook-ux`), but GitHub's `cs-3d` has gained **3 commits that are not here**:
-   `230d37b4`, `9bbea64a`, `285f71d1`, all `chore(reshape): re-vendor reshape-cad` (104 vendored files under the
-   reshape-cad tree). They touch **no file** these 12 commits touch, so integrating is clean, but a plain push will be
-   refused until you do. Last time the choice was a rebase onto `origin/cs-3d` (mind the untracked `pa-pseudocode/`
-   vs its tracked README collision: move it aside, `cp -an` back); a merge commit would keep the hashes quoted in
-   this section (`e7777a3a` is what is live). The live site was deployed from `gradebook-ux` WITHOUT those 3 commits.
+3. **Push `cs-3d`: it is ready.** On 2026-10-05 the 13 commits were rebased onto GitHub's `cs-3d` (which had gained three
+   `chore(reshape): re-vendor reshape-cad` commits, `230d37b4`, `9bbea64a`, `285f71d1`; no file overlap) so the local
+   `cs-3d` is **0 behind, 14 ahead of `origin/cs-3d`, not pushed**: a plain fast-forward push, no force. Checked on the
+   rebased tree: the app typecheck has 0 errors (the functions one has the same 9 old ones), the grade/cell/CSV/stamp/http
+   tests and the reshape refusal-gate test pass, and `npm run build` succeeds with the leak checks green. The pre-rebase
+   state is kept as the local branch `backup/cs-3d-before-rebase-2026-10-05` (delete it once you are happy). **The live
+   site was deployed from the PRE-rebase commits and does not include GitHub's three reshape commits**; the next deploy
+   (from `shCode-r7`, `git checkout --detach cs-3d`) ships both. Rebase renamed the commits quoted elsewhere in this
+   section; old to new:
+
+| was | now | commit |
+| --- | --- | --- |
+| `55328af5` | `5a77246b` | feat(grades): one grade-so-far rule for roster, drawer and student pag |
+| `2e55cad8` | `61641d3c` | feat(ui): clearer student gradebook and teacher grid |
+| `34d25382` | `b6252cb9` | feat(teacher): names on the roster; drawer lists past-due lessons the  |
+| `ebce8671` | `9b5127c0` | feat(student): tries and best score, "Opens <date>", due soon, teacher |
+| `ab2e58b9` | `1519c547` | fix(deploy): the go-live stamp guard compares author dates, so a rebas |
+| `3a164a29` | `419c5a0c` | feat(teacher): class page in five sections (Today, Students, Gradebook |
+| `3a120033` | `4405e316` | fix(teacher): Schedule opens with due dates and release solutions, sha |
+| `ca11878c` | `0a9612f7` | feat(teacher): grades CSV per student, Override score in the drawer, g |
+| `f4093c90` | `f6ec1bd0` | feat(teacher): toasts, styled confirms, "More" menus, readable errors, |
+| `e7777a3a` | `7e3745e1` | fix(teacher): only the owner is offered "Regenerate code"; one announc |
+| `0feb78c6` | `c91a2b73` | fix(deploy): TRIES_STAMP_ALLOW_OLD=1 lets npm run deploy pass the stam |
+| `273d15ee` | `2901216c` | docs(handoff): 2026-10-04 night, gradebook and teacher-panel overhaul; |
+| `75945b97` | `be44d8f1` | docs(handoff): origin/cs-3d moved (3 reshape-cad re-vendors); a push n |
+
+   (`e7777a3a` was the deployed commit, now `7e3745e1`.)
+
+4. **If `npm test` or any Bun script dies with "Cannot find module .../scratchpad/pa-fixture.mjs"**, it is Bun's runtime
+   transpiler cache, not the code: it passes with `BUN_RUNTIME_TRANSPILER_CACHE_PATH=0`. It hit on 2026-10-05; the cache
+   dir `~/.bun/install/cache/@t@` was moved aside to `@t@.stale-2026-10-05` (1.7 GB, safe to delete) and Bun rebuilt it.
+   Same fix if it recurs: move `@t@` aside.
 
 ## What shipped
 
