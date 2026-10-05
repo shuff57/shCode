@@ -102,13 +102,16 @@ const PLANE_WORD = { xy: 'top', xz: 'front', yz: 'side' };
  *  perpendicular pair grid, its Pin a corner row), 1-based, matching
  *  lib/reshape-script.ts's SketchHandle methods exactly (see that file's own
  *  comment on why "across"/"up" rather than a synonym like "level"). */
-function constraintCallLine(v, c) {
+function constraintCallLine(v, c, bindings) {
+    // A value the script gave as a param() keeps its name (the slot names are the interpreter's: len{edge}, dx{a}_{b}, ...); without
+    // this a param()-driven .length() came back as a literal and the slider was gone after a save.
+    const bound = (slot, value) => numText(bindings, v, slot, lit(value));
     if (c.kind === 'horizontal')
         return `${v}.across(${c.edge + 1})`;
     if (c.kind === 'vertical')
         return `${v}.up(${c.edge + 1})`;
     if (c.kind === 'length')
-        return `${v}.length(${c.edge + 1}, ${lit(c.value)})`;
+        return `${v}.length(${c.edge + 1}, ${bound(`len${c.edge}`, c.value)})`;
     if (c.kind === 'lock')
         return `${v}.pin(${c.corner + 1})`;
     // The four Point-rules rows below USED to throw here: P1d (packages/sketch)
@@ -121,13 +124,13 @@ function constraintCallLine(v, c) {
     // purpose: distanceX/distanceY/symmetric carry no .edge and would fall
     // into that line, emitting undefined.
     if (c.kind === 'distanceX')
-        return `${v}.distX(${c.a + 1}, ${c.b + 1}, ${lit(c.value)})`;
+        return `${v}.distX(${c.a + 1}, ${c.b + 1}, ${bound(`dx${c.a}_${c.b}`, c.value)})`;
     if (c.kind === 'distanceY')
-        return `${v}.distY(${c.a + 1}, ${c.b + 1}, ${lit(c.value)})`;
+        return `${v}.distY(${c.a + 1}, ${c.b + 1}, ${bound(`dy${c.a}_${c.b}`, c.value)})`;
     if (c.kind === 'symmetric')
         return `${v}.symmetric(${c.a + 1}, ${c.b + 1}, ${c.center + 1})`;
     if (c.kind === 'angle')
-        return `${v}.angle(${c.edge + 1}, ${c.other + 1}, ${lit(c.degrees)})`;
+        return `${v}.angle(${c.edge + 1}, ${c.other + 1}, ${bound(`ang${c.edge}_${c.other}`, c.degrees)})`;
     return `${v}.${c.kind}(${c.edge + 1}, ${c.other + 1})`; // equal / parallel / perpendicular
 }
 /** For every feature id, the script variable that currently represents it --
@@ -199,8 +202,13 @@ function draftFromWord(doc, rootId, pull, neutral) {
  *  RunResult.namedParams; empty when the doc was never built by a script
  *  (the ordinary Build-mode case), so every lookup below misses and this
  *  file's output is unchanged from before named params existed. */
+/** Per bindings map: every bound slot the emitter actually wrote a variable name for, with the literal it would otherwise have
+ *  written (the doc's current value there). The param() declarations are built from THIS, after the body: a name written into the
+ *  body with no declaration above it stops the saved script ("w is not a tool here"), whatever generatedParams() lists. */
+const usedSlots = new WeakMap();
 function paramBindings(namedParams) {
     const map = new Map();
+    usedSlots.set(map, new Map());
     if (!namedParams)
         return map;
     for (const p of namedParams) {
@@ -283,8 +291,24 @@ function ruleRowText(bindings, featureId, index, r) {
         case 'lock': return `{ k:'lock', a:${n(r.a)}${r.aEnd ? `, aEnd:'${r.aEnd}'` : ''} }`;
     }
 }
+/** `turn(id, [rx, ry, rz])` for a primitive that carries a rotation. The box, cylinder and cone branches spell this out inline;
+ *  the ring branch did not emit it at all, so a turned ring came back from a save unturned (a different part, silently).
+ *  Prism and wedge are deliberately NOT given one: canRotate() is false for them, so turn() refuses them and the script would
+ *  stop; nothing in the language or the studio can put a rotation on either. */
+function emitTurn(bindings, lines, f) {
+    if (!f.rotate || !f.rotate.some((n) => n !== 0))
+        return;
+    const rx = numText(bindings, f.id, 'rx', lit(f.rotate[0]));
+    const ry = numText(bindings, f.id, 'ry', lit(f.rotate[1]));
+    const rz = numText(bindings, f.id, 'rz', lit(f.rotate[2]));
+    lines.push(`turn(${f.id}, [${rx}, ${ry}, ${rz}])`);
+}
 function numText(bindings, featureId, slot, literalText) {
-    return bindings.get(pname(featureId, slot)) ?? literalText;
+    const key = pname(featureId, slot);
+    const bound = bindings.get(key);
+    if (bound !== undefined)
+        usedSlots.get(bindings)?.set(key, literalText);
+    return bound ?? literalText;
 }
 /** One `key: value` entry in an options object, or the bare-shorthand `key`
  *  when the bound param's own name happens to match the option key (the
@@ -293,6 +317,7 @@ function optText(bindings, featureId, slot, key, literalText) {
     const paramName = bindings.get(pname(featureId, slot));
     if (!paramName)
         return `${key}: ${literalText}`;
+    usedSlots.get(bindings)?.set(pname(featureId, slot), literalText);
     return paramName === key ? key : `${key}: ${paramName}`;
 }
 export function toScript(doc, namedParams) {
@@ -321,7 +346,14 @@ export function toScript(doc, namedParams) {
     // this is a stale namedParams array from a different doc entirely) is
     // skipped rather than emitted dead: declaring `wall` and never using it is
     // not what round-tripping a doc should produce.
-    if (namedParams) {
+    // The declarations are BUILT after the body (declareParams() below) and put in front of it: a name the body used must be
+    // declared, even when generatedParams() has no row for the slot (a sketch's rect width/height, a .length() value, ...);
+    // before this, `s.rect(w, h)` was saved with `w` and `h` undeclared and the saved script stopped on reopen.
+    const decls = [];
+    const declareParams = () => {
+        if (!namedParams)
+            return;
+        const used = usedSlots.get(bindings) ?? new Map();
         for (const p of namedParams) {
             // Skip a param() whose every bound slot has gone missing from THIS
             // doc (its feature was deleted, or namedParams came from a different
@@ -330,11 +362,12 @@ export function toScript(doc, namedParams) {
             if (p.slots.length === 0)
                 continue;
             const liveSlot = p.slots.find((s) => liveValues.has(s));
-            if (liveSlot === undefined)
+            const usedSlot = p.slots.find((s) => used.has(s));
+            if (liveSlot === undefined && usedSlot === undefined)
                 continue;
             // The doc's OWN current value at that slot, not p.value -- see
             // liveValues's own comment for why those two can disagree.
-            const currentValue = liveValues.get(liveSlot);
+            const currentValue = liveSlot !== undefined ? liveValues.get(liveSlot) : Number(used.get(usedSlot));
             const opts = [];
             if (!near(p.min, 0))
                 opts.push(`min: ${lit(p.min)}`);
@@ -345,9 +378,9 @@ export function toScript(doc, namedParams) {
             if (p.caption !== p.name)
                 opts.push(`caption: '${p.caption.replace(/'/g, "\\'")}'`);
             const optsText = opts.length ? `, { ${opts.join(', ')} }` : '';
-            lines.push(`const ${p.name} = param('${p.name}', ${lit(currentValue)}${optsText})`);
+            decls.push(`const ${p.name} = param('${p.name}', ${lit(currentValue)}${optsText})`);
         }
-    }
+    };
     doc.features.forEach((f, i) => {
         if (f.kind === 'box') {
             const def = defaultCenter(doc, i, 'box');
@@ -413,6 +446,7 @@ export function toScript(doc, namedParams) {
             const def = defaultCenter(doc, i, 'torus');
             const at = emitAt(bindings, f.id, f.center, def);
             lines.push(`const ${f.id} = torus(${lit(across)}, ${lit(tubeAcross)}${at})`);
+            emitTurn(bindings, lines, f);
             return;
         }
         if (f.kind === 'prism') {
@@ -520,13 +554,13 @@ export function toScript(doc, namedParams) {
                     // instead and drop them on the Code -> Run round trip; every rule
                     // in `f.constraints` is written here now, so nothing is lost.
                     for (const c of f.constraints ?? []) {
-                        lines.push(constraintCallLine(f.id, c));
+                        lines.push(constraintCallLine(f.id, c, bindings));
                     }
                 }
                 for (const [k, r] of Object.entries(f.rounds ?? {})) {
                     // The document counts corners from 0; the script counts them from 1, like the panel.
                     if (r > 0)
-                        lines.push(`${f.id}.round(${Number(k) + 1}, ${lit(r)})`);
+                        lines.push(`${f.id}.round(${Number(k) + 1}, ${numText(bindings, f.id, `r${k}`, lit(r))})`);
                 }
                 for (const [k, d] of Object.entries(f.chamfers ?? {})) {
                     if (d > 0)
@@ -682,6 +716,8 @@ export function toScript(doc, namedParams) {
             return;
         }
     });
+    declareParams();
+    lines.unshift(...decls);
     return lines.join('\n') + (lines.length ? '\n' : '');
 }
 //# sourceMappingURL=reshape-script-gen.js.map
