@@ -1102,6 +1102,18 @@ function GradebookView({
     };
   }, [fullScreen]);
 
+  // Phone width: the frozen name and grade columns (304px) were wider than the
+  // matrix box itself, so no lesson cell was reachable. Below 640px the name
+  // column narrows and the grade column scrolls with the lessons.
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const sync = () => setNarrow(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
   if (loading) return <div style={{ color: '#8393c4' }}>Loading gradebook…</div>;
   if (err) return <div style={{ color: '#ff5555', fontSize: 13 }}>{err}</div>;
   if (!gbData) return null;
@@ -1157,7 +1169,13 @@ function GradebookView({
   const headerBg = '#282a36';
 
   const CELL_W = 60;
-  const EMAIL_W = 220;
+  const EMAIL_W = narrow ? 110 : 220;
+  // Height of the unit header row. The per-lesson row sticks at this offset, so
+  // the row has to BE this tall: a unit title that wrapped made it 100px and the
+  // lesson row slid 67px up over it.
+  const HEAD1_H = 33;
+  // Frozen only on wide screens (see `narrow` above).
+  const gradeLeft = narrow ? undefined : EMAIL_W;
 
   // Late cells keep their normal glyph and gain a red underline, so scanning
   // the matrix for red still works without a second symbol to learn.
@@ -1187,7 +1205,7 @@ function GradebookView({
       ));
     }
     if (!cell || (!cell.state && cell.submitted_score === null)) {
-      return withLate(cell, <span style={{ color: cell?.late && graded ? '#ff5555' : '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
+      return withLate(cell, <span style={{ color: cell?.late && graded ? '#ff5555' : '#8393c4', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
     }
     if (cell.state === 'completed') {
       // The PERCENT the grade is built from (lessonPercent, the function functions/_shared/grading.ts
@@ -1228,7 +1246,7 @@ function GradebookView({
         </span>
       ));
     }
-    return withLate(cell, <span style={{ color: '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
+    return withLate(cell, <span style={{ color: '#8393c4', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
   }
 
   // Plain words for a cell, for the hover tip and for screen readers: what the student has done, the
@@ -1297,7 +1315,7 @@ function GradebookView({
       } : undefined}
     >
       {/* Toolbar */}
-      <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 10px' }}>
         <button style={S.btn('#8be9fd')} onClick={handleDownloadCsv}>
           Download lessons shown (CSV)
         </button>
@@ -1390,6 +1408,7 @@ function GradebookView({
                 style={{
                   position: 'sticky', left: 0, top: 0, zIndex: 3,
                   width: EMAIL_W, minWidth: EMAIL_W,
+                  height: HEAD1_H, boxSizing: 'border-box',
                   background: headerBg, padding: '6px 10px',
                   borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
                   textAlign: 'left', color: '#8393c4', fontSize: 11, fontWeight: 700,
@@ -1400,8 +1419,9 @@ function GradebookView({
               </th>
               <th
                 style={{
-                  position: 'sticky', left: EMAIL_W, top: 0, zIndex: 3,
+                  position: 'sticky', left: gradeLeft, top: 0, zIndex: 3,
                   width: GRADE_W, minWidth: GRADE_W,
+                  height: HEAD1_H, boxSizing: 'border-box',
                   background: headerBg, padding: '6px 6px',
                   borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
                   textAlign: 'center', color: '#8393c4', fontSize: 11, fontWeight: 700,
@@ -1415,8 +1435,11 @@ function GradebookView({
                 <th
                   key={unit}
                   colSpan={count}
+                  title={unit}
                   style={{
                     position: 'sticky', top: 0, zIndex: 2,
+                    height: HEAD1_H, boxSizing: 'border-box',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     background: headerBg, padding: '6px 4px',
                     borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
                     textAlign: 'center', color: '#bd93f9', fontSize: 11, fontWeight: 700,
@@ -1432,7 +1455,7 @@ function GradebookView({
             <tr>
               <th
                 style={{
-                  position: 'sticky', left: 0, top: 33, zIndex: 3,
+                  position: 'sticky', left: 0, top: HEAD1_H, zIndex: 3,
                   width: EMAIL_W, minWidth: EMAIL_W,
                   background: stickyBg, padding: '4px 10px',
                   borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a44',
@@ -1440,7 +1463,7 @@ function GradebookView({
               />
               <th
                 style={{
-                  position: 'sticky', left: EMAIL_W, top: 33, zIndex: 3,
+                  position: 'sticky', left: gradeLeft, top: HEAD1_H, zIndex: 3,
                   width: GRADE_W, minWidth: GRADE_W,
                   background: stickyBg, padding: '4px 6px',
                   borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a44',
@@ -1451,7 +1474,7 @@ function GradebookView({
                   key={lesson.id}
                   title={lesson.title}
                   style={{
-                    position: 'sticky', top: 33, zIndex: 2,
+                    position: 'sticky', top: HEAD1_H, zIndex: 2,
                     width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
                     // `height` on a <th> is a MINIMUM, not a maximum — the row
                     // grew to whatever the longest sideways title needed (574px
@@ -1531,7 +1554,7 @@ function GradebookView({
                   return (
                     <td
                       style={{
-                        position: 'sticky', left: EMAIL_W, zIndex: 1, background: bg,
+                        position: 'sticky', left: gradeLeft, zIndex: 1, background: bg,
                         width: GRADE_W, minWidth: GRADE_W, padding: '6px 6px', textAlign: 'center',
                         borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a44',
                         fontSize: 12, fontWeight: 700,
