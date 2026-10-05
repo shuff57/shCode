@@ -304,6 +304,14 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   rows per capped part, grading failures free), `opensAt` and the upcoming graded lessons. Only graded lessons
   are ever "missing"; a reading with a module due date is not an assignment. Browser checks: `DEV_REAL_DB=1
   DEV_ROLE=teacher npm run dev` seeds a six-student class (`seedClass` in `scripts/dev-demo-api.mjs`).
+- **Grade export and score override.** The Students tab's "Download grades (CSV)" is `buildGradesCsv`
+  (`lib/grades-csv.ts`, tested): one row per student with the grade so far, graded lessons done/total,
+  past due, and a column per category, from `GET /api/classes/[id]/progress` (which carries `categories`).
+  Every text cell goes through `csvCell`, which neutralises a leading `= + - @` (names are typed by
+  students; a spreadsheet would run them). The student drawer's "Override score" reuses `OverrideForm`
+  from `SubmissionQueue.tsx` and `POST /api/classes/[id]/submission-queue`, so the part's maximum, the
+  "keep the higher score on a part with a try limit" rule and the persisted choice stay one set of rules.
+  The teacher grid shows graded lessons only unless "Show readings and slides" is ticked.
 - `GET /api/my-due-dates` carries BOTH kinds — `rows` (due) and `openRows`
   (open) — per class. One endpoint, because a lesson's lock state must not
   flicker because one of two fetches landed first.

@@ -149,7 +149,7 @@ function markUnit(g: GradeJson | null): { total: number } | null {
   return { total: g.criteria.length };
 }
 
-function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, enforceMax = false, onOverride }: OverrideFormProps) {
+export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, enforceMax = false, onOverride }: OverrideFormProps) {
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
   // Capped parts only matter, but the box is harmless elsewhere (the server ignores it).

@@ -36,6 +36,7 @@ import { onRequestGet as classNeedsAttentionGet } from '../functions/api/classes
 import { onRequestGet as classPastDueGet } from '../functions/api/classes/[id]/past-due/index.ts';
 import { onRequestGet as classDueDatesGet, onRequestPut as classDueDatesPut } from '../functions/api/classes/[id]/due-dates/index.ts';
 import { onRequestGet as classReleasesGet, onRequestPut as classReleasesPut } from '../functions/api/classes/[id]/solution-releases/index.ts';
+import { onRequestGet as classQueueGet, onRequestPost as classQueuePost } from '../functions/api/classes/[id]/submission-queue/index.ts';
 import { onRequestPost as classArchivePost } from '../functions/api/classes/[id]/archive.ts';
 import { onRequestPost as classRegenPost } from '../functions/api/classes/[id]/regenerate-code.ts';
 
@@ -233,6 +234,8 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   server.put('/api/classes/:id/due-dates', json, route(classDueDatesPut, ['id']));
   server.get('/api/classes/:id/solution-releases', route(classReleasesGet, ['id']));
   server.put('/api/classes/:id/solution-releases', json, route(classReleasesPut, ['id']));
+  server.get('/api/classes/:id/submission-queue', route(classQueueGet, ['id']));
+  server.post('/api/classes/:id/submission-queue', json, route(classQueuePost, ['id']));
   server.post('/api/classes/:id/archive', json, route(classArchivePost, ['id']));
   server.post('/api/classes/:id/regenerate-code', json, route(classRegenPost, ['id']));
   server.post('/api/dev/solution-release', json, (req, res) => {

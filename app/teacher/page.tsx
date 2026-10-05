@@ -5,7 +5,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { NeedsAttentionPanel } from '../../components/NeedsAttentionPanel';
 import { BulkEnrollmentForm } from '../../components/BulkEnrollmentForm';
-import { SubmissionQueue } from '../../components/SubmissionQueue';
+import { SubmissionQueue, OverrideForm } from '../../components/SubmissionQueue';
 import { AnnouncementsPanel } from '../../components/AnnouncementsPanel';
 import DueDatesPanel from '../../components/DueDatesPanel';
 import GradingWeightsPanel from '../../components/GradingWeightsPanel';
@@ -15,6 +15,7 @@ import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
 import { criteriaScore } from '../../lib/grade-pass';
 import { lessonGradeCategory, lessonPercent } from '../../lib/grading-weights';
+import { buildGradesCsv } from '../../lib/grades-csv';
 import { toMermaid } from '../../lib/diagram-mermaid';
 
 // ---------------------------------------------------------------------------
@@ -68,6 +69,7 @@ interface StudentProgress {
   gradedDone?: number;
   gradedMissing?: number;
   gradedCounted?: number;
+  categories?: Array<{ category: string; percent: number }>;
 }
 
 interface LessonStateEntry {
@@ -93,6 +95,8 @@ interface StudentDetail {
   lastName?: string | null;
   lessonState: Record<string, LessonStateEntry>;
   latestSubmissions: Record<string, SubmissionEntry>;
+  /** This class's due date per lesson (epoch ms); a waived lesson has none. */
+  dueDates?: Record<string, number>;
   /** Absent when the class page's endpoint could not load the manifest. */
   grading?: {
     percent: number;
@@ -510,6 +514,15 @@ function StudentDrawer({
   const [detail, setDetail] = useState<StudentDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const closeRef = useRef<HTMLButtonElement>(null);
+  // The lesson whose Override score form is open (one at a time).
+  const [overrideOpen, setOverrideOpen] = useState<string | null>(null);
+  // Shown after a score is saved: the form closes on success, so without this the teacher sees nothing happen.
+  const [notice, setNotice] = useState('');
+  useEffect(() => {
+    if (!notice) return;
+    const t = window.setTimeout(() => setNotice(''), 7000);
+    return () => window.clearTimeout(t);
+  }, [notice]);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
   // Escape closes the drawer; focus starts on Close and goes back to wherever it was when it shuts.
@@ -739,6 +752,7 @@ function StudentDrawer({
         <div style={{ padding: '20px 24px', flex: 1 }}>
           {loading && <div style={{ color: '#6272a4' }}>Loading…</div>}
           {err && <div style={{ color: '#ff5555', fontSize: 13 }}>{err}</div>}
+          {notice && <div role="status" style={{ color: '#50fa7b', fontSize: 13, marginBottom: 12 }}>{notice}</div>}
           {detail?.grading && detail.grading.categories.length > 0 && (
             <div style={{ marginBottom: 24, padding: 12, background: '#282a36', borderRadius: 6, border: '1px solid #44475a33' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
@@ -815,6 +829,11 @@ function StudentDrawer({
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                         <span style={{ flex: 1, fontSize: 13, color: '#f8f8f2', minWidth: 0 }}>
                           {lesson.title}
+                          {detail.dueDates?.[lesson.id] && (
+                            <span style={{ marginLeft: 8, fontSize: 11, color: '#6272a4' }} title="This class's due date for the lesson">
+                              due {formatDue(detail.dueDates[lesson.id])}
+                            </span>
+                          )}
                         </span>
                         {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id))}
                         {ls?.state === 'completed' && ls.score !== null && (
@@ -843,6 +862,16 @@ function StudentDrawer({
                             onClick={() => toggleSub(lesson.id)}
                           >
                             {isExpanded ? 'Hide' : 'View submission'}
+                          </button>
+                        )}
+                        {sub && !Array.isArray(gradeData?.quiz) && (
+                          <button
+                            style={{ background: 'none', border: '1px solid #bd93f9', borderRadius: 4, color: '#bd93f9', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0 }}
+                            aria-expanded={overrideOpen === lesson.id}
+                            title="Change this student's score for the lesson, with an optional comment they will see"
+                            onClick={() => setOverrideOpen((cur) => (cur === lesson.id ? null : lesson.id))}
+                          >
+                            {overrideOpen === lesson.id ? 'Close override' : 'Override score'}
                           </button>
                         )}
                         {sub && typeof lesson.maxSubmissions === 'number' && (
@@ -875,6 +904,28 @@ function StudentDrawer({
                           </button>
                         )}
                       </div>
+
+                      {/* Override score: the same form the review queue uses, so the rules (the part's maximum, "keep the
+                          higher score" on a part with a try limit, the persisted choice) are one set of rules. */}
+                      {overrideOpen === lesson.id && sub && (
+                        <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #44475a33' }}>
+                          <div style={{ fontSize: 12, color: '#6272a4' }}>
+                            Latest hand-in {fmtTs(sub.submitted_at)}{submissionScoreLabel(sub) ? ` · ${submissionScoreLabel(sub)}` : ''}
+                          </div>
+                          <OverrideForm
+                            classId={classId}
+                            submissionId={sub.id}
+                            unitTotal={
+                              gradeData && Array.isArray(gradeData.criteria) && gradeData.criteria.length > 0 && !(typeof gradeData.totalPossible === 'number' && gradeData.totalPossible > 0)
+                                ? gradeData.criteria.length
+                                : null
+                            }
+                            pointsMax={sub.possible !== null && sub.possible > 0 ? sub.possible : null}
+                            enforceMax={typeof lesson.maxSubmissions === 'number'}
+                            onOverride={() => { setOverrideOpen(null); setNotice(`Saved. ${lesson.title} now carries your score. The student sees it on their gradebook, marked teacher-adjusted.`); setReloadKey((k) => k + 1); }}
+                          />
+                        </div>
+                      )}
 
                       {/* Submission detail */}
                       {isExpanded && sub && (
@@ -992,6 +1043,9 @@ function GradebookView({
   const [query, setQuery] = useState('');
   const [problemsOnly, setProblemsOnly] = useState(false);
   const [sortBy, setSortBy] = useState<'name' | 'grade' | 'missing'>('name');
+  // Off by default: the grid is the graded lessons only (about a tenth of the columns). Readings, slides and
+  // examples carry no grade, so they were 640 columns of dots between the ones a teacher came to read.
+  const [showAll, setShowAll] = useState(false);
   const [grades, setGrades] = useState<Map<string, GridGrade>>(new Map());
 
   // The grade so far beside each name: the same number the roster shows (one endpoint, one rule).
@@ -1067,8 +1121,18 @@ function GradebookView({
   }
 
   // If lesson manifest is empty (not yet loaded), fall back to lessons seen in data.
-  let displayLessons = orderedLessons;
-  let displaySpans = unitSpans;
+  const isGradedLesson = (l: LessonMeta) =>
+    lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null;
+  const gradedOnly = orderedLessons.filter(isGradedLesson);
+  // Fall back to everything when the manifest names no graded lesson at all (an older manifest), rather than an empty grid.
+  const narrowed = !showAll && gradedOnly.length > 0;
+  const hiddenCount = narrowed ? orderedLessons.length - gradedOnly.length : 0;
+  let displayLessons = narrowed ? gradedOnly : orderedLessons;
+  let displaySpans = narrowed
+    ? unitOrder
+        .map((u) => ({ unit: u, count: byUnit[u].filter(isGradedLesson).length }))
+        .filter((u) => u.count > 0)
+    : unitSpans;
   if (displayLessons.length === 0) {
     const allIds = new Set<string>();
     for (const s of gbData.students) for (const lid of Object.keys(s.cells)) allIds.add(lid);
@@ -1226,7 +1290,7 @@ function GradebookView({
       {/* Toolbar */}
       <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
         <button style={S.btn('#8be9fd')} onClick={handleDownloadCsv}>
-          Download as CSV
+          Download lessons shown (CSV)
         </button>
         <span style={{ fontSize: 12, color: '#6272a4' }}>
           {visibleStudents.length === gbData.students.length
@@ -1252,6 +1316,10 @@ function GradebookView({
           <option value="grade">Order: lowest grade first</option>
           <option value="missing">Order: most past due first</option>
         </select>
+        <label style={{ fontSize: 12, color: '#f8f8f2', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }} title="Readings, slides and examples have no grade. They are hidden unless you ask for them.">
+          <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+          Show readings and slides{hiddenCount > 0 ? ` (${hiddenCount} hidden)` : ''}
+        </label>
         <label style={{ fontSize: 12, color: '#f8f8f2', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
           <input type="checkbox" checked={problemsOnly} onChange={(e) => setProblemsOnly(e.target.checked)} />
           Only students with missing or ungraded work
@@ -2075,7 +2143,34 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div role="tabpanel" id={`panel-students`} aria-labelledby={`tab-students`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Roster view */}
           <div style={{ ...S.card, marginBottom: 28 }}>
-            <h2 style={S.h2}>Roster ({roster.length})</h2>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 4 }}>
+            <h2 style={{ ...S.h2, marginBottom: 0 }}>Roster ({roster.length})</h2>
+            <button
+              type="button"
+              style={roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : S.btn('#8be9fd')}
+              disabled={roster.length === 0 || progressMap.size === 0}
+              title="One row per student: the grade so far, how many graded lessons are done and past due, and a column per grade category. Ready to copy into a spreadsheet or the grade book."
+              onClick={() => {
+                const csv = buildGradesCsv(roster.map((r) => {
+                  const p = progressMap.get(r.student_email);
+                  return {
+                    email: r.student_email,
+                    firstName: p?.firstName,
+                    lastName: p?.lastName,
+                    percent: p?.weightedPercent ?? 0,
+                    counted: p?.gradedCounted ?? 0,
+                    done: p?.gradedDone ?? 0,
+                    total: p?.gradedTotal ?? 0,
+                    missing: p?.gradedMissing ?? 0,
+                    categories: p?.categories,
+                  };
+                }));
+                downloadCsv(csv, `grades-${cls.name.replace(/\s+/g, '-')}-${schoolDateString(Date.now())}.csv`);
+              }}
+            >
+              Download grades (CSV)
+            </button>
+          </div>
             {roster.length === 0 ? (
               <p style={{ color: '#6272a4', fontSize: 14 }}>No students enrolled yet.</p>
             ) : (

@@ -6,7 +6,7 @@
 import { canManageClass } from '../../../../_shared/classAuth';
 import { normalizeEmail } from '../../../../_shared/auth';
 import { loadLessonScopeMap, loadClassDueRows, loadClassDueWaivers } from '../../../../_shared/dueDates';
-import { buildDueIndex } from '../../../../../lib/due-dates-core';
+import { buildDueIndex, resolveDueAt } from '../../../../../lib/due-dates-core';
 import { loadClassWeights, studentGrading } from '../../../../_shared/grading';
 
 interface Env {
@@ -140,11 +140,22 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
   const scopeMap = await loadLessonScopeMap(env, request);
   const weights = await loadClassWeights(env.DB, classId);
   const waivers = await loadClassDueWaivers(env.DB, classId);
+  const dueIndex = buildDueIndex(await loadClassDueRows(env.DB, classId));
+  const waivedIds = waivers.get(studentEmail) ?? new Set<string>();
   const grading = studentGrading(scopeMap, stateRows.results ?? [], weights, {
-    index: buildDueIndex(await loadClassDueRows(env.DB, classId)),
-    waived: waivers.get(studentEmail) ?? new Set<string>(),
+    index: dueIndex,
+    waived: waivedIds,
     now: Date.now(),
   });
+  // This class's due date per lesson (a waived one carries none), so the drawer can say what was due when.
+  const dueDates: Record<string, number> = {};
+  if (scopeMap) {
+    for (const [lessonId, scope] of scopeMap) {
+      if (waivedIds.has(lessonId)) continue;
+      const at = resolveDueAt(dueIndex, { lessonId, moduleId: scope.moduleId, unitId: scope.unitId });
+      if (at !== null) dueDates[lessonId] = at;
+    }
+  }
 
   return json({
     student_email: studentEmail,
@@ -153,6 +164,7 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
     lessonState,
     latestSubmissions,
     grading,
+    dueDates,
   });
 };
 

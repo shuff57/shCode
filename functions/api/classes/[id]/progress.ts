@@ -120,6 +120,8 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
         gradedDone: g.doneCount,
         gradedMissing: g.missingCount,
         gradedCounted: g.counted,
+        // Per-category percent (only categories with something counted), for the one-row-per-student export.
+        categories: g.categories.map((c) => ({ category: c.category, percent: c.percent })),
       };
     }),
   });
