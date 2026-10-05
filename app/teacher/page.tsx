@@ -2210,15 +2210,6 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
 
       {activeTab === 'schedule' && (
         <div role="tabpanel" id={`panel-schedule`} aria-labelledby={`tab-schedule`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
-        {/* Shape tools vs code. Only reSHape assignments can be gated — the setting
-            decides which side a reSHape lesson opens on, and means nothing to a
-            moSHion or console one. */}
-          <LessonModeControl
-            classId={classId}
-            lessons={[...lessonMap.values()]
-              .filter((l) => l.preview === 'reshape')
-              .map((l) => ({ id: l.id, title: l.title }))}
-          />
         {/* Due dates */}
         <div style={S.card}>
           <h2 style={S.h2}>Due dates</h2>
@@ -2229,7 +2220,16 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           <h2 style={S.h2}>Release solutions</h2>
           <SolutionReleasePanel classId={classId} />
         </div>
-        </div>
+        {/* Shape tools vs code. Only reSHape assignments can be gated — the setting
+            decides which side a reSHape lesson opens on, and means nothing to a
+            moSHion or console one. */}
+          <LessonModeControl
+            classId={classId}
+            lessons={[...lessonMap.values()]
+              .filter((l) => l.preview === 'reshape')
+              .map((l) => ({ id: l.id, title: l.title }))}
+          />
+                </div>
       )}
 
       {activeTab === 'settings' && (
