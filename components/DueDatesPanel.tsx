@@ -25,6 +25,7 @@
 // takes an entries array rather than a single row.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFeedback } from './FeedbackProvider';
 import { Calendar, ChevronDown, ChevronRight, X } from 'lucide-react';
 import CalendarPopover from './CalendarPopover';
 import LessonAccessChip from './LessonAccessChip';
@@ -83,7 +84,7 @@ const OPEN_PAST_HINT = 'Already in the past — the lesson is open now';
 
 const C = {
   border: '#44475a',
-  dim: '#6272a4',
+  dim: '#8393c4',
   text: '#f8f8f2',
   input: '#282a36',
   accent: '#8be9fd',
@@ -264,6 +265,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
   const [dates, setDates] = useState<Record<Kind, ApiDate[]>>({ open: [], due: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useFeedback();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState<Set<string>>(new Set());
 
@@ -354,6 +356,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
         if (!res.ok) {
           const body = (await res.json().catch(() => ({}))) as { error?: string };
           setError(body.error ?? `Save failed (HTTP ${res.status})`);
+          toast(`Not saved: ${body.error ?? `HTTP ${res.status}`}`, { kind: 'error' });
           return;
         }
         // Re-read rather than patch locally: the server owns the timezone
@@ -361,13 +364,15 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
         // guess. Only the kind we wrote is re-read — the other is untouched.
         const fresh = await fetchKind(kind);
         setDates((prev) => ({ ...prev, [kind]: fresh }));
+        toast(kind === 'due' ? 'Due date saved.' : 'Available-after date saved.');
       } catch {
         setError('Save failed — check your connection.');
+        toast('Not saved: check your connection.', { kind: 'error' });
       } finally {
         setSaving(false);
       }
     },
-    [classId, fetchKind],
+    [classId, fetchKind, toast],
   );
 
   const toggle = (moduleId: string) => {

@@ -528,6 +528,19 @@ new panel belongs under exactly one tab in `DetailView`, not alongside them all.
 Students and moves to Today once if submissions are waiting for a grade; the last class opened is kept in
 `localStorage` (`shcode:lastClass`) for the class list and the top-nav Gradebook shortcut.
 
+## Teacher-side feedback and destructive actions
+
+Use `useFeedback()` (`components/FeedbackProvider.tsx`, mounted around the teacher page) for every action
+that changes something: `toast()` says what happened (an error toast is announced assertively and carries
+the server's own reason), `confirm()` replaces `window.confirm` and `window.prompt` (focus starts on
+Cancel for a `danger` confirm, and `requireText` gates deleting a class on typing its name). A confirm
+must say what is LOST, in plain words: the old delete prompt claimed student progress was preserved while
+`functions/api/classes/[id]/delete.ts` removes it for students enrolled nowhere else. Actions that remove
+something go in a `RowMenu` (`components/RowMenu.tsx`), not as a full-size button beside the routine ones.
+Show a failed request with `errorText(res)` (`lib/http-error.ts`), never `res.text()`: the API answers
+`{"error":"..."}` and that JSON was being printed to teachers. Muted text on the dark theme is `#8393c4`
+(4.7:1); `#6272a4` is 3.0:1 and is for borders and decoration only.
+
 ## Flowchart diagrams
 
 A `DiagramDoc` (`{nodes, edges}`, `lib/diagram-types.ts`) is the canonical form;

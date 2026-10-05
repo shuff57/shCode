@@ -37,6 +37,11 @@ import { onRequestGet as classPastDueGet } from '../functions/api/classes/[id]/p
 import { onRequestGet as classDueDatesGet, onRequestPut as classDueDatesPut } from '../functions/api/classes/[id]/due-dates/index.ts';
 import { onRequestGet as classReleasesGet, onRequestPut as classReleasesPut } from '../functions/api/classes/[id]/solution-releases/index.ts';
 import { onRequestGet as classQueueGet, onRequestPost as classQueuePost } from '../functions/api/classes/[id]/submission-queue/index.ts';
+import { onRequestPost as classEnrollPost } from '../functions/api/classes/[id]/enrollments/index.ts';
+import { onRequestDelete as classEnrollDelete } from '../functions/api/classes/[id]/enrollments/[email].ts';
+import { onRequestPost as classTriesResetPost } from '../functions/api/classes/[id]/tries-reset/index.ts';
+import { onRequestPost as classDeletePost } from '../functions/api/classes/[id]/delete.ts';
+import { onRequestGet as classAnnGet, onRequestPost as classAnnPost, onRequestDelete as classAnnDelete } from '../functions/api/classes/[id]/announcements/index.ts';
 import { onRequestPost as classArchivePost } from '../functions/api/classes/[id]/archive.ts';
 import { onRequestPost as classRegenPost } from '../functions/api/classes/[id]/regenerate-code.ts';
 
@@ -63,7 +68,7 @@ export function openDb(root) {
         bind(...a) { args = a; return q; },
         async all() { return { results: stmt.all(...args) }; },
         async first() { return stmt.get(...args) ?? null; },
-        async run() { const r = stmt.run(...args); return { success: true, meta: { changes: r.changes } }; },
+        async run() { const r = stmt.run(...args); return { success: true, meta: { changes: r.changes, last_row_id: Number(r.lastInsertRowid ?? 0) } }; },
       };
       return q;
     },
@@ -194,7 +199,8 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
     const request = new Request(url, {
       method: req.method,
       headers: { 'content-type': 'application/json' },
-      body: req.method === 'GET' || req.method === 'DELETE' ? undefined : JSON.stringify(req.body ?? {}),
+      // DELETE carries a body only where the handler reads one (announcements): pass it when there is one.
+      body: req.method === 'GET' || (req.method === 'DELETE' && !(req.body && Object.keys(req.body).length)) ? undefined : JSON.stringify(req.body ?? {}),
     });
     const params = {};
     for (const n of paramNames) params[n] = req.params[n];
@@ -236,6 +242,13 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   server.put('/api/classes/:id/solution-releases', json, route(classReleasesPut, ['id']));
   server.get('/api/classes/:id/submission-queue', route(classQueueGet, ['id']));
   server.post('/api/classes/:id/submission-queue', json, route(classQueuePost, ['id']));
+  server.post('/api/classes/:id/enrollments', json, route(classEnrollPost, ['id']));
+  server.delete('/api/classes/:id/enrollments/:email', route(classEnrollDelete, ['id', 'email']));
+  server.post('/api/classes/:id/tries-reset', json, route(classTriesResetPost, ['id']));
+  server.post('/api/classes/:id/delete', json, route(classDeletePost, ['id']));
+  server.get('/api/classes/:id/announcements', route(classAnnGet, ['id']));
+  server.post('/api/classes/:id/announcements', json, route(classAnnPost, ['id']));
+  server.delete('/api/classes/:id/announcements', json, route(classAnnDelete, ['id']));
   server.post('/api/classes/:id/archive', json, route(classArchivePost, ['id']));
   server.post('/api/classes/:id/regenerate-code', json, route(classRegenPost, ['id']));
   server.post('/api/dev/solution-release', json, (req, res) => {

@@ -15,6 +15,7 @@
 // the panel re-reads afterwards: the server owns the timezone maths.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useFeedback } from './FeedbackProvider';
 import { moduleIdFromTitle } from '../lib/due-dates-core';
 import {
   describeRelease,
@@ -60,7 +61,7 @@ type Entry =
 
 const C = {
   border: '#44475a',
-  dim: '#6272a4',
+  dim: '#8393c4',
   text: '#f8f8f2',
   input: '#282a36',
   accent: '#8be9fd',
@@ -147,6 +148,7 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
   const [lessons, setLessons] = useState<ManifestLesson[]>([]);
   const [data, setData] = useState<Payload | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useFeedback();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState<Set<string>>(new Set());
 
@@ -190,16 +192,19 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
         if (!res.ok) {
           const body = (await res.json().catch(() => ({}))) as { error?: string };
           setError(body.error ?? `Save failed (HTTP ${res.status})`);
+          toast(`Not saved: ${body.error ?? `HTTP ${res.status}`}`, { kind: 'error' });
           return;
         }
         await load();
+        toast('Solution release saved.');
       } catch {
         setError('Save failed. Check your connection.');
+        toast('Not saved: check your connection.', { kind: 'error' });
       } finally {
         setSaving(false);
       }
     },
-    [classId, load],
+    [classId, load, toast],
   );
 
   const titleOf = useMemo(() => {

@@ -16,6 +16,8 @@ import { lessonHref } from '../../lib/lesson-href';
 import { criteriaScore } from '../../lib/grade-pass';
 import { lessonGradeCategory, lessonPercent } from '../../lib/grading-weights';
 import { buildGradesCsv } from '../../lib/grades-csv';
+import { FeedbackProvider, useFeedback } from '../../components/FeedbackProvider';
+import { RowMenu } from '../../components/RowMenu';
 import { toMermaid } from '../../lib/diagram-mermaid';
 
 // ---------------------------------------------------------------------------
@@ -136,7 +138,7 @@ function submissionScoreLabel(sub: { score: number | null; possible: number | nu
 }
 
 function pctColor(pct: number): string {
-  return pct >= 100 ? '#50fa7b' : pct > 0 ? '#f1fa8c' : '#6272a4';
+  return pct >= 100 ? '#50fa7b' : pct > 0 ? '#f1fa8c' : '#8393c4';
 }
 
 /** The 80x6 bar from UnitProgressBadge, reused so the roster and the
@@ -440,7 +442,7 @@ const S = {
 
   btnDisabled: {
     background: '#44475a',
-    color: '#6272a4',
+    color: '#8393c4',
     border: 'none',
     borderRadius: 4,
     padding: '7px 14px',
@@ -488,7 +490,7 @@ const S = {
     textAlign: 'left' as const,
     padding: '8px 12px',
     borderBottom: '1px solid #44475a',
-    color: '#6272a4',
+    color: '#8393c4',
     fontWeight: 600,
     fontSize: 12,
     textTransform: 'uppercase' as const,
@@ -513,6 +515,7 @@ function StudentDrawer({
 }) {
   const [detail, setDetail] = useState<StudentDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const { confirm, toast } = useFeedback();
   const closeRef = useRef<HTMLButtonElement>(null);
   // The lesson whose Override score form is open (one at a time).
   const [overrideOpen, setOverrideOpen] = useState<string | null>(null);
@@ -575,7 +578,13 @@ function StudentDrawer({
   // Reopen a submitted quiz: the student keeps their answers and can change
   // them and resubmit. Removes the submission and its score, so confirm first.
   async function unsubmit(lessonId: string, title: string) {
-    if (!window.confirm(`Unsubmit "${title}" for ${email}? Their submission and score are removed. They keep their answers and can change them and resubmit.`)) return;
+    const ok = await confirm({
+      title: `Unsubmit "${title}"?`,
+      message: `${email}'s submission and score for this quiz are removed.\nThey keep their answers and can change them and hand it in again.`,
+      confirmLabel: 'Unsubmit',
+      danger: true,
+    });
+    if (!ok) return;
     setUnsubmitting(lessonId);
     setErr('');
     const res = await apiFetch<{ ok: true }>(`/api/classes/${classId}/lesson-unsubmit`, {
@@ -583,19 +592,28 @@ function StudentDrawer({
       body: JSON.stringify({ studentEmail: email, lessonId }),
     }).catch(() => null);
     setUnsubmitting(null);
-    if (res === null) setErr('Network error');
-    else if (res.error !== null) setErr(res.error);
-    else setReloadKey((k) => k + 1);
+    if (res === null) { setErr('Network error'); toast('Could not unsubmit: network error. Nothing changed.', { kind: 'error' }); }
+    else if (res.error !== null) { setErr(res.error); toast(`Could not unsubmit: ${res.error}`, { kind: 'error' }); }
+    else { setReloadKey((k) => k + 1); toast(`Unsubmitted "${title}". The student can change their answers and hand it in again.`); }
   }
 
   // Give tries back on a capped part. 'give-back-one' removes the newest try (the
   // earlier ones and their best score stay); 'reset' clears the part so every try is
   // back. What is removed is kept in an audit table (migration 0033), so confirm first.
   async function giveBack(lessonId: string, title: string, action: 'give-back-one' | 'reset') {
-    const what = action === 'reset'
-      ? `Reset ALL tries on "${title}" for ${email}? Every submission and the score are removed and they get all their tries back. What was removed is kept in an audit log.`
-      : `Give ${email} one try back on "${title}"? Their newest try is removed; their other tries and best score stay. What was removed is kept in an audit log.`;
-    if (!window.confirm(what)) return;
+    const ok = await confirm(action === 'reset'
+      ? {
+          title: `Reset all tries on "${title}"?`,
+          message: `Every submission and the score for ${email} on this part are removed, and they get all their tries back.\nWhat was removed is kept in an audit log.`,
+          confirmLabel: 'Reset all tries',
+          danger: true,
+        }
+      : {
+          title: `Give one try back on "${title}"?`,
+          message: `${email}'s newest try is removed. Their other tries and best score stay.\nWhat was removed is kept in an audit log.`,
+          confirmLabel: 'Give a try back',
+        });
+    if (!ok) return;
     setGivingBack(lessonId);
     setErr('');
     const res = await apiFetch<{ ok: true }>(`/api/classes/${classId}/tries-reset`, {
@@ -603,9 +621,9 @@ function StudentDrawer({
       body: JSON.stringify({ studentEmail: email, lessonId, action }),
     }).catch(() => null);
     setGivingBack(null);
-    if (res === null) setErr('Network error');
-    else if (res.error !== null) setErr(res.error);
-    else setReloadKey((k) => k + 1);
+    if (res === null) { setErr('Network error'); toast('Could not change the tries: network error. Nothing changed.', { kind: 'error' }); }
+    else if (res.error !== null) { setErr(res.error); toast(`Could not change the tries: ${res.error}`, { kind: 'error' }); }
+    else { setReloadKey((k) => k + 1); toast(action === 'reset' ? `All tries reset on "${title}".` : `One try given back on "${title}".`); }
   }
 
   // Group active lessons by unit. Only show lessons that have some state.
@@ -706,7 +724,7 @@ function StudentDrawer({
       );
     }
     return (
-      <span style={{ background: '#44475a', color: '#6272a4', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+      <span style={{ background: '#44475a', color: '#8393c4', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
         Not started
       </span>
     );
@@ -735,11 +753,11 @@ function StudentDrawer({
               {fullName(detail?.firstName, detail?.lastName) || email}
             </div>
             {fullName(detail?.firstName, detail?.lastName) && (
-              <div style={{ fontSize: 12, color: '#6272a4', fontFamily: 'monospace' }}>{email}</div>
+              <div style={{ fontSize: 12, color: '#8393c4', fontFamily: 'monospace' }}>{email}</div>
             )}
           </div>
           <button
-            style={{ background: 'none', border: 'none', color: '#6272a4', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: '4px 8px' }}
+            style={{ background: 'none', border: 'none', color: '#8393c4', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: '4px 8px' }}
             onClick={onClose}
             aria-label="Close"
             ref={closeRef}
@@ -750,7 +768,7 @@ function StudentDrawer({
 
         {/* Body */}
         <div style={{ padding: '20px 24px', flex: 1 }}>
-          {loading && <div style={{ color: '#6272a4' }}>Loading…</div>}
+          {loading && <div style={{ color: '#8393c4' }}>Loading…</div>}
           {err && <div style={{ color: '#ff5555', fontSize: 13 }}>{err}</div>}
           {notice && <div role="status" style={{ color: '#50fa7b', fontSize: 13, marginBottom: 12 }}>{notice}</div>}
           {detail?.grading && detail.grading.categories.length > 0 && (
@@ -761,7 +779,7 @@ function StudentDrawer({
                   {detail.grading.percent}% so far
                 </span>
                 {typeof detail.grading.gradedTotal === 'number' && detail.grading.gradedTotal > 0 && (
-                  <span style={{ fontSize: 12, color: '#6272a4' }}>
+                  <span style={{ fontSize: 12, color: '#8393c4' }}>
                     {detail.grading.doneCount ?? 0} of {detail.grading.gradedTotal} graded lessons done
                     {(detail.grading.missingCount ?? 0) > 0 ? ` · ${detail.grading.missingCount} past due` : ''}
                   </span>
@@ -775,7 +793,7 @@ function StudentDrawer({
                       {c.label}
                       <span style={{ opacity: 0.6 }}> · {c.weight}% of grade</span>
                     </span>
-                    <span style={{ color: '#6272a4' }}>
+                    <span style={{ color: '#8393c4' }}>
                       {c.done}/{c.total}
                     </span>
                     <span style={{ color: pctColor(c.percent), fontWeight: 600, width: 40, textAlign: 'right' }}>
@@ -787,7 +805,7 @@ function StudentDrawer({
             </div>
           )}
           {detail && unitGroups.length === 0 && (
-            <p style={{ color: '#6272a4', fontSize: 14 }}>No lesson activity yet.</p>
+            <p style={{ color: '#8393c4', fontSize: 14 }}>No lesson activity yet.</p>
           )}
           {detail && unitGroups.map(({ unit, lessons }) => (
             <div key={unit} style={{ marginBottom: 24 }}>
@@ -830,7 +848,7 @@ function StudentDrawer({
                         <span style={{ flex: 1, fontSize: 13, color: '#f8f8f2', minWidth: 0 }}>
                           {lesson.title}
                           {detail.dueDates?.[lesson.id] && (
-                            <span style={{ marginLeft: 8, fontSize: 11, color: '#6272a4' }} title="This class's due date for the lesson">
+                            <span style={{ marginLeft: 8, fontSize: 11, color: '#8393c4' }} title="This class's due date for the lesson">
                               due {formatDue(detail.dueDates[lesson.id])}
                             </span>
                           )}
@@ -852,7 +870,7 @@ function StudentDrawer({
                           </a>
                         )}
                         {!lessonMap.has(lesson.id) && (
-                          <span style={{ fontSize: 11, color: '#6272a4', fontStyle: 'italic', flexShrink: 0 }}>
+                          <span style={{ fontSize: 11, color: '#8393c4', fontStyle: 'italic', flexShrink: 0 }}>
                             legacy id — lesson since renamed
                           </span>
                         )}
@@ -874,34 +892,25 @@ function StudentDrawer({
                             {overrideOpen === lesson.id ? 'Close override' : 'Override score'}
                           </button>
                         )}
-                        {sub && typeof lesson.maxSubmissions === 'number' && (
-                          <>
-                            <button
-                              style={{ background: 'none', border: '1px solid #ffb86c', borderRadius: 4, color: '#ffb86c', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0 }}
-                              disabled={givingBack === lesson.id}
-                              title="Remove their newest try; their other tries and best score stay."
-                              onClick={() => giveBack(lesson.id, lesson.title, 'give-back-one')}
-                            >
-                              {givingBack === lesson.id ? 'Working…' : 'Give back a try'}
-                            </button>
-                            <button
-                              style={{ background: 'none', border: '1px solid #ff5555', borderRadius: 4, color: '#ff5555', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0 }}
-                              disabled={givingBack === lesson.id}
-                              title="Clear every submission on this part so they get all their tries back."
-                              onClick={() => giveBack(lesson.id, lesson.title, 'reset')}
-                            >
-                              Reset tries
-                            </button>
-                          </>
-                        )}
-                        {Array.isArray(gradeData?.quiz) && (
-                          <button
-                            style={{ background: 'none', border: '1px solid #ffb86c', borderRadius: 4, color: '#ffb86c', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0 }}
-                            disabled={unsubmitting === lesson.id}
-                            onClick={() => unsubmit(lesson.id, lesson.title)}
-                          >
-                            {unsubmitting === lesson.id ? 'Unsubmitting…' : 'Unsubmit'}
-                          </button>
+                        {/* The three actions that remove something live in one menu, in words, so a routine
+                            click on View or Override cannot land on Reset by accident. Each still confirms. */}
+                        {sub && (typeof lesson.maxSubmissions === 'number' || Array.isArray(gradeData?.quiz)) && (
+                          <RowMenu
+                            label={`More actions for ${lesson.title}`}
+                            buttonText="More"
+                            disabled={givingBack === lesson.id || unsubmitting === lesson.id}
+                            items={[
+                              ...(typeof lesson.maxSubmissions === 'number'
+                                ? [
+                                    { label: 'Give back one try', title: 'Removes their newest try; their other tries and best score stay.', onSelect: () => { void giveBack(lesson.id, lesson.title, 'give-back-one'); } },
+                                    { label: 'Reset all tries', danger: true, title: 'Clears every submission on this part so they get all their tries back.', onSelect: () => { void giveBack(lesson.id, lesson.title, 'reset'); } },
+                                  ]
+                                : []),
+                              ...(Array.isArray(gradeData?.quiz)
+                                ? [{ label: 'Unsubmit quiz', danger: true, title: 'Reopens the quiz: the submission and score are removed; they keep their answers.', onSelect: () => { void unsubmit(lesson.id, lesson.title); } }]
+                                : []),
+                            ]}
+                          />
                         )}
                       </div>
 
@@ -909,7 +918,7 @@ function StudentDrawer({
                           higher score" on a part with a try limit, the persisted choice) are one set of rules. */}
                       {overrideOpen === lesson.id && sub && (
                         <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #44475a33' }}>
-                          <div style={{ fontSize: 12, color: '#6272a4' }}>
+                          <div style={{ fontSize: 12, color: '#8393c4' }}>
                             Latest hand-in {fmtTs(sub.submitted_at)}{submissionScoreLabel(sub) ? ` · ${submissionScoreLabel(sub)}` : ''}
                           </div>
                           <OverrideForm
@@ -930,7 +939,7 @@ function StudentDrawer({
                       {/* Submission detail */}
                       {isExpanded && sub && (
                         <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #44475a33' }}>
-                          <div style={{ fontSize: 11, color: '#6272a4', marginBottom: 8 }}>
+                          <div style={{ fontSize: 11, color: '#8393c4', marginBottom: 8 }}>
                             Submitted: {fmtTs(sub.submitted_at)}
                             {submissionScoreLabel(sub) && (
                               <span style={{ marginLeft: 12, color: '#f1fa8c' }}>
@@ -968,7 +977,7 @@ function StudentDrawer({
                                           {s.passed ? 'pass' : 'fail'}
                                         </span>
                                       </div>
-                                      {s.detail && <div style={{ color: '#6272a4', fontSize: 11 }}>{s.detail}</div>}
+                                      {s.detail && <div style={{ color: '#8393c4', fontSize: 11 }}>{s.detail}</div>}
                                     </div>
                                   ))}
                                 </div>
@@ -984,7 +993,7 @@ function StudentDrawer({
                                         </span>
                                       </div>
                                       {c.feedback && (
-                                        <div style={{ color: '#6272a4', fontSize: 11 }}>{c.feedback}</div>
+                                        <div style={{ color: '#8393c4', fontSize: 11 }}>{c.feedback}</div>
                                       )}
                                     </div>
                                   ))}
@@ -998,7 +1007,7 @@ function StudentDrawer({
                               rather than raw JSON; everything else is prose. */}
                           {sub.response && (
                             <div>
-                              <div style={{ fontSize: 11, color: '#6272a4', marginBottom: 4 }}>
+                              <div style={{ fontSize: 11, color: '#8393c4', marginBottom: 4 }}>
                                 {asDiagramMermaid(sub.response) || (gradeData as { artifact?: unknown } | null)?.artifact ? 'Their chart' : 'Their answer'}
                               </div>
                               <pre style={{ margin: 0, maxHeight: 260, overflow: 'auto', background: '#1e1f29', borderRadius: 4, padding: '8px 10px', fontSize: 11, color: '#f8f8f2', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
@@ -1093,11 +1102,11 @@ function GradebookView({
     };
   }, [fullScreen]);
 
-  if (loading) return <div style={{ color: '#6272a4' }}>Loading gradebook…</div>;
+  if (loading) return <div style={{ color: '#8393c4' }}>Loading gradebook…</div>;
   if (err) return <div style={{ color: '#ff5555', fontSize: 13 }}>{err}</div>;
   if (!gbData) return null;
   if (gbData.students.length === 0) {
-    return <p style={{ color: '#6272a4', fontSize: 14 }}>No students enrolled — roster is empty.</p>;
+    return <p style={{ color: '#8393c4', fontSize: 14 }}>No students enrolled — roster is empty.</p>;
   }
 
   // Build ordered lesson list from the manifest, preserving unit grouping.
@@ -1292,7 +1301,7 @@ function GradebookView({
         <button style={S.btn('#8be9fd')} onClick={handleDownloadCsv}>
           Download lessons shown (CSV)
         </button>
-        <span style={{ fontSize: 12, color: '#6272a4' }}>
+        <span style={{ fontSize: 12, color: '#8393c4' }}>
           {visibleStudents.length === gbData.students.length
             ? `${gbData.students.length} student${gbData.students.length !== 1 ? 's' : ''}`
             : `${visibleStudents.length} of ${gbData.students.length} students`}
@@ -1348,7 +1357,7 @@ function GradebookView({
         <span><strong style={{ color: '#f1fa8c' }}>72</strong> done, percent below 100</span>
         <span><strong style={{ color: '#f1fa8c' }}>○</strong> started</span>
         <span><strong style={{ color: '#ffb86c' }}>⋯</strong> handed in, AI grading failed: needs you</span>
-        <span><strong style={{ color: '#6272a4' }}>·</strong> not started</span>
+        <span><strong style={{ color: '#8393c4' }}>·</strong> not started</span>
         <span><span style={{ borderBottom: '2px solid #ff5555' }}>red underline</span> a graded lesson past due and not done, or done late (readings and slides are never marked)</span>
         <span><strong style={{ color: '#ff5555' }}>(6)</strong> beside a grade: graded lessons past due and not done</span>
         <span>Hover a cell for details. Click a student&apos;s name to open them.</span>
@@ -1383,7 +1392,7 @@ function GradebookView({
                   width: EMAIL_W, minWidth: EMAIL_W,
                   background: headerBg, padding: '6px 10px',
                   borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
-                  textAlign: 'left', color: '#6272a4', fontSize: 11, fontWeight: 700,
+                  textAlign: 'left', color: '#8393c4', fontSize: 11, fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.06em',
                 }}
               >
@@ -1395,7 +1404,7 @@ function GradebookView({
                   width: GRADE_W, minWidth: GRADE_W,
                   background: headerBg, padding: '6px 6px',
                   borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
-                  textAlign: 'center', color: '#6272a4', fontSize: 11, fontWeight: 700,
+                  textAlign: 'center', color: '#8393c4', fontSize: 11, fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.06em',
                 }}
                 title="Grade so far: work done plus work past its due date, under this class's weights. Lessons not due yet are left out."
@@ -1491,7 +1500,7 @@ function GradebookView({
           </thead>
           <tbody>
             {visibleStudents.length === 0 && (
-              <tr><td colSpan={displayLessons.length + 2} style={{ padding: 16, color: '#6272a4' }}>No student matches. Clear the search or the filter above.</td></tr>
+              <tr><td colSpan={displayLessons.length + 2} style={{ padding: 16, color: '#8393c4' }}>No student matches. Clear the search or the filter above.</td></tr>
             )}
             {visibleStudents.map((student, i) => (
               <tr
@@ -1526,7 +1535,7 @@ function GradebookView({
                         width: GRADE_W, minWidth: GRADE_W, padding: '6px 6px', textAlign: 'center',
                         borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a44',
                         fontSize: 12, fontWeight: 700,
-                        color: !g || g.counted === 0 ? '#6272a4' : pctColor(g.pct),
+                        color: !g || g.counted === 0 ? '#8393c4' : pctColor(g.pct),
                       }}
                       title={g ? (g.counted === 0 ? 'Nothing is due yet and nothing is done' : `Grade so far ${g.pct}%${g.missing > 0 ? `, ${g.missing} past due and not done` : ''}`) : 'Loading'}
                     >
@@ -1642,7 +1651,7 @@ function ListView() {
     }
   }
 
-  if (loading) return <div style={{ color: '#6272a4' }}>Loading…</div>;
+  if (loading) return <div style={{ color: '#8393c4' }}>Loading…</div>;
   if (forbidden)
     return (
       <div style={{ color: '#ff5555', fontSize: 16, padding: 32 }}>Teacher access required.</div>
@@ -1653,7 +1662,7 @@ function ListView() {
       <h1 style={S.h1}>My Classes</h1>
 
       {/* Include archived toggle */}
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#6272a4', marginBottom: 20, cursor: 'pointer' }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#8393c4', marginBottom: 20, cursor: 'pointer' }}>
         <input
           type="checkbox"
           checked={includeArchived}
@@ -1665,7 +1674,7 @@ function ListView() {
 
       {/* Class list */}
       {classes.length === 0 ? (
-        <p style={{ color: '#6272a4' }}>No classes yet. Create one above.</p>
+        <p style={{ color: '#8393c4' }}>No classes yet. Create one above.</p>
       ) : (
         <div>
           {[...classes].sort((x, y) => Number(y.id === lastId) - Number(x.id === lastId)).map((c) => (
@@ -1685,12 +1694,12 @@ function ListView() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
                   <span style={{ fontWeight: 600, fontSize: 16 }}>{c.name}</span>
                   {c.archived_at && <span style={S.badge(true)}>Archived</span>}
-                  {c.id === lastId && <span style={{ fontSize: 11, color: '#6272a4' }}>last opened</span>}
+                  {c.id === lastId && <span style={{ fontSize: 11, color: '#8393c4' }}>last opened</span>}
                 </div>
                 {!c.archived_at && (
                   <div style={{ display: 'flex', gap: 8, marginBottom: 6, flexWrap: 'wrap', fontSize: 12 }}>
                     {chips[c.id] === undefined ? (
-                      <span style={{ color: '#6272a4' }}>checking…</span>
+                      <span style={{ color: '#8393c4' }}>checking…</span>
                     ) : chips[c.id].behind === 0 && chips[c.id].toGrade === 0 ? (
                       <span style={{ color: '#50fa7b' }}>All caught up</span>
                     ) : (
@@ -1709,7 +1718,7 @@ function ListView() {
                     )}
                   </div>
                 )}
-                <div style={{ display: 'flex', gap: 20, color: '#6272a4', fontSize: 13, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 20, color: '#8393c4', fontSize: 13, flexWrap: 'wrap' }}>
                   <span>Code: <span style={{ fontFamily: 'monospace', color: '#8be9fd' }}>{c.code}</span></span>
                   {c.school_year && <span>Year: {c.school_year}</span>}
                   <span>{c.student_count} student{c.student_count !== 1 ? 's' : ''}</span>
@@ -1775,6 +1784,7 @@ function parseTab(v: string | null): TabId | undefined {
 
 function DetailView({ classId, initialTab }: { classId: string; initialTab?: TabId }) {
   const router = useRouter();
+  const { confirm, toast } = useFeedback();
   const [detail, setDetail] = useState<ClassDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -1880,30 +1890,39 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   const behindCount = [...progressMap.values()].filter((p) => (p.gradedMissing ?? 0) > 0).length;
 
   async function handleRegenCode() {
-    if (!window.confirm('Regenerate join code? The old code will stop working.')) return;
+    const ok = await confirm({
+      title: 'Make a new join code?',
+      message: 'The old code stops working right away. Students already in the class stay in it.\nStudents who have not joined yet will need the new code.',
+      confirmLabel: 'Make a new code',
+      danger: true,
+    });
+    if (!ok) return;
     setRegenerating(true);
     const result = await apiFetch<{ ok: boolean; code: string }>(
       `/api/classes/${classId}/regenerate-code`,
       { method: 'POST' },
     );
     setRegenerating(false);
-    if (result.error === null) { setCurrentCode(result.data.code); setActionError(''); }
-    else setActionError(`Could not make a new join code: ${result.error}. The old code still works.`);
+    if (result.error === null) { setCurrentCode(result.data.code); setActionError(''); toast(`New join code: ${result.data.code}. The old one no longer works.`); }
+    else { setActionError(`Could not make a new join code: ${result.error}. The old code still works.`); toast(`Could not make a new join code: ${result.error}. The old code still works.`, { kind: 'error' }); }
   }
 
   async function handleArchiveToggle() {
     if (!detail) return;
     const isArchived = !!detail.class.archived_at;
     const action = isArchived ? 'Unarchive' : 'Archive';
-    if (!window.confirm(`${action} this class?`)) return;
+    const ok = await confirm(isArchived
+      ? { title: 'Unarchive this class?', message: 'It comes back into your class list and students can use it again.', confirmLabel: 'Unarchive' }
+      : { title: 'Archive this class?', message: 'It leaves your class list (tick "Include archived classes" to see it) and students can no longer join it. Nothing is deleted, and you can unarchive it any time.', confirmLabel: 'Archive' });
+    if (!ok) return;
     setArchiving(true);
     const result = await apiFetch<{ ok: boolean; archived_at: string | null }>(
       `/api/classes/${classId}/archive`,
       { method: 'POST', body: JSON.stringify({ archived: !isArchived }) },
     );
     setArchiving(false);
-    if (result.error !== null) setActionError(`Could not ${action.toLowerCase()} this class: ${result.error}.`);
-    else setActionError('');
+    if (result.error !== null) { setActionError(`Could not ${action.toLowerCase()} this class: ${result.error}.`); toast(`Could not ${action.toLowerCase()} this class: ${result.error}.`, { kind: 'error' }); }
+    else { setActionError(''); toast(isArchived ? 'Class unarchived.' : 'Class archived. It is in the list under "Include archived classes".'); }
     if (result.error === null) {
       setDetail((prev) =>
         prev
@@ -1936,14 +1955,14 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   async function handleDelete() {
     if (!detail) return;
     const name = detail.class.name;
-    const typed = window.prompt(
-      `Permanently delete "${name}"?\n\nThis removes the class, enrollments, and co-teacher rows. Student progress data (commits, completions) is preserved.\n\nType the class name to confirm:`,
-    );
-    if (typed === null) return;
-    if (typed.trim() !== name) {
-      setDeleteError('Name did not match. Nothing deleted.');
-      return;
-    }
+    const ok = await confirm({
+      title: `Permanently delete "${name}"?`,
+      message: 'This cannot be undone.\nIt removes the class, its enrollments and its co-teachers, AND all progress (completions, scores, submissions, saved work) of every student who is not enrolled in another class.\nStudents who are also in another class keep their progress.',
+      confirmLabel: 'Delete the class',
+      danger: true,
+      requireText: name,
+    });
+    if (!ok) return;
     setDeleting(true);
     setDeleteError('');
     const result = await apiFetch<{ ok: boolean }>(`/api/classes/${classId}/delete`, {
@@ -1958,13 +1977,34 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   }
 
   async function handleRemove(email: string) {
-    if (!window.confirm(`Remove ${email} from this class?`)) return;
-    setRemovingEmail(email);
-    await apiFetch(`/api/classes/${classId}/enrollments/${encodeURIComponent(email)}`, {
-      method: 'DELETE',
+    const ok = await confirm({
+      title: `Remove ${email} from this class?`,
+      message: 'They leave the roster and the gradebook for this class. Their work is kept, and adding them again brings it back.',
+      confirmLabel: 'Remove from class',
+      danger: true,
     });
+    if (!ok) return;
+    setRemovingEmail(email);
+    const res = await apiFetch(`/api/classes/${classId}/enrollments/${encodeURIComponent(email)}`, {
+      method: 'DELETE',
+    }).catch(() => null);
     setRemovingEmail('');
+    if (res === null || res.error !== null) {
+      toast(`Could not remove ${email}: ${res === null ? 'network error' : res.error}. They are still in the class.`, { kind: 'error' });
+      return;
+    }
     void loadDetail();
+    toast(`Removed ${email} from the class.`, {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          void apiFetch(`/api/classes/${classId}/enrollments`, { method: 'POST', body: JSON.stringify({ email }) }).then((r) => {
+            if (r.error === null) { toast(`${email} is back in the class.`); void loadDetail(); }
+            else toast(`Could not add ${email} back: ${r.error}`, { kind: 'error' });
+          });
+        },
+      },
+    });
   }
 
   async function handleAddCoTeacher(e: React.FormEvent) {
@@ -1986,16 +2026,23 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   }
 
   async function handleRemoveCoTeacher(email: string) {
-    if (!window.confirm(`Remove ${email} as co-teacher?`)) return;
+    const ok = await confirm({
+      title: `Remove ${email} as co-teacher?`,
+      message: 'They lose access to this class right away. The class and its students are not affected.',
+      confirmLabel: 'Remove co-teacher',
+      danger: true,
+    });
+    if (!ok) return;
     setRemovingCoTeacher(email);
     await apiFetch(`/api/classes/${classId}/teachers/${encodeURIComponent(email)}`, {
       method: 'DELETE',
     });
     setRemovingCoTeacher('');
+    toast(`${email} is no longer a co-teacher.`);
     void loadDetail();
   }
 
-  if (loading) return <div style={{ color: '#6272a4' }}>Loading…</div>;
+  if (loading) return <div style={{ color: '#8393c4' }}>Loading…</div>;
   if (loadError)
     return (
       <div>
@@ -2030,7 +2077,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <h1 style={{ ...S.h1, marginBottom: 0 }}>{cls.name}</h1>
             {isArchived && <span style={S.badge(true)}>Archived</span>}
           </div>
-          <div style={{ display: 'flex', gap: 20, color: '#6272a4', fontSize: 13, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 20, color: '#8393c4', fontSize: 13, flexWrap: 'wrap' }}>
             {cls.school_year && <span>Year: {cls.school_year}</span>}
             <span>Created: {fmt(cls.created_at)}</span>
             <span title="Students join with this code. Regenerate it under Class settings.">Join code: <strong style={{ fontFamily: 'monospace', color: '#8be9fd', letterSpacing: '0.08em' }}>{currentCode}</strong></span>
@@ -2172,7 +2219,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             </button>
           </div>
             {roster.length === 0 ? (
-              <p style={{ color: '#6272a4', fontSize: 14 }}>No students enrolled yet.</p>
+              <p style={{ color: '#8393c4', fontSize: 14 }}>No students enrolled yet.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {roster.map((row) => {
@@ -2191,11 +2238,11 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                           return (
                             <div style={{ marginBottom: 4 }}>
                               <span style={{ fontSize: 15, fontWeight: 600, color: '#f8f8f2' }}>{nm ?? row.student_email}</span>
-                              {nm && <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#6272a4', marginLeft: 10 }}>{row.student_email}</span>}
+                              {nm && <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#8393c4', marginLeft: 10 }}>{row.student_email}</span>}
                             </div>
                           );
                         })()}
-                        <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#6272a4', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#8393c4', flexWrap: 'wrap' }}>
                           <span>
                             Enrolled: {fmt(row.enrolled_at)} by {row.enrolled_by ?? 'self'}
                           </span>
@@ -2206,7 +2253,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                                 title={`Grade so far: ${wp}%. Counts work that is done plus work past its due date, under this class's weights. Lessons not due yet are left out.`}
                               >
                                 <MiniBar pct={wp} />
-                                <span style={{ color: prog.gradedCounted === 0 ? '#6272a4' : pctColor(wp), fontWeight: 600 }}>
+                                <span style={{ color: prog.gradedCounted === 0 ? '#8393c4' : pctColor(wp), fontWeight: 600 }}>
                                   {prog.gradedCounted === 0 ? 'No grade yet' : `${wp}% so far`}
                                 </span>
                               </span>
@@ -2240,17 +2287,11 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                         >
                           Open
                         </button>
-                        <button
-                          style={
-                            removingEmail === row.student_email
-                              ? S.btnDisabled
-                              : { ...S.btn('#ff5555'), color: '#f8f8f2' }
-                          }
+                        <RowMenu
+                          label={`More actions for ${row.student_email}`}
                           disabled={removingEmail === row.student_email}
-                          onClick={() => { void handleRemove(row.student_email); }}
-                        >
-                          {removingEmail === row.student_email ? '…' : 'Remove'}
-                        </button>
+                          items={[{ label: 'Remove from class…', danger: true, title: 'Takes them off this class roster. Their work is kept.', onSelect: () => { void handleRemove(row.student_email); } }]}
+                        />
                       </div>
                     </div>
                   );
@@ -2331,7 +2372,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div role="tabpanel" id={`panel-settings`} aria-labelledby={`tab-settings`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Code */}
         <div style={{ ...S.card, marginBottom: 28 }}>
-          <div style={{ color: '#6272a4', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Join Code</div>
+          <div style={{ color: '#8393c4', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Join Code</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span style={S.code}>{currentCode}</span>
             <button
@@ -2348,7 +2389,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div style={{ ...S.card, marginBottom: 16 }}>
           <h2 style={S.h2}>Co-teachers ({coTeachers.length})</h2>
           {coTeachers.length === 0 ? (
-            <p style={{ color: '#6272a4', fontSize: 14, marginBottom: isOwner ? 16 : 0 }}>No co-teachers added yet.</p>
+            <p style={{ color: '#8393c4', fontSize: 14, marginBottom: isOwner ? 16 : 0 }}>No co-teachers added yet.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: isOwner ? 16 : 0 }}>
               {coTeachers.map((ct) => (
@@ -2360,7 +2401,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                     <div style={{ fontFamily: 'monospace', fontSize: 14, color: '#f8f8f2', marginBottom: 2 }}>
                       {ct.teacher_email}
                     </div>
-                    <div style={{ fontSize: 12, color: '#6272a4' }}>
+                    <div style={{ fontSize: 12, color: '#8393c4' }}>
                       added {fmtTs(ct.added_at)}{ct.added_by ? ` by ${ct.added_by}` : ''}
                     </div>
                   </div>
@@ -2439,15 +2480,17 @@ function TeacherPageInner() {
   const wantsGradebook = view === 'gradebook';
 
   return (
-    <div style={S.page}>
-      {classId ? (
-        <DetailView classId={classId} initialTab={parseTab(params.get('tab')) ?? (wantsGradebook ? 'gradebook' : undefined)} />
-      ) : wantsGradebook ? (
-        <GradebookRedirect />
-      ) : (
-        <ListView />
-      )}
-    </div>
+    <FeedbackProvider>
+      <div style={S.page}>
+        {classId ? (
+          <DetailView classId={classId} initialTab={parseTab(params.get('tab')) ?? (wantsGradebook ? 'gradebook' : undefined)} />
+        ) : wantsGradebook ? (
+          <GradebookRedirect />
+        ) : (
+          <ListView />
+        )}
+      </div>
+    </FeedbackProvider>
   );
 }
 
@@ -2478,12 +2521,12 @@ function GradebookRedirect() {
   }, [router]);
 
   if (empty) return <ListView />;
-  return <div style={{ color: '#6272a4' }}>Loading…</div>;
+  return <div style={{ color: '#8393c4' }}>Loading…</div>;
 }
 
 export default function TeacherPage() {
   return (
-    <Suspense fallback={<div style={{ ...S.page, color: '#6272a4' }}>Loading…</div>}>
+    <Suspense fallback={<div style={{ ...S.page, color: '#8393c4' }}>Loading…</div>}>
       <TeacherPageInner />
     </Suspense>
   );

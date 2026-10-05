@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useFeedback } from './FeedbackProvider';
+import { errorText } from '../lib/http-error';
 import { Pin, Trash2 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
@@ -34,6 +36,7 @@ function formatTs(ts: number): string {
 export function AnnouncementsPanel({ classId }: Props) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast, confirm } = useFeedback();
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -53,7 +56,7 @@ export function AnnouncementsPanel({ classId }: Props) {
     })
       .then(async (res) => {
         if (!res.ok) {
-          const msg = await res.text().catch(() => 'Unknown error');
+          const msg = await errorText(res);
           throw new Error(msg || `${res.status}`);
         }
         return res.json();
@@ -93,13 +96,14 @@ export function AnnouncementsPanel({ classId }: Props) {
       });
 
       if (!res.ok) {
-        const msg = await res.text().catch(() => 'Unknown error');
+        const msg = await errorText(res);
         throw new Error(msg || `${res.status}`);
       }
 
       setContent('');
       setPinned(false);
       setRefreshKey((k) => k + 1);
+      toast('Announcement posted. Students see it on their page.');
     } catch (err) {
       setCreateError(err instanceof Error ? err.message : 'Failed to post announcement');
     } finally {
@@ -108,6 +112,13 @@ export function AnnouncementsPanel({ classId }: Props) {
   }
 
   async function handleDelete(id: string) {
+    const ok = await confirm({
+      title: 'Delete this announcement?',
+      message: 'Students stop seeing it right away. This cannot be undone.',
+      confirmLabel: 'Delete announcement',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       const res = await fetch(`/api/classes/${encodeURIComponent(classId)}/announcements`, {
         method: 'DELETE',
@@ -117,19 +128,21 @@ export function AnnouncementsPanel({ classId }: Props) {
       });
 
       if (!res.ok) {
-        const msg = await res.text().catch(() => 'Unknown error');
+        const msg = await errorText(res);
         throw new Error(msg || `${res.status}`);
       }
 
       setRefreshKey((k) => k + 1);
+      toast('Announcement deleted.');
     } catch {
-      // Silently fail — the item just stays in the list
+      // The item stays in the list, and the teacher is told, instead of the click doing nothing.
+      toast('Could not delete that announcement. It is still showing.', { kind: 'error' });
     }
   }
 
   if (loading) {
     return (
-      <div style={{ color: '#6272a4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: '#8393c4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
         Loading announcements...
       </div>
     );
@@ -223,7 +236,7 @@ export function AnnouncementsPanel({ classId }: Props) {
 
       {/* Existing announcements */}
       {announcements.length === 0 ? (
-        <div style={{ color: '#6272a4', fontSize: '0.88rem', padding: 8 }}>
+        <div style={{ color: '#8393c4', fontSize: '0.88rem', padding: 8 }}>
           No announcements yet.
         </div>
       ) : (
@@ -261,7 +274,7 @@ export function AnnouncementsPanel({ classId }: Props) {
                     Pinned
                   </span>
                 )}
-                <span style={{ fontSize: '0.78rem', color: '#6272a4' }}>
+                <span style={{ fontSize: '0.78rem', color: '#8393c4' }}>
                   {a.author_email} &middot; {formatTs(a.created_at)}
                 </span>
               </div>

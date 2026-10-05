@@ -74,7 +74,7 @@ const clickableStyle: React.CSSProperties = {
 };
 
 const mutedStyle: React.CSSProperties = {
-  color: '#6272a4',
+  color: '#8393c4',
   fontSize: '0.78rem',
 };
 
@@ -127,7 +127,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
 
   if (loading) {
     return (
-      <div style={{ color: '#6272a4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: '#8393c4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
         Loading attention data...
       </div>
     );

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { CircleCheck, CircleX } from 'lucide-react';
 import { parseDiagramArtifact, parseDiagramGrade, parseDiagramResponse } from '../lib/diagram-submission';
 import { criteriaScore } from '../lib/grade-pass';
+import { errorText } from '../lib/http-error';
 import { diagramFrameHeight } from '../lib/diagram-types';
 import SubmissionBoundary from './SubmissionBoundary';
 
@@ -13,7 +14,7 @@ import SubmissionBoundary from './SubmissionBoundary';
 const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   ssr: false,
   loading: () => (
-    <div style={{ height: 360, display: 'grid', placeItems: 'center', color: '#6272a4', fontSize: '0.82rem' }}>
+    <div style={{ height: 360, display: 'grid', placeItems: 'center', color: '#8393c4', fontSize: '0.82rem' }}>
       Loading diagram…
     </div>
   ),
@@ -168,7 +169,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ submissionId, clearOverride: true }),
       });
-      if (!res.ok) throw new Error((await res.text().catch(() => '')) || `${res.status}`);
+      if (!res.ok) throw new Error(await errorText(res));
       setMsg({ type: 'success', text: 'Cleared. The score is now the student\u2019s best again.' });
       onOverride();
     } catch (err) {
@@ -216,8 +217,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
       });
 
       if (!res.ok) {
-        const errMsg = await res.text().catch(() => 'Unknown error');
-        throw new Error(errMsg || `${res.status}`);
+        throw new Error(await errorText(res));
       }
 
       const out = (await res.json().catch(() => null)) as { overrideActive?: boolean; stateScore?: number } | null;
@@ -288,7 +288,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         />
       </div>
 
-      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#6272a4' }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#8393c4' }}>
         <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
         Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit). This stays until you change or clear it; the student&apos;s later tries do not undo it.
       </label>
@@ -316,7 +316,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
           onClick={handleClear}
           disabled={submitting}
           title="Drop a 'use this as the score' choice you made earlier on this part"
-          style={{ background: 'none', border: '1px solid #44475a', borderRadius: 4, color: '#6272a4', padding: '5px 10px', fontSize: '0.78rem', cursor: submitting ? 'not-allowed' : 'pointer' }}
+          style={{ background: 'none', border: '1px solid #44475a', borderRadius: 4, color: '#8393c4', padding: '5px 10px', fontSize: '0.78rem', cursor: submitting ? 'not-allowed' : 'pointer' }}
         >
           Clear my score choice
         </button>
@@ -351,8 +351,7 @@ export function SubmissionQueue({ classId }: Props) {
     })
       .then(async (res) => {
         if (!res.ok) {
-          const msg = await res.text().catch(() => 'Unknown error');
-          throw new Error(msg || `${res.status}`);
+          throw new Error(await errorText(res));
         }
         return res.json();
       })
@@ -377,7 +376,7 @@ export function SubmissionQueue({ classId }: Props) {
 
   if (loading) {
     return (
-      <div style={{ color: '#6272a4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: '#8393c4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
         Loading submission queue...
       </div>
     );
@@ -393,7 +392,7 @@ export function SubmissionQueue({ classId }: Props) {
 
   if (submissions.length === 0) {
     return (
-      <div style={{ color: '#6272a4', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: '#8393c4', padding: 16, fontSize: '0.88rem' }}>
         No submissions in the review queue.
       </div>
     );
@@ -468,7 +467,7 @@ export function SubmissionQueue({ classId }: Props) {
                 <div style={{ fontWeight: 600, color: '#f8f8f2', fontSize: '0.9rem' }}>
                   {sub.student_email}
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#6272a4' }}>
+                <div style={{ fontSize: '0.78rem', color: '#8393c4' }}>
                   {sub.lesson_id} &middot; submitted {formatTs(sub.submitted_at)}
                 </div>
               </div>
@@ -512,7 +511,7 @@ export function SubmissionQueue({ classId }: Props) {
                 The AI grader could not score this. The student&apos;s answer is below and is
                 safe — read it and set a score yourself.
                 {failed.error && (
-                  <div style={{ color: '#6272a4', marginTop: 4, fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                  <div style={{ color: '#8393c4', marginTop: 4, fontFamily: 'monospace', fontSize: '0.75rem' }}>
                     {failed.error}
                     {failed.httpStatus ? ` (HTTP ${failed.httpStatus})` : ''}
                   </div>
@@ -542,7 +541,7 @@ export function SubmissionQueue({ classId }: Props) {
                       style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '2px 0', color: '#f8f8f2' }}
                     >
                       <span>{c.title || c.id}</span>
-                      <span style={{ color: '#6272a4', flex: '0 0 auto' }}>
+                      <span style={{ color: '#8393c4', flex: '0 0 auto' }}>
                         {/* Every rubric is zero-point under green-to-advance, so
                             "3/0" says nothing — show the verdict instead. */}
                         {max ? `${c.earned ?? '?'}/${max}` : (c.verdict ?? '—')}
@@ -577,7 +576,7 @@ export function SubmissionQueue({ classId }: Props) {
                       // scroll-zoom into anything they need to read closely.
                       fitMinZoom={0.3}
                     />
-                    <div style={{ color: '#6272a4', fontSize: '0.76rem', marginTop: 5 }}>
+                    <div style={{ color: '#8393c4', fontSize: '0.76rem', marginTop: 5 }}>
                       {diagram.nodes.length} shapes · {diagram.edges.length} arrows · scroll to zoom,
                       drag to pan
                     </div>
@@ -585,7 +584,7 @@ export function SubmissionQueue({ classId }: Props) {
                         copy, and the teacher must always be able to see what the model read. */}
                     {parseDiagramResponse(sub.response) === null && sub.response ? (
                       <div style={{ marginTop: 8 }}>
-                        <div style={{ color: '#6272a4', fontSize: '0.76rem', marginBottom: 3 }}>What the AI read</div>
+                        <div style={{ color: '#8393c4', fontSize: '0.76rem', marginBottom: 3 }}>What the AI read</div>
                         <div
                           style={{
                             color: '#f8f8f2',
