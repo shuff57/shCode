@@ -14,7 +14,7 @@ import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
 import { criteriaScore } from '../../lib/grade-pass';
-import { lessonGradeCategory, lessonPercent } from '../../lib/grading-weights';
+import { CATEGORY_LABEL, GRADE_CATEGORIES, lessonGradeCategory, lessonPercent, type GradeCategory } from '../../lib/grading-weights';
 import { buildGradesCsv } from '../../lib/grades-csv';
 import { FeedbackProvider, useFeedback } from '../../components/FeedbackProvider';
 import { RowMenu } from '../../components/RowMenu';
@@ -231,6 +231,41 @@ interface GridGrade {
   pct: number;
   counted: number;
   missing: number;
+  /** Percent per grade category, from the same studentGrading() call. Only categories with something counted. */
+  cats: Record<string, number>;
+}
+
+/** Header stripe and total-column tint per grade category. None of these is a state colour (green, yellow, red, orange). */
+const CAT_COLOR: Record<GradeCategory, string> = {
+  lab: '#8be9fd',
+  written: '#ff79c6',
+  quiz: '#bd93f9',
+  chapterTest: '#6c9ef8',
+  finalExam: '#e0c3fc',
+  q1: '#d4a373',
+  q2: '#d4a373',
+  q4: '#d4a373',
+};
+const CAT_SHORT: Record<GradeCategory, string> = {
+  lab: 'Labs',
+  written: 'Written',
+  quiz: 'Quizzes',
+  chapterTest: 'Chapter tests',
+  finalExam: 'Final exams',
+  q1: 'Q1 synthesis',
+  q2: 'Q2 synthesis',
+  q4: 'Q4 synthesis',
+};
+
+/** The background behind a lesson cell: the state at a glance, with the number or mark in front of it. */
+function cellTint(cell: GradebookCell | undefined, graded: boolean, pct: number): string | undefined {
+  if (cell?.pending) return 'rgba(255,184,108,0.18)'; // handed in, needs you
+  if (cell?.state === 'completed') return pct >= 70 ? 'rgba(80,250,123,0.11)' : 'rgba(241,250,140,0.10)';
+  if (cell?.state === 'started' || (cell && cell.submitted_score !== null)) {
+    return cell.late && graded ? 'rgba(255,85,85,0.16)' : 'rgba(241,250,140,0.07)';
+  }
+  if (cell?.late && graded) return 'rgba(255,85,85,0.16)'; // missing: past due, not started
+  return undefined;
 }
 
 interface GradebookStudent {
@@ -1066,6 +1101,7 @@ function GradebookView({
         pct: Number.isFinite(p.weightedPercent) ? p.weightedPercent : 0,
         counted: p.gradedCounted ?? 1,
         missing: p.gradedMissing ?? 0,
+        cats: Object.fromEntries((p.categories ?? []).map((c) => [c.category, c.percent])),
       }])));
     }).catch(() => { /* the column just stays empty; the grid still works */ });
     return () => { cancelled = true; };
@@ -1168,7 +1204,10 @@ function GradebookView({
   const stickyBg = '#1e1f29';
   const headerBg = '#282a36';
 
-  const CELL_W = 60;
+  // Wide enough for a horizontal header: a wrapped title, "N pts" and the due date.
+  const CELL_W = 92;
+  // Category total columns, between the grade and the first lesson.
+  const CAT_W = 84;
   const EMAIL_W = narrow ? 110 : 220;
   // Height of the unit header row. The per-lesson row sticks at this offset, so
   // the row has to BE this tall: a unit title that wrapped made it 100px and the
@@ -1205,7 +1244,7 @@ function GradebookView({
       ));
     }
     if (!cell || (!cell.state && cell.submitted_score === null)) {
-      return withLate(cell, <span style={{ color: cell?.late && graded ? '#ff5555' : '#8393c4', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
+      return withLate(cell, <span style={{ color: cell?.late && graded ? '#ff5555' : '#8393c4', fontFamily: 'monospace', fontSize: 14 }}>–</span>);
     }
     if (cell.state === 'completed') {
       // The PERCENT the grade is built from (lessonPercent, the function functions/_shared/grading.ts
@@ -1213,14 +1252,12 @@ function GradebookView({
       // read "0" on a chart lesson that grades 100, and "3" meant 3 of 4 on one lesson and 3 of 10 on
       // the next. The latest attempt's raw points are still in the tooltip (cellTitle).
       const pct = lessonPercent(cell.state, cell.score, maxScore);
-      if (pct < 100) {
-        return withLate(cell, (
-          <span style={{ color: pct >= 70 ? '#50fa7b' : '#f1fa8c', fontFamily: 'monospace', fontWeight: 700, fontSize: 12 }}>
-            {pct}
-          </span>
-        ));
-      }
-      return withLate(cell, <span style={{ color: '#50fa7b', fontFamily: 'monospace', fontSize: 14 }}>✓</span>);
+      // A number for every finished lesson, 100 included: the cell background carries the state.
+      return withLate(cell, (
+        <span style={{ color: pct >= 70 ? '#50fa7b' : '#f1fa8c', fontFamily: 'monospace', fontWeight: 700, fontSize: 12 }}>
+          {pct}
+        </span>
+      ));
     }
     if (cell.state === 'started') {
       // A score can exist while the row is still 'started', and the glyph alone
@@ -1246,7 +1283,7 @@ function GradebookView({
         </span>
       ));
     }
-    return withLate(cell, <span style={{ color: '#8393c4', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
+    return withLate(cell, <span style={{ color: '#8393c4', fontFamily: 'monospace', fontSize: 14 }}>–</span>);
   }
 
   // Plain words for a cell, for the hover tip and for screen readers: what the student has done, the
@@ -1300,6 +1337,14 @@ function GradebookView({
       return byName(a, b);
     });
   const GRADE_W = 84;
+
+  // Which grade category each shown lesson belongs to (null = not graded) and the categories that appear,
+  // in the course's own order. Each category gets a total column; the numbers are the server's
+  // (studentGrading via /progress), never recomputed here.
+  const catOf = new Map(
+    displayLessons.map((l) => [l.id, lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode })] as const),
+  );
+  const shownCats = GRADE_CATEGORIES.filter((c) => displayLessons.some((l) => catOf.get(l.id) === c));
 
   function handleDownloadCsv() {
     const csv = buildGradebookCsv(gbData!.students, displayLessons.map((l) => l.id), gbData!.dueDates);
@@ -1369,16 +1414,24 @@ function GradebookView({
         </button>
       </div>
 
-      {/* Legend: the glyphs and the red underline were never explained anywhere on this page. */}
-      <div style={{ marginBottom: 8, fontSize: 12, color: '#a9b7e0', display: 'flex', flexWrap: 'wrap', gap: '4px 16px' }}>
-        <span><strong style={{ color: '#50fa7b' }}>✓</strong> done</span>
-        <span><strong style={{ color: '#f1fa8c' }}>72</strong> done, percent below 100</span>
-        <span><strong style={{ color: '#f1fa8c' }}>○</strong> started</span>
-        <span><strong style={{ color: '#ffb86c' }}>⋯</strong> handed in, AI grading failed: needs you</span>
-        <span><strong style={{ color: '#8393c4' }}>·</strong> not started</span>
+      {/* Legend: the number is the percent for the lesson; the background is the state. */}
+      <div style={{ marginBottom: 8, fontSize: 12, color: '#a9b7e0', display: 'flex', flexWrap: 'wrap', gap: '4px 16px', alignItems: 'center' }}>
+        {([
+          ['rgba(80,250,123,0.25)', '#50fa7b', '92', 'done, 70% or more'],
+          ['rgba(241,250,140,0.22)', '#f1fa8c', '55', 'done, under 70%'],
+          ['rgba(241,250,140,0.14)', '#f1fa8c', '○', 'started'],
+          ['rgba(255,184,108,0.30)', '#ffb86c', '⋯', 'handed in, AI grading failed: needs you'],
+          ['rgba(255,85,85,0.28)', '#ff5555', '–', 'missing: past due, not started'],
+        ] as const).map(([bg, fg, mark, words]) => (
+          <span key={words} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span aria-hidden="true" style={{ background: bg, color: fg, fontFamily: 'monospace', fontWeight: 700, minWidth: 26, textAlign: 'center', borderRadius: 3, padding: '1px 4px' }}>{mark}</span>
+            {words}
+          </span>
+        ))}
         <span><span style={{ borderBottom: '2px solid #ff5555' }}>red underline</span> a graded lesson past due and not done, or done late (readings and slides are never marked)</span>
+        <span><span style={{ color: '#8393c4' }}>–</span> not started</span>
         <span><strong style={{ color: '#ff5555' }}>(6)</strong> beside a grade: graded lessons past due and not done</span>
-        <span>Hover a cell for details. Click a student&apos;s name to open them.</span>
+        <span>Coloured bar on a header = grade category. Hover a cell for details. Click a student&apos;s name to open them.</span>
       </div>
 
       {/* Scrollable matrix */}
@@ -1400,7 +1453,7 @@ function GradebookView({
           borderRadius: 6,
         }}
       >
-        <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: EMAIL_W + GRADE_W + CELL_W * displayLessons.length }}>
+        <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: EMAIL_W + GRADE_W + CAT_W * shownCats.length + CELL_W * displayLessons.length }}>
           {/* Unit-spanning header row */}
           <thead>
             <tr>
@@ -1431,6 +1484,23 @@ function GradebookView({
               >
                 Grade
               </th>
+              {shownCats.length > 0 && (
+                <th
+                  colSpan={shownCats.length}
+                  style={{
+                    position: 'sticky', top: 0, zIndex: 2,
+                    height: HEAD1_H, boxSizing: 'border-box',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    background: headerBg, padding: '6px 4px',
+                    borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
+                    textAlign: 'center', color: '#8393c4', fontSize: 11, fontWeight: 700,
+                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                  }}
+                  title="Percent per grade category, from the same rule as the grade"
+                >
+                  Category totals
+                </th>
+              )}
               {displaySpans.map(({ unit, count }) => (
                 <th
                   key={unit}
@@ -1469,6 +1539,24 @@ function GradebookView({
                   borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a44',
                 }}
               />
+              {shownCats.map((c) => (
+                <th
+                  key={c}
+                  title={`${CATEGORY_LABEL[c]}: percent across this category's graded lessons`}
+                  style={{
+                    position: 'sticky', top: HEAD1_H, zIndex: 2,
+                    width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W,
+                    height: 104, verticalAlign: 'top', overflow: 'hidden',
+                    background: stickyBg, padding: '8px 4px 6px',
+                    borderTop: `3px solid ${CAT_COLOR[c]}`,
+                    borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a44',
+                    textAlign: 'center', color: CAT_COLOR[c], fontSize: 11, fontWeight: 700,
+                  }}
+                >
+                  {CAT_SHORT[c]}
+                  <div style={{ marginTop: 4, color: '#8393c4', fontSize: 10, fontWeight: 400 }}>total</div>
+                </th>
+              ))}
               {displayLessons.map((lesson) => (
                 <th
                   key={lesson.id}
@@ -1476,15 +1564,15 @@ function GradebookView({
                   style={{
                     position: 'sticky', top: HEAD1_H, zIndex: 2,
                     width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                    // `height` on a <th> is a MINIMUM, not a maximum — the row
-                    // grew to whatever the longest sideways title needed (574px
-                    // measured), pushing every student below the fold. The cap
-                    // that actually binds is maxHeight on the rotated div below.
-                    height: 180, verticalAlign: 'bottom', overflow: 'hidden',
-                    background: stickyBg, padding: '6px 2px',
-                    borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a11',
+                    // `height` on a <th> is a MINIMUM, not a maximum, so the
+                    // title is clamped to three lines below; that clamp is
+                    // what keeps this row one height for every lesson.
+                    height: 104, verticalAlign: 'top', overflow: 'hidden',
+                    background: stickyBg, padding: '8px 4px 6px',
+                    borderTop: `3px solid ${catOf.get(lesson.id) ? CAT_COLOR[catOf.get(lesson.id) as GradeCategory] : '#44475a'}`,
+                    borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a22',
                     textAlign: 'center', color: '#bd93f9', fontSize: 11,
-                    fontWeight: 500,
+                    fontWeight: 600,
                   }}
                 >
                   {/*
@@ -1501,29 +1589,29 @@ function GradebookView({
                     style={{
                       color: 'inherit',
                       textDecoration: 'none',
-                      display: 'block',
-                      writingMode: 'vertical-rl',
-                      transform: 'rotate(180deg)',
-                      whiteSpace: 'nowrap',
-                      lineHeight: 1.1,
-                      margin: '0 auto',
-                      // Sideways text runs along the block's HEIGHT, so height
-                      // is the inline size that text-overflow clips. The full
-                      // title stays reachable via the th's title= tooltip.
-                      maxHeight: 168,
+                      // Three lines, then an ellipsis; the full title stays in
+                      // the th's title= tooltip.
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis',
+                      lineHeight: 1.25,
+                      wordBreak: 'break-word',
                     }}
                   >
                     {lesson.title}
                   </a>
+                  <div style={{ marginTop: 4, color: '#a9b7e0', fontSize: 10, fontWeight: 400, lineHeight: 1.3 }}>
+                    {lesson.maxScore != null && lesson.maxScore > 0 && <div>{lesson.maxScore} pts</div>}
+                    {gbData.dueDates?.[lesson.id] ? <div>{formatDue(gbData.dueDates[lesson.id])}</div> : null}
+                  </div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {visibleStudents.length === 0 && (
-              <tr><td colSpan={displayLessons.length + 2} style={{ padding: 16, color: '#8393c4' }}>No student matches. Clear the search or the filter above.</td></tr>
+              <tr><td colSpan={displayLessons.length + shownCats.length + 2} style={{ padding: 16, color: '#8393c4' }}>No student matches. Clear the search or the filter above.</td></tr>
             )}
             {visibleStudents.map((student, i) => (
               <tr
@@ -1567,6 +1655,25 @@ function GradebookView({
                     </td>
                   );
                 })()}
+                {/* Category totals: the server's per-category percent, a dash where nothing in it counts yet */}
+                {shownCats.map((c) => {
+                  const v = grades.get(student.email)?.cats[c];
+                  return (
+                    <td
+                      key={c}
+                      style={{
+                        width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W, padding: '6px 4px', textAlign: 'center',
+                        borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a22',
+                        fontSize: 12, fontWeight: 700,
+                        background: 'rgba(98,114,164,0.10)',
+                        color: v === undefined ? '#8393c4' : pctColor(v),
+                      }}
+                      title={v === undefined ? `${CATEGORY_LABEL[c]}: nothing counted yet` : `${CATEGORY_LABEL[c]}: ${v}%`}
+                    >
+                      {v === undefined ? '–' : `${v}%`}
+                    </td>
+                  );
+                })}
                 {/* Cell per lesson */}
                 {displayLessons.map((lesson) => {
                   const cell = student.cells[lesson.id];
@@ -1576,9 +1683,10 @@ function GradebookView({
                       key={lesson.id}
                       style={{
                         width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                        padding: '4px 2px',
-                        borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a11',
+                        padding: '6px 2px',
+                        borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a22',
                         textAlign: 'center', verticalAlign: 'middle',
+                        background: cellTint(cell, gradedIds.has(lesson.id), lessonPercent(cell?.state, cell?.score, lesson.maxScore)),
                         ...(isCodingLesson ? { cursor: 'pointer' } : {}),
                       }}
                       title={cellTitle(cell, lesson.title, lesson.id, lesson.maxScore)}
