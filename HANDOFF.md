@@ -2,7 +2,7 @@
 
 Four phases shipped to shcode.pages.dev tonight (deployment `5f50e210` = commit `e7777a3a`) and were
 checked on the live site signed in as a throwaway teacher. Everything is committed on the local branch
-`gradebook-ux`, **12 commits ahead of `origin/cs-3d`, not pushed** (a push also triggers Cloudflare's own git
+`gradebook-ux` (now also the local `cs-3d`), **12 commits ahead of the `origin/cs-3d` they were built on, and not pushed; origin has since gained 3 reshape commits (see item 3)** (a push also triggers Cloudflare's own git
 build, which fails on the missing kernel wasm. Noise only, the wrangler-deployed site is unaffected.).
 Working tree is clean except `functions/_shared/module-docs.generated.ts`, which the build regenerates and
 which was deliberately never committed. All test data on prod was deleted (classes 26/31/1 students untouched).
@@ -19,7 +19,13 @@ which was deliberately never committed. All test data on prod was deleted (class
    `cd ~/Documents/GitHub/shCode-r7 && git checkout --detach gradebook-ux && TRIES_STAMP_ALLOW_OLD=1 npm run deploy`
    (that worktree holds the git-ignored `pa-pseudocode/`, kernel wasm, models and node_modules symlinks; its
    `*.generated.ts` files show as dirty after a build, which is normal). Never move the stamp itself.
-3. **Decide whether to push** `gradebook-ux` (a push to `cs-3d` is fast-forward, no force needed).
+3. **Decide whether to push, and integrate `origin/cs-3d` first.** As of 2026-10-05 the 12 commits are merged into the
+   local `cs-3d` (fast-forward from `gradebook-ux`), but GitHub's `cs-3d` has gained **3 commits that are not here**:
+   `230d37b4`, `9bbea64a`, `285f71d1`, all `chore(reshape): re-vendor reshape-cad` (104 vendored files under the
+   reshape-cad tree). They touch **no file** these 12 commits touch, so integrating is clean, but a plain push will be
+   refused until you do. Last time the choice was a rebase onto `origin/cs-3d` (mind the untracked `pa-pseudocode/`
+   vs its tracked README collision: move it aside, `cp -an` back); a merge commit would keep the hashes quoted in
+   this section (`e7777a3a` is what is live). The live site was deployed from `gradebook-ux` WITHOUT those 3 commits.
 
 ## What shipped
 
