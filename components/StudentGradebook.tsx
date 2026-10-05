@@ -14,7 +14,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight, MessageSquare } from 'lucide-react';
 import { formatDue } from '../lib/due-dates-core';
 import { sortLessons } from '../lib/lesson-order';
-import { lessonPercent } from '../lib/grading-weights';
+import { lessonGradeCategory, lessonPercent, type GradeCategory } from '../lib/grading-weights';
 // Status derivation is shared with the endpoint that builds these cells, so
 // the page and the teacher's gradebook can never disagree about whether a
 // student is behind. See lib/gradebook-cell.ts.
@@ -32,13 +32,40 @@ interface ManifestLesson {
   type?: string;
   /** Quiz questions, rubric points, or pass/fail criteria; null = completion is the grade. */
   maxScore?: number | null;
+  /** Grade-category inputs (lib/grading-weights.ts lessonGradeCategory), all on the manifest row. */
+  preview?: string | null;
+  assignmentCode?: string | null;
+  scoreKind?: 'quiz' | 'written' | null;
 }
 
 interface Props {
   lessons: ManifestLesson[];
 }
 
-type Filter = 'all' | 'attention';
+/** One class's grade so far, from /api/my-gradebook (functions/_shared/grading.ts studentGrading). */
+interface ClassGrade {
+  classId: string;
+  className: string;
+  percent: number;
+  gradedTotal: number;
+  doneCount: number;
+  counted: number;
+  missingCount: number;
+}
+
+type Filter = 'all' | 'attention' | 'progress';
+
+/** Short names for the chip beside each assignment: which part of the grade it counts toward. */
+const CATEGORY_SHORT: Record<GradeCategory, string> = {
+  lab: 'Lab',
+  written: 'Written',
+  quiz: 'Quiz',
+  chapterTest: 'Chapter test',
+  finalExam: 'Final exam',
+  q1: 'Q1 project',
+  q2: 'Q2 project',
+  q4: 'Q4 project',
+};
 
 const STATUS_LABEL: Record<CellStatus, string> = {
   pending: 'Awaiting teacher',
@@ -86,6 +113,7 @@ function scoreText(cell: GradebookCell, maxScore: number | null | undefined): st
 export default function StudentGradebook({ lessons }: Props) {
   const [cells, setCells] = useState<Record<string, GradebookCell> | null>(null);
   const [dueDates, setDueDates] = useState<Record<string, number>>({});
+  const [grades, setGrades] = useState<ClassGrade[]>([]);
   const [failed, setFailed] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -97,10 +125,11 @@ export default function StudentGradebook({ lessons }: Props) {
         if (!r.ok) throw new Error(`my-gradebook ${r.status}`);
         return r.json();
       })
-      .then((d: { cells?: Record<string, GradebookCell>; dueDates?: Record<string, number> }) => {
+      .then((d: { cells?: Record<string, GradebookCell>; dueDates?: Record<string, number>; grades?: ClassGrade[] }) => {
         if (cancelled) return;
         setCells(d.cells ?? {});
         setDueDates(d.dueDates ?? {});
+        setGrades((d.grades ?? []).filter((g) => g.counted > 0));
       })
       .catch(() => {
         if (!cancelled) setFailed(true);
@@ -139,12 +168,57 @@ export default function StudentGradebook({ lessons }: Props) {
     .map((l) => {
       const cell = cells[l.id];
       return { lesson: l, cell, status: cellStatus(cell) };
+    })
+    // A reading, slide deck or example has a due date through its module but no grade, so one the
+    // student never opened is not "Missing": it is not an assignment. Ones they did open still show.
+    .filter(({ lesson, status }) => {
+      if (status !== 'missing' && status !== 'not-started') return true;
+      return lessonGradeCategory({ title: lesson.title, preview: lesson.preview, scoreKind: lesson.scoreKind, assignmentCode: lesson.assignmentCode }) !== null;
     });
 
-  const attentionCount = rows.filter((r) => needsAttention(r.status)).length;
-  const shown = filter === 'attention' ? rows.filter((r) => needsAttention(r.status)) : rows;
+  // "Missing or late" is what a student can still act on or should know about; "In progress" is
+  // work they have started and not finished. They used to be one "Needs attention" list, which told
+  // a student halfway through a lesson that something was wrong.
+  const isMissingOrLate = (st: CellStatus) => st !== 'started' && needsAttention(st);
+  const attentionCount = rows.filter((r) => isMissingOrLate(r.status)).length;
+  const progressCount = rows.filter((r) => r.status === 'started').length;
+  const shown =
+    filter === 'attention'
+      ? rows.filter((r) => isMissingOrLate(r.status))
+      : filter === 'progress'
+        ? rows.filter((r) => r.status === 'started')
+        : rows;
 
   return (
+    <>
+    {grades.length > 0 && (
+      <div style={cardStyle}>
+        <h3 style={{ margin: '0 0 10px 0' }}>Your grade so far</h3>
+        {grades.map((g) => (
+          <div key={g.classId} style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 28, fontWeight: 700 }}>{g.percent}%</span>
+              <span style={{ opacity: 0.7 }}>{grades.length > 1 ? g.className : 'in your class'}</span>
+            </div>
+            <div style={{ opacity: 0.6, fontSize: 13, marginTop: 2 }}>
+              Counts work that is done plus work past its due date. Lessons not due yet are left out.
+              {' '}{g.doneCount} of {g.gradedTotal} graded lessons done
+              {g.missingCount > 0 ? ` \u00b7 ${g.missingCount} past due and not done` : ''}.
+            </div>
+          </div>
+        ))}
+        <details style={{ marginTop: 6 }}>
+          <summary style={{ cursor: 'pointer', fontSize: 13 }}>How your grade works</summary>
+          <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, listStyle: 'disc', fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>
+            <li>Each graded assignment counts toward a part of your grade (Lab, Written, Quiz, Chapter test). The chip beside each assignment below says which part.</li>
+            <li>Where an assignment allows several tries, your best try is the one that counts, not the latest.</li>
+            <li>An assignment past its due date that is not done counts as 0 until you finish it. Turning it in later replaces the 0.</li>
+            <li>An assignment that is not due yet does not count against you.</li>
+            <li>Handing something in late is marked &ldquo;Completed late&rdquo; so your teacher can see it. It does not lower the percent shown here.</li>
+          </ul>
+        </details>
+      </div>
+    )}
     <div style={cardStyle}>
       <div style={toolbarStyle}>
         {/* marginRight:auto, not flex:1 — flex:1 lets the heading shrink to
@@ -159,7 +233,14 @@ export default function StudentGradebook({ lessons }: Props) {
           onClick={() => setFilter('attention')}
           style={filter === 'attention' ? tabActive : tabIdle}
         >
-          Needs attention ({attentionCount})
+          Missing or late ({attentionCount})
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilter('progress')}
+          style={filter === 'progress' ? tabActive : tabIdle}
+        >
+          In progress ({progressCount})
         </button>
       </div>
 
@@ -168,7 +249,11 @@ export default function StudentGradebook({ lessons }: Props) {
           Nothing here yet. An assignment shows up once you start it, or once its due date passes.
         </p>
       ) : shown.length === 0 ? (
-        <p style={mutedStyle}>Nothing needs your attention — everything is done and on time.</p>
+        <p style={mutedStyle}>
+          {filter === 'progress'
+            ? 'Nothing is half-finished right now.'
+            : 'Nothing is missing or late. Everything past its due date is done.'}
+        </p>
       ) : (
         <div style={scrollWrapStyle}>
           <table style={tableStyle}>
@@ -184,6 +269,12 @@ export default function StudentGradebook({ lessons }: Props) {
               {shown.map(({ lesson, cell, status }) => {
                 const due = dueDates[lesson.id];
                 const score = scoreText(cell, lesson.maxScore);
+                const category = lessonGradeCategory({
+                  title: lesson.title,
+                  preview: lesson.preview,
+                  scoreKind: lesson.scoreKind,
+                  assignmentCode: lesson.assignmentCode,
+                });
                 const hasFeedback = !!cell.teacherFeedback;
                 const open = hasFeedback && !!expanded[lesson.id];
                 return (
@@ -203,6 +294,14 @@ export default function StudentGradebook({ lessons }: Props) {
                           </button>
                         ) : (
                           <span style={{ fontWeight: 500 }}>{lesson.title}</span>
+                        )}
+                        {category && (
+                          <span
+                            style={chipStyle}
+                            title={`Counts toward the ${CATEGORY_SHORT[category].toLowerCase()} part of your grade`}
+                          >
+                            {CATEGORY_SHORT[category]}
+                          </span>
                         )}
                       </td>
                       <td style={{ ...tdStyle, opacity: 0.65 }}>
@@ -245,6 +344,7 @@ export default function StudentGradebook({ lessons }: Props) {
         do not need to submit it again.
       </p>
     </div>
+    </>
   );
 }
 
@@ -354,6 +454,16 @@ const feedbackHeadStyle: React.CSSProperties = {
   fontSize: 12,
   opacity: 0.7,
   marginBottom: 6,
+};
+
+const chipStyle: React.CSSProperties = {
+  marginLeft: 8,
+  padding: '1px 7px',
+  borderRadius: 10,
+  border: '1px solid #6272a4',
+  color: '#a9b7e0',
+  fontSize: 11,
+  whiteSpace: 'nowrap',
 };
 
 const legendStyle: React.CSSProperties = {

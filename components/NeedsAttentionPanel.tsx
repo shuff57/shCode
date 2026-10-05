@@ -183,7 +183,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenStudent(item.student_email);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenStudent(item.student_email); }
                   }}
                 >
                   {item.student_email}
@@ -195,7 +195,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenTeacherEdit(item.student_email, item.lesson_id);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenTeacherEdit(item.student_email, item.lesson_id); }
                   }}
                 >
                   {item.lesson_id}
@@ -225,7 +225,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenStudent(item.student_email);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenStudent(item.student_email); }
                   }}
                 >
                   {item.student_email}
@@ -255,7 +255,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenStudent(item.student_email);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenStudent(item.student_email); }
                   }}
                 >
                   {item.student_email}
@@ -269,7 +269,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenTeacherEdit(item.student_email, item.lesson_id);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenTeacherEdit(item.student_email, item.lesson_id); }
                   }}
                 >
                   {item.lesson_id}
@@ -299,7 +299,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenStudent(item.student_email);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenStudent(item.student_email); }
                   }}
                 >
                   {item.student_email}
@@ -313,7 +313,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenTeacherEdit(item.student_email, item.lesson_id);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenTeacherEdit(item.student_email, item.lesson_id); }
                   }}
                 >
                   {item.lesson_id}

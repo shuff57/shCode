@@ -260,7 +260,7 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
         const modRow = rowOf('module', moduleId);
         const modLook = stateLook(modRow ? modRow.releaseAt : null, data.now);
         const lessonRows = parts.filter((p) => hasRow('lesson', p.lessonId));
-        // "Take back" or a whole-test release also drops every part override, so the test reads as one state.
+        // "Hold back" or a whole-test release also drops every part override, so the test reads as one state.
         const dropOverrides: Entry[] = lessonRows.map((p) => ({ scope: 'lesson', scopeId: p.lessonId, date: null }));
         const isOpen = open.has(moduleId);
         const allStates = parts.map((p) => resolveReleaseAt(rows, { lessonId: p.lessonId, moduleId, unitId: null }));
@@ -302,9 +302,9 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
                 disabled={saving || (!modRow && lessonRows.length === 0)}
                 style={btn(C.held, saving || (!modRow && lessonRows.length === 0))}
                 onClick={() => void write([{ scope: 'module', scopeId: moduleId, date: null }, ...dropOverrides])}
-                title="Closes every part of this test again"
+                title="Hides the solutions again for every part of this test, even for students who used all their tries"
               >
-                Take all back
+                Hold back all parts
               </button>
             </div>
 
@@ -315,7 +315,7 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
                   const at = resolveReleaseAt(rows, { lessonId: p.lessonId, moduleId, unitId: null });
                   const look = stateLook(at, data.now);
                   const inherited = !own && at !== null;
-                  // Take back: delete the part's own row when nothing above it would reopen it; otherwise hold it back.
+                  // Hold back: delete the part's own row when nothing above it would reopen it; otherwise hold it back.
                   const moduleRowReleases = !!modRow && !isHeldBack(modRow.releaseAt);
                   const takeBack = (): Entry =>
                     moduleRowReleases
@@ -352,8 +352,9 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
                           disabled={saving || at === null || isHeldBack(at)}
                           style={btn(C.held, saving || at === null || isHeldBack(at))}
                           onClick={() => void write([takeBack()])}
+                          title="Hides this part's solution again, even for students who used all their tries"
                         >
-                          Take back
+                          Hold back
                         </button>
                       </div>
                     </div>

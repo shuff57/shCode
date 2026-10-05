@@ -76,14 +76,6 @@ export default function ProgressPage() {
   // is lessonPercent() over the manifest's maxScore, the function the synced grade is built from;
   // printing the raw score with a "%" read "Completed 3%" for a quiz scored 3 of 8.
   const pctFor = (l: ManifestLesson) => lessonPercent(progress.states[l.id], progress.scores[l.id], l.maxScore);
-  // Average over completed lessons that are actually scored (have points or a stored score).
-  const scoredLessons = manifest.lessons.filter(
-    (l) => progress.states[l.id] === 'completed' && (l.maxScore != null || progress.scores[l.id] !== undefined),
-  );
-  const avgScore = scoredLessons.length > 0
-    ? Math.round(scoredLessons.reduce((sum, l) => sum + pctFor(l), 0) / scoredLessons.length)
-    : null;
-
   // Both lists below slice a SEQUENCE, so they need course order, not the
   // manifest's folder-id order — which reads 1.1.19, 1.1.2, 1.1.20 and made
   // "Up Next" name lessons the Next button would not go to. See
@@ -139,11 +131,6 @@ export default function ProgressPage() {
         <p style={{ opacity: 0.5, fontSize: 13, marginTop: 8 }}>
           {completionPct}% complete
         </p>
-        {avgScore !== null && (
-          <p style={{ margin: '12px 0 0 0', fontSize: 15 }}>
-            Average score: <strong>{avgScore}%</strong>
-          </p>
-        )}
       </div>
 
       {/* Per-assignment gradebook — the student's own row of the same matrix

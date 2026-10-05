@@ -1,7 +1,7 @@
 'use client';
 
 import LessonModeControl from '../../components/LessonModeControl';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { NeedsAttentionPanel } from '../../components/NeedsAttentionPanel';
 import { BulkEnrollmentForm } from '../../components/BulkEnrollmentForm';
@@ -14,7 +14,7 @@ import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
 import { criteriaScore } from '../../lib/grade-pass';
-import { lessonPercent } from '../../lib/grading-weights';
+import { lessonGradeCategory, lessonPercent } from '../../lib/grading-weights';
 import { toMermaid } from '../../lib/diagram-mermaid';
 
 // ---------------------------------------------------------------------------
@@ -59,8 +59,13 @@ interface StudentProgress {
   started_count: number;
   last_active: number | null;
   total_score: number;
-  /** 0-100 grade-weighted percent under this class's weights. */
+  /** 0-100 grade-so-far under this class's weights and due dates (work done plus work past due). */
   weightedPercent: number;
+  /** Graded lessons in the course, how many this student finished, and how many are past due and not done. */
+  gradedTotal?: number;
+  gradedDone?: number;
+  gradedMissing?: number;
+  gradedCounted?: number;
 }
 
 interface LessonStateEntry {
@@ -89,6 +94,10 @@ interface StudentDetail {
   /** Absent when the class page's endpoint could not load the manifest. */
   grading?: {
     percent: number;
+    gradedTotal?: number;
+    doneCount?: number;
+    counted?: number;
+    missingCount?: number;
     categories: Array<{ category: string; label: string; weight: number; percent: number; done: number; total: number }>;
   };
 }
@@ -164,6 +173,9 @@ interface LessonMeta {
   maxSubmissions?: number | null;
   /** Quiz questions, rubric points, or pass/fail criteria; null = completion is the grade. */
   maxScore?: number | null;
+  /** Grade-category inputs (lib/grading-weights.ts lessonGradeCategory): which lessons are graded at all. */
+  assignmentCode?: string | null;
+  scoreKind?: 'quiz' | 'written' | null;
 }
 
 /**
@@ -203,6 +215,13 @@ interface GradebookCell {
   late?: boolean;
   /** Handed in, but the AI grader failed on it — no score exists yet. */
   pending?: boolean;
+}
+
+/** One student's grade so far in this class, from /api/classes/[id]/progress. */
+interface GridGrade {
+  pct: number;
+  counted: number;
+  missing: number;
 }
 
 interface GradebookStudent {
@@ -487,6 +506,20 @@ function StudentDrawer({
 }) {
   const [detail, setDetail] = useState<StudentDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  // Escape closes the drawer; focus starts on Close and goes back to wherever it was when it shuts.
+  useEffect(() => {
+    const before = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onCloseRef.current(); };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      before?.focus?.();
+    };
+  }, []);
   const [err, setErr] = useState('');
   const [expandedSubs, setExpandedSubs] = useState<Set<string>>(new Set());
   // Bumped after an unsubmit to re-run the fetch below; `unsubmitting` is the
@@ -604,7 +637,7 @@ function StudentDrawer({
     top: 0,
     right: 0,
     bottom: 0,
-    width: 600,
+    width: 'min(600px, 100vw)',
     background: '#1e1f29',
     borderLeft: '1px solid #44475a',
     overflowY: 'auto',
@@ -658,8 +691,14 @@ function StudentDrawer({
       {/* Backdrop */}
       <div style={overlayStyle} onClick={onClose} />
 
-      {/* Panel */}
-      <div style={drawerStyle}>
+      {/* Panel. A real dialog: Escape closes it, focus lands on Close, and assistive tech is told it
+          is modal. It used to be a bare div that only the backdrop could dismiss. */}
+      <div
+        style={drawerStyle}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Student progress: ${fullName(detail?.firstName, detail?.lastName) || email}`}
+      >
         {/* Header */}
         <div style={{ padding: '20px 24px', borderBottom: '1px solid #44475a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div>
@@ -677,6 +716,7 @@ function StudentDrawer({
             style={{ background: 'none', border: 'none', color: '#6272a4', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: '4px 8px' }}
             onClick={onClose}
             aria-label="Close"
+            ref={closeRef}
           >
             ×
           </button>
@@ -691,8 +731,14 @@ function StudentDrawer({
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                 <MiniBar pct={detail.grading.percent} />
                 <span style={{ fontSize: 14, fontWeight: 700, color: pctColor(detail.grading.percent) }}>
-                  {detail.grading.percent}% of grade
+                  {detail.grading.percent}% so far
                 </span>
+                {typeof detail.grading.gradedTotal === 'number' && detail.grading.gradedTotal > 0 && (
+                  <span style={{ fontSize: 12, color: '#6272a4' }}>
+                    {detail.grading.doneCount ?? 0} of {detail.grading.gradedTotal} graded lessons done
+                    {(detail.grading.missingCount ?? 0) > 0 ? ` · ${detail.grading.missingCount} past due` : ''}
+                  </span>
+                )}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {detail.grading.categories.map((c) => (
@@ -929,6 +975,25 @@ function GradebookView({
   const [gbData, setGbData] = useState<GradebookData | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
+  // Find-a-student controls. All of them only narrow or reorder what is drawn; the CSV still has everyone.
+  const [query, setQuery] = useState('');
+  const [problemsOnly, setProblemsOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<'name' | 'grade' | 'missing'>('name');
+  const [grades, setGrades] = useState<Map<string, GridGrade>>(new Map());
+
+  // The grade so far beside each name: the same number the roster shows (one endpoint, one rule).
+  useEffect(() => {
+    let cancelled = false;
+    apiFetch<{ students: StudentProgress[] }>(`/api/classes/${classId}/progress`).then((res) => {
+      if (cancelled || res.error !== null) return;
+      setGrades(new Map(res.data.students.map((p) => [p.student_email, {
+        pct: Number.isFinite(p.weightedPercent) ? p.weightedPercent : 0,
+        counted: p.gradedCounted ?? 1,
+        missing: p.gradedMissing ?? 0,
+      }])));
+    }).catch(() => { /* the column just stays empty; the grid still works */ });
+    return () => { cancelled = true; };
+  }, [classId]);
 
   useEffect(() => {
     setLoading(true);
@@ -1010,8 +1075,8 @@ function GradebookView({
 
   // Late cells keep their normal glyph and gain a red underline, so scanning
   // the matrix for red still works without a second symbol to learn.
-  function withLate(cell: GradebookCell | undefined, node: React.ReactNode): React.ReactNode {
-    if (!cell?.late) return node;
+  function withLateBase(cell: GradebookCell | undefined, node: React.ReactNode, graded: boolean): React.ReactNode {
+    if (!cell?.late || !graded) return node;
     return (
       <span style={{ borderBottom: '2px solid #ff5555', paddingBottom: 1, display: 'inline-block' }}>
         {node}
@@ -1019,7 +1084,8 @@ function GradebookView({
     );
   }
 
-  function cellContent(cell: GradebookCell | undefined, maxScore?: number | null): React.ReactNode {
+  function cellContent(cell: GradebookCell | undefined, maxScore?: number | null, graded = true): React.ReactNode {
+    const withLate = (c: GradebookCell | undefined, node: React.ReactNode) => withLateBase(c, node, graded);
     // Checked before every other branch. A grader outage leaves the row
     // completed with a NULL score, which reads as a plain green tick, and it
     // leaves submitted_score NULL, which reads as the same "·" a student who
@@ -1035,7 +1101,7 @@ function GradebookView({
       ));
     }
     if (!cell || (!cell.state && cell.submitted_score === null)) {
-      return withLate(cell, <span style={{ color: cell?.late ? '#ff5555' : '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
+      return withLate(cell, <span style={{ color: cell?.late && graded ? '#ff5555' : '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
     }
     if (cell.state === 'completed') {
       // The PERCENT the grade is built from (lessonPercent, the function functions/_shared/grading.ts
@@ -1079,22 +1145,57 @@ function GradebookView({
     return withLate(cell, <span style={{ color: '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
   }
 
-  function cellTitle(cell: GradebookCell | undefined, lessonTitle: string, lessonId?: string): string {
-    const dueAt = lessonId ? gbData?.dueDates?.[lessonId] : undefined;
-    if (!cell) return dueAt ? `${lessonTitle} | due ${formatDue(dueAt)}` : lessonTitle;
-    const parts: string[] = [lessonTitle];
-    // First, because it is the only thing in the tooltip that asks the teacher
-    // to do something. There is no legend above the matrix, so "⋯" has to
-    // explain itself here.
-    if (cell.pending) parts.push('AI grading failed - needs a manual grade (see the review queue)');
-    if (cell.state) parts.push(`state: ${cell.state}`);
-    if (cell.score !== null) parts.push(`score: ${cell.score}`);
-    if (cell.submitted_score !== null) parts.push(`sub score: ${cell.submitted_score}`);
-    if (cell.possible !== null) parts.push(`possible: ${cell.possible}`);
-    if (dueAt) parts.push(`due ${formatDue(dueAt)}`);
-    if (cell.late) parts.push('LATE');
-    return parts.join(' | ');
+  // Plain words for a cell, for the hover tip and for screen readers: what the student has done, the
+  // best score, and whether it is late. (This used to print "state: completed | sub score: 4".)
+  function cellWords(cell: GradebookCell | undefined, maxScore?: number | null): string {
+    if (!cell) return 'Not started';
+    if (cell.pending) return 'Awaiting a grade: the AI grader failed, see the review queue';
+    if (cell.state === 'completed') {
+      const pct = lessonPercent(cell.state, cell.score, maxScore);
+      const pts = cell.score !== null && maxScore != null && maxScore > 0 ? `, best ${Math.round(cell.score * 100) / 100} of ${maxScore} points` : '';
+      return `${cell.late ? 'Completed late' : 'Done'}, ${pct}%${pts}`;
+    }
+    if (cell.state === 'started') {
+      const partial = cell.score ?? cell.submitted_score;
+      return `In progress${partial !== null ? `, ${partial} points so far` : ''}${cell.late ? ', past due' : ''}`;
+    }
+    if (cell.submitted_score !== null) return `Handed in, ${cell.submitted_score} points`;
+    return cell.late ? 'Missing: past due, not started' : 'Not started';
   }
+
+  function cellTitle(cell: GradebookCell | undefined, lessonTitle: string, lessonId?: string, maxScore?: number | null): string {
+    const dueAt = lessonId ? gbData?.dueDates?.[lessonId] : undefined;
+    const lines = [lessonTitle, cellWords(cell, maxScore)];
+    if (cell && cell.possible !== null && cell.possible > 0 && cell.submitted_score !== null) {
+      lines.push(`Latest try: ${cell.submitted_score} of ${cell.possible}`);
+    }
+    if (dueAt) lines.push(`Due ${formatDue(dueAt)}`);
+    return lines.join('\n');
+  }
+
+  // Students shown: filtered by the search box and the "problems only" switch, then ordered.
+  // A reading or a slide deck has a due date through its module but is not graded, so only graded lessons
+  // count as a problem here, the same set the grade's "past due" number counts.
+  const gradedIds = new Set(
+    displayLessons.filter((l) => lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null).map((l) => l.id),
+  );
+  const isProblem = (st: GradebookStudent) =>
+    Object.entries(st.cells).some(([id, c]) => gradedIds.has(id) && (c.pending || (c.late && c.state !== 'completed')));
+  const q = query.trim().toLowerCase();
+  const hasName = (st: GradebookStudent) => !!(st.lastName || st.firstName);
+  // Named students first, by last name; accounts with no name set go last, by email.
+  const byName = (a: GradebookStudent, b: GradebookStudent) =>
+    Number(!hasName(a)) - Number(!hasName(b)) ||
+    (hasName(a) ? `${a.lastName ?? ''} ${a.firstName ?? ''}` : a.email).localeCompare(hasName(b) ? `${b.lastName ?? ''} ${b.firstName ?? ''}` : b.email);
+  const visibleStudents = gbData.students
+    .filter((st) => (q === '' ? true : `${st.firstName ?? ''} ${st.lastName ?? ''} ${st.email}`.toLowerCase().includes(q)))
+    .filter((st) => !problemsOnly || isProblem(st))
+    .sort((a, b) => {
+      if (sortBy === 'grade') return (grades.get(a.email)?.pct ?? 101) - (grades.get(b.email)?.pct ?? 101) || byName(a, b);
+      if (sortBy === 'missing') return (grades.get(b.email)?.missing ?? 0) - (grades.get(a.email)?.missing ?? 0) || byName(a, b);
+      return byName(a, b);
+    });
+  const GRADE_W = 84;
 
   function handleDownloadCsv() {
     const csv = buildGradebookCsv(gbData!.students, displayLessons.map((l) => l.id), gbData!.dueDates);
@@ -1115,8 +1216,33 @@ function GradebookView({
           Download as CSV
         </button>
         <span style={{ fontSize: 12, color: '#6272a4' }}>
-          {gbData.students.length} student{gbData.students.length !== 1 ? 's' : ''} · {displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
+          {visibleStudents.length === gbData.students.length
+            ? `${gbData.students.length} student${gbData.students.length !== 1 ? 's' : ''}`
+            : `${visibleStudents.length} of ${gbData.students.length} students`}
+          {' · '}{displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
         </span>
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Find a student"
+          aria-label="Find a student by name or email"
+          style={{ background: '#1e1f29', color: '#f8f8f2', border: '1px solid #44475a', borderRadius: 4, padding: '4px 8px', fontSize: 12, width: 160 }}
+        />
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as 'name' | 'grade' | 'missing')}
+          aria-label="Order students by"
+          style={{ background: '#1e1f29', color: '#f8f8f2', border: '1px solid #44475a', borderRadius: 4, padding: '4px 6px', fontSize: 12 }}
+        >
+          <option value="name">Order: name</option>
+          <option value="grade">Order: lowest grade first</option>
+          <option value="missing">Order: most past due first</option>
+        </select>
+        <label style={{ fontSize: 12, color: '#f8f8f2', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+          <input type="checkbox" checked={problemsOnly} onChange={(e) => setProblemsOnly(e.target.checked)} />
+          Only students with missing or ungraded work
+        </label>
         {/* marginLeft:auto parks it on the right edge of the toolbar, above the
             matrix's own right edge, whatever the counts above widen to. */}
         <button
@@ -1133,6 +1259,18 @@ function GradebookView({
         >
           {fullScreen ? '✕ Exit full screen' : '⛶ Full screen'}
         </button>
+      </div>
+
+      {/* Legend: the glyphs and the red underline were never explained anywhere on this page. */}
+      <div style={{ marginBottom: 8, fontSize: 12, color: '#a9b7e0', display: 'flex', flexWrap: 'wrap', gap: '4px 16px' }}>
+        <span><strong style={{ color: '#50fa7b' }}>✓</strong> done</span>
+        <span><strong style={{ color: '#f1fa8c' }}>72</strong> done, percent below 100</span>
+        <span><strong style={{ color: '#f1fa8c' }}>○</strong> started</span>
+        <span><strong style={{ color: '#ffb86c' }}>⋯</strong> handed in, AI grading failed: needs you</span>
+        <span><strong style={{ color: '#6272a4' }}>·</strong> not started</span>
+        <span><span style={{ borderBottom: '2px solid #ff5555' }}>red underline</span> a graded lesson past due and not done, or done late (readings and slides are never marked)</span>
+        <span><strong style={{ color: '#ff5555' }}>(6)</strong> beside a grade: graded lessons past due and not done</span>
+        <span>Hover a cell for details. Click a student&apos;s name to open them.</span>
       </div>
 
       {/* Scrollable matrix */}
@@ -1154,7 +1292,7 @@ function GradebookView({
           borderRadius: 6,
         }}
       >
-        <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: EMAIL_W + CELL_W * displayLessons.length }}>
+        <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: EMAIL_W + GRADE_W + CELL_W * displayLessons.length }}>
           {/* Unit-spanning header row */}
           <thead>
             <tr>
@@ -1169,6 +1307,19 @@ function GradebookView({
                 }}
               >
                 Student
+              </th>
+              <th
+                style={{
+                  position: 'sticky', left: EMAIL_W, top: 0, zIndex: 3,
+                  width: GRADE_W, minWidth: GRADE_W,
+                  background: headerBg, padding: '6px 6px',
+                  borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
+                  textAlign: 'center', color: '#6272a4', fontSize: 11, fontWeight: 700,
+                  textTransform: 'uppercase', letterSpacing: '0.06em',
+                }}
+                title="Grade so far: work done plus work past its due date, under this class's weights. Lessons not due yet are left out."
+              >
+                Grade
               </th>
               {displaySpans.map(({ unit, count }) => (
                 <th
@@ -1194,6 +1345,14 @@ function GradebookView({
                   position: 'sticky', left: 0, top: 33, zIndex: 3,
                   width: EMAIL_W, minWidth: EMAIL_W,
                   background: stickyBg, padding: '4px 10px',
+                  borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a44',
+                }}
+              />
+              <th
+                style={{
+                  position: 'sticky', left: EMAIL_W, top: 33, zIndex: 3,
+                  width: GRADE_W, minWidth: GRADE_W,
+                  background: stickyBg, padding: '4px 6px',
                   borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a44',
                 }}
               />
@@ -1250,7 +1409,10 @@ function GradebookView({
             </tr>
           </thead>
           <tbody>
-            {gbData.students.map((student, i) => (
+            {visibleStudents.length === 0 && (
+              <tr><td colSpan={displayLessons.length + 2} style={{ padding: 16, color: '#6272a4' }}>No student matches. Clear the search or the filter above.</td></tr>
+            )}
+            {visibleStudents.map((student, i) => (
               <tr
                 key={student.email}
                 style={{ background: i % 2 === 0 ? '#1e1f29' : '#252636' }}
@@ -1272,6 +1434,26 @@ function GradebookView({
                 >
                   {fullName(student.firstName, student.lastName) || student.email}
                 </td>
+                {/* Grade so far */}
+                {(() => {
+                  const g = grades.get(student.email);
+                  const bg = i % 2 === 0 ? '#1e1f29' : '#252636';
+                  return (
+                    <td
+                      style={{
+                        position: 'sticky', left: EMAIL_W, zIndex: 1, background: bg,
+                        width: GRADE_W, minWidth: GRADE_W, padding: '6px 6px', textAlign: 'center',
+                        borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a44',
+                        fontSize: 12, fontWeight: 700,
+                        color: !g || g.counted === 0 ? '#6272a4' : pctColor(g.pct),
+                      }}
+                      title={g ? (g.counted === 0 ? 'Nothing is due yet and nothing is done' : `Grade so far ${g.pct}%${g.missing > 0 ? `, ${g.missing} past due and not done` : ''}`) : 'Loading'}
+                    >
+                      {g ? (g.counted === 0 ? '—' : `${g.pct}%`) : '…'}
+                      {g && g.missing > 0 && <span style={{ color: '#ff5555', fontWeight: 400, marginLeft: 4 }}>({g.missing})</span>}
+                    </td>
+                  );
+                })()}
                 {/* Cell per lesson */}
                 {displayLessons.map((lesson) => {
                   const cell = student.cells[lesson.id];
@@ -1286,12 +1468,17 @@ function GradebookView({
                         textAlign: 'center', verticalAlign: 'middle',
                         ...(isCodingLesson ? { cursor: 'pointer' } : {}),
                       }}
-                      title={cellTitle(cell, lesson.title, lesson.id)}
+                      title={cellTitle(cell, lesson.title, lesson.id, lesson.maxScore)}
+                      aria-label={`${fullName(student.firstName, student.lastName) || student.email}, ${lesson.title}: ${cellWords(cell, lesson.maxScore)}`}
+                      tabIndex={isCodingLesson ? 0 : undefined}
+                      onKeyDown={isCodingLesson ? (e) => {
+                        if (e.key === 'Enter') router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(student.email)}&lesson=${encodeURIComponent(lesson.id)}`);
+                      } : undefined}
                       onClick={isCodingLesson ? () => {
                         router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(student.email)}&lesson=${encodeURIComponent(lesson.id)}`);
                       } : undefined}
                     >
-                      {cellContent(cell, lesson.maxScore)}
+                      {cellContent(cell, lesson.maxScore, gradedIds.has(lesson.id))}
                     </td>
                   );
                 })}
@@ -1451,6 +1638,7 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
   const [currentCode, setCurrentCode] = useState('');
   const [archiving, setArchiving] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
+  const [actionError, setActionError] = useState('');
   const [enrollEmail, setEnrollEmail] = useState('');
   const [enrolling, setEnrolling] = useState(false);
   const [enrollError, setEnrollError] = useState('');
@@ -1523,7 +1711,8 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
       { method: 'POST' },
     );
     setRegenerating(false);
-    if (result.error === null) setCurrentCode(result.data.code);
+    if (result.error === null) { setCurrentCode(result.data.code); setActionError(''); }
+    else setActionError(`Could not make a new join code: ${result.error}. The old code still works.`);
   }
 
   async function handleArchiveToggle() {
@@ -1537,6 +1726,8 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
       { method: 'POST', body: JSON.stringify({ archived: !isArchived }) },
     );
     setArchiving(false);
+    if (result.error !== null) setActionError(`Could not ${action.toLowerCase()} this class: ${result.error}.`);
+    else setActionError('');
     if (result.error === null) {
       setDetail((prev) =>
         prev
@@ -1690,6 +1881,7 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
               </button>
             </div>
             {deleteError && <p style={S.error}>{deleteError}</p>}
+            {actionError && <p style={S.error} role="alert">{actionError}</p>}
           </div>
         )}
       </div>
@@ -1707,6 +1899,7 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
             {regenerating ? 'Regenerating…' : 'Regenerate code'}
           </button>
         </div>
+        {actionError && !isOwner && <p style={S.error} role="alert">{actionError}</p>}
       </div>
 
       {/* View toggle */}
@@ -1718,6 +1911,7 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
             border: '1px solid #bd93f9',
             borderRadius: 20,
           }}
+          aria-pressed={activeView === 'roster'}
           onClick={() => setActiveView('roster')}
         >
           Roster
@@ -1729,6 +1923,7 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
             border: '1px solid #8be9fd',
             borderRadius: 20,
           }}
+          aria-pressed={activeView === 'gradebook'}
           onClick={() => setActiveView('gradebook')}
         >
           Gradebook
@@ -1740,6 +1935,7 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
             border: '1px solid #ffb86c',
             borderRadius: 20,
           }}
+          aria-pressed={activeView === 'attention'}
           onClick={() => setActiveView('attention')}
         >
           Needs Attention
@@ -1788,13 +1984,23 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
                           <>
                             <span
                               style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                              title={`${wp}% of grade under this class's weights`}
+                              title={`Grade so far: ${wp}%. Counts work that is done plus work past its due date, under this class's weights. Lessons not due yet are left out.`}
                             >
                               <MiniBar pct={wp} />
-                              <span style={{ color: pctColor(wp), fontWeight: 600 }}>
-                                {wp}% of grade
+                              <span style={{ color: prog.gradedCounted === 0 ? '#6272a4' : pctColor(wp), fontWeight: 600 }}>
+                                {prog.gradedCounted === 0 ? 'No grade yet' : `${wp}% so far`}
                               </span>
                             </span>
+                            {typeof prog.gradedTotal === 'number' && prog.gradedTotal > 0 && (
+                              <span title="Graded lessons this student has finished, out of every graded lesson in the course">
+                                {prog.gradedDone ?? 0} of {prog.gradedTotal} graded lessons done
+                              </span>
+                            )}
+                            {(prog.gradedMissing ?? 0) > 0 && (
+                              <span style={{ color: '#ff5555' }} title="Past their due date and not done: each counts as a 0 in the grade so far">
+                                {prog.gradedMissing} past due
+                              </span>
+                            )}
                             <span style={{ color: '#50fa7b' }}>{prog.completed_count} completed</span>
                             {prog.started_count > 0 && (
                               <span style={{ color: '#f1fa8c' }}>{prog.started_count} started</span>
