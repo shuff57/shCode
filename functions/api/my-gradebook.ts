@@ -15,7 +15,8 @@
 // student reading another student's row is exactly the hole this endpoint
 // would open. Teachers use classes/[id]/gradebook.ts, which has its own ACL.
 
-import { loadLessonScopeMap, loadStudentDueRows } from '../_shared/dueDates';
+import { loadLessonScopeMap, loadStudentDueRows, loadStudentWaiversByClass } from '../_shared/dueDates';
+import { loadClassWeights, studentGrading, type StudentGrading } from '../_shared/grading';
 import { buildDueIndex, resolveDueAt } from '../../lib/due-dates-core';
 import { buildCell, type GradebookCell } from '../../lib/gradebook-cell';
 
@@ -80,26 +81,33 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
   // Due dates resolve PER CLASS and then take the earliest. Merging every
   // class's rows into one index first would let class A's lesson override
   // mask class B's earlier module date — see functions/api/my-due-dates.ts.
+  // A class where this student's due date for the lesson is waived does not
+  // contribute that class's date: a waiver means "no late flag", the same
+  // reading my-due-dates.ts gives it.
   const dueDates: Record<string, number> = {};
   const classes = await loadStudentDueRows(env.DB, email);
-  const withRows = classes.filter((c) => c.rows.length > 0);
-  if (withRows.length > 0) {
-    const scopeMap = await loadLessonScopeMap(env, request);
-    if (scopeMap) {
-      const indexes = withRows.map((c) => buildDueIndex(c.rows));
-      for (const [lessonId, scope] of scopeMap) {
-        let earliest: number | null = null;
-        for (const index of indexes) {
-          const at = resolveDueAt(index, {
-            lessonId,
-            moduleId: scope.moduleId,
-            unitId: scope.unitId,
-          });
-          if (at !== null && (earliest === null || at < earliest)) earliest = at;
-        }
-        if (earliest !== null) dueDates[lessonId] = earliest;
+  const waivers = await loadStudentWaiversByClass(env.DB, email);
+  const scopeMap = await loadLessonScopeMap(env, request);
+  const indexed = classes.map((c) => ({ c, index: buildDueIndex(c.rows), waived: waivers.get(c.classId) ?? new Set<string>() }));
+  if (scopeMap) {
+    for (const [lessonId, scope] of scopeMap) {
+      let earliest: number | null = null;
+      for (const { c, index, waived } of indexed) {
+        if (c.rows.length === 0 || waived.has(lessonId)) continue;
+        const at = resolveDueAt(index, { lessonId, moduleId: scope.moduleId, unitId: scope.unitId });
+        if (at !== null && (earliest === null || at < earliest)) earliest = at;
       }
+      if (earliest !== null) dueDates[lessonId] = earliest;
     }
+  }
+
+  // The grade so far, one per class the student is in: each class has its own due dates, waivers and
+  // weights, so a student in two classes sees two grades, each labelled (see studentGrading).
+  const stateRows = [...stateByLesson.values()];
+  const grades: Array<{ classId: string; className: string } & StudentGrading> = [];
+  for (const { c, index, waived } of indexed) {
+    const g = studentGrading(scopeMap, stateRows, await loadClassWeights(env.DB, c.classId), { index, waived, now });
+    grades.push({ classId: c.classId, className: c.className, ...g });
   }
 
   // A past-due lesson with no row anywhere is the one the student most needs
@@ -127,7 +135,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
     });
   }
 
-  return json({ cells, dueDates });
+  return json({ cells, dueDates, grades });
 };
 
 function json(body: unknown, status = 200): Response {

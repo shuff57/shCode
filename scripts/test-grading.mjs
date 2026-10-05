@@ -141,35 +141,78 @@ check('all categories present and all 100 is exactly 100', () => {
   assert.equal(weightedGradePercent(items, DEFAULT_WEIGHTS), 100);
 });
 
-// --- studentGrading (server-side, same rule) ------------------------------
+// --- studentGrading: the grade SO FAR (server-side) -----------------------
+// A lesson counts when it is done, or when this class's due date for it has passed and it is not
+// done and not waived. Anything not due yet is out of both numerator and denominator.
 
-check('studentGrading matches the client rule for one student', () => {
-  const scopeMap = new Map([
-    ['1.1.1-lab', { title: '1.1.1 Lab', moduleId: '1.1', unitId: 'U1', preview: 'console', assignmentCode: 'A1.1.1', maxScore: null, scoreKind: null }],
-    ['1.3.9-quiz', { title: '1.3.9 Quiz', moduleId: '1.3', unitId: 'U1', preview: 'quiz', assignmentCode: 'A1.3.9', maxScore: 10, scoreKind: 'quiz' }],
-    ['1.1.2-read', { title: '1.1.2 Reading', moduleId: '1.1', unitId: 'U1', preview: 'reading', assignmentCode: null, maxScore: null, scoreKind: null }],
-  ]);
-  // Lab not started (0), quiz completed 6/10 (60), reading ignored entirely.
-  const g = studentGrading(
-    scopeMap,
-    [{ lesson_id: '1.3.9-quiz', state: 'completed', score: 6 }],
-    DEFAULT_WEIGHTS,
-  );
-  // lab(30) at 0, quiz(5) at 60 -> 60*5/35 = 8.57 -> 9.
-  assert.equal(g.percent, Math.round((0 * 30 + 60 * 5) / 35));
-  assert.deepEqual(
-    g.categories.map((c) => c.category),
-    ['lab', 'quiz'], // reading is absent -- not graded
-  );
-  assert.equal(g.categories.find((c) => c.category === 'quiz').done, 1);
+const DAY = 86400000;
+const NOW = 1_800_000_000_000;
+const lesson = (title, o = {}) => ({ title, moduleId: title.split(' ')[0].split('.').slice(0, 2).join('.'), unitId: 'U1', preview: 'console', assignmentCode: 'A' + title.split(' ')[0], maxScore: null, scoreKind: null, ...o });
+const scopeMap = new Map([
+  ['lab-1', lesson('1.1.1 Lab one')],
+  ['lab-2', lesson('1.1.2 Lab two')],
+  ['quiz-1', lesson('1.3.9 Quiz', { preview: 'quiz', maxScore: 10, scoreKind: 'quiz' })],
+  ['read-1', lesson('1.1.3 Reading', { preview: 'reading', assignmentCode: null })],
+]);
+const noDue = { index: { lesson: new Map(), module: new Map(), unit: new Map() }, waived: new Set(), now: NOW };
+const dueOn = (entries, waived = []) => ({
+  index: { lesson: new Map(entries), module: new Map(), unit: new Map() },
+  waived: new Set(waived),
+  now: NOW,
+});
+const done = (id, score = null) => ({ lesson_id: id, state: 'completed', score });
+
+check('studentGrading: only completed work counts when nothing has a due date', () => {
+  const g = studentGrading(scopeMap, [done('quiz-1', 6)], DEFAULT_WEIGHTS, noDue);
+  assert.equal(g.percent, 60); // the quiz alone, at 6/10; the two untouched labs are not yet due
+  assert.deepEqual(g.categories.map((c) => c.category), ['quiz']);
+  assert.equal(g.gradedTotal, 3); // reading is not graded
+  assert.equal(g.doneCount, 1);
+  assert.equal(g.counted, 1);
+  assert.equal(g.missingCount, 0);
 });
 
-check('a student with no work at all scores 0, not a crash', () => {
-  const scopeMap = new Map([
-    ['1.1.1-lab', { title: '1.1.1 Lab', moduleId: '1.1', unitId: 'U1', preview: 'console', assignmentCode: 'A1.1.1', maxScore: null, scoreKind: null }],
-  ]);
-  assert.equal(studentGrading(scopeMap, [], DEFAULT_WEIGHTS).percent, 0);
-  assert.equal(studentGrading(null, [], DEFAULT_WEIGHTS).percent, 0);
+check('studentGrading: a past-due lesson that is not done counts as a zero', () => {
+  const g = studentGrading(scopeMap, [done('quiz-1', 10)], DEFAULT_WEIGHTS, dueOn([['lab-1', NOW - DAY]]));
+  // lab(30) at 0 (missing), quiz(5) at 100 -> 100*5/35 = 14
+  assert.equal(g.percent, Math.round((0 * 30 + 100 * 5) / 35));
+  assert.equal(g.missingCount, 1);
+  assert.equal(g.counted, 2);
+});
+
+check('studentGrading: a lesson due in the future is left out, not zeroed', () => {
+  const g = studentGrading(scopeMap, [done('quiz-1', 10)], DEFAULT_WEIGHTS, dueOn([['lab-1', NOW + DAY]]));
+  assert.equal(g.percent, 100);
+  assert.equal(g.missingCount, 0);
+});
+
+check('studentGrading: a waived past-due lesson is not a zero, a waived DONE one still counts', () => {
+  const waivedMissing = studentGrading(scopeMap, [done('quiz-1', 10)], DEFAULT_WEIGHTS, dueOn([['lab-1', NOW - DAY]], ['lab-1']));
+  assert.equal(waivedMissing.percent, 100);
+  assert.equal(waivedMissing.missingCount, 0);
+  const waivedDone = studentGrading(scopeMap, [done('lab-1')], DEFAULT_WEIGHTS, dueOn([['lab-1', NOW - DAY]], ['lab-1']));
+  assert.equal(waivedDone.counted, 1);
+  assert.equal(waivedDone.percent, 100);
+});
+
+check('studentGrading: up to date reads 100% while the progress denominator stays the whole course', () => {
+  const g = studentGrading(scopeMap, [done('lab-1')], DEFAULT_WEIGHTS, dueOn([['lab-1', NOW - DAY], ['lab-2', NOW + DAY]]));
+  assert.equal(g.percent, 100);
+  assert.equal(g.doneCount, 1);
+  assert.equal(g.gradedTotal, 3);
+});
+
+check('studentGrading: the due date resolves lesson over module over unit', () => {
+  const idx = { lesson: new Map([['lab-2', NOW + DAY]]), module: new Map([['1.1', NOW - DAY]]), unit: new Map() };
+  const g = studentGrading(scopeMap, [], DEFAULT_WEIGHTS, { index: idx, waived: new Set(), now: NOW });
+  assert.equal(g.missingCount, 1); // lab-1 inherits the module date (past); lab-2's own date (future) wins
+});
+
+check('studentGrading: a student with no work and nothing due scores 0 with nothing counted, not a crash', () => {
+  const g = studentGrading(scopeMap, [], DEFAULT_WEIGHTS, noDue);
+  assert.equal(g.percent, 0);
+  assert.equal(g.counted, 0);
+  assert.equal(studentGrading(null, [], DEFAULT_WEIGHTS, noDue).percent, 0);
 });
 
 console.log(results.join('\n'));

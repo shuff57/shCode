@@ -5,7 +5,8 @@
 // (class_grading_weights, defaulting per lib/grading-weights.ts).
 
 import { canManageClass } from '../../../_shared/classAuth';
-import { loadLessonScopeMap } from '../../../_shared/dueDates';
+import { loadLessonScopeMap, loadClassDueRows, loadClassDueWaivers } from '../../../_shared/dueDates';
+import { buildDueIndex } from '../../../../lib/due-dates-core';
 import { loadClassWeights, studentGrading } from '../../../_shared/grading';
 
 interface Env {
@@ -77,6 +78,8 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
   // per-student state rows come back in one query grouped by email.
   const scopeMap = await loadLessonScopeMap(env, request);
   const weights = await loadClassWeights(env.DB, classId);
+  const dueIndex = buildDueIndex(await loadClassDueRows(env.DB, classId));
+  const waivers = await loadClassDueWaivers(env.DB, classId);
   const statesByStudent = new Map<string, (StateRow & { student_email: string })[]>();
   if (rows.length > 0) {
     const stateResult = await env.DB.prepare(
@@ -95,10 +98,21 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
   }
 
   return json({
-    students: rows.map((r) => ({
-      ...r,
-      weightedPercent: studentGrading(scopeMap, statesByStudent.get(r.student_email) ?? [], weights).percent,
-    })),
+    students: rows.map((r) => {
+      const g = studentGrading(scopeMap, statesByStudent.get(r.student_email) ?? [], weights, {
+        index: dueIndex,
+        waived: waivers.get(r.student_email) ?? new Set<string>(),
+        now,
+      });
+      return {
+        ...r,
+        weightedPercent: g.percent,
+        gradedTotal: g.gradedTotal,
+        gradedDone: g.doneCount,
+        gradedMissing: g.missingCount,
+        gradedCounted: g.counted,
+      };
+    }),
   });
 };
 

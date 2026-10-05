@@ -5,7 +5,8 @@
 
 import { canManageClass } from '../../../../_shared/classAuth';
 import { normalizeEmail } from '../../../../_shared/auth';
-import { loadLessonScopeMap } from '../../../../_shared/dueDates';
+import { loadLessonScopeMap, loadClassDueRows, loadClassDueWaivers } from '../../../../_shared/dueDates';
+import { buildDueIndex } from '../../../../../lib/due-dates-core';
 import { loadClassWeights, studentGrading } from '../../../../_shared/grading';
 
 interface Env {
@@ -138,7 +139,12 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
   // class's grading, not the curriculum default.
   const scopeMap = await loadLessonScopeMap(env, request);
   const weights = await loadClassWeights(env.DB, classId);
-  const grading = studentGrading(scopeMap, stateRows.results ?? [], weights);
+  const waivers = await loadClassDueWaivers(env.DB, classId);
+  const grading = studentGrading(scopeMap, stateRows.results ?? [], weights, {
+    index: buildDueIndex(await loadClassDueRows(env.DB, classId)),
+    waived: waivers.get(studentEmail) ?? new Set<string>(),
+    now: Date.now(),
+  });
 
   return json({
     student_email: studentEmail,

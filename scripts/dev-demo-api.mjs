@@ -25,11 +25,22 @@ import { onRequestGet as gradeGet, onRequestPost as gradePost } from '../functio
 import { onRequestGet as attemptRevealGet } from '../functions/api/attempt-reveal.ts';
 import { onRequestGet as quizRevealGet } from '../functions/api/quiz-reveal.ts';
 import { onRequestGet as myGradebookGet } from '../functions/api/my-gradebook.ts';
+import { onRequestGet as classesGet } from '../functions/api/classes/index.ts';
+import { onRequestGet as classDetailGet, onRequestPatch as classDetailPatch } from '../functions/api/classes/[id]/index.ts';
+import { onRequestGet as classGradebookGet } from '../functions/api/classes/[id]/gradebook.ts';
+import { onRequestGet as classProgressGet } from '../functions/api/classes/[id]/progress.ts';
+import { onRequestGet as classStudentGet } from '../functions/api/classes/[id]/students/[email].ts';
+import { onRequestGet as classNeedsAttentionGet } from '../functions/api/classes/[id]/needs-attention.ts';
+import { onRequestGet as classPastDueGet } from '../functions/api/classes/[id]/past-due/index.ts';
+import { onRequestGet as classDueDatesGet, onRequestPut as classDueDatesPut } from '../functions/api/classes/[id]/due-dates/index.ts';
+import { onRequestGet as classReleasesGet, onRequestPut as classReleasesPut } from '../functions/api/classes/[id]/solution-releases/index.ts';
+import { onRequestPost as classArchivePost } from '../functions/api/classes/[id]/archive.ts';
+import { onRequestPost as classRegenPost } from '../functions/api/classes/[id]/regenerate-code.ts';
 
 const FAR = 4102444800000;
 const CLASS_ID = 'dev-class';
 
-function openDb(root) {
+export function openDb(root) {
   requireSqlite('dev-demo-api');
   const sql = openMemoryDb();
   const dir = path.join(root, 'migrations');
@@ -85,6 +96,46 @@ function startFakeOllama(onReady) {
   return server;
 }
 
+// A small class to look at: six students at different places, due dates that have passed for the first
+// four modules and not yet for the fifth, one waiver. Enough to see "up to date", "behind", "late",
+// "waived" and "nothing yet" side by side. Built from the real manifest, so the graded lessons are real.
+function seedClass(sql, root, teacherEmail) {
+  const man = JSON.parse(fs.readFileSync(path.join(root, 'public', 'lessons-manifest.json'), 'utf8')).lessons;
+  const modOf = (t) => /^(\d+\.\d+)\.\d+/.exec(t || '')?.[1] ?? null;
+  const graded = man.filter((l) => (l.assignmentCode || l.preview === 'quiz' || l.scoreKind === 'written') && modOf(l.title));
+  const inMods = (mods) => graded.filter((l) => mods.includes(modOf(l.title)));
+  const now = Date.now();
+  const DAY = 86400000;
+  sql.run('UPDATE classes SET owner_email = ?, name = ? WHERE id = ?', [teacherEmail, 'Period 3 Intro Programming', CLASS_ID]);
+  for (const [m, at] of [['1.1', now - 20 * DAY], ['1.2', now - 14 * DAY], ['1.3', now - 7 * DAY], ['1.4', now - 2 * DAY], ['1.5', now + 7 * DAY]]) {
+    sql.run("INSERT INTO class_due_dates (class_id, scope, scope_id, due_at, set_by, set_at) VALUES (?, 'module', ?, ?, ?, 0)", [CLASS_ID, m, at, teacherEmail]);
+  }
+  const students = [
+    ['ada@school.test', 'Ada', 'Lovelace', 'all'],
+    ['ben@school.test', 'Ben', 'Franklin', 'early'],
+    ['cleo@school.test', 'Cleo', 'Patra', 'partial'],
+    ['dev@school.test', 'Dev', 'Patel', 'none'],
+    ['eli@school.test', 'Eli', 'Whitney', 'late'],
+    ['fay@school.test', 'Fay', 'Ray', 'waived'],
+  ];
+  const put = (email, l, state, completedAt, score) =>
+    sql.run('INSERT OR REPLACE INTO lesson_state (student_email, lesson_id, state, started_at, completed_at, score) VALUES (?, ?, ?, ?, ?, ?)', [email, l.id, state, now - 30 * DAY, completedAt, score]);
+  for (const [email, first, last, kind] of students) {
+    sql.run('INSERT OR IGNORE INTO students (email, password_hash, created_at, first_name, last_name) VALUES (?, ?, 0, ?, ?)', [email, 'x', first, last]);
+    sql.run('INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, 0, ?)', [CLASS_ID, email, FAR]);
+    const full = (l) => (l.maxScore ? l.maxScore : null);
+    if (kind === 'all' || kind === 'waived') for (const l of inMods(kind === 'all' ? ['1.1', '1.2', '1.3', '1.4'] : ['1.1', '1.2', '1.3'])) put(email, l, 'completed', now - 25 * DAY, full(l));
+    if (kind === 'early') for (const l of inMods(['1.1', '1.2'])) put(email, l, 'completed', now - 15 * DAY, full(l));
+    if (kind === 'late') for (const l of inMods(['1.1', '1.2', '1.3', '1.4'])) put(email, l, 'completed', now - 1 * DAY, full(l));
+    if (kind === 'partial') {
+      const ls = inMods(['1.1', '1.2', '1.3']);
+      ls.slice(0, Math.ceil(ls.length / 2)).forEach((l) => put(email, l, 'completed', now - 18 * DAY, l.maxScore ? Math.max(1, Math.round(l.maxScore * 0.6)) : null));
+      if (ls[ls.length - 1]) put(email, ls[ls.length - 1], 'started', null, null);
+    }
+    if (kind === 'waived') for (const l of inMods(['1.4'])) sql.run("INSERT OR IGNORE INTO lesson_due_waivers (class_id, student_email, lesson_id, granted_by, granted_at) VALUES (?, ?, ?, ?, 0)", [CLASS_ID, email, l.id, teacherEmail]);
+  }
+}
+
 export function mountDemoApi({ server, express, devIdentity, role, root }) {
   const db = openDb(root);
   let fakePort = 0;
@@ -103,6 +154,7 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
     GRADE_WRITTEN_DAILY_LIMIT: '1000',
   };
 
+  seedClass(db.raw, root, devIdentity({ headers: {} }));
   const enrolled = new Set();
   const ensure = (email) => {
     if (enrolled.has(email)) return;
@@ -145,6 +197,21 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   server.get('/api/attempt-reveal', route(attemptRevealGet));
   server.get('/api/quiz-reveal', route(quizRevealGet));
   server.get('/api/my-gradebook', route(myGradebookGet));
+  // Teacher side: the class pages' real handlers, so the grid, the roster and the drawer show real numbers.
+  server.get('/api/classes', route(classesGet));
+  server.get('/api/classes/:id', route(classDetailGet, ['id']));
+  server.patch('/api/classes/:id', json, route(classDetailPatch, ['id']));
+  server.get('/api/classes/:id/gradebook', route(classGradebookGet, ['id']));
+  server.get('/api/classes/:id/progress', route(classProgressGet, ['id']));
+  server.get('/api/classes/:id/students/:email', route(classStudentGet, ['id', 'email']));
+  server.get('/api/classes/:id/needs-attention', route(classNeedsAttentionGet, ['id']));
+  server.get('/api/classes/:id/past-due', route(classPastDueGet, ['id']));
+  server.get('/api/classes/:id/due-dates', route(classDueDatesGet, ['id']));
+  server.put('/api/classes/:id/due-dates', json, route(classDueDatesPut, ['id']));
+  server.get('/api/classes/:id/solution-releases', route(classReleasesGet, ['id']));
+  server.put('/api/classes/:id/solution-releases', json, route(classReleasesPut, ['id']));
+  server.post('/api/classes/:id/archive', json, route(classArchivePost, ['id']));
+  server.post('/api/classes/:id/regenerate-code', json, route(classRegenPost, ['id']));
   server.post('/api/dev/solution-release', json, (req, res) => {
     const { lessonId, releaseAt } = req.body || {};
     if (typeof lessonId !== 'string') return res.status(400).json({ error: 'lessonId required' });
