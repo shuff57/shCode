@@ -514,6 +514,11 @@ before your students first use a capped part, and commit it).
 segments need `generateStaticParams()` at build time. For runtime-only IDs
 (classes, per-student views), use **query-string routing** on a single static
 page — e.g. `/teacher?class=<id>`, `/teacher-edit?class=X&student=Y&lesson=Z`.
+The class page (`/teacher?class=<id>`) has five sections, `&tab=today|students|gradebook|schedule|settings`
+(the old `roster` and `attention` values and `?view=gradebook` still land). Only the open tab mounts, so a
+new panel belongs under exactly one tab in `DetailView`, not alongside them all. With no `tab` it opens on
+Students and moves to Today once if submissions are waiting for a grade; the last class opened is kept in
+`localStorage` (`shcode:lastClass`) for the class list and the top-nav Gradebook shortcut.
 
 ## Flowchart diagrams
 

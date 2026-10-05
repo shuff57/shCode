@@ -150,6 +150,11 @@ function seedClass(sql, root, teacherEmail) {
       const first = inMods(['1.1'])[0];
       if (first) sql.run("INSERT INTO lesson_submissions (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at) VALUES ('seed-ada', ?, ?, 'x', ?, 5, 5, ?)", [email, first.id, JSON.stringify({ teacherFeedback: 'Nice work. Your comments made the idea clear.', teacherReviewedAt: now - 3 * DAY }), now - 3 * DAY]);
     }
+    if (kind === 'none') {
+      // Dev's hand-in sat in a grader outage: it needs the teacher (Today's badge, the grid's "..." cell).
+      const f = inMods(['1.2']).find((l) => !(l.id in ATTEMPT_CAPS));
+      if (f) sql.run("INSERT INTO lesson_submissions (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at) VALUES ('seed-pending', ?, ?, 'answer', ?, NULL, NULL, ?)", [email, f.id, JSON.stringify({ gradingFailed: true, error: 'grader unavailable' }), now - DAY]);
+    }
     if (kind === 'waived') for (const l of inMods(['1.4'])) sql.run("INSERT OR IGNORE INTO lesson_due_waivers (class_id, student_email, lesson_id, granted_by, granted_at) VALUES (?, ?, ?, ?, 0)", [CLASS_ID, email, l.id, teacherEmail]);
   }
 }

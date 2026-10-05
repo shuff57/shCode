@@ -1517,6 +1517,11 @@ function ListView() {
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
+  // Per class: students with work past due, and submissions waiting for a grade. Filled in as each class
+  // answers, so the list shows at a glance which of five classes needs a teacher first.
+  const [chips, setChips] = useState<Record<string, { behind: number; toGrade: number }>>({});
+  let lastId: string | null = null;
+  try { lastId = window.localStorage.getItem('shcode:lastClass'); } catch { /* private window */ }
 
   const loadClasses = useCallback(async (withArchived: boolean) => {
     setLoading(true);
@@ -1533,6 +1538,23 @@ function ListView() {
   useEffect(() => {
     void loadClasses(includeArchived);
   }, [loadClasses, includeArchived]);
+
+  useEffect(() => {
+    let cancelled = false;
+    for (const c of classes) {
+      if (c.archived_at) continue;
+      void Promise.all([
+        apiFetch<{ students: StudentProgress[] }>(`/api/classes/${c.id}/progress`),
+        apiFetch<{ awaiting_grade?: unknown[] }>(`/api/classes/${c.id}/needs-attention`),
+      ]).then(([prog, att]) => {
+        if (cancelled || prog.error !== null) return;
+        const behind = prog.data.students.filter((p) => (p.gradedMissing ?? 0) > 0).length;
+        const toGrade = att.error === null ? (att.data.awaiting_grade?.length ?? 0) : 0;
+        setChips((prev) => ({ ...prev, [c.id]: { behind, toGrade } }));
+      });
+    }
+    return () => { cancelled = true; };
+  }, [classes]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -1562,8 +1584,82 @@ function ListView() {
     <div>
       <h1 style={S.h1}>My Classes</h1>
 
+      {/* Include archived toggle */}
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#6272a4', marginBottom: 20, cursor: 'pointer' }}>
+        <input
+          type="checkbox"
+          checked={includeArchived}
+          onChange={(e) => setIncludeArchived(e.target.checked)}
+          style={{ accentColor: '#8be9fd' }}
+        />
+        Include archived classes
+      </label>
+
+      {/* Class list */}
+      {classes.length === 0 ? (
+        <p style={{ color: '#6272a4' }}>No classes yet. Create one above.</p>
+      ) : (
+        <div>
+          {[...classes].sort((x, y) => Number(y.id === lastId) - Number(x.id === lastId)).map((c) => (
+            <div
+              key={c.id}
+              style={{
+                ...S.card,
+                opacity: c.archived_at ? 0.6 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 16,
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                  <span style={{ fontWeight: 600, fontSize: 16 }}>{c.name}</span>
+                  {c.archived_at && <span style={S.badge(true)}>Archived</span>}
+                  {c.id === lastId && <span style={{ fontSize: 11, color: '#6272a4' }}>last opened</span>}
+                </div>
+                {!c.archived_at && (
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 6, flexWrap: 'wrap', fontSize: 12 }}>
+                    {chips[c.id] === undefined ? (
+                      <span style={{ color: '#6272a4' }}>checking…</span>
+                    ) : chips[c.id].behind === 0 && chips[c.id].toGrade === 0 ? (
+                      <span style={{ color: '#50fa7b' }}>All caught up</span>
+                    ) : (
+                      <>
+                        {chips[c.id].toGrade > 0 && (
+                          <span style={{ color: '#282a36', background: '#ffb86c', borderRadius: 10, padding: '1px 8px', fontWeight: 700 }}>
+                            {chips[c.id].toGrade} to grade
+                          </span>
+                        )}
+                        {chips[c.id].behind > 0 && (
+                          <span style={{ color: '#282a36', background: '#ff5555', borderRadius: 10, padding: '1px 8px', fontWeight: 700 }}>
+                            {chips[c.id].behind} behind
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+                <div style={{ display: 'flex', gap: 20, color: '#6272a4', fontSize: 13, flexWrap: 'wrap' }}>
+                  <span>Code: <span style={{ fontFamily: 'monospace', color: '#8be9fd' }}>{c.code}</span></span>
+                  {c.school_year && <span>Year: {c.school_year}</span>}
+                  <span>{c.student_count} student{c.student_count !== 1 ? 's' : ''}</span>
+                  <span style={{ textTransform: 'capitalize' }}>{c.role}</span>
+                </div>
+              </div>
+              <button
+                style={S.btn('#8be9fd')}
+                onClick={() => router.push(`/teacher?class=${c.id}`)}
+              >
+                Open →
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
       {/* Create form */}
-      <div style={{ ...S.card, marginBottom: 32 }}>
+      <div style={{ ...S.card, marginTop: 32 }}>
         <h2 style={{ ...S.h2, marginBottom: 12 }}>Create a new class</h2>
         <form onSubmit={(e) => { void handleCreate(e); }} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
           <input
@@ -1584,57 +1680,6 @@ function ListView() {
         {createError && <p style={S.error}>{createError}</p>}
       </div>
 
-      {/* Include archived toggle */}
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#6272a4', marginBottom: 20, cursor: 'pointer' }}>
-        <input
-          type="checkbox"
-          checked={includeArchived}
-          onChange={(e) => setIncludeArchived(e.target.checked)}
-          style={{ accentColor: '#8be9fd' }}
-        />
-        Include archived classes
-      </label>
-
-      {/* Class list */}
-      {classes.length === 0 ? (
-        <p style={{ color: '#6272a4' }}>No classes yet. Create one above.</p>
-      ) : (
-        <div>
-          {classes.map((c) => (
-            <div
-              key={c.id}
-              style={{
-                ...S.card,
-                opacity: c.archived_at ? 0.6 : 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 16,
-                flexWrap: 'wrap',
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                  <span style={{ fontWeight: 600, fontSize: 16 }}>{c.name}</span>
-                  {c.archived_at && <span style={S.badge(true)}>Archived</span>}
-                </div>
-                <div style={{ display: 'flex', gap: 20, color: '#6272a4', fontSize: 13, flexWrap: 'wrap' }}>
-                  <span>Code: <span style={{ fontFamily: 'monospace', color: '#8be9fd' }}>{c.code}</span></span>
-                  {c.school_year && <span>Year: {c.school_year}</span>}
-                  <span>{c.student_count} student{c.student_count !== 1 ? 's' : ''}</span>
-                  <span style={{ textTransform: 'capitalize' }}>{c.role}</span>
-                </div>
-              </div>
-              <button
-                style={S.btn('#8be9fd')}
-                onClick={() => router.push(`/teacher?class=${c.id}`)}
-              >
-                Open →
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -1643,7 +1688,24 @@ function ListView() {
 // Detail view
 // ---------------------------------------------------------------------------
 
-function DetailView({ classId, initialView }: { classId: string; initialView?: 'roster' | 'gradebook' | 'attention' }) {
+type TabId = 'today' | 'students' | 'gradebook' | 'schedule' | 'settings';
+
+const TABS: Array<{ id: TabId; label: string; color: string }> = [
+  { id: 'today', label: 'Today', color: '#ffb86c' },
+  { id: 'students', label: 'Students', color: '#bd93f9' },
+  { id: 'gradebook', label: 'Gradebook', color: '#8be9fd' },
+  { id: 'schedule', label: 'Schedule', color: '#50fa7b' },
+  { id: 'settings', label: 'Class settings', color: '#a9b7e0' },
+];
+
+/** ?tab= value -> tab. Accepts the two names the old tabs used (roster, attention) so saved links still land. */
+function parseTab(v: string | null): TabId | undefined {
+  if (v === 'roster') return 'students';
+  if (v === 'attention') return 'today';
+  return TABS.some((t) => t.id === v) ? (v as TabId) : undefined;
+}
+
+function DetailView({ classId, initialTab }: { classId: string; initialTab?: TabId }) {
   const router = useRouter();
   const [detail, setDetail] = useState<ClassDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1670,10 +1732,29 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
   const [lessonMap, setLessonMap] = useState<Map<string, LessonMeta>>(new Map());
   const [drawerEmail, setDrawerEmail] = useState<string | null>(null);
 
-  // View toggle: 'roster' | 'gradebook'. Seeded from the ?view= query param
-  // (top-nav "Gradebook" shortcut) on mount only -- clicking another tab
-  // after that is not overridden.
-  const [activeView, setActiveView] = useState<'roster' | 'gradebook' | 'attention'>(initialView ?? 'roster');
+  // Section tabs. Seeded from ?tab= (or the top-nav "Gradebook" shortcut's ?view=gradebook) on mount only.
+  // With no explicit tab the page opens on Students, and moves itself to Today once if submissions are
+  // waiting for a grade, so the most urgent job is the first thing a teacher sees. A tab the teacher
+  // picked is never overridden.
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab ?? 'students');
+  const pickedTab = useRef(initialTab !== undefined);
+  const [awaitingCount, setAwaitingCount] = useState<number | null>(null);
+  function pickTab(t: TabId) {
+    pickedTab.current = true;
+    setActiveTab(t);
+    // Keep the address in step so a refresh or a shared link lands on the same tab. replaceState, not a
+    // navigation: it must not add a history entry per click or re-run the page's loaders.
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.set('tab', t);
+      u.searchParams.delete('view');
+      window.history.replaceState(window.history.state, '', u.toString());
+    } catch { /* an address bar we cannot rewrite is not worth failing a tab click over */ }
+  }
+  // Remember the class for next time (the class list and the top-nav Gradebook shortcut offer it first).
+  useEffect(() => {
+    try { window.localStorage.setItem('shcode:lastClass', classId); } catch { /* private window: fine */ }
+  }, [classId]);
 
   const loadDetail = useCallback(async () => {
     setLoading(true);
@@ -1715,6 +1796,20 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
       })
       .catch(() => undefined);
   }, []);
+
+  // How many submissions are waiting for this teacher: the Today badge, and the reason to open on Today.
+  useEffect(() => {
+    if (!detail) return;
+    let cancelled = false;
+    void apiFetch<{ awaiting_grade?: unknown[] }>(`/api/classes/${classId}/needs-attention`).then((res) => {
+      if (cancelled) return;
+      const n = res.error === null ? (res.data.awaiting_grade?.length ?? 0) : 0;
+      setAwaitingCount(n);
+      if (n > 0 && !pickedTab.current) setActiveTab('today');
+    });
+    return () => { cancelled = true; };
+  }, [detail, classId]);
+  const behindCount = [...progressMap.values()].filter((p) => (p.gradedMissing ?? 0) > 0).length;
 
   async function handleRegenCode() {
     if (!window.confirm('Regenerate join code? The old code will stop working.')) return;
@@ -1870,6 +1965,7 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
           <div style={{ display: 'flex', gap: 20, color: '#6272a4', fontSize: 13, flexWrap: 'wrap' }}>
             {cls.school_year && <span>Year: {cls.school_year}</span>}
             <span>Created: {fmt(cls.created_at)}</span>
+            <span title="Students join with this code. Regenerate it under Class settings.">Join code: <strong style={{ fontFamily: 'monospace', color: '#8be9fd', letterSpacing: '0.08em' }}>{currentCode}</strong></span>
             {cls.archived_at && <span>Archived: {fmt(cls.archived_at)}</span>}
           </div>
         </div>
@@ -1899,317 +1995,330 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
         )}
       </div>
 
-      {/* Code */}
-      <div style={{ ...S.card, marginBottom: 28 }}>
-        <div style={{ color: '#6272a4', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Join Code</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
-          <span style={S.code}>{currentCode}</span>
-          <button
-            style={regenerating ? S.btnDisabled : S.btn('#ff79c6')}
-            disabled={regenerating}
-            onClick={() => { void handleRegenCode(); }}
-          >
-            {regenerating ? 'Regenerating…' : 'Regenerate code'}
-          </button>
+      {/* Section tabs. Sticky, so the way to the other sections is never scrolled out of reach, and each
+          panel mounts only while its tab is open (every panel used to mount and fetch on page load). */}
+      <div
+        role="tablist"
+        aria-label="Class sections"
+        style={{ position: 'sticky', top: 0, zIndex: 20, background: '#282a36', padding: '10px 0', marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap', borderBottom: '1px solid #44475a' }}
+      >
+        {TABS.map((t) => {
+          const on = activeTab === t.id;
+          const badge = t.id === 'today' ? (awaitingCount ?? 0) : t.id === 'students' ? behindCount : 0;
+          return (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              id={`tab-${t.id}`}
+              aria-selected={on}
+              aria-controls={`panel-${t.id}`}
+              onClick={() => pickTab(t.id)}
+              tabIndex={on ? 0 : -1}
+              onKeyDown={(e) => {
+                // Arrow keys move between tabs (the tablist pattern); Home and End jump to the ends.
+                const i = TABS.findIndex((x) => x.id === t.id);
+                const to = e.key === 'ArrowRight' ? (i + 1) % TABS.length : e.key === 'ArrowLeft' ? (i + TABS.length - 1) % TABS.length : e.key === 'Home' ? 0 : e.key === 'End' ? TABS.length - 1 : -1;
+                if (to < 0) return;
+                e.preventDefault();
+                pickTab(TABS[to].id);
+                document.getElementById(`tab-${TABS[to].id}`)?.focus();
+              }}
+              style={{
+                ...S.btn(on ? t.color : 'transparent'),
+                color: on ? '#282a36' : t.color,
+                border: `1px solid ${t.color}`,
+                borderRadius: 20,
+              }}
+            >
+              {t.label}
+              {badge > 0 && (
+                <span
+                  style={{ marginLeft: 8, background: on ? '#282a36' : t.color, color: on ? t.color : '#282a36', borderRadius: 10, padding: '0 7px', fontSize: 11, fontWeight: 700 }}
+                  title={t.id === 'today' ? `${badge} submission${badge === 1 ? '' : 's'} waiting for you to grade` : `${badge} student${badge === 1 ? '' : 's'} with work past due`}
+                >
+                  {badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {activeTab === 'today' && (
+        <div role="tabpanel" id={`panel-today`} aria-labelledby={`tab-today`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        {/* Needs Attention view */}
+          <div style={{ ...S.card, marginBottom: 28 }}>
+            <h2 style={{ ...S.h2, marginBottom: 16 }}>Needs Attention</h2>
+            <NeedsAttentionPanel
+              classId={classId}
+              onOpenStudent={(email: string) => setDrawerEmail(email)}
+              onOpenTeacherEdit={(studentEmail: string, lessonId: string) => {
+                router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(studentEmail)}&lesson=${encodeURIComponent(lessonId)}`);
+              }}
+            />
+          </div>
+        {/* Submission Review Queue */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Submission Review Queue</h2>
+          <SubmissionQueue classId={classId} />
         </div>
-        {actionError && !isOwner && <p style={S.error} role="alert">{actionError}</p>}
-      </div>
-
-      {/* View toggle */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button
-          style={{
-            ...S.btn(activeView === 'roster' ? '#bd93f9' : 'transparent'),
-            color: activeView === 'roster' ? '#282a36' : '#bd93f9',
-            border: '1px solid #bd93f9',
-            borderRadius: 20,
-          }}
-          aria-pressed={activeView === 'roster'}
-          onClick={() => setActiveView('roster')}
-        >
-          Roster
-        </button>
-        <button
-          style={{
-            ...S.btn(activeView === 'gradebook' ? '#8be9fd' : 'transparent'),
-            color: activeView === 'gradebook' ? '#282a36' : '#8be9fd',
-            border: '1px solid #8be9fd',
-            borderRadius: 20,
-          }}
-          aria-pressed={activeView === 'gradebook'}
-          onClick={() => setActiveView('gradebook')}
-        >
-          Gradebook
-        </button>
-        <button
-          style={{
-            ...S.btn(activeView === 'attention' ? '#ffb86c' : 'transparent'),
-            color: activeView === 'attention' ? '#282a36' : '#ffb86c',
-            border: '1px solid #ffb86c',
-            borderRadius: 20,
-          }}
-          aria-pressed={activeView === 'attention'}
-          onClick={() => setActiveView('attention')}
-        >
-          Needs Attention
-        </button>
-      </div>
-
-      {/* Shape tools vs code. Only reSHape assignments can be gated — the setting
-          decides which side a reSHape lesson opens on, and means nothing to a
-          moSHion or console one. */}
-      {activeView === 'roster' && (
-        <LessonModeControl
-          classId={classId}
-          lessons={[...lessonMap.values()]
-            .filter((l) => l.preview === 'reshape')
-            .map((l) => ({ id: l.id, title: l.title }))}
-        />
+        {/* Past due */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Past due</h2>
+          <PastDuePanel classId={classId} />
+        </div>
+        </div>
       )}
 
-      {/* Roster view */}
-      {activeView === 'roster' && (
-        <div style={{ ...S.card, marginBottom: 28 }}>
-          <h2 style={S.h2}>Roster ({roster.length})</h2>
-          {roster.length === 0 ? (
-            <p style={{ color: '#6272a4', fontSize: 14 }}>No students enrolled yet.</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {roster.map((row) => {
-                const prog = progressMap.get(row.student_email);
-                // A stale or older response can lack weightedPercent; a NaN
-                // here would render "NaN% of grade", so fall back to 0.
-                const wp = prog && Number.isFinite(prog.weightedPercent) ? prog.weightedPercent : 0;
-                return (
-                  <div
-                    key={row.student_email}
-                    style={{ background: '#282a36', borderRadius: 6, padding: '12px 16px', border: '1px solid #44475a33', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
-                  >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      {(() => {
-                        const nm = fullName(prog?.firstName, prog?.lastName);
-                        return (
-                          <div style={{ marginBottom: 4 }}>
-                            <span style={{ fontSize: 15, fontWeight: 600, color: '#f8f8f2' }}>{nm ?? row.student_email}</span>
-                            {nm && <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#6272a4', marginLeft: 10 }}>{row.student_email}</span>}
-                          </div>
-                        );
-                      })()}
-                      <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#6272a4', flexWrap: 'wrap' }}>
-                        <span>
-                          Enrolled: {fmt(row.enrolled_at)} by {row.enrolled_by ?? 'self'}
-                        </span>
-                        {prog ? (
-                          <>
-                            <span
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                              title={`Grade so far: ${wp}%. Counts work that is done plus work past its due date, under this class's weights. Lessons not due yet are left out.`}
-                            >
-                              <MiniBar pct={wp} />
-                              <span style={{ color: prog.gradedCounted === 0 ? '#6272a4' : pctColor(wp), fontWeight: 600 }}>
-                                {prog.gradedCounted === 0 ? 'No grade yet' : `${wp}% so far`}
+      {activeTab === 'students' && (
+        <div role="tabpanel" id={`panel-students`} aria-labelledby={`tab-students`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        {/* Roster view */}
+          <div style={{ ...S.card, marginBottom: 28 }}>
+            <h2 style={S.h2}>Roster ({roster.length})</h2>
+            {roster.length === 0 ? (
+              <p style={{ color: '#6272a4', fontSize: 14 }}>No students enrolled yet.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {roster.map((row) => {
+                  const prog = progressMap.get(row.student_email);
+                  // A stale or older response can lack weightedPercent; a NaN
+                  // here would render "NaN% of grade", so fall back to 0.
+                  const wp = prog && Number.isFinite(prog.weightedPercent) ? prog.weightedPercent : 0;
+                  return (
+                    <div
+                      key={row.student_email}
+                      style={{ background: '#282a36', borderRadius: 6, padding: '12px 16px', border: '1px solid #44475a33', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        {(() => {
+                          const nm = fullName(prog?.firstName, prog?.lastName);
+                          return (
+                            <div style={{ marginBottom: 4 }}>
+                              <span style={{ fontSize: 15, fontWeight: 600, color: '#f8f8f2' }}>{nm ?? row.student_email}</span>
+                              {nm && <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#6272a4', marginLeft: 10 }}>{row.student_email}</span>}
+                            </div>
+                          );
+                        })()}
+                        <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#6272a4', flexWrap: 'wrap' }}>
+                          <span>
+                            Enrolled: {fmt(row.enrolled_at)} by {row.enrolled_by ?? 'self'}
+                          </span>
+                          {prog ? (
+                            <>
+                              <span
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                                title={`Grade so far: ${wp}%. Counts work that is done plus work past its due date, under this class's weights. Lessons not due yet are left out.`}
+                              >
+                                <MiniBar pct={wp} />
+                                <span style={{ color: prog.gradedCounted === 0 ? '#6272a4' : pctColor(wp), fontWeight: 600 }}>
+                                  {prog.gradedCounted === 0 ? 'No grade yet' : `${wp}% so far`}
+                                </span>
                               </span>
-                            </span>
-                            {typeof prog.gradedTotal === 'number' && prog.gradedTotal > 0 && (
-                              <span title="Graded lessons this student has finished, out of every graded lesson in the course">
-                                {prog.gradedDone ?? 0} of {prog.gradedTotal} graded lessons done
-                              </span>
-                            )}
-                            {(prog.gradedMissing ?? 0) > 0 && (
-                              <span style={{ color: '#ff5555' }} title="Past their due date and not done: each counts as a 0 in the grade so far">
-                                {prog.gradedMissing} past due
-                              </span>
-                            )}
-                            <span style={{ color: '#50fa7b' }}>{prog.completed_count} completed</span>
-                            {prog.started_count > 0 && (
-                              <span style={{ color: '#f1fa8c' }}>{prog.started_count} started</span>
-                            )}
-                            {prog.last_active !== null && (
-                              <span>last active {fmtTs(prog.last_active)}</span>
-                            )}
-                          </>
-                        ) : (
-                          <span>No activity yet</span>
-                        )}
+                              {typeof prog.gradedTotal === 'number' && prog.gradedTotal > 0 && (
+                                <span title="Graded lessons this student has finished, out of every graded lesson in the course">
+                                  {prog.gradedDone ?? 0} of {prog.gradedTotal} graded lessons done
+                                </span>
+                              )}
+                              {(prog.gradedMissing ?? 0) > 0 && (
+                                <span style={{ color: '#ff5555' }} title="Past their due date and not done: each counts as a 0 in the grade so far">
+                                  {prog.gradedMissing} past due
+                                </span>
+                              )}
+                              <span style={{ color: '#50fa7b' }}>{prog.completed_count} completed</span>
+                              {prog.started_count > 0 && (
+                                <span style={{ color: '#f1fa8c' }}>{prog.started_count} started</span>
+                              )}
+                              {prog.last_active !== null && (
+                                <span>last active {fmtTs(prog.last_active)}</span>
+                              )}
+                            </>
+                          ) : (
+                            <span>No activity yet</span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                        <button
+                          style={S.btn('#8be9fd')}
+                          onClick={() => setDrawerEmail(row.student_email)}
+                        >
+                          Open
+                        </button>
+                        <button
+                          style={
+                            removingEmail === row.student_email
+                              ? S.btnDisabled
+                              : { ...S.btn('#ff5555'), color: '#f8f8f2' }
+                          }
+                          disabled={removingEmail === row.student_email}
+                          onClick={() => { void handleRemove(row.student_email); }}
+                        >
+                          {removingEmail === row.student_email ? '…' : 'Remove'}
+                        </button>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                      <button
-                        style={S.btn('#8be9fd')}
-                        onClick={() => setDrawerEmail(row.student_email)}
-                      >
-                        Open
-                      </button>
-                      <button
-                        style={
-                          removingEmail === row.student_email
-                            ? S.btnDisabled
-                            : { ...S.btn('#ff5555'), color: '#f8f8f2' }
-                        }
-                        disabled={removingEmail === row.student_email}
-                        onClick={() => { void handleRemove(row.student_email); }}
-                      >
-                        {removingEmail === row.student_email ? '…' : 'Remove'}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Gradebook view */}
-      {activeView === 'gradebook' && (
-        <div style={{ ...S.card, marginBottom: 28 }}>
-          <h2 style={{ ...S.h2, marginBottom: 16 }}>Gradebook</h2>
-          <GradebookView
-            classId={classId}
-            className={cls.name}
-            lessonMap={lessonMap}
-            onOpenStudent={(email) => setDrawerEmail(email)}
-          />
-        </div>
-      )}
-
-      {/* Needs Attention view */}
-      {activeView === 'attention' && (
-        <div style={{ ...S.card, marginBottom: 28 }}>
-          <h2 style={{ ...S.h2, marginBottom: 16 }}>Needs Attention</h2>
-          <NeedsAttentionPanel
-            classId={classId}
-            onOpenStudent={(email: string) => setDrawerEmail(email)}
-            onOpenTeacherEdit={(studentEmail: string, lessonId: string) => {
-              router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(studentEmail)}&lesson=${encodeURIComponent(lessonId)}`);
-            }}
-          />
-        </div>
-      )}
-
-      {/* Co-teachers */}
-      <div style={{ ...S.card, marginBottom: 16 }}>
-        <h2 style={S.h2}>Co-teachers ({coTeachers.length})</h2>
-        {coTeachers.length === 0 ? (
-          <p style={{ color: '#6272a4', fontSize: 14, marginBottom: isOwner ? 16 : 0 }}>No co-teachers added yet.</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: isOwner ? 16 : 0 }}>
-            {coTeachers.map((ct) => (
-              <div
-                key={ct.teacher_email}
-                style={{ background: '#282a36', borderRadius: 6, padding: '10px 14px', border: '1px solid #44475a33', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'monospace', fontSize: 14, color: '#f8f8f2', marginBottom: 2 }}>
-                    {ct.teacher_email}
-                  </div>
-                  <div style={{ fontSize: 12, color: '#6272a4' }}>
-                    added {fmtTs(ct.added_at)}{ct.added_by ? ` by ${ct.added_by}` : ''}
-                  </div>
-                </div>
-                {isOwner && (
-                  <button
-                    style={
-                      removingCoTeacher === ct.teacher_email
-                        ? S.btnDisabled
-                        : { ...S.btn('#ff5555'), color: '#f8f8f2' }
-                    }
-                    disabled={removingCoTeacher === ct.teacher_email}
-                    onClick={() => { void handleRemoveCoTeacher(ct.teacher_email); }}
-                  >
-                    {removingCoTeacher === ct.teacher_email ? '…' : 'Remove'}
-                  </button>
-                )}
+                  );
+                })}
               </div>
-            ))}
+            )}
           </div>
-        )}
-        {isOwner && (
-          <form onSubmit={(e) => { void handleAddCoTeacher(e); }} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        {/* Add student */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Add student by email</h2>
+          <form onSubmit={(e) => { void handleEnroll(e); }} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <input
               style={S.input}
               type="email"
-              placeholder="teacher@example.com"
-              value={coTeacherEmail}
-              onChange={(e) => setCoTeacherEmail(e.target.value)}
+              placeholder="student@example.com"
+              value={enrollEmail}
+              onChange={(e) => setEnrollEmail(e.target.value)}
               required
             />
             <button
               type="submit"
-              disabled={addingCoTeacher || !coTeacherEmail.trim()}
-              style={addingCoTeacher || !coTeacherEmail.trim() ? S.btnDisabled : S.btn('#bd93f9')}
+              disabled={enrolling || !enrollEmail.trim()}
+              style={enrolling || !enrollEmail.trim() ? S.btnDisabled : S.btn('#50fa7b')}
             >
-              {addingCoTeacher ? 'Adding…' : 'Add co-teacher'}
+              {enrolling ? 'Adding…' : 'Add student'}
             </button>
           </form>
-        )}
-        {coTeacherError && <p style={S.error}>{coTeacherError}</p>}
-      </div>
+          {enrollError && <p style={S.error}>{enrollError}</p>}
+        </div>
+        {/* Bulk enroll */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Bulk enroll</h2>
+          <BulkEnrollmentForm classId={classId} onDone={() => { void loadDetail(); }} />
+        </div>
+        </div>
+      )}
 
-      {/* Add student */}
-      <div style={S.card}>
-        <h2 style={S.h2}>Add student by email</h2>
-        <form onSubmit={(e) => { void handleEnroll(e); }} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <input
-            style={S.input}
-            type="email"
-            placeholder="student@example.com"
-            value={enrollEmail}
-            onChange={(e) => setEnrollEmail(e.target.value)}
-            required
+      {activeTab === 'gradebook' && (
+        <div role="tabpanel" id={`panel-gradebook`} aria-labelledby={`tab-gradebook`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        {/* Gradebook view */}
+          <div style={{ ...S.card, marginBottom: 28 }}>
+            <h2 style={{ ...S.h2, marginBottom: 16 }}>Gradebook</h2>
+            <GradebookView
+              classId={classId}
+              className={cls.name}
+              lessonMap={lessonMap}
+              onOpenStudent={(email) => setDrawerEmail(email)}
+            />
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'schedule' && (
+        <div role="tabpanel" id={`panel-schedule`} aria-labelledby={`tab-schedule`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        {/* Shape tools vs code. Only reSHape assignments can be gated — the setting
+            decides which side a reSHape lesson opens on, and means nothing to a
+            moSHion or console one. */}
+          <LessonModeControl
+            classId={classId}
+            lessons={[...lessonMap.values()]
+              .filter((l) => l.preview === 'reshape')
+              .map((l) => ({ id: l.id, title: l.title }))}
           />
-          <button
-            type="submit"
-            disabled={enrolling || !enrollEmail.trim()}
-            style={enrolling || !enrollEmail.trim() ? S.btnDisabled : S.btn('#50fa7b')}
-          >
-            {enrolling ? 'Adding…' : 'Add student'}
-          </button>
-        </form>
-        {enrollError && <p style={S.error}>{enrollError}</p>}
-      </div>
+        {/* Due dates */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Due dates</h2>
+          <DueDatesPanel classId={classId} />
+        </div>
+        {/* Solution release */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Release solutions</h2>
+          <SolutionReleasePanel classId={classId} />
+        </div>
+        </div>
+      )}
 
-      {/* Bulk enroll */}
-      <div style={S.card}>
-        <h2 style={S.h2}>Bulk enroll</h2>
-        <BulkEnrollmentForm classId={classId} onDone={() => { void loadDetail(); }} />
-      </div>
-
-      {/* Submission Review Queue */}
-      <div style={S.card}>
-        <h2 style={S.h2}>Submission Review Queue</h2>
-        <SubmissionQueue classId={classId} />
-      </div>
-
-      {/* Past due */}
-      <div style={S.card}>
-        <h2 style={S.h2}>Past due</h2>
-        <PastDuePanel classId={classId} />
-      </div>
-
-      {/* Due dates */}
-      <div style={S.card}>
-        <h2 style={S.h2}>Due dates</h2>
-        <DueDatesPanel classId={classId} />
-      </div>
-
-      {/* Solution release */}
-      <div style={S.card}>
-        <h2 style={S.h2}>Release solutions</h2>
-        <SolutionReleasePanel classId={classId} />
-      </div>
-
-      {/* Grading weights */}
-      <div style={S.card}>
-        <h2 style={S.h2}>Grading weights</h2>
-        <GradingWeightsPanel classId={classId} />
-      </div>
-
-      {/* Announcements */}
-      <div style={S.card}>
-        <h2 style={S.h2}>Announcements</h2>
-        <AnnouncementsPanel classId={classId} />
-      </div>
+      {activeTab === 'settings' && (
+        <div role="tabpanel" id={`panel-settings`} aria-labelledby={`tab-settings`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        {/* Code */}
+        <div style={{ ...S.card, marginBottom: 28 }}>
+          <div style={{ color: '#6272a4', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Join Code</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
+            <span style={S.code}>{currentCode}</span>
+            <button
+              style={regenerating ? S.btnDisabled : S.btn('#ff79c6')}
+              disabled={regenerating}
+              onClick={() => { void handleRegenCode(); }}
+            >
+              {regenerating ? 'Regenerating…' : 'Regenerate code'}
+            </button>
+          </div>
+          {actionError && !isOwner && <p style={S.error} role="alert">{actionError}</p>}
+        </div>
+        {/* Co-teachers */}
+        <div style={{ ...S.card, marginBottom: 16 }}>
+          <h2 style={S.h2}>Co-teachers ({coTeachers.length})</h2>
+          {coTeachers.length === 0 ? (
+            <p style={{ color: '#6272a4', fontSize: 14, marginBottom: isOwner ? 16 : 0 }}>No co-teachers added yet.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: isOwner ? 16 : 0 }}>
+              {coTeachers.map((ct) => (
+                <div
+                  key={ct.teacher_email}
+                  style={{ background: '#282a36', borderRadius: 6, padding: '10px 14px', border: '1px solid #44475a33', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: '#f8f8f2', marginBottom: 2 }}>
+                      {ct.teacher_email}
+                    </div>
+                    <div style={{ fontSize: 12, color: '#6272a4' }}>
+                      added {fmtTs(ct.added_at)}{ct.added_by ? ` by ${ct.added_by}` : ''}
+                    </div>
+                  </div>
+                  {isOwner && (
+                    <button
+                      style={
+                        removingCoTeacher === ct.teacher_email
+                          ? S.btnDisabled
+                          : { ...S.btn('#ff5555'), color: '#f8f8f2' }
+                      }
+                      disabled={removingCoTeacher === ct.teacher_email}
+                      onClick={() => { void handleRemoveCoTeacher(ct.teacher_email); }}
+                    >
+                      {removingCoTeacher === ct.teacher_email ? '…' : 'Remove'}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          {isOwner && (
+            <form onSubmit={(e) => { void handleAddCoTeacher(e); }} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+              <input
+                style={S.input}
+                type="email"
+                placeholder="teacher@example.com"
+                value={coTeacherEmail}
+                onChange={(e) => setCoTeacherEmail(e.target.value)}
+                required
+              />
+              <button
+                type="submit"
+                disabled={addingCoTeacher || !coTeacherEmail.trim()}
+                style={addingCoTeacher || !coTeacherEmail.trim() ? S.btnDisabled : S.btn('#bd93f9')}
+              >
+                {addingCoTeacher ? 'Adding…' : 'Add co-teacher'}
+              </button>
+            </form>
+          )}
+          {coTeacherError && <p style={S.error}>{coTeacherError}</p>}
+        </div>
+        {/* Grading weights */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Grading weights</h2>
+          <GradingWeightsPanel classId={classId} />
+        </div>
+        {/* Announcements */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Announcements</h2>
+          <AnnouncementsPanel classId={classId} />
+        </div>
+        </div>
+      )}
 
       {/* Student drawer */}
       {drawerEmail !== null && (
@@ -2237,7 +2346,7 @@ function TeacherPageInner() {
   return (
     <div style={S.page}>
       {classId ? (
-        <DetailView classId={classId} initialView={wantsGradebook ? 'gradebook' : undefined} />
+        <DetailView classId={classId} initialTab={parseTab(params.get('tab')) ?? (wantsGradebook ? 'gradebook' : undefined)} />
       ) : wantsGradebook ? (
         <GradebookRedirect />
       ) : (
@@ -2262,7 +2371,10 @@ function GradebookRedirect() {
     void apiFetch<{ classes: ClassSummary[] }>('/api/classes').then((result) => {
       if (cancelled) return;
       if (result.error === null && result.data.classes.length > 0) {
-        router.replace(`/teacher?class=${result.data.classes[0].id}&view=gradebook`);
+        let last: string | null = null;
+        try { last = window.localStorage.getItem('shcode:lastClass'); } catch { /* private window */ }
+        const pick = result.data.classes.find((c) => c.id === last) ?? result.data.classes[0];
+        router.replace(`/teacher?class=${pick.id}&tab=gradebook`);
       } else {
         setEmpty(true);
       }
