@@ -59,6 +59,8 @@ interface StudentProgress {
   started_count: number;
   last_active: number | null;
   total_score: number;
+  firstName?: string | null;
+  lastName?: string | null;
   /** 0-100 grade-so-far under this class's weights and due dates (work done plus work past due). */
   weightedPercent: number;
   /** Graded lessons in the course, how many this student finished, and how many are past due and not done. */
@@ -98,6 +100,7 @@ interface StudentDetail {
     doneCount?: number;
     counted?: number;
     missingCount?: number;
+    missingIds?: string[];
     categories: Array<{ category: string; label: string; weight: number; percent: number; done: number; total: number }>;
   };
 }
@@ -607,6 +610,9 @@ function StudentDrawer({
     const lessonIds = new Set([
       ...Object.keys(detail.lessonState),
       ...Object.keys(detail.latestSubmissions),
+      // Graded lessons past due that the student never opened have no row anywhere; they are the ones
+      // a teacher opens the drawer to find, so they are listed too, marked Missing.
+      ...(detail.grading?.missingIds ?? []),
     ]);
 
     for (const id of lessonIds) {
@@ -657,7 +663,14 @@ function StudentDrawer({
   // submission on file — a free-response answer that did not pass. Without
   // this it fell through to "Not started", which is the opposite of true and
   // worse than the missing row it replaced.
-  function stateBadge(state: 'started' | 'completed' | undefined, submitted = false) {
+  function stateBadge(state: 'started' | 'completed' | undefined, submitted = false, missing = false) {
+    if (!state && !submitted && missing) {
+      return (
+        <span style={{ background: '#ff5555', color: '#282a36', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }} title="Past its due date and never opened">
+          Missing
+        </span>
+      );
+    }
     if (!state && submitted) {
       return (
         <span style={{ background: '#ffb86c', color: '#282a36', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
@@ -803,7 +816,7 @@ function StudentDrawer({
                         <span style={{ flex: 1, fontSize: 13, color: '#f8f8f2', minWidth: 0 }}>
                           {lesson.title}
                         </span>
-                        {stateBadge(ls?.state, !!sub)}
+                        {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id))}
                         {ls?.state === 'completed' && ls.score !== null && (
                           <span style={{ fontSize: 12, color: '#8be9fd', fontFamily: 'monospace', flexShrink: 0 }}>
                             {ls.score} pts
@@ -1973,9 +1986,15 @@ function DetailView({ classId, initialView }: { classId: string; initialView?: '
                     style={{ background: '#282a36', borderRadius: 6, padding: '12px 16px', border: '1px solid #44475a33', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
                   >
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: 'monospace', fontSize: 14, color: '#f8f8f2', marginBottom: 4 }}>
-                        {row.student_email}
-                      </div>
+                      {(() => {
+                        const nm = fullName(prog?.firstName, prog?.lastName);
+                        return (
+                          <div style={{ marginBottom: 4 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: '#f8f8f2' }}>{nm ?? row.student_email}</span>
+                            {nm && <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#6272a4', marginLeft: 10 }}>{row.student_email}</span>}
+                          </div>
+                        );
+                      })()}
                       <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#6272a4', flexWrap: 'wrap' }}>
                         <span>
                           Enrolled: {fmt(row.enrolled_at)} by {row.enrolled_by ?? 'self'}

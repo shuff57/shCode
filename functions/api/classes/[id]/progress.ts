@@ -78,6 +78,13 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
   // per-student state rows come back in one query grouped by email.
   const scopeMap = await loadLessonScopeMap(env, request);
   const weights = await loadClassWeights(env.DB, classId);
+  const nameRows = await env.DB.prepare(
+    `SELECT email, first_name, last_name FROM students WHERE email IN (
+       SELECT student_email FROM enrollments WHERE class_id = ? AND expires_at > ?)`,
+  )
+    .bind(classId, now)
+    .all<{ email: string; first_name: string | null; last_name: string | null }>();
+  const names = new Map((nameRows.results ?? []).map((n) => [n.email, n]));
   const dueIndex = buildDueIndex(await loadClassDueRows(env.DB, classId));
   const waivers = await loadClassDueWaivers(env.DB, classId);
   const statesByStudent = new Map<string, (StateRow & { student_email: string })[]>();
@@ -106,6 +113,8 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
       });
       return {
         ...r,
+        firstName: names.get(r.student_email)?.first_name ?? null,
+        lastName: names.get(r.student_email)?.last_name ?? null,
         weightedPercent: g.percent,
         gradedTotal: g.gradedTotal,
         gradedDone: g.doneCount,

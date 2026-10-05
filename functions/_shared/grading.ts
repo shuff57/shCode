@@ -67,6 +67,8 @@ export interface StudentGrading {
   counted: number;
   /** Past due, not done, not waived: each is a 0 inside `percent`. */
   missingCount: number;
+  /** The lesson ids behind `missingCount`, so a teacher's drawer can list lessons the student never opened. */
+  missingIds: string[];
 }
 
 /** What makes a lesson count as "due so far" for one student in one class. */
@@ -108,7 +110,7 @@ export function studentGrading(
   weights: Weights,
   due: GradeDue,
 ): StudentGrading {
-  if (!scopeMap) return { percent: 0, categories: [], gradedTotal: 0, doneCount: 0, counted: 0, missingCount: 0 };
+  if (!scopeMap) return { percent: 0, categories: [], gradedTotal: 0, doneCount: 0, counted: 0, missingCount: 0, missingIds: [] };
 
   const stateByLesson = new Map<string, StateRow>();
   for (const s of states) stateByLesson.set(s.lesson_id, s);
@@ -118,6 +120,7 @@ export function studentGrading(
   let gradedTotal = 0;
   let doneCount = 0;
   let missingCount = 0;
+  const missingIds: string[] = [];
   for (const [lessonId, scope] of scopeMap) {
     const category = lessonGradeCategory({
       title: scope.title,
@@ -137,6 +140,7 @@ export function studentGrading(
       if (dueAt !== null && dueAt <= due.now) {
         counts = true;
         missingCount += 1;
+        missingIds.push(lessonId);
       }
     }
     if (!counts) continue;
@@ -173,5 +177,6 @@ export function studentGrading(
     doneCount,
     counted: items.length,
     missingCount,
+    missingIds,
   };
 }

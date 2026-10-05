@@ -186,6 +186,13 @@ check('studentGrading: a lesson due in the future is left out, not zeroed', () =
   assert.equal(g.missingCount, 0);
 });
 
+check('studentGrading: missingIds names the past-due, not-done, not-waived lessons (and only those)', () => {
+  const g = studentGrading(scopeMap, [done('lab-1')], DEFAULT_WEIGHTS, dueOn([['lab-1', NOW - DAY], ['lab-2', NOW - DAY], ['quiz-1', NOW + DAY]]));
+  assert.deepEqual(g.missingIds, ['lab-2']);
+  const waived = studentGrading(scopeMap, [], DEFAULT_WEIGHTS, dueOn([['lab-2', NOW - DAY]], ['lab-2']));
+  assert.deepEqual(waived.missingIds, []);
+});
+
 check('studentGrading: a waived past-due lesson is not a zero, a waived DONE one still counts', () => {
   const waivedMissing = studentGrading(scopeMap, [done('quiz-1', 10)], DEFAULT_WEIGHTS, dueOn([['lab-1', NOW - DAY]], ['lab-1']));
   assert.equal(waivedMissing.percent, 100);
