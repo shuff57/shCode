@@ -65,7 +65,9 @@ try {
   if (shallow) {
     console.error('[stamp-tries-applied] WARNING: this is a shallow clone, so the "earlier than the commit that introduced it" check is SKIPPED (git history is cut off). Run `git fetch --unshallow` to restore it.');
   }
-  const first = shallow ? '' : execFileSync('git', ['log', '-S', 'TRIES_APPLIED', '--format=%ct', '--reverse', '--', rel], { cwd: root, encoding: 'utf8' }).trim().split('\n')[0];
+  // %at (author date), not %ct: a rebase or cherry-pick rewrites the committer date to "now", which made a
+  // correct stamp look earlier than the feature after the branch was rebased onto GitHub (2026-10-04).
+  const first = shallow ? '' : execFileSync('git', ['log', '-S', 'TRIES_APPLIED', '--format=%at', '--reverse', '--', rel], { cwd: root, encoding: 'utf8' }).trim().split('\n')[0];
   if (first && applied < Number(first) * 1000 - 60_000) die(`TRIES_APPLIED (${new Date(applied).toISOString()}) is earlier than the commit that introduced it: a stamp that predates the feature is a typo.`);
   const dirty = execFileSync('git', ['status', '--porcelain', '--', rel], { cwd: root, encoding: 'utf8' }).trim();
   if (dirty) die('lib/attempt-cap.ts has uncommitted changes: the deploy worktree is built from HEAD, so the stamp would not ship. Commit it first.');
