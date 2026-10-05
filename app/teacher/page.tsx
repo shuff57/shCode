@@ -2105,7 +2105,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
               </button>
             </div>
             {deleteError && <p style={S.error}>{deleteError}</p>}
-            {actionError && <p style={S.error} role="alert">{actionError}</p>}
+            {actionError && <p style={S.error}>{actionError}</p>}
           </div>
         )}
       </div>
@@ -2375,15 +2375,20 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           <div style={{ color: '#8393c4', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Join Code</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span style={S.code}>{currentCode}</span>
-            <button
-              style={regenerating ? S.btnDisabled : S.btn('#ff79c6')}
-              disabled={regenerating}
-              onClick={() => { void handleRegenCode(); }}
-            >
-              {regenerating ? 'Regenerating…' : 'Regenerate code'}
-            </button>
+            {isOwner ? (
+              <button
+                style={regenerating ? S.btnDisabled : S.btn('#ff79c6')}
+                disabled={regenerating}
+                onClick={() => { void handleRegenCode(); }}
+              >
+                {regenerating ? 'Regenerating…' : 'Regenerate code'}
+              </button>
+            ) : (
+              // The server only lets the owner rotate the code; a button that always fails is worse than a sentence.
+              <span style={{ fontSize: 13, color: '#8393c4' }}>Only the class owner can make a new join code.</span>
+            )}
           </div>
-          {actionError && !isOwner && <p style={S.error} role="alert">{actionError}</p>}
+          
         </div>
         {/* Co-teachers */}
         <div style={{ ...S.card, marginBottom: 16 }}>
