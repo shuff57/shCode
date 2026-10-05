@@ -63,6 +63,11 @@ eq(run('--check'), 1, 'a stamp two days old: refuses (the deploy slipped; attemp
   eq(r.status, 0, 'a stamp two days old with --allow-old: passes');
   if (!/WARNING: --allow-old/.test(r.stderr)) fail('--allow-old did not warn loudly'); else ok('--allow-old warns loudly on stderr');
 }
+{
+  const r = spawnSync('node', [join(tmp, 'scripts/stamp-tries-applied.mjs'), '--check'], { cwd: tmp, encoding: 'utf8', env: { ...process.env, TRIES_STAMP_ALLOW_OLD: '1' } });
+  eq(r.status, 0, 'a stamp two days old with TRIES_STAMP_ALLOW_OLD=1 (how `npm run deploy` passes it): passes');
+  if (!/WARNING/.test(r.stderr)) fail('the env override did not warn loudly'); else ok('the env override warns loudly on stderr');
+}
 // back to a fresh stamp for the cases below
 writeFileSync(join(tmp, 'lib/attempt-cap.ts'), cap().replace(/TRIES_APPLIED = \d{13};/, `TRIES_APPLIED = ${Date.now()};`));
 git('add', '-A'); git('commit', '-q', '-m', 'fresh');

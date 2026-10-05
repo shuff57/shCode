@@ -10,7 +10,7 @@
 // --check refuses when: TRIES_GO_LIVE_STAMPED is false; TRIES_APPLIED is in the future; it is
 // earlier than the commit that introduced it (a stamp that predates the feature is a typo; skipped
 // with a loud warning on a shallow clone, where that commit cannot be found); more
-// than 24 hours old (the deploy slipped; --allow-old overrides, loudly); or
+// than 24 hours old (the deploy slipped; --allow-old or TRIES_STAMP_ALLOW_OLD=1 overrides, loudly); or
 // lib/attempt-cap.ts differs from HEAD (a deploy worktree is built from HEAD, so an uncommitted
 // stamp would not ship). Never move a stamped value EARLIER once students have used the
 // deploy: that confiscates tries (see the comment in lib/attempt-cap.ts).
@@ -51,10 +51,13 @@ if (applied > Date.now()) die(`TRIES_APPLIED (${new Date(applied).toISOString()}
 // --allow-old to say you know (the students' tries in that gap are the cost).
 const STALE_MS = 24 * 3600 * 1000;
 if (Date.now() - applied > STALE_MS) {
-  if (!process.argv.includes('--allow-old')) {
-    die(`TRIES_APPLIED (${new Date(applied).toISOString()}) is more than 24 hours old: the deploy slipped, and attempts made between the stamp and the deploy would count against the cap before the rule was live. Un-stamp it (set TRIES_GO_LIVE_STAMPED back to false and the literal to the placeholder, in a commit) and run --set-now again at the real go-live, or pass --allow-old to deploy anyway.`);
+  // `npm run deploy` cannot pass a flag to this step, so the same knowing override is also an env var:
+  //   TRIES_STAMP_ALLOW_OLD=1 npm run deploy
+  // For every deploy AFTER the first one that shipped the stamp: the rule has been live since the stamp, so no tries are lost.
+  if (!process.argv.includes('--allow-old') && process.env.TRIES_STAMP_ALLOW_OLD !== '1') {
+    die(`TRIES_APPLIED (${new Date(applied).toISOString()}) is more than 24 hours old: the deploy slipped, and attempts made between the stamp and the deploy would count against the cap before the rule was live. Un-stamp it (set TRIES_GO_LIVE_STAMPED back to false and the literal to the placeholder, in a commit) and run --set-now again at the real go-live, or pass --allow-old (or set TRIES_STAMP_ALLOW_OLD=1 for npm run deploy) to deploy anyway. Once a deploy has shipped this stamp, later deploys are not "slipped": set it.`);
   }
-  console.error(`[stamp-tries-applied] WARNING: --allow-old. The stamp is ${Math.round((Date.now() - applied) / 3600000)} hours old; every attempt since ${new Date(applied).toISOString()} counts against the cap.`);
+  console.error(`[stamp-tries-applied] WARNING: --allow-old / TRIES_STAMP_ALLOW_OLD. The stamp is ${Math.round((Date.now() - applied) / 3600000)} hours old; every attempt since ${new Date(applied).toISOString()} counts against the cap.`);
 }
 try {
   // On a SHALLOW clone `git log -S` can only see the shallow root commit, whose date is the clone's,
