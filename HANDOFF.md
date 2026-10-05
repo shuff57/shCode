@@ -25,14 +25,14 @@ which was deliberately never committed. All test data on prod was deleted (class
    rebased tree: the app typecheck has 0 errors (the functions one has the same 9 old ones), the grade/cell/CSV/stamp/http
    tests and the reshape refusal-gate test pass, and `npm run build` succeeds with the leak checks green. The pre-rebase
    state is kept as the local branch `backup/cs-3d-before-rebase-2026-10-05` (delete it once you are happy). **The live
-   site was deployed from the PRE-rebase commits and does not include GitHub's three reshape commits, and that is
-   intentional: reshape is still being built.** `cs-3d` now CONTAINS that unfinished reshape work, so a deploy from it
-   ships it to students. Until reshape is ready, deploy the gradebook work from `gradebook-ux` instead (it is the same
-   code that is live plus the stamp env override and the handoff notes, with none of the reshape commits):
-   `cd ~/Documents/GitHub/shCode-r7 && git checkout --detach gradebook-ux && TRIES_STAMP_ALLOW_OLD=1 npm run deploy`.
-   Keep the `gradebook-ux` branch for that reason. (Pushing `cs-3d` to GitHub does not deploy anything by itself: the
-   Cloudflare git build it triggers fails on the missing kernel wasm. If that build is ever fixed, a push would
-   auto-deploy `cs-3d`, reshape work included.) Rebase renamed the commits quoted elsewhere in this
+   site was deployed from the PRE-rebase commits, so it does not yet include GitHub's three reshape commits.** `cs-3d`
+   contains that unfinished reshape work. **Decision (2026-10-05): the owner accepts deploying it, even if reshape is
+   still broken**, so the next deploy goes from `cs-3d` as normal (from `shCode-r7`, `git checkout --detach cs-3d`,
+   `TRIES_STAMP_ALLOW_OLD=1 npm run deploy`). Students in the reshape lessons (module 8.1) may see rough edges; the
+   build and leak checks pass, but nobody has walked those lessons on this combination. If that ever needs to be
+   avoided, the `gradebook-ux` branch is the same code that is live without the reshape commits (keep it). Pushing
+   `cs-3d` deploys nothing by itself: the Cloudflare git build it triggers fails on the missing kernel wasm; if that
+   build is ever fixed, a push would auto-deploy `cs-3d`. Rebase renamed the commits quoted elsewhere in this
    section; old to new:
 
 | was | now | commit |
