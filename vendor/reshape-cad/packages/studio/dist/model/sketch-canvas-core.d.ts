@@ -115,6 +115,22 @@ export interface SoupSolver {
     solve(): boolean;
     params: Float64Array | number[];
 }
+/** The canvas's degrees-of-freedom badge, from the kernel's own diagnosis (brep-rs sketch/diagnose.rs:
+ *  `dof` is n_free - rank of the rule Jacobian, so a lone line reads 4, a lone arc 5 (centre, radius and
+ *  two end angles: its ends stay on its circle), a slot 6, a dimensioned rectangle 2).
+ *
+ *  A sketch whose rules cannot all hold gets the red badge whatever its `dof` says. The kernel names
+ *  the two ways that happens `conflicting` (rules that contradict one another) and `globallyInfeasible`
+ *  (each rule is fine on its own, and no point satisfies them all, such as a length longer than the
+ *  circle it sits in); the canvas used to colour only the first, so the second read "N free to move",
+ *  or "Fully constrained" when N was 0, for a sketch that had no solution. */
+export declare function dofBadge(d: {
+    dof: number;
+    bucket: string;
+} | null | undefined): {
+    cls: '' | 'sk-dof-ok' | 'sk-dof-warn' | 'sk-dof-bad';
+    text: string;
+};
 /** The rows the doc should STORE: the rule-satisfying (solved) state.
  *
  *  model-types.ts says a sketch's `geoms` are the SOLVED coordinates, but a

@@ -524,12 +524,13 @@ export function toScript(doc, namedParams) {
                     }
                 }
                 for (const [k, r] of Object.entries(f.rounds ?? {})) {
+                    // The document counts corners from 0; the script counts them from 1, like the panel.
                     if (r > 0)
-                        lines.push(`${f.id}.round(${k}, ${lit(r)})`);
+                        lines.push(`${f.id}.round(${Number(k) + 1}, ${lit(r)})`);
                 }
                 for (const [k, d] of Object.entries(f.chamfers ?? {})) {
                     if (d > 0)
-                        lines.push(`${f.id}.chamfer(${k}, ${lit(d)})`);
+                        lines.push(`${f.id}.chamfer(${Number(k) + 1}, ${lit(d)})`);
                 }
             }
             return;

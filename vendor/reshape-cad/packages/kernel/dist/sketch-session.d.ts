@@ -34,7 +34,7 @@ export type SessionRule = Record<string, unknown> & {
 export interface Diagnosis {
     rank: number;
     dof: number;
-    bucket: 'consistent' | 'globally-infeasible' | 'redundant' | 'conflicting';
+    bucket: 'consistent' | 'globallyInfeasible' | 'redundant' | 'conflicting' | 'error';
     blame: number[];
 }
 /** One solved profile segment (sketch_profile). Arc sweep is CCW radians. */

@@ -146,7 +146,7 @@ hole(c, { size: 'm6', counterbore: { across: 11, deep: 6 } })`,
       },
       {
         title: 'hole: round parts',
-        body: `A hole in a round part builds when it meets the part in a circle or in a curve the kernel can carry exactly. Down a cylinder's own axis: always. Down a cone's own axis: yes, and the tip is cut off where the cone narrows to the hole. Straight through a sphere's centre, along x, y or z: yes, through or with a flat floor (deep:), as long as the hole is at most 95% as wide as the sphere and a blind floor stays between the two circles where the hole meets the sphere. Straight across a cylinder's side, through its axis (along: 'x' on an upright cylinder): yes, through or blind, if the hole is at most 95% as wide as the cylinder and stays clear of both ends. Everything else on a round part gets a sentence that says what to do instead: an off-centre hole across a cylinder, a hole across a cone or beside its axis where it reaches the sloping wall, a second cut on a part that already has a hole across its side, and STEP export of a part with a hole across its side or a hole through a sphere (a sphere face has no STEP form yet). Here a 6 mm hole straight through a 40 mm sphere leaves 4/3 x pi x (20^2 - 3^2)^(3/2) = 32385.73 mm^3, a 4 mm hole across a 20 mm x 30 mm cylinder leaves 9174.71 mm^3, and a 4 mm hole down a 20 x 20 cone leaves 1876.58 mm^3.`,
+        body: `A hole in a round part builds when it meets the part in a circle or in a curve the kernel can carry exactly. Down a cylinder's own axis: always. Down a cone's own axis: yes, and the tip is cut off where the cone narrows to the hole. Straight through a sphere's centre, along x, y or z: yes, through or with a flat floor (deep:), as long as the hole is at most 95% as wide as the sphere and a blind floor stays between the two circles where the hole meets the sphere. Straight across a cylinder's side, through its axis (along: 'x' on an upright cylinder): yes, through or blind, if the hole is at most 95% as wide as the cylinder and stays clear of both ends. Everything else on a round part gets a sentence that says what to do instead: an off-centre hole across a cylinder, a hole across a cone or beside its axis where it reaches the sloping wall, and a second cut on a part that already has a hole across its side. A hole through a sphere exports to STEP. Here a 6 mm hole straight through a 40 mm sphere leaves 4/3 x pi x (20^2 - 3^2)^(3/2) = 32385.73 mm^3, a 4 mm hole across a 20 mm x 30 mm cylinder leaves 9174.71 mm^3, and a 4 mm hole down a 20 x 20 cone leaves 1876.58 mm^3.`,
         code: `const s = sphere(40)
 hole(s, { across: 6 })
 const c = cylinder(20, 30, { at: [60, 0, 0] })
@@ -198,7 +198,7 @@ shell(c, { wall: 2, open: 'top' })`,
     pages: [
       {
         title: 'fillet: smoothing edges',
-        body: `Rounding every edge of a box or cylinder is a property of the shape and shows on its own chip ("Box 1, corner 3"); rounding one edge is its own step ("Round 1"). fillet(b, 3) rounds every edge. fillet(b.edge('top', 'front'), 2) rounds one edge named by its two faces. A part you have joined or cut rounds the same way: any straight outside edge between two flat faces whose two ends are plain flat faces. A 40 x 40 x 20 block with a 10 x 10 x 10 corner notch cut from the top (31000 mm^3) and then fillet(v.edge('top', 'right'), 2) on its 40 mm edge leaves 31000 - (1 - pi/4) x 2^2 x 40 = 30965.66 mm^3, and two 20 mm cubes joined side by side with a 1 mm round on the 30 mm top front edge leave 12000 - (1 - pi/4) x 1^2 x 30 = 11993.56 mm^3. The words top, front and so on name the part's own topmost and frontmost faces, whole (an L-shaped top is one face). If those two faces do not touch, the words match every edge between a top-looking and a front-looking face: one edge is the one you mean, and several get the sentence "N edges of the part lie between a top face and a front face". An inside corner, an edge that ends against a slanted or curved face, or a round so big it would reach a neighbouring cut, each gets a sentence that says so.`,
+        body: `Rounding every edge of a box or cylinder is a property of the shape and shows on its own chip ("Box 1, corner 3"); rounding one edge is its own step ("Round 1"). fillet(b, 3) rounds every edge. fillet(b.edge('top', 'front'), 2) rounds one edge named by its two faces. A part you have joined or cut rounds the same way: any straight outside edge between two flat faces whose two ends are plain flat faces. A 40 x 40 x 20 block with a 10 x 10 x 10 corner notch cut from the top (31000 mm^3) and then fillet(v.edge('top', 'right'), 2) on its 40 mm edge leaves 31000 - (1 - pi/4) x 2^2 x 40 = 30965.66 mm^3, and two 20 mm cubes joined side by side with a 1 mm round on the 30 mm top front edge leave 12000 - (1 - pi/4) x 1^2 x 30 = 11993.56 mm^3. The words top, front and so on name the part's own topmost and frontmost faces, whole (an L-shaped top is one face). If those two faces do not touch, the words match every edge between a top-looking and a front-looking face: one edge is the one you mean, and several get the sentence "N edges of the part lie between a top face and a front face". An inside corner (where a wall stands on a plate, the bend of an L bracket) rounds the other way: the round ADDS material, a fillet of radius 2 in a 90 degree inside corner 20 mm long adds (1 - pi/4) x 2^2 x 20 = 17.17 mm^3, and a chamfer of 2 adds 2 x 2 / 2 x 20 = 40 mm^3. The words top and right match the outside edges around an inside corner as well, so the part answers with the sentence "3 edges of the part lie between a top face and a right face" until the words pick out exactly one edge. An inside corner that ends on more material (a tray's corner), an edge that ends against a slanted or curved face, the circle at the foot of a round boss, or a round so big it would reach a neighbouring cut, each gets a sentence that says so.`,
         code: `const b = cuboid(30, 20, 10)
 fillet(b, 3)`,
       },
@@ -210,7 +210,7 @@ chamfer(b.edge('top', 'front'), 3)`,
       },
       {
         title: 'Turned parts: bushings, washers and pins',
-        body: `A cylinder with a hole down its axis and rounded or bevelled rims is a part you could turn on a lathe, and the kernel builds it from its outline in one go, so these all build in any order: round the top rim and then the bottom rim, round or bevel a rim after the hole, drill after the rounds, and hollow a part whose rims are bevelled. cylinder(40, 20) with an 8 mm hole and a 3 mm round on each rim leaves 25132.74 - 1005.31 - 2 x 234.58 = 23658.28 mm^3, and a 3 mm bevel on each rim (no hole) leaves 24058.32 mm^3. Hollow it open at either end and the wall follows the bevel: a 3 mm bevel on the top rim and shell(c, { wall: 2, open: 'top' }) leaves 7043.83 mm^3, and the same part hollowed shut leaves a sealed wall 2 mm thick all round. A rounded rim at the end you leave open has no one obvious wall, so round after you hollow; a hole off the axis, a wall thicker than the rim it follows and a round wider than the flat it sits on each get a sentence that says what to do instead. A round has no STEP form yet, so a part with one says so on export; a bevel exports.`,
+        body: `A cylinder with a hole down its axis and rounded or bevelled rims is a part you could turn on a lathe, and the kernel builds it from its outline in one go, so these all build in any order: round the top rim and then the bottom rim, round or bevel a rim after the hole, drill after the rounds, and hollow a part whose rims are bevelled. cylinder(40, 20) with an 8 mm hole and a 3 mm round on each rim leaves 25132.74 - 1005.31 - 2 x 234.58 = 23658.28 mm^3, and a 3 mm bevel on each rim (no hole) leaves 24058.32 mm^3. Hollow it open at either end and the wall follows the bevel: a 3 mm bevel on the top rim and shell(c, { wall: 2, open: 'top' }) leaves 7043.83 mm^3, and the same part hollowed shut leaves a sealed wall 2 mm thick all round. Round the OUTER rim of the end you leave open, before or after the hollow, as long as the round is narrower than the wall: the cavity wall runs straight up to the open end and the lip keeps a flat of (wall - round) between the two, so cylinder(40, 20) rounded 1 mm on the top rim and hollowed open at the top with a 2 mm wall leaves 6784.31 mm^3 either way round, and a round as wide as the wall (or wider) would eat the whole lip and gets a sentence that says so; a hole off the axis, a wall thicker than the rim it follows and a round wider than the flat it sits on each get a sentence that says what to do instead. Rounds and bevels both export to STEP.`,
         code: `const c = cylinder(40, 20)
 hole(c, { across: 8 })
 round(c.edge('top', 'side'), 3)
@@ -315,6 +315,15 @@ const shape = extrude(sk, 30)`,
         body: `sk.polygon([[x, y], ...]) draws any flat shape from a list of corners, in the order you give them, and closes the last corner back to the first automatically. Corners and edges are both numbered starting at 1: corner 1 is the first point in the list, edge 1 runs from corner 1 to corner 2, and so on around the shape, with the last edge always closing back to corner 1. Those numbers are what the Rules panel shows for this sketch, and what the next page's rules take as arguments.`,
         code: `const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 15], [15, 15], [15, 30], [0, 30]])
+const shape = extrude(sk, 12)`,
+      },
+      {
+        title: 'round and chamfer: soften a corner',
+        body: `sk.round(corner, radius) turns a corner into a circular arc and sk.chamfer(corner, distance) cuts it off with a straight bevel. Corners are numbered from 1, the same numbers the Rules panel and sk.pin() use: corner 1 is the first point of the outline (for a rectangle, the one at the lower left), and a round or chamfer on corner 1 is written sk.round(1, 4). The number is a whole number from 1 to the corner count; 0 or a number past the last corner stops the script with a sentence that says so. A round or chamfer bigger than its corner has room for is cut down to what the corner can give, and the script says so in its notes: ".round(2, 99) is more than corner 2 has room for, so it was made 10 instead". A round and a chamfer on one corner leave the round. Here a 30 x 20 rectangle has corner 1 rounded by 4 and corner 3 chamfered by 3, and is extruded 12: its area is 600 - (1 - pi/4) x 4^2 - 3^2/2 = 592.07 mm^2, so the volume is 7104.80 mm^3.`,
+        code: `const sk = sketch('top')
+sk.rect(30, 20)
+sk.round(1, 4)
+sk.chamfer(3, 3)
 const shape = extrude(sk, 12)`,
       },
       {
@@ -460,9 +469,17 @@ pocket(sk, b, 5)`,
       },
       {
         title: 'revolve: revolving sketches',
-        body: `revolve(sk, 360) revolves the sketch 360 degrees around an axis.`,
+        body: `revolve(sk, 360) revolves the sketch 360 degrees around an axis: the line through the origin that stands square to the sketch plane, so the sketch's across direction is the distance from the axis and its up direction runs along it. This 30 x 10 rectangle sits 25 to 55 mm out from the axis, so it spins into a ring whose volume is 2 x pi x 40 x 300 = 75398.22 mm^3 (the distance of the rectangle's middle from the axis, times its area, times 2 pi). A sketch gets the same checks as a pull: edges that cross, a corner landing on an edge, a spike, or no area at all stop with a sentence that says what to move. A spin also stops when the outline crosses the axis, because the two sides would overlap; draw the whole outline on one side. A shape touching the axis is fine.`,
         code: `const sk = sketch('front', 0)
 sk.rect(30, 10, { at: [40, 0] })
+const shape = revolve(sk, 360)`,
+      },
+      {
+        title: 'revolve: rounds and arcs in the outline',
+        body: `A round on the outline spins into a true curved surface, not a bevel: with corner 1 of the ring above rounded by 4 (sk.round(1, 4)), the part is 74839.59 mm^3, which is the plain ring less the corner, 2 x pi x 25.89 x (1 - pi/4) x 4^2, where 25.89 is how far out the middle of that corner piece sits. A chamfer there would take off a different amount (74074.57 mm^3), so the two are not interchangeable. An outline drawn with arcs spins the same way when it sits clear of the axis. Rounds and arcs spin a full turn (360) only; a part turn of a curved outline, an arc whose centre is on the axis (a ball: use sphere()), and a groove with a curved outline each stop with a sentence.`,
+        code: `const sk = sketch('front', 0)
+sk.rect(30, 10, { at: [40, 0] })
+sk.round(1, 4)
 const shape = revolve(sk, 360)`,
       },
       {
@@ -531,7 +548,7 @@ shell(b, { wall: 15 })`,
     pages: [
       {
         title: 'Exporting your model',
-        body: `Click Export to save your model. STL for 3D printers, STEP for CAD software. Make sure walls are thick enough for printing (at least 0.5 mm).`,
+        body: `Click Export to save your model. STL for 3D printers, STEP for CAD software (spheres, rings, cones, rounded edges and rounded boxes all export exactly). Make sure walls are thick enough for printing (at least 0.5 mm).`,
         code: `const base = cuboid(40, 40, 5, { at: [0, 0, 2.5] })
 const post = cylinder(6, 20, { at: [0, 0, 10] })
 union(base, post)

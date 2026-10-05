@@ -64,7 +64,7 @@ import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-run
 // clicking one never draws geometry underneath it.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { angleInArcRange, arcEnds, arcFromClicks, autoDimension, dimensionValueError, distToCircleStroke, distToSegment, findSnap as findSnapCore, inferLineConstraint, isDimensionRule, migratedRules, namedPointsOf, nextGeomId, filletPick, maxFilletRadiusAt, whyCannotFilletAt, filletCornerAt, applyEqualRadiusRule, offsetChainPick, offsetChain, pointWorld, readSolved, solveRows, renumber, ruleGlyphAnchors, sampleArc, snapAxis, slotRows, arcAngles, toggleConstruction, trimLine, trimPick, splitWeldedCircles, mirrorSelection, copySelection, densifyIds, } from './sketch-canvas-core.js';
+import { angleInArcRange, arcEnds, arcFromClicks, autoDimension, dimensionValueError, distToCircleStroke, distToSegment, findSnap as findSnapCore, inferLineConstraint, isDimensionRule, migratedRules, namedPointsOf, nextGeomId, filletPick, maxFilletRadiusAt, whyCannotFilletAt, filletCornerAt, applyEqualRadiusRule, offsetChainPick, offsetChain, pointWorld, readSolved, solveRows, renumber, ruleGlyphAnchors, sampleArc, snapAxis, slotRows, arcAngles, toggleConstruction, trimLine, trimPick, splitWeldedCircles, mirrorSelection, copySelection, densifyIds, dofBadge, } from './sketch-canvas-core.js';
 import { pointSlots } from '@shuff57/reshape-kernel/sketch-session';
 import { applyWheelZoom, fitView, panByPx, screenPxToWorld, worldToScreen, } from '../sketch-view.js';
 import { marqueeKind, marqueeSelect } from '../marquee-select.js';
@@ -1728,20 +1728,7 @@ export default function SketchCanvas2D({ sketch, doc, onChange, onExit }) {
     const marqueeNow = marquee
         ? marqueeKind({ startX: marquee.from.x, startY: marquee.from.y, endX: marquee.to.x, endY: marquee.to.y })
         : null;
-    const dofClass = diagnosis
-        ? diagnosis.bucket === 'conflicting'
-            ? 'sk-dof-bad'
-            : diagnosis.dof === 0
-                ? 'sk-dof-ok'
-                : 'sk-dof-warn'
-        : '';
-    const dofText = diagnosis
-        ? diagnosis.bucket === 'conflicting'
-            ? 'Over-constrained'
-            : diagnosis.dof === 0
-                ? 'Fully constrained ✓'
-                : `${diagnosis.dof} free to move`
-        : '';
+    const { cls: dofClass, text: dofText } = dofBadge(diagnosis);
     // --- the constraint layer (P2.8) + the dimension chips (P2.7) ------------
     // One anchor per rule, index-aligned with `rules`, fanned out where several
     // land on the same spot. Pure math over the solved rows; recomputed when
