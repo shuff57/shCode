@@ -1,8 +1,8 @@
-# Handoff — 2026-10-04 (night) · gradebook + teacher-panel overhaul is LIVE; 14 commits not pushed
+# Handoff — 2026-10-04 (night) · gradebook + teacher-panel overhaul is LIVE and pushed
 
 Four phases shipped to shcode.pages.dev tonight (deployment `5f50e210` = commit `e7777a3a`; **redeployed 2026-10-05 as `f56b4f76` = `cs-3d` at `6c5ba49e`, which adds GitHub's three reshape commits**) and were
 checked on the live site signed in as a throwaway teacher. Everything is committed on the local branch
-`cs-3d` (rebased onto GitHub's tip on 2026-10-05; `gradebook-ux` still points at the old pre-rebase commits), **14 commits ahead of `origin/cs-3d`, not pushed** (a push also triggers Cloudflare's own git
+`cs-3d` (rebased onto GitHub's tip on 2026-10-05; `gradebook-ux` still points at the old pre-rebase commits), **pushed to `origin/cs-3d` on 2026-10-05 (`6dc32aa2`)** (a push also triggers Cloudflare's own git
 build, which fails on the missing kernel wasm. Noise only, the wrangler-deployed site is unaffected.).
 Working tree is clean except `functions/_shared/module-docs.generated.ts`, which the build regenerates and
 which was deliberately never committed. All test data on prod was deleted (classes 26/31/1 students untouched).
@@ -19,9 +19,9 @@ which was deliberately never committed. All test data on prod was deleted (class
    `cd ~/Documents/GitHub/shCode-r7 && git checkout --detach gradebook-ux && TRIES_STAMP_ALLOW_OLD=1 npm run deploy`
    (that worktree holds the git-ignored `pa-pseudocode/`, kernel wasm, models and node_modules symlinks; its
    `*.generated.ts` files show as dirty after a build, which is normal). Never move the stamp itself.
-3. **Push `cs-3d`: it is ready.** On 2026-10-05 the 13 commits were rebased onto GitHub's `cs-3d` (which had gained three
-   `chore(reshape): re-vendor reshape-cad` commits, `230d37b4`, `9bbea64a`, `285f71d1`; no file overlap) so the local
-   `cs-3d` is **0 behind, 14 ahead of `origin/cs-3d`, not pushed**: a plain fast-forward push, no force. Checked on the
+3. **`cs-3d` is rebased, deployed and PUSHED (2026-10-05, fast-forward `285f71d1..6dc32aa2`).** On 2026-10-05 the 13 commits were rebased onto GitHub's `cs-3d` (which had gained three
+   `chore(reshape): re-vendor reshape-cad` commits, `230d37b4`, `9bbea64a`, `285f71d1`; no file overlap) so `cs-3d` sat
+   0 behind GitHub's tip before the push. Checked on the
    rebased tree: the app typecheck has 0 errors (the functions one has the same 9 old ones), the grade/cell/CSV/stamp/http
    tests and the reshape refusal-gate test pass, and `npm run build` succeeds with the leak checks green. The pre-rebase
    state is kept as the local branch `backup/cs-3d-before-rebase-2026-10-05` (delete it once you are happy). **Deployed 2026-10-05
