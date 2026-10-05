@@ -293,6 +293,17 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `reason: 'enrollment' | 'tries' | 'not-released'`; a spent but unreleased capped
   quiz still returns the student's totals with `answersWithheld` and no key. Rules in
   `lib/solution-release-core.ts`, reads in `functions/_shared/solutionRelease.ts`.
+- **The grade is "so far", and there is ONE rule.** `studentGrading()` in `functions/_shared/grading.ts` is
+  the only place a course grade is computed (teacher roster, student drawer, and `GET /api/my-gradebook`'s
+  `grades`, one per class the student is in, each under that class's due dates, waivers and weights). A graded
+  lesson counts when it is done, or when its class due date has passed and it is not done and not waived;
+  anything not due yet is out of numerator and denominator. `gradedTotal`/`doneCount` carry "X of Y graded
+  lessons done" so a screen never presents "so far" as "whole course". Do not add a second grade formula to a
+  component: the roster once read a median 47% while the student's own page read 100%. Cells for both
+  gradebooks come from `buildCell` (`lib/gradebook-cell.ts`); `my-gradebook` also returns `tries` (counted
+  rows per capped part, grading failures free), `opensAt` and the upcoming graded lessons. Only graded lessons
+  are ever "missing"; a reading with a module due date is not an assignment. Browser checks: `DEV_REAL_DB=1
+  DEV_ROLE=teacher npm run dev` seeds a six-student class (`seedClass` in `scripts/dev-demo-api.mjs`).
 - `GET /api/my-due-dates` carries BOTH kinds — `rows` (due) and `openRows`
   (open) — per class. One endpoint, because a lesson's lock state must not
   flicker because one of two fetches landed first.

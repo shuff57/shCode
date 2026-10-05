@@ -114,6 +114,8 @@ export default function StudentGradebook({ lessons }: Props) {
   const [cells, setCells] = useState<Record<string, GradebookCell> | null>(null);
   const [dueDates, setDueDates] = useState<Record<string, number>>({});
   const [grades, setGrades] = useState<ClassGrade[]>([]);
+  const [tries, setTries] = useState<Record<string, { used: number; cap: number }>>({});
+  const [opensAt, setOpensAt] = useState<Record<string, number>>({});
   const [failed, setFailed] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -125,11 +127,13 @@ export default function StudentGradebook({ lessons }: Props) {
         if (!r.ok) throw new Error(`my-gradebook ${r.status}`);
         return r.json();
       })
-      .then((d: { cells?: Record<string, GradebookCell>; dueDates?: Record<string, number>; grades?: ClassGrade[] }) => {
+      .then((d: { cells?: Record<string, GradebookCell>; dueDates?: Record<string, number>; grades?: ClassGrade[]; tries?: Record<string, { used: number; cap: number }>; opensAt?: Record<string, number> }) => {
         if (cancelled) return;
         setCells(d.cells ?? {});
         setDueDates(d.dueDates ?? {});
         setGrades((d.grades ?? []).filter((g) => g.counted > 0));
+        setTries(d.tries ?? {});
+        setOpensAt(d.opensAt ?? {});
       })
       .catch(() => {
         if (!cancelled) setFailed(true);
@@ -167,7 +171,12 @@ export default function StudentGradebook({ lessons }: Props) {
     .filter((l) => cells[l.id])
     .map((l) => {
       const cell = cells[l.id];
-      return { lesson: l, cell, status: cellStatus(cell) };
+      const status = cellStatus(cell);
+      const t = tries[l.id];
+      // Tried and not passing: they handed something in, so "Not started" would be untrue.
+      const tried = !!t && t.used > 0 && cell.state !== 'completed' && status !== 'pending';
+      const opens = opensAt[l.id] && cell.state !== 'completed' && !tried ? opensAt[l.id] : null;
+      return { lesson: l, cell, status, tried, opens, t };
     })
     // A reading, slide deck or example has a due date through its module but no grade, so one the
     // student never opened is not "Missing": it is not an assignment. Ones they did open still show.
@@ -181,12 +190,14 @@ export default function StudentGradebook({ lessons }: Props) {
   // a student halfway through a lesson that something was wrong.
   const isMissingOrLate = (st: CellStatus) => st !== 'started' && needsAttention(st);
   const attentionCount = rows.filter((r) => isMissingOrLate(r.status)).length;
-  const progressCount = rows.filter((r) => r.status === 'started').length;
+  const nowMs = Date.now();
+  const isInProgress = (r: { status: CellStatus; tried: boolean }) => r.status === 'started' || (r.tried && r.status === 'not-started');
+  const progressCount = rows.filter(isInProgress).length;
   const shown =
     filter === 'attention'
       ? rows.filter((r) => isMissingOrLate(r.status))
       : filter === 'progress'
-        ? rows.filter((r) => r.status === 'started')
+        ? rows.filter(isInProgress)
         : rows;
 
   return (
@@ -266,9 +277,25 @@ export default function StudentGradebook({ lessons }: Props) {
               </tr>
             </thead>
             <tbody>
-              {shown.map(({ lesson, cell, status }) => {
+              {shown.map(({ lesson, cell, status, tried, opens, t }) => {
                 const due = dueDates[lesson.id];
                 const score = scoreText(cell, lesson.maxScore);
+                // Tried and not passing: say what they have and how many tries are left.
+                const left = t ? Math.max(0, t.cap - t.used) : 0;
+                const statusLabel = opens
+                  ? `Opens ${formatDue(opens)}`
+                  : tried
+                    ? left > 0 ? `Tried \u00b7 ${left} ${left === 1 ? 'try' : 'tries'} left` : 'Tried \u00b7 no tries left'
+                    : STATUS_LABEL[status];
+                const statusColor = opens ? '#94a3b8' : tried ? '#bd93f9' : STATUS_COLOR[status];
+                const bestText = tried
+                  ? cell.score != null && lesson.maxScore
+                    ? `best ${Math.round(cell.score * 100) / 100}/${lesson.maxScore}`
+                    : cell.possible != null && cell.possible > 0 && cell.submittedScore != null
+                      ? `latest ${cell.submittedScore}/${cell.possible}`
+                      : null
+                  : null;
+                const dueSoon = !!due && due > nowMs && due - nowMs <= 7 * 86400000 && status !== 'done' && status !== 'done-late';
                 const category = lessonGradeCategory({
                   title: lesson.title,
                   preview: lesson.preview,
@@ -304,17 +331,31 @@ export default function StudentGradebook({ lessons }: Props) {
                           </span>
                         )}
                       </td>
-                      <td style={{ ...tdStyle, opacity: 0.65 }}>
+                      <td style={{ ...tdStyle, opacity: dueSoon ? 1 : 0.65 }}>
                         {due ? formatDue(due) : '—'}
+                        {dueSoon && <span style={{ ...chipStyle, color: '#ffb86c', borderColor: '#ffb86c' }}>due soon</span>}
                       </td>
                       <td style={tdStyle}>
-                        <span
-                          style={{ ...badgeStyle, color: STATUS_COLOR[status], borderColor: STATUS_COLOR[status] }}
-                        >
-                          {STATUS_LABEL[status]}
+                        <span style={{ ...badgeStyle, color: statusColor, borderColor: statusColor }}>
+                          {statusLabel}
                         </span>
                       </td>
-                      <td style={scoreCellStyle}>{score ?? '—'}</td>
+                      <td style={scoreCellStyle}>
+                        {bestText ?? score ?? '\u2014'}
+                        {t && t.used > 0 && !tried && (
+                          <div style={{ opacity: 0.55, fontSize: 11 }}>
+                            {t.used} of {t.cap} {t.cap === 1 ? 'try' : 'tries'} used
+                          </div>
+                        )}
+                        {cell.teacherReviewedAt != null && (
+                          <div
+                            style={{ color: '#bd93f9', fontSize: 11 }}
+                            title="Your teacher reviewed this work and may have changed the score"
+                          >
+                            teacher-adjusted
+                          </div>
+                        )}
+                      </td>
                     </tr>
                     {open && (
                       <tr>

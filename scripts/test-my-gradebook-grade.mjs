@@ -10,6 +10,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openDb } from './dev-demo-api.mjs';
 import { onRequestGet } from '../functions/api/my-gradebook.ts';
+import { ATTEMPT_CAPS } from '../functions/_shared/pa-pseudocode.generated.ts';
+import { COUNT_SINCE } from '../lib/attempt-cap.ts';
 import { onRequestGet as classGradebookGet } from '../functions/api/classes/[id]/gradebook.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -73,8 +75,12 @@ const teacherView = async () => {
 await check('the teacher grid and the student page agree on every cell (one cell builder)', async () => {
   const mine = (await get()).cells;
   const theirs = (await teacherView()).cells;
-  assert.deepEqual(Object.keys(theirs).sort(), Object.keys(mine).sort());
+  // The student page also lists graded lessons coming due soon (nothing started, not late); the teacher
+  // grid does not. Every cell the teacher has must be on the student page, and every extra the student has
+  // must be one of those not-yet-late, not-started upcoming lessons.
+  for (const id of Object.keys(theirs)) assert.ok(mine[id], id + ' is on the student page');
   for (const id of Object.keys(mine)) {
+    if (!theirs[id]) { assert.equal(mine[id].state, null, id + ' extra is not started'); assert.equal(mine[id].late, false, id + ' extra is not late'); continue; }
     assert.equal(theirs[id].late, mine[id].late, id + ' late');
     assert.equal(theirs[id].pending, mine[id].pending, id + ' pending');
     assert.equal(theirs[id].state, mine[id].state, id + ' state');
@@ -91,12 +97,34 @@ await check('a waiver removes the past-due zero in that class and the late cell'
   assert.equal(g.missingCount, 0);
   // the only other class's date for lab-2 is in the future, so the lesson is not due anywhere now
   assert.equal(b.dueDates['lab-2'], NOW + 5 * DAY);
-  assert.equal(b.cells['lab-2'], undefined, 'no past-due cell for a waived, not-yet-due lesson');
+  // lab-2 is graded and due in 5 days in the other class, so it appears as an UPCOMING lesson, not a late one
+  assert.equal(b.cells['lab-2'].late, false);
+  assert.equal(b.cells['lab-2'].state, null);
 });
 
 await check('a waiver clears the teacher grid cell too, not only the student page', async () => {
   const theirs = (await teacherView()).cells;
   assert.equal(theirs['lab-2'], undefined);
+});
+
+await check('tries used counts real hand-ins only: a grading failure is free, rows before go-live are free', async () => {
+  const [capId, cap] = Object.entries(ATTEMPT_CAPS)[0];
+  const row = (n, at, gj) => db.raw.run("INSERT INTO lesson_submissions (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at) VALUES (?, ?, ?, 'x', ?, 1, 3, ?)", [`t${n}`, ME, capId, gj, at]);
+  row(1, COUNT_SINCE + 1000, null);
+  row(2, COUNT_SINCE + 2000, '{"criteria":[]}');
+  row(3, COUNT_SINCE + 3000, '{"gradingFailed":true}');
+  row(4, COUNT_SINCE - 5000, null); // before the go-live instant
+  const b = await get();
+  assert.deepEqual(b.tries[capId], { used: 2, cap });
+  assert.equal(b.capped[capId], cap);
+});
+
+db.raw.run("INSERT INTO class_open_dates (class_id, scope, scope_id, open_at, set_by, set_at) VALUES ('dev-class', 'lesson', 'lab-3', ?, 't', 0)", [NOW + 3 * DAY]);
+await check('a lesson that is not open yet reports when it opens, and still shows as an upcoming cell', async () => {
+  const b = await get();
+  assert.equal(b.opensAt['lab-3'], NOW + 3 * DAY);
+  assert.ok(b.cells['lab-3'], 'a locked graded lesson is listed');
+  assert.equal(b.opensAt['lab-1'], undefined);
 });
 
 console.log(results.join('\n'));

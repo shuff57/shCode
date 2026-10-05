@@ -25,6 +25,8 @@ import { onRequestGet as gradeGet, onRequestPost as gradePost } from '../functio
 import { onRequestGet as attemptRevealGet } from '../functions/api/attempt-reveal.ts';
 import { onRequestGet as quizRevealGet } from '../functions/api/quiz-reveal.ts';
 import { onRequestGet as myGradebookGet } from '../functions/api/my-gradebook.ts';
+import { ATTEMPT_CAPS } from '../functions/_shared/pa-pseudocode.generated.ts';
+import { COUNT_SINCE } from '../lib/attempt-cap.ts';
 import { onRequestGet as classesGet } from '../functions/api/classes/index.ts';
 import { onRequestGet as classDetailGet, onRequestPatch as classDetailPatch } from '../functions/api/classes/[id]/index.ts';
 import { onRequestGet as classGradebookGet } from '../functions/api/classes/[id]/gradebook.ts';
@@ -110,6 +112,8 @@ function seedClass(sql, root, teacherEmail) {
   for (const [m, at] of [['1.1', now - 20 * DAY], ['1.2', now - 14 * DAY], ['1.3', now - 7 * DAY], ['1.4', now - 2 * DAY], ['1.5', now + 7 * DAY]]) {
     sql.run("INSERT INTO class_due_dates (class_id, scope, scope_id, due_at, set_by, set_at) VALUES (?, 'module', ?, ?, ?, 0)", [CLASS_ID, m, at, teacherEmail]);
   }
+  const locked = inMods(['1.5'])[0];
+  if (locked) sql.run("INSERT INTO class_open_dates (class_id, scope, scope_id, open_at, set_by, set_at) VALUES (?, 'lesson', ?, ?, ?, 0)", [CLASS_ID, locked.id, now + 3 * DAY, teacherEmail]);
   const students = [
     ['ada@school.test', 'Ada', 'Lovelace', 'all'],
     ['ben@school.test', 'Ben', 'Franklin', 'early'],
@@ -131,6 +135,20 @@ function seedClass(sql, root, teacherEmail) {
       const ls = inMods(['1.1', '1.2', '1.3']);
       ls.slice(0, Math.ceil(ls.length / 2)).forEach((l) => put(email, l, 'completed', now - 18 * DAY, l.maxScore ? Math.max(1, Math.round(l.maxScore * 0.6)) : null));
       if (ls[ls.length - 1]) put(email, ls[ls.length - 1], 'started', null, null);
+    }
+    if (kind === 'early') {
+      // Ben has used 2 of 3 tries on a capped part and not passed: it shows "Tried" with one try left.
+      const capId = Object.keys(ATTEMPT_CAPS).find((id) => man.some((l) => l.id === id));
+      if (capId) {
+        const cl = man.find((l) => l.id === capId);
+        put(email, cl, 'started', null, 1.5);
+        for (const n of [1, 2]) sql.run("INSERT INTO lesson_submissions (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at) VALUES (?, ?, ?, 'attempt', ?, 1.5, 3, ?)", ['seed-' + n, email, capId, JSON.stringify({ criteria: [] }), Math.max(COUNT_SINCE, now) + n]);
+      }
+    }
+    if (kind === 'all') {
+      // Ada's first graded lesson was reviewed by the teacher, with a note.
+      const first = inMods(['1.1'])[0];
+      if (first) sql.run("INSERT INTO lesson_submissions (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at) VALUES ('seed-ada', ?, ?, 'x', ?, 5, 5, ?)", [email, first.id, JSON.stringify({ teacherFeedback: 'Nice work. Your comments made the idea clear.', teacherReviewedAt: now - 3 * DAY }), now - 3 * DAY]);
     }
     if (kind === 'waived') for (const l of inMods(['1.4'])) sql.run("INSERT OR IGNORE INTO lesson_due_waivers (class_id, student_email, lesson_id, granted_by, granted_at) VALUES (?, ?, ?, ?, 0)", [CLASS_ID, email, l.id, teacherEmail]);
   }
