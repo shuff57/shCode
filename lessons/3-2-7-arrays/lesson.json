@@ -3,6 +3,7 @@
   "title": "3.3.18 Arrays",
   "description": "Work with lists of values: create, add, remove, and iterate.",
   "type": "assignment",
+  "assignmentCode": "A3.3.1",
   "estimateMins": 40,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
@@ -42,7 +43,8 @@
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 10
     },
     {
@@ -51,8 +53,9 @@
       "description": "Add elements using .push(). Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.push\\(",
-      "flags": "i",
+      "pattern": "\\.push\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 5
     },
     {
@@ -61,34 +64,37 @@
       "description": "Remove an element using .pop(). Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.pop\\(",
-      "flags": "i",
+      "pattern": "\\.pop\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 5
     },
     {
       "id": "req4",
-      "title": "Iterate array",
-      "description": "Loop through the array with a for loop. Help: 3.3.5 (Looping Over Arrays)",
+      "title": "Iterate with a for loop",
+      "description": "Loop through the array with a for loop that has something in its body. Help: 3.3.5 (Looping Over Arrays)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(for\\s*\\(|\\.forEach\\(|\\.map\\()",
-      "flags": "i",
+      "pattern": "\\bfor\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*(?:\\{\\s*[^\\s};]|[^\\s{};])",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 10
     },
     {
       "id": "req5",
-      "title": "Search with if",
-      "description": "Compare each item to the one you are looking for with === inside the loop. Help: 3.3.5 (Looping Over Arrays)",
+      "title": "Search with a comparison",
+      "description": "Inside a loop, compare each item to the one you want with === (or use includes / indexOf) and act on it. Help: 3.3.5 (Looping Over Arrays)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^)]*===[^)]*\\)",
-      "flags": "i",
+      "pattern": "\\bfor\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*\\{?[^}]*\\bif\\s*\\([^;{}]*?(?:={2,3}|\\.includes\\s*\\(|\\.indexOf\\s*\\()|\\.(?:includes|indexOf)\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 5
     }
   ],
   "grading": {
     "totalPoints": 35,
-    "passingScore": 20,
+    "passingScore": 35,
     "allowLateSubmit": true,
     "reviewCommitHistory": true
   }

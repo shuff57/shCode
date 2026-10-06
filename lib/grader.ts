@@ -94,6 +94,64 @@ function stripJsComments(src: string): string {
   return out;
 }
 
+// Blank the CONTENT of string literals and template-literal text (the quote
+// characters stay, `${...}` expressions stay code), preserving length and
+// newlines. Runs after comment stripping. Without it a regex requirement is
+// satisfied by text a student merely PRINTS: `console.log("function findMax(
+// return ")` defined nothing, yet matched `function\\s+findMax\\s*\\(`.
+// OPT-IN per requirement (`ignoreStrings: true`): 49 other lessons match text
+// inside strings on purpose (printed output, asset paths, SQL-ish literals).
+function blankStringContents(src: string): string {
+  let out = '';
+  let i = 0;
+  const n = src.length;
+  const braces: number[] = []; // open-brace depth inside each active ${ }
+  let inTemplate = false;
+  while (i < n) {
+    const c = src[i];
+    if (inTemplate) {
+      if (c === '\\') { out += src[i + 1] === '\n' ? ' \n' : '  '; i += 2; continue; }
+      if (c === '`') { out += c; inTemplate = false; i++; continue; }
+      if (c === '$' && src[i + 1] === '{') { out += '${'; braces.push(0); inTemplate = false; i += 2; continue; }
+      out += c === '\n' ? '\n' : ' ';
+      i++;
+      continue;
+    }
+    if (c === '"' || c === "'") {
+      let j = i + 1;
+      let closed = false;
+      while (j < n && src[j] !== '\n') {
+        if (src[j] === '\\') { j += 2; continue; }
+        if (src[j] === c) { closed = true; break; }
+        j++;
+      }
+      if (!closed) { out += c; i++; continue; } // mid-syntax-error: leave it code
+      out += c + ' '.repeat(j - i - 1) + c;
+      i = j + 1;
+      continue;
+    }
+    if (c === '`') { out += c; inTemplate = true; i++; continue; }
+    if (braces.length) {
+      if (c === '{') braces[braces.length - 1]++;
+      else if (c === '}') {
+        if (braces[braces.length - 1] === 0) { braces.pop(); out += c; inTemplate = true; i++; continue; }
+        braces[braces.length - 1]--;
+      }
+    }
+    out += c;
+    i++;
+  }
+  return out;
+}
+
+// What a regex requirement reads: comments stripped, then, when the
+// requirement sets `ignoreStrings`, string contents blanked.
+function readableSource(req: Requirement, raw: string): string {
+  if (req.stripComments === false) return raw;
+  const code = stripJsComments(raw);
+  return req.ignoreStrings ? blankStringContents(code) : code;
+}
+
 // Return the body of `function <name>(...) { ... }` by balancing braces,
 // or null if the function isn't found. Lets requirements scope a pattern
 // to e.g. draw()'s body instead of the whole file.
@@ -130,7 +188,7 @@ function checkRegex(req: Requirement, files: Record<string, string>): boolean {
   // starter. A check that could not run must not report a pass.
   if (!req.pattern) return false;
   const raw = files[req.file || ''] || '';
-  const content = req.stripComments === false ? raw : stripJsComments(raw);
+  const content = readableSource(req, raw);
   const regex = new RegExp(req.pattern, req.flags ?? '');
   return regex.test(content);
 }
@@ -138,7 +196,7 @@ function checkRegex(req: Requirement, files: Record<string, string>): boolean {
 function checkInFunction(req: Requirement, files: Record<string, string>): boolean {
   if (!req.pattern) return false; // same fail-closed reason as checkRegex
   const raw = files[req.file || ''] || '';
-  const content = stripJsComments(raw);
+  const content = readableSource(req, raw);
   const names = Array.isArray(req.function)
     ? req.function
     : [req.function || 'draw'];

@@ -1,7 +1,7 @@
 {
   "id": "3-2-5-lab-sum-array",
   "title": "3.3.9 Sum an Array",
-  "description": "Use a for loop and .length to add up all numbers in an array, then log the total. Auto-graded.",
+  "description": "Use a for loop to add up all numbers in an array, then log the total. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -20,7 +20,7 @@
     {
       "id": "s2",
       "title": "Sum with a for loop",
-      "instructions": "Create a variable called total and set it to 0. Write a for loop that visits every element in numbers using its index (from 0 up to numbers.length - 1). On each iteration, add the current element to total."
+      "instructions": "Create a variable called total and set it to 0. Write a for loop that visits every element in numbers: either by index (from 0 up to numbers.length - 1) or with for...of. On each iteration, add the current element to total."
     },
     {
       "id": "s3",
@@ -36,17 +36,19 @@
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r2",
-      "title": ".length used",
-      "description": "Code uses .length. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "title": "the loop adds to total",
+      "description": "A for loop body adds each element to a running total (total += ..., or total = total + ...). Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.length",
-      "flags": "i",
+      "pattern": "for\\s*\\([^)]*\\)\\s*\\{?[^}]*(?:\\+=|=\\s*[\\w$.]+(?:\\[[^\\]]*\\])?\\s*\\+\\s*[\\w$])",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
@@ -57,6 +59,7 @@
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     }
   ],

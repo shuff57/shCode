@@ -42,6 +42,7 @@
       "file": "script.js",
       "pattern": "\\[\\s*\\[",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     },
     {
@@ -52,16 +53,18 @@
       "file": "script.js",
       "pattern": "\\]\\s*\\[",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r3",
       "title": "nested for loops present",
-      "description": "Code contains at least two for loops. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "description": "A for loop sits inside another for loop (braces optional). Help: 3.3.15 (Lists Inside Lists)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\([^{]*\\)\\s*\\{[^}]*for\\s*\\([^{]*\\)",
-      "flags": "is",
+      "pattern": "for\\s*\\([^{]*?\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?for\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
@@ -72,6 +75,7 @@
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     }
   ],

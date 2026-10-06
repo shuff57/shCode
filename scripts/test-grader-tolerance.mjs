@@ -561,6 +561,255 @@ for (const id of Object.values(L)) {
     solutionFiles('5-1-23-challenges'));
 }
 
+// ---------------------------------------------------------------- units 3.2 / 3.3 labs
+//
+// Found by blind student lenses (2026-10-06): the 3.x labs graded the SHAPE of
+// the reference answer from text anywhere in the file, so a console.log of a
+// string that merely contained `function findMax(` scored full marks, a
+// hard-coded `return 0` passed, and an untouched starter could come close.
+// Their requirements now set `ignoreStrings` (grader blanks string contents),
+// look inside the function they name, and check that the work is done.
+// Every reject below names the requirement it must lose.
+{
+  const js = (...lines) => ({ 'script.js': lines.join(nl) + nl });
+  const T = {
+    fm: '3-1-8-lab-findmax-iseven', sum: '3-1-9-lab-sum-to-n',
+    guard: '3-2-12-lab-guard-clause', fix: '3-2-15-lab-fix-print-not-return',
+    comp: '3-2-19-lab-compose-functions', scope: '3-2-21-lab-scope-prediction',
+    upd: '3-3-4-lab-update-by-index', q: '3-3-7-lab-shift-unshift-queue',
+    sa: '3-2-5-lab-sum-array', filt: '3-3-14-lab-filter-function',
+    nest: '3-3-17-lab-nested-array-update', rect: '3-2-7-lab-rectangle-area',
+    arr: '3-2-7-arrays',
+  };
+  for (const id of Object.values(T)) {
+    accept(id, 'reference solution', solutionFiles(id));
+    reject(id, 'untouched starter', null, starterFiles(id));
+    // Every requirement of these labs must ignore string contents, or the
+    // smuggle cases below stop meaning anything.
+    reject(id, 'every token only inside a string literal', null, js(
+      'console.log("function findMax( function isEven( function sumToN( function divide( function area( return x for( .length console.log( .push( .shift( .pop( if (a === b) [[1]][0] scores[0] = 1");',
+      `console.log(${BT}function triple( function addSeven( function findRectangleArea( let score let label${BT});`));
+  }
+
+  // Dead code must not count: a guard whose condition is a constant, a loop that never runs.
+  reject(T.guard, 'a guard if with a constant condition', null, js(
+    'function divide(a, b) {', '  if (false) { return 1; }', '  return 2;', '}',
+    'console.log(divide(1, 2));', 'console.log(divide(1, 0));'));
+  reject(T.sum, 'a loop that can never run', null, js(
+    'function sumToN(n) {', '  let total = 0;', '  for (; 0; ) { total += 1; }', '  return total;', '}',
+    'console.log(sumToN(5));'));
+
+  // 3.2.22 findMax / isEven
+  accept(T.fm, 'ternary and boolean one-liners', js(
+    'function findMax(a, b) { return a > b ? a : b; }', 'function isEven(n) { return n % 2 === 0; }',
+    'console.log(findMax(3, 7));', 'console.log(isEven(4));'));
+  accept(T.fm, 'Math.max and return( with no space', js(
+    'function findMax(a, b) {', '  return(Math.max(a, b));', '}', 'function isEven(n) {', '  return(n % 2 === 0);', '}',
+    'console.log(findMax(3, 7), isEven(4));'));
+  accept(T.fm, 'braceless if and !(n % 2)', js(
+    'function findMax(a,b){', '  if (a>b) return a', '  return b', '}', 'function isEven(n){', '  return !(n%2)', '}'));
+  reject(T.fm, 'hard-coded returns compare nothing', 'r4', js('function findMax(){return 0}', 'function isEven(){return 0}'));
+  reject(T.fm, 'isEven without the remainder operator', 'r5', js(
+    'function findMax(a, b) { return Math.max(a, b); }', 'function isEven(n) { return true; }'));
+  reject(T.fm, 'function names in the wrong case', 'r1', js('function FINDMAX(){return 1}', 'function iseven(){return 1}'));
+
+  // 3.2.23 sumToN
+  accept(T.sum, 'brace-less loop with +=', js(
+    'function sumToN(n) {', '  let total = 0;', '  for (let i = 1; i <= n; i += 1) total += i;', '  return total;', '}', 'console.log(sumToN(5));'));
+  accept(T.sum, 'i + sum and return(sum)', js(
+    'function sumToN(n) {', '  let sum = 0;', '  for (let i = 1; i <= n; i++) { sum = i + sum; }', '  return(sum);', '}'));
+  reject(T.sum, 'empty for and a hard-coded return', 'r4', js('function sumToN(n){for(;0;){}return 15}'));
+  reject(T.sum, 'decorative for, Gauss formula', 'r4', js('function sumToN(n){for(let i=0;i<0;i++){}', ' return n*(n+1)/2}'));
+
+  // 3.2.12 guard clause
+  accept(T.guard, 'brace-less guard with !b', js(
+    'function divide(a, b) {', '  if (!b) return "Cannot divide by zero";', '  return a / b;', '}',
+    'console.log(divide(10, 2));', 'console.log(divide(10, 0));'));
+  accept(T.guard, 'guard condition with a nested call', js(
+    'function divide(a, b) {', '  if (isNaN(b) || b === 0) { return("bad"); }', '  return(a / b);', '}', 'console.log(divide(1, 0));'));
+  reject(T.guard, 'no guard at all', 'r5', js('function divide(a,b){if(0){}return 0}', 'console.log(1)'));
+  reject(T.guard, 'if/else instead of a guard', 'r6', js(
+    'function divide(a,b){ if (b !== 0) { return a / b; } else { return "no"; } }', 'console.log(divide(1,0));'));
+
+  // 3.2.15 fix print-not-return
+  accept(T.fix, 'doubled with 2 * a', js(
+    'function area(width, height) {', '  return width * height;', '}', 'const a = area(5, 8);',
+    'console.log("One room: " + a);', 'console.log("Two rooms: " + 2 * a);'));
+  accept(T.fix, 'doubled with a + a', js(
+    'function area(width, height) {', '  return width * height;', '}', 'const a = area(5, 8);',
+    'console.log("Two rooms: " + (a + a));'));
+  accept(T.fix, 'doubled straight from the call', js(
+    'function area(width, height) {', '  return width * height;', '}',
+    'console.log("Two rooms: " + area(5, 8) * 2);'));
+  accept(T.fix, 'a result variable and return( )', js(
+    'function area(width, height) {', '  const result = width * height;', '  return(result);', '}',
+    'const a = area(5, 8);', 'console.log(a * 2);'));
+  reject(T.fix, 'prints AND returns', 'r2', js(
+    'function area(width, height) {', '  console.log(width * height);', '  return width * height;', '}',
+    'const a = area(5, 8);', 'console.log("Two rooms: " + (a * 2));'));
+  {
+    const st = starterFiles(T.fix);
+    reject(T.fix, 'starter plus a dummy function that returns', 'r2',
+      { 'script.js': st['script.js'] + 'function z(){return 1}' + nl });
+    reject(T.fix, 'starter plus the old doubling line (area still prints)', 'r2',
+      { 'script.js': st['script.js'] + 'console.log("Two rooms: " + (a * 2));' + nl });
+    // The starter once shipped with the doubling line already written.
+    if (/\ba\s*\*\s*2/.test(st['script.js'])) throw new Error('3-2-15 starter already contains the doubling line');
+  }
+  reject(T.fix, 'returns, but the result is only concatenated', 'r3', js(
+    'function area(width, height) {', '  return width * height;', '}', 'const a = area(5, 8);',
+    'console.log("One room: " + a);'));
+  reject(T.fix, 'returns, result only logged', 'r3', js(
+    'function area(width, height) {', '  return width * height;', '}', 'const a = area(5, 8);', 'console.log(a);'));
+
+  // 3.2.19 compose (triple / addSeven; deliberately not the reading's double / addTen)
+  accept(T.comp, 'spaces and newlines in the nesting', js(
+    'function triple(n) { return n * 3; }', 'function addSeven(n) { return n + 7; }',
+    'console.log(addSeven(', '  triple(4)', '));', 'console.log(triple( addSeven(4) ));'));
+  accept(T.comp, 'n + n + n and 7 + n', js(
+    'function triple(n) { return(n + n + n); }', 'function addSeven(n) { return(7 + n); }',
+    'console.log(addSeven(triple(4)));', 'console.log(triple(addSeven(4)));'));
+  reject(T.comp, 'functions return constants', 'r6', js(
+    'function triple(n){return 0}', 'function addSeven(n){return 0}', 'console.log(triple(addSeven(1)));', 'console.log(addSeven(triple(1)));'));
+  reject(T.comp, 'addSeven that does not add', 'r7', js(
+    'function triple(n){return n*3}', 'function addSeven(n){return n*7}', 'console.log(triple(addSeven(1)));', 'console.log(addSeven(triple(1)));'));
+  reject(T.comp, 'only one nesting order', 'r8', js(
+    'function triple(n){return n*3}', 'function addSeven(n){return n+7}', 'console.log(addSeven(triple(4)));'));
+  reject(T.comp, 'the reading\'s double / addTen, not the lab\'s functions', 'r1', js(
+    'function double(n){return n*2}', 'function addTen(n){return n+10}', 'console.log(addTen(double(5)));', 'console.log(double(addTen(5)));'));
+
+  // 3.2.21 scope prediction
+  if (!lesson(T.scope).grading.expectsRuntimeError) {
+    throw new Error('3-2-21 must set grading.expectsRuntimeError: its answer ends in an uncaught ReferenceError');
+  }
+  accept(T.scope, 'no semicolons', js(
+    'let score = 5', 'function showScore() {', '  console.log(score)', '}', 'function describeScore() {',
+    '  let label = "x"', '  console.log(score, label)', '}', 'showScore()', 'describeScore()', 'console.log(label)'));
+  accept(T.scope, 'step 4 inside try/catch', js(
+    'let score = 42;', 'function showScore() { console.log(score); }',
+    'function describeScore() { let label = "pts"; console.log(score, label); }',
+    'showScore();', 'describeScore();', 'try { console.log(label); } catch (e) { console.log(e.name); }'));
+  accept(T.scope, 'describeScore called first', js(
+    'let score = 42;', 'function showScore() { console.log(score); }',
+    'function describeScore() { let label = "pts"; console.log(score, label); }',
+    'describeScore();', 'showScore();', 'console.log(label);'));
+  reject(T.scope, 'label declared globally, not in describeScore', 'r2', js(
+    'let score = 1;', 'let label = 2;', 'function showScore() { console.log(score); }',
+    'function describeScore() { console.log(score, label); }', 'showScore();', 'describeScore();', 'console.log(label);'));
+  reject(T.scope, 'both functions defined, never called', 'r4', js(
+    'let score = 42;', 'function showScore() { console.log(score); }',
+    'function describeScore() { let label = "pts"; console.log(score, label); }', 'console.log(label);'));
+  reject(T.scope, 'only showScore called', 'r4', js(
+    'let score = 42;', 'function showScore() { console.log(score); }',
+    'function describeScore() { let label = "pts"; console.log(score, label); }', 'showScore();', 'console.log(label);'));
+  reject(T.scope, 'step 4 left out', 'r5', js(
+    'let score = 42;', 'function showScore() { console.log(score); }',
+    'function describeScore() { let label = "pts"; console.log(score, label); }', 'showScore();', 'describeScore();'));
+
+  // 3.3.4 update by index
+  accept(T.upd, 'last item through scores.length - 1', js(
+    'let scores = [88, 91, 76, 60];', 'scores[scores.length - 1] = 99;', 'console.log(scores);'));
+  accept(T.upd, 'compound assignment and ++', js(
+    'let scores = [88, 91, 76, 60];', 'scores[0] += 5;', 'scores[1]++;', 'console.log(scores);'));
+  accept(T.upd, 'index from a variable', js(
+    'const scores = [88, 91, 76, 60];', 'let i = 0;', 'scores[i + 1] = 100;', 'console.log("Scores:", scores);'));
+  reject(T.upd, 'only a string that looks like an assignment', 'r1', js('console.log("scores[0] = 1")'));
+  reject(T.upd, 'assigns, but not to scores', 'r1', js('let a=[1,2,3,4];a[0]=2;console.log(a)'));
+  reject(T.upd, 'comparisons are not assignments', 'r1', js(
+    'let scores = [88, 91, 76, 60];', 'if (scores[0] == 88) {}', 'if (scores[1] === 91) {}', 'console.log(scores);'));
+  reject(T.upd, 'push instead of index assignment', 'r1', js(
+    'let scores = [88, 91, 76, 60];', 'scores.push(1);', 'console.log(scores);'));
+  reject(T.upd, 'two-item array', 'r3', js('let scores = [88, 91];', 'scores[0] = 1;', 'console.log(scores);'));
+
+  // 3.3.7 queue
+  accept(T.q, 'push chained over a newline', js(
+    'let line = ["ana", "bob"];', 'line', '  .push("cy");', 'const served = line.shift();', 'console.log(served);', 'console.log(line);'));
+  accept(T.q, 'shift into a variable declared earlier', js(
+    'let line = ["ana", "bob"];', 'let who;', 'line.push("cy");', 'who = line.shift();', 'console.log(who, line);'));
+  accept(T.q, 'shift logged directly', js(
+    'let line = ["ana", "bob"];', 'line.push("cy");', 'console.log(line.shift());', 'console.log(line);'));
+  reject(T.q, 'push and shift on different arrays', 'r1', js(
+    'let a = ["x"];', 'let b = ["y"];', 'a.push("z");', 'let s = b.shift();', 'console.log(s);'));
+  reject(T.q, 'shift result thrown away', 'r2', js(
+    'let line=["a","b"];', 'line.push("c");', 'line.shift();', 'console.log(line);'));
+  reject(T.q, 'shift result stored but never logged', 'r2', js(
+    'let line=["a","b"];', 'line.push("c");', 'let s = line.shift();', 'console.log(line);'));
+  reject(T.q, 'empty array calls', 'r1', js('[].push();', '[].shift();', 'console.log();'));
+
+  // 3.3.9 sum an array
+  accept(T.sa, 'for...of', js(
+    'let numbers = [10, 25, 7, 42];', 'let total = 0;', 'for (const n of numbers) {', '  total += n;', '}', 'console.log(total);'));
+  accept(T.sa, 'reverse loop, brace-less', js(
+    'let numbers = [10, 25, 7, 42];', 'let total = 0;', 'for (let i = numbers.length - 1; i >= 0; i--) total += numbers[i];', 'console.log(total);'));
+  accept(T.sa, 'total = numbers[i] + total', js(
+    'let numbers = [10, 25, 7, 42];', 'let total = 0;', 'for (let i = 0; i < numbers.length; i++) {', '  total = numbers[i] + total;', '}', 'console.log(total);'));
+  reject(T.sa, 'empty loop and a hard-coded total', 'r2', js('for(;0;){}', 'console.log(24);'));
+  reject(T.sa, 'loop body does not accumulate', 'r2', js(
+    'let numbers=[1,2,3,4];', 'let total=0;', 'for(let i=0;i<numbers.length;i++){total=7}', 'console.log(total)'));
+
+  // 3.3.14 filter function
+  accept(T.filt, 'index loop', js(
+    'function doubled(arr){', ' let out=[];', ' for(let i=0;i<arr.length;i++){ out.push(arr[i]*2);}', ' return out;}',
+    'let s=[1,2,3];', 'console.log(doubled(s));', 'console.log(s);'));
+  accept(T.filt, 'the 3.3.13 filter shape', js(
+    'function passing(scores) {', '  let result = [];', '  for (let s of scores) {', '    if (s >= 60) {', '      result.push(s);', '    }', '  }', '  return result;', '}',
+    'let g=[72,55];', 'console.log(passing(g));', 'console.log(g);'));
+  reject(T.filt, 'pushes onto the input and returns it', 'r1', js(
+    'function bigger(numbers){for(let i=0;i<3;i++){numbers.push(i*2)}', ' return numbers}',
+    'let s=[1,2,3];', 'console.log(bigger(s));', 'console.log(s);'));
+  reject(T.filt, 'overwrites the input by index', 'r1', js(
+    'function bigger(numbers){for(let i=0;i<numbers.length;i++){numbers[i]=numbers[i]*2}', ' return numbers}',
+    'let s=[1,2,3];', 'console.log(bigger(s));', 'console.log(s);'));
+  reject(T.filt, 'no return in the function', 'r4', js(
+    'function bigger(numbers){', ' let r=[];', ' for (let n of numbers) { r.push(n*2); }', '}',
+    'console.log(bigger([1]));', 'console.log([1]);'));
+  reject(T.filt, 'plain copy: nothing changed or filtered', 'r5', js(
+    'function copy(numbers){', ' let r=[];', ' for (let n of numbers) { r.push(n); }', ' return r;', '}',
+    'let s=[1,2,3];', 'console.log(copy(s));', 'console.log(s);'));
+  reject(T.filt, 'only one array logged', 'r6', js(
+    'function bigger(numbers){', ' let r=[];', ' for (let n of numbers) { r.push(n*2); }', ' return r;', '}',
+    'console.log(bigger([1,2,3]));'));
+
+  // 3.3.17 nested arrays
+  accept(T.nest, 'brace-less nested for...of', js(
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;',
+    'for (const row of grid)', '  for (const n of row)', '    total += n;', 'console.log(total);'));
+  accept(T.nest, 'an if before the inner loop', js(
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;',
+    'for (let r = 0; r < grid.length; r++) {', '  if (grid[r].length === 0) { continue; }', '  for (let c = 0; c < grid[r].length; c++) {',
+    '    total += grid[r][c];', '  }', '}', 'console.log(total);'));
+  reject(T.nest, 'two loops side by side, not nested', 'r3', js(
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;',
+    'for (let r = 0; r < grid.length; r++) {', '  total += grid[r][0];', '}',
+    'for (let c = 0; c < 2; c++) {', '  total += grid[0][c];', '}', 'console.log(total);'));
+
+  // 3.2.7 rectangle area
+  accept(T.rect, 'template literal and a negative argument', js(
+    'function findRectangleArea(width, height) {', '  const area = width * height;', '  console.log(' + BT + 'Area: ${area}' + BT + ');', '}',
+    'findRectangleArea(3, 4);', 'findRectangleArea(-2, 5);'));
+  reject(T.rect, 'prints a constant, parameters unused', 'r5', js(
+    'function findRectangleArea(a,b){console.log(1)}', 'findRectangleArea(1,2)', 'findRectangleArea(3,4)'));
+  reject(T.rect, 'a single call only', 'r4', js(
+    'function findRectangleArea(w,h){console.log(w*h)}', 'findRectangleArea(3,4);'));
+  reject(T.rect, 'multiplies two numbers, not the parameters', 'r5', js(
+    'function findRectangleArea(w,h){console.log("Area: " + 3*4)}', 'findRectangleArea(3,4);', 'findRectangleArea(1,2);'));
+
+  // 3.3.18 arrays capstone: every point is needed to pass (passingScore 35)
+  if (lesson(T.arr).grading.passingScore !== 35) throw new Error('3-2-7-arrays passingScore must equal its 35 points');
+  accept(T.arr, 'search with a call inside the comparison', js(
+    'const fruits=["a","b"];', 'fruits.push("d");', 'fruits.pop();',
+    'for (const f of fruits) { if (f.toUpperCase() === "B") { console.log("found"); } }'));
+  accept(T.arr, 'for index, includes() as the search', js(
+    'let fruits=["a","b","c"];', 'fruits.push("d");', 'fruits.pop();',
+    'for (let i = 0; i < fruits.length; i++) { console.log(fruits[i]); }', 'console.log(fruits.includes("b"));'));
+  reject(T.arr, 'hollow: empty array, push, pop, empty loop, empty if', 'req4', js(
+    'let a=[];', 'a.push(1);', 'a.pop();', 'for(;0;){}', 'if(1===1){}'));
+  reject(T.arr, 'forEach is not the for loop the task asks for', 'req4', js(
+    'const a=[1];', 'a.push(2);', 'a.pop();', 'a.forEach(x=>console.log(x));', 'for(const x of a){}', 'if(2===2){}'));
+  reject(T.arr, 'a comparison with no search loop around it', 'req5', js(
+    'const a=["x"];', 'a.push("y");', 'a.pop();', 'for (const x of a) { console.log(x); }', 'if (1 === 1) { console.log("hi"); }'));
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(

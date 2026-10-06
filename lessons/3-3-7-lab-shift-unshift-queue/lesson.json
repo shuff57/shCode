@@ -36,22 +36,24 @@
   "requirements": [
     {
       "id": "r1",
-      "title": ".push used",
-      "description": "Code calls .push(. Help: 3.3.6 (Adding and Removing from the Front)",
+      "title": ".push used on the line",
+      "description": "Code calls .push( on an array, and the same array is later shifted. Help: 3.3.6 (Adding and Removing from the Front)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.push\\s*\\(",
-      "flags": "i",
+      "pattern": "([\\w$]+)\\s*\\.push\\s*\\([\\s\\S]*\\b\\1\\s*\\.shift\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r2",
-      "title": ".shift used",
-      "description": "Code calls .shift(. Help: 3.3.6 (Adding and Removing from the Front)",
+      "title": ".shift result is used",
+      "description": "The value .shift() hands back is stored and logged (or logged directly). Help: 3.3.6 (Adding and Removing from the Front)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.shift\\s*\\(",
-      "flags": "i",
+      "pattern": "(?:(?:let|const|var)\\s+)?([\\w$]+)\\s*=\\s*[\\w$]+\\s*\\.shift\\s*\\(\\s*\\)[\\s\\S]*\\bconsole\\.log\\s*\\([^)]*\\b\\1\\b|console\\.log\\s*\\([^)]*\\.shift\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
@@ -62,6 +64,7 @@
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     }
   ],

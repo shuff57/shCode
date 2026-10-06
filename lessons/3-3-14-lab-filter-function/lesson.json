@@ -1,7 +1,7 @@
 {
   "id": "3-3-14-lab-filter-function",
   "title": "3.3.14 Lab: Write a Function That Returns a New Array",
-  "description": "Write a function that builds and returns a new array of transformed values, proving the original is untouched. Auto-graded.",
+  "description": "Write a function that builds and returns a new array of transformed values (for example, each number doubled with result.push(n * 2), as in 3.3.12), proving the original is untouched. Auto-graded.",
   "type": "assignment",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -36,12 +36,13 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "function declaration present",
-      "description": "Code declares a function. Help: 3.3.12 (Arrays and Functions)",
+      "title": "function with an array parameter that is not mutated",
+      "description": "Code declares a function whose array parameter is never changed inside it (no push, pop, shift, unshift, splice, sort, reverse, fill or index assignment on it). Help: 3.3.12 (Arrays and Functions)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+\\w+\\s*\\(",
-      "flags": "i",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*([\\w$]+)\\s*(?:,[^)]*)?\\)(?![\\s\\S]*\\b\\1\\s*(?:\\.(?:push|pop|shift|unshift|splice|sort|reverse|fill)\\s*\\(|\\[[^\\]]*\\]\\s*=(?!=)))",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
@@ -52,6 +53,7 @@
       "file": "script.js",
       "pattern": "for\\s*\\(",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     },
     {
@@ -62,16 +64,40 @@
       "file": "script.js",
       "pattern": "\\.push\\s*\\(",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r4",
-      "title": "return present",
-      "description": "Code returns a value. Help: 3.3.12 (Arrays and Functions)",
+      "title": "function returns the new array",
+      "description": "A return inside the function hands back the new array. Help: 3.3.12 (Arrays and Functions)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "return",
-      "flags": "i",
+      "pattern": "function\\s+\\w+\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "the new array differs from the input",
+      "description": "A pushed value is changed (arithmetic or a call) or only pushed when an if says so, so the result is not a plain copy. Help: 3.3.12 (Arrays and Functions)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.push\\s*\\((?:[^()]|\\([^()]*\\))*(?:[-+*/%]|[\\w$.]+\\s*\\()|\\bif\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*\\{?[^}]*\\.push\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "both arrays are logged",
+      "description": "console.log is called at least twice: once for the returned array and once for the original. Help: 3.3.12 (Arrays and Functions)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\([\\s\\S]*console\\.log\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     }
   ],

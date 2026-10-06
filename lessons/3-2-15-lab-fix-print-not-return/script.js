@@ -9,7 +9,6 @@ function area(width, height) {
 
 const a = area(5, 8);
 console.log("One room: " + a);
-console.log("Two rooms: " + (a * 2));
 
 // STEP 1: Run it. Notice the area prints, but "a" is undefined.
 

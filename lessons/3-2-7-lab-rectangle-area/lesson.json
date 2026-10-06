@@ -20,7 +20,7 @@
     {
       "id": "s2",
       "title": "Print the area",
-      "instructions": "Inside the function, multiply width by height and print the answer with console.log, for example \"Area: 12\"."
+      "instructions": "Inside the function, multiply width by height and print the answer with console.log, for example \"Area: 12\". This lab asks you to print inside the function; handing a value back with return is covered later, in 3.2.9."
     },
     {
       "id": "s3",
@@ -32,41 +32,58 @@
     {
       "id": "r1",
       "title": "findRectangleArea defined",
-      "description": "Code defines a function named findRectangleArea. Help: 3.2.2 (Parameters & Return Values)",
+      "description": "Code defines a function named findRectangleArea. Help: 3.2.2 (Parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+findRectangleArea\\s*\\(",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r2",
       "title": "two parameters",
-      "description": "findRectangleArea is defined with two parameters. Help: 3.2.2 (Parameters & Return Values)",
+      "description": "findRectangleArea is defined with two parameters. Help: 3.2.2 (Parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+findRectangleArea\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*,\\s*[A-Za-z_$][\\w$]*\\s*\\)",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r3",
       "title": "prints the area",
-      "description": "The function body prints with console.log. Help: 3.2.3 (Passing Information In)",
-      "type": "regex",
+      "description": "findRectangleArea prints with console.log inside its body. Help: 3.2.2 (Parameters)",
+      "type": "inFunction",
       "file": "script.js",
-      "pattern": "function\\s+findRectangleArea\\s*\\([^)]*\\)\\s*\\{[^}]*console\\.log\\s*\\(",
-      "flags": "i",
-      "points": 0
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "function": "findRectangleArea"
     },
     {
       "id": "r4",
-      "title": "called with two numbers",
-      "description": "findRectangleArea is called with two arguments. Help: 3.2.5 (Parameters and Arguments)",
+      "title": "called twice with two numbers",
+      "description": "findRectangleArea is called at least twice, each with two arguments. Help: 3.2.2 (Parameters)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^\\s*findRectangleArea\\s*\\(\\s*[\\w.]+\\s*,\\s*[\\w.]+\\s*\\)",
-      "flags": "im",
+      "pattern": "^\\s*findRectangleArea\\s*\\(\\s*-?[\\w.]+[^,()]*,\\s*-?[\\w.]+[^()]*\\)[\\s\\S]*^\\s*findRectangleArea\\s*\\(\\s*-?[\\w.]+[^,()]*,\\s*-?[\\w.]+[^()]*\\)",
+      "flags": "m",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "the body multiplies width by height",
+      "description": "Inside the function, two names are multiplied (width * height). Help: 3.2.2 (Parameters)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "findRectangleArea",
+      "pattern": "[A-Za-z_$][\\w$]*\\s*\\*\\s*[A-Za-z_$][\\w$]*",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     }
   ],

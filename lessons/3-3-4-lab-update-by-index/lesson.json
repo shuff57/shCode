@@ -31,12 +31,13 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "index assignment present",
-      "description": "Code assigns to an array index (non-comparison). Help: 3.3.3 (Changing an Item by Index)",
+      "title": "index assignment on scores",
+      "description": "Code changes an item of scores by its index (scores[0] = ..., scores[i] += ..., scores[scores.length - 1] = ...). Help: 3.3.3 (Changing an Item by Index)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\[\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\]\\s*=\\s*[^=]",
-      "flags": "i",
+      "pattern": "\\bscores\\s*\\[[^\\]]+\\]\\s*(?:[-+*/]?=(?!=)|\\+\\+|--)",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
@@ -47,6 +48,18 @@
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "scores has at least four values",
+      "description": "scores is an array containing at least four values. Help: 3.3.3 (Changing an Item by Index)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+scores\\s*=\\s*\\[[^\\]]+(?:,[^\\]]+){3,}\\]",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     }
   ],

@@ -76,6 +76,11 @@ export interface Requirement {
    *  (e.g. "at least four // comments"), since stripping runs first and
    *  would delete the very thing being matched for. Defaults to true. */
   stripComments?: boolean;
+  /** Set true to blank the contents of string literals and template text
+   *  (after comment stripping) before matching, so `console.log("function f(")`
+   *  cannot satisfy a "defines f" check. Off by default: many lessons match
+   *  printed text on purpose. */
+  ignoreStrings?: boolean;
   /** type: 'model' only. The features (and named fields on them) the
    *  student's ModelDoc must contain — see lib/model-check.ts. */
   expect?: ModelExpect[];

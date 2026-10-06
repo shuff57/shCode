@@ -26,18 +26,19 @@
     {
       "id": "s3",
       "title": "Return the total",
-      "instructions": "After the loop ends, return the running total. Then call sumToN with a few different values and log the results to verify."
+      "instructions": "After the loop ends, return the running total. Then call sumToN with a few different values and log the results to verify. Expected: sumToN(5) is 15, sumToN(10) is 55, and sumToN(100) is 5050."
     }
   ],
   "requirements": [
     {
       "id": "r1",
       "title": "sumToN defined",
-      "description": "Code defines a function named sumToN. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Code defines a function named sumToN (exact spelling). Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+sumToN\\s*\\(",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
@@ -47,17 +48,31 @@
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r3",
       "title": "return statement present",
-      "description": "Code contains a return statement",
+      "description": "Code contains a return statement. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "return\\s",
-      "flags": "i",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "the loop adds to the total, then sumToN returns it",
+      "description": "Inside sumToN, a for loop body adds to a running total and a return comes after the loop. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "sumToN",
+      "pattern": "for\\s*\\((?![^;)]*;\\s*(?:0|false|null)\\s*;)[^)]*\\)\\s*\\{?[^}]*(?:\\+=|=\\s*[\\w$.]+(?:\\[[^\\]]*\\])?\\s*\\+\\s*[\\w$])[\\s\\S]*\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     }
   ],
