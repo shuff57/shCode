@@ -422,6 +422,16 @@ flowchart TD
      checkDiagram(good, DEFAULT_RULES).filter(x => !x.passed).map(x => x.id + ': ' + x.detail).join('; '));
 }
 
+section('fromMermaid — quoted edge labels');
+{
+  const d = fromMermaid('flowchart TD\n  A{ok?} -- "yes" --> B[go]\n  A -->|"no"| C[stop]\n  A -- maybe --> C');
+  ok('quotes are stripped from -- "yes" -->', d.edges[0].label === 'yes', JSON.stringify(d.edges[0]));
+  ok('quotes are stripped from -->|"no"|', d.edges[1].label === 'no', JSON.stringify(d.edges[1]));
+  ok('an unquoted label is unchanged', d.edges[2].label === 'maybe', JSON.stringify(d.edges[2]));
+  const rt = fromMermaid(toMermaid(d));
+  ok('round trip keeps the unquoted labels', rt.edges.map(e => e.label).join() === 'yes,no,maybe', JSON.stringify(rt.edges.map(e => e.label)));
+}
+
 section('describeDiagram');
 {
   const text = describeDiagram(good);

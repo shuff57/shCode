@@ -80,7 +80,7 @@ export default function ContentLessonView({ lesson }: Props) {
           },
         ]}
       />
-      <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 20px 80px', color: '#f8f8f2' }}>
+      <main style={{ maxWidth: 960, width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '24px 20px 80px', color: '#f8f8f2' }}>
       <nav style={{ marginBottom: 12, fontSize: 13, color: '#888' }}>
         <Link href="/" style={{ color: '#8be9fd' }}>Home</Link>
         {lesson.unit ? (
@@ -259,6 +259,7 @@ export default function ContentLessonView({ lesson }: Props) {
         .content-prose blockquote { border-left: 3px solid #bd93f9; margin: 12px 0; padding: 4px 14px; color: #ccc; background: rgba(189,147,249,0.08); }
         .content-prose hr { border: none; border-top: 1px solid #333; margin: 20px 0; }
         .content-prose ul, .content-prose ol { padding-left: 24px; }
+        @media (max-width: 720px) { .content-prose table { display: block; overflow-x: auto; max-width: 100%; } }
       `}</style>
     </main>
     </>

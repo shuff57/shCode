@@ -1883,3 +1883,12 @@ details.console > summary::-webkit-details-marker { display: none; }
   text-align: right;
 }
 
+
+/* Narrow screens: the assignment header row wraps instead of pushing the page sideways. */
+@media (max-width: 720px) {
+  .assignment-header-center { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+  .assignment-unmet-hint { max-width: 100%; min-width: 0; }
+}
+@media (max-width: 720px) {
+  .run-toolbar { flex-wrap: wrap; row-gap: 8px; }
+}

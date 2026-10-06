@@ -50,8 +50,12 @@ for (const id of fs.readdirSync(LESSONS)) {
   if (!fs.existsSync(file)) continue;
   let lesson;
   try { lesson = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { continue; }
+  // A summative grader of either kind, and EVERY chart grader (formative too): a chart's
+  // rubric describes the correct structure, so it is an answer key whatever the flag says
+  // (measured 2026-10-06 on 3-2-8, 3-2-18, 3-3-11, 2-2-12).
   for (const g of [lesson.aiGrader, lesson.diagram && lesson.diagram.aiGrader]) {
-    if (!g || !g.summative) continue;
+    if (!g) continue;
+    if (!g.summative && g !== (lesson.diagram && lesson.diagram.aiGrader)) continue;
     if (typeof g.prompt === 'string' && g.prompt.length >= 60) {
       probes.push({ id, what: 'prompt', text: g.prompt.slice(0, 70) });
     }
@@ -134,7 +138,7 @@ function scan(dir) {
     const body = fs.readFileSync(f, 'utf8');
     for (const p of probes) {
       if (spellings(p.text).some((s) => body.includes(s))) {
-        problems.push(`${path.relative(ROOT, f)} contains the ${p.what} of summative ${p.id}`);
+        problems.push(`${path.relative(ROOT, f)} contains the ${p.what} of grader ${p.id}`);
       }
     }
   }
@@ -156,4 +160,4 @@ if (problems.length) {
   for (const p of problems) console.error('  ' + p);
   process.exit(1);
 }
-console.log(`[check-ai-grader-leak] ok -- ${probes.length} probe(s) from summative graders; ${publicFiles} file(s) in public/, ${outNote}`);
+console.log(`[check-ai-grader-leak] ok -- ${probes.length} probe(s) from summative and chart graders; ${publicFiles} file(s) in public/, ${outNote}`);

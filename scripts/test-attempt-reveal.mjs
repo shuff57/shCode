@@ -984,6 +984,15 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
     const out = JSON.stringify(redactLessonForClient(chart(flagged)));
     eq([out.includes('THE-GRADING-BRIEF'), out.includes('THE-RUBRIC-KEY'), out.includes('DOC')], [false, false, false], `chart with diagram.summative: the grader brief and rubric stay home (aiGrader.summative ${flagged ? 'set' : 'MISSING'})`);
   }
+  // a FORMATIVE chart keeps only what the feedback panel draws
+  {
+    const f = { id: 'x', title: 'x', type: 'assignment', files: [], steps: [], requirements: [],
+      diagram: { starter: 'flowchart TD', aiGrader: { rubricTitle: 'R-TITLE', model: 'm', strict: true, prompt: 'THE-GRADING-BRIEF', contextDocs: ['DOC'], rubric: [{ id: 'a', title: 'A-TITLE', description: 'THE-RUBRIC-KEY', points: 1 }] } } };
+    const red = redactLessonForClient(f);
+    const out = JSON.stringify(red);
+    eq([out.includes('THE-GRADING-BRIEF'), out.includes('THE-RUBRIC-KEY'), out.includes('DOC'), out.includes('strict')], [false, false, false, false], 'formative chart: brief, descriptions, contextDocs and strict stay home');
+    eq([red.diagram.aiGrader.rubricTitle, red.diagram.aiGrader.rubric[0].title, red.diagram.aiGrader.rubric[0].id], ['R-TITLE', 'A-TITLE', 'a'], 'formative chart: feedback labels survive');
+  }
   // the authoring check fails a lesson written that way
   const tmp = join(root, '.tmp-summative-check');
   rmSync(tmp, { recursive: true, force: true });

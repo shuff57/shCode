@@ -27,7 +27,7 @@ console.log("Items under $10:", cheapCount);
 | Shape | Use it for |
 |---|---|
 | **Start / End** (oval) | One of each. |
-| **Loop setup** (hexagon) | `i = 0 to prices.length - 1`: the whole `for` header |
+| **Loop setup** (hexagon) | `i = 0 to prices.length - 1`: the whole `for` header. Press **+ more shapes** to reveal it |
 | **Decision** (diamond) | `prices[i] < 10` |
 | **Task** (rectangle) | `cheapCount = 0`, and adding one to it |
 | **Input / Output** (parallelogram) | The final print |

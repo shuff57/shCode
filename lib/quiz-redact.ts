@@ -124,6 +124,21 @@ function redactAiGrader(cfg: AiGraderConfig): AiGraderConfig {
 }
 
 /**
+ * A formative chart's grader as the browser may see it: the title and model, and
+ * each criterion's `{id, title, points}` so feedback can be labelled. `prompt`,
+ * `contextDocs`, rubric `description` and `strict` stay on the server. Rebuilt
+ * field by field, like `stripKey`.
+ */
+function redactFormativeDiagramAiGrader(g: NonNullable<DiagramConfig['aiGrader']>): NonNullable<DiagramConfig['aiGrader']> {
+  const out: NonNullable<DiagramConfig['aiGrader']> = {
+    rubric: (g.rubric ?? []).map(({ id, title, points }) => ({ id, title, points })),
+  };
+  if (g.rubricTitle !== undefined) out.rubricTitle = g.rubricTitle;
+  if (g.model !== undefined) out.model = g.model;
+  return out;
+}
+
+/**
  * The lesson as the client component may receive it. Call this in the SERVER
  * page, before the object crosses into a `'use client'` tree — after that
  * boundary it has already been serialised and it is too late.
@@ -144,6 +159,12 @@ export function redactLessonForClient(lesson: Lesson): Lesson {
     // scripts/check-summative-parts.mjs fails a lesson authored that way.
     const g = out.diagram!.aiGrader;
     if (g) out = { ...out, diagram: { ...out.diagram, aiGrader: redactAiGrader({ ...(g as AiGraderConfig), summative: true }) } };
+  } else if (out.diagram?.aiGrader) {
+    // A FORMATIVE chart still ships a brief that describes the correct structure
+    // (measured 2026-10-06 on 3-2-8, 3-2-18, 3-3-11, 2-2-12: 'Withhold if', 'sets-base',
+    // 'Credit any wording' were all in the student page). The client needs only the
+    // feedback labels; grading reads the server copy by lessonId.
+    out = { ...out, diagram: { ...out.diagram, aiGrader: redactFormativeDiagramAiGrader(out.diagram.aiGrader) } };
   }
   if (isSummativeGrading(out.grading)) {
     out = { ...out, requirements: redactRequirements(out.requirements ?? []) };
