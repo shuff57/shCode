@@ -4279,7 +4279,7 @@
     },
     {
       "id": "3-1-3-reading-parameters-return",
-      "title": "3.2.2 Reading: Parameters & Return Values",
+      "title": "3.2.2 Reading: Parameters",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -4585,9 +4585,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 20,
       "maxSubmissions": null,
-      "scoreKind": null
+      "scoreKind": "written"
     },
     {
       "id": "3-2-19-lab-compose-functions",
@@ -4637,7 +4637,7 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": 8,
+      "maxScore": 10,
       "maxSubmissions": null,
       "scoreKind": "quiz"
     },
@@ -4753,7 +4753,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.3.1",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -4780,9 +4780,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 20,
       "maxSubmissions": null,
-      "scoreKind": null
+      "scoreKind": "written"
     },
     {
       "id": "3-2-9-reading-return",
@@ -4806,9 +4806,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 20,
       "maxSubmissions": null,
-      "scoreKind": null
+      "scoreKind": "written"
     },
     {
       "id": "3-3-12-reading-arrays-and-functions",
