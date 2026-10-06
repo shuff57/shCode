@@ -1,5 +1,6 @@
 'use client';
 
+import { lessonLabel } from '../lib/lesson-title-order';
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { CircleCheck, CircleX } from 'lucide-react';
@@ -67,6 +68,8 @@ interface SubmissionItem {
 
 interface Props {
   classId: string;
+  /** lesson id -> title, so a row says "3.3.14 Filter" rather than a folder id. */
+  lessonTitles?: Record<string, string>;
 }
 
 // ---------------------------------------------------------------------------
@@ -335,7 +338,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
 // Main component
 // ---------------------------------------------------------------------------
 
-export function SubmissionQueue({ classId }: Props) {
+export function SubmissionQueue({ classId, lessonTitles }: Props) {
   const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -468,7 +471,7 @@ export function SubmissionQueue({ classId }: Props) {
                   {sub.student_email}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#8393c4' }}>
-                  {sub.lesson_id} &middot; submitted {formatTs(sub.submitted_at)}
+                  {lessonLabel(sub.lesson_id, lessonTitles)} &middot; submitted {formatTs(sub.submitted_at)}
                 </div>
               </div>
               <div

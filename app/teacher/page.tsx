@@ -3,6 +3,8 @@
 import LessonModeControl from '../../components/LessonModeControl';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { compareLessons, compareUnitLabels, lessonLabel } from '../../lib/lesson-title-order';
+import { csvCell } from '../../lib/grades-csv';
 import { NeedsAttentionPanel } from '../../components/NeedsAttentionPanel';
 import { BulkEnrollmentForm } from '../../components/BulkEnrollmentForm';
 import { SubmissionQueue, OverrideForm } from '../../components/SubmissionQueue';
@@ -385,10 +387,13 @@ function buildGradebookCsv(
   students: GradebookStudent[],
   lessonIds: string[],
   dueDates?: Record<string, number>,
+  titles?: Record<string, string>,
 ): string {
   const escape = (v: string) => (v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v);
 
-  const header = ['student_email', ...lessonIds].map(escape).join(',');
+  // Header cells are lesson titles ("3.2.10 Loops"), in the order the caller sorted them; the folder id
+  // is only a fallback. csvCell neutralises a leading = + - @ (a title is authored text, still guard it).
+  const header = [csvCell('student_email'), ...lessonIds.map((id) => csvCell(lessonLabel(id, titles)))].join(',');
 
   // Second header row carries each lesson's due date, so the export is
   // self-contained — a spreadsheet opened in March still says what was due.
@@ -693,14 +698,10 @@ function StudentDrawer({
 
     // Natural-sort unit labels ("1.1" < "1.2" < ... < "2.1"); "Other" always last
     // so genuinely unrecognized ids don't scatter mid-list.
-    unitOrder.sort((a, b) => {
-      if (a === 'Other') return b === 'Other' ? 0 : 1;
-      if (b === 'Other') return -1;
-      return a.localeCompare(b, undefined, { numeric: true });
-    });
+    unitOrder.sort(compareUnitLabels);
 
     for (const u of unitOrder) {
-      unitGroups.push({ unit: u, lessons: byUnit[u].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true })) });
+      unitGroups.push({ unit: u, lessons: byUnit[u].sort(compareLessons) });
     }
   }
 
@@ -1166,8 +1167,9 @@ function GradebookView({
     if (!byUnit[u]) { byUnit[u] = []; unitOrder.push(u); }
     byUnit[u].push(meta);
   }
-  // Sort lessons within each unit by id.
-  for (const u of unitOrder) byUnit[u].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+  // Units and the lessons inside them go in course order (title number), not folder-id order.
+  unitOrder.sort(compareUnitLabels);
+  for (const u of unitOrder) byUnit[u].sort(compareLessons);
 
   // Flatten to an ordered array; track unit spans for colspan.
   const orderedLessons: LessonMeta[] = [];
@@ -1347,7 +1349,7 @@ function GradebookView({
   const shownCats = GRADE_CATEGORIES.filter((c) => displayLessons.some((l) => catOf.get(l.id) === c));
 
   function handleDownloadCsv() {
-    const csv = buildGradebookCsv(gbData!.students, displayLessons.map((l) => l.id), gbData!.dueDates);
+    const csv = buildGradebookCsv(gbData!.students, displayLessons.map((l) => l.id), gbData!.dueDates, Object.fromEntries(displayLessons.map((l) => [l.id, l.title])));
     downloadCsv(csv, `gradebook-${className.replace(/\s+/g, '-')}.csv`);
   }
 
@@ -1939,6 +1941,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   // Progress state
   const [progressMap, setProgressMap] = useState<Map<string, StudentProgress>>(new Map());
   const [lessonMap, setLessonMap] = useState<Map<string, LessonMeta>>(new Map());
+  const lessonTitles = Object.fromEntries([...lessonMap.values()].map((l) => [l.id, l.title]));
   const [drawerEmail, setDrawerEmail] = useState<string | null>(null);
 
   // Section tabs. Seeded from ?tab= (or the top-nav "Gradebook" shortcut's ?view=gradebook) on mount only.
@@ -2298,6 +2301,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <h2 style={{ ...S.h2, marginBottom: 16 }}>Needs Attention</h2>
             <NeedsAttentionPanel
               classId={classId}
+              lessonTitles={lessonTitles}
               onOpenStudent={(email: string) => setDrawerEmail(email)}
               onOpenTeacherEdit={(studentEmail: string, lessonId: string) => {
                 router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(studentEmail)}&lesson=${encodeURIComponent(lessonId)}`);
@@ -2307,7 +2311,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         {/* Submission Review Queue */}
         <div style={S.card}>
           <h2 style={S.h2}>Submission Review Queue</h2>
-          <SubmissionQueue classId={classId} />
+          <SubmissionQueue classId={classId} lessonTitles={lessonTitles} />
         </div>
         {/* Past due */}
         <div style={S.card}>

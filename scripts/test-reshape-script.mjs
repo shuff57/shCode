@@ -455,7 +455,9 @@ refuses('bevel() on a whole shape', 'const b = box(40, 40, 20)\nbevel(b, 3)', 'b
 refuses('.edge() with the same face twice', 'const b = box(40, 40, 20)\nround(b.edge("top", "top"), 3)', 'two DIFFERENT faces');
 refuses('.edge() with an unknown word', 'const b = box(40, 40, 20)\nround(b.edge("top", "diagonal"), 3)', 'does not know the face "diagonal"');
 refuses('mirror() with a bad word', 'const b = box(40, 40, 20)\nmirror(b, "sideways")', "needs 'left-right'");
-refuses('turn() on a hole', 'const b = box(40, 40, 20)\nhole(b, { across: 6 })\nturn(b, [0, 0, 45])', 'turn() only works on a shape you built directly');
+// turn() on a built-up shape (a hole, a round, a join) is allowed since reshape-cad 3b00e00: a rotate step about the bounding-box centre.
+// What it still refuses is anything that is not a shape (a sketch handle, for one).
+refuses('turn() on a sketch', "const s = sketch('front')\nturn(s, [0, 0, 45])", 'turn() needs a shape');
 refuses('repeatAround() on the axis', 'const b = box(40, 40, 20)\nrepeatAround(b, { count: 6 })', 'nothing to spin around');
 refuses('join() with one shape', 'const b = box(40, 40, 20)\njoin(b)', 'join() needs two or more shapes');
 refuses('param() reusing a name', 'param("wall", 2)\nparam("wall", 3)', 'already used the name "wall"');
