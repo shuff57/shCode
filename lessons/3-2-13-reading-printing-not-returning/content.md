@@ -46,7 +46,7 @@ Now `total` is a real number, which is why it can be doubled. A printed value co
 
 **The tell is `undefined` in the wrong place.** If a variable holding a function's result prints as `undefined` even though the function clearly worked, look for a missing `return`. Beginners often add a second `console.log` to "check the value", see the right number printed from inside the function, and conclude the function is fine. But that print is coming from *inside*, and proves nothing about what came *out*.
 
-**Try it:** Add a `return` in place of the print in the first block and watch `total` change from `undefined` to a number.
+**Try it:** This block uses `return` where the first one used a print. Run it and watch `total` change from `undefined` to `5`. Then change `return a + b;` back to `console.log(a + b);` and run it again to see `undefined` come back.
 
 ```js live plain
 function addAndReturn(a, b) {

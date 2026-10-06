@@ -90,7 +90,7 @@
     {
       "id": "req3",
       "title": "A 3+ parameter function",
-      "description": "A function of your own with at least 3 parameters. Help: 3.2.2 (Parameters & Return Values)",
+      "description": "A function of your own with at least 3 parameters. Help: 3.2.2 (Parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*\\w+\\s*,\\s*\\w+|(?:const|let|var)\\s+\\w+\\s*=\\s*(?:function\\s*)?\\(\\s*\\w+\\s*,\\s*\\w+\\s*,\\s*\\w+",
@@ -100,7 +100,7 @@
     {
       "id": "req4",
       "title": "A function that returns a value",
-      "description": "A function of your own that returns a computed value, used elsewhere in the program. A named function, an arrow, or a method all count. Help: 3.2.2 (Parameters & Return Values)",
+      "description": "A function of your own that returns a computed value, used elsewhere in the program. A named function, an arrow, or a method all count. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:function\\s+\\w+\\s*\\(\\s*\\w|^[ \\t]*(?!(?:if|for|while|switch|catch|function|return|do)\\b)\\w+\\s*\\(\\s*\\w[^)\\n]*\\)\\s*\\{)[\\s\\S]*?\\breturn\\b\\s*[^;\\n]|(?:const|let|var)\\s+\\w+\\s*=\\s*(?:function\\s*\\(\\s*\\w[\\s\\S]*?\\breturn\\b\\s*[^;\\n]|\\(?\\s*\\w+[^)\\n]*\\)?\\s*=>\\s*(?:[^;{\\n]|\\{[\\s\\S]*?\\breturn\\b\\s*[^;\\n]))",

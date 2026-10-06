@@ -21,8 +21,10 @@ let line = ["ana", "bob"];
 
 line.unshift("zoe");   // front
 line.push("mia");       // back
-console.log(line);      // ["zoe", "ana", "bob", "mia"]
+console.log(line);      // the array, one item per line: zoe, ana, bob, mia
 ```
+
+The console prints an array as a `[`, then one item per line with strings in quotes, then a `]`, so look for `"zoe"` first and `"mia"` last.
 
 `shift()` removes the first item **and returns it** — the same double-job idea as a function `return` from Module 3.2. Store the return value if you need the person who just left the front.
 
@@ -33,7 +35,7 @@ let line = ["ana", "bob", "mia"];
 
 let first = line.shift();   // "ana" leaves, and we keep it
 console.log(first);         // "ana"
-console.log(line);          // ["bob", "mia"]
+console.log(line);          // the array, one item per line: bob, mia
 ```
 
 ---

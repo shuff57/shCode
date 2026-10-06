@@ -11,13 +11,13 @@ let board = [
   ["", "O", ""]
 ];
 
-console.log(board[1][2]);   // "X" -- row 1, cell 2
-console.log(board[2][0]);   // ""  -- bottom-left, empty
+console.log(board[1][2]);   // X -- row 1, cell 2
+console.log(board[2][0]);   // (an empty line) -- bottom-left, empty
 ```
 
 ## Step 2: Print the whole board
 
-A nested loop visits every row, then every cell inside it. Joining each row's cells with a space keeps each row on its own line, which is how the board reads visually.
+Loop over the rows, and join each row's cells with a space so each row prints on its own line, the way a board looks on paper.
 
 ```js live plain
 let board = [

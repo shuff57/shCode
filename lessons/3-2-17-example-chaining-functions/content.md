@@ -72,7 +72,7 @@ const result = addTen(double(addTen(5)));
 console.log(result);
 ```
 
-Inside out: `addTen(5)` is `15`, `double(15)` is `30`, `addTen(30)` is `40`. Three small functions composed into one longer job, with no logic repeated.
+Inside out: `addTen(5)` is `15`, `double(15)` is `30`, `addTen(30)` is `40`. Two small functions, called three times (`addTen` twice, `double` once), composed into one longer job with no logic repeated.
 
 ## Key takeaways
 

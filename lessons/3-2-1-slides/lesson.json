@@ -1,12 +1,13 @@
 {
   "id": "3-2-1-slides",
   "title": "3.3.1 Slides: Arrays",
-  "description": "Arrays slides. Placeholder until the deck is built from the book.",
+  "description": "Unit 3.3 slides: arrays, indexes, push and pop, looping over an array, and nested arrays. Served live from bookSHelf; a push there updates this deck with no shCode rebuild.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
   "preview": "slides",
+  "slidesUrl": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/chapter-3-functions-and-data/decks/3.3_arrays.paper",
   "slos": [
     "SLO-1"
   ],

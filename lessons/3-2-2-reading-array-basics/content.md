@@ -55,7 +55,7 @@ console.log(fruits[fruits.length - 1]);
 console.log(fruits[fruits.length]);
 ```
 
-`3`, then `cherry`, then `undefined`. Nothing crashes yet, but asking that `undefined` for a property, such as `fruits[fruits.length].name`, is a `TypeError`.
+`3`, then `cherry`, then `undefined`. Nothing crashes yet, but asking that `undefined` for anything inside it, such as adding a dot and a name after it, is a `TypeError`: `undefined` has nothing inside it to ask for. (Properties and methods come in later lessons; for now just remember that reading past the end hands you `undefined`.)
 
 ---
 

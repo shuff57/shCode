@@ -11,7 +11,7 @@ You already know how to read an item with `arr[i]`. The same syntax writes: assi
 let colors = ["red", "green", "blue"];
 
 colors[1] = "yellow";   // replace index 1
-console.log(colors);     // ["red", "yellow", "blue"]
+console.log(colors);     // red, yellow, blue (one item per line, see below)
 ```
 
 The array does not grow and it does not shrink — you are not adding an item, you are swapping what sits in a slot that already exists. `colors.length` is still `3` before and after.
@@ -24,15 +24,17 @@ let colors = ["red", "green", "blue"];
 console.log(colors.length);   // 3
 
 colors[1] = "yellow";
-console.log(colors);          // ["red", "yellow", "blue"]
+console.log(colors);          // the whole array: red, yellow, blue
 console.log(colors.length);    // still 3
 ```
 
-An array does not have to hold all the same type. `[42, "hello", true]` is a perfectly good array. When the console prints one, it shows strings in quotes but numbers and booleans bare — that is a **type signal**, not decoration:
+The console prints an array on several lines: an opening `[`, then one item per line (strings in quotes), then a closing `]`. So the second line above shows `"red"`, `"yellow"`, `"blue"` stacked one under another, with `"yellow"` in the middle where `"green"` used to be.
+
+An array does not have to hold all the same type. `[42, "hello", true]` is a perfectly good array. When the console prints one, it lists one item per line and shows strings in quotes but numbers and booleans bare — that is a **type signal**, not decoration:
 
 ```js live plain
 let mixed = [42, "hello", true];
-console.log(mixed);   // [42, "hello", true]
+console.log(mixed);   // 42, "hello" and true, one per line
 ```
 
 The quotes around `"hello"` tell you it is text; `42` and `true` have no quotes because they are a number and a boolean.

@@ -53,7 +53,7 @@ const result = addTen(double(addTen(5)));
 console.log(result);
 ```
 
-Read it from the inside out: `addTen(5)` is `15`, `double(15)` is `30`, `addTen(30)` is `40`. Three small functions, four layers of work, and not one line of the logic was duplicated.
+Read it from the inside out: `addTen(5)` is `15`, `double(15)` is `30`, `addTen(30)` is `40`. Two small functions, called three times (`addTen` is used twice), and not one line of the logic was duplicated.
 
 This only works because the functions return. A function that printed instead of returned would give `undefined` to the next call, and the chain would collapse into `NaN` or nonsense. Functions that return compose; functions that print do not.
 

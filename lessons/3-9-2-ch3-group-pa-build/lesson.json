@@ -155,7 +155,7 @@
     {
       "id": "r5",
       "title": "A function returns a value",
-      "description": "At least one function hands a value back with return, rather than printing it. Help: 3.2.2 (Parameters & Return Values)",
+      "description": "At least one function hands a value back with return, rather than printing it. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "return\\s+[A-Za-z_$(]",

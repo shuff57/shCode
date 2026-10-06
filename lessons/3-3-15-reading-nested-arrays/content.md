@@ -20,7 +20,7 @@ let grid = [[1, 2], [3, 4], [5, 6]];
 ```js live plain
 let grid = [[1, 2], [3, 4], [5, 6]];
 
-console.log(grid[1]);     // [3, 4]  -- the whole row
+console.log(grid[1]);     // the whole row: 3 and 4, one per line
 console.log(grid[1][0]);  // 3       -- first cell of row 1
 console.log(grid[2][1]);  // 6       -- second cell of row 2
 ```
