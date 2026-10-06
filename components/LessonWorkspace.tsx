@@ -8,6 +8,7 @@ import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission, streamGrade } from '../lib/written-grader-store';
+import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import AiGradeResultPanel, { type AiGradeResultData } from './AiGradeResultPanel';
@@ -637,7 +638,7 @@ export default function LessonWorkspace({
     setAiResult(null);
     try {
       const code = useLessonStore.getState().fileContents['script.js'] || '';
-      const { status, data } = await streamGrade(
+      const { status, data, network } = await streamGrade(
         {
           lessonId: lesson.id,
           lessonTitle: lesson.title,
@@ -649,14 +650,16 @@ export default function LessonWorkspace({
         (stage) => setAiStage(stage),
       );
       if (data === null) {
-        setAiError(`The grader returned something we could not read (HTTP ${status}). Ask your teacher.`);
+        console.warn('[grader]', network ? 'network error' : `non-JSON response (HTTP ${status})`);
+        setAiError(gradeFailureMessage({ kind: classifyGradeFailure(status, null, network), status }));
         // The server may have written its free outage marker: re-read the rows so
         // the completion repair can unlock the next part.
         if (capped) cap.refresh();
         return;
       }
       if (!data.ok) {
-        setAiError(data.error || `Grading failed (HTTP ${status}).`);
+        console.warn('[grader]', status, (data as { detail?: string }).detail || data.error);
+        setAiError(gradeFailureMessage({ kind: classifyGradeFailure(status, data), status, serverMessage: data.error }));
         // A refused fourth try (409), a lost race or an outage marker all change
         // what the server holds: re-read it so the banner and Submit are not stale.
         if (capped) cap.refresh();
@@ -678,7 +681,8 @@ export default function LessonWorkspace({
         if (capped) cap.spend();
       }
     } catch (e) {
-      setAiError(e instanceof Error ? e.message : String(e));
+      console.warn('[grader]', e);
+      setAiError(gradeFailureMessage({ kind: 'network' }));
       if (capped) cap.refresh();
     } finally {
       setAiGrading(false);

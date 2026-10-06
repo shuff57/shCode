@@ -16,6 +16,7 @@ import {
 } from '../lib/written-grader-store';
 import { countAttempts } from '../lib/attempt-cap';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
+import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import GraderPicker, { hasGraderChoice, useGraderChoice } from './GraderPicker';
 import SolutionPanel from './SolutionPanel';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
@@ -332,7 +333,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     setError(null);
     setOffline(false);
     try {
-      const { status, data } = await streamGrade(
+      const { status, data, network } = await streamGrade(
         {
           lessonId,
           lessonTitle,
@@ -347,8 +348,17 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       );
       const res = { status };
       if (data === null) {
-        const reason = `Grader returned a non-JSON response (HTTP ${res.status}).`;
-        setError(`${reason} Ask your teacher — the Ollama key or endpoint may not be configured. ${maxSubmissions !== null ? 'Your draft is saved and this did not use one of your tries.' : 'Your answer has been saved and sent to your teacher for marking.'}`);
+        // Raw status stays in the console and in the row the teacher sees; the
+        // student gets plain words (lib/grade-error.ts).
+        const reason = network
+          ? 'Network error: the grader could not be reached.'
+          : `Grader returned a non-JSON response (HTTP ${res.status}).`;
+        console.warn('[grader]', reason);
+        setError(gradeFailureMessage({
+          kind: classifyGradeFailure(res.status, null, network),
+          status: res.status,
+          keepsTries: maxSubmissions !== null,
+        }));
         await recordFailedAttempt(reason, res.status);
         await refreshAttempts();
         return;
@@ -362,8 +372,16 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         return;
       }
       if (!data || !data.ok) {
-        const reason = data?.error || `Grading failed (HTTP ${res.status}).`;
-        setError(`${reason} ${maxSubmissions !== null ? 'Your draft is saved and this did not use one of your tries. Try again in a minute.' : 'Your answer has been saved and sent to your teacher for marking.'}`);
+        // `detail` is the server's staff-only reason (may name the vendor): logged and
+        // sent to the teacher side, never shown.
+        const reason = (data as { detail?: string } | null)?.detail || data?.error || `Grading failed (HTTP ${res.status}).`;
+        console.warn('[grader]', res.status, reason);
+        setError(gradeFailureMessage({
+          kind: classifyGradeFailure(res.status, data),
+          status: res.status,
+          serverMessage: data?.error,
+          keepsTries: maxSubmissions !== null,
+        }));
         if (data?.offline) setOffline(true);
         await recordFailedAttempt(reason, res.status);
         await refreshAttempts();
@@ -410,7 +428,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       }
     } catch (e) {
       const reason = e instanceof Error ? e.message : String(e);
-      setError(reason);
+      console.warn('[grader]', reason);
+      setError(gradeFailureMessage({ kind: 'network', keepsTries: maxSubmissions !== null }));
       // Best effort — if the network is genuinely down this fails too, and
       // recordFailedAttempt leaves the retry guard clear so the next submit
       // tries again.

@@ -260,13 +260,17 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   if (!isAvailable(target)) {
     // 503 + offline:true is the shape the client's error branch already knows;
     // it saves the answer and hands it to the teacher rather than losing it.
-    if (fail) await fail('The grader is not set up on this site.', 503);
+    // The student-facing `error` names no vendor, key or host; the reason a staff
+    // member needs is in `detail` (clients log it, never show it) and in the
+    // outage row's reason below.
+    const why = target.unavailableReason ?? 'it is not configured.';
+    console.warn('[grade-written] grader unavailable:', why);
+    if (fail) await fail(`The grader is not set up on this site (${why})`, 503);
     return json(
       {
         ok: false,
-        error:
-          `The ${target.label.toLowerCase()} is not set up on this site. `
-          + `Ask your teacher — ${target.unavailableReason ?? 'it is not configured.'}`,
+        error: 'The grader is not available on this site right now.',
+        detail: why,
         offline: true,
         grader: requested,
       },
@@ -374,7 +378,10 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     // streaming path's identical check.
     const errorText = e instanceof GraderError ? msg : `Grader call failed: ${msg}`;
     if (fail) await fail(errorText, 502);
-    return json({ ok: false, error: errorText, grader: requested }, 502);
+    // The raw text can name the vendor and an upstream status: staff get it in
+    // `detail` and the outage row, the student gets a plain sentence.
+    console.warn('[grade-written] upstream failure:', errorText);
+    return json({ ok: false, error: UPSTREAM_FAILED_TEXT, detail: errorText, grader: requested }, 502);
   } finally {
     clearTimeout(timeout);
   }
@@ -442,6 +449,10 @@ async function callOllamaChat(
   const data = (await res.json()) as { message?: { content?: string } };
   return data.message?.content || '';
 }
+
+// What a student reads when the model call itself failed. The upstream text
+// ("Ollama 401: ...") goes out as `detail` instead.
+const UPSTREAM_FAILED_TEXT = "The grader isn't responding right now. Try again in a minute.";
 
 function json(body: unknown, status = 200, extraHeaders?: Record<string, string>): Response {
   return new Response(JSON.stringify(body), {
@@ -635,7 +646,8 @@ function streamGrade({ target, model, system, user, rubric, grader, record, fail
         const msg = e instanceof Error ? e.message : String(e);
         const errorText = e instanceof GraderError ? msg : `Grader call failed: ${msg}`;
         if (fail) await fail(errorText, 502);
-        send({ error: errorText });
+        console.warn('[grade-written] upstream failure:', errorText);
+        send({ error: UPSTREAM_FAILED_TEXT, detail: errorText });
       } finally {
         clearTimeout(timeout);
         controller.close();

@@ -40,6 +40,7 @@ import type { DiagramDoc, FlowShape, SideId } from '../../lib/diagram-types';
 import { SHAPE_HINTS, SHAPE_LABELS } from '../../lib/diagram-types';
 import { docToFlow } from '../../lib/diagram-flow';
 import { nodeTypes, SHAPE_COLORS, SHAPE_SIZE } from './FlowShapeNodes';
+import { nextFreeSlot } from '../../lib/diagram-layout';
 import { edgeTypes } from './EditableEdge';
 
 // ---- doc <-> react-flow ----
@@ -270,11 +271,13 @@ function Canvas({
     value.nodes.some((n) => MORE_SHAPES.includes(n.shape)),
   );
 
-  const { screenToFlowPosition, fitView } = useReactFlow();
+  const { screenToFlowPosition, fitView, getViewport } = useReactFlow();
   const wrapRef = useRef<HTMLDivElement>(null);
   const history = useRef<string[]>([]);
   const emitted = useRef<string>(JSON.stringify(value));
   const seq = useRef(0);
+  const nodesRef = useRef<Node[]>([]);
+  nodesRef.current = nodes;
   const edgeSeq = useRef(0);
   const labelInput = useRef<HTMLInputElement>(null);
 
@@ -450,11 +453,41 @@ function Canvas({
     (shape: FlowShape, at?: Point, spliceEdgeId?: string | null) => {
       snapshot();
       const id = `s${++seq.current}`;
-      const position = at ?? {
-        x: 320 + ((seq.current * 37) % 140),
-        y: 60 + ((seq.current * 61) % 220),
-      };
-      setNodes((ns) => [...ns, { id, type: shape, position, data: { label: '', shape } }]);
+      let position = at;
+      if (!position) {
+        // Top-left of the visible canvas (flow coordinates), else a fixed corner.
+        let origin = { x: 40, y: 40 };
+        const rect = wrapRef.current?.querySelector('.react-flow')?.getBoundingClientRect();
+        if (rect && rect.width > 0) {
+          const tl = screenToFlowPosition({ x: rect.left, y: rect.top });
+          if (Number.isFinite(tl.x) && Number.isFinite(tl.y)) origin = { x: tl.x + 40, y: tl.y + 40 };
+        }
+        const size = SHAPE_SIZE[shape] ?? SHAPE_SIZE.process;
+        const existing = nodesRef.current.map((n) => {
+          const s = SHAPE_SIZE[(n.data as any).shape as FlowShape] ?? SHAPE_SIZE.process;
+          return { x: n.position.x, y: n.position.y, w: s.w, h: s.h };
+        });
+        position = nextFreeSlot(existing, size, origin);
+      }
+      const placedByGrid = !at;
+      const added: Node = { id, type: shape, position, data: { label: '', shape } };
+      nodesRef.current = [...nodesRef.current, added];
+      setNodes((ns) => [...ns, added]);
+      if (placedByGrid) {
+        // Only when the new shape would land off screen: refit once (animated,
+        // never zooming in) so it is not added somewhere the student cannot see.
+        const el = wrapRef.current?.querySelector('.react-flow') as HTMLElement | null;
+        const sz = SHAPE_SIZE[shape] ?? SHAPE_SIZE.process;
+        if (el) {
+          const vp = getViewport();
+          const inView =
+            position.x * vp.zoom + vp.x >= 0 &&
+            position.y * vp.zoom + vp.y >= 0 &&
+            (position.x + sz.w) * vp.zoom + vp.x <= el.clientWidth &&
+            (position.y + sz.h) * vp.zoom + vp.y <= el.clientHeight;
+          if (!inView) setTimeout(() => fitView({ duration: 250, padding: 0.15, maxZoom: 1 }), 60);
+        }
+      }
       if (spliceEdgeId) spliceInto(spliceEdgeId, id);
       setSelNode(id);
       setSelEdge(null);
@@ -462,7 +495,7 @@ function Canvas({
       setEditNode(id);
       setEditEdge(null);
     },
-    [snapshot, spliceInto],
+    [snapshot, spliceInto, screenToFlowPosition, getViewport, fitView],
   );
 
   const setNodeLabel = useCallback((id: string, label: string) => {

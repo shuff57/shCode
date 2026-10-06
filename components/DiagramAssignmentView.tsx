@@ -41,6 +41,7 @@ import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { fetchDraft, saveDraft, recordSubmission, streamGrade } from '../lib/written-grader-store';
+import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
 import GraderPicker, { useGraderChoice } from './GraderPicker';
 import { checkDiagram, allPassed, type CheckResult } from '../lib/diagram-check';
@@ -247,7 +248,7 @@ export default function DiagramAssignmentView({
     setError(null);
     setOffline(false);
     try {
-      const { status, data } = await streamGrade(
+      const { status, data, network } = await streamGrade(
         {
           lessonId,
           lessonTitle,
@@ -267,16 +268,20 @@ export default function DiagramAssignmentView({
       );
       const res = { status };
       if (data === null) {
-        setError(
-          `Grader returned a non-JSON response (HTTP ${res.status}). Ask your teacher — the Ollama key or endpoint may not be configured.`,
-        );
+        console.warn('[grader]', network ? 'network error' : `non-JSON response (HTTP ${res.status})`);
+        setError(gradeFailureMessage({ kind: classifyGradeFailure(res.status, null, network), status: res.status }));
         // The server may have written its free outage marker: re-read the rows so
         // the completion repair can unlock the next part.
         if (capped) cap.refresh();
         return;
       }
       if (!data || !data.ok) {
-        setError(data?.error || `Grading failed (HTTP ${res.status}).`);
+        console.warn('[grader]', res.status, (data as { detail?: string } | null)?.detail || data?.error);
+        setError(gradeFailureMessage({
+          kind: classifyGradeFailure(res.status, data),
+          status: res.status,
+          serverMessage: data?.error,
+        }));
         if (data?.offline) setOffline(true);
         // A refused fourth try (409), a lost race or an outage marker all change
         // what the server holds: re-read it so the banner and Submit are not stale.
@@ -304,7 +309,8 @@ export default function DiagramAssignmentView({
         if (capped) cap.spend();
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      console.warn('[grader]', e);
+      setError(gradeFailureMessage({ kind: 'network' }));
       if (capped) cap.refresh();
     } finally {
       setGrading(false);

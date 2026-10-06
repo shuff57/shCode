@@ -11,6 +11,7 @@ if (!LIB) {
 }
 const { fromMermaid, toMermaid, describeDiagram } = require(LIB + '/diagram-mermaid.js');
 const { checkDiagram, allPassed } = require(LIB + '/diagram-check.js');
+const { nextFreeSlot } = require(LIB + '/diagram-layout.js');
 const { DEFAULT_RULES } = require(LIB + '/diagram-types.js');
 
 let fails = 0;
@@ -430,6 +431,39 @@ section('fromMermaid — quoted edge labels');
   ok('an unquoted label is unchanged', d.edges[2].label === 'maybe', JSON.stringify(d.edges[2]));
   const rt = fromMermaid(toMermaid(d));
   ok('round trip keeps the unquoted labels', rt.edges.map(e => e.label).join() === 'yes,no,maybe', JSON.stringify(rt.edges.map(e => e.label)));
+}
+
+section('nextFreeSlot — palette shapes do not stack');
+{
+  const size = { w: 176, h: 72 };
+  const origin = { x: 40, y: 40 };
+  const place = () => {
+    const rs = [];
+    for (let i = 0; i < 10; i++) rs.push({ ...nextFreeSlot(rs, size, origin), ...size });
+    return rs;
+  };
+  const rs = place();
+  let overlap = false;
+  for (let i = 0; i < rs.length; i++) for (let j = i + 1; j < rs.length; j++) {
+    const a = rs[i], b = rs[j];
+    if (a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y) overlap = true;
+  }
+  ok('10 shapes added in sequence never overlap', !overlap, JSON.stringify(rs));
+  ok('same inputs give the same slots', JSON.stringify(place()) === JSON.stringify(rs));
+  const first = nextFreeSlot([], size, origin);
+  ok('empty canvas uses the origin', first.x === 40 && first.y === 40, JSON.stringify(first));
+  // Slot 0 and slot 2 taken: the first free one is slot 1.
+  const step = size.w + 40;
+  const gap = nextFreeSlot([
+    { x: 40, y: 40, ...size }, { x: 40 + 2 * step, y: 40, ...size },
+  ], size, origin);
+  ok('first free slot in a gap is used', gap.x === 40 + step && gap.y === 40, JSON.stringify(gap));
+  const beside = nextFreeSlot([{ x: 40, y: 40, ...size }], size, origin);
+  ok('occupied origin lands beside, not on', beside.x >= 40 + size.w && beside.y === 40, JSON.stringify(beside));
+  const crowded = [];
+  for (let i = 0; i < 300; i++) crowded.push({ x: 40 + (i % 4) * step, y: 40 + Math.floor(i / 4) * 112, ...size });
+  const fb = nextFreeSlot(crowded, size, origin);
+  ok('a full grid falls back to a finite position', Number.isFinite(fb.x) && Number.isFinite(fb.y));
 }
 
 section('describeDiagram');

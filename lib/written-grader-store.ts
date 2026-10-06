@@ -123,18 +123,25 @@ export interface StreamGradeResult {
   status: number;
   /** Parsed body: the grade on success, or {error, offline} on failure. */
   data: any;
+  /** True when fetch itself threw (offline, DNS, dropped): no reply at all. */
+  network?: boolean;
 }
 
 export async function streamGrade(
   body: unknown,
   onStage: (stage: GradeStage, chars?: number) => void,
 ): Promise<StreamGradeResult> {
-  const res = await fetch('/api/grade-written?stream=1', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'same-origin',
-    body: JSON.stringify(body),
-  });
+  let res: Response;
+  try {
+    res = await fetch('/api/grade-written?stream=1', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(body),
+    });
+  } catch {
+    return { ok: false, status: 0, data: null, network: true };
+  }
 
   const ctype = res.headers.get('Content-Type') || '';
 
@@ -171,17 +178,22 @@ export async function streamGrade(
     } else if ('result' in evt) {
       terminal = evt.result;
     } else if ('error' in evt) {
-      terminal = { ok: false, error: evt.error, offline: evt.offline, raw: evt.raw, capReached: evt.capReached };
+      terminal = { ok: false, error: evt.error, detail: evt.detail, offline: evt.offline, raw: evt.raw, capReached: evt.capReached };
     }
   };
 
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buf += decoder.decode(value, { stream: true });
-    const lines = buf.split('\n');
-    buf = lines.pop() || '';
-    for (const line of lines) handle(line);
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop() || '';
+      for (const line of lines) handle(line);
+    }
+  } catch {
+    // The connection died mid-stream: no verdict arrived, same as no reply.
+    return { ok: false, status: 0, data: null, network: true };
   }
   if (buf) handle(buf);
 

@@ -317,6 +317,8 @@ providedRoles: [],
     const events = await readNdjson(res);
     const terminal = events[events.length - 1];
     ok(!!terminal.error, 'terminal is an error, got ' + JSON.stringify(terminal));
+    ok(!/ollama|key|endpoint/i.test(terminal.error), 'student-facing error names no vendor');
+    ok(/ollama/i.test(terminal.detail || ''), 'staff detail keeps the raw upstream reason');
     srv.close();
   }
 
@@ -405,6 +407,41 @@ providedRoles: [],
     ok(t.result?.grader === 'cloud', 'and it grades on cloud, got ' + t.result?.grader);
     ok(cloud.seen.length === 1, 'reaching the HTTP server');
     cloud.srv.close();
+  }
+
+  // -- client side: streamGrade's failure shapes ----------------------------
+  // A thrown fetch is `network`, not a non-JSON reply; a 404/502 that is not JSON
+  // is data:null with its real status kept for the log and the teacher row.
+  {
+    console.log('streamGrade failure shapes');
+    let streamGrade = null;
+    try {
+      ({ streamGrade } = await import('../lib/written-grader-store.ts'));
+    } catch (e) {
+      try {
+        const esbuild = await import('esbuild');
+        const outFile = path.join(out, 'store.mjs');
+        await esbuild.build({ entryPoints: [path.join(root, 'lib', 'written-grader-store.ts')], bundle: true, format: 'esm', outfile: outFile, logLevel: 'silent' });
+        ({ streamGrade } = await import('file://' + outFile.split(path.sep).join('/')));
+      } catch (e2) {
+        ok(false, 'could not load written-grader-store: ' + e.message + ' / ' + e2.message);
+      }
+    }
+    if (streamGrade) {
+      const realFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = async () => { throw new TypeError('Failed to fetch'); };
+        let r = await streamGrade({}, () => {});
+        ok(r.ok === false && r.status === 0 && r.data === null && r.network === true, 'thrown fetch -> network:true, got ' + JSON.stringify(r));
+        for (const st of [404, 502]) {
+          globalThis.fetch = async () => new Response('<html>Bad gateway</html>', { status: st, headers: { 'Content-Type': 'text/html' } });
+          r = await streamGrade({}, () => {});
+          ok(r.ok === false && r.status === st && r.data === null && !r.network, `non-JSON ${st} -> data:null, status kept`);
+        }
+      } finally {
+        globalThis.fetch = realFetch;
+      }
+    }
   }
 
 } finally {

@@ -309,6 +309,8 @@ interface GradeResultEvent {
 
 interface GradeErrorEvent {
   error: string;
+  /** Staff-only reason (may name the vendor); clients log it, never show it. */
+  detail?: string;
   /** Mirrors the non-streaming body so the client's error path is shared. */
   offline?: boolean;
   raw?: string;

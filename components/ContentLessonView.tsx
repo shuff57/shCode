@@ -67,6 +67,48 @@ export default function ContentLessonView({ lesson }: Props) {
     };
   }, [slidesUrl]);
 
+  // Can the deck be framed? Whether it is depends on bookSHelf's response headers
+  // (X-Frame-Options SAMEORIGIN refuses us). A cross-origin iframe cannot report
+  // that refusal to JS, and Chromium fires `load` on the browser's error page
+  // too, so the only signal available is time: if no handshake arrives within
+  // ~5s we show a hint. Handshake (not sent by any deck yet): the deck may call
+  // parent.postMessage({ type: 'deck-ready' }, '*'); we accept it only from the
+  // deck's own origin, and it cancels the timer and marks the embed healthy.
+  //
+  // The hint is deliberately NON-destructive: the frame stays mounted. No deck
+  // sends the handshake today, so a healthy embed would also time out; removing
+  // the frame then would break a working deck the moment the header is fixed.
+  const [deckHealthy, setDeckHealthy] = useState(false);
+  const [deckSlow, setDeckSlow] = useState(false);
+  const showFrame = !!slidesUrl && deckReady === true;
+
+  useEffect(() => {
+    setDeckHealthy(false);
+    setDeckSlow(false);
+    if (!slidesUrl || !showFrame) return;
+    let origin = '';
+    try {
+      origin = new URL(slidesUrl).origin;
+    } catch {
+      return;
+    }
+    const timer = window.setTimeout(() => setDeckSlow(true), 5000);
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin !== origin) return;
+      const d = e.data as { type?: unknown } | null;
+      if (d && typeof d === 'object' && d.type === 'deck-ready') {
+        window.clearTimeout(timer);
+        setDeckHealthy(true);
+        setDeckSlow(false);
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('message', onMessage);
+    };
+  }, [slidesUrl, showFrame]);
+
   return (
     <>
       <TabbedRightDrawer
@@ -170,11 +212,31 @@ export default function ContentLessonView({ lesson }: Props) {
       {preview === 'slides' ? (
         slidesUrl && deckReady === true ? (
           <div style={{ marginTop: 16 }}>
-            <div style={{ marginBottom: 8 }}>
-              <a href={slidesUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#50fa7b' }}>
-                → Open in new tab (full screen, editable code blocks)
+            <div style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+              <a
+                href={slidesUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  background: '#50fa7b',
+                  color: '#282a36',
+                  fontWeight: 700,
+                  fontSize: 15,
+                  padding: '10px 18px',
+                  borderRadius: 8,
+                  textDecoration: 'none',
+                }}
+              >
+                Open in new tab →
               </a>
+              <span style={{ color: '#8393c4', fontSize: 13 }}>Full screen, editable code blocks</span>
             </div>
+            {deckSlow && !deckHealthy ? (
+              <p role="status" style={{ margin: '0 0 8px', color: '#f1fa8c', fontSize: 14 }}>
+                Slides blank? Open them in a new tab.
+              </p>
+            ) : null}
             <div style={{ aspectRatio: '16 / 9', borderRadius: 8, overflow: 'hidden', background: '#000', border: '1px solid #44475a' }}>
               <iframe
                 src={slidesUrl}
