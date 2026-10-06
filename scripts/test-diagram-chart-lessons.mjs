@@ -199,10 +199,14 @@ try {
     check(!!g && g.strict === true, 'aiGrader present and strict');
     check(!!g && typeof g.prompt === 'string' && g.prompt.length > 200, 'aiGrader has a server-side prompt');
     check(!!g && g.rubric.length >= 5, 'at least 5 criteria');
-    // Pass line for a 0-point rubric is ceil(n/2) met-or-partial (lib/grade-pass.ts). The junk chart
-    // can at most satisfy the generic "both answers reach End" criterion, so it must be well short.
-    check(!!g && Math.ceil(g.rubric.length / 2) >= 3, 'pass line needs 3+ criteria, junk can earn at most 1-2');
-    check(!!g && g.rubric.every((r) => r.points === 0 && r.description && r.id), 'criteria are 0-point pass/fail with descriptions');
+    // Weighted points (20 total, pass line 70% = 14): the two criteria the lesson is ABOUT (the
+    // required shape kind and the order/loop structure) carry 7 each, so missing either one alone
+    // fails the chart (13/20). Measured live by scripts/test-chart-lessons-live.mjs.
+    const total = g ? g.rubric.reduce((a, r) => a + r.points, 0) : 0;
+    const heavy = g ? g.rubric.filter((r) => r.points >= 7).length : 0;
+    check(total === 20, `rubric points total 20 (got ${total})`);
+    check(heavy === 2 && g.rubric.every((r) => r.points >= 2), 'exactly two heavy (7) criteria, none under 2');
+    check(!!g && g.rubric.every((r) => r.description && r.id), 'criteria have descriptions');
     check(describeDiagram(fromMermaid(ref)).includes(SHAPE_WORD[id]), `the walk the model reads names "${SHAPE_WORD[id]}"`);
     check(g && g.rubric.some((r) => r.description.includes(SHAPE_WORD[id].split(' (')[0].replace('Function call', 'function-call')) || r.description.includes(SHAPE_WORD[id])), 'a criterion asks for that shape kind');
   }

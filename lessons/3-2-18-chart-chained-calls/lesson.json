@@ -60,32 +60,32 @@
         {
           "id": "two-call-shapes",
           "title": "Both calls are function-call shapes",
-          "description": "double(5) and addTen(...) are each drawn as a shape of kind 'Function call (predefined process)', two such shapes in all. Partial: only one is a function-call shape, or both are plain rectangles but clearly the two calls. Withhold if neither call appears.",
-          "points": 0
+          "description": "double(5) and addTen(...) are each drawn as a shape of kind 'Function call (predefined process)', two such shapes in all. Partial: only one of the two is a function-call shape. Withhold if neither is (plain rectangles do not count, however well worded) or if neither call appears.",
+          "points": 7
         },
         {
           "id": "inner-first",
           "title": "Inner call first, and its value flows into the outer call",
           "description": "Following arrows, double comes first and an arrow leaves it into addTen (directly, or through a step that holds the 10). Withhold if addTen comes before double, or if the two calls are on separate branches with no arrow from one to the other.",
-          "points": 0
+          "points": 2
         },
         {
           "id": "stores-result",
           "title": "The result is set from the outer call",
           "description": "A task step (or the label of the addTen call) sets result to what addTen handed back, after addTen and before the decision. Credit any wording.",
-          "points": 0
+          "points": 2
         },
         {
           "id": "decision",
           "title": "The diamond tests result after both calls",
           "description": "The decision asks whether result is over 25 (or equivalent such as 'result > 25'), and it comes AFTER both calls, not between them. Withhold if it tests another quantity or sits between or before the calls.",
-          "points": 0
+          "points": 7
         },
         {
           "id": "branches",
           "title": "Big and Small are alternatives that both reach End",
           "description": "The yes exit leads to a print of Big and the no exit to a print of Small (reversed only if the question is reversed), and both reach End. Withhold if a branch dead-ends or the prints are missing.",
-          "points": 0
+          "points": 2
         }
       ]
     }

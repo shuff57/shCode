@@ -61,31 +61,31 @@
           "id": "sets-base",
           "title": "Sets base before the call",
           "description": "A task step that sets base (to 100, or just 'base') appears on the path before the function call. Credit any wording.",
-          "points": 0
+          "points": 2
         },
         {
           "id": "call-shape",
           "title": "The call is one function-call shape",
-          "description": "showPriceWithTax(base) (or 'call showPriceWithTax with base') is drawn as a single shape of kind 'Function call (predefined process)', not as a plain rectangle and not expanded into the function's own lines. Withhold if it is a rectangle or if the body (the 'With tax' print and the multiplying by 1.08) is drawn as separate steps instead of the call. Partial: the call is a plain rectangle but otherwise named correctly.",
-          "points": 0
+          "description": "showPriceWithTax(base) (or 'call showPriceWithTax with base') is drawn as a single shape of kind 'Function call (predefined process)', not as a plain rectangle and not expanded into the function's own lines. Withhold if it is a rectangle or if the body (the 'With tax' print and the multiplying by 1.08) is drawn as separate steps instead of the call. A plain rectangle is not the shape the lesson asks for: mark this criterion missing, however well it is worded.",
+          "points": 7
         },
         {
           "id": "call-position",
           "title": "The call sits between setting base and the decision",
           "description": "Following arrows: the step that sets base leads to the call, and the call leads directly to the decision. Nothing branches off the call. Withhold if the decision comes before the call or the call hangs off to the side.",
-          "points": 0
+          "points": 7
         },
         {
           "id": "decision",
           "title": "The diamond tests base after the call",
           "description": "The decision asks whether base is over 80 (or an equivalent such as 'base > 80' or 'is base greater than 80'), and it comes AFTER the call. Withhold if it tests a different value or number, or sits before the call.",
-          "points": 0
+          "points": 2
         },
         {
           "id": "branches",
           "title": "Each answer reaches the right print and then End",
           "description": "The yes exit leads to 'Over budget' and the no exit to 'Within budget' (reversed only if the question is also reversed), and both then reach End. Withhold if a branch dead-ends, both exits print the same message, or the messages are missing.",
-          "points": 0
+          "points": 2
         }
       ]
     }

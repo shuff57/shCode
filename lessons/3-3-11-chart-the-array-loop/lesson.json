@@ -59,32 +59,32 @@
         {
           "id": "hexagon",
           "title": "The loop is drawn with the loop-setup hexagon",
-          "description": "The whole for-header (i from 0 up to the end of prices, or 'for each price') is a single shape of kind 'Loop setup (hexagon)'. Partial: the loop is drawn as a rectangle or diamond but the repeating is clear from the arrows. Withhold if there is no loop at all (the body appears once with no arrow back).",
-          "points": 0
+          "description": "The whole for-header (i from 0 up to the end of prices, or 'for each price') is a single shape of kind 'Loop setup (hexagon)'. A rectangle or diamond is not the loop-setup shape: withhold, however clear the repeating is from the arrows. Also withhold if there is no loop at all.",
+          "points": 7
         },
         {
           "id": "count-start",
           "title": "cheapCount starts at zero before the loop",
           "description": "A task step that sets cheapCount to 0 is on the path before the hexagon. Withhold if it is inside the loop (it would reset every time) or missing.",
-          "points": 0
+          "points": 2
         },
         {
           "id": "decision-in-loop",
           "title": "The diamond tests one price and sits inside the loop",
           "description": "The decision asks whether the current price (prices[i], or 'price') is under 10 (or an equivalent), and it is reached from the hexagon's repeat exit. Withhold if it tests something else or sits outside the loop.",
-          "points": 0
+          "points": 2
         },
         {
           "id": "both-back",
           "title": "Yes and no both return to the hexagon",
           "description": "The yes arrow goes to a step that adds one to cheapCount, and that step returns to the hexagon; the no arrow ALSO returns to the hexagon (directly, or through a join), not to End and not to a dead end. Partial: only one of the two returns. Withhold if neither does.",
-          "points": 0
+          "points": 2
         },
         {
           "id": "print-outside",
           "title": "The print is after the loop, off the hexagon",
           "description": "The print of the count leaves the hexagon's finished exit (the path taken when the items run out), once, and then reaches End. Withhold if the print is inside the loop body or missing.",
-          "points": 0
+          "points": 7
         }
       ]
     }
