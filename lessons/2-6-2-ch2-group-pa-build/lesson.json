@@ -44,8 +44,8 @@
     },
     {
       "id": "s5",
-      "title": "Add the continue",
-      "instructions": "Inside the loop, write the continue that skips the iterations your rule excludes. The continue goes BEFORE the flip/accumulate logic so the skipped iterations are truly skipped.",
+      "title": "Add the continue (Coin Drawer: skip to the next step)",
+      "instructions": "Inside the loop, write the continue that skips the iterations your rule excludes. The continue goes BEFORE the flip/accumulate logic so the skipped iterations are truly skipped. Coin Drawer has no iteration to skip, so its loop takes a break instead -- you add that in the next-but-one step.",
       "hints": [
         "if (i % 3 === 0) { continue; } -- skip multiples of 3",
         "The continue goes at the TOP of the loop body, before any flip logic"
@@ -169,24 +169,24 @@
     },
     {
       "id": "r7",
-      "title": "The loop has a continue",
-      "description": "A continue statement appears inside the loop. Help: 2.4.13 (Skipping a Round with continue)",
+      "title": "The loop has its continue (Coin Drawer: its break)",
+      "description": "A continue statement appears inside the loop. Coin Drawer has no skip rule, so there the loop needs its break instead: a break inside an if, for when the drawer is empty. Help: 2.4.13 (Skipping a Round with continue)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bcontinue\\s*;",
-      "flags": "",
+      "pattern": "^(?=[\\s\\S]*//[^\\S\\n]*Problem:[^\\S\\n]*coin\\W*drawer)[\\s\\S]*(?:\\)\\s*\\{\\s*break\\s*;|\\)\\s*break\\s*;)|^(?![\\s\\S]*//[^\\S\\n]*Problem:[^\\S\\n]*coin\\W*drawer)[\\s\\S]*\\bcontinue\\s*;",
+      "flags": "i",
       "points": 0,
-      "hint": "continue; -- exactly that word, inside the loop body.",
+      "hint": "continue; -- exactly that word, inside the loop body. Coin Drawer: if (drawerEmpty) { break; } -- a break the loop takes, not the one that ends a switch case.",
       "stripComments": false
     },
     {
       "id": "r8",
-      "title": "A break AND a continue",
-      "description": "A continue statement and a break statement both appear in the program. The break may be the one that ends a switch case.",
+      "title": "A break AND a continue (Coin Drawer: two breaks)",
+      "description": "A continue statement and a break statement both appear in the program. The break may be the one that ends a switch case. Coin Drawer: the loop break (inside an if) and the switch-case break both appear.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bcontinue\\s*;[\\s\\S]*\\bbreak\\s*;|\\bbreak\\s*;[\\s\\S]*\\bcontinue\\s*;",
-      "flags": "",
+      "pattern": "^(?=[\\s\\S]*//[^\\S\\n]*Problem:[^\\S\\n]*coin\\W*drawer)(?:[\\s\\S]*(?:\\)\\s*\\{\\s*break\\s*;|\\)\\s*break\\s*;)[\\s\\S]*\\bbreak\\s*;|[\\s\\S]*\\bbreak\\s*;[\\s\\S]*(?:\\)\\s*\\{\\s*break\\s*;|\\)\\s*break\\s*;))|^(?![\\s\\S]*//[^\\S\\n]*Problem:[^\\S\\n]*coin\\W*drawer)(?:[\\s\\S]*\\bcontinue\\s*;[\\s\\S]*\\bbreak\\s*;|[\\s\\S]*\\bbreak\\s*;[\\s\\S]*\\bcontinue\\s*;)",
+      "flags": "i",
       "points": 0,
       "hint": "Two keywords, both in the loop: continue for the iterations the rule excludes, break for the moment the outcome is decided.",
       "stripComments": false
