@@ -245,7 +245,6 @@
     <p class="dim2 mt-m" style="font-style:italic">bookSHelf &nbsp;&middot;&nbsp; Introduction to Programming Concepts &nbsp;&middot;&nbsp; &sect;1.2 &nbsp;&middot;&nbsp; a self-paced section</p>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">1 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:2.5%"></div>
-    <div class="notes">Titlepage: double rule over the sans title, one-sentence lede, hairline rule, small-print byline. Paper-white, link-blue accent, zero radius.</div>
   </section>
 
   <!-- 2 · Learning Objectives -->
@@ -261,7 +260,6 @@
     </ol>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">2 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:5.0%"></div>
-    <div class="notes">Four objectives, one per click. The tag column names the tool or definition each objective teaches.</div>
   </section>
 
   <!-- 3 · Context Pause: dynamically typed -->
@@ -272,7 +270,6 @@
     <p class="lede mt-s" style="max-width:74ch">Other languages (like Java or C++) require you to declare a variable&rsquo;s type upfront and stick with it. JavaScript is more flexible &mdash; but that also means type-related bugs only show up when the code actually runs.</p>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">3 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:7.5%"></div>
-    <div class="notes">Dynamically typed means the language checks types at runtime, not ahead of time &mdash; the payoff line for Objective 2.</div>
   </section>
 
   <!-- 4 · Definition 1.2.1: Special Numeric Values -->
@@ -425,7 +422,6 @@ console.log( "not a number" / 2 ); // NaN</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">4 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:10.0%"></div>
-    <div class="notes">The definition sits in a ruled paper box with a short runnable demo. The figure carries the same idea visually.</div>
   </section>
 
   <!-- 5 · Example 1.2.1: NaN Is Sticky -->
@@ -455,7 +451,6 @@ console.log( "not a number" / 2 ); // NaN</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">5 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:12.5%"></div>
-    <div class="notes">Commit-first: the attempt editor shows the three prompts, then one click reveals the full solution and explanation.</div>
   </section>
 
   <!-- 6 · Insight Note: JS math never crashes -->
@@ -466,7 +461,6 @@ console.log( "not a number" / 2 ); // NaN</pre>
     <p class="lede mt-s" style="max-width:74ch">Dividing by zero, multiplying a word by a number &mdash; none of it stops the program. At worst you get <code>NaN</code> and the code keeps running. This is different from many other languages, where such operations would halt the program with an error.</p>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">6 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:15.0%"></div>
-    <div class="notes">Math in JavaScript is "safe" &mdash; the script never crashes from a bad math operation.</div>
   </section>
 
   <!-- 7 · Try It Now 1.2.1 -->
@@ -493,7 +487,6 @@ console.log( "not a number" / 2 ); // NaN</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">7 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:17.5%"></div>
-    <div class="notes">Students try it in the live editor before clicking to reveal the answer.</div>
   </section>
   <section class="slide cs-reveal" data-title="Example 1.2.2">
     <div class="deck-header"><span>1.2 Variables and Data Types &middot; bookSHelf Programming Concepts</span><span>&sect;1.2</span></div>
@@ -559,7 +552,6 @@ console.log( 1.5 + 2.5 );</textarea>
 console.log(9007199254740991 + 2); // 9007199254740992</pre>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">10 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:25.0%"></div>
-    <div class="notes">Two different additions land on the same wrong answer &mdash; the hook for BigInt.</div>
   </section>
 
   <!-- 9 · Definition 1.2.2: BigInt -->
@@ -694,7 +686,6 @@ console.log(bigInt);</pre>
     <p class="footnote mt-m v-click">For most everyday programming, the regular <code>number</code> range is plenty. But <code>BigInt</code> is essential for cryptography, precise timestamps, and any situation where very large integers must be exact.</p>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">11 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:27.5%"></div>
-    <div class="notes">BigInt trades convenience for exactness past the safe-integer limit.</div>
   </section>
 
   <!-- 10 · Try It Now 1.2.3 -->
@@ -722,7 +713,6 @@ console.log( 9007199254740991n + 3n );</textarea>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">12 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:30.0%"></div>
-    <div class="notes">Regular-number vs. BigInt math side by side at the precision boundary.</div>
   </section>
 
   <!-- 11 · Definition 1.2.3: Three Types of Quotes -->
@@ -861,7 +851,6 @@ console.log( `Hello, ${name}!` ); // Hello, John!</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">13 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:32.5%"></div>
-    <div class="notes">Three quote kinds, one behavioral split: simple quotes vs. template literals.</div>
   </section>
 
   <!-- 12 · Context Pause: only backticks evaluate ${...} -->
@@ -873,7 +862,6 @@ console.log( `Hello, ${name}!` ); // Hello, John!</pre>
     <pre class="mt-m" style="font-size:18px">console.log( "the result is ${1 + 2}" ); // the result is ${1 + 2}</pre>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">14 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:35.0%"></div>
-    <div class="notes">The trap: pasting a backtick expression into a double-quoted string prints it literally.</div>
   </section>
 
   <!-- 13 · Try It Now 1.2.4 -->
@@ -900,7 +888,6 @@ console.log( `Hello, ${name}!` ); // Hello, John!</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">15 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:37.5%"></div>
-    <div class="notes">Same expression, two quote kinds, two very different outputs.</div>
   </section>
   <section class="slide cs-reveal" data-title="Example 1.2.3">
     <div class="deck-header"><span>1.2 Variables and Data Types &middot; bookSHelf Programming Concepts</span><span>&sect;1.2</span></div>
@@ -1146,7 +1133,6 @@ console.log( isGreater ); // true</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">20 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:50.0%"></div>
-    <div class="notes">Booleans are the simplest type: exactly two values.</div>
   </section>
 
   <!-- 15 · Try It Now 1.2.6 -->
@@ -1176,7 +1162,6 @@ console.log( 100 === 100 );</textarea>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">21 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:52.5%"></div>
-    <div class="notes">Four comparisons, four boolean results.</div>
   </section>
 
   <!-- 16 · Definition 1.2.5: null -->
@@ -1308,7 +1293,6 @@ console.log(age);</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">22 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:55.0%"></div>
-    <div class="notes">null is a deliberate, assigned "empty" &mdash; not JavaScript's automatic default.</div>
   </section>
 
   <!-- 17 · Try It Now 1.2.7 -->
@@ -1335,7 +1319,6 @@ console.log(age);</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">23 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:57.5%"></div>
-    <div class="notes">typeof null is the famous exception to watch for.</div>
   </section>
 
   <!-- 18 · Definition 1.2.6: undefined -->
@@ -1486,7 +1469,6 @@ console.log(age); // "undefined"</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">24 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:60.0%"></div>
-    <div class="notes">undefined is JavaScript's own automatic default, not something you should assign yourself.</div>
   </section>
 
   <!-- 19 · Insight Note: undefined vs. null -->
@@ -1497,7 +1479,6 @@ console.log(age); // "undefined"</pre>
     <p class="lede mt-s" style="max-width:74ch">Use <code>null</code> when you want to say &ldquo;this variable is intentionally empty.&rdquo; Think of <code>undefined</code> as JavaScript&rsquo;s way of saying &ldquo;you forgot to give this a value,&rdquo; and <code>null</code> as your way of saying &ldquo;I am deliberately setting this to nothing.&rdquo;</p>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">25 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:62.5%"></div>
-    <div class="notes">The rule of thumb that resolves the null/undefined distinction.</div>
   </section>
 
   <!-- 20 · Try It Now 1.2.8 -->
@@ -1524,7 +1505,6 @@ console.log(age); // "undefined"</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">26 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:65.0%"></div>
-    <div class="notes">A declared-but-unassigned variable, confirmed with typeof.</div>
   </section>
 
   <!-- 21 · Definition 1.2.7: Primitive vs. Object Types -->
@@ -1655,7 +1635,6 @@ console.log(age); // "undefined"</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">27 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:67.5%"></div>
-    <div class="notes">The primitive/object split organizes everything the section has covered so far.</div>
   </section>
 
   <!-- 22 · Try It Now 1.2.9 -->
@@ -1682,7 +1661,6 @@ console.log(age); // "undefined"</pre>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">28 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:70.0%"></div>
-    <div class="notes">A literal object, confirmed as type "object".</div>
   </section>
 
   <!-- 23 · Definition 1.2.8: typeof -->
@@ -1860,7 +1838,6 @@ console.log(typeof null);  // "object" (bug)</pre>
     <p class="footnote mt-m v-click">Three results need extra explanation: <code>typeof Math</code> is <code>"object"</code> (correct &mdash; <code>Math</code> is a built-in object); <code>typeof null</code> is <code>"object"</code> (a famous early bug); <code>typeof alert</code> is <code>"function"</code> (functions are a kind of object, but <code>typeof</code> reports them separately).</p>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">29 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:72.5%"></div>
-    <div class="notes">typeof is the tool; its three exceptions are worth memorizing.</div>
   </section>
 
   <!-- 24 · Try It Now 1.2.10 -->
@@ -1892,7 +1869,6 @@ console.log( typeof { name: "Sarah" } );</textarea>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">30 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:75.0%"></div>
-    <div class="notes">Six values, six typeof results &mdash; one of them a known quirk.</div>
   </section>
   <section class="slide center" data-title="1.2.9 Declaring a Variable">
     <div class="deck-header"><span>1.2 Variables and Data Types &middot; bookSHelf Programming Concepts</span><span>&sect;1.2</span></div>
@@ -2180,7 +2156,6 @@ console.log( x );   console.log( y );   console.log( z );</textarea>
     </div>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">38 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:95.0%"></div>
-    <div class="notes">Key terms glossary: the section's vocabulary in a two-column layout, matching Table 1.2.1 on the page.</div>
   </section>
 
   <!-- 26 · Key Result -->
@@ -2195,7 +2170,6 @@ console.log( x );   console.log( y );   console.log( z );</textarea>
     <p class="footnote mt-m v-click" style="text-align:left">&dagger; <code>typeof null</code> returns <code>"object"</code> &mdash; a famous bug from JavaScript&rsquo;s earliest days, kept for compatibility. <code>null</code> is not an object; it is its own type.</p>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">39 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:97.5%"></div>
-    <div class="notes">The key result lives in a ruled, accent-topped result box &mdash; never a lone giant numeral.</div>
   </section>
 
   <!-- 27 · Conclusions -->
@@ -2217,7 +2191,6 @@ console.log( x );   console.log( y );   console.log( z );</textarea>
     <p class="footnote mt-l v-click"><b>Next:</b> &sect;1.3 Documentation and Coding Conventions. <a href="#1">Back to start</a>.</p>
     <div class="deck-footer"><span>bookSHelf &middot; Programming Concepts</span><span class="mono">40 / 40</span></div>
     <div class="progress" data-morph="progress" style="width:100.0%"></div>
-    <div class="notes">Closing argument in two ruled cards over a ghost section numeral. The next-step line reveals last.</div>
   </section>
 </div>
 </div>

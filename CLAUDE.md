@@ -629,7 +629,11 @@ private folder convention, teach that script about it too.
   so a lesson's `slidesUrl` is a same-origin path, `/slides/<name>.paper.html`, served from
   `public/slides/` (committed). `npm run sync:decks` copies every deck a lesson references from the
   bookSHelf checkout (`BOOKSHELF_DIR`, default `../bookSHelf`; it reads the committed HEAD, never the
-  working tree, and rewrites nothing in the file). It is deliberately not in `prebuild`/`deploy`. A
+  working tree). The one change it makes is stripping authoring notes: every hidden
+  `<div class="notes">` and any `data-notes="..."` attribute is removed (students can read them in
+  view-source; no deck script reads the div, the presenter window reads `data-notes` and no deck carries
+  one), and the sync asserts with parse5 that none remain and the `<section>` count is unchanged, else it
+  exits 1 and writes nothing. Everything else is byte-for-byte. It is deliberately not in `prebuild`/`deploy`. A
   copy drifts from the book until someone re-runs it and commits the result. To wire a new deck:
   set `slidesUrl` to `/slides/<name>.html`, run the sync, commit. `ContentLessonView` inspects the
   frame once loaded and shows "Slides blank?" only if it really is empty.
