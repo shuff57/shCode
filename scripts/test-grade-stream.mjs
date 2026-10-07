@@ -149,6 +149,7 @@ try {
 
   function makeEnv({
     rateCount = 0,
+    globalCount = 0,
     host,
     cloudKey = 'stub-key',
   }) {
@@ -169,8 +170,17 @@ try {
       DB: {
         prepare(sql) {
           const stmt = {
-            bind: () => stmt,
-            first: async () => (/SELECT count/.test(sql) ? { count: rateCount } : null),
+            // The global-ceiling counter is keyed by the reserved NUL identity;
+            // report its own count so tests can exercise the deploy-wide cap.
+            bind: (...vals) => {
+              stmt.bound = vals;
+              return stmt;
+            },
+            first: async () => {
+              if (!/SELECT count/.test(sql)) return null;
+              if (stmt.bound?.[0] === '\x00GLOBAL') return { count: globalCount };
+              return { count: rateCount };
+            },
             run: async () => ({}),
             all: async () => ({ results: [] }),
           };
@@ -444,6 +454,31 @@ providedRoles: [],
     }
   }
 
+  // -- 23: the deploy-wide global ceiling bites (LEF-17) --------------------
+  {
+    console.log('the global ceiling refuses before the per-student cap is even read');
+    const cloud = await startStub([GOOD_GRADE]);
+    const env = makeEnv({ host: `http://127.0.0.1:${cloud.port}`, globalCount: 10_000 });
+
+    const res = await call(env);
+    ok(res.status === 429, 'status is 429, got ' + res.status);
+    const body = await res.json();
+    ok(body.rateLimited === true, 'carries rateLimited');
+    ok(body.limit === 10_000, 'names the global ceiling, got ' + body.limit);
+    ok(cloud.seen.length === 0, 'no model call was spent');
+    cloud.srv.close();
+  }
+
+  // -- 24: under the ceiling, grading still works ---------------------------
+  {
+    console.log('an empty global counter leaves ordinary grading alone');
+    const cloud = await startStub([GOOD_GRADE]);
+    const env = makeEnv({ host: `http://127.0.0.1:${cloud.port}`, globalCount: 0 });
+    const t = (await readNdjson(await call(env))).pop();
+    ok(!!t.result, 'produced a grade');
+    ok(t.result?.grader === 'cloud', 'on the ordinary target');
+    cloud.srv.close();
+  }
 } finally {
   rmSync(out, { recursive: true, force: true });
 }
