@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Guard against the bad input first",
-      "instructions": "At the very top of the function, write an if that checks for a bad value of b, such as b equal to 0. Inside that if, return the text \"Cannot divide by zero\" immediately. That early return is the guard: it ends the call before the rest of the body runs."
+      "instructions": "At the very top of the function, write an if that checks for a bad value of b, such as b equal to 0. Inside that if, return a message that includes the word zero, such as \"Cannot divide by zero\", immediately. That early return is the guard: it ends the call before the rest of the body runs."
     },
     {
       "id": "s3",
@@ -106,12 +106,12 @@
     {
       "id": "t1",
       "title": "divide guards zero and divides otherwise",
-      "description": "divide(a, b) returns \"Cannot divide by zero\" when b is 0 and a divided by b for every other b. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "description": "divide(a, b) returns a message that mentions zero when b is 0 and a divided by b for every other b. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "tests",
       "file": "script.js",
       "function": "divide",
       "points": 0,
-      "hint": "Check the guard condition: the message belongs to b equal to 0 only. Every other pair must get a / b.",
+      "hint": "Check the guard condition: the message (it must include the word zero) belongs to b equal to 0 only, and you must return it, not print it. Every other pair must get a / b.",
       "cases": [
         {
           "args": [
@@ -125,7 +125,7 @@
             10,
             0
           ],
-          "expect": "Cannot divide by zero"
+          "expectContains": "zero"
         },
         {
           "args": [
@@ -169,8 +169,8 @@
             1,
             0
           ],
-          "expect": "Cannot divide by zero",
-          "hidden": true
+          "hidden": true,
+          "expectContains": "zero"
         },
         {
           "args": [

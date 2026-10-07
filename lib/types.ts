@@ -88,7 +88,7 @@ export interface Requirement {
    *  Defaults to 0.01 (see lib/model-check.ts). */
   tolerance?: number;
   /** type: 'tests' only. The cases to run against the student's function
-   *  `function` (a name, not a list); see lib/test-harness-source.ts. */
+   *  `function` (a name, or a list of acceptable names); see lib/test-harness-source.ts. */
   cases?: TestCase[];
   /** type: 'tests' only. Per-case time budget in ms (default 1000, max 10000);
    *  a case still running when it ends is stopped and reported "did not finish".
@@ -106,6 +106,14 @@ export interface TestCase {
   expect?: unknown;
   /** Lines the call must print with console.log (one entry per line). */
   expectOutput?: string[];
+  /** Each string must appear in the printed text; case-insensitive, whitespace
+   *  collapsed, a plain-number string only as a whole number ("12" is not in "112"
+   *  or "12.5"). Use instead of expectOutput when the wording is not mandated. */
+  expectOutputContains?: string[];
+  /** Like expectOutputContains, for a string RETURN value (one string). */
+  expectContains?: string;
+  /** Like expectContains, every string in the list. */
+  expectContainsAll?: string[];
   /** Argument index (or indexes) that must be unchanged after the call. */
   unchanged?: number | number[];
   /** Expected final value of arguments after the call, keyed by index: {"0": [1,2,3]}. */

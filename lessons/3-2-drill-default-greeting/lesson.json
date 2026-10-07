@@ -71,16 +71,16 @@
       "cases": [
         {
           "args": [],
-          "expectOutput": [
+          "description": "no argument",
+          "expectOutputContains": [
             "Hello, friend!"
-          ],
-          "description": "no argument"
+          ]
         },
         {
           "args": [
             "Priya"
           ],
-          "expectOutput": [
+          "expectOutputContains": [
             "Hello, Priya!"
           ]
         },
@@ -88,7 +88,7 @@
           "args": [
             "Sam"
           ],
-          "expectOutput": [
+          "expectOutputContains": [
             "Hello, Sam!"
           ]
         },
@@ -96,19 +96,19 @@
           "args": [
             "Q"
           ],
-          "expectOutput": [
+          "description": "a one-letter name",
+          "expectOutputContains": [
             "Hello, Q!"
-          ],
-          "description": "a one-letter name"
+          ]
         },
         {
           "args": [
             "Maya"
           ],
-          "expectOutput": [
+          "hidden": true,
+          "expectOutputContains": [
             "Hello, Maya!"
-          ],
-          "hidden": true
+          ]
         }
       ]
     }

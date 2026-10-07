@@ -3,8 +3,8 @@
 // STEP 1: Define a function called divide that takes two parameters: a and b.
 
 // STEP 2: At the top of the function, write an if that checks for a bad input,
-//         such as b equal to 0. Inside that if, return the text
-//         "Cannot divide by zero" immediately.
+//         such as b equal to 0. Inside that if, return a message that
+//         includes the word zero, such as "Cannot divide by zero", immediately.
 //         This is the guard clause: it ends the call before the rest runs.
 
 // STEP 3: After the guard, return a divided by b.

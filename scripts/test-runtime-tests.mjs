@@ -226,6 +226,61 @@ try {
     check('return and output both checked', r.passed, r.msg);
   }
 
+  console.log('\nloose wording: expectOutputContains / expectContains / function lists');
+  {
+    const area = T('area', 'f', [{ args: [3, 4], expectOutputContains: ['12'] }]);
+    const prints = (expr) => `function f(w, h){ console.log(${expr}); }`;
+    for (const [name, expr] of [
+      ['bare number', 'w * h'], ['label sentence', '"The area is " + w * h'],
+      ['label = units', '"Area = " + w * h + " square units"'], ['template literal', '`Area: ${w * h}`'],
+      ['upper case and extra spaces', '"AREA:    " + w * h'], ['trailing full stop', '"It is " + w * h + "."'],
+      ['number in the middle', '"a " + w * h + " b"'],
+    ]) check('contains 12 accepts: ' + name, (await one(prints(expr), area)).passed, '');
+    for (const [name, expr, re] of [
+      ['112', '"Area: 112"', /should print a line that includes "12" but printed "Area: 112"/],
+      ['12.5', '"Area: 12.5"', /but printed "Area: 12\.5"/],
+      ['1.12', '"Area: 1.12"', /includes "12"/],
+      ['-12', '"Area: -12"', /includes "12"/],
+      ['212', '"212"', /includes "12"/],
+      ['the width', 'w', /but printed "3"/],
+      ['w * w', 'w * w', /but printed "9"/],
+      ['no number', '"Area"', /but printed "Area"/],
+    ]) await expectFail('contains 12 rejects: ' + name, prints(expr), area, re);
+    await expectFail('prints nothing', 'function f(w, h){ return w * h; }', area, /includes "12" but printed nothing$/);
+    check('digits split by a word do not join', !(await one('function f(){ console.log("1 2"); }', area)).passed, '');
+    check('12 in a later line counts', (await one('function f(w,h){ console.log("start"); console.log(w*h); }', area)).passed, '');
+    check('1,200 reads as 1200 and not as 200', (await one('function f(){ console.log("1,200"); }', T('c', 'f', [{ args: [], expectOutputContains: ['1200'] }]))).passed
+      && !(await one('function f(){ console.log("1,200"); }', T('c', 'f', [{ args: [], expectOutputContains: ['200'] }]))).passed, '');
+    check('decimal and negative needles are whole tokens', (await one('function f(){ console.log("Area is 6.5 now"); }', T('c', 'f', [{ args: [], expectOutputContains: ['6.5'] }]))).passed
+      && (await one('function f(){ console.log("temp -3"); }', T('c', 'f', [{ args: [], expectOutputContains: ['-3'] }]))).passed
+      && !(await one('function f(){ console.log("temp 3"); }', T('c', 'f', [{ args: [], expectOutputContains: ['-3'] }]))).passed, '');
+    const words = T('w', 'f', [{ args: [], expectOutputContains: ['hello world', 'BYE'] }]);
+    check('words: case-insensitive, whitespace collapsed, several needles',
+      (await one('function f(){ console.log("  Hello \\t  WORLD!"); console.log("bye"); }', words)).passed, '');
+    await expectFail('words: names the first missing needle', 'function f(){ console.log("hello world"); }', words, /includes "BYE" but printed "hello world"$/);
+    const hidd = T('h', 'f', [{ args: [3, 4], expectOutputContains: ['12'] }, { args: [5, 5], expectOutputContains: ['25'], hidden: true }]);
+    check('hidden contains passes when right', (await one('function f(w,h){ console.log("Area " + w*h); }', hidd)).passed, '');
+    await expectFail('hidden contains reveals nothing', 'function f(w,h){ console.log(w === 5 ? "x" : w*h); }', hidd, /^A hidden check failed\.$/);
+    const ret = T('r', 'f', [{ args: [1], expectContains: 'zero' }, { args: [2], expect: 7 }]);
+    check('string return: contains, case-insensitive', (await one('function f(b){ return b === 1 ? "Zero is NOT allowed" : 7; }', ret)).passed, '');
+    await expectFail('string return: wrong text', 'function f(b){ return b === 1 ? "Error" : 7; }', ret, /should give text that includes "zero" but gave "Error"$/);
+    await expectFail('string return: a number is not text', 'function f(b){ return b === 1 ? 0 : 7; }', ret, /should give text that includes "zero" but gave 0$/);
+    await expectFail('string return: printed instead of returned', 'function f(b){ if (b === 1) { console.log("zero"); return; } return 7; }', ret, /use return/);
+    await expectFail('combined with expect: the exact part still fails', 'function f(b){ return b === 1 ? "zero" : 8; }', ret, /should give 7 but gave 8/);
+    const all = T('a', 'f', [{ args: [], expectContainsAll: ['cannot', 'zero'] }]);
+    check('expectContainsAll: all present', (await one('function f(){ return "You cannot use zero here"; }', all)).passed, '');
+    await expectFail('expectContainsAll: one missing', 'function f(){ return "zero"; }', all, /includes "cannot"/);
+    const both = T('b', 'f', [{ args: [2], expect: 4, expectOutputContains: ['4'] }]);
+    check('expect + expectOutputContains both hold', (await one('function f(n){ console.log("got " + n * 2); return n * 2; }', both)).passed, '');
+    await expectFail('expect + expectOutputContains: print missing', 'function f(n){ return n * 2; }', both, /includes "4" but printed nothing/);
+    // function as a list of acceptable names
+    const names = T('n', ['doubled', 'bigger'], [{ args: [4], expect: 8 }]);
+    check('function list: first name', (await one('function doubled(n){ return n * 2; }', names)).passed, '');
+    check('function list: second name', (await one('function bigger(n){ return n * 2; }', names)).passed, '');
+    await expectFail('function list: none defined', 'function other(n){ return n * 2; }', names, /None of these functions was found: doubled, bigger/);
+    await expectFail('function list: the found one is judged', 'function bigger(n){ return n; }', names, /^bigger\(4\) should give 8 but gave 4$/);
+  }
+
   console.log('\nhidden cases');
   const hid = T('hid', 'triple', [{ args: [3], expect: 9 }, { args: [123], expect: 369, hidden: true }]);
   check('a correct function passes hidden cases', (await one('function triple(n){ return n * 3; }', hid)).passed, '');

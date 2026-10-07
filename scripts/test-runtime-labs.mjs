@@ -113,16 +113,32 @@ try {
     await accept(id, 'a template literal', lines('function findRectangleArea(width, height) {', '  const area = width * height;', '  console.log(`Area: ${area}`);', '}') + calls);
     await accept(id, 'string concatenation, other parameter names', lines('function findRectangleArea(w, h) {', '  console.log("Area: " + w * h);', '}') + calls);
     await accept(id, 'a result variable and (width * height) in parentheses', lines('function findRectangleArea(width, height) {', '  let result = width * height;', '  console.log("Area: " + result);', '}') + calls);
-    await reject(id, 'printing width * width', lines('function findRectangleArea(width, height) {', '  console.log("Area: " + width * width);', '}') + calls,
-      't1', /^findRectangleArea\(3, 4\) should print "Area: 12" but printed "Area: 9"$/);
-    await reject(id, 'printing width + height', lines('function findRectangleArea(width, height) {', '  console.log("Area: " + (width * height * 0 + width + height));', '}') + calls,
-      't1', /^findRectangleArea\(3, 4\) should print "Area: 12" but printed "Area: 7"$/);
-    await reject(id, 'a bare number with no Area: label', lines('function findRectangleArea(width, height) {', '  console.log(width * height);', '}') + calls,
-      't1', /^findRectangleArea\(3, 4\) should print "Area: 12" but printed "12"$/);
+    const fnWith = (...body) => lines('function findRectangleArea(width, height) {', ...body.map((b) => '  ' + b), '}') + calls;
+    // Wording is free: the number is the check (2026-10-07).
+    await accept(id, 'a sentence around the number', fnWith('console.log("The area is " + width * height);'));
+    await accept(id, 'a label with = and units', fnWith('console.log("Area = " + width * height + " square units");'));
+    await accept(id, 'only the bare number', fnWith('console.log(width * height);'));
+    await accept(id, 'lower case label, a full stop', fnWith('console.log("area: " + width * height + ".");'));
+    await accept(id, 'a template literal with a sentence', fnWith('console.log(`A ${width} by ${height} rectangle has area ${width * height}`);'));
+    await accept(id, 'printing the line twice (the wording is free, so is the count)', fnWith('console.log("Area: " + width * height);', 'console.log("Area: " + width * height);'));
+    await reject(id, 'printing width * width', fnWith('console.log("Area: " + width * width);'),
+      't1', /^findRectangleArea\(3, 4\) should print a line that includes "12" but printed "Area: 9"$/);
+    await reject(id, 'printing width + height', fnWith('console.log("Area: " + (width * height * 0 + width + height));'),
+      't1', /^findRectangleArea\(3, 4\) should print a line that includes "12" but printed "Area: 7"$/);
+    await reject(id, 'printing 112 (a longer number holding 12)', fnWith('console.log("Area: 1" + width * height);'),
+      't1', /^findRectangleArea\(3, 4\) should print a line that includes "12" but printed "Area: 112"$/);
+    await reject(id, 'printing 12.5', fnWith('console.log("Area: " + (width * height + 0.5));'),
+      't1', /but printed "Area: 12\.5"$/);
+    await reject(id, 'printing only the width', fnWith('console.log(width);'),
+      't1', /should print a line that includes "12" but printed "3"$/, { shaped: false });
+    await reject(id, 'printing just the label', fnWith('console.log("Area:");'),
+      't1', /but printed "Area:"$/, { shaped: false });
+    await reject(id, 'printing a blank line', fnWith('console.log();'),
+      't1', /^findRectangleArea\(3, 4\) should print a line that includes "12" but printed ""$/, { shaped: false });
     await reject(id, 'returning the area instead of printing it', lines('function findRectangleArea(width, height) {', '  console.log();', '  return width * height;', '}') + calls,
-      't1', /^findRectangleArea\(3, 4\) should print "Area: 12" but printed/);
-    await reject(id, 'printing the area twice', lines('function findRectangleArea(width, height) {', '  console.log("Area: " + width * height);', '  console.log("Area: " + width * height);', '}') + calls,
-      't1', /but printed an extra line "Area: 12"$/);
+      't1', /^findRectangleArea\(3, 4\) should print a line that includes "12" but printed/);
+    await reject(id, 'printing nothing at all', lines('function findRectangleArea(width, height) {', '  const area = width * height;', '}') + calls,
+      't1', /should print a line that includes "12" but printed nothing$/, { shaped: false });
   }
 
   // ------------------------------------------------------------ 3.2.15 divide guard
@@ -131,17 +147,23 @@ try {
     const calls = 'console.log(divide(10, 2));\nconsole.log(divide(10, 0));\n';
     await accept(id, 'if (b === 0) with a braced return', lines('function divide(a, b) {', '  if (b === 0) {', '    return "Cannot divide by zero";', '  }', '  return a / b;', '}') + calls);
     await accept(id, 'brace-less if (!b)', lines('function divide(a, b) {', '  if (!b) return "Cannot divide by zero";', '  return a / b;', '}') + calls);
+    await accept(id, 'a differently worded message', lines('function divide(a, b) {', '  if (b === 0) {', '    return "cannot divide by zero!";', '  }', '  return a / b;', '}') + calls);
+    await accept(id, 'another message that says zero', lines('function divide(a, b) {', '  if (b === 0) { return "Zero is not allowed"; }', '  return a / b;', '}') + calls);
     await accept(id, 'if (b == 0) and the quotient in a variable', lines('function divide(x, y) {', '  if (y == 0) { return "Cannot divide by zero"; }', '  const q = x / y;', '  return q;', '}') + calls);
     await reject(id, 'a guard on b > 100', lines('function divide(a, b) {', '  if (b > 100) { return "Cannot divide by zero"; }', '  return a / b;', '}') + calls,
-      't1', /^divide\(10, 0\) should give "Cannot divide by zero" but gave Infinity$/);
+      't1', /^divide\(10, 0\) should give text that includes "zero" but gave Infinity$/);
     await reject(id, 'a guard on a === 0 instead of b', lines('function divide(a, b) {', '  if (a === 0) { return "Cannot divide by zero"; }', '  return a / b;', '}') + calls,
-      't1', /^divide\(10, 0\) should give "Cannot divide by zero" but gave Infinity$/);
+      't1', /^divide\(10, 0\) should give text that includes "zero" but gave Infinity$/);
     await reject(id, 'a guard that is too wide (b <= 0)', lines('function divide(a, b) {', '  if (b <= 0) { return "Cannot divide by zero"; }', '  return a / b;', '}') + calls,
       't1', /^divide\(5, -1\) \(a negative b is not a bad value\) should give -5 but gave "Cannot divide by zero"$/);
     await reject(id, 'a different message', lines('function divide(a, b) {', '  if (b === 0) { return "Error"; }', '  return a / b;', '}') + calls,
-      't1', /^divide\(10, 0\) should give "Cannot divide by zero" but gave "Error"$/);
+      't1', /^divide\(10, 0\) should give text that includes "zero" but gave "Error"$/);
+    await reject(id, 'a message that says 0 but never the word zero', lines('function divide(a, b) {', '  if (b === 0) { return "Division by 0"; }', '  return a / b;', '}') + calls,
+      't1', /^divide\(10, 0\) should give text that includes "zero" but gave "Division by 0"$/);
+    await reject(id, 'the guard returns a number', lines('function divide(a, b) {', '  if (b === 0) { return 0; }', '  return a / b;', '}') + calls,
+      't1', /^divide\(10, 0\) should give text that includes "zero" but gave 0$/);
     await reject(id, 'the guard prints instead of returning', lines('function divide(a, b) {', '  if (b === 0) { console.log("Cannot divide by zero"); return; }', '  return a / b;', '}') + calls,
-      't1', /^divide\(10, 0\) should give "Cannot divide by zero" but gave undefined \(it printed instead of returning a value - use return\)$/, { shaped: false });
+      't1', /^divide\(10, 0\) should give text that includes "zero" but gave undefined \(it printed instead of returning a value - use return\)$/, { shaped: false });
   }
 
   // ------------------------------------------------------------ 3.2.18 area must return
@@ -287,14 +309,15 @@ try {
     await accept(id, 'concatenation', lines('function greet(name = "friend") {', '  console.log("Hello, " + name + "!");', '}') + calls);
     await accept(id, 'a template literal and another parameter name', lines('function greet(who = "friend") {', '  console.log(`Hello, ${who}!`);', '}') + calls);
     await accept(id, 'single quotes and a message variable', lines("function greet(name = 'friend') {", '  const message = "Hello, " + name + "!";', '  console.log(message);', '}') + calls);
+    await accept(id, 'lower case and extra words (case and surroundings are free, the Hello, name! shape is not)', lines('function greet(name = "friend") {', '  console.log("hello, " + name + "! welcome");', '}') + calls);
     await reject(id, 'the wrong default word', lines('function greet(name = "pal") {', '  console.log("Hello, " + name + "!");', '}') + calls,
-      't1', /^greet\(\) \(no argument\) should print "Hello, friend!" but printed "Hello, pal!"$/);
+      't1', /^greet\(\) \(no argument\) should print a line that includes "Hello, friend!" but printed "Hello, pal!"$/);
     await reject(id, 'a default that always wins over the argument', lines('function greet(name = "friend") {', '  name = "friend";', '  console.log("Hello, " + name + "!");', '}') + calls,
-      't1', /^greet\("Priya"\) should print "Hello, Priya!" but printed "Hello, friend!"$/);
+      't1', /^greet\("Priya"\) should print a line that includes "Hello, Priya!" but printed "Hello, friend!"$/);
     await reject(id, 'a missing exclamation mark', lines('function greet(name = "friend") {', '  console.log("Hello, " + name);', '}') + calls,
-      't1', /^greet\(\) \(no argument\) should print "Hello, friend!" but printed "Hello, friend"$/);
+      't1', /^greet\(\) \(no argument\) should print a line that includes "Hello, friend!" but printed "Hello, friend"$/);
     await reject(id, 'returning instead of printing', lines('function greet(name = "friend") {', '  return "Hello, " + name + "!";', '}') + calls,
-      't1', /^greet\(\) \(no argument\) should print "Hello, friend!" but printed nothing$/);
+      't1', /^greet\(\) \(no argument\) should print a line that includes "Hello, friend!" but printed nothing$/);
   }
 
   // ------------------------------------------------------------ 3.2.13 square

@@ -33,6 +33,32 @@
 // NOT defended: a student patching built-ins such as JSON or Array.prototype to
 // bend the comparison. That is deliberate sabotage of their own grade.
 //
+// CASE FIELDS AND WHEN TO USE WHICH (the conversion guide).
+//   expect              the RETURN value, exact (deep equality, numeric
+//                       `tolerance`). Use for numbers, booleans, arrays,
+//                       objects: that is correctness, not wording.
+//   expectOutput        the printed lines, EXACT, line by line. Use only when
+//                       the lesson's steps dictate the exact text ("print
+//                       exactly Hello, Sam!") or the lines ARE the substance
+//                       (one price per line, nothing else).
+//   expectOutputContains  each string must appear in the printed text
+//                       (case-insensitive, whitespace collapsed). Use when the
+//                       steps ask for a result but not a wording: "The area is
+//                       12", "Area = 12" and "12" all pass for ["12"].
+//   expectContains / expectContainsAll   the same, for a string RETURN value
+//                       ("Cannot divide by zero" and "zero is not allowed" both
+//                       contain "zero").
+//   A needle that is a plain number ("12", "-3", "6.5") matches only as a whole
+//   number token: "12" is not found in "112", "212", "12.5", "-12" or "1.12",
+//   but is found in "12", "12.", "= 12 units", "12,". A comma between thousands
+//   groups is ignored in the printed text ("1,200" reads as 1200). Any other
+//   needle is a plain substring test.
+//   `function` may be one name or an array of acceptable names (the first one
+//   the student defined is called); use an array only when the steps let the
+//   student choose the name.
+//   All fields given on a case must hold. Failure messages name the first
+//   failing case only; a `hidden` case says only "A hidden check failed."
+//
 // JSON TAGS. JSON cannot say undefined, NaN, Infinity or -0, so a value of the
 // exact shape {"$":"undefined"} / {"$":"NaN"} / {"$":"Infinity"} /
 // {"$":"-Infinity"} / {"$":"-0"} anywhere in `args`, `expect` or `after` stands
@@ -46,7 +72,11 @@ export const TEST_CASE_TIMEOUT_MS = 1000;
 
 export interface TestJob {
   id: string;
+  /** The primary function name (the first acceptable one). */
   fn: string;
+  /** Every acceptable name, `fn` first. The first one the student defined is
+   *  the one called; a lab whose steps let the student pick the name lists them. */
+  fns: string[];
   cases: TestCase[];
   timeout: number;
   tolerance: number;
@@ -73,10 +103,12 @@ export function jobsFromRequirements(reqs: Requirement[]): TestJob[] {
   const jobs: TestJob[] = [];
   for (const r of reqs) {
     if (r.type !== 'tests') continue;
-    const fn = Array.isArray(r.function) ? r.function[0] : r.function;
+    const names = (Array.isArray(r.function) ? r.function : [r.function]).filter((n): n is string => typeof n === 'string' && n !== '');
+    const fn = names[0];
     jobs.push({
       id: r.id,
       fn: typeof fn === 'string' ? fn : '',
+      fns: names,
       cases: Array.isArray(r.cases) ? r.cases : [],
       timeout: Math.min(Math.max(Number(r.timeout) || TEST_CASE_TIMEOUT_MS, 50), 10000),
       tolerance: typeof r.tolerance === 'number' && r.tolerance >= 0 ? r.tolerance : 1e-9,
@@ -154,10 +186,13 @@ export function createTestSession(jobs: TestJob[], nonce: string = randomNonce()
       for (const job of jobs) {
         const s = state[job.id];
         const fail = (message: string) => { out[job.id] = { status: 'failed', message }; };
-        if (!IDENT.test(job.fn)) { fail('This check has no valid function name, so it cannot run.'); continue; }
+        const names = job.fns && job.fns.length ? job.fns : [job.fn];
+        if (!names.every((n) => IDENT.test(n))) { fail('This check has no valid function name, so it cannot run.'); continue; }
         if (job.cases.length === 0) { fail('This check has no cases, so it cannot run.'); continue; }
         if (s.notfound) {
-          fail(`Function ${job.fn} was not found. Check that you wrote function ${job.fn}(...) with exactly that name.`);
+          fail(names.length > 1
+            ? `None of these functions was found: ${names.join(', ')}. Check that you wrote one of them as function name(...) with exactly that name.`
+            : `Function ${job.fn} was not found. Check that you wrote function ${job.fn}(...) with exactly that name.`);
         } else if (s.failed !== null) {
           fail(s.failed);
         } else if (s.inflight && how === 'timeout') {
@@ -287,6 +322,41 @@ const __runTestJobs = (() => {
   }
 
   // One case. Returns {ok:true} or {ok:false,msg}. Never throws.
+  // Loose text matching. norm: lower case, any run of whitespace -> one space.
+  function norm(s) { return String(s).toLowerCase().replace(/\s+/g, ' ').trim(); }
+  const NUM_RE = /^-?[0-9]+(\.[0-9]+)?$/;
+  const isDig = (ch) => ch !== undefined && ch >= '0' && ch <= '9';
+  const isAlnum = (ch) => ch !== undefined && /[a-z0-9]/i.test(ch);
+  // Does haystack (already normalised) contain needle (already normalised)?
+  // A number needle must stand alone as a number: not inside a longer run of
+  // digits, not the whole-number part of a decimal ("12" in "12.5") and not
+  // the tail of a decimal ("12" in "1.12"), and not with a minus it lacks.
+  function hasNeedle(hay, needle) {
+    if (needle === '') return true;
+    if (!NUM_RE.test(needle)) return hay.indexOf(needle) !== -1;
+    const text = hay.replace(/(?<=[0-9]),(?=[0-9]{3}(?![0-9]))/g, '');
+    let from = 0;
+    for (;;) {
+      const at = text.indexOf(needle, from);
+      if (at === -1) return false;
+      from = at + 1;
+      const before = text[at - 1];
+      const after = text[at + needle.length];
+      if (isDig(before)) continue;
+      if (before === '.' && isDig(text[at - 2])) continue;
+      if (after !== undefined && isDig(after)) continue;
+      if (after === '.' && isDig(text[at + needle.length + 1])) continue;
+      if (needle[0] !== '-' && before === '-' && !isAlnum(text[at - 2])) continue;
+      return true;
+    }
+  }
+  function needlesOf(c, one, many) {
+    const out = [];
+    if (typeof c[one] === 'string') out.push(c[one]);
+    if (isArr(c[many])) for (let i = 0; i < c[many].length; i++) out.push(String(c[many][i]));
+    return out;
+  }
+
   function runCase(fn, c, job) {
     const hidden = c.hidden === true;
     const rawArgs = isArr(c.args) ? c.args : [];
@@ -318,6 +388,23 @@ const __runTestJobs = (() => {
       const m = outputMsg(call, c.expectOutput, lines);
       if (m !== null) return bad(m);
     }
+    const retNeedles = needlesOf(c, 'expectContains', 'expectContainsAll');
+    if (retNeedles.length) {
+      const hay = typeof got === 'string' ? norm(got) : null;
+      for (let i = 0; i < retNeedles.length; i++) {
+        if (hay === null || !hasNeedle(hay, norm(retNeedles[i]))) {
+          return bad(call + ' should give text that includes ' + clip(JSON.stringify(retNeedles[i]), 60) + ' but gave ' + showClip(got) + (got === undefined && lines.length > 0 ? ' (it printed instead of returning a value - use return)' : ''));
+        }
+      }
+    }
+    if (isArr(c.expectOutputContains)) {
+      const printed = norm(lines.join(' '));
+      for (let i = 0; i < c.expectOutputContains.length; i++) {
+        if (!hasNeedle(printed, norm(c.expectOutputContains[i]))) {
+          return bad(call + ' should print a line that includes ' + clip(JSON.stringify(String(c.expectOutputContains[i])), 60) + ' but printed ' + (lines.length === 0 ? 'nothing' : clip(lines.map((l) => JSON.stringify(l.replace(/\s+$/, ''))).join(', '), 80)));
+        }
+      }
+    }
     if (c.unchanged !== undefined) {
       const idx = isArr(c.unchanged) ? c.unchanged : [c.unchanged];
       for (let i = 0; i < idx.length; i++) {
@@ -343,16 +430,21 @@ const __runTestJobs = (() => {
   return function (jobs, fns, nonce) {
     for (let j = 0; j < jobs.length; j++) {
       const job = jobs[j];
-      const fn = fns && hasOwn.call(fns, job.fn) ? fns[job.fn] : undefined;
+      const names = isArr(job.fns) && job.fns.length ? job.fns : [job.fn];
+      let fn, used = job.fn;
+      for (let k = 0; k < names.length && typeof fn !== 'function'; k++) {
+        if (fns && hasOwn.call(fns, names[k]) && typeof fns[names[k]] === 'function') { fn = fns[names[k]]; used = names[k]; }
+      }
       if (typeof fn !== 'function') { post({ kind: 'test-job', nonce, id: job.id, status: 'notfound' }); continue; }
+      const jobUsed = used === job.fn ? job : { fn: used, cases: job.cases, timeout: job.timeout, tolerance: job.tolerance };
       for (let i = 0; i < job.cases.length; i++) {
         const c = job.cases[i] || {};
         const rawArgs = isArr(c.args) ? c.args : [];
         post({
           kind: 'test-start', nonce, id: job.id, i, timeout: job.timeout, hidden: c.hidden === true,
-          call: clip(job.fn + '(' + decode(rawArgs).map(showClip).join(', ') + ')', 100),
+          call: clip(used + '(' + decode(rawArgs).map(showClip).join(', ') + ')', 100),
         });
-        const r = runCase(fn, c, job);
+        const r = runCase(fn, c, jobUsed);
         post({ kind: 'test-case', nonce, id: job.id, i, ok: r.ok, msg: r.msg });
         if (!r.ok) break;
       }
@@ -366,10 +458,13 @@ function __testLookupSource(jobs) {
   const seen = {};
   const parts = [];
   for (let i = 0; i < jobs.length; i++) {
-    const n = jobs[i] && jobs[i].fn;
-    if (typeof n !== 'string' || !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(n) || seen[n]) continue;
-    seen[n] = true;
-    parts.push(JSON.stringify(n) + ': (typeof ' + n + " === 'function' ? " + n + ' : undefined)');
+    const list = jobs[i] && Array.isArray(jobs[i].fns) && jobs[i].fns.length ? jobs[i].fns : [jobs[i] && jobs[i].fn];
+    for (let k = 0; k < list.length; k++) {
+      const n = list[k];
+      if (typeof n !== 'string' || !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(n) || seen[n]) continue;
+      seen[n] = true;
+      parts.push(JSON.stringify(n) + ': (typeof ' + n + " === 'function' ? " + n + ' : undefined)');
+    }
   }
   return 'return {' + parts.join(', ') + '};';
 }
