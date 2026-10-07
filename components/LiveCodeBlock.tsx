@@ -252,7 +252,14 @@ export default function LiveCodeBlock({
           {plain ? (
             <>
               <div className="output-header">Output</div>
-              <pre className="console-output run-output">
+              <pre
+                className="console-output run-output"
+                role="log"
+                aria-live="polite"
+                aria-atomic="false"
+                aria-relevant="additions text"
+                aria-label="Program output"
+              >
                 {!hasRunPlain ? (
                   <div className="console-empty">Click Run to see output.</div>
                 ) : plainLogs.length === 0 ? (

@@ -10,7 +10,7 @@ export default function RequirementCard({
   // Resolved once by the list above, not here: this card renders per criterion.
   hrefs: SourceHrefs;
 }) {
-  // Border color alone encodes pass/fail — green if passed, red if
+  // Border color plus the visible Passed / Not yet word encode pass/fail — green if passed, red if
   // failed, muted grey if neither (not yet graded / running). Keep the
   // "pass"/"fail" class names so any existing CSS hooks still work.
   const classes = ['requirement', 'mb-4'];
@@ -20,13 +20,36 @@ export default function RequirementCard({
   const borderColor =
     req.status === 'passed' ? '#50fa7b' : req.status === 'failed' ? '#ff5555' : '#44475a';
 
+  const status =
+    req.status === 'passed'
+      ? { text: 'Passed', icon: '\u2713', color: '#50fa7b' }
+      : req.status === 'failed'
+        ? { text: 'Not yet', icon: '\u2717', color: '#ff7b7b' }
+        : { text: '', icon: '', color: '#8393c4' };
+
   return (
     <div
       className={classes.join(' ')}
-      aria-live="polite"
       style={{ borderLeft: `4px solid ${borderColor}` }}
     >
-      <h3 className="text-xl">{req.title}</h3>
+      <h3 className="text-xl">
+        {req.title}
+        {/* Colour alone said pass/fail; say it in words too. role=status on just
+            this word means a Run only announces the cards whose result changed
+            (a live region announces text that changes, not the whole card). */}
+        <span
+          role="status"
+          className="req-status"
+          style={{ color: status.color, marginLeft: 10, fontSize: 14, fontWeight: 600 }}
+        >
+          {status.text ? (
+            <>
+              <span aria-hidden="true">{status.icon} </span>
+              {status.text}
+            </>
+          ) : null}
+        </span>
+      </h3>
       <p className="text-lg">
         <LessonNumberLinks text={req.description} hrefs={hrefs} />
       </p>

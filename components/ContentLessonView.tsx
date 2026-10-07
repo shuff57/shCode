@@ -236,6 +236,7 @@ export default function ContentLessonView({ lesson }: Props) {
             <div style={{ aspectRatio: '16 / 9', borderRadius: 8, overflow: 'hidden', background: '#000', border: '1px solid #44475a' }}>
               <iframe
                 ref={frameRef}
+                title={`Slides: ${lesson.title}`}
                 onLoad={() => checkFrame(false)}
                 src={slidesUrl}
                 allow="autoplay; clipboard-write; fullscreen"
