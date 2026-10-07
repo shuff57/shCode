@@ -1,0 +1,86 @@
+name: answer-key-leak-guard
+
+# The answer-key leak checks (`scripts/check-solution-leak.mjs`,
+# `scripts/check-quiz-key-leak.mjs`, `scripts/check-reshape-solutions.mjs`)
+# used to depend on a human remembering to run them. A starter that shipped a
+# solution, or a summative answer key serialised into a built page, got found
+# by a student before a build. This workflow wires the checks into CI so a
+# build fails if an answer key can leak.
+#
+# `check-quiz-key-leak.mjs` reads the BUILT output (`out/`), so this runs the
+# real `npm run build` first, then the leak checks WITHOUT `--allow-missing`:
+# a missing export directory fails loudly instead of printing NOT CHECKED.
+
+on:
+  push:
+    branches: [cs-3d]
+  pull_request:
+    branches: [cs-3d]
+  # Run the guard on the default branch's schedule too, so a leak introduced
+  # outside a PR (content-only push) is caught within a day.
+  schedule:
+    - cron: '27 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  answer-key-leak-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # reshape-cad is consumed three ways: the npm file: deps point at the
+      # vendored copy inside this repo, but scripts/_pkg-load.mjs resolves the
+      # '@shuff57/reshape-*' module specifiers in the COMPILED output at
+      # GITHUB_ROOT/reshape-cad (a sibling of shCode, the real checkout layout
+      # on a dev machine). Give CI that sibling as a symlink to the vendored
+      # packages — same files, the layout _pkg-load.mjs resolves through.
+      - name: Give the vendored reshape-cad its sibling path
+        run: |
+          repo_dir="$(pwd)"
+          ln -s "$repo_dir/vendor/reshape-cad" "$(dirname "$repo_dir")/reshape-cad"
+          # the compiled cross-package imports resolve @shuff57/reshape-* from
+          # reshape-cad/packages, so mirror shCode's node_modules links there
+          mkdir -p vendor/reshape-cad/packages/node_modules/@shuff57
+          for pkg in sketch script kernel studio; do
+            ln -s "../../$pkg" "vendor/reshape-cad/packages/node_modules/@shuff57/reshape-$pkg"
+          done
+
+      # The B-rep kernel bundle is gitignored and needs the OpenCascade wasm.
+      # Build scripts (check-reshape-solutions.mjs) load replicad_single.js
+      # from public/reshape/kernel/. Pull the same build npm serves.
+      - name: Fetch OpenCascade wasm for the B-rep kernel
+        id: occt
+        run: |
+          cd "$(mktemp -d)"
+          npm pack replicad-opencascadejs@1.1.0 --silent
+          tar xzf replicad-opencascadejs-1.1.0.tgz package/dist/replicad_single.js package/dist/replicad_single.wasm
+          echo "OCCT_DIR=$PWD/package/dist" >> "$GITHUB_ENV"
+
+      - name: Install dependencies
+        run: npm ci --include=dev
+
+      - name: Build the B-rep kernel bundle
+        run: node scripts/build-brep-kernel.mjs --occt "$OCCT_DIR"
+
+      # `npm run build` runs the full prebuild chain (generators + the
+      # starter-bundle leak check) and then `next build`, which exports out/.
+      - name: Build (runs check-solution-leak in prebuild)
+        run: npm run build
+
+      - name: Starter-bundle leak check
+        run: node scripts/check-solution-leak.mjs
+
+      - name: Built-page answer-key leak check
+        run: node scripts/check-quiz-key-leak.mjs
+
+      - name: Reshape reference-solution guard
+        run: node scripts/check-reshape-solutions.mjs --occt public/reshape/kernel
