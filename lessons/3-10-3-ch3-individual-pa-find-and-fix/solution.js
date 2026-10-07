@@ -22,7 +22,7 @@ const lastItem = priceList[priceList.length - 1];
 
 // BUG 3 — logic: the program ran to the end and printed one undefined
 // where the three receipt lines should be. Two returns are missing. The
-// outer arrow has a block body and never returns the mapped array (3.2.11),
+// outer arrow has a block body and never returns the mapped array (3.2.14),
 // so receiptLines(...) is undefined. The inner arrow also has a block body
 // that never says return (3.4.8), so the built string is thrown away and
 // map would have collected only undefineds. Fix: say return in both places,

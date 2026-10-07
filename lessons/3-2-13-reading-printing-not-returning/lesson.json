@@ -1,6 +1,6 @@
 {
   "id": "3-2-13-reading-printing-not-returning",
-  "title": "3.2.13 Reading: Printing Is Not Returning",
+  "title": "3.2.16 Reading: Printing Is Not Returning",
   "description": "console.log shows a value to a human; return gives it to the program. A function that prints produces undefined, which is why its result is unusable.",
   "type": "lesson",
   "estimateMins": 10,

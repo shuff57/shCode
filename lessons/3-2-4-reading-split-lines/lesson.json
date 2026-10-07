@@ -1,6 +1,6 @@
 {
   "id": "3-2-4-reading-split-lines",
-  "title": "3.3.8 Reading: Splitting Text into Lines (.split)",
+  "title": "3.3.10 Reading: Splitting Text into Lines (.split)",
   "description": "Learn how .split() turns one big string into an array of lines: the usual first step when text arrives as one long string. Read before the exercises that process lines of text.",
   "type": "lesson",
   "estimateMins": 10,

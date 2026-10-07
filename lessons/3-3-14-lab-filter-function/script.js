@@ -1,4 +1,4 @@
-// 3.3.14 Lab: Write a Function That Returns a New Array
+// 3.3.19 Lab: Write a Function That Returns a New Array
 
 // STEP 1: Write a function declaration called doubled that takes an
 //         array parameter (the numbers to double).

@@ -1,4 +1,4 @@
-// 3.2.15 Fix a Function That Prints Instead of Returning
+// 3.2.18 Fix a Function That Prints Instead of Returning
 
 // This is meant to give the caller a usable number, but something is wrong.
 // Run it first and read the output carefully.

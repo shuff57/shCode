@@ -269,6 +269,15 @@ Net effect: **slugs are integer-only**, full stop. A future mid-module insertion
 fresh renumbering decision: full sequential renumber (as done for Module 1.1) is now the
 only sanctioned mechanism, not a letter-suffix escape hatch.
 
+**Tooling (2026-10-06).** `scripts/renumber-module.mjs` does that renumber from one explicit
+plan file (`scripts/renumber-plans/*.json`: the final order of each module's lesson folders,
+new lessons flagged `"new": true`). It prints the old-to-new number table, rewrites the title
+prefixes and every citation of a changed number (`Help: 3.2.9` pointers, quiz `source`,
+"(reread 3.2.20)", prose in other modules, the module docs' Numbered Lesson List and
+`lessonSlots`), never renames a folder, is idempotent, and has `--dry-run`. Run the
+generators afterwards. New lessons get fresh, number-free folder names (`3-2-drill-shout`)
+because a number in a folder name goes stale on the next insert.
+
 **Code updated to match (2026-08-12).** `parseNumberedIdFromTitle` (`lib/curriculum.ts`)
 and every duplicate `parseNumberedId` helper (`functions/_shared/lessonAccess.ts`,
 `lib/lesson-neighbors.ts`, `components/HeaderLessonNav.tsx`,

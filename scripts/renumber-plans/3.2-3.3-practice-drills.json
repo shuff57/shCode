@@ -1,0 +1,211 @@
+{
+ "_comment": "Final order of modules 3.2 and 3.3 after the 2026-10-06 practice-drill insert. See scripts/renumber-module.mjs.",
+ "modules": {
+  "3.2": [
+   {
+    "folder": "3-2-1-slides-parameters-return"
+   },
+   {
+    "folder": "3-1-3-reading-parameters-return"
+   },
+   {
+    "folder": "3-2-3-reading-passing-information-in"
+   },
+   {
+    "folder": "3-2-4-example-one-parameter"
+   },
+   {
+    "folder": "3-2-5-reading-parameters-arguments"
+   },
+   {
+    "folder": "3-2-drill-shout",
+    "new": true,
+    "type": "lab",
+    "notes": "net new practice drill (2026-10-06): one parameter, **prints** the word in capitals (`return` is first taught at 3.2.11, so this drill does not use it). Formative"
+   },
+   {
+    "folder": "3-2-6-reading-order-matters"
+   },
+   {
+    "folder": "3-2-drill-default-greeting",
+    "new": true,
+    "type": "lab",
+    "notes": "net new practice drill: the default parameter read about at the end of 3.2.7. Prints, so no `return`. Formative"
+   },
+   {
+    "folder": "3-2-7-lab-rectangle-area"
+   },
+   {
+    "folder": "3-2-8-chart-parameter-trace"
+   },
+   {
+    "folder": "3-2-9-reading-return"
+   },
+   {
+    "folder": "3-2-10-example-return-vs-print"
+   },
+   {
+    "folder": "3-2-drill-square",
+    "new": true,
+    "type": "lab",
+    "notes": "net new practice drill: the first `return` practice, straight after the return reading and example. Formative"
+   },
+   {
+    "folder": "3-2-11-reading-return-ends-function"
+   },
+   {
+    "folder": "3-2-12-lab-guard-clause"
+   },
+   {
+    "folder": "3-2-13-reading-printing-not-returning"
+   },
+   {
+    "folder": "3-2-14-example-print-or-return"
+   },
+   {
+    "folder": "3-2-15-lab-fix-print-not-return"
+   },
+   {
+    "folder": "3-2-drill-initials",
+    "new": true,
+    "type": "lab",
+    "notes": "net new practice drill: two parameters, returns the first letter of each (`word[0]`, taught at 2.2.19). Formative"
+   },
+   {
+    "folder": "3-2-16-reading-building-with-returns"
+   },
+   {
+    "folder": "3-2-17-example-chaining-functions"
+   },
+   {
+    "folder": "3-2-18-chart-chained-calls"
+   },
+   {
+    "folder": "3-2-19-lab-compose-functions"
+   },
+   {
+    "folder": "3-1-4-reading-scope"
+   },
+   {
+    "folder": "3-2-21-lab-scope-prediction"
+   },
+   {
+    "folder": "3-1-8-lab-findmax-iseven"
+   },
+   {
+    "folder": "3-2-drill-largest-of-three",
+    "new": true,
+    "type": "lab",
+    "notes": "net new practice drill: three parameters, after the two-parameter `findMax` lab. Formative"
+   },
+   {
+    "folder": "3-1-9-lab-sum-to-n"
+   },
+   {
+    "folder": "3-2-22-parameters-return-quiz"
+   }
+  ],
+  "3.3": [
+   {
+    "folder": "3-2-1-slides"
+   },
+   {
+    "folder": "3-2-2-reading-array-basics"
+   },
+   {
+    "folder": "3-3-3-reading-index-assignment"
+   },
+   {
+    "folder": "3-3-4-lab-update-by-index"
+   },
+   {
+    "folder": "3-2-3-reading-array-iteration"
+   },
+   {
+    "folder": "3-3-drill-off-by-one",
+    "new": true,
+    "type": "lab",
+    "notes": "net new practice drill: fix a loop that reads one place past the end (the off-by-one added to 3.3.5). Formative"
+   },
+   {
+    "folder": "3-3-6-reading-shift-unshift"
+   },
+   {
+    "folder": "3-3-7-lab-shift-unshift-queue"
+   },
+   {
+    "folder": "3-3-drill-rotate-line",
+    "new": true,
+    "type": "lab",
+    "notes": "net new practice drill: `rotate(items)` moves the first item to the back with `shift` and `push`. Formative"
+   },
+   {
+    "folder": "3-2-4-reading-split-lines"
+   },
+   {
+    "folder": "3-3-drill-count-words",
+    "new": true,
+    "type": "lab",
+    "notes": "net new practice drill: `countWords(text)` with `.split(\" \")` and `.length`. Formative"
+   },
+   {
+    "folder": "3-2-5-lab-sum-array"
+   },
+   {
+    "folder": "3-2-6-example-menu-loop"
+   },
+   {
+    "folder": "3-3-11-chart-the-array-loop"
+   },
+   {
+    "folder": "3-3-12-reading-arrays-and-functions"
+   },
+   {
+    "folder": "3-3-drill-last-item",
+    "new": true,
+    "type": "lab",
+    "notes": "net new practice drill: `lastItem(items)` reads an array parameter and must not change it. Formative"
+   },
+   {
+    "folder": "3-3-13-example-filter-passing-scores"
+   },
+   {
+    "folder": "3-3-drill-smallest",
+    "new": true,
+    "type": "lab",
+    "notes": "net new practice drill: `smallest(numbers)`, the accumulator seeded with `numbers[0]` (3.3.15). Formative"
+   },
+   {
+    "folder": "3-3-14-lab-filter-function"
+   },
+   {
+    "folder": "3-3-15-reading-nested-arrays"
+   },
+   {
+    "folder": "3-3-16-example-nested-array-grid"
+   },
+   {
+    "folder": "3-3-17-lab-nested-array-update"
+   },
+   {
+    "folder": "3-3-checkpoint-quiz",
+    "new": true,
+    "type": "assignment",
+    "notes": "net new checkpoint quiz: eight predict-the-output questions across 3.3.2-3.3.22, formative, placed before the capstone"
+   },
+   {
+    "folder": "3-2-7-arrays"
+   }
+  ]
+ },
+ "alsoRewrite": [
+  "curriculum/modules/*.md",
+  "curriculum-plan.md",
+  "curriculum/BOOK-TO-MODULE.md",
+  "scripts/apply-criterion-pointers-*.mjs",
+  "scripts/test-grader-tolerance.mjs",
+  "scripts/test-runtime-labs.mjs",
+  "scripts/test-diagram-chart-lessons.mjs",
+  "scripts/verify-a11y-keyboard-chart.py"
+ ]
+}

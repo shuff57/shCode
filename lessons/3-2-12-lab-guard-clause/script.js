@@ -1,4 +1,4 @@
-// 3.2.12 An Early-Return Guard Clause
+// 3.2.15 An Early-Return Guard Clause
 
 // STEP 1: Define a function called divide that takes two parameters: a and b.
 

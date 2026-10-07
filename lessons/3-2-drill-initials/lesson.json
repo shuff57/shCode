@@ -1,0 +1,126 @@
+{
+  "id": "3-2-drill-initials",
+  "title": "3.2.19 Lab: initials(first, last)",
+  "description": "Write initials(first, last) so that it returns the first letter of each name joined into one string, using first[0]. Practice, not graded: the checks call your function.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write initials",
+      "instructions": "Write a function declaration called initials that takes two parameters, first and last."
+    },
+    {
+      "id": "s2",
+      "title": "Take the first letter of each",
+      "instructions": "A string's first character is word[0] (2.2.19). So first[0] is the first name's letter and last[0] is the last name's."
+    },
+    {
+      "id": "s3",
+      "title": "Join and return",
+      "instructions": "Join the two letters into one string with + and return it with return (3.2.11): initials(\"Ada\", \"Lovelace\") gives \"AL\". Keep the letters exactly as they were typed."
+    },
+    {
+      "id": "s4",
+      "title": "Check it",
+      "instructions": "Call initials with your own name and console.log the result."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "initials is defined with two parameters",
+      "description": "Code defines a function named initials with exactly two parameters. Help: 3.2.9 (Lab: findRectangleArea (multi-parameter))",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+initials\\s*\\(\\s*[\\w$]+\\s*,\\s*[\\w$]+\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Write function initials(first, last) { ... } with exactly that name and two names between the parentheses."
+    },
+    {
+      "id": "r2",
+      "title": "initials hands back a value with return",
+      "description": "initials contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "initials",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "The line that produces the answer should start with return, not console.log."
+    },
+    {
+      "id": "t1",
+      "title": "initials returns the two first letters",
+      "description": "initials(first, last) gives back the first letter of first followed by the first letter of last, as one string. Help: 2.2.19 (Walking Through a Word)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "initials",
+      "points": 0,
+      "hint": "initials must give back exactly two characters: the first letter of first, then the first letter of last. first[0] is the first letter of first. Check you did not return a whole name, swap the order, or print instead of returning.",
+      "cases": [
+        {
+          "args": [
+            "Ada",
+            "Lovelace"
+          ],
+          "expect": "AL"
+        },
+        {
+          "args": [
+            "Alan",
+            "Turing"
+          ],
+          "expect": "AT"
+        },
+        {
+          "args": [
+            "X",
+            "Y"
+          ],
+          "expect": "XY",
+          "description": "one-letter names"
+        },
+        {
+          "args": [
+            "mia",
+            "chen"
+          ],
+          "expect": "mc",
+          "description": "typed in lower case, so the letters stay lower case"
+        },
+        {
+          "args": [
+            "Grace",
+            "Hopper"
+          ],
+          "expect": "GH"
+        },
+        {
+          "args": [
+            "Katherine",
+            "Johnson"
+          ],
+          "expect": "KJ",
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

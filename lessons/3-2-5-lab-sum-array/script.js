@@ -1,4 +1,4 @@
-// 3.3.9 Sum an Array
+// 3.3.12 Sum an Array
 
 // STEP 1: Create a variable called numbers and assign it an array
 //         containing at least four number values.

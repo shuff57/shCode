@@ -1,6 +1,6 @@
 {
   "id": "3-2-8-chart-parameter-trace",
-  "title": "3.2.8 Chart the Code: Tracing Parameter Values",
+  "title": "3.2.10 Chart the Code: Tracing Parameter Values",
   "description": "Draw a program that passes a value into a function with a parameter, and get the call shape and the value flow right.",
   "type": "lesson",
   "estimateMins": 20,

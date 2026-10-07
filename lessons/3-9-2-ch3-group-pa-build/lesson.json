@@ -39,23 +39,23 @@
       "instructions": "The function from the top of your contract table. It takes the same three values the record holds, builds an object literal with those properties, and returns it. Nothing prints.",
       "hints": [
         "return { name: name, price: price, qty: qty }; -- 3.5.3",
-        "A function that prints instead of returning is the 3.2.13 error",
+        "A function that prints instead of returning is the 3.2.16 error",
         "Call it once at the bottom of the file so you can see it work"
       ]
     },
     {
       "id": "s5",
       "title": "Write totalValue",
-      "instructions": "An accumulator set to 0 before the loop, added to inside the loop, returned after it. §3.3.5 walks the list; §3.3.9 is the sum pattern. §3.7 has no method that combines a list into one value -- 3.7.19 only names the one that does. Do this by hand.",
+      "instructions": "An accumulator set to 0 before the loop, added to inside the loop, returned after it. §3.3.5 walks the list; §3.3.12 is the sum pattern. §3.7 has no method that combines a list into one value -- 3.7.19 only names the one that does. Do this by hand.",
       "hints": [
         "let total = 0;  for (const item of list) { total = total + item.price * item.qty; }  return total;",
-        "An accumulator is 'a variable set before a loop and updated inside it' -- 3.3.9 is the worked example"
+        "An accumulator is 'a variable set before a loop and updated inside it' -- 3.3.12 is the worked example"
       ]
     },
     {
       "id": "s6",
       "title": "Write lowStock",
-      "instructions": "Start with an empty array, walk the list, and push the records that pass the comparison. Return the new array. §3.7 does not teach the method that does this -- 3.7.19 only names it -- so build it by hand, exactly as 3.3.13 does.",
+      "instructions": "Start with an empty array, walk the list, and push the records that pass the comparison. Return the new array. §3.7 does not teach the method that does this -- 3.7.19 only names it -- so build it by hand, exactly as 3.3.17 does.",
       "hints": [
         "const short = [];  for ... if (...) { short.push(item); }  return short;",
         "push adds to the END of the array -- 3.3.2",
@@ -78,7 +78,7 @@
       "instructions": "Find the record whose name matches, lower its count by one, never below zero. This function is REQUIRED to change the list it was handed -- the caller holds the same array (3.6.2), so the change is already made when the function returns. Say so in a comment.",
       "hints": [
         "Walk the list, find the record, change its property -- 3.6.3 is the worked example",
-        "Never below zero: 3.2.12 is the guard-clause shape",
+        "Never below zero: 3.2.15 is the guard-clause shape",
         "The function may return nothing at all -- the caller already has the changed list"
       ]
     },
@@ -155,13 +155,13 @@
     {
       "id": "r5",
       "title": "A function returns a value",
-      "description": "At least one function hands a value back with return, rather than printing it. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "At least one function hands a value back with return, rather than printing it. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "return\\s+[A-Za-z_$(]",
       "flags": "",
       "points": 0,
-      "hint": "return total; -- 3.2.9. Printing is not returning (3.2.13): the value has to reach the caller.",
+      "hint": "return total; -- 3.2.11. Printing is not returning (3.2.16): the value has to reach the caller.",
       "stripComments": false
     },
     {
