@@ -625,6 +625,14 @@ private folder convention, teach that script about it too.
 - Inline style convention for components, using the Dracula palette defined in
   `app/globals.css`. See `components/AuthButton.tsx`, `app/teacher/page.tsx` for
   the established look.
+- **Slide decks are vendored copies, not links.** bookSHelf sends `X-Frame-Options: SAMEORIGIN`,
+  so a lesson's `slidesUrl` is a same-origin path, `/slides/<name>.paper.html`, served from
+  `public/slides/` (committed). `npm run sync:decks` copies every deck a lesson references from the
+  bookSHelf checkout (`BOOKSHELF_DIR`, default `../bookSHelf`; it reads the committed HEAD, never the
+  working tree, and rewrites nothing in the file). It is deliberately not in `prebuild`/`deploy`. A
+  copy drifts from the book until someone re-runs it and commits the result. To wire a new deck:
+  set `slidesUrl` to `/slides/<name>.html`, run the sync, commit. `ContentLessonView` inspects the
+  frame once loaded and shows "Slides blank?" only if it really is empty.
 - **Before assuming an authored `lesson.json` field reaches a student, check that
   something imports the component that would render it.** `codegraph_explore`
   answers that in one shot: name the field and the component that should render

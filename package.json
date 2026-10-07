@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "node scripts/build-brep-kernel.mjs && node scripts/build-pii-guard-models.mjs && node server.js",
     "prebuild": "node scripts/build-brep-kernel.mjs && node scripts/build-pii-guard-models.mjs && node scripts/check-lesson-numbers.mjs && node scripts/check-prompt-pointers.mjs && node scripts/test-source-hint.mjs && node scripts/check-assignment-codes.mjs && node scripts/generate-module-docs.mjs && node scripts/generate-lessons-manifest.mjs && node scripts/generate-ai-graders.mjs && node scripts/generate-quiz-keys.mjs && node scripts/generate-pa-pseudocode.mjs && node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs && node scripts/check-moshion-textures.mjs && node scripts/check-solution-leak.mjs",
+    "sync:decks": "node scripts/sync-decks.mjs",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "test:occt": "node scripts/test-occt-adapter.mjs --occt public/reshape/kernel",

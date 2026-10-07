@@ -7,7 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
   "preview": "slides",
-  "slidesUrl": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/chapter-3-functions-and-data/decks/3.3_arrays.paper",
+  "slidesUrl": "/slides/3.3_arrays.paper.html",
   "slos": [
     "SLO-1"
   ],

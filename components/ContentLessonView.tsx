@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { Lesson } from '../lib/types';
 import { badgeFor } from '../lib/lesson-badges';
@@ -67,47 +67,43 @@ export default function ContentLessonView({ lesson }: Props) {
     };
   }, [slidesUrl]);
 
-  // Can the deck be framed? Whether it is depends on bookSHelf's response headers
-  // (X-Frame-Options SAMEORIGIN refuses us). A cross-origin iframe cannot report
-  // that refusal to JS, and Chromium fires `load` on the browser's error page
-  // too, so the only signal available is time: if no handshake arrives within
-  // ~5s we show a hint. Handshake (not sent by any deck yet): the deck may call
-  // parent.postMessage({ type: 'deck-ready' }, '*'); we accept it only from the
-  // deck's own origin, and it cancels the timer and marks the embed healthy.
-  //
-  // The hint is deliberately NON-destructive: the frame stays mounted. No deck
-  // sends the handshake today, so a healthy embed would also time out; removing
-  // the frame then would break a working deck the moment the header is fixed.
-  const [deckHealthy, setDeckHealthy] = useState(false);
-  const [deckSlow, setDeckSlow] = useState(false);
+  // Did the deck actually render? Decks are vendored under /slides/ (see
+  // scripts/sync-decks.mjs), so the frame is same-origin and we can look inside
+  // it: once it has loaded, an empty body, about:blank, or an error/404 page
+  // means the student is looking at nothing and gets a pointer to the new-tab
+  // button. A working deck never shows the note. A deck that renders late gets
+  // one more look before we say anything.
+  const frameRef = useRef<HTMLIFrameElement | null>(null);
+  const [deckBlank, setDeckBlank] = useState(false);
   const showFrame = !!slidesUrl && deckReady === true;
 
-  useEffect(() => {
-    setDeckHealthy(false);
-    setDeckSlow(false);
-    if (!slidesUrl || !showFrame) return;
-    let origin = '';
+  const checkFrame = (final: boolean) => {
+    const f = frameRef.current;
+    if (!f) return;
+    let bad = false;
     try {
-      origin = new URL(slidesUrl).origin;
-    } catch {
-      return;
-    }
-    const timer = window.setTimeout(() => setDeckSlow(true), 5000);
-    const onMessage = (e: MessageEvent) => {
-      if (e.origin !== origin) return;
-      const d = e.data as { type?: unknown } | null;
-      if (d && typeof d === 'object' && d.type === 'deck-ready') {
-        window.clearTimeout(timer);
-        setDeckHealthy(true);
-        setDeckSlow(false);
+      const doc = f.contentDocument;
+      if (!doc) bad = true;
+      else if (doc.readyState !== 'complete') return;
+      else {
+        const text = (doc.body?.innerText ?? '').trim();
+        bad =
+          doc.location.href === 'about:blank' ||
+          text.length < 20 ||
+          /^(404|not found|error)\b/i.test(doc.title.trim());
       }
-    };
-    window.addEventListener('message', onMessage);
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener('message', onMessage);
-    };
-  }, [slidesUrl, showFrame]);
+    } catch {
+      bad = true; // cross-origin or otherwise unreadable: not the vendored deck
+    }
+    if (!bad) setDeckBlank(false);
+    else if (final) setDeckBlank(true);
+    else window.setTimeout(() => checkFrame(true), 1500);
+  };
+
+  useEffect(() => {
+    setDeckBlank(false);
+  }, [slidesUrl]);
+
 
   return (
     <>
@@ -232,13 +228,15 @@ export default function ContentLessonView({ lesson }: Props) {
               </a>
               <span style={{ color: '#8393c4', fontSize: 13 }}>Full screen, editable code blocks</span>
             </div>
-            {deckSlow && !deckHealthy ? (
+            {deckBlank ? (
               <p role="status" style={{ margin: '0 0 8px', color: '#f1fa8c', fontSize: 14 }}>
                 Slides blank? Open them in a new tab.
               </p>
             ) : null}
             <div style={{ aspectRatio: '16 / 9', borderRadius: 8, overflow: 'hidden', background: '#000', border: '1px solid #44475a' }}>
               <iframe
+                ref={frameRef}
+                onLoad={() => checkFrame(false)}
                 src={slidesUrl}
                 allow="autoplay; clipboard-write; fullscreen"
                 style={{ width: '100%', height: '100%', border: 0 }}

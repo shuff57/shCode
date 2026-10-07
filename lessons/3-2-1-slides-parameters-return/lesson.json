@@ -7,7 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",
   "preview": "slides",
-  "slidesUrl": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/chapter-3-functions-and-data/decks/3.2_parameters_and_return_values.paper",
+  "slidesUrl": "/slides/3.2_parameters_and_return_values.paper.html",
   "week": 7,
   "slos": [
     "SLO-2"

@@ -490,6 +490,9 @@ rewriting a working lab unless the concept it grades actually moved.
   `letter`, `notebook`, `course-module`) and §1.1 also has an older `.bookshelf`
   build still live alongside its `.paper` one: prefer `.paper`. Guess wrong and
   you do not get a 404, see below.
+- **Decks are vendored now.** `slidesUrl` is `/slides/<name>.paper.html`, a committed copy
+  under `public/slides/` made by `npm run sync:decks` (bookSHelf's X-Frame-Options blocks
+  framing). The wrong-URL warning below applies only to the old `oerbookshelf.app` form.
 - **A wrong deck URL returns HTTP 200, not 404.** `oerbookshelf.app` serves its site
   landing page ("Hand-curated math textbooks…") for any unrecognised deck path, so a
   HEAD probe cannot tell a real deck from a typo. This bit for real: `1-1-1-slides`
