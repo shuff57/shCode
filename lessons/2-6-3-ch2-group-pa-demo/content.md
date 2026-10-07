@@ -8,7 +8,7 @@ teacher. This part is worth **25%**.
 
 ### Part 1: Who did what
 
-Name both partners. Then say who drove the keyboard for the chart (2.6.1), who drove it
+Name both partners (or yourself, if you worked alone). Then say who drove the keyboard for the chart (2.6.1), who drove it
 for the code (2.6.2), and one thing the partner who was not typing caught that the one
 typing had missed.
 
