@@ -25,6 +25,7 @@ import type { CheckResult } from '../lib/diagram-check';
 import type { DiagramDoc } from '../lib/diagram-types';
 
 interface Props {
+  lessonId: string;
   lessonTitle: string;
   unit?: string | null;
   /** The assignment wording, so a hint is about this chart and not charts in general. */
@@ -45,7 +46,7 @@ function failingSummary(checks: CheckResult[] | null): string {
   return failed.map((c) => `- ${c.title}: ${c.detail}`).join('\n');
 }
 
-export default function DiagramHintPanel({ lessonTitle, unit, task, doc, checks, authed }: Props) {
+export default function DiagramHintPanel({ lessonId, lessonTitle, unit, task, doc, checks, authed }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
@@ -83,6 +84,7 @@ export default function DiagramHintPanel({ lessonTitle, unit, task, doc, checks,
         credentials: 'same-origin',
         body: JSON.stringify({
           mode: 'diagram',
+          lessonId,
           lessonTitle,
           unit: unit ?? null,
           task: task ?? '',

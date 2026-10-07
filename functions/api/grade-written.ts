@@ -73,6 +73,10 @@ interface Env {
   OLLAMA_HOST?: string;
   // Optional per-student daily submission cap. Default 30. Teachers exempt.
   GRADE_WRITTEN_DAILY_LIMIT?: string;
+  // Optional GLOBAL per-deploy daily ceiling across all students. Default
+  // 10000 — the runaway-cost backstop behind the per-student cap, so one
+  // compromised account cannot exhaust the shared model keys.
+  GRADE_WRITTEN_GLOBAL_DAILY_LIMIT?: string;
   ASSETS?: Fetcher;
 }
 
@@ -85,6 +89,15 @@ interface Env {
 // and a student who could reset it by flipping the dropdown would not be capped.
 const RATE_BUCKET = 'grade-written';
 const DEFAULT_DAILY_LIMIT = 30;
+const DEFAULT_GLOBAL_DAILY_LIMIT = 10000;
+
+// The deploy-wide counter's reserved (identity, bucket) pair — the backstop
+// behind the per-student cap, so one compromised account (open registration,
+// no email verification yet) cannot exhaust the shared model keys. The NUL
+// byte makes the identity unreachable by any real signup, whose emails are
+// trimmed strings.
+const GLOBAL_BUCKET_IDENTITY = '\x00GLOBAL';
+const GRADE_WRITTEN_GLOBAL_BUCKET = 'grade-written:global';
 const DEFAULT_CLOUD_MODEL = 'glm-5.3-flash:cloud';
 
 
@@ -326,8 +339,39 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     1,
     parseInt(env.GRADE_WRITTEN_DAILY_LIMIT || '', 10) || DEFAULT_DAILY_LIMIT,
   );
+  const globalDailyLimit = Math.max(
+    1,
+    parseInt(env.GRADE_WRITTEN_GLOBAL_DAILY_LIMIT || '', 10) || DEFAULT_GLOBAL_DAILY_LIMIT,
+  );
   if (data.role === 'student') {
     const day = new Date().toISOString().slice(0, 10); // UTC YYYY-MM-DD
+
+    // Global ceiling first, the same runaway-cost stop ai-help carries: even a
+    // fresh identity (open registration) cannot spend past the deploy-wide
+    // cap. The reserved identity below is unreachable by any session email —
+    // an email never contains a NUL byte — so no real account collides with
+    // the deploy-wide counter.
+    const globalRow = await env.DB.prepare(
+      'SELECT count FROM ai_help_usage WHERE student_email = ? AND unit = ? AND day = ?',
+    )
+      .bind(GLOBAL_BUCKET_IDENTITY, GRADE_WRITTEN_GLOBAL_BUCKET, day)
+      .first<{ count: number }>();
+    if ((globalRow?.count ?? 0) >= globalDailyLimit) {
+      console.error('grade-written global daily ceiling reached:', globalRow?.count ?? 0);
+      return json(
+        {
+          ok: false,
+          error:
+            'Grading is very busy today. The whole-school allowance resets at midnight UTC — your answer is safe, try again tomorrow or ask your teacher.',
+          rateLimited: true,
+          limit: globalDailyLimit,
+          remaining: 0,
+        },
+        429,
+        { 'X-RateLimit-Limit': String(globalDailyLimit), 'X-RateLimit-Remaining': '0' },
+      );
+    }
+
     const row = await env.DB.prepare(
       'SELECT count FROM ai_help_usage WHERE student_email = ? AND unit = ? AND day = ?',
     )
@@ -354,6 +398,14 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
        ON CONFLICT(student_email, unit, day) DO UPDATE SET count = count + 1`,
     )
       .bind(data.email, RATE_BUCKET, day)
+      .run();
+    // Only requests that are about to reach a model increment the global
+    // counter, so the ceiling measures real spend.
+    await env.DB.prepare(
+      `INSERT INTO ai_help_usage (student_email, unit, day, count) VALUES (?, ?, ?, 1)
+       ON CONFLICT(student_email, unit, day) DO UPDATE SET count = count + 1`,
+    )
+      .bind(GLOBAL_BUCKET_IDENTITY, GRADE_WRITTEN_GLOBAL_BUCKET, day)
       .run();
   }
 

@@ -478,6 +478,7 @@ export default function DiagramAssignmentView({
           submit. This is the one place a student stuck mid-chart can ask. */}
       <div style={{ marginTop: 12 }}>
         <DiagramHintPanel
+          lessonId={lessonId}
           lessonTitle={lessonTitle}
           unit={unit}
           task={promptText}

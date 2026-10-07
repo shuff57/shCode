@@ -72,6 +72,7 @@ export default function AiHelpPanel({ lesson }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          lessonId: lesson.id,
           lessonTitle: lesson.title,
           fileName: currentFile || 'script.js',
           unit: lesson.unit ?? null,
