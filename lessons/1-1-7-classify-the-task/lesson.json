@@ -36,7 +36,7 @@
     {
       "id": "r1",
       "title": "Menu code is construction",
-      "description": "Logs the correct phase for writing the code that shows the menu",
+      "description": "Logs the correct phase for writing the code that shows the menu. Help: 1.1.6 (The Four Phases)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*[\"'`]construction[\"'`]\\s*\\)",
@@ -46,7 +46,7 @@
     {
       "id": "r2",
       "title": "School choice is inception",
-      "description": "Logs the correct phase for deciding which schools the app will serve",
+      "description": "Logs the correct phase for deciding which schools the app will serve. Help: 1.1.6 (The Four Phases)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*[\"'`]inception[\"'`]\\s*\\)",
@@ -56,7 +56,7 @@
     {
       "id": "r3",
       "title": "App structure is elaboration",
-      "description": "Logs the correct phase for drawing the overall structure of the app",
+      "description": "Logs the correct phase for drawing the overall structure of the app. Help: 1.1.6 (The Four Phases)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*[\"'`]elaboration[\"'`]\\s*\\)",
@@ -66,7 +66,7 @@
     {
       "id": "r4",
       "title": "App store release is deployment",
-      "description": "Logs the correct phase for putting the finished app in the app store",
+      "description": "Logs the correct phase for putting the finished app in the app store. Help: 1.1.6 (The Four Phases)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*[\"'`]deployment[\"'`]\\s*\\)",

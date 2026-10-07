@@ -1,4 +1,4 @@
-// 2.3.12 Challenges: pick at least one Groups stretch from content.md.
+// 6.2.7 Challenges: pick at least one Groups stretch from content.md.
 // You are graded on four things: creating a Group, spawning into it with the
 // factory form, detecting an overlap, and completing one stretch challenge.
 // The content page lists the three stretch options.

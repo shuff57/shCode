@@ -6,7 +6,7 @@ import { Play, RotateCcw } from 'lucide-react';
 import MoshionPreview from './MoshionPreview';
 import LiveConsole from './LiveConsole';
 import CodeMirrorPane from './CodeMirrorPane';
-import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
+import { RUN_TIMEOUT_MS, errorWithLocation, lineColOf, runStudentCode } from '../lib/js-runner-source';
 
 interface Props {
   code: string;
@@ -37,7 +37,7 @@ interface PlainLogEntry {
   message: string;
 }
 
-// Runs the block's code in a Worker with a kill timer, exactly as the graded
+// Runs the block's code through the shared runner with a kill timer, exactly as the graded
 // console labs do (LessonWorkspace) and the sandbox does (SandboxWorkspace).
 // This is the third caller of the same shared runner.
 //
@@ -59,7 +59,8 @@ function runPlainCode(code: string, done: (logs: PlainLogEntry[]) => void): () =
   if (typeof Worker === 'undefined') {
     // No Worker (very old browser): the direct call, which is the path that
     // can hang. Fallback only, never the default -- same tradeoff, and same
-    // comment, as LessonWorkspace.
+    // comment, as LessonWorkspace. No prompt() here (there is nothing to raise
+    // a dialog with), but no book fence needs one.
     const orig = { log: console.log, warn: console.warn, error: console.error };
     const capture = (type: PlainLogEntry['type']) => (...args: unknown[]) => {
       push(type, args.map((a) => (typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a))).join(' '));
@@ -72,7 +73,8 @@ function runPlainCode(code: string, done: (logs: PlainLogEntry[]) => void): () =
     } catch (e: unknown) {
       const name = e instanceof Error ? e.name : 'Error';
       const msg = e instanceof Error ? e.message : String(e);
-      push('error', `${name}: ${msg}`);
+      const { line, col } = lineColOf(e);
+      push('error', errorWithLocation(name, msg, line, col));
     }
     console.log = orig.log;
     console.warn = orig.warn;
@@ -81,57 +83,44 @@ function runPlainCode(code: string, done: (logs: PlainLogEntry[]) => void): () =
     return () => {};
   }
 
-  const url = URL.createObjectURL(new Blob([RUNNER_SOURCE], { type: 'text/javascript' }));
-  const worker = new Worker(url);
   let settled = false;
-
-  const cleanup = () => {
-    worker.terminate();
-    URL.revokeObjectURL(url);
-  };
-
   const finish = () => {
     if (settled) return;
     settled = true;
-    clearTimeout(killer);
-    cleanup();
     done(logs);
   };
 
-  const killer = setTimeout(() => {
-    push(
-      'error',
-      `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
-    );
-    finish();
-  }, RUN_TIMEOUT_MS);
-
-  worker.onmessage = (e: MessageEvent) => {
-    const d = e.data as { kind: string; type?: PlainLogEntry['type']; message?: string; name?: string };
-    if (d.kind === 'log') {
-      push(d.type || 'log', d.message || '');
-      return;
-    }
-    if (d.kind === 'error') {
-      push('error', `${d.name || 'Error'}: ${d.message || ''}`);
-    }
-    finish();
-  };
-
-  worker.onerror = (e: ErrorEvent) => {
-    push('error', e.message || 'Error');
-    finish();
-  };
-
-  worker.postMessage(code);
+  const run = runStudentCode(
+    code,
+    (d) => {
+      if (d.kind === 'log') {
+        push(d.type || 'log', d.message || '');
+        return;
+      }
+      if (d.kind === 'error') {
+        push('error', errorWithLocation(d.name, d.message, d.line, d.col));
+      }
+      finish();
+    },
+    () => {
+      push(
+        'error',
+        `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
+      );
+      finish();
+    },
+    () => {
+      logs.length = 0;
+    },
+  );
 
   // Caller cancels on unmount or on a second Run, so a slow block cannot post
-  // logs into a component that has moved on.
+  // logs into a component that has moved on — and a block parked on an open
+  // prompt() dialog is stopped here too.
   return () => {
     if (settled) return;
     settled = true;
-    clearTimeout(killer);
-    cleanup();
+    run.kill();
   };
 }
 
@@ -263,7 +252,14 @@ export default function LiveCodeBlock({
           {plain ? (
             <>
               <div className="output-header">Output</div>
-              <pre className="console-output run-output">
+              <pre
+                className="console-output run-output"
+                role="log"
+                aria-live="polite"
+                aria-atomic="false"
+                aria-relevant="additions text"
+                aria-label="Program output"
+              >
                 {!hasRunPlain ? (
                   <div className="console-empty">Click Run to see output.</div>
                 ) : plainLogs.length === 0 ? (

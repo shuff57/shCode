@@ -215,4 +215,32 @@ export declare function addConstraintSettling(points: Point[], next: Constraint[
  *  The 1e-3 tolerance is the same one the Rules panel marks a control with, so
  *  a red edge and a red control are always the same claim. */
 export declare function losingEdges(pts: Point[], constraints: Constraint[]): number[];
+export type SlotGeom = {
+    k: 'arc';
+    id: number;
+    c: [number, number];
+    r: number;
+    a: [number, number];
+    b: [number, number];
+    sense: 'cw';
+} | {
+    k: 'line';
+    id: number;
+    a: [number, number];
+    b: [number, number];
+};
+export interface SlotRowsResult {
+    geoms: SlotGeom[];
+    rules: Array<Record<string, any>>;
+    ids: {
+        arc1: number;
+        arc2: number;
+        top: number;
+        bottom: number;
+    };
+}
+/** Rows for a slot with cap centres `cA` and `cB` and cap radius `r` (width
+ *  2r), ids starting at `baseId` (arc1, arc2, top, bottom). Null when `r` or
+ *  the centre distance is degenerate. */
+export declare function buildSlotRows(cA: readonly [number, number], cB: readonly [number, number], r: number, baseId: number): SlotRowsResult | null;
 //# sourceMappingURL=sketch-solve.d.ts.map

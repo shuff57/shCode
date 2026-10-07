@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "switch statement present",
-      "description": "Code contains a switch statement",
+      "description": "Code contains a switch statement. Help: 2.3.14 (Grouping Cases)",
       "type": "regex",
       "file": "script.js",
       "pattern": "switch\\s*\\(\\s*letter\\s*\\)",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "'a' and 'e' cases grouped",
-      "description": "case 'a' is stacked directly above case 'e' with no code between them",
+      "description": "case 'a' is stacked directly above case 'e' with no code between them. Help: 2.3.14 (Grouping Cases)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]a['\"]\\s*:\\s*case\\s*['\"]e['\"]\\s*:",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "'u' case reaches the shared block",
-      "description": "case 'u' is grouped in among the vowel cases and the shared block logs Vowel",
+      "description": "case 'u' is grouped in among the vowel cases and the shared block logs Vowel. Help: 2.3.14 (Grouping Cases)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]u['\"]\\s*:\\s*console\\.log\\s*\\([^)]*Vowel",
@@ -58,7 +58,7 @@
     {
       "id": "r4",
       "title": "default label present",
-      "description": "The default label is directly followed by a console.log call that prints Consonant",
+      "description": "The default label is directly followed by a console.log call that prints Consonant. Help: 2.3.14 (Grouping Cases)",
       "type": "regex",
       "file": "script.js",
       "pattern": "default\\s*:\\s*console\\.log\\s*\\([^)]*Consonant",
@@ -68,7 +68,7 @@
     {
       "id": "r5",
       "title": "break present",
-      "description": "Code contains a break statement",
+      "description": "Code contains a break statement. Help: 2.3.9 (break and Fall-Through)",
       "type": "regex",
       "file": "script.js",
       "pattern": "break",

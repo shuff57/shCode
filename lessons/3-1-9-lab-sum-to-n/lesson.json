@@ -1,15 +1,16 @@
 {
   "id": "3-1-9-lab-sum-to-n",
-  "title": "3.1.16 Preview: Sum 1 to N",
+  "title": "3.2.28 Lab: Sum 1 to N",
   "description": "Define sumToN(n) that uses a for loop to add every integer from 1 to n and returns the total. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "3.1 Functions: Definition and Calls",
+  "unit": "3.2 Parameters and Return Values",
   "preview": "console",
   "week": 7,
   "slos": [
     "SLO-2",
+    "SLO-3",
     "SLO-4"
   ],
   "steps": [
@@ -26,39 +27,112 @@
     {
       "id": "s3",
       "title": "Return the total",
-      "instructions": "After the loop ends, return the running total. Then call sumToN with a few different values and log the results to verify."
+      "instructions": "After the loop ends, return the running total. Then call sumToN with a few different values and log the results to verify. Expected: sumToN(5) is 15, sumToN(10) is 55, and sumToN(100) is 5050."
     }
   ],
   "requirements": [
     {
       "id": "r1",
       "title": "sumToN defined",
-      "description": "Code defines a function named sumToN",
+      "description": "Code defines a function named sumToN (exact spelling). Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+sumToN\\s*\\(",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r2",
       "title": "for loop present",
-      "description": "Code contains a for loop",
+      "description": "Code contains a for loop. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r3",
       "title": "return statement present",
-      "description": "Code contains a return statement",
+      "description": "Code contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "return\\s",
-      "flags": "i",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "the loop adds to the total, then sumToN returns it",
+      "description": "Inside sumToN, a for loop body adds to a running total and a return comes after the loop. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "sumToN",
+      "pattern": "for\\s*\\((?![^;)]*;\\s*(?:0|false|null)\\s*;)[^)]*\\)\\s*\\{?[^}]*(?:\\+=|=\\s*[\\w$.]+(?:\\[[^\\]]*\\])?\\s*\\+\\s*[\\w$])[\\s\\S]*\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "t1",
+      "title": "sumToN adds 1 up to and including n",
+      "description": "sumToN(n) returns 1 + 2 + ... + n: for example sumToN(5) is 15, sumToN(10) is 55 and sumToN(100) is 5050. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "sumToN",
+      "points": 0,
+      "hint": "Add the loop counter itself (not 1) to the total on every pass, count up to and including n, and return the total after the loop ends.",
+      "cases": [
+        {
+          "args": [
+            5
+          ],
+          "expect": 15
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": 1,
+          "description": "the smallest n"
+        },
+        {
+          "args": [
+            10
+          ],
+          "expect": 55
+        },
+        {
+          "args": [
+            100
+          ],
+          "expect": 5050
+        },
+        {
+          "args": [
+            3
+          ],
+          "expect": 6
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": 0,
+          "description": "nothing to add",
+          "hidden": true
+        },
+        {
+          "args": [
+            20
+          ],
+          "expect": 210,
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

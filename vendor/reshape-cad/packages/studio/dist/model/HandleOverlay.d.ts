@@ -1,4 +1,5 @@
 import { type Point } from '@shuff57/reshape-sketch/sketch-arc';
+import type { Feature, ModelDoc } from '@shuff57/reshape-script/model-types';
 /**
  * One sketch's outline, in plane coordinates -- what the overlay needs to
  * draw it as a read-only reference shape, alongside the corner param names
@@ -98,7 +99,50 @@ interface Props {
      * reservation back in here is what makes the two match again.
      */
     bottomInset?: number;
+    /**
+     * Phase 5.1's arrow+value-box manipulator (todo 22). The currently
+     * selected feature and the doc to read its committed value from; when
+     * the feature kind carries a single positive-extent parameter (extrude
+     * height / pocket depth / fillet size) the projected anchor for that
+     * parameter grows an on-canvas ARROW and a floating drag-or-type value
+     * box at its tip. Dragging stays the existing push/commit flow (the
+     * same rAF coalescer, one undo step on pointerup); typing commits
+     * through the same param name on Enter, so both paths converge on one
+     * parameter-update call. Refused text leaves the doc alone, in a
+     * sentence. Absent (Code mode, or no selection) draws nothing new.
+     */
+    manipulator?: {
+        feature: Feature;
+        doc: ModelDoc;
+        onDragParam: (param: string, value: number) => void;
+        onCommitParam: () => void;
+    } | null;
+    /**
+     * Phase 5.2's Incremental Move (todo 24): snap mode and step for
+     * drags on a MOVE feature's axis handles. 'adaptive' reads the model
+     * extent (move-gizmo-core.adaptiveStep); 'fixed' uses fixedStep; 'off'
+     * passes raw deltas through. modelExtent is the model's longest mm
+     * extent, which ReshapeStudio already owns from the stats readout.
+     */
+    incrementalMove?: {
+        mode: 'adaptive' | 'fixed' | 'off';
+        fixedStep: number;
+        modelExtent: number;
+        onModeChange?: (mode: 'adaptive' | 'fixed' | 'off') => void;
+        onStepChange?: (step: number) => void;
+    } | null;
+    /**
+     * Phase 5.4 (todo 26): the ACTIVE COMMAND's own state, for the
+     * step tooltip -- prompt string per command step rather than the
+     * single static string per hover target. `active: false` (command
+     * cancelled or ended) clears the tooltip rather than persisting a
+     * stale prompt. The command id is the manipulator feature's kind.
+     */
+    activeCommand?: {
+        command: string;
+        selectionCount: number;
+    } | null;
 }
-export default function HandleOverlay({ points, values, scales, onDrag, onCommit, onTap, outlines, outlineAnchors, bottomInset, }: Props): import("react/jsx-runtime").JSX.Element | null;
+export default function HandleOverlay({ points, values, scales, onDrag, onCommit, onTap, outlines, outlineAnchors, bottomInset, manipulator, incrementalMove, activeCommand, }: Props): import("react/jsx-runtime").JSX.Element | null;
 export {};
 //# sourceMappingURL=HandleOverlay.d.ts.map

@@ -6,7 +6,7 @@
 // An ordered feature list IS a program: each row is a statement, each number a
 // value, and subtract(a, b) is not subtract(b, a). That is the whole reason the
 // visual mode belongs in a CS course rather than beside one.
-import { splitEdge } from '@shuff57/reshape-sketch/sketch-arc';
+import { splitEdge, circleOf, outlineOf, arcFromBulge } from '@shuff57/reshape-sketch/sketch-arc';
 import { featureChain } from './topo-name.js';
 /** The named planes' world axes, matching PLANE_AXES in occt-build.ts and
  *  plane_frame in brep-rs/src/wasm.rs. Kept as the one JS copy so a frame
@@ -34,7 +34,7 @@ export function sketchFrameOf(f) {
         ];
         return { origin, u, v, n };
     }
-    const a = NAMED_PLANE_FRAMES[f.plane] ?? NAMED_PLANE_FRAMES.xy;
+    const a = NAMED_PLANE_FRAMES[f.plane ?? 'xy'] ?? NAMED_PLANE_FRAMES.xy;
     const offset = f.offset ?? 0;
     return {
         origin: [a.n[0] * offset, a.n[1] * offset, a.n[2] * offset],
@@ -61,11 +61,18 @@ export function dependsOn(f) {
     // variable references. Deleting the solid used to leave the cut pointing
     // at an undeclared name -- the exact ReferenceError this file exists for.
     const into = 'into' in f && typeof f.into === 'string' ? [f.into] : [];
+    const datum = datumRefs(f);
     if ('targets' in f)
-        return [...new Set([...f.targets, ...into, ...named])];
+        return [...new Set([...f.targets, ...into, ...named, ...datum])];
     if ('target' in f)
-        return [...new Set([f.target, ...into, ...named])];
-    return [...new Set([...into, ...named])];
+        return [...new Set([f.target, ...into, ...named, ...datum])];
+    return [...new Set([...into, ...named, ...datum])];
+}
+/** The datum plane a sketch sits on (SPEC-datum-family Stage 3). A separate
+ *  field from `target` on purpose: reusing `target` would collide with every
+ *  `'target' in f` consumer. */
+export function datumRefs(f) {
+    return f.kind === 'sketch' && f.onDatum ? [f.onDatum] : [];
 }
 /**
  * Feature ids a feature reaches through a TopoName rather than through a
@@ -114,7 +121,7 @@ export function isDerived(f) {
  * unblocks.
  */
 export function isSketchOnly(doc) {
-    return doc.features.length === 0 || doc.features.every((f) => f.kind === 'sketch');
+    return doc.features.length === 0 || doc.features.every((f) => f.kind === 'sketch' || f.kind === 'datum');
 }
 export const EMPTY_DOC = { version: 1, features: [] };
 /** A positioned primitive: has a centre, and can carry handles. Listed
@@ -324,6 +331,17 @@ export function newSketchOnFace(doc, frame, points = [[0, 0], [40, 0], [40, 25],
         constraints: RECTANGLE_CONSTRAINTS.slice(),
     };
 }
+/** The words a timeline row shows for where a sketch or datum sits: the named
+ *  plane, or 'custom plane' for a literal frame (whose `plane` field is only a
+ *  placeholder and would otherwise read 'xy'). */
+export function placementLabel(f) {
+    return f.frame ? 'custom plane' : (f.plane ?? 'xy');
+}
+/** A datum plane with no placement yet; the caller sets `plane`+`offset` or
+ *  `frame`. Ids are pl1, pl2, ... */
+export function newDatum(doc) {
+    return { id: nextId(doc, 'pl'), kind: 'datum', type: 'plane' };
+}
 /** A circle, drawn as the two ends of a diameter -- see SketchFeature.shape.
  *  Not a rectangle-with-round-corners and not four points: the tag is the
  *  only thing that makes it a circle, so the data says so directly.
@@ -494,6 +512,394 @@ export function extentAlong(doc, featureId, axis) {
         id = 'target' in f ? f.target : undefined;
     }
     return null;
+}
+/** The sweep sign of each NAMED plane: MEASURED, not derived (xz pulls -Y). A
+ *  sketch with a literal `frame` always pulls along u x v. Shared with
+ *  model-handles.ts so there is one table. */
+export const SWEEP_DIR = { xy: 1, xz: -1, yz: 1 };
+const AXIS_INDEX = { x: 0, y: 1, z: 2 };
+/** The plane-coordinate bounding box [uLo, uHi, vLo, vHi] of a plain sketch's
+ *  real outline: circle by centre and radius, arcs by their true extremes,
+ *  rounds and chamfers by outlineOf (the same outline the kernel builds).
+ *  null for a soup sketch or a collapsed outline -- not provable. */
+function sketchBounds2D(f) {
+    if ((f.geoms && f.geoms.length) || (f.geom && f.geom.length) || (f.rules && f.rules.length))
+        return null;
+    const circle = circleOf(f);
+    if (circle) {
+        const [cx, cy] = circle.center;
+        return [cx - circle.radius, cx + circle.radius, cy - circle.radius, cy + circle.radius];
+    }
+    if (f.shape === 'circle' || f.points.length < 3)
+        return null;
+    const o = outlineOf(f);
+    if (!o.ok || o.points.length < 3)
+        return null;
+    let uLo = Infinity, uHi = -Infinity, vLo = Infinity, vHi = -Infinity;
+    const take = (u, v) => {
+        if (u < uLo)
+            uLo = u;
+        if (u > uHi)
+            uHi = u;
+        if (v < vLo)
+            vLo = v;
+        if (v > vHi)
+            vHi = v;
+    };
+    const n = o.points.length;
+    for (let i = 0; i < n; i++) {
+        const a = o.points[i], b = o.points[(i + 1) % n];
+        take(a[0], a[1]);
+        const bulge = o.bulges?.[i];
+        if (!bulge)
+            continue;
+        const { center, radius, startAngle, endAngle } = arcFromBulge(a, b, bulge);
+        let sweep = endAngle - startAngle;
+        if (bulge > 0 && sweep < 0)
+            sweep += Math.PI * 2;
+        if (bulge < 0 && sweep > 0)
+            sweep -= Math.PI * 2;
+        for (let k = 0; k < 4; k++) {
+            const theta = (k * Math.PI) / 2;
+            // How far round from the start, in the arc's own direction of travel.
+            let d = sweep >= 0 ? theta - startAngle : startAngle - theta;
+            d = ((d % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+            if (d <= Math.abs(sweep))
+                take(center[0] + radius * Math.cos(theta), center[1] + radius * Math.sin(theta));
+        }
+    }
+    if (![uLo, uHi, vLo, vHi].every(Number.isFinite))
+        return null;
+    return [uLo, uHi, vLo, vHi];
+}
+const unitAxisOf = (v) => {
+    for (const i of [0, 1, 2]) {
+        if (Math.abs(Math.abs(v[i]) - 1) < 1e-9 && v.every((c, j) => j === i || Math.abs(c) < 1e-9)) {
+            return { i, sign: v[i] > 0 ? 1 : -1 };
+        }
+    }
+    return null;
+};
+/** Where an extruded sketch sits along one world axis: its outline's extent for
+ *  an in-plane axis, the pull depth for the sweep axis. null unless the frame's
+ *  u, v and normal are all world axes. */
+function extrudeRange(sk, height, axis) {
+    const bounds = sketchBounds2D(sk);
+    if (!bounds || !(height > 0))
+        return null;
+    const fr = sketchFrameOf(sk);
+    const ui = unitAxisOf(fr.u), vi = unitAxisOf(fr.v), ni = unitAxisOf(fr.n);
+    if (!ui || !vi || !ni)
+        return null;
+    const i = AXIS_INDEX[axis];
+    const o = fr.origin[i];
+    if (ni.i === i) {
+        const dir = sk.frame ? 1 : (SWEEP_DIR[sk.plane ?? 'xy'] ?? 1);
+        const far = o + ni.sign * dir * height;
+        return { lo: Math.min(o, far), hi: Math.max(o, far), exact: true };
+    }
+    const [lo, hi, w] = ui.i === i ? [bounds[0], bounds[1], ui.sign] : [bounds[2], bounds[3], vi.sign];
+    const a = o + w * lo, b = o + w * hi;
+    return { lo: Math.min(a, b), hi: Math.max(a, b), exact: true };
+}
+/** Axis-aligned range of a revolved sketch. The kernel spins a profile about
+ *  the sketch plane's NORMAL axis, reading u as the radius and v as the height
+ *  along that axis (measured on the wasm: xz and yz, 360 degrees). Only that
+ *  case is claimed; a profile with a negative u, a partial sweep, an offset or
+ *  a frame is not provable and stays null. */
+function revolveRange(sk, angle, axis) {
+    if (angle !== 360 || sk.frame || sk.offset !== 0 || (sk.plane !== 'xz' && sk.plane !== 'yz'))
+        return null;
+    const bounds = sketchBounds2D(sk);
+    if (!bounds || bounds[0] < 0)
+        return null;
+    const normal = sk.plane === 'xz' ? 'y' : 'x';
+    if (axis === normal)
+        return { lo: bounds[2], hi: bounds[3], exact: true };
+    return { lo: -bounds[1], hi: bounds[1], exact: true };
+}
+/** World-axis rotation matrix for the kernel's `rotate`: X, then Y, then Z, in
+ *  degrees, about the shape's own centre (math.rs euler_deg). Row i is how world
+ *  axis i is built from the shape's own x, y, z. */
+function rotationMatrix(rot) {
+    const [a, b, c] = rot.map(d => (d * Math.PI) / 180);
+    const [sa, ca, sb, cb, sc, cc] = [Math.sin(a), Math.cos(a), Math.sin(b), Math.cos(b), Math.sin(c), Math.cos(c)];
+    return [
+        [cc * cb, cc * sb * sa - sc * ca, cc * sb * ca + sc * sa],
+        [sc * cb, sc * sb * sa + cc * ca, sc * sb * ca - cc * sa],
+        [-sb, cb * sa, cb * ca],
+    ];
+}
+/** Snap float residue (a quarter turn leaves 1e-16) so an exact extent stays exact. */
+const snap = (v) => Math.round(v * 1e9) / 1e9;
+const matMul = (A, B) => A.map(row => [0, 1, 2].map(j => row[0] * B[0][j] + row[1] * B[1][j] + row[2] * B[2][j]));
+/** Right-handed rotation about a world axis (the kernel's Transform::rotation). */
+function axisRotation(axis, deg) {
+    const t = (deg * Math.PI) / 180, c = Math.cos(t), s = Math.sin(t);
+    return axis === 'x' ? [[1, 0, 0], [0, c, -s], [0, s, c]]
+        : axis === 'y' ? [[c, 0, s], [0, 1, 0], [-s, 0, c]]
+            : [[c, -s, 0], [s, c, 0], [0, 0, 1]];
+}
+/** Support function of a torus or prism about its own centre and axes (z is the
+ *  height): the furthest the shape reaches along unit direction d in its OWN frame.
+ *  Closed form, so a turned or spun copy's reach along a world axis is exact:
+ *   - torus: the ring's reach plus the tube;
+ *   - prism: corner k at angle 2 pi k / N from the own x axis, at z = +-H/2.
+ *  Validated against the kernel's own bbox (hole-extent-polar.test.mjs). */
+function ownSupport(t, d) {
+    const side = Math.hypot(d[0], d[1]);
+    switch (t.kind) {
+        case 'torus':
+            return t.ringRadius * side + t.tubeRadius;
+        case 'cone':
+            // base disk (z = -H/2, radius R) or the apex (z = +H/2): the kernel's box of a cone is
+            // the exact hull of those two (it used to be the cylinder's symmetric box, which a cut
+            // or a turn left loose).
+            return Math.max(-d[2] * t.height / 2 + t.radius * side, d[2] * t.height / 2);
+        case 'prism': {
+            let best = -Infinity;
+            for (let k = 0; k < t.sides; k++) {
+                const a = (2 * Math.PI * k) / t.sides;
+                best = Math.max(best, Math.cos(a) * d[0] + Math.sin(a) * d[1]);
+            }
+            return Math.abs(d[2]) * t.height / 2 + t.radius * best;
+        }
+        default:
+            return null;
+    }
+}
+/** World range along axis index i of a torus or prism whose own axes map to
+ *  world through M (row i = how world axis i is built from the shape's x, y, z)
+ *  and whose centre is at world coordinate c along i. null for any other kind. */
+function hullRange(t, M, c, i) {
+    const d = M[i];
+    const up = ownSupport(t, d), down = ownSupport(t, d.map(v => -v));
+    if (up === null || down === null)
+        return null;
+    return { lo: snap(c - down), hi: snap(c + up), exact: true };
+}
+/** World range of a polar pattern along `axis`. The kernel spins copy k about the
+ *  WORLD axis through the origin by k * totalAngle / count (wasm.rs pattern arm;
+ *  360 never doubles the seam), so:
+ *   - about the SAME axis the range is the target's, unchanged and as exact;
+ *   - about another axis it is provable only for a box, cylinder, sphere, cone,
+ *     torus or prism straight from the doc, whose rotated copy's reach is closed
+ *     form. Anything else (a derived target, a wedge...) is null. */
+function polarRange(doc, f, axis, rec) {
+    if (!(f.count >= 1) || !Number.isFinite(f.count))
+        return null;
+    const spin = f.axis ?? 'z';
+    const total = f.totalAngle ?? 360;
+    if (!Number.isFinite(total))
+        return null;
+    if (spin === axis || f.count === 1)
+        return rec(f.target);
+    const t = doc.features.find(feat => feat.id === f.target);
+    if (!t || (t.kind !== 'box' && t.kind !== 'cylinder' && t.kind !== 'sphere'
+        && t.kind !== 'cone' && t.kind !== 'torus' && t.kind !== 'prism'))
+        return null;
+    const i = AXIS_INDEX[axis];
+    const own = rotationMatrix(t.rotate ?? [0, 0, 0]);
+    let lo = Infinity, hi = -Infinity;
+    for (let k = 0; k < f.count; k++) {
+        const R = axisRotation(spin, (total / f.count) * k);
+        const c = R[i].reduce((a, r, j) => a + r * t.center[j], 0);
+        if (t.kind === 'torus' || t.kind === 'prism' || t.kind === 'cone') {
+            const h = hullRange(t, matMul(R, own), c, i);
+            if (!h)
+                return null;
+            lo = Math.min(lo, h.lo);
+            hi = Math.max(hi, h.hi);
+            continue;
+        }
+        let half;
+        if (t.kind === 'sphere')
+            half = t.radius;
+        else {
+            const M = matMul(R, own);
+            half = t.kind === 'box'
+                ? M[i].reduce((a, m, j) => a + Math.abs(m) * t.size[j] / 2, 0)
+                : t.height / 2 * Math.abs(M[i][2]) + t.radius * Math.sqrt(Math.max(0, 1 - M[i][2] * M[i][2]));
+        }
+        lo = Math.min(lo, c - half);
+        hi = Math.max(hi, c + half);
+    }
+    return { lo: snap(lo), hi: snap(hi), exact: true };
+}
+/** World range of a feature along an axis, or null when it cannot be bounded.
+ *  Follows targets at most 16 hops deep at each level of nesting (combine,
+ *  pattern copies recurse with a shared budget). */
+function rangeOf(doc, featureId, axis, budget = { n: 64 }) {
+    const f = doc.features.find(feat => feat.id === featureId);
+    if (!f || budget.n-- <= 0)
+        return null;
+    const i = AXIS_INDEX[axis];
+    const spun = 'rotate' in f && f.rotate && f.rotate.some(v => v !== 0);
+    const around = (c, half, exact = true) => ({ lo: c - half, hi: c + half, exact });
+    const rec = (id) => rangeOf(doc, id, axis, budget);
+    switch (f.kind) {
+        case 'box': {
+            if (!spun)
+                return around(f.center[i], f.size[i] / 2);
+            // A turned box reaches sum(|R_ij| * size_j) / 2 along world axis i -- exact.
+            const R = rotationMatrix(f.rotate);
+            return around(f.center[i], snap(R[i].reduce((t, r, j) => t + Math.abs(r) * f.size[j] / 2, 0)));
+        }
+        case 'cone':
+            // The kernel's box of a cone is its exact hull: the base disk and the apex.
+            if (!spun)
+                return around(f.center[i], (axis === 'z' ? f.height : f.radius * 2) / 2);
+            return hullRange(f, rotationMatrix(f.rotate), f.center[i], i);
+        case 'cylinder':
+            if (!spun)
+                return around(f.center[i], (axis === 'z' ? f.height : f.radius * 2) / 2);
+            // A turned cylinder: half the height times the axis' lean, plus the disc's reach sideways.
+            {
+                const d = rotationMatrix(f.rotate)[i][2];
+                return around(f.center[i], snap(f.height / 2 * Math.abs(d) + f.radius * Math.sqrt(Math.max(0, 1 - d * d))));
+            }
+        case 'prism':
+            // z is the height; corner k sits at angle 2 pi k / N from the own x axis
+            // (build.rs prism_solid), so the reach is the closed-form support function.
+            return hullRange(f, rotationMatrix(f.rotate ?? [0, 0, 0]), f.center[i], i);
+        case 'sphere': return around(f.center[i], f.radius);
+        case 'torus':
+            return hullRange(f, rotationMatrix(f.rotate ?? [0, 0, 0]), f.center[i], i);
+        case 'wedge':
+            // MEASURED on the wasm: the bbox is exactly width x depth x height about center.
+            return spun ? null : around(f.center[i], (axis === 'x' ? f.width : axis === 'y' ? f.depth : f.height) / 2);
+        case 'hole':
+        case 'shell':
+        case 'fillet':
+        case 'draft':
+            return rec(f.target);
+        case 'move': {
+            const r = rec(f.target);
+            if (!r)
+                return null;
+            const d = f.offset[i];
+            // A copy's own result is ONLY the translated duplicate (measured: the
+            // original stays a separate top-level shape), so both forms shift.
+            return { ...r, lo: r.lo + d, hi: r.hi + d };
+        }
+        case 'extrude': {
+            const sk = doc.features.find(feat => feat.id === f.target);
+            return sk && sk.kind === 'sketch' ? extrudeRange(sk, f.height, axis) : null;
+        }
+        case 'revolve': {
+            const sk = doc.features.find(feat => feat.id === f.target);
+            return sk && sk.kind === 'sketch' ? revolveRange(sk, f.angle, axis) : null;
+        }
+        case 'groove':
+        case 'pocket': {
+            // A cut can only shrink the part, so the target solid's range CONTAINS the
+            // result; it is exact only if nothing sliced an end off, which is not
+            // provable here.
+            const r = rec(f.into);
+            return r ? { ...r, exact: false } : null;
+        }
+        case 'combine': {
+            if (f.targets.length === 0)
+                return null;
+            if (f.op === 'intersect')
+                return null;
+            if (f.op === 'subtract') {
+                const r = rec(f.targets[0]);
+                return r ? { ...r, exact: false } : null;
+            }
+            let lo = Infinity, hi = -Infinity, exact = true;
+            for (const t of f.targets) {
+                const r = rec(t);
+                if (!r)
+                    return null;
+                lo = Math.min(lo, r.lo);
+                hi = Math.max(hi, r.hi);
+                exact = exact && r.exact;
+            }
+            return { lo, hi, exact };
+        }
+        case 'pattern': {
+            if (f.mode === 'circular')
+                return polarRange(doc, f, axis, rec);
+            if (f.mode !== 'linear' || !f.step || !(f.count >= 1))
+                return null;
+            const r = rec(f.target);
+            if (!r)
+                return null;
+            const d = f.step[i] * (f.count - 1);
+            return { lo: Math.min(r.lo, r.lo + d), hi: Math.max(r.hi, r.hi + d), exact: r.exact };
+        }
+        case 'mirror': {
+            const r = rec(f.target);
+            if (!r)
+                return null;
+            // Across the mirror's own axis the result doubles about a plane the
+            // kernel picks (the part's nearest face, not the origin), which is not
+            // something to promise from here: null. Along the other two axes the
+            // reflection leaves the range exactly as it was.
+            const across = f.plane === 'xy' ? 'z' : f.plane === 'xz' ? 'y' : 'x';
+            return across === axis ? null : r;
+        }
+        default:
+            return null;
+    }
+}
+/** How far the named feature's solid reaches along an axis, and whether that is
+ *  its EXACT extent or only an upper bound. null when nothing can be proved. */
+export function extentBoundAlong(doc, featureId, axis) {
+    const r = rangeOf(doc, featureId, axis);
+    return r ? { extent: r.hi - r.lo, exact: r.exact } : null;
+}
+/**
+ * An UPPER BOUND (or the exact value) on how far the named feature's solid
+ * reaches along one axis, for a hole that has to go all the way through. A bound
+ * is enough: the tool is centred on the part, so a hole longer than the part
+ * cuts only air. Unlike extentAlong() (a default-picker that ignores patterns
+ * and mirrors) this refuses to guess: null for anything it cannot prove -- a
+ * rotated cone or prism, a polar pattern of a derived shape, an intersect, a sketch that is not on a
+ * world-aligned plane -- so hole() can say so instead of drilling a blind hole
+ * the student never asked for.
+ */
+export function throughExtentAlong(doc, featureId, axis) {
+    return extentBoundAlong(doc, featureId, axis)?.extent ?? null;
+}
+/** The EXACT extent along an axis, or null when only a bound (or nothing) is
+ *  known. A blind hole's start offset needs this: an over-long extent would
+ *  start the hole short of the face. */
+export function exactExtentAlong(doc, featureId, axis) {
+    const e = extentBoundAlong(doc, featureId, axis);
+    return e && e.exact ? e.extent : null;
+}
+/**
+ * Where a hole's tool must sit ALONG its axis so a blind hole starts at the
+ * drilled face. The kernel contract (and the OCCT referee) centres the tool on
+ * the target's bounding-box centre plus HoleFeature.center, with `depth` as the
+ * tool's length -- so a blind `depth` shorter than the part would float a sealed
+ * cavity in the middle. Shifting the tool toward the +axis face by
+ * (extent - depth) / 2 puts its top flush with that face.
+ *
+ * 0 when the hole goes through (depth >= extent). null when the thickness along
+ * the axis cannot be bounded (see throughExtentAlong), so callers can say so.
+ */
+export function holeAxialOffset(doc, target, axis, depth) {
+    const e = extentBoundAlong(doc, target, axis);
+    if (!e)
+        return null;
+    if (depth >= e.extent)
+        return 0; // through, even if extent is only a bound
+    return e.exact ? (e.extent - depth) / 2 : null;
+}
+/** The hole with `depth` set AND its axial offset kept in step. The axial
+ *  component of `center` is DERIVED from depth + target thickness (never typed,
+ *  never emitted as `at:`), so every writer of depth goes through here. When the
+ *  thickness is unknown the axial component is left as it was. */
+export function withHoleDepth(doc, f, depth) {
+    const off = holeAxialOffset(doc, f.target, f.axis, depth);
+    if (off == null)
+        return { ...f, depth };
+    const center = [...f.center];
+    center[f.axis === 'x' ? 0 : f.axis === 'y' ? 1 : 2] = off;
+    return { ...f, depth, center };
 }
 export function newPattern(doc, target, mode = 'linear') {
     const id = nextId(doc, 'pat');
@@ -716,38 +1122,39 @@ function labelOf(f) {
         return f.op === 'union' ? 'Join' : f.op === 'subtract' ? 'Cut' : 'Overlap';
     }
     return f.kind === 'sketch' ? 'Sketch'
-        : f.kind === 'extrude' ? 'Pull'
-            : f.kind === 'revolve' ? 'Spin'
-                : f.kind === 'mirror' ? 'Mirror'
-                    // Match the toolbar's own two labels (ModelEditor.tsx's patternLabel) --
-                    // this used to collapse both modes to plain "Repeat", so a circular
-                    // Repeat Around step showed up in the timeline as "Repeat 1", the same
-                    // name a linear Repeat would get.
-                    : f.kind === 'pattern' ? (f.mode === 'circular' ? 'Repeat Around' : 'Repeat')
-                        : f.kind === 'hole' ? 'Hole'
-                            : f.kind === 'shell' ? 'Hollow'
-                                // Match the toolbar's own two labels (ModelEditor.tsx's moveLabel) --
-                                // this used to always say "Move", so a Copy step showed up in the
-                                // timeline as "Move 2" with nothing marking it as a copy.
-                                : f.kind === 'move' ? (f.copy ? 'Copy' : 'Move')
-                                    : f.kind === 'box' ? 'Box'
-                                        : f.kind === 'cylinder' ? 'Cylinder'
-                                            : f.kind === 'cone' ? 'Cone'
-                                                : f.kind === 'torus' ? 'Ring'
-                                                    : f.kind === 'prism' ? 'Prism'
-                                                        : f.kind === 'wedge' ? 'Wedge'
-                                                            : f.kind === 'groove' ? 'Groove'
-                                                                : f.kind === 'pocket' ? 'Pocket'
-                                                                    : f.kind === 'blend' ? 'Blend'
-                                                                        : f.kind === 'sphere' ? 'Sphere'
-                                                                            // Decision: reference.md and studentWord() (lib/model-check.ts) both
-                                                                            // call this "bevel", and the toolbar's own button (ModelEditor.tsx's
-                                                                            // roundLabel) now says "Bevel" too -- one word for the tool everywhere
-                                                                            // a student meets it, not the three-way split ("Angled Corner" on the
-                                                                            // button, "bevel" in messages and the reference) this used to be.
-                                                                            : f.kind === 'fillet' ? (f.style === 'chamfer' ? 'Bevel' : 'Round')
-                                                                                : f.kind === 'draft' ? (f.whole ? 'Body draft' : 'Draft')
-                                                                                    : nameless(f);
+        : f.kind === 'datum' ? (f.frame ? 'Custom plane' : 'Plane')
+            : f.kind === 'extrude' ? 'Pull'
+                : f.kind === 'revolve' ? 'Spin'
+                    : f.kind === 'mirror' ? 'Mirror'
+                        // Match the toolbar's own two labels (ModelEditor.tsx's patternLabel) --
+                        // this used to collapse both modes to plain "Repeat", so a circular
+                        // Repeat Around step showed up in the timeline as "Repeat 1", the same
+                        // name a linear Repeat would get.
+                        : f.kind === 'pattern' ? (f.mode === 'circular' ? 'Repeat Around' : 'Repeat')
+                            : f.kind === 'hole' ? 'Hole'
+                                : f.kind === 'shell' ? 'Hollow'
+                                    // Match the toolbar's own two labels (ModelEditor.tsx's moveLabel) --
+                                    // this used to always say "Move", so a Copy step showed up in the
+                                    // timeline as "Move 2" with nothing marking it as a copy.
+                                    : f.kind === 'move' ? (f.copy ? 'Copy' : 'Move')
+                                        : f.kind === 'box' ? 'Box'
+                                            : f.kind === 'cylinder' ? 'Cylinder'
+                                                : f.kind === 'cone' ? 'Cone'
+                                                    : f.kind === 'torus' ? 'Ring'
+                                                        : f.kind === 'prism' ? 'Prism'
+                                                            : f.kind === 'wedge' ? 'Wedge'
+                                                                : f.kind === 'groove' ? 'Groove'
+                                                                    : f.kind === 'pocket' ? 'Pocket'
+                                                                        : f.kind === 'blend' ? 'Blend'
+                                                                            : f.kind === 'sphere' ? 'Sphere'
+                                                                                // Decision: reference.md and studentWord() (lib/model-check.ts) both
+                                                                                // call this "bevel", and the toolbar's own button (ModelEditor.tsx's
+                                                                                // roundLabel) now says "Bevel" too -- one word for the tool everywhere
+                                                                                // a student meets it, not the three-way split ("Angled Corner" on the
+                                                                                // button, "bevel" in messages and the reference) this used to be.
+                                                                                : f.kind === 'fillet' ? (f.style === 'chamfer' ? 'Bevel' : 'Round')
+                                                                                    : f.kind === 'draft' ? (f.whole ? 'Body draft' : 'Draft')
+                                                                                        : nameless(f);
 }
 /**
  * Every Feature kind must be named above. This takes `never`, so adding a
@@ -807,7 +1214,22 @@ export function defaultName(f, doc) {
 /** Features nothing else consumes — what the model actually shows. */
 export function topLevel(doc) {
     const consumed = new Set();
+    // Cuts naming one body apply cumulatively (PartDesign): each supersedes the
+    // previous cut on that body. Mirrors `heads` in brep-rs history.rs.
+    const heads = new Map();
+    const supersede = (body, id) => {
+        const from = heads.get(body) ?? body;
+        consumed.add(from);
+        for (const [k, v] of heads)
+            if (v === from)
+                heads.set(k, id);
+        heads.set(body, id);
+    };
     for (const f of doc.features) {
+        if (f.kind === 'hole')
+            supersede(f.target, f.id);
+        if (f.kind === 'pocket' || f.kind === 'groove')
+            supersede(f.into, f.id);
         if (f.kind === 'combine')
             f.targets.forEach((t) => consumed.add(t));
         if (f.kind === 'extrude')
@@ -839,6 +1261,6 @@ export function topLevel(doc) {
     // handing one to the renderer draws nothing -- the outline is drawn as an
     // overlay instead, so an un-extruded sketch is still visible while being
     // honestly absent from the model.
-    return doc.features.filter((f) => !consumed.has(f.id) && f.kind !== 'sketch');
+    return doc.features.filter((f) => !consumed.has(f.id) && f.kind !== 'sketch' && f.kind !== 'datum');
 }
 //# sourceMappingURL=model-types.js.map

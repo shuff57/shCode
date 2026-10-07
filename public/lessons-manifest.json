@@ -10,6 +10,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -22,6 +23,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -34,6 +36,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -46,6 +49,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -58,6 +62,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -70,6 +75,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -81,7 +87,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 2,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -94,6 +101,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -106,6 +114,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -118,6 +127,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -130,6 +140,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -142,6 +153,7 @@
       "week": 1,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -154,6 +166,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -166,6 +179,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 4,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -177,7 +191,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.1.2",
-      "maxScore": null,
+      "maxScore": 6,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -190,6 +205,7 @@
       "week": 3,
       "assignmentCode": null,
       "maxScore": 10,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -202,6 +218,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -214,6 +231,7 @@
       "week": 1,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -226,6 +244,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -238,6 +257,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -250,6 +270,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -262,6 +283,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -274,6 +296,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -286,6 +309,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -298,6 +322,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -310,6 +335,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -322,6 +348,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -334,6 +361,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -346,6 +374,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -358,6 +387,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -370,6 +400,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -382,6 +413,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -394,6 +426,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -406,6 +439,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -418,6 +452,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -429,7 +464,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -442,6 +478,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -454,6 +491,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -466,6 +504,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -478,6 +517,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -490,6 +530,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -502,6 +543,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -514,6 +556,7 @@
       "week": null,
       "assignmentCode": "A1.2.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -526,6 +569,7 @@
       "week": null,
       "assignmentCode": "A1.2.2",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -538,6 +582,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -550,6 +595,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -562,6 +608,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 8,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -574,6 +621,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -586,6 +634,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -598,6 +647,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -610,6 +660,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -622,6 +673,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -634,6 +686,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -646,6 +699,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -658,6 +712,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -670,6 +725,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -681,7 +737,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -694,6 +751,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -706,6 +764,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -718,6 +777,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -730,6 +790,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -741,7 +802,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -754,6 +816,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -766,6 +829,7 @@
       "week": null,
       "assignmentCode": "A1.3.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -778,6 +842,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -790,6 +855,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -802,6 +868,7 @@
       "week": null,
       "assignmentCode": "A1.3.3",
       "maxScore": 9,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -814,6 +881,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -826,6 +894,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -838,6 +907,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -850,6 +920,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -862,6 +933,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -874,6 +946,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -886,6 +959,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -898,6 +972,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -910,6 +985,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -922,6 +998,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -934,6 +1011,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -946,6 +1024,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -957,7 +1036,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -970,6 +1050,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -982,6 +1063,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -994,6 +1076,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -1006,6 +1089,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1018,6 +1102,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1030,6 +1115,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1042,6 +1128,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1054,6 +1141,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1066,6 +1154,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 8,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -1077,7 +1166,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.4.1",
-      "maxScore": null,
+      "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1090,6 +1180,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1102,6 +1193,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1114,6 +1206,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1126,6 +1219,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -1138,6 +1232,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1150,6 +1245,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1162,6 +1258,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1174,6 +1271,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1186,6 +1284,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1198,6 +1297,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1210,6 +1310,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -1222,6 +1323,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1234,6 +1336,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1246,6 +1349,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1258,6 +1362,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -1269,7 +1374,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.5.2",
-      "maxScore": null,
+      "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1282,6 +1388,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1294,6 +1401,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1306,6 +1414,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1318,6 +1427,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1330,6 +1440,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1342,6 +1453,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1354,6 +1466,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -1366,6 +1479,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -1378,6 +1492,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1390,6 +1505,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1402,6 +1518,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1414,6 +1531,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1426,6 +1544,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1438,6 +1557,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1450,6 +1570,7 @@
       "week": null,
       "assignmentCode": "A1.5.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1462,6 +1583,7 @@
       "week": null,
       "assignmentCode": "A1.5.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1474,6 +1596,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1486,6 +1609,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1498,6 +1622,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1510,6 +1635,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1522,6 +1648,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1534,6 +1661,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1546,6 +1674,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1558,6 +1687,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1570,6 +1700,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1582,6 +1713,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1594,6 +1726,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1606,6 +1739,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1618,6 +1752,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1630,6 +1765,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1642,6 +1778,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": 12,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -1654,6 +1791,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1666,6 +1804,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1677,7 +1816,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1690,6 +1830,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1702,6 +1843,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1713,7 +1855,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.6.1",
-      "maxScore": null,
+      "maxScore": 3,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -1726,6 +1869,7 @@
       "week": null,
       "assignmentCode": "A1.6.2",
       "maxScore": null,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -1737,7 +1881,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.6.3",
-      "maxScore": null,
+      "maxScore": 6,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -1749,7 +1894,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.7.1",
-      "maxScore": 18,
+      "maxScore": 8,
+      "maxSubmissions": 3,
       "scoreKind": "quiz"
     },
     {
@@ -1761,7 +1907,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.7.2",
-      "maxScore": null,
+      "maxScore": 3,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -1773,8 +1920,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.7.3",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 20,
+      "maxSubmissions": 3,
+      "scoreKind": "written"
     },
     {
       "id": "1-7-4-ch1-individual-pa-chart-it",
@@ -1785,8 +1933,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.7.4",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 10,
+      "maxSubmissions": 3,
+      "scoreKind": "written"
     },
     {
       "id": "1-7-5-ch1-individual-pa-write-the-steps",
@@ -1797,7 +1946,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A1.7.5",
-      "maxScore": null,
+      "maxScore": 5,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -1810,6 +1960,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1822,6 +1973,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1834,6 +1986,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1846,6 +1999,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1858,6 +2012,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1870,6 +2025,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1882,6 +2038,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1894,6 +2051,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1906,6 +2064,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1918,6 +2077,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1930,6 +2090,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1942,6 +2103,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1954,6 +2116,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1966,6 +2129,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1978,6 +2142,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -1990,6 +2155,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2002,6 +2168,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2014,6 +2181,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2026,6 +2194,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2038,6 +2207,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2050,6 +2220,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2062,6 +2233,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2074,6 +2246,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2086,6 +2259,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2098,6 +2272,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2110,6 +2285,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2122,6 +2298,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2134,6 +2311,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2146,6 +2324,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2158,6 +2337,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2170,6 +2350,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2182,6 +2363,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2194,6 +2376,7 @@
       "week": 5,
       "assignmentCode": "A2.1.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2206,6 +2389,7 @@
       "week": 5,
       "assignmentCode": "A2.1.2",
       "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -2218,6 +2402,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2230,6 +2415,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2242,6 +2428,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2254,6 +2441,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2266,6 +2454,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2278,6 +2467,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2290,6 +2480,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2302,6 +2493,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2314,6 +2506,7 @@
       "week": 5,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2326,6 +2519,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2338,6 +2532,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2350,6 +2545,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2361,7 +2557,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6,
       "assignmentCode": "A2.2.0",
-      "maxScore": null,
+      "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2374,6 +2571,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2386,6 +2584,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2398,6 +2597,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2410,6 +2610,7 @@
       "week": 6,
       "assignmentCode": "A2.2.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2422,6 +2623,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2434,6 +2636,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2446,6 +2649,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2458,6 +2662,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2470,6 +2675,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2482,6 +2688,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2494,6 +2701,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2505,7 +2713,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6,
       "assignmentCode": "A2.2.1",
-      "maxScore": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2518,6 +2727,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2530,6 +2740,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2542,6 +2753,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2554,6 +2766,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2566,6 +2779,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2578,6 +2792,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2590,6 +2805,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2602,6 +2818,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2614,6 +2831,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2626,6 +2844,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2638,6 +2857,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2650,6 +2870,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2662,6 +2883,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2674,6 +2896,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2686,6 +2909,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2698,6 +2922,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2710,6 +2935,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2722,6 +2948,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2734,6 +2961,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2746,6 +2974,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2758,6 +2987,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2770,6 +3000,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2782,6 +3013,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2794,6 +3026,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2806,6 +3039,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2817,7 +3051,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 3,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2830,6 +3065,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2842,6 +3078,7 @@
       "week": 6,
       "assignmentCode": "A2.3.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2854,6 +3091,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2866,6 +3104,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2878,6 +3117,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2890,6 +3130,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2902,6 +3143,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2914,6 +3156,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2926,6 +3169,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2938,6 +3182,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2950,6 +3195,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2962,6 +3208,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2974,6 +3221,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2986,6 +3234,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -2998,6 +3247,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3010,6 +3260,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3022,6 +3273,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3034,6 +3286,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3046,6 +3299,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3058,6 +3312,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3070,6 +3325,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3082,6 +3338,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3094,6 +3351,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3106,6 +3364,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3118,6 +3377,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3130,6 +3390,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3142,6 +3403,7 @@
       "week": 6,
       "assignmentCode": "A2.4.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3154,6 +3416,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3166,6 +3429,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3178,6 +3442,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3190,6 +3455,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3202,6 +3468,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3214,6 +3481,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3226,6 +3494,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3238,6 +3507,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3250,6 +3520,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3262,6 +3533,7 @@
       "week": 7,
       "assignmentCode": "A2.4.2",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3274,6 +3546,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3286,6 +3559,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3298,6 +3572,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3310,6 +3585,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3322,6 +3598,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3334,6 +3611,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3346,6 +3624,7 @@
       "week": 6,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3358,6 +3637,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3370,6 +3650,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3382,6 +3663,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3394,6 +3676,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3406,6 +3689,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3418,6 +3702,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3430,6 +3715,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3442,6 +3728,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3454,6 +3741,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3466,6 +3754,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3478,6 +3767,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3490,6 +3780,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3502,6 +3793,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3514,6 +3806,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3526,6 +3819,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3538,6 +3832,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3550,6 +3845,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3562,6 +3858,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3574,6 +3871,7 @@
       "week": 7,
       "assignmentCode": "A2.5.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3586,6 +3884,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3598,6 +3897,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3610,6 +3910,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3622,6 +3923,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3634,6 +3936,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3646,6 +3949,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3658,6 +3962,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3670,6 +3975,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3681,7 +3987,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A2.6.1",
-      "maxScore": null,
+      "maxScore": 4,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -3694,6 +4001,7 @@
       "week": null,
       "assignmentCode": "A2.6.2",
       "maxScore": null,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -3705,7 +4013,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A2.6.3",
-      "maxScore": null,
+      "maxScore": 6,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -3717,7 +4026,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A2.7.1",
-      "maxScore": 18,
+      "maxScore": 8,
+      "maxSubmissions": 3,
       "scoreKind": "quiz"
     },
     {
@@ -3730,6 +4040,7 @@
       "week": null,
       "assignmentCode": "A2.7.2",
       "maxScore": 10,
+      "maxSubmissions": 3,
       "scoreKind": "written"
     },
     {
@@ -3741,8 +4052,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A2.7.3",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 20,
+      "maxSubmissions": 3,
+      "scoreKind": "written"
     },
     {
       "id": "2-7-4-ch2-individual-pa-chart-it",
@@ -3753,8 +4065,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A2.7.4",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 10,
+      "maxSubmissions": 3,
+      "scoreKind": "written"
     },
     {
       "id": "2-7-5-ch2-individual-pa-write-the-steps",
@@ -3766,6 +4079,7 @@
       "week": null,
       "assignmentCode": "A2.7.5",
       "maxScore": 20,
+      "maxSubmissions": 3,
       "scoreKind": "written"
     },
     {
@@ -3778,18 +4092,20 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-1-10-functions",
-      "title": "3.1.17 Preview: Functions with Parameters and Arrow Syntax",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.4.21 Lab: Parameters, Return Values, and Arrow Syntax",
+      "unit": "3.4 Function Expressions and Arrow Functions",
       "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7,
+      "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3802,6 +4118,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -3814,6 +4131,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3826,6 +4144,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3838,6 +4157,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3850,6 +4170,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3862,6 +4183,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3874,6 +4196,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3886,6 +4209,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3898,6 +4222,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3910,11 +4235,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-1-20-quiz",
-      "title": "3.1.18 Functions: Definition and Calls",
+      "title": "3.1.15 Functions: Definition and Calls",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "quiz",
       "type": "assignment",
@@ -3922,6 +4248,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": 8,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -3934,6 +4261,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3946,11 +4274,12 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-1-3-reading-parameters-return",
-      "title": "3.2.2 Reading: Parameters & Return Values",
+      "title": "3.2.2 Reading: Parameters",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -3958,11 +4287,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-1-4-reading-scope",
-      "title": "3.2.20 Reading: Scope: Local vs Global",
+      "title": "3.2.24 Reading: Scope: Local vs Global",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -3970,6 +4300,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3982,6 +4313,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -3994,6 +4326,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4005,7 +4338,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4018,30 +4352,33 @@
       "week": null,
       "assignmentCode": "A3.1.0",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-1-8-lab-findmax-iseven",
-      "title": "3.1.15 Preview: findMax & isEven",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.2.26 Lab: findMax & isEven",
+      "unit": "3.2 Parameters and Return Values",
       "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-1-9-lab-sum-to-n",
-      "title": "3.1.16 Preview: Sum 1 to N",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.2.28 Lab: Sum 1 to N",
+      "unit": "3.2 Parameters and Return Values",
       "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4053,7 +4390,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.10.1",
-      "maxScore": 18,
+      "maxScore": 8,
+      "maxSubmissions": 3,
       "scoreKind": "quiz"
     },
     {
@@ -4066,6 +4404,7 @@
       "week": null,
       "assignmentCode": "A3.10.2",
       "maxScore": 10,
+      "maxSubmissions": 3,
       "scoreKind": "written"
     },
     {
@@ -4077,8 +4416,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.10.3",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 20,
+      "maxSubmissions": 3,
+      "scoreKind": "written"
     },
     {
       "id": "3-10-4-ch3-individual-pa-chart-it",
@@ -4089,8 +4429,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.10.4",
-      "maxScore": null,
-      "scoreKind": null
+      "maxScore": 10,
+      "maxSubmissions": 3,
+      "scoreKind": "written"
     },
     {
       "id": "3-10-5-ch3-individual-pa-write-the-steps",
@@ -4102,6 +4443,7 @@
       "week": null,
       "assignmentCode": "A3.10.5",
       "maxScore": 20,
+      "maxSubmissions": 3,
       "scoreKind": "written"
     },
     {
@@ -4111,9 +4453,10 @@
       "preview": "slides",
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": null,
+      "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4126,11 +4469,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-10-example-return-vs-print",
-      "title": "3.2.10 Worked Example: return instead of print",
+      "title": "3.2.12 Worked Example: return instead of print",
       "unit": "3.2 Parameters and Return Values",
       "preview": "example",
       "type": "lesson",
@@ -4138,11 +4482,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-11-reading-return-ends-function",
-      "title": "3.2.11 Reading: `return` Ends the Function",
+      "title": "3.2.14 Reading: `return` Ends the Function",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -4150,11 +4495,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-12-lab-guard-clause",
-      "title": "3.2.12 Lab: an Early-Return Guard Clause",
+      "title": "3.2.15 Lab: an Early-Return Guard Clause",
       "unit": "3.2 Parameters and Return Values",
       "preview": "console",
       "type": "assignment",
@@ -4162,11 +4508,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-13-reading-printing-not-returning",
-      "title": "3.2.13 Reading: Printing Is Not Returning",
+      "title": "3.2.16 Reading: Printing Is Not Returning",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -4174,11 +4521,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-14-example-print-or-return",
-      "title": "3.2.14 Worked Example: Which Should a Function Do?",
+      "title": "3.2.17 Worked Example: Which Should a Function Do?",
       "unit": "3.2 Parameters and Return Values",
       "preview": "example",
       "type": "lesson",
@@ -4186,11 +4534,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-15-lab-fix-print-not-return",
-      "title": "3.2.15 Lab: Fix a Function That Prints Instead of Returning",
+      "title": "3.2.18 Lab: Fix a Function That Prints Instead of Returning",
       "unit": "3.2 Parameters and Return Values",
       "preview": "console",
       "type": "assignment",
@@ -4198,11 +4547,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-16-reading-building-with-returns",
-      "title": "3.2.16 Reading: Building With Returned Values",
+      "title": "3.2.20 Reading: Building With Returned Values",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -4210,11 +4560,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-17-example-chaining-functions",
-      "title": "3.2.17 Worked Example: Chaining Two Functions",
+      "title": "3.2.21 Worked Example: Chaining Two Functions",
       "unit": "3.2 Parameters and Return Values",
       "preview": "example",
       "type": "lesson",
@@ -4222,11 +4573,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-18-chart-chained-calls",
-      "title": "3.2.18 Chart the Code: Data Flow Through Chained Calls",
+      "title": "3.2.22 Chart the Code: Data Flow Through Chained Calls",
       "unit": "3.2 Parameters and Return Values",
       "preview": "diagram",
       "type": "lesson",
@@ -4234,11 +4586,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-19-lab-compose-functions",
-      "title": "3.2.19 Lab: Compose Two Functions",
+      "title": "3.2.23 Lab: Compose Two Functions",
       "unit": "3.2 Parameters and Return Values",
       "preview": "console",
       "type": "assignment",
@@ -4246,6 +4599,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4258,11 +4612,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-21-lab-scope-prediction",
-      "title": "3.2.21 Lab: Scope Prediction Exercise",
+      "title": "3.2.25 Lab: Scope Prediction Exercise",
       "unit": "3.2 Parameters and Return Values",
       "preview": "console",
       "type": "assignment",
@@ -4270,18 +4625,20 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-22-parameters-return-quiz",
-      "title": "3.2.22 Parameters and Return Values",
+      "title": "3.2.29 Parameters and Return Values",
       "unit": "3.2 Parameters and Return Values",
       "preview": "quiz",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": null,
+      "week": 7,
       "assignmentCode": null,
-      "maxScore": 8,
+      "maxScore": 10,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -4294,6 +4651,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4306,6 +4664,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4318,11 +4677,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-4-reading-split-lines",
-      "title": "3.3.8 Reading: Splitting Text into Lines (.split)",
+      "title": "3.3.10 Reading: Splitting Text into Lines (.split)",
       "unit": "3.3 Arrays",
       "preview": "reading",
       "type": "lesson",
@@ -4330,11 +4690,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-5-lab-sum-array",
-      "title": "3.3.9 Sum an Array",
+      "title": "3.3.12 Sum an Array",
       "unit": "3.3 Arrays",
       "preview": "console",
       "type": "assignment",
@@ -4342,6 +4703,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4354,11 +4716,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-6-example-menu-loop",
-      "title": "3.3.10 Worked Example: A tiny menu loop",
+      "title": "3.3.13 Worked Example: A tiny menu loop",
       "unit": "3.3 Arrays",
       "preview": "example",
       "type": "lesson",
@@ -4366,11 +4729,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-6-reading-order-matters",
-      "title": "3.2.6 Reading: Order Matters",
+      "title": "3.2.7 Reading: Order Matters",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -4378,23 +4742,25 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-7-arrays",
-      "title": "3.3.18 Arrays",
+      "title": "3.3.24 Arrays",
       "unit": "3.3 Arrays",
       "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.3.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-7-lab-rectangle-area",
-      "title": "3.2.7 Lab: findRectangleArea (multi-parameter)",
+      "title": "3.2.9 Lab: findRectangleArea (multi-parameter)",
       "unit": "3.2 Parameters and Return Values",
       "preview": "console",
       "type": "assignment",
@@ -4402,11 +4768,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-8-chart-parameter-trace",
-      "title": "3.2.8 Chart the Code: Tracing Parameter Values",
+      "title": "3.2.10 Chart the Code: Tracing Parameter Values",
       "unit": "3.2 Parameters and Return Values",
       "preview": "diagram",
       "type": "lesson",
@@ -4414,11 +4781,12 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-2-9-reading-return",
-      "title": "3.2.9 Reading: Getting a Value Back with `return`",
+      "title": "3.2.11 Reading: Getting a Value Back with `return`",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -4426,23 +4794,90 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "3-2-drill-default-greeting",
+      "title": "3.2.8 Lab: greet with a Default Name",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "3-2-drill-initials",
+      "title": "3.2.19 Lab: initials(first, last)",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "3-2-drill-largest-of-three",
+      "title": "3.2.27 Lab: largest(a, b, c)",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "3-2-drill-shout",
+      "title": "3.2.6 Lab: shout(word)",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "3-2-drill-square",
+      "title": "3.2.13 Lab: square(n)",
+      "unit": "3.2 Parameters and Return Values",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-3-11-chart-the-array-loop",
-      "title": "3.3.11 Chart the Code: Looping Over an Array",
+      "title": "3.3.14 Chart the Code: Looping Over an Array",
       "unit": "3.3 Arrays",
       "preview": "diagram",
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": null,
+      "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-3-12-reading-arrays-and-functions",
-      "title": "3.3.12 Reading: Arrays and Functions",
+      "title": "3.3.15 Reading: Arrays and Functions",
       "unit": "3.3 Arrays",
       "preview": "reading",
       "type": "lesson",
@@ -4450,11 +4885,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-3-13-example-filter-passing-scores",
-      "title": "3.3.13 Worked Example: Keeping Only the Passing Scores",
+      "title": "3.3.17 Worked Example: Keeping Only the Passing Scores",
       "unit": "3.3 Arrays",
       "preview": "example",
       "type": "lesson",
@@ -4462,11 +4898,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-3-14-lab-filter-function",
-      "title": "3.3.14 Lab: Write a Function That Filters an Array",
+      "title": "3.3.19 Lab: Write a Function That Returns a New Array",
       "unit": "3.3 Arrays",
       "preview": "console",
       "type": "assignment",
@@ -4474,11 +4911,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-3-15-reading-nested-arrays",
-      "title": "3.3.15 Reading: Lists Inside Lists",
+      "title": "3.3.20 Reading: Lists Inside Lists",
       "unit": "3.3 Arrays",
       "preview": "reading",
       "type": "lesson",
@@ -4486,11 +4924,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-3-16-example-nested-array-grid",
-      "title": "3.3.16 Worked Example: A Tic-Tac-Toe Board as a Nested Array",
+      "title": "3.3.21 Worked Example: A Tic-Tac-Toe Board as a Nested Array",
       "unit": "3.3 Arrays",
       "preview": "example",
       "type": "lesson",
@@ -4498,11 +4937,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-3-17-lab-nested-array-update",
-      "title": "3.3.17 Lab: Read and Update a Nested Array",
+      "title": "3.3.22 Lab: Read and Update a Nested Array",
       "unit": "3.3 Arrays",
       "preview": "console",
       "type": "assignment",
@@ -4510,6 +4950,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4522,6 +4963,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4534,11 +4976,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-3-6-reading-shift-unshift",
-      "title": "3.3.6 Reading: Adding and Removing from the Front",
+      "title": "3.3.7 Reading: Adding and Removing from the Front",
       "unit": "3.3 Arrays",
       "preview": "reading",
       "type": "lesson",
@@ -4546,11 +4989,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-3-7-lab-shift-unshift-queue",
-      "title": "3.3.7 Lab: Front-of-Line Queue",
+      "title": "3.3.8 Lab: Front-of-Line Queue",
       "unit": "3.3 Arrays",
       "preview": "console",
       "type": "assignment",
@@ -4558,6 +5002,85 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "3-3-checkpoint-quiz",
+      "title": "3.3.23 Arrays Checkpoint",
+      "unit": "3.3 Arrays",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8,
+      "assignmentCode": null,
+      "maxScore": 8,
+      "maxSubmissions": null,
+      "scoreKind": "quiz"
+    },
+    {
+      "id": "3-3-drill-count-words",
+      "title": "3.3.11 Lab: countWords(text)",
+      "unit": "3.3 Arrays",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "3-3-drill-last-item",
+      "title": "3.3.16 Lab: lastItem(items)",
+      "unit": "3.3 Arrays",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "3-3-drill-off-by-one",
+      "title": "3.3.6 Lab: Fix the Off-by-One Loop",
+      "unit": "3.3 Arrays",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "3-3-drill-rotate-line",
+      "title": "3.3.9 Lab: rotate(items)",
+      "unit": "3.3 Arrays",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "3-3-drill-smallest",
+      "title": "3.3.18 Lab: smallest(numbers)",
+      "unit": "3.3 Arrays",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4570,6 +5093,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4582,6 +5106,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4594,6 +5119,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4606,6 +5132,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4618,6 +5145,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4630,6 +5158,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4642,6 +5171,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4654,6 +5184,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4666,6 +5197,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4678,6 +5210,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4690,6 +5223,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4702,6 +5236,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4714,11 +5249,12 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-4-21-arrow-functions-quiz",
-      "title": "3.4.21 Function Expressions and Arrow Functions",
+      "title": "3.4.22 Function Expressions and Arrow Functions",
       "unit": "3.4 Function Expressions and Arrow Functions",
       "preview": "quiz",
       "type": "assignment",
@@ -4726,6 +5262,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": 8,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -4738,6 +5275,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4750,6 +5288,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4762,6 +5301,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4774,6 +5314,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4786,6 +5327,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4798,6 +5340,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4810,6 +5353,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4822,6 +5366,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4834,6 +5379,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4846,6 +5392,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4858,6 +5405,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4870,6 +5418,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4882,6 +5431,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4894,6 +5444,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4906,6 +5457,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4918,6 +5470,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4930,6 +5483,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4942,6 +5496,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4954,6 +5509,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4966,6 +5522,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4978,6 +5535,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -4990,6 +5548,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5002,6 +5561,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5014,6 +5574,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5026,6 +5587,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5038,6 +5600,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": 8,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -5050,6 +5613,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5062,6 +5626,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5074,6 +5639,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5086,6 +5652,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5098,6 +5665,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5110,6 +5678,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5122,6 +5691,7 @@
       "week": 8,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5134,6 +5704,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5146,6 +5717,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5158,6 +5730,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5170,6 +5743,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5182,6 +5756,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5194,6 +5769,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5206,6 +5782,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": 8,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -5218,6 +5795,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5230,6 +5808,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5242,6 +5821,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5254,6 +5834,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5266,6 +5847,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5278,6 +5860,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5290,6 +5873,7 @@
       "week": 7,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5302,6 +5886,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5314,6 +5899,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5326,6 +5912,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5338,6 +5925,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5350,6 +5938,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5362,6 +5951,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5374,6 +5964,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5386,6 +5977,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5398,6 +5990,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5410,6 +6003,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5422,6 +6016,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5434,6 +6029,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5446,6 +6042,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5458,6 +6055,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5470,6 +6068,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5482,6 +6081,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": 8,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -5494,6 +6094,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5506,6 +6107,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5518,6 +6120,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5530,6 +6133,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5542,6 +6146,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5554,6 +6159,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5566,6 +6172,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5578,6 +6185,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5590,6 +6198,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5602,6 +6211,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5614,6 +6224,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5626,6 +6237,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5638,6 +6250,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5650,6 +6263,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5662,6 +6276,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5674,6 +6289,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5686,6 +6302,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5698,6 +6315,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5710,6 +6328,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5722,6 +6341,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5734,6 +6354,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5746,6 +6367,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5758,6 +6380,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5770,6 +6393,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": 9,
+      "maxSubmissions": null,
       "scoreKind": "quiz"
     },
     {
@@ -5782,6 +6406,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5794,6 +6419,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5806,6 +6432,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5818,6 +6445,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5830,6 +6458,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5842,6 +6471,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5854,6 +6484,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5865,7 +6496,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.9.1",
-      "maxScore": null,
+      "maxScore": 4,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -5878,6 +6510,7 @@
       "week": null,
       "assignmentCode": "A3.9.2",
       "maxScore": null,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -5889,7 +6522,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.9.3",
-      "maxScore": null,
+      "maxScore": 6,
+      "maxSubmissions": 3,
       "scoreKind": null
     },
     {
@@ -5902,6 +6536,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5914,6 +6549,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5926,6 +6562,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5938,6 +6575,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5950,6 +6588,7 @@
       "week": null,
       "assignmentCode": "A4.1.0",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5962,6 +6601,7 @@
       "week": 9,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5973,7 +6613,8 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 3,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5986,6 +6627,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -5998,6 +6640,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6010,6 +6653,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6022,6 +6666,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6034,6 +6679,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6046,6 +6692,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6058,6 +6705,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6070,6 +6718,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6082,6 +6731,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6094,6 +6744,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6106,6 +6757,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6118,6 +6770,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6130,6 +6783,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6142,6 +6796,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6153,7 +6808,8 @@
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 3,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6166,6 +6822,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6178,6 +6835,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6190,6 +6848,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6202,6 +6861,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6214,6 +6874,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6226,6 +6887,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6238,6 +6900,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6250,6 +6913,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6262,6 +6926,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6274,6 +6939,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6286,6 +6952,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6298,6 +6965,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6310,6 +6978,7 @@
       "week": 15,
       "assignmentCode": "A5.2.1",
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6322,6 +6991,7 @@
       "week": 15,
       "assignmentCode": "A5.2.2",
       "maxScore": 3,
+      "maxSubmissions": null,
       "scoreKind": "written"
     },
     {
@@ -6334,6 +7004,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6346,6 +7017,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6358,6 +7030,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6370,6 +7043,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6382,6 +7056,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6394,6 +7069,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6406,6 +7082,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6418,6 +7095,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6430,6 +7108,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6442,6 +7121,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6454,6 +7134,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6466,6 +7147,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6478,6 +7160,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6490,6 +7173,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6502,6 +7186,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6514,6 +7199,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6526,6 +7212,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6538,6 +7225,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6550,6 +7238,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6562,6 +7251,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6574,6 +7264,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6586,6 +7277,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6598,6 +7290,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6610,6 +7303,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6622,6 +7316,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6634,6 +7329,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6646,6 +7342,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6658,6 +7355,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6670,6 +7368,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6682,6 +7381,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6694,6 +7394,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6706,6 +7407,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6718,6 +7420,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6730,6 +7433,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6742,6 +7446,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6753,7 +7458,8 @@
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 5,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6766,6 +7472,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6778,6 +7485,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6790,6 +7498,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6802,6 +7511,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6814,6 +7524,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6826,6 +7537,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6838,6 +7550,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6850,6 +7563,7 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6862,6 +7576,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6874,6 +7589,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6886,6 +7602,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6898,6 +7615,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6910,6 +7628,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6922,6 +7641,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6934,6 +7654,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6946,6 +7667,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6958,6 +7680,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6970,6 +7693,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6982,6 +7706,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -6994,6 +7719,7 @@
       "week": 13,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7006,6 +7732,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7018,6 +7745,7 @@
       "week": 14,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7030,6 +7758,7 @@
       "week": 14,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7042,6 +7771,7 @@
       "week": 14,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7054,6 +7784,7 @@
       "week": 14,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7066,6 +7797,7 @@
       "week": 14,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7078,6 +7810,7 @@
       "week": 14,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7090,6 +7823,7 @@
       "week": 14,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7102,6 +7836,7 @@
       "week": 14,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7114,6 +7849,7 @@
       "week": 14,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7126,6 +7862,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7138,6 +7875,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7150,6 +7888,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7162,6 +7901,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7174,6 +7914,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7186,6 +7927,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7198,6 +7940,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7210,6 +7953,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7222,6 +7966,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7234,6 +7979,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7246,6 +7992,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7258,6 +8005,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7270,6 +8018,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7282,6 +8031,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7294,6 +8044,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7306,6 +8057,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7318,6 +8070,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7330,6 +8083,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7342,6 +8096,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7354,6 +8109,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7366,6 +8122,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7378,6 +8135,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7390,6 +8148,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7402,6 +8161,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7414,6 +8174,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7426,6 +8187,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7438,6 +8200,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7450,6 +8213,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7462,6 +8226,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7474,6 +8239,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7486,6 +8252,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7498,6 +8265,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7510,6 +8278,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7522,6 +8291,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7534,6 +8304,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7546,6 +8317,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7558,6 +8330,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7570,6 +8343,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7582,6 +8356,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7594,6 +8369,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7606,6 +8382,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7618,6 +8395,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7630,6 +8408,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7642,6 +8421,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7654,6 +8434,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7666,6 +8447,7 @@
       "week": 16,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7678,6 +8460,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7690,6 +8473,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7702,6 +8486,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7714,6 +8499,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7726,6 +8512,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7738,6 +8525,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7750,6 +8538,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7762,6 +8551,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7774,6 +8564,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7786,6 +8577,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7798,6 +8590,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7810,6 +8603,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7822,6 +8616,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7834,6 +8629,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7846,6 +8642,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7858,6 +8655,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7870,6 +8668,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7882,6 +8681,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7894,6 +8694,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7906,6 +8707,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7918,6 +8720,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7930,6 +8733,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7942,6 +8746,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7954,6 +8759,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7966,6 +8772,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7978,6 +8785,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -7990,6 +8798,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8002,6 +8811,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8014,6 +8824,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8026,6 +8837,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8038,6 +8850,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8050,6 +8863,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8062,6 +8876,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8074,6 +8889,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8086,6 +8902,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8098,6 +8915,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8110,6 +8928,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8122,6 +8941,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8134,6 +8954,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8146,6 +8967,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8158,6 +8980,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8170,6 +8993,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8182,6 +9006,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8194,6 +9019,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8206,6 +9032,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8218,6 +9045,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8230,6 +9058,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8242,6 +9071,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8254,6 +9084,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8266,6 +9097,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8278,6 +9110,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8290,6 +9123,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8302,6 +9136,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8314,6 +9149,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8326,6 +9162,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8338,6 +9175,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8350,6 +9188,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8362,6 +9201,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8374,6 +9214,7 @@
       "week": 17,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8386,6 +9227,7 @@
       "week": 18,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8397,7 +9239,8 @@
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 18,
       "assignmentCode": null,
-      "maxScore": null,
+      "maxScore": 3,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8410,6 +9253,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8422,6 +9266,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8434,6 +9279,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8446,6 +9292,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8458,6 +9305,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8470,6 +9318,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8482,6 +9331,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8494,6 +9344,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8506,6 +9357,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8518,6 +9370,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8530,6 +9383,7 @@
       "week": null,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8542,6 +9396,7 @@
       "week": 15,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     },
     {
@@ -8554,6 +9409,7 @@
       "week": 10,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
       "scoreKind": null
     }
   ]

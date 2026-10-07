@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "Three separate new Enemy(...) calls",
-      "description": "Create three Enemy instances: `e1`, `e2`, and `e3`, in `setup()`. Each must be a distinct `new Enemy(...)` call.",
+      "description": "Create three Enemy instances: `e1`, `e2`, and `e3`, in `setup()`. Each must be a distinct `new Enemy(...)` call. Help: 5.3.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:new\\s+Enemy\\s*\\([\\s\\S]*?){3}",
@@ -37,7 +37,7 @@
     {
       "id": "r2",
       "title": "e1 assigned to a new Enemy",
-      "description": "Assign the first Enemy instance to the variable `e1`.",
+      "description": "Assign the first Enemy instance to the variable `e1`. Help: 5.3.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "e1\\s*=\\s*new\\s+Enemy",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "e2 assigned to a new Enemy",
-      "description": "Assign the second Enemy instance to the variable `e2`.",
+      "description": "Assign the second Enemy instance to the variable `e2`. Help: 5.3.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "e2\\s*=\\s*new\\s+Enemy",
@@ -59,7 +59,7 @@
     {
       "id": "r4",
       "title": "e3 assigned to a new Enemy",
-      "description": "Assign the third Enemy instance to the variable `e3`.",
+      "description": "Assign the third Enemy instance to the variable `e3`. Help: 5.3.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "e3\\s*=\\s*new\\s+Enemy",

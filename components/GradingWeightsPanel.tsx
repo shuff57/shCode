@@ -9,6 +9,7 @@
 // curriculum default from lib/grading-weights.ts.
 
 import { useEffect, useState } from 'react';
+import { useFeedback } from './FeedbackProvider';
 import { CATEGORY_LABEL, DEFAULT_WEIGHTS, GRADE_CATEGORIES, type GradeCategory } from '../lib/grading-weights';
 
 interface WeightRow {
@@ -19,7 +20,7 @@ interface WeightRow {
 
 const C = {
   border: '#44475a',
-  dim: '#6272a4',
+  dim: '#8393c4',
   text: '#f8f8f2',
   input: '#282a36',
   accent: '#8be9fd',
@@ -35,6 +36,7 @@ async function fetchWeights(classId: string): Promise<WeightRow[]> {
 
 export default function GradingWeightsPanel({ classId }: { classId: string }) {
   const [rows, setRows] = useState<WeightRow[] | null>(null);
+  const { toast } = useFeedback();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,8 +68,10 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
       if (!res.ok) throw new Error(`grading-weights PUT ${res.status}`);
       const data = (await res.json()) as { weights: WeightRow[] };
       setRows(data.weights);
+      toast('Weight saved. Every grade in this class now uses it.');
     } catch {
       setError('Could not save that weight.');
+      toast('Could not save that weight.', { kind: 'error' });
     } finally {
       setSaving(false);
     }

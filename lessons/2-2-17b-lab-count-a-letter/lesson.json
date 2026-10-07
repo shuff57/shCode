@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "loop runs to word.length with <",
-      "description": "A for loop counts i from 0 while i < word.length",
+      "description": "A for loop counts i from 0 while i < word.length. Help: 2.2.19 (Walking Through a Word)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$][A-Za-z0-9_$]*)\\s*=\\s*0\\s*;\\s*\\1\\s*<\\s*word\\.length\\s*;",
@@ -42,19 +42,19 @@
     {
       "id": "r2",
       "title": "a character is tested by position",
-      "description": "The if compares word[i] against a letter",
+      "description": "The if compares word[i] against a letter. Help: 2.2.19 (Walking Through a Word)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\(?\\s*word\\s*\\[\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\]\\s*===?\\s*[\"'`]",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*word\\s*\\[\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\]\\s*===?\\s*(?:[\"'`]|[A-Za-z_$])",
       "points": 0
     },
     {
       "id": "r3",
       "title": "the counter goes up inside the if",
-      "description": "count is increased inside the if body, not somewhere else in the file",
+      "description": "count is increased inside the if body, not somewhere else in the file. Help: 2.2.9 (The for Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\(?\\s*word\\s*\\[\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\]\\s*===?\\s*[\"'`][^\"'`]*[\"'`]\\s*\\)?\\s*\\)\\s*\\{?[^}]*?count\\s*(\\+\\+|\\+=\\s*1|=\\s*count\\s*\\+\\s*1)",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*word\\s*\\[\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\]\\s*===?\\s*(?:[\"'`][^\"'`]*[\"'`]|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*\\)\\s*\\{?[^}]*?count\\s*(\\+\\+|\\+=\\s*1|=\\s*count\\s*\\+\\s*1)",
       "points": 0
     },
     {

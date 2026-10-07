@@ -1,11 +1,26 @@
 import { type ModelDoc, type RoundStyle, type SketchPlane } from '@shuff57/reshape-script/model-types';
-import { type TopoName } from '@shuff57/reshape-script/topo-name';
+import { type SelectionState } from '../selection-model.js';
+import type { RecessKind } from './hole-recess.js';
 interface Props {
     doc: ModelDoc;
     onChange: (next: ModelDoc) => void;
-    /** Lifted so the preview knows whose drag handles to draw. */
-    selected: string[];
+    /** The ONE selection state, owned by ReshapeStudio and shared with the
+     *  viewport (SPEC-mouse-parity.md Phase 3 item 7). It carries what used to
+     *  arrive here as four separate props -- the selected feature ids plus the
+     *  picked edge/face -- so a pick made in the viewport and a click made on a
+     *  row below are the same state, not two copies that have to agree. Read
+     *  through selection-model.ts's ops just below the destructure. */
+    selection: SelectionState;
+    /** Replace the selected feature ids, leaving the viewport picks alone --
+     *  every `setSelected([...])` in this file. The caller owns that swap (it
+     *  owns the state), so this signature is unchanged from when `selected`
+     *  was its own prop. */
     onSelect: (ids: string[]) => void;
+    /** Write the whole selection. Takes a next state OR an updater, the same
+     *  shape React's own setState does, because several verbs here write it
+     *  twice in one handler -- round() selects the new fillets, then drops the
+     *  edge they consumed -- and the second write has to see the first. */
+    onSelectionChange: (next: SelectionState | ((prev: SelectionState) => SelectionState)) => void;
     onUndo: () => void;
     onRedo: () => void;
     canUndo: boolean;
@@ -40,55 +55,6 @@ interface Props {
     rollbackIndex?: number | null;
     /** Set the rollback boundary, or null to clear it (show the full model). */
     onRollback?: (i: number | null) => void;
-    /**
-     * An edge picked in the 3D viewport (BrepViewportThree's `onPick`), lifted
-     * up alongside `selected` for the same reason: the pick outlives any one
-     * render and the sandbox is what owns the viewport this came from.
-     *
-     * `edge` is null when the picked edge is real (and highlighted in the
-     * viewport) but could not be turned into a TopoName -- anything past a box
-     * or cylinder; see nameEdgeBetweenPrimitiveFaces() in lib/topo-resolve.ts.
-     * round() below only acts on a non-null edge and otherwise falls back to
-     * the whole-shape tool, same as picking nothing at all.
-     */
-    pickedEdge?: {
-        target: string;
-        edge: TopoName | null;
-    } | null;
-    /** Called once a picked edge has been consumed into a new FilletFeature,
-     *  so the sandbox stops pinning a selection that no longer points at
-     *  anything useful (its target feature is now consumed -- see topLevel()). */
-    onClearPickedEdge?: () => void;
-    /** The last FACE picked in the viewport, the same way pickedEdge tracks an
-     *  edge -- see ShellFeature.open. `face` is null the same way pickedEdge's
-     *  `edge` can be: a real pick that could not be traced back to a named
-     *  primitive face (see nameFaceOnCurrentShape() in lib/topo-resolve.ts).
-     *  openHollow() below only acts on a non-null face and otherwise refuses
-     *  with a reason, rather than falling back to a closed hollow silently. */
-    pickedFace?: {
-        target: string;
-        face: TopoName | null;
-    } | null;
-    /** Called once a picked face has been consumed into a new open ShellFeature,
-     *  the same reason onClearPickedEdge exists. */
-    onClearPickedFace?: () => void;
-    /**
-     * Every edge the student has Shift-added to the selection (item E), most
-     * recent last -- purely additive over `pickedEdge` above, which keeps
-     * meaning "the most recent pick" for every consumer that only ever cared
-     * about one edge (the tooltip, the disabled-state message, Hole/Hollow's
-     * own single-face requirement). round() below only takes the multi-edge
-     * path once two or more of these resolve to the SAME solid as `chosen`;
-     * otherwise it falls straight through to the single-edge/whole-shape
-     * logic that already existed, unchanged.
-     */
-    pickedEdges?: Array<{
-        target: string;
-        edge: TopoName;
-    }>;
-    /** Called once every edge in a multi-selection has been consumed into new
-     *  FilletFeatures, the same reason onClearPickedEdge exists. */
-    onClearPickedEdges?: () => void;
     /** Feature id -> why that feature could not be built, from the B-rep build.
      *  A refused feature is ABSENT from the model but still present in the
      *  history, which without this marker looks like the app ignoring a click. */
@@ -125,6 +91,12 @@ interface Props {
     onOpenSketch2D?: (id: string) => void;
     /** Leave the 2D sketcher and return to the 3D ribbon. */
     onExitSketch2D?: () => void;
+    /** Double-click a timeline row (SPEC-mouse-parity.md Phase 3.6): open
+     *  that feature's params panel, focused -- the caller's own per-kind
+     *  "open this" action (Edit 2D for a sketch, Dimensions otherwise), the
+     *  same one the context bar's own buttons already call, not a second
+     *  entry point. A single click's own `pick()` below is unaffected. */
+    onEditFeature?: (id: string) => void;
 }
 type PatternMode = 'linear' | 'circular';
 /** Adoption step 4 piece B: the toolbar's own verbs, handed up to the caller
@@ -138,13 +110,21 @@ export interface ContextActions {
     moveTool: (copy: boolean) => void;
     round: (style: RoundStyle) => void;
     drillHole: () => void;
+    /** Give the chosen hole a recess, or take it back off. The decision
+     *  itself is pure and lives in ./hole-recess.ts; this is the closure both the
+     *  context bar and repeatLast dispatch through. */
+    recess: (kind: RecessKind) => void;
     hollow: () => void;
     pull: () => void;
     spin: () => void;
     turn: () => void;
     repeat: (mode: PatternMode) => void;
     mirror: (plane: SketchPlane) => void;
+    /** The marking menu's Repeat wedge: re-run the LAST feature op
+     *  (whatever lastPattern holds at the call). Same flow as repeat(mode)
+     *  with the sticky last-used mode. */
+    repeatLast: () => void;
 }
-export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, pickedEdges, onClearPickedEdges, refusals, registerContextActions, historyGen, hasMesh, onExportSTL, onExportOBJ, onExport3MF, canClearModel, onClearModel, activePlane, onActivePlaneChange, sketchMode, onOpenSketch2D, onExitSketch2D, }: Props): import("react/jsx-runtime").JSX.Element;
+export default function ModelEditor({ doc, onChange, selection, onSelect, onSelectionChange, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, refusals, registerContextActions, historyGen, hasMesh, onExportSTL, onExportOBJ, onExport3MF, canClearModel, onClearModel, activePlane, onActivePlaneChange, sketchMode, onOpenSketch2D, onExitSketch2D, onEditFeature, }: Props): import("react/jsx-runtime").JSX.Element;
 export {};
 //# sourceMappingURL=ModelEditor.d.ts.map

@@ -1,0 +1,11 @@
+-- A teacher's "use this as the score even if lower" on a capped performance-assessment part
+-- (.gauntlet/SPEC-attempt-caps.md, round 5 finding 1).
+--
+-- On a capped part lesson_state.score is DERIVED from the student's submission rows (best
+-- counted try), so a teacher's deliberate lower mark written straight into score was undone
+-- by the student's next "completed" request, a later try, or a give-back. This column holds
+-- the teacher's choice instead. While it is non-NULL it IS the part's score: lesson-state's
+-- recompute, tries-reset and the review queue all read it first. It changes only when a
+-- teacher changes it (POST /api/classes/[id]/submission-queue with replaceBest or
+-- clearOverride, or a tries-reset 'reset').
+ALTER TABLE lesson_state ADD COLUMN score_override REAL;

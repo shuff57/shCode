@@ -1,4 +1,4 @@
-// 2.4.5 Animated Sprites Sandbox (reference solution).
+// 6.4.9 Animated Sprites Sandbox (reference solution).
 // Same pattern as addAni / changeAni, but with sprite.image swapping so the
 // sandbox doesn't need image asset hosting.
 

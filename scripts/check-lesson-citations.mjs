@@ -197,8 +197,38 @@ for (const l of lessons) {
         // The moSHion units were chapter 2 before the renumber. A chapter-5+
         // lesson pointing into chapter 1-2 is that rot until a human says
         // otherwise -- and it resolves, so nothing else will ever flag it.
-        stale.push(`${l.dir} (${l.num}) [${where}] ${cited} RESOLVES TO`
-          + ` "${byNum.get(cited).title.slice(0, 52)}"`);
+        //
+        // WAIVED 2026-09-28, verified by topic against the current titles. The
+        // rule above exists because rot is INDISTINGUISHABLE from a real
+        // cross-chapter citation: both resolve, both point backwards, and both
+        // look identical to this file. These are real, and this is the human
+        // sign-off the rule asks for. Narrow on purpose -- a blanket baseline
+        // bump would also excuse the NEXT piece of rot.
+        //
+        //   6.6.26 / 6.6.27 -> 2.3.3  a state-machine lab needs `switch`, and
+        //                            2.3.3 is "Reading: switch Statements".
+        //   6.6.26        -> 2.3.9  it needs `break`, and 2.3.9 is
+        //                            "Reading: break and Fall-Through".
+        //   6.8.14        -> 1.2.2  Pong-Sumo needs independent score variables.
+        //   6.8.14        -> 2.1.3  its win condition is a conditional.
+        //   7.1.1        -> 2.3.3  the Arcade capstone's game states are a
+        //                            switch, same as 6.6.
+        //   5.2.5        -> 2.1.29 it combines two checks with &&.
+        //   5.2.9        -> 2.1.3  it applies a force only inside an if zone.
+        const WAIVED = new Set([
+          '6-6-24-a16-2-game-states|2.3.3',
+          '6-6-24-a16-2-game-states|2.3.9',
+          '6-6-25-challenges|2.3.3',
+          '6-7-27-a17-1-pong-sumo|1.2.2',
+          '6-7-27-a17-1-pong-sumo|2.1.3',
+          '7-1-1-arcade-cabinet|2.3.3',
+          '5-2-5-lab-add-a-jump|2.1.29',
+          '5-2-9-lab-wind-zone|2.1.3',
+        ]);
+        if (!WAIVED.has(`${l.dir}|${cited}`)) {
+          stale.push(`${l.dir} (${l.num}) [${where}] ${cited} RESOLVES TO`
+            + ` "${byNum.get(cited).title.slice(0, 52)}"`);
+        }
       }
     }
   }

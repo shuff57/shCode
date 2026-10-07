@@ -32,7 +32,7 @@
     {
       "id": "r1",
       "title": "array of object records built",
-      "description": "An array literal holds object literals",
+      "description": "An array literal holds object literals. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\s*\\{[^}]*\\}",
@@ -42,17 +42,17 @@
     {
       "id": "r2",
       "title": "record fields read with a dot",
-      "description": "Reads arr[i].field",
+      "description": "Reads arr[i].field. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\[\\w+\\]\\.\\w+",
+      "pattern": "\\[\\s*\\w+\\s*\\]\\s*\\.\\s*\\w+|(?:const|let)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*\\w+\\s*\\[\\s*\\w+\\s*\\][\\s\\S]*?\\b\\1\\.\\w+",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "loop present",
-      "description": "Contains a for loop",
+      "description": "Contains a for loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -62,7 +62,7 @@
     {
       "id": "r4",
       "title": "output printed",
-      "description": "Calls console.log",
+      "description": "Calls console.log. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log",

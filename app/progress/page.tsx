@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getCurrentUser, type CurrentUser } from '../../lib/auth';
 import { useLessonState } from '../../lib/progress';
+import { lessonPercent } from '../../lib/grading-weights';
 import { sortLessons } from '../../lib/lesson-order';
 import StudentGradebook from '../../components/StudentGradebook';
 
@@ -12,6 +13,8 @@ interface ManifestLesson {
   title: string;
   unit?: string;
   category?: string;
+  /** Quiz questions, rubric points, or pass/fail criteria; null = completion is the grade. */
+  maxScore?: number | null;
 }
 
 interface ManifestData {
@@ -68,12 +71,11 @@ export default function ProgressPage() {
   const totalLessons = manifest.lessons.length;
   const completionPct = totalLessons > 0 ? Math.round((completedIds.length / totalLessons) * 100) : 0;
 
-  // Average score across completed lessons that have a score
-  const scoredIds = completedIds.filter((id) => progress.scores[id] !== undefined);
-  const avgScore = scoredIds.length > 0
-    ? Math.round(scoredIds.reduce((sum, id) => sum + (progress.scores[id] ?? 0), 0) / scoredIds.length)
-    : null;
-
+  // lesson_state.score is raw POINTS in each lesson's own units (a quiz's correct count, a rubric's
+  // earned points, a pass/fail rubric's criteria met), never a percent. Every percent on this page
+  // is lessonPercent() over the manifest's maxScore, the function the synced grade is built from;
+  // printing the raw score with a "%" read "Completed 3%" for a quiz scored 3 of 8.
+  const pctFor = (l: ManifestLesson) => lessonPercent(progress.states[l.id], progress.scores[l.id], l.maxScore);
   // Both lists below slice a SEQUENCE, so they need course order, not the
   // manifest's folder-id order — which reads 1.1.19, 1.1.2, 1.1.20 and made
   // "Up Next" name lessons the Next button would not go to. See
@@ -129,11 +131,6 @@ export default function ProgressPage() {
         <p style={{ opacity: 0.5, fontSize: 13, marginTop: 8 }}>
           {completionPct}% complete
         </p>
-        {avgScore !== null && (
-          <p style={{ margin: '12px 0 0 0', fontSize: 15 }}>
-            Average score: <strong>{avgScore}%</strong>
-          </p>
-        )}
       </div>
 
       {/* Per-assignment gradebook — the student's own row of the same matrix
@@ -151,7 +148,7 @@ export default function ProgressPage() {
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {recentlyCompleted.map((l) => {
-                const score = progress.scores[l.id];
+                const score = progress.scores[l.id] !== undefined || l.maxScore != null ? pctFor(l) : undefined;
                 return (
                   <li key={l.id} style={listItemStyle}>
                     <span style={{ flex: 1, fontWeight: 500 }}>{l.title}</span>

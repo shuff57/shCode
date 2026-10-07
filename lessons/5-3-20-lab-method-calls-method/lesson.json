@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "bigStep() calls this.addBy(5) and returns this.isHigh()",
-      "description": "Write `bigStep()` inside `Counter`. It must call `this.addBy(5)` and return `this.isHigh()`.",
+      "description": "Write `bigStep()` inside `Counter`. It must call `this.addBy(5)` and return `this.isHigh()`. Help: 5.4.1 (Methods: functions that live on a class)",
       "type": "regex",
       "file": "script.js",
       "pattern": "bigStep[\\s\\S]*this\\.addBy\\s*\\(\\s*5\\s*\\)[\\s\\S]*return\\s+this\\.isHigh\\s*\\(\\s*\\)",

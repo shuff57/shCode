@@ -31,6 +31,8 @@ Here is the part worth slowing down for. Snippet B does not yet carry a method o
 
 ## Step 4: Why it matters at scale
 
+*(Read it, do not write it yet: `[ ... ]` is a list, and `books[0]` is its first item, counting from 0. Chapter 2 teaches lists.)*
+
 ```js live plain
 // Procedural, for two books: the pairing is only in your head
 let title1 = "JavaScript Guide";  let pages1 = 200;

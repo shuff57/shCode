@@ -41,7 +41,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "Call new Canvas(...) inside setup() to open a drawing area.",
+      "description": "Call new Canvas(...) inside setup() to open a drawing area. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "inFunction",
       "function": "setup",
       "file": "script.js",
@@ -53,7 +53,7 @@
     {
       "id": "r2",
       "title": "Create a sprite",
-      "description": "Call new Sprite(...) inside setup() to put a rectangle on the canvas.",
+      "description": "Call new Sprite(...) inside setup() to put a rectangle on the canvas. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "inFunction",
       "function": "setup",
       "file": "script.js",
@@ -65,7 +65,7 @@
     {
       "id": "r3",
       "title": "Set the sprite's color",
-      "description": "Assign a color string to the sprite's .color property.",
+      "description": "Assign a color string to the sprite's .color property. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "inFunction",
       "function": "setup",
       "file": "script.js",

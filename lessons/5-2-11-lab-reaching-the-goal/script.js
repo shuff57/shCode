@@ -37,7 +37,8 @@ function draw() {
   // STEP 1: Check whether the player has reached the goal, but only while
   //         `goal` still exists (guard the whole block with if (goal) so
   //         it can only fire once). Compute the distance between the
-  //         player and the goal (dx, dy, then the Pythagorean distance).
+  //         player and the goal (dx, dy, then the Pythagorean distance with Math.sqrt,
+  //         or use player.distanceTo(goal)).
   //         When that distance is small enough, log a win message, call
   //         goal.delete(), and set `goal` to null so the check can never
   //         run again.

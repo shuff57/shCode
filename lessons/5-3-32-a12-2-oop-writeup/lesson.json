@@ -15,12 +15,12 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Procedural vs OOP: AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
+    "model": "glm-5.3-flash:cloud",
     "contextDocs": [
       "overview",
       "sprite"
     ],
-    "prompt": "Answer all four questions. Questions 1 and 4 come from the readings; questions 2 and 3 come from code you have written yourself. Your own everyday words throughout: do not copy definitions from the internet.\n\nQuestion 1: Definitions in your own words. What does procedural programming mean? What does object-oriented programming mean? (5.3.3, 5.4.14, and the side-by-side worked example in 5.4.15)\n\nQuestion 2: A specific procedural example from Q1. Name a specific assignment or program you wrote in Q1 that used a procedural approach, and describe it in one or two sentences. Name the assignment.\n\nQuestion 3: A specific moSHion OOP example. Name a specific place in your moSHion code: the A12.1 Collectible class, or an earlier class you wrote: where you used OOP. Describe how the class organised your code: what data and what behaviour did it group together? (5.3.7 and 5.4.1)\n\nQuestion 4: When OOP wins. Describe one situation, hypothetical is fine, where OOP is clearly the better choice than procedural code. Explain why, using at least one of these: readability, extensibility, or keeping data and behaviour together. (5.4.16 and 5.4.17)",
+    "prompt": "Answer all four questions. Questions 1 and 4 come from the readings; questions 2 and 3 come from code you have written yourself. Your own everyday words throughout: do not copy definitions from the internet.\n\nQuestion 1: Definitions in your own words. What does procedural programming mean? What does object-oriented programming mean? (1.4.8 for procedural; 5.3.3, 5.4.14 and the side-by-side worked example in 5.4.15 for object-oriented)\n\nQuestion 2: A specific procedural example from your first-quarter code (Units 1 to 3, before moSHion). Name a specific assignment or program you wrote then that used a procedural approach, and describe it in one or two sentences. Name the assignment.\n\nQuestion 3: A specific moSHion OOP example. Name a specific place in your moSHion code: the A12.1 Collectible class, or an earlier class you wrote: where you used OOP. Describe how the class organised your code: what data and what behaviour did it group together? (5.3.7 and 5.4.1)\n\nQuestion 4: When OOP wins. Describe one situation, hypothetical is fine, where OOP is clearly the better choice than procedural code. Explain why, using at least one of these: readability, extensibility, or keeping data and behaviour together. (5.4.16 and 5.4.17)",
     "rubric": [
       {
         "id": "q1-definitions",
@@ -30,8 +30,8 @@
       },
       {
         "id": "q2-proc-example",
-        "title": "Q2: Specific Q1 procedural example named",
-        "description": "Student names a specific Q1 assignment (by name or description) and says something, however brief, about how it used a procedural approach. Any real named assignment with even a loose description counts - it doesn't need to be precise or detailed. Deny only a fully generic statement like 'I used procedural code in Q1' with nothing pinning it to an actual assignment, or no example at all.",
+        "title": "Q2: Specific first-quarter procedural example named",
+        "description": "Student names a specific first-quarter (Units 1 to 3) assignment (by name or description) and says something, however brief, about how it used a procedural approach. Any real named assignment with even a loose description counts - it doesn't need to be precise or detailed. Deny only a fully generic statement like 'I used procedural code last quarter' with nothing pinning it to an actual assignment, or no example at all.",
         "points": 0
       },
       {

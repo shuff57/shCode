@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "inner loop starts at a + 1",
-      "description": "The inner loop's counter b starts at a + 1, not a fixed value, and the nested loops still log each pair",
+      "description": "The inner loop's counter b starts at a + 1, not a fixed value, and the nested loops still log each pair. Help: 2.4.24 (Nested Loops)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(\\s*(?:let|var)\\s+a\\s*=\\s*1\\s*;\\s*a\\s*<=\\s*3\\s*;\\s*a\\+\\+\\s*\\)\\s*\\{[^{}]*for\\s*\\(\\s*(?:let|var)\\s+b\\s*=\\s*a\\s*\\+\\s*1\\s*;\\s*b\\s*<=\\s*3\\s*;\\s*b\\+\\+\\s*\\)\\s*\\{(?=[^{}]*console\\.log)[^{}]*\\}[^{}]*\\}",

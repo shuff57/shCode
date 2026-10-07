@@ -30,7 +30,7 @@ interface PastDueData {
   warning?: string;
 }
 
-const C = { border: '#44475a', dim: '#6272a4', text: '#f8f8f2', late: '#ff5555', ok: '#50fa7b' };
+const C = { border: '#44475a', dim: '#8393c4', text: '#f8f8f2', late: '#ff5555', ok: '#50fa7b' };
 
 export default function PastDuePanel({ classId }: { classId: string }) {
   const [data, setData] = useState<PastDueData | null>(null);

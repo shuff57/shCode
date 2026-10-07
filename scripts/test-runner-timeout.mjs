@@ -16,6 +16,10 @@ import { Worker } from 'worker_threads';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execFileSync } from 'child_process';
+import { writeFileSync, mkdtempSync, rmSync } from 'fs';
+import { tmpdir } from 'os';
+import { createRequire } from 'module';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const component = readFileSync(path.join(root, 'lib', 'js-runner-source.ts'), 'utf8');
@@ -28,8 +32,32 @@ const TIMEOUT = Number((component.match(/const RUN_TIMEOUT_MS = (\d+);/) || [])[
 const MAX_LOGS = Number((component.match(/const RUN_MAX_LOGS = (\d+);/) || [])[1]);
 if (!TIMEOUT || !MAX_LOGS) { console.error('FAIL  could not read RUN_TIMEOUT_MS / RUN_MAX_LOGS'); process.exit(1); }
 
-// The component interpolates RUN_MAX_LOGS into the template literal; do the same.
-const runnerSource = m[1].replace(/\$\{RUN_MAX_LOGS\}/g, String(MAX_LOGS));
+// The limits still come from the file text above, but the runner body must be
+// COMPILED: reading the template literal out by regex hands back the source with
+// its backslash escapes still doubled, which is not the JavaScript a browser
+// runs and does not even parse. Same approach as test-js-docs.mjs.
+const runnerSource = readRunnerSource();
+if (runnerSource === null) {
+  console.error('FAIL  lib/js-runner-source.ts did not compile');
+  process.exit(1);
+}
+
+function readRunnerSource() {
+  const dir = mkdtempSync(path.join(tmpdir(), 'shcode-runner-timeout-'));
+  try {
+    execFileSync(process.execPath, [
+      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
+      'lib/js-runner-source.ts', '--outDir', dir, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
+    ], { cwd: root, stdio: 'ignore' });
+    writeFileSync(path.join(dir, 'package.json'), '{"type":"commonjs"}');
+    const req = createRequire(path.join(dir, 'noop.cjs'));
+    return req(path.join(dir, 'js-runner-source.js')).RUNNER_SOURCE;
+  } catch {
+    return null;
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
 
 const SHIM = `
 import { parentPort } from 'worker_threads';

@@ -30,18 +30,18 @@ Same idea for plain objects. The `...` inside `{...}` copies every key-value pai
 **Try it:** Predict what each `console.log` will print, then run it.
 
 ```js live plain
-var scores = [90, 85, 78];
+let scores = [90, 85, 78];
 
 // Make a copy, then change the copy
-var scoresCopy = [...scores];
+let scoresCopy = [...scores];
 scoresCopy.push(100);
 
 console.log("original:", scores);    // [90, 85, 78]: unchanged
 console.log("copy:", scoresCopy);    // [90, 85, 78, 100]
 
 // Object copy works the same way
-var student = { name: "Alex", grade: "A" };
-var studentCopy = { ...student };
+let student = { name: "Alex", grade: "A" };
+let studentCopy = { ...student };
 studentCopy.grade = "B";
 
 console.log("original student:", student.grade);   // A: unchanged

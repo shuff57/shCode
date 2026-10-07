@@ -1,4 +1,4 @@
-// 2.2.4d Lab: Two sprites, two property values.
+// 5.3.10 Lab: Two sprites, two property values.
 
 class Box {
   constructor(c) {

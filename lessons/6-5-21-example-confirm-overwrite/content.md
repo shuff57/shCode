@@ -53,7 +53,7 @@ The problem: press S again and the previous save is silently replaced. No warnin
 
 ## Step 2: Detect when a slot is already occupied
 
-Before saving, check if the slot has data. If it does, enter a "confirmation" state instead of saving immediately.
+Before saving, check if the slot has data. If it does, enter a "confirmation" state instead of saving immediately. (`millis()` is the number of milliseconds since the sketch started; subtracting an earlier reading from the current one measures elapsed time.)
 
 ```js live
 let player;
@@ -212,7 +212,7 @@ function drawConfirmation() {
 
 ## Step 4: Add a visual timer and polish
 
-Show a shrinking bar that indicates how much time is left to decide. Freeze the player during confirmation.
+Show a shrinking bar that indicates how much time is left to decide. Freeze the player during confirmation. `map(value, a, b, c, d)` rescales a number from the range a to b onto the range c to d (here, time left becomes bar width), and `round(n)` rounds to a whole number.
 
 ```js live
 let player;

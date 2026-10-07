@@ -1,7 +1,7 @@
 {
   "id": "3-2-7-lab-rectangle-area",
-  "title": "3.2.7 Lab: findRectangleArea (multi-parameter)",
-  "description": "Define findRectangleArea(width, height) that returns the area, then call it and log the result. Auto-graded.",
+  "title": "3.2.9 Lab: findRectangleArea (multi-parameter)",
+  "description": "Define findRectangleArea(width, height) that works out the area and prints it, then call it twice. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -9,7 +9,8 @@
   "preview": "console",
   "week": 7,
   "slos": [
-    "SLO-2"
+    "SLO-2",
+    "SLO-3"
   ],
   "steps": [
     {
@@ -19,55 +20,150 @@
     },
     {
       "id": "s2",
-      "title": "Return the area",
-      "instructions": "Inside the function, hand back the area by returning width multiplied by height. Use return, not console.log, so the caller receives a number."
+      "title": "Print the area",
+      "instructions": "Inside the function, multiply width by height and print the answer with console.log in exactly this form: Area: 12 (the word Area, a colon, a space, then the number). This lab asks you to print inside the function; handing a value back with return is covered later, in 3.2.11."
     },
     {
       "id": "s3",
-      "title": "Call it and log the result",
-      "instructions": "Call findRectangleArea with two numbers, store or pass the result, and use console.log to print it. Try a second call with different numbers."
+      "title": "Call it twice",
+      "instructions": "Call findRectangleArea with two numbers, then call it again with two different numbers. Each call prints its own area."
     }
   ],
   "requirements": [
     {
       "id": "r1",
       "title": "findRectangleArea defined",
-      "description": "Code defines a function named findRectangleArea",
+      "description": "Code defines a function named findRectangleArea. Help: 3.2.2 (Parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+findRectangleArea\\s*\\(",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r2",
       "title": "two parameters",
-      "description": "findRectangleArea is defined with two parameters",
+      "description": "findRectangleArea is defined with two parameters. Help: 3.2.2 (Parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+findRectangleArea\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*,\\s*[A-Za-z_$][\\w$]*\\s*\\)",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r3",
-      "title": "returns a value",
-      "description": "Code contains a return statement",
-      "type": "regex",
+      "title": "prints the area",
+      "description": "findRectangleArea prints with console.log inside its body. Help: 3.2.2 (Parameters)",
+      "type": "inFunction",
       "file": "script.js",
-      "pattern": "return\\s",
-      "flags": "i",
-      "points": 0
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "function": "findRectangleArea"
     },
     {
       "id": "r4",
-      "title": "result is logged",
-      "description": "Code calls console.log",
+      "title": "called twice with two numbers",
+      "description": "findRectangleArea is called at least twice, each with two arguments. Help: 3.2.2 (Parameters)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(",
-      "flags": "i",
+      "pattern": "^\\s*findRectangleArea\\s*\\(\\s*-?[\\w.]+[^,()]*,\\s*-?[\\w.]+[^()]*\\)[\\s\\S]*^\\s*findRectangleArea\\s*\\(\\s*-?[\\w.]+[^,()]*,\\s*-?[\\w.]+[^()]*\\)",
+      "flags": "m",
+      "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "the body multiplies width by height",
+      "description": "Inside the function, two names are multiplied (width * height). Help: 3.2.2 (Parameters)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "findRectangleArea",
+      "pattern": "[A-Za-z_$][\\w$]*\\s*\\*\\s*[A-Za-z_$][\\w$]*",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "t1",
+      "title": "prints the right area for any size",
+      "description": "Called with different widths and heights, findRectangleArea prints one line, Area: followed by width times height. Help: 3.2.2 (Parameters)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "findRectangleArea",
+      "points": 0,
+      "hint": "Print one line shaped like Area: 12 each time the function runs: the word Area, a colon, a space, then width * height.",
+      "cases": [
+        {
+          "args": [
+            3,
+            4
+          ],
+          "expectOutput": [
+            "Area: 12"
+          ]
+        },
+        {
+          "args": [
+            5,
+            5
+          ],
+          "expectOutput": [
+            "Area: 25"
+          ]
+        },
+        {
+          "args": [
+            2,
+            7
+          ],
+          "expectOutput": [
+            "Area: 14"
+          ]
+        },
+        {
+          "args": [
+            10,
+            2
+          ],
+          "expectOutput": [
+            "Area: 20"
+          ]
+        },
+        {
+          "args": [
+            0,
+            6
+          ],
+          "expectOutput": [
+            "Area: 0"
+          ],
+          "description": "a side of 0"
+        },
+        {
+          "args": [
+            1.5,
+            4
+          ],
+          "expectOutput": [
+            "Area: 6"
+          ],
+          "hidden": true
+        },
+        {
+          "args": [
+            8,
+            3
+          ],
+          "expectOutput": [
+            "Area: 24"
+          ],
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

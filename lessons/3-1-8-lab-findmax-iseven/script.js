@@ -1,4 +1,4 @@
-// 1.3.1g findMax & isEven
+// 3.2.26 findMax & isEven
 
 // STEP 1: Define a function called findMax that takes two parameters: a and b.
 //         Inside the function, compare a and b.

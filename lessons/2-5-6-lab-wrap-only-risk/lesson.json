@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "for loop present",
-      "description": "The loop that computes the total is still in the file",
+      "description": "The loop that computes the total is still in the file. Help: 2.2.9 (The for Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -37,11 +37,11 @@
     },
     {
       "id": "r2",
-      "title": "total logged after catch",
-      "description": "The total is logged after the catch block, not inside the try",
+      "title": "loop runs before try; total logged after catch",
+      "description": "The total is logged after the catch block, not inside the try. Help: 2.5.4 (try...catch: Attempt and Recover)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "catch[\\s\\S]*console\\.log\\s*\\([\\s\\S]*total",
+      "pattern": "^(?=[\\s\\S]*let\\s+total\\s*=\\s*0\\s*;[\\s\\S]*\\bfor\\s*\\([\\s\\S]*\\btry\\s*\\{)(?![\\s\\S]*\\btry\\s*\\{[^}]*\\bfor\\s*\\()(?![\\s\\S]*\\btry\\s*\\{[^}]*console\\.log\\s*\\([^)]*total)[\\s\\S]*\\}\\s*catch\\s*\\([^)]*\\)\\s*\\{[^}]*\\}[\\s\\S]*console\\.log\\s*\\([^)]*total",
       "flags": "i",
       "points": 0
     }

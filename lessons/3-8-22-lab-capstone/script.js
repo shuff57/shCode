@@ -12,5 +12,5 @@
 //         the defaults from the catch block if the text will not parse.
 
 // STEP 4: Call save with your state, then call load and use console.log to
-//         print a property of the restored object. Run it again and note the
-//         value persists between runs.
+//         print a property of the restored object. Check that the
+//         value you print is the one you saved.

@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "pop() calls this.sprite.delete()",
-      "description": "Write a `pop()` method inside `Bubble` that calls `this.sprite.delete()` to remove the wrapped sprite.",
+      "description": "Write a `pop()` method inside `Bubble` that calls `this.sprite.delete()` to remove the wrapped sprite. Help: 5.2.10 (Cleanup and Delete)",
       "type": "regex",
       "file": "script.js",
       "pattern": "pop[\\s\\S]*this\\.sprite\\.delete\\s*\\(\\s*\\)",

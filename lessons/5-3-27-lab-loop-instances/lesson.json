@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "for loop over enemies in draw()",
-      "description": "Write a `for...of` (or `for` index) loop over the `enemies` array inside `draw()`.",
+      "description": "Write a `for...of` (or `for` index) loop over the `enemies` array inside `draw()`. Help: 5.4.1 (Methods: functions that live on a class)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "Method called on loop variable",
-      "description": "Inside the loop body, call a method on the loop variable (e.g. `e.render()`).",
+      "description": "Inside the loop body, call a method on the loop variable (e.g. `e.render()`). Help: 5.4.1 (Methods: functions that live on a class)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

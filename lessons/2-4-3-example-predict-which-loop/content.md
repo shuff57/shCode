@@ -18,6 +18,8 @@ Yes: `12` is known before the loop starts, so `for` is the natural fit. A `while
 
 Now the opposite case: keep shuffling a deck until the top card happens to be an ace. Run this a few times: the number of shuffles it takes changes every time.
 
+The only new piece is `Math.random()`, which gives a different decimal between 0 and 1 on every run; `Math.floor(Math.random() * 13)` turns that into a random whole number from 0 to 12. You do not have to write that line yourself: read it as "pick a random card" and watch what the loop does with it.
+
 ```js live plain
 let topCard = Math.floor(Math.random() * 13); // 0 = ace
 let shuffles = 0;

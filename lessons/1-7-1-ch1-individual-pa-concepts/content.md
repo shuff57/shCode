@@ -5,9 +5,11 @@ from the chapter, five where you read a short program and say what it prints.
 
 **This one is a test, so it does not behave like the quizzes.**
 
-- **You submit once.** When you press submit the paper locks and does not reopen.
-- **Nothing is marked on screen.** No green, no red, no notes explaining the
-  answer. Your teacher hands the score back.
+- **You get three tries.** Submit, see your total, change your answers and submit
+  again. Your best try is the one that counts.
+- **Between tries you see only your total.** No green, no red, no notes on which
+  questions were wrong. After your third try the marking and the explanations
+  appear once your teacher releases them.
 - **Submitting is what unlocks Part 2**, not passing. Answer everything, submit,
   and move on.
 

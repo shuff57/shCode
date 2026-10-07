@@ -33,6 +33,8 @@ Anyone who can read English can follow that, including someone who has never wri
 
 The pseudocode above, turned into JavaScript almost line for line. Watch the indentation survive the translation.
 
+*(Read it, do not write it yet: `while (i <= 5) { ... }` repeats its block for as long as the condition is true. Chapter 2 teaches loops.)*
+
 ```js live plain
 let total = 0;              // set total to 0
 let i = 1;                  // set i to 1

@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "switch statement present",
-      "description": "Code still contains a switch statement",
+      "description": "Code still contains a switch statement. Help: 2.3.9 (break and Fall-Through)",
       "type": "regex",
       "file": "script.js",
       "pattern": "switch\\s*\\(",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "break added after the apple case",
-      "description": "A break statement now appears between the apple case and the banana case",
+      "description": "A break statement now appears between the apple case and the banana case. Help: 2.3.9 (break and Fall-Through)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]apple['\"]\\s*:[\\s\\S]*?break[\\s\\S]*?case\\s*['\"]banana['\"]",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "default label still present",
-      "description": "Code still contains a default label",
+      "description": "Code still contains a default label. Help: 2.3.9 (break and Fall-Through)",
       "type": "regex",
       "file": "script.js",
       "pattern": "default\\s*:",

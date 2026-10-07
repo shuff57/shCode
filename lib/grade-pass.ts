@@ -65,3 +65,30 @@ export function isPassingSubmission(
     criteria: criteria as PassCriterion[],
   });
 }
+
+/**
+ * A pass/fail rubric's score as a number: each criterion met counts 1, partial 0.5,
+ * missing 0, out of `criteria.length`.
+ *
+ * WHY. A 0-point rubric stores `totalEarned = 0` whatever the verdicts say, so a
+ * completed part with that score and a NULL maxScore reads as 100% in lessonPercent()
+ * -- three junk answers on a group demo graded full marks. Counting the verdicts gives
+ * the part a real fraction: the manifest's maxScore for such a part is the number of
+ * criteria (scripts/generate-lessons-manifest.mjs, app/page.tsx). Partial is half so a
+ * half-covered paper is not graded as a pass-and-a-bit; the separate pass rule above
+ * (ceil(n/2) criteria met or partial) is unchanged and still decides "struggling".
+ */
+export function criteriaScore(criteria: ReadonlyArray<{ verdict: string }> | null | undefined): number {
+  if (!Array.isArray(criteria)) return 0;
+  let n = 0;
+  for (const c of criteria) {
+    if (c && c.verdict === 'met') n += 1;
+    else if (c && c.verdict === 'partial') n += 0.5;
+  }
+  return n;
+}
+
+/** Does a rubric carry no points at all (a pass/fail rubric)? */
+export function isPassFailRubric(rubric: ReadonlyArray<{ points?: number }> | null | undefined): boolean {
+  return Array.isArray(rubric) && rubric.length > 0 && rubric.every((r) => !(typeof r?.points === 'number' && r.points > 0));
+}

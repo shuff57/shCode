@@ -23,6 +23,8 @@ The abstraction row is the interesting one. A strong player is not tracking all 
 
 ## Step 3: The abstraction, made concrete
 
+*(Read it, do not write it yet: `[ ... ]` is a list of values, `relevant[i]` is the item at position `i` counting from 0, `.length` is how many items there are, and `for` repeats its block once per position. Chapter 2 teaches all of this.)*
+
 ```js live plain
 // The full board state is 64 squares. The abstraction is: which
 // pieces actually bear on the decision in front of me?

@@ -36,10 +36,10 @@
     {
       "id": "r1",
       "title": "typeof a string",
-      "description": "Logs the type of a quoted piece of text, either inline or via a variable holding one",
+      "description": "Logs the type of a quoted piece of text, either inline or via a variable holding one. Help: 1.2.23 (The typeof Operator)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*[\"'][^\"']*[\"']|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*[\"'][^\"']*[\"']\\s*;?[\\s\\S]*?console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*\\1\\b",
+      "pattern": "console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*[\"'`]|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*[\"'`][^\"'`]*[\"'`]\\s*;?[\\s\\S]*?console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*\\1\\b|(?:let|const|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*typeof\\s*\\(?\\s*[\"'`]",
       "flags": "",
       "hint": "No line logs the type of quoted text yet. Put the quotes straight inside typeof, or use the name of a variable you set to a string.",
       "points": 0
@@ -47,10 +47,10 @@
     {
       "id": "r2",
       "title": "typeof a number",
-      "description": "Logs the type of a plain number, either inline or via a variable holding one",
+      "description": "Logs the type of a plain number, either inline or via a variable holding one. Help: 1.2.23 (The typeof Operator)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*\\d|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*-?[\\d.]+\\s*;?[\\s\\S]*?console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*\\1\\b",
+      "pattern": "console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*-?\\d|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*-?[\\d.]+\\s*;?[\\s\\S]*?console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*\\1\\b|(?:let|const|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*typeof\\s*\\(?\\s*-?\\d",
       "flags": "",
       "hint": "No line logs the type of a number yet. Put the number straight inside typeof, or use the name of a variable you set to one.",
       "points": 0
@@ -58,10 +58,10 @@
     {
       "id": "r3",
       "title": "typeof true",
-      "description": "Logs the type of a boolean, either inline or via a variable holding true/false",
+      "description": "Logs the type of a boolean, either inline or via a variable holding true/false. Help: 1.2.23 (The typeof Operator)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*true|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:true|false)\\s*;?[\\s\\S]*?console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*\\1\\b",
+      "pattern": "console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*(?:true|false)\\b|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:true|false)\\s*;?[\\s\\S]*?console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*\\1\\b|(?:let|const|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*typeof\\s*\\(?\\s*(?:true|false)\\b",
       "flags": "",
       "hint": "No line logs the type of true yet. Put true straight inside typeof, or use the name of a variable you set to true or false.",
       "points": 0
@@ -69,10 +69,10 @@
     {
       "id": "r4",
       "title": "typeof undefined",
-      "description": "Logs the type of undefined, either inline or via a variable left unassigned",
+      "description": "Logs the type of undefined, either inline or via a variable left unassigned. Help: 1.2.20 (The undefined Value)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*undefined|(?:let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?:=\\s*undefined)?\\s*(?:;|\\n|$)[\\s\\S]*?console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*\\1\\b",
+      "pattern": "console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*undefined|(?:let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?:=\\s*undefined)?\\s*(?:;|\\n|$)[\\s\\S]*?console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*\\1\\b|(?:let|const|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*typeof\\s*\\(?\\s*undefined",
       "flags": "",
       "hint": "No line logs the type of undefined yet. Put undefined straight inside typeof, or use the name of a variable you declared with let and never gave a value.",
       "points": 0
@@ -80,10 +80,10 @@
     {
       "id": "r5",
       "title": "typeof null",
-      "description": "Logs the type of null: the answer that is a known bug: either inline or via a variable holding null",
+      "description": "Logs the type of null: the answer that is a known bug: either inline or via a variable holding null. Help: 1.2.19 (The null Value)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*null|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*null\\s*;?[\\s\\S]*?console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*\\1\\b",
+      "pattern": "console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*null|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*null\\s*;?[\\s\\S]*?console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*\\1\\b|(?:let|const|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*typeof\\s*\\(?\\s*null",
       "flags": "",
       "hint": "No line logs the type of null yet. Put null straight inside typeof, or use the name of a variable you set to null.",
       "points": 0
@@ -91,10 +91,10 @@
     {
       "id": "r6",
       "title": "typeof an object",
-      "description": "Logs the type of an object written with curly braces, either inline or via a variable holding one",
+      "description": "Logs the type of an object written with curly braces, either inline or via a variable holding one. Help: 1.2.23 (The typeof Operator)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*\\{|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*\\{[\\s\\S]*?console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*\\1\\b",
+      "pattern": "console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*\\{|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*\\{[\\s\\S]*?console\\.log\\s*\\((?:[^;\"'`]|\"[^\"]*\"|'[^']*'|`[^`]*`|`(?:[^`$]|\\$(?!\\{))*\\$\\{[^}`]*)*?\\btypeof\\s*\\(?\\s*\\1\\b|(?:let|const|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*typeof\\s*\\(?\\s*\\{",
       "flags": "",
       "hint": "No line logs the type of an object yet. If a variable holds your object, log typeof followed by that variable's own name -- not the name of a property inside it.",
       "points": 0

@@ -41,7 +41,7 @@
       "description": "An if statement tests score",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*console\\.log[^}]*\\}",
+      "pattern": "if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*(?:console\\.log|\\w+\\s*=\\s*[\"'`])[^}]*\\}",
       "flags": "i",
       "points": 0
     },
@@ -51,7 +51,7 @@
       "description": "An else if chain with at least two branches, each testing score against a real cutoff and logging",
       "type": "regex",
       "file": "script.js",
-      "pattern": "else\\s+if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*console\\.log[^}]*\\}[\\s\\S]*else\\s+if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*console\\.log[^}]*\\}",
+      "pattern": "else\\s+if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*(?:console\\.log|\\w+\\s*=\\s*[\"'`])[^}]*\\}[\\s\\S]*else\\s+if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*(?:console\\.log|\\w+\\s*=\\s*[\"'`])[^}]*\\}",
       "flags": "i",
       "points": 0
     },

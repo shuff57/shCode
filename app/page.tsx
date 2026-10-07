@@ -2,6 +2,7 @@ import LessonSearchFilter from '../components/LessonSearchFilter';
 import { loadLessons } from '../lib/lessons';
 import { listUnits } from '../lib/curriculum';
 import type { Lesson } from '../lib/types';
+import { formQuestionCount } from '../lib/quiz-variant';
 
 // The home page draws cards. A card shows a title, a description, a badge and
 // a due chip -- it never touches a lesson's quiz, its grading rubric, its
@@ -31,17 +32,27 @@ import type { Lesson } from '../lib/types';
 // completion by actual score instead of flat done/not-done -- see
 // lib/progress.ts lessonPercent().
 function maxScoreFor(l: Lesson): number | null {
-  if (l.quiz && l.quiz.questions.length > 0) return l.quiz.questions.length;
-  if (l.aiGrader) {
-    const total = l.aiGrader.rubric.reduce((sum, r) => sum + r.points, 0);
-    if (total > 0) return total; // 0 = pass/fail rubric, treated as binary
+  if (l.quiz && l.quiz.questions.length > 0) return formQuestionCount(l.quiz);
+  if (l.grading?.formative) return null;
+  const g = l.aiGrader ?? l.diagram?.aiGrader;
+  if (g) {
+    const total = g.rubric.reduce((sum, r) => sum + r.points, 0);
+    if (total > 0) return total;
+    // 0 = pass/fail rubric: criteria met out of criteria total, the same number the server
+    // stores as the best (lib/grade-pass.ts criteriaScore; scripts/generate-lessons-manifest.mjs).
+    if (g.rubric.length > 0) return g.rubric.length;
   }
   return null;
 }
 
+// scoreKind decides the GRADE CATEGORY (lib/grading-weights.ts: 'written' beats an
+// assignmentCode's 'lab'), so it stays rubric-POINTS based: a pass/fail rubric gets a
+// maxScore for its percent (above) but must not move from Lab to Written.
 function scoreKindFor(l: Lesson): 'quiz' | 'written' | null {
   if (l.quiz && l.quiz.questions.length > 0) return 'quiz';
-  if (l.aiGrader && l.aiGrader.rubric.reduce((sum, r) => sum + r.points, 0) > 0) return 'written';
+  if (l.grading?.formative) return null;
+  const g = l.aiGrader ?? l.diagram?.aiGrader;
+  if (g && g.rubric.reduce((sum, r) => sum + r.points, 0) > 0) return 'written';
   return null;
 }
 

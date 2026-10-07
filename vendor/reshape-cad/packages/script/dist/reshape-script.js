@@ -36,7 +36,7 @@
 // line 3 is reported at line 6, regardless of how many lines <source> has
 // or what's in it. LINE_OFFSET encodes that gap in one place rather than as
 // a magic number wherever a stack is parsed.
-import { nextId, newShape, newHole, newHoleCorners, newShell, newMove, newPattern, newSketch, RECTANGLE_CONSTRAINTS, newExtrude, newRevolve, newGroove, newPocket, newMirror, newBlend, extentAlong, isRoundable, canRotate, whyCannotRound, whyCannotOrbit, } from './model-types.js';
+import { nextId, newShape, newHole, newHoleCorners, newShell, newMove, newPattern, newSketch, newSketchOnFace, newDatum, RECTANGLE_CONSTRAINTS, newExtrude, newRevolve, newGroove, newPocket, newMirror, newBlend, extentAlong, throughExtentAlong, extentBoundAlong, holeAxialOffset, isRoundable, canRotate, whyCannotRound, whyCannotOrbit, } from './model-types.js';
 import { generatedParams, applyParam, pname } from './model-codegen.js';
 // addConstraintSettling is the SAME beginner-friendly settle a click on the
 // Rules panel runs through (components/model/SketchConstraints.tsx's own
@@ -47,7 +47,8 @@ import { generatedParams, applyParam, pname } from './model-codegen.js';
 // `describe` is aliased -- this file already has its own local `describe()`
 // for error messages (line 296), unrelated to sketch-solve.ts's constraint-
 // naming one ("edge 1 = edge 2").
-import { addConstraintSettling, seedForNewRule, solveSketch, collapsedByRatio, describe as describeConstraint, } from '@shuff57/reshape-sketch/sketch-solve';
+import { addConstraintSettling, seedForNewRule, solveSketch, collapsedByRatio, describe as describeConstraint, buildSlotRows, } from '@shuff57/reshape-sketch/sketch-solve';
+import { outlineOf } from '@shuff57/reshape-sketch/sketch-arc';
 /**
  * Every top-level name a reSHape script can call, in the exact order
  * runScript() installs them -- the single source of truth for "what is the
@@ -72,7 +73,7 @@ export const VOCABULARY = [
     'prism', 'wedge', 'groove', 'pocket',
     'hole', 'holes', 'hollow', 'round', 'bevel', 'repeat', 'repeatAround', 'mirror', 'move', 'turn',
     'join', 'cut', 'keep', 'draft',
-    'sketch', 'pull', 'spin', 'blend',
+    'sketch', 'plane', 'pull', 'spin', 'blend',
     'param',
     // official geometry names (API-facing; same fns as their student alias)
     'cuboid', 'torus', 'fillet', 'chamfer',
@@ -111,8 +112,8 @@ function messageOf(err) {
 /** Classic edit distance -- insert, delete, substitute, each cost 1. Used
  *  only to find the closest VOCABULARY word to a name a script misspelled;
  *  nothing here needs to be fast, a script's undefined names are typed by
- *  hand and the candidate set is VOCABULARY's length (37 since SPEC-S2 added
- *  the official-name aliases) — small either way. */
+ *  hand and the candidate set is VOCABULARY's length (38: SPEC-S2's official-name
+ *  aliases, then SPEC-datum-family's plane) — small either way. */
 function levenshtein(a, b) {
     const rows = a.length + 1;
     const cols = b.length + 1;
@@ -326,6 +327,30 @@ function wholeIndex(fn, label, v, count) {
         throw new Error(`${fn}'s ${label} has to be a whole number from 1 to ${count} -- you gave it ${val}.`);
     }
     return val - 1;
+}
+/** A corner number as the script writes it: 1 is the first corner, the same count the Rules panel and
+ *  .pin() use. Returns the 0-based index the document stores. `count` is the sketch's corner count
+ *  (0 when it has none yet, in which case any whole number from 1 is let through). */
+function cornerIndex(fn, v, count) {
+    const val = unwrap(requiredNumber(fn, 'corner', v));
+    if (!Number.isInteger(val) || val < 1 || (count > 0 && val > count)) {
+        throw new Error(`${fn}'s corner has to be a whole number from 1${count > 0 ? ` to ${count}` : ''} (corner 1 is the first corner) -- you gave it ${val}.`);
+    }
+    return val - 1;
+}
+/** What plane() returns. Plain data in a class only so sketch() can tell it
+ *  from a hand-written frame; it is never stored in the doc. */
+class PlaneValue {
+    datumId;
+    plane;
+    offset;
+    frame;
+    constructor(datumId, plane, offset, frame) {
+        this.datumId = datumId;
+        this.plane = plane;
+        this.offset = offset;
+        this.frame = frame;
+    }
 }
 function isPlainOptions(v) {
     return !!v && typeof v === 'object' && !Array.isArray(v) && !(v instanceof Number) && !isTopoRef(v) && !isHandle(v);
@@ -592,7 +617,19 @@ export function runScript(source, opts = {}) {
     // groove(sketch, target, angle): the subtractive revolve — spin the profile
     // around the sketch plane's own normal and CUT the ring out of the target
     // solid. Mirror of spin(), with the solid it cuts named.
-    function groove(sk, target, angle) {
+    /** A word that takes no options object: a surplus argument is named, not
+     *  silently dropped. Aliases share the implementation, so the error names
+     *  the base word. */
+    function noExtraArgs(word, takes, max, extra, hint = '') {
+        if (extra.length === 0)
+            return;
+        const ord = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'];
+        const n = max + 1;
+        const which = ord[n - 1] ?? `${n}th`;
+        throw new Error(`${word}() takes ${takes}; the ${which} argument (${describe(extra[0])}) was ignored.${hint ? ' ' + hint : ''}`);
+    }
+    function groove(sk, target, angle, ...extra) {
+        noExtraArgs('groove', 'a sketch, a shape and an angle', 3, extra);
         if (!isSketchHandle(sk))
             throw new Error('groove() needs a sketch: groove(sketch1, shape, angle).');
         if (!isHandle(target))
@@ -607,7 +644,8 @@ export function runScript(source, opts = {}) {
     // straight into the target solid and CUT the block out. Mirror of pull(),
     // with the solid it cuts named. Same argument order as groove() on purpose:
     // profile first, victim second, number last.
-    function pocket(sk, target, depth) {
+    function pocket(sk, target, depth, ...extra) {
+        noExtraArgs('pocket', 'a sketch, a shape and a depth', 3, extra);
         if (!isSketchHandle(sk))
             throw new Error('pocket() needs a sketch: pocket(sketch1, shape, depth).');
         if (!isHandle(target))
@@ -620,9 +658,99 @@ export function runScript(source, opts = {}) {
     }
     // ---- sketches ---------------------------------------------------------
     const PLANE_WORD = { top: 'xy', front: 'xz', side: 'yz' };
-    function sketch(planeWord, offset) {
+    // The frame form: sketch({ origin: [x,y,z], u: [..], v: [..] }). The normal
+    // is u x v (right-handed), exactly as SketchFeature.frame defines it. A
+    // frame that is not unit-length and orthogonal is REFUSED rather than
+    // normalised or re-orthogonalised: either repair would silently change the
+    // sketch's scale or skew its outline, and a swapped u/v mirrors the part
+    // (it flips the normal) -- the student must see that, so it is documented
+    // in the error and nothing here guesses. Plain numbers only (no param()).
+    const FRAME_TOL = 1e-6;
+    function readFrame(given, fn = 'sketch') {
+        const o = readOptions(fn, ['origin', 'u', 'v'], given);
+        for (const k of ['origin', 'u', 'v']) {
+            if (o[k] === undefined) {
+                throw new Error(`${fn}({ ... }) needs origin, u and v: ${fn}({ origin: [0, 0, 0], u: [1, 0, 0], v: [0, 1, 0] }). It is missing ${k}.`);
+            }
+        }
+        const vec = (label) => {
+            const raw = readVec3(fn, label, o[label]).map((n) => unwrap(n));
+            if (!raw.every((n) => Number.isFinite(n))) {
+                throw new Error(`${fn}()'s ${label} needs three finite numbers, like [x, y, z].`);
+            }
+            return raw;
+        };
+        const origin = vec('origin');
+        const u = vec('u');
+        const v = vec('v');
+        const len = (a) => Math.hypot(a[0], a[1], a[2]);
+        for (const [label, a] of [['u', u], ['v', v]]) {
+            if (Math.abs(len(a) - 1) > FRAME_TOL) {
+                throw new Error(`${fn}()'s ${label} has to be a unit-length direction (its length is ${len(a)}, not 1). `
+                    + `Divide it by its length -- sketches are never silently rescaled.`);
+            }
+        }
+        const dot = u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+        if (Math.abs(dot) > FRAME_TOL) {
+            throw new Error(`${fn}()'s u and v have to be at right angles to each other (their dot product is ${dot}, not 0).`);
+        }
+        return { origin, u, v };
+    }
+    // plane(...): creates a `datum` feature (SPEC-datum-family Stage 3), which
+    // shows in the timeline and has no geometry. A named plane keeps its NAMED
+    // path (never a cross product: xz's u x v is -Y but it sweeps -Y on
+    // purpose); a literal frame is validated by the same readFrame
+    // sketch({...}) uses. The returned PlaneValue carries the datum id, so
+    // sketch(plane(...)) can both point at the datum (onDatum) and copy its
+    // placement into the sketch's own plane/offset/frame -- every reader and
+    // the kernel keep working from those, and the kernel ignores onDatum.
+    function plane(spec, offset) {
+        if (isPlainOptions(spec) && !(spec instanceof PlaneValue)) {
+            if (offset !== undefined) {
+                throw new Error('plane({ origin, u, v }) takes no offset: the origin already says where the plane sits.');
+            }
+            const frame = readFrame(spec, 'plane');
+            const d = newDatum(docNow());
+            d.frame = frame;
+            pushFeature(d);
+            return new PlaneValue(d.id, null, 0, frame);
+        }
+        if (typeof spec !== 'string' || !(spec in PLANE_WORD)) {
+            throw new Error(`plane() needs a plane word: 'top', 'front' or 'side' (or a frame { origin, u, v }). You gave it ${describe(spec)}.`);
+        }
+        const d = newDatum(docNow());
+        d.plane = PLANE_WORD[spec];
+        // Canonical: a named datum always carries its offset (0 when none was
+        // given), so plane('top') and plane('top', 0) are the same doc.
+        d.offset = offset === undefined ? 0 : num(requiredNumber('plane', 'offset', offset), d.id, 'offset');
+        pushFeature(d);
+        return new PlaneValue(d.id, d.plane, d.offset, null);
+    }
+    function sketch(planeWord, offset, ...extra) {
+        noExtraArgs('sketch', 'a plane and an optional offset', 2, extra);
+        if (planeWord instanceof PlaneValue) {
+            if (offset !== undefined) {
+                throw new Error('sketch(plane(...)) takes no offset: give the offset to plane(), like plane(\'top\', 10).');
+            }
+            const f = planeWord.frame
+                ? newSketchOnFace(docNow(), { origin: [...planeWord.frame.origin], u: [...planeWord.frame.u], v: [...planeWord.frame.v] })
+                : newSketch(docNow(), planeWord.plane);
+            if (!planeWord.frame)
+                f.offset = planeWord.offset ?? 0;
+            f.onDatum = planeWord.datumId;
+            pushFeature(f);
+            return makeSketchHandle(f.id);
+        }
+        if (isPlainOptions(planeWord)) {
+            if (offset !== undefined) {
+                throw new Error('sketch({ origin, u, v }) takes no offset: the origin already says where the plane sits.');
+            }
+            const f = newSketchOnFace(docNow(), readFrame(planeWord));
+            pushFeature(f);
+            return makeSketchHandle(f.id);
+        }
         if (typeof planeWord !== 'string' || !(planeWord in PLANE_WORD)) {
-            throw new Error(`sketch() needs a plane word: 'top', 'front' or 'side'. You gave it ${describe(planeWord)}.`);
+            throw new Error(`sketch() needs a plane word: 'top', 'front' or 'side' (or a frame { origin, u, v }). You gave it ${describe(planeWord)}.`);
         }
         const plane = PLANE_WORD[planeWord];
         const f = newSketch(docNow(), plane);
@@ -919,17 +1047,17 @@ export function runScript(source, opts = {}) {
                 return handle;
             },
             round(corner, radius) {
-                const k = requiredNumber('.round()', 'corner', corner);
-                const r = requiredNumber('.round()', 'radius', radius);
                 const cur = findFeature(id);
+                const k = cornerIndex('.round()', corner, cur.points?.length ?? 0);
+                const r = requiredNumber('.round()', 'radius', radius);
                 const rounds = { ...(cur.rounds ?? {}), [k]: num(r, id, `r${k}`) };
                 replaceFeature(id, { ...cur, rounds });
                 return handle;
             },
             chamfer(corner, distance) {
-                const k = requiredNumber('.chamfer()', 'corner', corner);
-                const dist = requiredNumber('.chamfer()', 'distance', distance);
                 const cur = findFeature(id);
+                const k = cornerIndex('.chamfer()', corner, cur.points?.length ?? 0);
+                const dist = requiredNumber('.chamfer()', 'distance', distance);
                 const chamfers = { ...(cur.chamfers ?? {}), [k]: dist };
                 replaceFeature(id, { ...cur, chamfers });
                 return handle;
@@ -1168,10 +1296,43 @@ export function runScript(source, opts = {}) {
                 replaceFeature(id, { ...cur, rules: out });
                 return handle;
             },
+            slot(a, b, r) {
+                const cA = readVec2('.slot()', 'a (one end cap centre)', a);
+                const cB = readVec2('.slot()', 'b (the other end cap centre)', b);
+                const rp = positiveNumber('.slot()', 'radius', r);
+                const rv = unwrap(rp);
+                if (cA[0] === cB[0] && cA[1] === cB[1]) {
+                    throw new Error(`.slot() needs two different end centres -- a and b are both [${cA[0]}, ${cA[1]}], which holds no slot.`);
+                }
+                const cur = findFeature(id);
+                const geoms = (cur.geoms ?? cur.geom ?? []);
+                // Continue the sketch's dense 1-based ids (SPEC-sketcher2 §2.1).
+                const base = geoms.reduce((m, g) => Math.max(m, g.id), 0) + 1;
+                const built = buildSlotRows(cA, cB, rv, base);
+                if (!built) {
+                    throw new Error(`.slot() could not build a slot from centres [${cA}] and [${cB}] with radius ${rv}.`);
+                }
+                // r may be a param(): num() records the slot-key -> name binding the
+                // round trip re-binds through, one per arc (both arcs share the value).
+                for (const g of built.geoms) {
+                    if (g.k === 'arc') {
+                        num(rp, id, `g${g.id}r`);
+                        g.r = rv;
+                    }
+                }
+                const rules = (cur.rules ?? []);
+                const outGeoms = [...geoms, ...built.geoms];
+                replaceFeature(id, {
+                    ...cur, geoms: outGeoms, geom: outGeoms,
+                    rules: [...rules, ...built.rules],
+                });
+                return handle;
+            },
         };
         return handle;
     }
-    function pull(sk, height) {
+    function pull(sk, height, ...extra) {
+        noExtraArgs('pull', 'a sketch and a height', 2, extra, 'To move the result, use move(...).');
         if (!isSketchHandle(sk))
             throw new Error(`pull() needs a sketch: pull(sketch('top'), height).`);
         requiredNumber('pull', 'height', height);
@@ -1180,7 +1341,8 @@ export function runScript(source, opts = {}) {
         pushFeature(f);
         return makeSolidHandle(f);
     }
-    function spin(sk, angle) {
+    function spin(sk, angle, ...extra) {
+        noExtraArgs('spin', 'a sketch and an angle', 2, extra, 'To move the result, use move(...).');
         if (!isSketchHandle(sk))
             throw new Error(`spin() needs a sketch: spin(sketch('top'), angle).`);
         requiredNumber('spin', 'angle', angle);
@@ -1195,7 +1357,8 @@ export function runScript(source, opts = {}) {
     // third argument sets sk2's offset to sk1's offset + gap rather than being
     // stored anywhere new. toScript() reverses this by emitting the CURRENT
     // difference, so the two are exact inverses of each other.
-    function blend(a, b, gap) {
+    function blend(a, b, gap, ...extra) {
+        noExtraArgs('blend', 'two sketches and a gap', 3, extra);
         if (!isSketchHandle(a) || !isSketchHandle(b)) {
             throw new Error('blend() needs two sketches: blend(sketch1, sketch2, gap).');
         }
@@ -1243,10 +1406,117 @@ export function runScript(source, opts = {}) {
         }
         return { axis, center };
     }
+    /** SPEC-brep-feature-provenance 5.2b: parse the recess options onto the hole.
+     *
+     *  The split of responsibility is deliberate and is not re-argued per option.
+     *  This validates only what is nonsensical REGARDLESS of geometry: types,
+     *  positivity, an included angle over 90, and the two being mutually exclusive.
+     *  Genuine geometric degeneracy -- a counterbore wider than its bore, or deeper
+     *  than it -- is deliberately NOT checked here. That has to reach the kernel
+     *  and come back as a refusal sentence, because a script error would tell the
+     *  student they typed something malformed, when in fact they asked for
+     *  something impossible. Both answers are correct; they answer different
+     *  questions.
+     *
+     *  The kernel has cut both recesses since 37c6091 and 8abd28f; until this
+     *  existed nothing in the language could ask for them.
+     */
+    function applyRecess(fn, base, extra) {
+        const cb = extra.counterbore;
+        const cs = extra.countersink;
+        if (cb !== undefined && cs !== undefined) {
+            throw new Error(`${fn}(): a hole takes a counterbore OR a countersink, not both -- one mouth, one shape.`);
+        }
+        if (cb !== undefined) {
+            const o = readOptions('counterbore', ['across', 'deep'], cb);
+            if (o.across === undefined) {
+                throw new Error(`${fn}(): counterbore needs { across: <number> } for the recess's diameter.`);
+            }
+            if (o.deep === undefined) {
+                throw new Error(`${fn}(): counterbore needs { deep: <number> } for how far the recess is cut.`);
+            }
+            base.counterbore = {
+                diameter: num(positiveNumber(fn, 'counterbore across', o.across), base.id, 'diameter'),
+                depth: num(positiveNumber(fn, 'counterbore deep', o.deep), base.id, 'depth'),
+            };
+        }
+        if (cs !== undefined) {
+            const o = readOptions('countersink', ['across', 'angle'], cs);
+            if (o.across === undefined) {
+                throw new Error(`${fn}(): countersink needs { across: <number> } for its width at the mouth.`);
+            }
+            if (o.angle === undefined) {
+                throw new Error(`${fn}(): countersink needs { angle: <number> } for the included cone angle (90 is the usual choice).`);
+            }
+            const angleDeg = num(positiveNumber(fn, 'countersink angle', o.angle), base.id, 'angleDeg');
+            if (angleDeg > 90) {
+                throw new Error(`${fn}(): a countersink's angle is its INCLUDED cone angle, so 90 is the widest -- got ${angleDeg}.`);
+            }
+            base.countersink = {
+                diameter: num(positiveNumber(fn, 'countersink across', o.across), base.id, 'diameter'),
+                angleDeg,
+            };
+        }
+    }
+    /** Depth for a hole with no deep: -- it must go THROUGH. Never a guess: a
+     *  shape whose thickness cannot be bounded is a script error, because the
+     *  old flat 10 mm default silently drilled a blind hole into thicker parts. */
+    function throughDepth(fn, target, axis) {
+        const extent = throughExtentAlong(docNow(), target.id, axis);
+        if (extent == null) {
+            throw new Error(`${fn}() cannot find how thick this ${findFeature(target.rootId).kind} is along ${axis} yet, so it cannot drill all the way through. Give it a depth: ${fn}(shape, { across: 4, deep: 20 }).`);
+        }
+        return extent + 2;
+    }
+    /** A blind `deep:` must START AT THE DRILLED FACE: the kernel centres a hole's
+     *  tool on the target's bbox centre, so the axial component of center is set
+     *  to (thickness - deep) / 2 (see holeAxialOffset). That needs the EXACT
+     *  thickness:
+     *   - exact: the offset is set.
+     *   - only an upper bound (a cut result, a prism across its corners): a deep
+     *     that stops short of the bound cannot be placed, so it is a plain error --
+     *     a wrong offset would float a cavity or start the hole short of the face.
+     *   - nothing known (a rotated shape, a polar pattern ...): the offset stays 0
+     *     and the hole is centred. That still builds, and the kernel refuses a
+     *     tool that would leave a sealed cavity inside the part, so the student
+     *     gets a sentence rather than a wrong solid (pinned in
+     *     silent-noop-errors.test.mjs and hole-extent-extrude.test.mjs). */
+    function blindOffset(fn, target, axis, deep, center) {
+        const off = holeAxialOffset(docNow(), target.id, axis, deep);
+        if (off != null) {
+            center[axis === 'x' ? 0 : axis === 'y' ? 1 : 2] = off;
+            return;
+        }
+        const known = extentBoundAlong(docNow(), target.id, axis);
+        if (known && !known.exact) {
+            throw new Error(`${fn}() cannot find where the top of this ${findFeature(target.rootId).kind} is along ${axis} exactly, so a hole that stops short of the other side cannot start at the top. Make it go all the way through (leave out deep:, or give a deep: at least ${known.extent}), or drill the shape before it is cut.`);
+        }
+    }
+    // ISO 273 medium-fit clearance diameters (mm), M3..M12. A CLEARANCE table
+    // (the bolt passes through), not a tap drill. `size:` is interpret-time
+    // sugar: it resolves to `across` here and the name is never persisted, so
+    // toScript emits the resolved across, like the name aliases.
+    const HOLE_SIZES = {
+        M3: 3.4, M4: 4.5, M5: 5.5, M6: 6.6, M8: 9, M10: 11, M12: 13.5,
+    };
+    function resolveHoleSize(fn, extra) {
+        if (extra.size === undefined)
+            return;
+        if (extra.across !== undefined) {
+            throw new Error(`${fn}() takes { size: 'M6' } OR { across: 6.6 }, not both -- size is a name for an across.`);
+        }
+        const key = typeof extra.size === 'string' ? extra.size.trim().toUpperCase() : '';
+        if (!Object.prototype.hasOwnProperty.call(HOLE_SIZES, key)) {
+            throw new Error(`${fn}() does not know the size ${describe(extra.size)}. Sizes are ${Object.keys(HOLE_SIZES).join(', ')} (clearance holes), or give { across: <number> }.`);
+        }
+        extra.across = HOLE_SIZES[key];
+        delete extra.size;
+    }
     function hole(target, opts) {
         if (!isHandle(target))
             throw new Error('hole() needs a shape to drill into: hole(shape, { across: 6 }).');
-        const extra = readOptions('hole', ['across', 'deep', 'at', 'along'], opts);
+        const extra = readOptions('hole', ['across', 'size', 'deep', 'at', 'along', 'counterbore', 'countersink'], opts);
+        resolveHoleSize('hole', extra);
         if (extra.across === undefined)
             throw new Error('hole() needs { across: <number> } for the bit\'s diameter.');
         const across = positiveNumber('hole', 'across', extra.across);
@@ -1256,12 +1526,13 @@ export function runScript(source, opts = {}) {
         base.diameter = num(across, base.id, 'diameter');
         if (extra.deep !== undefined) {
             base.depth = num(positiveNumber('hole', 'deep', extra.deep), base.id, 'depth');
+            blindOffset('hole', target, axis, base.depth, center);
         }
         else {
-            const extent = extentAlong(docNow(), target.id, axis);
-            base.depth = extent != null ? extent + 2 : 10;
+            base.depth = throughDepth('hole', target, axis);
         }
         base.center = center;
+        applyRecess('hole', base, extra);
         pushFeature(base);
         mutateHandle(target, base);
         return target;
@@ -1269,7 +1540,8 @@ export function runScript(source, opts = {}) {
     function holes(target, opts) {
         if (!isHandle(target))
             throw new Error('holes() needs a shape to drill into: holes(shape, { across: 6, apart: [15, 10] }).');
-        const extra = readOptions('holes', ['across', 'apart', 'at', 'along'], opts);
+        const extra = readOptions('holes', ['across', 'size', 'apart', 'at', 'along', 'deep', 'counterbore', 'countersink'], opts);
+        resolveHoleSize('holes', extra);
         if (extra.across === undefined)
             throw new Error('holes() needs { across: <number> } for the bit\'s diameter.');
         if (extra.apart === undefined)
@@ -1282,16 +1554,17 @@ export function runScript(source, opts = {}) {
         base.diameter = num(across, base.id, 'diameter');
         if (extra.deep !== undefined) {
             base.depth = num(positiveNumber('holes', 'deep', extra.deep), base.id, 'depth');
+            blindOffset('holes', target, axis, base.depth, center);
         }
         else {
-            const extent = extentAlong(docNow(), target.id, axis);
-            base.depth = extent != null ? extent + 2 : 10;
+            base.depth = throughDepth('holes', target, axis);
         }
         base.center = center;
         base.corners = {
             dx: num(spanX, base.id, 'dx') / 2,
             dy: num(spanY, base.id, 'dy') / 2,
         };
+        applyRecess('holes', base, extra);
         pushFeature(base);
         mutateHandle(target, base);
         return target;
@@ -1316,7 +1589,8 @@ export function runScript(source, opts = {}) {
         return target;
     }
     // ---- round / bevel ----------------------------------------------------
-    function round(arg, size) {
+    function round(arg, size, ...extra) {
+        noExtraArgs('round', 'a shape or edge and a size', 2, extra, 'To pick the edge, use shape.edge(faceA, faceB).');
         const s = requiredNumber('round', 'size', size);
         if (isTopoRef(arg)) {
             if (arg.name.cause !== 'between') {
@@ -1341,6 +1615,9 @@ export function runScript(source, opts = {}) {
         return arg;
     }
     function bevel(arg, size) {
+        if (isHandle(arg)) {
+            throw new Error('bevel() needs one edge: a whole shape is not supported yet -- chamfer one edge with bevel(shape.edge(faceA, faceB), size), or round the whole box or cylinder with fillet(shape, size).');
+        }
         if (!isTopoRef(arg) || arg.name.cause !== 'between') {
             throw new Error('bevel() needs one edge -- try bevel(shape.edge(faceA, faceB), size).');
         }
@@ -1406,7 +1683,8 @@ export function runScript(source, opts = {}) {
         'front-back': 'xz',
         'top-bottom': 'xy',
     };
-    function mirror(target, word) {
+    function mirror(target, word, ...extra) {
+        noExtraArgs('mirror', 'a shape and a direction word', 2, extra);
         if (!isHandle(target))
             throw new Error('mirror() needs a shape: mirror(shape, "left-right").');
         if (typeof word !== 'string' || !(word in MIRROR_WORD)) {
@@ -1430,7 +1708,8 @@ export function runScript(source, opts = {}) {
         mutateHandle(target, base);
         return target;
     }
-    function turn(target, angles) {
+    function turn(target, angles, ...extra) {
+        noExtraArgs('turn', 'a shape and a list of angles', 2, extra);
         if (!isHandle(target))
             throw new Error('turn() needs a shape: turn(shape, [rx, ry, rz]).');
         const f = findFeature(target.id);
@@ -1543,7 +1822,7 @@ export function runScript(source, opts = {}) {
         prism, wedge, groove, pocket,
         hole, holes, hollow, round, bevel, repeat, repeatAround, mirror, move, turn,
         join, cut, keep, draft,
-        sketch, pull, spin, blend,
+        sketch, plane, pull, spin, blend,
         param,
         // Official names: SAME reference as their student alias (SPEC-S2) — an
         // alias that wrapped instead would drift the moment the student word's
@@ -1557,7 +1836,7 @@ export function runScript(source, opts = {}) {
     const globals = fns;
     // scope is a `with()` base object, not a parameter list (changed
     // 2026-09-13; see the file header and LINE_OFFSET's own comment for why).
-    // Passing the 37 VOCABULARY words as `new Function` PARAMETER names meant a
+    // Passing the VOCABULARY words (38 at the time of writing) as `new Function` PARAMETER names meant a
     // student's own `const box = ...`, `let ring = ...`, or `class hollow {}`
     // was a SyntaxError -- "Identifier 'box' has already been declared" --
     // because `let`/`const`/`class` can never redeclare a name already bound
@@ -1666,6 +1945,23 @@ export function runScript(source, opts = {}) {
         ...def,
         slots: slotsByParamName.get(def.name) ?? [],
     }));
+    // A round or chamfer bigger than its corner can give is cut down to what the
+    // corner can give. The part is still right for that size, but the script
+    // asked for another one, so say so instead of building it silently.
+    for (const f of finalDoc.features) {
+        if (f.kind !== 'sketch' || (!f.rounds && !f.chamfers))
+            continue;
+        try {
+            for (const n of outlineOf(f).notes) {
+                const word = f.rounds && f.rounds[n.corner] !== undefined ? 'round' : 'chamfer';
+                const fmt = (v) => String(Math.round(v * 100) / 100);
+                ruleWarnings.push(n.got > 0
+                    ? `.${word}(${n.corner + 1}, ${fmt(n.want)}) is more than corner ${n.corner + 1} has room for, so it was made ${fmt(n.got)} instead.`
+                    : `.${word}(${n.corner + 1}, ${fmt(n.want)}) was left out: corner ${n.corner + 1} cannot take a ${word} (its edges are curved, in a straight line, or have no length).`);
+            }
+        }
+        catch { /* a malformed sketch is reported elsewhere */ }
+    }
     return {
         doc: finalDoc, params, namedParams: namedParamsOut, errors,
         ...(ruleWarnings.length > 0 ? { warnings: ruleWarnings } : {}),

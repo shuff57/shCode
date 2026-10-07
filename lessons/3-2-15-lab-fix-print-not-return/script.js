@@ -1,4 +1,4 @@
-// 3.2.15 Fix a Function That Prints Instead of Returning
+// 3.2.18 Fix a Function That Prints Instead of Returning
 
 // This is meant to give the caller a usable number, but something is wrong.
 // Run it first and read the output carefully.
@@ -9,7 +9,6 @@ function area(width, height) {
 
 const a = area(5, 8);
 console.log("One room: " + a);
-console.log("Two rooms: " + (a * 2));
 
 // STEP 1: Run it. Notice the area prints, but "a" is undefined.
 

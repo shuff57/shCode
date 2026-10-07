@@ -5,6 +5,7 @@
 - How zero-based indexing works (`arr[0]` is the first item, not `arr[1]`)
 - How `.push()` adds an item to the end and `.pop()` removes the last item
 - How `.length` tells you how many items are in the array
+- How to read the last item, and what reading one place past the end gives you
 
 An **array** is a variable that holds a list of values in order. You create one with square brackets:
 
@@ -42,6 +43,20 @@ console.log(removed);          // "date"
 console.log(fruits.length);    // 3
 ```
 
+### The last item, and one place past it
+
+The last index is always one less than `.length`, so `fruits[fruits.length - 1]` reads the last item however long the array is. Reading `fruits[fruits.length]` goes one place past the end, where nothing lives, and gives `undefined`:
+
+```js live plain
+let fruits = ["apple", "banana", "cherry"];
+
+console.log(fruits.length);
+console.log(fruits[fruits.length - 1]);
+console.log(fruits[fruits.length]);
+```
+
+`3`, then `cherry`, then `undefined`. Nothing crashes yet, but asking that `undefined` for anything inside it, such as adding a dot and a name after it, is a `TypeError`: `undefined` has nothing inside it to ask for. (Properties and methods come in later lessons; for now just remember that reading past the end hands you `undefined`.)
+
 ---
 
 ## Short glossary (quick reference)
@@ -54,3 +69,4 @@ console.log(fruits.length);    // 3
 | **`.push(value)`** | Add `value` to the end of the array |
 | **`.pop()`** | Remove and return the last item of the array |
 | **`.length`** | The number of items currently in the array |
+| **last item** | `arr[arr.length - 1]`; `arr[arr.length]` is one place past the end and is `undefined` |

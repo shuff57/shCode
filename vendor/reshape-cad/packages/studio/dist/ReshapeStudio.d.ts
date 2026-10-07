@@ -1,4 +1,5 @@
 import { type ComponentType, type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from 'react';
+import { type SelectionItem } from './selection-model.js';
 import { type ModelDoc } from '@shuff57/reshape-script/model-types';
 /** The two pieces of shCode's lesson/sandbox chrome this component does not
  *  own -- CodeEditor is the shared, store-backed code editor used well
@@ -12,6 +13,16 @@ export type ReshapePreviewComponent = ForwardRefExoticComponent<{
     runKey: number;
     engine: 'brep' | 'script';
 } & RefAttributes<HTMLIFrameElement>>;
+/** Every DISTINCT feature id that owns at least one of `items`, in
+*  first-seen order. A box-select can span MULTIPLE bodies (unlike a
+*  single click's always-one-owner pick) -- collapsing to just the LAST
+*  item's owner silently dropped every other solid's items from
+*  `selected` (the status bar's "N selected" count and every
+*  owner-scoped reader downstream of it), even though the raw item list
+*  itself was correct. Exported so this box-select-multi-owner regression
+*  has a direct unit test without needing the full React/viewport
+*  harness (see onBoxSelect below, the one caller). */
+export declare function distinctOwners(doc: ModelDoc, items: SelectionItem[]): string[];
 export type ReshapeStudioProps = {
     /** script.js text -- the ONE saved artifact. Controlled: Code edits it
      *  through the store-backed CodeEditor this component renders, and Build

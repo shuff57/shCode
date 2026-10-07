@@ -1,6 +1,6 @@
 function findRectangleArea(width, height) {
-  return width * height;
+  console.log("Area: " + width * height);
 }
 
-console.log(findRectangleArea(3, 4));
-console.log(findRectangleArea(10, 2));
+findRectangleArea(3, 4);
+findRectangleArea(10, 2);

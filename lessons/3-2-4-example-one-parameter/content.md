@@ -46,7 +46,7 @@ greetingFor("Marisol");
 greetingFor("Dev");
 ```
 
-The second line uses `name.length`, so the function does arithmetic on the value it was handed. The parameter is not just a string to print; it is a variable the body can work with.
+The second line uses `name.length`, a **property** that reports how many characters the text has, so the function measures the value it was handed (you will meet properties properly later). The parameter is not just a string to print; it is a variable the body can work with.
 
 ## Step 4: Change the argument, keep the code
 

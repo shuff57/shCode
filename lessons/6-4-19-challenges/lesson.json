@@ -32,7 +32,7 @@
     {
       "id": "s3",
       "title": "Pick a stretch from content.md",
-      "instructions": "Implement at least one: a parallax background (a second sprite at a lower layer that moves slower), mirroring the sprite with mirrorX when walking left, or vertical camera follow.",
+      "instructions": "Implement at least one: a parallax background (a second sprite at a lower layer that moves slower), mirroring the sprite (sprite.scale.x = -1) when walking left, or vertical camera follow.",
       "hints": [
         "content.md describes three stretches with hints for each: pick whichever interests you."
       ]
@@ -50,7 +50,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "Use new Canvas(...) in setup().",
+      "description": "Use new Canvas(...) in setup(). Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -70,7 +70,7 @@
     {
       "id": "r3",
       "title": "Camera follows something",
-      "description": "Inside draw(), assign camera.x or camera.y in a way that depends on a sprite's position (or uses lerp).",
+      "description": "Inside draw(), assign camera.x or camera.y in a way that depends on a sprite's position (or uses lerp). Help: 6.4.11 (moSHion docs: Camera)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

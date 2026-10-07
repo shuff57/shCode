@@ -14,7 +14,7 @@ const reportLocker = 7;
 // INPUT n and bankName
 // FOR i = 1 TO n
 //   IF i is a multiple of 3 THEN CONTINUE
-//   FLIP locker i (odd opens, even closes)
+//   FLIP locker i (it starts closed, so it opens)
 // END FOR
 // WORK OUT locker 7's final state
 // CLASSIFY open / closed / never touched
@@ -29,44 +29,41 @@ try {
     throw new Error("n must be a number that is at least 1");
   }
 
+  // Every locker starts closed and the walk visits each one once, so every
+  // locker that is not skipped is flipped exactly once: closed becomes open.
   let openCount = 0;
-let locker7State = "never touched";
+  let locker7State = "never touched";
 
-for (let i = 1; i <= N; i++) {
-  if (i % skipMultiple === 0) {
-    continue;
-  }
-  if (i === reportLocker) {
-    if (i % 2 === 1) {
+  for (let i = 1; i <= N; i++) {
+    if (i % skipMultiple === 0) {
+      continue;
+    }
+    openCount = openCount + 1;
+    if (i === reportLocker) {
       locker7State = "open";
-    } else {
-      locker7State = "closed";
     }
   }
-  if (i % 2 === 1) {
-    openCount = openCount + 1;
+
+  switch (locker7State) {
+    case "open":
+      console.log(`Locker ${reportLocker} at ${bankName} is open.`);
+      break;
+    case "closed":
+      console.log(`Locker ${reportLocker} at ${bankName} is closed.`);
+      break;
+    case "never touched":
+      console.log(`Locker ${reportLocker} at ${bankName} was never touched.`);
+      break;
+    default:
+      console.log("Unknown state");
   }
-}
 
-switch (locker7State) {
-  case "open":
-    console.log(`Locker ${reportLocker} at ${bankName} is open.`);
-    break;
-  case "closed":
-    console.log(`Locker ${reportLocker} at ${bankName} is closed.`);
-    break;
-  case "never touched":
-    console.log(`Locker ${reportLocker} at ${bankName} was never touched.`);
-    break;
-  default:
-    console.log("Unknown state");
-}
-
-console.log("Open lockers: " + openCount);
+  console.log("Open lockers: " + openCount);
   console.log(typeof locker7State);
 } catch (err) {
   console.log(err.message);
 }
 
-// Early-finisher extension: run the sweep with N = 0 -- the loop never
-// enters, the report still prints, and locker 7 was never touched.
+// Early-finisher extension: run the sweep with N = 0 -- the guard throws
+// before the loop, the catch prints the message, and there is no report.
+// Then try N = 6: the walk stops before locker 7, so it was never touched.

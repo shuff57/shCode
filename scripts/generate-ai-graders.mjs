@@ -1,4 +1,5 @@
-// Bakes every lesson's authored aiGrader config into public/ai-graders.json.
+// Bakes every lesson's authored aiGrader config into
+// functions/_shared/ai-graders.generated.ts.
 //
 // WHY THIS EXISTS: /api/grade-written used to build the model prompt from the
 // REQUEST BODY -- and the system prompt tells the model that the rubric and
@@ -10,7 +11,17 @@
 //
 // The server now looks the config up here by lessonId and ignores the body's
 // rubric/prompt/model/contextDocs entirely. This file is the trust boundary:
-// if it isn't published, grading fails closed rather than trusting the client.
+// if the lookup fails, grading fails closed rather than trusting the client.
+//
+// WHY A TS MODULE AND NOT public/ai-graders.json. This used to be a public/
+// JSON file, and anything in public/ is fetchable by anyone: measured
+// 2026-10-03, https://shcode.pages.dev/ai-graders.json answered 200 to a
+// request with no cookie and handed over the prompt and rubric for every
+// graded written item, including the six chapter-test parts (1.7.2, 1.7.5,
+// 2.7.2, 2.7.5, 3.10.2, 3.10.5), whose rubrics name the answers. Same class
+// as the quiz keys, which generate-quiz-keys.mjs already keeps out of
+// public/. So the module is bundled into the Function worker at deploy and
+// is never a static asset. Do not import it from app/ or components/.
 //
 // Two authoring shapes are collected, matching the two client callers:
 //   lesson.aiGrader          -> ContentLessonView -> WrittenGrader
@@ -22,14 +33,16 @@
 // a build error instead, so the gap surfaces at build time rather than
 // silently grading against a 2000-char slice of prose.
 
-import { readFileSync, readdirSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, readdirSync, writeFileSync, existsSync, unlinkSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
 const lessonsDir = path.join(root, 'lessons');
-const outFile = path.join(root, 'public', 'ai-graders.json');
+const outFile = path.join(root, 'functions', '_shared', 'ai-graders.generated.ts');
+// The old public copy. Remove it so a stale one is never deployed.
+const legacyPublicFile = path.join(root, 'public', 'ai-graders.json');
 
 const out = {};
 const errors = [];
@@ -64,6 +77,50 @@ for (const id of readdirSync(lessonsDir)) {
       if (!r.id) errors.push(`${id}: a rubric item has no id`);
       if (typeof r.points !== 'number') errors.push(`${id}: rubric item ${r.id} has non-numeric points`);
     }
+    // Hybrid charts (diagram.aiGrader): `check` on a rubric item and `gate` on the grader are
+    // marked by lib/diagram-score.ts on the server. Validate them here so a typo is a build
+    // error and not a silent zero at grading time. They are copied through below (rubric is
+    // copied whole; `gate` explicitly) and NEVER reach the browser: lib/quiz-redact.ts rebuilds
+    // the client rubric as {id,title,points} and drops `gate`.
+    const OPS = ['count', 'sequence', 'loop-exit', 'in-cycle', 'not-in-cycle', 'branch', 'label'];
+    const regexes = (v, where) => {
+      if (v === undefined) return;
+      if (Array.isArray(v)) return v.forEach((x) => regexes(x, where));
+      if (typeof v === 'string') {
+        try { new RegExp(v, 'iu'); } catch (e) { errors.push(`${id}: ${where} has an invalid regex ${JSON.stringify(v)} -- ${e.message}`); }
+        return;
+      }
+      errors.push(`${id}: ${where} regex must be a string or list of strings`);
+    };
+    const matcher = (m, where) => {
+      if (m === undefined) return;
+      if (!m || typeof m !== 'object') { errors.push(`${id}: ${where} is not a matcher`); return; }
+      regexes(m.re, where);
+      if (m.not) matcher(m.not, where + '.not');
+    };
+    for (const r of g.rubric) {
+      if (r.check === undefined) continue;
+      if (!r.check || !Array.isArray(r.check.steps) || r.check.steps.length === 0) {
+        errors.push(`${id}: rubric item ${r.id} has a check with no steps`);
+        continue;
+      }
+      if (!(lesson.diagram && lesson.diagram.aiGrader === g)) errors.push(`${id}: rubric item ${r.id} has a check, which only a diagram.aiGrader may carry`);
+      for (const st of r.check.steps) {
+        if (!OPS.includes(st.op)) errors.push(`${id}: ${r.id} has an unknown check op ${JSON.stringify(st.op)}`);
+        for (const k of ['match', 'loop', 'at', 'yes', 'no']) matcher(st[k], `${r.id}.${st.op}.${k}`);
+        if (Array.isArray(st.of)) st.of.forEach((m) => matcher(m, `${r.id}.sequence.of`));
+      }
+    }
+    if (g.gate !== undefined) {
+      const gt = g.gate;
+      if (!gt || !Array.isArray(gt.anyOf) || typeof gt.min !== 'number' || typeof gt.capTo !== 'number' || typeof gt.fail !== 'string') {
+        errors.push(`${id}: aiGrader.gate must be {anyOf: string[], min: number, capTo: number, fail: string}`);
+      } else {
+        regexes(gt.anyOf, 'gate.anyOf');
+        const possible = g.rubric.reduce((a, r) => a + r.points, 0);
+        if (gt.capTo >= possible) errors.push(`${id}: gate.capTo (${gt.capTo}) must be under the rubric total (${possible})`);
+      }
+    }
     const ids = g.rubric.map((r) => r.id);
     if (new Set(ids).size !== ids.length) errors.push(`${id}: duplicate rubric ids`);
 
@@ -73,6 +130,9 @@ for (const id of readdirSync(lessonsDir)) {
       rubric: g.rubric,
       ...(g.model ? { model: g.model } : {}),
       ...(g.contextDocs ? { contextDocs: g.contextDocs } : {}),
+      ...(g.strict ? { strict: true } : {}),
+      ...(g.gate ? { gate: g.gate } : {}),
+      ...(lesson.diagram && Array.isArray(lesson.diagram.rules) ? { diagramRules: lesson.diagram.rules } : {}),
     };
   }
 }
@@ -83,8 +143,24 @@ if (errors.length) {
   process.exit(1);
 }
 
-writeFileSync(outFile, JSON.stringify(out));
+const header = `// GENERATED by scripts/generate-ai-graders.mjs from lessons/*/lesson.json -- do not edit.
+//
+// Every lesson's authored AI-grader prompt and rubric, read server-side by
+// functions/_shared/aiGraders.ts. Bundled into the Pages Function worker at
+// deploy; NEVER served as a static asset (a public/ file is fetchable by
+// anyone, and the chapter-test rubrics name the answers). Do not import this
+// from anything under app/ or components/ -- the browser must never receive it.
+// Regenerated by prebuild; rerun manually after editing an aiGrader.
+
+import type { AiGraderConfig } from './aiGraders';
+
+`;
+writeFileSync(
+  outFile,
+  header + 'export const AI_GRADERS: Record<string, AiGraderConfig> = ' + JSON.stringify(out, null, 2) + ';\n',
+);
+if (existsSync(legacyPublicFile)) unlinkSync(legacyPublicFile);
 const criteria = Object.values(out).reduce((n, g) => n + g.rubric.length, 0);
 console.log(
-  `generate-ai-graders: ${Object.keys(out).length} graders, ${criteria} criteria -> public/ai-graders.json`,
+  `generate-ai-graders: ${Object.keys(out).length} graders, ${criteria} criteria -> functions/_shared/ai-graders.generated.ts`,
 );

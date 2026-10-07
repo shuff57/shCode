@@ -1,6 +1,6 @@
 {
   "id": "3-2-11-reading-return-ends-function",
-  "title": "3.2.11 Reading: `return` Ends the Function",
+  "title": "3.2.14 Reading: `return` Ends the Function",
   "description": "return does two jobs at once: it hands back a value and stops the function right there, so anything after it does not run.",
   "type": "lesson",
   "estimateMins": 10,

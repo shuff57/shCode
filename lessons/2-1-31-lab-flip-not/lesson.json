@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "if condition is !isRaining and logs",
-      "description": "if statement's condition is !isRaining, and console.log runs inside the block",
+      "description": "if statement's condition is !isRaining, and console.log runs inside the block. Help: 2.1.29 (Logical Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*isRaining\\b[\\s)]*\\)\\s*(?:\\{[^}]*)?console\\.log\\s*\\(",
@@ -37,7 +37,7 @@
     {
       "id": "r2",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 2.1.29 (Logical Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

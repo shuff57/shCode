@@ -1,0 +1,115 @@
+{
+  "id": "3-2-drill-square",
+  "title": "3.2.13 Lab: square(n)",
+  "description": "Write square(n) so that it hands back n times n with return, and use the value it gives back. The first return practice. Practice, not graded: the checks call your function.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write square",
+      "instructions": "Write a function declaration called square that takes one parameter, n. You met square in 3.2.11; write it from memory, and look back only if you are stuck."
+    },
+    {
+      "id": "s2",
+      "title": "Return the product",
+      "instructions": "Hand back n times n with return (3.2.11), not console.log. A returned value is something the rest of your program can use."
+    },
+    {
+      "id": "s3",
+      "title": "Use what comes back",
+      "instructions": "Store square(5) in a variable, then console.log that variable plus 1. Getting 26 proves a real number came back."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "square is defined with one parameter",
+      "description": "Code defines a function named square with exactly one parameter. Help: 3.2.5 (Parameters and Arguments)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+square\\s*\\(\\s*[\\w$]+\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Write function square(n) { ... } with exactly that name and one name between the parentheses."
+    },
+    {
+      "id": "r2",
+      "title": "square hands back a value with return",
+      "description": "square contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "square",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "The line that produces the answer should start with return, not console.log."
+    },
+    {
+      "id": "t1",
+      "title": "square returns n times n",
+      "description": "square(n) gives back n multiplied by itself, for any number. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "square",
+      "points": 0,
+      "hint": "square(n) must give back n * n. An answer of 8 for 4 means you added n to itself. If the right number only appears in the output but the check says undefined, you printed it: use return.",
+      "cases": [
+        {
+          "args": [
+            4
+          ],
+          "expect": 16
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": 0,
+          "description": "zero"
+        },
+        {
+          "args": [
+            -3
+          ],
+          "expect": 9,
+          "description": "a negative number"
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": 1
+        },
+        {
+          "args": [
+            2.5
+          ],
+          "expect": 6.25
+        },
+        {
+          "args": [
+            12
+          ],
+          "expect": 144,
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

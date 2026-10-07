@@ -4,6 +4,8 @@
 
 Before touching anything, run the code and see the failure yourself. Reproducing a bug confirms it is real and gives you a starting point. Each task in a task set produces a work product that gets checked: here the check is "I can trigger the bug."
 
+*(You only run and debug this loop, you do not write it, so here is all you need: `for (...)` repeats the lines inside `{ }` once for each value of `i`, `i++` adds 1 to `i`, `if` runs its lines only when its condition is true, and `continue` skips the rest of that pass. Chapter 2 teaches these properly.)*
+
 ```js live plain
 // A loop that prints 1..5 but skips 3.
 for (let i = 1; i <= 5; i++) {

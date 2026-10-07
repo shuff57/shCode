@@ -24,6 +24,8 @@ It sits close to mathematical thinking: both use abstraction, generalisation, mo
 
 A plan has no language. Here is the same plan expressed twice, once as ordinary English, once as JavaScript, to make the point that the thinking came first.
 
+*(Read it, do not write it yet: `[ ... ]` is a list of values, `scores[i]` is the item at position `i` counting from 0, `.length` is how many items there are, and `for` repeats its block once per position. Chapter 2 teaches all of this.)*
+
 ```js live plain
 // The plan, in English:
 //   start a total at zero

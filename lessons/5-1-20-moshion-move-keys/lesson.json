@@ -23,7 +23,7 @@
     {
       "id": "s2",
       "title": "Horizontal movement",
-      "instructions": "In update(), if kb.pressing('left') set player.vel.x = -4; else if kb.pressing('right') set +4; else set it to 0.",
+      "instructions": "In update() (it runs every frame, just before draw()), if kb.pressing('left') set player.vel.x = -4; else if kb.pressing('right') set +4; else set it to 0. WASD ('a' / 'd') works the same way and is what the graded labs use.",
       "hints": [
         "vel.x is pixels per frame. Positive = right, negative = left."
       ]
@@ -31,7 +31,7 @@
     {
       "id": "s3",
       "title": "Vertical movement",
-      "instructions": "Same pattern with 'up' / 'down' on player.vel.y. Remember: in screen coords, up is negative y.",
+      "instructions": "Same pattern with 'up' / 'down' (or 'w' / 's') on player.vel.y. Remember: in screen coords, up is negative y.",
       "hints": [
         "Always reset vel.y to 0 in the else branch or the sprite will coast forever."
       ]
@@ -47,7 +47,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "A canvas is created when the sketch starts.",
+      "description": "A canvas is created when the sketch starts. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -58,7 +58,7 @@
     {
       "id": "r2",
       "title": "Create a sprite",
-      "description": "A sprite exists in the sketch.",
+      "description": "A sprite exists in the sketch. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\(",
@@ -69,14 +69,14 @@
     {
       "id": "r3",
       "title": "Horizontal keyboard input",
-      "description": "Left or right keys affect the sprite each frame.",
+      "description": "Left/right (or A/D) keys affect the sprite each frame. Help: 5.1.13 (kb.pressing(key))",
       "type": "inFunction",
       "function": [
         "update",
         "draw"
       ],
       "file": "script.js",
-      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:left|right)['\"]",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:left|right|a|d)['\"]",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -84,14 +84,14 @@
     {
       "id": "r4",
       "title": "Vertical keyboard input",
-      "description": "Up or down keys affect the sprite each frame.",
+      "description": "Up/down (or W/S) keys affect the sprite each frame. Help: 5.1.13 (kb.pressing(key))",
       "type": "inFunction",
       "function": [
         "update",
         "draw"
       ],
       "file": "script.js",
-      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:up|down)['\"]",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:up|down|w|s)['\"]",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -99,7 +99,7 @@
     {
       "id": "r5",
       "title": "Set horizontal velocity",
-      "description": "Horizontal velocity is set each frame.",
+      "description": "Horizontal velocity is set each frame. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "inFunction",
       "function": [
         "update",
@@ -114,7 +114,7 @@
     {
       "id": "r6",
       "title": "Set vertical velocity",
-      "description": "Vertical velocity is set each frame.",
+      "description": "Vertical velocity is set each frame. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "inFunction",
       "function": [
         "update",

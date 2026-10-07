@@ -846,16 +846,31 @@ function revolveProfileFace(oc, arc, f, marks) {
     // solid by the frame's origin afterward. Adding the origin here too would
     // move the profile twice.
     const at = (p) => new oc.gp_Pnt(a.u[0] * p[0] + a.n[0] * p[1], a.u[1] * p[0] + a.n[1] * p[1], a.u[2] * p[0] + a.n[2] * p[1]);
+    const bulges = outline.bulges ?? {};
     const w = new oc.BRepBuilderAPI_MakeWire();
     for (let i = 0; i < n; i++) {
         const b = pts[(i + 1) % n];
-        w.Add(new oc.BRepBuilderAPI_MakeEdge(at(pts[i]), at(b)).Edge());
-        marks?.push({ ...roles[i], at: at([(pts[i][0] + b[0]) / 2, (pts[i][1] + b[1]) / 2]) });
+        const g = bulges[i];
+        if (!g) {
+            w.Add(new oc.BRepBuilderAPI_MakeEdge(at(pts[i]), at(b)).Edge());
+            marks?.push({ ...roles[i], at: at([(pts[i][0] + b[0]) / 2, (pts[i][1] + b[1]) / 2]) });
+            continue;
+        }
+        // A bowed edge (a bulge, or a round) is a real circular arc, as in sketchWire: this used to
+        // spin the chord, so a rounded profile came out as a chamfered one and the referee agreed
+        // with a kernel that did the same.
+        const { center, radius, startAngle, endAngle } = arc.arcFromBulge(pts[i], b, g);
+        let sweep = endAngle - startAngle;
+        if (g > 0 && sweep < 0)
+            sweep += Math.PI * 2;
+        if (g < 0 && sweep > 0)
+            sweep -= Math.PI * 2;
+        const mid = startAngle + sweep / 2;
+        const through = [center[0] + radius * Math.cos(mid), center[1] + radius * Math.sin(mid)];
+        const made = new oc.GC_MakeArcOfCircle(at(pts[i]), at(through), at(b));
+        w.Add(new oc.BRepBuilderAPI_MakeEdge(made.Value()).Edge());
+        marks?.push({ ...roles[i], at: at(through) });
     }
-    // Straight segments only: this profile ignores `bulges`, so a bowed sketch
-    // spins as a polygon. That is a pre-existing gap in Spin rather than one the
-    // naming work introduces, and it is why the marks here are chord midpoints
-    // where sketchWire uses arc midpoints.
     return new oc.BRepBuilderAPI_MakeFace(w.Wire(), false).Face();
 }
 /** The sketch as a flat face, ready to be pulled or spun. */
@@ -990,6 +1005,18 @@ export function buildDoc(oc, doc, arc) {
      *  relying on the two-argument constructor to do it, because the history maps
      *  are what this is for and an explicitly built operation is the shape that
      *  was measured to fill them. */
+    // Cuts (hole/pocket/groove) naming one body apply cumulatively -- the
+    // PartDesign convention: body id -> id of the latest cut made on it. Each
+    // cut's own shape stays in `built` under its id.
+    const heads = new Map();
+    const headOf = (body) => heads.get(body) ?? body;
+    const advanceHead = (body, id) => {
+        const from = headOf(body);
+        for (const [k, v] of heads)
+            if (v === from)
+                heads.set(k, id);
+        heads.set(body, id);
+    };
     const boolean = (kind, a, b, feature, inputs) => {
         const op = new oc[kind](a, b);
         op.Build(new oc.Message_ProgressRange());
@@ -1013,7 +1040,7 @@ export function buildDoc(oc, doc, arc) {
             // the named solid. Mirror of the revolve branch, minus the sweep
             // history (a cut's faces come from the boolean, not the spin).
             const src = doc.features.find((x) => x.id === f.target);
-            const base = built.get(f.into);
+            const base = built.get(headOf(f.into));
             if (arc && src && src.kind === 'sketch' && base) {
                 const a = sketchFrame(src);
                 const marks = [];
@@ -1031,7 +1058,7 @@ export function buildDoc(oc, doc, arc) {
                         after.SetTranslation(new oc.gp_Vec(o[0], o[1], o[2]));
                         tool = new oc.BRepBuilderAPI_Transform(spun, after, false).Shape();
                     }
-                    shape = boolean('BRepAlgoAPI_Cut', base, tool, f.id, [f.into]);
+                    shape = boolean('BRepAlgoAPI_Cut', base, tool, f.id, [headOf(f.into)]);
                 }
             }
         }
@@ -1043,7 +1070,7 @@ export function buildDoc(oc, doc, arc) {
             // not from the prism.
             const face = built.get(f.target);
             const src = doc.features.find((x) => x.id === f.target);
-            const base = built.get(f.into);
+            const base = built.get(headOf(f.into));
             if (face && src && src.kind === 'sketch' && base) {
                 const a = sketchFrame(src);
                 // NEGATIVE where extrude is positive: a pad pulls the profile up out
@@ -1053,7 +1080,7 @@ export function buildDoc(oc, doc, arc) {
                 const h = -f.depth * a.dir;
                 const v = new oc.gp_Vec(a.n[0] * h, a.n[1] * h, a.n[2] * h);
                 const tool = new oc.BRepPrimAPI_MakePrism(face, v, false, true).Shape();
-                shape = boolean('BRepAlgoAPI_Cut', base, tool, f.id, [f.into]);
+                shape = boolean('BRepAlgoAPI_Cut', base, tool, f.id, [headOf(f.into)]);
             }
         }
         else if (f.kind === 'combine') {
@@ -1419,15 +1446,17 @@ export function buildDoc(oc, doc, arc) {
             // Sugar over cylinder + subtract. f.center is an offset from the
             // TARGET's own bounding-box centre, never a world position -- a
             // documented behavioural contract of the app.
-            const src = built.get(f.target);
-            if (src) {
+            // `body` fixes the frame (centre offset, fit test); `src` is what is cut.
+            const body = built.get(f.target);
+            const src = built.get(headOf(f.target));
+            if (body && src) {
                 if (f.diameter <= 0 || f.depth <= 0) {
                     refusals.set(f.id, `${label(f.id)}'s diameter and depth must both be greater than zero -- `
                         + `${label(f.id)} is shown without it.`);
                     shape = src;
                 }
                 else {
-                    const { bbox } = measureShape(oc, src);
+                    const { bbox } = measureShape(oc, body);
                     const cx = (bbox[0][0] + bbox[1][0]) / 2 + f.center[0];
                     const cy = (bbox[0][1] + bbox[1][1]) / 2 + f.center[1];
                     const cz = (bbox[0][2] + bbox[1][2]) / 2 + f.center[2];
@@ -1480,7 +1509,7 @@ export function buildDoc(oc, doc, arc) {
                             op.Build(new oc.Message_ProgressRange());
                             tool = op.Shape();
                         }
-                        shape = boolean('BRepAlgoAPI_Cut', src, tool, f.id, [f.target]);
+                        shape = boolean('BRepAlgoAPI_Cut', src, tool, f.id, [headOf(f.target)]);
                     }
                 }
             }
@@ -1649,8 +1678,13 @@ export function buildDoc(oc, doc, arc) {
                 }
             }
         }
-        if (shape)
+        if (shape) {
             built.set(f.id, shape);
+            if (f.kind === 'hole')
+                advanceHead(f.target, f.id);
+            else if (f.kind === 'pocket' || f.kind === 'groove')
+                advanceHead(f.into, f.id);
+        }
     }
     return { shapes: built, ops, sweeps, refusals };
 }

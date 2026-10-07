@@ -32,7 +32,7 @@
     {
       "id": "r1",
       "title": "birthday defined",
-      "description": "Code defines a function named birthday",
+      "description": "Code defines a function named birthday. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+birthday\\s*\\(",
@@ -42,17 +42,17 @@
     {
       "id": "r2",
       "title": "property mutated",
-      "description": "Code assigns to a property on the parameter object",
+      "description": "Code assigns to a property on the parameter object. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.\\w+\\s*=",
+      "pattern": "\\.\\w+\\s*(?:[-+*/]?=(?!=)|\\+\\+|--)",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "birthdaySafe defined",
-      "description": "Code defines a function named birthdaySafe",
+      "description": "Code defines a function named birthdaySafe. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+birthdaySafe\\s*\\(",
@@ -62,7 +62,7 @@
     {
       "id": "r4",
       "title": "object spread used",
-      "description": "Code copies the object with spread syntax",
+      "description": "Code copies the object with spread syntax. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\{\\s*\\.\\.\\.",
@@ -72,7 +72,7 @@
     {
       "id": "r5",
       "title": "results logged",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.6.10 (Defensive Copying: [...] and {...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

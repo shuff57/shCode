@@ -42,7 +42,7 @@
     {
       "id": "r1",
       "title": "object literal created",
-      "description": "Declares an object with braces",
+      "description": "Declares an object with braces. Help: 3.5.4 (Reading and Changing Properties)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:const|let|var)\\s+\\w+\\s*=",
@@ -52,7 +52,7 @@
     {
       "id": "r2",
       "title": "property read with a dot",
-      "description": "Reads a property using dot notation",
+      "description": "Reads a property using dot notation. Help: 3.5.4 (Reading and Changing Properties)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\.\\w+",
@@ -62,7 +62,7 @@
     {
       "id": "r3",
       "title": "existing field changed",
-      "description": "Assigns a new value to a property",
+      "description": "Assigns a new value to a property. Help: 3.5.4 (Reading and Changing Properties)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\.\\w+\\s*=",
@@ -72,7 +72,7 @@
     {
       "id": "r4",
       "title": "whole object printed",
-      "description": "Calls console.log",
+      "description": "Calls console.log. Help: 3.5.4 (Reading and Changing Properties)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log",

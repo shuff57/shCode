@@ -1,7 +1,7 @@
 {
   "id": "8-1-10-lab-sketch-and-pull",
   "title": "8.1.10 Lab: Sketch and Pull",
-  "description": "Draw a flat rectangle and pull it up into a solid. Auto-graded.",
+  "description": "Draw a flat rectangle, then pull it up into a solid 10 mm tall. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 3: reSHape: Solid Modelling",
@@ -15,48 +15,49 @@
     {
       "id": "s1",
       "title": "Draw a rectangle",
-      "instructions": "Press the Sketch tool in the toolbar. A flat rectangle appears on the ground, 40 mm one way and 25 mm the other.",
+      "instructions": "Press the Sketch tool in the toolbar. reSHape opens the 2D sketch editor with a flat rectangle already drawn on the ground plane, 40 mm by 25 mm. Leave its size as it is.",
       "hints": [
-        "Nothing is solid yet - a sketch is flat, like a drawing on a piece of paper lying on the ground."
+        "Nothing is solid yet - a sketch is flat, like a drawing on a piece of paper lying on the ground.",
+        "The toolbar changes to drawing tools (Select, Line, Rect, Circle ...) while you are in the sketch editor. That is normal."
       ]
     },
     {
       "id": "s2",
-      "title": "Make it 40 x 20",
-      "instructions": "In the Dimensions panel, find \"Sketch 1 corner 3 up\" - it reads 25. Type 20 there. reSHape keeps the sketch a rectangle, so \"Sketch 1 corner 4 up\" usually follows to 20 on its own; if it still reads 25, type 20 there too. The rectangle is now 40 mm by 20 mm.",
+      "title": "Finish the sketch",
+      "instructions": "Press the Done button (the left-arrow icon in the SKETCH group of the toolbar) to leave the sketch editor and go back to the 3D view. The toolbar goes back to Sketch, Box, Pull, Spin ... and Sketch 1 shows in the timeline at the bottom.",
       "hints": [
-        "The width side (40) is already correct - you're only changing the 25s.",
-        "Watch the rectangle in the 3D view get shorter on one side as you type."
+        "Done is the button with the left arrow, next to the Sketch group of the toolbar.",
+        "If the toolbar still shows Line, Rect and Circle, you are still inside the sketch editor. Press Done."
       ]
     },
     {
       "id": "s3",
       "title": "Pull it into a solid",
-      "instructions": "With the sketch selected, press the Pull tool. In the Dimensions panel, type 10 in the height field.",
+      "instructions": "With Sketch 1 selected, press the Pull tool in the toolbar. In the Dimensions panel, the height reads 12 - type 10 in the \"Pull 1 height\" field.",
       "hints": [
-        "The rectangle turns into a solid block standing 10 mm tall.",
-        "Look for the field named \"Pull 1 height\" in the Dimensions panel."
+        "The rectangle turns into a solid block. After you type 10 it stands 10 mm tall.",
+        "If Pull is greyed out, click the \"Sketch 1\" chip in the timeline at the bottom first, then press Pull."
       ]
     }
   ],
   "requirements": [
     {
       "id": "r1",
-      "title": "A 40 x 20 rectangle pulled 10 mm tall",
-      "description": "A flat 40 mm by 20 mm rectangle, pulled into a solid 10 mm tall.",
+      "title": "A 40 x 25 rectangle pulled 10 mm tall",
+      "description": "A flat 40 mm by 25 mm rectangle (the one the Sketch tool draws), pulled into a solid 10 mm tall.",
       "type": "model",
       "expect": [
         {
           "kind": "sketch",
           "width": 40,
-          "depth": 20
+          "depth": 25
         },
         {
           "kind": "extrude",
           "height": 10
         }
       ],
-      "hint": "Press Sketch, set both 25 fields to 20, then press Pull and type 10.",
+      "hint": "Press Sketch, leave the 40 x 25 rectangle as it is, press Done, then press Pull and type 10 in the Pull 1 height field.",
       "points": 0
     }
   ],

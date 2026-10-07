@@ -2,9 +2,12 @@
 
 **This is the design part of the test, and you are doing it alone.** One problem, pick
 one of three, draw the flowchart, **10 points**, about **7 minutes**. You draw the chart in the editor below, press
-**Check my diagram** as many times as you like, and submit. The checker judges
-whether your drawing is a legal flowchart -- never whether it answers the problem.
-Whether the loop is right is for you to read; the teacher grades the submitted chart.
+**Check my diagram** as many times as you like, and submit. The checker in your
+browser judges whether your drawing is a legal flowchart, and each time you submit the AI
+marks whether it answers the problem you picked.
+
+**You get three tries.** Submit, read the feedback, redraw and submit again. Your best try
+counts. After your third try you can see how it is solved, once your teacher releases it.
 
 **Five shapes are legal on this chart** (Appendix D §D.2): oval, rectangle, diamond,
 parallelogram, and the **loop-setup hexagon** (released at §2.2). The double-rail
@@ -47,6 +50,10 @@ a `switch` to classify the outcome.
 - **Five shapes only:** oval, rectangle, diamond, parallelogram, hexagon.
 - **Loop setup uses the hexagon** — your chart must include a `for` or `while` loop.
 - **At least one decision diamond** — the comparison against the limit.
+- **A `switch` is drawn as chained diamonds.** A flowchart has no switch shape, so draw one
+  diamond per case, each with both exits labeled: the first asks about one outcome, and its
+  "no" exit leads to the next diamond, which asks about the next. Three outcomes need two
+  diamonds.
 - **At least two task rectangles** (the hexagon does not count).
 - **Both exits of every diamond labeled** (yes/no, true/false, etc.).
 - **No `[[ ]]` double-rail, no connectors, no comments** — not released yet.

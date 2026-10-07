@@ -11,5 +11,5 @@ switch (animal) {
     console.log('Moo!');
     break;
   default:
-    console.log('Unknown animal');
+    console.log('I do not know that animal');
 }

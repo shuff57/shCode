@@ -4,6 +4,8 @@ Make names **descriptive but concise**. There is a ditch on each side of that.
 
 **Ditch one: too vague.** `data`, `value`, `info`, `thing`, `stuff`, `temp`, `result`. These are real words, which makes them feel like real names, and they say nothing about what is actually in there. Every variable holds data. Every variable holds a value. Naming one `data` is like labelling a box "box".
 
+`temp` is the borderline one: programmers do use it, but on its own it could mean temperature or temporary. Add the context (`bodyTemperature`) and the doubt goes away.
+
 Use them only when the surrounding code makes the meaning completely obvious, and that is rarer than it feels while you are writing it.
 
 **Ditch two: too long.** `theCurrentlyLoggedInUsersShoppingCartTotalPriceInDollars` is descriptive and nobody will read it. Long names get skimmed, mistyped, and abbreviated by the next person anyway. `cartTotal` is better, and it is better *because* it is shorter.

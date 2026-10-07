@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "guards firstMissing",
-      "description": "try block logs firstMissing, caught in catch",
+      "description": "try block logs firstMissing, caught in catch. Help: 2.5.18 (throw vs if: The Distance Rule)",
       "type": "regex",
       "file": "script.js",
       "pattern": "try\\s*\\{[^}]*firstMissing[\\s\\S]*catch",
@@ -43,10 +43,10 @@
     {
       "id": "r2",
       "title": "secondMissing left unguarded",
-      "description": "secondMissing is logged after the try...catch closes, not inside it",
+      "description": "secondMissing is logged after the try...catch closes, not inside it. Help: 2.5.18 (throw vs if: The Distance Rule)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^{}]*\\}[\\s\\S]*console\\.log\\s*\\(\\s*secondMissing\\s*\\)",
+      "pattern": "^(?![\\s\\S]*\\btry\\s*\\{[^}]*secondMissing)[\\s\\S]*?catch\\s*\\([^)]*\\)\\s*\\{[^{}]*\\}[\\s\\S]*console\\.log\\s*\\(\\s*secondMissing\\s*\\)",
       "flags": "i",
       "points": 0
     }

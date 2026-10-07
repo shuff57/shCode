@@ -11,7 +11,7 @@
 //         (three separate if statements).
 
 // STEP 2: Inside a try block, convert raw to a number with Number(raw).
-//         If the result is NaN, throw new Error naming the bad value.
+//         If the result is NaN (test with Number.isNaN(value)), throw new Error naming the bad value.
 //         If it is 0 or less, throw new Error saying it must be
 //         positive. Otherwise log the reading number and its value.
 

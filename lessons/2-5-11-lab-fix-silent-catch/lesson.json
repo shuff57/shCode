@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "try/catch present",
-      "description": "Code still has a try block and a catch block",
+      "description": "Code still has a try block and a catch block. Help: 2.5.10 (The Empty catch Trap)",
       "type": "regex",
       "file": "script.js",
       "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\(",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "catch is no longer empty",
-      "description": "The catch block now logs something",
+      "description": "The catch block now logs something. Help: 2.5.10 (The Empty catch Trap)",
       "type": "regex",
       "file": "script.js",
       "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*console\\.log\\s*\\(",

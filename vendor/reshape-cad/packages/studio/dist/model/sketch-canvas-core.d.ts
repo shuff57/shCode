@@ -17,9 +17,33 @@ export declare function namedPointsOf(g: CoreGeom): Array<{
 /** World coordinates of a named point of geometry `g`, from the row's own
  *  values (the UI keeps rows solved, so no re-projection is needed). */
 export declare function pointWorld(g: CoreGeom, at: 'a' | 'b' | 'c'): Pt | null;
+export type SnapKind = 'vertex' | 'midpoint' | 'center' | 'intersection' | 'onCurve' | 'grid';
+export interface SnapHit {
+    kind: SnapKind;
+    at?: 'a' | 'b' | 'c';
+    world: Pt;
+    id?: number;
+}
+export interface FindSnapOpts {
+    gridStep?: number;
+    kinds?: SnapKind[];
+    dist?: (p: Pt) => number;
+}
+/** Standard line-circle intersection: parametrize the segment p->p+d, solve
+ *  the quadratic against the circle, keep roots within [0,1]. */
+export declare function lineCircleIntersections(p: Pt, d: Pt, c: Pt, r: number): Pt[];
+/** Standard two-circle intersection via the radical line; [] when the circles
+ *  do not meet (or coincide). */
+export declare function circleCircleIntersections(c1: Pt, r1: number, c2: Pt, r2: number): Pt[];
+/** The best snap within `tolWorld` of `worldPt` over every kind: vertices,
+ *  midpoints, centres, intersections, on-curve points, and (when a gridStep is
+ *  given) grid crossings. Rank decides; distance breaks ties. `opts.kinds` and
+ *  `opts.dist` are the delegation seam snapVertex rides on. */
+export declare function findSnap(geoms: CoreGeom[], worldPt: Pt, tolWorld: number, opts?: FindSnapOpts): SnapHit | null;
 /** The nearest named point within `snapPx` screen pixels of the pointer, or
  *  null. Screen distance is decided by the caller-supplied `distPx`, so the
- *  projection stays the component's business. */
+ *  projection stays the component's business. Delegates to findSnap with the
+ *  vertex kind only -- one snap engine, no duplicated logic. */
 export declare function snapVertex(geoms: CoreGeom[], target: Pt, distPx: (p: Pt) => number, snapPx: number): {
     id: number;
     at: 'a' | 'b' | 'c';
@@ -84,11 +108,58 @@ export declare function renumber(geoms: CoreGeom[], rules: Record<string, any>[]
  *  kernel's slot layout (built-ins 10, then point 2 / line 4 / circle 3 /
  *  arc 7 per row in id order). Rows carry their construction flag through. */
 export declare function readSolved(geoms: CoreGeom[], params: Float64Array | number[]): CoreGeom[];
+/** The slice of SketchSession2D `solveRows` needs (kept structural so this
+ *  file stays free of the wasm import). */
+export interface SoupSolver {
+    open(geoms: any[], rules: any[]): string | null;
+    solve(): boolean;
+    params: Float64Array | number[];
+}
+/** The canvas's degrees-of-freedom badge, from the kernel's own diagnosis (brep-rs sketch/diagnose.rs:
+ *  `dof` is n_free - rank of the rule Jacobian, so a lone line reads 4, a lone arc 5 (centre, radius and
+ *  two end angles: its ends stay on its circle), a slot 6, a dimensioned rectangle 2).
+ *
+ *  A sketch whose rules cannot all hold gets the red badge whatever its `dof` says. The kernel names
+ *  the two ways that happens `conflicting` (rules that contradict one another) and `globallyInfeasible`
+ *  (each rule is fine on its own, and no point satisfies them all, such as a length longer than the
+ *  circle it sits in); the canvas used to colour only the first, so the second read "N free to move",
+ *  or "Fully constrained" when N was 0, for a sketch that had no solution. */
+export declare function dofBadge(d: {
+    dof: number;
+    bucket: string;
+} | null | undefined): {
+    cls: '' | 'sk-dof-ok' | 'sk-dof-warn' | 'sk-dof-bad';
+    text: string;
+};
+/** The rows the doc should STORE: the rule-satisfying (solved) state.
+ *
+ *  model-types.ts says a sketch's `geoms` are the SOLVED coordinates, but a
+ *  canvas edit writes the rows it drew plus the new rule, and the kernel only
+ *  re-solves at build time. Left alone, a typed dimension changed the built
+ *  solid while the doc's own rows (all a `model` requirement can read, see
+ *  model-check.ts) still described the old size. Solving here, inside the same
+ *  write, keeps one onChange = one undo entry.
+ *
+ *  Falls back to the rows as given when the session refuses or cannot solve
+ *  (the canvas already shows that in its status line), and keeps a row's
+ *  original numbers when the solve moved nothing, so a plain edit never drifts
+ *  the stored coordinates by float noise. */
+export declare function solveRows<G extends CoreGeom>(session: SoupSolver, geoms: G[], rules: unknown[]): G[];
 /** A soup geometry row minus its id, distributively over the union so each
  *  kind keeps its own fields (a plain Omit<SoupGeom,'id'> does not). */
-import type { SoupGeom } from '@shuff57/reshape-script/model-types';
+import type { SketchConstraint, SoupGeom, SoupRule } from '@shuff57/reshape-script/model-types';
 type DistOmit<U> = U extends unknown ? Omit<U, 'id'> : never;
 export type SoupGeomNew = DistOmit<SoupGeom>;
+/** The soup rules a migrated points outline owes the kernel: one coincident
+ *  per corner (line i's end meets line i+1's start, wrap included) plus each
+ *  horizontal/vertical edge as a soup row on its line. The soup arm welds
+ *  corners through RULES, not coordinates (wires.rs refuses coordinate-only
+ *  contact as a guess the student never sees), so a loop migrated with empty
+ *  rules arrives as open ends: "edge 1 has a loose end" -- the scaffold Pull
+ *  bug of 2026-10-01. A circle has no corners to weld: []. Length and the
+ *  other legacy kinds stay on `constraints` untranslated (ponytail: only H/V
+ *  ever reach the soup session; add the rest when a legacy doc needs them). */
+export declare function migratedRules(constraints: SketchConstraint[] | undefined, geoms: SoupGeom[]): SoupRule[];
 /** Majority toggle: if ANY selected shape is not construction, all become
  *  construction; only when they all already are does the toggle turn them
  *  all off. A per-shape toggle on a mixed selection just inverts the mix,
@@ -109,16 +180,67 @@ export declare function trimPick(geoms: CoreGeom[], clickedId: number, click: Pt
 } | null;
 /** Trim the clicked line at `split`: the half UNDER the click is deleted
  *  (whichever half's midpoint sits closer to the click), the far half keeps
- *  the clicked row's id with its far endpoint pulled to the split. No new
- *  row, no weld: a trim that deletes a piece leaves the wire open, and wire
- *  discovery's refusals say exactly that. Rules referencing the clicked row
- *  keep working (the surviving half kept the id); a rule that referenced the
- *  deleted geometry may become unsatisfiable — the diagnosis badge surfaces
- *  that, the trim does not try to fix it. */
+ *  the clicked row's id with its far endpoint pulled to the split. The far
+ *  endpoint keeps its ORIGINAL LETTER ('a' stays 'a', 'b' stays 'b') --
+ *  earlier this always wrote `{a: farPt, b: split}` regardless of which
+ *  letter farPt actually was, so trimming the line back from its 'a' end
+ *  silently RELABELED the surviving far point from 'b' to 'a'. Any weld
+ *  (coincident) rule naming that endpoint by letter (e.g. `aEnd: 'b'`)
+ *  then silently pointed at the fresh split point instead of the corner it
+ *  was welded to -- not a dangling reference (the id still exists), a
+ *  SILENTLY WRONG one, which is worse: diagnose() has nothing to flag,
+ *  since the rule is perfectly satisfiable, just against the wrong point.
+ *  No new row: a trim that deletes a piece leaves the wire open, and wire
+ *  discovery's refusals say exactly that. Rules referencing the clicked
+ *  row's SURVIVING letter keep working correctly; a rule that referenced
+ *  the DELETED letter may become unsatisfiable -- the diagnosis badge
+ *  surfaces that, the trim does not try to fix it. */
 export declare function trimLine(geoms: CoreGeom[], rules: Array<Record<string, any>>, clickedId: number, split: Pt, click: Pt): {
     geoms: CoreGeom[];
     rules: Array<Record<string, any>>;
 };
+export interface FilletPick {
+    lineA: number;
+    endA: 'a' | 'b';
+    lineB: number;
+    endB: 'a' | 'b';
+    corner: Pt;
+}
+/** The fillet-able corner nearest `click`: among every pair of DISTINCT
+ *  lines, the named ends that sit at (nearly) the same world point --
+ *  within `tolWorld` of the click. Only line-line corners are handled (v1);
+ *  circles/arcs are future work here, same precedent as trimPick. */
+export declare function filletPick(geoms: CoreGeom[], click: Pt, tolWorld: number): FilletPick | null;
+/** The real ceiling on this corner's fillet radius -- maxFilletRadius()'s
+ *  own trig (sketch-arc.ts), reading the two lines' live coordinates
+ *  instead of a points array. 0 refuses: a zero-length adjacent edge, or a
+ *  corner that is straight within FILLET_STRAIGHT_TOL. */
+export declare function maxFilletRadiusAt(geoms: CoreGeom[], lineA: number, endA: 'a' | 'b', lineB: number, endB: 'a' | 'b'): number;
+/** Plain words for why this corner cannot take a fillet at all, or null
+ *  when some positive radius would work -- the soup-native mirror of
+ *  whyCannotRoundCorner()'s tone, written fresh (not imported) because the
+ *  soup has no bulges/curved-neighbour case to report. */
+export declare function whyCannotFilletAt(geoms: CoreGeom[], lineA: number, endA: 'a' | 'b', lineB: number, endB: 'a' | 'b'): string | null;
+/** Round one line-line corner into an arc, mutating no row in place.
+ *
+ *  Clamps `radius` to maxFilletRadiusAt (never trusts the caller's number
+ *  past what the corner can take, same as filletCorner()); refuses (null)
+ *  when even the smallest positive radius has nowhere to go. Both lines
+ *  REUSE their own ids for the surviving trimmed ends (trimLine's own
+ *  convention); only the new arc gets a fresh id via nextGeomId(). The one
+ *  sharp-corner coincident (if any existed) is dropped and replaced by two
+ *  new coincidents welding the arc to both trimmed lines -- the one place
+ *  fillet must do more than trim, because it inserts geometry the corner
+ *  never had. */
+export declare function filletCornerAt(geoms: CoreGeom[], rules: Array<Record<string, any>>, lineA: number, endA: 'a' | 'b', lineB: number, endB: 'a' | 'b', radius: number): {
+    geoms: CoreGeom[];
+    rules: Array<Record<string, any>>;
+    arcId: number;
+} | null;
+/** Append an `equal` rule tying two arcs' radii, unless one already does
+ *  (either order) -- the auto-equal-radius heuristic commits alongside a
+ *  second same-radius fillet and must not pile up duplicates on repeat. */
+export declare function applyEqualRadiusRule(rules: Array<Record<string, any>>, arcIdA: number, arcIdB: number): Array<Record<string, any>>;
 export interface SlotResult {
     geoms: CoreGeom[];
     rules: Array<Record<string, any>>;
@@ -167,6 +289,52 @@ export interface DupResult {
 export declare function mirrorSelection(geoms: CoreGeom[], rules: Array<Record<string, any>>, ids: number[], axis: 'x' | 'y'): DupResult | null;
 /** Copy the selected rows, shifted by (dx, dy). */
 export declare function copySelection(geoms: CoreGeom[], rules: Array<Record<string, any>>, ids: number[], dx: number, dy: number): DupResult | null;
+/** Order the selected line ids into a single simple open chain, walking head
+*  to tail via shared (coincident, within tolerance) endpoints among ONLY
+*  the given ids. Refuses (null) branching (a T-junction), closed loops
+*  (every endpoint shared, no free end to start from), and disconnected
+*  pieces -- offsetting an ambiguous or non-chain selection is refused
+*  rather than guessed at. A lone id is trivially its own one-line chain. */
+export declare function offsetChainOrder(geoms: CoreGeom[], ids: number[]): Array<{
+    id: number;
+    from: Pt;
+    to: Pt;
+}> | null;
+export interface OffsetPick {
+    chain: Array<{
+        id: number;
+        from: Pt;
+        to: Pt;
+    }>;
+    side: 1 | -1;
+}
+/** Order the picked ids into a chain (offsetChainOrder) and decide which
+*  perpendicular side `click` sits on, relative to whichever chain segment
+*  the click lands nearest -- the same nearest-segment idea trimPick uses
+*  to pick a crossing. Returns null if the ids are not a single chain. */
+export declare function offsetChainPick(geoms: CoreGeom[], ids: number[], click: Pt): OffsetPick | null;
+/** Build the new offset chain at `distance` (> 0) on `side`: each segment
+*  is pushed perpendicular to its own direction, then adjacent offset
+*  segments are re-joined at their new mitered (infinite-line) intersection
+*  so the chain's corners stay sharp -- the same corner the ORIGINAL chain
+*  had, just pushed out by `distance`. Appends new line rows (fresh ids via
+*  nextGeomId) and welds each adjacent pair with the same coincident
+*  convention filletCornerAt's new arc uses. The originals keep their own
+*  position and id -- offset always creates new geometry alongside the
+*  source, never moves or deletes it -- but flip to construction=true
+*  (Fusion's own offset behavior: the source becomes a dashed reference,
+*  the new offset chain the real profile edge).
+*  `distance <= 0` is degenerate (a zero offset would duplicate the source
+*  in place) and is refused with null; the caller shows the message. */
+export declare function offsetChain(geoms: CoreGeom[], rules: Array<Record<string, any>>, chain: Array<{
+    id: number;
+    from: Pt;
+    to: Pt;
+}>, side: 1 | -1, distance: number): {
+    geoms: CoreGeom[];
+    rules: Array<Record<string, any>>;
+    newIds: number[];
+} | null;
 /** Re-dense the ids after duplication: 100000-offset ids are a collision-
  *  free trick, not a representation. Renumber everything to 1..n and rewrite
  *  every rule reference through the map. */
@@ -174,5 +342,59 @@ export declare function densifyIds(geoms: CoreGeom[], rules: Array<Record<string
     geoms: CoreGeom[];
     rules: Array<Record<string, any>>;
 };
+/** The six rule kinds that carry a numeric `value`. They are drawn as a
+  * VALUE LABEL rather than an icon -- the number is the glyph -- which is
+  * also the set the on-canvas dimension flow can write. */
+export declare const DIMENSION_RULE_KINDS: readonly ["distance", "distanceX", "distanceY", "radius", "diameter", "angle"];
+export type DimKind = (typeof DIMENSION_RULE_KINDS)[number];
+export declare function isDimensionRule(k: string): k is DimKind;
+/** The middle of a geometry row: a line's halfway point, a circle's centre,
+  * an arc's MID-SWEEP point (not its chord's middle -- a label on the chord
+  * of a half circle sits nowhere near the curve), a point's own location.
+  * Returns null for anything that is not one of the four soup kinds. */
+export declare function geomMidpoint(g: CoreGeom): Pt | null;
+/** One end of a dimension: a geometry id plus which of its named points, or
+  * null for "the whole row". */
+export interface DimPick {
+    id: number;
+    at: 'a' | 'b' | 'c' | null;
+}
+export interface AutoDimension {
+    kind: DimKind;
+    /** What the geometry measures RIGHT NOW -- what the input box opens on. */
+    value: number;
+    /** Where the label rests until the user places it somewhere else. */
+    anchor: Pt;
+    /** The ends the committed rule will name. */
+    a: DimPick;
+    b: DimPick | null;
+}
+/** What dimension does a pick (or a pair of point picks) ASK for? A line
+  * wants the distance between its own two ends; a circle or an arc wants its
+  * radius -- the convention SketchCanvas2D's own openDimFromSelection already
+  * uses, so the on-canvas flow and the ribbon buttons cannot disagree about
+  * what `D` on a circle means; two picked points want the distance between
+  * them.
+  *
+  * Returns null when there is nothing to measure: ONE point pick (it is half
+  * a dimension, and the caller waits for the other half), a bare point row,
+  * or an id that is not in `geoms`. */
+export declare function autoDimension(geoms: CoreGeom[], a: DimPick, b?: DimPick | null): AutoDimension | null;
+/** Why the solver cannot take this text, in a sentence, or null when it can.
+  * The caller shows the sentence on the status line and writes NOTHING --
+  * a refused dimension must not grow the undo stack.
+  *
+  * distanceX/distanceY are the only SIGNED kinds: a negative one names the
+  * other direction and a zero one names a shared axis, so neither is absurd
+  * there the way a zero-length distance or a negative radius is. */
+export declare function dimensionValueError(kind: DimKind, text: string): string | null;
+/** One anchor per rule, INDEX-ALIGNED with `rules` (a rule the canvas cannot
+  * place keeps its slot as null) because the glyph layer identifies a rule by
+  * its index and a shifted array would delete the wrong one.
+  *
+  * Rules that land on the same spot are fanned out along +x by `stepWorld`
+  * each: a rectangle's bottom edge carries a horizontal AND a distance, and
+  * stacked on one pixel they are one unreadable blur. */
+export declare function ruleGlyphAnchors(geoms: CoreGeom[], rules: Array<Record<string, any>>, stepWorld: number): Array<Pt | null>;
 export {};
 //# sourceMappingURL=sketch-canvas-core.d.ts.map

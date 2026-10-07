@@ -1,4 +1,4 @@
-// 2.1.11 Challenges (reference solution).
+// 5.1.23 Challenges (reference solution).
 // Demonstrates Challenge 1 (color cycle on tap), Challenge 2 (orbiting
 // companion), and Challenge 4 (frameCount HUD). Any one of the six
 // challenges is enough to pass the grader.

@@ -25,7 +25,7 @@
       "title": "Hollow it out",
       "instructions": "Press the Hollow tool in the toolbar. The box becomes an open-topped shell, like a cup. In the Dimensions panel, wall reads 2 - type 3, so the walls are 3 mm thick.",
       "hints": [
-        "A message under the 3D view should read \"Hollow 1 is open at the top face.\" That's the open top you want — you don't need any other tool for it.",
+        "A message at the bottom right of the studio should read \"Hollow 1 is open at the top face.\" That's the open top you want — you don't need any other tool for it.",
         "Look for the field named \"Hollow 1 wall\" in the Dimensions panel. Click its number box, type 3, and press Enter."
       ]
     }

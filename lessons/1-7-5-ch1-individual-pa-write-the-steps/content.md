@@ -3,8 +3,12 @@
 **20 points — the largest single item.** Pseudocode for the problem you charted
 in Part 4. The same one.
 
-- **Not JavaScript.** Plain English, arranged like code.
-- One submission. It locks, and nothing comes back on screen.
+- **Not JavaScript.** Plain English, arranged like code. (If you write real JavaScript
+  instead, you are not marked down for it as long as the logic is right and readable, but
+  plain English is what this item asks for.)
+- **You get three tries.** Submit, read the feedback on each criterion, improve your
+  steps and submit again. Your best try is the one that counts. After your third try
+  you can see how it is solved, once your teacher releases it.
 - Part 4 is the lesson right before this one. Going back to look at your own
   chart costs you nothing.
 

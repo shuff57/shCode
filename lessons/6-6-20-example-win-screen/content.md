@@ -2,7 +2,7 @@
 
 ## Step 1: Trigger the win state
 
-Start with a play state where the player collects items to reach a goal. When they reach the target, switch to `'win'`. The win screen shows a congratulatory message and the final score.
+Start with a play state where the player collects items to reach a goal. When they reach the target, switch to `'win'`. The win screen shows a congratulatory message and the final score. In this example the player glides toward the mouse: `mouseX` and `mouseY` are the mouse's x and y position (`mouse.x` and `mouse.y` are taught properly in 6.7).
 
 ```js live
 let state, score, goal, player, item;
@@ -48,7 +48,7 @@ function draw() {
 
 ## Step 2: Show play stats on the win screen
 
-Capture stats when the win triggers: save the elapsed time so the win screen can show how long it took.
+Capture stats when the win triggers: save the elapsed time so the win screen can show how long it took. (`millis()` is the number of milliseconds since the sketch started; subtracting an earlier reading from the current one measures elapsed time.) `nf(n, 0, 1)` formats a number to show 1 decimal place.
 
 ```js live
 let state, score, goal, startTime, finalTime, player, item;

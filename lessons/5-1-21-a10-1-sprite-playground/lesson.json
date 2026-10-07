@@ -51,7 +51,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "A canvas is created when the sketch starts.",
+      "description": "A canvas is created when the sketch starts. Help: 5.1.5 (Canvas: new Canvas(w, h))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -61,7 +61,7 @@
     {
       "id": "r2",
       "title": "Create at least 2 sprites",
-      "description": "Two sprites exist in the sketch.",
+      "description": "Two sprites exist in the sketch. Help: 5.1.16 (Movement pattern (if / else if / else))",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\([\\s\\S]*?new\\s+Sprite\\s*\\(",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "Horizontal WASD input",
-      "description": "A or D keys move the player horizontally each frame.",
+      "description": "A or D keys move the player horizontally each frame. Help: 5.1.19 (WASD-not-arrows)",
       "type": "inFunction",
       "function": [
         "draw",
@@ -85,7 +85,7 @@
     {
       "id": "r4",
       "title": "Vertical WASD input",
-      "description": "W or S keys move the player vertically each frame.",
+      "description": "W or S keys move the player vertically each frame. Help: 5.1.19 (WASD-not-arrows)",
       "type": "inFunction",
       "function": [
         "draw",
@@ -99,7 +99,7 @@
     {
       "id": "r5",
       "title": "Velocity resets to zero",
-      "description": "The player stops when no movement key is held.",
+      "description": "The player stops when no movement key is held. Help: 5.1.17 (The else-to-zero rule)",
       "type": "inFunction",
       "function": [
         "draw",
@@ -113,7 +113,7 @@
     {
       "id": "r6",
       "title": "Automatic motion for the mover",
-      "description": "The mover sprite animates without keyboard input.",
+      "description": "The mover sprite animates without keyboard input. Help: 5.1.16 (Movement pattern (if / else if / else))",
       "type": "inFunction",
       "function": [
         "draw",

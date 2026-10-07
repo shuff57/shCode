@@ -27,18 +27,23 @@ const read = (p) => readFileSync(path.join(root, p), 'utf8');
 const stripComments = (s) =>
   s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
 
-// Moved to reshape-cad's packages/sketch and packages/studio (B1 extraction,
-// plan: freecad-browser.md) -- read from there now, one level up.
-const SOLVER = '../reshape-cad/packages/sketch/src/sketch-solve.ts';
-const PANEL = '../reshape-cad/packages/studio/src/model/SketchConstraints.tsx';
+// The Rules panel (SketchConstraints.tsx) and the legacy point/edge-index
+// `Constraint` union's only editor were retired in reshape-cad 2b19a05
+// ("retire the legacy 2D sketcher"). SketchCanvas2D is now the only sketch
+// editor and speaks the soup rule vocabulary, `SoupRule` ({k: ...}) in
+// packages/script's model-types.ts. So the census reads that union and the
+// UI it must be reachable from is SketchCanvas2D.tsx. Vendored copy, so no
+// sibling checkout is needed.
+const SOLVER = 'vendor/reshape-cad/packages/script/src/model-types.ts';
+const PANEL = 'vendor/reshape-cad/packages/studio/src/model/SketchCanvas2D.tsx';
 
 // `;\s*$` and not `;\n` -- this repo's files are CRLF on Windows checkouts,
 // and a \n-anchored match here failed to find a union that was sitting right
 // there. The self-check below is the only reason that surfaced as a FAIL
 // rather than as an empty kind list quietly passing.
-const union = read(SOLVER).match(/export type Constraint =([\s\S]*?);\s*$/m);
+const union = read(SOLVER).match(/export type SoupRule =([\s\S]*?);\s*$/m);
 if (!union) {
-  console.error(`\nFAIL  could not find the Constraint union in ${SOLVER}.`);
+  console.error(`\nFAIL  could not find the SoupRule union in ${SOLVER}.`);
   process.exit(1);
 }
 // [A-Za-z] and not [a-z] -- P1d added `distanceX` and `distanceY`, and a
@@ -48,7 +53,7 @@ if (!union) {
 // was never in the list to be missing FROM. So the check ran, failed for a
 // real reason, and was silently not looking at two of the eleven kinds it
 // exists to census. Measured 2026-09-09: [a-z]+ yields 9, [A-Za-z]+ yields 11.
-const kinds = [...union[1].matchAll(/kind:\s*'([A-Za-z]+)'/g)].map((m) => m[1]);
+const kinds = [...union[1].matchAll(/\bk:\s*'([A-Za-z]+)'/g)].map((m) => m[1]);
 
 // A census that found nothing is a census that is not looking.
 //
@@ -56,7 +61,7 @@ const kinds = [...union[1].matchAll(/kind:\s*'([A-Za-z]+)'/g)].map((m) => m[1]);
 // At 5 this guard was satisfied by 9 of 11 and never fired on the camelCase
 // miss above -- a tripwire set low enough to step over. Raise it whenever the
 // union grows; a failure here means the parse broke, not that the union did.
-const EXPECTED_KINDS = 11;
+const EXPECTED_KINDS = 16; // SoupRule's documented 16 kinds
 if (kinds.length < EXPECTED_KINDS) {
   console.error(
     `\nFAIL  only parsed ${kinds.length} constraint kind(s) out of ${SOLVER}, `
@@ -76,8 +81,8 @@ if (missing.length) {
     + `in ${PANEL}:\n`
     + missing.map((k) => `        ${k}`).join('\n')
     + '\n\nA student cannot create, see, or remove one. Either give it a control\n'
-    + `or take it out of the Constraint union in ${SOLVER}.\n`);
+    + `or take it out of the SoupRule union in ${SOLVER}.\n`);
   process.exit(1);
 }
 
-console.log(`constraint UI: ${kinds.length} solver kinds, all reachable from the Rules panel`);
+console.log(`constraint UI: ${kinds.length} solver kinds, all reachable from the sketch editor`);

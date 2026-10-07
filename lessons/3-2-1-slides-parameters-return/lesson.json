@@ -1,12 +1,13 @@
 {
   "id": "3-2-1-slides-parameters-return",
   "title": "3.2.1 Slides: Parameters and Return Values",
-  "description": "Parameters and Return Values slides. Placeholder until the deck is built from the book.",
+  "description": "Unit 3.2 slides: parameters and arguments, return values, print versus return, composing functions, and scope. Shown from a copy of the bookSHelf deck kept in this site.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",
   "preview": "slides",
+  "slidesUrl": "/slides/3.2_parameters_and_return_values.paper.html",
   "week": 7,
   "slos": [
     "SLO-2"

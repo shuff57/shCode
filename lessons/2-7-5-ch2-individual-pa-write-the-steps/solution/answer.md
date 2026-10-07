@@ -22,10 +22,11 @@ A correct chart with botched code loses only the D2 points. A blank D1 costs the
 
 ### Reference solution (Problem 1: Seat Map)
 
-No functions, no arrays, no objects. Nested loop, `if / else if / else` with `&&`,
-`continue` past blocked seats, `break` the moment the block is found. The
-classification is an `if / else if / else` — `switch (true)` is deliberately not
-used, because Chapter 2 never teaches it.
+No functions, no arrays, no objects. Nested loop, `if / else if / else` with `||`,
+`continue` past blocked seats (which also breaks up the run of free seats), `break`
+the moment the block is found, and a `switch` that classifies the result into three
+outcomes. `switch (true)` is deliberately not used, because Chapter 2 never teaches
+it: the `switch` is on a text label the loop sets.
 
 ```js
 // Problem: Seat Map
@@ -41,49 +42,59 @@ try {
     throw new Error("R, S and G must all be at least 1");
   }
 
-  let found = false;
+  // The result as a label: "front" (rows 1-2), "back" (any later row),
+  // or "none" while no block has been found.
+  let verdict = "none";
   let foundRow = 0;
   let foundStart = 0;
 
   for (let r = 1; r <= ROWS; r++) {
     let consecutive = 0;
     for (let s = 1; s <= seatsPerRow; s++) {
-      // Seats 4 and 5 of every row are staff seats -- skip them.
+      // Seats 4 and 5 of every row are blocked. A blocked seat ends the
+      // run of free seats, so the count starts again, then we skip it.
       if (s === 4 || s === 5) {
+        consecutive = 0;
         continue;
       }
       consecutive = consecutive + 1;
-      if (consecutive >= groupSize && !found) {
-        found = true;
+      if (consecutive === groupSize) {
         foundRow = r;
         foundStart = s - groupSize + 1;
+        if (r <= 2) {
+          verdict = "front";
+        } else {
+          verdict = "back";
+        }
+        break; // stop this row: the block is found
       }
+    }
+    if (verdict !== "none") {
+      break; // stop the sweep: no need to look at later rows
     }
   }
 
-  // Report with a branch, not a switch: two outcomes, and §2.3 teaches
-  // that a two-outcome classification is an if/else.
-  if (found) {
-    console.log(`Block found: row ${foundRow}, seats ${foundStart} to ${foundStart + groupSize - 1}`);
-  } else if (ROWS < 1) {
-    console.log("No theater at all");
-  } else {
-    console.log("No block of " + groupSize + " free seats anywhere");
+  switch (verdict) {
+    case "front":
+      console.log(`Block found near the front: row ${foundRow}, seats ${foundStart} to ${foundStart + groupSize - 1}`);
+      break;
+    case "back":
+      console.log(`Block found further back: row ${foundRow}, seats ${foundStart} to ${foundStart + groupSize - 1}`);
+      break;
+    default:
+      console.log("No block of " + groupSize + " free seats anywhere");
   }
 
-  console.log(typeof found);
+  console.log(typeof verdict);
 } catch (err) {
   console.log(err.message);
 }
 ```
 
 **Points earned (example):**
-- Branch with `&&`: 8/8 — `consecutive >= groupSize && !found` is compound
+- Branch with `||`: 8/8 — `s === 4 || s === 5` and the `if / else` that sets the label (full marks need a chain with at least one compound condition)
 - Nested loop: 9/9 — seat sweep inside a row sweep, both run
 - Break/continue: 3/3 — `continue` past seats 4 and 5
 - **Total: 20/20**
 
-**Note on the `break`:** this reference intentionally does not `break` out of
-the sweep — the full map is worth walking so the report can name the *first*
-block found from the top. A student who breaks early earns the same 3: the
-criterion is a loop-control keyword that changes what runs, and theirs does.
+**Note on the `break`:** the task says to `break` the moment the block is found, so the reference does, once out of the seat loop and once out of the row loop. A `break` inside a `switch` case does not count for the loop-control criterion.

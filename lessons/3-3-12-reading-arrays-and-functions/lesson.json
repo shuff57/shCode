@@ -1,6 +1,6 @@
 {
   "id": "3-3-12-reading-arrays-and-functions",
-  "title": "3.3.12 Reading: Arrays and Functions",
+  "title": "3.3.15 Reading: Arrays and Functions",
   "description": "Learn how a whole array can be one function parameter, and how a function can build and return a new array. Read before the filter-function lab.",
   "type": "lesson",
   "estimateMins": 10,

@@ -10,6 +10,8 @@ program for your teacher with the writeup open next to it.
 
 ### Write it together, submit it twice
 
+**You get three tries.** Each partner submits their own; submit, read the feedback on each criterion, improve and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
+
 One answer, agreed on by both of you, pasted in by each of you. If the two of you
 would not give the same answer to a question, that is the question to talk about
 before you write it down.

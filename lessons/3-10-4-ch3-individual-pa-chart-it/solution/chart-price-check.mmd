@@ -3,20 +3,27 @@ flowchart TD
   B[/Read the cart and the limit/]
   C[Set the total to zero]
   D{{i = 0 to cart.length - 1}}
-  F[[totalOne item]]
-  G{Is total over the limit?}
-  H[/Report over the limit/]
-  I[Report at or under the limit]
-  J[[receiptLine item]]
+  E[[totalOne item]]
+  F[Add the item's cost to the total]
+  G[[receiptLine item]]
+  H{Is the total over the limit?}
+  I[/Report over the limit/]
+  J{Is the total exactly the limit?}
+  K[/Report at the limit/]
+  L[/Report under the limit/]
   Z([End])
   A --> B
   B --> C
   C --> D
-  D -- "Yes, more to count" --> F
-  F --> D
-  D -- "No, the cart is done" --> G
-  G -- "Past the limit" --> H
-  G -- "At or under" --> I
-  H --> Z
-  I --> J
-  J --> Z
+  D -- "More items" --> E
+  E --> F
+  F --> G
+  G --> D
+  D -- "Cart is done" --> H
+  H -- "Over" --> I
+  H -- "Not over" --> J
+  J -- "Exactly" --> K
+  J -- "Under" --> L
+  I --> Z
+  K --> Z
+  L --> Z

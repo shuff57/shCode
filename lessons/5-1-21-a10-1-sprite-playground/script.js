@@ -1,4 +1,4 @@
-// 2.1.10 Sprite Playground: combine canvas, WASD movement, auto-motion, and text.
+// 5.1.21 Sprite Playground: combine canvas, WASD movement, auto-motion, and text.
 
 let player, mover;
 

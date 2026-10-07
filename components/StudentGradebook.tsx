@@ -14,6 +14,8 @@ import { Fragment, useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight, MessageSquare } from 'lucide-react';
 import { formatDue } from '../lib/due-dates-core';
 import { sortLessons } from '../lib/lesson-order';
+import { lessonHref } from '../lib/lesson-href';
+import { lessonGradeCategory, lessonPercent, type GradeCategory } from '../lib/grading-weights';
 // Status derivation is shared with the endpoint that builds these cells, so
 // the page and the teacher's gradebook can never disagree about whether a
 // student is behind. See lib/gradebook-cell.ts.
@@ -29,13 +31,42 @@ interface ManifestLesson {
   title: string;
   unit?: string;
   type?: string;
+  /** Quiz questions, rubric points, or pass/fail criteria; null = completion is the grade. */
+  maxScore?: number | null;
+  /** Grade-category inputs (lib/grading-weights.ts lessonGradeCategory), all on the manifest row. */
+  preview?: string | null;
+  assignmentCode?: string | null;
+  scoreKind?: 'quiz' | 'written' | null;
 }
 
 interface Props {
   lessons: ManifestLesson[];
 }
 
-type Filter = 'all' | 'attention';
+/** One class's grade so far, from /api/my-gradebook (functions/_shared/grading.ts studentGrading). */
+interface ClassGrade {
+  classId: string;
+  className: string;
+  percent: number;
+  gradedTotal: number;
+  doneCount: number;
+  counted: number;
+  missingCount: number;
+}
+
+type Filter = 'all' | 'attention' | 'progress';
+
+/** Short names for the chip beside each assignment: which part of the grade it counts toward. */
+const CATEGORY_SHORT: Record<GradeCategory, string> = {
+  lab: 'Lab',
+  written: 'Written',
+  quiz: 'Quiz',
+  chapterTest: 'Chapter test',
+  finalExam: 'Final exam',
+  q1: 'Q1 project',
+  q2: 'Q2 project',
+  q4: 'Q4 project',
+};
 
 const STATUS_LABEL: Record<CellStatus, string> = {
   pending: 'Awaiting teacher',
@@ -57,21 +88,35 @@ const STATUS_COLOR: Record<CellStatus, string> = {
 
 /** Score text for one cell.
  *
- *  Most rubrics in this course grade pass/fail with every criterion worth 0
- *  points (see lib/grade-pass.ts), so `possible` is 0 far more often than it is
- *  a real total. "17/0" would be worse than showing nothing, so raw points
- *  appear only when there are points to show. */
-function scoreText(cell: GradebookCell): string | null {
+ *  The percent is lessonPercent() -- the SAME function the grade the teacher syncs is built
+ *  from (functions/_shared/grading.ts) -- over lesson_state.score, which is raw POINTS (see
+ *  lib/gradebook-cell.ts), so it is never printed as if it were already a percent. It used to
+ *  be: a chart lesson stored 0 points and showed "9/9 · 0%" beside a grade of 100.
+ *
+ *  Raw points of the latest attempt appear only when there are points to show: most rubrics
+ *  grade pass/fail with every criterion worth 0 points (lib/grade-pass.ts), so `possible` is 0
+ *  far more often than it is a real total, and "17/0" would be worse than showing nothing. */
+function scoreText(cell: GradebookCell, maxScore: number | null | undefined): string | null {
   const hasPoints = cell.possible != null && cell.possible > 0 && cell.submittedScore != null;
-  if (hasPoints && cell.score != null) return `${cell.submittedScore}/${cell.possible} · ${cell.score}%`;
+  const percent = cell.state === 'completed' ? lessonPercent(cell.state, cell.score, maxScore) : null;
+  // The recorded grade is the BEST attempt (lesson_state.score), so when the lesson has a max the
+  // points shown are that best score out of the max, never the latest attempt's: "3/8 \u00b7 50%"
+  // paired the last try's 3 with the best try's 4-of-8.
+  if (percent != null && maxScore != null && maxScore > 0 && cell.score != null) {
+    return `${Math.round(cell.score * 100) / 100}/${maxScore} \u00b7 ${percent}%`;
+  }
+  if (hasPoints && percent != null) return `${cell.submittedScore}/${cell.possible} · ${percent}%`;
   if (hasPoints) return `${cell.submittedScore}/${cell.possible}`;
-  if (cell.score != null) return `${cell.score}%`;
+  if (percent != null) return `${percent}%`;
   return null;
 }
 
 export default function StudentGradebook({ lessons }: Props) {
   const [cells, setCells] = useState<Record<string, GradebookCell> | null>(null);
   const [dueDates, setDueDates] = useState<Record<string, number>>({});
+  const [grades, setGrades] = useState<ClassGrade[]>([]);
+  const [tries, setTries] = useState<Record<string, { used: number; cap: number }>>({});
+  const [opensAt, setOpensAt] = useState<Record<string, number>>({});
   const [failed, setFailed] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -83,10 +128,13 @@ export default function StudentGradebook({ lessons }: Props) {
         if (!r.ok) throw new Error(`my-gradebook ${r.status}`);
         return r.json();
       })
-      .then((d: { cells?: Record<string, GradebookCell>; dueDates?: Record<string, number> }) => {
+      .then((d: { cells?: Record<string, GradebookCell>; dueDates?: Record<string, number>; grades?: ClassGrade[]; tries?: Record<string, { used: number; cap: number }>; opensAt?: Record<string, number> }) => {
         if (cancelled) return;
         setCells(d.cells ?? {});
         setDueDates(d.dueDates ?? {});
+        setGrades((d.grades ?? []).filter((g) => g.counted > 0));
+        setTries(d.tries ?? {});
+        setOpensAt(d.opensAt ?? {});
       })
       .catch(() => {
         if (!cancelled) setFailed(true);
@@ -124,13 +172,65 @@ export default function StudentGradebook({ lessons }: Props) {
     .filter((l) => cells[l.id])
     .map((l) => {
       const cell = cells[l.id];
-      return { lesson: l, cell, status: cellStatus(cell) };
+      const status = cellStatus(cell);
+      const t = tries[l.id];
+      // Tried and not passing: they handed something in, so "Not started" would be untrue.
+      const tried = !!t && t.used > 0 && cell.state !== 'completed' && status !== 'pending';
+      const opens = opensAt[l.id] && cell.state !== 'completed' && !tried ? opensAt[l.id] : null;
+      return { lesson: l, cell, status, tried, opens, t };
+    })
+    // A reading, slide deck or example has a due date through its module but no grade, so one the
+    // student never opened is not "Missing": it is not an assignment. Ones they did open still show.
+    .filter(({ lesson, status }) => {
+      if (status !== 'missing' && status !== 'not-started') return true;
+      return lessonGradeCategory({ title: lesson.title, preview: lesson.preview, scoreKind: lesson.scoreKind, assignmentCode: lesson.assignmentCode }) !== null;
     });
 
-  const attentionCount = rows.filter((r) => needsAttention(r.status)).length;
-  const shown = filter === 'attention' ? rows.filter((r) => needsAttention(r.status)) : rows;
+  // "Missing or late" is what a student can still act on or should know about; "In progress" is
+  // work they have started and not finished. They used to be one "Needs attention" list, which told
+  // a student halfway through a lesson that something was wrong.
+  const isMissingOrLate = (st: CellStatus) => st !== 'started' && needsAttention(st);
+  const attentionCount = rows.filter((r) => isMissingOrLate(r.status)).length;
+  const nowMs = Date.now();
+  const isInProgress = (r: { status: CellStatus; tried: boolean }) => r.status === 'started' || (r.tried && r.status === 'not-started');
+  const progressCount = rows.filter(isInProgress).length;
+  const shown =
+    filter === 'attention'
+      ? rows.filter((r) => isMissingOrLate(r.status))
+      : filter === 'progress'
+        ? rows.filter(isInProgress)
+        : rows;
 
   return (
+    <>
+    {grades.length > 0 && (
+      <div style={cardStyle}>
+        <h3 style={{ margin: '0 0 10px 0' }}>Your grade so far</h3>
+        {grades.map((g) => (
+          <div key={g.classId} style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 28, fontWeight: 700 }}>{g.percent}%</span>
+              <span style={{ opacity: 0.7 }}>{grades.length > 1 ? g.className : 'in your class'}</span>
+            </div>
+            <div style={{ opacity: 0.6, fontSize: 13, marginTop: 2 }}>
+              Counts work that is done plus work past its due date. Lessons not due yet are left out.
+              {' '}{g.doneCount} of {g.gradedTotal} graded lessons done
+              {g.missingCount > 0 ? ` \u00b7 ${g.missingCount} past due and not done` : ''}.
+            </div>
+          </div>
+        ))}
+        <details style={{ marginTop: 6 }}>
+          <summary style={{ cursor: 'pointer', fontSize: 13 }}>How your grade works</summary>
+          <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, listStyle: 'disc', fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>
+            <li>Each graded assignment counts toward a part of your grade (Lab, Written, Quiz, Chapter test). The chip beside each assignment below says which part.</li>
+            <li>Where an assignment allows several tries, your best try is the one that counts, not the latest.</li>
+            <li>An assignment past its due date that is not done counts as 0 until you finish it. Turning it in later replaces the 0.</li>
+            <li>An assignment that is not due yet does not count against you.</li>
+            <li>Handing something in late is marked &ldquo;Completed late&rdquo; so your teacher can see it. It does not lower the percent shown here.</li>
+          </ul>
+        </details>
+      </div>
+    )}
     <div style={cardStyle}>
       <div style={toolbarStyle}>
         {/* marginRight:auto, not flex:1 — flex:1 lets the heading shrink to
@@ -145,7 +245,14 @@ export default function StudentGradebook({ lessons }: Props) {
           onClick={() => setFilter('attention')}
           style={filter === 'attention' ? tabActive : tabIdle}
         >
-          Needs attention ({attentionCount})
+          Missing or late ({attentionCount})
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilter('progress')}
+          style={filter === 'progress' ? tabActive : tabIdle}
+        >
+          In progress ({progressCount})
         </button>
       </div>
 
@@ -154,7 +261,11 @@ export default function StudentGradebook({ lessons }: Props) {
           Nothing here yet. An assignment shows up once you start it, or once its due date passes.
         </p>
       ) : shown.length === 0 ? (
-        <p style={mutedStyle}>Nothing needs your attention — everything is done and on time.</p>
+        <p style={mutedStyle}>
+          {filter === 'progress'
+            ? 'Nothing is half-finished right now.'
+            : 'Nothing is missing or late. Everything past its due date is done.'}
+        </p>
       ) : (
         <div style={scrollWrapStyle}>
           <table style={tableStyle}>
@@ -167,9 +278,31 @@ export default function StudentGradebook({ lessons }: Props) {
               </tr>
             </thead>
             <tbody>
-              {shown.map(({ lesson, cell, status }) => {
+              {shown.map(({ lesson, cell, status, tried, opens, t }) => {
                 const due = dueDates[lesson.id];
-                const score = scoreText(cell);
+                const score = scoreText(cell, lesson.maxScore);
+                // Tried and not passing: say what they have and how many tries are left.
+                const left = t ? Math.max(0, t.cap - t.used) : 0;
+                const statusLabel = opens
+                  ? `Opens ${formatDue(opens)}`
+                  : tried
+                    ? left > 0 ? `Tried \u00b7 ${left} ${left === 1 ? 'try' : 'tries'} left` : 'Tried \u00b7 no tries left'
+                    : STATUS_LABEL[status];
+                const statusColor = opens ? '#94a3b8' : tried ? '#bd93f9' : STATUS_COLOR[status];
+                const bestText = tried
+                  ? cell.score != null && lesson.maxScore
+                    ? `best ${Math.round(cell.score * 100) / 100}/${lesson.maxScore}`
+                    : cell.possible != null && cell.possible > 0 && cell.submittedScore != null
+                      ? `latest ${cell.submittedScore}/${cell.possible}`
+                      : null
+                  : null;
+                const dueSoon = !!due && due > nowMs && due - nowMs <= 7 * 86400000 && status !== 'done' && status !== 'done-late';
+                const category = lessonGradeCategory({
+                  title: lesson.title,
+                  preview: lesson.preview,
+                  scoreKind: lesson.scoreKind,
+                  assignmentCode: lesson.assignmentCode,
+                });
                 const hasFeedback = !!cell.teacherFeedback;
                 const open = hasFeedback && !!expanded[lesson.id];
                 return (
@@ -188,20 +321,54 @@ export default function StudentGradebook({ lessons }: Props) {
                             <MessageSquare size={13} style={{ color: '#bd93f9', flexShrink: 0 }} />
                           </button>
                         ) : (
-                          <span style={{ fontWeight: 500 }}>{lesson.title}</span>
+                          <a href={lessonHref(lesson)} style={{ fontWeight: 500, color: 'inherit' }}>
+                            {lesson.title}
+                          </a>
+                        )}
+                        {hasFeedback && (
+                          <a
+                            href={lessonHref(lesson)}
+                            aria-label={`Open ${lesson.title}`}
+                            title="Open lesson"
+                            style={{ marginLeft: 6, color: '#8393c4', fontSize: 12 }}
+                          >
+                            Open
+                          </a>
+                        )}
+                        {category && (
+                          <span
+                            style={chipStyle}
+                            title={`Counts toward the ${CATEGORY_SHORT[category].toLowerCase()} part of your grade`}
+                          >
+                            {CATEGORY_SHORT[category]}
+                          </span>
                         )}
                       </td>
-                      <td style={{ ...tdStyle, opacity: 0.65 }}>
+                      <td style={{ ...tdStyle, opacity: dueSoon ? 1 : 0.65 }}>
                         {due ? formatDue(due) : '—'}
+                        {dueSoon && <span style={{ ...chipStyle, color: '#ffb86c', borderColor: '#ffb86c' }}>due soon</span>}
                       </td>
                       <td style={tdStyle}>
-                        <span
-                          style={{ ...badgeStyle, color: STATUS_COLOR[status], borderColor: STATUS_COLOR[status] }}
-                        >
-                          {STATUS_LABEL[status]}
+                        <span style={{ ...badgeStyle, color: statusColor, borderColor: statusColor }}>
+                          {statusLabel}
                         </span>
                       </td>
-                      <td style={scoreCellStyle}>{score ?? '—'}</td>
+                      <td style={scoreCellStyle}>
+                        {bestText ?? score ?? '\u2014'}
+                        {t && t.used > 0 && !tried && (
+                          <div style={{ opacity: 0.55, fontSize: 11 }}>
+                            {t.used} of {t.cap} {t.cap === 1 ? 'try' : 'tries'} used
+                          </div>
+                        )}
+                        {cell.teacherReviewedAt != null && (
+                          <div
+                            style={{ color: '#bd93f9', fontSize: 11 }}
+                            title="Your teacher reviewed this work and may have changed the score"
+                          >
+                            teacher-adjusted
+                          </div>
+                        )}
+                      </td>
                     </tr>
                     {open && (
                       <tr>
@@ -231,6 +398,7 @@ export default function StudentGradebook({ lessons }: Props) {
         do not need to submit it again.
       </p>
     </div>
+    </>
   );
 }
 
@@ -340,6 +508,16 @@ const feedbackHeadStyle: React.CSSProperties = {
   fontSize: 12,
   opacity: 0.7,
   marginBottom: 6,
+};
+
+const chipStyle: React.CSSProperties = {
+  marginLeft: 8,
+  padding: '1px 7px',
+  borderRadius: 10,
+  border: '1px solid #6272a4',
+  color: '#a9b7e0',
+  fontSize: 11,
+  whiteSpace: 'nowrap',
 };
 
 const legendStyle: React.CSSProperties = {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { Lesson } from '../lib/types';
 import { badgeFor } from '../lib/lesson-badges';
@@ -67,6 +67,44 @@ export default function ContentLessonView({ lesson }: Props) {
     };
   }, [slidesUrl]);
 
+  // Did the deck actually render? Decks are vendored under /slides/ (see
+  // scripts/sync-decks.mjs), so the frame is same-origin and we can look inside
+  // it: once it has loaded, an empty body, about:blank, or an error/404 page
+  // means the student is looking at nothing and gets a pointer to the new-tab
+  // button. A working deck never shows the note. A deck that renders late gets
+  // one more look before we say anything.
+  const frameRef = useRef<HTMLIFrameElement | null>(null);
+  const [deckBlank, setDeckBlank] = useState(false);
+  const showFrame = !!slidesUrl && deckReady === true;
+
+  const checkFrame = (final: boolean) => {
+    const f = frameRef.current;
+    if (!f) return;
+    let bad = false;
+    try {
+      const doc = f.contentDocument;
+      if (!doc) bad = true;
+      else if (doc.readyState !== 'complete') return;
+      else {
+        const text = (doc.body?.innerText ?? '').trim();
+        bad =
+          doc.location.href === 'about:blank' ||
+          text.length < 20 ||
+          /^(404|not found|error)\b/i.test(doc.title.trim());
+      }
+    } catch {
+      bad = true; // cross-origin or otherwise unreadable: not the vendored deck
+    }
+    if (!bad) setDeckBlank(false);
+    else if (final) setDeckBlank(true);
+    else window.setTimeout(() => checkFrame(true), 1500);
+  };
+
+  useEffect(() => {
+    setDeckBlank(false);
+  }, [slidesUrl]);
+
+
   return (
     <>
       <TabbedRightDrawer
@@ -80,7 +118,7 @@ export default function ContentLessonView({ lesson }: Props) {
           },
         ]}
       />
-      <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 20px 80px', color: '#f8f8f2' }}>
+      <main style={{ maxWidth: 960, width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '24px 20px 80px', color: '#f8f8f2' }}>
       <nav style={{ marginBottom: 12, fontSize: 13, color: '#888' }}>
         <Link href="/" style={{ color: '#8be9fd' }}>Home</Link>
         {lesson.unit ? (
@@ -170,13 +208,36 @@ export default function ContentLessonView({ lesson }: Props) {
       {preview === 'slides' ? (
         slidesUrl && deckReady === true ? (
           <div style={{ marginTop: 16 }}>
-            <div style={{ marginBottom: 8 }}>
-              <a href={slidesUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#50fa7b' }}>
-                → Open in new tab (full screen, editable code blocks)
+            <div style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+              <a
+                href={slidesUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  background: '#50fa7b',
+                  color: '#282a36',
+                  fontWeight: 700,
+                  fontSize: 15,
+                  padding: '10px 18px',
+                  borderRadius: 8,
+                  textDecoration: 'none',
+                }}
+              >
+                Open in new tab →
               </a>
+              <span style={{ color: '#8393c4', fontSize: 13 }}>Full screen, editable code blocks</span>
             </div>
+            {deckBlank ? (
+              <p role="status" style={{ margin: '0 0 8px', color: '#f1fa8c', fontSize: 14 }}>
+                Slides blank? Open them in a new tab.
+              </p>
+            ) : null}
             <div style={{ aspectRatio: '16 / 9', borderRadius: 8, overflow: 'hidden', background: '#000', border: '1px solid #44475a' }}>
               <iframe
+                ref={frameRef}
+                title={`Slides: ${lesson.title}`}
+                onLoad={() => checkFrame(false)}
                 src={slidesUrl}
                 allow="autoplay; clipboard-write; fullscreen"
                 style={{ width: '100%', height: '100%', border: 0 }}
@@ -259,6 +320,7 @@ export default function ContentLessonView({ lesson }: Props) {
         .content-prose blockquote { border-left: 3px solid #bd93f9; margin: 12px 0; padding: 4px 14px; color: #ccc; background: rgba(189,147,249,0.08); }
         .content-prose hr { border: none; border-top: 1px solid #333; margin: 20px 0; }
         .content-prose ul, .content-prose ol { padding-left: 24px; }
+        @media (max-width: 720px) { .content-prose table { display: block; overflow-x: auto; max-width: 100%; } }
       `}</style>
     </main>
     </>

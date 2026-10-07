@@ -11,7 +11,7 @@ import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import TextureEditor from './TextureEditor';
 import DocsDrawer from './DocsDrawer';
-import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
+import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
   canUseBuild,
@@ -111,9 +111,9 @@ export default function SandboxWorkspace() {
   const [full, setFull] = useState(false);
   const [editorHidden, setEditorHidden] = useState(false);
   const [consoleHidden, setConsoleHidden] = useState(false);
-  const workerRef = useRef<Worker | null>(null);
+  const runRef = useRef<{ kill: () => void } | null>(null);
 
-  useEffect(() => () => { workerRef.current?.terminate(); }, []);
+  useEffect(() => () => { runRef.current?.kill(); }, []);
 
   // Restore the last mode before the first paint that matters. Reading in an
   // effect rather than useState's initialiser keeps the server and client
@@ -141,8 +141,8 @@ export default function SandboxWorkspace() {
 
   function chooseMode(next: SandboxModeId) {
     if (next === modeId) return;
-    workerRef.current?.terminate();
-    workerRef.current = null;
+    runRef.current?.kill();
+    runRef.current = null;
     try { window.localStorage.setItem(MODE_KEY, next); } catch { /* private mode */ }
     setEditorHidden(false);
     setConsoleHidden(false);
@@ -152,54 +152,36 @@ export default function SandboxWorkspace() {
   // ---- Running ----------------------------------------------------------
 
   const runJs = useCallback((script: string) => {
-    workerRef.current?.terminate();
+    runRef.current?.kill();
     const collected: LogLine[] = [];
     setLogs([]);
     setIsRunning(true);
 
-    const url = URL.createObjectURL(new Blob([RUNNER_SOURCE], { type: 'text/javascript' }));
-    const worker = new Worker(url);
-    workerRef.current = worker;
-
-    const cleanup = () => {
-      worker.terminate();
-      URL.revokeObjectURL(url);
-      if (workerRef.current === worker) workerRef.current = null;
-      setIsRunning(false);
-    };
-
-    const killer = setTimeout(() => {
-      collected.push({
-        type: 'error',
-        message: `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
-      });
-      setLogs([...collected]);
-      cleanup();
-    }, RUN_TIMEOUT_MS);
-
-    worker.onmessage = (e: MessageEvent) => {
-      const d = e.data as { kind: string; type?: string; message?: string; name?: string };
-      if (d.kind === 'log') {
-        collected.push({ type: d.type || 'log', message: d.message || '' });
+    const run = runStudentCode(
+      script,
+      (d) => {
+        if (d.kind === 'log') {
+          collected.push({ type: d.type || 'log', message: d.message || '' });
+          setLogs([...collected]);
+          return;
+        }
+        if (d.kind === 'error') {
+          collected.push({ type: 'error', message: errorWithLocation(d.name, d.message, d.line, d.col) });
+          setLogs([...collected]);
+        }
+      },
+      () => {
+        collected.push({
+          type: 'error',
+          message: `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
+        });
         setLogs([...collected]);
-        return;
-      }
-      if (d.kind === 'error') {
-        collected.push({ type: 'error', message: `${d.name || 'Error'}: ${d.message || ''}` });
-        setLogs([...collected]);
-      }
-      clearTimeout(killer);
-      cleanup();
-    };
-
-    worker.onerror = (e: ErrorEvent) => {
-      clearTimeout(killer);
-      collected.push({ type: 'error', message: e.message || 'Error' });
-      setLogs([...collected]);
-      cleanup();
-    };
-
-    worker.postMessage(script);
+      },
+      () => {
+        collected.length = 0;
+      },
+    );
+    runRef.current = run;
   }, []);
 
   // js/moSHion only -- reSHape's Run lives inside ReshapeStudio now (it owns
@@ -217,8 +199,8 @@ export default function SandboxWorkspace() {
   }, [fileContents, mode.preview, runJs]);
 
   function stopRun() {
-    workerRef.current?.terminate();
-    workerRef.current = null;
+    runRef.current?.kill();
+    runRef.current = null;
     setCode('');
     setRunKey(0);
     setConsoleResetKey((k) => k + 1);

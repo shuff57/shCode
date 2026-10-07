@@ -1,17 +1,21 @@
 'use client';
 
+import { lessonLabel } from '../lib/lesson-title-order';
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { CircleCheck, CircleX } from 'lucide-react';
-import { parseDiagramGrade, parseDiagramResponse } from '../lib/diagram-submission';
+import { parseDiagramArtifact, parseDiagramGrade, parseDiagramResponse } from '../lib/diagram-submission';
+import { criteriaScore } from '../lib/grade-pass';
+import { errorText } from '../lib/http-error';
 import { diagramFrameHeight } from '../lib/diagram-types';
+import SubmissionBoundary from './SubmissionBoundary';
 
 // Only pulled in when a flowchart submission is actually on screen — a class
 // with no diagram assignments never downloads React Flow.
 const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   ssr: false,
   loading: () => (
-    <div style={{ height: 360, display: 'grid', placeItems: 'center', color: '#6272a4', fontSize: '0.82rem' }}>
+    <div style={{ height: 360, display: 'grid', placeItems: 'center', color: '#8393c4', fontSize: '0.82rem' }}>
       Loading diagram…
     </div>
   ),
@@ -53,10 +57,19 @@ interface SubmissionItem {
   possible: number | null;
   grade_json: string;
   response: string;
+  /**
+   * What a teacher's mark on this row is out of (the server's rowLimit): points, or criteria met on a
+   * pass/fail part. Present even for a grader-outage row, which has no criteria list of its own.
+   */
+  limit?: { max: number; unit: 'points' | 'criteria' } | null;
+  /** The part has a try limit, so the server refuses a mark above `limit` (round 7). */
+  capped?: boolean;
 }
 
 interface Props {
   classId: string;
+  /** lesson id -> title, so a row says "3.3.14 Filter" rather than a folder id. */
+  lessonTitles?: Record<string, string>;
 }
 
 // ---------------------------------------------------------------------------
@@ -124,20 +137,64 @@ function hasTeacherReview(raw: string): boolean {
 interface OverrideFormProps {
   classId: string;
   submissionId: string;
+  /** Pass/fail part: the mark is CRITERIA MET out of this many. Null: a pointed or unknown part. */
+  unitTotal: number | null;
+  /** A pointed part: the mark is points, out of this many. Null: unknown. */
+  pointsMax?: number | null;
+  /** The ceiling is enforced (a capped part). Elsewhere the unit is a label and extra credit is allowed. */
+  enforceMax?: boolean;
   onOverride: () => void;
 }
 
-function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) {
+/** A pass/fail rubric's grade unit (criteria met out of the criteria count), or null for a pointed one. */
+function markUnit(g: GradeJson | null): { total: number } | null {
+  if (!g || !Array.isArray(g.criteria) || g.criteria.length === 0) return null;
+  if (typeof g.totalPossible === 'number' && g.totalPossible > 0) return null;
+  return { total: g.criteria.length };
+}
+
+export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, enforceMax = false, onOverride }: OverrideFormProps) {
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
+  // Capped parts only matter, but the box is harmless elsewhere (the server ignores it).
+  const [replaceBest, setReplaceBest] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Drop a "use this as the score" choice made earlier: the part goes back to the best its rows give.
+  async function handleClear() {
+    setSubmitting(true);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/classes/${encodeURIComponent(classId)}/submission-queue`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submissionId, clearOverride: true }),
+      });
+      if (!res.ok) throw new Error(await errorText(res));
+      setMsg({ type: 'success', text: 'Cleared. The score is now the student\u2019s best again.' });
+      onOverride();
+    } catch (err) {
+      setMsg({ type: 'error', text: err instanceof Error ? err.message : 'Clear failed' });
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   async function handleOverride(e: React.FormEvent) {
     e.preventDefault();
     const parsedScore = Number(score);
     if (isNaN(parsedScore) || parsedScore < 0) {
       setMsg({ type: 'error', text: 'Enter a valid score.' });
+      return;
+    }
+    if (enforceMax && unitTotal !== null && parsedScore > unitTotal) {
+      setMsg({ type: 'error', text: `This part is marked in criteria met, out of ${unitTotal}. Enter 0 to ${unitTotal}.` });
+      return;
+    }
+    if (enforceMax && unitTotal === null && pointsMax !== null && parsedScore > pointsMax) {
+      setMsg({ type: 'error', text: `This part is marked in points, out of ${pointsMax}. Enter 0 to ${pointsMax}.` });
       return;
     }
 
@@ -158,15 +215,21 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
           submissionId,
           score: parsedScore,
           feedback: feedback || undefined,
+          replaceBest: replaceBest || undefined,
         }),
       });
 
       if (!res.ok) {
-        const errMsg = await res.text().catch(() => 'Unknown error');
-        throw new Error(errMsg || `${res.status}`);
+        throw new Error(await errorText(res));
       }
 
-      setMsg({ type: 'success', text: 'Grade overridden successfully.' });
+      const out = (await res.json().catch(() => null)) as { overrideActive?: boolean; stateScore?: number } | null;
+      setMsg({
+        type: 'success',
+        text: out && out.overrideActive && !replaceBest
+          ? `Saved on this try. A score you set earlier is still in force (${out.stateScore}); tick the box to change it.`
+          : 'Grade overridden successfully.',
+      });
       onOverride();
     } catch (err) {
       setMsg({ type: 'error', text: err instanceof Error ? err.message : 'Override failed' });
@@ -182,12 +245,13 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <label htmlFor={`override-score-${submissionId}`} style={{ fontSize: '0.82rem', color: '#f8f8f2' }}>
-          New score:
+          {unitTotal !== null ? `New mark (criteria met, out of ${unitTotal}):` : pointsMax !== null ? `New score (points, out of ${pointsMax}):` : 'New score:'}
         </label>
         <input
           id={`override-score-${submissionId}`}
           type="number"
           min={0}
+          max={enforceMax ? unitTotal ?? pointsMax ?? undefined : undefined}
           step={0.5}
           value={score}
           onChange={(e) => setScore(e.target.value)}
@@ -227,6 +291,11 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
         />
       </div>
 
+      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#8393c4' }}>
+        <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
+        Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit). This stays until you change or clear it; the student&apos;s later tries do not undo it.
+      </label>
+
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <button
           type="submit"
@@ -245,6 +314,15 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
         >
           {submitting ? 'Overriding...' : 'Override grade'}
         </button>
+        <button
+          type="button"
+          onClick={handleClear}
+          disabled={submitting}
+          title="Drop a 'use this as the score' choice you made earlier on this part"
+          style={{ background: 'none', border: '1px solid #44475a', borderRadius: 4, color: '#8393c4', padding: '5px 10px', fontSize: '0.78rem', cursor: submitting ? 'not-allowed' : 'pointer' }}
+        >
+          Clear my score choice
+        </button>
 
         {msg && (
           <span style={{ fontSize: '0.82rem', color: msg.type === 'success' ? '#50fa7b' : '#ff5555' }}>
@@ -260,7 +338,7 @@ function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) 
 // Main component
 // ---------------------------------------------------------------------------
 
-export function SubmissionQueue({ classId }: Props) {
+export function SubmissionQueue({ classId, lessonTitles }: Props) {
   const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -276,8 +354,7 @@ export function SubmissionQueue({ classId }: Props) {
     })
       .then(async (res) => {
         if (!res.ok) {
-          const msg = await res.text().catch(() => 'Unknown error');
-          throw new Error(msg || `${res.status}`);
+          throw new Error(await errorText(res));
         }
         return res.json();
       })
@@ -302,7 +379,7 @@ export function SubmissionQueue({ classId }: Props) {
 
   if (loading) {
     return (
-      <div style={{ color: '#6272a4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: '#8393c4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
         Loading submission queue...
       </div>
     );
@@ -318,7 +395,7 @@ export function SubmissionQueue({ classId }: Props) {
 
   if (submissions.length === 0) {
     return (
-      <div style={{ color: '#6272a4', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: '#8393c4', padding: 16, fontSize: '0.88rem' }}>
         No submissions in the review queue.
       </div>
     );
@@ -362,7 +439,12 @@ export function SubmissionQueue({ classId }: Props) {
                 criteria: diagramGrade.ai.criteria,
               }
             : null);
-        const diagram = parseDiagramResponse(sub.response);
+        // A capped AI-graded chart's `response` is the Mermaid text the model read; the drawn chart
+        // itself is kept in grade_json.artifact.
+        const diagram = parseDiagramResponse(sub.response) ?? parseDiagramArtifact(sub.grade_json);
+        // The row's own criteria say it first; a grader-outage row has none, so the server's
+        // limit carries the unit (round 6: the form must always say what the mark is out of).
+        const unit = markUnit(gradeData) ?? (sub.limit?.unit === 'criteria' ? { total: sub.limit.max } : null);
         // The row's own score, not the marker, decides. An override writes a
         // score onto the row but leaves gradingFailed in place, so keying on
         // the marker alone kept a graded submission reading "Needs manual
@@ -388,8 +470,8 @@ export function SubmissionQueue({ classId }: Props) {
                 <div style={{ fontWeight: 600, color: '#f8f8f2', fontSize: '0.9rem' }}>
                   {sub.student_email}
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#6272a4' }}>
-                  {sub.lesson_id} &middot; submitted {formatTs(sub.submitted_at)}
+                <div style={{ fontSize: '0.78rem', color: '#8393c4' }}>
+                  {lessonLabel(sub.lesson_id, lessonTitles)} &middot; submitted {formatTs(sub.submitted_at)}
                 </div>
               </div>
               <div
@@ -404,9 +486,15 @@ export function SubmissionQueue({ classId }: Props) {
               >
                 {failed
                   ? 'Needs manual grade'
-                  : hasTeacherReview(sub.grade_json)
-                    ? `Teacher score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
-                    : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
+                  : unit
+                    ? // A pass/fail rubric stores 0 of 0, so the stored numbers say nothing. Its grade is
+                      // criteria met out of the criteria count, and that is what a mark is in.
+                      hasTeacherReview(sub.grade_json)
+                      ? `Teacher mark: ${sub.score ?? '—'} of ${unit.total} criteria`
+                      : `AI: ${criteriaScore(gradeData?.criteria as Array<{ verdict: string }>)} of ${unit.total} criteria met`
+                    : hasTeacherReview(sub.grade_json)
+                      ? `Teacher score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
+                      : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
               </div>
             </div>
 
@@ -426,7 +514,7 @@ export function SubmissionQueue({ classId }: Props) {
                 The AI grader could not score this. The student&apos;s answer is below and is
                 safe — read it and set a score yourself.
                 {failed.error && (
-                  <div style={{ color: '#6272a4', marginTop: 4, fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                  <div style={{ color: '#8393c4', marginTop: 4, fontFamily: 'monospace', fontSize: '0.75rem' }}>
                     {failed.error}
                     {failed.httpStatus ? ` (HTTP ${failed.httpStatus})` : ''}
                   </div>
@@ -456,7 +544,7 @@ export function SubmissionQueue({ classId }: Props) {
                       style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '2px 0', color: '#f8f8f2' }}
                     >
                       <span>{c.title || c.id}</span>
-                      <span style={{ color: '#6272a4', flex: '0 0 auto' }}>
+                      <span style={{ color: '#8393c4', flex: '0 0 auto' }}>
                         {/* Every rubric is zero-point under green-to-advance, so
                             "3/0" says nothing — show the verdict instead. */}
                         {max ? `${c.earned ?? '?'}/${max}` : (c.verdict ?? '—')}
@@ -479,36 +567,60 @@ export function SubmissionQueue({ classId }: Props) {
               <div style={{ fontWeight: 600, color: '#f8f8f2', fontSize: '0.82rem', marginBottom: 4 }}>
                 {diagram ? 'Student diagram' : 'Student response'}
               </div>
-              {diagram ? (
-                <>
-                  <DiagramEditor
-                    value={diagram}
-                    readOnly
-                    height={diagramFrameHeight(diagram, 300, 560)}
-                    // A review card is short by design, so let the fit shrink
-                    // far enough to show the whole diagram; the teacher can
-                    // scroll-zoom into anything they need to read closely.
-                    fitMinZoom={0.3}
-                  />
-                  <div style={{ color: '#6272a4', fontSize: '0.76rem', marginTop: 5 }}>
-                    {diagram.nodes.length} shapes · {diagram.edges.length} arrows · scroll to zoom,
-                    drag to pan
+              <SubmissionBoundary raw={sub.response}>
+                {diagram ? (
+                  <>
+                    <DiagramEditor
+                      value={diagram}
+                      readOnly
+                      height={diagramFrameHeight(diagram, 300, 560)}
+                      // A review card is short by design, so let the fit shrink
+                      // far enough to show the whole diagram; the teacher can
+                      // scroll-zoom into anything they need to read closely.
+                      fitMinZoom={0.3}
+                    />
+                    <div style={{ color: '#8393c4', fontSize: '0.76rem', marginTop: 5 }}>
+                      {diagram.nodes.length} shapes · {diagram.edges.length} arrows · scroll to zoom,
+                      drag to pan
+                    </div>
+                    {/* The text the AI actually graded, beside the drawing: the chart is a display
+                        copy, and the teacher must always be able to see what the model read. */}
+                    {parseDiagramResponse(sub.response) === null && sub.response ? (
+                      <div style={{ marginTop: 8 }}>
+                        <div style={{ color: '#8393c4', fontSize: '0.76rem', marginBottom: 3 }}>What the AI read</div>
+                        <div
+                          style={{
+                            color: '#f8f8f2',
+                            fontSize: '0.78rem',
+                            lineHeight: 1.45,
+                            whiteSpace: 'pre-wrap',
+                            maxHeight: 160,
+                            overflowY: 'auto',
+                            background: '#1e1f29',
+                            borderRadius: 4,
+                            padding: '6px 8px',
+                          }}
+                        >
+                          {sub.response}
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      color: '#f8f8f2',
+                      fontSize: '0.85rem',
+                      lineHeight: 1.5,
+                      whiteSpace: 'pre-wrap',
+                      maxHeight: 160,
+                      overflowY: 'auto',
+                    }}
+                  >
+                    {sub.response || '(no response)'}
                   </div>
-                </>
-              ) : (
-                <div
-                  style={{
-                    color: '#f8f8f2',
-                    fontSize: '0.85rem',
-                    lineHeight: 1.5,
-                    whiteSpace: 'pre-wrap',
-                    maxHeight: 160,
-                    overflowY: 'auto',
-                  }}
-                >
-                  {sub.response || '(no response)'}
-                </div>
-              )}
+                )}
+              </SubmissionBoundary>
             </div>
 
             {/* Structural checks — only a flowchart submission records these. */}
@@ -544,7 +656,7 @@ export function SubmissionQueue({ classId }: Props) {
             )}
 
             {/* Override form */}
-            <OverrideForm classId={classId} submissionId={sub.id} onOverride={handleOverride} />
+            <OverrideForm classId={classId} submissionId={sub.id} unitTotal={unit?.total ?? null} pointsMax={sub.limit?.unit === 'points' ? sub.limit.max : null} enforceMax={sub.capped === true} onOverride={handleOverride} />
           </div>
         );
       })}

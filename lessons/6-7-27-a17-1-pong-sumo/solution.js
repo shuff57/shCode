@@ -1,4 +1,4 @@
-// 2.7.26 A17.1 Two-Player Pong-Sumo (reference solution).
+// 6.8.14 A17.1 Two-Player Pong-Sumo (reference solution).
 // Two paddles (WASD + arrows), bouncy ball, score zones, first to 5 wins.
 // DistanceJoint chain links the four corner anchors around the arena edge,
 // satisfying the "at least one joint" criterion while keeping the gameplay clean.

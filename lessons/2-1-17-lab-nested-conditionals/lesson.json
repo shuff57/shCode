@@ -28,25 +28,25 @@
     {
       "id": "r1",
       "title": "isAdmin check nested inside isLoggedIn, logs admin message",
-      "description": "if (isLoggedIn) nests an if (isAdmin) whose block logs a message about admin",
+      "description": "if (isLoggedIn) nests an if (isAdmin) whose block logs a message about admin. Help: 2.1.9 (Nested Conditionals)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\(?\\s*isLoggedIn\\s*\\)?\\s*\\)\\s*(?:\\{[^{}]*)?if\\s*\\(\\s*\\(?\\s*isAdmin\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\([^)]*admin",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*isLoggedIn(?:\\s*===?\\s*true)?\\s*\\)?\\s*\\)\\s*(?:\\{[^{}]*)?if\\s*\\(\\s*\\(?\\s*isAdmin(?:\\s*===?\\s*true)?\\s*\\)?\\s*\\)\\s*\\{[^}]*console\\.log\\s*\\([^)]*admin",
       "points": 0
     },
     {
       "id": "r2",
       "title": "isAdmin's else logs user message",
-      "description": "the else paired with if (isAdmin) logs a message about user",
+      "description": "the else paired with if (isAdmin) logs a message about user. Help: 2.1.9 (Nested Conditionals)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\(?\\s*isAdmin\\s*\\)?\\s*\\)\\s*\\{[^}]*\\}\\s*else\\s*\\{[^}]*console\\.log\\s*\\([^)]*user",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*isAdmin(?:\\s*===?\\s*true)?\\s*\\)?\\s*\\)\\s*\\{[^}]*\\}\\s*else\\s*\\{[^}]*console\\.log\\s*\\([^)]*user",
       "points": 0
     },
     {
       "id": "r3",
       "title": "outer else logs please log in",
-      "description": "the outer else (paired with isLoggedIn) logs a message containing 'log in'",
+      "description": "the outer else (paired with isLoggedIn) logs a message containing 'log in'. Help: 2.1.9 (Nested Conditionals)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\}\\s*else\\s*\\{[^}]*console\\.log\\s*\\([^)]*log in",

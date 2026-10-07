@@ -656,8 +656,8 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 ---
 
 ### 3.2 Parameters and Return Values (~3.5 hrs)
-**Contact hours:** 3.5
-**Sizing note:** 748 lines — scheduled at **2 meetings**. §3.1 was deliberately split from this because the old combined treatment moved too fast; re-compressing it would undo that.
+**Contact hours:** 3.5 planned; built module runs about 5.0 (29 lessons, 299 minutes; five formative practice drills were added 2026-10-06), so **3 meetings**
+**Sizing note:** 748 lines — planned at 2 meetings, built at **3**. §3.1 was deliberately split from this because the old combined treatment moved too fast; re-compressing it would undo that.
 **Book section:** 3.2 Parameters and Return Values
 **SLOs covered:** SLO 2, SLO 3
 **Reading:** Book §3.2 Parameters and Return Values
@@ -679,17 +679,17 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - Bug hunt: 3 provided functions that `console.log` instead of `return` — fix each and explain what broke because of it
 
 **Assignments:**
-- **A3.2.1 (Lab):** Write a "design calculator" program with 4 functions: `calculateVolume(w, h, d)`, `calculateSurfaceArea(w, h, d)`, `isWithinBuildVolume(w, h, d)` (returns boolean), and a main function that calls all three and prints results using template literals. Every function must use `return`, not `console.log`, to produce its answer.
+- **A3.2.1 (Lab) — not built as written (2026-10-06).** The planned "design calculator" (`calculateVolume`, `calculateSurfaceArea`, `isWithinBuildVolume`, and a main function, all using `return`) was never made, and no lesson carries the code A3.2.1. Module 3.2 was instead built as one concept per lesson with six small graded labs that exercise the same skills: 3.2.9 rectangle area (multi-parameter), 3.2.15 early-return guard, 3.2.18 fix a function that prints instead of returning, 3.2.23 compose two functions, 3.2.26 `findMax`/`isEven`, 3.2.28 `sumToN`. The repository holds no recorded decision to drop the calculator, so treat this as a plan item that was overtaken, not one that was rejected; a four-function artifact would now repeat those labs. If a single module artifact is wanted, add it as a new lab and give it this code.
 
 **Teacher Notes:**
-- The design calculator is a deliberate bridge toward JSCAD thinking. "Build volume" starts priming spatial thinking.
+- The design calculator was meant as a bridge toward JSCAD thinking ("build volume" priming spatial thinking). It was not built (see A3.2.1 above), so that priming now has to come from §3.3's `[x, y, z]` coordinate arrays.
 - Emphasize return values — many beginners write functions that `console.log` instead of returning. Address this directly; it is this section's core teaching point.
 
 ---
 
 ### 3.3 Arrays (~3.5 hrs)
 **Contact hours:** 3.5
-**Sizing note:** 844 lines — scheduled at **2 meetings**. Flagged as one of the two highest-leverage sections in Q1: groups, JSCAD parameter arrays and sorting all assume fluency.
+**Sizing note:** 893 lines — planned at **2 meetings**, now **3** (the 24 built lessons sum to 273 minutes, 2.6 days; five formative practice drills and a checkpoint quiz were added 2026-10-06 on top of the 18 lessons, 213 minutes, that fit exactly 2 days). Flagged as one of the two highest-leverage sections in Q1: groups, JSCAD parameter arrays and sorting all assume fluency.
 **Book section:** 3.3 Arrays
 **SLOs covered:** SLO 3, Topic: arrays
 **Reading:** Book §3.3 Arrays
@@ -715,7 +715,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - Students load a provided array of 10 part measurements and compute max/min/average with a loop
 
 **Assignments:**
-- **A3.3.1 (Lab):** Write a program that stores 10 design measurements in an array. Use loops to find the maximum, minimum, and average. Must use at least 3 different array methods.
+- **A3.3.1 (Lab) — built as the 3.3.24 capstone (`3-2-7-arrays`), not as written (2026-10-06).** An arrays recap graded on seven requirements (10, 5, 5, 10, 5, 10 and 10 points, all 55 needed to pass): create an array, `push`, `pop`, walk it with a `for` loop, and search it with a comparison, then two functions checked by runtime test cases that call them: `countFruit(fruits, name)` (returns a count) and `longFruits(fruits, minLength)` (returns a new array and leaves the original untouched). It does not ask for 10 design measurements or for maximum/minimum/average. It is the module's only graded Lab; 3.3.4, 3.3.8, 3.3.19 and 3.3.22 are practice labs, as are the five drills added 2026-10-06 (3.3.6, 3.3.9, 3.3.11, 3.3.16, 3.3.18), and 3.3.23 is a formative checkpoint quiz. The two function tasks are the runtime test cases (`type: "tests"`): they run the student's own functions rather than only reading their shape.
 
 **Teacher Notes:**
 - The `[x, y, z]` array introduction is intentional foreshadowing. Say explicitly: "In a few weeks we'll be using arrays exactly like this to place shapes in 3D space."
@@ -747,7 +747,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - Pair exercise: given 4 arrow functions with the implicit-return shorthand, rewrite each with an explicit `return` and block body, and vice versa
 
 **Assignments:**
-- **A3.4.1 (Lab):** Rewrite your A3.2.1 design-calculator functions as arrow functions assigned to `const`. Add one new arrow function using implicit return. Comment on which style you find more readable and why.
+- **A3.4.1 (Lab):** Rewrite your §3.2 functions (the 3.2.23 compose lab's, since the A3.2.1 design calculator was not built) as arrow functions assigned to `const`. Add one new arrow function using implicit return. Comment on which style you find more readable and why.
 
 **Teacher Notes:**
 - This section closes a real gap: arrow functions appear 53 times in later chapters (all of §3.7's array-method callbacks use one), but nothing before this taught the syntax on its own.
@@ -780,7 +780,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - Destructuring drill: unpack 4 provided objects into named variables
 
 **Assignments:**
-- **A3.5.1 (Lab):** Rewrite your A3.3.1 measurements program to store each measurement as an object (`{ name, value, unit }`) instead of a bare number, in an array of objects. Use destructuring at least twice when reading values back out.
+- **A3.5.1 (Lab):** Rewrite your §3.3 arrays program (the 3.3.24 capstone; A3.3.1 was built as an arrays recap, not a measurements program) so it stores each item as an object (`{ name, value, unit }`) instead of a bare number, in an array of objects. Use destructuring at least twice when reading values back out.
 
 **Teacher Notes:**
 - This section closes the single largest citation gap in the book (140 downstream uses of object literals against almost no prior coverage) — it is a foundational week, not a light one.
@@ -1790,7 +1790,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 **In-Class Activities:**
 - Live demo: program that crashes without try/catch, then add it
 - Students use DevTools debugger to trace a provided buggy program
-- Add input validation to the A3.2.1 design calculator from Q1
+- Add input validation to a function you wrote in §3.2 (the design calculator planned as A3.2.1 was not built)
 - **AP CSP Discussion (15 min):** Cybersecurity basics. Error handling prevents crashes, but what about intentional attacks? Brief intro to PII, phishing, malware, and why input validation is also a security practice. "Never trust user input — it might be an attack, not a mistake."
 
 **Assignments:**
@@ -1828,7 +1828,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 **In-Class Activities:**
 - Students write test cases for a provided function before seeing the implementation
 - Live code: simple test runner function (no framework)
-- Pair exercise: write tests for partner's A3.2.1 design calculator
+- Pair exercise: write tests for a partner's §3.2 function (the design calculator planned as A3.2.1 was not built)
 
 **Assignments:**
 - **A9.4.1 (Lab, Testing SLO):** Write a complete test suite for your A4.1.1 Q1 Synthesis Project functions. For each function, write at least 3 test cases: one normal input, one edge case (boundary value), one invalid input. Implement a simple test runner that reports pass/fail. Submit test results showing at least one test catching a real bug you then fixed.

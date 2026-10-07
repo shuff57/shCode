@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "Game-state object declared",
-      "description": "Declares an object with curly braces",
+      "description": "Declares an object with curly braces. Help: 3.8.4 (JSON.stringify — Object to Text)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\{",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "An array of objects inside",
-      "description": "Contains an array whose elements are objects",
+      "description": "Contains an array whose elements are objects. Help: 3.8.4 (JSON.stringify — Object to Text)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\s*\\{",
@@ -53,7 +53,7 @@
     {
       "id": "r3",
       "title": "Saved with stringify",
-      "description": "Calls JSON.stringify to produce text",
+      "description": "Calls JSON.stringify to produce text. Help: 3.8.4 (JSON.stringify — Object to Text)",
       "type": "regex",
       "file": "script.js",
       "pattern": "JSON\\.stringify\\s*\\(",
@@ -63,7 +63,7 @@
     {
       "id": "r4",
       "title": "Restored with parse",
-      "description": "Calls JSON.parse on the saved text",
+      "description": "Calls JSON.parse on the saved text. Help: 3.8.8 (JSON.parse — Text Back to Object)",
       "type": "regex",
       "file": "script.js",
       "pattern": "JSON\\.parse\\s*\\(",
@@ -73,7 +73,7 @@
     {
       "id": "r5",
       "title": "Output printed",
-      "description": "Calls console.log",
+      "description": "Calls console.log. Help: 3.8.4 (JSON.stringify — Object to Text)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

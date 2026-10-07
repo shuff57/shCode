@@ -27,6 +27,8 @@ Two more steps belong alongside the four: **testing**, which uncovers errors in 
 
 All four, applied to a tiny problem: work out which of three students scored highest.
 
+*(Read it, do not write it yet: `[ ... ]` is a list of values, `scores[i]` is the item at position `i` counting from 0, `.length` is how many items there are, and `for` repeats its block once per position, and `if` runs its block only when its condition is true. Chapter 2 teaches these.)*
+
 ```js live plain
 // DECOMPOSITION: the problem breaks into: hold the scores,
 //   compare them, report the winner.

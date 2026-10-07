@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "Write a for-loop counting task",
-      "instructions": "Use a for loop to count or step through a range of numbers, logging something on each pass, for example, counting how many multiples of a number appear in a range."
+      "instructions": "Use a for loop to count or step through a range of numbers, logging something on each pass, for example, counting how many multiples of a number appear in a range (`n % 3 === 0` is true when n is a multiple of 3: the remainder is 0)."
     },
     {
       "id": "s2",
@@ -34,7 +34,7 @@
     {
       "id": "r1",
       "title": "for loop present",
-      "description": "Code contains a for loop",
+      "description": "Code contains a for loop. Help: 2.2.9 (The for Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -44,7 +44,7 @@
     {
       "id": "r2",
       "title": "while loop present",
-      "description": "Code contains a while loop",
+      "description": "Code contains a while loop. Help: 2.2.13 (The while Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "while\\s*\\(",
@@ -60,6 +60,26 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0
+    },
+    {
+      "type": "regex",
+      "file": "script.js",
+      "points": 0,
+      "id": "r4",
+      "title": "for loop logs on each pass",
+      "description": "The for loop body contains a console.log.",
+      "pattern": "for\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*(?:\\{[^{}]*)?console\\.log",
+      "flags": "i"
+    },
+    {
+      "type": "regex",
+      "file": "script.js",
+      "points": 0,
+      "id": "r5",
+      "title": "while loop builds a running total",
+      "description": "Inside the while loop a variable is added to itself (total = total + n or total += n).",
+      "pattern": "while\\s*\\(\\s*\\(?[^)]*\\)\\s*\\)?\\s*\\{[^}]*?([A-Za-z_$]\\w*)\\s*(?:\\+=|=\\s*\\(?\\s*\\1\\s*\\+)",
+      "flags": "i"
     }
   ],
   "grading": {

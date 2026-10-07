@@ -28,10 +28,10 @@
     {
       "id": "r1",
       "title": "while loop present",
-      "description": "Code contains a while loop",
+      "description": "Code contains a while loop. Help: 2.2.13 (The while Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(",
+      "pattern": "while\\s*\\(\\s*\\(?\\s*count\\s*(?:>\\s*0|>=\\s*1)\\s*\\)?\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -44,6 +44,16 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0
+    },
+    {
+      "type": "regex",
+      "file": "script.js",
+      "points": 0,
+      "id": "r3",
+      "title": "count goes down by 1",
+      "description": "count is decreased inside the loop.",
+      "pattern": "(?:count\\s*(?:--|-=\\s*1|=\\s*count\\s*-\\s*1)|--\\s*count)",
+      "flags": "i"
     }
   ],
   "grading": {

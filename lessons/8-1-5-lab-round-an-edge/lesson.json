@@ -15,11 +15,12 @@
     {
       "id": "s1",
       "title": "Pick one edge, not a face",
-      "instructions": "You're starting from a 40 x 40 x 20 mm box. Move the mouse slowly onto the line where two faces meet: when the mouse is on an edge, the edge lights up light blue and a small label names it. Click while it is lit; it turns pink to show it is selected. You'll know it worked if the label above the Dimensions panel reads \"Box 1 · edge\".",
+      "instructions": "You're starting from a 40 x 40 x 20 mm box. Move the mouse slowly onto the line where two faces meet: when the mouse is on an edge, the edge lights up light blue (there is no hover label). Click while it is lit; the Dimensions panel opens for the box. You'll know it worked if the label at the bottom-left of the 3D view reads \"BOX 1 · EDGE\" (it is drawn in capitals and may be cut off).",
       "hints": [
         "Look for the thin line along the top of the box where two faces meet. Slide the mouse across it until it lights up light blue, then click without moving. Pink means it is selected.",
         "If the label reads \"top face\" instead of \"edge\", you clicked a little too far from the line. Try again, right on it.",
-        "Hard to see the edge? Drag in the 3D view to turn the box, or press Home to fit it."
+        "Hard to see the edge? Drag in the 3D view to turn the box, or press Home to fit it.",
+        "If the \"BOX 1 · EDGE\" label is not on screen, close the Quest tab (it narrows the 3D view) and look again at the bottom-left of the 3D view."
       ]
     },
     {
@@ -27,8 +28,9 @@
       "title": "Round it to 3",
       "instructions": "Press the Round tool in the toolbar. A new \"Round 1\" step appears in the timeline. In the Dimensions panel, type 3 in the radius field.",
       "hints": [
-        "If instead every edge of the box rounds at once, you selected the whole box rather than one edge — undo (Ctrl+Z) and try Step 1 again.",
-        "Look for the field named \"Round 1 radius\" in the Dimensions panel."
+        "If every edge of the box looks rounded at once, you selected the whole box rather than one edge, and the Quest tab will not count it as a round — undo (Ctrl+Z) and try Step 1 again.",
+        "Look for the field named \"Round 1 radius\" in the Dimensions panel.",
+        "After you press Round, an amber note may appear at the bottom right: \"fillet: ignoring 1 feature — edges only\". That is normal here, not an error; check the Quest tab instead."
       ]
     }
   ],

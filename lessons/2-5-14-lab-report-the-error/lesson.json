@@ -28,30 +28,30 @@
     {
       "id": "r1",
       "title": "reads a property of null",
-      "description": "Code reads a property off a value set to null, inside try",
+      "description": "Code reads a property off a value set to null, inside try. Help: 1.2.19 (The null Value)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "=\\s*null[\\s\\S]*\\.\\w+",
+      "pattern": "(?:const|let|var)\\s+(\\w+)\\s*=\\s*null\\s*;[\\s\\S]*?\\b\\1\\s*\\.\\s*\\w+|\\bnull\\s*\\.\\s*\\w+",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "logs err.name",
-      "description": "Catch block logs err.name",
+      "description": "Catch block logs err.name. Help: 2.5.12 (Reading the Error Object)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*err\\.name\\s*\\)",
+      "pattern": "console\\.log\\s*\\([^)]*\\berr\\.name\\b",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "logs err.message",
-      "description": "Catch block logs err.message",
+      "description": "Catch block logs err.message. Help: 2.5.12 (Reading the Error Object)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*err\\.message\\s*\\)",
+      "pattern": "console\\.log\\s*\\([^)]*\\berr\\.message\\b",
       "flags": "i",
       "points": 0
     }

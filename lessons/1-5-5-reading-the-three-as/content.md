@@ -33,6 +33,8 @@ Those abilities rest on habits rather than knowledge: confidence facing complexi
 
 The three As on one small problem. Note that step 3 is where the work actually pays.
 
+*(Read it, do not write it yet: `%` gives the remainder after dividing, so `year % 4 === 0` asks whether 4 divides evenly into `year`, and `if` runs its block only when that is true. Chapter 2 teaches `if`.)*
+
 ```js live plain
 // ABSTRACTION: formulate: "is this year a leap year?"
 //   What matters: the year number. What does not: the month, the day.

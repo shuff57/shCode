@@ -7,7 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",
   "preview": "slides",
-  "slidesUrl": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/chapter-2-control-flow/decks/2.1_conditionals.paper",
+  "slidesUrl": "/slides/2.1_conditionals.paper.html",
   "slos": [
     "SLO-1"
   ],

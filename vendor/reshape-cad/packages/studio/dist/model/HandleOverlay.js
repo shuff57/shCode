@@ -1,5 +1,5 @@
 'use client';
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 // Drag handles, drawn as plain divs on top of the preview frame.
 //
 // The runner projects each anchor and hands back where it landed, which way it
@@ -17,6 +17,10 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 // machinery left in this file for a sketch's own geometry.
 import { useEffect, useRef, useState } from 'react';
 import { arcFromBulge } from '@shuff57/reshape-sketch/sketch-arc';
+import ValueBox, { formatValue } from './ValueBox.js';
+import { manipulatorParam, manipulatorValue, manipulatorValueError, angleValueError, hasAngleParam, arcPoints } from './manipulator-core.js';
+import { snapDelta } from './move-gizmo-core.js';
+import { stepTooltip } from './step-tooltips.js';
 /**
  * A plane point Q, projected through corner `basis`'s own screen anchor --
  * P0.screen + (Q.u - P0.u)*(ux,uy) + (Q.v - P0.v)*(vx,vy). Pure client
@@ -109,7 +113,31 @@ function projectOutline(o, at) {
  *  comment. Screen pixels, not world units: a tap has to feel the same
  *  regardless of what the handle happens to be scaled to right now. */
 const TAP_TOLERANCE_PX = 4;
-export default function HandleOverlay({ points, values, scales, onDrag, onCommit, onTap, outlines, outlineAnchors, bottomInset = 0, }) {
+/** Phase 5.1: the manipulator arrow's screen length. Fixed, like every
+ *  other overlay chrome here -- a world-scaled arrow would shrink to a dot
+ *  when the student zooms out to see the whole part, exactly when they
+ *  need the direction most. */
+const MANI_ARROW_PX = 64;
+/** Phase 5.1 part 2: the taper arc's screen radius. Same fixed-chrome
+ *  reasoning as the arrow's. */
+const MANI_TAPER_R_PX = 46;
+/** A triangular arrowhead at the END of a line from (x0,y0) along
+ *  (dx,dy), at travel `at` px. Pure screen arithmetic, kept beside the
+ *  SVG that draws it. */
+function arrowHead(x0, y0, dx, dy, at) {
+    const tipX = x0 + dx * at;
+    const tipY = y0 + dy * at;
+    const px = -dy;
+    const py = dx;
+    const backX = x0 + dx * (at - 10);
+    const backY = y0 + dy * (at - 10);
+    return [
+        `${tipX},${tipY}`,
+        `${backX + px * 4},${backY + py * 4}`,
+        `${backX - px * 4},${backY - py * 4}`,
+    ].join(' ');
+}
+export default function HandleOverlay({ points, values, scales, onDrag, onCommit, onTap, outlines, outlineAnchors, bottomInset = 0, manipulator, incrementalMove, activeCommand, }) {
     const [dragging, setDragging] = useState(null);
     // Whether the current pointerdown-to-pointerup has crossed TAP_TOLERANCE_PX
     // yet. A click on a handle (e.g. the height handle sitting over a face's
@@ -179,7 +207,77 @@ export default function HandleOverlay({ points, values, scales, onDrag, onCommit
         return { n, pts: projected.pts };
     })
         .filter((r) => r !== null);
-    if (!hasHandles && outlineRenders.length === 0)
+    // ---- Phase 5.1 manipulator: arrow + drag-or-type value box -------------
+    // The single selected feature's own handle, located among the projected
+    // anchors by its generated-param name. Everything below is null when
+    // there is no manipulator prop, the feature carries no single positive-
+    // extent parameter, or its anchor is not currently on screen.
+    const mani = manipulator ? manipulatorParam(manipulator.feature) : null;
+    const maniAnchor = mani
+        ? points.find((a) => a.param === mani.param && (a.kind === 'size' || a.kind === 'radius'))
+        : undefined;
+    const maniValue = mani && manipulator ? manipulatorValue(manipulator.doc, mani.param) : null;
+    // Typed text for the value box, parent-of-the-box owned. Kept OUTSIDE the
+    // early return below (hooks order) and keyed by param so a selection
+    // change starts from that feature's own committed value instead of the
+    // previous feature's draft.
+    const [maniDraft, setManiDraft] = useState(null);
+    const [maniNote, setManiNote] = useState(null);
+    const maniShownText = mani && maniDraft?.param === mani.param ? maniDraft.text : maniValue != null ? formatValue(maniValue) : '';
+    /** The type half of drag-or-type. The same param name the drag pushes
+     *  (mani.param) -- the convergence the todo's acceptance criteria name.
+     *  A refusal shows the sentence and writes nothing, exactly like the
+     *  sketch dimension chips. */
+    const commitManiText = () => {
+        if (!mani || !manipulator)
+            return;
+        const text = maniDraft?.param === mani.param ? maniDraft.text : '';
+        const err = manipulatorValueError(mani.kind, text);
+        if (err) {
+            setManiNote(err);
+            return;
+        }
+        setManiNote(null);
+        setManiDraft(null);
+        manipulator.onDragParam(mani.param, Number(text.trim()));
+        manipulator.onCommitParam();
+    };
+    // Phase 5.1 part 2 (todo 23): the TAPER ARC. Present only when the
+    // feature's own parameter schema carries an angle -- a draft does, a
+    // fillet/extrude/pocket does not (hasAngleParam). Same drag-or-type
+    // convergence as the arrow's box, on the draft's `_angle` param.
+    const taper = mani && mani.kind === 'draft' && manipulator
+        && manipulator.feature.kind === 'draft'
+        ? { param: mani.param, value: manipulatorValue(manipulator.doc, `${manipulator.feature.id}_angle`) }
+        : null;
+    const [taperDraft, setTaperDraft] = useState(null);
+    const [taperNote, setTaperNote] = useState(null);
+    const taperShownText = taper && taperDraft?.param === taper.param ? taperDraft.text : taper?.value != null ? formatValue(taper.value) : '';
+    const commitTaperText = () => {
+        if (!taper || !manipulator)
+            return;
+        const text = taperDraft?.param === taper.param ? taperDraft.text : '';
+        const err = angleValueError(text);
+        if (err) {
+            setTaperNote(err);
+            return;
+        }
+        setTaperNote(null);
+        setTaperDraft(null);
+        manipulator.onDragParam(taper.param, Number(text.trim()));
+        manipulator.onCommitParam();
+    };
+    // Phase 5.4 (todo 26): the step tooltip. While a command is active its
+    // prompt string follows the COMMAND's own step (no selection yet ->
+    // "Select...", selection held -> "Hold Ctrl..."); command end clears it.
+    const tooltip = activeCommand ? stepTooltip(activeCommand.command, { active: true, selectionCount: activeCommand.selectionCount }) : null;
+    // Phase 5.2 (todo 24): the gizmo mode chip -- a move selection's axis
+    // arrows ARE the gizmo (moveFeatureHandles); this renders the
+    // incremental-move toggle beside the first projected move anchor.
+    const gizmoAnchor = manipulator && manipulator.feature.kind === 'move'
+        ? points.find((a) => a.kind === 'move')
+        : undefined;
+    if (!hasHandles && outlineRenders.length === 0 && !(mani && maniAnchor))
         return null;
     return (_jsxs("div", { className: "handle-layer", ref: layerRef, 
         // Inline, so it wins over the class's plain `inset:0` for this one
@@ -231,7 +329,19 @@ export default function HandleOverlay({ points, values, scales, onDrag, onCommit
                         // pinned every negative-direction drag at exactly 0.1 (dogfood
                         // 2026-09-14, handle-dogfood report).
                         const clamped = a.kind === 'move' || a.kind === 'turn' ? rounded : Math.max(0.1, rounded);
-                        push([{ param: a.param, value: clamped }]);
+                        // Phase 5.2's Incremental Move: a MOVE-feature axis drag with
+                        // snapping on lands its VALUE on the increment grid. The
+                        // delta snapped is the drag's own contribution (value - the
+                        // value the gesture began at), so snapping never fights the
+                        // drag start; adaptive/fixed/off per the prop. A non-move
+                        // drag is untouched -- size and turn have no increment.
+                        let finalValue = clamped;
+                        if (a.kind === 'move' && incrementalMove && incrementalMove.mode !== 'off') {
+                            const deltaValue = finalValue - start.current.value;
+                            const [sx] = snapDelta([deltaValue, 0, 0], incrementalMove.mode, incrementalMove.fixedStep, incrementalMove.modelExtent);
+                            finalValue = start.current.value + sx;
+                        }
+                        push([{ param: a.param, value: finalValue }]);
                     }, onPointerUp: (e) => {
                         try {
                             e.currentTarget.releasePointerCapture(e.pointerId);
@@ -255,8 +365,15 @@ export default function HandleOverlay({ points, values, scales, onDrag, onCommit
                         if (wasDrag)
                             commit();
                     } }, a.param));
-            }), _jsx("style", { children: `
-        /* The layer must not eat orbit drags — only the handles themselves do. */
+            }), mani && maniAnchor && maniValue != null && (_jsxs("svg", { className: "mani-arrow", "data-manipulator": mani.kind, "aria-hidden": "true", children: [_jsx("line", { x1: maniAnchor.x, y1: maniAnchor.y, x2: maniAnchor.x + maniAnchor.dirX * MANI_ARROW_PX, y2: maniAnchor.y + maniAnchor.dirY * MANI_ARROW_PX }), _jsx("polygon", { points: arrowHead(maniAnchor.x, maniAnchor.y, maniAnchor.dirX, maniAnchor.dirY, MANI_ARROW_PX) })] })), mani && maniAnchor && maniValue != null && manipulator && (_jsxs("div", { className: "mani-value-wrap", children: [_jsx(ValueBox, { testId: "manipulator-value", kind: mani.kind, x: maniAnchor.x + maniAnchor.dirX * (MANI_ARROW_PX + 34), y: maniAnchor.y + maniAnchor.dirY * (MANI_ARROW_PX + 34), value: maniShownText, onChange: (next) => setManiDraft({ param: mani.param, text: next }), onCommit: commitManiText, onCancel: () => { setManiDraft(null); setManiNote(null); } }), maniNote && _jsx("div", { className: "mani-note", role: "status", children: maniNote })] })), taper && taper.value != null && maniAnchor && hasAngleParam(manipulator.feature) && (_jsxs(_Fragment, { children: [_jsxs("svg", { className: "mani-taper", "data-taper": "true", "aria-hidden": "true", children: [_jsx("polyline", { points: arcPoints(maniAnchor.x, maniAnchor.y, MANI_TAPER_R_PX, -90, -10) }), _jsx("circle", { cx: maniAnchor.x + MANI_TAPER_R_PX, cy: maniAnchor.y - MANI_TAPER_R_PX * 0.17, r: 3 })] }), _jsxs("div", { className: "mani-value-wrap", children: [_jsx(ValueBox, { testId: "manipulator-taper", kind: "draft-angle", x: maniAnchor.x + MANI_TAPER_R_PX + 30, y: maniAnchor.y - MANI_TAPER_R_PX - 8, value: taperShownText, onChange: (next) => setTaperDraft({ param: taper.param, text: next }), onCommit: commitTaperText, onCancel: () => { setTaperDraft(null); setTaperNote(null); } }), taperNote && _jsx("div", { className: "mani-note", role: "status", children: taperNote })] })] })), gizmoAnchor && incrementalMove && (_jsx("div", { className: "mani-value-wrap", children: _jsxs("div", { className: "move-snap-chip", "data-move-snap": incrementalMove.mode, style: { left: `${gizmoAnchor.x + 16}px`, top: `${gizmoAnchor.y - 30}px` }, children: [_jsx("span", { children: "Incremental move:" }), _jsx("button", { type: "button", className: "move-snap-mode", onClick: () => {
+                                const order = ['adaptive', 'fixed', 'off'];
+                                const nextMode = order[(order.indexOf(incrementalMove.mode) + 1) % order.length];
+                                incrementalMove.onModeChange?.(nextMode);
+                            }, title: "Snap drag distance to grid increments: adaptive (from the model), fixed (a step you set), or off", children: incrementalMove.mode }), incrementalMove.mode === 'fixed' && (_jsx("input", { className: "move-snap-step", size: 4, value: String(incrementalMove.fixedStep), onChange: (e) => {
+                                const v = Number(e.target.value);
+                                incrementalMove.onStepChange?.(Number.isFinite(v) && v > 0 ? v : incrementalMove.fixedStep);
+                            }, onPointerDown: (e) => e.stopPropagation(), onClick: (e) => e.stopPropagation(), onKeyDown: (e) => { if (e.key === 'Enter' || e.key === 'Escape')
+                                e.currentTarget.blur(); } }))] }) })), tooltip && (_jsx("div", { className: "step-tooltip", role: "status", "data-active-command": activeCommand.command, children: tooltip })), _jsx("style", { children: `
         .handle-layer { position: absolute; inset: 0; pointer-events: none; }
         .sketch-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
         .sketch-lines polygon {
@@ -301,6 +418,45 @@ export default function HandleOverlay({ points, values, scales, onDrag, onCommit
         .handle.is-radius:hover, .handle.is-radius.is-on { background: var(--reshape-warn); }
         .handle:focus-visible { outline: 2px solid var(--reshape-accent-2); outline-offset: 2px; }
         .handle.is-on { background: var(--reshape-accent); cursor: grabbing; transform: scale(1.25); }
+        /* Phase 5.1's arrow: same non-scaling screen-pixel discipline as
+           every other overlay mark; the value box sits in its own wrapper
+           so the note below it never shifts the box. */
+        .mani-arrow { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        .mani-arrow line { stroke: var(--reshape-accent-2, #bd93f9); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+        .mani-arrow polygon { fill: var(--reshape-accent-2, #bd93f9); }
+        /* The taper arc: yellow (the turn-handle family colour -- an angle
+           is an angle, whatever drives it), same non-scaling rule. */
+        .mani-taper { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        .mani-taper polyline { fill: none; stroke: var(--reshape-yellow, #f1fa8c); stroke-width: 2; vector-effect: non-scaling-stroke; }
+        .mani-taper circle { fill: var(--reshape-yellow, #f1fa8c); }
+        .mani-value-wrap { position: absolute; inset: 0; pointer-events: none; }
+        .mani-value-wrap input { pointer-events: auto; }
+        .reshape-value-box { min-width: 2.5em; text-align: center; padding: 1px 4px; border-radius: 3px;
+          border: 1px solid transparent; background: var(--reshape-bg, #282a36); color: var(--reshape-accent-2, #bd93f9);
+          font-family: var(--reshape-font-mono, monospace); font-size: 12px; cursor: text; }
+        .reshape-value-box:focus, .reshape-value-box[data-editing="true"] { outline: none;
+          background: var(--reshape-surface, #1e1f29); border-color: var(--reshape-accent, #8be9fd); color: var(--reshape-text, #f8f8f2); }
+        .mani-note { position: absolute; transform: translate(-50%, 0); white-space: nowrap;
+          color: var(--reshape-warn, #ffb86c); font-size: 12px; }
+        /* Phase 5.2's Incremental Move chip. pointer-events auto so the
+           buttons/input catch presses; the WRAPPER above stays none so
+           the canvas underneath keeps orbiting drags. */
+        .move-snap-chip { position: absolute; transform: translateY(-50%); pointer-events: auto;
+          display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 4px;
+          background: var(--reshape-bg, #282a36); border: 1px solid var(--reshape-border, #44475a);
+          color: var(--reshape-text-muted, #6272a4); font-size: 12px; }
+        .move-snap-chip .move-snap-mode { height: 20px; padding: 0 8px; border-radius: 3px;
+          border: 1px solid transparent; background: #3d4051; color: var(--reshape-text, #f8f8f2); cursor: pointer;
+          font-size: 11px; font-family: var(--reshape-font-ui, sans-serif); }
+        .move-snap-chip .move-snap-mode:hover { border-color: var(--reshape-accent-2); }
+        .move-snap-chip .move-snap-step { background: var(--reshape-surface, #1e1f29); color: var(--reshape-text);
+          border: 1px solid var(--reshape-accent, #8be9fd); border-radius: 3px; padding: 1px 4px;
+          font-family: var(--reshape-font-mono, monospace); font-size: 11px; }
+        /* Phase 5.4's step tooltip: same pill family, pinned top-center. */
+        .step-tooltip { position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+          pointer-events: none; white-space: nowrap; padding: 3px 10px; border-radius: 999px;
+          background: var(--reshape-bg, #282a36); border: 1px solid var(--reshape-accent-2, #bd93f9);
+          color: var(--reshape-text, #f8f8f2); font-size: 12px; font-family: var(--reshape-font-ui, sans-serif); }
       ` })] }));
 }
 //# sourceMappingURL=HandleOverlay.js.map

@@ -134,11 +134,16 @@ check('trust', !/buildPrompt\(body\)/.test(endpoint), 'endpoint passes the raw r
 check('trust', !/shapeResult\(parsed,\s*body\.rubric\)/.test(endpoint), 'endpoint shapes against the CLIENT rubric');
 check('trust', !/body\.model/.test(endpoint), 'endpoint still takes the model from the client');
 
-const graders = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '..', 'public', 'ai-graders.json'), 'utf8'),
-);
+// The graders live in a server-only module now (public/ai-graders.json was
+// fetchable by anyone). The generated file is `export const AI_GRADERS = <json>;`,
+// so lift the JSON literal out of it.
+const gradersTs = fs.readFileSync(
+  path.join(__dirname, '..', 'functions', '_shared', 'ai-graders.generated.ts'), 'utf8');
+const graders = JSON.parse(gradersTs.slice(gradersTs.indexOf('= {') + 2, gradersTs.lastIndexOf(';')));
 check('trust', Object.keys(graders).length === rubrics.length,
-  `ai-graders.json has ${Object.keys(graders).length} graders but the repo authors ${rubrics.length}`);
+  `ai-graders.generated.ts has ${Object.keys(graders).length} graders but the repo authors ${rubrics.length}`);
+check('trust', !fs.existsSync(path.join(__dirname, '..', 'public', 'ai-graders.json')),
+  'public/ai-graders.json exists: every grader prompt and rubric is downloadable without logging in');
 for (const [id, g] of Object.entries(graders)) {
   if (!g.prompt) check('trust', false, `${id}: published grader has no prompt`);
   if (!Array.isArray(g.rubric) || !g.rubric.length) check('trust', false, `${id}: published grader has no rubric`);
@@ -240,6 +245,30 @@ check('fence: hostile lessonTitle is fenced, not at message level',
 check('fence: hostile title did not break the fence',
   graderContains(hostile.user, 'Student response:') && graderIsFenced(hostile.user, 'A loop repeats'),
   'the payload closed the fence and re-levelled the rest of the message');
+
+// --- strict marking for graded test parts ----------------------------------
+//
+// A graded part sets the recorded score, so the course-wide "grade VERY leniently"
+// framing would credit a find-and-fix with a bug still in it. `strict` is read from
+// the authored config on the SERVER; the client body can never carry it. The
+// default prompt must stay byte-identical for every lesson that does not opt in.
+console.log('\n=== strict marking ===');
+{
+  const { buildPrompt } = require(libPath);
+  const req = { lessonId: 'x', lessonTitle: 'T', prompt: 'P', response: 'R',
+    rubric: [{ id: 'a', title: 'A', description: 'd', points: 2 }] };
+  const lenient = buildPrompt(req);
+  const strict = buildPrompt({ ...req, strict: true });
+  check('strict', /Grade VERY leniently/.test(lenient.system), 'the default prompt lost its lenient framing');
+  check('strict', !/STRICTLY ON CORRECTNESS/.test(lenient.system), 'the default prompt picked up strict wording');
+  check('strict', /STRICTLY ON CORRECTNESS/.test(strict.system), 'strict: true did not change the framing');
+  check('strict', !/Grade VERY leniently/.test(strict.system), 'strict prompt still tells the model to grade VERY leniently');
+  check('strict', /A claim is not the work/.test(strict.system), 'strict prompt lost the claim-is-not-the-work rule');
+  check('strict', /prompt-injection attempt/.test(strict.system), 'strict prompt lost the injection rule');
+  check('strict', /Never reveal the correct answer to ANY criterion/.test(strict.system), 'strict prompt lost the no-reveal rule');
+  check('strict', /strict:\s*config\.strict/.test(endpoint), 'the endpoint does not pass the SERVER config strict flag');
+  check('strict', !/body\.strict/.test(endpoint), 'the endpoint reads strict from the client body');
+}
 
 for (const w of warnings) console.warn(`  WARN  ${w}`);
 

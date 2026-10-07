@@ -245,17 +245,19 @@ try {
     process.execPath,
     [
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/grader.ts', '--outDir', out, '--module', 'commonjs',
+      'lib/run-tests-node.ts', '--outDir', out, '--module', 'commonjs',
       '--target', 'es2022', '--skipLibCheck',
     ],
     { cwd: root, stdio: 'inherit' },
   );
   writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
-  const { grade } = createRequire(import.meta.url)(
-    path.join(out, 'grader.js').replace(/\\/g, '/'));
+  // gradeWithTests runs a lesson's runtime `tests` cases in the shipped runner
+  // (lib/run-tests-node.ts); for a lesson with none it is plain grade().
+  const { gradeWithTests } = createRequire(import.meta.url)(
+    path.join(out, 'run-tests-node.js').replace(/\\/g, '/'));
 
-  const failedIds = (reqs, files) =>
-    grade(reqs, files, 0).results.filter((r) => r.status === 'failed').map((r) => r.id);
+  const failedIds = async (reqs, files) =>
+    (await gradeWithTests(reqs, files, 0)).results.filter((r) => r.status === 'failed').map((r) => r.id);
 
   const audited = [];
   // How many lessons each mutation actually rewrote. A mutation whose regex
@@ -283,7 +285,7 @@ try {
 
     // A lesson whose own reference answer does not score full marks is a
     // finding in its own right, and makes every mutation below meaningless.
-    const baseline = failedIds(reqs, ref);
+    const baseline = await failedIds(reqs, ref);
     if (baseline.length) {
       brokenReference.push({ id, failed: baseline, title: cfg.title ?? id });
       continue;
@@ -314,7 +316,7 @@ try {
       if (!applied) continue;
       reach.set(mut.name, (reach.get(mut.name) ?? 0) + 1);
 
-      const broke = failedIds(reqs, mutated);
+      const broke = await failedIds(reqs, mutated);
       if (!broke.length) continue;
 
       findings.push({

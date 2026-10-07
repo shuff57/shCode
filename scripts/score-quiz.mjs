@@ -15,9 +15,17 @@
 // entering the number is the teacher's job, in Aeries, as it is for every other
 // part of a chapter assessment.
 //
-// Each student's LATEST submission is the one that counts. There should only be
-// one, since summative quizzes lock after submitting; a second row means the
-// lock was got around and the run says so rather than quietly taking the newer.
+// An UNCAPPED quiz: each student's LATEST submission is the one that counts. There
+// should only be one, since summative quizzes lock after submitting; a second row
+// means the lock was got around and the run says so rather than quietly taking the
+// newer.
+//
+// A CAPPED quiz (quiz.maxSubmissions, .gauntlet/SPEC-attempt-caps.md): the student
+// has several tries and the BEST one counts, so this reports the best counted try,
+// not the last. A row written because grading failed, and one from before the
+// go-live cutoff, spend no try and are not scored (lib/attempt-cap.ts). The server
+// does not store the form on a capped row, so it is recomputed here from the same
+// seed the app uses (lib/quiz-variant.ts hashSeed(`${lessonId}:${email}`)).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -49,6 +57,23 @@ if (!lesson.quiz) {
 const key = new Map();
 for (const q of lesson.quiz.questions ?? []) key.set(q.id, q.answer);
 
+const capped = typeof lesson.quiz.maxSubmissions === 'number';
+// The app's own counting rule and form assignment, imported rather than copied so
+// they cannot drift. They are TypeScript: this runs under Bun here. Under a plain
+// Node the import fails, and a capped quiz then refuses to score rather than guess.
+let countAttempts = null;
+let assignVariant = null;
+let hashSeed = null;
+try {
+  ({ countAttempts } = await import('../lib/attempt-cap.ts'));
+  ({ assignVariant, hashSeed } = await import('../lib/quiz-variant.ts'));
+} catch (e) {
+  if (capped) {
+    console.error(`${lessonId} is capped, and its counting rule is TypeScript that this runtime cannot import (${e.message}). Run with bun.`);
+    process.exit(2);
+  }
+}
+
 const sql = `SELECT student_email, grade_json, submitted_at FROM lesson_submissions `
   + `WHERE lesson_id = '${lessonId.replace(/'/g, "''")}' ORDER BY submitted_at ASC;`;
 
@@ -77,6 +102,8 @@ const byStudent = new Map();
 for (const row of rows) {
   let parsed;
   try { parsed = JSON.parse(row.grade_json ?? '{}'); } catch { parsed = {}; }
+  // A capped quiz: a row that spent no try is not a hand-in.
+  if (capped && countAttempts([{ submittedAt: row.submitted_at, gradeJson: parsed }]) !== 1) continue;
   const picks = Array.isArray(parsed.quiz) ? parsed.quiz : [];
   const asked = picks.length;
   let right = 0;
@@ -93,17 +120,17 @@ for (const row of rows) {
     else if (p.picked === key.get(p.id)) right++;
     else wrong.push(p.id);
   }
+  // The form: stored on an uncapped row, recomputed for a capped one.
+  const variant = parsed.variant
+    ?? (assignVariant && lesson.quiz.variants
+      ? assignVariant(lesson.quiz.variants, hashSeed(`${lessonId}:${row.student_email}`))
+      : null)
+    ?? '-';
   const prior = byStudent.get(row.student_email);
-  byStudent.set(row.student_email, {
-    email: row.student_email,
-    variant: parsed.variant ?? '-',
-    right,
-    asked,
-    wrong,
-    blank,
-    at: row.submitted_at,
-    attempts: (prior?.attempts ?? 0) + 1,
-  });
+  const here = { email: row.student_email, variant, right, asked, wrong, blank, at: row.submitted_at, attempts: (prior?.attempts ?? 0) + 1 };
+  // Capped: keep the best try (the earlier one on a tie, so a re-run is stable).
+  // Uncapped: the latest row replaces the earlier.
+  byStudent.set(row.student_email, capped && prior && prior.right >= right ? { ...prior, attempts: here.attempts } : here);
 }
 
 const marks = [...byStudent.values()].sort((a, b) => a.email.localeCompare(b.email));
@@ -121,7 +148,7 @@ if (asCsv) {
   const w = Math.max(...marks.map((m) => m.email.length), 5);
   console.log(`${'email'.padEnd(w)}  form  score   missed / [blank]`);
   for (const m of marks) {
-    const flag = m.attempts > 1 ? `  (${m.attempts} hand-ins)` : '';
+    const flag = m.attempts > 1 ? (capped ? `  (best of ${m.attempts} tries)` : `  (${m.attempts} hand-ins)`) : '';
     const blanks = m.blank.length ? `  [blank: ${m.blank.join(' ')}]` : '';
     console.log(
       `${m.email.padEnd(w)}  ${String(m.variant).padEnd(4)}  ${m.right}/${m.asked}`
@@ -134,11 +161,12 @@ if (asCsv) {
       + 'test part can be handed in unfinished so the parts after it unlock, and the '
       + 'paper stays open until every question is answered. Blanks score nothing.');
   }
-  const repeats = marks.filter((m) => m.attempts > 1);
+  const repeats = capped ? [] : marks.filter((m) => m.attempts > 1);
   if (repeats.length) {
     console.log(`\n${repeats.length} student(s) handed in more than once. Expected when the `
       + 'first hand-in was partial -- the LATEST row is the one scored above. A student '
       + 'with several hand-ins and no blanks is worth a look.');
   }
+  if (capped) console.log(`\nThis quiz allows ${lesson.quiz.maxSubmissions} tries and the BEST one is scored above.`);
   console.log('\nEach question is worth 5 points: score x 5.');
 }

@@ -39,7 +39,7 @@ export type FileHistory = Record<string, Version[]>;
 // ---- Lessons & Assignments ----
 
 type LessonType = 'lesson' | 'assignment' | 'project' | 'example' | 'challenge';
-type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom' | 'model';
+type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom' | 'model' | 'tests';
 
 interface Step {
   id: string;
@@ -76,18 +76,58 @@ export interface Requirement {
    *  (e.g. "at least four // comments"), since stripping runs first and
    *  would delete the very thing being matched for. Defaults to true. */
   stripComments?: boolean;
+  /** Set true to blank the contents of string literals and template text
+   *  (after comment stripping) before matching, so `console.log("function f(")`
+   *  cannot satisfy a "defines f" check. Off by default: many lessons match
+   *  printed text on purpose. */
+  ignoreStrings?: boolean;
   /** type: 'model' only. The features (and named fields on them) the
    *  student's ModelDoc must contain — see lib/model-check.ts. */
   expect?: ModelExpect[];
   /** type: 'model' only. Absolute tolerance for numeric field comparisons.
    *  Defaults to 0.01 (see lib/model-check.ts). */
   tolerance?: number;
+  /** type: 'tests' only. The cases to run against the student's function
+   *  `function` (a name, not a list); see lib/test-harness-source.ts. */
+  cases?: TestCase[];
+  /** type: 'tests' only. Per-case time budget in ms (default 1000, max 10000);
+   *  a case still running when it ends is stopped and reported "did not finish".
+   *  `tolerance` (above) is the allowed numeric difference, default 1e-9. */
+  timeout?: number;
+}
+
+/** One runtime case of a `tests` requirement. Pure JSON: undefined, NaN,
+ *  Infinity and -0 are written {"$":"undefined"} / {"$":"NaN"} / {"$":"Infinity"}
+ *  / {"$":"-Infinity"} / {"$":"-0"}. */
+export interface TestCase {
+  /** Arguments for the call; fresh copies are built for every case. */
+  args?: unknown[];
+  /** The value the call must return. Omit to not check the return value. */
+  expect?: unknown;
+  /** Lines the call must print with console.log (one entry per line). */
+  expectOutput?: string[];
+  /** Argument index (or indexes) that must be unchanged after the call. */
+  unchanged?: number | number[];
+  /** Expected final value of arguments after the call, keyed by index: {"0": [1,2,3]}. */
+  after?: Record<string, unknown>;
+  /** Failure says only "A hidden check failed." with no values. */
+  hidden?: boolean;
+  /** Short words for the case, appended to the call in the failure message. */
+  description?: string;
 }
 
 export interface Grading {
   totalPoints: number;
   passingScore: number;
   allowLateSubmit?: boolean;
+  /**
+   * Tries the student gets at this part, counted server-side from their own
+   * lesson_submissions rows (lib/attempt-cap.ts). Absent = unlimited. The best
+   * score counts, and once the last try is spent the part's solution is shown
+   * as pseudocode (functions/api/attempt-reveal.ts). See
+   * .gauntlet/SPEC-attempt-caps.md. Only meaningful on a performance assessment.
+   */
+  maxSubmissions?: number;
   /**
    * This item is one part of a test the student sits in one sitting.
    *
@@ -106,6 +146,9 @@ export interface Grading {
    * unit sets whichever one its renderer reads.
    */
   summative?: boolean;
+  /** Practice, not graded: a lesson with a weighted rubric (so it still has a pass line) that
+   *  must stay out of the course grade. The manifest then carries no scoreKind or maxScore. */
+  formative?: boolean;
   /**
    * The lesson's CORRECT answer includes an uncaught runtime error -- 2.5.3
    * asks the student to log an undeclared variable and watch it fail, before
@@ -226,17 +269,77 @@ export interface QuizConfig {
    * is green-to-advance and a summative score is the teacher's to hand back.
    */
   summative?: boolean;
+  /**
+   * Release the correct answers and their explanations to the student once they
+   * have handed the paper in. Off by default, and that default is load-bearing:
+   * `summative` is set on five quizzes in the course, two of them module quizzes
+   * where marking is the entire point. A test opts in by asking.
+   *
+   * Delivery is server-side and after the attempt, never in the page -- see
+   * functions/api/quiz-reveal.ts. The attempt count is unchanged; this only
+   * decides whether the marking is shown once it is spent.
+   */
+  revealAfterSubmit?: boolean;
+  /**
+   * Tries the student gets at this part, counted server-side from their own
+   * lesson_submissions rows (lib/attempt-cap.ts). Absent = unlimited. The best
+   * score counts, and once the last try is spent the part's solution is shown
+   * as pseudocode (functions/api/attempt-reveal.ts). See
+   * .gauntlet/SPEC-attempt-caps.md. Only meaningful on a performance assessment.
+   */
+  maxSubmissions?: number;
   questions: QuizQuestion[];
 }
 
 export interface AiGraderConfig {
   /**
+   * Strict marking for a graded test part (correctness first, phrasing generous)
+   * instead of the course's lenient practice framing. Authored here, read ONLY on
+   * the server (functions/_shared/aiGraders.ts); lib/quiz-redact.ts rebuilds the
+   * client copy field by field and never carries it.
+   */
+  strict?: boolean;
+  /**
    * Test mode, the written-response twin of QuizConfig.summative. One
    * submission, no rubric feedback returned to the student, and the lesson
    * completes on submission. Rubric feedback on a graded test is the answer
    * key: it names the criterion that was missed, and the student resubmits.
+   * Either way the grading brief (`prompt`, `contextDocs`, rubric
+   * descriptions) stays out of the browser -- see lib/quiz-redact.ts.
+   * `revisable` lifts the first two.
    */
   summative?: boolean;
+  /**
+   * A summative item the student may revise: submit, read the grader's
+   * feedback, fix the answer, submit again, without limit. Lifts only the
+   * one-submission lock and the suppressed feedback panel. The brief still
+   * never reaches the browser and sitting the item still completes the lesson,
+   * so a student is not locked out of the rest of the test by a draft that has
+   * not passed yet.
+   *
+   * The price is the feedback itself: it names what a draft is missing and can
+   * paraphrase the accepted answer. Decided per item. Inert without `summative`.
+   */
+  revisable?: boolean;
+  /**
+   * How many graded attempts the student gets. Absent means unlimited, which
+   * is every formative assignment in the course. Counted from the server's own
+   * submission rows rather than from this browser -- see lib/attempt-cap.ts for
+   * why a client-side count is not a cap, and what it does not count.
+   *
+   * Only meaningful with `summative`. On a formative item it is inert: a
+   * practice assignment has no reason to stop somebody trying again.
+   */
+  maxSubmissions?: number;
+  /**
+   * What the student types into. 'text' (the default) is the prose textarea;
+   * 'code' is the CodeMirror JavaScript editor: line numbers, colour, bracket
+   * matching, auto-indent, and no Run button, lint or autocomplete, so the
+   * student still has to find their own mistakes. Presentation only: it passes
+   * through redaction (lib/quiz-redact.ts) because the widget needs it, and the
+   * grader never sees it -- it takes only `lessonId` and `response`.
+   */
+  input?: 'text' | 'code';
   rubricTitle?: string;
   model?: string;
   contextDocs?: string[];

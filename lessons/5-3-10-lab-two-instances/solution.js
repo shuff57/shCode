@@ -1,4 +1,4 @@
-// 2.2.4d Lab: Two sprites, two property values (reference solution).
+// 5.3.10 Lab: Two sprites, two property values (reference solution).
 
 class Box {
   constructor(c) {

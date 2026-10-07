@@ -49,6 +49,8 @@ for (let i = 2; i <= 10; i += 2) {
 }
 ```
 
+`i += 2` means `i = i + 2`: add 2 to `i`. In the next example, `i--` means `i = i - 1`.
+
 Now count down instead: start high, subtract each pass, and stop once you pass 1:
 
 ```js live plain

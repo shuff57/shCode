@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ReshapePreview from './ReshapePreview';
 // BrepViewportThree.tsx moved to reshape-cad's packages/studio (B1
 // extraction, plan: freecad-browser.md) -- this component is a second,
 // independent consumer of it alongside the package's own ReshapeStudio.
 import BrepViewport from '@shuff57/reshape-studio/model/BrepViewportThree';
+import type { BrepViewportStats } from '@shuff57/reshape-studio/model/BrepViewportThree';
 import type { ModelDoc } from '../lib/model-types';
 
 interface Props {
@@ -35,6 +36,13 @@ export default function ReshapeScriptPreview({ code, runKey }: Props) {
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const [doc, setDoc] = useState<ModelDoc | null>(null);
   const [error, setError] = useState<{ message: string; line: number | null } | null>(null);
+  // The kernel refuses a step it cannot build exactly and shows the shape WITHOUT it. With no
+  // fallback engine the sentence in BrepViewportStats.refusals is the only way the student
+  // learns why the shape looks unchanged, so it is shown under the picture (empty = all built).
+  const [refusals, setRefusals] = useState<string[]>([]);
+  const onStats = useCallback((s: BrepViewportStats) => {
+    setRefusals(s.refusals ? [...s.refusals.values()] : []);
+  }, []);
   const hasRun = runKey > 0;
 
   useEffect(() => {
@@ -74,7 +82,27 @@ export default function ReshapeScriptPreview({ code, runKey }: Props) {
       <ReshapePreview ref={frameRef} engine="script" code={code} runKey={runKey} />
       {doc && (
         <div style={{ position: 'absolute', inset: 0 }}>
-          <BrepViewport doc={doc} />
+          <BrepViewport doc={doc} onStats={onStats} />
+        </div>
+      )}
+      {!error && refusals.length > 0 && (
+        <div
+          role="status"
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            padding: '8px 12px',
+            background: '#282a36',
+            color: '#f1fa8c',
+            fontFamily: "'Fira Code', Consolas, monospace",
+            fontSize: '0.75rem',
+            whiteSpace: 'pre-wrap',
+            borderTop: '1px solid #44475a',
+          }}
+        >
+          {refusals.join('\n')}
         </div>
       )}
       {error && (
