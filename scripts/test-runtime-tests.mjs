@@ -237,15 +237,18 @@ try {
       ['number in the middle', '"a " + w * h + " b"'],
     ]) check('contains 12 accepts: ' + name, (await one(prints(expr), area)).passed, '');
     for (const [name, expr, re] of [
-      ['112', '"Area: 112"', /should print a line that includes "12" but printed "Area: 112"/],
-      ['12.5', '"Area: 12.5"', /but printed "Area: 12\.5"/],
-      ['1.12', '"Area: 1.12"', /includes "12"/],
-      ['-12', '"Area: -12"', /includes "12"/],
-      ['212', '"212"', /includes "12"/],
-      ['the width', 'w', /but printed "3"/],
+      ['112', '"Area: 112"', /should print the number 12 on its own, but printed "Area: 112"/],
+      ['12100', '"Area: 12100"', /should print the number 12 on its own, but printed "Area: 12100"/],
+      ['12.5', '"Area: 12.5"', /should print the number 12 on its own, but printed "Area: 12\.5"/],
+      ['1.12', '"Area: 1.12"', /should print the number 12 on its own/],
+      ['-12', '"Area: -12"', /should print the number 12 on its own/],
+      ['212', '"212"', /should print the number 12 on its own/],
+      ['the width', 'w', /should print a line that includes "12" but printed "3"/],
       ['w * w', 'w * w', /but printed "9"/],
       ['no number', '"Area"', /but printed "Area"/],
     ]) await expectFail('contains 12 rejects: ' + name, prints(expr), area, re);
+    // A text needle keeps the "includes" wording; a hidden case says only that it failed.
+    await expectFail('text needle keeps the old wording', 'function f(w, h){ console.log("Perimeter"); }', T('t', 'f', [{ args: [3, 4], expectOutputContains: ['Area'] }]), /should print a line that includes "Area" but printed "Perimeter"/);
     await expectFail('prints nothing', 'function f(w, h){ return w * h; }', area, /includes "12" but printed nothing$/);
     check('digits split by a word do not join', !(await one('function f(){ console.log("1 2"); }', area)).passed, '');
     check('12 in a later line counts', (await one('function f(w,h){ console.log("start"); console.log(w*h); }', area)).passed, '');
@@ -260,6 +263,7 @@ try {
     await expectFail('words: names the first missing needle', 'function f(){ console.log("hello world"); }', words, /includes "BYE" but printed "hello world"$/);
     const hidd = T('h', 'f', [{ args: [3, 4], expectOutputContains: ['12'] }, { args: [5, 5], expectOutputContains: ['25'], hidden: true }]);
     check('hidden contains passes when right', (await one('function f(w,h){ console.log("Area " + w*h); }', hidd)).passed, '');
+    await expectFail('hidden digits-inside case still reveals nothing', 'function f(w,h){ console.log(w === 5 ? "x" + (w*h) + "1" : "Area " + w*h); }', hidd, /^A hidden check failed\.$/);
     await expectFail('hidden contains reveals nothing', 'function f(w,h){ console.log(w === 5 ? "x" : w*h); }', hidd, /^A hidden check failed\.$/);
     const ret = T('r', 'f', [{ args: [1], expectContains: 'zero' }, { args: [2], expect: 7 }]);
     check('string return: contains, case-insensitive', (await one('function f(b){ return b === 1 ? "Zero is NOT allowed" : 7; }', ret)).passed, '');

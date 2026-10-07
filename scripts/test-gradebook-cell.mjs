@@ -71,7 +71,7 @@ try {
   writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
 
   const require = createRequire(import.meta.url);
-  const { buildCell, cellStatus, needsAttention, readTeacherNotes } =
+  const { buildCell, cellStatus, needsAttention, readTeacherNotes, practiceDisplay } =
     require(path.join(out, 'gradebook-cell.js'));
 
   const status = (over) => cellStatus(buildCell(cell(over)));
@@ -191,6 +191,19 @@ try {
   check('the authoritative percent survives', graded.score, 90);
   check('teacher feedback survives', graded.teacherFeedback, 'nice');
   check('teacher review date survives', graded.teacherReviewedAt, 950_000);
+
+  // ---- practice items: finished work that does not count says so, not "100%" ----
+  const drill = { state: 'completed', score: 0, possible: 0, completedAt: 900_000, dueAt: DUE };
+  const drillStatus = status(drill);
+  const p = practiceDisplay(false, drillStatus);
+  check('an ungraded completed item has a practice label', p && p.statusLabel, 'Done');
+  check('an ungraded completed item carries the practice tag', p && p.tag, 'Practice, not graded');
+  check('a counted completed item keeps its percent (no practice display)', practiceDisplay(true, 'done'), null);
+  check('a late ungraded item still reads as practice', practiceDisplay(false, 'done-late') !== null, true);
+  for (const st of ['pending', 'started', 'missing', 'not-started']) {
+    check(`${st} is unchanged for an ungraded item`, practiceDisplay(false, st), null);
+  }
+  check('the status of a practice item is unchanged', drillStatus, 'done');
 } finally {
   rmSync(out, { recursive: true, force: true });
 }

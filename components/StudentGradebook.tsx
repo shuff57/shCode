@@ -22,6 +22,7 @@ import { lessonGradeCategory, lessonPercent, type GradeCategory } from '../lib/g
 import {
   cellStatus,
   needsAttention,
+  practiceDisplay,
   type CellStatus,
   type GradebookCell,
 } from '../lib/gradebook-cell';
@@ -280,14 +281,22 @@ export default function StudentGradebook({ lessons }: Props) {
             <tbody>
               {shown.map(({ lesson, cell, status, tried, opens, t }) => {
                 const due = dueDates[lesson.id];
-                const score = scoreText(cell, lesson.maxScore);
+                const category = lessonGradeCategory({
+                  title: lesson.title,
+                  preview: lesson.preview,
+                  scoreKind: lesson.scoreKind,
+                  assignmentCode: lesson.assignmentCode,
+                });
+                // Finished work that does not count toward the grade says so instead of "100%".
+                const practice = practiceDisplay(category !== null, status);
+                const score = practice ? null : scoreText(cell, lesson.maxScore);
                 // Tried and not passing: say what they have and how many tries are left.
                 const left = t ? Math.max(0, t.cap - t.used) : 0;
                 const statusLabel = opens
                   ? `Opens ${formatDue(opens)}`
                   : tried
                     ? left > 0 ? `Tried \u00b7 ${left} ${left === 1 ? 'try' : 'tries'} left` : 'Tried \u00b7 no tries left'
-                    : STATUS_LABEL[status];
+                    : practice ? practice.statusLabel : STATUS_LABEL[status];
                 const statusColor = opens ? '#94a3b8' : tried ? '#bd93f9' : STATUS_COLOR[status];
                 const bestText = tried
                   ? cell.score != null && lesson.maxScore
@@ -297,12 +306,6 @@ export default function StudentGradebook({ lessons }: Props) {
                       : null
                   : null;
                 const dueSoon = !!due && due > nowMs && due - nowMs <= 7 * 86400000 && status !== 'done' && status !== 'done-late';
-                const category = lessonGradeCategory({
-                  title: lesson.title,
-                  preview: lesson.preview,
-                  scoreKind: lesson.scoreKind,
-                  assignmentCode: lesson.assignmentCode,
-                });
                 const hasFeedback = !!cell.teacherFeedback;
                 const open = hasFeedback && !!expanded[lesson.id];
                 return (
@@ -334,6 +337,11 @@ export default function StudentGradebook({ lessons }: Props) {
                           >
                             Open
                           </a>
+                        )}
+                        {practice && (
+                          <span style={{ ...chipStyle, borderColor: 'transparent', color: '#8393c4' }} title="This lesson is practice. It does not count toward your grade.">
+                            {practice.tag}
+                          </span>
                         )}
                         {category && (
                           <span

@@ -350,6 +350,11 @@ const __runTestJobs = (() => {
       return true;
     }
   }
+  // A number needle whose digits DO appear, just not as a standalone number ("12" in "Area: 112"):
+  // the plain "includes" wording would read as a lie, so the message says what is actually wanted.
+  function digitsInside(hay, needle) {
+    return NUM_RE.test(needle) && hay.replace(/(?<=[0-9]),(?=[0-9]{3}(?![0-9]))/g, '').indexOf(needle) !== -1;
+  }
   function needlesOf(c, one, many) {
     const out = [];
     if (typeof c[one] === 'string') out.push(c[one]);
@@ -393,6 +398,9 @@ const __runTestJobs = (() => {
       const hay = typeof got === 'string' ? norm(got) : null;
       for (let i = 0; i < retNeedles.length; i++) {
         if (hay === null || !hasNeedle(hay, norm(retNeedles[i]))) {
+          if (hay !== null && digitsInside(hay, norm(retNeedles[i]))) {
+            return bad(call + ' should give the number ' + clip(String(retNeedles[i]).trim(), 40) + ' on its own, but gave ' + showClip(got));
+          }
           return bad(call + ' should give text that includes ' + clip(JSON.stringify(retNeedles[i]), 60) + ' but gave ' + showClip(got) + (got === undefined && lines.length > 0 ? ' (it printed instead of returning a value - use return)' : ''));
         }
       }
@@ -401,6 +409,9 @@ const __runTestJobs = (() => {
       const printed = norm(lines.join(' '));
       for (let i = 0; i < c.expectOutputContains.length; i++) {
         if (!hasNeedle(printed, norm(c.expectOutputContains[i]))) {
+          if (digitsInside(printed, norm(c.expectOutputContains[i]))) {
+            return bad(call + ' should print the number ' + clip(String(c.expectOutputContains[i]).trim(), 40) + ' on its own, but printed ' + clip(lines.map((l) => JSON.stringify(l.replace(/\s+$/, ''))).join(', '), 80));
+          }
           return bad(call + ' should print a line that includes ' + clip(JSON.stringify(String(c.expectOutputContains[i])), 60) + ' but printed ' + (lines.length === 0 ? 'nothing' : clip(lines.map((l) => JSON.stringify(l.replace(/\s+$/, ''))).join(', '), 80)));
         }
       }

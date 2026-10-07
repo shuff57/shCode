@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getCurrentUser, type CurrentUser } from '../../lib/auth';
 import { useLessonState } from '../../lib/progress';
-import { lessonPercent } from '../../lib/grading-weights';
+import { lessonGradeCategory, lessonPercent } from '../../lib/grading-weights';
 import { sortLessons } from '../../lib/lesson-order';
 import StudentGradebook from '../../components/StudentGradebook';
 
@@ -15,6 +15,9 @@ interface ManifestLesson {
   category?: string;
   /** Quiz questions, rubric points, or pass/fail criteria; null = completion is the grade. */
   maxScore?: number | null;
+  preview?: string | null;
+  assignmentCode?: string | null;
+  scoreKind?: 'quiz' | 'written' | null;
 }
 
 interface ManifestData {
@@ -148,7 +151,9 @@ export default function ProgressPage() {
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {recentlyCompleted.map((l) => {
-                const score = progress.scores[l.id] !== undefined || l.maxScore != null ? pctFor(l) : undefined;
+                // Work with no grade category does not count, so it gets no percent (its 100 is a placeholder).
+                const counts = lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null;
+                const score = !counts ? undefined : progress.scores[l.id] !== undefined || l.maxScore != null ? pctFor(l) : undefined;
                 return (
                   <li key={l.id} style={listItemStyle}>
                     <span style={{ flex: 1, fontWeight: 500 }}>{l.title}</span>
@@ -161,7 +166,7 @@ export default function ProgressPage() {
                       padding: '2px 10px',
                       fontWeight: 600,
                     }}>
-                      Completed{score !== undefined ? ` ${score}%` : ''}
+                      {counts ? `Completed${score !== undefined ? ` ${score}%` : ''}` : 'Done \u00b7 practice'}
                     </span>
                   </li>
                 );

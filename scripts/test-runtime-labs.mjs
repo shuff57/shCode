@@ -126,7 +126,9 @@ try {
     await reject(id, 'printing width + height', fnWith('console.log("Area: " + (width * height * 0 + width + height));'),
       't1', /^findRectangleArea\(3, 4\) should print a line that includes "12" but printed "Area: 7"$/);
     await reject(id, 'printing 112 (a longer number holding 12)', fnWith('console.log("Area: 1" + width * height);'),
-      't1', /^findRectangleArea\(3, 4\) should print a line that includes "12" but printed "Area: 112"$/);
+      't1', /^findRectangleArea\(3, 4\) should print the number 12 on its own, but printed "Area: 112"$/);
+    await reject(id, 'printing 12100 (a longer number starting with 12)', fnWith('console.log("Area: " + width * height + "100");'),
+      't1', /^findRectangleArea\(3, 4\) should print the number 12 on its own, but printed "Area: 12100"$/);
     await reject(id, 'printing 12.5', fnWith('console.log("Area: " + (width * height + 0.5));'),
       't1', /but printed "Area: 12\.5"$/);
     await reject(id, 'printing only the width', fnWith('console.log(width);'),

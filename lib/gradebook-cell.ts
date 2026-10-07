@@ -124,3 +124,22 @@ export function cellStatus(cell: GradebookCell): CellStatus {
 export function needsAttention(s: CellStatus): boolean {
   return s === 'missing' || s === 'done-late' || s === 'pending' || s === 'started';
 }
+
+/** The words a gradebook shows for finished work that does not count toward the grade.
+ *
+ *  A lesson with no grade category (a drill, a practice lab, a formative chart, a reading) is
+ *  completed with a stored score of 0 / possible 0, and lessonPercent() reads that as 100. That 100
+ *  is a placeholder, not a mark, so showing "Completed 100%" tells a student something was graded
+ *  that was not. Returns null for anything that counts (the caller keeps its percent) and for any
+ *  state other than finished (in progress, missing, waived and pending read exactly as before). */
+export const PRACTICE_STATUS_LABEL = 'Done';
+export const PRACTICE_TAG = 'Practice, not graded';
+
+export function practiceDisplay(
+  counts: boolean,
+  status: CellStatus,
+): { statusLabel: string; tag: string } | null {
+  if (counts) return null;
+  if (status !== 'done' && status !== 'done-late') return null;
+  return { statusLabel: PRACTICE_STATUS_LABEL, tag: PRACTICE_TAG };
+}

@@ -1254,6 +1254,11 @@ function GradebookView({
       // read "0" on a chart lesson that grades 100, and "3" meant 3 of 4 on one lesson and 3 of 10 on
       // the next. The latest attempt's raw points are still in the tooltip (cellTitle).
       const pct = lessonPercent(cell.state, cell.score, maxScore);
+      // Practice work (no grade category; only visible with "Show readings and slides") has no mark:
+      // its 100 is a placeholder, so a check says "done" without implying a score.
+      if (!graded) {
+        return withLate(cell, <span style={{ color: '#8393c4', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>✓</span>);
+      }
       // A number for every finished lesson, 100 included: the cell background carries the state.
       return withLate(cell, (
         <span style={{ color: pct >= 70 ? '#50fa7b' : '#f1fa8c', fontFamily: 'monospace', fontWeight: 700, fontSize: 12 }}>
@@ -1290,11 +1295,12 @@ function GradebookView({
 
   // Plain words for a cell, for the hover tip and for screen readers: what the student has done, the
   // best score, and whether it is late. (This used to print "state: completed | sub score: 4".)
-  function cellWords(cell: GradebookCell | undefined, maxScore?: number | null): string {
+  function cellWords(cell: GradebookCell | undefined, maxScore?: number | null, graded = true): string {
     if (!cell) return 'Not started';
     if (cell.pending) return 'Awaiting a grade: the AI grader failed, see the review queue';
     if (cell.state === 'completed') {
       const pct = lessonPercent(cell.state, cell.score, maxScore);
+      if (!graded) return `${cell.late ? 'Completed late' : 'Done'}, practice (not graded)`;
       const pts = cell.score !== null && maxScore != null && maxScore > 0 ? `, best ${Math.round(cell.score * 100) / 100} of ${maxScore} points` : '';
       return `${cell.late ? 'Completed late' : 'Done'}, ${pct}%${pts}`;
     }
@@ -1306,9 +1312,9 @@ function GradebookView({
     return cell.late ? 'Missing: past due, not started' : 'Not started';
   }
 
-  function cellTitle(cell: GradebookCell | undefined, lessonTitle: string, lessonId?: string, maxScore?: number | null): string {
+  function cellTitle(cell: GradebookCell | undefined, lessonTitle: string, lessonId?: string, maxScore?: number | null, graded = true): string {
     const dueAt = lessonId ? gbData?.dueDates?.[lessonId] : undefined;
-    const lines = [lessonTitle, cellWords(cell, maxScore)];
+    const lines = [lessonTitle, cellWords(cell, maxScore, graded)];
     if (cell && cell.possible !== null && cell.possible > 0 && cell.submitted_score !== null) {
       lines.push(`Latest try: ${cell.submitted_score} of ${cell.possible}`);
     }
@@ -1691,8 +1697,8 @@ function GradebookView({
                         background: cellTint(cell, gradedIds.has(lesson.id), lessonPercent(cell?.state, cell?.score, lesson.maxScore)),
                         ...(isCodingLesson ? { cursor: 'pointer' } : {}),
                       }}
-                      title={cellTitle(cell, lesson.title, lesson.id, lesson.maxScore)}
-                      aria-label={`${fullName(student.firstName, student.lastName) || student.email}, ${lesson.title}: ${cellWords(cell, lesson.maxScore)}`}
+                      title={cellTitle(cell, lesson.title, lesson.id, lesson.maxScore, gradedIds.has(lesson.id))}
+                      aria-label={`${fullName(student.firstName, student.lastName) || student.email}, ${lesson.title}: ${cellWords(cell, lesson.maxScore, gradedIds.has(lesson.id))}`}
                       tabIndex={isCodingLesson ? 0 : undefined}
                       onKeyDown={isCodingLesson ? (e) => {
                         if (e.key === 'Enter') router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(student.email)}&lesson=${encodeURIComponent(lesson.id)}`);
