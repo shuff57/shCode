@@ -14,6 +14,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight, MessageSquare } from 'lucide-react';
 import { formatDue } from '../lib/due-dates-core';
 import { sortLessons } from '../lib/lesson-order';
+import { lessonHref } from '../lib/lesson-href';
 import { lessonGradeCategory, lessonPercent, type GradeCategory } from '../lib/grading-weights';
 // Status derivation is shared with the endpoint that builds these cells, so
 // the page and the teacher's gradebook can never disagree about whether a
@@ -320,7 +321,19 @@ export default function StudentGradebook({ lessons }: Props) {
                             <MessageSquare size={13} style={{ color: '#bd93f9', flexShrink: 0 }} />
                           </button>
                         ) : (
-                          <span style={{ fontWeight: 500 }}>{lesson.title}</span>
+                          <a href={lessonHref(lesson)} style={{ fontWeight: 500, color: 'inherit' }}>
+                            {lesson.title}
+                          </a>
+                        )}
+                        {hasFeedback && (
+                          <a
+                            href={lessonHref(lesson)}
+                            aria-label={`Open ${lesson.title}`}
+                            title="Open lesson"
+                            style={{ marginLeft: 6, color: '#8393c4', fontSize: 12 }}
+                          >
+                            Open
+                          </a>
                         )}
                         {category && (
                           <span
