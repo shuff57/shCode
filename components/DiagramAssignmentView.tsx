@@ -56,6 +56,8 @@ interface CriterionResult {
   max: number;
   verdict: 'met' | 'partial' | 'missing';
   feedback: string;
+  /** Hybrid charts: 'rules' = marked from the drawing, 'ai' = marked from the wording. */
+  source?: 'rules' | 'ai';
 }
 
 interface GradeResult {
@@ -525,6 +527,11 @@ export default function DiagramAssignmentView({
               </div>
             ))}
           </div>
+          {structureOk && config.aiGrader && !summative ? (
+            <p style={{ color: '#8393c4', fontSize: 12.5, marginTop: 8 }}>
+              Order and wording are checked when you submit.
+            </p>
+          ) : null}
           {!structureOk && (
             <p style={{ color: '#ffb86c', fontSize: 12.5, marginTop: 8 }}>
               Shapes with a problem are outlined in red on the canvas.{' '}
@@ -598,6 +605,11 @@ export default function DiagramAssignmentView({
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <Icon size={18} color={color} />
                     <strong style={{ color: '#f8f8f2' }}>{label?.title || c.id}</strong>
+                    {c.source ? (
+                      <span style={{ fontSize: 11, color: '#8393c4', border: '1px solid #44475a', borderRadius: 10, padding: '1px 7px' }}>
+                        {c.source === 'rules' ? 'Checked by rules' : 'AI feedback'}
+                      </span>
+                    ) : null}
                     <span style={{ marginLeft: 'auto', color, fontWeight: 600, fontSize: 13 }}>
                       {result.totalPossible === 0 ? c.verdict : `${c.earned} / ${c.max} pts`}
                     </span>

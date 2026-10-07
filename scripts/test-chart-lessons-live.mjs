@@ -1,4 +1,7 @@
-// LIVE measurement of the strict chart aiGraders on the 3.2 / 3.3 chart lessons.
+// LIVE measurement of the HYBRID chart graders on the 3.2 / 3.3 chart lessons: the 14 heavy points
+// are marked from the drawing (lib/diagram-score.ts, no model), the model marks only the 6 points of
+// wording. A fixture that fails the server's structural refusal (422) or cannot reach 14 even with a
+// perfect model is settled on the rules alone and costs no model call, exactly as on the server.
 //   node scripts/test-chart-lessons-live.mjs [--runs=3] [--filter=text]   (needs OLLAMA_API_KEY)
 // Fixtures are derived from each lesson's own solution/chart.mmd by string edits (no
 // hand-kept copies). Marking goes through the real server path: ai-graders.generated.ts +
@@ -19,12 +22,14 @@ if (!key) { console.error('needs OLLAMA_API_KEY'); process.exit(1); }
 const out = mkdtempSync(path.join(tmpdir(), 'shcode-chart-live-'));
 try {
   execFileSync(process.execPath, [path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-    'lib/grade-written-core.ts', 'lib/diagram-mermaid.ts', '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck', '--esModuleInterop'], { cwd: root, stdio: 'inherit' });
+    'lib/grade-written-core.ts', 'lib/diagram-mermaid.ts', 'lib/diagram-score.ts', 'lib/diagram-check.ts', '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck', '--esModuleInterop'], { cwd: root, stdio: 'inherit' });
   writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
   const req = createRequire(path.join(out, 'x.js'));
   const find = (n) => [path.join(out, n), path.join(out, 'lib', n)].find((p) => existsSync(p));
   const core = req(find('grade-written-core.js'));
   const mermaid = req(find('diagram-mermaid.js'));
+  const dscore = req(find('diagram-score.js'));
+  const dcheck = req(find('diagram-check.js'));
   const ts = readFileSync(path.join(root, 'functions', '_shared', 'ai-graders.generated.ts'), 'utf8');
   const GRADERS = JSON.parse(ts.slice(ts.indexOf('= {') + 2, ts.lastIndexOf(';')));
   const describe = (m) => mermaid.describeDiagram(mermaid.fromMermaid(m));
@@ -44,6 +49,8 @@ try {
       ['variant: own wording', true, sw(sw(sw(sw(sw(r, 'Set base to 100', 'let base = 100'), 'showPriceWithTax of base', 'call showPriceWithTax(base)'), 'Is base over 80?', 'base > 80?'), 'Print Over budget', 'show: Over budget'), 'Print Within budget', 'show: Within budget')],
       ['variant: reversed question and labels', true, sw(sw(r, 'Is base over 80?', 'Is base 80 or less?'), 'D -- "yes" --> F\n  D -- "no" --> G', 'D -- "yes" --> G\n  D -- "no" --> F')],
       ['variant: terse + base passed in label', true, sw(sw(r, 'Set base to 100', 'base = 100'), 'Is base over 80?', 'is base greater than 80')],
+      ['variant: connector pair and a note', true, sw(sw(r, 'B --> C', 'B --> K1((J))\n  K2((J)) --> C'), 'Z([End])', 'Z([End])\n  N>priceWithTax adds tax]')],
+      ['variant: shared print before End, two Ends alt', true, sw(r, 'F --> Z\n  G --> Z', 'F --> P[/Print Thanks/]\n  G --> P\n  P --> Z')],
       ['GAME: generic junk', false, JUNK], ['GAME: Start->End', false, MIN], ['GAME: sandwich', false, SANDWICH], ['GAME: inject label', false, INJECT],
       ['GAME: decision before call', false, sw(r, 'B --> C\n  C --> D\n  D -- "yes" --> F\n  D -- "no" --> G\n  F --> Z\n  G --> Z', 'B --> D\n  D -- "yes" --> F\n  D -- "no" --> G\n  F --> C\n  G --> C\n  C --> Z')],
       ['GAME: rectangle for call', false, sw(sw(r, 'C[[', 'C['), 'base]]', 'base]')],
@@ -77,15 +84,25 @@ try {
   const passes = (res) => res.totalPossible === 0
     ? res.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length >= Math.ceil(res.criteria.length / 2)
     : res.totalEarned / res.totalPossible >= 0.7;
-  async function mark(id, response) {
+  // The server's own path for a hybrid chart, minus HTTP: structural refusal, rule score, then the
+  // model on the wording items only, merged. Returns {res, how} where how says what settled it.
+  async function mark(id, mmd) {
     const g = GRADERS[id];
-    const { system, user } = core.buildPrompt({ lessonId: id, lessonTitle: g.lessonTitle, prompt: g.prompt, response, rubric: g.rubric, strict: g.strict });
+    const doc = mermaid.fromMermaid(mmd);
+    const { ruleItems, aiItems } = dscore.splitRubric(g.rubric);
+    const checks = dcheck.checkDiagram(doc, g.diagramRules);
+    if (!dcheck.allPassed(checks)) return { res: null, how: 'refused 422: ' + checks.filter((c) => !c.passed).map((c) => c.id).join(',') };
+    const det = dscore.scoreDiagram(doc, ruleItems, g.gate);
+    const aiMax = aiItems.reduce((a, r) => a + r.points, 0);
+    if (det.earned + aiMax < 14) return { res: dscore.mergeGrade(det, null, aiItems), how: 'rules' };
+    const response = mermaid.describeDiagram(doc);
+    const { system, user } = core.buildPrompt({ lessonId: id, lessonTitle: g.lessonTitle, prompt: g.prompt, response, rubric: aiItems, strict: g.strict });
     const body = { model: g.model || 'glm-5.3-flash:cloud', messages: [{ role: 'system', content: system }, { role: 'user', content: user }], stream: false, format: 'json', options: { temperature: 0.2 } };
     for (let a = 0; a < 3; a++) {
       const res = await fetch('https://ollama.com/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key }, body: JSON.stringify(body) });
       if (!res.ok) { await new Promise((r) => setTimeout(r, 4000)); continue; }
       const parsed = core.parseModelJson((await res.json()).message?.content || '');
-      if (parsed) return core.shapeResult(parsed, g.rubric);
+      if (parsed) return { res: dscore.mergeGrade(det, core.shapeResult(parsed, aiItems), aiItems), how: 'hybrid' };
     }
     throw new Error('no usable answer');
   }
@@ -94,21 +111,24 @@ try {
   const jobs = [];
   for (const [id, fx] of Object.entries(L)) for (const [name, want, mmd] of fx) {
     if (filterArg && !(id + name).includes(filterArg)) continue;
-    jobs.push({ id, name, want, text: describe(mmd) });
+    jobs.push({ id, name, want, mmd });
   }
   let next = 0;
   await Promise.all(Array.from({ length: 5 }, async () => { while (next < jobs.length) { const j = jobs[next++];
     const rs = [];
-    for (let i = 0; i < runs; i++) { try { rs.push(await mark(j.id, j.text)); } catch (e) { rs.push(null); j.err = e.message; } }
+    for (let i = 0; i < runs; i++) { try { rs.push(await mark(j.id, j.mmd)); } catch (e) { rs.push(null); j.err = e.message; } }
     j.rs = rs;
   } }));
   for (const j of jobs) {
-    const p = j.rs.filter((r) => r && passes(r)).length;
+    const done = j.rs.filter((r) => r && r.res);
+    const p = done.filter((r) => passes(r.res)).length;
+    const refused = j.rs.filter((r) => r && !r.res).length; // 422: never graded, so never a pass
     const ok = j.want ? p * 2 > runs : p * 2 <= runs - 1 || p === 0;
     const bad = j.want ? p < runs : p > 0;
     if (!ok) failures++;
-    console.log(`${ok ? 'ok  ' : 'FAIL'}${bad && ok ? ' ~' : '  '} ${j.id.padEnd(30)} ${j.name.padEnd(42)} pass ${p}/${runs}  ${j.rs.map((r) => (r ? r.criteria.map((c) => ({ met: 'M', partial: 'p', missing: '-' }[c.verdict])).join('') : 'ERR')).join(' ')}${j.err ? ' ' + j.err : ''}`);
-    if (process.env.VERBOSE && bad) for (const r of j.rs) if (r) console.log('     ' + r.criteria.map((c) => `${c.id}:${c.verdict}:${(c.feedback || '').slice(0, 140)}`).join('\n     '));
+    const letters = (r) => (r ? (r.res ? r.res.criteria.map((c) => ({ met: 'M', partial: 'p', missing: '-' }[c.verdict])).join('') + `=${r.res.totalEarned}${r.res.capped ? 'cap' : ''}` : 'REFUSED') : 'ERR');
+    console.log(`${ok ? 'ok  ' : 'FAIL'}${bad && ok ? ' ~' : '  '} ${j.id.padEnd(30)} ${j.name.padEnd(42)} pass ${p}/${runs}  ${j.rs.map((r) => letters(r)).join(' ')}  [${[...new Set(j.rs.filter(Boolean).map((r) => r.how))].join('|')}]${refused ? ' (refused before grading)' : ''}${j.err ? ' ' + j.err : ''}`);
+    if (process.env.VERBOSE && bad) for (const r of j.rs) if (r && r.res) console.log('     ' + r.res.criteria.map((c) => `${c.id}:${c.verdict}:${(c.feedback || '').slice(0, 140)}`).join('\n     '));
   }
   console.log(failures ? `\n${failures} fixture(s) off target` : '\nall fixtures on target');
   process.exitCode = failures ? 1 : 0;
