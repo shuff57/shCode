@@ -555,13 +555,21 @@ export function mergeGrade(
   const capped = !!det.gate && !det.gate.passed && rawTotal > det.gate.capTo;
   const totalEarned = capped ? det.gate!.capTo : rawTotal;
 
+  // The authoritative numbers come first and are the only place a total is stated: the model
+  // sees only the wording items, so its own words can never speak for the whole chart. Its text
+  // is shown unedited, beneath a label that says what it is about.
+  const passAt = Math.ceil(possible * 0.7 - 1e-9);
+  const lines: string[] = [];
   const parts = [`Shapes and order: ${det.earned} of ${det.possible}.`];
   if (aiItems.length > 0) parts.push(`Wording: ${aiEarned} of ${aiPossible}.`);
-  let summary = parts.join(' ');
+  parts.push(`Total ${totalEarned} of ${possible} (pass at ${passAt}).`);
+  lines.push(parts.join(' '));
   if (det.gate && !det.gate.passed) {
-    summary += ` ${det.gate.fail}` + (capped ? ` Your total is held at ${det.gate.capTo} of ${possible} until it does.` : '');
+    lines.push(`${det.gate.fail}` + (capped ? ` Your total is held at ${det.gate.capTo} of ${possible} until it does.` : ''));
   }
-  if (ai?.summary) summary += ` ${ai.summary}`;
+  if (totalEarned < passAt) lines.push('Not passed yet.');
+  if (ai?.summary) lines.push(`Wording feedback: ${ai.summary}`);
+  const summary = lines.join('\n');
 
   const merged: MergedGrade = {
     ok: true,

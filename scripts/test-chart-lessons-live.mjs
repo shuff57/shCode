@@ -96,7 +96,7 @@ try {
     const aiMax = aiItems.reduce((a, r) => a + r.points, 0);
     if (det.earned + aiMax < 14) return { res: dscore.mergeGrade(det, null, aiItems), how: 'rules' };
     const response = mermaid.describeDiagram(doc);
-    const { system, user } = core.buildPrompt({ lessonId: id, lessonTitle: g.lessonTitle, prompt: g.prompt, response, rubric: aiItems, strict: g.strict });
+    const { system, user } = core.buildPrompt({ lessonId: id, lessonTitle: g.lessonTitle, prompt: g.prompt, response, rubric: aiItems, strict: g.strict, wordingOnly: true });
     const body = { model: g.model || 'glm-5.3-flash:cloud', messages: [{ role: 'system', content: system }, { role: 'user', content: user }], stream: false, format: 'json', options: { temperature: 0.2 } };
     for (let a = 0; a < 3; a++) {
       const res = await fetch('https://ollama.com/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key }, body: JSON.stringify(body) });
@@ -129,6 +129,8 @@ try {
     const letters = (r) => (r ? (r.res ? r.res.criteria.map((c) => ({ met: 'M', partial: 'p', missing: '-' }[c.verdict])).join('') + `=${r.res.totalEarned}${r.res.capped ? 'cap' : ''}` : 'REFUSED') : 'ERR');
     console.log(`${ok ? 'ok  ' : 'FAIL'}${bad && ok ? ' ~' : '  '} ${j.id.padEnd(30)} ${j.name.padEnd(42)} pass ${p}/${runs}  ${j.rs.map((r) => letters(r)).join(' ')}  [${[...new Set(j.rs.filter(Boolean).map((r) => r.how))].join('|')}]${refused ? ' (refused before grading)' : ''}${j.err ? ' ' + j.err : ''}`);
     if (process.env.VERBOSE && bad) for (const r of j.rs) if (r && r.res) console.log('     ' + r.res.criteria.map((c) => `${c.id}:${c.verdict}:${(c.feedback || '').slice(0, 140)}`).join('\n     '));
+    // SUMMARIES=1 prints each hybrid run's summary, so the merged wording can be read next to its score.
+    if (process.env.SUMMARIES) for (const r of j.rs) if (r && r.res && r.how === 'hybrid') console.log('     | ' + r.res.summary.replace(/\n/g, '\n     | '));
   }
   console.log(failures ? `\n${failures} fixture(s) off target` : '\nall fixtures on target');
   process.exitCode = failures ? 1 : 0;

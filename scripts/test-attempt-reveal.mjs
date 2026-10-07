@@ -1657,6 +1657,8 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   const promptText = body.messages.map((m) => m.content).join('\n');
   eq([/call-shape|call-position/.test(promptText), /double-rail|Function call shape/i.test(promptText.split('Shape-by-shape')[0])], [false, false], 'hybrid: the model\'s prompt carries ONLY the wording items (the checked ones are not in it)');
   eq([/Rubric \(total 6 pts\)/.test(promptText), promptText.includes('sets-base')], [true, true], '...and its rubric total is 6');
+  eq([/ONLY the wording criteria/.test(promptText), /do not state a total/.test(promptText)], [true, true], 'hybrid: the model is told it marks wording only and must not state totals or praise the whole chart');
+  eq([j.summary.startsWith('Shapes and order: 14 of 14. Wording: 6 of 6. Total 20 of 20 (pass at 14).'), j.summary.includes('Wording feedback: AISUM'), /Not passed yet/.test(j.summary)], [true, true, false], 'hybrid: a 20/20 summary leads with the authoritative line, labels the model text, no Not passed yet');
   eq([rows(E(1)), JSON.parse(db.raw.query('SELECT score, possible FROM lesson_submissions WHERE student_email = ?').get(E(1)).score)], [1, 20], 'hybrid on a capped part: ONE counted row, with the merged total (20)');
   eq(JSON.stringify(j).includes('"check"') || JSON.stringify(j).includes('anyOf'), false, 'hybrid: no check or gate definition is in the response');
 
@@ -1665,6 +1667,7 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   r = await gw({ doc: offTarget, checks: [] }, mer.describeDiagram(offTarget), E(2));
   j = await r.json();
   eq([r.status, j.criteria[0].earned, j.criteria[1].earned, j.totalEarned < 14], [200, 7, 0, true], 'hybrid: a decision before the call keeps the shape points, loses the order points, and cannot pass even with a perfect model');
+  eq([j.summary.startsWith('Shapes and order: 7 of 14. Wording: 6 of 6. Total 13 of 20 (pass at 14).'), /Not passed yet\./.test(j.summary), j.summary.indexOf('Not passed yet.') < j.summary.indexOf('Wording feedback: AISUM')], [true, true, true], 'hybrid: a 13/20 summary starts with the authoritative line and says Not passed yet before the model text');
   // right shapes, words that mean nothing: the gate caps the total
   r = await gw({ doc: junkLegal, checks: [] }, mer.describeDiagram(junkLegal), E(3));
   j = await r.json();

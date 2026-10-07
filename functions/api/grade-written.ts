@@ -426,6 +426,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     rubric: hybrid ? aiItems : config.rubric,
     contextDocs: config.contextDocs,
     strict: config.strict,
+    wordingOnly: hybrid,
   });
   // One place that turns the model's JSON into the grade the student gets, shared by both paths.
   const finish = (parsed: unknown) => {

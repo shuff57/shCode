@@ -176,10 +176,19 @@ export default function DiagramAssignmentView({
     setDoc(next);
     setChecks(null);
     setError(null);
+    setBlockedMsg('');
   }, []);
 
   // One part of a sat test -- see DiagramConfig.summative.
   const summative = !!config.summative;
+
+  // A blocked Submit says why, in a polite live region next to the button, and moves focus to the
+  // first red check. `blockedMsg` clears as soon as the chart changes.
+  const [blockedMsg, setBlockedMsg] = useState('');
+  const liveBlocked = useMemo(
+    () => !summative && doc.nodes.length > 0 && !allPassed(checkDiagram(doc, rules)),
+    [doc, rules, summative],
+  );
 
   const runChecks = useCallback((): CheckResult[] => {
     const results = checkDiagram(doc, rules);
@@ -207,7 +216,20 @@ export default function DiagramAssignmentView({
     // On a test the structural checks stop being a gate: a student who cannot
     // get a second exit off their diamond would otherwise never reach Part 5.
     // See DiagramConfig.summative.
-    if (!allPassed(results) && !summative) return;
+    if (!allPassed(results) && !summative) {
+      const first = results.findIndex((r) => !r.passed);
+      setBlockedMsg(`Fix the red checks first, then submit. ${results[first]?.detail ?? ''}`.trim());
+      // The rows render after this state commits; focus the first failing one then.
+      setTimeout(() => {
+        const row = document.getElementById(`diagram-check-${first}`);
+        if (row) {
+          row.focus();
+          row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+      }, 0);
+      return;
+    }
+    setBlockedMsg('');
     // A summative chart may be handed in with red checks (a student stuck on one
     // check must not be locked out), but on a capped part that hand-in is a counted
     // try. Say so and let them choose: an accidental click must not spend one.
@@ -399,6 +421,7 @@ export default function DiagramAssignmentView({
 
         <button
           onClick={submit}
+          aria-disabled={liveBlocked || undefined}
           disabled={grading || doc.nodes.length === 0 || cap.unknown || cap.reached}
           style={{
             padding: '8px 16px',
@@ -407,6 +430,7 @@ export default function DiagramAssignmentView({
             fontWeight: 600,
             cursor: grading ? 'wait' : doc.nodes.length === 0 ? 'not-allowed' : 'pointer',
             background: grading ? '#44475a' : doc.nodes.length === 0 ? '#333' : '#bd93f9',
+            opacity: liveBlocked && !grading ? 0.75 : 1,
             color: '#282a36',
             display: 'inline-flex',
             alignItems: 'center',
@@ -457,6 +481,11 @@ export default function DiagramAssignmentView({
         </span>
       </div>
 
+      {/* Always mounted so a screen reader hears the text when it appears. */}
+      <div role="status" aria-live="polite" style={{ marginTop: blockedMsg ? 8 : 0, color: '#ffb86c', fontSize: 13, lineHeight: 1.5 }}>
+        {blockedMsg}
+      </div>
+
       {/* Only a lesson with an aiGrader makes a model call at all -- on a
           structure-only chart the checks ARE the grade, so offering a choice of
           grader would name a step that never runs. Renders nothing anyway when
@@ -501,9 +530,11 @@ export default function DiagramAssignmentView({
             </p>
           )}
           <div style={{ display: 'grid', gap: 8 }}>
-            {checks.map((c) => (
+            {checks.map((c, ci) => (
               <div
                 key={c.id + c.title}
+                id={`diagram-check-${ci}`}
+                tabIndex={-1}
                 style={{
                   padding: '9px 12px',
                   background: '#282a36',
@@ -581,6 +612,7 @@ export default function DiagramAssignmentView({
                 borderRadius: 4,
                 color: '#f8f8f2',
                 fontStyle: 'italic',
+                whiteSpace: 'pre-line',
               }}
             >
               {result.summary}
