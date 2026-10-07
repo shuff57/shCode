@@ -15,7 +15,7 @@
 // copy. Falling back is the exact hole this module exists to close.
 
 import type { RubricItem } from '../../lib/grade-written-core';
-import type { DiagramRule } from '../../lib/diagram-types';
+import type { DiagramGate, DiagramRule } from '../../lib/diagram-types';
 import { AI_GRADERS } from './ai-graders.generated';
 
 export interface AiGraderConfig {
@@ -32,6 +32,12 @@ export interface AiGraderConfig {
    * shows the same list to the student. Absent = DEFAULT_RULES.
    */
   diagramRules?: DiagramRule[];
+  /**
+   * Hybrid chart: relevance gate (lib/diagram-score.ts). SERVER ONLY, like each rubric item's
+   * `check`: both are copied here from diagram.aiGrader by generate-ai-graders.mjs and stripped
+   * from the browser's copy by lib/quiz-redact.ts.
+   */
+  gate?: DiagramGate;
 }
 
 // `env` and `request` are no longer needed (there is nothing to fetch) but the

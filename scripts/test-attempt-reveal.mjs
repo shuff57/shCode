@@ -91,16 +91,23 @@ writeFileSync(join(outDir, 'package.json'), '{"type":"commonjs"}');
 const CAP = 3;
 const attemptCapsMod = join(outDir, 'functions/_shared/pa-pseudocode.generated.js');
 writeFileSync(attemptCapsMod, `exports.ATTEMPT_CAPS = ${JSON.stringify({
-  'fx-written': CAP, 'fx-nopseudo': CAP, 'fx-quiz': 2, 'fx-client': CAP, 'fx-passfail': CAP, 'fx-chart': CAP,
+  'fx-written': CAP, 'fx-nopseudo': CAP, 'fx-quiz': 2, 'fx-client': CAP, 'fx-passfail': CAP, 'fx-chart': CAP, 'fx-hybrid': CAP,
 })};
 exports.ATTEMPT_KINDS = ${JSON.stringify({
-  'fx-written': 'ai', 'fx-nopseudo': 'ai', 'fx-quiz': 'quiz', 'fx-client': 'client', 'fx-passfail': 'ai', 'fx-chart': 'ai',
+  'fx-written': 'ai', 'fx-nopseudo': 'ai', 'fx-quiz': 'quiz', 'fx-client': 'client', 'fx-passfail': 'ai', 'fx-chart': 'ai', 'fx-hybrid': 'ai',
 })};
 exports.PA_PSEUDOCODE = ${JSON.stringify({
   'fx-written': 'SET total TO 0\nFOR each item IN cart\n  ADD item.price TO total\nRETURN total',
   'fx-quiz': 'IF the answer is a THEN ...',
 })};`);
+// 'fx-hybrid' IS lesson 3.2.8's real hybrid config (rubric with `check`, `gate`, rules), so the handler
+// tests below run against what ships, capped at CAP tries so "no try spent" is observable.
+const L328 = JSON.parse(readFileSync(join(root, 'lessons/3-2-8-chart-parameter-trace/lesson.json'), 'utf8'));
 writeFileSync(join(outDir, 'functions/_shared/ai-graders.generated.js'), `exports.AI_GRADERS = ${JSON.stringify({
+  'fx-hybrid': {
+    lessonTitle: L328.title, prompt: L328.diagram.aiGrader.prompt, model: 'fx-model', strict: true,
+    rubric: L328.diagram.aiGrader.rubric, gate: L328.diagram.aiGrader.gate, diagramRules: L328.diagram.rules,
+  },
   'fx-written': {
     lessonTitle: 'fx', prompt: 'grade it', model: 'fx-model',
     rubric: [{ id: 'a', title: 'A', description: 'a', points: 5 }, { id: 'b', title: 'B', description: 'b', points: 5 }],
@@ -1603,6 +1610,125 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   const gen = readFileSync(join(root, 'functions/_shared/ai-graders.generated.ts'), 'utf8');
   if (!/"diagramRules"/.test(gen)) fail('ai-graders.generated.ts carries no diagramRules (generate-ai-graders must bake lesson.diagram.rules)');
   else ok('the server-only grader config carries the diagram rules the checks are recomputed from');
+  globalThis.fetch = realFetch;
+}
+
+// ============ hybrid flowchart grading: rules mark the heavy points, the model only the wording ============
+{
+  const db = makeDb();
+  const realFetch = globalThis.fetch;
+  const sent = [];
+  let reply = null;
+  const aiOk = (earned = [2, 2, 2]) => () => new Response(JSON.stringify({ message: { content: JSON.stringify({
+    criteria: ['sets-base', 'decision', 'branches'].map((id, i) => ({ id, earned: earned[i], verdict: earned[i] >= 2 ? 'met' : 'partial', feedback: 'AI-' + id })),
+    summary: 'AISUM', hints: ['HINT'] }) } }) + '\n', { status: 200 });
+  globalThis.fetch = async (url, init) => {
+    if (String(url).endsWith('/api/chat')) { sent.push(String(init?.body ?? '')); return reply(); }
+    return realFetch(url, init);
+  };
+  const mer = require(join(outDir, 'lib/diagram-mermaid.js'));
+  const att = require(join(outDir, 'functions/_shared/attempts.js'));
+  const redact = require(join(outDir, 'lib/quiz-redact.js'));
+  const ref = readFileSync(join(root, 'lessons/3-2-8-chart-parameter-trace/solution/chart.mmd'), 'utf8');
+  const good = mer.fromMermaid(ref);
+  const goodText = mer.describeDiagram(good);
+  // a legal chart with the required shape and nothing else right: a call, no decision after it, words that mean nothing
+  const junkLegal = mer.fromMermaid('flowchart TD\n  A([Start])\n  B[[x]]\n  S[c]\n  Q{y}\n  P[a]\n  R[b]\n  Z([End])\n  A --> B\n  B --> S\n  S --> Q\n  Q -- yes --> P\n  Q -- no --> R\n  P --> Z\n  R --> Z');
+  const offTarget = mer.fromMermaid('flowchart TD\n  A([Start])\n  Q{y}\n  B[[x]]\n  P[a]\n  S[c]\n  T[d]\n  Z([End])\n  A --> Q\n  Q -- yes --> B\n  Q -- no --> P\n  B --> S\n  P --> T\n  S --> Z\n  T --> Z');
+  const noEnd = mer.fromMermaid('flowchart TD\n  A([Start])\n  B[[call it]]\n  A --> B');
+  const E = (n) => `hy${n}@example.invalid`;
+  for (let i = 1; i <= 12; i++) db.raw.run('INSERT INTO enrollments (class_id, student_email, expires_at) VALUES (?, ?, ?)', ['c1', E(i), 4102444800000]);
+  const gw = (artifact, text, email, qs = '') => gradeWritten({
+    request: new Request('https://example.test/api/grade-written' + qs, { method: 'POST', body: JSON.stringify({ lessonId: 'fx-hybrid', response: text, ...(artifact === undefined ? {} : { artifact }) }) }),
+    env: { DB: db, OLLAMA_API_KEY: 'k' }, params: {}, data: { email, role: 'student' }, next: async () => new Response(null),
+  });
+  const rows = (email) => db.raw.query('SELECT COUNT(*) AS n FROM lesson_submissions WHERE student_email = ?').get(email).n;
+  const usage = (email) => db.raw.query('SELECT COUNT(*) AS n FROM ai_help_usage WHERE student_email = ?').get(email).n;
+
+  // the merge
+  reply = aiOk();
+  let r = await gw({ doc: good, checks: [] }, goodText, E(1));
+  let j = await r.json();
+  eq([r.status, j.totalEarned, j.totalPossible], [200, 20, 20], 'hybrid: the reference scores 20 of 20 (14 from rules + 6 from the model)');
+  eq(j.criteria.map((c) => c.id + ':' + c.source).join(), 'call-shape:rules,call-position:rules,sets-base:ai,decision:ai,branches:ai', 'hybrid: rule criteria first, then the model\'s, each tagged with its source');
+  eq([j.criteria[0].earned, j.criteria[1].earned, j.criteria[2].feedback], [7, 7, 'AI-sets-base'], 'hybrid: rule criteria carry their own points; model criteria keep the model\'s feedback');
+  eq([/Shapes and order: 14 of 14\. Wording: 6 of 6\./.test(j.summary), j.summary.includes('AISUM'), j.hints], [true, true, ['HINT']], 'hybrid: the summary names both halves and hints come from the model');
+  const body = JSON.parse(sent[sent.length - 1]);
+  const promptText = body.messages.map((m) => m.content).join('\n');
+  eq([/call-shape|call-position/.test(promptText), /double-rail|Function call shape/i.test(promptText.split('Shape-by-shape')[0])], [false, false], 'hybrid: the model\'s prompt carries ONLY the wording items (the checked ones are not in it)');
+  eq([/Rubric \(total 6 pts\)/.test(promptText), promptText.includes('sets-base')], [true, true], '...and its rubric total is 6');
+  eq([rows(E(1)), JSON.parse(db.raw.query('SELECT score, possible FROM lesson_submissions WHERE student_email = ?').get(E(1)).score)], [1, 20], 'hybrid on a capped part: ONE counted row, with the merged total (20)');
+  eq(JSON.stringify(j).includes('"check"') || JSON.stringify(j).includes('anyOf'), false, 'hybrid: no check or gate definition is in the response');
+
+  // model gives full marks on a chart whose heavy points are missing: capped by the rules, not the model
+  reply = aiOk();
+  r = await gw({ doc: offTarget, checks: [] }, mer.describeDiagram(offTarget), E(2));
+  j = await r.json();
+  eq([r.status, j.criteria[0].earned, j.criteria[1].earned, j.totalEarned < 14], [200, 7, 0, true], 'hybrid: a decision before the call keeps the shape points, loses the order points, and cannot pass even with a perfect model');
+  // right shapes, words that mean nothing: the gate caps the total
+  r = await gw({ doc: junkLegal, checks: [] }, mer.describeDiagram(junkLegal), E(3));
+  j = await r.json();
+  eq([r.status, j.totalEarned, j.capped, j.summary.includes('None of your shapes say what this program does')], [200, 13, true, true], 'hybrid: a chart with the right shapes and none of the program\'s words is held at 13 (relevance gate), with the reason in the summary');
+  eq(db.raw.query('SELECT score FROM lesson_submissions WHERE student_email = ?').get(E(3)).score, 13, '...and that capped total is what is recorded');
+
+  // refusals that cost nothing
+  sent.length = 0;
+  r = await gw({ doc: noEnd, checks: [] }, mer.describeDiagram(noEnd), E(4));
+  j = await r.json();
+  eq([r.status, j.ok, /End oval|Ends in an End/.test(j.error), Array.isArray(j.structural) && j.structural.length > 0], [422, false, true, true], 'hybrid: a structurally broken chart is refused 422 with the failing lines');
+  eq([rows(E(4)), usage(E(4)), sent.length], [0, 0, 0], '...before the rate limiter, before any try is recorded and before the model is called');
+  r = await gw(undefined, goodText, E(4));
+  j = await r.json();
+  eq([r.status, j.ok, /chart/i.test(j.error), rows(E(4)), usage(E(4)), sent.length], [400, false, true, 0, 0, 0], 'hybrid: a submission with no artifact is 400 "send the chart" and free');
+  r = await gw({ doc: { nodes: 'x', edges: [] } }, goodText, E(4));
+  eq([r.status, rows(E(4)), sent.length], [400, 0, 0], 'hybrid: an artifact that is not a chart is 400 and free');
+
+  // rules and model grade the SAME chart: the server's text, not the client's
+  sent.length = 0;
+  reply = aiOk();
+  r = await gw({ doc: good, checks: [] }, 'Totally unrelated words that are at least twenty characters long.', E(5));
+  j = await r.json();
+  eq([r.status, j.totalEarned, sent[0].includes('Set base to 100'), sent[0].includes('Totally unrelated')], [200, 20, true, false], 'hybrid: junk text with a good chart grades the GOOD chart (the model never sees the client text)');
+  sent.length = 0;
+  r = await gw({ doc: junkLegal, checks: [] }, goodText, E(5));
+  j = await r.json();
+  eq([r.status, j.criteria[0].earned, sent[0].includes('Set base to 100'), j.totalEarned < 14], [200, 7, false, true], 'hybrid: good text with a junk chart grades the JUNK chart');
+
+  // streaming path: same merge
+  reply = aiOk();
+  r = await gw({ doc: good, checks: [] }, goodText, E(6), '?stream=1');
+  const lines = (await r.text()).trim().split('\n').map((l) => JSON.parse(l));
+  const fin = lines[lines.length - 1];
+  eq([r.status, fin.result?.totalEarned, fin.result?.criteria?.map((c) => c.source).join()], [200, 20, 'rules,rules,ai,ai,ai'], 'hybrid: the streaming path returns the same merged grade');
+  sent.length = 0;
+  r = await gw({ doc: noEnd, checks: [] }, mer.describeDiagram(noEnd), E(6), '?stream=1');
+  eq([r.status, sent.length], [422, 0], 'hybrid: the streaming path also refuses a broken chart with a real 422 before the first byte');
+
+  // an unreachable model: the free outage marker, no counted try, the rule score is NOT recorded alone
+  reply = () => new Response('boom', { status: 500 });
+  r = await gw({ doc: good, checks: [] }, goodText, E(7));
+  j = await r.json();
+  const row7 = db.raw.query('SELECT score, possible, grade_json FROM lesson_submissions WHERE student_email = ?').all(E(7));
+  eq([r.status, j.ok, row7.length, JSON.parse(row7[0].grade_json).gradingFailed, row7[0].score], [502, false, 1, true, null], 'hybrid: AI unreachable -> 502, ONE row and it is the free grader-outage marker (no score), not the rule score alone');
+  eq(await att.attemptsUsed(db, E(7), 'fx-hybrid'), 0, '...and it spends no try');
+  reply = () => new Response(JSON.stringify({ message: { content: '{"nope":1}' } }), { status: 200 });
+  r = await gw({ doc: good, checks: [] }, goodText, E(8));
+  eq([r.status, await att.attemptsUsed(db, E(8), 'fx-hybrid')], [502, 0], 'hybrid: a model reply with no usable grade is the same free outage');
+
+  // rules-only lesson (no wording items) never calls the model
+  // (checked on the pure merge in diagram-assertions; here: nothing to do without a fixture)
+
+  // check and gate reach the server and never the browser
+  const gen = readFileSync(join(root, 'functions/_shared/ai-graders.generated.ts'), 'utf8');
+  for (const id of ['3-2-8-chart-parameter-trace', '3-2-18-chart-chained-calls', '3-3-11-chart-the-array-loop']) {
+    const lesson = JSON.parse(readFileSync(join(root, 'lessons', id, 'lesson.json'), 'utf8'));
+    const server = JSON.parse(gen.slice(gen.indexOf('= {') + 2, gen.lastIndexOf(';')))[id];
+    eq([server.rubric.filter((x) => x.check).length, server.gate?.anyOf?.length, server.gate?.capTo], [2, 5, 13], `${id}: the server-only config carries two rule items and the gate`);
+    const client = JSON.stringify(redact.redactLessonForClient(lesson));
+    const leaks = ['"check"', '"gate"', '"anyOf"', '"sequence"', '"loop-exit"', 'capTo', ...lesson.diagram.aiGrader.gate.anyOf.map((x) => JSON.stringify(x).slice(1, -1).slice(0, 40))].filter((x) => client.includes(x));
+    eq(leaks, [], `${id}: nothing of check or gate is in the lesson the browser receives`);
+    eq(JSON.parse(client).diagram.aiGrader.rubric.map((x) => Object.keys(x).sort().join()), lesson.diagram.aiGrader.rubric.map(() => 'id,points,title'), `${id}: the browser's rubric is {id, title, points} only`);
+  }
   globalThis.fetch = realFetch;
 }
 

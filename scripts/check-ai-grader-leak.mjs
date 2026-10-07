@@ -63,6 +63,26 @@ for (const id of fs.readdirSync(LESSONS)) {
       if (typeof r.description === 'string' && r.description.length >= 60) {
         probes.push({ id, what: `rubric ${r.id}`, text: r.description.slice(0, 70) });
       }
+      // Hybrid chart items (lib/diagram-score.ts): the `check` is the answer key in machine form.
+      // The whole serialised check, and every regex / student-line inside it, must stay server-only.
+      if (r.check) {
+        probes.push({ id, what: `check ${r.id}`, text: JSON.stringify(r.check).slice(0, 70) });
+        const walkCheck = (v) => {
+          if (Array.isArray(v)) return v.forEach(walkCheck);
+          if (!v || typeof v !== 'object') return;
+          for (const [k, x] of Object.entries(v)) {
+            if (k === 're') for (const t of [].concat(x)) if (typeof t === 'string' && t.length >= 12) probes.push({ id, what: `check ${r.id} regex`, text: t.slice(0, 70) });
+            if ((k === 'fail' || k === 'pass') && typeof x === 'string' && x.length >= 40) probes.push({ id, what: `check ${r.id} ${k} line`, text: x.slice(0, 70) });
+            walkCheck(x);
+          }
+        };
+        walkCheck(r.check);
+      }
+    }
+    // The relevance gate: each token group is a list of words that buy the cap off.
+    if (g.gate) {
+      for (const t of g.gate.anyOf || []) if (typeof t === 'string' && t.length >= 12) probes.push({ id, what: 'gate group', text: t.slice(0, 70) });
+      if (typeof g.gate.fail === 'string' && g.gate.fail.length >= 40) probes.push({ id, what: 'gate line', text: g.gate.fail.slice(0, 70) });
     }
   }
 }
