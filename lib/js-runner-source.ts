@@ -183,6 +183,9 @@ export function runStudentCode(
       // Cancel returns null; '' keeps the rest of the program running instead
       // of turning a dismissed dialog into a crash.
       answers.push(window.prompt(d.message || '') ?? '');
+      // window.prompt blocks the page, but the kill timer keeps wall-clock time:
+      // restart it so time spent typing an answer is not counted as the run.
+      arm(RUN_TIMEOUT_MS);
       attempt += 1;
       if (jobs) session = createTestSession(jobs);
       worker.postMessage({ code, answers: answers.slice(), attempt, tests: session?.payload } satisfies RunnerRequest);
