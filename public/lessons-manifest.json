@@ -4453,7 +4453,7 @@
       "preview": "slides",
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": null,
+      "week": 8,
       "assignmentCode": null,
       "maxScore": null,
       "maxSubmissions": null,
@@ -4585,9 +4585,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
       "assignmentCode": null,
-      "maxScore": 20,
+      "maxScore": null,
       "maxSubmissions": null,
-      "scoreKind": "written"
+      "scoreKind": null
     },
     {
       "id": "3-2-19-lab-compose-functions",
@@ -4635,7 +4635,7 @@
       "preview": "quiz",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": null,
+      "week": 7,
       "assignmentCode": null,
       "maxScore": 10,
       "maxSubmissions": null,
@@ -4780,9 +4780,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
       "assignmentCode": null,
-      "maxScore": 20,
+      "maxScore": null,
       "maxSubmissions": null,
-      "scoreKind": "written"
+      "scoreKind": null
     },
     {
       "id": "3-2-9-reading-return",
@@ -4804,11 +4804,11 @@
       "preview": "diagram",
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": null,
+      "week": 8,
       "assignmentCode": null,
-      "maxScore": 20,
+      "maxScore": null,
       "maxSubmissions": null,
-      "scoreKind": "written"
+      "scoreKind": null
     },
     {
       "id": "3-3-12-reading-arrays-and-functions",

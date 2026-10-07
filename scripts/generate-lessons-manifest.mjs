@@ -5,6 +5,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { lessonScoreFields } from './lesson-score-fields.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
@@ -60,9 +61,7 @@ const results = await Promise.all(
       [meta.quiz, meta.aiGrader, meta.diagram, meta.grading]
         .map((b) => (b && typeof b === 'object' ? b.maxSubmissions : undefined))
         .find((n) => typeof n === 'number') ?? null;
-    const passFailCount =
-      Array.isArray(rubric) && rubric.length > 0 && rubricPoints === 0 ? rubric.length : null;
-    const maxScore = quizCount ?? (rubricPoints > 0 ? rubricPoints : passFailCount);
+    const { maxScore, scoreKind } = lessonScoreFields(meta, quizCount);
     return {
       id: meta.id ?? id,
       title: meta.title ?? id,
@@ -86,7 +85,7 @@ const results = await Promise.all(
       // scoreKind decides the GRADE CATEGORY (lib/grading-weights.ts: 'written' beats an
       // assignmentCode's 'lab'), so it stays rubric-POINTS based: a capped pass/fail rubric
       // gets a maxScore for its percent but must not move from Lab to Written.
-      scoreKind: quizCount != null ? 'quiz' : rubricPoints > 0 ? 'written' : null,
+      scoreKind,
     };
   }),
 );

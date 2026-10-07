@@ -152,7 +152,7 @@ groups sub-modules into weeks downstream and can be re-cut without touching a sp
 | `1.2.5` | 2.5 Handling Errors with Try/Catch | 794 | 2 |
 | `1.3.1` | 3.1 Functions: Definition and Calls | 590 | 1 |
 | `1.3.2` | 3.2 Parameters and Return Values | 748 | 2 |
-| `1.3.3` | 3.3 Arrays | 844 | 2 |
+| `1.3.3` | 3.3 Arrays | 893 | 2 |
 | `1.3.4` | 3.4 Function Expressions and Arrow Functions | 622 | 2 |
 | `1.3.5` | 3.5 Objects and Properties | 796 | 2 |
 | `1.3.6` | 3.6 Functions: Pass by Value/Reference | 384 | 1 |
@@ -215,7 +215,7 @@ on disk today. The actual result:
 | Unit 1.1 Foundations, sub-module 1.1.1 | Module 1.1 | book Ch.1 §1.1 (ids happened to already match: no rename needed) |
 | Unit 1.1, sub-modules 1.1.2 / 1.1.3 (carry-over content) | Module 1.2 / 1.3 | book Ch.1 §1.2 Variables, §1.3 Documentation |
 | Unit 1.2 Control Flow | Unit 2, modules 2.1 / 2.2 / 2.3 | book Ch.2 §2.1 Conditionals, §2.2 Algorithms/Loops, §2.3 Switch |
-| Unit 1.3 Functions and Data | Unit 3, modules 3.1 / 3.2 | book Ch.3 §3.1 Functions, §3.2 Arrays |
+| Unit 1.3 Functions and Data | Unit 3, modules 3.1 / 3.2 / 3.3 | book Ch.3 §3.1 Functions, §3.2 Parameters and Return Values, §3.3 Arrays (§3.2 and §3.3 were split out of an earlier two-module numbering, where "3.2" meant Arrays) |
 | Unit 1.4 Synthesis | Unit 4, module 4.1 | book Ch.4 §4.1 Print Shop |
 | Unit 2.1 moSHion Foundations, 2.2 OOP | Unit 5, modules 5.1 / 5.3 | book Ch.5 §5.1 Hello Sprite, §5.3 Classes/Objects (§5.2 Physics Feel not built) |
 | Unit 2.3 Collections and Physics Applications | Unit 6, modules 6.1 / 6.3 | book Ch.6 §6.1+6.2 Groups/Overlaps combined, §6.3 Physics Applications |
@@ -438,6 +438,16 @@ rewriting a working lab unless the concept it grades actually moved.
   so the gap is one of **placement**, not absence: the plan wants it a section
   earlier than the book delivers it. Decide whether the plan moves to match the
   book or §2.2 keeps its own treatment. Raised 2026-08-16 from a module 2.2 build.
+
+- **Book §3.2 has no scope section, but the course needs one before the unit quiz.**
+  §3.2 covers parameters, arguments, `return`, early exit, printing versus returning, and
+  chaining returned values. Nothing in it says what a variable declared inside a function
+  can and cannot be seen from, yet a student meets the question as soon as two functions
+  share a program. shCode's `3-1-4-reading-scope`
+  (titled 3.2.20) and `3-2-21-lab-scope-prediction` (3.2.21) therefore invent that teaching.
+  Same shape as the §1.1 and §2.1 gaps above: tagged as designed, with no book anchor.
+  **A resync must not delete them for being absent from the book.** **Book-side request:**
+  a short local-versus-global subsection in §3.2, after "Printing is not returning".
 
 - **Book §2.4 Example 2.3 needs arrays three weeks before arrays are taught.**
   "Filtering while you loop" is written over `readings = [4, -2, 7, 0, -9, 3]`,

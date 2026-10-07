@@ -721,6 +721,14 @@ for (const id of Object.values(L)) {
     'let scores = [88, 91, 76, 60];', 'scores.push(1);', 'console.log(scores);'));
   reject(T.upd, 'two-item array', 'r3', js('let scores = [88, 91];', 'scores[0] = 1;', 'console.log(scores);'));
 
+  // no-op self-assignment is not an update (3.3.4)
+  reject(T.upd, 'scores[0] = scores[0] changes nothing', 'r1', js(
+    'let scores = [88, 91, 76, 60];', 'scores[0] = scores[0];', 'console.log(scores);'));
+  reject(T.upd, 'scores[1] = scores[1] with no semicolon', 'r1', js(
+    'let scores = [88, 91, 76, 60];', 'scores[1] = scores[1]', 'console.log(scores);'));
+  accept(T.upd, 'an update that reads the old value (scores[0] = scores[0] + 5)', js(
+    'let scores = [88, 91, 76, 60];', 'scores[0] = scores[0] + 5;', 'console.log(scores);'));
+
   // 3.3.7 queue
   accept(T.q, 'push chained over a newline', js(
     'let line = ["ana", "bob"];', 'line', '  .push("cy");', 'const served = line.shift();', 'console.log(served);', 'console.log(line);'));
@@ -782,6 +790,25 @@ for (const id of Object.values(L)) {
     'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;',
     'for (let r = 0; r < grid.length; r++) {', '  total += grid[r][0];', '}',
     'for (let c = 0; c < 2; c++) {', '  total += grid[0][c];', '}', 'console.log(total);'));
+
+  // 3.3.17: a cell is really updated and a total is really logged
+  accept(T.nest, 'update with += and a template-literal total', js(
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[0][1]);', 'grid[0][1] += 5;', 'let sum = 0;',
+    'for (const row of grid) { for (const n of row) { sum += n; } }', 'console.log(' + BT + 'Total: ${sum}' + BT + ');'));
+  accept(T.nest, 'update with ++ and sum = n + sum', js(
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[0][0]);', 'grid[1][1]++;', 'let sum = 0;',
+    'for (let r = 0; r < grid.length; r++) for (let c = 0; c < grid[r].length; c++) sum = grid[r][c] + sum;', 'console.log("Total", sum);'));
+  reject(T.nest, 'a cell written back to itself', 'r5', js(
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = grid[1][0];', 'let total = 0;',
+    'for (const row of grid) for (const n of row) total += n;', 'console.log(total);'));
+  reject(T.nest, 'never updates a cell (only reads)', 'r5', js(
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'let total = 0;',
+    'for (let r = 0; r < grid.length; r++) { for (let c = 0; c < grid[r].length; c++) { total += grid[r][c]; } }', 'console.log(total);'));
+  reject(T.nest, 'total is computed but never logged', 'r6', js(
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;',
+    'for (const row of grid) for (const n of row) total += n;', 'console.log(grid);'));
+  reject(T.nest, 'nothing is summed (hard-coded total)', 'r6', js(
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = 8;', 'for (const row of grid) for (const n of row) {}', 'console.log(15);'));
 
   // 3.2.7 rectangle area
   accept(T.rect, 'template literal and a negative argument', js(

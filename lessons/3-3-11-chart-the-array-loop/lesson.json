@@ -92,8 +92,10 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "formative": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "week": 8
 }

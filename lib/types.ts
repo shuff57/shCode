@@ -119,6 +119,9 @@ export interface Grading {
    * unit sets whichever one its renderer reads.
    */
   summative?: boolean;
+  /** Practice, not graded: a lesson with a weighted rubric (so it still has a pass line) that
+   *  must stay out of the course grade. The manifest then carries no scoreKind or maxScore. */
+  formative?: boolean;
   /**
    * The lesson's CORRECT answer includes an uncaught runtime error -- 2.5.3
    * asks the student to log an undeclared variable and watch it fail, before

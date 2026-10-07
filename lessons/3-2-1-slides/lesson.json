@@ -9,7 +9,7 @@
   "preview": "slides",
   "slidesUrl": "/slides/3.3_arrays.paper.html",
   "slos": [
-    "SLO-1"
+    "SLO-3"
   ],
   "steps": [],
   "requirements": [],
@@ -17,5 +17,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "week": 8
 }

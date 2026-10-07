@@ -77,6 +77,28 @@
       "flags": "i",
       "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "a grid cell is updated",
+      "description": "Code changes one cell with a double index and an assignment, like grid[1][0] = 8 (writing a cell back to itself changes nothing). Help: 3.3.15 (Lists Inside Lists)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\])\\s*(?:[-+*/]=(?!=)|\\+\\+|--|=(?!=)(?!\\s*\\1\\s*(?:;|\\r?\\n|$)))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "a running total is logged",
+      "description": "Code adds numbers into a total with += (or total = total + ...) and then logs that total. Help: 3.3.15 (Lists Inside Lists)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "([\\w$]+)\\s*(?:\\+=|=\\s*\\1\\s*\\+|=[^;\\n=]*\\+\\s*\\1\\b)[\\s\\S]*\\bconsole\\.log\\s*\\([^)]*\\b\\1\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
     }
   ],
   "grading": {

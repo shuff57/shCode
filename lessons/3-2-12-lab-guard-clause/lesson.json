@@ -9,7 +9,8 @@
   "preview": "console",
   "week": 7,
   "slos": [
-    "SLO-2"
+    "SLO-2",
+    "SLO-3"
   ],
   "steps": [
     {
@@ -37,7 +38,7 @@
     {
       "id": "r1",
       "title": "divide defined",
-      "description": "Code defines a function named divide. Help: 3.2.9 (Getting a Value Back with return)",
+      "description": "Code defines a function named divide. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+divide\\s*\\(",
@@ -59,7 +60,7 @@
     {
       "id": "r3",
       "title": "return statement present",
-      "description": "Code contains a return statement. Help: 3.2.9 (Getting a Value Back with return)",
+      "description": "Code contains a return statement. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\breturn\\b",
@@ -70,7 +71,7 @@
     {
       "id": "r4",
       "title": "results are logged",
-      "description": "Code calls console.log. Help: 3.2.9 (Getting a Value Back with return)",
+      "description": "Code calls console.log. Help: 3.2.9 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
@@ -81,7 +82,7 @@
     {
       "id": "r5",
       "title": "a guard if returns early",
-      "description": "Inside divide, an if returns right away for the bad input, and a second return follows for the good result. Help: 3.2.9 (Getting a Value Back with return)",
+      "description": "Inside divide, an if returns right away for the bad input, and a second return follows for the good result. Help: 3.2.11 (`return` Ends the Function)",
       "type": "inFunction",
       "file": "script.js",
       "function": "divide",
@@ -93,7 +94,7 @@
     {
       "id": "r6",
       "title": "no else needed",
-      "description": "divide does not use else: the early return already handled the bad case. Help: 3.2.9 (Getting a Value Back with return)",
+      "description": "divide does not use else: the early return already handled the bad case. Help: 3.2.11 (`return` Ends the Function)",
       "type": "inFunction",
       "file": "script.js",
       "function": "divide",

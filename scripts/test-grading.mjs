@@ -18,6 +18,8 @@ import {
   DEFAULT_WEIGHTS,
 } from '../lib/grading-weights.ts';
 import { studentGrading } from '../functions/_shared/grading.ts';
+import { lessonScoreFields } from './lesson-score-fields.mjs';
+import fs from 'node:fs';
 
 const results = [];
 function check(name, fn) {
@@ -220,6 +222,49 @@ check('studentGrading: a student with no work and nothing due scores 0 with noth
   assert.equal(g.percent, 0);
   assert.equal(g.counted, 0);
   assert.equal(studentGrading(null, [], DEFAULT_WEIGHTS, noDue).percent, 0);
+});
+
+// --- grading.formative: a weighted-rubric practice chart stays out of the grade ----------------
+const weighted = [{ id: 'a', points: 7 }, { id: 'b', points: 7 }, { id: 'c', points: 2 }, { id: 'd', points: 2 }, { id: 'e', points: 2 }];
+const chartMeta = (grading) => ({ preview: 'diagram', diagram: { aiGrader: { rubric: weighted } }, grading });
+const chartScope = (f) => lesson('3.2.8 Chart the Code', { preview: 'diagram', assignmentCode: null, ...f });
+
+check('formative flag: a weighted-rubric chart with grading.formative has no score kind or max', () => {
+  assert.deepEqual(lessonScoreFields(chartMeta({ totalPoints: 0, passingScore: 0, formative: true }), null), { maxScore: null, scoreKind: null });
+});
+check('formative flag: the same chart WITHOUT it is Written, 20 points (unchanged behaviour)', () => {
+  assert.deepEqual(lessonScoreFields(chartMeta({ totalPoints: 0, passingScore: 0 }), null), { maxScore: 20, scoreKind: 'written' });
+});
+check('formative flag: a flagged chart is excluded from the grade; an unflagged one counts', () => {
+  const flagged = chartScope(lessonScoreFields(chartMeta({ formative: true }), null));
+  const plain = chartScope(lessonScoreFields(chartMeta({}), null));
+  assert.equal(lessonGradeCategory(flagged), null);
+  assert.equal(lessonGradeCategory(plain), 'written');
+  const startedChart = { lesson_id: 'chart', state: 'started', score: null };
+  const base = new Map([['quiz-1', lesson('1.3.9 Quiz', { preview: 'quiz', maxScore: 10, scoreKind: 'quiz' })]]);
+  const without = studentGrading(base, [done('quiz-1', 10)], DEFAULT_WEIGHTS, noDue);
+  const withFlag = studentGrading(new Map([...base, ['chart', flagged]]), [done('quiz-1', 10), done('chart', 6)], DEFAULT_WEIGHTS, noDue);
+  assert.equal(withFlag.percent, without.percent);
+  assert.equal(withFlag.gradedTotal, without.gradedTotal); // not in the denominator
+  assert.deepEqual(withFlag.categories.map((c) => c.category), ['quiz']);
+  const withPlain = studentGrading(new Map([...base, ['chart', plain]]), [done('quiz-1', 10), done('chart', 6)], DEFAULT_WEIGHTS, noDue);
+  assert.equal(withPlain.gradedTotal, 2);
+  assert.notEqual(withPlain.percent, 100);
+  // past due and untouched: a flagged chart is never "missing"
+  const lateNone = studentGrading(new Map([...base, ['chart', flagged]]), [done('quiz-1', 10), startedChart], DEFAULT_WEIGHTS, dueOn([['chart', NOW - DAY]]));
+  assert.equal(lateNone.missingCount, 0);
+});
+check('formative flag: every flagged lesson in the tree has no score fields in the committed manifest', () => {
+  const manifest = JSON.parse(fs.readFileSync(new URL('../public/lessons-manifest.json', import.meta.url), 'utf8')).lessons;
+  let flagged = 0;
+  for (const l of manifest) {
+    const meta = JSON.parse(fs.readFileSync(new URL(`../lessons/${l.id}/lesson.json`, import.meta.url), 'utf8'));
+    if (meta.grading?.formative !== true) continue;
+    flagged += 1;
+    assert.equal(l.scoreKind, null, l.id);
+    assert.equal(l.maxScore, null, l.id);
+  }
+  assert.ok(flagged >= 3);
 });
 
 console.log(results.join('\n'));

@@ -32,10 +32,10 @@
     {
       "id": "r1",
       "title": "index assignment on scores",
-      "description": "Code changes an item of scores by its index (scores[0] = ..., scores[i] += ..., scores[scores.length - 1] = ...). Help: 3.3.3 (Changing an Item by Index)",
+      "description": "Code changes an item of scores by its index (scores[0] = ..., scores[i] += ..., scores[scores.length - 1] = ...), not scores[0] = scores[0]. Help: 3.3.3 (Changing an Item by Index)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bscores\\s*\\[[^\\]]+\\]\\s*(?:[-+*/]?=(?!=)|\\+\\+|--)",
+      "pattern": "(\\bscores\\s*\\[[^\\]]+\\])\\s*(?:[-+*/]=(?!=)|\\+\\+|--|=(?!=)(?!\\s*\\1\\s*(?:;|\\r?\\n|$)))",
       "flags": "",
       "ignoreStrings": true,
       "points": 0

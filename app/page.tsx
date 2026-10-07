@@ -33,6 +33,7 @@ import { formQuestionCount } from '../lib/quiz-variant';
 // lib/progress.ts lessonPercent().
 function maxScoreFor(l: Lesson): number | null {
   if (l.quiz && l.quiz.questions.length > 0) return formQuestionCount(l.quiz);
+  if (l.grading?.formative) return null;
   const g = l.aiGrader ?? l.diagram?.aiGrader;
   if (g) {
     const total = g.rubric.reduce((sum, r) => sum + r.points, 0);
@@ -49,6 +50,7 @@ function maxScoreFor(l: Lesson): number | null {
 // maxScore for its percent (above) but must not move from Lab to Written.
 function scoreKindFor(l: Lesson): 'quiz' | 'written' | null {
   if (l.quiz && l.quiz.questions.length > 0) return 'quiz';
+  if (l.grading?.formative) return null;
   const g = l.aiGrader ?? l.diagram?.aiGrader;
   if (g && g.rubric.reduce((sum, r) => sum + r.points, 0) > 0) return 'written';
   return null;
