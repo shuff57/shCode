@@ -1,0 +1,163 @@
+{
+  "id": "3-3-drill-smallest",
+  "title": "3.3.18 Lab: smallest(numbers)",
+  "description": "Write smallest(numbers): find the smallest number in an array, starting your running answer from the array's own first item. Practice, not graded: the checks call your function.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.3 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write smallest",
+      "instructions": "Write a function declaration called smallest that takes one parameter, numbers, an array with at least one number."
+    },
+    {
+      "id": "s2",
+      "title": "Start from the first item",
+      "instructions": "Make a variable called best and set it to numbers[0], not to 0 (3.3.15). If every number in the array is above 0, starting at 0 would report a number that is not in the array."
+    },
+    {
+      "id": "s3",
+      "title": "Walk the array and update",
+      "instructions": "Use a for...of loop. Whenever a number is smaller than best, set best to that number."
+    },
+    {
+      "id": "s4",
+      "title": "Return it",
+      "instructions": "After the loop, return best with return. Leave the array alone."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "smallest is defined with one parameter",
+      "description": "Code defines a function named smallest with exactly one parameter. Help: 3.3.15 (Arrays and Functions)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+smallest\\s*\\(\\s*[\\w$]+\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Write function smallest(numbers) { ... } with exactly that name and one name between the parentheses."
+    },
+    {
+      "id": "r2",
+      "title": "the running answer starts from the first item",
+      "description": "smallest sets a variable to the array's first item, written as something[0]. Help: 3.3.15 (Arrays and Functions)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "smallest",
+      "pattern": "=\\s*[\\w$]+\\s*\\[\\s*0\\s*\\]",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Start the running answer from the array's own first item: let best = numbers[0];"
+    },
+    {
+      "id": "r3",
+      "title": "smallest hands back a value with return",
+      "description": "smallest contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "smallest",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "The answer must leave the function with return, not console.log."
+    },
+    {
+      "id": "t1",
+      "title": "smallest returns the smallest number in the array",
+      "description": "smallest(numbers) gives back the smallest number in the array, and the array is not changed. Help: 3.3.15 (Arrays and Functions)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "smallest",
+      "points": 0,
+      "hint": "smallest must give back a number that is really in the array, the smallest one. If you got 0 for an array of positive numbers, your running answer started at 0 instead of numbers[0]. If you got the first number, check that the loop updates it.",
+      "cases": [
+        {
+          "args": [
+            [
+              4,
+              2,
+              9
+            ]
+          ],
+          "expect": 2,
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              8
+            ]
+          ],
+          "expect": 8,
+          "unchanged": 0,
+          "description": "one number"
+        },
+        {
+          "args": [
+            [
+              -3,
+              -9,
+              -1
+            ]
+          ],
+          "expect": -9,
+          "unchanged": 0,
+          "description": "all negative"
+        },
+        {
+          "args": [
+            [
+              5,
+              4,
+              3,
+              2
+            ]
+          ],
+          "expect": 2,
+          "unchanged": 0,
+          "description": "the smallest is last"
+        },
+        {
+          "args": [
+            [
+              2,
+              2,
+              5
+            ]
+          ],
+          "expect": 2,
+          "unchanged": 0,
+          "description": "a repeat"
+        },
+        {
+          "args": [
+            [
+              2000,
+              3000,
+              2500
+            ]
+          ],
+          "expect": 2000,
+          "unchanged": 0,
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

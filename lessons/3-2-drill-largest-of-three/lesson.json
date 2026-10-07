@@ -1,0 +1,148 @@
+{
+  "id": "3-2-drill-largest-of-three",
+  "title": "3.2.27 Lab: largest(a, b, c)",
+  "description": "Write largest(a, b, c) so that it returns the biggest of three numbers, whatever order they come in. Practice, not graded: the checks call your function.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write largest",
+      "instructions": "Write a function declaration called largest that takes three parameters, a, b and c."
+    },
+    {
+      "id": "s2",
+      "title": "Find the biggest",
+      "instructions": "Compare the numbers the way findMax did in 3.2.26: either use if statements, or keep a variable for the biggest so far and update it when a number beats it."
+    },
+    {
+      "id": "s3",
+      "title": "Return it",
+      "instructions": "Return the biggest number with return (3.2.11)."
+    },
+    {
+      "id": "s4",
+      "title": "Try every order",
+      "instructions": "Call largest with the biggest number first, in the middle and last. All three calls must give the same answer."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "largest is defined with three parameters",
+      "description": "Code defines a function named largest with exactly three parameters. Help: 3.2.9 (Lab: findRectangleArea (multi-parameter))",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+largest\\s*\\(\\s*[\\w$]+\\s*,\\s*[\\w$]+\\s*,\\s*[\\w$]+\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Write function largest(a, b, c) { ... } with exactly that name and three names between the parentheses."
+    },
+    {
+      "id": "r2",
+      "title": "largest compares its numbers",
+      "description": "largest compares the numbers (with > or <, or Math.max) inside its body. Help: 3.2.26 (Lab: findMax & isEven)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "largest",
+      "pattern": "[<>]|Math\\.max",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Compare the numbers inside largest with > or <, as findMax did."
+    },
+    {
+      "id": "r3",
+      "title": "largest hands back a value with return",
+      "description": "largest contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "largest",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "The answer must leave the function with return, not console.log."
+    },
+    {
+      "id": "t1",
+      "title": "largest returns the biggest of the three",
+      "description": "largest(a, b, c) gives back the biggest of the three numbers, wherever it sits in the list. Help: 3.2.26 (Lab: findMax & isEven)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "largest",
+      "points": 0,
+      "hint": "largest must give back the biggest of ALL three, whichever argument it is. If it works when the biggest is first but not when it is last, check that your comparisons look at every number.",
+      "cases": [
+        {
+          "args": [
+            1,
+            2,
+            3
+          ],
+          "expect": 3,
+          "description": "biggest last"
+        },
+        {
+          "args": [
+            3,
+            2,
+            1
+          ],
+          "expect": 3,
+          "description": "biggest first"
+        },
+        {
+          "args": [
+            2,
+            3,
+            1
+          ],
+          "expect": 3,
+          "description": "biggest in the middle"
+        },
+        {
+          "args": [
+            5,
+            5,
+            5
+          ],
+          "expect": 5,
+          "description": "all equal"
+        },
+        {
+          "args": [
+            -4,
+            -9,
+            -1
+          ],
+          "expect": -1,
+          "description": "all negative"
+        },
+        {
+          "args": [
+            10,
+            40,
+            25
+          ],
+          "expect": 40,
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

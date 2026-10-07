@@ -1,0 +1,149 @@
+{
+  "id": "3-3-drill-last-item",
+  "title": "3.3.16 Lab: lastItem(items)",
+  "description": "Write lastItem(items): read the last item of an array parameter and return it, leaving the array exactly as it was. Practice, not graded: the checks call your function.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.3 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write lastItem",
+      "instructions": "Write a function declaration called lastItem that takes one parameter, items, the array to look at."
+    },
+    {
+      "id": "s2",
+      "title": "Read the last item",
+      "instructions": "The last index is one less than the length (3.3.2), so the last item is items[items.length - 1]."
+    },
+    {
+      "id": "s3",
+      "title": "Return it and leave the array alone",
+      "instructions": "Return that item with return. Do not use .pop(): it also gives back the last item, but it removes it from the array, and a function that only looks at an array must leave it as it found it (3.3.15)."
+    },
+    {
+      "id": "s4",
+      "title": "Check both",
+      "instructions": "Call lastItem on an array, then console.log the result and the array, to show the array still has every item."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "lastItem is defined with one parameter",
+      "description": "Code defines a function named lastItem with exactly one parameter. Help: 3.3.15 (Arrays and Functions)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+lastItem\\s*\\(\\s*[\\w$]+\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Write function lastItem(items) { ... } with exactly that name and one name between the parentheses."
+    },
+    {
+      "id": "r2",
+      "title": "lastItem hands back a value with return",
+      "description": "lastItem contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "lastItem",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "The answer must leave the function with return, not console.log."
+    },
+    {
+      "id": "t1",
+      "title": "lastItem returns the last item and leaves the array alone",
+      "description": "lastItem(items) gives back the last item of the array, and the array you pass in is not changed. Help: 3.3.15 (Arrays and Functions)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "lastItem",
+      "points": 0,
+      "hint": "lastItem must give back the last item and leave the array as it was. items[items.length - 1] reads the last item. items[items.length] is one place too far (undefined), items[0] is the first item, and items.pop() removes the item from the array.",
+      "cases": [
+        {
+          "args": [
+            [
+              "a",
+              "b",
+              "c"
+            ]
+          ],
+          "expect": "c",
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              5
+            ]
+          ],
+          "expect": 5,
+          "unchanged": 0,
+          "description": "an array of one"
+        },
+        {
+          "args": [
+            [
+              1,
+              2
+            ]
+          ],
+          "expect": 2,
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              10,
+              20,
+              30,
+              40
+            ]
+          ],
+          "expect": 40,
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              "x",
+              "y",
+              "z",
+              "w"
+            ]
+          ],
+          "expect": "w",
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              7,
+              8,
+              9,
+              10,
+              11
+            ]
+          ],
+          "expect": 11,
+          "unchanged": 0,
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

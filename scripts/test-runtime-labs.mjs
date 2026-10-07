@@ -84,6 +84,10 @@ try {
     rect: '3-2-7-lab-rectangle-area', guard: '3-2-12-lab-guard-clause', fix: '3-2-15-lab-fix-print-not-return',
     comp: '3-2-19-lab-compose-functions', fm: '3-1-8-lab-findmax-iseven', sum: '3-1-9-lab-sum-to-n',
     filt: '3-3-14-lab-filter-function', arr: '3-2-7-arrays',
+    // The practice drills inserted into 3.2 and 3.3 (2026-10-06).
+    shout: '3-2-drill-shout', dflt: '3-2-drill-default-greeting', sq: '3-2-drill-square', ini: '3-2-drill-initials',
+    big: '3-2-drill-largest-of-three', off: '3-3-drill-off-by-one', rot: '3-3-drill-rotate-line',
+    cw: '3-3-drill-count-words', last: '3-3-drill-last-item', small: '3-3-drill-smallest',
   };
   for (const [key, id] of Object.entries(LABS)) {
     const ref = read(`lessons/${id}/solution.js`);
@@ -102,7 +106,7 @@ try {
     check(`${id}: an empty program fails the tests`, tr.every((t) => r.ids.includes(t.id)), JSON.stringify(r.ids));
   }
 
-  // ------------------------------------------------------------ 3.2.7 findRectangleArea (prints)
+  // ------------------------------------------------------------ 3.2.9 findRectangleArea (prints)
   {
     const id = LABS.rect;
     const calls = 'findRectangleArea(3, 4);\nfindRectangleArea(10, 2);\n';
@@ -121,7 +125,7 @@ try {
       't1', /but printed an extra line "Area: 12"$/);
   }
 
-  // ------------------------------------------------------------ 3.2.12 divide guard
+  // ------------------------------------------------------------ 3.2.15 divide guard
   {
     const id = LABS.guard;
     const calls = 'console.log(divide(10, 2));\nconsole.log(divide(10, 0));\n';
@@ -140,7 +144,7 @@ try {
       't1', /^divide\(10, 0\) should give "Cannot divide by zero" but gave undefined \(it printed instead of returning a value - use return\)$/, { shaped: false });
   }
 
-  // ------------------------------------------------------------ 3.2.15 area must return
+  // ------------------------------------------------------------ 3.2.18 area must return
   {
     const id = LABS.fix;
     const use = 'const a = area(5, 8);\nconsole.log("One room: " + a);\nconsole.log("Two rooms: " + a * 2);\n';
@@ -155,7 +159,7 @@ try {
       't1', /^area\(5, 8\) should print 0 lines but printed an extra line "40"$/, { shaped: false });
   }
 
-  // ------------------------------------------------------------ 3.2.19 triple / addSeven
+  // ------------------------------------------------------------ 3.2.23 triple / addSeven
   {
     const id = LABS.comp;
     const chain = 'console.log(addSeven(triple(4)));\nconsole.log(triple(addSeven(4)));\n';
@@ -211,7 +215,7 @@ try {
       't1', /^sumToN\(5\) should give 15 but gave 14$/);
   }
 
-  // ------------------------------------------------------------ 3.3.14 doubled
+  // ------------------------------------------------------------ 3.3.19 doubled
   {
     const id = LABS.filt;
     const use = 'let sample = [1, 2, 3];\nconsole.log(doubled(sample));\nconsole.log(sample);\n';
@@ -230,7 +234,7 @@ try {
       't1', /^doubled\(\[1, 2, 3\]\) should give \[2, 4, 6\] but gave undefined \(it printed instead of returning a value - use return\)$/, { shaped: false });
   }
 
-  // ------------------------------------------------------------ 3.3.18 capstone functions
+  // ------------------------------------------------------------ 3.3.24 capstone functions
   {
     const id = LABS.arr;
     const base = lines('let fruits = ["apple", "banana", "cherry"];', 'fruits.push("date");', 'fruits.pop();',
@@ -258,6 +262,192 @@ try {
     // The five array tasks alone no longer reach the pass line: 35 of 55.
     const only = await gradeWithTests(reqs(id), { 'script.js': base }, 55);
     check(`${id}: the five array tasks alone score 35 of 55`, only.totalScore === 35 && only.totalPossible === 55, `${only.totalScore}/${only.totalPossible}`);
+  }
+  // ------------------------------------------------------------ 3.2.6 shout (prints; return is not taught yet)
+  {
+    const id = LABS.shout;
+    const calls = 'shout("hello");\nshout("watch out");\n';
+    await accept(id, 'console.log(word.toUpperCase())', lines('function shout(word) {', '  console.log(word.toUpperCase());', '}') + calls);
+    await accept(id, 'a variable, other parameter name', lines('function shout(w) {', '  let loud = w.toUpperCase();', '  console.log(loud);', '}') + calls);
+    await accept(id, 'a template literal', lines('function shout(word) {', '  console.log(`${word.toUpperCase()}`);', '}') + calls);
+    await reject(id, 'printing the word as typed', lines('function shout(word) {', '  let loud = word.toUpperCase();', '  console.log(word);', '}') + calls,
+      't1', /^shout\("hello"\) should print "HELLO" but printed "hello"$/);
+    await reject(id, 'capitalising only the first letter', lines('function shout(word) {', '  console.log(word[0].toUpperCase() + word.slice(1));', '}') + calls,
+      't1', /^shout\("hello"\) should print "HELLO" but printed "Hello"$/);
+    await reject(id, 'printing it twice', lines('function shout(word) {', '  console.log(word.toUpperCase());', '  console.log(word.toUpperCase());', '}') + calls,
+      't1', /^shout\("hello"\) should print 1 line but printed an extra line "HELLO"$/);
+    await reject(id, 'returning instead of printing', lines('function shout(word) {', '  return word.toUpperCase();', '}') + calls,
+      't1', /^shout\("hello"\) should print "HELLO" but printed nothing$/);
+  }
+
+  // ------------------------------------------------------------ 3.2.8 greet with a default parameter
+  {
+    const id = LABS.dflt;
+    const calls = 'greet();\ngreet("Priya");\n';
+    await accept(id, 'concatenation', lines('function greet(name = "friend") {', '  console.log("Hello, " + name + "!");', '}') + calls);
+    await accept(id, 'a template literal and another parameter name', lines('function greet(who = "friend") {', '  console.log(`Hello, ${who}!`);', '}') + calls);
+    await accept(id, 'single quotes and a message variable', lines("function greet(name = 'friend') {", '  const message = "Hello, " + name + "!";', '  console.log(message);', '}') + calls);
+    await reject(id, 'the wrong default word', lines('function greet(name = "pal") {', '  console.log("Hello, " + name + "!");', '}') + calls,
+      't1', /^greet\(\) \(no argument\) should print "Hello, friend!" but printed "Hello, pal!"$/);
+    await reject(id, 'a default that always wins over the argument', lines('function greet(name = "friend") {', '  name = "friend";', '  console.log("Hello, " + name + "!");', '}') + calls,
+      't1', /^greet\("Priya"\) should print "Hello, Priya!" but printed "Hello, friend!"$/);
+    await reject(id, 'a missing exclamation mark', lines('function greet(name = "friend") {', '  console.log("Hello, " + name);', '}') + calls,
+      't1', /^greet\(\) \(no argument\) should print "Hello, friend!" but printed "Hello, friend"$/);
+    await reject(id, 'returning instead of printing', lines('function greet(name = "friend") {', '  return "Hello, " + name + "!";', '}') + calls,
+      't1', /^greet\(\) \(no argument\) should print "Hello, friend!" but printed nothing$/);
+  }
+
+  // ------------------------------------------------------------ 3.2.13 square
+  {
+    const id = LABS.sq;
+    const use = 'const result = square(5);\nconsole.log(result + 1);\n';
+    await accept(id, 'return n * n', lines('function square(n) {', '  return n * n;', '}') + use);
+    await accept(id, 'n ** 2 and another parameter name', lines('function square(x) {', '  return x ** 2;', '}') + use);
+    await accept(id, 'a result variable and return(...)', lines('function square(n) {', '  const product = n * n;', '  return(product);', '}') + use);
+    await reject(id, 'returning n + n', lines('function square(n) {', '  return n + n;', '}') + use,
+      't1', /^square\(4\) should give 16 but gave 8$/);
+    await reject(id, 'returning n * 2', lines('function square(n) {', '  return n * 2;', '}') + use,
+      't1', /^square\(4\) should give 16 but gave 8$/);
+    await reject(id, 'returning n itself', lines('function square(n) {', '  return n;', '}') + use,
+      't1', /^square\(4\) should give 16 but gave 4$/);
+    await reject(id, 'printing the square and returning nothing', lines('function square(n) {', '  console.log(n * n);', '  return;', '}') + use,
+      't1', /^square\(4\) should give 16 but gave undefined \(it printed instead of returning a value - use return\)$/);
+  }
+
+  // ------------------------------------------------------------ 3.2.19 initials
+  {
+    const id = LABS.ini;
+    const use = 'console.log(initials("Ada", "Lovelace"));\n';
+    await accept(id, 'first[0] + last[0]', lines('function initials(first, last) {', '  return first[0] + last[0];', '}') + use);
+    await accept(id, 'a template literal and other parameter names', lines('function initials(a, b) {', '  return `${a[0]}${b[0]}`;', '}') + use);
+    await accept(id, 'two variables, then joined', lines('function initials(first, last) {', '  const f = first[0];', '  const l = last[0];', '  return f + l;', '}') + use);
+    await accept(id, 'charAt(0) on both', lines('function initials(first, last) {', '  return first.charAt(0) + last.charAt(0);', '}') + use);
+    await reject(id, 'the whole last name', lines('function initials(first, last) {', '  return first[0] + last;', '}') + use,
+      't1', /^initials\("Ada", "Lovelace"\) should give "AL" but gave "ALovelace"$/);
+    await reject(id, 'the letters in the wrong order', lines('function initials(first, last) {', '  return last[0] + first[0];', '}') + use,
+      't1', /^initials\("Ada", "Lovelace"\) should give "AL" but gave "LA"$/);
+    await reject(id, 'a space between the letters', lines('function initials(first, last) {', '  return first[0] + " " + last[0];', '}') + use,
+      't1', /^initials\("Ada", "Lovelace"\) should give "AL" but gave "A L"$/);
+    await reject(id, 'the second letters', lines('function initials(first, last) {', '  return first[1] + last[1];', '}') + use,
+      't1', /^initials\("Ada", "Lovelace"\) should give "AL" but gave "do"$/);
+    await reject(id, 'upper-casing letters that were typed in lower case', lines('function initials(first, last) {', '  return (first[0] + last[0]).toUpperCase();', '}') + use,
+      't1', /^initials\("mia", "chen"\) \(typed in lower case, so the letters stay lower case\) should give "mc" but gave "MC"$/);
+    await reject(id, 'printing instead of returning', lines('function initials(first, last) {', '  console.log(first[0] + last[0]);', '  return;', '}') + use,
+      't1', /^initials\("Ada", "Lovelace"\) should give "AL" but gave undefined \(it printed instead of returning a value - use return\)$/);
+  }
+
+  // ------------------------------------------------------------ 3.2.27 largest of three
+  {
+    const id = LABS.big;
+    const use = 'console.log(largest(9, 4, 6));\nconsole.log(largest(4, 6, 9));\n';
+    await accept(id, 'a biggest-so-far variable', lines('function largest(a, b, c) {', '  let biggest = a;', '  if (b > biggest) { biggest = b; }', '  if (c > biggest) { biggest = c; }', '  return biggest;', '}') + use);
+    await accept(id, 'Math.max with three arguments', lines('function largest(a, b, c) { return Math.max(a, b, c); }') + use);
+    await accept(id, 'an if / else if chain and other parameter names', lines('function largest(x, y, z) {', '  if (x >= y && x >= z) {', '    return x;', '  } else if (y >= z) {', '    return y;', '  }', '  return z;', '}') + use);
+    await accept(id, 'nested ternaries', lines('function largest(a, b, c) { return a > b ? (a > c ? a : c) : (b > c ? b : c); }') + use);
+    await reject(id, 'comparing only the first two', lines('function largest(a, b, c) {', '  if (a > b) { return a; }', '  return b;', '}') + use,
+      't1', /^largest\(1, 2, 3\) \(biggest last\) should give 3 but gave 2$/);
+    await reject(id, 'an else-if chain that falls back to a', lines('function largest(a, b, c) {', '  if (a > b && a > c) { return a; }', '  else if (b > c) { return b; }', '  return a;', '}') + use,
+      't1', /^largest\(1, 2, 3\) \(biggest last\) should give 3 but gave 1$/);
+    await reject(id, 'the smallest instead of the largest', lines('function largest(a, b, c) {', '  let pick = a;', '  if (b < pick) { pick = b; }', '  if (c < pick) { pick = c; }', '  return pick;', '}') + use,
+      't1', /^largest\(1, 2, 3\) \(biggest last\) should give 3 but gave 1$/);
+    await reject(id, 'printing the biggest and returning nothing', lines('function largest(a, b, c) {', '  let biggest = a;', '  if (b > biggest) { biggest = b; }', '  if (c > biggest) { biggest = c; }', '  console.log(biggest);', '  return;', '}') + use,
+      't1', /^largest\(1, 2, 3\) \(biggest last\) should give 3 but gave undefined \(it printed instead of returning a value - use return\)$/);
+  }
+
+  // ------------------------------------------------------------ 3.3.6 fix the off-by-one loop
+  {
+    const id = LABS.off;
+    const call = 'printPrices([5, 12, 8]);\n';
+    await accept(id, 'i < prices.length', lines('function printPrices(prices) {', '  for (let i = 0; i < prices.length; i++) {', '    console.log(prices[i]);', '  }', '}') + call);
+    await accept(id, 'i <= prices.length - 1', lines('function printPrices(prices) {', '  for (let i = 0; i <= prices.length - 1; i++) {', '    console.log(prices[i]);', '  }', '}') + call);
+    await accept(id, 'for...of and another parameter name', lines('function printPrices(list) {', '  for (const p of list) {', '    console.log(p);', '  }', '}') + call);
+    await reject(id, 'the untouched starter (still one round too long)', read(`lessons/${id}/script.js`),
+      't1', /^printPrices\(\[5, 12, 8\]\) should print 3 lines but printed an extra line "undefined"$/, { shaped: false });
+    await reject(id, 'starting the counter at 1 (the first price goes missing)', lines('function printPrices(prices) {', '  for (let i = 1; i < prices.length; i++) {', '    console.log(prices[i]);', '  }', '}') + call,
+      't1', /^printPrices\(\[5, 12, 8\]\) should print "5" on line 1 but printed "12"$/);
+    await reject(id, 'stopping one round early (the last price goes missing)', lines('function printPrices(prices) {', '  for (let i = 0; i < prices.length - 1; i++) {', '    console.log(prices[i]);', '  }', '}') + call,
+      't1', /^printPrices\(\[5, 12, 8\]\) should print "8" on line 3 but printed only 2 lines$/);
+    await reject(id, 'printing every price twice', lines('function printPrices(prices) {', '  for (let i = 0; i < prices.length; i++) {', '    console.log(prices[i]);', '    console.log(prices[i]);', '  }', '}') + call,
+      't1', /^printPrices\(\[5, 12, 8\]\) should print "12" on line 2 but printed "5"$/);
+    // The extra line hidden by a guard still leaves the loop condition wrong, so the regex requirement r2 is what refuses it.
+    const guarded = await grade(id, lines('function printPrices(prices) {', '  for (let i = 0; i <= prices.length; i++) {', '    if (prices[i] !== undefined) { console.log(prices[i]); }', '  }', '}') + call);
+    check(`${id} refuses a guard that hides the extra line instead of fixing the loop`, guarded.ids.length === 1 && guarded.ids[0] === 'r2', `failed [${guarded.ids.join(', ')}]`);
+  }
+
+  // ------------------------------------------------------------ 3.3.9 rotate
+  {
+    const id = LABS.rot;
+    const call = 'console.log(rotate(["ana", "bob", "cy"]));\n';
+    await accept(id, 'push(shift()) in place', lines('function rotate(items) {', '  items.push(items.shift());', '  return items;', '}') + call);
+    await accept(id, 'a variable for the front item', lines('function rotate(line) {', '  const first = line.shift();', '  line.push(first);', '  return line;', '}') + call);
+    await accept(id, 'a new array built by a loop, then rotated', lines('function rotate(items) {', '  const copy = [];', '  for (const x of items) { copy.push(x); }', '  copy.push(copy.shift());', '  return copy;', '}') + call);
+    await reject(id, 'taking the first item off and never putting it back', lines('function rotate(items) {', '  items.shift();', '  return items;', '}') + call,
+      't1', /^rotate\(\["ana", "bob", "cy"\]\) should give \["bob", "cy", "ana"\] but gave \["bob", "cy"\]$/);
+    await reject(id, 'returning the item that came off, not the array', lines('function rotate(items) {', '  const first = items.shift();', '  items.push(first);', '  return first;', '}') + call,
+      't1', /^rotate\(\["ana", "bob", "cy"\]\) should give \["bob", "cy", "ana"\] but gave "ana"$/);
+    await reject(id, 'putting the item back twice', lines('function rotate(items) {', '  const first = items.shift();', '  items.push(first);', '  items.push(first);', '  return items;', '}') + call,
+      't1', /^rotate\(\["ana", "bob", "cy"\]\) should give \["bob", "cy", "ana"\] but gave \["bob", "cy", "ana", "ana"\]$/);
+    await reject(id, 'moving the last item to the front instead (shift is also used, so the regexes pass)', lines('function rotate(items) {', '  const first = items.shift();', '  items.unshift(first);', '  items.unshift(items.pop());', '  return items;', '}') + call,
+      't1', /^rotate\(\["ana", "bob", "cy"\]\) should give \["bob", "cy", "ana"\] but gave \["cy", "ana", "bob"\]$/);
+    await reject(id, 'printing the line and returning nothing', lines('function rotate(items) {', '  items.push(items.shift());', '  console.log(items);', '  return;', '}') + call,
+      't1', /^rotate\(\["ana", "bob", "cy"\]\) should give \["bob", "cy", "ana"\] but gave undefined \(it printed instead of returning a value - use return\)$/);
+  }
+
+  // ------------------------------------------------------------ 3.3.11 countWords
+  {
+    const id = LABS.cw;
+    const call = 'console.log(countWords("one two three"));\n';
+    await accept(id, 'split(" ").length', lines('function countWords(text) {', '  return text.split(" ").length;', '}') + call);
+    await accept(id, 'a words variable, single quotes, other parameter name', lines('function countWords(sentence) {', "  const words = sentence.split(' ');", '  return words.length;', '}') + call);
+    await accept(id, 'counting the pieces with a loop', lines('function countWords(text) {', '  let count = 0;', '  for (const w of text.split(" ")) {', '    count++;', '  }', '  return count;', '}') + call);
+    await reject(id, 'splitting at "" (letters, not words)', lines('function countWords(text) {', '  return text.split("").length;', '}') + call,
+      't1', /^countWords\("one two three"\) should give 3 but gave 13$/);
+    await reject(id, 'counting the spaces instead of the words', lines('function countWords(text) {', '  return text.split(" ").length - 1;', '}') + call,
+      't1', /^countWords\("one two three"\) should give 3 but gave 2$/);
+    await reject(id, 'splitting at line breaks', lines('function countWords(text) {', '  return text.split("\\n").length;', '}') + call,
+      't1', /^countWords\("one two three"\) should give 3 but gave 1$/);
+    await reject(id, 'returning the array of words, not how many', lines('function countWords(text) {', '  return text.split(" ");', '}') + call,
+      't1', /^countWords\("one two three"\) should give 3 but gave \["one", "two", "three"\]$/);
+    await reject(id, 'printing the count and returning nothing', lines('function countWords(text) {', '  console.log(text.split(" ").length);', '  return;', '}') + call,
+      't1', /^countWords\("one two three"\) should give 3 but gave undefined \(it printed instead of returning a value - use return\)$/);
+  }
+
+  // ------------------------------------------------------------ 3.3.16 lastItem
+  {
+    const id = LABS.last;
+    const call = 'let names = ["ana", "bob", "cy"];\nconsole.log(lastItem(names));\nconsole.log(names);\n';
+    await accept(id, 'items[items.length - 1]', lines('function lastItem(items) {', '  return items[items.length - 1];', '}') + call);
+    await accept(id, 'an index variable and another parameter name', lines('function lastItem(list) {', '  const last = list.length - 1;', '  return list[last];', '}') + call);
+    await accept(id, 'a loop that remembers the latest item', lines('function lastItem(items) {', '  let found;', '  for (const x of items) { found = x; }', '  return found;', '}') + call);
+    await reject(id, 'reading one place past the end', lines('function lastItem(items) {', '  return items[items.length];', '}') + call,
+      't1', /^lastItem\(\["a", "b", "c"\]\) should give "c" but gave undefined$/);
+    await reject(id, 'the first item', lines('function lastItem(items) {', '  return items[0];', '}') + call,
+      't1', /^lastItem\(\["a", "b", "c"\]\) should give "c" but gave "a"$/);
+    await reject(id, 'the second to last item', lines('function lastItem(items) {', '  return items[items.length - 2];', '}') + call,
+      't1', /^lastItem\(\["a", "b", "c"\]\) should give "c" but gave "b"$/);
+    await reject(id, 'pop(): the right value, but it removes it from the array', lines('function lastItem(items) {', '  return items.pop();', '}') + call,
+      't1', /^lastItem\(\["a", "b", "c"\]\) changed the array you gave it\. It should leave the original untouched$/);
+  }
+
+  // ------------------------------------------------------------ 3.3.18 smallest
+  {
+    const id = LABS.small;
+    const call = 'console.log(smallest([4, 2, 9]));\n';
+    await accept(id, 'for...of seeded with numbers[0]', lines('function smallest(numbers) {', '  let best = numbers[0];', '  for (let n of numbers) {', '    if (n < best) { best = n; }', '  }', '  return best;', '}') + call);
+    await accept(id, 'an index loop from 1', lines('function smallest(list) {', '  let low = list[0];', '  for (let i = 1; i < list.length; i++) {', '    if (list[i] < low) { low = list[i]; }', '  }', '  return low;', '}') + call);
+    await accept(id, 'Math.min on the running answer', lines('function smallest(numbers) {', '  let best = numbers[0];', '  for (const n of numbers) { best = Math.min(best, n); }', '  return best;', '}') + call);
+    await reject(id, 'a running answer that starts at 0', lines('function smallest(numbers) {', '  let best = 0;', '  for (let n of numbers) {', '    if (n < best) { best = n; }', '  }', '  return best;', '}') + call,
+      't1', /^smallest\(\[4, 2, 9\]\) should give 2 but gave 0$/, { shaped: false });
+    await reject(id, 'a start of 0 with numbers[0] read somewhere else (the regex sees [0])', lines('function smallest(numbers) {', '  let first = numbers[0];', '  let best = 0;', '  for (let n of numbers) {', '    if (n < best) { best = n; }', '  }', '  return best;', '}') + call,
+      't1', /^smallest\(\[4, 2, 9\]\) should give 2 but gave 0$/);
+    await reject(id, 'a made-up start of 1000', lines('function smallest(numbers) {', '  let first = numbers[0];', '  let best = 1000;', '  for (let n of numbers) {', '    if (n < best) { best = n; }', '  }', '  return best;', '}') + call,
+      't1', /^A hidden check failed\.$/);
+    await reject(id, 'the largest instead of the smallest', lines('function smallest(numbers) {', '  let best = numbers[0];', '  for (let n of numbers) {', '    if (n > best) { best = n; }', '  }', '  return best;', '}') + call,
+      't1', /^smallest\(\[4, 2, 9\]\) should give 2 but gave 9$/);
+    await reject(id, 'never updating the first item', lines('function smallest(numbers) {', '  let best = numbers[0];', '  return best;', '}') + call,
+      't1', /^smallest\(\[4, 2, 9\]\) should give 2 but gave 4$/);
+    await reject(id, 'sorting the original array to find it', lines('function smallest(numbers) {', '  numbers.sort();', '  let best = numbers[0];', '  return best;', '}') + call,
+      't1', /^smallest\(\[4, 2, 9\]\) changed the array you gave it\. It should leave the original untouched$/);
   }
 } finally {
   rmSync(out, { recursive: true, force: true });

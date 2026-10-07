@@ -4244,6 +4244,27 @@
       }
     ]
   },
+  "3-2-3-reading-array-iteration#1": {
+    "code": "let prices = [4, 9, 6];\n\nfor (let i = 0; i <= prices.length; i++) {\n    console.log(prices[i]);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "9"
+      },
+      {
+        "type": "log",
+        "text": "6"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      }
+    ]
+  },
   "3-2-3-reading-passing-information-in#0": {
     "code": "function greet(name) {\n  console.log(\"Hello, \" + name + \"!\");\n}\n\ngreet(\"Marisol\");\ngreet(\"Dev\");\ngreet(\"Priya\");",
     "output": [

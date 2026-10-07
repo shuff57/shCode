@@ -1,0 +1,150 @@
+{
+  "id": "3-3-drill-off-by-one",
+  "title": "3.3.6 Lab: Fix the Off-by-One Loop",
+  "description": "A loop that should print every price also prints an extra undefined. Find the part of the loop that lets it run one round too long and fix it. Practice, not graded: the checks call your function.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.3 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it and read the output",
+      "instructions": "Run the code. printPrices should print 5, 12 and 8 and nothing else. Find the extra line."
+    },
+    {
+      "id": "s2",
+      "title": "Find where the loop goes too far",
+      "instructions": "The array has 3 items, so its last index is 2. Read the middle part of the for header: for which values of i does the loop still run?"
+    },
+    {
+      "id": "s3",
+      "title": "Fix the condition",
+      "instructions": "Change the condition so the loop stops after the last item (3.3.5), then run again. The output must be exactly 5, 12, 8."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "printPrices is defined with one parameter",
+      "description": "Code defines a function named printPrices with exactly one parameter. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+printPrices\\s*\\(\\s*[\\w$]+\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Keep the function header function printPrices(prices) as it is."
+    },
+    {
+      "id": "r2",
+      "title": "the loop stops at the last item",
+      "description": "A for loop is still there, and its condition no longer lets the index reach the array's length (use < prices.length, not <=). Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*<=\\s*[\\w$.]+\\.length(?!\\s*-\\s*1))[\\s\\S]*\\bfor\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "The index of the last item is length - 1, so the loop must stop BEFORE length: use < instead of <=."
+    },
+    {
+      "id": "t1",
+      "title": "printPrices prints every price once and nothing else",
+      "description": "printPrices(prices) prints each price on its own line, in order, with no extra line at the end. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "type": "tests",
+      "file": "script.js",
+      "function": "printPrices",
+      "points": 0,
+      "hint": "Every price must print once, in order, and nothing else. A stray line that says undefined means the loop ran one round past the last item. If the first price is missing, check where the loop starts.",
+      "cases": [
+        {
+          "args": [
+            [
+              5,
+              12,
+              8
+            ]
+          ],
+          "expectOutput": [
+            "5",
+            "12",
+            "8"
+          ]
+        },
+        {
+          "args": [
+            [
+              7
+            ]
+          ],
+          "expectOutput": [
+            "7"
+          ],
+          "description": "one price"
+        },
+        {
+          "args": [
+            [
+              3,
+              3,
+              3
+            ]
+          ],
+          "expectOutput": [
+            "3",
+            "3",
+            "3"
+          ],
+          "description": "equal prices"
+        },
+        {
+          "args": [
+            [
+              20,
+              10,
+              30,
+              40
+            ]
+          ],
+          "expectOutput": [
+            "20",
+            "10",
+            "30",
+            "40"
+          ]
+        },
+        {
+          "args": [
+            []
+          ],
+          "expectOutput": [],
+          "description": "no prices"
+        },
+        {
+          "args": [
+            [
+              9,
+              1
+            ]
+          ],
+          "expectOutput": [
+            "9",
+            "1"
+          ],
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
