@@ -14,7 +14,7 @@
 //              make readable.
 
 import type { DiagramDoc, DiagramRule, DiagramRuleId, FlowNode } from './diagram-types';
-import { isFlowShape } from './diagram-types';
+import { isFlowShape, SHAPE_LABELS } from './diagram-types';
 
 export interface CheckResult {
   id: DiagramRuleId;
@@ -38,10 +38,11 @@ const DEFAULT_TITLES: Record<DiagramRuleId, string> = {
   'connector-pairs': 'Every connector has a matching partner',
   'min-decisions': 'Uses at least one decision diamond',
   'min-process': 'Uses at least one task rectangle',
+  'min-shape': 'Uses the required shape',
   'min-nodes': 'Diagram has enough shapes',
 };
 
-interface Graph {
+export interface Graph {
   /** Every original node, for naming offenders. */
   byId: Map<string, FlowNode>;
   /** Logical nodes: comments dropped, connector groups merged. */
@@ -60,7 +61,7 @@ function connectorKey(n: FlowNode): string | null {
   return label ? `conn:${label}` : null;
 }
 
-function buildGraph(doc: DiagramDoc): Graph {
+export function buildGraph(doc: DiagramDoc): Graph {
   const byId = new Map(doc.nodes.map((n) => [n.id, n]));
   const logicalOf = new Map<string, string | null>();
   const membersOf = new Map<string, string[]>();
@@ -109,7 +110,7 @@ function expand(ids: string[], g: Graph): string[] {
   return ids.flatMap((id) => g.membersOf.get(id) ?? [id]);
 }
 
-function startNodes(g: Graph): FlowNode[] {
+export function startNodes(g: Graph): FlowNode[] {
   return g.flowNodes.filter((n) => (g.incoming.get(n.id) ?? []).length === 0);
 }
 
@@ -123,7 +124,7 @@ function endNodes(g: Graph): FlowNode[] {
  * questions have to be asked — a shape can sit on a path out of Start and
  * still never finish, which is exactly what a dead-ending branch is.
  */
-function reachableFrom(seeds: string[], g: Graph, dir: 'outgoing' | 'incoming' = 'outgoing'): Set<string> {
+export function reachableFrom(seeds: string[], g: Graph, dir: 'outgoing' | 'incoming' = 'outgoing'): Set<string> {
   const seen = new Set<string>(seeds);
   const queue = [...seeds];
   while (queue.length > 0) {
@@ -383,6 +384,26 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
           };
     }
 
+    case 'min-shape': {
+      // A required shape KIND (e.g. the function-call double rail). Counts every flow shape of
+      // that kind, labels never read. Client-visible on purpose: content.md names the shape.
+      const want = rule.count ?? 1;
+      const shape = rule.shape;
+      if (!shape || !(shape in SHAPE_LABELS)) {
+        return { id, passed: false, detail: 'This check has no shape set in the lesson. Tell your teacher.', offenders: [] };
+      }
+      const noun = SHAPE_LABELS[shape].toLowerCase() + ' shape';
+      const have = doc.nodes.filter((n) => n.shape === shape).length;
+      return have >= want
+        ? { id, passed: true, detail: `${have} ${plural(have, noun, noun + 's')}.`, offenders: [] }
+        : {
+            id,
+            passed: false,
+            detail: `Needs at least ${want} ${plural(want, noun, noun + 's')} (see the shape palette); the diagram has ${have}.`,
+            offenders: [],
+          };
+    }
+
     case 'min-decisions':
     case 'min-process':
     case 'min-nodes': {
@@ -423,7 +444,9 @@ export function checkDiagram(doc: DiagramDoc, rules: DiagramRule[]): CheckResult
     const outcome = evaluate(rule, doc, g);
     const fallback = DEFAULT_TITLES[rule.id] ?? rule.id;
     let title = rule.title ?? fallback;
-    if (!rule.title && rule.count !== undefined && rule.id.startsWith('min-')) {
+    if (!rule.title && rule.id === 'min-shape' && rule.shape && rule.shape in SHAPE_LABELS) {
+      title = `Uses ${rule.count && rule.count > 1 ? `at least ${rule.count} ` : 'a '}${SHAPE_LABELS[rule.shape].toLowerCase()} shape${rule.count && rule.count > 1 ? 's' : ''}`;
+    } else if (!rule.title && rule.count !== undefined && rule.id.startsWith('min-')) {
       title = `${fallback} (at least ${rule.count})`;
     }
     return { ...outcome, title };

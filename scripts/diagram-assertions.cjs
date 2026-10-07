@@ -475,5 +475,318 @@ section('describeDiagram');
   ok('counts shapes', text.includes('7 shapes, 7 arrows'), text.match(/\d+ shapes, \d+ arrows/));
 }
 
+
+// ---------- hybrid scoring (lib/diagram-score.ts) ----------
+const SC = require(LIB + '/diagram-score.js');
+{
+  const D = (mmd) => fromMermaid('flowchart TD\n' + mmd);
+  const item = (points, check, id = 'x') => ({ id, title: id, points, check });
+  const one = (mmd, check, points = 7) => SC.scoreDiagram(D(mmd), [item(points, check)]).criteria[0];
+  const CALL = { kind: 'subroutine' };
+
+  section('score: count');
+  const REF = `
+  A([Start])
+  B[set it]
+  C[[call it]]
+  Q{ok?}
+  P[/print yes/]
+  R[/print no/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> Q
+  Q -- yes --> P
+  Q -- no --> R
+  P --> Z
+  R --> Z`;
+  ok('count: one call shape on the path earns it', one(REF, { steps: [{ op: 'count', match: CALL, min: 1 }] }).earned === 7);
+  ok('count: rectangle instead of call earns 0', one(REF.replace('C[[call it]]', 'C[call it]'), { steps: [{ op: 'count', match: CALL, min: 1 }] }).earned === 0);
+  const DECOY = `
+  A([Start])
+  B[set it]
+  X[[decoy call]]
+  Z([End])
+  A --> B
+  B --> Z
+  B --> X`;
+  ok('count: a call on a dead-end side branch is off the path and does not count', one(DECOY, { steps: [{ op: 'count', match: CALL, min: 1 }] }).earned === 0);
+  const FLOAT = `
+  A([Start])
+  B[set it]
+  Z([End])
+  X[[floating call]]
+  A --> B
+  B --> Z`;
+  ok('count: a floating (unconnected) call does not count', one(FLOAT, { steps: [{ op: 'count', match: CALL, min: 1 }] }).earned === 0);
+  const CONN = `
+  A([Start])
+  K1((J))
+  K2((J))
+  C[[call it]]
+  Z([End])
+  A --> K1
+  K2 --> C
+  C --> Z`;
+  ok('count: a connector pair is ONE logical node (min 2 connectors fails, min 1 passes)',
+    one(CONN, { steps: [{ op: 'count', match: { kind: 'connector' }, min: 2 }] }).earned === 0 &&
+    one(CONN, { steps: [{ op: 'count', match: { kind: 'connector' }, min: 1 }] }).earned === 7);
+  ok('count: a call still counts across a connector jump', one(CONN, { steps: [{ op: 'count', match: CALL, min: 1 }] }).earned === 7);
+  const NOTE = REF + `\n  N>a note beside the chart]`;
+  ok('count: a note shape is dropped and never counts', one(NOTE, { steps: [{ op: 'count', match: { kind: 'comment' }, min: 1 }] }).earned === 0);
+  const TWO = `
+  A([Start])
+  B[[first]]
+  C[[second]]
+  Q{ok?}
+  P[/yes/]
+  R[/no/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> Q
+  Q -- yes --> P
+  Q -- no --> R
+  P --> Z
+  R --> Z`;
+  const ONEOFTWO = TWO.replace('C[[second]]', 'C[second]');
+  const lin = { scale: 'linear', steps: [{ op: 'count', match: CALL, min: 2 }] };
+  ok('count linear: both calls earn the full 7', one(TWO, lin).earned === 7 && one(TWO, lin).verdict === 'met');
+  ok('count linear: one of two earns 3.5 (partial)', one(ONEOFTWO, lin).earned === 3.5 && one(ONEOFTWO, lin).verdict === 'partial', JSON.stringify(one(ONEOFTWO, lin)));
+  ok('count linear: none earns 0 (missing)', one(ONEOFTWO.replace('B[[first]]', 'B[first]'), lin).earned === 0);
+  ok('count (not linear): one of two earns 0', one(ONEOFTWO, { steps: [{ op: 'count', match: CALL, min: 2 }] }).earned === 0);
+  ok('count: default fail line says what is missing and gives the count, no label',
+    /at least 2 function-call shapes.*yours has 1/.test(one(ONEOFTWO, lin).feedback), one(ONEOFTWO, lin).feedback);
+  ok('count: max is enforced', one(TWO, { steps: [{ op: 'count', match: CALL, min: 1, max: 1 }] }).earned === 0);
+  ok('matcher: re is ORed, case-folded and not: excludes',
+    one(REF, { steps: [{ op: 'count', match: { kind: 'process', re: ['zzz', 'SET'] }, min: 1 }] }).earned === 7 &&
+    one(REF, { steps: [{ op: 'count', match: { kind: 'process', re: 'set', not: { re: 'it$' } }, min: 1 }] }).earned === 0);
+
+  section('score: sequence (dominator chain)');
+  const seq = (mmd, of) => one(mmd, { steps: [{ op: 'sequence', of }] }).earned === 7;
+  const CD = [CALL, { kind: 'decision' }];
+  ok('sequence: reference order accepted', seq(REF, CD));
+  ok('sequence: an extra step between call and decision is tolerated', seq(REF.replace('C --> Q', 'C --> E1[hold it]\n  E1 --> Q'), CD));
+  ok('sequence: a join node before the decision is tolerated', seq(REF.replace('B --> C', 'B --> J[join]\n  J --> C'), CD));
+  ok('sequence: a connector pair between them is tolerated', seq(REF.replace('C --> Q', 'C --> K1((J))\n  K2((J)) --> Q'), CD));
+  ok('sequence: decision BEFORE the call is rejected', !seq(`
+  A([Start])
+  Q{ok?}
+  C[[call it]]
+  P[/yes/]
+  Z([End])
+  A --> Q
+  Q -- yes --> C
+  Q -- no --> P
+  C --> Z
+  P --> Z`, CD));
+  ok('sequence: a call on one branch only (does not dominate the decision) is rejected', !seq(`
+  A([Start])
+  Q0{first?}
+  C[[call it]]
+  E[step]
+  Q{ok?}
+  P[/yes/]
+  R[/no/]
+  Z([End])
+  A --> Q0
+  Q0 -- yes --> C
+  Q0 -- no --> E
+  C --> Q
+  E --> Q
+  Q -- yes --> P
+  Q -- no --> R
+  P --> Z
+  R --> Z`, CD));
+  const CCD = [CALL, CALL, { kind: 'decision' }];
+  ok('sequence: call, call, decision accepted', seq(TWO, CCD));
+  ok('sequence: calls on separate branches rejected', !seq(`
+  A([Start])
+  Q0{pick}
+  B[[first]]
+  C[[second]]
+  Q{ok?}
+  Z([End])
+  A --> Q0
+  Q0 -- yes --> B
+  Q0 -- no --> C
+  B --> Q
+  C --> Q
+  Q -- yes --> Z
+  Q -- no --> Z`, CCD));
+  ok('sequence: a decision BETWEEN the two calls rejected', !seq(`
+  A([Start])
+  B[[first]]
+  Q{ok?}
+  C[[second]]
+  E[step]
+  Z([End])
+  A --> B
+  B --> Q
+  Q -- yes --> C
+  Q -- no --> E
+  C --> Z
+  E --> Z`, CCD));
+  ok('sequence: one call cannot satisfy two slots (distinct nodes)', !seq(REF, CCD));
+
+  section('score: loop-exit / cycles');
+  const LOOP = `
+  A([Start])
+  B[count = 0]
+  H{{for each}}
+  D{small?}
+  E[add one]
+  F[/print count/]
+  Z([End])
+  A --> B
+  B --> H
+  H -- next --> D
+  D -- yes --> E
+  D -- no --> H
+  E --> H
+  H -- done --> F
+  F --> Z`;
+  const LX = { steps: [{ op: 'loop-exit', loop: { kind: 'preparation' }, minAfter: 1, from: 'loop' }] };
+  ok('loop-exit: print after the loop accepted', one(LOOP, LX).earned === 7);
+  ok('loop-exit: a join on the return arrow accepted', one(LOOP.replace('D -- no --> H', 'D -- no --> J[next]\n  J --> H').replace('E --> H', 'E --> J'), LX).earned === 7);
+  ok('loop-exit: edge labels are never read (swap them)', one(LOOP.replace('H -- done --> F', 'H -- next --> F').replace('H -- next --> D', 'H -- done --> D'), LX).earned === 7);
+  ok('loop-exit: print INSIDE the loop (exit goes straight to End) rejected',
+    one(LOOP.replace('H -- done --> F\n  F --> Z', 'H -- done --> Z').replace('E --> H', 'E --> F\n  F --> H'), LX).earned === 0);
+  ok('loop-exit: no loop at all rejected', one(`
+  A([Start])
+  H{{setup}}
+  F[/print/]
+  Z([End])
+  A --> H
+  H --> F
+  F --> Z`, LX).earned === 0);
+  ok('loop-exit: hexagon on no cycle (setup only, a diamond does the looping) rejected', one(`
+  A([Start])
+  H{{i = 0}}
+  D{more?}
+  E[body]
+  F[/print/]
+  Z([End])
+  A --> H
+  H --> D
+  D -- yes --> E
+  E --> D
+  D -- no --> F
+  F --> Z`, LX).earned === 0);
+  ok('loop-exit from:any accepts that same chart when the diamond is the head', one(`
+  A([Start])
+  H{{i = 0}}
+  D{more?}
+  E[body]
+  F[/print/]
+  Z([End])
+  A --> H
+  H --> D
+  D -- yes --> E
+  E --> D
+  D -- no --> F
+  F --> Z`, { steps: [{ op: 'loop-exit', loop: { kind: 'decision' }, minAfter: 1, from: 'any' }] }).earned === 7);
+  ok('loop-exit: minAfter 2 needs two steps after the loop', one(LOOP, { steps: [{ op: 'loop-exit', loop: { kind: 'preparation' }, minAfter: 2 }] }).earned === 0 &&
+    one(LOOP.replace('F --> Z', 'F --> G[tidy]\n  G --> Z'), { steps: [{ op: 'loop-exit', loop: { kind: 'preparation' }, minAfter: 2 }] }).earned === 7);
+  ok('in-cycle: the hexagon is in the repeat', one(LOOP, { steps: [{ op: 'in-cycle', match: { kind: 'preparation' } }] }).earned === 7);
+  ok('in-cycle: the print is not', one(LOOP, { steps: [{ op: 'in-cycle', match: { kind: 'io' } }] }).earned === 0);
+  ok('not-in-cycle: the print is outside, the hexagon is not', one(LOOP, { steps: [{ op: 'not-in-cycle', match: { kind: 'io' } }] }).earned === 7 &&
+    one(LOOP, { steps: [{ op: 'not-in-cycle', match: { kind: 'preparation' } }] }).earned === 0);
+  ok('in-cycle: a shape that is not there fails', one(LOOP, { steps: [{ op: 'in-cycle', match: { kind: 'subroutine' } }] }).earned === 0);
+
+  section('score: branch and label');
+  const br = (mmd, step) => one(mmd, { steps: [Object.assign({ op: 'branch' }, step)] }).earned === 7;
+  ok('branch: two different results accepted', br(REF, { at: { kind: 'decision' }, yes: { kind: 'io' }, no: { kind: 'io' }, distinct: true }));
+  ok('branch: both exits to the same node rejected with distinct', !br(REF.replace('Q -- no --> R', 'Q -- no --> P'), { at: { kind: 'decision' }, yes: { kind: 'io' }, no: { kind: 'io' }, distinct: true }));
+  ok('branch: orientation any accepts yes/no swapped',
+    br(REF, { at: { kind: 'decision' }, yes: { kind: 'io', re: 'print yes' }, no: { kind: 'io', re: 'print no' } }) &&
+    br(REF.replace('Q -- yes --> P\n  Q -- no --> R', 'Q -- yes --> R\n  Q -- no --> P'), { at: { kind: 'decision' }, yes: { kind: 'io', re: 'print yes' }, no: { kind: 'io', re: 'print no' } }));
+  ok('branch: orientation labelled follows the yes/no labels',
+    br(REF, { at: { kind: 'decision' }, yes: { re: 'print yes' }, no: { re: 'print no' }, orientation: 'labelled' }) &&
+    !br(REF.replace('Q -- yes --> P\n  Q -- no --> R', 'Q -- yes --> R\n  Q -- no --> P'), { at: { kind: 'decision' }, yes: { re: 'print yes' }, no: { re: 'print no' }, orientation: 'labelled' }));
+  ok('label: opt-in label read on the path', one(REF, { steps: [{ op: 'label', match: { re: 'set' }, min: 1 }] }).earned === 7 && one(REF, { steps: [{ op: 'label', match: { re: 'banana' }, min: 1 }] }).earned === 0);
+
+  section('score: bad charts and messages');
+  ok('no Start (everything has an incoming arrow) scores 0 with a fix-structure line',
+    /structure first/i.test(one(`
+  B[a]
+  C[b]
+  B --> C
+  C --> B`, { steps: [{ op: 'count', match: {}, min: 1 }] }).feedback));
+  ok('author fail/pass lines are used verbatim', one(REF.replace('C[[call it]]', 'C[call it]'), { steps: [{ op: 'count', match: CALL, min: 1, fail: 'FAILLINE' }] }).feedback === 'FAILLINE' &&
+    one(REF, { steps: [{ op: 'count', match: CALL, min: 1, pass: 'PASSLINE' }] }).feedback === 'PASSLINE');
+  ok('offenders name real node ids for a failed loop-exit', Array.isArray(one(LOOP.replace('H -- done --> F\n  F --> Z', 'H -- done --> Z').replace('E --> H', 'E --> F\n  F --> H'), LX).offenders));
+
+  section('splitRubric / gate / mergeGrade');
+  const rub = [{ id: 'a', points: 7, check: { steps: [] } }, { id: 'b', points: 2 }, { id: 'c', points: 7, check: { steps: [] } }];
+  const sp = SC.splitRubric(rub);
+  ok('splitRubric: items with a check are the rule items, the rest go to the model', sp.ruleItems.map((r) => r.id).join() === 'a,c' && sp.aiItems.map((r) => r.id).join() === 'b');
+  ok('splitRubric: no check anywhere leaves ruleItems empty (behaves exactly as before)', SC.splitRubric([{ id: 'z', points: 1 }]).ruleItems.length === 0);
+  const gate = { anyOf: ['base|\\b100\\b', 'price|tax'], min: 2, capTo: 13, fail: 'GATEFAIL' };
+  const g1 = SC.evalGate(D(`A([Start])\n  B[set base]\n  C[tax price]\n  Z([End])\n  A --> B\n  B --> C\n  C --> Z`), gate);
+  const g2 = SC.evalGate(D(`A([Start])\n  B[set base]\n  C[x]\n  Z([End])\n  A --> B\n  B --> C\n  C --> Z`), gate);
+  ok('gate: counts token groups across all labels; passes at min', g1.matched === 2 && g1.passed);
+  ok('gate: one group is below min', g2.matched === 1 && !g2.passed);
+  ok('gate: a comment does not satisfy it', SC.evalGate(D(`A([Start])\n  B[set base]\n  N>tax price]\n  Z([End])\n  A --> B\n  B --> Z`), gate).matched === 1);
+  ok('gate: absent gate is null', SC.evalGate(D('A([Start])\n  Z([End])\n  A --> Z'), null) === null);
+
+  const items = [item(7, { steps: [{ op: 'count', match: CALL, min: 1 }] }, 'call'), item(7, { steps: [{ op: 'sequence', of: CD }] }, 'order')];
+  const aiItems = [{ id: 'w1', title: 'W1', points: 2 }, { id: 'w2', title: 'W2', points: 2 }, { id: 'w3', title: 'W3', points: 2 }];
+  const aiRes = { totalEarned: 5, totalPossible: 6, criteria: [{ id: 'w1', earned: 2, max: 2, verdict: 'met', feedback: 'f1' }, { id: 'w2', earned: 2, max: 2, verdict: 'met', feedback: 'f2' }, { id: 'w3', earned: 1, max: 2, verdict: 'partial', feedback: 'f3' }], summary: 'AISUM', hints: ['h'] };
+  const gateRef = { anyOf: ['set it', 'call it', 'print'], min: 2, capTo: 13, fail: 'GATEFAIL' };
+  const det = SC.scoreDiagram(D(REF), items, gateRef);
+  const m = SC.mergeGrade(det, aiRes, aiItems);
+  ok('mergeGrade: rule + AI totals (14 + 5 = 19 of 20)', m.totalEarned === 19 && m.totalPossible === 20, JSON.stringify([m.totalEarned, m.totalPossible]));
+  ok('mergeGrade: rule criteria first, then AI, with source tags', m.criteria.map((c) => c.id + ':' + c.source).join() === 'call:rules,order:rules,w1:ai,w2:ai,w3:ai', m.criteria.map((c) => c.id).join());
+  ok('mergeGrade: AI criteria keep their titles; summary names both halves; hints from AI only',
+    m.criteria[2].title === 'W1' && /Shapes and order: 14 of 14\. Wording: 5 of 6\./.test(m.summary) && m.summary.includes('AISUM') && m.hints.join() === 'h');
+  ok('mergeGrade: gate passing leaves the total alone', !m.capped);
+  const detBad = SC.scoreDiagram(D(REF.replace(/set it|call it|ok\?|print yes|print no/g, 'x')), items, gateRef);
+  ok('gate: relabelling everything leaves the rule points at 14', detBad.earned === 14 && detBad.gate && !detBad.gate.passed);
+  const mc = SC.mergeGrade(detBad, aiRes, aiItems);
+  ok('mergeGrade: a failed gate caps the TOTAL at capTo (19 -> 13), says why, still 20 possible', mc.totalEarned === 13 && mc.totalPossible === 20 && mc.capped === true && mc.summary.includes('GATEFAIL'), mc.summary);
+  ok('mergeGrade: a cap never RAISES a lower total', SC.mergeGrade(SC.scoreDiagram(D(REF.replace('C[[call it]]', 'C[call it]').replace(/set it|ok\?/g, 'x')), items, gateRef), { ...aiRes, totalEarned: 0, criteria: aiRes.criteria.map((c) => ({ ...c, earned: 0, verdict: 'missing' })) }, aiItems).totalEarned === 0);
+  const mn = SC.mergeGrade(det, null, aiItems);
+  ok('mergeGrade: AI null lists the AI items as zero, rules intact (the server never records this shape)', mn.criteria.length === 5 && mn.totalEarned === 14 && mn.criteria.slice(2).every((c) => c.earned === 0 && c.source === 'ai'));
+  ok('mergeGrade: every item rule-scored (no AI) has no Wording line', !/Wording/.test(SC.mergeGrade(det, null, []).summary));
+
+  section('score: regexes cannot hang');
+  {
+    // Every regex any lesson ships (check re + gate groups) against worst-case 300-char labels.
+    const fs = require('fs');
+    const path = require('path');
+    const lessonsDir = path.resolve(__dirname, '..', 'lessons');
+    const pats = [];
+    const walk = (v) => { if (v && typeof v === 'object') { if (typeof v.re === 'string') pats.push(v.re); if (Array.isArray(v.re)) pats.push(...v.re); for (const k of Object.keys(v)) walk(v[k]); } };
+    for (const id of fs.readdirSync(lessonsDir)) {
+      const f = path.join(lessonsDir, id, 'lesson.json');
+      if (!fs.existsSync(f)) continue;
+      const g = JSON.parse(fs.readFileSync(f, 'utf8')).diagram?.aiGrader;
+      if (!g) continue;
+      for (const r of g.rubric || []) if (r.check) walk(r.check);
+      if (g.gate) pats.push(...g.gate.anyOf);
+    }
+    const worst = ['a'.repeat(300), 'ab'.repeat(150), ('x '.repeat(150)), '('.repeat(300), '1'.repeat(300), ('aaaa!'.repeat(60))];
+    let slowest = 0;
+    for (const p of pats) for (const w of worst) {
+      const re = new RegExp(p, 'iu');
+      const t0 = process.hrtime.bigint();
+      re.test(SC.foldLabel(w));
+      slowest = Math.max(slowest, Number(process.hrtime.bigint() - t0) / 1e6);
+    }
+    ok(`every shipped pattern (${pats.length}) tests a 300-char worst-case label in under 20 ms (slowest ${slowest.toFixed(2)} ms)`, pats.length > 0 && slowest < 20);
+    // And the whole scorer on a 200-node chain with a back edge, against the time budget.
+    const nodes = [{ id: 'n0', shape: 'terminal', label: 'Start', x: 0, y: 0 }];
+    const edges = [];
+    for (let i = 1; i < 199; i++) { nodes.push({ id: 'n' + i, shape: i % 7 === 0 ? 'subroutine' : i % 5 === 0 ? 'decision' : 'process', label: 'step ' + i, x: 0, y: i }); edges.push({ id: 'e' + i, from: 'n' + (i - 1), to: 'n' + i }); }
+    nodes.push({ id: 'nz', shape: 'terminal', label: 'End', x: 0, y: 999 });
+    edges.push({ id: 'ez', from: 'n198', to: 'nz' }, { id: 'eb', from: 'n150', to: 'n20' });
+    const big = { version: 1, nodes, edges };
+    const t0 = Date.now();
+    const bigScore = SC.scoreDiagram(big, [item(7, { steps: [{ op: 'sequence', of: [CALL, CALL, CALL, { kind: 'decision' }] }, { op: 'loop-exit', loop: { kind: 'process' }, from: 'any' }] })]);
+    ok(`a 200-node chart scores in well under a second (${Date.now() - t0} ms)`, Date.now() - t0 < 1000 && typeof bigScore.earned === 'number');
+  }
+}
+
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);
