@@ -43,10 +43,10 @@
     {
       "id": "r2",
       "title": "the loop adds to total",
-      "description": "A for loop body adds each element to a running total (total += ..., or total = total + ...). Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "description": "A for loop body adds each element to a running total (total += ..., or total = total + ...). Adding the same number every time, like total += 1, counts items instead of summing them. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\([^)]*\\)\\s*\\{?[^}]*(?:\\+=|=\\s*[\\w$.]+(?:\\[[^\\]]*\\])?\\s*\\+\\s*[\\w$])",
+      "pattern": "for\\s*\\([^)]*\\)\\s*\\{?[^}]*(?:\\+=(?!\\s*\\d+(?:\\.\\d+)?\\s*(?:[;}\\n]|$))|=\\s*[\\w$.]+(?:\\[[^\\]]*\\])?\\s*\\+(?!\\s*\\d)\\s*[\\w$])",
       "flags": "",
       "ignoreStrings": true,
       "points": 0

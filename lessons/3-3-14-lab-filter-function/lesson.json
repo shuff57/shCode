@@ -15,22 +15,22 @@
     {
       "id": "s1",
       "title": "Write a function with an array parameter",
-      "instructions": "Write a function declaration (e.g. doubled or bigger) that takes an array parameter."
+      "instructions": "Write a function declaration called doubled that takes an array parameter (the numbers to double)."
     },
     {
       "id": "s2",
       "title": "Build a new array inside it",
-      "instructions": "Create a new empty array inside the function and use a for...of loop to push each transformed value in."
+      "instructions": "Create a new empty array inside the function and use a for...of loop to push each number, doubled (n * 2), into it, as in 3.3.12."
     },
     {
       "id": "s3",
       "title": "Return the new array",
-      "instructions": "After the loop, return the new array."
+      "instructions": "After the loop, return the new array. Do not change the array you were given."
     },
     {
       "id": "s4",
       "title": "Call it and log both arrays",
-      "instructions": "Call the function with a sample array and console.log both the result and the original array to show the original is untouched."
+      "instructions": "Call doubled with a sample array and console.log both the result and the original array to show the original is untouched."
     }
   ],
   "requirements": [
@@ -99,6 +99,100 @@
       "flags": "",
       "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "t1",
+      "title": "doubled returns a new, doubled array and leaves the original alone",
+      "description": "doubled(numbers) returns a NEW array holding every number doubled, in the same order, and the array you pass in is not changed. Help: 3.3.12 (Arrays and Functions)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "doubled",
+      "points": 0,
+      "hint": "Build a separate result array, push n * 2 for every number, and return the result. Pushing onto or assigning into the array you were given changes the original.",
+      "cases": [
+        {
+          "args": [
+            [
+              1,
+              2,
+              3
+            ]
+          ],
+          "expect": [
+            2,
+            4,
+            6
+          ],
+          "unchanged": 0
+        },
+        {
+          "args": [
+            []
+          ],
+          "expect": [],
+          "unchanged": 0,
+          "description": "an empty array"
+        },
+        {
+          "args": [
+            [
+              5
+            ]
+          ],
+          "expect": [
+            10
+          ],
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              -1,
+              0,
+              4
+            ]
+          ],
+          "expect": [
+            -2,
+            0,
+            8
+          ],
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              1.5,
+              2.5
+            ]
+          ],
+          "expect": [
+            3,
+            5
+          ],
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              10,
+              20,
+              30,
+              40,
+              50
+            ]
+          ],
+          "expect": [
+            20,
+            40,
+            60,
+            80,
+            100
+          ],
+          "unchanged": 0,
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

@@ -79,6 +79,68 @@
       "flags": "i",
       "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "t1",
+      "title": "area hands back the number and prints nothing",
+      "description": "Called on its own, area(width, height) gives back width times height and prints nothing itself. Help: 3.2.13 (Printing Is Not Returning)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "area",
+      "points": 0,
+      "hint": "area must return the number (return width * height) and must not call console.log itself: the caller does the printing.",
+      "cases": [
+        {
+          "args": [
+            5,
+            8
+          ],
+          "expect": 40,
+          "expectOutput": []
+        },
+        {
+          "args": [
+            3,
+            4
+          ],
+          "expect": 12,
+          "expectOutput": []
+        },
+        {
+          "args": [
+            1,
+            1
+          ],
+          "expect": 1,
+          "expectOutput": []
+        },
+        {
+          "args": [
+            0,
+            9
+          ],
+          "expect": 0,
+          "expectOutput": [],
+          "description": "a side of 0"
+        },
+        {
+          "args": [
+            2.5,
+            4
+          ],
+          "expect": 10,
+          "expectOutput": []
+        },
+        {
+          "args": [
+            7,
+            6
+          ],
+          "expect": 42,
+          "expectOutput": [],
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

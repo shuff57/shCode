@@ -87,6 +87,132 @@
       "flags": "",
       "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "t1",
+      "title": "findMax returns the larger value",
+      "description": "findMax(a, b) gives back whichever of the two numbers is larger, whichever order they come in. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "findMax",
+      "points": 0,
+      "hint": "findMax must hand back the LARGER of a and b. Check which way your comparison points, and that both branches return a value.",
+      "cases": [
+        {
+          "args": [
+            3,
+            9
+          ],
+          "expect": 9
+        },
+        {
+          "args": [
+            9,
+            3
+          ],
+          "expect": 9
+        },
+        {
+          "args": [
+            -5,
+            -2
+          ],
+          "expect": -2
+        },
+        {
+          "args": [
+            4,
+            4
+          ],
+          "expect": 4,
+          "description": "equal values"
+        },
+        {
+          "args": [
+            0,
+            -1
+          ],
+          "expect": 0
+        },
+        {
+          "args": [
+            100,
+            99
+          ],
+          "expect": 100,
+          "hidden": true
+        },
+        {
+          "args": [
+            -1000,
+            5
+          ],
+          "expect": 5,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "title": "isEven is true for even numbers only",
+      "description": "isEven(n) returns true when n is even and false when it is odd, including 0 and negative numbers. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "isEven",
+      "points": 0,
+      "hint": "isEven must return true or false (not 0 or 1): an even number has a remainder of 0 when divided by 2.",
+      "cases": [
+        {
+          "args": [
+            4
+          ],
+          "expect": true
+        },
+        {
+          "args": [
+            7
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            6
+          ],
+          "expect": true
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": true
+        },
+        {
+          "args": [
+            -3
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            -4
+          ],
+          "expect": true,
+          "hidden": true
+        },
+        {
+          "args": [
+            9
+          ],
+          "expect": false,
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

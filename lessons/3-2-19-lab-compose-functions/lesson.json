@@ -93,11 +93,11 @@
     {
       "id": "r6",
       "title": "triple multiplies",
-      "description": "triple returns n times 3 (a * in its return). Help: 3.2.16 (Building With Returned Values)",
+      "description": "triple multiplies: its body has a * (or adds the number to itself three times). Help: 3.2.16 (Building With Returned Values)",
       "type": "inFunction",
       "file": "script.js",
       "function": "triple",
-      "pattern": "\\breturn\\b[^;]*(?:\\*|\\bn\\s*\\+\\s*n\\s*\\+\\s*n)",
+      "pattern": "\\*|\\b(\\w+)\\s*\\+\\s*\\1\\s*\\+\\s*\\1\\b",
       "flags": "",
       "ignoreStrings": true,
       "points": 0
@@ -105,11 +105,11 @@
     {
       "id": "r7",
       "title": "addSeven adds",
-      "description": "addSeven returns n plus 7 (a + in its return). Help: 3.2.16 (Building With Returned Values)",
+      "description": "addSeven adds: its body has a +. Help: 3.2.16 (Building With Returned Values)",
       "type": "inFunction",
       "file": "script.js",
       "function": "addSeven",
-      "pattern": "\\breturn\\b[^;]*\\+",
+      "pattern": "\\+",
       "flags": "",
       "ignoreStrings": true,
       "points": 0
@@ -124,6 +124,104 @@
       "flags": "",
       "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "t1",
+      "title": "triple gives back 3 times n",
+      "description": "triple(n) returns n multiplied by 3 for any number. Help: 3.2.16 (Building With Returned Values)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "triple",
+      "points": 0,
+      "hint": "triple should return n * 3 (or n + n + n) and give the value back with return.",
+      "cases": [
+        {
+          "args": [
+            4
+          ],
+          "expect": 12
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": 3
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": 0
+        },
+        {
+          "args": [
+            -2
+          ],
+          "expect": -6
+        },
+        {
+          "args": [
+            1.5
+          ],
+          "expect": 4.5
+        },
+        {
+          "args": [
+            100
+          ],
+          "expect": 300,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "title": "addSeven gives back n plus 7",
+      "description": "addSeven(n) returns n plus 7 for any number. Help: 3.2.16 (Building With Returned Values)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "addSeven",
+      "points": 0,
+      "hint": "addSeven should return n + 7 and give the value back with return.",
+      "cases": [
+        {
+          "args": [
+            4
+          ],
+          "expect": 11
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": 7
+        },
+        {
+          "args": [
+            -7
+          ],
+          "expect": 0
+        },
+        {
+          "args": [
+            10
+          ],
+          "expect": 17
+        },
+        {
+          "args": [
+            2.5
+          ],
+          "expect": 9.5
+        },
+        {
+          "args": [
+            100
+          ],
+          "expect": 107,
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

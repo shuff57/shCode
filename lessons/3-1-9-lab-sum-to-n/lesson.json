@@ -75,6 +75,64 @@
       "flags": "",
       "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "t1",
+      "title": "sumToN adds 1 up to and including n",
+      "description": "sumToN(n) returns 1 + 2 + ... + n: for example sumToN(5) is 15, sumToN(10) is 55 and sumToN(100) is 5050. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "sumToN",
+      "points": 0,
+      "hint": "Add the loop counter itself (not 1) to the total on every pass, count up to and including n, and return the total after the loop ends.",
+      "cases": [
+        {
+          "args": [
+            5
+          ],
+          "expect": 15
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": 1,
+          "description": "the smallest n"
+        },
+        {
+          "args": [
+            10
+          ],
+          "expect": 55
+        },
+        {
+          "args": [
+            100
+          ],
+          "expect": 5050
+        },
+        {
+          "args": [
+            3
+          ],
+          "expect": 6
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": 0,
+          "description": "nothing to add",
+          "hidden": true
+        },
+        {
+          "args": [
+            20
+          ],
+          "expect": 210,
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

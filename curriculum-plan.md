@@ -715,7 +715,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - Students load a provided array of 10 part measurements and compute max/min/average with a loop
 
 **Assignments:**
-- **A3.3.1 (Lab) — built as the 3.3.18 capstone (`3-2-7-arrays`), not as written (2026-10-06).** An arrays recap graded on five requirements (10, 5, 5, 10 and 5 points, all 35 needed to pass): create an array, `push`, `pop`, walk it with a `for` loop, and search it with a comparison. It does not ask for 10 design measurements or for maximum/minimum/average. It is the module's only graded Lab; 3.3.4, 3.3.7, 3.3.14 and 3.3.17 are practice labs. It will gain runtime test cases (checking what the program prints, not only that the code is shaped right).
+- **A3.3.1 (Lab) — built as the 3.3.18 capstone (`3-2-7-arrays`), not as written (2026-10-06).** An arrays recap graded on seven requirements (10, 5, 5, 10, 5, 10 and 10 points, all 55 needed to pass): create an array, `push`, `pop`, walk it with a `for` loop, and search it with a comparison, then two functions checked by runtime test cases that call them: `countFruit(fruits, name)` (returns a count) and `longFruits(fruits, minLength)` (returns a new array and leaves the original untouched). It does not ask for 10 design measurements or for maximum/minimum/average. It is the module's only graded Lab; 3.3.4, 3.3.7, 3.3.14 and 3.3.17 are practice labs. The two function tasks are the runtime test cases (`type: "tests"`): they run the student's own functions rather than only reading their shape.
 
 **Teacher Notes:**
 - The `[x, y, z]` array introduction is intentional foreshadowing. Say explicitly: "In a few weeks we'll be using arrays exactly like this to place shapes in 3D space."

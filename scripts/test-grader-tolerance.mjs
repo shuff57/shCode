@@ -626,7 +626,7 @@ for (const id of Object.values(L)) {
     'function divide(a, b) {', '  if (!b) return "Cannot divide by zero";', '  return a / b;', '}',
     'console.log(divide(10, 2));', 'console.log(divide(10, 0));'));
   accept(T.guard, 'guard condition with a nested call', js(
-    'function divide(a, b) {', '  if (isNaN(b) || b === 0) { return("bad"); }', '  return(a / b);', '}', 'console.log(divide(1, 0));'));
+    'function divide(a, b) {', '  if (isNaN(b) || b === 0) { return("Cannot divide by zero"); }', '  return(a / b);', '}', 'console.log(divide(1, 0));'));
   reject(T.guard, 'no guard at all', 'r5', js('function divide(a,b){if(0){}return 0}', 'console.log(1)'));
   reject(T.guard, 'if/else instead of a guard', 'r6', js(
     'function divide(a,b){ if (b !== 0) { return a / b; } else { return "no"; } }', 'console.log(divide(1,0));'));
@@ -752,6 +752,15 @@ for (const id of Object.values(L)) {
   accept(T.sa, 'total = numbers[i] + total', js(
     'let numbers = [10, 25, 7, 42];', 'let total = 0;', 'for (let i = 0; i < numbers.length; i++) {', '  total = numbers[i] + total;', '}', 'console.log(total);'));
   reject(T.sa, 'empty loop and a hard-coded total', 'r2', js('for(;0;){}', 'console.log(24);'));
+  // Counting items is not summing them (found by the gap analysis: `total += 1` passed).
+  reject(T.sa, 'adds 1 per item (total += 1)', 'r2', js(
+    'let numbers = [10, 25, 7, 42];', 'let total = 0;', 'for (const n of numbers) {', '  total += 1;', '}', 'console.log(total);'));
+  reject(T.sa, 'adds 1 per item (total = total + 1), no semicolon', 'r2', js(
+    'let numbers = [10, 25, 7, 42];', 'let total = 0;', 'for (let i = 0; i < numbers.length; i++) {', '  total = total + 1', '}', 'console.log(total);'));
+  reject(T.sa, 'brace-less loop that adds 1', 'r2', js(
+    'let numbers = [10, 25, 7, 42];', 'let total = 0;', 'for (const n of numbers) total += 1', 'console.log(total);'));
+  accept(T.sa, 'index loop with total += numbers[i]', js(
+    'let numbers = [10, 25, 7, 42];', 'let total = 0;', 'for (let i = 0; i < numbers.length; i++) {', '  total += numbers[i];', '}', 'console.log(total);'));
   reject(T.sa, 'loop body does not accumulate', 'r2', js(
     'let numbers=[1,2,3,4];', 'let total=0;', 'for(let i=0;i<numbers.length;i++){total=7}', 'console.log(total)'));
 
@@ -759,7 +768,11 @@ for (const id of Object.values(L)) {
   accept(T.filt, 'index loop', js(
     'function doubled(arr){', ' let out=[];', ' for(let i=0;i<arr.length;i++){ out.push(arr[i]*2);}', ' return out;}',
     'let s=[1,2,3];', 'console.log(doubled(s));', 'console.log(s);'));
-  accept(T.filt, 'the 3.3.13 filter shape', js(
+  accept(T.filt, 'for...of with push(n + n)', js(
+    'function doubled(numbers) {', '  let result = [];', '  for (let n of numbers) {', '    result.push(n + n);', '  }', '  return result;', '}',
+    'let g=[72,55];', 'console.log(doubled(g));', 'console.log(g);'));
+  // 3.3.14 now names the function and the transformation (doubled), so a filter no longer scores.
+  reject(T.filt, 'the 3.3.13 filter shape instead of doubled', 't1', js(
     'function passing(scores) {', '  let result = [];', '  for (let s of scores) {', '    if (s >= 60) {', '      result.push(s);', '    }', '  }', '  return result;', '}',
     'let g=[72,55];', 'console.log(passing(g));', 'console.log(g);'));
   reject(T.filt, 'pushes onto the input and returns it', 'r1', js(
@@ -821,14 +834,23 @@ for (const id of Object.values(L)) {
   reject(T.rect, 'multiplies two numbers, not the parameters', 'r5', js(
     'function findRectangleArea(w,h){console.log("Area: " + 3*4)}', 'findRectangleArea(3,4);', 'findRectangleArea(1,2);'));
 
-  // 3.3.18 arrays capstone: every point is needed to pass (passingScore 35)
-  if (lesson(T.arr).grading.passingScore !== 35) throw new Error('3-2-7-arrays passingScore must equal its 35 points');
+  // 3.3.18 arrays capstone: every point is needed to pass (passingScore 55 = the 35 points of the
+  // five array tasks + 10 each for the countFruit and longFruits function tests)
+  if (lesson(T.arr).grading.passingScore !== 55) throw new Error('3-2-7-arrays passingScore must equal its 55 points');
+  const FRUIT_FNS = [
+    'function countFruit(fruits, name) { let n = 0; for (const f of fruits) { if (f === name) n++; } return n; }',
+    'function longFruits(fruits, minLength) { return fruits.filter((f) => f.length >= minLength); }',
+  ];
   accept(T.arr, 'search with a call inside the comparison', js(
     'const fruits=["a","b"];', 'fruits.push("d");', 'fruits.pop();',
-    'for (const f of fruits) { if (f.toUpperCase() === "B") { console.log("found"); } }'));
+    'for (const f of fruits) { if (f.toUpperCase() === "B") { console.log("found"); } }', ...FRUIT_FNS));
   accept(T.arr, 'for index, includes() as the search', js(
     'let fruits=["a","b","c"];', 'fruits.push("d");', 'fruits.pop();',
-    'for (let i = 0; i < fruits.length; i++) { console.log(fruits[i]); }', 'console.log(fruits.includes("b"));'));
+    'for (let i = 0; i < fruits.length; i++) { console.log(fruits[i]); }', 'console.log(fruits.includes("b"));', ...FRUIT_FNS));
+  reject(T.arr, 'the five array tasks done, neither function written', 'req6', js(
+    'let fruits=["a","b","c"];', 'fruits.push("d");', 'fruits.pop();',
+    'for (let i = 0; i < fruits.length; i++) { console.log(fruits[i]); }',
+    'for (const f of fruits) { if (f === "b") { console.log("found"); } }'));
   reject(T.arr, 'hollow: empty array, push, pop, empty loop, empty if', 'req4', js(
     'let a=[];', 'a.push(1);', 'a.pop();', 'for(;0;){}', 'if(1===1){}'));
   reject(T.arr, 'forEach is not the for loop the task asks for', 'req4', js(
@@ -843,7 +865,7 @@ try {
     process.execPath,
     [
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/grader.ts',
+      'lib/run-tests-node.ts',
       '--outDir', out,
       '--module', 'commonjs',
       '--target', 'es2022',
@@ -854,7 +876,9 @@ try {
   writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
 
   const require = createRequire(import.meta.url);
-  const { grade } = require(path.join(out, 'grader.js').replace(/\\/g, '/'));
+  // gradeWithTests is grade() plus the runtime `tests` cases (lib/run-tests-node.ts);
+  // for a lesson with none it is plain grade(), so regex-only lessons behave as before.
+  const { gradeWithTests } = require(path.join(out, 'run-tests-node.js').replace(/\\/g, '/'));
 
   const reqsFor = new Map();
   let failures = 0;
@@ -862,7 +886,7 @@ try {
   for (const c of cases) {
     if (!reqsFor.has(c.id)) reqsFor.set(c.id, lesson(c.id).requirements);
     const requirements = reqsFor.get(c.id);
-    const report = grade(requirements, c.files, 0);
+    const report = await gradeWithTests(requirements, c.files, 0);
     const failed = report.results.filter((r) => r.status === 'failed');
     const short = c.id.replace(/^(\d+-\d+-\d+).*$/, '$1');
 
@@ -898,7 +922,7 @@ try {
   {
     const id = '1-2-25-lab-typeof-round-up';
     const reqs = lesson(id).requirements;
-    const report = grade(reqs, starterFiles(id), 0);
+    const report = await gradeWithTests(reqs, starterFiles(id), 0);
     // The starter must lose everything, or the loop below checks nothing.
     if (!report.results.some((r) => r.status === 'failed')) {
       hintFailures++;
