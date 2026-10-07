@@ -25,6 +25,7 @@ try {
       'lib/diagram-types.ts',
       'lib/diagram-mermaid.ts',
       'lib/diagram-check.ts',
+      'lib/diagram-score.ts',
       'lib/diagram-layout.ts',
       '--outDir', out,
       '--module', 'commonjs',

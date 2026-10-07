@@ -77,6 +77,50 @@ for (const id of readdirSync(lessonsDir)) {
       if (!r.id) errors.push(`${id}: a rubric item has no id`);
       if (typeof r.points !== 'number') errors.push(`${id}: rubric item ${r.id} has non-numeric points`);
     }
+    // Hybrid charts (diagram.aiGrader): `check` on a rubric item and `gate` on the grader are
+    // marked by lib/diagram-score.ts on the server. Validate them here so a typo is a build
+    // error and not a silent zero at grading time. They are copied through below (rubric is
+    // copied whole; `gate` explicitly) and NEVER reach the browser: lib/quiz-redact.ts rebuilds
+    // the client rubric as {id,title,points} and drops `gate`.
+    const OPS = ['count', 'sequence', 'loop-exit', 'in-cycle', 'not-in-cycle', 'branch', 'label'];
+    const regexes = (v, where) => {
+      if (v === undefined) return;
+      if (Array.isArray(v)) return v.forEach((x) => regexes(x, where));
+      if (typeof v === 'string') {
+        try { new RegExp(v, 'iu'); } catch (e) { errors.push(`${id}: ${where} has an invalid regex ${JSON.stringify(v)} -- ${e.message}`); }
+        return;
+      }
+      errors.push(`${id}: ${where} regex must be a string or list of strings`);
+    };
+    const matcher = (m, where) => {
+      if (m === undefined) return;
+      if (!m || typeof m !== 'object') { errors.push(`${id}: ${where} is not a matcher`); return; }
+      regexes(m.re, where);
+      if (m.not) matcher(m.not, where + '.not');
+    };
+    for (const r of g.rubric) {
+      if (r.check === undefined) continue;
+      if (!r.check || !Array.isArray(r.check.steps) || r.check.steps.length === 0) {
+        errors.push(`${id}: rubric item ${r.id} has a check with no steps`);
+        continue;
+      }
+      if (!(lesson.diagram && lesson.diagram.aiGrader === g)) errors.push(`${id}: rubric item ${r.id} has a check, which only a diagram.aiGrader may carry`);
+      for (const st of r.check.steps) {
+        if (!OPS.includes(st.op)) errors.push(`${id}: ${r.id} has an unknown check op ${JSON.stringify(st.op)}`);
+        for (const k of ['match', 'loop', 'at', 'yes', 'no']) matcher(st[k], `${r.id}.${st.op}.${k}`);
+        if (Array.isArray(st.of)) st.of.forEach((m) => matcher(m, `${r.id}.sequence.of`));
+      }
+    }
+    if (g.gate !== undefined) {
+      const gt = g.gate;
+      if (!gt || !Array.isArray(gt.anyOf) || typeof gt.min !== 'number' || typeof gt.capTo !== 'number' || typeof gt.fail !== 'string') {
+        errors.push(`${id}: aiGrader.gate must be {anyOf: string[], min: number, capTo: number, fail: string}`);
+      } else {
+        regexes(gt.anyOf, 'gate.anyOf');
+        const possible = g.rubric.reduce((a, r) => a + r.points, 0);
+        if (gt.capTo >= possible) errors.push(`${id}: gate.capTo (${gt.capTo}) must be under the rubric total (${possible})`);
+      }
+    }
     const ids = g.rubric.map((r) => r.id);
     if (new Set(ids).size !== ids.length) errors.push(`${id}: duplicate rubric ids`);
 
@@ -87,6 +131,7 @@ for (const id of readdirSync(lessonsDir)) {
       ...(g.model ? { model: g.model } : {}),
       ...(g.contextDocs ? { contextDocs: g.contextDocs } : {}),
       ...(g.strict ? { strict: true } : {}),
+      ...(g.gate ? { gate: g.gate } : {}),
       ...(lesson.diagram && Array.isArray(lesson.diagram.rules) ? { diagramRules: lesson.diagram.rules } : {}),
     };
   }

@@ -52,6 +52,7 @@ import {
   DEFAULT_GRADER,
   type GradeRequest,
   type GradeStage,
+  type GradeResponse,
   type GradeStreamEvent,
   type GraderId,
   type GraderOption,
@@ -59,6 +60,10 @@ import {
 import { isLessonAccessible, lockedResponse, type SessionData } from '../_shared/lessonAccess';
 import { loadAiGrader } from '../_shared/aiGraders';
 import { DEFAULT_RULES } from '../../lib/diagram-types';
+import { sanitizeDiagramDoc } from '../../lib/diagram-artifact';
+import { describeDiagram } from '../../lib/diagram-mermaid';
+import { checkDiagram, allPassed } from '../../lib/diagram-check';
+import { splitRubric, scoreDiagram, mergeGrade, type DiagramScore } from '../../lib/diagram-score';
 import { capFor, kindFor, attemptsUsed, recordGraded, recordOutage, isStaff, effectiveCap, cleanArtifact } from '../_shared/attempts';
 
 interface Env {
@@ -221,7 +226,40 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   const capped = cap !== undefined && kindFor(body.lessonId) === 'ai';
   const tryCap = cap === undefined ? undefined : effectiveCap(cap, data.role);
   // Display-only copy of what was drawn, kept with the counted row for the teacher's view.
-  const artifact = cleanArtifact((body as { artifact?: unknown }).artifact, body.response, config.diagramRules ?? DEFAULT_RULES);
+  //
+  // ----- Hybrid flowchart (rubric items carrying a `check`) -----
+  //
+  // The heavy points are marked from the drawing itself (lib/diagram-score.ts), the model marks
+  // only the wording items, and it never sees the checked ones. Both halves must grade the SAME
+  // chart, so the graded text is rebuilt from the artifact's doc here and a `response` that
+  // disagrees with it is ignored (otherwise good text + junk doc, or the reverse, would split the
+  // two graders). All of this runs before the rate limiter and before a try is spent: a chart that
+  // is not even structurally legal, or that arrives without its drawing, costs nothing.
+  const { ruleItems, aiItems } = splitRubric(config.rubric);
+  const hybrid = ruleItems.length > 0;
+  let response = body.response;
+  let det: DiagramScore | null = null;
+  if (hybrid) {
+    const doc = sanitizeDiagramDoc((body as { artifact?: { doc?: unknown } }).artifact?.doc);
+    if (!doc) {
+      return json({ ok: false, error: 'Send the chart itself with your submission. Reload the page and submit again.' }, 400);
+    }
+    const checks = checkDiagram(doc, config.diagramRules ?? DEFAULT_RULES);
+    if (!allPassed(checks)) {
+      const failing = checks.filter((c) => !c.passed);
+      return json(
+        {
+          ok: false,
+          error: `Fix these first, then submit again: ${failing.map((c) => `${c.title} (${c.detail})`).join(' ')}`.slice(0, 900),
+          structural: failing.map((c) => ({ id: c.id, title: c.title, detail: c.detail, offenders: c.offenders })),
+        },
+        422,
+      );
+    }
+    response = describeDiagram(doc);
+    det = scoreDiagram(doc, ruleItems, config.gate);
+  }
+  const artifact = cleanArtifact((body as { artifact?: unknown }).artifact, response, config.diagramRules ?? DEFAULT_RULES);
   if (capped && !isStaff(data.role) && (await attemptsUsed(env.DB, data.email, body.lessonId)) >= (cap as number)) {
     return json(
       { ok: false, error: `All ${cap} tries on this part are already used.`, capReached: true, cap },
@@ -230,7 +268,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   }
   const record = capped
     ? (result: { totalEarned: number; totalPossible: number }) =>
-        recordGraded(env, request, data.email, body.lessonId, tryCap as number, body.response, result, artifact)
+        recordGraded(env, request, data.email, body.lessonId, tryCap as number, response, result, artifact)
     : undefined;
   // A grade that could not be produced (grader down or busy, or a model reply with
   // no usable grade). The SERVER writes the free marker so the work still reaches
@@ -240,7 +278,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   const fail = capped
     ? async (reason: string, status: number): Promise<void> => {
         try {
-          await recordOutage(env, request, data.email, body.lessonId, tryCap as number, body.response, reason, status, artifact);
+          await recordOutage(env, request, data.email, body.lessonId, tryCap as number, response, reason, status, artifact);
         } catch {
           /* the failure message below is still what the student sees */
         }
@@ -329,13 +367,32 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   const model = target.model as string;
   const { system, user } = buildPrompt({
     lessonId: body.lessonId,
-    response: body.response,
+    response,
     lessonTitle: config.lessonTitle,
     prompt: config.prompt,
-    rubric: config.rubric,
+    // A hybrid chart's model sees ONLY the wording items; the checked ones are not in its prompt.
+    rubric: hybrid ? aiItems : config.rubric,
     contextDocs: config.contextDocs,
     strict: config.strict,
   });
+  // One place that turns the model's JSON into the grade the student gets, shared by both paths.
+  const finish = (parsed: unknown) => {
+    if (!hybrid) return { ...shapeResult(parsed, config.rubric), grader: requested, graderModel: model };
+    const ai = shapeResult(parsed, aiItems);
+    return { ...mergeGrade(det as DiagramScore, ai, aiItems), grader: requested, graderModel: model };
+  };
+
+  // Every item is checked by rules: nothing left for the model to say.
+  if (hybrid && aiItems.length === 0) {
+    const result = { ...mergeGrade(det as DiagramScore, null, []), grader: requested, graderModel: 'rules' };
+    if (record && !(await record(result))) {
+      return json({ ok: false, error: `All ${cap} tries on this part are already used.`, capReached: true, cap }, 409);
+    }
+    if (!wantsStream) return json(result);
+    return new Response(JSON.stringify({ result }) + '\n', {
+      headers: { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store' },
+    });
+  }
 
   if (wantsStream) {
     return streamGrade({
@@ -343,7 +400,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
       model,
       system,
       user,
-      rubric: config.rubric,
+      finish,
       grader: requested,
       record,
       fail,
@@ -406,7 +463,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     return json({ ok: false, error: 'Grader returned an empty result. Try submitting again.', grader: requested }, 502);
   }
 
-  const result = { ...shapeResult(parsed, config.rubric), grader: requested, graderModel: model };
+  const result = finish(parsed);
   // A racing request may have taken the last try while the model ran: the
   // conditional insert refuses it, and the grade is withheld rather than given
   // away free.
@@ -580,7 +637,8 @@ interface StreamArgs {
   model: string;
   system: string;
   user: string;
-  rubric: Parameters<typeof shapeResult>[1];
+  /** Turns the parsed model JSON into the grade the student gets (plain, or merged with the chart's rule score). */
+  finish: (parsed: unknown) => GradeResponse;
   grader: GraderId;
   /** Capped parts: spend the try. False = every try was already spent. */
   record?: (result: { totalEarned: number; totalPossible: number }) => Promise<boolean>;
@@ -588,7 +646,7 @@ interface StreamArgs {
   fail?: (reason: string, status: number) => Promise<void>;
 }
 
-function streamGrade({ target, model, system, user, rubric, grader, record, fail }: StreamArgs): Response {
+function streamGrade({ target, model, system, user, finish, record, fail }: StreamArgs): Response {
   const host = target.host as string;
   const apiKey = target.apiKey;
   const encoder = new TextEncoder();
@@ -634,7 +692,7 @@ function streamGrade({ target, model, system, user, rubric, grader, record, fail
           return;
         }
 
-        const result = { ...shapeResult(parsed, rubric), grader, graderModel: model };
+        const result = finish(parsed);
         if (record && !(await record(result))) {
           send({ error: 'All tries on this part are already used.', capReached: true });
           return;

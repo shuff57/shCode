@@ -4,12 +4,19 @@
 // two paths drifting.
 
 import { sections as docSections } from './moshion-docs';
+import type { RubricCheck } from './diagram-types';
 
 export interface RubricItem {
   id: string;
   title: string;
   description?: string;
   points: number;
+  /**
+   * Hybrid flowchart parts only: this item is scored deterministically from the drawn chart
+   * (lib/diagram-score.ts) and is NEVER given to the model. Server-side config, never from a
+   * request body, never in the client's rubric.
+   */
+  check?: RubricCheck;
 }
 
 export interface GradeRequest {
@@ -61,6 +68,8 @@ interface CriterionResult {
   max: number;
   verdict: 'met' | 'partial' | 'missing';
   feedback: string;
+  /** Hybrid flowchart parts: who scored this criterion. Absent on every other grader. */
+  source?: 'rules' | 'ai';
 }
 
 export interface GradeResponse {
