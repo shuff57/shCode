@@ -1,6 +1,6 @@
 {
   "id": "3-1-8-lab-findmax-iseven",
-  "title": "3.2.22 Lab: findMax & isEven",
+  "title": "3.2.26 Lab: findMax & isEven",
   "description": "Define two functions, findMax(a, b) and isEven(n), that take parameters and return a value. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
@@ -34,7 +34,7 @@
     {
       "id": "r1",
       "title": "findMax defined",
-      "description": "Code defines a function named findMax (exact spelling). Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Code defines a function named findMax (exact spelling). Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+findMax\\s*\\(",
@@ -45,7 +45,7 @@
     {
       "id": "r2",
       "title": "isEven defined",
-      "description": "Code defines a function named isEven (exact spelling). Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Code defines a function named isEven (exact spelling). Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+isEven\\s*\\(",
@@ -56,7 +56,7 @@
     {
       "id": "r3",
       "title": "return statement present",
-      "description": "Code contains a return statement. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Code contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\breturn\\b",
@@ -67,7 +67,7 @@
     {
       "id": "r4",
       "title": "findMax compares its two values",
-      "description": "findMax compares a and b (with > or <, or Math.max) inside its body. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "findMax compares a and b (with > or <, or Math.max) inside its body. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "inFunction",
       "file": "script.js",
       "function": "findMax",
@@ -79,7 +79,7 @@
     {
       "id": "r5",
       "title": "isEven uses the remainder operator",
-      "description": "isEven uses % inside its body. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "isEven uses % inside its body. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "inFunction",
       "file": "script.js",
       "function": "isEven",
@@ -91,7 +91,7 @@
     {
       "id": "t1",
       "title": "findMax returns the larger value",
-      "description": "findMax(a, b) gives back whichever of the two numbers is larger, whichever order they come in. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "findMax(a, b) gives back whichever of the two numbers is larger, whichever order they come in. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "tests",
       "file": "script.js",
       "function": "findMax",
@@ -155,7 +155,7 @@
     {
       "id": "t2",
       "title": "isEven is true for even numbers only",
-      "description": "isEven(n) returns true when n is even and false when it is odd, including 0 and negative numbers. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "isEven(n) returns true when n is even and false when it is odd, including 0 and negative numbers. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "tests",
       "file": "script.js",
       "function": "isEven",

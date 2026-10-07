@@ -1,4 +1,4 @@
-// The three "Chart the Code" lessons (3.2.8, 3.2.18, 3.3.11) were graded by
+// The three "Chart the Code" lessons (3.2.10, 3.2.22, 3.3.14) were graded by
 // structural rules only, so ANY legal flowchart passed them. The structural rule
 // vocabulary (lib/diagram-check.ts) has no "requires a function-call shape",
 // "requires a hexagon" or "requires this label" rule, so the part that checks the

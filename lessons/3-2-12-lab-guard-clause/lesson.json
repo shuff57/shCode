@@ -1,6 +1,6 @@
 {
   "id": "3-2-12-lab-guard-clause",
-  "title": "3.2.12 Lab: an Early-Return Guard Clause",
+  "title": "3.2.15 Lab: an Early-Return Guard Clause",
   "description": "Write a function whose first check returns early when the input is invalid, so the valid path runs without an else. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
@@ -38,7 +38,7 @@
     {
       "id": "r1",
       "title": "divide defined",
-      "description": "Code defines a function named divide. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Code defines a function named divide. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+divide\\s*\\(",
@@ -60,7 +60,7 @@
     {
       "id": "r3",
       "title": "return statement present",
-      "description": "Code contains a return statement. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Code contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\breturn\\b",
@@ -71,7 +71,7 @@
     {
       "id": "r4",
       "title": "results are logged",
-      "description": "Code calls console.log. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Code calls console.log. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
@@ -82,7 +82,7 @@
     {
       "id": "r5",
       "title": "a guard if returns early",
-      "description": "Inside divide, an if returns right away for the bad input, and a second return follows for the good result. Help: 3.2.11 (`return` Ends the Function)",
+      "description": "Inside divide, an if returns right away for the bad input, and a second return follows for the good result. Help: 3.2.14 (`return` Ends the Function)",
       "type": "inFunction",
       "file": "script.js",
       "function": "divide",
@@ -94,7 +94,7 @@
     {
       "id": "r6",
       "title": "no else needed",
-      "description": "divide does not use else: the early return already handled the bad case. Help: 3.2.11 (`return` Ends the Function)",
+      "description": "divide does not use else: the early return already handled the bad case. Help: 3.2.14 (`return` Ends the Function)",
       "type": "inFunction",
       "file": "script.js",
       "function": "divide",
@@ -106,7 +106,7 @@
     {
       "id": "t1",
       "title": "divide guards zero and divides otherwise",
-      "description": "divide(a, b) returns \"Cannot divide by zero\" when b is 0 and a divided by b for every other b. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "divide(a, b) returns \"Cannot divide by zero\" when b is 0 and a divided by b for every other b. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "tests",
       "file": "script.js",
       "function": "divide",

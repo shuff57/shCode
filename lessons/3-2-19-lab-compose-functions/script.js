@@ -1,4 +1,4 @@
-// 3.2.19 Compose Two Functions
+// 3.2.23 Compose Two Functions
 
 // STEP 1: Define a function called triple that takes one parameter n
 //         and returns n multiplied by 3.

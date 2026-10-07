@@ -14,27 +14,27 @@ const POINTERS = {
   '1-5-39-lab-cause-a-reference-error': { target: '1.5.38', note: 'Reading an Error Message' },
   // --- 1.5.43 debug the order total -------------------------------------
   '1-5-43-lab-debug-the-order-total': { target: '1.5.41', note: 'Debugging with console.log' },
-  // --- 3.2.7 findRectangleArea ------------------------------------------
+  // --- 3.2.9 findRectangleArea ------------------------------------------
   '3-2-7-lab-rectangle-area': { target: '3.2.2', note: 'Parameters & Return Values' },
-  // --- 3.2.12 guard clause ----------------------------------------------
-  '3-2-12-lab-guard-clause': { target: '3.2.9', note: 'Getting a Value Back with return' },
-  // --- 3.2.15 fix print-not-return --------------------------------------
-  '3-2-15-lab-fix-print-not-return': { target: '3.2.13', note: 'Printing Is Not Returning' },
-  // --- 3.2.19 compose functions -----------------------------------------
-  '3-2-19-lab-compose-functions': { target: '3.2.16', note: 'Building With Returned Values' },
-  // --- 3.2.21 scope prediction ------------------------------------------
-  '3-2-21-lab-scope-prediction': { target: '3.2.20', note: 'Scope: Local vs Global' },
+  // --- 3.2.15 guard clause ----------------------------------------------
+  '3-2-12-lab-guard-clause': { target: '3.2.11', note: 'Getting a Value Back with return' },
+  // --- 3.2.18 fix print-not-return --------------------------------------
+  '3-2-15-lab-fix-print-not-return': { target: '3.2.16', note: 'Printing Is Not Returning' },
+  // --- 3.2.23 compose functions -----------------------------------------
+  '3-2-19-lab-compose-functions': { target: '3.2.20', note: 'Building With Returned Values' },
+  // --- 3.2.25 scope prediction ------------------------------------------
+  '3-2-21-lab-scope-prediction': { target: '3.2.24', note: 'Scope: Local vs Global' },
   // --- 3.3.4 update by index --------------------------------------------
   '3-3-4-lab-update-by-index': { target: '3.3.3', note: 'Changing an Item by Index' },
-  // --- 3.3.7 shift/unshift queue ----------------------------------------
-  '3-3-7-lab-shift-unshift-queue': { target: '3.3.6', note: 'Adding and Removing from the Front' },
-  // --- 3.3.9 sum an array ----------------------------------------------
+  // --- 3.3.8 shift/unshift queue ----------------------------------------
+  '3-3-7-lab-shift-unshift-queue': { target: '3.3.7', note: 'Adding and Removing from the Front' },
+  // --- 3.3.12 sum an array ----------------------------------------------
   '3-2-5-lab-sum-array': { target: '3.3.5', note: 'Looping Over Arrays (for / for…of)' },
-  // --- 3.3.14 filter function -------------------------------------------
-  '3-3-14-lab-filter-function': { target: '3.3.12', note: 'Arrays and Functions' },
-  // --- 3.3.17 nested array update ---------------------------------------
-  '3-3-17-lab-nested-array-update': { target: '3.3.15', note: 'Lists Inside Lists' },
-  // --- 3.3.18 arrays reference lab --------------------------------------
+  // --- 3.3.19 filter function -------------------------------------------
+  '3-3-14-lab-filter-function': { target: '3.3.15', note: 'Arrays and Functions' },
+  // --- 3.3.22 nested array update ---------------------------------------
+  '3-3-17-lab-nested-array-update': { target: '3.3.20', note: 'Lists Inside Lists' },
+  // --- 3.3.24 arrays reference lab --------------------------------------
   '3-2-7-arrays': { target: '3.3.2', note: 'Array Basics: Index, push, pop' },
   // --- 3.4.5 declaration to expression ----------------------------------
   '3-4-5-lab-declaration-to-expression': { target: '3.4.4', note: 'Function Expressions' },
@@ -87,14 +87,14 @@ const SKIP_TITLE = {
   'The error message is recorded': 'the message is read on 1.5.38, the sibling criterion carries it',
   'The useful part is identified': 'reading the message is 1.5.38, on the sibling criterion',
   'A third expression of your own': 'the operator rule is on the sibling criterion',
-  'result used in an expression': 'using a returned value is 3.2.16, on the sibling criterion',
+  'result used in an expression': 'using a returned value is 3.2.20, on the sibling criterion',
   'Helper defined': 'declaring a function is 3.1.2, earlier than this module',
   'global variable declared': 'covered by the sibling scope criteria',
   'two functions defined': 'declaring functions is 3.1.2, earlier than this module',
   'calls are made': 'covered by the sibling scope criteria',
   'pagesRequested is declared': 'covered by the sibling variable criteria',
   'creditRemaining is declared': 'covered by the sibling variable criteria',
-  'a local variable declared inside a function': 'covered by the default pointer on 3.2.20',
+  'a local variable declared inside a function': 'covered by the default pointer on 3.2.24',
   '.length used': 'array length is on 3.3.5, the default pointer here',
   'function declaration present': 'declaring a function is 3.1.2, earlier than this module',
   'The misspelling is gone': 'the sibling criterion carries the 1.5.38 pointer',

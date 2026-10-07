@@ -1,4 +1,4 @@
-# Keyboard-only build of the 3.2.8 chart + a11y probes. Usage: ORDER_JSON=<list of lesson ids in order> AXE_JS=<axe.min.js> python3 scripts/verify-a11y-keyboard-chart.py [width]
+# Keyboard-only build of the 3.2.10 chart + a11y probes. Usage: ORDER_JSON=<list of lesson ids in order> AXE_JS=<axe.min.js> python3 scripts/verify-a11y-keyboard-chart.py [width]
 # Needs the student dev server: DEV_ROLE=student PORT=3002 node server.js
 import json
 import os; ORDER=json.load(open(os.environ['ORDER_JSON']))

@@ -599,7 +599,7 @@ for (const id of Object.values(L)) {
     'function sumToN(n) {', '  let total = 0;', '  for (; 0; ) { total += 1; }', '  return total;', '}',
     'console.log(sumToN(5));'));
 
-  // 3.2.22 findMax / isEven
+  // 3.2.26 findMax / isEven
   accept(T.fm, 'ternary and boolean one-liners', js(
     'function findMax(a, b) { return a > b ? a : b; }', 'function isEven(n) { return n % 2 === 0; }',
     'console.log(findMax(3, 7));', 'console.log(isEven(4));'));
@@ -613,7 +613,7 @@ for (const id of Object.values(L)) {
     'function findMax(a, b) { return Math.max(a, b); }', 'function isEven(n) { return true; }'));
   reject(T.fm, 'function names in the wrong case', 'r1', js('function FINDMAX(){return 1}', 'function iseven(){return 1}'));
 
-  // 3.2.23 sumToN
+  // 3.2.28 sumToN
   accept(T.sum, 'brace-less loop with +=', js(
     'function sumToN(n) {', '  let total = 0;', '  for (let i = 1; i <= n; i += 1) total += i;', '  return total;', '}', 'console.log(sumToN(5));'));
   accept(T.sum, 'i + sum and return(sum)', js(
@@ -621,7 +621,7 @@ for (const id of Object.values(L)) {
   reject(T.sum, 'empty for and a hard-coded return', 'r4', js('function sumToN(n){for(;0;){}return 15}'));
   reject(T.sum, 'decorative for, Gauss formula', 'r4', js('function sumToN(n){for(let i=0;i<0;i++){}', ' return n*(n+1)/2}'));
 
-  // 3.2.12 guard clause
+  // 3.2.15 guard clause
   accept(T.guard, 'brace-less guard with !b', js(
     'function divide(a, b) {', '  if (!b) return "Cannot divide by zero";', '  return a / b;', '}',
     'console.log(divide(10, 2));', 'console.log(divide(10, 0));'));
@@ -631,7 +631,7 @@ for (const id of Object.values(L)) {
   reject(T.guard, 'if/else instead of a guard', 'r6', js(
     'function divide(a,b){ if (b !== 0) { return a / b; } else { return "no"; } }', 'console.log(divide(1,0));'));
 
-  // 3.2.15 fix print-not-return
+  // 3.2.18 fix print-not-return
   accept(T.fix, 'doubled with 2 * a', js(
     'function area(width, height) {', '  return width * height;', '}', 'const a = area(5, 8);',
     'console.log("One room: " + a);', 'console.log("Two rooms: " + 2 * a);'));
@@ -662,7 +662,7 @@ for (const id of Object.values(L)) {
   reject(T.fix, 'returns, result only logged', 'r3', js(
     'function area(width, height) {', '  return width * height;', '}', 'const a = area(5, 8);', 'console.log(a);'));
 
-  // 3.2.19 compose (triple / addSeven; deliberately not the reading's double / addTen)
+  // 3.2.23 compose (triple / addSeven; deliberately not the reading's double / addTen)
   accept(T.comp, 'spaces and newlines in the nesting', js(
     'function triple(n) { return n * 3; }', 'function addSeven(n) { return n + 7; }',
     'console.log(addSeven(', '  triple(4)', '));', 'console.log(triple( addSeven(4) ));'));
@@ -678,7 +678,7 @@ for (const id of Object.values(L)) {
   reject(T.comp, 'the reading\'s double / addTen, not the lab\'s functions', 'r1', js(
     'function double(n){return n*2}', 'function addTen(n){return n+10}', 'console.log(addTen(double(5)));', 'console.log(double(addTen(5)));'));
 
-  // 3.2.21 scope prediction
+  // 3.2.25 scope prediction
   if (!lesson(T.scope).grading.expectsRuntimeError) {
     throw new Error('3-2-21 must set grading.expectsRuntimeError: its answer ends in an uncaught ReferenceError');
   }
@@ -729,7 +729,7 @@ for (const id of Object.values(L)) {
   accept(T.upd, 'an update that reads the old value (scores[0] = scores[0] + 5)', js(
     'let scores = [88, 91, 76, 60];', 'scores[0] = scores[0] + 5;', 'console.log(scores);'));
 
-  // 3.3.7 queue
+  // 3.3.8 queue
   accept(T.q, 'push chained over a newline', js(
     'let line = ["ana", "bob"];', 'line', '  .push("cy");', 'const served = line.shift();', 'console.log(served);', 'console.log(line);'));
   accept(T.q, 'shift into a variable declared earlier', js(
@@ -744,7 +744,7 @@ for (const id of Object.values(L)) {
     'let line=["a","b"];', 'line.push("c");', 'let s = line.shift();', 'console.log(line);'));
   reject(T.q, 'empty array calls', 'r1', js('[].push();', '[].shift();', 'console.log();'));
 
-  // 3.3.9 sum an array
+  // 3.3.12 sum an array
   accept(T.sa, 'for...of', js(
     'let numbers = [10, 25, 7, 42];', 'let total = 0;', 'for (const n of numbers) {', '  total += n;', '}', 'console.log(total);'));
   accept(T.sa, 'reverse loop, brace-less', js(
@@ -764,15 +764,15 @@ for (const id of Object.values(L)) {
   reject(T.sa, 'loop body does not accumulate', 'r2', js(
     'let numbers=[1,2,3,4];', 'let total=0;', 'for(let i=0;i<numbers.length;i++){total=7}', 'console.log(total)'));
 
-  // 3.3.14 filter function
+  // 3.3.19 filter function
   accept(T.filt, 'index loop', js(
     'function doubled(arr){', ' let out=[];', ' for(let i=0;i<arr.length;i++){ out.push(arr[i]*2);}', ' return out;}',
     'let s=[1,2,3];', 'console.log(doubled(s));', 'console.log(s);'));
   accept(T.filt, 'for...of with push(n + n)', js(
     'function doubled(numbers) {', '  let result = [];', '  for (let n of numbers) {', '    result.push(n + n);', '  }', '  return result;', '}',
     'let g=[72,55];', 'console.log(doubled(g));', 'console.log(g);'));
-  // 3.3.14 now names the function and the transformation (doubled), so a filter no longer scores.
-  reject(T.filt, 'the 3.3.13 filter shape instead of doubled', 't1', js(
+  // 3.3.19 now names the function and the transformation (doubled), so a filter no longer scores.
+  reject(T.filt, 'the 3.3.17 filter shape instead of doubled', 't1', js(
     'function passing(scores) {', '  let result = [];', '  for (let s of scores) {', '    if (s >= 60) {', '      result.push(s);', '    }', '  }', '  return result;', '}',
     'let g=[72,55];', 'console.log(passing(g));', 'console.log(g);'));
   reject(T.filt, 'pushes onto the input and returns it', 'r1', js(
@@ -791,7 +791,7 @@ for (const id of Object.values(L)) {
     'function bigger(numbers){', ' let r=[];', ' for (let n of numbers) { r.push(n*2); }', ' return r;', '}',
     'console.log(bigger([1,2,3]));'));
 
-  // 3.3.17 nested arrays
+  // 3.3.22 nested arrays
   accept(T.nest, 'brace-less nested for...of', js(
     'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;',
     'for (const row of grid)', '  for (const n of row)', '    total += n;', 'console.log(total);'));
@@ -804,7 +804,7 @@ for (const id of Object.values(L)) {
     'for (let r = 0; r < grid.length; r++) {', '  total += grid[r][0];', '}',
     'for (let c = 0; c < 2; c++) {', '  total += grid[0][c];', '}', 'console.log(total);'));
 
-  // 3.3.17: a cell is really updated and a total is really logged
+  // 3.3.22: a cell is really updated and a total is really logged
   accept(T.nest, 'update with += and a template-literal total', js(
     'let grid = [[1, 2], [3, 4]];', 'console.log(grid[0][1]);', 'grid[0][1] += 5;', 'let sum = 0;',
     'for (const row of grid) { for (const n of row) { sum += n; } }', 'console.log(' + BT + 'Total: ${sum}' + BT + ');'));
@@ -823,7 +823,7 @@ for (const id of Object.values(L)) {
   reject(T.nest, 'nothing is summed (hard-coded total)', 'r6', js(
     'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = 8;', 'for (const row of grid) for (const n of row) {}', 'console.log(15);'));
 
-  // 3.2.7 rectangle area
+  // 3.2.9 rectangle area
   accept(T.rect, 'template literal and a negative argument', js(
     'function findRectangleArea(width, height) {', '  const area = width * height;', '  console.log(' + BT + 'Area: ${area}' + BT + ');', '}',
     'findRectangleArea(3, 4);', 'findRectangleArea(-2, 5);'));
@@ -834,7 +834,7 @@ for (const id of Object.values(L)) {
   reject(T.rect, 'multiplies two numbers, not the parameters', 'r5', js(
     'function findRectangleArea(w,h){console.log("Area: " + 3*4)}', 'findRectangleArea(3,4);', 'findRectangleArea(1,2);'));
 
-  // 3.3.18 arrays capstone: every point is needed to pass (passingScore 55 = the 35 points of the
+  // 3.3.24 arrays capstone: every point is needed to pass (passingScore 55 = the 35 points of the
   // five array tasks + 10 each for the countFruit and longFruits function tests)
   if (lesson(T.arr).grading.passingScore !== 55) throw new Error('3-2-7-arrays passingScore must equal its 55 points');
   const FRUIT_FNS = [

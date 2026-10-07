@@ -1,6 +1,6 @@
 {
   "id": "3-2-19-lab-compose-functions",
-  "title": "3.2.19 Lab: Compose Two Functions",
+  "title": "3.2.23 Lab: Compose Two Functions",
   "description": "Write two returning functions, triple and addSeven, then feed one result into the other in both orders and log the chains. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
@@ -38,7 +38,7 @@
     {
       "id": "r1",
       "title": "triple defined",
-      "description": "Code defines a function named triple. Help: 3.2.16 (Building With Returned Values)",
+      "description": "Code defines a function named triple. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+triple\\s*\\(",
@@ -49,7 +49,7 @@
     {
       "id": "r2",
       "title": "addSeven defined",
-      "description": "Code defines a function named addSeven. Help: 3.2.16 (Building With Returned Values)",
+      "description": "Code defines a function named addSeven. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+addSeven\\s*\\(",
@@ -60,7 +60,7 @@
     {
       "id": "r3",
       "title": "returns a value",
-      "description": "Code contains a return statement. Help: 3.2.16 (Building With Returned Values)",
+      "description": "Code contains a return statement. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\breturn\\b",
@@ -71,7 +71,7 @@
     {
       "id": "r4",
       "title": "one call nested in another",
-      "description": "A call to one function is written as the argument of the other. Help: 3.2.16 (Building With Returned Values)",
+      "description": "A call to one function is written as the argument of the other. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\b(?:triple|addSeven)\\s*\\(\\s*(?:triple|addSeven)\\s*\\(",
@@ -82,7 +82,7 @@
     {
       "id": "r5",
       "title": "results are logged",
-      "description": "Code calls console.log. Help: 3.2.16 (Building With Returned Values)",
+      "description": "Code calls console.log. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
@@ -93,7 +93,7 @@
     {
       "id": "r6",
       "title": "triple multiplies",
-      "description": "triple multiplies: its body has a * (or adds the number to itself three times). Help: 3.2.16 (Building With Returned Values)",
+      "description": "triple multiplies: its body has a * (or adds the number to itself three times). Help: 3.2.20 (Building With Returned Values)",
       "type": "inFunction",
       "file": "script.js",
       "function": "triple",
@@ -105,7 +105,7 @@
     {
       "id": "r7",
       "title": "addSeven adds",
-      "description": "addSeven adds: its body has a +. Help: 3.2.16 (Building With Returned Values)",
+      "description": "addSeven adds: its body has a +. Help: 3.2.20 (Building With Returned Values)",
       "type": "inFunction",
       "file": "script.js",
       "function": "addSeven",
@@ -117,7 +117,7 @@
     {
       "id": "r8",
       "title": "both nesting orders",
-      "description": "Both orders are written: triple inside addSeven and addSeven inside triple. Help: 3.2.16 (Building With Returned Values)",
+      "description": "Both orders are written: triple inside addSeven and addSeven inside triple. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\btriple\\s*\\(\\s*addSeven\\s*\\([\\s\\S]*\\baddSeven\\s*\\(\\s*triple\\s*\\(|\\baddSeven\\s*\\(\\s*triple\\s*\\([\\s\\S]*\\btriple\\s*\\(\\s*addSeven\\s*\\(",
@@ -128,7 +128,7 @@
     {
       "id": "t1",
       "title": "triple gives back 3 times n",
-      "description": "triple(n) returns n multiplied by 3 for any number. Help: 3.2.16 (Building With Returned Values)",
+      "description": "triple(n) returns n multiplied by 3 for any number. Help: 3.2.20 (Building With Returned Values)",
       "type": "tests",
       "file": "script.js",
       "function": "triple",
@@ -177,7 +177,7 @@
     {
       "id": "t2",
       "title": "addSeven gives back n plus 7",
-      "description": "addSeven(n) returns n plus 7 for any number. Help: 3.2.16 (Building With Returned Values)",
+      "description": "addSeven(n) returns n plus 7 for any number. Help: 3.2.20 (Building With Returned Values)",
       "type": "tests",
       "file": "script.js",
       "function": "addSeven",

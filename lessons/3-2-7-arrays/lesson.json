@@ -1,6 +1,6 @@
 {
   "id": "3-2-7-arrays",
-  "title": "3.3.18 Arrays",
+  "title": "3.3.24 Arrays",
   "description": "Work with lists of values: create, add, remove, and iterate.",
   "type": "assignment",
   "assignmentCode": "A3.3.1",
@@ -103,7 +103,7 @@
     {
       "id": "req6",
       "title": "countFruit returns how many times a name appears",
-      "description": "countFruit(fruits, name) returns the number of items in the array that are exactly name, and 0 when there are none. Help: 3.3.12 (Arrays and Functions)",
+      "description": "countFruit(fruits, name) returns the number of items in the array that are exactly name, and 0 when there are none. Help: 3.3.15 (Arrays and Functions)",
       "type": "tests",
       "file": "script.js",
       "function": "countFruit",
@@ -193,7 +193,7 @@
     {
       "id": "req7",
       "title": "longFruits returns a new array of the long names",
-      "description": "longFruits(fruits, minLength) returns a new array with only the items whose length is minLength or more, in order, and does not change the array it was given. Help: 3.3.12 (Arrays and Functions)",
+      "description": "longFruits(fruits, minLength) returns a new array with only the items whose length is minLength or more, in order, and does not change the array it was given. Help: 3.3.15 (Arrays and Functions)",
       "type": "tests",
       "file": "script.js",
       "function": "longFruits",

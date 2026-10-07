@@ -1,6 +1,6 @@
 {
   "id": "3-2-7-lab-rectangle-area",
-  "title": "3.2.7 Lab: findRectangleArea (multi-parameter)",
+  "title": "3.2.9 Lab: findRectangleArea (multi-parameter)",
   "description": "Define findRectangleArea(width, height) that works out the area and prints it, then call it twice. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Print the area",
-      "instructions": "Inside the function, multiply width by height and print the answer with console.log in exactly this form: Area: 12 (the word Area, a colon, a space, then the number). This lab asks you to print inside the function; handing a value back with return is covered later, in 3.2.9."
+      "instructions": "Inside the function, multiply width by height and print the answer with console.log in exactly this form: Area: 12 (the word Area, a colon, a space, then the number). This lab asks you to print inside the function; handing a value back with return is covered later, in 3.2.11."
     },
     {
       "id": "s3",

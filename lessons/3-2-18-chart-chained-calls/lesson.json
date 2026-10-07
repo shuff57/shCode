@@ -1,6 +1,6 @@
 {
   "id": "3-2-18-chart-chained-calls",
-  "title": "3.2.18 Chart the Code: Data Flow Through Chained Calls",
+  "title": "3.2.22 Chart the Code: Data Flow Through Chained Calls",
   "description": "Draw two nested calls so the value handed from the inner function to the outer one is visible on the chart.",
   "type": "lesson",
   "estimateMins": 20,

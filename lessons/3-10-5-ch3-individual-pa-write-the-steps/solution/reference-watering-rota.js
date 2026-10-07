@@ -12,7 +12,7 @@ const rota = [
 // The limit: the can holds 250 ml.
 const canMl = 250;
 
-// One function: the total (loop + accumulator, 3.3.9).
+// One function: the total (loop + accumulator, 3.3.12).
 function totalWater(plants) {
   let total = 0;
   for (const plant of plants) {

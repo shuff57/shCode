@@ -1,4 +1,4 @@
-// 3.2.7 findRectangleArea
+// 3.2.9 findRectangleArea
 
 // STEP 1: Define a function called findRectangleArea that takes two
 //         parameters: width and height.

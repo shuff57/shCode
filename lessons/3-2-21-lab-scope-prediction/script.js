@@ -1,4 +1,4 @@
-// 3.2.21 Scope Prediction Exercise
+// 3.2.25 Scope Prediction Exercise
 
 // STEP 1: Outside any function, declare a variable called score with let
 //         and set it to a number. Being outside every function makes it global,

@@ -444,7 +444,7 @@ rewriting a working lab unless the concept it grades actually moved.
   chaining returned values. Nothing in it says what a variable declared inside a function
   can and cannot be seen from, yet a student meets the question as soon as two functions
   share a program. shCode's `3-1-4-reading-scope`
-  (titled 3.2.20) and `3-2-21-lab-scope-prediction` (3.2.21) therefore invent that teaching.
+  (titled 3.2.24) and `3-2-21-lab-scope-prediction` (3.2.25) therefore invent that teaching.
   Same shape as the §1.1 and §2.1 gaps above: tagged as designed, with no book anchor.
   **A resync must not delete them for being absent from the book.** **Book-side request:**
   a short local-versus-global subsection in §3.2, after "Printing is not returning".

@@ -1,6 +1,6 @@
 {
   "id": "3-3-15-reading-nested-arrays",
-  "title": "3.3.15 Reading: Lists Inside Lists",
+  "title": "3.3.20 Reading: Lists Inside Lists",
   "description": "Learn how an array can hold other arrays, which is how you store a grid or a table of rows. Read before the nested-array lab.",
   "type": "lesson",
   "estimateMins": 10,

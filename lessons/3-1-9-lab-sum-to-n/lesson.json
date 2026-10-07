@@ -1,6 +1,6 @@
 {
   "id": "3-1-9-lab-sum-to-n",
-  "title": "3.2.23 Lab: Sum 1 to N",
+  "title": "3.2.28 Lab: Sum 1 to N",
   "description": "Define sumToN(n) that uses a for loop to add every integer from 1 to n and returns the total. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
@@ -34,7 +34,7 @@
     {
       "id": "r1",
       "title": "sumToN defined",
-      "description": "Code defines a function named sumToN (exact spelling). Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Code defines a function named sumToN (exact spelling). Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+sumToN\\s*\\(",
@@ -45,7 +45,7 @@
     {
       "id": "r2",
       "title": "for loop present",
-      "description": "Code contains a for loop. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Code contains a for loop. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -56,7 +56,7 @@
     {
       "id": "r3",
       "title": "return statement present",
-      "description": "Code contains a return statement. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Code contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\breturn\\b",
@@ -67,7 +67,7 @@
     {
       "id": "r4",
       "title": "the loop adds to the total, then sumToN returns it",
-      "description": "Inside sumToN, a for loop body adds to a running total and a return comes after the loop. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "Inside sumToN, a for loop body adds to a running total and a return comes after the loop. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "inFunction",
       "file": "script.js",
       "function": "sumToN",
@@ -79,7 +79,7 @@
     {
       "id": "t1",
       "title": "sumToN adds 1 up to and including n",
-      "description": "sumToN(n) returns 1 + 2 + ... + n: for example sumToN(5) is 15, sumToN(10) is 55 and sumToN(100) is 5050. Help: 3.2.9 (Getting a Value Back with `return`)",
+      "description": "sumToN(n) returns 1 + 2 + ... + n: for example sumToN(5) is 15, sumToN(10) is 55 and sumToN(100) is 5050. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "tests",
       "file": "script.js",
       "function": "sumToN",
