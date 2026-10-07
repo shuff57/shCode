@@ -3,6 +3,7 @@
   "title": "3.3.19 Lab: Write a Function That Returns a New Array",
   "description": "Write a function that builds and returns a new array of transformed values (for example, each number doubled with result.push(n * 2), as in 3.3.15), proving the original is untouched. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.3.3",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",

@@ -3,6 +3,7 @@
   "title": "3.2.23 Lab: Compose Two Functions",
   "description": "Write two returning functions, triple and addSeven, then feed one result into the other in both orders and log the chains. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.2.5",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

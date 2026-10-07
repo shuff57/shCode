@@ -3,6 +3,7 @@
   "title": "3.2.28 Lab: Sum 1 to N",
   "description": "Define sumToN(n) that uses a for loop to add every integer from 1 to n and returns the total. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.2.6",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

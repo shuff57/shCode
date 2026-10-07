@@ -267,5 +267,67 @@ check('formative flag: every flagged lesson in the tree has no score fields in t
   assert.ok(flagged >= 3);
 });
 
+// --- counted console labs: completion credit (decided 2026-10-07) -----------------------------
+// A console lab with an assignmentCode and no rubric (maxScore and scoreKind null) is a Lab, scores
+// 100% on completion, and is "missing" only when its class due date has passed.
+
+const countedLab = () => new Map([['cl-1', lesson('3.2.26 Lab: findMax & isEven', { assignmentCode: 'A3.2.4' })], ['cl-2', lesson('3.2.28 Lab: Sum 1 to N', { assignmentCode: 'A3.2.6' })]]);
+
+check('counted console lab: assignmentCode with no rubric is category lab', () => {
+  assert.equal(lessonGradeCategory({ title: '3.2.26 Lab: findMax & isEven', preview: 'console', scoreKind: null, assignmentCode: 'A3.2.4' }), 'lab');
+});
+check('counted console lab: done with no maxScore reads 100%, and counts in gradedTotal and doneCount', () => {
+  assert.equal(lessonPercent('completed', null, null), 100);
+  const g = studentGrading(countedLab(), [done('cl-1')], DEFAULT_WEIGHTS, noDue);
+  assert.equal(g.percent, 100);
+  assert.equal(g.gradedTotal, 2);
+  assert.equal(g.doneCount, 1);
+  assert.equal(g.counted, 1);
+  assert.deepEqual(g.categories.map((c) => c.category), ['lab']);
+});
+check('counted console lab: past due and not done is missing (a 0); not waived only', () => {
+  const g = studentGrading(countedLab(), [done('cl-1')], DEFAULT_WEIGHTS, dueOn([['cl-1', NOW - DAY], ['cl-2', NOW - DAY]]));
+  assert.deepEqual(g.missingIds, ['cl-2']);
+  assert.equal(g.percent, 50);
+  const waived = studentGrading(countedLab(), [done('cl-1')], DEFAULT_WEIGHTS, dueOn([['cl-1', NOW - DAY], ['cl-2', NOW - DAY]], ['cl-2']));
+  assert.equal(waived.percent, 100);
+  assert.equal(waived.missingCount, 0);
+});
+check('counted console lab: not due (future date or no date) and not done is excluded from the grade', () => {
+  for (const d of [noDue, dueOn([['cl-2', NOW + DAY]])]) {
+    const g = studentGrading(countedLab(), [done('cl-1')], DEFAULT_WEIGHTS, d);
+    assert.equal(g.percent, 100);
+    assert.equal(g.counted, 1);
+    assert.equal(g.missingCount, 0);
+    assert.equal(g.gradedTotal, 2);
+  }
+});
+
+check('guard: the four runtime-tested labs carry codes and no try cap; the three practice charts carry none and stay formative', () => {
+  const read = (id) => JSON.parse(fs.readFileSync(new URL(`../lessons/${id}/lesson.json`, import.meta.url), 'utf8'));
+  const manifest = new Map(JSON.parse(fs.readFileSync(new URL('../public/lessons-manifest.json', import.meta.url), 'utf8')).lessons.map((l) => [l.id, l]));
+  const labs = { '3-1-8-lab-findmax-iseven': 'A3.2.4', '3-2-19-lab-compose-functions': 'A3.2.5', '3-1-9-lab-sum-to-n': 'A3.2.6', '3-3-14-lab-filter-function': 'A3.3.3' };
+  for (const [id, code] of Object.entries(labs)) {
+    const meta = read(id);
+    assert.equal(meta.assignmentCode, code, id);
+    assert.ok(!meta.maxSubmissions && !meta.aiGrader && !meta.quiz, `${id} must stay unlimited-tries completion credit`);
+    const m = manifest.get(id);
+    assert.equal(m.assignmentCode, code, `${id} manifest (run generate-lessons-manifest)`);
+    assert.equal(m.maxScore, null, id);
+    assert.equal(m.scoreKind, null, id);
+    assert.equal(m.maxSubmissions, null, id);
+    assert.equal(lessonGradeCategory({ title: m.title, preview: m.preview, scoreKind: m.scoreKind, assignmentCode: m.assignmentCode }), 'lab', id);
+  }
+  for (const id of ['3-2-8-chart-parameter-trace', '3-2-18-chart-chained-calls', '3-3-11-chart-the-array-loop']) {
+    const meta = read(id);
+    assert.equal(meta.grading?.formative, true, id);
+    assert.ok(!meta.assignmentCode, `${id} must carry no code (A3.2.2, A3.2.3, A3.3.2 are reserved)`);
+    const m = manifest.get(id);
+    assert.equal(lessonGradeCategory({ title: m.title, preview: m.preview, scoreKind: m.scoreKind, assignmentCode: m.assignmentCode }), null, id);
+  }
+  const taken = new Set([...manifest.values()].map((l) => l.assignmentCode).filter(Boolean));
+  for (const reserved of ['A3.2.2', 'A3.2.3', 'A3.3.2']) assert.ok(!taken.has(reserved), `${reserved} is reserved for a chart`);
+});
+
 console.log(results.join('\n'));
 console.log(process.exitCode ? '\ngrading tests FAILED' : '\ngrading tests passed');
