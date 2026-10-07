@@ -97,7 +97,7 @@ function startFakeOllama(onReady) {
       }));
       const content = JSON.stringify({ criteria, summary: level === 1 ? 'Demo grader: a full answer.' : 'Demo grader: add more detail and try again.', hints: level === 1 ? [] : ['Say what each step does, in your own words.'] });
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ message: { content }, done: true }));
+      res.end(JSON.stringify({ message: { content }, done: true }) + '\n'); // trailing newline: the streaming reader only parses complete lines
     });
   });
   server.listen(0, '127.0.0.1', () => onReady(server.address().port));
