@@ -36,7 +36,7 @@
       "description": "Code throws at least one error deliberately. Help: 2.5.15 (Throwing Your Own Errors)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "throw\\s+new\\s+Error\\(",
+      "pattern": "throw\\s+new\\s+Error\\s*\\(",
       "flags": "i",
       "points": 0
     },
