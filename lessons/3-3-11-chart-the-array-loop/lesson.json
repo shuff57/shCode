@@ -84,7 +84,7 @@
           "id": "print-outside",
           "title": "The print is after the loop, off the hexagon",
           "points": 7,
-          "description": "Scored by the editor (arrow order): a hexagon that is part of a repeat (arrows lead back to it) and has an arrow leaving the repeat to at least one more step before End.",
+          "description": "Scored by the editor (arrow order): a hexagon that is part of a repeat (arrows lead back to it), or that sets up a repeat started by a decision after it, with an arrow leaving that repeat to at least one more step before End.",
           "check": {
             "steps": [
               {
@@ -94,7 +94,8 @@
                 },
                 "minAfter": 1,
                 "from": "loop",
-                "fail": "Two things must hold: arrows have to lead back to the loop shape from the steps that run each time round, and the arrow that leaves the loop must lead to a step that runs once, after it, before End. In your chart the loop does not repeat, or the way out goes straight to End.",
+                "orSetup": true,
+                "fail": "Two things must hold: the steps that run each time round must have an arrow leading back (to the hexagon, or to the diamond that tests whether there are more items), and the arrow that leaves that repeat must lead to a step that runs once, after it, before End. In your chart nothing repeats, or the way out goes straight to End, or the print is still inside the repeat.",
                 "pass": "The way out of the loop leads on to the work after it."
               }
             ]

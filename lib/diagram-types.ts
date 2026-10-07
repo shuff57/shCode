@@ -237,7 +237,7 @@ export type CheckStep = StepBase &
   (
     | { op: 'count'; match: Matcher; min: number; max?: number }
     | { op: 'sequence'; of: Matcher[] }
-    | { op: 'loop-exit'; loop: Matcher; minAfter?: number; from?: 'loop' | 'any' }
+    | { op: 'loop-exit'; loop: Matcher; minAfter?: number; from?: 'loop' | 'any'; orSetup?: boolean }
     | { op: 'in-cycle'; match: Matcher }
     | { op: 'not-in-cycle'; match: Matcher }
     | { op: 'branch'; at: Matcher; orientation?: 'any' | 'labelled'; yes?: Matcher; no?: Matcher; distinct?: boolean }

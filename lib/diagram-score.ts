@@ -389,6 +389,37 @@ function evalLoopExit(f: Facts, step: Extract<CheckStep, { op: 'loop-exit' }>): 
     return { fraction: 0, message: fail ?? `There is no ${kindWord(step.loop)} shape on the path from Start to End.`, offenders: [] };
   }
   const inLoop = heads.filter((id) => f.sccOf.has(id));
+  if (inLoop.length === 0 && step.orSetup) {
+    // The head (a for-loop's hexagon) is drawn as set-up only: it runs once, and a separate decision
+    // does the looping. That is a legal chart, so accept it when a repeat that CONTAINS A DECISION
+    // starts after the head (is reachable from it) and the arrow that leaves that repeat leads on to
+    // minAfter more steps before End. A repeat with no decision in it, one the head cannot reach,
+    // and an exit that goes straight to End still fail.
+    for (const h of heads) {
+      const seen = new Set<string>([h]);
+      const stack = [h];
+      while (stack.length > 0) {
+        const v = stack.pop()!;
+        for (const w of f.g.outgoing.get(v) ?? []) if (!seen.has(w)) { seen.add(w); stack.push(w); }
+      }
+      const visited = new Set<number>();
+      for (const v of seen) {
+        const sc = f.sccOf.get(v);
+        if (sc === undefined || visited.has(sc)) continue;
+        visited.add(sc);
+        const comp = f.sccMembers.get(sc)!;
+        if (![...comp].some((id) => nodeOf(f, id).shape === 'decision')) continue;
+        for (const s of comp) {
+          for (const x of f.g.outgoing.get(s) ?? []) {
+            if (comp.has(x) || !f.onPath.has(x)) continue;
+            if (fewestStepsToEnd(f, x) >= minAfter) {
+              return { fraction: 1, message: step.pass ?? 'The way out of the loop leads on to the work after it.', offenders: [] };
+            }
+          }
+        }
+      }
+    }
+  }
   if (inLoop.length === 0) {
     return {
       fraction: 0,

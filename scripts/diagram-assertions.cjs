@@ -660,7 +660,7 @@ const SC = require(LIB + '/diagram-score.js');
   A --> H
   H --> F
   F --> Z`, LX).earned === 0);
-  ok('loop-exit: hexagon on no cycle (setup only, a diamond does the looping) rejected', one(`
+  ok('loop-exit: hexagon on no cycle (setup only, a diamond does the looping) rejected by default (strict)', one(`
   A([Start])
   H{{i = 0}}
   D{more?}
@@ -673,6 +673,92 @@ const SC = require(LIB + '/diagram-score.js');
   E --> D
   D -- no --> F
   F --> Z`, LX).earned === 0);
+  const LXS = { steps: [{ op: 'loop-exit', loop: { kind: 'preparation' }, minAfter: 1, from: 'loop', orSetup: true }] };
+  const SETUP_DIAMOND = `
+  A([Start])
+  H{{i = 0}}
+  D{more?}
+  E[body]
+  F[/print/]
+  Z([End])
+  A --> H
+  H --> D
+  D -- yes --> E
+  E --> D
+  D -- no --> F
+  F --> Z`;
+  ok('loop-exit orSetup: setup hexagon + a diamond loop test + print after accepted', one(SETUP_DIAMOND, LXS).earned === 7);
+  ok('loop-exit orSetup: a nested decision and a join on the return arrow accepted', one(`
+  A([Start])
+  H{{i = 0}}
+  D{more?}
+  Q{small?}
+  E[add]
+  J[next]
+  F[/print/]
+  Z([End])
+  A --> H
+  H --> D
+  D -- yes --> Q
+  Q -- yes --> E
+  Q -- no --> J
+  E --> J
+  J --> D
+  D -- no --> F
+  F --> Z`, LXS).earned === 7);
+  ok('loop-exit orSetup: the strict reading of the same chart is unchanged (still 0)', one(SETUP_DIAMOND, LX).earned === 0);
+  ok('loop-exit orSetup: print INSIDE the diamond loop (exit straight to End) rejected', one(`
+  A([Start])
+  H{{i = 0}}
+  D{more?}
+  E[body]
+  F[/print/]
+  Z([End])
+  A --> H
+  H --> D
+  D -- yes --> E
+  E --> F
+  F --> D
+  D -- no --> Z`, LXS).earned === 0);
+  ok('loop-exit orSetup: no repeat anywhere rejected', one(`
+  A([Start])
+  H{{i = 0}}
+  D{more?}
+  F[/print/]
+  Z([End])
+  A --> H
+  H --> D
+  D -- yes --> F
+  D -- no --> F
+  F --> Z`, LXS).earned === 0);
+  ok('loop-exit orSetup: a repeat BEFORE the hexagon does not count', one(`
+  A([Start])
+  D{more?}
+  E[body]
+  H{{i = 0}}
+  F[/print/]
+  Z([End])
+  A --> D
+  D -- yes --> E
+  E --> D
+  D -- no --> H
+  H --> F
+  F --> Z`, LXS).earned === 0);
+  ok('loop-exit orSetup: a repeat with no decision in it rejected', one(`
+  A([Start])
+  H{{i = 0}}
+  E[body]
+  G[next]
+  F[/print/]
+  Z([End])
+  A --> H
+  H --> E
+  E --> G
+  G --> E
+  G --> F
+  F --> Z`, LXS).earned === 0);
+  ok('loop-exit orSetup: a hexagon that IS in the cycle behaves as before', one(LOOP, LXS).earned === 7 &&
+    one(LOOP.replace('H -- done --> F\n  F --> Z', 'H -- done --> Z').replace('E --> H', 'E --> F\n  F --> H'), LXS).earned === 0);
   ok('loop-exit from:any accepts that same chart when the diamond is the head', one(`
   A([Start])
   H{{i = 0}}

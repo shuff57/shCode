@@ -55,7 +55,18 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const SHCODE_ROOT = path.resolve(here, '..');
 export const GITHUB_ROOT = path.resolve(SHCODE_ROOT, '..');
-export const RESHAPE_CAD_ROOT = path.join(GITHUB_ROOT, 'reshape-cad');
+// Which copy of reshape-cad the tests compile. DEFAULT: the vendored snapshot in this repo
+// (vendor/reshape-cad), because that is what ships: node_modules/@shuff57/reshape-* are symlinks
+// into it, scripts/build-brep-kernel.mjs builds public/reshape/kernel from it, and
+// reshape-docs-text.mjs reads it. This used to point at the SIBLING checkout (../reshape-cad), a
+// live working tree that another session edits and commits to: test-reshape-script.mjs then
+// measured the sibling's NEWER docs (a cone/rounded-box `shell` page, 2026-10-07) against the
+// older kernel that ships here, and failed 'lib/reshape-docs.ts: hollowing / shell: ...' on one
+// run and passed on the next as the sibling moved. To test a sibling build deliberately, run with
+// RESHAPE_CAD_ROOT=/path/to/reshape-cad (e.g. before re-vendoring it).
+export const RESHAPE_CAD_ROOT = process.env.RESHAPE_CAD_ROOT
+  ? path.resolve(process.env.RESHAPE_CAD_ROOT)
+  : path.join(SHCODE_ROOT, 'vendor', 'reshape-cad');
 
 // name -> [package, path relative to that package's src/]. Kept in one
 // place so every script names modules the same way regardless of which

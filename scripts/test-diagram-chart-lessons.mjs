@@ -217,6 +217,67 @@ const VARIANTS = {
     ['the whole for header written out, an io print', REFSW('i = 0 to prices.length - 1', 'for (let i = 0; i < prices.length; i++)')],
     ['count set after the prices list, io for the print', REFSW('A --> B', 'A --> P[the prices array holds 5 items]\n  P --> B')],
     ['the add step reached through a labelled join', REFSW('E --> C', 'E --> M[total goes up by one]\n  M --> C')],
+    // The hexagon drawn only as set-up (it runs once); a separate diamond tests "more prices?" and
+    // the body returns to THAT diamond. A legal for-loop chart, accepted by loop-exit orSetup.
+    ['hexagon only as setup, a diamond tests for more prices', `flowchart TD
+  A([Start])
+  B[Set cheapCount to 0]
+  C{{i = 0}}
+  D{More prices?}
+  H{Is the price under 10?}
+  E[Add one to cheapCount]
+  F[/Print Items under 10 and cheapCount/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -- yes --> H
+  H -- yes --> E
+  H -- no --> D
+  E --> D
+  D -- no --> F
+  F --> Z`],
+    ['setup hexagon, i < prices.length test, an i = i + 1 step joins both branches', `flowchart TD
+  A([Start])
+  B[cheapCount = 0]
+  C{{let i = 0}}
+  D{i < prices.length?}
+  H{prices[i] < 10?}
+  E[cheapCount = cheapCount + 1]
+  I[i = i + 1]
+  F[/print cheapCount/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -- yes --> H
+  H -- yes --> E
+  H -- no --> I
+  E --> I
+  I --> D
+  D -- no --> F
+  F --> Z`],
+    ['count set after the hexagon, a step between the test and the print, a note', `flowchart TD
+  A([Start])
+  C{{for i from 0 up to prices.length}}
+  B[set cheapCount to 0]
+  D{Any prices left?}
+  H{Is this price under 10?}
+  E[add one to cheapCount]
+  S[the loop is finished]
+  F[/Print the count of cheap items/]
+  Z([End])
+  N>the hexagon is only the setup]
+  A --> C
+  C --> B
+  B --> D
+  D -- yes --> H
+  H -- yes --> E
+  H -- no --> D
+  E --> D
+  D -- no --> S
+  S --> F
+  F --> Z`],
   ],
 };
 
@@ -255,8 +316,13 @@ const GAMES = {
   ],
   '3-3-11-chart-the-array-loop': (r) => [
     ['print inside the loop', sw(sw(r, 'C -- "done" --> F\n  F --> Z', 'C -- "done" --> Z'), 'E --> C', 'E --> F\n  F --> C'), 7],
-    ['hexagon only as setup, a diamond does the looping', 'flowchart TD\n  A([Start])\n  B[Set cheapCount to 0]\n  C{{i = 0}}\n  D{More prices?}\n  H{Is the price under 10?}\n  E[Add one to cheapCount]\n  F[/Print Items under 10 and cheapCount/]\n  Z([End])\n  A --> B\n  B --> C\n  C --> D\n  D -- yes --> H\n  H -- yes --> E\n  H -- no --> D\n  E --> D\n  D -- no --> F\n  F --> Z', 7],
     ['rectangle for the loop', sw(sw(r, 'C{{', 'C['), '- 1}}', '- 1]'), 0],
+    // the hexagon-as-setup acceptance (orSetup) must not become a loophole: each of these keeps the
+    // hexagon (7 for the shape) and still loses the 7 for a print that comes after a real repeat
+    ['hexagon as setup, a diamond loop, but the print is inside the loop', 'flowchart TD\n  A([Start])\n  B[Set cheapCount to 0]\n  C{{i = 0}}\n  D{More prices?}\n  H{Is the price under 10?}\n  E[Add one to cheapCount]\n  F[/Print cheapCount/]\n  Z([End])\n  A --> B\n  B --> C\n  C --> D\n  D -- yes --> H\n  H -- yes --> E\n  H -- no --> D\n  E --> F\n  F --> D\n  D -- no --> Z', 7],
+    ['hexagon as setup, then no repeat at all', 'flowchart TD\n  A([Start])\n  B[Set cheapCount to 0]\n  C{{i = 0 to prices.length - 1}}\n  H{Is the price under 10?}\n  E[Add one to cheapCount]\n  F[/Print cheapCount/]\n  Z([End])\n  A --> B\n  B --> C\n  C --> H\n  H -- yes --> E\n  H -- no --> F\n  E --> F\n  F --> Z', 7],
+    ['a diamond loop first, the hexagon only after it (nothing repeats after the hexagon)', 'flowchart TD\n  A([Start])\n  B[Set cheapCount to 0]\n  D{More prices?}\n  H{Is the price under 10?}\n  E[Add one to cheapCount]\n  C{{i = 0 to prices.length - 1}}\n  F[/Print cheapCount/]\n  Z([End])\n  A --> B\n  B --> D\n  D -- yes --> H\n  H -- yes --> E\n  H -- no --> D\n  E --> D\n  D -- no --> C\n  C --> F\n  F --> Z', 7],
+    ['hexagon as setup, but the only repeat has no decision in it', 'flowchart TD\n  A([Start])\n  B[Set cheapCount to 0]\n  C{{i = 0 to prices.length - 1}}\n  E[Add one to cheapCount]\n  G[Move to the next price]\n  F[/Print cheapCount/]\n  Z([End])\n  A --> B\n  B --> C\n  C --> E\n  E --> G\n  G --> E\n  G --> F\n  F --> Z', 7],
   ],
 };
 const AI_MAX = 6;
