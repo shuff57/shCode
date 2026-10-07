@@ -1,4 +1,4 @@
-// 2.1.9 Make it Move: arrow keys drive a sprite around.
+// 5.1.20 Make it Move: arrow keys drive a sprite around.
 
 let player;
 

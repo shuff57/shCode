@@ -6,8 +6,12 @@
 - Three shapes only — oval, rectangle, diamond (1.5.25, 1.5.26).
 - Press **Check my diagram** as often as you like. It is free, and red costs you
   nothing.
-- The checks say whether it is a *legal* flowchart, never whether it answers the
-  problem. A green chart of the wrong problem still scores nothing.
+- The checks in your browser say whether it is a *legal* flowchart. Each time you
+  submit, the AI marks whether it answers the problem. A green chart of the wrong
+  problem still scores nothing.
+- **You get three tries.** Submit, read the feedback on whether the chart answers your
+  problem, redraw and submit again. Your best try counts. After your third try you can see
+  how it is solved, once your teacher releases it.
 
 | Shape | Use it for |
 | --- | --- |

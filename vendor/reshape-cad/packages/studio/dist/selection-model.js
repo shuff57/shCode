@@ -1,0 +1,211 @@
+// Pure selection-state type/op model for SPEC-mouse-parity.md Phase 3 item 7
+// ("unify selection state between viewport and ModelEditor... the riskiest
+// refactor in the phase"). This is the DESIGN only -- a later task wires it
+// into ReshapeStudio.tsx/ModelEditor.tsx; nothing here touches React or the
+// DOM, so it is unit-testable under node --test the same as camera-fit.ts.
+//
+// WHAT THIS REPLACES. Today selection is six separate useState calls in
+// ReshapeStudio.tsx: `selected` (feature ids, mutated by ModelEditor's
+// pick() at ModelEditor.tsx:1118-1125), `pickedEdge`/`pickedFace`/
+// `pickedSize` (the single most-recent viewport pick, mutated only by
+// onPick around ReshapeStudio.tsx:1223-1264), and `pickedEdges`/
+// `pickedFaces` (a Shift-accumulated multi-pick, same onPick). Read back
+// together at ReshapeStudio.tsx:517 (HandleOverlay's feature filter),
+// :686-705 (the context bar's selectionLabel, ownerOf-filtered) and
+// ModelEditor.tsx's chosen()/round()/hollow() (ownerOf-guarded against
+// staleness -- see round()'s own regression comment at ModelEditor.tsx:724).
+// `SelectionState` merges the three axes into one `items` list plus one
+// `primary` slot; `featuresOf`/`primaryOf`/`ownerScoped` are the read shapes
+// that replace `selected`/the pickedEdge-trio/the ownerOf-filtered reads
+// above -- see each function's own comment for the exact line it stands in
+// for.
+//
+// pick(id, additive) at ModelEditor.tsx:1118-1125 is exactly `replace`
+// (additive=false, "selected = [id]") and `toggle` (additive=true,
+// "selected.includes(id) ? filter it out : append it") below, generalised
+// from bare feature ids to any SelectionItem; `toggleFeature` is the
+// feature-only wrapper that IS pick()'s additive branch. Structural
+// equality for an item with a TopoName reuses the same rule ReshapeStudio's
+// own sameTopo() (ReshapeStudio.tsx:61-63) uses to dedupe a Shift-click
+// multi-selection: JSON.stringify comparison, since TopoName is a plain
+// serialisable object.
+//
+// DEVIATIONS FROM THE LITERAL SPEC SKETCH (reality won; see the design
+// report for the full list):
+//  - No `id?: string` field. Nothing in the real pick payloads (ViewportPick
+//    in BrepViewportThree.tsx, PickName in model-selection.ts, or the bare
+//    `selected: string[]`) carries an id independent of kind+target+name; a
+//    feature-kind item already uses `target` as the feature id, so a
+//    separate `id` would be redundant and could drift out of sync with it.
+//  - No `faceIndex` field (ViewportPick's own -- a mesh re-highlight
+//    shortcut, a rendering concern, not a selection-state one).
+//  - `ownerScoped` takes `doc` as a second parameter. The pattern it
+//    replaces (ReshapeStudio.tsx:686-687) calls `ownerOf(doc, item)`, and
+//    `ownerOf` (model-selection.ts) needs `doc` to check whether a name's
+//    root feature still exists -- there is no way to answer "which owner"
+//    without it.
+//  - `toggle`'s primary-on-remove rule ("the new last-remaining item, or
+//    null") is a NEW rule this module defines, not a pre-existing behaviour
+//    of pick() -- `selected` has no primary concept of its own to match.
+//    It does NOT bit-for-bit match onPick's `pickedEdge`, which today is
+//    unconditionally overwritten to whatever was just clicked
+//    (ReshapeStudio.tsx:1235-1236) even when that same click is a
+//    Shift-toggle-OFF in `pickedEdges` -- i.e. today, toggling an edge off
+//    still leaves `pickedEdge` pointing at the just-removed edge until the
+//    next click. A later refactor that wants that exact quirk preserved
+//    cannot lean on this generic `toggle()` alone for the pickedEdge slot;
+//    it would need to set `primary` from the raw pick separately from
+//    updating multi-select membership.
+import { ownerOf } from '@shuff57/reshape-script/model-selection';
+/** A fresh, nothing-selected state: empty items, no primary, and every
+ *  filter open. The starting point every other constructor below builds
+ *  from. */
+export function emptySelection() {
+    return { items: [], primary: null, filters: { face: true, edge: true, vertex: true, body: true } };
+}
+function sameName(a, b) {
+    if (a == null || b == null)
+        return a == null && b == null;
+    // Same rule as ReshapeStudio.tsx's own sameTopo(): TopoName is a plain
+    // serialisable object (topo-name.ts), so JSON.stringify is a safe, cheap
+    // structural comparison.
+    return JSON.stringify(a) === JSON.stringify(b);
+}
+/** Structural equality for two SelectionItems: same kind, same target, same
+ *  name. `size` is deliberately excluded -- nothing in the current app ever
+ *  compares picks by size (pickedEdges/pickedFaces dedupe on
+ *  `target`+sameTopo(name) alone, ModelEditor.pick()'s `selected` dedupes
+ *  on bare id equality, which this collapses to when `name` is absent on
+ *  both sides). */
+function sameItem(a, b) {
+    return a.kind === b.kind && a.target === b.target && sameName(a.name, b.name);
+}
+/** Clears everything, then selects only `item`. This is pick(id, false)
+ *  at ModelEditor.tsx:1122 ("selected = [id]"), generalised from a bare
+ *  feature id to any SelectionItem. `filters` survives unchanged -- a
+ *  plain click has never reset a filter, since no filter exists yet. */
+export function replace(state, item) {
+    return { items: [item], primary: item, filters: state.filters };
+}
+/** Removes `item` if present (by structural equality, see sameItem above),
+ *  else adds it. This is pick(id, true) at ModelEditor.tsx:1121
+ *  ("selected.includes(id) ? filter it out : append it"), generalised the
+ *  same way replace() is.
+ *
+ *  On add, the new item becomes primary -- "the most recent pick" is the
+ *  same convention pickedEdge/pickedFace and pickedEdges/pickedFaces
+ *  already use ("most recent last", ModelEditor.tsx:172). On remove,
+ *  primary becomes the new last-remaining item, or null if none: see this
+ *  file's header for why that is a rule this module defines rather than
+ *  one pick() already had to make, and where it does not match onPick's
+ *  own pickedEdge quirk. */
+export function toggle(state, item) {
+    const idx = state.items.findIndex((existing) => sameItem(existing, item));
+    if (idx === -1) {
+        return { items: [...state.items, item], primary: item, filters: state.filters };
+    }
+    const items = state.items.filter((_, i) => i !== idx);
+    const primary = items.length ? items[items.length - 1] : null;
+    return { items, primary, filters: state.filters };
+}
+/** Adds `item`, keeping every existing item -- no presence check, unlike
+ *  toggle() (a caller that wants "add only if absent" calls toggle() after
+ *  checking, the way onPick's own pickedEdges branch only appends after its
+ *  own `hit` check already came back false). Primary is left alone unless
+ *  `item` is the very first item this state has ever held, in which case it
+ *  becomes primary the same way replace()/toggle()'s add branch would. */
+export function add(state, item) {
+    const primary = state.items.length === 0 ? item : state.primary;
+    return { items: [...state.items, item], primary, filters: state.filters };
+}
+/** Empties items and primary, unconditionally. `filters` survives -- the
+ *  same "not this axis's concern" reasoning as replace()'s. */
+export function clear(state) {
+    return { items: [], primary: null, filters: state.filters };
+}
+/** pick(featureId, true) exactly -- the feature-kind convenience wrapper
+ *  over toggle() a chip/timeline row's onClick calls
+ *  (ModelEditor.tsx:1274, :1724, :1840: `pick(f.id, e.ctrlKey ||
+ *  e.metaKey || e.shiftKey)`). */
+export function toggleFeature(state, featureId) {
+    return toggle(state, { kind: 'feature', target: featureId });
+}
+/** Every feature in `doc`, selected -- the Ctrl+A case (SPEC-mouse-parity.md
+ *  Phase 3 item 6). No existing state constructs this today (there is no
+ *  Ctrl+A yet), so `primary` follows the same "most recent [i.e. last]
+ *  wins" convention toggle()'s add branch uses; an empty doc returns
+ *  emptySelection() in every field, not a special case. */
+export function selectAllFeatures(doc) {
+    const items = doc.features.map((f) => ({ kind: 'feature', target: f.id }));
+    return { ...emptySelection(), items, primary: items.length ? items[items.length - 1] : null };
+}
+/** The current primary, whole. This replaces reading pickedEdge, pickedFace
+ *  and pickedSize as three separate variables (ReshapeStudio.tsx:236-246,
+ *  read together at :697-702): a caller reconstructs each legacy value by
+ *  discriminating on `kind` --
+ *    pickedEdge  == primary?.kind === 'edge' ? { target: primary.target, edge: primary.name ?? null } : null
+ *    pickedFace  == primary?.kind === 'face' ? { target: primary.target, face: primary.name ?? null } : null
+ *    pickedSize  == primary?.size ?? null
+ *  -- which is exactly the information one SelectionItem already carries,
+ *  so no separate accessor per legacy variable is needed. */
+export function primaryOf(state) {
+    return state.primary;
+}
+/** The feature ids currently selected, in item order -- replaces reading
+ *  `selected` directly (e.g. the HandleOverlay filter at
+ *  ReshapeStudio.tsx:517: `doc.features.filter((f) => selected.includes(f.id))`
+ *  becomes `doc.features.filter((f) => featuresOf(state).includes(f.id))`). */
+export function featuresOf(state) {
+    return state.items.filter((item) => item.kind === 'feature').map((item) => item.target);
+}
+/** Every edge-kind item, in item order -- SPEC-mouse-parity.md Phase 3 item
+ *  3's mixed-selection consumers (round()'s fillet, which uses only these)
+ *  read this instead of filtering `state.items` by hand. */
+export function edgesOf(state) {
+    return state.items.filter((item) => item.kind === 'edge');
+}
+/** Every face-kind item, in item order -- the face-only counterpart of
+ *  edgesOf() above (e.g. hollow()'s open face). */
+export function facesOf(state) {
+    return state.items.filter((item) => item.kind === 'face');
+}
+/** Every vertex-kind item, in item order. */
+export function verticesOf(state) {
+    return state.items.filter((item) => item.kind === 'vertex');
+}
+/** Every body-kind item, in item order. */
+export function bodiesOf(state) {
+    return state.items.filter((item) => item.kind === 'body');
+}
+/** Every item that belongs to `ownerId`, via the real ownerOf() -- replaces
+ *  the filtering pattern at ReshapeStudio.tsx:686-687
+ *  (`pickedEdges.filter((e) => ownerOf(doc, e) === id)`,
+ *  `pickedFaces.filter((f) => ownerOf(doc, f) === id)`). Reuses ownerOf()
+ *  itself rather than re-implementing its rootFeature-then-target
+ *  fallback, so the two can never drift apart. */
+export function ownerScoped(state, doc, ownerId) {
+    return state.items.filter((item) => ownerOf(doc, { target: item.target, name: item.name ?? null }) === ownerId);
+}
+/** SPEC-mouse-parity.md Phase 3 item 3 (mixed selection): fillet only ever
+ *  consumes edges -- a face/vertex/body riding along in the same selection
+ *  (Ctrl/Shift-picked alongside the edges, same owning solid) is used by
+ *  nothing there, so round() must say so rather than silently drop it.
+ *
+ *  'feature' items are NOT counted: every viewport pick also lists its
+ *  owning solid as a feature item (ReshapeStudio's withFeatureIds), so a
+ *  plain edge click is always [edge, feature]. That item is bookkeeping for
+ *  the timeline highlight, not something the student picked and not
+ *  something a fillet "ignores" -- counting it made a plain single-edge
+ *  Round say "ignoring 1 feature". Returns null when nothing real is left
+ *  over. */
+export function mixedSelectionNote(scoped) {
+    const ignored = scoped.filter((i) => i.kind !== 'edge' && i.kind !== 'feature');
+    if (!ignored.length)
+        return null;
+    const counts = new Map();
+    for (const i of ignored)
+        counts.set(i.kind, (counts.get(i.kind) ?? 0) + 1);
+    const parts = [...counts.entries()].map(([kind, n]) => `${n} ${kind}${n > 1 ? 's' : ''}`);
+    return `fillet: ignoring ${parts.join(', ')} \u2014 edges only`;
+}
+//# sourceMappingURL=selection-model.js.map

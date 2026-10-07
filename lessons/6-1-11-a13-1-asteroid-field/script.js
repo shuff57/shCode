@@ -1,4 +1,4 @@
-// 2.3.11 A13.1 Asteroid Field
+// 6.2.6 A13.1 Asteroid Field
 // Open the Quest tab for the graded requirements; open the Docs tab for the moSHion API.
 
 let ship, asteroids;

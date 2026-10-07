@@ -1,4 +1,4 @@
-// 2.1.9 Sprite Playground (reference solution).
+// 5.1.21 Sprite Playground (reference solution).
 // Canvas + WASD player + frameCount-driven mover + on-screen text.
 
 let player, mover;

@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "function defined",
-      "description": "Defines a function",
+      "description": "Defines a function. Help: 3.5.16 (Objects as Named Arguments)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+\\w+\\s*\\(",
@@ -43,17 +43,17 @@
     {
       "id": "r2",
       "title": "reads a property off the options object",
-      "description": "Uses options.property in the body",
+      "description": "Uses options.property in the body. Help: 3.5.16 (Objects as Named Arguments)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "options\\.\\w+",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{[\\s\\S]*?\\b\\1\\.\\w+",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "called with an object literal",
-      "description": "A call passes a brace literal",
+      "description": "A call passes a brace literal. Help: 3.5.16 (Objects as Named Arguments)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\s*\\(\\s*\\{",
@@ -63,7 +63,7 @@
     {
       "id": "r4",
       "title": "result printed",
-      "description": "Calls console.log",
+      "description": "Calls console.log. Help: 3.5.16 (Objects as Named Arguments)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log",

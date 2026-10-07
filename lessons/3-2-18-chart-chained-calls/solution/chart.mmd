@@ -1,0 +1,17 @@
+flowchart TD
+  A([Start])
+  B[[double of 5 hands back 10]]
+  C[[addTen of 10 hands back 20]]
+  D[Set result to the value addTen returned]
+  E{Is result over 25?}
+  F[/Print Big/]
+  G[/Print Small/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D --> E
+  E -- "yes" --> F
+  E -- "no" --> G
+  F --> Z
+  G --> Z

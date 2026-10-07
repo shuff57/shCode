@@ -16,6 +16,8 @@ function passing(scores) {
 }
 ```
 
+This block only **defines** the function and never calls it, so pressing Run shows `(no output)`. That is expected; the next step calls it.
+
 The loop visits every score once. Each one is either pushed into `result` (it passed) or skipped (it did not). Nothing is removed from the original — `scores` still holds every value.
 
 ## Step 2: Call it with a mixed set
@@ -34,7 +36,7 @@ function passing(scores) {
 }
 
 let grades = [72, 55, 88, 41, 60, 93];
-console.log(passing(grades));   // [72, 88, 60, 93]
+console.log(passing(grades));   // 72, 88, 60, 93 (one per line)
 ```
 
 ## Step 3: Call it with an array that returns nothing
@@ -55,7 +57,7 @@ function passing(scores) {
 console.log(passing([30, 45, 12]));   // []
 ```
 
-The output is `[]` — an empty array. That is **correct, not an error**: "nothing matched" is a valid answer, and it means a caller never has to special-case it. The function returns the same type (an array) whether it matched everything, something, or nothing, so the code that uses it stays simple.
+The output is `[]` — an empty array (the console prints an empty array on one line). That is **correct, not an error**: "nothing matched" is a valid answer, and it means a caller never has to special-case it. The function returns the same type (an array) whether it matched everything, something, or nothing, so the code that uses it stays simple.
 
 ## Key takeaways
 

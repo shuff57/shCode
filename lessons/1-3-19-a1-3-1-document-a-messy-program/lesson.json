@@ -36,7 +36,7 @@
     {
       "id": "r1",
       "title": "taxRate is declared with const",
-      "description": "The rate that never changes is declared with const, not let",
+      "description": "The rate that never changes is declared with const, not let. Help: 1.3.2 (camelCase and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "const\\s+(?:taxRate|TAX_RATE)\\s*=\\s*[\\d.][^;\\n]*;",
@@ -46,7 +46,7 @@
     {
       "id": "r2",
       "title": "bookTitle holds the title",
-      "description": "Declares bookTitle with quoted text",
+      "description": "Declares bookTitle with quoted text. Help: 1.3.6 (Human-Readable Names)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+bookTitle\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`]*`)\\s*;",
@@ -56,7 +56,7 @@
     {
       "id": "r3",
       "title": "unitPrice and quantity are named",
-      "description": "Declares both unitPrice and quantity",
+      "description": "Declares both unitPrice and quantity. Help: 1.3.6 (Human-Readable Names)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?=[\\s\\S]*\\bunitPrice\\s*=)(?=[\\s\\S]*\\bquantity\\s*=)[\\s\\S]*",
@@ -66,7 +66,7 @@
     {
       "id": "r4",
       "title": "subtotal is computed from them",
-      "description": "subtotal is unitPrice times quantity",
+      "description": "subtotal is unitPrice times quantity. Help: 1.3.6 (Human-Readable Names)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?=[\\s\\S]*\\bsubtotal\\s*=)(?=[\\s\\S]*(?:unitPrice[^;\\n]*quantity|quantity[^;\\n]*unitPrice))[\\s\\S]*",
@@ -76,7 +76,7 @@
     {
       "id": "r5",
       "title": "orderTotal uses the tax rate",
-      "description": "orderTotal is computed from subtotal and taxRate",
+      "description": "orderTotal is computed from subtotal and taxRate. Help: 1.3.6 (Human-Readable Names)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?=[\\s\\S]*\\borderTotal\\s*=)(?=[\\s\\S]*(?:subtotal[^;\\n]*(?:taxRate|TAX_RATE)|(?:taxRate|TAX_RATE)[^;\\n]*subtotal))[\\s\\S]*",
@@ -86,7 +86,7 @@
     {
       "id": "r6",
       "title": "No single-letter variables remain",
-      "description": "No declaration of a one-letter variable is left in the file",
+      "description": "No declaration of a one-letter variable is left in the file. Help: 1.3.6 (Human-Readable Names)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*(?:let|const|var)\\s+[a-z]\\s*=)[\\s\\S]*$",
@@ -96,7 +96,7 @@
     {
       "id": "r7",
       "title": "Operators are spaced",
-      "description": "No cramped arithmetic like a*b remains: every operator has a space on each side",
+      "description": "No cramped arithmetic like a*b remains: every operator has a space on each side. Help: 1.3.3 (Code Layout)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*[A-Za-z0-9_)][*+][A-Za-z0-9_(])[\\s\\S]*$",
@@ -106,7 +106,7 @@
     {
       "id": "r8",
       "title": "At least four explanatory comments",
-      "description": "Four or more comments explaining the code, written as // or /* */",
+      "description": "Four or more comments explaining the code, written as // or /* */. Help: 1.3.4 (Comments: // and /* */)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:[\\s\\S]*?(?://[^\\n]{6,}|/\\*[\\s\\S]{6,}?\\*/)){4}",
@@ -117,7 +117,7 @@
     {
       "id": "r9",
       "title": "README answers all three prompts",
-      "description": "Each of the three headings has a real answer under it -- a sentence or a bullet, not an empty heading",
+      "description": "Each of the three headings has a real answer under it -- a sentence or a bullet, not an empty heading. Help: 1.3.18 (What a README Is For)",
       "type": "regex",
       "file": "README.md",
       "pattern": "(?:[\\s\\S]*?^(?![ \\t]*[#*\\-]*[ \\t]*(?:What is it\\?|How to run\\?|Know first\\?|\\(name it\\))[ \\t]*$)[ \\t]*[#*\\-]*[ \\t]*\\S[^\\n]{2,}$){3}",
@@ -127,7 +127,7 @@
     {
       "id": "r10",
       "title": "README mentions the tax rate",
-      "description": "README tells the reader about the tax rate they may need to change",
+      "description": "README tells the reader about the tax rate they may need to change. Help: 1.3.6 (Human-Readable Names)",
       "type": "regex",
       "file": "README.md",
       "pattern": "tax",

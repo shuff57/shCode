@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "printHeader defined, no parameters",
-      "description": "Code defines a function named printHeader with an empty parameter list",
+      "description": "Code defines a function named printHeader with an empty parameter list. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+printHeader\\s*\\(\\s*\\)\\s*\\{",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "header text lives inside printHeader",
-      "description": "printHeader()'s body logs the header line",
+      "description": "printHeader()'s body logs the header line. Help: 3.1.7 (Refactoring calcDistance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+printHeader\\s*\\([^)]*\\)\\s*\\{[^}]*LIBRARY CHECKOUT[^}]*\\}",
@@ -53,7 +53,7 @@
     {
       "id": "r3",
       "title": "printHeader called three times",
-      "description": "printHeader() is called three separate times",
+      "description": "printHeader() is called three separate times. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(printHeader\\s*\\(\\s*\\)\\s*;[\\s\\S]*){3}",
@@ -63,7 +63,7 @@
     {
       "id": "r4",
       "title": "all three books still printed",
-      "description": "The three distinct book titles are still logged, in order",
+      "description": "The three distinct book titles are still logged, in order. Help: 3.1.2 (Defining & Calling a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "The Hobbit[\\s\\S]*Dune[\\s\\S]*Kindred",

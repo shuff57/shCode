@@ -1,28 +1,37 @@
 flowchart TD
   A([Start])
-  B[/Load the stock list from storage/]
-  C[Set up the seed list and the reorder level]
-  D{{i = 0 to list.length - 1}}
-  E{Is qty below the reorder level?}
-  F[[lowStock list level]]
-  G[[totalValue list]]
-  H[[receiptLines list]]
-  I[Print total, low stock and receipt]
-  J[[sellItem list name]]
-  K[Show the new quantity]
-  L[[saveStock list]]
+  B[[loadStock]]
+  C{Was a saved list found?}
+  D[[makeItem name price qty]]
+  E[Set the shack name and the reorder level]
+  F[[totalValue list]]
+  G[[lowStock list level]]
+  H{Is anything low?}
+  I[/Show the low-stock list/]
+  J[Note that nothing is low]
+  K[[receiptLines list]]
+  L{{i = 0 to lines.length - 1}}
+  M[/Show line i/]
+  N[[sellItem list name]]
+  O[/Show the total, the shack name and the new quantity/]
+  P[[saveStock list]]
   Z([End])
   A --> B
   B --> C
-  C --> D
-  D -- "More items" --> E
-  E -- "Low, select it" --> F
-  E -- "Stocked, keep it" --> D
-  F --> D
-  D -- "List is done" --> G
+  C -- "Yes, use it" --> E
+  C -- "No, seed it" --> D
+  D --> E
+  E --> F
+  F --> G
   G --> H
-  H --> I
-  I --> J
+  H -- "Some are low" --> I
+  H -- "All stocked" --> J
+  I --> K
   J --> K
   K --> L
-  L --> Z
+  L -- "More lines" --> M
+  M --> L
+  L -- "Lines are done" --> N
+  N --> O
+  O --> P
+  P --> Z

@@ -1,0 +1,138 @@
+{
+  "id": "3-2-drill-shout",
+  "title": "3.2.6 Lab: shout(word)",
+  "description": "Write a one-parameter function, shout, that prints its word in capital letters, then call it with two different words. Practice, not graded: the checks call your function.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the function",
+      "instructions": "Write a function declaration called shout with one parameter, word, as in 3.2.5."
+    },
+    {
+      "id": "s2",
+      "title": "Print the word in capitals",
+      "instructions": "Inside shout, use console.log to print word in capital letters with .toUpperCase() (1.2.14). This function prints its answer; return is first taught later, at 3.2.11."
+    },
+    {
+      "id": "s3",
+      "title": "Call it twice",
+      "instructions": "Below the function, call shout with two different words, such as shout(\"hello\") and shout(\"watch out\"), and read the output."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "shout is defined with one parameter",
+      "description": "Code defines a function named shout with exactly one parameter. Help: 3.2.5 (Parameters and Arguments)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+shout\\s*\\(\\s*[\\w$]+\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Write function shout(word) { ... } with exactly that name and one name between the parentheses."
+    },
+    {
+      "id": "r2",
+      "title": "shout turns the word into capitals",
+      "description": "shout uses .toUpperCase() in its body. Help: 1.2.14 (String Methods in Practice)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "shout",
+      "pattern": "\\.toUpperCase\\s*\\(\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Put .toUpperCase() after the parameter's name inside shout, like word.toUpperCase()."
+    },
+    {
+      "id": "r3",
+      "title": "shout is called",
+      "description": "Code calls shout at least once. Help: 3.2.5 (Parameters and Arguments)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?<!function\\s+)\\bshout\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Add a line below the function that calls it, such as shout(\"hello\");"
+    },
+    {
+      "id": "t1",
+      "title": "shout prints the word in capitals",
+      "description": "shout(word) prints the word in capital letters, whatever word it is given. Help: 1.2.14 (String Methods in Practice)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "shout",
+      "points": 0,
+      "hint": "shout must print the word in capitals with console.log, exactly one line. Check that you print word.toUpperCase(), not word, and that you print it once.",
+      "cases": [
+        {
+          "args": [
+            "hello"
+          ],
+          "expectOutput": [
+            "HELLO"
+          ]
+        },
+        {
+          "args": [
+            "Watch out"
+          ],
+          "expectOutput": [
+            "WATCH OUT"
+          ]
+        },
+        {
+          "args": [
+            "a"
+          ],
+          "expectOutput": [
+            "A"
+          ],
+          "description": "one letter"
+        },
+        {
+          "args": [
+            "ALREADY LOUD"
+          ],
+          "expectOutput": [
+            "ALREADY LOUD"
+          ]
+        },
+        {
+          "args": [
+            "room 101!"
+          ],
+          "expectOutput": [
+            "ROOM 101!"
+          ]
+        },
+        {
+          "args": [
+            "quiet please"
+          ],
+          "expectOutput": [
+            "QUIET PLEASE"
+          ],
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

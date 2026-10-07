@@ -12,6 +12,14 @@
 
 const CONTENT_PREVIEWS = new Set(['reading', 'video', 'example', 'slides', 'diagram', 'quiz']);
 
+// Previews whose lesson is code the student edits and runs. An `aiGrader` on one of
+// these means "the AI marks the student's FILE" (the three find-and-fix test parts),
+// not "the answer is prose": it must stay in the workspace, with its editor, Run
+// button and tries banner. Before this, `aiGrader` alone sent them to the prose
+// WrittenGrader panel: no editor, no Run, no tries count (found 2026-10-03 by the
+// phase 2 gaming judge).
+const WORKSPACE_PREVIEWS = new Set(['console', 'moshion', 'reshape']);
+
 export interface ViewableLesson {
   preview?: string | null;
   aiGrader?: unknown;
@@ -21,5 +29,8 @@ export interface ViewableLesson {
 
 export function rendersAsContent(lesson: ViewableLesson): boolean {
   if (lesson.preview && CONTENT_PREVIEWS.has(lesson.preview)) return true;
+  if (lesson.preview && WORKSPACE_PREVIEWS.has(lesson.preview)) {
+    return Boolean(lesson.diagram || lesson.quiz);
+  }
   return Boolean(lesson.aiGrader || lesson.diagram || lesson.quiz);
 }

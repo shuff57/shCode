@@ -1,0 +1,121 @@
+{
+  "id": "3-2-drill-default-greeting",
+  "title": "3.2.8 Lab: greet with a Default Name",
+  "description": "Write greet(name) so that calling it with no argument greets \"friend\", using a default parameter, and calling it with a name greets that name. Practice, not graded: the checks call your function.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Parameters and Return Values",
+  "preview": "console",
+  "week": 7,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write greet",
+      "instructions": "Write a function declaration called greet that takes one parameter, name."
+    },
+    {
+      "id": "s2",
+      "title": "Give name a default",
+      "instructions": "Write the fallback inside the parentheses: name = \"friend\" (3.2.7). A call with no argument now uses it."
+    },
+    {
+      "id": "s3",
+      "title": "Print the greeting",
+      "instructions": "Inside greet, use console.log to print Hello, then the name, then an exclamation mark, for example Hello, Priya!"
+    },
+    {
+      "id": "s4",
+      "title": "Call it both ways",
+      "instructions": "Call greet() with nothing in the parentheses, then greet(\"Priya\"), and compare the two lines."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "greet has a default parameter",
+      "description": "Code defines greet with a default value written in the parentheses, as name = something. Help: 3.2.7 (Order Matters)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+greet\\s*\\(\\s*[\\w$]+\\s*=\\s*[^,)]+\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "The default goes inside the parentheses of the definition, like function greet(name = \"friend\")."
+    },
+    {
+      "id": "r2",
+      "title": "greet is called with no argument",
+      "description": "Code calls greet() with nothing in the parentheses. Help: 3.2.7 (Order Matters)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?<!function\\s+)\\bgreet\\s*\\(\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Add a line below the function that calls greet() with empty parentheses."
+    },
+    {
+      "id": "t1",
+      "title": "greet greets the name, or \"friend\" when there is none",
+      "description": "greet() prints Hello, friend! and greet(name) prints Hello, then that name, then an exclamation mark. Help: 3.2.7 (Order Matters)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "greet",
+      "points": 0,
+      "hint": "A call with no argument leaves name as undefined unless the parameter has a default. Check the default is \"friend\", and that a name you pass in still wins over it.",
+      "cases": [
+        {
+          "args": [],
+          "expectOutput": [
+            "Hello, friend!"
+          ],
+          "description": "no argument"
+        },
+        {
+          "args": [
+            "Priya"
+          ],
+          "expectOutput": [
+            "Hello, Priya!"
+          ]
+        },
+        {
+          "args": [
+            "Sam"
+          ],
+          "expectOutput": [
+            "Hello, Sam!"
+          ]
+        },
+        {
+          "args": [
+            "Q"
+          ],
+          "expectOutput": [
+            "Hello, Q!"
+          ],
+          "description": "a one-letter name"
+        },
+        {
+          "args": [
+            "Maya"
+          ],
+          "expectOutput": [
+            "Hello, Maya!"
+          ],
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

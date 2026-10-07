@@ -38,38 +38,22 @@ import {
 
 import type { DiagramDoc, FlowShape, SideId } from '../../lib/diagram-types';
 import { SHAPE_HINTS, SHAPE_LABELS } from '../../lib/diagram-types';
+import { docToFlow } from '../../lib/diagram-flow';
 import { nodeTypes, SHAPE_COLORS, SHAPE_SIZE } from './FlowShapeNodes';
+import { nextFreeSlot } from '../../lib/diagram-layout';
 import { edgeTypes } from './EditableEdge';
 
 // ---- doc <-> react-flow ----
-
-function docToFlow(doc: DiagramDoc): { nodes: Node[]; edges: Edge[] } {
-  const known = new Set(doc.nodes.map((n) => n.id));
-  return {
-    nodes: doc.nodes.map((n) => ({
-      id: n.id,
-      type: n.shape,
-      position: { x: n.x, y: n.y },
-      data: { label: n.label, shape: n.shape },
-    })),
-    edges: doc.edges
-      .filter((e) => known.has(e.from) && known.has(e.to))
-      .map((e) => ({
-        id: e.id,
-        source: e.from,
-        target: e.to,
-        ...(e.label ? { label: e.label } : {}),
-        ...(e.fromSide ? { sourceHandle: `s-${e.fromSide}` } : {}),
-        ...(e.toSide ? { targetHandle: `t-${e.toSide}` } : {}),
-      })),
-  };
-}
 
 /** `s-b` / `t-r` -> `b` / `r`. Null for an auto-routed edge. */
 function sideOf(handle: string | null | undefined): SideId | undefined {
   if (!handle) return undefined;
   const side = handle.slice(2);
   return side === 't' || side === 'r' || side === 'b' || side === 'l' ? side : undefined;
+}
+
+function es_has(es: Edge[], a: string, b: string): boolean {
+  return es.some((e) => e.source === a && e.target === b);
 }
 
 function flowToDoc(nodes: Node[], edges: Edge[]): DiagramDoc {
@@ -285,17 +269,23 @@ function Canvas({
   const [editEdge, setEditEdge] = useState<string | null>(null);
   const [spliceTarget, setSpliceTarget] = useState<string | null>(null);
   const [isFull, setIsFull] = useState(false);
+  // Spoken by the polite live region below the toolbar (keyboard + screen reader path).
+  const [announce, setAnnounce] = useState('');
+  const [connectTo, setConnectTo] = useState('');
+  useEffect(() => setConnectTo(''), [selNode]);
   // Opens itself if the diagram already uses one of the extra shapes, so a
   // loaded starter never shows shapes the palette appears not to have.
   const [showMore, setShowMore] = useState(() =>
     value.nodes.some((n) => MORE_SHAPES.includes(n.shape)),
   );
 
-  const { screenToFlowPosition, fitView } = useReactFlow();
+  const { screenToFlowPosition, fitView, getViewport } = useReactFlow();
   const wrapRef = useRef<HTMLDivElement>(null);
   const history = useRef<string[]>([]);
   const emitted = useRef<string>(JSON.stringify(value));
   const seq = useRef(0);
+  const nodesRef = useRef<Node[]>([]);
+  nodesRef.current = nodes;
   const edgeSeq = useRef(0);
   const labelInput = useRef<HTMLInputElement>(null);
 
@@ -425,6 +415,29 @@ function Canvas({
     [nodes, snapshot, newEdgeId],
   );
 
+  /** Keyboard path for onConnect: draws an arrow from the selected shape to a
+   *  shape picked in a <select>. No handles are stored, so routeEdge auto-picks
+   *  the sides, and a diamond's exits get yes then no exactly as a drag does. */
+  const connectSelectedTo = useCallback(
+    (targetId: string) => {
+      if (!selNode || !targetId || targetId === selNode) return;
+      const from = nodes.find((n) => n.id === selNode);
+      const to = nodes.find((n) => n.id === targetId);
+      if (es_has(edges, selNode, targetId)) {
+        setAnnounce('Those two shapes are already joined by an arrow.');
+        return;
+      }
+      const isDecision = (from?.data as any)?.shape === 'decision';
+      const already = edges.filter((e) => e.source === selNode).length;
+      onConnect({ source: selNode, target: targetId, sourceHandle: null, targetHandle: null });
+      const label = isDecision ? (already === 0 ? ', labelled yes' : already === 1 ? ', labelled no' : '') : '';
+      const name = (n?: Node) => String((n?.data as any)?.label || '').trim() || 'a blank shape';
+      setAnnounce(`Arrow added from ${name(from)} to ${name(to)}${label}.`);
+      setConnectTo('');
+    },
+    [selNode, nodes, edges, onConnect],
+  );
+
   /**
    * Drag either end of an existing arrow onto a different shape to re-point
    * it. The arrow keeps its id and its yes/no label, so re-aiming a branch
@@ -471,19 +484,50 @@ function Canvas({
     (shape: FlowShape, at?: Point, spliceEdgeId?: string | null) => {
       snapshot();
       const id = `s${++seq.current}`;
-      const position = at ?? {
-        x: 320 + ((seq.current * 37) % 140),
-        y: 60 + ((seq.current * 61) % 220),
-      };
-      setNodes((ns) => [...ns, { id, type: shape, position, data: { label: '', shape } }]);
+      let position = at;
+      if (!position) {
+        // Top-left of the visible canvas (flow coordinates), else a fixed corner.
+        let origin = { x: 40, y: 40 };
+        const rect = wrapRef.current?.querySelector('.react-flow')?.getBoundingClientRect();
+        if (rect && rect.width > 0) {
+          const tl = screenToFlowPosition({ x: rect.left, y: rect.top });
+          if (Number.isFinite(tl.x) && Number.isFinite(tl.y)) origin = { x: tl.x + 40, y: tl.y + 40 };
+        }
+        const size = SHAPE_SIZE[shape] ?? SHAPE_SIZE.process;
+        const existing = nodesRef.current.map((n) => {
+          const s = SHAPE_SIZE[(n.data as any).shape as FlowShape] ?? SHAPE_SIZE.process;
+          return { x: n.position.x, y: n.position.y, w: s.w, h: s.h };
+        });
+        position = nextFreeSlot(existing, size, origin);
+      }
+      const placedByGrid = !at;
+      const added: Node = { id, type: shape, position, data: { label: '', shape } };
+      nodesRef.current = [...nodesRef.current, added];
+      setNodes((ns) => [...ns, added]);
+      if (placedByGrid) {
+        // Only when the new shape would land off screen: refit once (animated,
+        // never zooming in) so it is not added somewhere the student cannot see.
+        const el = wrapRef.current?.querySelector('.react-flow') as HTMLElement | null;
+        const sz = SHAPE_SIZE[shape] ?? SHAPE_SIZE.process;
+        if (el) {
+          const vp = getViewport();
+          const inView =
+            position.x * vp.zoom + vp.x >= 0 &&
+            position.y * vp.zoom + vp.y >= 0 &&
+            (position.x + sz.w) * vp.zoom + vp.x <= el.clientWidth &&
+            (position.y + sz.h) * vp.zoom + vp.y <= el.clientHeight;
+          if (!inView) setTimeout(() => fitView({ duration: 250, padding: 0.15, maxZoom: 1 }), 60);
+        }
+      }
       if (spliceEdgeId) spliceInto(spliceEdgeId, id);
+      setAnnounce(`Added ${SHAPE_LABELS[shape]}. Type its text in the field.`);
       setSelNode(id);
       setSelEdge(null);
       // Open the on-canvas editor immediately: a new shape always needs text.
       setEditNode(id);
       setEditEdge(null);
     },
-    [snapshot, spliceInto],
+    [snapshot, spliceInto, screenToFlowPosition, getViewport, fitView],
   );
 
   const setNodeLabel = useCallback((id: string, label: string) => {
@@ -599,6 +643,31 @@ function Canvas({
     setEditEdge(null);
   }, []);
 
+  // Keyboard path for typing on a shape. The textarea's own autoFocus can lose to
+  // the toolbar button that was just pressed (the node is not laid out yet), so
+  // focus it once the shape exists; and when Enter/Escape ends the edit, hand
+  // focus back to the shape so Tab does not restart from the top of the page.
+  useEffect(() => {
+    if (!editNode) return;
+    const t = window.setTimeout(() => {
+      const ta = wrapRef.current?.querySelector<HTMLTextAreaElement>(
+        `.react-flow__node[data-id="${editNode}"] textarea`,
+      );
+      if (ta && document.activeElement !== ta) ta.focus();
+    }, 60);
+    return () => window.clearTimeout(t);
+  }, [editNode]);
+
+  const onWrapKeyDownCapture = useCallback((ev: React.KeyboardEvent<HTMLDivElement>) => {
+    const t = ev.target as HTMLElement;
+    if (t.tagName !== 'TEXTAREA' || (ev.key !== 'Enter' && ev.key !== 'Escape') || ev.shiftKey) return;
+    const node = t.closest<HTMLElement>('.react-flow__node');
+    if (!node) return;
+    window.setTimeout(() => {
+      if (document.activeElement === document.body) node.focus();
+    }, 0);
+  }, []);
+
   // ---- dragging a shape onto an arrow ----
 
   const onNodeDrag = useCallback(
@@ -668,6 +737,7 @@ function Canvas({
   return (
     <div
       ref={wrapRef}
+      onKeyDownCapture={onWrapKeyDownCapture}
       className={readOnly ? 'shcode-flow shcode-flow-static' : 'shcode-flow'}
       style={{
         border: '1px solid #44475a',
@@ -730,6 +800,9 @@ function Canvas({
           }}
         >
           <span style={{ fontSize: 12, color: '#8b93a7', marginRight: 2 }}>Add:</span>
+          <span role="status" aria-live="polite" className="sr-only">
+            {announce}
+          </span>
           {(showMore ? SHAPE_ORDER : CORE_SHAPES).map((shape) => (
             <button
               key={shape}
@@ -741,6 +814,7 @@ function Canvas({
               }}
               onDragEnd={() => setSpliceTarget(null)}
               onClick={() => addShape(shape)}
+              aria-label={`Add ${SHAPE_LABELS[shape]} shape`}
               title={`${SHAPE_HINTS[shape]}. Click to add, or drag onto the canvas — drop it on an arrow to insert it mid-path.`}
               style={{
                 display: 'inline-flex',
@@ -926,6 +1000,7 @@ function Canvas({
                   setNodeShape(selectedNode.id, ev.target.value as FlowShape);
                 }}
                 style={{ ...inputStyle, flex: '0 0 auto', width: 150, cursor: 'pointer' }}
+                aria-label="Shape kind"
               >
                 {SHAPE_ORDER.map((s) => (
                   <option key={s} value={s}>
@@ -933,6 +1008,48 @@ function Canvas({
                   </option>
                 ))}
               </select>
+              <label style={{ fontSize: 12, color: '#8b93a7' }} htmlFor="flow-connect-to">
+                Arrow to
+              </label>
+              <select
+                id="flow-connect-to"
+                value={connectTo}
+                onChange={(ev) => setConnectTo(ev.target.value)}
+                style={{ ...inputStyle, flex: '0 0 auto', width: 190, minWidth: 0, cursor: 'pointer' }}
+              >
+                <option value="">Choose a shape…</option>
+                {nodes
+                  .filter((n) => n.id !== selectedNode.id)
+                  .map((n) => (
+                    <option key={n.id} value={n.id}>
+                      {SHAPE_LABELS[(n.data as any).shape as FlowShape]}
+                      {String((n.data as any).label || '').trim()
+                        ? `: ${String((n.data as any).label).trim().slice(0, 40)}`
+                        : ' (blank)'}
+                    </option>
+                  ))}
+              </select>
+              {/* A button, not onChange: arrowing through a closed select fires
+                  change on every option, which would draw an arrow per key press. */}
+              <button
+                type="button"
+                onClick={() => connectSelectedTo(connectTo)}
+                disabled={!connectTo}
+                title="Draw an arrow from the selected shape to the chosen one"
+                style={{
+                  padding: '6px 12px',
+                  background: '#21222c',
+                  border: '1px solid #44475a',
+                  borderRadius: 6,
+                  color: '#f8f8f2',
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  cursor: connectTo ? 'pointer' : 'not-allowed',
+                  opacity: connectTo ? 1 : 0.5,
+                }}
+              >
+                Connect
+              </button>
             </>
           ) : selectedEdge ? (
             <>

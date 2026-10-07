@@ -2,7 +2,8 @@
 
 **This is the coding part of the test, and you are doing it alone.** One problem, pick
 one of three, write the JavaScript. **20 points**, about **12 minutes**. No Run button.
-You submit once; the paper locks on submit.
+
+**You get three tries.** Submit, read the feedback on each criterion, fix the code and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
 
 **What you write:** A single JavaScript program that solves the problem you picked. It
 must contain:
@@ -14,7 +15,7 @@ must contain:
 - At least one **spread** copy (`{ ...item }` or `[...list]`)
 - A **save/load round trip**: `JSON.stringify` into `localStorage`, and `JSON.parse` back
 - **Documentation:** header comment (Problem, Partners = N/A, Date), a const for the
-  limit, camelCase names throughout, at least one `console.log` reporting the
+  problem's limit (budget, weekly goal or can size, below), camelCase names throughout, at least one `console.log` reporting the
   result, `typeof` for one value
 
 **Three problems. Pick one.** They are the same difficulty and the same shape. Adjacent
@@ -26,9 +27,11 @@ tables should not pick the same one.
 
 Your cart is an array of items, each `{ name, price, qty }`. Write `totalCost` (returns
 the total over the whole cart), `receiptLine` (takes one item, returns its
-`"name xqty"` line), and `mostExpensive` (returns the item with the highest price). Print
-the receipt lines, the total, and the most expensive item. Save the cart to localStorage
-under a key and load it back.
+`"name xqty"` line), and `discountOne` (takes the cart, a name and a percent off, marks
+that item's `price` down on its own copy, and returns the copy without changing the
+original). Keep a `const` budget (pick a number) and print whether the total is over it.
+Print the receipt lines, the total, and the discounted copy. Save the cart to
+localStorage under a key and load it back.
 
 ---
 
@@ -36,8 +39,10 @@ under a key and load it back.
 
 Your week is an array of days, each `{ day, minutes }`. Write `totalMinutes` (returns the
 week's total), `logLine` (takes one day, returns its `"Mon: 30 min"` line), and
-`longestDay` (returns the day with the most minutes). Print the log, the total, and the
-longest day. Save the week under a key and load it back.
+`addMinutes` (takes the week, a day name and extra minutes, adds them to that day on its
+own copy, and returns the copy without changing the original). Keep a `const` weekly
+goal (pick a number) and print whether the total reaches it. Print the log, the total,
+and the updated copy. Save the week under a key and load it back.
 
 ---
 
@@ -46,18 +51,22 @@ longest day. Save the week under a key and load it back.
 Your rota is an array of plants, each `{ name, ml, watered }`. Write `totalWater`
 (returns the total millilitres), `label` (takes one plant, returns its `"name — ml ml"`
 label), and `waterOne` (takes the rota and a name, marks that plant's `watered` as true
-on its own copy, and returns the copy without changing the original). Print the labels,
-the total, and the watered copy. Save the rota under a key and load it back.
+on its own copy, and returns the copy without changing the original). Keep a `const`
+for the watering can's size in millilitres (pick a number) and print whether one fill
+is enough for the total. Print the labels, the total, and the watered copy. Save the
+rota under a key and load it back.
 
 ---
 
 ### Rules
 
 - **No classes, no `this`.** Plain functions over plain objects and arrays.
-- **The array methods you may use are `map`, `slice`, `concat` and spread.** 3.7.19 named
-  the others without teaching them; anything outside the four goes past the chapter.
+- **The array methods you may use are `push`, `pop` (3.3.2), `map`, `slice`, `concat` and
+  spread.** 3.7.19 named the others without teaching them; anything outside that list goes
+  past the chapter.
 - **Header comment:** Problem, Partners = N/A, Date.
-- **Limit** as a `const`.
+- **Limit** (the budget, weekly goal or can size your problem names) as a `const`, and
+  used: print whether the total is over, reaches, or fits it.
 - At least one `console.log` that reports a result.
 - **`typeof`** for one value.
-- **No Run button.** One attempt, paper locks on submit.
+- **No Run button.** Three tries; your best one counts.

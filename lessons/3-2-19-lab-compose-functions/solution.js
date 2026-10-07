@@ -1,10 +1,10 @@
-function double(n) {
-  return n * 2;
+function triple(n) {
+  return n * 3;
 }
 
-function addTen(n) {
-  return n + 10;
+function addSeven(n) {
+  return n + 7;
 }
 
-console.log(addTen(double(5)));
-console.log(double(addTen(5)));
+console.log(addSeven(triple(4)));
+console.log(triple(addSeven(4)));

@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Leap year checker",
-      "instructions": "Create a variable called year. Write a condition that logs 'Leap year' when the year is divisible by 4 and (not divisible by 100, or divisible by 400), and 'Not a leap year' otherwise. You will need &&, ||, and !."
+      "instructions": "Create a variable called year. Write a condition that logs 'Leap year' when the year is divisible by 4 (`year % 4 === 0` is true when year divides evenly by 4: the remainder is 0) and (not divisible by 100, or divisible by 400), and 'Not a leap year' otherwise. You will need &&, ||, and !."
     },
     {
       "id": "s2",

@@ -29,14 +29,14 @@
     {
       "id": "s4",
       "title": "Now try it with single quotes",
-      "instructions": "Log the same text again using single quotes instead of backticks. Read both outputs and note the difference."
+      "instructions": "Log the same text again using single quotes instead of backticks, keeping the ${myName} part inside the single quotes. Read both outputs and note the difference."
     }
   ],
   "requirements": [
     {
       "id": "r1",
       "title": "myName is declared",
-      "description": "Declares a variable called myName",
+      "description": "Declares a variable called myName. Help: 1.2.13 (Embedding Values with ${...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+myName\\s*=",
@@ -46,7 +46,7 @@
     {
       "id": "r2",
       "title": "A backtick string embeds myName",
-      "description": "Uses a template literal containing ${myName}",
+      "description": "Uses a template literal containing ${myName}. Help: 1.2.13 (Embedding Values with ${...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "`[^`]*\\$\\{\\s*myName\\s*\\}[^`]*`",
@@ -56,7 +56,7 @@
     {
       "id": "r3",
       "title": "A calculation is embedded",
-      "description": "Embeds an expression containing an operator, such as ${2024 + 1}",
+      "description": "Embeds an expression containing an operator, such as ${2024 + 1}. Help: 1.2.13 (Embedding Values with ${...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\$\\{[^}]*[-+*/][^}]*\\}",
@@ -66,7 +66,7 @@
     {
       "id": "r4",
       "title": "The single-quote version is logged too",
-      "description": "Logs a single-quoted string containing a literal ${ so the difference is visible",
+      "description": "Logs a single-quoted string containing a literal ${ so the difference is visible. Help: 1.2.13 (Embedding Values with ${...})",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*'[^']*\\$\\{[^']*'\\s*\\)",

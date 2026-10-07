@@ -21,6 +21,8 @@ module.exports = function run(dir) {
   check('phone (parens)', m.findPII('call (555) 123-4567') === 'phone');
   check('credit card', m.findPII('card is 4111 1111 1111 1111') === 'credit card');
   check('address', m.findPII('I live at 123 Main Street apt 2') === 'address');
+  check('bank account number', m.findPII('my bank account number is 123456789012') === 'bank account number');
+  check('routing number', m.findPII('routing number: 021000021') === 'bank account number');
 
   console.log('\n=== ordinary tutor questions pass through ===');
 
@@ -29,6 +31,8 @@ module.exports = function run(dir) {
     m.findPII('my teacher is Mrs. Lee, can you explain loops?') === null);
   check('mentions a friend by name', m.findPII('my friend John helped me with this') === null);
   check('short number, not a phone/CC/SSN shape', m.findPII('I got 42 on the quiz') === null);
+  check('the word account with no number nearby', m.findPII('can you check my account settings?') === null);
+  check('a bare id number with no bank keyword', m.findPII('my student id is 123456789') === null);
   check('empty string', m.findPII('') === null);
 
   console.log('\n=== first match wins, label is returned ===');

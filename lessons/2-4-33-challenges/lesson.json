@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "for loop present",
-      "description": "Code contains a for loop",
+      "description": "Code contains a for loop. Help: 2.4.2 (for vs while: Choosing a Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -43,12 +43,22 @@
     {
       "id": "r2",
       "title": "continue present",
-      "description": "Code contains a continue statement",
+      "description": "Code contains a continue statement. Help: 2.4.13 (Skipping a Round with continue)",
       "type": "regex",
       "file": "script.js",
       "pattern": "continue",
       "flags": "i",
       "points": 0
+    },
+    {
+      "type": "regex",
+      "file": "script.js",
+      "points": 0,
+      "id": "r3",
+      "title": "multiple-of-3 and multiple-of-5 tests",
+      "description": "Uses % 3 and % 5.",
+      "pattern": "(?=[\\s\\S]*%\\s*3)(?=[\\s\\S]*%\\s*5)",
+      "flags": "i"
     }
   ],
   "grading": {

@@ -28,27 +28,27 @@
     {
       "id": "r1",
       "title": "do...while loop present",
-      "description": "A do...while loop logs and increments a counter up through 5",
+      "description": "A do...while loop logs and increments a counter up through 5. Help: 2.4.5 (The do...while Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "do\\s*\\{(?=[^}]*console\\.log)(?=[^}]*(?:\\+\\+|\\+=\\s*1))[^}]*\\}\\s*while\\s*\\(\\s*[A-Za-z_$]\\w*\\s*(?:<=\\s*5|<\\s*6)\\s*\\)",
+      "pattern": "do\\s*\\{(?=(?:[^{}]|\\$\\{[^}]*\\})*console\\.log)(?=(?:[^{}]|\\$\\{[^}]*\\})*(?:\\+\\+|\\+=\\s*1|=\\s*[A-Za-z_$]\\w*\\s*\\+\\s*1))(?:[^{}]|\\$\\{[^}]*\\})*\\}\\s*while\\s*\\(\\s*\\(?\\s*[A-Za-z_$]\\w*\\s*(?:<=\\s*5|<\\s*[56])\\s*\\)?\\s*\\)",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "closing while present",
-      "description": "A second do...while loop logs something with a condition that is already false before the loop starts",
+      "title": "second do...while with a condition that starts false",
+      "description": "A second do...while loop logs something with a condition that is already false before the loop starts. Help: 2.4.5 (The do...while Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "do\\s*\\{(?=[^}]*console\\.log)[^}]*\\}\\s*while\\s*\\(\\s*(?:false|[A-Za-z_$]\\w*\\s*<\\s*-?\\d+)\\s*\\)",
+      "pattern": "^(?=(?:[\\s\\S]*?do\\s*\\{(?:[^{}]|\\$\\{[^}]*\\})*\\}\\s*while\\s*\\([^)]*\\)){2})[\\s\\S]*do\\s*\\{(?=(?:[^{}]|\\$\\{[^}]*\\})*console\\.log)(?:[^{}]|\\$\\{[^}]*\\})*\\}\\s*while\\s*\\(\\s*\\(?\\s*(?:false|[A-Za-z_$]\\w*\\s*(?:<=|>=|===|!==|<|>)\\s*-?\\d+)\\s*\\)?\\s*\\)",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 2.4.5 (The do...while Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

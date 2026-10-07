@@ -1,4 +1,4 @@
-// 2.4.10 A15.1 Side-Scrolling Platformer (reference solution).
+// 6.4.18 A15.1 Side-Scrolling Platformer (reference solution).
 // Player visual swap + camera follow + 3+ platforms + ground-gated jump
 // + goal overlap with win text.
 

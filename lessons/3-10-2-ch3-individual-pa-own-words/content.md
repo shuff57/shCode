@@ -3,25 +3,26 @@
 **This is the written part of the test, and you are doing it alone.** Three questions,
 **10 points total**, about **7 minutes**. Type your answers directly into the boxes.
 
-### Question 1: parameter vs argument, and the no-return case (4 points)
+### Question 1: printing vs returning (4 points)
 
-What is the difference between a *parameter* and an *argument*? And what does a function
-hand back when it has no `return` statement?
+What is the difference between a function that *prints* its answer and a function that
+*returns* it? Give one thing you can do with a returned value that you cannot do with a
+printed one.
 
 *Type your answer here. Use your own words -- no code required.*
 
-### Question 2: what the caller sees (3 points)
+### Question 2: working on a copy (3 points)
 
-A function changes one of the properties of the object you passed it. Does the caller
-see that change? Say why. And what would have happened if the function had *reassigned*
-the parameter instead of changing the object it was handed?
+A function is given an array, and it has to sort out or change the items **without
+altering the caller's original array**. How can it do that? Say why your way leaves the
+original alone.
 
 *Type your answer here.*
 
-### Question 3: `map()` vs `push()` (3 points)
+### Question 3: `slice()` vs `pop()` (3 points)
 
-Both of these work on arrays. What is the difference in what each one does to the
-original array?
+Both of these work on arrays. For each one, say what it does to the original array and
+what it hands back.
 
 *Type your answer here.*
 

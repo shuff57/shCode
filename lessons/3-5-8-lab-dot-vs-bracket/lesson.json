@@ -42,7 +42,7 @@
     {
       "id": "r1",
       "title": "square bracket access used",
-      "description": "Reads a property with square brackets",
+      "description": "Reads a property with square brackets. Help: 3.5.6 (Square Brackets and Computed Keys)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\[",
@@ -52,7 +52,7 @@
     {
       "id": "r2",
       "title": "spaced key reached in brackets",
-      "description": "Uses a quoted key containing a space inside brackets",
+      "description": "Uses a quoted key containing a space inside brackets. Help: 3.5.6 (Square Brackets and Computed Keys)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\s*[\"'][^\"']+ [^\"']*[\"']\\s*\\]",
@@ -62,7 +62,7 @@
     {
       "id": "r3",
       "title": "Object.keys used",
-      "description": "Walks the object's keys",
+      "description": "Walks the object's keys. Help: 3.5.6 (Square Brackets and Computed Keys)",
       "type": "regex",
       "file": "script.js",
       "pattern": "Object\\.keys\\s*\\(",
@@ -72,10 +72,10 @@
     {
       "id": "r4",
       "title": "value fetched with brackets",
-      "description": "Uses the loop variable inside brackets",
+      "description": "Uses the loop variable inside brackets. Help: 3.5.6 (Square Brackets and Computed Keys)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\[\\s*key",
+      "pattern": "\\w+\\[\\s*[A-Za-z_$][\\w$]*\\s*[\\]\\[]",
       "flags": "i",
       "points": 0
     }

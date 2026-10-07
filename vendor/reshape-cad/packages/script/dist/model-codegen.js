@@ -14,7 +14,7 @@
 // ModelDoc directly, through lib/occt-build.ts, with no text in between.
 import { solveSketch, collapsedByRatio } from '@shuff57/reshape-sketch/sketch-solve';
 import { maxFilletRadius, outlineOf } from '@shuff57/reshape-sketch/sketch-arc';
-import { canRotate, extentAlong, isRoundable, isShape, maxRound, nameMap, } from './model-types.js';
+import { canRotate, extentAlong, isRoundable, isShape, maxRound, nameMap, withHoleDepth, } from './model-types.js';
 import { rootFeature } from './topo-name.js';
 const AXIS = ['width', 'depth', 'height'];
 /** Param names must survive an edit, or pushing values into a live frame
@@ -91,6 +91,12 @@ export function generatedParams(doc) {
             pushCentre(out, f.id, label, f.center);
             pushTurn(out, f.id, label, f.rotate);
         }
+        else if (f.kind === 'datum') {
+            // A named plane's offset is a slot (the sketches on it follow it); a
+            // literal frame has none -- its origin/u/v are frozen numbers.
+            if (!f.frame)
+                push('offset', 'offset', f.offset ?? 0, { min: -500, max: 500, step: 1 });
+        }
         else if (f.kind === 'groove') {
             push('angle', 'angle', f.angle);
         }
@@ -121,7 +127,23 @@ export function generatedParams(doc) {
                         step: 1,
                     });
                 });
-                push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
+                // A circle/arc radius is a numeric slot too (§6.2): the interpreter
+                // records g${id}r when a param() fed it, and the emitter re-binds
+                // through that same key, so the slot must exist here.
+                for (const g of f.geoms) {
+                    if (g.k !== 'circle' && g.k !== 'arc')
+                        continue;
+                    out.push({
+                        name: pname(f.id, `g${g.id}r`),
+                        caption: `${label} ${g.k} ${g.id} radius`,
+                        value: g.r,
+                        min: 0,
+                        max: Math.max(Math.abs(g.r) * 4, 100),
+                        step: 1,
+                    });
+                }
+                if (!f.onDatum)
+                    push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
                 return out;
             }
             if (f.shape === 'circle' && f.points.length === 2) {
@@ -174,7 +196,8 @@ export function generatedParams(doc) {
                     });
                 }
             }
-            push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
+            if (!f.onDatum)
+                push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
         }
         else if (f.kind === 'extrude') {
             push('height', 'height', f.height);
@@ -197,7 +220,7 @@ export function generatedParams(doc) {
         else if (f.kind === 'hole') {
             push('diameter', 'diameter', f.diameter);
             push('depth', 'depth', f.depth);
-            pushCentre(out, f.id, label, f.center);
+            pushCentre(out, f.id, label, f.center, f.axis === 'x' ? 0 : f.axis === 'y' ? 1 : 2);
             // Item P: "corner spacing" (HoleFeature.corners' own stored dx/dy --
             // half the distance BETWEEN two opposite holes, i.e. measured from
             // the CENTRE) reads as "inset from the edge" only when the target's
@@ -228,6 +251,25 @@ export function generatedParams(doc) {
                 push('dx', 'in from each side (across)', insetX, { min: margin, max: 250, step: 0.5 });
                 push('dy', 'in from each side (up)', insetY, { min: margin, max: 250, step: 0.5 });
             }
+            // SPEC-brep-feature-provenance 5.2b: a recess shows the way `corners`
+            // does -- only when the doc actually has one. The panel must not offer a
+            // recess the shape does not have.
+            //
+            // The min here is an absolute floor, NOT the bore's radius, and that is
+            // deliberate. A recess narrower or deeper than its bore is geometrically
+            // impossible, and by the split pinned in slice A1 that is a KERNEL refusal,
+            // not a clamp: clamping it here would silently turn a refusal into a
+            // different shape, which is the outcome this campaign exists to prevent.
+            if (f.counterbore) {
+                push('counterboreAcross', 'counterbore across', f.counterbore.diameter, { min: 0.5, max: 250, step: 0.5 });
+                push('counterboreDeep', 'counterbore deep', f.counterbore.depth, { min: 0.5, max: 250, step: 0.5 });
+            }
+            if (f.countersink) {
+                push('countersinkAcross', 'countersink across', f.countersink.diameter, { min: 0.5, max: 250, step: 0.5 });
+                // Included cone angle, so 90 is the ceiling. Same reasoning as above: an
+                // angle past 90 is refused by the script, so the panel stops there.
+                push('countersinkAngle', 'countersink angle', f.countersink.angleDeg, { min: 1, max: 90, step: 1 });
+            }
         }
         else if (f.kind === 'shell') {
             push('thickness', 'wall', f.thickness, { min: 0.5, max: 40, step: 0.5 });
@@ -256,6 +298,12 @@ export function generatedParams(doc) {
                 step: 0.5,
             });
         }
+        // Phase 5.1 part 2 (todo 23): the draft's angle joins the panel the
+        // same way it joins the manipulator -- one slot, one caption family.
+        // |angle| < 90; negative leans in, 0 is "no taper" (identity).
+        if (f.kind === 'draft') {
+            push('angle', 'taper angle', f.angle, { min: -89.5, max: 89.5, step: 0.5 });
+        }
         // mirror carries no numeric slot -- its only input is a plane choice.
     });
     return out;
@@ -276,8 +324,10 @@ function pushTurn(out, id, label, r) {
         });
     });
 }
-function pushCentre(out, id, label, c) {
+function pushCentre(out, id, label, c, skip = -1) {
     ['x', 'y', 'z'].forEach((a, i) => {
+        if (i === skip)
+            return;
         out.push({
             name: pname(id, a),
             caption: `${label} ${a}`,
@@ -410,6 +460,12 @@ export function applyParam(doc, name, value) {
                 return { ...f, height: value };
             }
         }
+        if (f.kind === 'datum') {
+            if (slot === 'offset' && !f.frame) {
+                changed = true;
+                return { ...f, offset: value };
+            }
+        }
         if (f.kind === 'groove') {
             if (slot === 'angle') {
                 changed = true;
@@ -492,6 +548,16 @@ export function applyParam(doc, name, value) {
             // A soup rule's value slot (D8): rule${i}-value writes back into
             // rules[i].value, the same field the emitter reads. The kernel solves
             // the soup at build time, so the doc write IS the solve request.
+            const gm = /^g(\d+)r$/.exec(slot);
+            if (gm && f.geoms) {
+                const gid = Number(gm[1]);
+                const hit = f.geoms.some((g) => g.id === gid && (g.k === 'circle' || g.k === 'arc'));
+                if (hit) {
+                    const geoms = f.geoms.map((g) => (g.id === gid && (g.k === 'circle' || g.k === 'arc') ? { ...g, r: value } : g));
+                    changed = true;
+                    return { ...f, geoms, geom: geoms };
+                }
+            }
             const rm = /^rule(\d+)-value$/.exec(slot);
             if (rm && f.rules) {
                 const i = Number(rm[1]);
@@ -539,14 +605,27 @@ export function applyParam(doc, name, value) {
             }
             if (slot === 'depth') {
                 changed = true;
-                return { ...f, depth: value };
+                return withHoleDepth(doc, f, value);
             }
             const holeAx = slot === 'x' ? 0 : slot === 'y' ? 1 : slot === 'z' ? 2 : null;
-            if (holeAx !== null) {
+            // The component along the drill axis is derived from depth (see
+            // withHoleDepth), so a typed value for it is ignored, not stored.
+            const drillAx = f.axis === 'x' ? 0 : f.axis === 'y' ? 1 : 2;
+            if (holeAx !== null && holeAx !== drillAx) {
                 const center = [...f.center];
                 center[holeAx] = value;
                 changed = true;
                 return { ...f, center };
+            }
+            if (f.counterbore && (slot === 'counterboreAcross' || slot === 'counterboreDeep')) {
+                const key = slot === 'counterboreAcross' ? 'diameter' : 'depth';
+                changed = true;
+                return { ...f, counterbore: { ...f.counterbore, [key]: value } };
+            }
+            if (f.countersink && (slot === 'countersinkAcross' || slot === 'countersinkAngle')) {
+                const key = slot === 'countersinkAcross' ? 'diameter' : 'angleDeg';
+                changed = true;
+                return { ...f, countersink: { ...f.countersink, [key]: value } };
             }
             if (f.corners && (slot === 'dx' || slot === 'dy')) {
                 // Inverse of generatedParams' inset conversion above: the panel
@@ -578,9 +657,24 @@ export function applyParam(doc, name, value) {
             changed = true;
             return { ...f, size: value };
         }
+        if (f.kind === 'draft' && slot === 'angle') {
+            changed = true;
+            return { ...f, angle: value };
+        }
         return f;
     });
-    return changed ? { ...doc, features } : doc;
+    if (!changed)
+        return doc;
+    // A datum plane moved: every sketch sitting on it follows, because the
+    // sketch carries its own copy of the placement (the kernel reads that).
+    const moved = features.find((f) => f.id === id);
+    if (moved && moved.kind === 'datum' && slot === 'offset') {
+        return {
+            ...doc,
+            features: features.map((f) => f.kind === 'sketch' && f.onDatum === id && !f.frame ? { ...f, offset: moved.offset ?? 0 } : f),
+        };
+    }
+    return { ...doc, features };
 }
 /**
  * Make every constrained sketch in a doc obey its own rules.

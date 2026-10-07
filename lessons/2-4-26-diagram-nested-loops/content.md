@@ -39,6 +39,6 @@ If your print's return arrow goes straight to the outer hexagon instead of the i
 
 ### Before you submit
 
-Press **Check my diagram**. The checks confirm a legal flowchart: one Start, one End, nothing floating, at least six shapes, every path reaching the End. They can't tell whether the return arrows land on the right hexagon, so trace `row 1` through both hexagons by hand and compare against the code's expected output before you call it done.
+Press **Check my diagram**. The checks confirm a legal flowchart: one Start, one End, nothing floating, at least five shapes, every path reaching the End. They can't tell whether the return arrows land on the right hexagon, so trace `row 1` through both hexagons by hand and compare against the code's expected output before you call it done.
 
 No points, no AI grader. Redraw as often as you like.

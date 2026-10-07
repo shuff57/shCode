@@ -31,16 +31,16 @@
     {
       "id": "s3",
       "title": "Ground-gated jump (kb.presses + colliding)",
-      "instructions": "Use kb.presses(' ') (edge-triggered, fires once per tap: pass a literal space character, the string 'space' will not match) AND player.colliding(ground). Only then set player.vel.y to a negative number.",
+      "instructions": "Use kb.presses('space') (edge-triggered, fires once per tap; 'w' or ' ' also work) AND player.colliding(ground). Only then set player.vel.y to a negative number.",
       "hints": [
-        "The Input docs explains the difference between kb.pressing and kb.presses. Use a literal space ' ' as the key: 'space' is not recognized.",
+        "The Input docs explains the difference between kb.pressing and kb.presses. 'space' and ' ' both name the space bar.",
         "The Collisions docs chapter covers .colliding() for per-frame contact checks (returns the frame count while the bodies are in contact, falsy when apart)."
       ]
     },
     {
       "id": "s4",
       "title": "Win condition",
-      "instructions": "Add a goal sprite the player can reach. When ship.overlaps(goal), trigger a clear win state: change the background, log a message, or stop updating.",
+      "instructions": "Add a goal sprite the player can reach. When player.overlaps(goal), trigger a clear win state: change the background, log a message, or stop updating.",
       "hints": [
         "overlaps() is in the Collisions docs chapter. Boolean form is fine for a one-shot win check."
       ]
@@ -50,7 +50,7 @@
     {
       "id": "r1",
       "title": "Static geometry exists",
-      "description": "Create at least one sprite with collider 'static'",
+      "description": "Create at least one sprite with collider 'static'. Help: 5.2.6 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "WASD horizontal input",
-      "description": "Use kb.pressing with 'a' or 'd' inside draw()",
+      "description": "Use kb.pressing with 'a' or 'd' inside draw(). Help: 5.1.14 (Keyboard Movement)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -82,7 +82,7 @@
     {
       "id": "r4",
       "title": "Gravity enabled",
-      "description": "Assign a positive value to world.gravity.y",
+      "description": "Assign a positive value to world.gravity.y. Help: 5.2.2 (Gravity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "world\\.gravity\\.y\\s*=\\s*[1-9]",
@@ -92,18 +92,18 @@
     {
       "id": "r5",
       "title": "Edge-triggered jump",
-      "description": "Use kb.presses for the jump (not kb.pressing). Key arg must be a literal space ' ' or 'w'.",
+      "description": "Use kb.presses for the jump (not kb.pressing). The key can be 'space' (or ' '), 'w' or 'up'. Help: 6.3.3 (moSHion docs: Input edges)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "kb\\.presses\\s*\\(\\s*(?:['\"]w['\"]|['\"] ['\"])",
+      "pattern": "kb\\.presses\\s*\\(\\s*['\"](?:w|up|space| )['\"]",
       "flags": "",
       "points": 0
     },
     {
       "id": "r6",
       "title": "Ground-gated jump",
-      "description": "Use .colliding() to gate the jump",
+      "description": "Use .colliding() to gate the jump. Help: 6.3.6 (Colliding + Ground Detection)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.colliding\\s*\\(",
@@ -113,7 +113,7 @@
     {
       "id": "r7",
       "title": "Win condition via overlap",
-      "description": "Use .overlaps() somewhere: typically the goal-sprite check",
+      "description": "Use .overlaps() somewhere: typically the goal-sprite check. Help: 6.2.3 (moSHion docs: Collisions + Overlaps)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.overlaps\\s*\\(",

@@ -171,7 +171,7 @@ Save to a slot, then delete it with X+number. The label switches back to "empty"
 
 ## Step 3: Overwrite protection
 
-Before saving to a slot that already has data, show a warning. Only save if the player presses the key a second time within 2 seconds.
+Before saving to a slot that already has data, show a warning. Only save if the player presses the key a second time within 2 seconds. (`millis()` is the number of milliseconds since the sketch started; subtracting an earlier reading from the current one measures elapsed time.)
 
 ```js live
 let player;

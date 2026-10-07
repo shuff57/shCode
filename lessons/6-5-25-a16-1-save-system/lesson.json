@@ -61,7 +61,7 @@
     {
       "id": "r1",
       "title": "Canvas exists",
-      "description": "A canvas is created when the sketch starts.",
+      "description": "A canvas is created when the sketch starts. Help: 6.5.3 (storeItem: Save Game Data)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -71,7 +71,7 @@
     {
       "id": "r2",
       "title": "storeItem used",
-      "description": "storeItem is called at least once to save data to localStorage.",
+      "description": "storeItem is called at least once to save data to localStorage. Help: 6.5.3 (storeItem: Save Game Data)",
       "type": "regex",
       "file": "script.js",
       "pattern": "storeItem\\s*\\(",
@@ -81,7 +81,7 @@
     {
       "id": "r3",
       "title": "getItem used",
-      "description": "getItem is called at least once to read data from localStorage.",
+      "description": "getItem is called at least once to read data from localStorage. Help: 6.5.3 (storeItem: Save Game Data)",
       "type": "regex",
       "file": "script.js",
       "pattern": "getItem\\s*\\(",
@@ -91,7 +91,7 @@
     {
       "id": "r4",
       "title": "JSON.stringify used",
-      "description": "JSON.stringify is used to serialize save data before storing.",
+      "description": "JSON.stringify is used to serialize save data before storing. Help: 3.8.4 (JSON.stringify)",
       "type": "regex",
       "file": "script.js",
       "pattern": "JSON\\.stringify\\s*\\(",
@@ -101,7 +101,7 @@
     {
       "id": "r5",
       "title": "JSON.parse used",
-      "description": "JSON.parse is used to deserialize save data after loading.",
+      "description": "JSON.parse is used to deserialize save data after loading. Help: 3.8.8 (JSON.parse)",
       "type": "regex",
       "file": "script.js",
       "pattern": "JSON\\.parse\\s*\\(",

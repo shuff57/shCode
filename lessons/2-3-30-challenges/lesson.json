@@ -60,6 +60,16 @@
       "pattern": "break",
       "flags": "i",
       "points": 0
+    },
+    {
+      "type": "regex",
+      "file": "script.js",
+      "points": 0,
+      "id": "r4",
+      "title": "HTTP status cases",
+      "description": "case 200, 404 and 500 each appear.",
+      "pattern": "case\\s+200\\s*:[\\s\\S]*case\\s+404\\s*:[\\s\\S]*case\\s+500\\s*:",
+      "flags": "i"
     }
   ],
   "grading": {

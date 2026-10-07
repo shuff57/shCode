@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "isHigh() compares this.n to 10",
-      "description": "Write an `isHigh()` method inside `Counter` whose body compares `this.n` to `10` (e.g. `return this.n > 10`). The driver paints the number red when it returns truthy.",
+      "description": "Write an `isHigh()` method inside `Counter` whose body compares `this.n` to `10` (e.g. `return this.n > 10`). The driver paints the number red when it returns truthy. Help: 5.4.1 (Methods: functions that live on a class)",
       "type": "regex",
       "file": "script.js",
       "pattern": "isHigh\\s*\\([^)]*\\)\\s*\\{(?=[\\s\\S]*?\\breturn\\b)(?=[\\s\\S]*?(?:this\\.n\\s*>\\s*10|10\\s*<\\s*this\\.n))",

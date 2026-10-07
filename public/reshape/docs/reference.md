@@ -7,8 +7,8 @@ A reSHape script is the Build timeline written down. Every call appends one step
 A script is a straight run of steps. You make a shape, then change it: drill a hole, hollow it out, round its edges. Each line adds one step to the timeline, the same way the Build toolbar does. The script is executed top to bottom; the last shape built is what appears.
 
 ```js intro-basic
-const b = box(40, 40, 20)
-hollow(b, { wall: 2 })
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 2 })
 hole(b, { across: 6 })
 ```
 
@@ -22,7 +22,7 @@ Numbers are millimetres. Angles are degrees. Faces are plain words (`top`, `bott
 
 Every model starts with a shape. Each shape call returns a handle and adds a step to the timeline.
 
-A **box** is a rectangular block, centred at the origin. Specify width, depth, and height. `box(40, 40, 20)` is 40 mm wide (left-right), 40 mm deep (front-back), and 20 mm tall (up-down).
+A **box** is a rectangular block, centred at the origin. Specify width, depth, and height. `cuboid(40, 40, 20)` is 40 mm wide (left-right), 40 mm deep (front-back), and 20 mm tall (up-down).
 
 A **cylinder** is round, centred at the origin with its axis pointing up. Specify how wide across and how tall. `cylinder(30, 80)` is 30 mm across and 80 mm tall. Round the edges with an option: `cylinder(30, 80, { corner: 4 })`.
 
@@ -30,10 +30,10 @@ A **sphere** is a ball, centred at the origin. Specify how wide across. `sphere(
 
 A **cone** is round at the base and comes to a point, centred at the origin with the point up. Specify how wide across the base is and how tall. `cone(30, 40)` has a 30 mm base and stands 40 mm tall.
 
-A **ring** is a donut or torus, centred at the origin. Specify two diameters across: the ring diameter (distance across the middle of the donut) and the tube diameter (thickness of the tube). `ring(40, 8)` is 40 mm across the ring and 8 mm thick. Both measurements are diameters, not radii. A typical donut 36 mm across with an 8 mm thick tube uses `ring(36, 8)`.
+A **ring** is a donut or torus, centred at the origin. Specify two diameters across: the ring diameter (distance across the middle of the donut) and the tube diameter (thickness of the tube). `torus(40, 8)` is 40 mm across the ring and 8 mm thick. Both measurements are diameters, not radii. A typical donut 36 mm across with an 8 mm thick tube uses `torus(36, 8)`.
 
 ```js shape-box
-const b = box(40, 40, 20)
+const b = cuboid(40, 40, 20)
 ```
 
 A 40 × 40 × 20 box; 32,000 mm³.
@@ -57,13 +57,13 @@ const c = cone(30, 40)
 A cone with 30 mm base, tapering to 10 mm, standing 40 mm tall.
 
 ```js shape-ring
-const r = ring(40, 8)
+const r = torus(40, 8)
 ```
 
 A donut 40 mm across the ring, 8 mm tube diameter.
 
 ```js shape-rounded-box
-const b = box(30, 30, 20, { corner: 3 })
+const b = cuboid(30, 30, 20, { corner: 3 })
 ```
 
 A 30 × 30 × 20 box with all edges rounded.
@@ -74,30 +74,47 @@ const c = cylinder(30, 80, { corner: 2 })
 
 A cylinder 30 mm across, 80 mm tall, with edges rounded.
 
+A **prism** is a straight post with 3 to 12 equal sides. `prism(6, 20, 10)` is a hexagon 20 mm across its corners and 10 mm tall. The width is the whole distance corner to corner, a diameter like every other width here. Its volume is (sides / 2) × (across / 2)² × sin(360 / sides) × tall: the hexagon is 2598.08 mm³ and a triangle of the same size is 1299.04 mm³. Place one with `at: [x, y, z]`.
+
+```js shape-prism
+const hex = prism(6, 20, 10)
+const tri = prism(3, 20, 10, { at: [30, 0, 0] })
+```
+
+A hexagonal post and a triangular post beside it.
+
+A **wedge** is a block cut corner to corner along its height, so the end is a right triangle: a ramp, a stop or a gusset. `wedge(10, 20, 30)` is exactly half of a 10 × 20 × 30 block, so its volume is 10 × 20 × 30 / 2 = 3000 mm³. It is centred on the origin until you place it with `{ at: [x, y, z] }` or slide it later with `move(w, [x, y, z])`.
+
+```js shape-wedge
+const a = wedge(10, 20, 30, { at: [20, 0, 0] })
+```
+
+One ramp, 3000 mm³, placed 20 mm along x.
+
 ## Placing things at a location
 
 When you build multiple shapes, they all start at the origin, the point where the red, green, and blue lines meet. That means they land inside each other. Move shapes out of the way with `at: [x, y, z]` when you create them.
 
-**`at` positions the shape's centre.** `box(40, 40, 20, { at: [50, 0, 0] })` places the box's centre at x = 50, y = 0, z = 0. Shifting left-right is x, away-and-back is y, up-down is z. The numbers are millimetres.
+**`at` positions the shape's centre.** `cuboid(40, 40, 20, { at: [50, 0, 0] })` places the box's centre at x = 50, y = 0, z = 0. Shifting left-right is x, away-and-back is y, up-down is z. The numbers are millimetres.
 
 When you place shapes this way, they sit side by side. A second box built at the origin overlaps the first one built at the origin. Place it at `[80, 0, 0]` and it lands clear. This is why placing things with `at` is faster than building overlapping shapes and cutting them apart: you see the model you meant instead of the hole you have to fill.
 
 ```js place-side-by-side
-const left = box(30, 30, 20, { at: [-50, 0, 10] })
-const right = box(30, 30, 20, { at: [50, 0, 10] })
+const left = cuboid(30, 30, 20, { at: [-50, 0, 10] })
+const right = cuboid(30, 30, 20, { at: [50, 0, 10] })
 ```
 
 Two 30 × 30 × 20 boxes, 100 mm apart, lifted to sit on the floor.
 
 ```js place-stacked
-const base = box(40, 40, 10, { at: [0, 0, 5] })
-const top = box(20, 20, 10, { at: [0, 0, 15] })
+const base = cuboid(40, 40, 10, { at: [0, 0, 5] })
+const top = cuboid(20, 20, 10, { at: [0, 0, 15] })
 ```
 
 A base plate with a smaller box stacked above it.
 
 ```js place-assembly
-const plate = box(60, 40, 5, { at: [0, 0, 2.5] })
+const plate = cuboid(60, 40, 5, { at: [0, 0, 2.5] })
 const post = cylinder(6, 20, { at: [0, 0, 10] })
 const cap = sphere(8, { at: [0, 0, 28] })
 ```
@@ -105,8 +122,8 @@ const cap = sphere(8, { at: [0, 0, 28] })
 A plate, post, and sphere cap arranged vertically.
 
 ```js place-clear-of-origin
-const small = box(10, 10, 10)
-const large = box(40, 40, 20, { at: [60, 0, 0] })
+const small = cuboid(10, 10, 10)
+const large = cuboid(40, 40, 20, { at: [60, 0, 0] })
 ```
 
 A small box at the origin and a larger box placed clear of it.
@@ -115,53 +132,64 @@ A small box at the origin and a larger box placed clear of it.
 
 A **hole** is a pocket or a through-hole drilled into a shape. Specify how wide across and (optionally) how deep.
 
-`hole(b, { across: 6 })` drills a hole 6 mm across, all the way through. The hole's depth is calculated to go through the whole shape—an extent of 2 mm beyond each side ensures it reaches the far surface.
+`hole(b, { across: 6 })` drills a hole 6 mm across, all the way through. A through-hole needs to know how thick the part is, and it does for boxes, cylinders, cones, prisms, spheres, tori and wedges you have not turned, for a box or cylinder you have turned (at any angle), for a polarPattern around the hole's own axis, for a polarPattern of a box, cylinder or sphere around another axis, and for shapes pulled from a flat sketch, joined together, repeated in a line, moved or cut: a 30 × 20 pulled shape 20 mm tall takes `hole(t, { across: 6 })` straight through and leaves 12000 − 180π = 11434.51 mm³. A hole that stops short (`deep:`) also has to know exactly where the top is, so it works on those but stops with "cannot find where the top of this ... is" on a cut shape or a prism drilled across its corners. A turned cone, prism, torus or wedge, a polarPattern of anything else around another axis, an overlap or a mirror drilled along its own mirror axis still stops with "cannot find how thick" and asks you to give it a depth (and a `deep:` you give such a shape drills from its middle, so the kernel refuses one that would leave a sealed cavity). A second hole may cross the first at right angles, through its axis, as long as it is narrower than the first: a 40 × 40 × 20 block with an 8 mm hole down through it and a 4 mm hole across it along `x` leaves 30589.32 mm³ (9 faces). A hole as wide as or wider than the one it crosses, or one that misses its axis, gets a sentence that says so. Holes side by side may overlap too, and make a slot: a 10 mm hole and a 6 mm hole whose centres are 4 mm apart leave 32000 − (π × 5² + π × 3² − lens) × 20 = 30228.21 mm³ (9 faces), where the lens is the area the two circles share.
 
-`hole(b, { across: 6, deep: 10 })` drills a pocket 6 mm across and exactly 10 mm deep. The depth is measured from the face you pick, or the first face it encounters if you don't specify one.
+**Round parts take a hole too, in these cases.** A hole straight through a sphere's centre builds (through, or blind down to a floor inside the sphere). A hole down a cone's own axis builds. A hole across a cylinder's side builds when it passes straight through the cylinder's axis, is at most 95% as wide as the cylinder, stays clear of both ends, and either goes right through or stops inside the cylinder. Anything else on a round part gets a sentence that says what to do instead, and the shape is shown without the hole. A hole through a sphere exports to STEP.
+
+`hole(b, { across: 6, deep: 10 })` drills a pocket 6 mm across and exactly 10 mm deep. The depth is measured from the face the hole is drilled into: a blind `deep:` hole starts at that face, so the pocket is open there and never a sealed cavity inside the part.
 
 **`at` places the hole on the face.** `hole(b, { across: 6, at: [10, 0] })` drills the hole 10 mm to the right of the shape's centre on the first face. The coordinates are local to that face: x and y only, no z.
 
-**`along` drills perpendicular to a different face.** `hole(b, { across: 6, along: 'x' })` drills from the right or left face (perpendicular to the x-axis) rather than from the top. The hole still goes across 6 mm and through (depth extends beyond the shape by 2 mm).
+**`along` drills perpendicular to a different face.** `hole(b, { across: 6, along: 'x' })` drills from the right or left face (perpendicular to the x-axis) rather than from the top. The hole still goes across 6 mm and through.
 
 **`holes` drills multiple holes at once in a rectangular pattern.** `holes(b, { across: 6, apart: [15, 10] })` drills four holes—spacing 15 mm apart left-right and 10 mm apart front-back. The pattern is centred on the shape.
 
 ```js hole-through
-const b = box(40, 40, 20)
+const b = cuboid(40, 40, 20)
 hole(b, { across: 6 })
 ```
 
 A 40 × 40 × 20 box with a 6 mm through-hole at the centre of the top face.
 
 ```js hole-pocket
-const b = box(40, 40, 20)
+const b = cuboid(40, 40, 20)
 hole(b, { across: 6, deep: 10 })
 ```
 
 A 40 × 40 × 20 box with a 6 mm pocket 10 mm deep on the top face.
 
+**`size` names a bolt instead of a width.** `hole(b, { size: 'M6' })` looks up the clearance hole that bolt passes through, in millimetres (the ISO medium fit): M3 3.4, M4 4.5, M5 5.5, M6 6.6, M8 9, M10 11, M12 13.5. The name is not case-sensitive, so `'m6'` works. `size` is another way to say `across`: give one or the other, never both. A size that is not in the list stops the script, with the valid names in the message. An M6 hole through a 40 × 40 × 20 block leaves 32000 − 217.8π = 31315.76 mm³.
+
+```js hole-size
+const b = cuboid(40, 40, 20)
+hole(b, { size: 'M6' })
+```
+
+A 40 × 40 × 20 box with an M6 clearance hole (6.6 mm across) through it.
+
 ```js hole-offset
-const b = box(40, 40, 20)
+const b = cuboid(40, 40, 20)
 hole(b, { across: 6, at: [10, 0] })
 ```
 
 A 40 × 40 × 20 box with a 6 mm through-hole offset from the centre.
 
 ```js hole-from-side
-const b = box(40, 40, 20)
+const b = cuboid(40, 40, 20)
 hole(b, { across: 6, along: 'x' })
 ```
 
 A 40 × 40 × 20 box with a 6 mm through-hole drilled from the side.
 
 ```js holes-pattern
-const b = box(40, 40, 20)
+const b = cuboid(40, 40, 20)
 holes(b, { across: 4, apart: [15, 15] })
 ```
 
 A 40 × 40 × 20 box with four 4 mm through-holes in a square pattern.
 
 ```js hole-multiple
-const b = box(40, 40, 20)
+const b = cuboid(40, 40, 20)
 hole(b, { across: 3, at: [-10, -10] })
 hole(b, { across: 3, at: [10, 10] })
 ```
@@ -172,70 +200,70 @@ A 40 × 40 × 20 box with two 3 mm through-holes at opposite corners.
 
 A **hollow** removes the inside of a shape, leaving a shell with walls of a thickness you specify.
 
-`hollow(b, { wall: 2 })` hollows the entire shape, leaving 2 mm thick walls on all sides. The hollow is a closed shell with no opening.
+`shell(b, { wall: 2 })` hollows the entire shape, leaving 2 mm thick walls on all sides. The hollow is a closed shell with no opening.
 
-`hollow(b, { wall: 2, open: 'top' })` hollows the shape but leaves one face open—the top in this case. You can now fill the shape from above, like a pencil cup. Open options are `'top'`, `'bottom'`, `'front'`, `'back'`, `'left'`, `'right'`.
+`shell(b, { wall: 2, open: 'top' })` hollows the shape but leaves one face open—the top in this case. You can now fill the shape from above, like a pencil cup. Open options are `'top'`, `'bottom'`, `'front'`, `'back'`, `'left'`, `'right'`.
 
 The wall thickness is measured inward from each surface. A 40 × 40 × 20 box hollowed with 2 mm walls becomes a shell with 2 mm thick walls all around.
 
-**The order that always builds: shape, hollow, holes, then single-edge rounds and bevels.** `hollow` comes first because this kernel cannot hollow a shape that already has a hole or a round in it; asked later, the timeline shows "Hollowing Hollow 1 did not work after the steps before it -- this kernel cannot hollow a shape that already has a hole or a round. Hollow first, then drill or round. Hollow 1 is shown without it." A hollowed shape rounds its edges one at a time, with `round(b.edge('top', 'front'), 1)`. Rounding every edge at once (`round(b, 3)`) is a property of the shape itself, and a shape cannot have both that and a hollow: before the hollow, the kernel refuses the hollow; after it, the script stops with "Rounding works on a shape, not a hollowed-out one. A hollow shape rounds its edges one at a time: pick an edge and round that." Round every edge only on shapes you do not hollow, and before any hole.
+**The order that always builds: shape, hollow, holes, then single-edge rounds and bevels.** `hollow` comes first because hollowing a shape that already has a hole or a round in it only works in a few cases (a hole straight through, or a chamfer: see below); anywhere else the timeline shows a sentence that says so, and the hollow is shown without it. A hollowed shape rounds its edges one at a time, with `fillet(b.edge('top', 'front'), 1)`. Rounding every edge at once (`fillet(b, 3)`) is a property of the shape itself, and a shape cannot have both that and a hollow: before the hollow, the kernel refuses the hollow; after it, the script stops with "Rounding works on a shape, not a hollowed-out one. A hollow shape rounds its edges one at a time: pick an edge and round that." Round every edge only on shapes you do not hollow, and before any hole. These orders build as well. Drill a plain box and then round one edge the hole stays clear of: the kernel rounds that edge of the drilled block directly, so a 40 × 40 × 20 block with an 8 mm hole and then a 3 mm round on one 40 mm edge leaves 32000 − 16 × π × 20 − (1 − π/4) × 3² × 40 = 30917.43 mm³ (8 faces). Hollow a plain box and then round one edge that is farther from the cavity than the round is big: the kernel builds the round and the cavity together, so a 1.5 mm round on one 40 mm edge of the hollowed box leaves 11264 − (1 − π/4) × 1.5² × 40 = 11244.69 mm³. Drill it and then hollow it, when the hole goes straight through: the wall runs round the hole, 2 mm thick like everywhere else, so a 40 × 40 × 20 block with an 8 mm hole and then `shell(b, { wall: 2, open: 'bottom' })` leaves 8672 + π × (6² − 4²) × 18 − π × 4² × 2 = 9702.44 mm³ (14 faces), and the closed hollow of the same block leaves 30994.69 − (36 × 36 × 16 − π × 6² × 16) = 12068.25 mm³. Chamfer a plain box and then hollow it: the wall follows the chamfer, so a 3 mm chamfer on the top front edge and then `shell(c, { wall: 2, open: 'top' })` leaves 32000 − 180 − (36 × 36 × 18 − (3 + √2 × 2 − 2)² / 2 × 36) = 8755.82 mm³ (13 faces). A hole that stops inside the part, a counterbore or a countersink gets "brep-rs cannot hollow a part with a blind hole, counterbore or countersink yet"; a hole so near a side or another hole that the wall cannot run round it gets "the wall that runs round each hole would reach a side of the part or another hole's wall"; for those, hollow first and drill afterwards. A round that would reach the hole or the cavity gets a sentence that says so.
 
 ```js hollow-closed
-const b = box(40, 40, 20)
-hollow(b, { wall: 2 })
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 2 })
 ```
 
 A 40 × 40 × 20 box hollowed with 2 mm thick walls, completely sealed.
 
 ```js hollow-open-top
-const b = box(40, 40, 20)
-hollow(b, { wall: 2, open: 'top' })
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 2, open: 'top' })
 ```
 
 A 40 × 40 × 20 box hollowed with 2 mm thick walls and the top face open, like a cup.
 
 ```js hollow-open-side
-const b = box(40, 40, 20)
-hollow(b, { wall: 2, open: 'front' })
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 2, open: 'front' })
 ```
 
 A 40 × 40 × 20 box hollowed with the front face open.
 
 ```js hollow-then-hole
-const b = box(40, 40, 20)
-hollow(b, { wall: 2 })
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 2 })
 hole(b, { across: 6 })
 ```
 
 A 40 × 40 × 20 box hollowed first with 2 mm walls, then drilled through. Hollow first, then hole: this kernel cannot hollow a shape that already has a hole in it.
 
 ```js hollow-full-order
-const b = box(40, 40, 20)
-hollow(b, { wall: 2 })
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 2 })
 hole(b, { across: 6 })
-round(b.edge('top', 'front'), 1)
+fillet(b.edge('top', 'front'), 1)
 ```
 
 Every kind of step on one box, in the order that builds: the shape, a 2 mm hollow, a 6 mm hole through, and one edge of the result rounded to 1.
 
 ```js hollow-open-round-rim
-const b = box(40, 40, 20)
-hollow(b, { wall: 2, open: 'top' })
-round(b.edge('top', 'front'), 1)
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 2, open: 'top' })
+fillet(b.edge('top', 'front'), 1)
 ```
 
 A 40 × 40 × 20 box hollowed with 2 mm walls and the top open, with the top-front rim edge -- the boundary the opening left behind, not a face of the hollow itself -- rounded to 1 mm; ≈8663 mm³.
 
 ```js hollow-thin-wall
-const b = box(40, 40, 20)
-hollow(b, { wall: 1 })
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 1 })
 ```
 
 A 40 × 40 × 20 box with thin 1 mm walls.
 
 ```js hollow-thick-wall
-const b = box(40, 40, 20)
-hollow(b, { wall: 5 })
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 5 })
 ```
 
 A 40 × 40 × 20 box with thick 5 mm walls.
@@ -244,93 +272,104 @@ A 40 × 40 × 20 box with thick 5 mm walls.
 
 A **round** smooths edges into curves. A **bevel** cuts edges at an angle.
 
-`round(b, 3)` rounds every edge of the shape to a 3 mm radius. On a box or cylinder, this softens all the sharp corners at once, and it shows in the timeline as part of the shape ("Box 1, corner 3") rather than as its own step, because it is a property of the shape. Rounding one edge is its own step ("Round 1").
+`fillet(b, 3)` rounds every edge of the shape to a 3 mm radius. On a box or cylinder, this softens all the sharp corners at once, and it shows in the timeline as part of the shape ("Box 1, corner 3") rather than as its own step, because it is a property of the shape. Rounding one edge is its own step ("Round 1").
 
-`round(b.edge('top', 'front'), 3)` rounds only the edge between the top and front faces, named by the two faces it connects. This lets you soften one edge while leaving others sharp. Use this for detail work—rounding just the corner where two faces meet, leaving the rest untouched.
+`fillet(b.edge('top', 'front'), 3)` rounds only the edge between the top and front faces, named by the two faces it connects. This lets you soften one edge while leaving others sharp. Use this for detail work—rounding just the corner where two faces meet, leaving the rest untouched. A part you have joined or cut rounds the same way: any straight outside edge between two flat faces whose two ends are plain flat faces. A 40 × 40 × 20 block with a 10 × 10 × 10 corner notch cut from the top (31000 mm³) and then `fillet(v.edge('top', 'right'), 2)` on its 40 mm edge leaves 31000 − (1 − π/4) × 2² × 40 = 30965.66 mm³, and two 20 mm cubes joined side by side with a 1 mm round on the 30 mm top front edge leave 12000 − (1 − π/4) × 1² × 30 = 11993.56 mm³. The words top, front and so on name the part's own topmost and frontmost faces, whole (an L-shaped top is one face). If those two faces do not touch, the words match every edge between a top-looking and a front-looking face: one edge is the one you mean, and several get the sentence "N edges of the part lie between a top face and a front face". An inside corner (where a wall stands on a plate, the bend of an L bracket) rounds the other way: the round ADDS material, a fillet of radius 2 in a 90 degree inside corner 20 mm long adds (1 − π/4) × 2² × 20 = 17.17 mm³, and a chamfer of 2 adds 2 × 2 / 2 × 20 = 40 mm³. The words top and right match the outside edges around an inside corner as well, so the part answers with the sentence "3 edges of the part lie between a top face and a right face" until the words pick out exactly one edge. An inside corner that ends on more material (a tray's corner), an edge that ends against a slanted or curved face, the circle at the foot of a round boss, or a round so big it would reach a neighbouring cut, each gets a sentence that says so.
 
-`bevel` works the same way, but with a 45-degree cut instead of a smooth curve. `bevel(b.edge('top', 'front'), 3)` bevels that one edge by 3 mm.
+`bevel` works the same way, but with a 45-degree cut instead of a smooth curve. `chamfer(b.edge('top', 'front'), 3)` bevels that one edge by 3 mm. On a mirrored part, or on copies that touch, an edge that runs on across the mirror plane is still one edge and is chamfered all the way along: an 8 × 30 × 10 block mirrored left-right and then chamfered by 2 mm on its bottom front edge leaves 4800 − 2 × 2 × 16 = 4768 mm³. An edge that only lies on the same line as the other copy's different edge gets a sentence that says so.
+
+**Turned parts: bushings, washers and pins.** A cylinder with a hole down its axis and rounded or bevelled rims is a part you could turn on a lathe, and the kernel builds it from its outline in one go, so these all build in any order: round the top rim and then the bottom rim, round or bevel a rim after the hole, drill after the rounds, and hollow a part whose rims are bevelled. `cylinder(40, 20)` with an 8 mm hole and a 3 mm round on each rim leaves 25132.74 − 1005.31 − 2 × 234.58 = 23658.28 mm³, and a 3 mm bevel on each rim (no hole) leaves 24058.32 mm³. Hollow it open at either end and the wall follows the bevel: a 3 mm bevel on the top rim and `shell(c, { wall: 2, open: 'top' })` leaves 7043.83 mm³, and the same part hollowed shut leaves a sealed wall 2 mm thick all round. Round the OUTER rim of the end you leave open, before or after the hollow, as long as the round is narrower than the wall: the cavity wall runs straight up to the open end and the lip keeps a flat of (wall − round) between the two, so `cylinder(40, 20)` rounded 1 mm on the top rim and hollowed open at the top with a 2 mm wall leaves 6784.31 mm³ either way round, and a round as wide as the wall (or wider) would eat the whole lip and gets a sentence that says so; a hole off the axis, a wall thicker than the rim it follows and a round wider than the flat it sits on each get a sentence that says what to do instead. Rounds and bevels both export to STEP.
 
 Edge names are the six faces: `'top'`, `'bottom'`, `'front'`, `'back'`, `'left'`, `'right'`. A cylinder also has `'side'`. The edge between top and front is written `b.edge('top', 'front')`, and it is the same edge as `b.edge('front', 'top')`.
 
 ```js round-all-edges
-const b = box(30, 20, 10)
-round(b, 3)
+const b = cuboid(30, 20, 10)
+fillet(b, 3)
 ```
 
 A 30 × 20 × 10 box with all edges rounded.
 
 ```js round-one-edge
-const b = box(40, 40, 20)
-round(b.edge('top', 'front'), 2)
+const b = cuboid(40, 40, 20)
+fillet(b.edge('top', 'front'), 2)
 ```
 
 A 40 × 40 × 20 box with only the top-front edge rounded.
 
 ```js bevel-one-edge
-const b = box(40, 40, 20)
-bevel(b.edge('top', 'front'), 3)
+const b = cuboid(40, 40, 20)
+chamfer(b.edge('top', 'front'), 3)
 ```
 
 A 40 × 40 × 20 box with the top-front edge bevelled.
 
 ```js round-cylinder-edges
 const c = cylinder(30, 60)
-round(c.edge('top', 'side'), 2)
+fillet(c.edge('top', 'side'), 2)
 ```
 
 A cylinder with the top rim rounded.
 
 ```js round-then-bevel
-const b = box(40, 40, 20)
-round(b.edge('top', 'front'), 1)
-round(b.edge('top', 'back'), 1)
-bevel(b.edge('bottom', 'front'), 2)
+const b = cuboid(40, 40, 20)
+fillet(b.edge('top', 'front'), 1)
+fillet(b.edge('top', 'back'), 1)
+chamfer(b.edge('bottom', 'front'), 2)
 ```
 
 A 40 × 40 × 20 box with selective rounding and bevelling.
+
+A **draft** tilts the side walls so a part can release from a mould, or come away cleanly from a print. `draft(shape, angle, { whole: true })` leans every side wall by `angle` degrees. The wall at the middle height stays where it was; the top leans in and the bottom flares out. For a 40 × 40 × 20 block drafted 8 degrees the volume is 32000 + (8/3) × 10³ × tan(8°)² = 32052.67 mm³. A very steep angle collapses a wall, and then the panel tells you so in a sentence.
+
+```js draft-whole
+const b = cuboid(40, 40, 20)
+draft(b, 8, { whole: true })
+```
+
+A 40 × 40 × 20 block with all four walls drafted 8 degrees.
 
 ## Repeating and patterns
 
 A **repeat** copies a shape in a line, spaced apart. A **repeatAround** spins copies around a central axis, like petals around a flower.
 
-`repeat(b, { count: 3, step: 60 })` makes 3 copies of a shape, each 60 mm along the x-axis from the last. The copies stack left to right.
+`linearPattern(b, { count: 3, step: 60 })` makes 3 copies of a shape, each 60 mm along the x-axis from the last. The copies stack left to right.
 
-`repeat(b, { count: 3, step: [60, 0, 0] })` makes the same pattern explicitly along x. You can specify `step: [0, 60, 0]` to repeat along y or `step: [0, 0, 60]` to repeat along z. Any combination works.
+`linearPattern(b, { count: 3, step: [60, 0, 0] })` makes the same pattern explicitly along x. You can specify `step: [0, 60, 0]` to repeat along y or `step: [0, 0, 60]` to repeat along z. Any combination works.
 
-`repeatAround(b, { count: 6, axis: 'z' })` makes 6 copies arranged in a circle around the z-axis, evenly spaced. `axis: 'x'` or `axis: 'y'` rotate around a different axis instead.
+`polarPattern(b, { count: 6, axis: 'z' })` makes 6 copies arranged in a circle around the z-axis, evenly spaced. `axis: 'x'` or `axis: 'y'` rotate around a different axis instead. Copies that overlap are joined into one solid (at count 6 the copies in the example below overlap and become a single 16760.91 mm³ part); a pattern whose copies overlap in a way brep-rs cannot join exactly stops with a sentence that says so.
 
 ```js repeat-linear
-const b = box(20, 20, 10)
-repeat(b, { count: 3, step: 60 })
+const b = cuboid(20, 20, 10)
+linearPattern(b, { count: 3, step: 60 })
 ```
 
 Three 20 × 20 × 10 boxes in a line, spaced 60 mm apart.
 
 ```js repeat-along-y
 const c = cylinder(10, 30)
-repeat(c, { count: 4, step: [0, 40, 0] })
+linearPattern(c, { count: 4, step: [0, 40, 0] })
 ```
 
 Four cylinders arranged in a line along the y-axis, 40 mm apart.
 
 ```js repeat-vertical
-const b = box(30, 30, 10)
-repeat(b, { count: 3, step: [0, 0, 15] })
+const b = cuboid(30, 30, 10)
+linearPattern(b, { count: 3, step: [0, 0, 15] })
 ```
 
 Three 30 × 30 × 10 boxes stacked vertically, 15 mm apart.
 
 ```js repeat-around-circle
-const b = box(10, 30, 10, { at: [25, 0, 0] })
-repeatAround(b, { count: 6, axis: 'z' })
+const b = cuboid(10, 30, 10, { at: [25, 0, 0] })
+polarPattern(b, { count: 6, axis: 'z' })
 ```
 
 Six boxes arranged in a circle around the z-axis.
 
 ```js repeat-around-with-hole
-const b = box(6, 20, 6, { at: [20, 0, 0] })
-repeatAround(b, { count: 4, axis: 'z' })
-hole(b, { across: 3 })
+const b = cuboid(6, 20, 6, { at: [20, 0, 0] })
+polarPattern(b, { count: 4, axis: 'z' })
+hole(b, { across: 3, deep: 6 })
 ```
 
 Four boxes in a circle, each with a hole drilled through.
@@ -344,21 +383,21 @@ A **mirror** flips a shape across a plane, creating a symmetrical copy.
 Mirror options are `'left-right'` (mirror across the y-z plane), `'front-back'` (mirror across the x-z plane), and `'top-bottom'` (mirror across the x-y plane).
 
 ```js mirror-left-right
-const b = box(30, 40, 20, { at: [30, 0, 10] })
+const b = cuboid(30, 40, 20, { at: [30, 0, 10] })
 mirror(b, 'left-right')
 ```
 
 A box and its left-right mirror.
 
 ```js mirror-front-back
-const b = box(40, 30, 20, { at: [0, 30, 10] })
+const b = cuboid(40, 30, 20, { at: [0, 30, 10] })
 mirror(b, 'front-back')
 ```
 
 A box and its front-back mirror.
 
 ```js mirror-top-bottom
-const b = box(40, 40, 10, { at: [0, 0, 20] })
+const b = cuboid(40, 40, 10, { at: [0, 0, 20] })
 mirror(b, 'top-bottom')
 ```
 
@@ -373,28 +412,28 @@ A **move** shifts a shape to a new location. A **turn** rotates a shape around i
 `turn(b, [0, 0, 45])` rotates the shape 45 degrees around the z-axis (spinning in place). The rotation happens around the shape's own middle, not the world origin. Angles are degrees. Specify all three axes as `[x-rotation, y-rotation, z-rotation]`, or just the z-rotation as a single number for the common case.
 
 ```js move-shape
-const b = box(20, 20, 10)
+const b = cuboid(20, 20, 10)
 move(b, [40, 0, 0])
 ```
 
 A 20 × 20 × 10 box moved 40 mm to the right.
 
 ```js turn-around-z
-const b = box(30, 20, 10, { at: [0, 0, 5] })
+const b = cuboid(30, 20, 10, { at: [0, 0, 5] })
 turn(b, [0, 0, 45])
 ```
 
 A 30 × 20 × 10 box rotated 45 degrees, tilted on one corner.
 
 ```js turn-around-x
-const b = box(40, 20, 10, { at: [0, 0, 5] })
+const b = cuboid(40, 20, 10, { at: [0, 0, 5] })
 turn(b, [90, 0, 0])
 ```
 
 A 40 × 20 × 10 box rotated 90 degrees, standing up on one edge.
 
 ```js move-and-turn
-const b = box(20, 20, 10)
+const b = cuboid(20, 20, 10)
 turn(b, [0, 0, 30])
 move(b, [30, 0, 0])
 ```
@@ -405,43 +444,43 @@ A 20 × 20 × 10 box moved and then rotated.
 
 **Join** glues two shapes together (union). **Cut** removes one shape from another. **Keep** finds the overlap (intersection).
 
-`join(a, b)` combines two shapes into one. Where they touch or overlap, they become one solid. After joining, the result is one shape you can drill, hollow, or round.
+`union(a, b)` combines two shapes into one. Where they touch or overlap, they become one solid. After joining, the result is one shape you can drill, hollow, or round. Two cylinders whose axes cross at a right angle join too, a pipe tee or a boss on a shaft, as long as the second is narrower than the first: `cylinder(20, 40)` and `cylinder(10, 40, { at: [0, 0, 0] })` turned `[0, 90, 0]` make π × 10² × 40 + π × 5² × 40 − 1520.04 = 14187.92 mm³ (7 faces), where 1520.04 mm³ is the part the two share. A second cylinder as wide as the first, one whose axis misses the first's or crosses it at a slant, and a boss that ends between the curve where the two surfaces meet and the wall get a sentence that says so. A shape joined with an identical copy of itself in the same place is just that shape. Two shapes that only touch along a line or at a point (a cylinder resting against a block's side, two blocks sharing one edge) would not be one solid, and get a sentence that says so; overlap them a little, or let them share a face. A peg as wide as the hole it sits in joins into the part: a 40 × 40 × 20 block with a 10 mm hole 12 mm deep (`hole(b, { across: 10, deep: 12 })`) and a `cylinder(10, 12, { at: [0, 0, 4] })` standing in it make 32000 mm³ again. A ball or a cone joins a block, a cylinder, or another ball or cone when every cut is a circle around the ball's or cone's own axis: the block's faces square to that axis, the cylinder about it. `cuboid(40, 40, 10, { at: [0, 0, 5] })` with `sphere(16, { at: [0, 0, 10] })`, a ball centred on the plate's top face, adds the upper half of the ball: 16000 + 2 × π × 8³ / 3 = 17072.33 mm³ (7 faces); `cylinder(20, 20)` with `cone(20, 14, { at: [0, 0, 17] })`, a cone standing on its top face, makes π × 10² × 20 + π × 10² × 14 / 3 = 7749.26 mm³ (3 faces). A block whose side the ball would cross, a ball against a block's corner, a cylinder off the ball's axis, a plate resting on the ball's top point, and two equal balls get a sentence that says so.
 
-`cut(a, b)` subtracts b from a. The volume of b is removed from a, leaving a hole. This is how you cut complex features into a shape when drilling doesn't fit.
+`subtract(a, b)` subtracts b from a. The volume of b is removed from a, leaving a hole. This is how you cut complex features into a shape when drilling doesn't fit.
 
-`keep(a, b)` keeps only the part where a and b overlap. The result is their intersection—the shape where both exist.
+`intersect(a, b)` keeps only the part where a and b overlap. The result is their intersection—the shape where both exist. This kernel intersects boxes with boxes, and two cylinders whose axes cross at a right angle with the second narrower than the first: `cylinder(20, 40)` and `cylinder(10, 40, { at: [0, 0, 0] })` turned `[0, 90, 0]` keep the 1520.04 mm³ they share (3 faces). A ball with a block that slices it keeps the cap: `sphere(24)` and `cuboid(60, 60, 20, { at: [0, 0, 18] })` keep π × 4² × (3 × 12 − 4) / 3 = 536.17 mm³ (2 faces), a cap 4 mm tall; a cone with a plate above its middle keeps the tip. This works when the block's faces are square to the ball's or cone's axis and its sides do not reach the ball; a box that cuts across the ball's side is a pair it cannot intersect yet.
 
-The first argument is the one you keep. `cut(a, b)` removes b from a; `cut(b, a)` removes a from b. The order matters.
+The first argument is the one you keep. `subtract(a, b)` removes b from a; `subtract(b, a)` removes a from b. The order matters. It also works on a part that is already hollow, an open-top cup, or a part with a flat-sided pocket: a 60 × 30 × 40 box laid over half of a hollowed 40 × 40 × 20 box (`shell(b, { wall: 2 })`) takes away exactly half, leaving 11264 ÷ 2 = 5632 mm³. It also takes a part with a round hole cut into it, as long as the cutter crosses the hole's wall along its whole length: the same box with a 12 mm hole through it and the same cutter leaves (32000 − 36 × π × 20) ÷ 2 = 14869.03 mm³. A cutter that covers only part of the hole's height works too: a 60 × 30 × 6 cutter across the middle of the same 12 mm hole removes 20 × 40 × 6 − 36 × π × 3 = 4460.71 mm³ and leaves 25277.35 mm³. A cutter whose face just touches a cylinder along a line works too: `cylinder(20, 30)` with a 20 × 20 × 40 cutter laid over its upper half (`at: [0, 10, 0]`) leaves half of π × 10² × 30, 4712.39 mm³. A shape cut from an identical copy of itself leaves nothing, and gets a sentence that says so. A cutter that sits wholly inside the part but touches its surface along a line or at a point (a cylinder grazing the top face from inside, a ball resting against it) gets a sentence that says so, because what is left would not be one solid; move it a little, or make it go all the way through. A slanted cutter face gets a sentence that says so. A ball cuts a round pocket in a block when the block's faces are square to the ball's axis and the block is wider than the ball: `cuboid(40, 40, 20, { at: [0, 0, 10] })` minus `sphere(24, { at: [0, 0, 20] })`, a ball centred on the top face, leaves 32000 − 2 × π × 12³ / 3 = 28380.89 mm³ (7 faces). A cone cuts a conical dent the same way, and a ball takes a cap, a cone a tip, off whatever a plate slices from it. A cut that would leave two separate pieces, such as a ball with a slab taken out of its middle, gets a sentence that says so.
 
 ```js join-shapes
-const base = box(40, 40, 10, { at: [0, 0, 5] })
+const base = cuboid(40, 40, 10, { at: [0, 0, 5] })
 const post = cylinder(6, 20, { at: [0, 0, 10] })
-join(base, post)
+union(base, post)
 ```
 
 A base and post combined into one shape.
 
 ```js cut-hole
-const b = box(40, 40, 20, { at: [0, 0, 10] })
-const cutter = box(20, 20, 30, { at: [0, 0, 15] })
-cut(b, cutter)
+const b = cuboid(40, 40, 20, { at: [0, 0, 10] })
+const cutter = cuboid(20, 20, 30, { at: [0, 0, 15] })
+subtract(b, cutter)
 ```
 
 A 40 × 40 × 20 box with a rectangular block subtracted from its centre.
 
 ```js keep-overlap
-const a = box(40, 40, 20, { at: [0, 0, 10] })
+const a = cuboid(40, 40, 20, { at: [0, 0, 10] })
 const b = sphere(20, { at: [0, 0, 20] })
-keep(a, b)
+intersect(a, b)
 ```
 
 The intersection of a box and sphere.
 
 ```js boolean-sequence
-const base = box(40, 40, 20, { at: [0, 0, 10] })
-const notch = box(15, 40, 10, { at: [-20, 0, 10] })
-cut(base, notch)
-round(base, 2)
+const base = cuboid(40, 40, 20, { at: [0, 0, 10] })
+const notch = cuboid(15, 40, 10, { at: [-20, 0, 10] })
+subtract(base, notch)
+fillet(base, 2)
 ```
 
 A box with a notch cut out and edges rounded.
@@ -462,16 +501,16 @@ On the sketch, draw shapes with `rect`, `circle`, and `polygon`, all positioned 
 
 Once you have a sketch, extrude it into a 3D shape.
 
-`pull(sk, 30)` extrudes the sketch upward 30 mm, creating a solid. The extrusion runs perpendicular to the plane the sketch is drawn on.
+`extrude(sk, 30)` extrudes the sketch upward 30 mm, creating a solid. The extrusion runs perpendicular to the plane the sketch is drawn on.
 
-`spin(sk, 360)` revolves the sketch around an axis 360 degrees (a full turn). This is useful for rotational symmetry—draw a profile and spin it to create a 3D shape.
+`revolve(sk, 360)` revolves the sketch around an axis 360 degrees (a full turn): the line through the origin that stands square to the sketch plane, so the sketch's across direction is the distance from the axis and its up direction runs along it. This is useful for rotational symmetry—draw a profile and spin it to create a 3D shape. The 30 × 10 rectangle in the example below sits 25 to 55 mm out from the axis, so it spins into a ring whose volume is 2 × π × 40 × 300 = 75398.22 mm³ (the distance of the rectangle's middle from the axis, times its area, times 2π). A sketch gets the same checks as a pull: edges that cross, a corner landing on an edge, a spike, or no area at all stop with a sentence that says what to move. A spin also stops when the outline crosses the axis, because the two sides would overlap; draw the whole outline on one side. A shape touching the axis is fine.
 
-`blend(sk1, sk2, 20)` smoothly transitions from one sketch to another over 20 mm, creating a lofted surface between them.
+`loft(sk1, sk2, 20)` smoothly transitions from one sketch to another over 20 mm, creating a lofted surface between them.
 
 ```js sketch-rect
 const sk = sketch('top')
 sk.rect(20, 10)
-const shape = pull(sk, 30)
+const shape = extrude(sk, 30)
 ```
 
 A rectangular prism extruded from a sketch.
@@ -479,7 +518,7 @@ A rectangular prism extruded from a sketch.
 ```js sketch-circle
 const sk = sketch('front')
 sk.circle(10)
-const shape = pull(sk, 40)
+const shape = extrude(sk, 40)
 ```
 
 A cylinder created by extruding a circle.
@@ -487,35 +526,142 @@ A cylinder created by extruding a circle.
 ```js sketch-polygon
 const sk = sketch('top')
 sk.polygon([[0, 0], [20, 0], [10, 15]])
-const shape = pull(sk, 30)
+const shape = extrude(sk, 30)
 ```
 
 A triangular prism extruded from a polygon.
 
+`sk.round(corner, radius)` turns a corner into a circular arc and `sk.chamfer(corner, distance)` cuts it off with a straight bevel. Corners are numbered from 1, the same numbers the Rules panel and `sk.pin()` use: corner 1 is the first point of the outline (for a rectangle, the one at the lower left), and a round or chamfer on corner 1 is written `sk.round(1, 4)`. The number is a whole number from 1 to the corner count; 0 or a number past the last corner stops the script with a sentence that says so. A round or chamfer bigger than its corner has room for is cut down to what the corner can give, and the script says so in its notes: ".round(2, 99) is more than corner 2 has room for, so it was made 10 instead". A round and a chamfer on one corner leave the round. Here a 30 × 20 rectangle has corner 1 rounded by 4 and corner 3 chamfered by 3, and is extruded 12: its area is 600 − (1 − π/4) × 4² − 3²/2 = 592.07 mm², so the volume is 7104.80 mm³.
+
+```js sketch-corners
+const sk = sketch('top')
+sk.rect(30, 20)
+sk.round(1, 4)
+sk.chamfer(3, 3)
+const shape = extrude(sk, 12)
+```
+
+A rectangle with one rounded corner and one bevelled corner, extruded.
+
 ```js sketch-spin
 const sk = sketch('front', 0)
 sk.rect(30, 10, { at: [40, 0] })
-const shape = spin(sk, 360)
+const shape = revolve(sk, 360)
 ```
 
 A shape created by spinning a rectangle around an axis.
+
+A round on the outline spins into a true curved surface, not a bevel: with corner 1 of the ring above rounded by 4 (`sk.round(1, 4)`), the part is 74839.59 mm³, which is the plain ring less the corner, 2 × π × 25.89 × (1 − π/4) × 4², where 25.89 is how far out the middle of that corner piece sits. A chamfer there would take off a different amount (74074.57 mm³), so the two are not interchangeable. An outline drawn with arcs spins the same way when it sits clear of the axis. Rounds and arcs spin a full turn (360) only; a part turn of a curved outline, an arc whose centre is on the axis (a ball: use `sphere()`), and a groove with a curved outline each stop with a sentence.
+
+```js sketch-spin-round
+const sk = sketch('front', 0)
+sk.rect(30, 10, { at: [40, 0] })
+sk.round(1, 4)
+const shape = revolve(sk, 360)
+```
+
+The same ring with one rounded corner, spun into a true curved surface.
 
 ```js sketch-blend
 const sk1 = sketch('top')
 sk1.circle(15)
 const sk2 = sketch('top', 30)
 sk2.circle(5)
-const shape = blend(sk1, sk2, 30)
+const shape = loft(sk1, sk2, 30)
 ```
 
 A cone-like shape blended from one circle to another.
+
+`pocket(sk, shape, depth)` is `extrude` in reverse: it pushes the sketch into a shape and takes that block away instead of adding one. Say the sketch first, then the shape it cuts, then how deep. A 10 × 10 pocket 5 mm deep leaves 40 × 40 × 20 − 10 × 10 × 5 = 31500 mm³. The sketch has to sit on the face you cut from, because the cut runs from the sketch plane down into the shape. `sketch('top')` alone is the plane through the middle of a shape centred on the origin, so a pocket there would be a sealed cavity inside the part. The second argument of `sketch()` moves the plane: a 20 mm tall box centred on the origin has its top face at z = +10, so `sketch('top', 10)` puts the sketch on it. The pocket has 11 faces (the 6 of the box, 4 pocket walls and a floor). One pocket per shape: a second pocket cut into a shape that already has one stops the script today, with "not fully enclosed".
+
+```js sketch-pocket
+const b = cuboid(40, 40, 20)
+const sk = sketch('top', 10)
+sk.rect(10, 10)
+pocket(sk, b, 5)
+```
+
+A rectangular pocket 5 mm deep, open on the top face of a block.
+
+`groove(sk, shape, angle)` is `revolve` in reverse: it spins the sketch around the vertical middle line of its plane (the world y axis, for a `'front'` sketch) and takes the solid it sweeps out away from the shape. Say the sketch, the shape, then the turn in degrees. The profile has to reach the part's surface, or the cut stays sealed inside the part instead of opening onto a face. The kernel builds a groove whose profile touches the axis (a solid disc, not a ring) and runs past a face, with a full 360 degree turn; a ring-shaped groove, and a partial turn other than a half turn, are not supported yet. Here the 6 × 8 profile spans radius 0 to 6 from the axis and height 14 to 22, and the 40 × 40 × 20 block ends at y = +20, so the profile pokes 2 mm out of that face. A full turn removes a cylinder of radius 6 and length 6: π × 6² × 6 = 216π mm³ from the 32000 mm³ block, leaving 31321.42 mm³. The result is a round blind hole in the face, with 8 faces and 16 edges.
+
+```js sketch-groove
+const b = cuboid(40, 40, 20)
+const sk = sketch('front', 0)
+sk.rect(6, 8, { at: [3, 18] })
+groove(sk, b, 360)
+```
+
+A disc groove cut through the top face of a block by spinning a small rectangle.
+
+`sk.slot([x1, y1], [x2, y2], r)` draws a rounded slot: the two points are the centres of the two end caps and `r` is the cap radius, so the slot is 2r wide. Centres 40 apart with radius 5 give a 40 × 10 rectangle plus two half-discs, and extruded 10 mm it is 4000 + 250π = 4785.40 mm³.
+
+`sketch({ origin: [x, y, z], u: [...], v: [...] })` draws on a plane you describe instead of a named one. `origin` is where the sketch's (0, 0) sits; `u` is the direction its x runs and `v` the direction its y runs. `u` and `v` must each be exactly unit length and at right angles to each other, or the script stops with a sentence saying which is wrong. The sketch faces u × v, and `extrude` pushes along that direction. Swapping `u` and `v` turns the part the other way. This part is 30 × 20 × 10 = 6000 mm³, spanning x from −10 to 20, y from −4 to 16 and z from 7 to 17.
+
+```js sketch-frame
+const sk = sketch({ origin: [5, 6, 7], u: [1, 0, 0], v: [0, 1, 0] })
+sk.rect(30, 20)
+const shape = extrude(sk, 10)
+```
+
+A 30 × 20 block extruded 10 mm from a plane placed at [5, 6, 7].
+
+`plane('top')`, `plane('front')` and `plane('side')` name a flat surface, and `plane('top', 10)` slides it 10 mm along its own normal. `plane({ origin: [x, y, z], u: [...], v: [...] })` describes one yourself, with the same rules as a frame in `sketch()`: `u` and `v` each exactly unit length and at right angles, or a plain sentence says which is wrong. Draw on it with `sketch(pl)`. `plane()` makes the surface a step of its own: it shows up in the timeline as Plane 1 (or Custom plane, for one you described yourself) and the sketches that use it are drawn on it, but it adds no material to the part by itself. Deleting a plane also deletes every sketch on it and everything built from those sketches, and the delete tells you so first. A plane is frozen: it is a place in space, not a face of anything, so it does not move when a box height param changes. This sketches a 40 × 25 rectangle on the plane at z = 10 and pulls it 12: a 40 × 25 × 12 = 12000 mm³ slab spanning z from 10 to 22.
+
+```js sketch-plane
+const top = plane({ origin: [0, 0, 10], u: [1, 0, 0], v: [0, 1, 0] })
+const sk = sketch(top)
+sk.rect(40, 25)
+const slab = extrude(sk, 12)
+```
+
+A slab built on a plane you described, 10 mm above the top plane.
+
+One named plane can carry two sketches, and both stay level with each other. Here `plane('top', 10)` carries a 20 × 10 rectangle pulled 6 and a circle 5 across pulled 6 beside it, joined: 1200 + 37.5π = 1317.81 mm³, spanning z from 10 to 16.
+
+```js sketch-plane-shared
+const level = plane('top', 10)
+const a = sketch(level)
+a.rect(20, 10, { at: [-20, 0] })
+const slab = extrude(a, 6)
+const b = sketch(level)
+b.circle(5, { at: [20, 0] })
+const post = extrude(b, 6)
+join(slab, post)
+```
+
+Two sketches on one plane, joined into a slab and a post.
+
+`sk.geom([...])` draws a sketch from rows instead of one call per shape. Each row says what it is with `k`: `'point'` (`p: [x, y]`), `'line'` (`a` and `b`, its two ends), `'circle'` (`c` for the centre, `r` for the radius) or `'arc'` (`c`, `r`, `a`, `b` and `sense`). Every row has an `id`, a positive whole number. A row marked `construction: true` is scaffolding for rules and is left out of the outline. `sk.rules([...])` ties rows together, for example `{ k: 'coincident', a: 1, aEnd: 'b', b: 2, bEnd: 'a' }` welds the end of line 1 to the start of line 2. Here four lines make a 40 × 25 rectangle with a circle of radius 5 cut out of it: 10000 − 250π = 9214.60 mm³.
+
+```js sketch-geom
+const sk = sketch('top')
+sk.geom([
+  { k: 'line', id: 1, a: [0, 0], b: [40, 0] },
+  { k: 'line', id: 2, a: [40, 0], b: [40, 25] },
+  { k: 'line', id: 3, a: [40, 25], b: [0, 25] },
+  { k: 'line', id: 4, a: [0, 25], b: [0, 0] },
+  { k: 'circle', id: 5, c: [20, 12.5], r: 5 }
+])
+sk.rules([
+  { k: 'coincident', a: 1, aEnd: 'b', b: 2, bEnd: 'a' },
+  { k: 'coincident', a: 2, aEnd: 'b', b: 3, bEnd: 'a' },
+  { k: 'coincident', a: 3, aEnd: 'b', b: 4, bEnd: 'a' },
+  { k: 'coincident', a: 4, aEnd: 'b', b: 1, bEnd: 'a' }
+])
+const shape = extrude(sk, 10)
+```
+
+A rectangle drawn from rows, with a circular hole.
+
+An arc row is `{ k: 'arc', id, c, r, a, b, sense }`: a centre, a radius, two ends on the circle and a sense, `'cw'` or `'ccw'`. The order of the ends sets the direction of travel around the outline, and the sense alone does not. A `'cw'` arc must start at its lower point and end at its upper one to round the outer side of a slot's end; the fix for a wrong curve is to reverse the ends, not the sense.
 
 ```js sketch-complex
 const sk = sketch('front')
 sk.rect(30, 10, { at: [0, 5] })
 sk.circle(5, { at: [-10, -5] })
 sk.circle(5, { at: [10, -5] })
-const shape = pull(sk, 25)
+const shape = extrude(sk, 25)
 ```
 
 A complex shape extruded from a sketch with multiple elements.
@@ -554,49 +700,49 @@ Not every pair of these can hold at once. Asking a rectangle for both a `distX` 
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.across(1)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 ```js rule-up
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.up(2)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 ```js rule-length
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.length(1, 40)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 ```js rule-equal
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.equal(2, 4)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 ```js rule-parallel
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.parallel(1, 3)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 ```js rule-perpendicular
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.perpendicular(1, 2)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 ```js rule-pin
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.pin(1)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 A rectangular prism, same as `sk.rect(40, 25)` would draw -- these seven examples exist to show the call, not a different shape.
@@ -607,28 +753,28 @@ The four corner rules are the exception: each of these does change the shape, be
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.distX(1, 3, 30)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 ```js rule-disty
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.distY(1, 3, 15)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 ```js rule-symmetric
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.symmetric(1, 3, 2)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 ```js rule-angle
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
 sk.angle(1, 2, 60)
-const shape = pull(sk, 12)
+const shape = extrude(sk, 12)
 ```
 
 A rule call never stops the script. It settles the same way a click on the panel does: if dropping one OLDER rule would make the new one fit, that rule quietly goes, and the sketch keeps building. If nothing does, the new rule is still added, and the sketch is left fighting -- the same thing you would see by clicking the same rule into the panel by hand:
@@ -647,8 +793,8 @@ A variable cannot share a name with a tool: `const holes = param('holes', 3)` is
 
 ```js param-basic
 const wall = param('wall', 2, { min: 0.5, max: 10 })
-const b = box(40, 40, 20)
-hollow(b, { wall })
+const b = cuboid(40, 40, 20)
+shell(b, { wall })
 ```
 
 A 40 × 40 × 20 box with a parametric wall thickness.
@@ -657,9 +803,9 @@ A 40 × 40 × 20 box with a parametric wall thickness.
 const width = param('width', 40, { min: 20, max: 80 })
 const height = param('height', 20, { min: 10, max: 40 })
 const count = param('holes', 3, { min: 1, max: 6 })
-const b = box(width, 40, height, { at: [60, 0, 0] })
-repeatAround(b, { count: count, axis: 'z' })
-hole(b, { across: 4 })
+const b = cuboid(width, 40, height, { at: [60, 0, 0] })
+polarPattern(b, { count: count, axis: 'z' })
+hole(b, { across: 4, deep: 40 })
 ```
 
 A parametric box with adjustable dimensions and hole count.
@@ -667,7 +813,7 @@ A parametric box with adjustable dimensions and hole count.
 ```js param-dimensions
 const size = param('size', 30, { min: 10, max: 80 })
 const c = cylinder(size / 2, size)
-round(c, 2)
+fillet(c, 2)
 ```
 
 A cylinder whose height and diameter scale together from a single parameter.
@@ -678,15 +824,15 @@ The **timeline** shows every step you built, in order. Each step is a chip with 
 
 The **Dimensions panel** shows sliders for every number in the model. Drag a slider to change a value, and the model rebuilds instantly. Named parameters appear with their own captions; unnamed numbers get automatic names from the Build tools.
 
-Each number in the timeline has a corresponding slider. If you used `param('wall', 2)`, that slider is named "wall". If you just wrote `hollow(b, { wall: 2 })` without `param`, the slider appears as "hollow wall" or similar, generated from the operation and field name.
+Each number in the timeline has a corresponding slider. If you used `param('wall', 2)`, that slider is named "wall". If you just wrote `shell(b, { wall: 2 })` without `param`, the slider appears as "hollow wall" or similar, generated from the operation and field name.
 
 You can see exactly which number is which by clicking a timeline chip—it highlights the corresponding slider in the panel.
 
 ```js timeline-example
-const b = box(40, 40, 20)
-hollow(b, { wall: 2 })
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 2 })
 hole(b, { across: 6 })
-round(b.edge('top', 'front'), 3)
+fillet(b.edge('top', 'front'), 3)
 ```
 
 Four timeline steps appear: Box 1, Hole 1, Hollow 1, Round 1. Each is a chip you can click to edit its parameters.
@@ -704,13 +850,13 @@ Two different things can go wrong, and they look different on screen.
 
 **The script stops at a line.** Some orders cannot be a step at all, so the script stops there and the message names the line:
 
-- **"Rounding works on a shape, not a hollowed-out one. A hollow shape rounds its edges one at a time: pick an edge and round that."** `round(b, 3)` and `hollow` cannot both be on one shape, in either order. Round the hollowed shape's edges one at a time: `round(b.edge('top', 'front'), 1)`.
+- **"Rounding works on a shape, not a hollowed-out one. A hollow shape rounds its edges one at a time: pick an edge and round that."** `fillet(b, 3)` and `hollow` cannot both be on one shape, in either order. Round the hollowed shape's edges one at a time: `fillet(b.edge('top', 'front'), 1)`.
 - **"Rounding works on the shape, not the hole cut into it. Round the shape before you drill it."** The same rule, before `hole`.
 - **"Rounding works on a shape, not a combination. Round the shape before you cut it."** The same rule, before `join`, `cut` or `keep`.
 
 ```js refusal-wall
-const b = box(40, 40, 20)
-hollow(b, { wall: 15 })
+const b = cuboid(40, 40, 20)
+shell(b, { wall: 15 })
 ```
 
 This one is refused on purpose so you can see what it looks like: Hollow 1 gets the warning chip and the box is shown solid. Change 15 to anything under 10 and the hollow appears.
@@ -721,7 +867,7 @@ Your finished model is a solid 3D shape ready to print, analyse, or use in other
 
 **Export as STL** for 3D printing. STL is the standard format for 3D printers worldwide. The file contains a mesh of triangles that define the shape.
 
-**Export as STEP** for CAD software. STEP preserves the model's structure—edges, faces, and construction history—so you can edit it later in another program.
+**Export as STEP** for CAD software (spheres, rings, cones, rounded edges and rounded boxes all export exactly). STEP preserves the model's structure—edges, faces, and construction history—so you can edit it later in another program.
 
 **Export as IGES** for advanced CAD tools. IGES is an older format but widely supported.
 
@@ -730,10 +876,10 @@ Click Export in the toolbar to save your model. Choose the format and a filename
 For 3D printing, make sure your model is closed (no holes or gaps), dimensions are correct, and walls are thick enough to print (generally at least 0.5 mm for most printers). Test-print small parts first.
 
 ```js export-printable
-const base = box(40, 40, 5, { at: [0, 0, 2.5] })
+const base = cuboid(40, 40, 5, { at: [0, 0, 2.5] })
 const post = cylinder(6, 20, { at: [0, 0, 10] })
-join(base, post)
-round(post.edge('top', 'side'), 1)
+union(base, post)
+fillet(post.edge('top', 'side'), 1)
 ```
 
 A completed model ready for export: a base plate with a centred post and smooth top edge.

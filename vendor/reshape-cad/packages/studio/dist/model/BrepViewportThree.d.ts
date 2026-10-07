@@ -4,6 +4,7 @@ import type { EngineAdapter } from '@shuff57/reshape-kernel/engine-adapter';
 import type { HandleSpec } from '@shuff57/reshape-script/model-handles';
 import type { AnchorPoint } from './HandleOverlay.js';
 import { type MeshInput } from '../mesh-export.js';
+import type { SelectionFilters, SelectionItem } from '../selection-model.js';
 export interface BrepViewportStats {
     buildMs: number;
     meshMs: number;
@@ -37,6 +38,23 @@ export interface BrepViewportStats {
  * in lib/topo-resolve.ts for which faces/edges that covers and which they
  * honestly refuse. The caller can still show it was picked; it just cannot
  * build a Fillet, or an open Hollow, from it.
+ *
+ * `ctrlKey`/`shiftKey`/`metaKey` are read straight off the triggering
+ * PointerEvent/MouseEvent at the moment of the pick (SPEC-mouse-parity.md
+ * Phase 3 item 1), never a global keyboard listener -- the stopgap that
+ * used to fake Shift this way is gone precisely because
+ * a page-wide listener could not tell "Shift held while clicking this
+ * canvas" from "Shift held while the runner iframe has focus". A pick with
+ * no real triggering event (restorePicks()'s own re-emission once a name
+ * resolves post-rebuild) carries all three false.
+ *
+ * `vertex`/`body` (SPEC-mouse-parity.md Phase 3 item 2) have no naming
+ * machinery of their own -- there is no kernel concept of a stable vertex
+ * or whole-body name the way a TopoName resolves a face or edge -- so
+ * `name` is always `null` for them, not sometimes-null like a face/edge
+ * pick whose resolution merely failed. `size` is likewise never present:
+ * nothing measures a point, and a body's own size is just its owning
+ * feature's, already shown elsewhere.
  */
 export type ViewportPick = {
     kind: 'face';
@@ -44,11 +62,33 @@ export type ViewportPick = {
     faceIndex: number;
     name: TopoName | null;
     size?: [number, number];
+    ctrlKey: boolean;
+    shiftKey: boolean;
+    metaKey: boolean;
 } | {
     kind: 'edge';
     target: string;
     name: TopoName | null;
     size?: number;
+    ctrlKey: boolean;
+    shiftKey: boolean;
+    metaKey: boolean;
+} | {
+    kind: 'vertex';
+    target: string;
+    name: null;
+    size?: undefined;
+    ctrlKey: boolean;
+    shiftKey: boolean;
+    metaKey: boolean;
+} | {
+    kind: 'body';
+    target: string;
+    name: null;
+    size?: undefined;
+    ctrlKey: boolean;
+    shiftKey: boolean;
+    metaKey: boolean;
 };
 interface Props {
     doc: ModelDoc;
@@ -173,6 +213,17 @@ interface Props {
      * plane, is not a new "entering flat view" event).
      */
     sketchPlane?: 'xy' | 'xz' | 'yz' | null;
+    /** Ids of datum planes currently selected (timeline), drawn brighter. A
+     *  datum has no mesh, so the viewport cannot learn this from a pick. */
+    selectedDatumIds?: string[];
+    /** A click that lands on a datum plane and on no solid face or edge. Datums
+     *  have no mesh, so this is separate from `onPick`; the modifiers say whether
+     *  the click accumulates (Ctrl/Shift/Cmd) or replaces the selection. */
+    onDatumPick?: (datumId: string, mods: {
+        ctrlKey: boolean;
+        shiftKey: boolean;
+        metaKey: boolean;
+    }) => void;
     /**
      * How many pixels of docked UI panel currently sit to one side of the
      * canvas -- the Rules panel's own width while a sketch is being viewed
@@ -200,6 +251,121 @@ interface Props {
      * Default false: every existing caller keeps its badges.
      */
     badgesInStatusBar?: boolean;
+    /** The status bar's mouse-binding hint, LIFTED to the caller like the
+     *  selection readout badgesInStatusBar lifts: the viewport owns the
+     *  scheme (its own chip writes it), the caller renders the words. Fired
+     *  on mount and on every scheme flip, with the pure navHint() string.
+     *  Absent: the caller renders nothing (app/brep-three callers). */
+    onNavHint?: (hint: string) => void;
+    /**
+     * Which pickable kinds are currently active -- SPEC-mouse-parity.md Phase 3
+     * item 2's filter toolbar. Rendered HERE, beside this component's own view
+     * strip, rather than in ReshapeStudio.tsx: every other piece of viewport
+     * chrome (the view strip itself, the nav cube, the selection badge) already
+     * lives in this component's own JSX, driven by props the caller owns --
+     * `filters` follows that same split rather than inventing a second
+     * viewport-overlay convention. Read through a ref (see filtersRef below)
+     * the same way `onPick`/`pick` are, so hitAt()'s pointermove/click
+     * listeners -- set up once by the scene-setup effect, not on every prop
+     * change -- see a toggle the instant it happens. Absent (no caller has
+     * wired the toolbar) defaults to every kind pickable, i.e. today's actual
+     * behaviour before this filter existed -- see DEFAULT_FILTERS.
+     */
+    filters?: SelectionFilters;
+    /**
+     * Fired with the next filters value on a chip click. ReshapeStudio.tsx
+     * owns the real SelectionState.filters this only reflects; this component
+     * renders the toggle UI and reports the requested change, the same split
+     * `onPick` already draws between "renders a pick" and "owns selection".
+     */
+    onFiltersChange?: (next: SelectionFilters) => void;
+    /**
+     * Fired once a box-select drag completes (SPEC-mouse-parity.md Phase 3
+     * item 4) with every candidate the drag's window/crossing rect kept,
+     * filtered by `filters` the same way a single click already is -- a
+     * filtered-out kind is never in this list, same as it is never
+     * click-pickable. `shiftKey` mirrors a click's own accumulate-vs-replace
+     * choice (Ctrl's "add if absent" has no separate meaning for a whole
+     * batch, so only Shift's distinction survives here): held, the caller
+     * adds every item to whatever is already selected; released, the caller
+     * replaces the selection with exactly these. Never fired for a drag
+     * that stayed under the 4px threshold or started on a real pick target
+     * -- both fall through to the ordinary click-to-pick path (`onPick`)
+     * instead, same as before this prop existed. Absent means box select
+     * still WORKS (the drag gesture and its rectangle overlay do not depend
+     * on this prop), it just has nowhere to report its result.
+     */
+    onBoxSelect?: (items: SelectionItem[], shiftKey: boolean) => void;
+    /**
+     * Double-click a feature body (SPEC-mouse-parity.md Phase 3.6): fired
+     * with the feature id hitAt() resolves at the click point. Never fired
+     * for a double-click on empty space -- the caller's job is "open this
+     * feature's params panel, focused", which has nothing to open when
+     * nothing was hit. A single click's own onPick keeps selecting exactly
+     * as it always has; this is purely additive.
+     */
+    onFeatureDoubleClick?: (featureId: string) => void;
+    /**
+     * Ctrl+A while the canvas has focus (SPEC-mouse-parity.md Phase 3.6):
+     * select every feature. Fired with no arguments, the same
+     * "renders the gesture, reports it, the caller owns SelectionState"
+     * split `onFiltersChange`/`onBoxSelect` already draw -- the caller writes
+     * `selectAllFeatures(doc)` itself.
+     */
+    onSelectAll?: () => void;
+    /**
+     * Delete/Backspace while the canvas has focus (SPEC-mouse-parity.md
+     * Phase 3.6): delete the current selection through the SAME doc-edit
+     * path the caller's own Delete button already uses. Guarded internally
+     * by `shouldHandleViewportDelete()` (pick-helpers.ts) so a Delete/
+     * Backspace typed into a text field elsewhere on the page is never
+     * intercepted -- the listener lives on the canvas element itself, so it
+     * only ever sees a keydown that targeted (or bubbled through) the
+     * canvas in the first place.
+     */
+    onDeleteSelected?: () => void;
+    /**
+     * The marking menu's Undo/Redo wedges (SPEC-mouse-parity.md Phase 4.1) --
+     * the SAME history ReshapeStudio.tsx's own toolbar buttons already call
+     * (`undo`/`redo`). Absent means those wedges render disabled: "renders the
+     * gesture, reports it, the caller owns the history" is the same split
+     * `onDeleteSelected`/`onSelectAll` above already draw.
+     */
+    onUndo?: () => void;
+    onRedo?: () => void;
+    /**
+     * The marking menu's Sketch wedge: start a new sketch on the caller's
+     * current active plane, the exact flow ModelEditor's own Sketch button
+     * (startSketch(), ModelEditor.tsx:884-890) runs -- this component has no
+     * `doc`-editing machinery of its own, so the caller supplies the whole
+     * gesture rather than this component reaching into `doc`/`activePlane`
+     * itself. Absent means the wedge renders disabled.
+     */
+    onStartSketch?: () => void;
+    /** The marking menu's Repeat wedge (Fusion's top wedge, footage-verified
+     *  in the holes lesson: it re-runs the last feature command). The
+     *  viewport only names the wedge; the caller supplies the repeat flow
+     *  (ModelEditor's own repeat(lastPattern)). Null/absent keeps the wedge
+     *  present-but-disabled — visible, greyed, no-op. */
+    onRepeat?: () => void;
+    /** The canvas's M hotkey (Fusion footage 03:08: "M" activates Move/Copy
+     *  from the viewport). The viewport owns keydown scope; the caller
+     *  supplies the Move/Copy entry (ModelEditor's moveTool). Fires only on
+     *  a plain 'm' with no modifier and no text field owning the keys. */
+    onMoveHotkey?: () => void;
+    /**
+     * Phase 5.3's live-preview tint (todo 25): while a manipulator drag is
+     * in flight the rebuilt meshes are drawn TRANSLUCENT in the op's colour
+     * -- blue for an additive operation, red for a cut -- instead of the
+     * committed opaque orange. `active` is the caller's own previewDoc
+     * signal (a pending param fold exists); `tint` is the selected
+     * feature's op colour (manipulator-core's previewTint). Absent or
+     * inactive draws the committed material, exactly as before.
+     */
+    preview?: {
+        active: boolean;
+        tint: 'add' | 'cut';
+    } | null;
 }
 /**
  * Renders a ModelDoc through the brep-rs B-rep kernel, live, in the page.
@@ -207,6 +373,6 @@ interface Props {
  * Incremental (feature-level) rebuild is NOT here: every doc change rebuilds
  * every feature from scratch through the adapter's build().
  */
-export default function BrepViewportThree({ doc, deflection, onStats, onPick, pick, selectedCount, selectionLabel, anchors, onAnchors, onMesh, registerPickAt, sketchPlane, panelOcclusionPx, ruleActivityAt, onEngine, badgesInStatusBar, }: Props): import("react/jsx-runtime").JSX.Element;
+export default function BrepViewportThree({ doc, deflection, onStats, onPick, pick, selectedCount, selectionLabel, anchors, onAnchors, onMesh, registerPickAt, sketchPlane, selectedDatumIds, onDatumPick, panelOcclusionPx, ruleActivityAt, onEngine, badgesInStatusBar, onNavHint, filters, onFiltersChange, onBoxSelect, onFeatureDoubleClick, onSelectAll, onDeleteSelected, onUndo, onRedo, onStartSketch, onRepeat, onMoveHotkey, preview, }: Props): import("react/jsx-runtime").JSX.Element;
 export {};
 //# sourceMappingURL=BrepViewportThree.d.ts.map

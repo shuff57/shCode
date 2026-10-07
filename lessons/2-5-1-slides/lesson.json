@@ -1,13 +1,13 @@
 {
   "id": "2-5-1-slides",
   "title": "2.5.1 Slides: Handling Errors with try/catch",
-  "description": "Handling Errors with try/catch slides. Placeholder until the deck is built from the book.",
+  "description": "Unit 2.5 slides: handling errors with try/catch.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
   "preview": "slides",
-  "slidesUrl": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/chapter-2-control-flow/decks/2.5_handling_errors_with_try_catch.paper",
+  "slidesUrl": "/slides/2.5_handling_errors_with_try_catch.paper.html",
   "slos": [
     "SLO-3"
   ],

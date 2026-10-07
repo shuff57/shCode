@@ -1,0 +1,104 @@
+// Pure projection-selection math for viewport picking (SPEC-mouse-parity.md
+// Phase 3 item 2: vertex + body picking). The IMPURE half -- projecting a
+// mesh vertex to screen space through a live THREE.Camera -- has to stay in
+// BrepViewportThree.tsx's hitAt(), the same way closestEdgeScreenDist()
+// already does for edges; this is only the "given already-projected
+// candidates, which one wins" decision, kept here so it is testable under
+// node --test the same as camera-fit.ts.
+
+/** A candidate already projected to screen space: how far it sits from the
+ *  cursor in CSS pixels, and its depth (distance from the camera) for the
+ *  occlusion check below. */
+export interface ScreenCandidate {
+  distPx: number;
+  depth: number;
+}
+
+/** The nearest of `candidates` within `tolerancePx` screen distance whose
+ *  depth does not exceed `maxDepth` -- mirrors hitAt()'s own edge-candidate
+ *  selection in BrepViewportThree.tsx: closest screen distance wins, but
+ *  only among candidates that survive an occlusion check against the
+ *  nearest real surface at the cursor (a candidate behind that surface
+ *  loses even if it projects closer to the cursor). `maxDepth` of Infinity
+ *  skips the occlusion check entirely -- the same "no face hit at the
+ *  cursor to reject against" fallback the edge candidates already use when
+ *  their own reference hit is absent. Returns null when nothing is in
+ *  tolerance, or every in-tolerance candidate is occluded. A tie in
+ *  `distPx` keeps whichever candidate the caller listed first. */
+export function nearestVisible<T extends ScreenCandidate>(
+  candidates: T[], tolerancePx: number, maxDepth: number,
+): T | null {
+  let best: T | null = null;
+  for (const c of candidates) {
+    if (c.distPx > tolerancePx || c.depth > maxDepth) continue;
+    if (!best || c.distPx < best.distPx) best = c;
+  }
+  return best;
+}
+
+/** Advances a click-and-hold "select other" cycle by one step, wrapping
+ *  back to 0 after the last candidate. BrepViewportThree.tsx's hold gesture
+ *  (SPEC-mouse-parity.md Phase 3.5) calls this once per completed hold --
+ *  never per frame, and never more than once per hold; there is no
+ *  repeat-while-held timer -- to move from whichever candidate the
+ *  previous hold at this same screen point landed on to the next one,
+ *  nearest-camera-first. `candidateCount` of 0 returns 0 (nothing to
+ *  advance into); the gesture itself never calls this with fewer than 2
+ *  candidates, since that is a plain click, not a cycle. */
+export function nextCycleIndex(currentIndex: number, candidateCount: number): number {
+  if (candidateCount <= 0) return 0;
+  return (currentIndex + 1) % candidateCount;
+}
+
+/** Whether a Delete/Backspace keydown over the viewport should delete the
+ *  current selection (SPEC-mouse-parity.md Phase 3.6), or pass through
+ *  untouched. False only for the element kinds that own their own
+ *  Delete/Backspace behaviour -- a text field editing its own contents --
+ *  so a student clearing a parameter's typed value never loses the
+ *  feature it belongs to. Takes the plain tag name string (not an Element)
+ *  so it is testable under node --test without a DOM, the same convention
+ *  nearestVisible()/nextCycleIndex() above follow. */
+export function shouldHandleViewportDelete(activeElementTagName: string): boolean {
+  const tag = activeElementTagName.toUpperCase();
+  return tag !== 'INPUT' && tag !== 'TEXTAREA';
+}
+
+/** Minimal structural view of a three.js Object3D, enough for solidBounds. */
+interface BoundsObject {
+  userData: Record<string, unknown>;
+  children: BoundsObject[];
+  geometry?: { boundingBox: unknown; computeBoundingBox(): void };
+  matrixWorld: unknown;
+  updateWorldMatrix(updateParents: boolean, updateChildren: boolean): void;
+}
+interface BoundsBox<B> {
+  isEmpty(): boolean;
+  copy(b: unknown): B;
+  applyMatrix4(m: unknown): B;
+  union(b: B): B;
+}
+
+/** The world-space box of the drawn solid ONLY. three's Box3.setFromObject
+ *  measures every descendant with geometry, visible or not, and each mesh
+ *  carries one invisible hover/selected edge-highlight tube per topological
+ *  edge (radius EDGE_TUBE_RADIUS) -- those stick out half a radius past
+ *  every face, so the status bar read a 40x40x20 box as 41.5x41.5x21.5 (and
+ *  the section plane's range was equally fat). Objects flagged
+ *  `userData.excludeFromBounds` are skipped, along with their subtree.
+ *  `makeBox` builds an empty THREE.Box3. */
+export function solidBounds<B extends BoundsBox<B>>(root: unknown, makeBox: () => B): B {
+  const out = makeBox();
+  const visit = (o: BoundsObject) => {
+    if (o.userData.excludeFromBounds) return;
+    if (o.geometry) {
+      if (o.geometry.boundingBox === null) o.geometry.computeBoundingBox();
+      if (o.geometry.boundingBox) {
+        o.updateWorldMatrix(true, false);
+        out.union(makeBox().copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld));
+      }
+    }
+    for (const c of o.children) visit(c);
+  };
+  visit(root as BoundsObject);
+  return out;
+}

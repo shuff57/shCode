@@ -37,6 +37,7 @@ try {
       'lib/diagram-types.ts',
       'lib/diagram-mermaid.ts',
       'lib/diagram-check.ts',
+      'lib/diagram-score.ts',
       '--outDir', out,
       '--module', 'commonjs',
       '--target', 'es2022',
@@ -49,6 +50,7 @@ try {
   const toUrl = (f) => 'file://' + path.join(out, f).replace(/\\/g, '/');
   const { fromMermaid } = await import(toUrl('diagram-mermaid.js'));
   const { checkDiagram } = await import(toUrl('diagram-check.js'));
+  const { scoreDiagram, splitRubric } = await import(toUrl('diagram-score.js'));
 
   for (const id of readdirSync(lessonsDir).sort()) {
     const cfgPath = path.join(lessonsDir, id, 'lesson.json');
@@ -85,6 +87,22 @@ try {
         continue;
       }
       const red = results.filter((r) => !r.passed);
+      // A hybrid chart's reference must also earn every rule point and clear the relevance gate,
+      // or the lesson would refuse its own answer key.
+      const ai = cfg.diagram?.aiGrader;
+      const { ruleItems } = splitRubric(ai?.rubric ?? []);
+      if (ruleItems.length > 0) {
+        const det = scoreDiagram(fromMermaid(src), ruleItems, ai.gate);
+        if (det.earned !== det.possible) {
+          failures += 1;
+          console.error(`  FAIL  ${id}/solution/${file}  rule score ${det.earned}/${det.possible}`);
+          for (const c of det.criteria.filter((x) => x.earned < x.max)) console.error(`          ${c.title} -- ${c.feedback}`);
+        }
+        if (det.gate && !det.gate.passed) {
+          failures += 1;
+          console.error(`  FAIL  ${id}/solution/${file}  relevance gate: ${det.gate.matched}/${det.gate.min} token groups`);
+        }
+      }
       if (red.length === 0) {
         console.log(`  ok    ${id}/solution/${file}  ${results.length}/${results.length}`);
       } else {

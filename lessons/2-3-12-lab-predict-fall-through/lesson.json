@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "switch statement present",
-      "description": "Code contains a switch statement",
+      "description": "Code contains a switch statement. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "switch\\s*\\(\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*\\)",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "three case labels present",
-      "description": "Code contains at least three case labels in sequence",
+      "description": "Code contains at least three case labels in sequence. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case[^:]*:[\\s\\S]*case[^:]*:[\\s\\S]*case[^:]*:",
@@ -47,23 +47,33 @@
     },
     {
       "id": "r3",
-      "title": "break present",
-      "description": "Code contains at least one break statement",
+      "title": "at least two breaks",
+      "description": "Code contains at least two break statements (the second and third cases each end in one). Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "break",
+      "pattern": "(?:\\bbreak\\b[\\s\\S]*){2}",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r4",
       "title": "console.log present",
-      "description": "A case label is directly followed by a console.log call",
+      "description": "A case label is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case[^:]*:\\s*console\\.log",
       "flags": "i",
       "points": 0
+    },
+    {
+      "type": "regex",
+      "file": "script.js",
+      "points": 0,
+      "id": "r5",
+      "title": "first case left without a break",
+      "description": "The first case has no break, so it falls through into the second.",
+      "pattern": "case[^:]*:\\s*console\\.log\\s*\\([^)]*\\)\\s*;?\\s*case",
+      "flags": "i"
     }
   ],
   "grading": {

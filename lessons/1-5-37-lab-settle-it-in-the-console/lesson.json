@@ -36,7 +36,7 @@
     {
       "id": "r1",
       "title": "Logs 2 + 2 * 3",
-      "description": "Prints the un-bracketed expression",
+      "description": "Prints the un-bracketed expression. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*2\\s*\\+\\s*2\\s*\\*\\s*3\\s*\\)",
@@ -46,7 +46,7 @@
     {
       "id": "r2",
       "title": "Logs (2 + 2) * 3",
-      "description": "Prints the bracketed expression",
+      "description": "Prints the bracketed expression. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*\\(\\s*2\\s*\\+\\s*2\\s*\\)\\s*\\*\\s*3\\s*\\)",
@@ -56,10 +56,10 @@
     {
       "id": "r3",
       "title": "The rule is stated in a comment",
-      "description": "A comment naming precedence, order of operations, or that multiplication happens first",
+      "description": "A comment naming precedence, order of operations, or that multiplication happens first. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "//[^\\n]*(?:precedence|order of operations|pemdas|bodmas|bidmas|(?:multipl\\w*|times)[^\\n]*(?:first|before)|(?:brackets?|parenthes\\w*)[^\\n]*(?:first|change|before))",
+      "pattern": "//[^\\n]*(?:precedence|priorit\\w*|order of operations|pemdas|bodmas|bidmas|bedmas|(?:multipl\\w*|times)[^\\n]*(?:first|before)|(?:brackets?|parenthes\\w*)[^\\n]*(?:first|change|before)|(?:change|first|before)[^\\n]*(?:brackets?|parenthes\\w*)|\\*[^\\n]*(?:first|before))|/\\*[\\s\\S]*?(?:precedence|priorit\\w*|order of operations|pemdas|bodmas|bidmas|bedmas|(?:multipl\\w*|times)[^\\n]*(?:first|before)|(?:brackets?|parenthes\\w*)[^\\n]*(?:first|change|before)|(?:change|first|before)[^\\n]*(?:brackets?|parenthes\\w*))[\\s\\S]*?\\*/",
       "flags": "i",
       "stripComments": false,
       "points": 0
@@ -67,7 +67,7 @@
     {
       "id": "r4",
       "title": "A third expression of your own",
-      "description": "At least three console.log calls, so something beyond the two given was checked",
+      "description": "At least three console.log calls, so something beyond the two given was checked. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:[\\s\\S]*?console\\.log\\s*\\(){3}",

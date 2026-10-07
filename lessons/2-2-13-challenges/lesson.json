@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "FizzBuzz 1 to 20",
-      "instructions": "Loop through the integers 1 to 20. For each number: if it is divisible by both 3 and 5, log 'FizzBuzz'. If divisible by only 3, log 'Fizz'. If divisible by only 5, log 'Buzz'. Otherwise log the number itself."
+      "instructions": "Loop through the integers 1 to 20. For each number: if it is divisible by both 3 and 5 (`i % 3 === 0` is true when i divides evenly by 3: the remainder is 0), log 'FizzBuzz'. If divisible by only 3, log 'Fizz'. If divisible by only 5, log 'Buzz'. Otherwise log the number itself."
     },
     {
       "id": "s2",
@@ -34,7 +34,7 @@
     {
       "id": "r1",
       "title": "for loop present",
-      "description": "Code contains a for loop",
+      "description": "Code contains a for loop. Help: 2.2.9 (The for Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -44,12 +44,32 @@
     {
       "id": "r2",
       "title": "if statement present",
-      "description": "Code contains an if statement",
+      "description": "Code contains an if statement. Help: 2.1.3 (If / Else if / Else)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\(",
       "flags": "i",
       "points": 0
+    },
+    {
+      "type": "regex",
+      "file": "script.js",
+      "points": 0,
+      "id": "r3",
+      "title": "FizzBuzz strings and % tests",
+      "description": "Logs Fizz/Buzz/FizzBuzz and uses % to test divisibility.",
+      "pattern": "(?=[\\s\\S]*[\"'`]Fizz)(?=[\\s\\S]*[\"'`]Buzz)(?=[\\s\\S]*%\\s*3)(?=[\\s\\S]*%\\s*5)",
+      "flags": "i"
+    },
+    {
+      "type": "regex",
+      "file": "script.js",
+      "points": 0,
+      "id": "r4",
+      "title": "even-sum test",
+      "description": "Uses % 2 to pick the even numbers.",
+      "pattern": "%\\s*2",
+      "flags": "i"
     }
   ],
   "grading": {

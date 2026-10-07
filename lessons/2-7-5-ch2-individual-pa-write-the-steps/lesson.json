@@ -1,7 +1,7 @@
 {
   "id": "2-7-5-ch2-individual-pa-write-the-steps",
   "title": "2.7.5 Individual PA Part 5: Write the Steps",
-  "description": "One problem, pick one of three, write the JavaScript it describes: a nested loop, a branch, a break or continue, a guard. One attempt, no Run button.",
+  "description": "One problem, pick one of three, write the JavaScript it describes: a nested loop, a branch, a break or continue, a guard. Three attempts, no Run button.",
   "type": "assignment",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -19,10 +19,13 @@
   "assignmentCode": "A2.7.5",
   "aiGrader": {
     "summative": true,
+    "revisable": true,
+    "maxSubmissions": 3,
+    "input": "code",
     "rubricTitle": "Chapter 2 Individual PA, Part 5: Write the Steps",
-    "model": "deepseek-v4-flash:0731-cloud",
+    "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "prompt": "The student submitted one JavaScript program answering one of three Part 5 problems (Seat Map, Word Grid, Fuel Log). Mark the CODE against the three criteria below. This is a summative, one-attempt item: mark what is on the paper, do not ask the student to run it.\n\nThe Chapter 2 ceiling: no functions, no arrays, no objects. Iteration only from loop counters and string indexing (word[i], word.length). A program that uses any of those loses the criterion that needed it and the feedback says which line crossed the ceiling.\n\nCriterion 1 -- the branch (8 of the 20). An if / else if / else chain, with at least one compound condition using && or ||. Full credit: the chain resolves the problem's decision and the compound condition is meaningful, not (true && true). Partial: an if/else chain with a compound condition but no else-if rung, or a full chain where every condition is single. Withhold: no branch, or branches only.\n\nCriterion 2 -- the loop and its nesting (9 of the 20). A loop inside a loop, both of which run. Full credit: two nested for/while forms, the inner one completing a full sweep per outer pass, with the bounds consistent with the problem's inputs. Partial credit ladder: 9 for a correct nest with an off-by-one in one bound; 6 for two loops that do not actually nest; 3 for one loop only where two are required. Withhold: no loop.\n\nCriterion 3 -- loop control (3 of the 20, marked separately from criterion 2). At least one break or continue inside the loop that changes what would otherwise run: a continue past blocked seats or spaces, a break the moment the group size is met or the word ends. A control keyword sitting after the last statement of its loop body is decorative and earns nothing by itself.\n\nAlso check, without changing the 20: the header comment names Problem and Date (Partners is N/A on an individual paper); the limit is a const rather than a let; at least one template-literal console.log reports the result; typeof is reported for one value. Missing these are feedback lines, not point deductions -- the 20 points are the branch and the nested loop, and saying otherwise would re-weight the paper.",
+    "prompt": "The student submitted one JavaScript program answering one of three Part 5 problems (Seat Map, Word Grid, Fuel Log). Mark the CODE against the three criteria below. This is a summative item with a limited number of attempts: mark what is on the paper, and do not ask the student to run it.\n\nThe Chapter 2 ceiling: no functions, no arrays, no objects. Iteration only from loop counters and string indexing (word[i], word.length). A program that uses any of those loses the criterion that needed it and the feedback says which line crossed the ceiling.\n\nCriterion 1 -- the branch (8 of the 20). An if / else if / else chain, with at least one compound condition using && or ||. Full credit: the chain resolves the problem's decision and the compound condition is meaningful, not (true && true). Partial 5: a full chain where every condition is single, or a chain with a compound condition but no else-if rung. Partial 3: a single if/else only. Withhold: no branch.\n\nCriterion 2 -- the loop and its nesting (9 of the 20). A loop inside a loop, both of which run. Full credit: two nested for/while forms, the inner one completing a full sweep per outer pass, with the bounds consistent with the problem's inputs. Partial credit ladder: 6 for a correct nest with an off-by-one in one bound or an inner sweep that does not complete; 3 for two loops that do not actually nest, or one loop only where two are required. Withhold: no loop.\n\nCriterion 3 -- loop control (3 of the 20, marked separately from criterion 2). At least one break or continue inside the loop that changes what would otherwise run: a continue past blocked seats or spaces, a break the moment the group size is met or the word ends. A control keyword sitting after the last statement of its loop body is decorative and earns 1 of the 3 at most. Withhold: none, or only switch-case breaks.\n\nAlso check, without changing the 20: the header comment names Problem and Date (Partners is N/A on an individual paper); the limit is a const rather than a let; at least one template-literal console.log reports the result; typeof is reported for one value. Missing these are feedback lines, not point deductions -- the 20 points are the branch and the nested loop, and saying otherwise would re-weight the paper.",
     "rubric": [
       {
         "id": "branch",
@@ -33,7 +36,7 @@
       {
         "id": "nested-loop",
         "title": "The nested loop, genuinely nested and genuinely running",
-        "description": "Full credit 9: two nested loop forms that both execute, bounds consistent with the problem. Partial 6-7: off-by-one in a bound or the inner sweep does not complete. Partial 3: two loops that do not nest. Withhold: no loop.",
+        "description": "Full credit 9: two nested loop forms that both execute, bounds consistent with the problem. Partial 6: off-by-one in a bound or the inner sweep does not complete. Partial 3: two loops that do not nest, or one loop only. Withhold: no loop.",
         "points": 9
       },
       {

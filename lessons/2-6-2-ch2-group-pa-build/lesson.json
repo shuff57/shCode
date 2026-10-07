@@ -1,7 +1,7 @@
 {
   "id": "2-6-2-ch2-group-pa-build",
   "title": "2.6.2 Group PA Part 2: Build It",
-  "description": "Turn the chart you just passed into a documented, loop-driven program. Ten checks, all of them things Chapter 2 taught. Auto-graded.",
+  "description": "Turn the chart you just passed into a documented, loop-driven program. Ten checks, all of them things Chapter 2 taught. Auto-graded: submit up to three times and your best counts. After your third try you can see how it is solved, once your teacher releases it.",
   "type": "assignment",
   "estimateMins": 42,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -44,8 +44,8 @@
     },
     {
       "id": "s5",
-      "title": "Add the continue",
-      "instructions": "Inside the loop, write the continue that skips the iterations your rule excludes. The continue goes BEFORE the flip/accumulate logic so the skipped iterations are truly skipped.",
+      "title": "Add the continue (Coin Drawer: skip to the next step)",
+      "instructions": "Inside the loop, write the continue that skips the iterations your rule excludes. The continue goes BEFORE the flip/accumulate logic so the skipped iterations are truly skipped. Coin Drawer has no iteration to skip, so its loop takes a break instead -- you add that in the next-but-one step.",
       "hints": [
         "if (i % 3 === 0) { continue; } -- skip multiples of 3",
         "The continue goes at the TOP of the loop body, before any flip logic"
@@ -98,7 +98,7 @@
     {
       "id": "r1",
       "title": "Both partners named in the header",
-      "description": "The Partners line at the top of script.js has names on it",
+      "description": "The Partners line at the top of script.js has names on it. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\S\\n]*Partners:[^\\S\\n]*\\S+",
@@ -110,7 +110,7 @@
     {
       "id": "r2",
       "title": "The problem is named in the header",
-      "description": "The Problem line says which of the four menu problems this is",
+      "description": "The Problem line says which of the four menu problems this is. Help: 2.6.1 (Group PA Part 1: Design the Chart)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\S\\n]*Problem:[^\\S\\n]*\\S+",
@@ -122,10 +122,10 @@
     {
       "id": "r3",
       "title": "The limit is a const",
-      "description": "The number that never changes is declared with const, not let",
+      "description": "The number that never changes is declared with const, not let. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "const\\s+[a-z][A-Za-z0-9]*\\s*=\\s*\\d",
+      "pattern": "const\\s+[A-Za-z][A-Za-z0-9_]*\\s*=\\s*\\d",
       "flags": "",
       "points": 0,
       "hint": "const goodDealLimit = 2.00; -- const rather than let, because it never changes. The name is camelCase like every other name.",
@@ -134,10 +134,10 @@
     {
       "id": "r4",
       "title": "A string variable is declared",
-      "description": "One variable holds text -- the name or label your problem talks about",
+      "description": "One variable holds text -- the name or label your problem talks about. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`$]*`)",
+      "pattern": "(?:let|const)\\s+[A-Za-z][A-Za-z0-9_]*\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`$]*`)",
       "flags": "",
       "points": 0,
       "hint": "Something like const pizzeriaName = \"Tony's\"; -- quotes make it a string.",
@@ -146,10 +146,10 @@
     {
       "id": "r5",
       "title": "A number variable is declared",
-      "description": "At least one variable holds a number typed straight in",
+      "description": "At least one variable holds a number typed straight in. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*-?\\d",
+      "pattern": "(?:let|const)\\s+[A-Za-z][A-Za-z0-9_]*\\s*=\\s*-?\\d",
       "flags": "",
       "points": 0,
       "hint": "let sliceCount = 8; -- no quotes around a number, or it is a string.",
@@ -158,7 +158,7 @@
     {
       "id": "r6",
       "title": "The loop uses a for or while",
-      "description": "A for or while loop is present and walks the input range",
+      "description": "A for or while loop is present and walks the input range. Help: 2.2.13 (The while Loop)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\b(for|while)\\s*\\([^)]*\\)\\s*\\{",
@@ -169,24 +169,24 @@
     },
     {
       "id": "r7",
-      "title": "The loop has a continue",
-      "description": "A continue statement appears inside the loop",
+      "title": "The loop has its continue (Coin Drawer: its break)",
+      "description": "A continue statement appears inside the loop. Coin Drawer has no skip rule, so there the loop needs its break instead: a break inside an if, for when the drawer is empty. Help: 2.4.13 (Skipping a Round with continue)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bcontinue\\s*;",
-      "flags": "",
+      "pattern": "^(?=[\\s\\S]*//[^\\S\\n]*Problem:[^\\S\\n]*coin\\W*drawer)[\\s\\S]*(?:\\)\\s*\\{\\s*break\\s*;|\\)\\s*break\\s*;)|^(?![\\s\\S]*//[^\\S\\n]*Problem:[^\\S\\n]*coin\\W*drawer)[\\s\\S]*\\bcontinue\\s*;",
+      "flags": "i",
       "points": 0,
-      "hint": "continue; -- exactly that word, inside the loop body.",
+      "hint": "continue; -- exactly that word, inside the loop body. Coin Drawer: if (drawerEmpty) { break; } -- a break the loop takes, not the one that ends a switch case.",
       "stripComments": false
     },
     {
       "id": "r8",
-      "title": "A break AND a continue",
-      "description": "The loop contains both a continue and a break, as the brief forces — one skip and one stop.",
+      "title": "A break AND a continue (Coin Drawer: two breaks)",
+      "description": "A continue statement and a break statement both appear in the program. The break may be the one that ends a switch case. Coin Drawer: the loop break (inside an if) and the switch-case break both appear.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bcontinue\\s*;[\\s\\S]*\\bbreak\\s*;|\\bbreak\\s*;[\\s\\S]*\\bcontinue\\s*;",
-      "flags": "",
+      "pattern": "^(?=[\\s\\S]*//[^\\S\\n]*Problem:[^\\S\\n]*coin\\W*drawer)(?:[\\s\\S]*(?:\\)\\s*\\{\\s*break\\s*;|\\)\\s*break\\s*;)[\\s\\S]*\\bbreak\\s*;|[\\s\\S]*\\bbreak\\s*;[\\s\\S]*(?:\\)\\s*\\{\\s*break\\s*;|\\)\\s*break\\s*;))|^(?![\\s\\S]*//[^\\S\\n]*Problem:[^\\S\\n]*coin\\W*drawer)(?:[\\s\\S]*\\bcontinue\\s*;[\\s\\S]*\\bbreak\\s*;|[\\s\\S]*\\bbreak\\s*;[\\s\\S]*\\bcontinue\\s*;)",
+      "flags": "i",
       "points": 0,
       "hint": "Two keywords, both in the loop: continue for the iterations the rule excludes, break for the moment the outcome is decided.",
       "stripComments": false
@@ -194,10 +194,10 @@
     {
       "id": "r9",
       "title": "A switch classifies the outcome",
-      "description": "A switch with at least three cases (each with a break) and a default.",
+      "description": "A switch with at least two case groups (each ending in a break) and a default. Grouped cases count as one group.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "switch\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?default\\s*:",
+      "pattern": "switch\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?case[\\s\\S]*?break\\s*;[\\s\\S]*?default\\s*:",
       "flags": "",
       "points": 0,
       "hint": "Three case labels -- the lesson text says your classification names three outcomes -- every one closed with break, and a default that catches the rest.",
@@ -206,7 +206,7 @@
     {
       "id": "r10",
       "title": "The bad input is guarded with throw",
-      "description": "A throw statement guards the bad input before the loop runs",
+      "description": "A throw statement guards the bad input before the loop runs. Help: 2.5.1 (Handling Errors with try/catch)",
       "type": "regex",
       "file": "script.js",
       "pattern": "throw\\s+new\\s+Error\\s*\\([^)]*\\)",
@@ -219,7 +219,8 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "maxSubmissions": 3
   },
   "assignmentCode": "A2.6.2",
   "planFrom": "2-6-1-ch2-group-pa-design-chart",

@@ -49,11 +49,11 @@
     {
       "id": "r1",
       "title": "Restore else player.vel.x = 0",
-      "description": "The draw() function must contain an else branch that sets player.vel.x to 0, so the sprite stops horizontally when no key is held.",
+      "description": "The draw() function must contain an else branch that sets player.vel.x to 0, so the sprite stops horizontally when no key is held. Help: 5.1.17 (The else-to-zero rule)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "else\\s+player\\.vel\\.x\\s*=\\s*0",
+      "pattern": "else[\\s{]*player\\.vel\\.x\\s*=\\s*0",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -61,11 +61,11 @@
     {
       "id": "r2",
       "title": "Restore else player.vel.y = 0",
-      "description": "The draw() function must contain an else branch that sets player.vel.y to 0, so the sprite stops vertically when no key is held.",
+      "description": "The draw() function must contain an else branch that sets player.vel.y to 0, so the sprite stops vertically when no key is held. Help: 5.1.17 (The else-to-zero rule)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "else\\s+player\\.vel\\.y\\s*=\\s*0",
+      "pattern": "else[\\s{]*player\\.vel\\.y\\s*=\\s*0",
       "flags": "",
       "points": 0,
       "status": "pending"

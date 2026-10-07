@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "=== used in the condition",
-      "description": "The if condition compares temperature to 100 with === (either order)",
+      "description": "The if condition compares temperature to 100 with === (either order). Help: 2.1.18 (One Equals Sign, or Three?)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\(\\s*\\(?\\s*(temperature\\s*===\\s*100|100\\s*===\\s*temperature)\\s*\\)?\\s*\\)",
@@ -42,7 +42,7 @@
     {
       "id": "r2",
       "title": "no assignment left inside any if condition",
-      "description": "No single = remains inside an if condition anywhere in the file",
+      "description": "No single = remains inside an if condition anywhere in the file. Help: 2.1.18 (One Equals Sign, or Three?)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*if\\s*\\(\\s*\\w+\\s*=[^=])[\\s\\S]*$",

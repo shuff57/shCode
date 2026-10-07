@@ -10,5 +10,4 @@
 // Step 3: Write an arrow function.
 //         Use the short arrow form from the reading.
 
-// Step 4: Call your greet function and log the result.
-//         Then call it and print what it hands back.
+// Step 4: Call your greet function and log what it hands back.

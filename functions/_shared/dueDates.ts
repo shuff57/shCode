@@ -301,6 +301,38 @@ export async function loadStudentDueWaivers(db: D1Database, email: string): Prom
   return new Set((result.results ?? []).map((r) => r.lesson_id));
 }
 
+// One student's waived lessons, grouped by class: the student's own grade is computed per class.
+export async function loadStudentWaiversByClass(db: D1Database, email: string): Promise<Map<string, Set<string>>> {
+  const result = await db
+    .prepare('SELECT class_id, lesson_id FROM lesson_due_waivers WHERE student_email = ?')
+    .bind(email)
+    .all<{ class_id: string; lesson_id: string }>();
+  const byClass = new Map<string, Set<string>>();
+  for (const r of result.results ?? []) {
+    const set = byClass.get(r.class_id);
+    if (set) set.add(r.lesson_id);
+    else byClass.set(r.class_id, new Set([r.lesson_id]));
+  }
+  return byClass;
+}
+
+// Every waived lesson in ONE class, by student: the roster grade needs these for the whole class
+// in one read, not one query per student. Unlike loadStudentDueWaivers this is scoped to the class
+// being viewed, because a grade is computed under one class's due dates.
+export async function loadClassDueWaivers(db: D1Database, classId: string): Promise<Map<string, Set<string>>> {
+  const result = await db
+    .prepare('SELECT student_email, lesson_id FROM lesson_due_waivers WHERE class_id = ?')
+    .bind(classId)
+    .all<{ student_email: string; lesson_id: string }>();
+  const byStudent = new Map<string, Set<string>>();
+  for (const r of result.results ?? []) {
+    const set = byStudent.get(r.student_email);
+    if (set) set.add(r.lesson_id);
+    else byStudent.set(r.student_email, new Set([r.lesson_id]));
+  }
+  return byStudent;
+}
+
 // True when the student may open this lesson right now, as far as the
 // "available after" gate is concerned. An override grant short-circuits the
 // open-date check entirely. The sequential green-to-advance rule is a

@@ -1,7 +1,7 @@
 {
   "id": "3-3-14-lab-filter-function",
-  "title": "3.3.14 Lab: Write a Function That Filters an Array",
-  "description": "Write a function that builds and returns a new array of transformed values, proving the original is untouched. Auto-graded.",
+  "title": "3.3.19 Lab: Write a Function That Returns a New Array",
+  "description": "Write a function that builds and returns a new array of transformed values (for example, each number doubled with result.push(n * 2), as in 3.3.15), proving the original is untouched. Auto-graded.",
   "type": "assignment",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -15,64 +15,184 @@
     {
       "id": "s1",
       "title": "Write a function with an array parameter",
-      "instructions": "Write a function declaration (e.g. doubled or bigger) that takes an array parameter."
+      "instructions": "Write a function declaration called doubled that takes an array parameter (the numbers to double)."
     },
     {
       "id": "s2",
       "title": "Build a new array inside it",
-      "instructions": "Create a new empty array inside the function and use a for...of loop to push each transformed value in."
+      "instructions": "Create a new empty array inside the function and use a for...of loop to push each number, doubled (n * 2), into it, as in 3.3.15."
     },
     {
       "id": "s3",
       "title": "Return the new array",
-      "instructions": "After the loop, return the new array."
+      "instructions": "After the loop, return the new array. Do not change the array you were given."
     },
     {
       "id": "s4",
       "title": "Call it and log both arrays",
-      "instructions": "Call the function with a sample array and console.log both the result and the original array to show the original is untouched."
+      "instructions": "Call doubled with a sample array and console.log both the result and the original array to show the original is untouched."
     }
   ],
   "requirements": [
     {
       "id": "r1",
-      "title": "function declaration present",
-      "description": "Code declares a function",
+      "title": "function with an array parameter that is not mutated",
+      "description": "Code declares a function whose array parameter is never changed inside it (no push, pop, shift, unshift, splice, sort, reverse, fill or index assignment on it). Help: 3.3.15 (Arrays and Functions)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+\\w+\\s*\\(",
-      "flags": "i",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*([\\w$]+)\\s*(?:,[^)]*)?\\)(?![\\s\\S]*\\b\\1\\s*(?:\\.(?:push|pop|shift|unshift|splice|sort|reverse|fill)\\s*\\(|\\[[^\\]]*\\]\\s*=(?!=)))",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r2",
       "title": "for loop present",
-      "description": "Code uses a for or for...of loop",
+      "description": "Code uses a for or for...of loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r3",
       "title": ".push used",
-      "description": "Code calls .push(",
+      "description": "Code calls .push(. Help: 3.3.15 (Arrays and Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.push\\s*\\(",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r4",
-      "title": "return present",
-      "description": "Code returns a value",
+      "title": "function returns the new array",
+      "description": "A return inside the function hands back the new array. Help: 3.3.15 (Arrays and Functions)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "return",
-      "flags": "i",
+      "pattern": "function\\s+\\w+\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "the new array differs from the input",
+      "description": "A pushed value is changed (arithmetic or a call) or only pushed when an if says so, so the result is not a plain copy. Help: 3.3.15 (Arrays and Functions)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.push\\s*\\((?:[^()]|\\([^()]*\\))*(?:[-+*/%]|[\\w$.]+\\s*\\()|\\bif\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*\\{?[^}]*\\.push\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "both arrays are logged",
+      "description": "console.log is called at least twice: once for the returned array and once for the original. Help: 3.3.15 (Arrays and Functions)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\([\\s\\S]*console\\.log\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "t1",
+      "title": "doubled returns a new, doubled array and leaves the original alone",
+      "description": "doubled(numbers) returns a NEW array holding every number doubled, in the same order, and the array you pass in is not changed. Help: 3.3.15 (Arrays and Functions)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "doubled",
+      "points": 0,
+      "hint": "Build a separate result array, push n * 2 for every number, and return the result. Pushing onto or assigning into the array you were given changes the original.",
+      "cases": [
+        {
+          "args": [
+            [
+              1,
+              2,
+              3
+            ]
+          ],
+          "expect": [
+            2,
+            4,
+            6
+          ],
+          "unchanged": 0
+        },
+        {
+          "args": [
+            []
+          ],
+          "expect": [],
+          "unchanged": 0,
+          "description": "an empty array"
+        },
+        {
+          "args": [
+            [
+              5
+            ]
+          ],
+          "expect": [
+            10
+          ],
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              -1,
+              0,
+              4
+            ]
+          ],
+          "expect": [
+            -2,
+            0,
+            8
+          ],
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              1.5,
+              2.5
+            ]
+          ],
+          "expect": [
+            3,
+            5
+          ],
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [
+              10,
+              20,
+              30,
+              40,
+              50
+            ]
+          ],
+          "expect": [
+            20,
+            40,
+            60,
+            80,
+            100
+          ],
+          "unchanged": 0,
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

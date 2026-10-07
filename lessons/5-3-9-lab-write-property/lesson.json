@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "Assign to b.color",
-      "description": "Write `b.color = ...` inside `draw()` to change the box's color property.",
+      "description": "Write `b.color = ...` inside `draw()` to change the box's color property. Help: 5.3.3 (Class and instance)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "Detect a key press",
-      "description": "Use `kb.presses(...)` inside `draw()` to respond to keyboard input.",
+      "description": "Use `kb.presses(...)` inside `draw()` to respond to keyboard input. Help: 5.1.14 (Keyboard Movement)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

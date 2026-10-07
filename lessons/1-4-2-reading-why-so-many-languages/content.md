@@ -22,6 +22,8 @@ That is a list of *jobs*, not a ranking. Asking which language is best is like a
 
 A card-sort you can run. Read the two lists first and pair them up in your head before you press run.
 
+*(Read it, do not write it yet: `[ ... ]` is a list of values, `languages[i]` is the item at position `i` counting from 0, `.length` is how many items there are, and `for` repeats its block once per position. Chapter 2 teaches all of this.)*
+
 ```js live plain
 let languages = ["Python", "C", "SQL", "Swift"];
 let jobs = ["analysing data", "an operating system", "a database question", "an iPhone app"];

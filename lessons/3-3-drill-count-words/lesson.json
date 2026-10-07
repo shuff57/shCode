@@ -1,0 +1,132 @@
+{
+  "id": "3-3-drill-count-words",
+  "title": "3.3.11 Lab: countWords(text)",
+  "description": "Write countWords(text): split a sentence at its spaces and return how many words there are. Practice with split and length, not graded: the checks call your function.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.3 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write countWords",
+      "instructions": "Write a function declaration called countWords that takes one parameter, text. The words in text are separated by single spaces, and there is always at least one word."
+    },
+    {
+      "id": "s2",
+      "title": "Split it into words",
+      "instructions": "Inside the function, cut text at every space with text.split(\" \") (3.3.10). That gives you an array with one item per word."
+    },
+    {
+      "id": "s3",
+      "title": "Return the count",
+      "instructions": "Return how many items that array has, using .length (3.3.2)."
+    },
+    {
+      "id": "s4",
+      "title": "Check it",
+      "instructions": "Call countWords with a sentence and console.log the result."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "countWords is defined with one parameter",
+      "description": "Code defines a function named countWords with exactly one parameter. Help: 3.3.10 (Splitting Text into Lines (.split))",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+countWords\\s*\\(\\s*[\\w$]+\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Write function countWords(text) { ... } with exactly that name and one name between the parentheses."
+    },
+    {
+      "id": "r2",
+      "title": "countWords splits the text",
+      "description": "countWords calls .split( in its body. Help: 3.3.10 (Splitting Text into Lines (.split))",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "countWords",
+      "pattern": "\\.split\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Use .split(\" \") on the text parameter to get an array of words."
+    },
+    {
+      "id": "r3",
+      "title": "countWords hands back a value with return",
+      "description": "countWords contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "countWords",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "The answer must leave the function with return, not console.log."
+    },
+    {
+      "id": "t1",
+      "title": "countWords counts the words",
+      "description": "countWords(text) gives back how many words the text has, when the words are separated by single spaces. Help: 3.3.10 (Splitting Text into Lines (.split))",
+      "type": "tests",
+      "file": "script.js",
+      "function": "countWords",
+      "points": 0,
+      "hint": "Split at a space, .split(\" \"), and return the length of the array. Splitting at \"\" (nothing between the quotes) cuts the text into letters, not words, and splitting at \"\\n\" only cuts at line breaks.",
+      "cases": [
+        {
+          "args": [
+            "one two three"
+          ],
+          "expect": 3
+        },
+        {
+          "args": [
+            "hello"
+          ],
+          "expect": 1,
+          "description": "a single word"
+        },
+        {
+          "args": [
+            "the quick brown fox"
+          ],
+          "expect": 4
+        },
+        {
+          "args": [
+            "a b"
+          ],
+          "expect": 2
+        },
+        {
+          "args": [
+            "go go go"
+          ],
+          "expect": 3,
+          "description": "a repeated word"
+        },
+        {
+          "args": [
+            "to be or not to be"
+          ],
+          "expect": 6,
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

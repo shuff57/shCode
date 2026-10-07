@@ -132,7 +132,8 @@ export function fromMermaid(src: string): DiagramDoc {
 
     const chain = (refs as ParsedRef[]).map(touch);
     for (let i = 0; i < chain.length - 1; i++) {
-      const label = opLabels[i]?.trim();
+      const rawLabel = opLabels[i]?.trim();
+      const label = rawLabel === undefined ? undefined : unquote(rawLabel);
       edges.push({
         id: `e${edgeSeq++}`,
         from: chain[i].id,

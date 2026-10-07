@@ -1,6 +1,6 @@
 {
   "id": "3-3-6-reading-shift-unshift",
-  "title": "3.3.6 Reading: Adding and Removing from the Front",
+  "title": "3.3.7 Reading: Adding and Removing from the Front",
   "description": "Learn .unshift() and .shift(), the front-of-list partners to .push() and .pop() you already know. Read before the queue lab.",
   "type": "lesson",
   "estimateMins": 10,

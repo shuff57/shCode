@@ -1,4 +1,4 @@
-// 2.3.5 Groups Sandbox (reference solution).
+// 6.1.5 Groups Sandbox (reference solution).
 // Spawn yellow stars from a Group, drift them downward, despawn off-screen.
 
 let stars;

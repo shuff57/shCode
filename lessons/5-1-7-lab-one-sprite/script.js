@@ -1,4 +1,4 @@
-// 2.1.3c Lab: Drop one sprite, change its color.
+// 5.1.7 Lab: Drop one sprite, change its color.
 
 function setup() {
   // STEP 1: Make a canvas (any reasonable size, e.g. 360x360).
@@ -7,7 +7,7 @@ function setup() {
 
   // STEP 3: Set the sprite's color to anything you like.
   //         Chain `.color = '...'` onto the new Sprite(...) call,
-  //         the same way you saw in 2.1.3b's reading.
+  //         the same way you saw in the 5.1.6 reading.
 }
 
 function draw() {

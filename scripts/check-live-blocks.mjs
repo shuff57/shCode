@@ -152,6 +152,20 @@ function sameEntry(a, b) {
   return JSON.stringify(normalise(a)) === JSON.stringify(normalise(b));
 }
 
+// The snapshot is V8's output, and V8 is what a student's Chrome runs. Bun runs
+// JavaScriptCore, which words the same errors differently ("null is not an
+// object (evaluating 'x.length')" for V8's "Cannot read properties of null
+// (reading 'length')", no trailing period on a RangeError, and so on). When the
+// code of a block is byte-identical to the frozen one, a different output on a
+// non-V8 engine is the engine, not the lesson, so it is reported as a warning
+// instead of a failure -- and --update keeps the V8 entry rather than baking
+// another engine's wording in. A block whose CODE changed is still compared
+// strictly. Run under real Node to compare everything.
+const ENGINE_IS_V8 = !process.versions.bun && !process.versions.deno;
+function engineOnly(expected, actual) {
+  return !ENGINE_IS_V8 && !!expected && (expected.code ?? '') === (actual.code ?? '');
+}
+
 function readSnapshot() {
   if (!existsSync(snapshotPath)) return {};
   try {
@@ -191,10 +205,16 @@ function main() {
     const next = {};
     const added = [];
     const changed = [];
+    const kept = [];
     for (const b of blocks) {
-      const entry = buildEntry(b);
+      let entry = buildEntry(b);
       if (!(b.id in old)) added.push(b.id);
-      else if (!sameEntry(old[b.id], entry)) changed.push(b.id);
+      else if (!sameEntry(old[b.id], entry)) {
+        if (engineOnly(old[b.id], entry)) {
+          kept.push(b.id);
+          entry = old[b.id];
+        } else changed.push(b.id);
+      }
       next[b.id] = entry;
     }
     const removed = Object.keys(old).filter((id) => !next[id]).sort();
@@ -208,6 +228,9 @@ function main() {
     console.log(`  added: ${added.length}${added.length ? ` (${added.join(', ')})` : ''}`);
     console.log(`  changed: ${changed.length}${changed.length ? ` (${changed.join(', ')})` : ''}`);
     console.log(`  removed: ${removed.length}${removed.length ? ` (${removed.join(', ')})` : ''}`);
+    if (kept.length) {
+      console.log(`  kept (engine wording only, this is not V8): ${kept.length} (${kept.join(', ')})`);
+    }
     return;
   }
 
@@ -228,6 +251,7 @@ function main() {
   const snapshot = readSnapshot();
   const byId = new Map(blocks.map((b) => [b.id, b]));
   const failures = [];
+  const engineWarnings = [];
 
   for (const id of Object.keys(snapshot).sort()) {
     if (!byId.has(id)) {
@@ -244,7 +268,8 @@ function main() {
     if (!expected) continue;
     const actual = buildEntry(b);
     if (!sameEntry(expected, actual)) {
-      failures.push({ id: b.id, why: 'behaviour changed', expected, actual });
+      if (engineOnly(expected, actual)) engineWarnings.push(b.id);
+      else failures.push({ id: b.id, why: 'behaviour changed', expected, actual });
     }
   }
 
@@ -260,6 +285,11 @@ function main() {
     }
     console.error(`\n[check-live-blocks] ${failures.length} mismatch(es) across ${blocks.length} block(s)`);
     process.exit(1);
+  }
+  if (engineWarnings.length) {
+    console.log(`${blocks.length - engineWarnings.length} blocks match; ${engineWarnings.length} differ only in engine wording`);
+    console.log(`  (this is ${process.versions.bun ? 'Bun/JavaScriptCore' : 'not V8'}; the snapshot is V8's, which is what students run. Same code, different error text: ${engineWarnings.join(', ')})`);
+    return;
   }
   console.log(`${blocks.length} blocks, all match`);
 }

@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Write the switch",
-      "instructions": "Write a switch on filamentType with a case for 'PLA', 'ABS', 'PETG', and 'TPU'. Each case must print a recommended temperature and a recommended print speed for that filament: you choose reasonable numbers. Add a default that prints a message for a filament type you don't recognize. End every case with a break."
+      "instructions": "Write a switch on filamentType with a case for 'PLA', 'ABS', 'PETG', and 'TPU'. Each case must print a recommended temperature and a recommended print speed for that filament, and what you print must include the words \"temperature\" and \"speed\": you choose reasonable numbers. Add a default that prints a message for a filament type you don't recognize. End every case with a break."
     },
     {
       "id": "s3",
@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "switch statement present",
-      "description": "Code contains a switch statement",
+      "description": "Code contains a switch statement. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "switch\\s*\\(",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "case 'PLA' present",
-      "description": "Code contains a case for 'PLA'",
+      "description": "Code contains a case for 'PLA'. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]PLA['\"]",
@@ -53,7 +53,7 @@
     {
       "id": "r3",
       "title": "case 'ABS' present",
-      "description": "Code contains a case for 'ABS'",
+      "description": "Code contains a case for 'ABS'. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]ABS['\"]",
@@ -63,7 +63,7 @@
     {
       "id": "r4",
       "title": "case 'PETG' present",
-      "description": "Code contains a case for 'PETG'",
+      "description": "Code contains a case for 'PETG'. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]PETG['\"]",
@@ -73,7 +73,7 @@
     {
       "id": "r5",
       "title": "case 'TPU' present",
-      "description": "Code contains a case for 'TPU'",
+      "description": "Code contains a case for 'TPU'. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"]TPU['\"]",
@@ -83,7 +83,7 @@
     {
       "id": "r6",
       "title": "default label present",
-      "description": "Code contains a default label",
+      "description": "Code contains a default label. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "default\\s*:",
@@ -92,18 +92,18 @@
     },
     {
       "id": "r7",
-      "title": "break present",
-      "description": "Code contains at least one break statement",
+      "title": "four breaks, one per case",
+      "description": "Code contains four break statements, one for each of the PLA, ABS, PETG and TPU cases. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "break",
+      "pattern": "(?:\\bbreak\\b[\\s\\S]*){4}",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r8",
       "title": "mentions temperature",
-      "description": "A filament case's console.log call prints a recommended temperature",
+      "description": "A filament case's console.log call prints a recommended temperature. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"](?:PLA|ABS|PETG|TPU)['\"]\\s*:(?:(?!case\\s*['\"]|default\\s*:)[\\s\\S])*?console\\.log\\s*\\([^)]*temp",
@@ -113,7 +113,7 @@
     {
       "id": "r9",
       "title": "mentions speed",
-      "description": "A filament case's console.log call prints a recommended print speed",
+      "description": "A filament case's console.log call prints a recommended print speed. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s*['\"](?:PLA|ABS|PETG|TPU)['\"]\\s*:(?:(?!case\\s*['\"]|default\\s*:)[\\s\\S])*?console\\.log\\s*\\([^)]*speed",
@@ -123,7 +123,7 @@
     {
       "id": "r10",
       "title": "fall-through comment written",
-      "description": "A comment explains what would print if a break were removed",
+      "description": "A comment explains what would print if a break were removed. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\n]*\\bbreak\\b|/\\*[\\s\\S]*?\\bbreak\\b[\\s\\S]*?\\*/",

@@ -2,55 +2,43 @@
 // server. Runs on Cloudflare Pages Functions, not in the static Next bundle,
 // so no API key ever reaches the browser.
 //
-// Four targets, chosen by the student from a dropdown (see GraderId):
+// ONE target: Ollama cloud. The grader stopped being a menu. A self-hosted
+// classroom box and a second paid provider were both removed (see below), so
+// there is nothing to choose between and the picker never renders.
 //
-//   workersai   the AI binding    [+ WORKERS_AI_MODEL]   <- preferred
-//   cloud       OLLAMA_API_KEY    + OLLAMA_HOST (default https://ollama.com)
-//   local       OLLAMA_LOCAL_HOST + OLLAMA_LOCAL_MODEL [+ OLLAMA_LOCAL_API_KEY]
-//   openrouter  OPENROUTER_API_KEY [+ OPENROUTER_MODEL] -- CLASS-RESTRICTED
+// cloud OLLAMA_API_KEY + OLLAMA_HOST (default https://ollama.com)
+//      model: the lesson's aiGrader.model, else glm-5.3-flash:cloud
 //
-// workersai is the one to reach for. It is a BINDING, so there is no host to
-// keep alive, no key to rotate and no tunnel to maintain -- and it is the only
-// target measured to survive a whole class submitting at once. Benchmarked
-// 2026-09-05 against the real rubrics in public/ai-graders.json:
+// The Cloudflare Workers AI binding was a target here until 2026-09-30 and was
+// removed as an experiment that did not work out. Two measured facts from
+// that experiment are kept because they hold for any future model swap:
+// Two measured facts from that experiment are kept because they hold for any
+// future model swap:
 //
-//   @cf/google/gemma-4-26b-a4b-it   20/20 correct   25/25 under a 25-way burst
-//   @cf/zai-org/glm-5.3-flash       20/20 correct   20/25 -- five refused with
-//                                                   "3021: rate limiting",
-//                                                   i.e. the 20-rpm frontier cap
+// @cf/google/gemma-4-26b-a4b-it 20/20 correct 25/25 under a 25-way burst
+// @cf/zai-org/glm-5.3-flash 20/20 correct 20/25 -- five refused with
+// "3021: rate limiting",
+// i.e. the 20-rpm frontier cap
 //
-// Both graded identically; only the burst separated them, which is why the
-// default model is gemma. A frontier model here would silently drop five
-// students in a class of twenty-five.
+// The max_tokens ceiling mattered too: at 1500 a reasoning model spent its
+// whole budget on the `reasoning` field and returned finish_reason:"length"
+// with content null -- indistinguishable from "cannot produce JSON" unless
+// you read finish_reason. 8000 was the measured ceiling.
 //
 // Set the cloud secret once per project:
 //
 //   npx wrangler pages secret put OLLAMA_API_KEY --project-name shcode
 //
-// The local target is a self-hosted Ollama on the school's own hardware. It
-// has to be reachable FROM CLOUDFLARE, not just from the classroom -- a Pages
-// Function runs in Cloudflare's network and cannot see a LAN address, so a
-// bare 192.168.x.y in OLLAMA_LOCAL_HOST will always time out. Publish the box
-// through a Cloudflare Tunnel (or any public hostname) and point the var at
-// that. Routing it through the Function rather than letting the browser call
-// the box directly is what keeps the rubric server-side; see the note on
-// target resolution below.
+// The self-hosted classroom box and the second paid provider were both removed
+// 2026-09-30: one vendor, one key, one model, one thing to be wrong. Neither
+// needed a migration, because a target the deploy has not configured was
+// already reported unavailable rather than hidden -- the picker simply had
+// nothing left to offer.
 //
-// openrouter is NOT a general-availability target. It is gated per class, not
-// per deploy: even with OPENROUTER_API_KEY configured, a student only sees or
-// can select it when their class's owner_email (or their own email, for the
-// teacher previewing a lesson) is in OPENROUTER_ALLOWED_OWNER_EMAILS. That
-// check runs independently in both the GET menu and the POST handler -- see
-// isOpenRouterAllowed() below -- so a student outside an allowed class is
-// refused regardless of whether the deploy has a key configured. Benchmarked
-// 2026-09-05 against public/ai-graders.json: 25/25 and 60/60 concurrent
-// requests succeeded (avg ~480ms), correctly caught a planted structural error
-// in a flowchart-grading test case, and graded a six-criterion free response
-// correctly. Cheapest and fastest of the candidates tried.
-//
-// GET /api/grade-written lists the configured targets, so the picker offers
-// only what this deploy can actually run -- and, for openrouter, only what
-// this requester's class is allowed to run.
+// GET /api/grade-written still answers with the one configured target. The
+// client keeps the response shape; a single entry means no dropdown to show,
+// and a `grader` value from a stale cached bundle is ignored rather than
+// refused, so an old tab cannot 400 on a retired target.
 //
 // The middleware at functions/_middleware.ts already gates this on a valid
 // session cookie, so only signed-in students hit this.
@@ -64,45 +52,25 @@ import {
   DEFAULT_GRADER,
   type GradeRequest,
   type GradeStage,
+  type GradeResponse,
   type GradeStreamEvent,
   type GraderId,
   type GraderOption,
 } from '../../lib/grade-written-core';
 import { isLessonAccessible, lockedResponse, type SessionData } from '../_shared/lessonAccess';
 import { loadAiGrader } from '../_shared/aiGraders';
-import { normalizeEmail } from '../_shared/auth';
+import { DEFAULT_RULES } from '../../lib/diagram-types';
+import { sanitizeDiagramDoc } from '../../lib/diagram-artifact';
+import { describeDiagram } from '../../lib/diagram-mermaid';
+import { checkDiagram, allPassed } from '../../lib/diagram-check';
+import { splitRubric, scoreDiagram, mergeGrade, type DiagramScore } from '../../lib/diagram-score';
+import { capFor, kindFor, attemptsUsed, recordGraded, recordOutage, isStaff, effectiveCap, cleanArtifact } from '../_shared/attempts';
 
 interface Env {
   DB: D1Database;
   OLLAMA_API_KEY: string;
   // Optional override — defaults to https://ollama.com when unset.
   OLLAMA_HOST?: string;
-  // Self-hosted target. Must be a hostname Cloudflare can resolve.
-  OLLAMA_LOCAL_HOST?: string;
-  // Model id as the LOCAL server names it. Required: a lesson's `model` is a
-  // cloud id (e.g. deepseek-v4-flash:0731-cloud) that will not exist on the
-  // box, so guessing one would fail at grading time instead of at
-  // configuration time. No default, deliberately.
-  OLLAMA_LOCAL_MODEL?: string;
-  // Optional — a plain Ollama behind a private tunnel usually has no auth.
-  OLLAMA_LOCAL_API_KEY?: string;
-  // Workers AI. A binding, not a URL -- declared in wrangler.toml for local dev
-  // and in the Pages dashboard (Settings -> Functions -> AI bindings) for
-  // production. Absent on a deploy that has not added it, which is why every
-  // use is guarded rather than assumed.
-  AI?: Ai;
-  // Optional override for the Workers AI model id. Defaults to the model the
-  // benchmark picked; set it to try another without a code change.
-  WORKERS_AI_MODEL?: string;
-  OPENROUTER_API_KEY?: string;
-  // Optional override; defaults to the benchmarked model below.
-  OPENROUTER_MODEL?: string;
-  // Comma-separated teacher emails. A class is eligible for the OpenRouter
-  // grader iff enrollments -> classes.owner_email matches one of these
-  // (case-insensitive), OR the requesting session email itself is in this
-  // list (so the owning teacher can test it directly, e.g. previewing a
-  // lesson with no enrollment row of their own).
-  OPENROUTER_ALLOWED_OWNER_EMAILS?: string;
   // Optional per-student daily submission cap. Default 30. Teachers exempt.
   GRADE_WRITTEN_DAILY_LIMIT?: string;
   ASSETS?: Fetcher;
@@ -117,33 +85,8 @@ interface Env {
 // and a student who could reset it by flipping the dropdown would not be capped.
 const RATE_BUCKET = 'grade-written';
 const DEFAULT_DAILY_LIMIT = 30;
-const DEFAULT_CLOUD_MODEL = 'deepseek-v4-flash:0731-cloud';
+const DEFAULT_CLOUD_MODEL = 'glm-5.3-flash:cloud';
 
-// Chosen by measurement, not by reputation -- see the benchmark note at the top
-// of this file. The burst result is the reason: an equally accurate frontier
-// model refused five of twenty-five simultaneous submissions.
-const DEFAULT_WORKERS_AI_MODEL = '@cf/google/gemma-4-26b-a4b-it';
-
-// Workers AI needs an explicit ceiling and it needs to be generous. At 1500 a
-// reasoning model spent the whole budget on its `reasoning` field and returned
-// finish_reason:"length" with content still null -- a truncation that looks
-// exactly like "this model cannot produce JSON". Measured 2026-09-05.
-const WORKERS_AI_MAX_TOKENS = 8000;
-
-// The benchmark ran at temperature 0 and scored 20/20; the Ollama path has
-// always used 0.2. Keep each at the value it was actually measured with rather
-// than unifying them on an untested number.
-const WORKERS_AI_TEMPERATURE = 0;
-
-// Benchmarked 2026-09-05 against public/ai-graders.json rubrics: 25/25 and
-// 60/60 concurrent requests succeeded (avg ~480ms), correctly caught a
-// planted structural error in a flowchart-grading test case, and graded a
-// six-criterion free response correctly. Cheapest and fastest of the
-// candidates tried (deepseek/deepseek-chat, deepseek/deepseek-v4-flash,
-// google/gemma-3-12b-it — the last was unusable, rate-limited upstream on
-// every request via OpenRouter's free DeepInfra pool).
-const DEFAULT_OPENROUTER_MODEL = 'mistralai/mistral-small-24b-instruct-2501';
-const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
 
 type Ctx = EventContext<Env, string, SessionData>;
 
@@ -158,129 +101,48 @@ type Ctx = EventContext<Env, string, SessionData>;
 // would be the identical hole one level down -- point it at a server you
 // control and collect any grade you like.
 
-// `kind` is the one structural difference between the targets. An 'ollama'
-// target is an HTTP endpoint we fetch; a 'binding' target is an object
-// Cloudflare hands the Function, with no host and no key at all. Everything
-// downstream branches on this and nothing else.
+// There used to be a `kind` here to branch transports on -- bare NDJSON for
+// Ollama, OpenAI-style SSE plus a silent retry for the second provider. With
+// one target both transports and the branch are gone; the shape is kept so the
+// GET menu and the client's error branch still have a uniform object.
 interface GraderTarget {
   id: GraderId;
-  kind: 'ollama' | 'binding' | 'openrouter';
-  label: string;
-  description: string;
-  host: string | null;
-  model: string | null;
-  apiKey: string | null;
-  ai: Ai | null;
-  unavailableReason?: string;
+ label: string;
+ description: string;
+ host: string | null;
+ model: string | null;
+ apiKey: string | null;
+ unavailableReason?: string;
 }
 
 function resolveTargets(env: Env, lessonModel?: string): Record<GraderId, GraderTarget> {
   const cloudKey = env.OLLAMA_API_KEY || null;
-  const localHost = (env.OLLAMA_LOCAL_HOST || '').trim().replace(/\/+$/, '') || null;
-  const localModel = (env.OLLAMA_LOCAL_MODEL || '').trim() || null;
-  const ai = env.AI || null;
 
   return {
-    workersai: {
-      id: 'workersai',
-      kind: 'binding',
-      label: 'Fast grader',
-      description: 'Runs on Cloudflare. Handles a whole class submitting at once.',
-      host: null,
-      model: (env.WORKERS_AI_MODEL || '').trim() || DEFAULT_WORKERS_AI_MODEL,
-      apiKey: null,
-      ai,
-      // Names the binding, not a variable: this one is configured in the Pages
-      // dashboard under Settings -> Functions -> AI bindings, and a teacher
-      // reading "WORKERS_AI is not set" would go looking in the wrong pane.
-      unavailableReason: ai
-        ? undefined
-        : 'the AI binding is not attached to this Pages project.',
-    },
     cloud: {
       id: 'cloud',
-      kind: 'ollama',
       label: 'Cloud grader',
       description: 'A hosted model. Works from anywhere, and usually answers faster.',
       host: (env.OLLAMA_HOST || 'https://ollama.com').replace(/\/+$/, ''),
       model: lessonModel || DEFAULT_CLOUD_MODEL,
       apiKey: cloudKey,
-      ai: null,
       unavailableReason: cloudKey ? undefined : 'OLLAMA_API_KEY is not set on this deploy.',
-    },
-    local: {
-      id: 'local',
-      kind: 'ollama',
-      label: 'Classroom grader',
-      description: 'Runs on the school machine. Your writing stays in the building, but it takes longer.',
-      host: localHost,
-      model: localModel,
-      apiKey: env.OLLAMA_LOCAL_API_KEY || null,
-      ai: null,
-      unavailableReason: localHost
-        ? localModel
-          ? undefined
-          : 'OLLAMA_LOCAL_MODEL is not set on this deploy.'
-        : 'OLLAMA_LOCAL_HOST is not set on this deploy.',
-    },
-    openrouter: {
-      id: 'openrouter',
-      kind: 'openrouter',
-      label: 'OpenRouter grader',
-      description: 'A fast, low-cost hosted model. Only offered to classes this is enabled for.',
-      host: OPENROUTER_ENDPOINT,
-      model: (env.OPENROUTER_MODEL || '').trim() || DEFAULT_OPENROUTER_MODEL,
-      apiKey: env.OPENROUTER_API_KEY || null,
-      ai: null,
-      unavailableReason: env.OPENROUTER_API_KEY ? undefined : 'OPENROUTER_API_KEY is not set on this deploy.',
     },
   };
 }
 
-// Whether the OpenRouter grader is offered/usable for this requester at all.
-// Independent of isAvailable() -- that checks whether the deploy configured
-// the target; this checks whether the requester's CLASS is allowed to see it.
-// Both must pass. A student outside an allowed class is refused even on a
-// deploy with OPENROUTER_API_KEY set, because the whole point of this target
-// is that it is not general availability.
-async function isOpenRouterAllowed(env: Env, db: D1Database, email: string): Promise<boolean> {
-  const allowedOwners = (env.OPENROUTER_ALLOWED_OWNER_EMAILS || '')
-    .split(',')
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  if (allowedOwners.length === 0) return false;
-  const normalized = normalizeEmail(email);
-  // The allowlisted teacher(s) themselves can use it directly, e.g. testing a
-  // lesson preview with no enrollment row of their own.
-  if (allowedOwners.includes(normalized.toLowerCase())) return true;
-  const placeholders = allowedOwners.map(() => '?').join(',');
-  const row = await db
-    .prepare(
-      `SELECT 1 FROM enrollments e JOIN classes c ON c.id = e.class_id
-       WHERE e.student_email = ? AND lower(c.owner_email) IN (${placeholders})
-       LIMIT 1`,
-    )
-    .bind(normalized, ...allowedOwners)
-    .first();
-  return !!row;
-}
 
 function isAvailable(t: GraderTarget): boolean {
-  if (t.unavailableReason) return false;
-  if (!t.model) return false;
-  // A binding target has no host by definition; requiring one would have made
-  // Workers AI permanently unavailable while reporting no reason why.
-  return t.kind === 'binding' ? !!t.ai : !!t.host;
+ if (t.unavailableReason) return false;
+ if (!t.model) return false;
+ return !!t.host;
 }
 
-// Which grader a request gets when it names none. Preference order, first
-// available wins: the binding needs no upkeep and survives a full class, the
-// hosted key is the long-standing fallback, the school box is last because it
-// is the one most likely to be switched off.
-//
-// Resolved per request rather than baked into DEFAULT_GRADER because only the
-// Function can see which targets this particular deploy has.
-const PREFERENCE: readonly GraderId[] = ['workersai', 'cloud', 'local'];
+// Which grader a request gets when it names none. One target, so the
+// preference order is a list of one -- kept as a list because the GET menu
+// iterates it, and resolved per request rather than baked into DEFAULT_GRADER
+// because only the Function can see what this deploy has configured.
+const PREFERENCE: readonly GraderId[] = ['cloud'];
 
 function pickDefault(targets: Record<GraderId, GraderTarget>): GraderId {
   for (const id of PREFERENCE) {
@@ -303,25 +165,16 @@ function toOption(t: GraderTarget): GraderOption {
   };
 }
 
-// GET — what this deploy can run, for this requester. Every field on the menu
-// is still public (no secrets, no hosts), but whether 'openrouter' appears at
-// all is now per-requester -- see isOpenRouterAllowed() -- so this does need
-// the session's email and a lesson-access-free DB check.
+// GET -- what this deploy can run. Every field on the menu is public (no
+// secrets, no hosts) and there is exactly one entry, so the client renders no
+// dropdown. Kept because the client reads this shape, not because there is a
+// choice left to make.
 export const onRequestGet: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
-  const { env, data } = context;
+  const { env } = context;
   const targets = resolveTargets(env);
-  const openRouterAllowed = await isOpenRouterAllowed(env, env.DB, data.email);
-  // An allowed class sees ONLY OpenRouter -- the picker itself hides once there
-  // is nothing to choose between (hasGraderChoice in GraderPicker.tsx needs
-  // 2+ available options), so this is what actually removes the dropdown.
-  // workersai/cloud/local stay fully resolvable server-side regardless: the
-  // non-streaming and streaming paths fall back to `cloud` if the OpenRouter
-  // call itself fails, and a class outside the allowlist still gets the
-  // ordinary menu.
-  const displayIds: GraderId[] = openRouterAllowed ? ['openrouter'] : [...PREFERENCE];
   return json({
-    graders: displayIds.map((id) => toOption(targets[id])),
-    fallback: openRouterAllowed ? 'openrouter' : pickDefault(targets),
+    graders: PREFERENCE.map((id) => toOption(targets[id])),
+    fallback: pickDefault(targets),
   });
 };
 
@@ -356,50 +209,106 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     );
   }
 
-  // ----- Pick the target -----
+  // ----- Tries (capped Performance Assessment parts only) -----
   //
-  // An unrecognised value falls back rather than erroring: the field is
-  // optional, and a client from before the picker existed sends nothing.
-  const targets = resolveTargets(env, config.model);
-  // Computed once and reused below -- the default-pick and the fail-closed
-  // gate used to each run their own DB query for the same answer.
-  const openRouterAllowed = await isOpenRouterAllowed(env, env.DB, data.email);
-  const requested: GraderId = isGraderId(body.grader)
-    ? body.grader
-    : openRouterAllowed
-      ? 'openrouter'
-      : pickDefault(targets);
-
-  // Fail-closed, independent of isAvailable() below: a student outside an
-  // allowed class must be refused even on a deploy with OPENROUTER_API_KEY
-  // configured. This is deliberately checked here, before the "is this target
-  // configured at all" check, not folded into it.
-  if (requested === 'openrouter' && !openRouterAllowed) {
+  // On a capped, AI-graded part THIS route spends the try: it records the counted
+  // lesson_submissions row itself, with the grader's own totals, once a grade
+  // exists (see `record` below). So the AI cannot be used as free practice
+  // before a row is written, a score the browser relays is never what counts,
+  // and once every try is spent no further call reaches the model. Refused here,
+  // before the rate limit and before any model cost. Applies to STUDENTS only: a teacher or
+  // admin who opens the part is previewing it (checking a rubric, a burst test before test
+  // day), and the cap is about what a student may spend. Their rows are recorded but never
+  // refused (tryCap is unlimited for them), and they never reach a class gradebook or the
+  // review queue because those read enrolled students only. A student who needs a clean slate
+  // is given one by a teacher (POST /api/classes/[id]/tries-reset), not by unsubmit.
+  const cap = capFor(body.lessonId);
+  const capped = cap !== undefined && kindFor(body.lessonId) === 'ai';
+  const tryCap = cap === undefined ? undefined : effectiveCap(cap, data.role);
+  // Display-only copy of what was drawn, kept with the counted row for the teacher's view.
+  //
+  // ----- Hybrid flowchart (rubric items carrying a `check`) -----
+  //
+  // The heavy points are marked from the drawing itself (lib/diagram-score.ts), the model marks
+  // only the wording items, and it never sees the checked ones. Both halves must grade the SAME
+  // chart, so the graded text is rebuilt from the artifact's doc here and a `response` that
+  // disagrees with it is ignored (otherwise good text + junk doc, or the reverse, would split the
+  // two graders). All of this runs before the rate limiter and before a try is spent: a chart that
+  // is not even structurally legal, or that arrives without its drawing, costs nothing.
+  const { ruleItems, aiItems } = splitRubric(config.rubric);
+  const hybrid = ruleItems.length > 0;
+  let response = body.response;
+  let det: DiagramScore | null = null;
+  if (hybrid) {
+    const doc = sanitizeDiagramDoc((body as { artifact?: { doc?: unknown } }).artifact?.doc);
+    if (!doc) {
+      return json({ ok: false, error: 'Send the chart itself with your submission. Reload the page and submit again.' }, 400);
+    }
+    const checks = checkDiagram(doc, config.diagramRules ?? DEFAULT_RULES);
+    if (!allPassed(checks)) {
+      const failing = checks.filter((c) => !c.passed);
+      return json(
+        {
+          ok: false,
+          error: `Fix these first, then submit again: ${failing.map((c) => `${c.title} (${c.detail})`).join(' ')}`.slice(0, 900),
+          structural: failing.map((c) => ({ id: c.id, title: c.title, detail: c.detail, offenders: c.offenders })),
+        },
+        422,
+      );
+    }
+    response = describeDiagram(doc);
+    det = scoreDiagram(doc, ruleItems, config.gate);
+  }
+  const artifact = cleanArtifact((body as { artifact?: unknown }).artifact, response, config.diagramRules ?? DEFAULT_RULES);
+  if (capped && !isStaff(data.role) && (await attemptsUsed(env.DB, data.email, body.lessonId)) >= (cap as number)) {
     return json(
-      {
-        ok: false,
-        error: 'The OpenRouter grader is not available for your class.',
-        offline: true,
-        grader: requested,
-      },
-      503,
+      { ok: false, error: `All ${cap} tries on this part are already used.`, capReached: true, cap },
+      409,
     );
   }
+  const record = capped
+    ? (result: { totalEarned: number; totalPossible: number }) =>
+        recordGraded(env, request, data.email, body.lessonId, tryCap as number, response, result, artifact)
+    : undefined;
+  // A grade that could not be produced (grader down or busy, or a model reply with
+  // no usable grade). The SERVER writes the free marker so the work still reaches
+  // the teacher: the browser's marker is refused on a capped part, because a row a
+  // student can post at will is a free row. See recordOutage for its limits. Never
+  // throws, never blocks the response.
+  const fail = capped
+    ? async (reason: string, status: number): Promise<void> => {
+        try {
+          await recordOutage(env, request, data.email, body.lessonId, tryCap as number, response, reason, status, artifact);
+        } catch {
+          /* the failure message below is still what the student sees */
+        }
+      }
+    : undefined;
 
+  // ----- Pick the target -----
+  //
+  // An unrecognised value falls back rather than erroring. The field is
+  // optional, a client from before the picker existed sends nothing, and a
+  // student with a stale cached bundle may still name a target this deploy
+  // retired. All three land on the one target rather than a 400.
+  const targets = resolveTargets(env, config.model);
+  const requested: GraderId = isGraderId(body.grader) ? body.grader : pickDefault(targets);
   const target = targets[requested];
 
-  // This replaced an unconditional OLLAMA_API_KEY check at the top of the
-  // handler. That check would have refused every LOCAL grade on a deploy with
-  // no cloud key -- exactly the deploy where the local grader is the point.
   if (!isAvailable(target)) {
     // 503 + offline:true is the shape the client's error branch already knows;
     // it saves the answer and hands it to the teacher rather than losing it.
+    // The student-facing `error` names no vendor, key or host; the reason a staff
+    // member needs is in `detail` (clients log it, never show it) and in the
+    // outage row's reason below.
+    const why = target.unavailableReason ?? 'it is not configured.';
+    console.warn('[grade-written] grader unavailable:', why);
+    if (fail) await fail(`The grader is not set up on this site (${why})`, 503);
     return json(
       {
         ok: false,
-        error:
-          `The ${target.label.toLowerCase()} is not set up on this site. `
-          + `Ask your teacher — ${target.unavailableReason ?? 'it is not configured.'}`,
+        error: 'The grader is not available on this site right now.',
+        detail: why,
         offline: true,
         grader: requested,
       },
@@ -458,134 +367,60 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   const model = target.model as string;
   const { system, user } = buildPrompt({
     lessonId: body.lessonId,
-    response: body.response,
+    response,
     lessonTitle: config.lessonTitle,
     prompt: config.prompt,
-    rubric: config.rubric,
+    // A hybrid chart's model sees ONLY the wording items; the checked ones are not in its prompt.
+    rubric: hybrid ? aiItems : config.rubric,
     contextDocs: config.contextDocs,
+    strict: config.strict,
   });
+  // One place that turns the model's JSON into the grade the student gets, shared by both paths.
+  const finish = (parsed: unknown) => {
+    if (!hybrid) return { ...shapeResult(parsed, config.rubric), grader: requested, graderModel: model };
+    const ai = shapeResult(parsed, aiItems);
+    return { ...mergeGrade(det as DiagramScore, ai, aiItems), grader: requested, graderModel: model };
+  };
 
-  // Both targets take the identical path from here -- one streaming
-  // implementation, not two. A local grader that streamed differently from the
-  // cloud one would make every "is it the model or the plumbing?" question
-  // unanswerable.
+  // Every item is checked by rules: nothing left for the model to say.
+  if (hybrid && aiItems.length === 0) {
+    const result = { ...mergeGrade(det as DiagramScore, null, []), grader: requested, graderModel: 'rules' };
+    if (record && !(await record(result))) {
+      return json({ ok: false, error: `All ${cap} tries on this part are already used.`, capReached: true, cap }, 409);
+    }
+    if (!wantsStream) return json(result);
+    return new Response(JSON.stringify({ result }) + '\n', {
+      headers: { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store' },
+    });
+  }
+
   if (wantsStream) {
     return streamGrade({
       target,
       model,
       system,
       user,
-      rubric: config.rubric,
+      finish,
       grader: requested,
-      // Only meaningful when target.kind === 'openrouter' -- the silent
-      // retry target if that call fails. null when this deploy has no cloud
-      // grader configured, so the failure surfaces instead of a confusing
-      // "cloud not set up" error.
-      fallbackTarget:
-        target.kind === 'openrouter' && isAvailable(targets.cloud) ? targets.cloud : null,
+      record,
+      fail,
     });
   }
 
-  // 180s timeout — the cloud can be slow on a cold model, and the classroom box
-  // is slower still. Cloudflare Pages Functions on the free plan allow up to 30s
-  // of CPU but wall-clock can be longer while awaiting an external fetch; this
-  // is the wait the streaming path exists to make legible.
+  // 180s timeout -- the model can be slow on a cold start. Cloudflare Pages
+  // Functions on the free plan allow up to 30s of CPU but wall-clock can be
+  // longer while awaiting an external fetch; this is the wait the streaming
+  // path exists to make legible.
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 180_000);
 
   let raw: string;
-  // Overridden below only on an OpenRouter-to-cloud fallback, so the response
-  // always names the grader that actually produced the text.
-  let effectiveGrader: GraderId = requested;
-  let effectiveModel: string = model;
   try {
-    if (target.kind === 'binding') {
-      // Non-streaming binding call. The same max_tokens ceiling applies: it is
-      // the difference between a grade and a truncated reasoning block.
-      const out = (await (target.ai as Ai).run(model as Parameters<Ai['run']>[0], {
-        messages: [
-          { role: 'system', content: system },
-          { role: 'user', content: user },
-        ],
-        temperature: WORKERS_AI_TEMPERATURE,
-        max_tokens: WORKERS_AI_MAX_TOKENS,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any)) as {
-        response?: string;
-        choices?: { message?: { content?: string | null }; finish_reason?: string }[];
-      };
-      const choice = out?.choices?.[0];
-      // content can be present-but-null when generation stopped inside the
-      // reasoning block. Reading it as '' would report an empty grade; say what
-      // actually happened instead.
-      const text = out?.response ?? choice?.message?.content ?? null;
-      if (text === null || text === undefined) {
-        return json(
-          {
-            ok: false,
-            error:
-              'The grader ran out of room before finishing. Try submitting again.',
-            grader: requested,
-            finishReason: choice?.finish_reason ?? null,
-          },
-          502,
-        );
-      }
-      raw = text;
-    } else if (target.kind === 'openrouter') {
-      // OpenRouter is a single external API with no SLA of its own -- unlike
-      // Workers AI (Cloudflare's binding) it can genuinely be down or rate
-      // limiting while the rest of the site is fine. A class that only sees
-      // this one grader must not lose grading entirely when that happens, so
-      // any failure here (429, a non-2xx, or the fetch throwing) retries once
-      // against `cloud` (Ollama) rather than surfacing an error -- silently,
-      // the way a student expects a submit button to just work.
-      try {
-        const res = await fetch(OPENROUTER_ENDPOINT, {
-          method: 'POST',
-          headers: chatHeaders(target.apiKey),
-          body: JSON.stringify({
-            model,
-            messages: [
-              { role: 'system', content: system },
-              { role: 'user', content: user },
-            ],
-            temperature: 0.2,
-            response_format: { type: 'json_object' },
-          }),
-          signal: controller.signal,
-        });
-        if (res.status === 429) {
-          throw new GraderError('The grader is busy right now. Wait a moment and submit again.');
-        }
-        if (!res.ok) {
-          const text = await res.text();
-          throw new GraderError(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
-        }
-        const payload = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-        raw = payload.choices?.[0]?.message?.content || '';
-      } catch (openRouterErr) {
-        const cloudTarget = targets.cloud;
-        // No cloud fallback configured on this deploy -- surface the original
-        // OpenRouter failure rather than a confusing "cloud not set up" one.
-        if (!isAvailable(cloudTarget)) throw openRouterErr;
-        raw = await callOllamaChat(
-          cloudTarget.host as string,
-          cloudTarget.apiKey,
-          cloudTarget.model as string,
-          system,
-          user,
-          controller.signal,
-        );
-        effectiveGrader = 'cloud';
-        effectiveModel = cloudTarget.model as string;
-      }
-    } else {
-      raw = await callOllamaChat(host, target.apiKey, model, system, user, controller.signal);
-    }
+    raw = await callOllamaChat(host, target.apiKey, model, system, user, controller.signal);
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     if (/3021|rate limit|busy right now/i.test(msg)) {
+      if (fail) await fail('The grader was busy.', 503);
       return json(
         {
           ok: false,
@@ -595,26 +430,27 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
         503,
       );
     }
-    // A GraderError (thrown by callOllamaChat, or the openrouter branch above)
-    // already carries a student-readable sentence -- only an unexpected throw
-    // gets the generic wrapper. Mirrors the streaming path's identical check.
+    // A GraderError thrown by callOllamaChat already carries a student-readable
+    // sentence -- only an unexpected throw gets the generic wrapper. Mirrors the
+    // streaming path's identical check.
     const errorText = e instanceof GraderError ? msg : `Grader call failed: ${msg}`;
-    return json({ ok: false, error: errorText, grader: requested }, 502);
+    if (fail) await fail(errorText, 502);
+    // The raw text can name the vendor and an upstream status: staff get it in
+    // `detail` and the outage row, the student gets a plain sentence.
+    console.warn('[grade-written] upstream failure:', errorText);
+    return json({ ok: false, error: UPSTREAM_FAILED_TEXT, detail: errorText, grader: requested }, 502);
   } finally {
     clearTimeout(timeout);
   }
 
   const parsed = parseModelJson(raw);
   if (!parsed) {
-    return json(
-      {
-        ok: false,
-        error: 'Model did not return JSON. Try again.',
-        raw: raw.slice(0, 500),
-        grader: requested,
-      },
-      502,
-    );
+    // The model's own text is NEVER sent to the client. It used to be (`raw`), and
+    // a crafted answer can steer a model into JSON that quotes the rubric it was
+    // given; logging it here keeps it for the teacher and out of the page.
+    console.warn('[grade-written] model reply was not JSON', body.lessonId, raw.slice(0, 500));
+    if (fail) await fail('Model did not return JSON.', 502);
+    return json({ ok: false, error: 'Model did not return JSON. Try again.', grader: requested }, 502);
   }
 
   // A reply that parses but carries no criteria used to sail through:
@@ -622,22 +458,22 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   // scoreless grade with no explanation and no error. Surface it as a retry
   // instead of a silent zero.
   if (!Array.isArray(parsed.criteria) || parsed.criteria.length === 0) {
-    return json(
-      {
-        ok: false,
-        error: 'Grader returned an empty result. Try submitting again.',
-        raw: raw.slice(0, 500),
-        grader: requested,
-      },
-      502,
-    );
+    console.warn('[grade-written] model reply carried no criteria', body.lessonId, raw.slice(0, 500));
+    if (fail) await fail('Grader returned an empty result.', 502);
+    return json({ ok: false, error: 'Grader returned an empty result. Try submitting again.', grader: requested }, 502);
   }
 
-  return json({ ...shapeResult(parsed, config.rubric), grader: effectiveGrader, graderModel: effectiveModel });
+  const result = finish(parsed);
+  // A racing request may have taken the last try while the model ran: the
+  // conditional insert refuses it, and the grade is withheld rather than given
+  // away free.
+  if (record && !(await record(result))) {
+    return json({ ok: false, error: `All ${cap} tries on this part are already used.`, capReached: true, cap }, 409);
+  }
+  return json(result);
 };
 
-// Shared Ollama /api/chat call (non-streaming): used for the `cloud`/`local`
-// targets directly, and as the silent fallback when `openrouter` fails.
+// Shared Ollama /api/chat call (non-streaming): the only path a grade takes.
 // Throws GraderError so callers can catch it the same way a thrown fetch
 // error is caught -- one failure shape, not two.
 async function callOllamaChat(
@@ -671,6 +507,10 @@ async function callOllamaChat(
   return data.message?.content || '';
 }
 
+// What a student reads when the model call itself failed. The upstream text
+// ("Ollama 401: ...") goes out as `detail` instead.
+const UPSTREAM_FAILED_TEXT = "The grader isn't responding right now. Try again in a minute.";
+
 function json(body: unknown, status = 200, extraHeaders?: Record<string, string>): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -689,9 +529,10 @@ function chatHeaders(apiKey: string | null): Record<string, string> {
 // ---------------------------------------------------------------------------
 // Transports
 //
-// Both read a complete grade and report progress the same way. The difference
-// is only how bytes arrive: an HTTP response body for Ollama, a binding's
-// stream for Workers AI.
+// One transport. It reads a complete grade and reports progress as it grows.
+// There used to be a second one here, for an API that framed its stream as
+// SSE and had no SLA of its own; both are gone, which is why this section is one
+// function and not two.
 
 // Carries a sentence already fit to show a student. Anything else thrown gets
 // the generic wrapper instead.
@@ -782,164 +623,6 @@ async function readOllama(
   return raw;
 }
 
-// Workers AI. env.AI.run() with stream:true answers Server-Sent Events, so the
-// framing is `data: {...}` lines rather than Ollama's bare NDJSON.
-//
-// max_tokens is load-bearing, not a default worth inheriting: at 1500 a
-// reasoning model spent its entire budget on the `reasoning` field, stopped
-// with finish_reason "length", and returned content:null. That truncation is
-// indistinguishable from "this model cannot follow the JSON instruction" unless
-// you look at finish_reason -- which is why it is reported below by name.
-async function readBinding(
-  ai: Ai,
-  model: string,
-  system: string,
-  user: string,
-  stage: StageFn,
-): Promise<string> {
-  let stream: ReadableStream<Uint8Array>;
-  try {
-    stream = (await ai.run(model as Parameters<Ai['run']>[0], {
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-      stream: true,
-      temperature: WORKERS_AI_TEMPERATURE,
-      max_tokens: WORKERS_AI_MAX_TOKENS,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any)) as unknown as ReadableStream<Uint8Array>;
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    // 3021 is the per-minute inference cap. Say so in words a student can act
-    // on -- it is a wait-and-retry, not a broken answer.
-    if (/3021|rate limit/i.test(msg)) {
-      throw new GraderError('The grader is busy right now. Wait a moment and submit again.');
-    }
-    throw new GraderError(`Workers AI: ${msg.slice(0, 300)}`);
-  }
-
-  stage('thinking');
-
-  const reader = stream.getReader();
-  const decoder = new TextDecoder();
-  const announce = makeAnnouncer(stage);
-  let buf = '';
-  let raw = '';
-  let finish: string | null = null;
-
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buf += decoder.decode(value, { stream: true });
-
-    const lines = buf.split('\n');
-    buf = lines.pop() || '';
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed.startsWith('data:')) continue;
-      const payload = trimmed.slice(5).trim();
-      if (!payload || payload === '[DONE]') continue;
-      let chunk: {
-        response?: string;
-        choices?: { delta?: { content?: string }; finish_reason?: string }[];
-      };
-      try {
-        chunk = JSON.parse(payload);
-      } catch {
-        continue;
-      }
-      // Older @cf models answer { response }; the OpenAI-compatible ones answer
-      // choices[].delta.content. Both are in the catalog, so read both.
-      const piece = chunk.response ?? chunk.choices?.[0]?.delta?.content;
-      if (piece) raw += piece;
-      const fr = chunk.choices?.[0]?.finish_reason;
-      if (fr) finish = fr;
-    }
-
-    announce(raw.length);
-  }
-
-  if (finish === 'length') {
-    throw new GraderError(
-      'The grader ran out of room before finishing. Try submitting again — '
-      + 'if it keeps happening, tell your teacher (WORKERS_AI max_tokens).',
-    );
-  }
-
-  return raw;
-}
-
-// OpenRouter is OpenAI-style SSE: `data: {...}` lines, choices[0].delta.content
-// -- same framing as readBinding's Workers AI stream, different endpoint and
-// auth (a plain Bearer key via chatHeaders(), no binding).
-async function readOpenRouter(
-  apiKey: string | null,
-  model: string,
-  system: string,
-  user: string,
-  stage: StageFn,
-  signal: AbortSignal,
-): Promise<string> {
-  const res = await fetch(OPENROUTER_ENDPOINT, {
-    method: 'POST',
-    headers: chatHeaders(apiKey),
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-      temperature: 0.2,
-      response_format: { type: 'json_object' },
-      stream: true,
-    }),
-    signal,
-  });
-
-  if (res.status === 429) {
-    throw new GraderError('The grader is busy right now. Wait a moment and submit again.');
-  }
-  if (!res.ok || !res.body) {
-    const text = res.body ? await res.text() : '';
-    throw new GraderError(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
-  }
-
-  stage('thinking');
-
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  const announce = makeAnnouncer(stage);
-  let buf = '';
-  let raw = '';
-
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buf += decoder.decode(value, { stream: true });
-    const lines = buf.split('\n');
-    buf = lines.pop() || '';
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed.startsWith('data:')) continue;
-      const payload = trimmed.slice(5).trim();
-      if (!payload || payload === '[DONE]') continue;
-      let chunk: { choices?: { delta?: { content?: string } }[] };
-      try {
-        chunk = JSON.parse(payload);
-      } catch {
-        continue;
-      }
-      const piece = chunk.choices?.[0]?.delta?.content;
-      if (piece) raw += piece;
-    }
-    announce(raw.length);
-  }
-
-  return raw;
-}
-
 // ---------------------------------------------------------------------------
 // Streaming variant (?stream=1). Emits NDJSON: stage lines while work happens,
 // then exactly ONE terminal {result} or {error} line.
@@ -954,14 +637,16 @@ interface StreamArgs {
   model: string;
   system: string;
   user: string;
-  rubric: Parameters<typeof shapeResult>[1];
+  /** Turns the parsed model JSON into the grade the student gets (plain, or merged with the chart's rule score). */
+  finish: (parsed: unknown) => GradeResponse;
   grader: GraderId;
-  // The silent retry target if `target.kind === 'openrouter'` fails. null
-  // when there is nothing to fall back to.
-  fallbackTarget: GraderTarget | null;
+  /** Capped parts: spend the try. False = every try was already spent. */
+  record?: (result: { totalEarned: number; totalPossible: number }) => Promise<boolean>;
+  /** Capped parts: write the server's free grader-outage marker. Never throws. */
+  fail?: (reason: string, status: number) => Promise<void>;
 }
 
-function streamGrade({ target, model, system, user, rubric, grader, fallbackTarget }: StreamArgs): Response {
+function streamGrade({ target, model, system, user, finish, record, fail }: StreamArgs): Response {
   const host = target.host as string;
   const apiKey = target.apiKey;
   const encoder = new TextEncoder();
@@ -978,45 +663,14 @@ function streamGrade({ target, model, system, user, rubric, grader, fallbackTarg
       const controllerAbort = new AbortController();
       const timeout = setTimeout(() => controllerAbort.abort(), 180_000);
 
-      // Overridden below only on an OpenRouter-to-cloud fallback, so the
-      // terminal result always names the grader that actually produced it.
-      let effectiveGrader = grader;
-      let effectiveModel = model;
-
       try {
         stage('reading');
 
-        // One accumulation contract, two transports. Both return the COMPLETE
-        // text and both announce 'writing' as it grows; neither forwards a
-        // partial grade -- see the note on GradeStage. Branching here rather
-        // than writing two streamGrade functions is what keeps "is it the model
-        // or the plumbing?" answerable.
-        let raw: string;
-        if (target.kind === 'binding') {
-          raw = await readBinding(target.ai as Ai, model, system, user, stage);
-        } else if (target.kind === 'openrouter') {
-          try {
-            raw = await readOpenRouter(apiKey, model, system, user, stage, controllerAbort.signal);
-          } catch (openRouterErr) {
-            // Same silent retry as the non-streaming path: no stage naming a
-            // specific grader has been sent yet ('reading' is generic), so
-            // switching underneath the student here is invisible, not a lie.
-            if (!fallbackTarget) throw openRouterErr;
-            raw = await readOllama(
-              fallbackTarget.host as string,
-              fallbackTarget.apiKey,
-              fallbackTarget.model as string,
-              system,
-              user,
-              stage,
-              controllerAbort.signal,
-            );
-            effectiveGrader = fallbackTarget.id;
-            effectiveModel = fallbackTarget.model as string;
-          }
-        } else {
-          raw = await readOllama(host, apiKey, model, system, user, stage, controllerAbort.signal);
-        }
+        // One accumulation contract: readOllama returns the COMPLETE text and
+        // announces 'writing' as it grows; it never forwards a partial grade --
+        // see the note on GradeStage. One path rather than two is what keeps
+        // "is it the model or the plumbing?" answerable.
+        const raw = await readOllama(host, apiKey, model, system, user, stage, controllerAbort.signal);
 
         stage('checking', raw.length);
 
@@ -1025,23 +679,33 @@ function streamGrade({ target, model, system, user, rubric, grader, fallbackTarg
         // otherwise hand back a scoreless grade with empty feedback and no error.
         const parsed = parseModelJson(raw);
         if (!parsed) {
-          send({ error: 'Model did not return JSON. Try again.', raw: raw.slice(0, 500) });
+          // The model's text stays on the server (see the non-streaming path).
+          console.warn('[grade-written] model reply was not JSON', raw.slice(0, 500));
+          if (fail) await fail('Model did not return JSON.', 502);
+          send({ error: 'Model did not return JSON. Try again.' });
           return;
         }
         if (!Array.isArray(parsed.criteria) || parsed.criteria.length === 0) {
-          send({
-            error: 'Grader returned an empty result. Try submitting again.',
-            raw: raw.slice(0, 500),
-          });
+          console.warn('[grade-written] model reply carried no criteria', raw.slice(0, 500));
+          if (fail) await fail('Grader returned an empty result.', 502);
+          send({ error: 'Grader returned an empty result. Try submitting again.' });
           return;
         }
 
-        send({ result: { ...shapeResult(parsed, rubric), grader: effectiveGrader, graderModel: effectiveModel } });
+        const result = finish(parsed);
+        if (record && !(await record(result))) {
+          send({ error: 'All tries on this part are already used.', capReached: true });
+          return;
+        }
+        send({ result });
       } catch (e: unknown) {
         // A GraderError already carries a student-readable sentence; anything
         // else is an unexpected throw and gets the generic wrapper.
         const msg = e instanceof Error ? e.message : String(e);
-        send({ error: e instanceof GraderError ? msg : `Grader call failed: ${msg}` });
+        const errorText = e instanceof GraderError ? msg : `Grader call failed: ${msg}`;
+        if (fail) await fail(errorText, 502);
+        console.warn('[grade-written] upstream failure:', errorText);
+        send({ error: UPSTREAM_FAILED_TEXT, detail: errorText });
       } finally {
         clearTimeout(timeout);
         controller.close();

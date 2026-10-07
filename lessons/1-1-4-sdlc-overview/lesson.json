@@ -72,20 +72,20 @@
     {
       "id": "req1",
       "title": "Hello world",
-      "description": "Print \"Hello, world!\" using console.log",
+      "description": "Print \"Hello, world!\" using console.log. Help: 1.1.2 (console.log & sequential execution)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(['\"]Hello,?\\s*[Ww]orld!?['\"]\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]Hello,?\\s*[Ww]orld!?[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
     {
       "id": "req2",
       "title": "Math expression",
-      "description": "Use console.log with a math expression",
+      "description": "Use console.log with a math expression. Help: 1.1.2 (console.log & sequential execution)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\d+\\s*[+\\-*/]\\s*\\d+\\)",
+      "pattern": "console\\.log\\s*\\(\\s*-?[\\d.]+\\s*[+\\-*/]\\s*-?[\\d.]+\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -95,7 +95,7 @@
       "description": "Join two strings with the + operator",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(['\"].*['\"]\\s*\\+\\s*['\"].*['\"]\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`].*[\"'`]\\s*\\+\\s*[\"'`].*[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -105,7 +105,7 @@
       "description": "Print a comparison that evaluates to true or false",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\d+\\s*[><=!]+\\s*\\d+\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\\d.]+\\s*[><=!]+\\s*[\\d.]+\\s*\\)",
       "flags": "i",
       "points": 0
     },

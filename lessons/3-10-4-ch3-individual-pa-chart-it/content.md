@@ -3,9 +3,11 @@
 **This is the design part of the test, and you are doing it alone.** One problem, pick
 one of three, draw the flowchart, **10 points**, about **7 minutes**. You draw the chart
 in the editor below, press **Check my diagram** as many times as you like, and submit.
-The checker judges whether your drawing is a legal flowchart -- never whether it answers
-the problem. Whether the functions are right is for you to read; the teacher grades the
-submitted chart.
+The checker in your browser judges whether your drawing is a legal flowchart, and each
+time you submit the AI marks whether it answers the problem you picked.
+
+**You get three tries.** Submit, read the feedback, redraw and submit again. Your best try
+counts. After your third try you can see how it is solved, once your teacher releases it.
 
 **Six shapes are legal on this chart** (Appendix D §D.2): oval, rectangle, diamond,
 parallelogram, the loop-setup hexagon (§2.2), and the **double-rail subroutine**
@@ -45,7 +47,8 @@ water needed, then compare it against what the can holds. Report whether one fil
 
 - **Six shapes only:** oval, rectangle, diamond, parallelogram, hexagon, double-rail.
 - **The double-rail is a function call** — label it with the function's name. One arrow
-  in, one arrow out.
+  in, one arrow out. **Draw at least two** (for example one that totals and one that
+  reports); a chart with only one loses points.
 - **The loop setup uses the hexagon** — your chart must include a loop.
 - **At least one decision diamond** — the comparison.
 - **At least two task rectangles** (the hexagon and the double-rail do not count).

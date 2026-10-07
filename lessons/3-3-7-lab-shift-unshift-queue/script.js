@@ -1,4 +1,4 @@
-// 3.3.7 Lab: Front-of-Line Queue
+// 3.3.8 Lab: Front-of-Line Queue
 
 // STEP 1: Create a variable called line and assign it an array
 //         containing at least two name strings.

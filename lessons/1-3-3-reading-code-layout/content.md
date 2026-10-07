@@ -10,6 +10,8 @@ Consistent layout makes code easy to scan. The class style: **2 spaces** of inde
 
 **Try it:**
 
+*(Read it, do not write it yet: `if ... else` runs the first block when its condition is true and the second when it is not. Chapter 2 teaches it; here only the spacing matters.)*
+
 ```js live plain
 // Cramped and hard to read (but it still runs)
 let age=17;if(age>=18){console.log("adult");}else{console.log("minor");}

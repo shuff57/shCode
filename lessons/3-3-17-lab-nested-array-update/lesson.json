@@ -1,6 +1,6 @@
 {
   "id": "3-3-17-lab-nested-array-update",
-  "title": "3.3.17 Lab: Read and Update a Nested Array",
+  "title": "3.3.22 Lab: Read and Update a Nested Array",
   "description": "Read and reassign values in a nested array with double-index syntax, then sum every cell with a nested loop. Auto-graded.",
   "type": "assignment",
   "estimateMins": 12,
@@ -37,41 +37,67 @@
     {
       "id": "r1",
       "title": "nested array literal present",
-      "description": "Code declares a nested array",
+      "description": "Code declares a nested array. Help: 3.3.20 (Lists Inside Lists)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\s*\\[",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r2",
       "title": "double-index access present",
-      "description": "Code reads or writes with two indexes",
+      "description": "Code reads or writes with two indexes. Help: 3.3.20 (Lists Inside Lists)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\]\\s*\\[",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r3",
       "title": "nested for loops present",
-      "description": "Code contains at least two for loops",
+      "description": "A for loop sits inside another for loop (braces optional). Help: 3.3.20 (Lists Inside Lists)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\([^{]*\\)\\s*\\{[^}]*for\\s*\\([^{]*\\)",
-      "flags": "is",
+      "pattern": "for\\s*\\([^{]*?\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?for\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r4",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.3.20 (Lists Inside Lists)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "a grid cell is updated",
+      "description": "Code changes one cell with a double index and an assignment, like grid[1][0] = 8 (writing a cell back to itself changes nothing). Help: 3.3.20 (Lists Inside Lists)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\])\\s*(?:[-+*/]=(?!=)|\\+\\+|--|=(?!=)(?!\\s*\\1\\s*(?:;|\\r?\\n|$)))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "a running total is logged",
+      "description": "Code adds numbers into a total with += (or total = total + ...) and then logs that total. Help: 3.3.20 (Lists Inside Lists)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "([\\w$]+)\\s*(?:\\+=|=\\s*\\1\\s*\\+|=[^;\\n=]*\\+\\s*\\1\\b)[\\s\\S]*\\bconsole\\.log\\s*\\([^)]*\\b\\1\\b",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     }
   ],

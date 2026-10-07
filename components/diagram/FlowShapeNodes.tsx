@@ -158,7 +158,8 @@ function ShapeNode({ id, data, selected }: NodeProps) {
       style={{
         position: 'relative',
         width: w,
-        height: h,
+        height: shape === 'comment' ? 'auto' : h,
+        minHeight: shape === 'comment' ? h : undefined,
         filter: selected ? 'drop-shadow(0 0 0 2px #ff79c6)' : undefined,
         outline: selected && clip === undefined ? '2px solid #ff79c6' : undefined,
         outlineOffset: 2,
@@ -168,8 +169,11 @@ function ShapeNode({ id, data, selected }: NodeProps) {
       {layers}
       <div
         style={{
-          position: 'absolute',
-          inset: textInset,
+          position: shape === 'comment' ? 'relative' : 'absolute',
+          inset: shape === 'comment' ? undefined : textInset,
+          padding: shape === 'comment' ? '8px 10px 8px 12px' : undefined,
+          minHeight: shape === 'comment' ? h : undefined,
+          boxSizing: 'border-box',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -179,7 +183,7 @@ function ShapeNode({ id, data, selected }: NodeProps) {
           lineHeight: 1.25,
           fontWeight: 500,
           fontFamily: 'system-ui, sans-serif',
-          overflow: 'hidden',
+          overflow: shape === 'comment' ? 'visible' : 'hidden',
           wordBreak: 'break-word',
           // The label is inert so clicks reach the node beneath it — except
           // while editing, when the textarea has to receive them.
@@ -193,7 +197,7 @@ function ShapeNode({ id, data, selected }: NodeProps) {
             className="nodrag nopan nowheel"
             autoFocus
             value={d.label}
-            rows={2}
+            rows={shape === 'comment' ? Math.max(2, (d.label || '').split('\n').length + Math.floor((d.label || '').length / 24)) : 2}
             onChange={(e) => d.onLabelChange?.(id, e.target.value)}
             onBlur={() => d.onEditEnd?.()}
             onKeyDown={(e) => {
@@ -208,7 +212,7 @@ function ShapeNode({ id, data, selected }: NodeProps) {
             onDoubleClick={(e) => e.stopPropagation()}
             style={{
               width: '100%',
-              height: '100%',
+              height: shape === 'comment' ? undefined : '100%',
               background: 'rgba(0,0,0,0.35)',
               border: `1px dashed ${colors.stroke}`,
               borderRadius: 4,

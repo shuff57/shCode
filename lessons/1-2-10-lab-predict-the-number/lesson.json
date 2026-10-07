@@ -36,7 +36,7 @@
     {
       "id": "r1",
       "title": "Logs 10 / 3",
-      "description": "Prints the result of dividing 10 by 3",
+      "description": "Prints the result of dividing 10 by 3. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*10\\s*/\\s*3\\s*\\)",
@@ -46,7 +46,7 @@
     {
       "id": "r2",
       "title": "Logs 100 / 0",
-      "description": "Prints the result of dividing 100 by 0",
+      "description": "Prints the result of dividing 100 by 0. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*100\\s*/\\s*0\\s*\\)",
@@ -56,7 +56,7 @@
     {
       "id": "r3",
       "title": "Logs \"hello\" * 5",
-      "description": "Prints the result of multiplying text by a number",
+      "description": "Prints the result of multiplying text by a number. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*[\"'`]hello[\"'`]\\s*\\*\\s*5\\s*\\)",
@@ -66,7 +66,7 @@
     {
       "id": "r4",
       "title": "Logs Infinity + 1",
-      "description": "Prints the result of adding 1 to Infinity",
+      "description": "Prints the result of adding 1 to Infinity. Help: 1.2.8 (Infinity, -Infinity and NaN)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(\\s*Infinity\\s*\\+\\s*1\\s*\\)",

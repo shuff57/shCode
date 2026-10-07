@@ -1,5 +1,5 @@
 'use client';
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 // The three.js twin of components/model/BrepViewport.tsx -- same OpenCascade
 // kernel, same ModelDoc, same props, a different renderer underneath. Built
 // alongside the JSCAD/regl viewport rather than in place of it so the two can
@@ -62,10 +62,26 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 // is loaded through a runtime-computed import rather than a static one, and
 // why that load lives in a module-level (not component-level) promise.
 import { useEffect, useRef, useState } from 'react';
-import { topLevel } from '@shuff57/reshape-script/model-types';
+import { topLevel, sketchFrameOf } from '@shuff57/reshape-script/model-types';
 import { BrepRsEngineAdapter } from '@shuff57/reshape-kernel/brep-rs-engine-adapter';
 import { mergeMeshes } from '../mesh-export.js';
 import { bboxCenter, DEFAULT_FILL_FRACTION, fitDistance } from '../camera-fit.js';
+import { CUBE_ZONE_CELL, cubeZoneAt, cubeZoneDirs } from './cube-zone.js';
+import { loadSchemeName, navHint, saveSchemeName, schemeToMouseButtons, schemeToTouches } from '../camera-controls.js';
+import { CameraMode, loadCameraMode, orthoFrustumFromPerspective, saveCameraMode } from '../ortho-camera.js';
+import { computeSelectionFit, computeWindowZoomFit } from '../window-zoom-fit.js';
+import { nearestVisible, nextCycleIndex, shouldHandleViewportDelete, solidBounds } from '../pick-helpers.js';
+import { HOLD_CYCLE_DELAY_MS, HOLD_CYCLE_DEAD_ZONE_PX } from '../input-threshold.js';
+import MarkingMenu from './MarkingMenu.js';
+import { classifyGesture, wedgesForMode } from './marking-menu-core.js';
+import { rightClickGuard } from './marking-menu-guard.js';
+import { pickDatum } from './datum-pick.js';
+import { marqueeKind, pointSetSelect } from '../marquee-select.js';
+// Todo 19's [CONFIRM]-sourced gesture thresholds: the delay is the
+// marking-menu gesture's own default (150ms, pending real-Fusion
+// verification per SPEC open question #2); the dead zone is the SHARED
+// click-and-hold constant from input-threshold.ts, not a second number.
+const MARKING_GESTURE = { delayMs: 150, deadZonePx: HOLD_CYCLE_DEAD_ZONE_PX, wedgeCount: 8 };
 /** The Dracula palette this app already uses everywhere else -- see
  *  app/globals.css and BrepViewport.tsx. */
 const COLORS = {
@@ -218,24 +234,100 @@ const EDGE_OCCLUSION_TOLERANCE_FRACTION = 0.05;
  *  for that. Tuned by eye against this app's own primitive sizes (10-40
  *  unit boxes and cylinders). */
 const EDGE_TUBE_RADIUS = 0.75;
+/** World-space radius of the vertex highlight marker -- a small sphere
+ *  centred on the picked point, real geometry for the same reason edge
+ *  highlights are (edgeTubeGeometry()'s own doc comment): no WebGL
+ *  implementation guarantees a screen-space point size. Bigger than
+ *  EDGE_TUBE_RADIUS on purpose -- tuned by eye so a single point still
+ *  reads as its own thing next to a tube it might sit right beside. */
+const VERTEX_MARKER_RADIUS = 1.4;
+/** Every kind pickable -- the default `filters` prop value when no caller
+ *  has wired the toolbar yet, identical to emptySelection()'s own filters
+ *  default in selection-model.ts. */
+const DEFAULT_FILTERS = { face: true, edge: true, vertex: true, body: true };
+// Single source of truth for the filter strip's four chips -- same reason
+// NAV_CUBE_FACES is one below: the JSX maps over this instead of hand-writing
+// four near-identical buttons, so a filter key and its label can never drift
+// out of sync with each other.
+const FILTER_CHIPS = [
+    { key: 'face', label: 'Faces' },
+    { key: 'edge', label: 'Edges' },
+    { key: 'vertex', label: 'Vertices' },
+    { key: 'body', label: 'Bodies' },
+];
 /**
  * Renders a ModelDoc through the brep-rs B-rep kernel, live, in the page.
  *
  * Incremental (feature-level) rebuild is NOT here: every doc change rebuilds
  * every feature from scratch through the adapter's build().
  */
-export default function BrepViewportThree({ doc, deflection, onStats, onPick, pick, selectedCount, selectionLabel, anchors, onAnchors, onMesh, registerPickAt, sketchPlane, panelOcclusionPx, ruleActivityAt, onEngine, badgesInStatusBar = false, }) {
+export default function BrepViewportThree({ doc, deflection, onStats, onPick, pick, selectedCount, selectionLabel, anchors, onAnchors, onMesh, registerPickAt, sketchPlane, selectedDatumIds, onDatumPick, panelOcclusionPx, ruleActivityAt, onEngine, badgesInStatusBar = false, onNavHint, filters, onFiltersChange, onBoxSelect, onFeatureDoubleClick, onSelectAll, onDeleteSelected, onUndo, onRedo, onStartSketch, onRepeat, onMoveHotkey, preview, }) {
     const [phase, setPhase] = useState('loading');
+    // Section view: a display-only clipping plane. The kernel and the model are
+    // untouched, so volume and exports never change. `t` is 0..1 along the part's
+    // own extent on `axis`; `flip` keeps the other side.
+    const [section, setSection] = useState({ on: false, axis: 1, t: 0.5, flip: false });
+    const sectionRef = useRef(section);
+    sectionRef.current = section;
+    useEffect(() => { if (phase === 'ready')
+        applySectionRef.current(); }, [section, phase]);
+    const applySectionRef = useRef(() => { });
+    applySectionRef.current = applySection;
     // Which view-strip preset the camera is sitting on, or null once the
     // student has dragged away from it. A blind judge could not tell the
     // Underneath view from Top -- straight up and straight down look alike --
     // so the strip itself says which one is active.
     const [preset, setPreset] = useState('home');
+    // SPEC-mouse-parity Phase 1: which mouse-button preset OrbitControls is
+    // bound to ('legacy' = stock three.js L-orbit/M-dolly/R-pan, what this
+    // viewport has always done; 'fusion' = M-pan / R-dolly) and whether the
+    // live camera is perspective or orthographic. Both persist across sessions.
+    const [mouseScheme, setMouseScheme] = useState(() => loadSchemeName());
+    const mouseSchemeRef = useRef(mouseScheme);
+    mouseSchemeRef.current = mouseScheme;
+    const [cameraKind, setCameraKind] = useState(() => loadCameraMode());
+    // Same stale-closure reasoning as docRef below: the scene-setup effect's
+    // applyCameraMode() was created once and reads this ref, never the state.
+    const cameraKindRef = useRef(cameraKind);
+    cameraKindRef.current = cameraKind;
+    // Window-zoom: null = inert; 'armed' = the next left-drag draws a zoom
+    // rectangle instead of orbiting; a rect = mid-drag (drives the overlay).
+    // React state because arming changes the cursor and mid-drag re-renders the
+    // rectangle div; the bookkeeping the pointer handlers mutate lives beside
+    // it in windowZoomRef.
+    const [windowZoom, setWindowZoom] = useState(null);
+    // Box select (SPEC-mouse-parity.md Phase 3 item 4): the drag rectangle
+    // overlay, plus which window/crossing rule it is currently drawing under
+    // -- same convention SketchCanvas2D's own 2D marquee state uses (its
+    // `marquee`/`marqueeKind` split), adapted to screen pixels instead of SVG
+    // world units. React state because it drives the overlay div below; the
+    // in-progress drag bookkeeping the pointer handlers mutate every move
+    // lives beside it in boxSelectRef, the same split windowZoom/
+    // windowZoomRef use.
+    const [boxSelect, setBoxSelect] = useState(null);
+    // The right-click marking menu (SPEC-mouse-parity.md Phase 4.1):
+    // container-relative px (same convention as boxSelect/windowZoom above,
+    // computed off renderer.domElement's own getBoundingClientRect() in the
+    // scene-setup effect's contextmenu listener below), or null when closed.
+    const [markingMenu, setMarkingMenu] = useState(null);
     // Nav cube: DOM node whose CSS transform is synced to the live camera
     // orientation every frame (see the rAF effect below) -- a ref, not state,
     // so 60x/sec orientation reads never trigger a React re-render.
     const navCubeInnerRef = useRef(null);
     const cubeDragRef = useRef({ dragging: false, x: 0, y: 0, moved: false });
+    // Todo 28 (SPEC Phase 1.5): the cube's own small menu, opened by the
+    // affordance icon on the cube -- NEVER by right-click (the marking menu
+    // owns right-click everywhere, cube included; two competing menus over
+    // one widget would collide). Offers the two camera modes that already
+    // exist (the view-strip's Persp/Ortho) plus Set as Home/Front/Top;
+    // SPEC-mouse-parity.md :65 defers "Perspective with Orthographic Faces"
+    // so it is deliberately absent here.
+    const [cubeMenu, setCubeMenu] = useState(false);
+    // The open menu is a SIBLING of the cube wrapper (fixed-position at the
+    // gear's screen spot) so a click on its entry buttons is never captured
+    // by the wrapper's pointerdown -- their own onClicks fire. gearX/gearY
+    // are read from the gear's bounding rect at open time.
+    const [gearPos, setGearPos] = useState(null);
     const [loadError, setLoadError] = useState(null);
     const [buildError, setBuildError] = useState(null);
     // A stage that is empty ON PURPOSE (nothing yet, or only flat sketches)
@@ -312,8 +404,29 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
      *  the exact per-edit cost this component exists to avoid. */
     const rendererRef = useRef(null);
     const sceneRef = useRef(null);
+    /** The live camera. Phase 1 (SPEC-mouse-parity) swaps between a
+     *  PerspectiveCamera and an OrthographicCamera in place (applyCameraMode
+     *  below); typed as the union because every consumer treats both the same
+     *  except for the projection details each swap carries across itself. */
     const cameraRef = useRef(null);
+    /** The camera NOT currently live -- kept constructed so a mode toggle never
+     *  re-measures the container or re-states clipping planes. */
+    const inactiveCameraRef = useRef(null);
     const controlsRef = useRef(null);
+    /** Pointer-down bookkeeping for the scene-setup effect's click-vs-drag
+     *  threshold and the window-zoom rectangle drag; see its onPointerDown.
+     *  `null` when no window-zoom is armed; `{ armed: true }` from the Win Zoom
+     *  button until the effect's pointerup consumes it. A ref, not state, so the
+     *  effect's `[phase]`-only handlers can read the flag they were created
+     *  before. */
+    const windowZoomRef = useRef(null);
+    /** The in-progress box-select drag: where it started (client px) and
+     *  where the pointer is now, plus whether it has crossed the 4px
+     *  click-vs-drag threshold yet -- same shape SketchCanvas2D's own
+     *  marqueeRef uses. Null whenever no box-select drag is in flight --
+     *  armed implicitly by an empty-space pointerdown, not a toolbar toggle
+     *  the way window-zoom is (see onCanvasPointerDown). */
+    const boxSelectRef = useRef(null);
     /** The current solid(s), as a group, so a rebuild can dispose the old
      *  geometry rather than leaking a WebGL buffer per edit. */
     const solidGroupRef = useRef(null);
@@ -366,6 +479,12 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
     onEngineRef.current = onEngine;
     const registerPickAtRef = useRef(registerPickAt);
     registerPickAtRef.current = registerPickAt;
+    /** The scene-setup effect's window-zoom drag (a `[phase]`-only closure) hands
+     *  its finished rectangle to the component-level applyWindowZoomRect through
+     *  here -- same stale-closure pattern as registerPickAtRef itself, one
+     *  indirection so an effect created once can call a function written below
+     *  it in the file. */
+    const applyWindowZoomRectRef = useRef(null);
     // The scene-setup effect below only re-runs on a `phase` change (see its
     // own dep array), so its onClick closure is created ONCE and would
     // otherwise keep reading whatever `doc` was current at that moment --
@@ -376,14 +495,74 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
     docRef.current = doc;
     const onPickRef = useRef(onPick);
     onPickRef.current = onPick;
+    const onDatumPickRef = useRef(onDatumPick);
+    onDatumPickRef.current = onDatumPick;
+    // The datum squares as last drawn, for the click handler (its closure is made
+    // once, so it reads them through a ref).
+    const datumQuadsRef = useRef([]);
     const pickRef = useRef(pick);
     pickRef.current = pick;
+    // Same stale-closure reasoning as onPickRef above -- filters is read by
+    // hitAt()'s pointermove/click listeners, set up once by the scene-setup
+    // effect below, not on every render.
+    const filtersRef = useRef(filters ?? DEFAULT_FILTERS);
+    filtersRef.current = filters ?? DEFAULT_FILTERS;
+    // Same stale-closure reasoning as onPickRef above -- onBoxSelect is fired
+    // from inside the scene-setup effect's onCanvasPointerUp, set up once,
+    // not on every render.
+    const onBoxSelectRef = useRef(onBoxSelect);
+    onBoxSelectRef.current = onBoxSelect;
+    // Same stale-closure reasoning as onBoxSelectRef above -- these three are
+    // read from the scene-setup effect's dblclick/keydown listeners, set up
+    // once, not on every render.
+    const onFeatureDoubleClickRef = useRef(onFeatureDoubleClick);
+    onFeatureDoubleClickRef.current = onFeatureDoubleClick;
+    const onSelectAllRef = useRef(onSelectAll);
+    onSelectAllRef.current = onSelectAll;
+    const onDeleteSelectedRef = useRef(onDeleteSelected);
+    onDeleteSelectedRef.current = onDeleteSelected;
+    // The marking menu's shared dispatch, for BOTH the rendered menu's wedges
+    // (the onClick near the bottom of this file) and todo 19's fast
+    // directional gesture -- one function so a wedge fired either way does
+    // exactly the same thing.
+    const dispatchMarkingCommandRef = useRef(() => { });
+    // Whether the JUST-ENDED right press classified as a menu click (set by
+    // onCanvasPointerUp's classifier, consumed by onCanvasContextMenu — which
+    // the browser fires for the same press). Cleared by every non-armed
+    // contextmenu so a stray native-menu event never opens the menu.
+    const rightMenuArmedRef = useRef(false);
     // Same stale-closure reasoning as docRef above: projectAnchors() is a
     // component-level function (reads refs, not props) so it can be called
     // both from inside the scene-setup effect's camera-change handler and from
     // the doc-rebuild effect, without either one recreating it.
     const anchorsRef = useRef(anchors ?? []);
     anchorsRef.current = anchors ?? [];
+    // Phase 5.3's live-preview tint (todo 25), read through a ref for the
+    // same stale-closure reasoning as anchorsRef above: drawGeoms() is a
+    // component-level function called from the doc-rebuild effect.
+    const previewRef = useRef(preview ?? null);
+    previewRef.current = preview ?? null;
+    // The ONE marking-menu dispatch both entry points share: the rendered
+    // menu's onClick (near the bottom of this file) AND todo 19's fast
+    // directional gesture (which never renders the menu). Assignment during
+    // render (not an effect) keeps the ref fresh with no commit delay, and
+    // the dispatch reads props directly so there is no stale closure.
+    dispatchMarkingCommandRef.current = (id) => {
+        if (id === 'delete')
+            onDeleteSelected?.();
+        else if (id === 'undo')
+            onUndo?.();
+        else if (id === 'redo')
+            onRedo?.();
+        else if (id === 'sketch')
+            onStartSketch?.();
+        else if (id === 'repeat')
+            onRepeat?.();
+        // press-pull / move-copy / hole: still present-but-noop. Each needs
+        // new plumbing the base-component todo did not build -- a Press Pull
+        // command, a Move/Copy command entry, a Hole feature dialog -- see
+        // marking-menu-core.ts's own comment on PART_VIEWPORT_WEDGES.
+    };
     const onAnchorsRef = useRef(onAnchors);
     onAnchorsRef.current = onAnchors;
     // Set by the camera's own 'change' event, consumed (and cleared) inside the
@@ -407,6 +586,12 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
      *  restorePicks(). */
     const hoverFaceMeshRef = useRef(null);
     const selectedFaceMeshRef = useRef(null);
+    // Same pooling convention, for the vertex marker (a small sphere, not a
+    // borrowed triangle range) -- see the scene-setup effect for why a sphere
+    // needs no per-pick geometry work at all, only a position + a visibility
+    // flag.
+    const hoverVertexMeshRef = useRef(null);
+    const selectedVertexMeshRef = useRef(null);
     // Edge highlights are POOLED TUBE MESHES, one built per topological edge in
     // drawGeoms() -- see the pooling note above their material definitions in
     // the scene-setup effect. These two refs hold the two SHARED materials
@@ -478,12 +663,27 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         const { THREE, OrbitControls, LineSegments2, LineSegmentsGeometry, LineMaterial } = three;
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(COLORS.bg);
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / Math.max(1, container.clientHeight), 0.1, 5000);
-        // Z-up, matching every other view of a ModelDoc in this app (the sketch
-        // planes, the JSCAD/regl viewport) -- extrude runs along +Z, not +Y.
-        camera.up.set(0, 0, 1);
-        camera.position.set(140, 160, 130);
-        camera.lookAt(0, 0, 0);
+        // SPEC-mouse-parity Phase 1: both camera kinds exist from the start so the
+        // view-strip's Persp/Ortho toggle (applyCameraMode below, bound by the
+        // camera-mode effect further down) never has to re-measure the container--
+        // the toggle only re-derives the ortho frustum at the current target
+        // distance and copies placement across. `camera` is whichever kind the
+        // persisted mode (loadCameraMode) says; everything below keeps compiling
+        // against it unchanged because the union carries both kinds' members.
+        const initialKind = cameraKindRef.current;
+        const aspect0 = container.clientWidth / Math.max(1, container.clientHeight);
+        const perspCamera = new THREE.PerspectiveCamera(45, aspect0, 0.1, 5000);
+        perspCamera.up.set(0, 0, 1);
+        perspCamera.position.set(140, 160, 130);
+        perspCamera.lookAt(0, 0, 0);
+        const orthoDist0 = perspCamera.position.length();
+        const orthoFrame0 = orthoFrustumFromPerspective({ fov: perspCamera.fov, aspect: aspect0, near: perspCamera.near, far: perspCamera.far }, orthoDist0);
+        const orthoCamera = new THREE.OrthographicCamera(orthoFrame0.left, orthoFrame0.right, orthoFrame0.top, orthoFrame0.bottom, orthoFrame0.near, orthoFrame0.far);
+        orthoCamera.up.set(0, 0, 1);
+        orthoCamera.position.set(140, 160, 130);
+        orthoCamera.lookAt(0, 0, 0);
+        const camera = initialKind === CameraMode.ORTHOGRAPHIC ? orthoCamera : perspCamera;
+        inactiveCameraRef.current = initialKind === CameraMode.ORTHOGRAPHIC ? perspCamera : orthoCamera;
         const renderer = new THREE.WebGLRenderer({
             antialias: true,
             // WITHOUT this, the drawing buffer clears right after the browser
@@ -495,6 +695,15 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         renderer.setPixelRatio(window.devicePixelRatio || 1);
         renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(renderer.domElement);
+        // Focusable (SPEC-mouse-parity.md Phase 3.6): Ctrl+A/Delete below are
+        // ordinary keydown listeners on this element, so they only ever see a
+        // key press that targeted (or bubbled through) the canvas -- a Delete
+        // typed into some other focused text field on the page never reaches
+        // them. A plain <canvas> is not focusable without this. outline is
+        // suppressed the same way a click-to-pick canvas already reads as
+        // "clicked, not tabbed to" -- the selection badge is the focus cue.
+        renderer.domElement.tabIndex = 0;
+        renderer.domElement.style.outline = 'none';
         const ambient = new THREE.AmbientLight(0xffffff, 0.6);
         const key = new THREE.DirectionalLight(0xffffff, 1.4);
         key.position.set(100, 200, 150);
@@ -622,8 +831,58 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         scene.add(solidGroup);
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.target.set(0, 0, 0);
-        controls.enableDamping = true;
         controls.dampingFactor = 0.1;
+        // SPEC-mouse-parity Phase 1 items 1+2: bind the persisted mouse scheme's
+        // button/touch map and zoom the wheel toward the cursor. camera-controls
+        // .ts is action->button-number; OrbitControls is slot->action (LEFT
+        // /MIDDLE/RIGHT, ONE/TWO), so the mapping inverts through THREE's own
+        // MOUSE/TOUCH enums. Effect-scoped because the scheme effect below is the
+        // only other caller, and it reaches this same instance via controlsRef.
+        //
+        // Touches: the scheme's 0/1/2 slot index maps onto ONE(=0)/TWO(=1); index
+        // 2 ("middle") has no slot on three.js's touches today and is dropped --
+        // the stock configuration never bound it either.
+        const bindMouseScheme = (c, scheme) => {
+            const buttons = schemeToMouseButtons(scheme);
+            const mb = {};
+            if (buttons.ORBIT === 0)
+                mb.LEFT = THREE.MOUSE.ROTATE;
+            else if (buttons.ORBIT === 1)
+                mb.MIDDLE = THREE.MOUSE.ROTATE;
+            else if (buttons.ORBIT === 2)
+                mb.RIGHT = THREE.MOUSE.ROTATE;
+            if (buttons.PAN === 0)
+                mb.LEFT = THREE.MOUSE.PAN;
+            else if (buttons.PAN === 1)
+                mb.MIDDLE = THREE.MOUSE.PAN;
+            else if (buttons.PAN === 2)
+                mb.RIGHT = THREE.MOUSE.PAN;
+            if (buttons.DOLLY === 0)
+                mb.LEFT = THREE.MOUSE.DOLLY;
+            else if (buttons.DOLLY === 1)
+                mb.MIDDLE = THREE.MOUSE.DOLLY;
+            else if (buttons.DOLLY === 2)
+                mb.RIGHT = THREE.MOUSE.DOLLY;
+            c.mouseButtons = mb;
+            const t = schemeToTouches(scheme);
+            const touches = {};
+            if (t.ORBIT === 0)
+                touches.ONE = THREE.TOUCH.ROTATE;
+            else if (t.ORBIT === 1)
+                touches.TWO = THREE.TOUCH.ROTATE;
+            if (t.PAN === 0)
+                touches.ONE = THREE.TOUCH.PAN;
+            else if (t.PAN === 1)
+                touches.TWO = THREE.TOUCH.PAN;
+            if (t.DOLLY === 0)
+                touches.ONE = THREE.TOUCH.DOLLY_PAN;
+            else if (t.DOLLY === 1)
+                touches.TWO = THREE.TOUCH.DOLLY_PAN;
+            c.touches = touches;
+        };
+        bindMouseScheme(controls, mouseSchemeRef.current);
+        schemeBindRef.current = (scheme) => bindMouseScheme(controls, scheme);
+        controls.zoomToCursor = true;
         const renderNow = () => renderer.render(scene, camera);
         // RENDER ON DEMAND, not a continuous rAF loop -- this is the point of the
         // move, not a style preference. A loop that repaints on every frame
@@ -703,7 +962,20 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             // would compare CSS pixels against DEVICE pixels the moment
             // devicePixelRatio is not 1, which is a false-mismatch on every call.
             renderer.setSize(w, h);
-            camera.aspect = w / h;
+            // The union makes `camera` look like it carries both projection shapes;
+            // guard on the real kind instead of reaching for `aspect`/frustum fields
+            // the other kind does not have. Both branches end with the same
+            // updateProjectionMatrix() + LineMaterial resolution refresh below.
+            if (camera.isPerspectiveCamera) {
+                camera.aspect = w / h;
+            }
+            else {
+                const ortho = camera;
+                const hh = (ortho.top - ortho.bottom) / 2;
+                const hw = hh * (w / h);
+                ortho.left = -hw;
+                ortho.right = hw;
+            }
             camera.updateProjectionMatrix();
             // LineMaterial (item V's grid/axes) computes its own screen-space
             // line width from this -- stale after a resize would draw them too
@@ -757,6 +1029,22 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         selectedFaceMesh.visible = false;
         selectedFaceMesh.renderOrder = 1;
         scene.add(selectedFaceMesh);
+        // A vertex marker is a real 3D sphere, not a flat overlay -- unlike the
+        // face highlights above, it has genuine depth separation from the
+        // surface it sits on (half embedded, half protruding), so normal depth
+        // testing alone places it correctly with no polygon-offset trick needed:
+        // the embedded half is correctly hidden by the solid, the protruding
+        // half correctly shows. Same hover/selected colour convention as every
+        // other highlight; pooled the same way (see hoverVertexMeshRef's own
+        // comment) -- a click only ever moves it and flips `.visible`.
+        const hoverVertexMesh = new THREE.Mesh(new THREE.SphereGeometry(VERTEX_MARKER_RADIUS, 12, 8), new THREE.MeshBasicMaterial({ color: 0x8be9fd }));
+        hoverVertexMesh.visible = false;
+        hoverVertexMesh.renderOrder = 2;
+        scene.add(hoverVertexMesh);
+        const selectedVertexMesh = new THREE.Mesh(new THREE.SphereGeometry(VERTEX_MARKER_RADIUS, 12, 8), new THREE.MeshBasicMaterial({ color: 0xff79c6 }));
+        selectedVertexMesh.visible = false;
+        selectedVertexMesh.renderOrder = 2;
+        scene.add(selectedVertexMesh);
         // Edges highlight as TUBE MESHES (real geometry, real width -- see
         // edgeTubeGeometry()'s doc comment) rather than THREE.Line, drawn ON TOP
         // (depthTest off) rather than offset like the faces above: a face
@@ -813,6 +1101,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         selectedEdgeMaterialRef.current = selectedEdgeMaterial;
         hoverFaceMeshRef.current = hoverFaceMesh;
         selectedFaceMeshRef.current = selectedFaceMesh;
+        hoverVertexMeshRef.current = hoverVertexMesh;
+        selectedVertexMeshRef.current = selectedVertexMesh;
         // ---- raycasting -----------------------------------------------------
         const raycaster = new THREE.Raycaster();
         let pendingHoverRaf = null;
@@ -878,7 +1168,23 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             }
             return { distPx: bestDistPx, depth: bestDepth };
         }
+        // Section view: the plane only hides pixels, so the raycaster still hits
+        // the cut-away wall in front of the inside. Drop hits on the hidden side,
+        // and hits on a back face (the inside of the cut wall), so a click lands
+        // on what is drawn.
+        const clipOut = (p) => {
+            const pl = renderer.clippingPlanes;
+            return !!pl && pl.length > 0 && pl[0].distanceToPoint(p) < 0;
+        };
+        const lineClipped = (line) => {
+            const pos = line.geometry.getAttribute('position');
+            if (!pos || !sectionRef.current.on)
+                return false;
+            return [0, pos.count >> 1, pos.count - 1].every((i) => clipOut(new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i)).applyMatrix4(line.matrixWorld)));
+        };
+        const sectionFilter = (hits, dir) => !sectionRef.current.on ? hits : hits.filter((h) => !clipOut(h.point) && !(h.face && h.face.normal.dot(dir) > 0));
         function hitAt(clientX, clientY) {
+            const filters = filtersRef.current;
             const rect = renderer.domElement.getBoundingClientRect();
             if (rect.width === 0 || rect.height === 0)
                 return null;
@@ -886,11 +1192,50 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             const ndc = new THREE.Vector2((cursor.x / rect.width) * 2 - 1, -(cursor.y / rect.height) * 2 + 1);
             raycaster.setFromCamera(ndc, camera);
             // Face hit, tested first here purely to have a DEPTH reference for the
-            // edge occlusion check below -- which kind actually gets RETURNED is
-            // still edge-first, same priority as before (see the return logic at
-            // the bottom of this function).
-            const faceHits = raycaster.intersectObjects(solidGroup.children, false);
+            // edge/vertex occlusion checks below -- which kind actually gets
+            // RETURNED depends on `filters` and the priority order below (vertex,
+            // then edge, then face, then body), not on this test order.
+            const faceHits = sectionFilter(raycaster.intersectObjects(solidGroup.children, false), raycaster.ray.direction);
             const faceHit = faceHits.find((h) => h.faceIndex != null);
+            const camDist = camera.position.distanceTo(controls.target);
+            const occlusionMaxDepth = faceHit
+                ? faceHit.distance + Math.max(0.5, camDist * EDGE_OCCLUSION_TOLERANCE_FRACTION)
+                : Infinity;
+            // VERTEX (SPEC-mouse-parity.md Phase 3 item 2), tried first among the
+            // filters that are on: the most specific pickable thing at a point
+            // wins over the face/edge/body sitting at that same point. Walks
+            // every solid mesh's own raw position buffer -- candidate mesh
+            // vertices -- projecting each one to screen space the same way
+            // closestEdgeScreenDist() below projects an edge's discretised
+            // points, and reuses `faceHit`'s own depth as the occlusion
+            // reference exactly like the edge candidates do: a vertex behind the
+            // surface the cursor is actually over must lose to one facing the
+            // camera, and a MISSING faceHit (cursor off the mesh entirely, e.g.
+            // just past a silhouette corner) means nothing to reject against --
+            // the same fallback the edge candidates rely on. The pure
+            // nearest-in-tolerance decision lives in pick-helpers.ts, testable
+            // without a THREE.Camera; only the projection itself, which needs a
+            // live camera, stays here.
+            if (filters.vertex) {
+                const vertexCandidates = [];
+                for (const mesh of solidGroup.children) {
+                    const pos = mesh.geometry.getAttribute('position');
+                    if (!pos)
+                        continue;
+                    for (let i = 0; i < pos.count; i++) {
+                        const world = new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i)).applyMatrix4(mesh.matrixWorld);
+                        if (clipOut(world))
+                            continue;
+                        const depth = camera.position.distanceTo(world);
+                        const proj = world.clone().project(camera);
+                        const distPx = Math.hypot(cursor.x - (proj.x * 0.5 + 0.5) * rect.width, cursor.y - (1 - (proj.y * 0.5 + 0.5)) * rect.height);
+                        vertexCandidates.push({ distPx, depth, mesh, world });
+                    }
+                }
+                const vertexWinner = nearestVisible(vertexCandidates, EDGE_HIT_BAND_PX, occlusionMaxDepth);
+                if (vertexWinner)
+                    return { kind: 'vertex', mesh: vertexWinner.mesh, position: vertexWinner.world };
+            }
             // EDGE HIT TEST, IN SCREEN PIXELS -- NOT a world-space distance.
             //
             // This used to be raycaster.params.Line.threshold, a fixed WORLD-space
@@ -915,98 +1260,221 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             // CLOSEST-FIRST, and the first one to pass the occlusion check below
             // is returned immediately, so whichever is nearer in screen space
             // still wins whenever both are genuinely visible.
-            const candidates = [];
-            for (const line of edgePickLinesRef.current) {
-                const { distPx, depth } = closestEdgeScreenDist(line, rect.width, rect.height, cursor);
-                if (distPx <= EDGE_HIT_BAND_PX)
-                    candidates.push({ distPx, depth, line });
-            }
-            candidates.sort((a, b) => a.distPx - b.distPx);
-            // An edge sits ON the boundary of whichever face(s) meet there, so its
-            // depth should match a face hit at the same pixel almost exactly; this
-            // tolerance is only slack for the edge's own discretisation and the
-            // two hits' slightly different sample points, not a second occlusion
-            // system -- it exists so a genuinely FAR edge (the back of a box,
-            // glimpsed through open space near a front edge in screen space) can
-            // never out-rank a face that is actually in front of it.
-            //
-            // THE BUG THIS REPLACED: only ever tracking the single screen-closest
-            // candidate. A square-footprint box viewed from this app's own
-            // slightly off-axis default camera (140, 160, 130 -- not a true 45
-            // degree isometric) can put a genuinely FAR, hidden edge fractions of
-            // a pixel closer to the cursor than the true visible one at certain
-            // points along it -- measured 2026-09-04: hovering the box's own
-            // top-left edge found a "closest" candidate at depth 132 while every
-            // other visible top-face edge sat at depth ~90-100, a ~40-unit gap
-            // (the box's own 40mm width) that is a different edge entirely, not
-            // discretisation slop. The occlusion check correctly rejected that
-            // far edge -- but with only one candidate ever tried, rejecting it
-            // meant giving up on the pixel entirely, even though the TRUE visible
-            // edge was very likely a second candidate within the very same band.
-            // Trying every in-band candidate, nearest first, until one survives
-            // occlusion fixes exactly that without loosening the occlusion test
-            // itself (which stays exactly as strict, and still does its real job
-            // of rejecting a genuinely hidden edge glimpsed through open space).
-            const dist = camera.position.distanceTo(controls.target);
-            const surviving = candidates.filter((c) => {
-                const occluded = !!faceHit && c.depth > faceHit.distance + Math.max(0.5, dist * EDGE_OCCLUSION_TOLERANCE_FRACTION);
-                return !occluded;
-            });
-            if (surviving.length > 0) {
-                // Item J (D3): an open hollow's outer rim (inherited from the box
-                // underneath -- nameEdgeOnCurrentShape() resolves it) and its own
-                // BRAND NEW inner rim (no primitive lineage, resolves to null --
-                // same "no answer" case a Hole's own fresh wall already has, per
-                // that function's own comment) sit only the wall's thickness apart
-                // in world space. Most camera angles foreshorten that to a couple
-                // of screen pixels, well inside distPx's own float/discretisation
-                // noise -- close enough that "closest wins outright" started
-                // picking the inner edge (or missing both and falling through to
-                // the interior wall face) for a click plainly meant for the outer
-                // one. Only consulted once there is more than one edge candidate
-                // actually surviving occlusion -- the ordinary one-edge and
-                // same-primitive-corner cases (both candidates resolve to a name,
-                // so the first/closest still wins, exactly as before) are
-                // untouched, and this never runs at all for the common case of a
-                // single edge in the band.
-                if (surviving.length > 1 && lastBuiltRef.current && engineRef.current) {
-                    const built = lastBuiltRef.current;
-                    const engine = engineRef.current;
-                    const named = surviving.find((c) => {
-                        const { featureId, kernelEdge } = c.line.userData;
-                        // A throw here is honest, not an error -- the same "no answer"
-                        // case this disambiguation already treats null as; see the
-                        // try/catch pattern repeated at every nameFace/nameEdge/
-                        // resolveFace/resolveEdge call site below, for the same reason.
-                        try {
-                            return engine.nameEdge(built, docRef.current, featureId, kernelEdge) !== null;
-                        }
-                        catch {
-                            return false;
-                        }
-                    });
-                    if (named)
-                        return { kind: 'edge', line: named.line };
+            if (filters.edge) {
+                const candidates = [];
+                for (const line of edgePickLinesRef.current) {
+                    if (lineClipped(line))
+                        continue;
+                    const { distPx, depth } = closestEdgeScreenDist(line, rect.width, rect.height, cursor);
+                    if (distPx <= EDGE_HIT_BAND_PX)
+                        candidates.push({ distPx, depth, line });
                 }
-                return { kind: 'edge', line: surviving[0].line };
+                candidates.sort((a, b) => a.distPx - b.distPx);
+                // An edge sits ON the boundary of whichever face(s) meet there, so its
+                // depth should match a face hit at the same pixel almost exactly; this
+                // tolerance is only slack for the edge's own discretisation and the
+                // two hits' slightly different sample points, not a second occlusion
+                // system -- it exists so a genuinely FAR edge (the back of a box,
+                // glimpsed through open space near a front edge in screen space) can
+                // never out-rank a face that is actually in front of it.
+                //
+                // THE BUG THIS REPLACED: only ever tracking the single screen-closest
+                // candidate. A square-footprint box viewed from this app's own
+                // slightly off-axis default camera (140, 160, 130 -- not a true 45
+                // degree isometric) can put a genuinely FAR, hidden edge fractions of
+                // a pixel closer to the cursor than the true visible one at certain
+                // points along it -- measured 2026-09-04: hovering the box's own
+                // top-left edge found a "closest" candidate at depth 132 while every
+                // other visible top-face edge sat at depth ~90-100, a ~40-unit gap
+                // (the box's own 40mm width) that is a different edge entirely, not
+                // discretisation slop. The occlusion check correctly rejected that
+                // far edge -- but with only one candidate ever tried, rejecting it
+                // meant giving up on the pixel entirely, even though the TRUE visible
+                // edge was very likely a second candidate within the very same band.
+                // Trying every in-band candidate, nearest first, until one survives
+                // occlusion fixes exactly that without loosening the occlusion test
+                // itself (which stays exactly as strict, and still does its real job
+                // of rejecting a genuinely hidden edge glimpsed through open space).
+                const surviving = candidates.filter((c) => c.depth <= occlusionMaxDepth);
+                if (surviving.length > 0) {
+                    // Item J (D3): an open hollow's outer rim (inherited from the box
+                    // underneath -- nameEdgeOnCurrentShape() resolves it) and its own
+                    // BRAND NEW inner rim (no primitive lineage, resolves to null --
+                    // same "no answer" case a Hole's own fresh wall already has, per
+                    // that function's own comment) sit only the wall's thickness apart
+                    // in world space. Most camera angles foreshorten that to a couple
+                    // of screen pixels, well inside distPx's own float/discretisation
+                    // noise -- close enough that "closest wins outright" started
+                    // picking the inner edge (or missing both and falling through to
+                    // the interior wall face) for a click plainly meant for the outer
+                    // one. Only consulted once there is more than one edge candidate
+                    // actually surviving occlusion -- the ordinary one-edge and
+                    // same-primitive-corner cases (both candidates resolve to a name,
+                    // so the first/closest still wins, exactly as before) are
+                    // untouched, and this never runs at all for the common case of a
+                    // single edge in the band.
+                    if (surviving.length > 1 && lastBuiltRef.current && engineRef.current) {
+                        const built = lastBuiltRef.current;
+                        const engine = engineRef.current;
+                        const named = surviving.find((c) => {
+                            const { featureId, kernelEdge } = c.line.userData;
+                            // A throw here is honest, not an error -- the same "no answer"
+                            // case this disambiguation already treats null as; see the
+                            // try/catch pattern repeated at every nameFace/nameEdge/
+                            // resolveFace/resolveEdge call site below, for the same reason.
+                            try {
+                                return engine.nameEdge(built, docRef.current, featureId, kernelEdge) !== null;
+                            }
+                            catch {
+                                return false;
+                            }
+                        });
+                        if (named)
+                            return { kind: 'edge', line: named.line };
+                    }
+                    return { kind: 'edge', line: surviving[0].line };
+                }
             }
-            if (!faceHit)
-                return null;
-            const range = faceRangeFor(faceHit.object, faceHit.faceIndex);
-            return range ? { kind: 'face', mesh: faceHit.object, range } : null;
+            if (faceHit) {
+                if (filters.face) {
+                    const range = faceRangeFor(faceHit.object, faceHit.faceIndex);
+                    return range ? { kind: 'face', mesh: faceHit.object, range } : null;
+                }
+                // BODY (SPEC-mouse-parity.md Phase 3 item 2): only reached once
+                // filters.face is OFF -- the branch above always returns (a face
+                // pick or null) whenever it runs, so with every filter on a face
+                // click stays a face pick byte-for-byte (T8's already-verified
+                // matrix); body only gets a turn once face-kind picking has
+                // explicitly stepped aside. Selects the whole owning feature -- see
+                // paintFaceHighlight()'s own `range`-less call in pickAt() for how
+                // "whole" is painted -- with no per-face resolution needed at all.
+                if (filters.body) {
+                    return { kind: 'body', mesh: faceHit.object };
+                }
+            }
+            return null;
+        }
+        /** Every raycast candidate at this pixel, ordered nearest-camera-first,
+         *  for whichever kind wins hitAt()'s own vertex > edge > face > body
+         *  priority -- used only by the click-and-hold "select other" cycling
+         *  gesture below (SPEC-mouse-parity.md Phase 3.5) to learn how many
+         *  overlapping picks sit at one screen point, and in what order to
+         *  cycle through them. hitAt() itself is left completely untouched,
+         *  including its own closest-screen-distance-first / named-edge-
+         *  preferred disambiguation for the SINGLE winner a plain click gets --
+         *  this walks the same candidate lists a SECOND way, ordered by DEPTH
+         *  (camera distance) rather than screen distance, because cycling is
+         *  about front-to-back stacking, not which candidate happens to project
+         *  nearest the cursor. Returns [] in every case hitAt() would return
+         *  null (same filter/occlusion decisions, mirrored branch for branch),
+         *  so `.length > 0` is a drop-in replacement for `hitAt(...) !== null`
+         *  at the box-select gate below -- a press on pickable geometry never
+         *  raycasts twice to answer both questions. */
+        function hitCandidatesAt(clientX, clientY) {
+            const filters = filtersRef.current;
+            const rect = renderer.domElement.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0)
+                return [];
+            const cursor = { x: clientX - rect.left, y: clientY - rect.top };
+            const ndc = new THREE.Vector2((cursor.x / rect.width) * 2 - 1, -(cursor.y / rect.height) * 2 + 1);
+            raycaster.setFromCamera(ndc, camera);
+            const faceHits = sectionFilter(raycaster.intersectObjects(solidGroup.children, false), raycaster.ray.direction);
+            const faceHit = faceHits.find((h) => h.faceIndex != null);
+            const camDist = camera.position.distanceTo(controls.target);
+            const occlusionMaxDepth = faceHit
+                ? faceHit.distance + Math.max(0.5, camDist * EDGE_OCCLUSION_TOLERANCE_FRACTION)
+                : Infinity;
+            if (filters.vertex) {
+                const vertexCandidates = [];
+                for (const mesh of solidGroup.children) {
+                    const pos = mesh.geometry.getAttribute('position');
+                    if (!pos)
+                        continue;
+                    for (let i = 0; i < pos.count; i++) {
+                        const world = new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i)).applyMatrix4(mesh.matrixWorld);
+                        if (clipOut(world))
+                            continue;
+                        const depth = camera.position.distanceTo(world);
+                        const proj = world.clone().project(camera);
+                        const distPx = Math.hypot(cursor.x - (proj.x * 0.5 + 0.5) * rect.width, cursor.y - (1 - (proj.y * 0.5 + 0.5)) * rect.height);
+                        vertexCandidates.push({ distPx, depth, mesh, world });
+                    }
+                }
+                const winners = vertexCandidates
+                    .filter((c) => c.distPx <= EDGE_HIT_BAND_PX && c.depth <= occlusionMaxDepth)
+                    .sort((a, b) => a.depth - b.depth);
+                if (winners.length > 0) {
+                    return winners.map((w) => ({ kind: 'vertex', mesh: w.mesh, position: w.world }));
+                }
+            }
+            if (filters.edge) {
+                const edgeCandidates = [];
+                for (const line of edgePickLinesRef.current) {
+                    if (lineClipped(line))
+                        continue;
+                    const { distPx, depth } = closestEdgeScreenDist(line, rect.width, rect.height, cursor);
+                    if (distPx <= EDGE_HIT_BAND_PX)
+                        edgeCandidates.push({ distPx, depth, line });
+                }
+                const surviving = edgeCandidates
+                    .filter((c) => c.depth <= occlusionMaxDepth)
+                    .sort((a, b) => a.depth - b.depth);
+                if (surviving.length > 0) {
+                    return surviving.map((c) => ({ kind: 'edge', line: c.line }));
+                }
+            }
+            if (faceHit) {
+                if (filters.face) {
+                    // Mirrors hitAt()'s own null case exactly: if the PRIMARY (nearest)
+                    // face hit cannot resolve a FaceRange, this returns [] rather than
+                    // trying harder against the stacked hits behind it -- same as a
+                    // plain click gets nothing there today.
+                    const primaryRange = faceRangeFor(faceHit.object, faceHit.faceIndex);
+                    if (!primaryRange)
+                        return [];
+                    const faceCandidates = [];
+                    for (const h of faceHits) {
+                        if (h.faceIndex == null)
+                            continue;
+                        const range = faceRangeFor(h.object, h.faceIndex);
+                        // faceHits is already nearest-first (three.js sorts
+                        // intersectObjects by distance ascending), so no re-sort here.
+                        if (range)
+                            faceCandidates.push({ kind: 'face', mesh: h.object, range });
+                    }
+                    return faceCandidates;
+                }
+                if (filters.body) {
+                    const seen = new Set();
+                    const bodyCandidates = [];
+                    for (const h of faceHits) {
+                        if (h.faceIndex == null)
+                            continue;
+                        const mesh = h.object;
+                        if (seen.has(mesh))
+                            continue;
+                        seen.add(mesh);
+                        bodyCandidates.push({ kind: 'body', mesh });
+                    }
+                    return bodyCandidates;
+                }
+            }
+            return [];
         }
         function applyHover(hit) {
             hoverFaceMesh.visible = false;
+            hoverVertexMesh.visible = false;
             // A cheap, immediate second cue: the cursor tells a student an edge or
             // face is interactive before they have even noticed the highlight, or
-            // known that picking exists at all. `crosshair` for an edge, distinct
-            // from `pointer` for a face, so the cursor itself hints that an edge
-            // click is a DIFFERENT, more precise action than a face click -- it
-            // used to be `pointer` for both, plus idle-over-model, which told a
-            // student nothing. Reverts to the container's own CSS cursor (the
-            // inline 'grab' set below, while phase is 'ready') rather than a
-            // hardcoded default.
-            renderer.domElement.style.cursor = hit ? (hit.kind === 'edge' ? 'crosshair' : 'pointer') : '';
+            // known that picking exists at all. `crosshair` for an edge or a
+            // vertex -- both a more precise action than a face/body click -- and
+            // `pointer` for the other two: it used to be `pointer` for both, plus
+            // idle-over-model, which told a student nothing. Reverts to the
+            // container's own CSS cursor (the inline 'grab' set below, while
+            // phase is 'ready') rather than a hardcoded default.
+            renderer.domElement.style.cursor = hit
+                ? (hit.kind === 'edge' || hit.kind === 'vertex' ? 'crosshair' : 'pointer')
+                : '';
             // Drives the "click this edge" hint (JSX below) -- see hoveringEdge's
             // own doc comment for why this is React state, not a ref.
             setHoveringEdge(hit?.kind === 'edge');
@@ -1018,8 +1486,20 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                 setHoveredEdgeTube(null);
                 paintFaceHighlight(THREE, hoverFaceMesh, hit.mesh, hit.range);
             }
-            else {
+            else if (hit.kind === 'edge') {
                 setHoveredEdgeTube(hit.line.userData.tubeMesh);
+            }
+            else if (hit.kind === 'vertex') {
+                setHoveredEdgeTube(null);
+                hoverVertexMesh.position.copy(hit.position);
+                hoverVertexMesh.visible = true;
+            }
+            else {
+                // body: the same highlight mesh and material a face hover uses,
+                // just spanning its full index instead of one FaceRange -- see
+                // paintFaceHighlight()'s own doc comment for the `range`-less case.
+                setHoveredEdgeTube(null);
+                paintFaceHighlight(THREE, hoverFaceMesh, hit.mesh);
             }
         }
         function onPointerMove(e) {
@@ -1047,21 +1527,49 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         // so it can also run for a HandleOverlay tap (see registerPickAt's own
         // doc comment) -- same naming, same highlight paint, same onPick emission
         // either way, rather than a second copy that could drift from this one.
-        function pickAt(clientX, clientY) {
+        function pickAt(clientX, clientY, mods) {
             const hit = hitAt(clientX, clientY);
             if (!hit) {
+                // Nothing solid under the cursor: a datum plane there takes the click.
+                // hitAt() has just aimed the shared raycaster at this pointer.
+                const d = onDatumPickRef.current && datumQuadsRef.current.length > 0
+                    ? pickDatum([raycaster.ray.origin.x, raycaster.ray.origin.y, raycaster.ray.origin.z], [raycaster.ray.direction.x, raycaster.ray.direction.y, raycaster.ray.direction.z], datumQuadsRef.current)
+                    : null;
+                if (d) {
+                    selectedFaceMesh.visible = false;
+                    selectedVertexMesh.visible = false;
+                    setSelectedEdgeTube(null);
+                    selectedFaceStateRef.current = null;
+                    onDatumPickRef.current(d.id, {
+                        ctrlKey: mods?.ctrlKey ?? false, shiftKey: mods?.shiftKey ?? false, metaKey: mods?.metaKey ?? false
+                    });
+                    renderNow();
+                    return;
+                }
                 selectedFaceMesh.visible = false;
+                selectedVertexMesh.visible = false;
                 setSelectedEdgeTube(null);
                 selectedFaceStateRef.current = null;
                 onPickRef.current?.(null);
                 renderNow();
                 return;
             }
+            commitHit(hit, mods);
+        }
+        // The actual selection side effects for ONE ALREADY-RESOLVED Hit, split
+        // out of pickAt() above so the click-and-hold "select other" cycling
+        // gesture below (SPEC-mouse-parity.md Phase 3.5) can commit whichever
+        // candidate a hold cycled onto directly. Re-running hitAt() there would
+        // just re-resolve pickAt()'s own single winner again -- not the specific
+        // stacked candidate the hold actually highlighted.
+        function commitHit(hit, mods) {
+            const { ctrlKey = false, shiftKey = false, metaKey = false } = mods ?? {};
             if (hit.kind === 'face') {
                 const featureId = hit.mesh.userData.featureId;
                 selectedFaceStateRef.current = { featureId, faceIndex: hit.range.index };
                 paintFaceHighlight(THREE, selectedFaceMesh, hit.mesh, hit.range);
                 setSelectedEdgeTube(null);
+                selectedVertexMesh.visible = false;
                 // Resolved the same way an edge's `name` is, just off the other end
                 // of faceAt()'s own walk: FaceRange.index is this face's position
                 // in that SAME stable order (see FaceRange's own doc comment in
@@ -1096,9 +1604,9 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                         size = undefined;
                     }
                 }
-                onPickRef.current?.({ kind: 'face', target: featureId, faceIndex: hit.range.index, name, size });
+                onPickRef.current?.({ kind: 'face', target: featureId, faceIndex: hit.range.index, name, size, ctrlKey, shiftKey, metaKey });
             }
-            else {
+            else if (hit.kind === 'edge') {
                 const { featureId, kernelEdge } = hit.line.userData;
                 // Resolved down to whichever primitive actually produced this edge,
                 // however many features (a Move, a Hole, ...) sit on top of it --
@@ -1123,6 +1631,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                 setSelectedEdgeTube(hit.line.userData.tubeMesh);
                 selectedFaceMesh.visible = false;
                 selectedFaceStateRef.current = null;
+                selectedVertexMesh.visible = false;
                 let size;
                 try {
                     size = engine.edgeLength(kernelEdge) ?? undefined;
@@ -1130,21 +1639,525 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                 catch {
                     size = undefined;
                 }
-                onPickRef.current?.({ kind: 'edge', target: featureId, name, size });
+                onPickRef.current?.({ kind: 'edge', target: featureId, name, size, ctrlKey, shiftKey, metaKey });
+            }
+            else if (hit.kind === 'vertex') {
+                setSelectedEdgeTube(null);
+                selectedFaceMesh.visible = false;
+                selectedFaceStateRef.current = null;
+                selectedVertexMesh.position.copy(hit.position);
+                selectedVertexMesh.visible = true;
+                const featureId = hit.mesh.userData.featureId;
+                onPickRef.current?.({ kind: 'vertex', target: featureId, name: null, ctrlKey, shiftKey, metaKey });
+            }
+            else {
+                // body: whole-mesh highlight, same shared mesh/material a face pick
+                // uses, just spanning the full index -- see paintFaceHighlight()'s
+                // own doc comment.
+                setSelectedEdgeTube(null);
+                selectedVertexMesh.visible = false;
+                selectedFaceStateRef.current = null;
+                paintFaceHighlight(THREE, selectedFaceMesh, hit.mesh);
+                const featureId = hit.mesh.userData.featureId;
+                onPickRef.current?.({ kind: 'body', target: featureId, name: null, ctrlKey, shiftKey, metaKey });
             }
             renderNow();
         }
-        function onClick(e) {
-            // Left click only. This app's own navigation convention is right-drag
-            // to orbit and left-drag is a deliberate no-op (see HANDOFF.md), so a
-            // plain left click never contends with OrbitControls for the gesture.
+        // CLICK vs DRAG, and WINDOW-ZOOM as its own drag gesture. The pick gesture
+        // is a left-button click WITHOUT a drag; OrbitControls itself never fires
+        // a `click` for a drag it consumed, but a click fires the moment ANY press
+        // releases, moved or not -- so this component tells the two apart itself:
+        // pointerdown records where the press started, and a `click` whose pointer
+        // moved past a few pixels since then is the tail end of an orbit/pan/dolly
+        // gesture, not a pick. This check stays a movement threshold even though
+        // the scheme preset above makes which-BUTTON-orbits configurable, because
+        // the button that was pressed is not the question -- whether the pointer
+        // MOVED is.
+        //
+        // Window-zoom is armed from the view strip (button below), then runs as
+        // its own captured-pointer drag on the canvas: `controls.enabled` goes
+        // false for just that drag (the ONE supported way to keep OrbitControls
+        // out of a gesture it would otherwise claim), the rectangle is tracked in
+        // React state so the overlay div draws it, and pointerup hands the
+        // finished rect to applyWindowZoomRect(). `windowZoomRef.current !== null`
+        // means "armed, and the next left-drag is the rectangle".
+        /** Every pickable candidate a box-select drag's rect keeps, respecting
+         *  the SAME filters a click already does (hitAt() reads filtersRef the
+         *  same way). Each candidate reduces to a screen-space point set for
+         *  pointSetSelect() -- a vertex to its own projected point, an edge to
+         *  its two projected endpoints, a face or a whole body to its own
+         *  screen bbox corners (SPEC-mouse-parity.md Phase 3 item 4's own
+         *  wording) -- and resolves the SAME name a click on that face/edge
+         *  would (nameFace()/nameEdge(), the identical try/catch-is-honest-null
+         *  pattern pickAt() already uses), so a box-selected edge is just as
+         *  usable by round()/hollow() as a clicked one. No occlusion test: a
+         *  click has a real surface hit to occlude against, a drag rectangle
+         *  does not, and a tightly-drawn box around visible geometry does not,
+         *  in practice, also enclose the model's own hidden far side. */
+        function collectBoxSelection(startClientX, startClientY, endClientX, endClientY) {
+            const group = solidGroupRef.current;
+            if (!group)
+                return [];
+            const rect = renderer.domElement.getBoundingClientRect();
+            const drag = {
+                startX: startClientX - rect.left, startY: startClientY - rect.top,
+                endX: endClientX - rect.left, endY: endClientY - rect.top,
+            };
+            const toScreen = (v) => {
+                const p = v.clone().project(camera);
+                return { x: (p.x * 0.5 + 0.5) * rect.width, y: (1 - (p.y * 0.5 + 0.5)) * rect.height };
+            };
+            const filters = filtersRef.current;
+            const built = lastBuiltRef.current;
+            const engine = engineRef.current;
+            const found = [];
+            for (const obj of group.children) {
+                const featureId = obj.userData.featureId;
+                const pos = obj.geometry.getAttribute('position');
+                if (!featureId || !pos)
+                    continue;
+                const worldAt = (i) => new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i)).applyMatrix4(obj.matrixWorld);
+                if (filters.vertex) {
+                    for (let i = 0; i < pos.count; i++) {
+                        if (pointSetSelect([toScreen(worldAt(i))], drag))
+                            found.push({ kind: 'vertex', target: featureId, name: null });
+                    }
+                }
+                if (filters.face) {
+                    const idx = obj.geometry.getIndex();
+                    const ranges = obj.userData.faceRanges ?? [];
+                    if (idx) {
+                        for (const range of ranges) {
+                            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                            for (let k = range.start; k < range.start + range.count; k++) {
+                                const s = toScreen(worldAt(idx.getX(k)));
+                                if (s.x < minX)
+                                    minX = s.x;
+                                if (s.x > maxX)
+                                    maxX = s.x;
+                                if (s.y < minY)
+                                    minY = s.y;
+                                if (s.y > maxY)
+                                    maxY = s.y;
+                            }
+                            if (minX > maxX)
+                                continue;
+                            const corners = [{ x: minX, y: minY }, { x: maxX, y: minY }, { x: maxX, y: maxY }, { x: minX, y: maxY }];
+                            if (!pointSetSelect(corners, drag))
+                                continue;
+                            let name = null;
+                            const shape = obj.userData.kernelShape;
+                            if (built && engine && shape) {
+                                try {
+                                    const face = engine.faceAt(shape, range.index);
+                                    if (face)
+                                        name = engine.nameFace(built, docRef.current, featureId, face);
+                                }
+                                catch {
+                                    name = null;
+                                }
+                            }
+                            found.push({ kind: 'face', target: featureId, name });
+                        }
+                    }
+                }
+                if (filters.body) {
+                    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                    for (let i = 0; i < pos.count; i++) {
+                        const s = toScreen(worldAt(i));
+                        if (s.x < minX)
+                            minX = s.x;
+                        if (s.x > maxX)
+                            maxX = s.x;
+                        if (s.y < minY)
+                            minY = s.y;
+                        if (s.y > maxY)
+                            maxY = s.y;
+                    }
+                    if (minX <= maxX) {
+                        const corners = [{ x: minX, y: minY }, { x: maxX, y: minY }, { x: maxX, y: maxY }, { x: minX, y: maxY }];
+                        if (pointSetSelect(corners, drag))
+                            found.push({ kind: 'body', target: featureId, name: null });
+                    }
+                }
+            }
+            if (filters.edge) {
+                for (const line of edgePickLinesRef.current) {
+                    const edgePos = line.geometry.getAttribute('position');
+                    if (!edgePos || edgePos.count < 1)
+                        continue;
+                    const a = new THREE.Vector3(edgePos.getX(0), edgePos.getY(0), edgePos.getZ(0)).applyMatrix4(line.matrixWorld);
+                    const last = edgePos.count - 1;
+                    const b = new THREE.Vector3(edgePos.getX(last), edgePos.getY(last), edgePos.getZ(last)).applyMatrix4(line.matrixWorld);
+                    if (!pointSetSelect([toScreen(a), toScreen(b)], drag))
+                        continue;
+                    const { featureId, kernelEdge } = line.userData;
+                    let name = null;
+                    if (built && engine) {
+                        try {
+                            name = engine.nameEdge(built, docRef.current, featureId, kernelEdge);
+                        }
+                        catch {
+                            name = null;
+                        }
+                    }
+                    found.push({ kind: 'edge', target: featureId, name });
+                }
+            }
+            return found;
+        }
+        let downAt = null;
+        // The marking menu's own click-vs-drag classifier (SPEC-mouse-parity.md
+        // Phase 4.1/4.3) needs the ORIGINAL right-button down point, not `downAt`
+        // above (button-0-only) and not OrbitControls' own internal state (which
+        // a pan/dolly drag mutates every move) -- see onCanvasContextMenu below.
+        let rightDownAt = null;
+        // The pointer's last KNOWN sample: what classifyGesture/rightClickGuard
+        // read as the gesture's up-sample (see onCanvasPointerMove's comment).
+        let rightMoveAt = null;
+        const CLICK_DRAG_TOLERANCE_PX = 4;
+        // Click-and-hold "select other" cycling state (SPEC-mouse-parity.md
+        // Phase 3.5, [CONFIRM behaviour]). `lastCycleKey`/`lastCycleIndex`
+        // persist ACROSS separate hold gestures, not just within one -- "hold,
+        // release, hold again" at the same stacked point has to advance one
+        // more step each time rather than re-landing on the same candidate, per
+        // the two-stacked-solids contract in mouse-parity-handover.md's T12
+        // entry ("hold cycles to the back one; hold again cycles back [to
+        // front]").
+        let holdTimer = null;
+        let holdCycleState = null;
+        let holdCycleCommitted = false;
+        let lastCycleKey = null;
+        let lastCycleIndex = 0;
+        function hitKey(hit) {
+            switch (hit.kind) {
+                case 'vertex': return `v:${hit.mesh.uuid}:${hit.position.x.toFixed(5)},${hit.position.y.toFixed(5)},${hit.position.z.toFixed(5)}`;
+                case 'edge': return `e:${hit.line.uuid}`;
+                case 'face': return `f:${hit.mesh.uuid}:${hit.range.index}`;
+                case 'body': return `b:${hit.mesh.uuid}`;
+            }
+        }
+        function onCanvasPointerDown(e) {
+            if (e.button === 2)
+                rightDownAt = { x: e.clientX, y: e.clientY, t: e.timeStamp };
             if (e.button !== 0)
                 return;
-            pickAt(e.clientX, e.clientY);
+            downAt = { x: e.clientX, y: e.clientY };
+            if (windowZoomRef.current !== null) {
+                // Arming already set the ref; from here on the drag is the rectangle.
+                e.preventDefault();
+                renderer.domElement.setPointerCapture(e.pointerId);
+                controls.enabled = false;
+                return;
+            }
+            // Box select (SPEC-mouse-parity.md Phase 3 item 4): a left-press
+            // starting on EMPTY space -- the same hitAt() a click would use, so a
+            // press ON a pickable face/edge/vertex/body falls straight through to
+            // the ordinary orbit/click path below, untouched. Disables orbit for
+            // just this gesture up front, the same eager-disable window-zoom uses
+            // above, rather than waiting to see whether it crosses the drag
+            // threshold: OrbitControls binds LEFT to rotate in BOTH mouse-scheme
+            // presets (camera-controls.ts's own MOUSE_SCHEMES), so by the time a
+            // threshold check could fire the camera would already have moved.
+            // `hitCandidatesAt` (not `hitAt`) answers "is there anything here"
+            // (`.length > 0`, the same gate `hitAt(...) !== null` used) AND
+            // doubles as the click-and-hold candidate list below, so a press on
+            // pickable geometry never raycasts twice.
+            const candidates = hitCandidatesAt(e.clientX, e.clientY);
+            if (candidates.length > 0) {
+                // Click-and-hold "select other" (SPEC-mouse-parity.md Phase 3.5,
+                // [CONFIRM behaviour] -- see input-threshold.ts for the settled-
+                // number-vs-unverified-behavior split): armed ONLY with 2+
+                // overlapping candidates at this exact pixel -- a single-candidate
+                // press stays an ordinary click, no cycling timer at all, per the
+                // settled contract's own failure case. One setTimeout, cleared on
+                // move past the dead zone (onCanvasPointerMove) or on release
+                // (onCanvasPointerUp), whichever comes first; no rAF, no repeat-
+                // while-held tick -- a single hold advances the cycle by exactly
+                // one candidate, the same as pressing again later at the same
+                // point does (see lastCycleKey/lastCycleIndex above).
+                if (candidates.length >= 2) {
+                    holdTimer = setTimeout(() => {
+                        holdTimer = null;
+                        const key = candidates.map(hitKey).join('|');
+                        const baseIndex = key === lastCycleKey ? lastCycleIndex : 0;
+                        const index = nextCycleIndex(baseIndex, candidates.length);
+                        lastCycleKey = key;
+                        lastCycleIndex = index;
+                        holdCycleState = { candidates, index };
+                        applyHover(candidates[index]);
+                        renderNow();
+                    }, HOLD_CYCLE_DELAY_MS);
+                }
+                return;
+            }
+            boxSelectRef.current = { startX: e.clientX, startY: e.clientY, endX: e.clientX, endY: e.clientY, moved: false };
+            controls.enabled = false;
+            renderer.domElement.setPointerCapture(e.pointerId);
+        }
+        function onCanvasPointerMove(e) {
+            // Todo 19/20's gesture classifier reads the pointer's LAST KNOWN
+            // position + timestamp, not the contextmenu event's: the browser fires
+            // contextmenu BEFORE pointerup (measured 2026-09-21: contextmenu's
+            // timeStamp equals pointerdown's, its coords are the DOWN point), so
+            // classifying from the contextmenu event itself reads a 0px/0ms
+            // gesture and opens the menu on ANY drag. The up-sample is the latest
+            // pointermove's own sample.
+            rightMoveAt = { x: e.clientX, y: e.clientY, t: e.timeStamp };
+            if (holdTimer !== null && downAt !== null
+                && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) >= HOLD_CYCLE_DEAD_ZONE_PX) {
+                // Movement past the dead zone before the delay elapses cancels the
+                // hold outright -- this is what lets hold-then-drag orbit normally
+                // (SPEC-mouse-parity.md Phase 3.5): nothing above disables
+                // `controls.enabled` for a press that landed on pickable geometry
+                // (unlike the box-select/window-zoom branches), so OrbitControls'
+                // own listener on this same element is already free to rotate the
+                // camera the moment the cursor moves -- no cycle is ever triggered.
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            }
+            if (windowZoomRef.current !== null) {
+                if (downAt === null)
+                    return;
+                const bounds = renderer.domElement.getBoundingClientRect();
+                setWindowZoom({
+                    x: Math.min(downAt.x, e.clientX) - bounds.left,
+                    y: Math.min(downAt.y, e.clientY) - bounds.top,
+                    w: Math.abs(e.clientX - downAt.x),
+                    h: Math.abs(e.clientY - downAt.y),
+                });
+                return;
+            }
+            const bs = boxSelectRef.current;
+            if (!bs)
+                return;
+            bs.endX = e.clientX;
+            bs.endY = e.clientY;
+            if (!bs.moved && Math.hypot(e.clientX - bs.startX, e.clientY - bs.startY) >= CLICK_DRAG_TOLERANCE_PX)
+                bs.moved = true;
+            if (!bs.moved)
+                return;
+            const bounds = renderer.domElement.getBoundingClientRect();
+            setBoxSelect({
+                x: Math.min(bs.startX, bs.endX) - bounds.left,
+                y: Math.min(bs.startY, bs.endY) - bounds.top,
+                w: Math.abs(bs.endX - bs.startX),
+                h: Math.abs(bs.endY - bs.startY),
+                kind: marqueeKind({ startX: bs.startX, startY: bs.startY, endX: bs.endX, endY: bs.endY }),
+            });
+        }
+        function onCanvasPointerUp(e) {
+            // Todo 19/20: THIS is where the right-button gesture classifies —
+            // pointerup carries the gesture's real end coords + timestamp (the
+            // contextmenu event does not: see onCanvasContextMenu's comment). A
+            // fast directional drag fires the wedge's command directly (no menu);
+            // a release within the dead zone arms the menu-open (the actual
+            // render happens on the contextmenu event, which the browser fires
+            // for the same press); a drag past the dead zone is the camera's and
+            // opens nothing.
+            if (e.button === 2) {
+                const downSample = rightDownAt;
+                rightDownAt = null;
+                const upSample = { x: e.clientX, y: e.clientY, t: e.timeStamp };
+                const verdict = classifyGesture(downSample, upSample, MARKING_GESTURE);
+                if (verdict.kind === 'wedge') {
+                    // Fast directional drag: the wedge's command fires with no visible
+                    // menu flash (SPEC :37-39). The wedge ids are the part-viewport
+                    // config's own, in MarkingMenu.tsx's layout order.
+                    const id = wedgesForMode('part-viewport')[verdict.wedgeIndex]?.id;
+                    if (id)
+                        dispatchMarkingCommandRef.current?.(id);
+                    return;
+                }
+                if (verdict.kind === 'menu' && rightClickGuard(downSample, upSample, HOLD_CYCLE_DEAD_ZONE_PX) === 'menu') {
+                    // Click-shaped release: open the menu HERE. The contextmenu event
+                    // for this same press has ALREADY fired by now (Chromium fires it
+                    // at press time, before pointerup — measured 2026-09-21), so
+                    // relaying through a flag would never be consumed; this handler
+                    // is the last event of the gesture.
+                    const bounds = renderer.domElement.getBoundingClientRect();
+                    setMarkingMenu({ x: upSample.x - bounds.left, y: upSample.y - bounds.top });
+                }
+                // A slow drag: neither wedge nor menu — OrbitControls consumed it.
+                return;
+            }
+            if (windowZoomRef.current !== null) {
+                try {
+                    renderer.domElement.releasePointerCapture(e.pointerId);
+                }
+                catch { /* already released */ }
+                controls.enabled = true;
+                windowZoomRef.current = null;
+                setWindowZoom(null);
+                const start = downAt;
+                downAt = null;
+                if (start === null)
+                    return;
+                const width = Math.abs(e.clientX - start.x);
+                const height = Math.abs(e.clientY - start.y);
+                if (width <= CLICK_DRAG_TOLERANCE_PX || height <= CLICK_DRAG_TOLERANCE_PX)
+                    return;
+                const bounds = renderer.domElement.getBoundingClientRect();
+                applyWindowZoomRectRef.current?.({
+                    x: Math.min(start.x, e.clientX) - bounds.left,
+                    y: Math.min(start.y, e.clientY) - bounds.top,
+                    width,
+                    height,
+                }, bounds.width, bounds.height);
+                return;
+            }
+            if (holdTimer !== null) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            }
+            if (holdCycleState !== null) {
+                // The hold reached its 300ms delay and highlighted a candidate; a
+                // plain release (no further movement) COMMITS it -- see commitHit()
+                // for why this calls it directly rather than pickAt(), which would
+                // just re-raycast and land back on the ordinary nearest winner.
+                const { candidates, index } = holdCycleState;
+                holdCycleState = null;
+                holdCycleCommitted = true;
+                commitHit(candidates[index], { ctrlKey: e.ctrlKey, shiftKey: e.shiftKey, metaKey: e.metaKey });
+                return;
+            }
+            const bs = boxSelectRef.current;
+            if (!bs)
+                return;
+            boxSelectRef.current = null;
+            try {
+                renderer.domElement.releasePointerCapture(e.pointerId);
+            }
+            catch { /* already released */ }
+            controls.enabled = true;
+            setBoxSelect(null);
+            // Below the 4px threshold: a genuine click, not a drag -- `downAt` is
+            // left exactly as onCanvasPointerDown set it, so the native `click`
+            // handler's own movement check runs pickAt() normally (the same
+            // empty-space click-clears path this drag started from). A drag past
+            // the threshold leaves `downAt` alone too -- onClick's own check
+            // already rejects a moved press on its own, the same way it always
+            // has for an ordinary orbit drag.
+            if (!bs.moved)
+                return;
+            const items = collectBoxSelection(bs.startX, bs.startY, bs.endX, bs.endY);
+            onBoxSelectRef.current?.(items, e.shiftKey);
+        }
+        function onClick(e) {
+            if (e.button !== 0)
+                return;
+            if (holdCycleCommitted) {
+                // The hold-cycle gesture above already committed a candidate in
+                // onCanvasPointerUp; the DOM `click` that always follows a same-
+                // element pointerup must not re-pick (it would re-run hitAt() and
+                // silently overwrite the cycled selection with the plain nearest
+                // winner).
+                holdCycleCommitted = false;
+                return;
+            }
+            // The stale comment this replaces claimed "right-drag orbits" -- it did
+            // not (stock OrbitControls binds LEFT-drag to orbit, and always has),
+            // and with the scheme preset above that binding is user-switchable
+            // besides, so no orbit button can be named here at all. What stays true
+            // is the split itself: a drag of ANY button is navigation, and the
+            // movement check below is what keeps its release from ever reaching
+            // pickAt().
+            if (downAt === null)
+                return;
+            const moved = Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y);
+            if (moved > CLICK_DRAG_TOLERANCE_PX)
+                return;
+            pickAt(e.clientX, e.clientY, { ctrlKey: e.ctrlKey, shiftKey: e.shiftKey, metaKey: e.metaKey });
+        }
+        // Double-click (SPEC-mouse-parity.md Phase 3.6): reuses hitAt() --
+        // pickAt()'s own resolver -- rather than a second raycast helper, so
+        // "what did the dblclick land on" can never disagree with what a plain
+        // click at the same point would have picked. A miss (empty space) hits
+        // the same `if (!hit) return` every other hitAt() caller uses -- no
+        // event reaches the caller at all, so "nothing opens" needs no special
+        // case on either side of this prop.
+        function featureIdOfHit(hit) {
+            return hit.kind === 'edge'
+                ? hit.line.userData.featureId
+                : hit.mesh.userData.featureId;
+        }
+        function onDblClick(e) {
+            if (e.button !== 0)
+                return;
+            const hit = hitAt(e.clientX, e.clientY);
+            if (!hit)
+                return;
+            onFeatureDoubleClickRef.current?.(featureIdOfHit(hit));
+        }
+        // Ctrl+A / Delete-Backspace (SPEC-mouse-parity.md Phase 3.6). Lives on
+        // the canvas element itself (tabIndex set above), not window -- the
+        // same "scoped to viewport focus" split onDblClick draws -- so a
+        // Ctrl+A/Delete typed anywhere else on the page (the code editor, a
+        // param box) never reaches this listener at all. The
+        // shouldHandleViewportDelete() check is defence in depth for the one
+        // case that split alone does not cover: the canvas keeping focus from
+        // an earlier click while a DIFFERENT element (reached by Tab, not a
+        // click) is what the keydown's own activeElement actually names.
+        function onCanvasKeyDown(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+                e.preventDefault();
+                onSelectAllRef.current?.();
+                return;
+            }
+            // The M hotkey (Fusion footage 03:08): activate Move/Copy from the
+            // viewport. Plain 'm' only — a modifier means a browser command; a
+            // text field owning the keys means the M was meant for it.
+            if (e.key.toLowerCase() === 'm' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                const tag = document.activeElement?.tagName;
+                if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT')
+                    return;
+                if (document.activeElement?.isContentEditable)
+                    return;
+                e.preventDefault();
+                onMoveHotkeyRef.current?.();
+                return;
+            }
+            if (e.key !== 'Delete' && e.key !== 'Backspace')
+                return;
+            const active = document.activeElement;
+            if (!shouldHandleViewportDelete(active ? active.tagName : ''))
+                return;
+            e.preventDefault();
+            onDeleteSelectedRef.current?.();
+        }
+        // Todo 19/20's classify-and-dispatch lives in onCanvasPointerUp (below),
+        // which has the pointer's REAL up-sample; the browser fires contextmenu
+        // BEFORE pointerup and BEFORE any drag's moves (measured 2026-09-21:
+        // Playwright/Chromium fire contextmenu at press time, coords = the DOWN
+        // point, timeStamp = pointerdown's), so a classifier on this event reads
+        // a 0px/0ms gesture and opens the menu on ANY drag. This handler only
+        // kills the native menu — always, whatever the gesture turns out to be
+        // (a right-drag that pans still fires contextmenu, and the native menu
+        // popping up over an in-progress pan would be worse than no menu).
+        function onCanvasContextMenu(e) {
+            e.preventDefault();
+            if (!rightMenuArmedRef.current)
+                return;
+            rightMenuArmedRef.current = false;
+            const bounds = renderer.domElement.getBoundingClientRect();
+            setMarkingMenu({ x: e.clientX - bounds.left, y: e.clientY - bounds.top });
         }
         renderer.domElement.addEventListener('pointermove', onPointerMove);
         renderer.domElement.addEventListener('pointerleave', onPointerLeave);
+        renderer.domElement.addEventListener('pointerleave', onPointerLeave);
+        // pointerdown/move/up sit BESIDE click here, not inside the existing
+        // onPointerMove above -- that one is throttled to a hover raycast and
+        // returns early when none is in flight, which is the wrong shape for a
+        // state machine that has to see EVERY move of a drag gesture. The three
+        // below are raw and cheap (four compares against null on the hover path).
+        renderer.domElement.addEventListener('pointerdown', onCanvasPointerDown);
+        renderer.domElement.addEventListener('pointermove', onCanvasPointerMove);
+        renderer.domElement.addEventListener('pointerup', onCanvasPointerUp);
+        renderer.domElement.addEventListener('pointercancel', onCanvasPointerUp);
         renderer.domElement.addEventListener('click', onClick);
+        renderer.domElement.addEventListener('dblclick', onDblClick);
+        renderer.domElement.addEventListener('keydown', onCanvasKeyDown);
+        renderer.domElement.addEventListener('contextmenu', onCanvasContextMenu);
         registerPickAtRef.current?.(pickAt);
         renderNow();
         return () => {
@@ -1154,7 +2167,16 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             resizeObserver.disconnect();
             renderer.domElement.removeEventListener('pointermove', onPointerMove);
             renderer.domElement.removeEventListener('pointerleave', onPointerLeave);
+            renderer.domElement.removeEventListener('pointerdown', onCanvasPointerDown);
+            renderer.domElement.removeEventListener('pointermove', onCanvasPointerMove);
+            renderer.domElement.removeEventListener('pointerup', onCanvasPointerUp);
+            renderer.domElement.removeEventListener('pointercancel', onCanvasPointerUp);
             renderer.domElement.removeEventListener('click', onClick);
+            renderer.domElement.removeEventListener('dblclick', onDblClick);
+            renderer.domElement.removeEventListener('keydown', onCanvasKeyDown);
+            renderer.domElement.removeEventListener('contextmenu', onCanvasContextMenu);
+            if (holdTimer !== null)
+                clearTimeout(holdTimer);
             if (pendingHoverRaf !== null)
                 cancelAnimationFrame(pendingHoverRaf);
             if (dampingRafRef.current !== null)
@@ -1167,7 +2189,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                 const mesh = obj;
                 mesh.geometry?.dispose?.();
             });
-            [hoverFaceMesh, selectedFaceMesh].forEach((obj) => {
+            [hoverFaceMesh, selectedFaceMesh, hoverVertexMesh, selectedVertexMesh].forEach((obj) => {
                 obj.geometry.dispose();
                 obj.material.dispose();
             });
@@ -1180,15 +2202,19 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             rendererRef.current = null;
             sceneRef.current = null;
             cameraRef.current = null;
+            inactiveCameraRef.current = null;
             controlsRef.current = null;
             solidGroupRef.current = null;
             hoverFaceMeshRef.current = null;
             selectedFaceMeshRef.current = null;
+            hoverVertexMeshRef.current = null;
+            selectedVertexMeshRef.current = null;
             hoverEdgeMaterialRef.current = null;
             selectedEdgeMaterialRef.current = null;
             hoveredEdgeTubeRef.current = null;
             selectedEdgeTubeRef.current = null;
             edgePickLinesRef.current = [];
+            windowZoomRef.current = null;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [phase]);
@@ -1279,11 +2305,11 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         setPreset(null);
     }
     /** Snaps the camera to one nav-cube face's direction, by CSS face key
-     *  (NAV_CUBE_FACES above). Looked up by key rather than called inline so
-     *  the pointerup handler below (which resolves the face via
-     *  elementFromPoint, not the button's own onClick -- see that handler's
-     *  comment for why) and the button's onClick (kept for keyboard
-     *  Enter/Space activation) both go through the exact same path. */
+    (NAV_CUBE_FACES above). Looked up by key rather than called inline so
+    the pointerup handler below (which resolves the face via
+    elementFromPoint, not the button's own onClick -- see that handler's
+    comment for why) and the button's onClick (kept for keyboard
+    Enter/Space activation) both go through the exact same path. */
     function fireFace(key) {
         const entry = NAV_CUBE_FACES.find((f) => f.key === key);
         if (!entry)
@@ -1291,6 +2317,48 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         lookFrom(entry.dir);
         setPreset(entry.preset);
     }
+    /** Todo 28: a right-click ANYWHERE over the cube opens the same marking
+     *  menu the canvas path opens (todo 17 owns right-click everywhere; the
+     *  wrapper captures pointerdown, so the canvas classifier never sees these
+     *  events). The browser's contextmenu event fires at PRESS time in
+     *  Chromium (measured 2026-09-21, see onCanvasContextMenu's comment), so
+     *  the sample here is the press point -- good enough for a click-shaped
+     *  menu open, which is what a right-click on a 88px widget is. A
+     *  right-DRAG over the cube is not served here (the menu opens only for
+     *  click-shaped presses; a drag keeps orbiting via the canvas's own
+     *  controls -- the wrapper's own pointermove only orbits on LEFT drag
+     *  since button 2 no longer sets cubeDragRef). */
+    function rightCubeMenuAt(sample) {
+        const renderer = rendererRef.current;
+        if (!renderer)
+            return;
+        const bounds = renderer.domElement.getBoundingClientRect();
+        setMarkingMenu({ x: sample.x - bounds.left, y: sample.y - bounds.top });
+    }
+    /** Todo 28 (SPEC Phase 1.5): face OR edge OR corner snap, from a
+    cube-zone id. Faces keep fireFace()'s exact path; edges/corners look
+    from the normalized dir-sum cube-zone.ts computed (both preserve
+    distance exactly like a face click, per lookFrom) and clear the
+    preset -- a diagonal view is not any named view-strip preset. */
+    function fireZone(zone) {
+        if (zone.kind === 'face') {
+            fireFace(zone.id.slice('face:'.length));
+            return;
+        }
+        if (zone.kind === 'none')
+            return;
+        const dir = CUBE_ZONE_DIRS[zone.id];
+        if (!dir)
+            return;
+        lookFrom(dir);
+        setPreset(null);
+    }
+    /** The zone dirs for the live cube, derived ONCE from the same face
+    dirs NAV_CUBE_FACES already owns -- recomputed per render is fine
+    (20 small sums), but a module-level map cannot drift from a future
+    NAV_CUBE_FACES edit only if it derives FROM it; so it is built here,
+    where NAV_CUBE_FACES is in scope. */
+    const CUBE_ZONE_DIRS = cubeZoneDirs(Object.fromEntries(NAV_CUBE_FACES.map((f) => [f.key, f.dir])));
     /**
      * Aims the camera at the model's own bounding-box centre along a preset
      * DIRECTION, at a distance computed by lib/camera-fit.ts's fitDistance() so
@@ -1341,14 +2409,15 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         if (!three || !group)
             return null;
         const { THREE } = three;
-        const box = new THREE.Box3().setFromObject(group);
+        const box = solidBounds(group, () => new THREE.Box3());
         for (const f of doc.features) {
             if (f.kind !== 'sketch')
                 continue;
-            const { u, v, n } = SKETCH_PLANE_AXES[f.plane ?? 'xy'] ?? SKETCH_PLANE_AXES.xy;
-            const off = f.offset ?? 0;
+            // Through the one resolver, so a framed sketch (sketch-on-a-face, or on
+            // a datum plane) is fitted where it really is (SPEC-datum-family 1c).
+            const { u, v, origin: o } = sketchFrameOf(f);
             for (const [pu, pv] of f.points) {
-                box.expandByPoint(new THREE.Vector3(n[0] * off + u[0] * pu + v[0] * pv, n[1] * off + u[1] * pu + v[1] * pv, n[2] * off + u[2] * pu + v[2] * pv));
+                box.expandByPoint(new THREE.Vector3(o[0] + u[0] * pu + v[0] * pv, o[1] + u[1] * pu + v[1] * pv, o[2] + u[2] * pu + v[2] * pv));
             }
         }
         return box;
@@ -1371,7 +2440,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             max: [box.max.x, box.max.y, box.max.z],
         };
         const center = bboxCenter(bbox);
-        const distance = fitDistance(bbox, container.clientWidth, container.clientHeight, camera.fov);
+        const perspCamera = camera;
+        const distance = fitDistance(bbox, container.clientWidth, container.clientHeight, perspCamera.fov ?? 45);
         const direction = new THREE.Vector3(dir[0], dir[1], dir[2]).normalize();
         controls.target.set(center[0], center[1], center[2]);
         camera.position.copy(controls.target).addScaledVector(direction, distance);
@@ -1395,7 +2465,192 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
      *
      * Respects prefers-reduced-motion by skipping straight to the instant
      * fitToModel() behaviour (0ms is still "the same fit", just not eased).
+    /** Todo 28: the cube-menu's camera-mode entries reuse applyCameraMode()
+    AND mirror the view-strip toggle's own React-state + localStorage write
+    (see that toggle's onClick below) so both entry points can never
+    disagree about the current mode. */
+    function applyCameraModeAndToggle(next) {
+        applyCameraMode(next);
+        saveCameraMode(next);
+        setCameraKind(next);
+        setCubeMenu(false);
+    }
+    function applyCameraMode(next) {
+        const three = threeRef.current;
+        const controls = controlsRef.current;
+        const renderer = rendererRef.current;
+        const scene = sceneRef.current;
+        const container = containerRef.current;
+        if (!three || !controls || !renderer || !scene || !container)
+            return;
+        const { THREE } = three;
+        const current = cameraRef.current;
+        const other = inactiveCameraRef.current;
+        if (!current || !other)
+            return;
+        if (next === cameraKindRef.current)
+            return;
+        // Placement + target carry over verbatim -- both cameras orbit the same
+        // point at the same distance.
+        other.position.copy(current.position);
+        other.up.copy(current.up);
+        controls.object = other;
+        cameraRef.current = other;
+        inactiveCameraRef.current = current;
+        cameraKindRef.current = next;
+        // Resize handler reads the live camera's own kind, so it keeps whichever
+        // projection this swap landed on aspect-correct from here on.
+        const w = container.clientWidth;
+        const h = Math.max(1, container.clientHeight);
+        if (next === CameraMode.ORTHOGRAPHIC) {
+            const persp = current;
+            const targetDistance = current.position.distanceTo(controls.target);
+            const frame = orthoFrustumFromPerspective({ fov: persp.fov, aspect: w / h, near: persp.near, far: persp.far }, targetDistance);
+            const ortho = other;
+            ortho.left = frame.left;
+            ortho.right = frame.right;
+            ortho.top = frame.top;
+            ortho.bottom = frame.bottom;
+            ortho.near = frame.near;
+            ortho.far = frame.far;
+            ortho.zoom = 1;
+            ortho.updateProjectionMatrix();
+        }
+        else {
+            // Restoring the perspective camera preserves ITS fov/near/far (the swap
+            // never touched them); only aspect may have drifted since the last time
+            // it was live.
+            const persp = other;
+            persp.aspect = w / h;
+            persp.updateProjectionMatrix();
+        }
+        controls.update();
+        renderer.render(scene, other);
+        projectAnchors();
+        setCameraKind(next);
+    }
+    /**
+     * SPEC-mouse-parity Phase 1 item 4: frame the selection as the new orbit
+     * target. The selection this component itself can reach is its OWN pick state
+     * (the picked face's feature+index, or the picked edge's feature) -- the
+     * `pick`/`selectedCount` props stop at display, so a window into
+     * ReshapeStudio's feature-tree selection is not rebuilt here. Boxes come
+     * from the live meshes drawGeoms() already tagged with featureId; an empty
+     * pick is a no-op button (disabled, and never rendered hot).
+     *
+     * A snap, not an eased fly-to -- the same deliberate instant-ness the Home
+     * button's own fitToModel() keeps for on-demand framing; the automatic
+     * first-solid path below is the only eased one (see animateFitToModel's
+     * own comment).
      */
+    function fitSelection() {
+        const three = threeRef.current;
+        const camera = cameraRef.current;
+        const controls = controlsRef.current;
+        const renderer = rendererRef.current;
+        const scene = sceneRef.current;
+        const container = containerRef.current;
+        const group = solidGroupRef.current;
+        if (!three || !camera || !controls || !renderer || !scene || !container || !group)
+            return;
+        const persp = cameraKindRef.current === CameraMode.PERSPECTIVE ? camera : null;
+        // The fit math (computeSelectionFit) is written for a perspective-fov
+        // camera. Ortho mode asks the same question of the perspective camera it
+        // would swap BACK to (inactiveCameraRef) -- the frustum width/height at
+        // target distance matches, which is all the fit needs.
+        const fovCam = persp ?? inactiveCameraRef.current;
+        if (!fovCam)
+            return;
+        const wanted = new Set();
+        const facePick = selectedFaceStateRef.current;
+        if (facePick)
+            wanted.add(facePick.featureId);
+        if (pick && pick.target)
+            wanted.add(pick.target);
+        if (wanted.size === 0)
+            return;
+        const boxes = [];
+        for (const child of group.children) {
+            const mesh = child;
+            const featureId = mesh.userData?.featureId;
+            if (!featureId || !wanted.has(featureId))
+                continue;
+            if (!mesh.geometry)
+                continue;
+            mesh.geometry.computeBoundingBox();
+            const b = mesh.geometry.boundingBox;
+            if (!b)
+                continue;
+            // computeSelectionFit takes plain tuples, not THREE.Box3 -- convert at
+            // the call site (its own file's note).
+            boxes.push({ min: [b.min.x, b.min.y, b.min.z], max: [b.max.x, b.max.y, b.max.z] });
+        }
+        if (boxes.length === 0)
+            return;
+        const target = [controls.target.x, controls.target.y, controls.target.z];
+        const fit = computeSelectionFit(boxes, {
+            position: [camera.position.x, camera.position.y, camera.position.z],
+            fov: fovCam.fov ?? 45,
+            near: camera.near,
+            far: camera.far,
+        }, target, container.clientWidth, container.clientHeight);
+        if (!fit.valid)
+            return;
+        const distance = Math.max(fit.distance, camera.near * 2);
+        const toTarget = new three.THREE.Vector3(fit.target[0], fit.target[1], fit.target[2]);
+        const direction = new three.THREE.Vector3(camera.position.x - controls.target.x, camera.position.y - controls.target.y, camera.position.z - controls.target.z);
+        if (direction.lengthSq() < 1e-12)
+            direction.set(140, 160, 130);
+        direction.normalize();
+        controls.target.copy(toTarget);
+        camera.position.copy(toTarget).addScaledVector(direction, distance);
+        controls.update();
+        renderer.render(scene, camera);
+        projectAnchors();
+    }
+    /** The scene-setup effect's captured drag hands its finished rectangle here
+     *  via applyWindowZoomRectRef -- kept component-level, not in the effect,
+     *  because it needs the live camera and controls the same way fitSelection
+     *  above does. A snap (not the eased animateFitToModel path) on purpose: this
+     *  is the student's own deliberate drag, the same on-demand class of gesture
+     *  the Home button already snaps for. */
+    function applyWindowZoomRect(rect, viewportWidth, viewportHeight) {
+        const three = threeRef.current;
+        const camera = cameraRef.current;
+        const controls = controlsRef.current;
+        const renderer = rendererRef.current;
+        const scene = sceneRef.current;
+        if (!three || !camera || !controls || !renderer || !scene)
+            return;
+        const persp = cameraKindRef.current === CameraMode.PERSPECTIVE ? camera : null;
+        const fovCam = persp ?? inactiveCameraRef.current;
+        if (!fovCam)
+            return;
+        const sceneBox = computeSceneBox();
+        const boxTuple = sceneBox && !sceneBox.isEmpty()
+            ? { min: [sceneBox.min.x, sceneBox.min.y, sceneBox.min.z], max: [sceneBox.max.x, sceneBox.max.y, sceneBox.max.z] }
+            : null;
+        const target = [controls.target.x, controls.target.y, controls.target.z];
+        const fit = computeWindowZoomFit(rect, viewportWidth, viewportHeight, {
+            position: [camera.position.x, camera.position.y, camera.position.z],
+            fov: fovCam.fov ?? 45,
+            near: camera.near,
+            far: camera.far,
+        }, target, boxTuple);
+        if (!fit.valid)
+            return;
+        const { THREE } = three;
+        const direction = new THREE.Vector3(camera.position.x - controls.target.x, camera.position.y - controls.target.y, camera.position.z - controls.target.z);
+        if (direction.lengthSq() < 1e-12)
+            direction.set(140, 160, 130);
+        direction.normalize();
+        controls.target.set(fit.target[0], fit.target[1], fit.target[2]);
+        camera.position.copy(controls.target).addScaledVector(direction, fit.distance);
+        controls.update();
+        renderer.render(scene, camera);
+        projectAnchors();
+    }
+    applyWindowZoomRectRef.current = applyWindowZoomRect;
     function animateFitToModel(dir, durationMs = 250) {
         const three = threeRef.current;
         const camera = cameraRef.current;
@@ -1414,7 +2669,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             max: [box.max.x, box.max.y, box.max.z],
         };
         const center = bboxCenter(bbox);
-        const distance = fitDistance(bbox, container.clientWidth, container.clientHeight, camera.fov);
+        const perspCamera = camera;
+        const distance = fitDistance(bbox, container.clientWidth, container.clientHeight, perspCamera.fov ?? 45);
         const direction = new THREE.Vector3(dir[0], dir[1], dir[2]).normalize();
         const toTarget = new THREE.Vector3(center[0], center[1], center[2]);
         const toPosition = toTarget.clone().addScaledVector(direction, distance);
@@ -1564,7 +2820,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             ? { min: [box.min.x, box.min.y, box.min.z], max: [box.max.x, box.max.y, box.max.z] }
             : { min: [-60, -60, 0], max: [60, 60, 0] };
         const center = bboxCenter(bbox);
-        const distance = fitDistance(bbox, container.clientWidth, container.clientHeight, camera.fov, DEFAULT_FILL_FRACTION, occludedWidthPx);
+        const perspCamera = camera;
+        const distance = fitDistance(bbox, container.clientWidth, container.clientHeight, perspCamera.fov ?? 45, DEFAULT_FILL_FRACTION, occludedWidthPx);
         const { n } = SKETCH_PLANE_AXES[plane] ?? SKETCH_PLANE_AXES.xy;
         const direction = new THREE.Vector3(n[0], n[1], n[2]).normalize();
         // Re-centre into the VISIBLE strip: the occluded half of the canvas is
@@ -1575,7 +2832,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         // world-per-pixel relationship fitDistance()'s own derivation uses,
         // inverted), then applied to BOTH camera.position and controls.target
         // so the orbit still turns around the same visual point afterward.
-        const worldPerPixel = (2 * distance * Math.tan((camera.fov * Math.PI) / 360)) / container.clientHeight;
+        const worldPerPixel = (2 * distance * Math.tan(((perspCamera.fov ?? 45) * Math.PI) / 360)) / container.clientHeight;
         const shiftWorld = (occludedWidthPx / 2) * worldPerPixel;
         const right = new THREE.Vector3().crossVectors(direction, camera.up).normalize();
         controls.target.set(center[0], center[1], center[2]).addScaledVector(right, -shiftWorld);
@@ -1650,7 +2907,11 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
      * Paint one face's triangle range into a highlight mesh, by sharing the
      * source mesh's own position/normal attributes (zero-copy -- the same
      * BufferAttribute objects, not clones) and slicing a VIEW of its index
-     * buffer down to just this FaceRange.
+     * buffer down to just this FaceRange. `range` omitted paints the WHOLE
+     * mesh instead -- every face, not one -- by sharing its full index
+     * directly rather than slicing a view of it; SPEC-mouse-parity.md Phase 3
+     * item 2's body-kind pick uses this to highlight an entire owning feature
+     * with no per-face resolution needed at all.
      *
      * Shared attributes are safe to keep past this call because a highlight
      * mesh's geometry only ever gets REPOINTED, never read after the source it
@@ -1672,11 +2933,16 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             geom.setAttribute('normal', normal);
         const idx = source.geometry.getIndex();
         if (idx) {
-            // tessellateToThree() hands a plain number[] to BufferGeometry.setIndex(),
-            // which picks Uint16 or Uint32 for itself depending on the largest
-            // value -- so this cannot assume either width and reads it back as `any`.
-            const arr = idx.array;
-            geom.setIndex(new THREE.BufferAttribute(arr.subarray(range.start, range.start + range.count), 1));
+            if (range) {
+                // tessellateToThree() hands a plain number[] to BufferGeometry.setIndex(),
+                // which picks Uint16 or Uint32 for itself depending on the largest
+                // value -- so this cannot assume either width and reads it back as `any`.
+                const arr = idx.array;
+                geom.setIndex(new THREE.BufferAttribute(arr.subarray(range.start, range.start + range.count), 1));
+            }
+            else {
+                geom.setIndex(idx);
+            }
         }
         target.visible = true;
     }
@@ -1759,6 +3025,43 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             tube.visible = true;
         }
     }
+    /** Apply the section state to the renderer and to every drawn solid. Safe to
+     *  call at any time: it does nothing until the scene exists. */
+    function applySection() {
+        const three = threeRef.current;
+        const group = solidGroupRef.current;
+        const renderer = rendererRef.current;
+        const scene = sceneRef.current;
+        const camera = cameraRef.current;
+        if (!three || !group || !renderer || !scene || !camera)
+            return;
+        const { THREE } = three;
+        const sec = sectionRef.current;
+        let on = sec.on;
+        if (on) {
+            const box = solidBounds(group, () => new THREE.Box3());
+            if (box.isEmpty())
+                on = false;
+            else {
+                const lo = box.min.getComponent(sec.axis);
+                const hi = box.max.getComponent(sec.axis);
+                const at = lo + sec.t * (hi - lo);
+                const n = new THREE.Vector3();
+                n.setComponent(sec.axis, sec.flip ? 1 : -1);
+                renderer.clippingPlanes = [new THREE.Plane(n, sec.flip ? -at : at)];
+            }
+        }
+        if (!on)
+            renderer.clippingPlanes = [];
+        for (const m of group.children) {
+            const mat = m.material;
+            if (mat) {
+                mat.side = on ? THREE.DoubleSide : THREE.FrontSide;
+                mat.needsUpdate = true;
+            }
+        }
+        renderer.render(scene, camera);
+    }
     /** Replace the drawn solids and render exactly one frame. Never called from
      *  inside a loop -- see the render-on-demand note above. Returns the meshes
      *  it created so the caller can re-apply a persisted selection against
@@ -1772,8 +3075,10 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         const camera = cameraRef.current;
         const hoverFaceMesh = hoverFaceMeshRef.current;
         const selectedFaceMesh = selectedFaceMeshRef.current;
+        const hoverVertexMesh = hoverVertexMeshRef.current;
+        const selectedVertexMesh = selectedVertexMeshRef.current;
         if (!three || !engine || !group || !renderer || !scene || !camera
-            || !hoverFaceMesh || !selectedFaceMesh) {
+            || !hoverFaceMesh || !selectedFaceMesh || !hoverVertexMesh || !selectedVertexMesh) {
             throw new Error('the three.js scene has not been created yet');
         }
         const { THREE } = three;
@@ -1788,6 +3093,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         // pool.
         hoverFaceMesh.visible = false;
         selectedFaceMesh.visible = false;
+        hoverVertexMesh.visible = false;
+        selectedVertexMesh.visible = false;
         hoveredEdgeTubeRef.current = null;
         selectedEdgeTubeRef.current = null;
         group.traverse((obj) => obj.geometry?.dispose?.());
@@ -1799,6 +3106,23 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         const material = new THREE.MeshStandardMaterial({
             color: 0xff6600, roughness: 0.6, metalness: 0.1,
         });
+        // Seen only through a section cut: the inside of the outer wall shows as a
+        // flat cap colour, so the cut reads as solid material rather than a hole.
+        material.onBeforeCompile = (shader) => {
+            shader.fragmentShader = shader.fragmentShader.replace('#include <dithering_fragment>', 'if (!gl_FrontFacing) gl_FragColor = vec4(0.36, 0.62, 0.82, 1.0);\n#include <dithering_fragment>');
+        };
+        // Phase 5.3 (todo 25): while a preview is active the rebuilt meshes
+        // are drawn TRANSLUCENT in the op's colour, not the committed orange --
+        // the colour says "not committed yet", the opacity says "computed",
+        // and pointerup folds the committed doc (one undo step) which drops
+        // the tint. Same zero-copy geometry path as the committed draw.
+        const pv = previewRef.current;
+        if (pv?.active) {
+            material.color.setHex(pv.tint === 'cut' ? 0xff5555 : 0x8be9fd);
+            material.transparent = true;
+            material.opacity = 0.55;
+            material.depthWrite = false;
+        }
         const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x1a1a1a });
         // Never drawn (every pick line is invisible -- see below), so one shared
         // material for all of them is fine; three.js does not read material
@@ -1850,11 +3174,14 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                 const tube = new THREE.Mesh(pos ? edgeTubeGeometry(THREE, pos.array, EDGE_TUBE_RADIUS) : new THREE.BufferGeometry(), hoverEdgeMaterialRef.current);
                 tube.visible = false;
                 tube.renderOrder = 2;
+                // Highlight-only: must not count toward the model's size (solidBounds).
+                tube.userData.excludeFromBounds = true;
                 mesh.add(tube);
                 line.userData.tubeMesh = tube;
             }
         }
         renderer.render(scene, camera);
+        applySection();
         return meshes;
     }
     /**
@@ -1931,7 +3258,10 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                     catch {
                         size = undefined;
                     }
-                    onPickRef.current?.({ kind: 'face', target: sel.featureId, faceIndex: sel.faceIndex, name, size });
+                    // Not a real click -- see this function's own header -- so there is no
+                    // event to read real modifiers off; SPEC-mouse-parity.md Phase 3 item 1
+                    // treats that as "none held", same as any other programmatic pick.
+                    onPickRef.current?.({ kind: 'face', target: sel.featureId, faceIndex: sel.faceIndex, name, size, ctrlKey: false, shiftKey: false, metaKey: false });
                 }
             }
         }
@@ -1958,16 +3288,32 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             const built = engine.build(doc);
             const activeEngine = engine;
             const buildMs = performance.now() - t0;
-            const shapes = topLevel(doc)
-                .map((f) => ({ id: f.id, kind: f.kind, shape: built.shapes.get(f.id) }))
+            const pick = (f) => ({ id: f.id, kind: f.kind, shape: built.shapes.get(f.id) });
+            const isBuilt = (f) => Boolean(built.shapes.get(f.id));
+            let shapes = topLevel(doc)
+                .map(pick)
                 .filter((s) => Boolean(s.shape));
+            if (shapes.length === 0) {
+                // A REFUSED top-level feature empties the top of the tree, but the
+                // shape it was cutting still built. "shown without it" means the part
+                // stays on screen with the feature called out -- not an empty scene
+                // and no sentence, which is what a hole through a rounded box did
+                // before this: brep-rs refuses it honestly, and the refusal was
+                // thrown away with the throw below, so the student got a blank
+                // viewport. Fall back to the NEWEST feature that did build, which is
+                // the part exactly as it stood before the refused one ran.
+                const fallback = [...doc.features].reverse().find(isBuilt);
+                if (fallback) {
+                    shapes = [pick(fallback)];
+                }
+            }
             if (shapes.length === 0) {
                 // AN EMPTY DOCUMENT IS NOT A FAILURE -- same distinction
                 // BrepViewport.tsx draws, for the same reason: /sandbox/ opens on
                 // EMPTY_DOC, so without this branch the workspace greets a student
                 // with an error before they have done anything. Draw the empty stage
                 // (grid + axes already sit in the scene) and report zero.
-                const onlySketches = doc.features.length > 0 && doc.features.every((f) => f.kind === 'sketch');
+                const onlySketches = doc.features.length > 0 && doc.features.every((f) => f.kind === 'sketch' || f.kind === 'datum');
                 if (doc.features.length === 0 || onlySketches) {
                     setStageHint(onlySketches ? 'A sketch is flat. Select it and press Pull to make it solid.' : null);
                     // No solid on screen -- rearm the auto-fit whenever the doc is
@@ -2028,6 +3374,13 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                     onMeshRef.current?.(null);
                     return;
                 }
+                // Nothing built at all. Report the refusals first: they are the
+                // reason, and the catch below would otherwise show only this
+                // generic sentence and drop the kernel's own words on the floor.
+                onStatsRef.current?.({
+                    buildMs: round(buildMs), meshMs: 0, drawMs: 0, triangles: 0,
+                    refusals: built.refusals,
+                });
                 throw new Error('The document built without error, but nothing came out as a top-level shape.');
             }
             const t1 = performance.now();
@@ -2164,6 +3517,73 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [phase, sketchPlane]);
+    // ---- datum planes -----------------------------------------------------------
+    // A datum has no geometry, so the kernel builds nothing for it. It is drawn
+    // here as a translucent square (a filled quad plus an outline) lying in its
+    // plane, sized from the model (floor 40 mm half-side). Rebuilt whenever the
+    // doc or the selection changes, and disposed on every pass. Selection is
+    // through the timeline row, or a click in the canvas that lands on no solid
+    // face or edge (see pickAt / datumQuadsRef).
+    useEffect(() => {
+        if (phase !== 'ready')
+            return;
+        const three = threeRef.current;
+        const scene = sceneRef.current;
+        const camera = cameraRef.current;
+        const renderer = rendererRef.current;
+        if (!three || !scene || !camera || !renderer)
+            return;
+        const datums = doc.features.filter((f) => f.kind === 'datum');
+        datumQuadsRef.current = [];
+        if (datums.length === 0)
+            return;
+        const { THREE } = three;
+        const box = computeSceneBox();
+        let half = 40;
+        if (box && !box.isEmpty()) {
+            const s = box.getSize(new THREE.Vector3());
+            half = Math.max(40, Math.max(s.x, s.y, s.z) * 0.75);
+        }
+        const group = new THREE.Group();
+        group.name = 'datum-planes';
+        const quads = [];
+        const selectedSet = new Set(selectedDatumIds ?? []);
+        for (const d of datums) {
+            const { origin: o, u, v } = sketchFrameOf(d);
+            const at = (a, b) => new THREE.Vector3(o[0] + u[0] * a + v[0] * b, o[1] + u[1] * a + v[1] * b, o[2] + u[2] * a + v[2] * b);
+            const corners = [at(-half, -half), at(half, -half), at(half, half), at(-half, half)];
+            const on = selectedSet.has(d.id);
+            const colour = on ? 0xffb86c : 0x8be9fd;
+            const quad = new THREE.BufferGeometry().setFromPoints([
+                corners[0], corners[1], corners[2], corners[0], corners[2], corners[3]
+            ]);
+            const fill = new THREE.Mesh(quad, new THREE.MeshBasicMaterial({
+                color: colour, transparent: true, opacity: on ? 0.22 : 0.1, side: THREE.DoubleSide, depthWrite: false,
+            }));
+            fill.userData.datumId = d.id;
+            quads.push({ id: d.id, origin: o, u, v, half });
+            const outline = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(corners), new THREE.LineBasicMaterial({ color: colour, transparent: true, opacity: on ? 1 : 0.6 }));
+            group.add(fill, outline);
+        }
+        datumQuadsRef.current = quads;
+        scene.add(group);
+        renderer.render(scene, camera);
+        return () => {
+            datumQuadsRef.current = [];
+            scene.remove(group);
+            group.traverse((o) => {
+                const m = o;
+                m.geometry?.dispose();
+                const mat = m.material;
+                mat?.dispose();
+            });
+            try {
+                renderer.render(scene, camera);
+            }
+            catch { /* renderer already disposed */ }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [phase, doc, selectedDatumIds]);
     // ---- keep the edge highlight in sync when ONLY `pick` changes -------------
     // Clearing a selection from the model tree, or picking a different edge
     // there, changes `pick` without touching `doc` -- and the effect above
@@ -2197,14 +3617,84 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         projectAnchors();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [phase, anchors]);
-    return (_jsxs("div", { style: { position: 'relative', width: '100%', height: '100%', minHeight: 320, background: COLORS.bg }, children: [_jsx("div", { ref: containerRef, style: { width: '100%', height: '100%', touchAction: 'none', cursor: phase === 'ready' ? 'grab' : 'default' } }), phase === 'loading' && (_jsx("div", { style: overlayStyle, children: _jsx("div", { style: { color: COLORS.dim }, children: loadingNote }) })), phase === 'error' && (_jsxs("div", { style: overlayStyle, children: [_jsx("div", { style: { color: COLORS.bad, fontWeight: 700, marginBottom: 6 }, children: "The B-rep kernel failed to load." }), _jsx("div", { style: { color: COLORS.fg, maxWidth: 480, textAlign: 'center' }, children: loadError })] })), phase === 'ready' && stageHint && !buildError && showStageHint && (_jsx("div", { style: stageHintStyle, children: stageHint })), phase === 'ready' && stageHint && !buildError && !showStageHint && ruleActivityAt && (_jsx("div", { style: stageHintStyle, children: "Rules keep an edge level, upright, equal, parallel or at a right angle to another." })), phase === 'ready' && buildError && (_jsxs("div", { style: errorPanelStyle, children: [_jsx("div", { style: { color: COLORS.bad, fontWeight: 700, marginBottom: 4 }, children: "Could not build this model" }), _jsx("div", { style: { color: COLORS.fg }, children: buildError })] })), phase === 'ready' && (
+    // ---- Phase 1 live bindings -----------------------------------------------
+    // The scene-setup effect is `[phase]`-only, so a preset switch or an ortho
+    // toggle after mount has to reach INTO the live instances from outside it --
+    // these effects are that seam. Both are no-ops until `phase` flips ready.
+    const schemeBindRef = useRef(null);
+    const onMoveHotkeyRef = useRef(onMoveHotkey);
+    onMoveHotkeyRef.current = onMoveHotkey;
+    const onNavHintRef = useRef(onNavHint);
+    onNavHintRef.current = onNavHint;
+    useEffect(() => {
+        const controls = controlsRef.current;
+        if (phase !== 'ready' || !controls)
+            return;
+        // The scene-setup effect's bindMouseScheme is a `[phase]`-only closure, so
+        // this same conversion has to reach it via the ref it stashed at setup
+        // time rather than re-defining the translation here.
+        schemeBindRef.current?.(mouseScheme);
+        onNavHintRef.current?.(navHint(mouseScheme));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [phase, mouseScheme]);
+    useEffect(() => {
+        if (phase !== 'ready')
+            return;
+        applyCameraMode(cameraKind);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [phase, cameraKind]);
+    return (_jsxs("div", { style: { position: 'relative', width: '100%', height: '100%', minHeight: 320, background: COLORS.bg }, children: [_jsx("div", { ref: containerRef, style: { width: '100%', height: '100%', touchAction: 'none', cursor: phase === 'ready' ? (windowZoom !== null ? 'crosshair' : 'grab') : 'default' } }), phase === 'loading' && (_jsx("div", { style: overlayStyle, children: _jsx("div", { style: { color: COLORS.dim }, children: loadingNote }) })), phase === 'error' && (_jsxs("div", { style: overlayStyle, children: [_jsx("div", { style: { color: COLORS.bad, fontWeight: 700, marginBottom: 6 }, children: "The B-rep kernel failed to load." }), _jsx("div", { style: { color: COLORS.fg, maxWidth: 480, textAlign: 'center' }, children: loadError })] })), phase === 'ready' && stageHint && !buildError && showStageHint && (_jsx("div", { style: stageHintStyle, children: stageHint })), phase === 'ready' && stageHint && !buildError && !showStageHint && ruleActivityAt && (_jsx("div", { style: stageHintStyle, children: "Rules keep an edge level, upright, equal, parallel or at a right angle to another." })), phase === 'ready' && buildError && (_jsxs("div", { style: errorPanelStyle, children: [_jsx("div", { style: { color: COLORS.bad, fontWeight: 700, marginBottom: 4 }, children: "Could not build this model" }), _jsx("div", { style: { color: COLORS.fg }, children: buildError })] })), phase === 'ready' && typeof windowZoom === 'object' && windowZoom !== null && (() => {
+                const rect = windowZoom;
+                return (_jsx("div", { style: {
+                        position: 'absolute',
+                        left: rect.x,
+                        top: rect.y,
+                        width: rect.w,
+                        height: rect.h,
+                        border: `1px dashed ${COLORS.dim}`,
+                        pointerEvents: 'none',
+                    } }));
+            })(), phase === 'ready' && boxSelect && (_jsx("div", { style: {
+                    position: 'absolute',
+                    left: boxSelect.x,
+                    top: boxSelect.y,
+                    width: boxSelect.w,
+                    height: boxSelect.h,
+                    border: boxSelect.kind === 'window' ? `1px dashed ${COLORS.accent}` : `1px dotted ${COLORS.ok}`,
+                    background: boxSelect.kind === 'window' ? 'rgba(189, 147, 249, 0.08)' : 'rgba(80, 250, 123, 0.08)',
+                    pointerEvents: 'none',
+                } })), phase === 'ready' && markingMenu && (_jsx(MarkingMenu, { x: markingMenu.x, y: markingMenu.y, mode: "part-viewport", onCommand: (id) => {
+                    setMarkingMenu(null);
+                    dispatchMarkingCommandRef.current?.(id);
+                }, onClose: () => setMarkingMenu(null) })), phase === 'ready' && (
             // Home alone, bottom-left -- Top/Front/Underneath moved onto the nav
             // cube (bottom-right, below), since a physical cube already says
             // "you can look from any side" better than three more words could.
             // Home stays a button because fitToModel() re-centres AND re-fits
             // distance, a different job than a face-look, with no cube-face
             // equivalent.
-            _jsx("div", { style: viewStripStyle, children: _jsx("button", { type: "button", title: "Back to the starting view", style: preset === 'home' ? viewStripActiveStyle : viewStripButtonStyle, "aria-pressed": preset === 'home', onClick: () => { fitToModel(HOME_DIR); setPreset('home'); }, children: "Home" }) })), phase === 'ready' && (
+            _jsxs("div", { style: viewStripStyle, children: [_jsx("button", { type: "button", title: "Back to the starting view", style: preset === 'home' ? viewStripActiveStyle : viewStripButtonStyle, "aria-pressed": preset === 'home', onClick: () => { fitToModel(HOME_DIR); setPreset('home'); }, children: "Home" }), _jsx("button", { type: "button", title: "Mouse-button preset (click to switch)", style: viewStripButtonStyle, onClick: () => {
+                            const next = mouseScheme === 'legacy' ? 'fusion' : 'legacy';
+                            saveSchemeName(next);
+                            setMouseScheme(next);
+                        }, children: mouseScheme === 'legacy' ? 'Mouse: Legacy' : 'Mouse: Fusion' }), _jsx("button", { type: "button", title: cameraKind === CameraMode.PERSPECTIVE ? 'Switch to an orthographic camera' : 'Switch to a perspective camera', style: viewStripButtonStyle, onClick: () => {
+                            const next = cameraKind === CameraMode.PERSPECTIVE ? CameraMode.ORTHOGRAPHIC : CameraMode.PERSPECTIVE;
+                            saveCameraMode(next);
+                            setCameraKind(next);
+                        }, children: cameraKind === CameraMode.PERSPECTIVE ? 'Persp' : 'Ortho' }), _jsx("button", { type: "button", title: "Frame the current selection", style: viewStripButtonStyle, disabled: !pick && !selectedFaceStateRef.current, onClick: () => fitSelection(), children: "Fit Selection" }), _jsx("button", { type: "button", title: "Draw a rectangle to zoom into it", style: windowZoom !== null ? viewStripActiveStyle : viewStripButtonStyle, "aria-pressed": windowZoom !== null, onClick: () => {
+                            setWindowZoom(windowZoom !== null ? null : 'armed');
+                            windowZoomRef.current = windowZoom !== null ? null : { armed: true };
+                        }, children: "Win Zoom" })] })), phase === 'ready' && (() => {
+                // SPEC-mouse-parity.md Phase 3 item 2: which pickable kinds are
+                // active. `liveFilters` mirrors hitAt()'s own `filters ?? DEFAULT_FILTERS`
+                // fallback, so this renders the exact same "everything on" state a
+                // caller that has not wired the prop yet already gets when picking.
+                const liveFilters = filters ?? DEFAULT_FILTERS;
+                return (_jsx("div", { style: filterStripStyle, children: FILTER_CHIPS.map(({ key, label }) => {
+                        const active = liveFilters[key];
+                        return (_jsx("button", { type: "button", title: `${active ? 'Stop' : 'Allow'} picking ${label.toLowerCase()}`, style: active ? viewStripActiveStyle : viewStripButtonStyle, "aria-pressed": active, onClick: () => onFiltersChange?.({ ...liveFilters, [key]: !active }), children: label }, key));
+                    }) }));
+            })(), phase === 'ready' && (
             // Nav cube: click a face to snap to that view (lookFrom, same
             // preserve-distance behaviour the old Top/Front/Underneath buttons
             // had), or drag the cube to free-orbit the camera. The cube's own
@@ -2231,7 +3721,19 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
             // buttons' own onClick is kept anyway, but only as the keyboard
             // (Enter/Space) path -- that activation never goes through a
             // captured pointer, so it isn't affected by any of the above.
-            _jsx("div", { style: navCubeWrapStyle, title: "Drag to orbit, click a face to snap to that view", onPointerDown: (e) => {
+            _jsxs("div", { style: navCubeWrapStyle, title: "Drag to orbit, click a face to snap to that view", onContextMenu: (e) => {
+                    // Todo 17 owns right-click EVERYWHERE, cube included: the wrapper
+                    // captures pointerdown, so the canvas never sees button-2 events
+                    // aimed at the cube and its own menu path never runs. This
+                    // forwards the release-point to the same gesture classifier the
+                    // canvas path uses (rightCubeMenuAt below) so a right-click over
+                    // the widget opens the marking menu like everywhere else.
+                    e.preventDefault();
+                    e.stopPropagation();
+                    rightCubeMenuAt({ x: e.clientX, y: e.clientY });
+                }, onPointerDown: (e) => {
+                    if (e.button === 2)
+                        return; // right button: marking menu, not a cube drag
                     e.currentTarget.setPointerCapture(e.pointerId);
                     cubeDragRef.current = { dragging: true, x: e.clientX, y: e.clientY, moved: false };
                 }, onPointerMove: (e) => {
@@ -2262,18 +3764,70 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
                     if (wasDrag)
                         return;
                     const hit = document.elementFromPoint(e.clientX, e.clientY);
+                    // The gear affordance has NO working click of its own for mouse
+                    // users (captured pointerup retargets to the wrapper, so React's
+                    // click never lands on it -- same measured behaviour the face
+                    // buttons hit). So the resolver OPENS/CLOSES the menu itself,
+                    // instead of returning and trusting an onClick that never comes.
+                    // A release INSIDE the open menu (gear, or any entry button) is
+                    // left alone: the gear closes it, and an entry button's own
+                    // onClick fires because the menu div is OUTSIDE the capturing
+                    // wrapper's pointer chain (rendered beside navCubeSceneStyle,
+                    // not inside it) -- verified: a mouse click on Orthographic
+                    // switches the live camera and the view-strip label follows.
+                    if (hit?.closest('[data-cube-menu]')) {
+                        const gear = hit.closest('[data-cube-menu]');
+                        const r = gear.getBoundingClientRect();
+                        setGearPos({ x: r.right + 4, y: r.top });
+                        setCubeMenu((v) => !v);
+                        return;
+                    }
+                    const zoneEl = hit?.closest('[data-zone]');
+                    if (zoneEl) {
+                        // Todo 28: face/edge/corner all resolve here. A face cell's
+                        // data-zone is the CSS face key (same string fireFace keys
+                        // on); edge/corner cells carry their 'a|b' / 'a|b|c' id --
+                        // fireZone routes both, so a release point that lands on a
+                        // zone NEVER falls through to the bare face resolver below.
+                        const z = zoneEl.dataset.zone;
+                        fireZone(z.startsWith('face:') ? { kind: 'face', id: z } : cubeZoneAt(zoneEl.dataset.zface, Number(zoneEl.dataset.zx), Number(zoneEl.dataset.zy)));
+                        return;
+                    }
                     const face = hit?.closest('[data-face]')?.dataset.face;
                     if (face)
                         fireFace(face);
-                }, children: _jsx("div", { style: navCubeSceneStyle, children: _jsx("div", { ref: navCubeInnerRef, style: navCubeInnerStyle, children: NAV_CUBE_FACES.map((f) => (_jsx("button", { type: "button", "data-face": f.key, style: navCubeFaceStyle(f.key), onClick: () => fireFace(f.key), children: f.label }, f.key))) }) }) })), phase === 'ready' && !badgesInStatusBar && (hoveringEdge && !pick || !!selectedCount) && (_jsxs("div", { style: topRightStackStyle, children: [hoveringEdge && !pick && (_jsx("div", { style: edgeHintStyle, children: "Click this edge to round or bevel just it" })), !!selectedCount && (_jsx("div", { style: selectionBadgeStyle, children: selectionLabel ?? (pick ? '1 edge picked' : `${selectedCount} Selected`) }))] }))] }));
+                }, children: [_jsx("div", { style: navCubeSceneStyle, children: _jsxs("div", { ref: navCubeInnerRef, style: navCubeInnerStyle, children: [NAV_CUBE_FACES.map((f) => (_jsx("button", { type: "button", "data-face": f.key, style: navCubeFaceStyle(f.key), onClick: () => fireFace(f.key), children: f.label }, f.key))), ['front', 'back', 'right', 'left', 'top', 'bottom'].map((face) => {
+                                    const tf = NAV_CUBE_FACE_TRANSFORMS[face];
+                                    return (_jsxs("div", { style: { position: 'absolute', inset: 0, transform: `${tf} translateZ(1px)`, transformStyle: 'preserve-3d' }, children: [_jsx("button", { type: "button", "data-zone": "face-cell", "data-zface": face, "data-zx": NAV_CUBE_SIZE / 2, "data-zy": NAV_CUBE_SIZE / 2, title: `Snap to ${face} view`, style: cubeZoneStyle(NAV_CUBE_SIZE - 2 * CUBE_ZONE_CELL, NAV_CUBE_SIZE - 2 * CUBE_ZONE_CELL, CUBE_ZONE_CELL, CUBE_ZONE_CELL), onClick: () => fireFace(face) }), [0, 1].map((row) => [0, 1].map((col) => {
+                                                const px = col === 0 ? CUBE_ZONE_CELL / 2 : col === 1 ? NAV_CUBE_SIZE / 2 : NAV_CUBE_SIZE - CUBE_ZONE_CELL / 2;
+                                                const py = row === 0 ? CUBE_ZONE_CELL / 2 : row === 1 ? NAV_CUBE_SIZE / 2 : NAV_CUBE_SIZE - CUBE_ZONE_CELL / 2;
+                                                const z = cubeZoneAt(face, px, py);
+                                                return (_jsx("button", { type: "button", "data-zone": z.id, "data-zface": face, "data-zx": px, "data-zy": py, title: `${z.kind === 'edge' ? 'Diagonal view' : 'Isometric-style view'} (${z.id})`, style: cubeZoneStyle(col === 1 ? NAV_CUBE_SIZE - 2 * CUBE_ZONE_CELL : CUBE_ZONE_CELL, row === 1 ? NAV_CUBE_SIZE - 2 * CUBE_ZONE_CELL : CUBE_ZONE_CELL, col === 1 ? CUBE_ZONE_CELL : col === 0 ? 0 : NAV_CUBE_SIZE - CUBE_ZONE_CELL, row === 1 ? CUBE_ZONE_CELL : row === 0 ? 0 : NAV_CUBE_SIZE - CUBE_ZONE_CELL), onClick: () => fireZone(cubeZoneAt(face, px, py)) }, `${face}-z-${row}-${col}`));
+                                            }))] }, `zones-${face}`));
+                                })] }) }), _jsx("div", { style: {
+                            position: 'absolute', left: 2, top: 2, width: 20, height: 20,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 4,
+                            color: COLORS.dim, cursor: 'pointer', pointerEvents: 'auto', userSelect: 'none',
+                        }, "data-cube-menu": "1", title: "Camera options (perspective / orthographic, set Home / Front / Top)", onClick: () => setCubeMenu((v) => !v), children: "\u2699" })] })), cubeMenu && (_jsxs("div", { style: {
+                    position: 'fixed', left: gearPos?.x ?? 0, top: gearPos?.y ?? 0, zIndex: 5, padding: 6, display: 'flex', flexDirection: 'column', gap: 4,
+                    background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 6,
+                }, "data-cube-menu-root": "1", children: [_jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => applyCameraModeAndToggle(CameraMode.PERSPECTIVE), children: "Perspective" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => applyCameraModeAndToggle(CameraMode.ORTHOGRAPHIC), children: "Orthographic" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => { fitToModel(HOME_DIR); setPreset('home'); setCubeMenu(false); }, children: "Set as Home" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => { lookFrom(FRONT_DIR); setPreset('front'); setCubeMenu(false); }, children: "Set as Front" }), _jsx("button", { type: "button", style: viewStripButtonStyle, onClick: () => { lookFrom(TOP_DIR); setPreset('top'); setCubeMenu(false); }, children: "Set as Top" })] })), phase === 'ready' && (_jsxs("div", { style: sectionPanelStyle, "data-section-panel": "1", children: [_jsx("button", { type: "button", title: "Cut the view with a plane to see inside the part (display only: the model is unchanged)", style: section.on ? viewStripActiveStyle : viewStripButtonStyle, "aria-pressed": section.on, onClick: () => setSection((s) => ({ ...s, on: !s.on })), children: "Section" }), section.on && (_jsxs(_Fragment, { children: [[0, 1, 2].map((a) => (_jsx("button", { type: "button", title: `Cut across ${'xyz'[a]}`, style: section.axis === a ? viewStripActiveStyle : viewStripButtonStyle, "aria-pressed": section.axis === a, onClick: () => setSection((s) => ({ ...s, axis: a })), children: 'XYZ'[a] }, a))), _jsx("input", { type: "range", min: 0, max: 1, step: 0.005, value: section.t, "aria-label": "Section position", style: { width: 120 }, onChange: (e) => { const t = Number(e.target.value); setSection((s) => ({ ...s, t })); } }), _jsx("button", { type: "button", title: "Keep the other side of the cut", style: viewStripButtonStyle, onClick: () => setSection((s) => ({ ...s, flip: !s.flip })), children: "Flip" })] }))] })), phase === 'ready' && !badgesInStatusBar && (hoveringEdge && !pick || !!selectedCount) && (_jsxs("div", { style: topRightStackStyle, children: [hoveringEdge && !pick && (_jsx("div", { style: edgeHintStyle, children: "Click this edge to round or bevel just it" })), !!selectedCount && (_jsx("div", { style: selectionBadgeStyle, children: selectionLabel ?? (pick ? '1 edge picked' : `${selectedCount} Selected`) }))] }))] }));
 }
 const overlayStyle = {
     position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
     flexDirection: 'column', gap: 8, font: '13px ui-monospace, Menlo, Consolas, monospace',
     background: COLORS.bg, pointerEvents: 'none',
 };
+// TOP-left, not the bottom strip. It used to sit at `bottom: 12, left: 12,
+// right: 12` -- full width -- while the Faces/Edges/Vertices/Bodies filter
+// chips live at `bottom: 48` (filterStripStyle), so the chips painted straight
+// over the middle of the sentence and the student read a truncated fragment
+// of the most important message the app can print. The top band is free
+// in-studio (see topRightStackStyle's note); `maxWidth` keeps the box clear
+// of the right-aligned badge stack that ribbon-less hosts still draw there.
 const errorPanelStyle = {
-    position: 'absolute', left: 12, right: 12, bottom: 12, padding: '10px 14px',
+    position: 'absolute', left: 12, top: 12, right: 12, maxWidth: 560, padding: '10px 14px',
     background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 6,
     font: '13px ui-monospace, Menlo, Consolas, monospace', pointerEvents: 'none',
 };
@@ -2289,6 +3843,10 @@ const errorPanelStyle = {
 // in the model tree (selectedCount > 0) while the student hovers one of its
 // edges before clicking. Stacking avoids the two pills drawing on top of
 // each other in that case; either can also appear alone.
+// Above the view strip (left 12, bottom 12) so the two never overlap.
+const sectionPanelStyle = {
+    position: 'absolute', left: 12, bottom: 104, display: 'flex', gap: 6, alignItems: 'center',
+};
 const topRightStackStyle = {
     position: 'absolute', top: 12, right: 12, display: 'flex', flexDirection: 'column',
     alignItems: 'flex-end', gap: 6, pointerEvents: 'none',
@@ -2315,6 +3873,13 @@ const selectionBadgeStyle = {
 // (12 + 46 = 58) with an 12px gap. With the docked grid that dodge is dead.
 const viewStripStyle = {
     position: 'absolute', left: 12, bottom: 12, display: 'flex', gap: 6,
+};
+// Directly above viewStripStyle's own row (bottom: 12 there), same left
+// edge, same gap -- "near the view strip" per SPEC-mouse-parity.md Phase 3
+// item 2, stacked rather than appended onto the same row so camera controls
+// and selection filters read as two separate groups, not one long strip.
+const filterStripStyle = {
+    ...viewStripStyle, bottom: 48,
 };
 // Same pill family as selectionBadgeStyle/edgeHintStyle, but NOT
 // pointerEvents: 'none' -- these are real buttons, not a status readout.
@@ -2373,6 +3938,16 @@ function navCubeFaceStyle(face) {
         background: COLORS.panel, border: `1px solid ${COLORS.line}`, color: COLORS.fg,
         font: '10px ui-monospace, Menlo, Consolas, monospace', letterSpacing: '0.05em',
         display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab',
+    };
+}
+// Todo 28: transparent hit-zone button over a cube face's plane. x/y/w/h
+// are the cell's own in-plane geometry; the parent div carries the face's
+// CSS transform and one extra px of translateZ so the zones sit above the
+// face planes (a stacked 3D widget, same preserve-3d trick the faces use).
+function cubeZoneStyle(w, h, x, y) {
+    return {
+        position: 'absolute', width: w, height: h, left: x, top: y, padding: 0,
+        background: 'transparent', border: 'none', cursor: 'pointer',
     };
 }
 // Same visual family as selectionBadgeStyle (same pill), deliberately -- a

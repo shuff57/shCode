@@ -1,4 +1,4 @@
-// 2.1.3c Lab: Drop one sprite, change its color (reference solution).
+// 5.1.7 Lab: Drop one sprite, change its color (reference solution).
 
 let player;
 

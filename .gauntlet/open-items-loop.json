@@ -1,0 +1,113 @@
+{
+  "spec": ".gauntlet/SPEC-open-items-loop.md",
+  "started": "2026-10-03",
+  "caps": {
+    "roundsPerPhase": 4,
+    "cleanRoundsToExit": 2,
+    "parallelJudges": 3
+  },
+  "phases": {
+    "0": {
+      "status": "running",
+      "rounds": [
+        {
+          "round": 1,
+          "gate": {
+            "leak_check_public_and_out": "ok (26 probes, out/ 3160 files; out/ is from an earlier build, not a fresh --require-build)",
+            "prod_ai-graders.json_noauth": "200 (still leaking, fix not deployed)",
+            "npm_test": "4 failures, all pre-existing reshape tooling reading files that no longer exist or moved: test-sketch-arc, test-sketch-outline, check-constraint-ui (missing studio/src/model files), check-docs-prose (7 pages still teaching the real API)"
+          },
+          "status": "gate not green: waiting on human approval to push and deploy"
+        },
+        {
+          "round": 2,
+          "gate": {
+            "push": "cs-3d dac36d80",
+            "deploy": "99a08b67 (Production, cs-3d); check-ai-grader-leak --require-build ok",
+            "origin_ai-graders.json": "404 (cache-busted request, and the deployment URL)",
+            "edge_cache_alias": "shcode.pages.dev/ai-graders.json still 200 from CDN cache (s-maxage=604800, age ~1460s); needs purge or expiry",
+            "git_integration_build_b8dc8041": "Failure (the push also triggers a Cloudflare git build; it cannot copy the gitignored kernel wasm)"
+          },
+          "status": "origin fixed; edge cache still serving the old file"
+        }
+      ]
+    },
+    "2": {
+      "status": "done: gate green; mutation test passes; judge review folded into phase 1 walks",
+      "rounds": [
+        {
+          "round": 1,
+          "gate": {
+            "mutation": "scripts/test-brep-refusal-gate.mjs: round-after-hollow refused, hollow-after-round refused, hollow+hole accepted",
+            "known_bad": "check-reshape-solutions failed old 8.1.11 on brep-rs: 'brep-rs can only round an edge of a box yet'",
+            "fixed": "check-reshape-solutions PASS 8-1-11 (box+hollow+hole); check-starters green"
+          },
+          "note": "test-brep-refusal-gate not yet in npm test: package.json carries the user's uncommitted edit"
+        }
+      ]
+    },
+    "1": {
+      "status": "round 3 clean apart from wording (fixed); needs one more clean round, folded into the phase 4 walk",
+      "rounds": [
+        {
+          "round": 1,
+          "findings": [
+            "hole goes through floor in Build, text said wall",
+            "hint labels not on screen",
+            "Code names missing",
+            "stale-error latch"
+          ],
+          "fix": "abd1bc37, 8.1.11 redesigned"
+        },
+        {
+          "round": 2,
+          "findings": [
+            "hint 3 vs step text",
+            "stale latch reproducible"
+          ],
+          "fix": "hole hint; LessonWorkspace clears runtimeError on reshape-doc"
+        },
+        {
+          "round": 3,
+          "findings": [
+            "step says 'click the tray', hint says wall",
+            "'Hole 1' vs HOLE 1 case"
+          ],
+          "fix": "wording; latch fix verified in browser (typo, refused, on-load)"
+        }
+      ]
+    },
+    "4": {
+      "status": "done: round 3 walk of 8.1.2/8.1.5/8.1.11 zero text mismatches",
+      "rounds": [
+        {
+          "round": 1,
+          "findings": [
+            "8.1.5 hover label/where label is/amber note",
+            "8.1.10 Done icon",
+            "8.1.11 message location, +y face",
+            "8.1.2 Enter adds a box"
+          ],
+          "fix": "lesson wording; app usability items (icon-only tools, 800x280 canvas, floating bar covers model, face pill says 50 x 80 for 80 x 50) NOT fixed, upstream"
+        }
+      ]
+    },
+    "3": {
+      "status": "done: fixed upstream reshape-cad 7664acb, re-vendored; browser-verified (typed 60 red, 40 green, drag/circle/undo no glitch)",
+      "note": "undo seems to take one press per selection change and Ctrl+Z can leave the sketch editor; not shown to predate or follow this change"
+    },
+    "5": {
+      "status": "done",
+      "decisions": {
+        "leniency": "no change needed: summative written items are not AI-graded (ContentLessonView sends no prompt; teacher marks), so the lenient prompt never meets a strict summative rubric",
+        "pass_rule_text": "9 pass/fail-rubric lessons now say 'aim to cover every criterion; completes once the grader finds at least half met'; 5.2.14 keeps 'every criterion' (1-point rubric, 70% = all 3)"
+      }
+    }
+  },
+  "open": [
+    "edge-cache purge of /ai-graders.json (user)",
+    "delete old deployments (awaiting confirm)",
+    "rotate six chapter-test rubrics (user decision)",
+    "test-reshape-script 2 docs pages: docs ahead of vendored kernel; clears on next re-vendor of reshape-cad HEAD"
+  ]
+}

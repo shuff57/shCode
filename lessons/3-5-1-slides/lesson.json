@@ -1,12 +1,13 @@
 {
   "id": "3-5-1-slides",
   "title": "3.5.1 Slides: Objects and Properties",
-  "description": "Objects and Properties slides. Placeholder until the deck is built from the book.",
+  "description": "Unit 3.5 slides: objects and properties, dot versus bracket access, nested objects, arrays of objects, methods, and destructuring.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",
   "preview": "slides",
+  "slidesUrl": "/slides/3.5_objects_and_properties.paper.html",
   "week": 8,
   "slos": [
     "SLO-3"

@@ -28,17 +28,17 @@
     {
       "id": "r1",
       "title": "switched value converted to a number",
-      "description": "switch(...) wraps place in Number(...)/parseInt(...)/parseFloat(...), or place is reassigned from one of those before the switch",
+      "description": "switch(...) wraps place in Number(...)/parseInt(...)/parseFloat(...), or place is reassigned from one of those before the switch. Help: 2.3.18 (switch Compares Strictly)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:switch\\s*\\(\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*\\))|(?:switch\\s*\\(\\s*\\+\\s*place\\s*\\))|(?:place\\s*=\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))|(?:place\\s*=\\s*\\+\\s*place[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))",
+      "pattern": "(?:switch\\s*\\(\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*\\))|(?:switch\\s*\\(\\s*\\+\\s*place\\s*\\))|(?:place\\s*=\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))|(?:place\\s*=\\s*\\+\\s*place[\\s\\S]*?switch\\s*\\(\\s*place\\s*\\))|(?:(?:const|let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*(?:Number|parseInt|parseFloat)\\s*\\(\\s*place\\s*(?:,\\s*\\d+\\s*)?\\)\\s*;[\\s\\S]*?switch\\s*\\(\\s*\\1\\s*\\))",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "case 1 unchanged",
-      "description": "case 1 is still a plain number",
+      "description": "case 1 is still a plain number. Help: 2.3.18 (switch Compares Strictly)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s+1\\s*:",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "case 2 unchanged",
-      "description": "case 2 is still a plain number",
+      "description": "case 2 is still a plain number. Help: 2.3.18 (switch Compares Strictly)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s+2\\s*:",
@@ -58,7 +58,7 @@
     {
       "id": "r4",
       "title": "case 2 actually prints output",
-      "description": "case 2's body calls console.log, so the fix is visible in the output",
+      "description": "case 2's body calls console.log, so the fix is visible in the output. Help: 2.3.18 (switch Compares Strictly)",
       "type": "regex",
       "file": "script.js",
       "pattern": "case\\s+2\\s*:\\s*console\\.log",

@@ -22,7 +22,7 @@ Your game should follow the state-machine pattern from Unit 6.6: **title → pla
 | # | What you need | Plain-English description |
 |---|--------------|--------------------------|
 | 1 | Two-player keyboard input | `kb.pressing(...)` is called with keys for both players |
-| 2 | Independent score variables | `p1Score` and `p2Score` (or similar) are declared at the top of the file |
+| 2 | Independent score variables | `p1Score` and `p2Score` are declared at the top of the file |
 | 3 | Bounciness is set | `.bounciness` is assigned on at least one sprite |
 | 4 | No gravity | `world.gravity.y = 0` appears in your setup |
 | 5 | Score is rendered | `text(...)` displays `p1Score` or `p2Score` on screen inside `draw()` |

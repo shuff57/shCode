@@ -51,7 +51,7 @@
     {
       "id": "r1",
       "title": "Create a Group",
-      "description": "Use new Group() to create at least one Group.",
+      "description": "Use new Group() to create at least one Group. Help: 6.1.3 (moSHion docs: Groups)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Group\\s*\\(",
@@ -61,7 +61,7 @@
     {
       "id": "r2",
       "title": "Spawn into a Group",
-      "description": "Use the factory form `new groupName.Sprite(...)` to spawn members.",
+      "description": "Use the factory form `new groupName.Sprite(...)` to spawn members. Help: 6.1.3 (moSHion docs: Groups)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+\\w+\\.Sprite\\s*\\(",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "Use overlaps()",
-      "description": "Call .overlaps() somewhere in your sketch.",
+      "description": "Call .overlaps() somewhere in your sketch. Help: 6.2.1 (overlaps() boolean vs callback)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.overlaps\\s*\\(",
@@ -81,7 +81,7 @@
     {
       "id": "r4",
       "title": "Implement one stretch challenge",
-      "description": "Pick any of the three challenges in content.md: a `lives` counter (Challenge 1), `Math.random()` driving a sprite property like .diameter / .color (Challenge 2), or a `function cull(...)` helper (Challenge 3).",
+      "description": "Pick any of the three challenges in content.md: a `lives` counter (Challenge 1), `Math.random()` driving a sprite property like .diameter / .color (Challenge 2), or a `function cull(...)` helper (Challenge 3). Help: 6.1.3 (moSHion docs: Groups)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\blives\\s*(?:=|--|\\+\\+|[-+*/]=)|(?:Math\\.random|\\brandom)\\s*\\([^)]*\\)[\\s\\S]{0,120}?\\.(diameter|width|height|color)\\s*=|\\.(diameter|width|height|color)\\s*=[\\s\\S]{0,120}?(?:Math\\.random|\\brandom)\\s*\\(|\\bfunction\\s+cull\\s*\\(",

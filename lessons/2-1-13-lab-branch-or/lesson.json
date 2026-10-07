@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "|| combines two real variables",
-      "description": "if statement condition uses || between two named variables, not hardcoded true/false literals",
+      "description": "if statement condition uses || between two named variables, not hardcoded true/false literals. Help: 2.1.29 (Logical Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\((?=[^{]*\\|\\|)(?:[^{]*\\b(?!true\\b|false\\b)[A-Za-z_$][A-Za-z0-9_$]*\\b){2,}[^{]*\\)",
@@ -37,7 +37,7 @@
     {
       "id": "r2",
       "title": "two variables declared",
-      "description": "Two variables are declared and given values before the if, in any shape",
+      "description": "Two variables are declared and given values before the if, in any shape. Help: 2.1.29 (Logical Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:const|let|var)\\s[\\s\\S]*?\\b[A-Za-z_$][\\w$]*\\s*=(?!=)[\\s\\S]*?\\b[A-Za-z_$][\\w$]*\\s*=(?!=)",
@@ -46,7 +46,7 @@
     {
       "id": "r3",
       "title": "a message is printed inside the if block",
-      "description": "console.log runs inside the if block, as step 2 asks",
+      "description": "console.log runs inside the if block, as step 2 asks. Help: 2.1.29 (Logical Operators)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\([^{;]*(?:\\{[^}]*)?console\\.log",

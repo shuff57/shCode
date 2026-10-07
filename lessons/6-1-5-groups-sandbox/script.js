@@ -1,4 +1,4 @@
-// 2.3.5 Groups Sandbox: spawn many sprites from a factory and clean up safely.
+// 6.1.5 Groups Sandbox: spawn many sprites from a factory and clean up safely.
 
 let stars;
 

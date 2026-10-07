@@ -1,4 +1,4 @@
-// 2.2.7e Lab: A method calling this.otherMethod() (reference solution).
+// 5.4.5 Lab: A method calling this.otherMethod() (reference solution).
 
 class Counter {
   constructor() {

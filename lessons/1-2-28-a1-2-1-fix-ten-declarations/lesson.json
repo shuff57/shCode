@@ -36,7 +36,7 @@
     {
       "id": "r1",
       "title": "studentAge is a number",
-      "description": "studentAge is declared and holds a number, not text",
+      "description": "studentAge is declared and holds a number, not text. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+studentAge\\s*=\\s*[\\d.]",
@@ -46,7 +46,7 @@
     {
       "id": "r2",
       "title": "firstName is a string",
-      "description": "firstName is declared and holds properly quoted text",
+      "description": "firstName is declared and holds properly quoted text. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+firstName\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`]*`)",
@@ -56,17 +56,17 @@
     {
       "id": "r3",
       "title": "isEnrolled is a real boolean",
-      "description": "isEnrolled holds a real boolean -- true, false, or a comparison that produces one -- not quoted text",
+      "description": "isEnrolled holds a real boolean -- true, false, or a comparison that produces one -- not quoted text. Help: 1.2.17 (The boolean Type)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const|var)\\s+isEnrolled\\s*=\\s*(?!\\s)(?![\"'`])(?!\\d[\\d.]*\\s*[;\\n])[^;\\n]+",
+      "pattern": "(?:let|const|var)\\s+isEnrolled\\s*=\\s*(?:!*(?:true|false)\\b|Boolean\\s*\\(|[^;\\n\"'`]*(?:===|!==|==|!=|<=|>=|<|>))",
       "flags": "",
       "points": 0
     },
     {
       "id": "r4",
       "title": "gradeLevel is declared with a keyword",
-      "description": "gradeLevel uses let or const rather than being assigned with no keyword",
+      "description": "gradeLevel uses let or const rather than being assigned with no keyword. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+gradeLevel\\s*=",
@@ -76,7 +76,7 @@
     {
       "id": "r5",
       "title": "maxStudents is a const",
-      "description": "The value that never changes is declared with const",
+      "description": "The value that never changes is declared with const. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "const\\s+(?:maxStudents|MAX_STUDENTS)\\s*=\\s*[\\d.]",
@@ -86,7 +86,7 @@
     {
       "id": "r6",
       "title": "unitPrice replaces the single-letter name",
-      "description": "The mystery name p has been renamed to unitPrice",
+      "description": "The mystery name p has been renamed to unitPrice. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+unitPrice\\s*=\\s*[\\d.]",
@@ -96,7 +96,7 @@
     {
       "id": "r7",
       "title": "itemCount replaces the second mystery name",
-      "description": "The mystery name q has been renamed to itemCount",
+      "description": "The mystery name q has been renamed to itemCount. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+itemCount\\s*=\\s*\\d",
@@ -106,7 +106,7 @@
     {
       "id": "r8",
       "title": "favouriteColour is camelCase",
-      "description": "The snake_case or all-lowercase name has become camelCase",
+      "description": "The snake_case or all-lowercase name has become camelCase. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+favouriteColour\\s*=",
@@ -116,7 +116,7 @@
     {
       "id": "r9",
       "title": "middleName is null, not the string \"null\"",
-      "description": "The deliberately-empty value uses the null keyword without quotes",
+      "description": "The deliberately-empty value uses the null keyword without quotes. Help: 1.2.19 (The null Value)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+middleName\\s*=\\s*null\\b",
@@ -126,7 +126,7 @@
     {
       "id": "r10",
       "title": "finalScore is declared but left unassigned",
-      "description": "finalScore is declared with let and no value, so it holds undefined until set",
+      "description": "finalScore is declared with let and no value, so it holds undefined until set. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|var)\\s+finalScore\\s*(?:;|$)",

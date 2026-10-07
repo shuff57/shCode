@@ -1,20 +1,29 @@
 flowchart TD
   A([Start])
-  B[/Input stepsGoal, stepsSoFar, walkerName/]
-  C{{d = 1 to 7}}
-  D{Is d within the week?}
-  E[Add today's steps to stepsSoFar]
-  F[Set remaining to stepsGoal minus stepsSoFar]
-  G{Is remaining below zero?}
-  H[/Print status: exceeded, met, or not reached/]
+  B[/Input stepsGoal/]
+  C[Set stepsSoFar to zero]
+  D{{d = 1 to 7}}
+  E[/Input the steps for day d/]
+  F[Add day d's steps to stepsSoFar]
+  G[Set remaining to stepsGoal minus stepsSoFar]
+  H{Is remaining above zero?}
+  I[/Print not yet reached/]
+  J{Is remaining below zero?}
+  K[/Print goal exceeded/]
+  L[/Print goal met/]
   Z([End])
   A --> B
   B --> C
   C --> D
-  D -- Yes, count the day --> E
-  D -- No, week is over --> F
-  E --> C
-  F --> G
-  G -- Yes, passed the goal --> H
-  G -- No, still walking --> H
-  H --> Z
+  D -- "Day to count" --> E
+  E --> F
+  F --> D
+  D -- "Week is over" --> G
+  G --> H
+  H -- "Yes, not yet reached" --> I
+  H -- "No" --> J
+  J -- "Yes, exceeded" --> K
+  J -- "No, exactly met" --> L
+  I --> Z
+  K --> Z
+  L --> Z

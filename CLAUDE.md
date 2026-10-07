@@ -226,14 +226,6 @@ Cloudflare dashboard env vars pane (plain vars):
 | `AUTH_SECRET` | secret | HS256 signing key for session JWTs |
 | `OLLAMA_API_KEY` | secret | Bearer token for `https://ollama.com/api/chat` |
 | `OLLAMA_HOST` | var (optional) | Override Ollama endpoint (defaults to `https://ollama.com`) |
-| `AI` | **binding** | Workers AI. Not a variable — attach it in the dashboard: Pages → shcode → Settings → Functions → **AI bindings**, name `AI`. `wrangler.toml`'s `[ai]` block covers local dev only. Absent ⇒ the fast grader reports unavailable and the picker hides it; grading still works on the other targets. |
-| `WORKERS_AI_MODEL` | var (optional) | Model id for the `workersai` target. Defaults to `@cf/google/gemma-4-26b-a4b-it`. **Do not swap this for a frontier model** (`kimi-k2.*`, `glm-5.2`) — those carry a 20-requests-per-minute account cap, measured to refuse 5 of 25 simultaneous submissions. Ordinary text-generation models get 300/min. |
-| `OLLAMA_LOCAL_HOST` | var (optional) | Second grading target — the "Classroom grader" in the student dropdown. Must be reachable **from Cloudflare**, so a LAN address will not work; publish the box through a Cloudflare Tunnel. |
-| `OLLAMA_LOCAL_MODEL` | var (optional) | Model id as the *local* server names it. No default: a lesson's `model` is a cloud id and will not exist on the box. Without this the local grader stays unavailable even when the host is set. |
-| `OLLAMA_LOCAL_API_KEY` | secret (optional) | Bearer token for the local server. Omit for an unauthenticated box — the Function then sends no `Authorization` header at all. |
-| `OPENROUTER_API_KEY` | secret (optional) | Enables the `openrouter` grader target — **class-restricted**, not general-availability; see `OPENROUTER_ALLOWED_OWNER_EMAILS` below. Without this the target reports unavailable regardless of allowlist membership. |
-| `OPENROUTER_MODEL` | var (optional) | Model id for the `openrouter` target. Defaults to `mistralai/mistral-small-24b-instruct-2501`, served free via OpenRouter's DeepInfra pool. |
-| `OPENROUTER_ALLOWED_OWNER_EMAILS` | var (optional) | Comma-separated class-owner allowlist. A student only sees/can select `openrouter` when their class's `owner_email` (or their own email, for a teacher previewing a lesson) is listed here — checked independently in both the GET menu and the POST handler. |
 | `ADMIN_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='admin'` |
 | `TEACHER_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='teacher'` |
 | `AI_HELP_DAILY_LIMIT` | var (optional) | Per-student per-unit daily quota for `POST /api/ai-help`; default `10`. Each unit gets its own bucket. Teachers/admins are exempt. |
@@ -263,9 +255,11 @@ retries Cloudflare's transient failures; bare `wrangler` does not).
   difference is what they mean — a due date is advisory, an open date
   **locks**. Two tables rather than one nullable column because
   `class_due_dates.due_at` is NOT NULL and SQLite cannot relax that in place.
-  **A lesson-id rename migration must UPDATE BOTH tables** where
-  `scope = 'lesson'`; an orphaned due row only loses a badge, but an orphaned
-  open row leaves a lesson locked with no findable date holding it shut.
+  **A lesson-id rename migration must UPDATE ALL THREE tables** (`class_due_dates`,
+  `class_open_dates` and `class_solution_releases`, 0032) where `scope = 'lesson'`;
+  an orphaned due row only loses a badge, an orphaned open row leaves a lesson
+  locked with no findable date holding it shut, and an orphaned release row
+  quietly withholds a solution nobody can find the row for.
 - Both `due_at` and `open_at` now carry a real time of day. Every row written
   before 0023 sits at 23:59:59.999, and the due-dates route special-cases the
   `23:59` an `<input type="time">` reads back so re-saving one does not
@@ -283,6 +277,41 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 - `GET|PUT /api/classes/[id]/open-dates` is the "available after" editor, the
   deliberate sibling of `due-dates` (same auth, same entries array, same
   batching). Both entry shapes take an optional `time: 'HH:MM'`.
+- `GET|PUT /api/classes/[id]/solution-releases` is the teacher's per-class release of
+  a capped performance-assessment part's solution (the pseudocode shown after the
+  last try, and a capped quiz's answer key). Same auth, batching and school-timezone
+  `time: 'HH:MM'` shape as `open-dates`, but an entry takes exactly one action:
+  `{ now: true }`, `{ date, time? }`, `{ hold: true }` (a lesson row at `HELD_BACK`,
+  which beats an inherited module date) or `{ date: null }` (delete). Rows hold a
+  `release_at` instant compared with the server clock on every reveal request, so a
+  scheduled release needs no cron; **no row means NOT released** (the opposite of an
+  open date). `GET /api/attempt-reveal` and the capped path of `GET /api/quiz-reveal`
+  need BOTH every try spent AND a live class of the student that has released the
+  part (a lesson row overrides its module row, any class suffices, an expired or
+  archived one does not count); a database error fails closed. Teachers and admins
+  bypass both so they can preview. A 403 from attempt-reveal carries
+  `reason: 'enrollment' | 'tries' | 'not-released'`; a spent but unreleased capped
+  quiz still returns the student's totals with `answersWithheld` and no key. Rules in
+  `lib/solution-release-core.ts`, reads in `functions/_shared/solutionRelease.ts`.
+- **The grade is "so far", and there is ONE rule.** `studentGrading()` in `functions/_shared/grading.ts` is
+  the only place a course grade is computed (teacher roster, student drawer, and `GET /api/my-gradebook`'s
+  `grades`, one per class the student is in, each under that class's due dates, waivers and weights). A graded
+  lesson counts when it is done, or when its class due date has passed and it is not done and not waived;
+  anything not due yet is out of numerator and denominator. `gradedTotal`/`doneCount` carry "X of Y graded
+  lessons done" so a screen never presents "so far" as "whole course". Do not add a second grade formula to a
+  component: the roster once read a median 47% while the student's own page read 100%. Cells for both
+  gradebooks come from `buildCell` (`lib/gradebook-cell.ts`); `my-gradebook` also returns `tries` (counted
+  rows per capped part, grading failures free), `opensAt` and the upcoming graded lessons. Only graded lessons
+  are ever "missing"; a reading with a module due date is not an assignment. Browser checks: `DEV_REAL_DB=1
+  DEV_ROLE=teacher npm run dev` seeds a six-student class (`seedClass` in `scripts/dev-demo-api.mjs`).
+- **Grade export and score override.** The Students tab's "Download grades (CSV)" is `buildGradesCsv`
+  (`lib/grades-csv.ts`, tested): one row per student with the grade so far, graded lessons done/total,
+  past due, and a column per category, from `GET /api/classes/[id]/progress` (which carries `categories`).
+  Every text cell goes through `csvCell`, which neutralises a leading `= + - @` (names are typed by
+  students; a spreadsheet would run them). The student drawer's "Override score" reuses `OverrideForm`
+  from `SubmissionQueue.tsx` and `POST /api/classes/[id]/submission-queue`, so the part's maximum, the
+  "keep the higher score on a part with a try limit" rule and the persisted choice stay one set of rules.
+  The teacher grid shows graded lessons only unless "Show readings and slides" is ticked.
 - `GET /api/my-due-dates` carries BOTH kinds — `rows` (due) and `openRows`
   (open) — per class. One endpoint, because a lesson's lock state must not
   flicker because one of two fetches landed first.
@@ -308,45 +337,48 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   own tokens are never forwarded**: a half-arrived grade is meaningless, and a
   rubric verdict the model then revises would lie to the student about their
   score. Stage labels move; the grade appears once, whole.
-- The grader target is chosen by an enum, and there are four. `workersai` is
-  the **Workers AI binding** and the preferred one: no host, no key, no tunnel,
-  nothing to keep alive. `resolveTargets()` marks each target `kind: 'ollama'`
-  (an HTTP endpoint we fetch), `kind: 'binding'` (an object Cloudflare hands
-  the Function), or `kind: 'openrouter'` (a single external API, no SLA of its
-  own); everything downstream branches on that and nothing else. The default
-  is resolved **per request** by `pickDefault()` walking
-  `['workersai', 'cloud', 'local']` and taking the first available, so a deploy
-  that never adds the AI binding keeps grading on `cloud` instead of 503ing.
+- The grader target is chosen by an enum, and there is now **one**: `cloud`,
+  Ollama, on `glm-5.3-flash:cloud`. The default is resolved **per request** by
+  `pickDefault()` walking `PREFERENCE` and taking the first available, so a deploy
+  with nothing configured keeps grading on `cloud` instead of 503ing.
   `DEFAULT_GRADER` stays `'cloud'` as the last-resort constant for that reason.
-  `openrouter` sits outside that walk entirely — it's class-gated (see the env
-  var table above), so it's only ever offered/defaulted-to for an allowed
-  class, and a failed `openrouter` call falls back to `cloud` silently rather
-  than 503ing the student.
-- **`max_tokens` on the Workers AI path is load-bearing** (`WORKERS_AI_MAX_TOKENS`,
-  8000). At 1500 a reasoning model spent its whole budget on its `reasoning`
-  field, stopped with `finish_reason: "length"`, and returned `content: null` —
-  which is indistinguishable from "this model cannot produce JSON" unless you
-  read `finish_reason`. That mistake made a first benchmark run score two
-  perfectly good models at 85% and 30%; both are 20/20. A null `content` is now
-  reported by name rather than read as `''`.
-- Model choice was **measured, not assumed** (2026-09-05, against the repo's own
-  rubrics via `buildPrompt` and `isPassingGrade`): `gemma-4-26b-a4b-it` and
-  `glm-5.3-flash` both scored 20/20 on a labelled set of strong / thin /
-  off-topic / prompt-injection answers. Only the burst separated them —
-  25 simultaneous submissions gave 25/25 for gemma and 20/25 for glm, the five
-  refusals being `3021: rate limiting`, i.e. the 20-rpm frontier cap. Cost ran
-  75–81 neurons per grade, so ~130 grades/day inside the free 10,000.
-- `GET /api/grade-written` lists the grading targets this deploy can run —
-  `workersai` (the binding), `cloud` (hosted), `local` (the school's own box),
-  and `openrouter` (class-restricted; only shown to an allowed class, see the
-  env var table above). The student picks between
-  them in `components/GraderPicker.tsx`; the choice is remembered per browser
-  and travels as a `grader` **enum** on the POST body. It is never a host, a
-  model, or a key — those are read from env in `resolveTargets()` and nowhere
-  else, for the same reason the rubric is: a client-supplied host is the
-  client-supplied-rubric hole one level down. An unconfigured target refuses
-  with 503 + `offline: true` rather than silently falling back, and both targets
-  share one rate-limit bucket so flipping the dropdown cannot reset the cap.
+  Three targets were removed 2026-09-30 — the Workers AI binding, a
+  self-hosted classroom box, and a class-gated second paid provider — all
+  tried, measured, dropped; the lessons below are why. Removing them needed no
+  migration, because a target the deploy has not configured was already reported
+  unavailable rather than hidden.
+- **`max_tokens` on a reasoning model is load-bearing** — the lesson the
+ removed Workers AI grader taught (2026-09-05; its `WORKERS_AI_MAX_TOKENS`
+ ceiling was 8000). At 1500 a reasoning model spent its whole budget on its
+ `reasoning` field, stopped with `finish_reason: "length"`, and returned
+ `content: null` — which is indistinguishable from "this model cannot
+ produce JSON" unless you read `finish_reason`. That mistake made a first
+ benchmark run score two perfectly good models at 85% and 30%; both are
+ 20/20. A null `content` was then reported by name rather than read as `''`.
+- Model choice was **measured, not assumed** (2026-09-05, on the removed
+ Workers AI path, against the repo's own rubrics via `buildPrompt` and
+ `isPassingGrade`): `gemma-4-26b-a4b-it` and `glm-5.3-flash` both scored
+ 20/20 on a labelled set of strong / thin / off-topic / prompt-injection
+ answers. Only the burst separated them — 25 simultaneous submissions gave
+ 25/25 for gemma and 20/25 for glm, the five refusals being `3021: rate
+ limiting`, i.e. the 20-rpm frontier cap. Cost ran 75–81 neurons per grade,
+ so ~130 grades/day inside the free 10,000. The burst cap is why that target
+ pinned an ordinary text-generation model, and why no frontier model should
+ ever be a classroom grader default.
+- `GET /api/grade-written` still answers with the one configured target, and the
+  client keeps the response shape. There is no picker: `hasGraderChoice()` in
+  `components/GraderPicker.tsx` needs 2+ available targets and the menu now
+  carries one, so the dropdown never renders and that component is dead code.
+  A `grader` value on the POST body is still accepted and **ignored** — an
+  unrecognised id falls through to the one target rather than erroring, because a
+  student with a stale cached bundle would otherwise lose a submission over a
+  target they never chose by hand. `isGraderId` is a single-value check and a
+  retired id fails it, which is what routes it to the default. It is never a
+  host, a model, or a key — those are read from env in `resolveTargets()` and
+  nowhere else, for the same reason the rubric is: a client-supplied host is the
+  client-supplied-rubric hole one level down. An unconfigured deploy refuses
+  with 503 + `offline: true` rather than silently falling back, and the tutor and
+  the grader share one rate-limit bucket per student.
 - `POST /api/grade-written` takes **only** `lessonId` and `response` from the
   client. The rubric, prompt, model and contextDocs are read server-side from
   `public/ai-graders.json` (generated by `scripts/generate-ai-graders.mjs`,
@@ -357,6 +389,21 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   the shared `ai_help_usage` table under the `grade-written` bucket.
 - Owner-only class routes: `archive`, `regenerate-code`, `delete` (cascades to
   progress data for students enrolled nowhere else), and co-teacher management.
+- `POST /api/classes/[id]/lesson-unsubmit` — a manager of the class (or an admin)
+  reopens one student's submitted **multiple-choice** quiz. The `lesson_drafts`
+  row is rewritten to the **same answers with `graded: false`**, which is what
+  unlocks the radios in `components/QuizView.tsx` and beats a stale
+  `graded: true` left in that browser's localStorage; `lesson_state` drops back to
+  `started` with the score cleared (so the lessons after it re-gate); and the
+  `lesson_submissions` rows are **deleted**, which is what the drawer, the review
+  queue, the gradebook and `scripts/score-quiz.mjs` all read. One `DB.batch`, so a
+  half-reopened quiz is not a state the system can be left in. It 409s anything
+  whose `grade_json` carries no `quiz` array — a written answer, a diagram and
+  code live in the same table, and unsubmitting one would delete a graded essay.
+  The delete is deliberate and leaves **no audit trail**; keeping one needs a new
+  table plus a filter on every reader of `lesson_submissions`. Guarded by
+  `scripts/test-quiz-unsubmit.mjs` (wired into `npm test`), which drives the real
+  handler against a D1 stub.
 
 ### Image uploads
 - `GET /api/uploads` — caller's images + quota (40 files / 20 MB, 2 MB each)
@@ -389,9 +436,16 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 # Local dev (Next dev server + Pages Functions emulated)
 npm run dev            # port 3002
 
-# Prod build + deploy
-npm run build                                                   # static export to ./out
-npx wrangler pages deploy out --project-name shcode --branch cs-3d
+# Prod build + deploy (THE ORIGINAL AUTHOR'S deploy of shcode.pages.dev): ALWAYS
+# `npm run deploy`, never `npm run build` + bare wrangler. `deploy` runs, in order:
+# check-pending-migrations, check-pa-attempts --require-pseudocode,
+# stamp-tries-applied --check, the build, check-ai-grader-leak --require-build, then
+# wrangler. Bare wrangler skips every one of those guards.
+# It is specific to this deployment: the Pages project `shcode`, branch `cs-3d`, the D1
+# database `shcode-commits`, the author's committed go-live stamp, and the author's local
+# pa-pseudocode/ files. A SELF-HOSTING teacher does not run it (see "Self-hosting" below).
+npm run deploy
+npm run build                                                   # build only (local checks)
 
 # D1 migrations. Go through scripts/d1.mjs, not bare wrangler -- it retries the
 # transient Cloudflare failures and, when retries run out, tells you whether the
@@ -415,12 +469,77 @@ npx wrangler r2 bucket create shcode-uploads
 # alone covers local dev; production reads the dashboard binding.
 ```
 
+### Deploying the three-tries feature (read before the first deploy)
+
+- **Deploy from a clean worktree that HAS `pa-pseudocode/` populated.** The solutions
+  are git-ignored (the repo is public so other teachers can self-host), so a plain
+  `git worktree add` has none. Copy the folder in the way `public/reshape/kernel` is
+  copied. An empty one fails `check-pa-attempts --require-pseudocode` and stops the
+  deploy; if you bypassed that, every solution reveal would answer 404.
+- **The go-live instant must be stamped once.** `TRIES_APPLIED` in
+  `lib/attempt-cap.ts` is the instant before which attempts are free. It is a
+  development placeholder (`TRIES_GO_LIVE_STAMPED = false`) until you run
+  `node scripts/stamp-tries-applied.mjs --set-now` at go-live and commit the result;
+  `deploy` refuses while it is unstamped, in the future, older than the feature, or
+  uncommitted. Do not move it afterwards: an earlier instant confiscates tries.
+- **Migration 0032** (`class_solution_releases`) must be applied (`npm run d1:migrate`)
+  before the deploy; the migration preflight refuses with it pending.
+- **Migrations 0033 (`lesson_try_resets`) and 0034 (`lesson_state.score_override`)** likewise.
+  0034 must be applied BEFORE the deploy: the new code reads `score_override`, and a Function
+  that selects a column the database does not have 500s.
+- **Grandfather backfill, once at go-live, after 0032-0034 and the stamp.** Most PA parts had no
+  `maxScore` before, so a completed one read 100% and holds a stored score of 0/NULL; with the new max it
+  would show 0% until reopened. `node scripts/backfill-grandfather-scores.mjs` is a read-only dry run
+  (215 parts on 2026-10-04); `--emit-sql f.sql` writes guarded UPDATEs for the owner to review and run.
+- **The stamp goes stale.** `--check` also refuses a stamp more than 24 hours old (the deploy
+  slipped, and attempts between the stamp and the deploy would count against the cap before the
+  rule was live). Re-stamp at the real go-live, or pass `--allow-old` knowingly.
+
+### Self-hosting (another teacher running their own copy)
+
+`npm run deploy` is the original author's script and is not meant to be reused as is: it names
+the author's Pages project and D1 database, refuses without the author's `pa-pseudocode/` files,
+and checks the author's committed go-live stamp (which is old by the time you fork). Use your own
+commands instead:
+
+```bash
+npx wrangler d1 create <your-db>            # then put its id in wrangler.toml
+npx wrangler d1 migrations apply <your-db> --remote
+npm run build                               # runs prebuild: generators + the leak checks it can
+node scripts/check-ai-grader-leak.mjs --require-build
+npx wrangler pages deploy out --project-name <your-project>
+```
+
+Set your own `AUTH_SECRET`, `OLLAMA_API_KEY`, `ADMIN_EMAILS` and `TEACHER_EMAILS` (the table above).
+With an empty `pa-pseudocode/` the three tries, AI feedback and best score all work; students just
+never see a solution (see `pa-pseudocode/README.md`). Write your own pseudocode files to turn that
+on, and set your own `TRIES_APPLIED` (run `node scripts/stamp-tries-applied.mjs --set-now` once,
+before your students first use a capped part, and commit it).
+
 ## Static-export gotcha
 
 `next.config.js` has `output: 'export'` + `trailingSlash: true`. Dynamic route
 segments need `generateStaticParams()` at build time. For runtime-only IDs
 (classes, per-student views), use **query-string routing** on a single static
 page — e.g. `/teacher?class=<id>`, `/teacher-edit?class=X&student=Y&lesson=Z`.
+The class page (`/teacher?class=<id>`) has five sections, `&tab=today|students|gradebook|schedule|settings`
+(the old `roster` and `attention` values and `?view=gradebook` still land). Only the open tab mounts, so a
+new panel belongs under exactly one tab in `DetailView`, not alongside them all. With no `tab` it opens on
+Students and moves to Today once if submissions are waiting for a grade; the last class opened is kept in
+`localStorage` (`shcode:lastClass`) for the class list and the top-nav Gradebook shortcut.
+
+## Teacher-side feedback and destructive actions
+
+Use `useFeedback()` (`components/FeedbackProvider.tsx`, mounted around the teacher page) for every action
+that changes something: `toast()` says what happened (an error toast is announced assertively and carries
+the server's own reason), `confirm()` replaces `window.confirm` and `window.prompt` (focus starts on
+Cancel for a `danger` confirm, and `requireText` gates deleting a class on typing its name). A confirm
+must say what is LOST, in plain words: the old delete prompt claimed student progress was preserved while
+`functions/api/classes/[id]/delete.ts` removes it for students enrolled nowhere else. Actions that remove
+something go in a `RowMenu` (`components/RowMenu.tsx`), not as a full-size button beside the routine ones.
+Show a failed request with `errorText(res)` (`lib/http-error.ts`), never `res.text()`: the API answers
+`{"error":"..."}` and that JSON was being printed to teachers. Muted text on the dark theme is `#8393c4`
+(4.7:1); `#6272a4` is 3.0:1 and is for borders and decoration only.
 
 ## Flowchart diagrams
 
@@ -469,7 +588,7 @@ body to the bottom of the canvas and the chart appeared to run upward.
 
 The essay grader at `POST /api/grade-written` calls `https://ollama.com/api/chat`
 with `Authorization: Bearer $OLLAMA_API_KEY`. Model comes from the lesson's
-`aiGrader.model` field (e.g. `deepseek-v4-flash:0731-cloud`). The key lives server-side
+`aiGrader.model` field (e.g. `glm-5.3-flash:cloud`). The key lives server-side
 only — never exposed to the client.
 
 ## Reference solutions
@@ -506,6 +625,18 @@ private folder convention, teach that script about it too.
 - Inline style convention for components, using the Dracula palette defined in
   `app/globals.css`. See `components/AuthButton.tsx`, `app/teacher/page.tsx` for
   the established look.
+- **Slide decks are vendored copies, not links.** bookSHelf sends `X-Frame-Options: SAMEORIGIN`,
+  so a lesson's `slidesUrl` is a same-origin path, `/slides/<name>.paper.html`, served from
+  `public/slides/` (committed). `npm run sync:decks` copies every deck a lesson references from the
+  bookSHelf checkout (`BOOKSHELF_DIR`, default `../bookSHelf`; it reads the committed HEAD, never the
+  working tree). The one change it makes is stripping authoring notes: every hidden
+  `<div class="notes">` and any `data-notes="..."` attribute is removed (students can read them in
+  view-source; no deck script reads the div, the presenter window reads `data-notes` and no deck carries
+  one), and the sync asserts with parse5 that none remain and the `<section>` count is unchanged, else it
+  exits 1 and writes nothing. Everything else is byte-for-byte. It is deliberately not in `prebuild`/`deploy`. A
+  copy drifts from the book until someone re-runs it and commits the result. To wire a new deck:
+  set `slidesUrl` to `/slides/<name>.html`, run the sync, commit. `ContentLessonView` inspects the
+  frame once loaded and shows "Slides blank?" only if it really is empty.
 - **Before assuming an authored `lesson.json` field reaches a student, check that
   something imports the component that would render it.** `codegraph_explore`
   answers that in one shot: name the field and the component that should render

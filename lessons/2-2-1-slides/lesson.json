@@ -1,13 +1,13 @@
 {
   "id": "2-2-1-slides",
   "title": "2.2.1 Slides: Algorithms and Loops",
-  "description": "Algorithms and Loops slides. Placeholder until the deck is built from the book.",
+  "description": "Unit 2.2 slides: algorithms and loops.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",
   "preview": "slides",
-  "slidesUrl": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/chapter-2-control-flow/decks/2.2_algorithms_and_loops.paper",
+  "slidesUrl": "/slides/2.2_algorithms_and_loops.paper.html",
   "slos": [
     "SLO-1"
   ],

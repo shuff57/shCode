@@ -63,7 +63,7 @@ export interface RunResult {
  * array (`Object.fromEntries(VOCABULARY.map(...))`) rather than the other
  * way around, so the two cannot drift apart.
  */
-export declare const VOCABULARY: readonly ["box", "cylinder", "sphere", "cone", "ring", "prism", "wedge", "groove", "pocket", "hole", "holes", "hollow", "round", "bevel", "repeat", "repeatAround", "mirror", "move", "turn", "join", "cut", "keep", "draft", "sketch", "pull", "spin", "blend", "param", "cuboid", "torus", "fillet", "chamfer", "shell", "subtract", "union", "intersect", "linearPattern", "polarPattern", "extrude", "revolve", "loft"];
+export declare const VOCABULARY: readonly ["box", "cylinder", "sphere", "cone", "ring", "prism", "wedge", "groove", "pocket", "hole", "holes", "hollow", "round", "bevel", "repeat", "repeatAround", "mirror", "move", "turn", "join", "cut", "keep", "draft", "sketch", "plane", "pull", "spin", "blend", "param", "cuboid", "torus", "fillet", "chamfer", "shell", "subtract", "union", "intersect", "linearPattern", "polarPattern", "extrude", "revolve", "loft"];
 export interface RunOptions {
     /** Values keyed exactly like generatedParams()'s own `name` field
      *  (`${featureId}_${slot}`, see pname() in lib/model-codegen.ts) -- the
@@ -117,6 +117,7 @@ export interface SketchHandle {
     angle(edge: unknown, other: unknown, degrees: unknown): SketchHandle;
     geom(rows: unknown): SketchHandle;
     rules(rows: unknown): SketchHandle;
+    slot(a: unknown, b: unknown, r: unknown): SketchHandle;
 }
 export declare function runScript(source: string, opts?: RunOptions): RunResult;
 //# sourceMappingURL=reshape-script.d.ts.map

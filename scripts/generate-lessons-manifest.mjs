@@ -5,6 +5,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { lessonScoreFields } from './lesson-score-fields.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
@@ -38,11 +39,29 @@ const results = await Promise.all(
     const rubricPoints = Array.isArray(rubric)
       ? rubric.reduce((sum, r) => sum + (r?.points ?? 0), 0)
       : 0;
+    // One student's paper, not every form's questions: a variant quiz is answered
+    // as a single form, and its stored score is correct-out-of-that-form (see
+    // formQuestionCount in lib/quiz-variant.ts, which this mirrors).
+    const formCount = (quiz) => {
+      const qs = quiz.questions;
+      if (!Array.isArray(quiz.variants) || quiz.variants.length === 0) return qs.length;
+      return Math.min(...quiz.variants.map((v) => qs.filter((q) => !q.variant || q.variant === v).length));
+    };
     const quizCount =
       meta.quiz && Array.isArray(meta.quiz.questions) && meta.quiz.questions.length > 0
-        ? meta.quiz.questions.length
+        ? formCount(meta.quiz)
         : null;
-    const maxScore = quizCount ?? (rubricPoints > 0 ? rubricPoints : null);
+    // A pass/fail rubric (every criterion 0 points) is scored as criteria met out of criteria
+    // total (criteriaScore in lib/grade-pass.ts), capped or not. Without a maxScore a completed
+    // such part read as 100 whatever the AI found, so three junk demos were full marks.
+    // 2026-10-04: uncapped pass/fail lessons get the same fraction, with students who completed
+    // them before then grandfathered at full by scripts/backfill-passfail-fraction.mjs.
+    // Mirrors app/page.tsx maxScoreFor().
+    const capLimit =
+      [meta.quiz, meta.aiGrader, meta.diagram, meta.grading]
+        .map((b) => (b && typeof b === 'object' ? b.maxSubmissions : undefined))
+        .find((n) => typeof n === 'number') ?? null;
+    const { maxScore, scoreKind } = lessonScoreFields(meta, quizCount);
     return {
       id: meta.id ?? id,
       title: meta.title ?? id,
@@ -60,7 +79,13 @@ const results = await Promise.all(
       // out silently drops every lab from any weighted percentage.
       assignmentCode: meta.assignmentCode ?? null,
       maxScore,
-      scoreKind: quizCount != null ? 'quiz' : maxScore != null ? 'written' : null,
+      // The part's try limit (null = unlimited). Not secret; the teacher drawer reads it to offer
+      // 'Give back a try' on the parts that have one.
+      maxSubmissions: capLimit,
+      // scoreKind decides the GRADE CATEGORY (lib/grading-weights.ts: 'written' beats an
+      // assignmentCode's 'lab'), so it stays rubric-POINTS based: a capped pass/fail rubric
+      // gets a maxScore for its percent but must not move from Lab to Written.
+      scoreKind,
     };
   }),
 );

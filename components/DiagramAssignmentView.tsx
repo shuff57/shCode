@@ -36,9 +36,12 @@ const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   ssr: false,
   loading: () => <EditorPlaceholder height={570} />,
 });
-import { recordLessonCompleted, useLessonState } from '../lib/progress';
+import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
+import { AttemptBanner, PseudocodePanel } from './AttemptCap';
+import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { fetchDraft, saveDraft, recordSubmission, streamGrade } from '../lib/written-grader-store';
+import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
 import GraderPicker, { useGraderChoice } from './GraderPicker';
 import { checkDiagram, allPassed, type CheckResult } from '../lib/diagram-check';
@@ -53,6 +56,8 @@ interface CriterionResult {
   max: number;
   verdict: 'met' | 'partial' | 'missing';
   feedback: string;
+  /** Hybrid charts: 'rules' = marked from the drawing, 'ai' = marked from the wording. */
+  source?: 'rules' | 'ai';
 }
 
 interface GradeResult {
@@ -125,6 +130,11 @@ export default function DiagramAssignmentView({
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   const progress = useLessonState();
+  // Tries on a capped part, counted on the server. See lib/use-attempt-cap.ts.
+  const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed, bypassesLessonLock(progress.role));
+  const capped = cap.max !== null;
+  // A grader outage (or a lost completion call) must not leave the NEXT part locked.
+  useCompletionRepair(lessonId, cap, progress);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ---- load: server draft wins over the local cache, starter is the floor
@@ -184,18 +194,39 @@ export default function DiagramAssignmentView({
     setTimeout(() => setSaveStatus('idle'), 2000);
   }
 
+  // Best try counts: the stored score can only go up (and the server's
+  // lesson_state upsert enforces the same on a capped part).
+  function bestOf(score: number): number {
+    const prior = progress.scores[lessonId];
+    return typeof prior === 'number' ? Math.max(prior, score) : score;
+  }
+
   async function submit() {
+    if (cap.unknown || cap.reached) return;
     const results = runChecks();
     // On a test the structural checks stop being a gate: a student who cannot
     // get a second exit off their diamond would otherwise never reach Part 5.
     // See DiagramConfig.summative.
     if (!allPassed(results) && !summative) return;
+    // A summative chart may be handed in with red checks (a student stuck on one
+    // check must not be locked out), but on a capped part that hand-in is a counted
+    // try. Say so and let them choose: an accidental click must not spend one.
+    if (!allPassed(results) && capped && typeof window !== 'undefined') {
+      const left = cap.left;
+      const ok = window.confirm(
+        `Some checks are still red. Handing in now uses one of your tries${left !== null ? ` (you have ${left} left)` : ''}, and the feedback will be about an unfinished chart.\n\nFix the red checks first, or press OK to hand it in anyway.`,
+      );
+      if (!ok) return;
+    }
 
     // Structure-only lesson: the checks are the whole grade.
     if (!config.aiGrader) {
-      await recordLessonCompleted(lessonId, 0);
+      const passedCount = results.filter((r) => r.passed).length;
       if (progress.authed) {
-        recordSubmission({
+        // Record the try BEFORE completing the part: on a capped part the server
+        // derives the stored best from the counted rows, so completing first
+        // would leave the current try out of it.
+        await recordSubmission({
           lessonId,
           response: JSON.stringify(doc),
           gradeJson: { structural: results },
@@ -207,8 +238,11 @@ export default function DiagramAssignmentView({
           possible: results.length,
         });
         saveDraft(lessonId, JSON.stringify(doc));
+        if (capped) cap.spend();
       }
-      setTimeout(() => navigateToNextLesson(lessonId), 1200);
+      await recordLessonCompleted(lessonId, capped ? bestOf(passedCount) : 0);
+      // A capped part stays on the page so the student can use their other tries.
+      if (!capped) setTimeout(() => navigateToNextLesson(lessonId), 1200);
       return;
     }
 
@@ -216,7 +250,7 @@ export default function DiagramAssignmentView({
     setError(null);
     setOffline(false);
     try {
-      const { status, data } = await streamGrade(
+      const { status, data, network } = await streamGrade(
         {
           lessonId,
           lessonTitle,
@@ -228,23 +262,40 @@ export default function DiagramAssignmentView({
           model: config.aiGrader.model,
           contextDocs: config.aiGrader.contextDocs,
           grader,
+          // What the teacher will see beside the grade: the drawn chart and the browser-side
+          // checks. Display only; the server bounds it and never scores or prompts from it.
+          artifact: { doc, checks: results },
         },
         setStage,
       );
       const res = { status };
       if (data === null) {
-        setError(
-          `Grader returned a non-JSON response (HTTP ${res.status}). Ask your teacher — the Ollama key or endpoint may not be configured.`,
-        );
+        console.warn('[grader]', network ? 'network error' : `non-JSON response (HTTP ${res.status})`);
+        setError(gradeFailureMessage({ kind: classifyGradeFailure(res.status, null, network), status: res.status }));
+        // The server may have written its free outage marker: re-read the rows so
+        // the completion repair can unlock the next part.
+        if (capped) cap.refresh();
         return;
       }
       if (!data || !data.ok) {
-        setError(data?.error || `Grading failed (HTTP ${res.status}).`);
+        console.warn('[grader]', res.status, (data as { detail?: string } | null)?.detail || data?.error);
+        setError(gradeFailureMessage({
+          kind: classifyGradeFailure(res.status, data),
+          status: res.status,
+          serverMessage: data?.error,
+        }));
         if (data?.offline) setOffline(true);
+        // A refused fourth try (409), a lost race or an outage marker all change
+        // what the server holds: re-read it so the banner and Submit are not stale.
+        if (capped) cap.refresh();
         return;
       }
       setResult(data as GradeResult);
-      if (isPassing(data as GradeResult)) {
+      // On a capped part every graded try is a sitting: it completes the part with
+      // the best score so far and does not walk the student away from their tries.
+      if (capped) {
+        await recordLessonCompleted(lessonId, bestOf(data.totalEarned));
+      } else if (isPassing(data as GradeResult)) {
         await recordLessonCompleted(lessonId, data.totalEarned);
         setTimeout(() => navigateToNextLesson(lessonId), 1500);
       }
@@ -257,9 +308,12 @@ export default function DiagramAssignmentView({
           possible: data.totalPossible,
         });
         saveDraft(lessonId, JSON.stringify(doc));
+        if (capped) cap.spend();
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      console.warn('[grader]', e);
+      setError(gradeFailureMessage({ kind: 'network' }));
+      if (capped) cap.refresh();
     } finally {
       setGrading(false);
       setStage(null);
@@ -283,6 +337,8 @@ export default function DiagramAssignmentView({
           {promptText}
         </p>
       ) : null}
+
+      <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} />
 
       <DiagramEditor
         value={doc}
@@ -343,7 +399,7 @@ export default function DiagramAssignmentView({
 
         <button
           onClick={submit}
-          disabled={grading || doc.nodes.length === 0}
+          disabled={grading || doc.nodes.length === 0 || cap.unknown || cap.reached}
           style={{
             padding: '8px 16px',
             borderRadius: 6,
@@ -471,6 +527,11 @@ export default function DiagramAssignmentView({
               </div>
             ))}
           </div>
+          {structureOk && config.aiGrader && !summative ? (
+            <p style={{ color: '#8393c4', fontSize: 12.5, marginTop: 8 }}>
+              Order and wording are checked when you submit.
+            </p>
+          ) : null}
           {!structureOk && (
             <p style={{ color: '#ffb86c', fontSize: 12.5, marginTop: 8 }}>
               Shapes with a problem are outlined in red on the canvas.{' '}
@@ -544,6 +605,11 @@ export default function DiagramAssignmentView({
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <Icon size={18} color={color} />
                     <strong style={{ color: '#f8f8f2' }}>{label?.title || c.id}</strong>
+                    {c.source ? (
+                      <span style={{ fontSize: 11, color: '#8393c4', border: '1px solid #44475a', borderRadius: 10, padding: '1px 7px' }}>
+                        {c.source === 'rules' ? 'Checked by rules' : 'AI feedback'}
+                      </span>
+                    ) : null}
                     <span style={{ marginLeft: 'auto', color, fontWeight: 600, fontSize: 13 }}>
                       {result.totalPossible === 0 ? c.verdict : `${c.earned} / ${c.max} pts`}
                     </span>
@@ -589,6 +655,7 @@ export default function DiagramAssignmentView({
           )}
         </div>
       )}
+      <PseudocodePanel lessonId={lessonId} show={capped && cap.reached} />
     </section>
   );
 }

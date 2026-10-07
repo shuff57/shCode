@@ -1,4 +1,4 @@
-// 2.3.11 A13.1 Asteroid Field (reference solution).
+// 6.2.6 A13.1 Asteroid Field (reference solution).
 // WASD ship + asteroid Group + overlap-driven hit state + safe despawn.
 
 let ship, asteroids, hit = false;

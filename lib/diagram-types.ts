@@ -133,12 +133,15 @@ export type DiagramRuleId =
   | 'connector-pairs'
   | 'min-decisions'
   | 'min-process'
+  | 'min-shape'
   | 'min-nodes';
 
 export interface DiagramRule {
   id: DiagramRuleId;
   /** Threshold for the min-* rules. Ignored by the others. */
   count?: number;
+  /** min-shape only: the shape KIND that must appear `count` times. */
+  shape?: FlowShape;
   /** Overrides the default student-facing wording. */
   title?: string;
 }
@@ -178,6 +181,14 @@ export interface DiagramConfig {
    */
   summative?: boolean;
   /**
+   * Tries the student gets at this part, counted server-side from their own
+   * lesson_submissions rows (lib/attempt-cap.ts). Absent = unlimited. The best
+   * score counts, and once the last try is spent the part's solution is shown
+   * as pseudocode (functions/api/attempt-reveal.ts). See
+   * .gauntlet/SPEC-attempt-caps.md. Only meaningful on a performance assessment.
+   */
+  maxSubmissions?: number;
+  /**
    * When present, "Submit for feedback" also sends the Mermaid text to the
    * Ollama grader through the existing /api/grade-written endpoint.
    */
@@ -186,6 +197,66 @@ export interface DiagramConfig {
     model?: string;
     contextDocs?: string[];
     prompt?: string;
-    rubric: Array<{ id: string; title: string; description?: string; points: number }>;
+    rubric: Array<{ id: string; title: string; description?: string; points: number; check?: RubricCheck }>;
+    /** Hybrid charts: relevance gate, server-only (see DiagramGate). */
+    gate?: DiagramGate;
+    /** Same meanings as on lib/types.ts AiGraderConfig: the brief stays server-side,
+     *  the part is revisable up to its cap, and `strict` is read only on the server. */
+    summative?: boolean;
+    revisable?: boolean;
+    strict?: boolean;
   };
+}
+
+// ---- Hybrid grading: deterministic rubric items (lib/diagram-score.ts) ----
+//
+// A chart's heavy points can be marked by STRUCTURE instead of by the model: a rubric item in
+// diagram.aiGrader.rubric[i] that carries `check` is scored by lib/diagram-score.ts, from shape
+// kinds and arrow topology only, with no label read. Items without `check` stay with the AI,
+// which never sees the checked items. `check` and `gate` live INSIDE aiGrader, so
+// lib/quiz-redact.ts (which rebuilds the client rubric as {id,title,points}) never ships them,
+// and scripts/generate-ai-graders.mjs copies them into the server-only module.
+
+/** Picks flow nodes. Every present field must hold. */
+export interface Matcher {
+  /** Shape kind, or any of several. */
+  kind?: FlowShape | FlowShape[];
+  /** Label patterns, ORed. Flags 'iu'; the label is NFKC-folded, lowercased, whitespace-collapsed. */
+  re?: string | string[];
+  /** The node must NOT match this. */
+  not?: Matcher;
+}
+
+interface StepBase {
+  /** Student-readable lines. A fail line describes structure and never reveals a label. */
+  pass?: string;
+  fail?: string;
+}
+
+export type CheckStep = StepBase &
+  (
+    | { op: 'count'; match: Matcher; min: number; max?: number }
+    | { op: 'sequence'; of: Matcher[] }
+    | { op: 'loop-exit'; loop: Matcher; minAfter?: number; from?: 'loop' | 'any' }
+    | { op: 'in-cycle'; match: Matcher }
+    | { op: 'not-in-cycle'; match: Matcher }
+    | { op: 'branch'; at: Matcher; orientation?: 'any' | 'labelled'; yes?: Matcher; no?: Matcher; distinct?: boolean }
+    | { op: 'label'; match: Matcher; min?: number }
+  );
+
+export interface RubricCheck {
+  steps: CheckStep[];
+  /** 'linear': points x the mean step fraction, rounded to 0.5. Default: all steps or nothing. */
+  scale?: 'linear';
+}
+
+/**
+ * Relevance gate: fewer than `min` of the `anyOf` token groups matching ANY flow-node label caps
+ * the whole total at `capTo`. Stops a chart with the right shapes and nonsense words from passing.
+ */
+export interface DiagramGate {
+  anyOf: string[];
+  min: number;
+  capTo: number;
+  fail: string;
 }

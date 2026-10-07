@@ -41,7 +41,7 @@
     {
       "id": "r2",
       "title": "pagesRequested is declared",
-      "description": "A descriptive variable holds how many pages were asked for",
+      "description": "A descriptive variable holds how many pages were asked for. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|var|const)\\s+pagesRequested\\s*(?:=\\s*\\d+|;[\\s\\S]*?\\bpagesRequested\\s*=\\s*\\d+)",
@@ -51,7 +51,7 @@
     {
       "id": "r3",
       "title": "creditRemaining is declared",
-      "description": "A descriptive variable holds the credit left",
+      "description": "A descriptive variable holds the credit left. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|var|const)\\s+creditRemaining\\s*(?:=\\s*\\d+|;[\\s\\S]*?\\bcreditRemaining\\s*=\\s*\\d+)",
@@ -81,7 +81,7 @@
     {
       "id": "r6",
       "title": "Both branches print",
-      "description": "Two or more console.log calls, so each path reports an outcome",
+      "description": "Two or more console.log calls, so each path reports an outcome. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:[\\s\\S]*?console\\.log\\s*\\(){2}",

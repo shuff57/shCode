@@ -1,4 +1,4 @@
-// 2.6.25 Challenges: Extended state features
+// 6.6.27 Challenges: Extended state features
 
 let state;
 

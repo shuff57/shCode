@@ -25,6 +25,7 @@
 // takes an entries array rather than a single row.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFeedback } from './FeedbackProvider';
 import { Calendar, ChevronDown, ChevronRight, X } from 'lucide-react';
 import CalendarPopover from './CalendarPopover';
 import LessonAccessChip from './LessonAccessChip';
@@ -83,7 +84,7 @@ const OPEN_PAST_HINT = 'Already in the past — the lesson is open now';
 
 const C = {
   border: '#44475a',
-  dim: '#6272a4',
+  dim: '#8393c4',
   text: '#f8f8f2',
   input: '#282a36',
   accent: '#8be9fd',
@@ -264,6 +265,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
   const [dates, setDates] = useState<Record<Kind, ApiDate[]>>({ open: [], due: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [failedParts, setFailedParts] = useState<Record<Kind, boolean>>({ open: false, due: false });
+  const { toast } = useFeedback();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState<Set<string>>(new Set());
 
@@ -295,23 +298,34 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
   useEffect(() => {
     let alive = true;
     void (async () => {
-      try {
-        const [manifestRes, openRows, dueRows] = await Promise.all([
-          fetch('/lessons-manifest.json'),
-          fetchKind('open'),
-          fetchKind('due'),
-        ]);
-        if (!alive) return;
-        if (manifestRes.ok) {
-          const data = (await manifestRes.json()) as { lessons: ManifestLesson[] };
-          if (alive) setLessons(data.lessons ?? []);
+      // Each part loads on its own: one failing endpoint must not blank the lessons or the other dates.
+      const failed: string[] = [];
+      const part = async <T,>(label: string, run: () => Promise<T>, fallback: T): Promise<T> => {
+        try {
+          return await run();
+        } catch (e) {
+          failed.push(`${label} (${e instanceof Error ? e.message : 'failed'})`);
+          return fallback;
         }
-        if (alive) setDates({ open: openRows, due: dueRows });
-      } catch (e) {
-        if (alive) setError(e instanceof Error ? e.message : 'Could not load dates.');
-      } finally {
-        if (alive) setLoading(false);
+      };
+      const [manifest, openRows, dueRows] = await Promise.all([
+        part('lesson list', async () => {
+          const res = await fetch('/lessons-manifest.json');
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = (await res.json()) as { lessons: ManifestLesson[] };
+          return data.lessons ?? [];
+        }, [] as ManifestLesson[]),
+        part('available-after dates', () => fetchKind('open'), [] as ApiDate[]),
+        part('due dates', () => fetchKind('due'), [] as ApiDate[]),
+      ]);
+      if (!alive) return;
+      setLessons(manifest);
+      setDates({ open: openRows, due: dueRows });
+      if (failed.length > 0) {
+        setError(`Could not load: ${failed.join('; ')}. The rest is shown. Saving a date of a part that did not load is disabled until you reload.`);
+        setFailedParts({ open: failed.some((f) => f.startsWith('available-after')), due: failed.some((f) => f.startsWith('due dates')) });
       }
+      setLoading(false);
     })();
     return () => { alive = false; };
   }, [classId, fetchKind]);
@@ -342,6 +356,10 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
   const write = useCallback(
     async (kind: Kind, entries: { scope: DueScope; scopeId: string; date: string | null; time?: string | null }[]) => {
       if (entries.length === 0) return;
+      if (failedParts[kind]) {
+        toast(`Not saved: the ${kind === 'due' ? 'due' : 'available-after'} dates did not load. Reload the page first.`, { kind: 'error' });
+        return;
+      }
       setSaving(true);
       setError(null);
       try {
@@ -354,6 +372,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
         if (!res.ok) {
           const body = (await res.json().catch(() => ({}))) as { error?: string };
           setError(body.error ?? `Save failed (HTTP ${res.status})`);
+          toast(`Not saved: ${body.error ?? `HTTP ${res.status}`}`, { kind: 'error' });
           return;
         }
         // Re-read rather than patch locally: the server owns the timezone
@@ -361,13 +380,15 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
         // guess. Only the kind we wrote is re-read — the other is untouched.
         const fresh = await fetchKind(kind);
         setDates((prev) => ({ ...prev, [kind]: fresh }));
+        toast(kind === 'due' ? 'Due date saved.' : 'Available-after date saved.');
       } catch {
         setError('Save failed — check your connection.');
+        toast('Not saved: check your connection.', { kind: 'error' });
       } finally {
         setSaving(false);
       }
     },
-    [classId, fetchKind],
+    [classId, fetchKind, toast, failedParts],
   );
 
   const toggle = (moduleId: string) => {
@@ -401,7 +422,15 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       )}
       {saving && <p style={{ color: C.dim, fontSize: 12, marginBottom: 12 }}>Saving…</p>}
 
-      {units.length === 0 && <p style={{ color: C.dim }}>No lessons found.</p>}
+      {units.length === 0 && !loading && (
+        <p style={{ color: C.dim }}>
+          {lessons.length > 0
+            ? 'No numbered lessons to set dates on.'
+            : error
+              ? 'The lesson list did not load, so there is nothing to show.'
+              : 'No lessons found.'}
+        </p>
+      )}
 
       {units.map((unit) => (
         <div key={unit.unitId} style={{ marginBottom: 22 }}>

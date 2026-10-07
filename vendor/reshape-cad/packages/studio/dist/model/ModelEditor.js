@@ -23,10 +23,12 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Box as BoxIcon, Circle, Cylinder as CylIcon, Cone as ConeIcon, Torus as TorusIcon, Combine, Scissors, SquareDashedBottom, PenLine, MoveUp, PanelLeftClose, RotateCw, Trash2, Undo2, Redo2, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Search, Disc3, Layers, FlipHorizontal2, FlipHorizontal, FlipVertical2, MoveHorizontal, RefreshCw, CircleDot, Grid2x2, PackageOpen, Move as MoveIcon, Copy as CopyIcon, SquareRoundCorner, Octagon, Download, Eraser, ArrowLeft, } from 'lucide-react';
-import { withoutFeatures, orphanedBy } from '@shuff57/reshape-script/model-deps';
-import { canRotate, dependsOn, extentAlong, isRoundable, maxRound, nameMap, newExtrude, newHole, newHoleCorners, newBlend, newMirror, newPattern, newRevolve, newShape, newShell, newSketch, shellInsertion, whyCannotBlend, newMove, nextId, topLevel, whyCannotOrbit, whyCannotRound, } from '@shuff57/reshape-script/model-types';
+import { withoutFeatures, orphanedBy, firstOrderViolation } from '@shuff57/reshape-script/model-deps';
+import { canRotate, extentAlong, isRoundable, maxRound, nameMap, newExtrude, newHole, newHoleCorners, newBlend, newMirror, newPattern, newRevolve, newShape, newShell, newSketch, shellInsertion, whyCannotBlend, newMove, nextId, topLevel, whyCannotOrbit, whyCannotRound, placementLabel, } from '@shuff57/reshape-script/model-types';
 import { partWordFor } from '@shuff57/reshape-script/topo-name';
 import { ownerOf } from '@shuff57/reshape-script/model-selection';
+import { edgesOf, featuresOf, mixedSelectionNote, ownerScoped, primaryOf } from '../selection-model.js';
+import { withRecess, whyCannotRecess } from './hole-recess.js';
 function shapeIcon(kind) {
     if (kind === 'box')
         return _jsx(BoxIcon, { size: 14 });
@@ -186,7 +188,7 @@ function FlyoutButton({ label, icon, onMain, disabled, title, open, onToggleOpen
         return null;
     return (_jsxs("span", { className: "model-flyout", ref: wrapRef, children: [_jsxs("button", { onClick: onMain, disabled: disabled, title: title, children: [icon, " ", label] }), _jsx("button", { className: "model-flyout-caret", onClick: onToggleOpen, disabled: disabled, "aria-label": `More ${label.toLowerCase()} tools`, title: `More ${label.toLowerCase()} tools`, children: _jsx(ChevronDown, { size: 9 }) }), revealed && at && shown.length > 0 && (_jsx("div", { className: "model-flyout-menu", style: { left: at.left, top: at.top }, children: shown.map((v) => (_jsxs("button", { onClick: v.onClick, disabled: v.disabled, title: v.title, children: [v.icon, " ", v.label] }, v.id))) }))] }));
 }
-export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, pickedEdges, onClearPickedEdges, refusals, registerContextActions, historyGen, hasMesh, onExportSTL, onExportOBJ, onExport3MF, canClearModel, onClearModel, activePlane, onActivePlaneChange, sketchMode, onOpenSketch2D, onExitSketch2D, }) {
+export default function ModelEditor({ doc, onChange, selection, onSelect, onSelectionChange, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, refusals, registerContextActions, historyGen, hasMesh, onExportSTL, onExportOBJ, onExport3MF, canClearModel, onClearModel, activePlane, onActivePlaneChange, sketchMode, onOpenSketch2D, onExitSketch2D, onEditFeature, }) {
     const [note, setNote] = useState(null);
     // Which single rule the student most recently set or changed in the Rules
     // panel, if any -- so the toolbar Delete can tell "delete this rule" apart
@@ -254,9 +256,24 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         setCollapsed(next);
         onCollapsed?.(next);
     };
+    // Timeline right-click context menu (SPEC-mouse-parity Phase 4.4): the
+    // feature id, plus the click's own client coords for positioning. null
+    // means closed; Escape or any click elsewhere closes it.
+    const [tlMenu, setTlMenu] = useState(null);
+    // HTML5 drag-and-drop reorder state: which feature id the drag carries
+    // (dataTransfer) and which row is the current drop target (for the
+    // insertion hairline). dataTransfer.setData is write-only on dragover in
+    // every browser, so the id is mirrored in a ref.
+    const [tlDrag, setTlDrag] = useState(null);
+    const tlDragIdRef = useRef(null);
     const [lastShape, setLastShape] = useState('box');
     const [lastRound, setLastRound] = useState('fillet');
     const [lastPattern, setLastPattern] = useState('linear');
+    const lastPatternRef = useRef(lastPattern);
+    lastPatternRef.current = lastPattern;
+    const repeatLastOpRef = useRef(null);
+    // The CURRENT render's verbs, for repeatLast to dispatch through.
+    const verbsRef = useRef(null);
     const [lastMoveCopy, setLastMoveCopy] = useState(false);
     // null until the student has picked a plane once -- see mirror() below.
     // There is no safe default here the way 'fillet' or 'linear' are for the
@@ -264,6 +281,37 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
     // wrong, so the first click has to ask rather than guess.
     const [lastMirrorPlane, setLastMirrorPlane] = useState(null);
     const setSelected = onSelect;
+    // The shared selection, read back in the shapes this file already had
+    // props for, so every consumer below -- round()'s single-edge path,
+    // hollow()'s open face, pickedEdgeUsable and the disabled-state messages
+    // -- reads exactly what it always did:
+    //   selected    the feature ids            (featuresOf)
+    //   pickedEdge  the most recent pick, when that pick was an edge
+    //   pickedFace  ditto for a face
+    // One `primary` slot standing in for what were two separate useStates in
+    // the caller is faithful rather than lossy: its onPick has always set one
+    // of those two and nulled the other on every single pick, so they were
+    // never both live at once.
+    const selected = featuresOf(selection);
+    const primary = primaryOf(selection);
+    const pickedEdge = primary?.kind === 'edge' ? { target: primary.target, edge: primary.name ?? null } : null;
+    const pickedFace = primary?.kind === 'face' ? { target: primary.target, face: primary.name ?? null } : null;
+    /** Forget the most recent pick when it is an edge -- what the caller's own
+     *  onClearPickedEdge() (setPickedEdge(null)) did, called once a picked edge
+     *  has been consumed into a new FilletFeature so nothing stays pinned to a
+     *  selection that no longer points at anything useful. A face primary is
+     *  left alone, exactly as two independent useStates left it. Updater form:
+     *  see onSelectionChange's own doc comment. */
+    const clearPickedEdge = () => onSelectionChange((s) => (s.primary?.kind === 'edge' ? { ...s, primary: null } : s));
+    /** The same for a picked face, once it is consumed into an open Shell. */
+    const clearPickedFace = () => onSelectionChange((s) => (s.primary?.kind === 'face' ? { ...s, primary: null } : s));
+    /** Drop every Shift-added edge, once a multi-edge Round has consumed them
+     *  all. Face items stay: the two multi-pick arrays this replaces were
+     *  independent of each other. */
+    const clearPickedEdgeItems = () => onSelectionChange((s) => {
+        const items = s.items.filter((i) => i.kind !== 'edge');
+        return items.length === s.items.length ? s : { ...s, items };
+    });
     const toolsRef = useRef(null);
     const searchRef = useRef(null);
     // Onshape's Search tools is a magnifier that opens a field, not a field
@@ -305,6 +353,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
             }
             else if (e.key === 'Escape') {
                 setMenu(null);
+                setTlMenu(null);
                 setSearchOpen(false);
             }
         }
@@ -385,7 +434,41 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         setMenu(null);
         say(null);
     }
+    /** Give the chosen hole a recess -- a counterbore (flat bottom) or a countersink
+     *  (cone) -- or take it back off if it already has one.
+     *
+     *  WHY the decision is not written here: this is a component with no test
+     *  harness (see test/marking-menu.test.mjs:227, which greps ModelEditor's
+     *  source because nothing can drive it), so inline logic could only ever be
+     *  checked by reading it. It lives in ./hole-recess.ts, is tested for real,
+     *  and this calls it.
+     *
+     *  A degenerate recess -- wider or deeper than the bore -- is deliberately NOT
+     *  clamped here. By the split pinned in slice A1 that is a kernel refusal, and
+     *  clamping would silently substitute a buildable shape for the one the
+     *  student asked for, which is the failure this campaign exists to prevent. */
+    function recess(kind) {
+        const f = chosen[0];
+        // The inline kind test is a TYPE guard, so `f` narrows to HoleFeature below --
+        // that is its only job. The WORDS come from whyCannotRecess, which is pinned
+        // in hole-recess.test.mjs. At e69d3a2 this restated the sentence inline,
+        // leaving a tested function that guarded nothing and two copies of one rule.
+        if (!f || f.kind !== 'hole') {
+            say(whyCannotRecess(f) ?? 'Pick a hole first.');
+            return;
+        }
+        const had = kind === 'counterbore' ? f.counterbore !== undefined : f.countersink !== undefined;
+        onChange({
+            ...doc,
+            // `x.kind === 'hole'` narrows the union, so no cast is needed -- and it
+            // re-checks the id rather than trusting the match.
+            features: doc.features.map((x) => (x.id === f.id && x.kind === 'hole' ? withRecess(x, kind) : x)),
+        });
+        setMenu(null);
+        say(had ? `Took the ${kind} off this hole.` : `Gave the hole a ${kind}.`);
+    }
     function round(style) {
+        repeatLastOpRef.current = { verb: 'round', style, target: chosen[0].id };
         // Item E: two or more Shift-selected edges on the SAME solid as `chosen`
         // round/bevel together from one click. ownerOf() re-checks each one the
         // same staleness-guard reason the single-edge branch below re-checks
@@ -400,7 +483,17 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         // selected edge in one step" -- one click, every edge rounds -- just as
         // several timeline rows instead of one; flagged rather than silently
         // presented as a single feature.
-        const multi = (pickedEdges ?? []).filter((e) => chosen.length === 1 && chosen[0].id === ownerOf(doc, e));
+        // ownerScoped() IS that ownerOf() re-check, run over the shared
+        // selection's own items -- hoisted so the single-edge branch below can
+        // also report what it ignored (mixedSelectionNote() above).
+        const scoped = chosen.length === 1 ? ownerScoped(selection, doc, chosen[0].id) : [];
+        // P3.3: the kind-filtered view, not a hand-rolled .filter -- the same
+        // helper the status label reads, so label and command can never drift.
+        const scopedState = { ...selection, items: scoped };
+        const scopedEdges = edgesOf(scopedState);
+        const multi = scopedEdges
+            .filter((i) => i.name != null)
+            .map((i) => ({ target: i.target, edge: i.name }));
         if (multi.length > 1) {
             let building = doc;
             const made = [];
@@ -420,11 +513,40 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
             }
             onChange(building);
             setSelected(made.map((f) => f.id));
-            onClearPickedEdges?.();
-            onClearPickedEdge?.();
+            clearPickedEdgeItems();
+            clearPickedEdge();
             setLastRound(style);
             setMenu(null);
-            say(null);
+            say(mixedSelectionNote(scoped));
+            return;
+        }
+        // P3.3: exactly ONE named edge in the selection, with other kinds riding
+        // along. The multi branch above needs 2+, and the pickedEdge branch below
+        // only fires when the edge is the PRIMARY (the most recent click) -- so a
+        // Ctrl-picked edge sitting in `items` beside a face used to fall through
+        // to the whole-shape round, silently ignoring the edge the student
+        // explicitly picked. This branch rounds it and lets the note say what
+        // was ignored; `scoped` is already ownerScoped to chosen[0], so no
+        // second ownerOf() re-check is needed here.
+        if (multi.length === 1 && chosen.length === 1) {
+            const e = multi[0];
+            const root = doc.features.find((x) => x.id === e.edge.feature);
+            const size = root && isRoundable(root) ? Math.min(maxRound(root), 4) : 4;
+            const f = {
+                id: nextId(doc, style === 'chamfer' ? 'bevel' : 'round'),
+                kind: 'fillet',
+                target: e.target,
+                edge: e.edge,
+                size,
+                style,
+            };
+            onChange({ ...doc, features: [...doc.features, f] });
+            setSelected([f.id]);
+            clearPickedEdgeItems();
+            clearPickedEdge();
+            setLastRound(style);
+            setMenu(null);
+            say(mixedSelectionNote(scoped));
             return;
         }
         // A picked EDGE (a click in the 3D viewport) takes priority over the
@@ -476,10 +598,10 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
             };
             onChange({ ...doc, features: [...doc.features, f] });
             setSelected([f.id]);
-            onClearPickedEdge?.();
+            clearPickedEdge();
             setLastRound(style);
             setMenu(null);
-            say(null);
+            say(mixedSelectionNote(scoped));
             return;
         }
         if (chosen.length !== 1) {
@@ -513,6 +635,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
     // and three ring handles on every shape from the start would be clutter for
     // the many models that never turn anything.
     function turn() {
+        repeatLastOpRef.current = { verb: 'turn', target: chosen[0].id };
         if (chosen.length !== 1) {
             say('Pick one shape to turn.');
             return;
@@ -538,6 +661,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         onOpenSketch2D?.(f.id);
     }
     function pull() {
+        repeatLastOpRef.current = { verb: 'pull', target: chosen[0].id };
         const f = chosen[0];
         if (chosen.length !== 1 || !f || f.kind !== 'sketch') {
             say('Pick a sketch to pull into a solid.');
@@ -556,6 +680,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         say(null);
     }
     function spin() {
+        repeatLastOpRef.current = { verb: 'spin', target: chosen[0].id };
         const f = chosen[0];
         if (chosen.length !== 1 || !f || f.kind !== 'sketch') {
             say('Pick a sketch to spin into a solid.');
@@ -574,6 +699,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         say(null);
     }
     function mirror(plane) {
+        repeatLastOpRef.current = { verb: 'mirror', plane, target: chosen[0].id };
         const why = whyCannotSolidOp(chosen, 'mirror');
         if (why) {
             say(why);
@@ -587,6 +713,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         say(null);
     }
     function repeat(mode) {
+        repeatLastOpRef.current = { verb: 'repeat', mode, target: chosen[0].id };
         const why = whyCannotSolidOp(chosen, 'repeat');
         if (why) {
             say(why);
@@ -615,6 +742,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
             return;
         }
         const f = newHole(doc, chosen[0].id);
+        repeatLastOpRef.current = { verb: 'drill', target: chosen[0].id };
         onChange({ ...doc, features: [...doc.features, f] });
         setSelected([f.id]);
         setMenu(null);
@@ -631,6 +759,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
             return;
         }
         const f = newHoleCorners(doc, chosen[0].id);
+        repeatLastOpRef.current = { verb: 'drill', target: chosen[0].id };
         onChange({ ...doc, features: [...doc.features, f] });
         setSelected([f.id]);
         setMenu(null);
@@ -696,6 +825,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
      *  before the student chose a different shape does not silently open
      *  the wrong one. */
     function hollow() {
+        repeatLastOpRef.current = { verb: 'hollow', target: chosen[0].id };
         const why = whyCannotSolidOp(chosen, 'hollow out');
         if (why) {
             say(why);
@@ -706,7 +836,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         onChange(next);
         setSelected([feature.id]);
         if (openFace)
-            onClearPickedFace?.();
+            clearPickedFace();
         say(note);
     }
     /** The explicit Open Hollow flyout -- newShell with the picked face
@@ -731,7 +861,7 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         const { next, feature, note } = insertShell(pickedFace.face);
         onChange(next);
         setSelected([feature.id]);
-        onClearPickedFace?.();
+        clearPickedFace();
         setMenu(null);
         say(note ?? 'Hollowed, open at the face you clicked.');
     }
@@ -742,10 +872,38 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
             return;
         }
         const f = newMove(doc, chosen[0].id, copy);
+        repeatLastOpRef.current = { verb: 'move', copy, target: chosen[0].id };
         onChange({ ...doc, features: [...doc.features, f] });
         setSelected([f.id]);
         setLastMoveCopy(copy);
         setMenu(null);
+        say(null);
+    }
+    /** Delete ONE feature by id, from the timeline context menu (Phase 4.4).
+    *  Routes through the SAME guarded remove() path: set the selection to the
+    *  one id, let remove() run its dependents/confirm machinery on it. */
+    function deleteById(id) {
+        const row = doc.features.find((f) => f.id === id);
+        if (!row)
+            return;
+        setSelected([id]);
+        // remove() reads `chosen`, which is derived state from `selected` -- it
+        // would miss this call's new id until the next render. Inline the same
+        // guarded body instead of a setState-then-call race:
+        const asked = [id];
+        const doomed = [...orphanedBy(doc, asked)];
+        const extra = doc.features.filter((f) => doomed.includes(f.id) && !asked.includes(f.id));
+        if (extra.length > 0) {
+            const extraNames = extra.map((f) => names[f.id] ?? f.id);
+            const list = extraNames.length === 1 ? extraNames[0] : extraNames.slice(0, -1).join(', ') + ' and ' + extraNames[extraNames.length - 1];
+            const verb = extraNames.length === 1 ? 'goes' : 'go';
+            const removedNames = doc.features.filter((f) => doomed.includes(f.id)).map((f) => names[f.id] ?? f.id);
+            setConfirmDelete({ ids: asked, message: `Delete ${names[id] ?? id}? ${list} ${verb} with it.`, removedNames });
+            return;
+        }
+        onChange(withoutFeatures(doc, asked));
+        if (selected.includes(id))
+            setSelected(selected.filter((x) => x !== id));
         say(null);
     }
     function remove() {
@@ -828,15 +986,34 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         // mirror, pattern, shell, move -- not just combine, so dragging a Hole
         // above the box it drills is caught the same as dragging a Cut above
         // its inputs.
-        const seen = new Set();
-        for (const f of features) {
-            const missing = dependsOn(f).filter((t) => !seen.has(t));
-            if (missing.length) {
-                const what = missing.map((t) => names[t] ?? t).join(', ');
-                say(`That would put ${names[f.id]} before ${what}, which it is built from.`);
-                return;
-            }
-            seen.add(f.id);
+        const bad = firstOrderViolation(features);
+        if (bad) {
+            const what = bad.missing.map((t) => names[t] ?? t).join(', ');
+            say(`That would put ${names[bad.feature]} before ${what}, which it is built from.`);
+            return;
+        }
+        onChange({ ...doc, features });
+        say(null);
+    }
+    /** Drag-reorder to a target INDEX (SPEC-mouse-parity Phase 4.4): same
+    *  dependsOn() guard as move() above, shared validation loop -- a drag
+    *  cannot put a Hole before the sketch it drills any more than the up/down
+    *  buttons can. */
+    function moveTo(id, toIndex) {
+        const i = doc.features.findIndex((f) => f.id === id);
+        if (i < 0)
+            return;
+        const j = Math.max(0, Math.min(doc.features.length - 1, toIndex));
+        if (i === j)
+            return;
+        const features = [...doc.features];
+        const [row] = features.splice(i, 1);
+        features.splice(j, 0, row);
+        const bad = firstOrderViolation(features);
+        if (bad) {
+            const what = bad.missing.map((t) => names[t] ?? t).join(', ');
+            say(`That would put ${names[bad.feature]} before ${what}, which it is built from.`);
+            return;
         }
         onChange({ ...doc, features });
         say(null);
@@ -932,16 +1109,90 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
     // stale doc closures until its deps changed, which is the exact drift this
     // hand-off exists to prevent.
     useEffect(() => {
+        verbsRef.current = {
+            drillHole: () => drillHole(),
+            recess: (kind) => recess(kind),
+            hollow: () => hollow(),
+            turn: () => turn(),
+            pull: () => pull(),
+            spin: () => spin(),
+            moveTool: (copy) => moveTool(copy),
+            round: (style) => round(style),
+            mirror: (plane) => mirror(plane),
+            repeat: (mode) => repeat(mode),
+        };
         registerContextActions?.({
             remove: () => remove(),
             moveTool: (copy) => moveTool(copy),
             round: (style) => round(style),
             drillHole: () => drillHole(),
+            recess: (kind) => recess(kind),
             hollow: () => hollow(),
             pull: () => pull(),
             spin: () => spin(),
             turn: () => turn(),
             repeat: (mode) => repeat(mode),
+            repeatLast: () => {
+                // Dispatch through verbsRef (THIS render's verbs — fresh doc), with
+                // the target re-selected first so the verb's `chosen` reads it. A
+                // captured closure would append onto its own STALE doc snapshot and
+                // the second op would overwrite the first (the silent no-op this
+                // replaces).
+                const last = repeatLastOpRef.current;
+                if (!last) {
+                    say('Nothing to repeat yet.');
+                    return;
+                }
+                const verbs = verbsRef.current;
+                if (!verbs) {
+                    say('Nothing to repeat yet.');
+                    return;
+                }
+                const runVerb = () => {
+                    switch (last.verb) {
+                        case 'drill':
+                            verbs.drillHole();
+                            return;
+                        case 'hollow':
+                            verbs.hollow();
+                            return;
+                        case 'turn':
+                            verbs.turn();
+                            return;
+                        case 'pull':
+                            verbs.pull();
+                            return;
+                        case 'spin':
+                            verbs.spin();
+                            return;
+                        case 'move':
+                            verbs.moveTool(last.copy ?? false);
+                            return;
+                        case 'round':
+                            verbs.round(last.style ?? 'fillet');
+                            return;
+                        case 'mirror':
+                            verbs.mirror(last.plane ?? 'yz');
+                            return;
+                        case 'repeat':
+                            verbs.repeat(last.mode ?? 'linear');
+                            return;
+                    }
+                };
+                if (chosen[0]?.id === last.target) {
+                    runVerb();
+                    return;
+                }
+                if (doc.features.some((f) => f.id === last.target)) {
+                    setSelected([last.target]);
+                    // Two frames: the re-selection must COMMIT before the verb reads
+                    // its derived `chosen` (a setTimeout(0) can fire pre-commit).
+                    requestAnimationFrame(() => requestAnimationFrame(runVerb));
+                }
+                else {
+                    say('The shape ' + (names[last.target] ?? last.target) + ' to repeat on is gone.');
+                }
+            },
             mirror: (plane) => mirror(plane),
         });
         return () => registerContextActions?.(null);
@@ -1024,13 +1275,63 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
                                         ? 'Show the full model'
                                         : `Roll back to before "${names[f.id]}"`, "aria-label": rollbackIndex === i
                                         ? 'Show the full model'
-                                        : `Roll back to before "${names[f.id]}"`, children: _jsx("span", { className: "model-rollback-line", "aria-hidden": "true" }) }), _jsxs("li", { className: 'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed') + (rolledBack ? ' is-rolled-back' : '') + (refusedWhy ? ' is-refused' : ''), onClick: (e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey), title: refusedWhy, "aria-label": refusedWhy ? `${names[f.id]}: ${refusedWhy}` : undefined, children: [_jsx("span", { className: "model-step", children: i + 1 }), _jsxs("span", { className: "model-name", children: [names[f.id], refusedWhy && (_jsxs(_Fragment, { children: [_jsx("span", { className: "model-refused", "aria-hidden": "true", children: "\u26A0" }), _jsx("span", { className: "model-refused-why", children: refusedWhy })] })), f.kind === 'sketch' && (_jsxs("em", { className: "model-detail", children: [' ', f.points.length, " corners, ", f.plane, f.constraints?.length ? `, ${f.constraints.length} rules` : ''] })), f.kind === 'extrude' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target] })), f.kind === 'revolve' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target, ", ", f.angle, "\u00B0"] })), f.kind === 'mirror' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, ", ", mirrorPlaneLabel(f.plane)] })), f.kind === 'pattern' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, " \u00D7 ", f.count, f.mode === 'circular' ? ' around' : ''] })), f.kind === 'hole' && (_jsxs("em", { className: "model-detail", children: [' ', f.corners ? '4 holes ' : '', "\u2300", f.diameter, f.corners ? `, ${cornerInsetText(doc, f.target, f.corners)}` : '', ' ', "in ", names[f.target] ?? f.target] })), f.kind === 'shell' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target, ", wall ", f.thickness, f.open ? ', open' : ''] })), f.kind === 'move' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, f.copy ? ' (copy)' : ''] })), f.kind === 'combine' && (_jsxs("em", { className: "model-detail", children: [' ', f.targets.map((t) => names[t] ?? t).join(f.op === 'subtract' ? ' − ' : f.op === 'union' ? ' + ' : ' ∩ ')] })), canRotate(f) && f.rotate && f.rotate.some((v) => v !== 0) ? (_jsx("em", { className: "model-detail", children: " turned" })) : null, 'round' in f && f.round ? (_jsxs("em", { className: "model-detail", children: [" ", f.roundStyle === 'chamfer' ? 'chamfered' : 'filleted'] })) : null] }), _jsxs("span", { className: "model-move", children: [_jsx("button", { onClick: (e) => { e.stopPropagation(); move(f.id, -1); }, disabled: i === 0, "aria-label": `Move ${names[f.id]} earlier`, children: _jsx(ChevronLeft, { size: 12 }) }), _jsx("button", { onClick: (e) => { e.stopPropagation(); move(f.id, 1); }, disabled: i === doc.features.length - 1, "aria-label": `Move ${names[f.id]} later`, children: _jsx(ChevronRight, { size: 12 }) })] })] })] }, f.id));
+                                        : `Roll back to before "${names[f.id]}"`, children: _jsx("span", { className: "model-rollback-line", "aria-hidden": "true" }) }), _jsxs("li", { className: 'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed') + (rolledBack ? ' is-rolled-back' : '') + (refusedWhy ? ' is-refused' : ''), onClick: (e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey), onDoubleClick: () => onEditFeature?.(f.id), 
+                                    // Timeline right-click context menu (Phase 4.4): edit /
+                                    // delete / rollback-to-here.
+                                    onContextMenu: (e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setTlMenu({ id: f.id, x: e.clientX, y: e.clientY });
+                                    }, 
+                                    // HTML5 drag-and-drop reorder (Phase 4.4). draggable on the
+                                    // row; the up/down buttons below stay as the keyboard-
+                                    // reachable fallback SPEC explicitly asks to keep.
+                                    draggable: true, onDragStart: (e) => {
+                                        tlDragIdRef.current = f.id;
+                                        e.dataTransfer.setData('text/plain', f.id);
+                                        e.dataTransfer.effectAllowed = 'move';
+                                    }, onDragOver: (e) => {
+                                        e.preventDefault();
+                                        e.dataTransfer.dropEffect = 'move';
+                                        setTlDrag((d) => (d?.over === f.id ? d : { over: f.id }));
+                                    }, onDrop: (e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const dragged = tlDragIdRef.current;
+                                        setTlDrag(null);
+                                        tlDragIdRef.current = null;
+                                        if (!dragged || dragged === f.id)
+                                            return;
+                                        // The drop lands on the row; moving the dragged feature
+                                        // TO this row's own index gives the Fusion semantics (the
+                                        // dragged chip lands where the target chip was).
+                                        moveTo(dragged, i);
+                                    }, onDragEnd: () => {
+                                        setTlDrag(null);
+                                        tlDragIdRef.current = null;
+                                    }, title: refusedWhy, "aria-label": refusedWhy ? `${names[f.id]}: ${refusedWhy}` : undefined, children: [_jsx("span", { className: "model-step", children: i + 1 }), _jsxs("span", { className: "model-name", children: [names[f.id], refusedWhy && (_jsxs(_Fragment, { children: [_jsx("span", { className: "model-refused", "aria-hidden": "true", children: "\u26A0" }), _jsx("span", { className: "model-refused-why", children: refusedWhy })] })), f.kind === 'sketch' && (_jsxs("em", { className: "model-detail", children: [' ', f.points.length, " corners, ", f.onDatum && names[f.onDatum] ? `on ${names[f.onDatum]}` : placementLabel(f), f.constraints?.length ? `, ${f.constraints.length} rules` : ''] })), f.kind === 'datum' && (_jsxs("em", { className: "model-detail", children: [' ', f.frame ? 'custom plane' : `${f.plane ?? 'xy'}${f.offset ? `, offset ${f.offset}` : ''}`] })), f.kind === 'extrude' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target] })), f.kind === 'revolve' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target, ", ", f.angle, "\u00B0"] })), f.kind === 'mirror' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, ", ", mirrorPlaneLabel(f.plane)] })), f.kind === 'pattern' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, " \u00D7 ", f.count, f.mode === 'circular' ? ' around' : ''] })), f.kind === 'hole' && (_jsxs("em", { className: "model-detail", children: [' ', f.corners ? '4 holes ' : '', "\u2300", f.diameter, f.corners ? `, ${cornerInsetText(doc, f.target, f.corners)}` : '', ' ', "in ", names[f.target] ?? f.target] })), f.kind === 'shell' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target, ", wall ", f.thickness, f.open ? ', open' : ''] })), f.kind === 'move' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, f.copy ? ' (copy)' : ''] })), f.kind === 'combine' && (_jsxs("em", { className: "model-detail", children: [' ', f.targets.map((t) => names[t] ?? t).join(f.op === 'subtract' ? ' − ' : f.op === 'union' ? ' + ' : ' ∩ ')] })), canRotate(f) && f.rotate && f.rotate.some((v) => v !== 0) ? (_jsx("em", { className: "model-detail", children: " turned" })) : null, 'round' in f && f.round ? (_jsxs("em", { className: "model-detail", children: [" ", f.roundStyle === 'chamfer' ? 'chamfered' : 'filleted'] })) : null] }), _jsxs("span", { className: "model-move", children: [_jsx("button", { onClick: (e) => { e.stopPropagation(); move(f.id, -1); }, disabled: i === 0, "aria-label": `Move ${names[f.id]} earlier`, children: _jsx(ChevronLeft, { size: 12 }) }), _jsx("button", { onClick: (e) => { e.stopPropagation(); move(f.id, 1); }, disabled: i === doc.features.length - 1, "aria-label": `Move ${names[f.id]} later`, children: _jsx(ChevronRight, { size: 12 }) })] })] })] }, f.id));
                     }), _jsx("button", { type: "button", className: 'model-rollback-handle'
                             + (rollbackIndex === doc.features.length ? ' is-active' : ''), onClick: () => onRollback?.(rollbackIndex === doc.features.length ? null : doc.features.length), title: "Show the full model", "aria-label": "Show the full model", children: _jsx("span", { className: "model-rollback-line", "aria-hidden": "true" }) })] }), timelineHost) : (_jsxs("ol", { className: "model-list", children: [doc.features.length === 0 && (_jsxs("li", { className: "model-empty", children: ["Nothing here yet. Add a box, select it, and press", ' ', _jsx("strong", { children: "Hole" }), " to drill through it. Drag the view to spin it."] })), doc.features.map((f, i) => {
                         const on = selected.includes(f.id);
                         const refusedWhy = refusals?.get(f.id);
-                        return (_jsxs("li", { className: 'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed'), onClick: (e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey), title: refusedWhy, "aria-label": refusedWhy ? `${names[f.id]}: ${refusedWhy}` : undefined, children: [_jsx("span", { className: "model-step", children: i + 1 }), _jsxs("span", { className: "model-name", children: [names[f.id], refusedWhy && (_jsxs(_Fragment, { children: [_jsx("span", { className: "model-refused", "aria-hidden": "true", children: "\u26A0" }), _jsx("span", { className: "model-refused-why", children: refusedWhy })] })), f.kind === 'sketch' && (_jsxs("em", { className: "model-detail", children: [' ', f.points.length, " corners, ", f.plane, f.constraints?.length ? `, ${f.constraints.length} rules` : ''] })), f.kind === 'extrude' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target] })), f.kind === 'revolve' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target, ", ", f.angle, "\u00B0"] })), f.kind === 'mirror' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, ", ", mirrorPlaneLabel(f.plane)] })), f.kind === 'pattern' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, " \u00D7 ", f.count, f.mode === 'circular' ? ' around' : ''] })), f.kind === 'hole' && (_jsxs("em", { className: "model-detail", children: [' ', f.corners ? '4 holes ' : '', "\u2300", f.diameter, f.corners ? `, ${cornerInsetText(doc, f.target, f.corners)}` : '', ' ', "in ", names[f.target] ?? f.target] })), f.kind === 'shell' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target, ", wall ", f.thickness, f.open ? ', open' : ''] })), f.kind === 'move' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, f.copy ? ' (copy)' : ''] })), f.kind === 'combine' && (_jsxs("em", { className: "model-detail", children: [' ', f.targets.map((t) => names[t] ?? t).join(f.op === 'subtract' ? ' − ' : f.op === 'union' ? ' + ' : ' ∩ ')] })), canRotate(f) && f.rotate && f.rotate.some((v) => v !== 0) ? (_jsx("em", { className: "model-detail", children: " turned" })) : null, 'round' in f && f.round ? (_jsxs("em", { className: "model-detail", children: [" ", f.roundStyle === 'chamfer' ? 'chamfered' : 'filleted'] })) : null] }), _jsxs("span", { className: "model-move", children: [_jsx("button", { onClick: (e) => { e.stopPropagation(); move(f.id, -1); }, disabled: i === 0, "aria-label": `Move ${names[f.id]} earlier`, children: _jsx(ChevronUp, { size: 12 }) }), _jsx("button", { onClick: (e) => { e.stopPropagation(); move(f.id, 1); }, disabled: i === doc.features.length - 1, "aria-label": `Move ${names[f.id]} later`, children: _jsx(ChevronDown, { size: 12 }) })] })] }, f.id));
-                    })] })), _jsx("style", { children: `
+                        return (_jsxs("li", { className: 'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed'), onClick: (e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey), onDoubleClick: () => onEditFeature?.(f.id), title: refusedWhy, "aria-label": refusedWhy ? `${names[f.id]}: ${refusedWhy}` : undefined, children: [_jsx("span", { className: "model-step", children: i + 1 }), _jsxs("span", { className: "model-name", children: [names[f.id], refusedWhy && (_jsxs(_Fragment, { children: [_jsx("span", { className: "model-refused", "aria-hidden": "true", children: "\u26A0" }), _jsx("span", { className: "model-refused-why", children: refusedWhy })] })), f.kind === 'sketch' && (_jsxs("em", { className: "model-detail", children: [' ', f.points.length, " corners, ", f.onDatum && names[f.onDatum] ? `on ${names[f.onDatum]}` : placementLabel(f), f.constraints?.length ? `, ${f.constraints.length} rules` : ''] })), f.kind === 'datum' && (_jsxs("em", { className: "model-detail", children: [' ', f.frame ? 'custom plane' : `${f.plane ?? 'xy'}${f.offset ? `, offset ${f.offset}` : ''}`] })), f.kind === 'extrude' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target] })), f.kind === 'revolve' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target, ", ", f.angle, "\u00B0"] })), f.kind === 'mirror' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, ", ", mirrorPlaneLabel(f.plane)] })), f.kind === 'pattern' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, " \u00D7 ", f.count, f.mode === 'circular' ? ' around' : ''] })), f.kind === 'hole' && (_jsxs("em", { className: "model-detail", children: [' ', f.corners ? '4 holes ' : '', "\u2300", f.diameter, f.corners ? `, ${cornerInsetText(doc, f.target, f.corners)}` : '', ' ', "in ", names[f.target] ?? f.target] })), f.kind === 'shell' && (_jsxs("em", { className: "model-detail", children: [" ", names[f.target] ?? f.target, ", wall ", f.thickness, f.open ? ', open' : ''] })), f.kind === 'move' && (_jsxs("em", { className: "model-detail", children: [' ', names[f.target] ?? f.target, f.copy ? ' (copy)' : ''] })), f.kind === 'combine' && (_jsxs("em", { className: "model-detail", children: [' ', f.targets.map((t) => names[t] ?? t).join(f.op === 'subtract' ? ' − ' : f.op === 'union' ? ' + ' : ' ∩ ')] })), canRotate(f) && f.rotate && f.rotate.some((v) => v !== 0) ? (_jsx("em", { className: "model-detail", children: " turned" })) : null, 'round' in f && f.round ? (_jsxs("em", { className: "model-detail", children: [" ", f.roundStyle === 'chamfer' ? 'chamfered' : 'filleted'] })) : null] }), _jsxs("span", { className: "model-move", children: [_jsx("button", { onClick: (e) => { e.stopPropagation(); move(f.id, -1); }, disabled: i === 0, "aria-label": `Move ${names[f.id]} earlier`, children: _jsx(ChevronUp, { size: 12 }) }), _jsx("button", { onClick: (e) => { e.stopPropagation(); move(f.id, 1); }, disabled: i === doc.features.length - 1, "aria-label": `Move ${names[f.id]} later`, children: _jsx(ChevronDown, { size: 12 }) })] })] }, f.id));
+                    })] })), tlMenu && (_jsxs(_Fragment, { children: [_jsx("div", { className: "tl-menu-backdrop", onClick: () => setTlMenu(null), onContextMenu: (e) => {
+                            e.preventDefault();
+                            setTlMenu(null);
+                        } }), _jsxs("div", { className: "tl-menu", role: "menu", style: { left: tlMenu.x, top: tlMenu.y }, children: [_jsx("button", { type: "button", role: "menuitem", className: "tl-menu-row", onClick: () => {
+                                    const id = tlMenu.id;
+                                    setTlMenu(null);
+                                    onEditFeature?.(id);
+                                }, children: "Edit" }), _jsx("button", { type: "button", role: "menuitem", className: "tl-menu-row", onClick: () => {
+                                    const id = tlMenu.id;
+                                    setTlMenu(null);
+                                    deleteById(id);
+                                }, children: "Delete" }), _jsx("button", { type: "button", role: "menuitem", className: "tl-menu-row", onClick: () => {
+                                    const id = tlMenu.id;
+                                    setTlMenu(null);
+                                    const i = doc.features.findIndex((x) => x.id === id);
+                                    onRollback?.(rollbackIndex === i + 1 ? null : i + 1);
+                                }, children: "Rollback to here" })] })] })), _jsx("style", { children: `
         .model-editor { display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }
         /* Onshape's Part Studio bar, measured against a screenshot of it: ONE
            row that never wraps, square icon-only buttons with no chrome of
@@ -1063,13 +1364,19 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
           align-self: center; flex: 0 0 1px; width: 1px; height: 34px;
           background: var(--reshape-border); margin: 0 4px;
         }
+
         /* ponytail: font-size:0 blanks the bare text node sitting beside each
            icon, which is what makes the bar icon-only without wrapping twenty
            labels in spans. The words stay in the DOM for screen readers and
            are what the tooltip and the flyout menu show. Anything nested that
            SHOULD read as text sets its own size back (menu, search box) --
-           add that line too if you nest something new in here. */
-        .model-tools button {
+           add that line too if you nest something new in here.
+           :not(.sk2d-tool) because the 2D sketch toolbar docks in this same bar
+           (SketchCanvas2D's ribbonHost) and its buttons ARE their label:
+           blanking the size left thirty empty 28px boxes. SK2D_CSS already
+           styles .sk2d-tool as text buttons, but (0,1,0) loses to (0,1,1) here.
+           Excluding the class beats raising SK2D_CSS's specificity for every rule. */
+        .model-tools button:not(.sk2d-tool) {
           display: inline-flex; align-items: center; justify-content: center;
           width: 28px; height: 28px; padding: 0; gap: 0; font-size: 0;
           background: transparent; color: #d3d5e3;
@@ -1210,8 +1517,8 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
            the two read as distinct states (a feature can be both). */
         .model-timeline .model-row.is-rolled-back { opacity: 0.35; filter: grayscale(0.6); }
         /* The rollback tick between chips: a hairline divider, click-to-set
-           (not drag -- a deliberate adaptation of Onshape's draggable bar to
-           reSHape's horizontal timeline). */
+           (the timeline's ROWS drag-reorder now, Phase 4.4; this tick stays
+           click-only). */
         .model-timeline .model-rollback-handle {
           flex: 0 0 auto;
           align-self: stretch;
@@ -1235,6 +1542,28 @@ export default function ModelEditor({ doc, onChange, selected, onSelect, onUndo,
         .model-timeline .model-rollback-handle.is-active .model-rollback-line {
           background: var(--reshape-accent);
         }
+        /* The timeline's right-click context menu (Phase 4.4), fixed to the
+           click's own client coords so it floats above the editor's scroll.
+           Backdrop-under-the-menu, the same convention MarkingMenu.tsx uses
+           for "click elsewhere closes it". */
+        .tl-menu-backdrop { position: fixed; inset: 0; z-index: 39; }
+        .tl-menu {
+          position: fixed; z-index: 40; min-width: 140px;
+          display: flex; flex-direction: column;
+          border: 1px solid var(--border, var(--reshape-border));
+          background: var(--card, var(--reshape-surface));
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+          border-radius: 6px; overflow: hidden;
+        }
+        .tl-menu-row {
+          text-align: left; padding: 6px 12px; border: 0; cursor: pointer;
+          background: var(--card, var(--reshape-surface));
+          color: var(--text, var(--reshape-text));
+          font-size: var(--reshape-font-size-sm, 12px); font-family: var(--reshape-font-ui);
+        }
+        .tl-menu-row:hover { background: var(--reshape-surface-alt); color: var(--reshape-accent); }
+        /* The drop-target hairline while a drag is over a row. */
+        .model-timeline .model-row.is-drop-target { outline: 1px dashed var(--reshape-accent); }
         .model-timeline .model-step {
           flex: 0 0 auto;
           text-align: left;

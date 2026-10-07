@@ -23,6 +23,8 @@ An editor plus a browser is a perfectly good **IDE** (integrated development env
 
 Two things an editor does for you that the console does not. Read the code and notice what would be harder without help.
 
+*(Read it, do not write it yet: `if ... else` runs one block or the other, and `.toFixed(2)` rounds a number to two decimal places, as in 1.3.18. Chapter 2 teaches `if`.)*
+
 ```js live plain
 const taxRate = 0.0725;
 

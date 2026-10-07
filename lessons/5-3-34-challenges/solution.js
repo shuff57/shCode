@@ -1,4 +1,4 @@
-// 2.2.13 Challenges: reference solution.
+// 5.4.21 Challenges: reference solution.
 // Demonstrates all three OOP stretches: Challenge 1 (Enemy.isAlive),
 // Challenge 2 (Player class wrapping a sprite), Challenge 3 (PowerUp
 // extends Collectible). Any one of the three is enough to pass the grader.

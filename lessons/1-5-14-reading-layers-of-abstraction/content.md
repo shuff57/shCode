@@ -26,6 +26,8 @@ The programming version of this is the whole reason §1.4.5 mattered: high-level
 
 Three layers, visible at once. Each line uses the one below without knowing how it works.
 
+*(Read it, do not write it yet: `[ ... ]` is a list of values, `prices[i]` is the item at position `i` counting from 0, `.length` is how many items there are, and `for` repeats its block once per position. `.toFixed(2)` rounds a number to two decimal places, as in 1.3.18. Chapter 2 teaches lists and loops.)*
+
 ```js live plain
 // Bottom layer: the machine adds numbers. You never see this happen.
 let prices = [4.50, 2.25, 9.99];

@@ -47,7 +47,7 @@
     {
       "id": "r1",
       "title": "Create multiple static walls",
-      "description": "At least two 'static' sprites",
+      "description": "At least two 'static' sprites. Help: 5.2.6 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\([^)]*['\"]static['\"][\\s\\S]*new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
@@ -69,7 +69,7 @@
     {
       "id": "r3",
       "title": "Set bounciness",
-      "description": "Assign to .bounciness",
+      "description": "Assign to .bounciness. Help: 5.2.6 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.bounciness\\s*=",
@@ -80,7 +80,7 @@
     {
       "id": "r4",
       "title": "Set friction",
-      "description": "Assign to .friction",
+      "description": "Assign to .friction. Help: 5.2.6 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.friction\\s*=",

@@ -1,4 +1,4 @@
-// 2.1.5 Hello Sprite (reference solution).
+// 5.1.11 Hello Sprite (reference solution).
 // First moSHion sketch: canvas, sprite, color, background.
 
 let player;

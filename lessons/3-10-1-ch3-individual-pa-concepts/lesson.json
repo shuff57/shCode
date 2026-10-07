@@ -1,7 +1,7 @@
 {
   "id": "3-10-1-ch3-individual-pa-concepts",
   "title": "3.10.1 Individual PA Part 1: Concepts and Traces",
-  "description": "Eight questions: three on the ideas of Chapter 3, five where you read a short program and say what it prints. One submission, nothing marked on screen.",
+  "description": "Eight questions: three on the ideas of Chapter 3, five where you read a short program and say what it prints. Three tries: you see your total after each one, your best try counts, and the marking appears after the last.",
   "type": "assignment",
   "estimateMins": 16,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -23,6 +23,7 @@
   "assignmentCode": "A3.10.1",
   "quiz": {
     "summative": true,
+    "maxSubmissions": 3,
     "shuffle": true,
     "variants": [
       "a",
@@ -81,7 +82,7 @@
       {
         "id": "a-t1-no-return",
         "variant": "a",
-        "source": "3.2.11",
+        "source": "3.2.14",
         "question": "What does this program print?",
         "code": "function setup(name) {\n  const label = \"Counter: \" + name;\n}\n\nconst out = setup(\"Gate A\");\nconsole.log(out);",
         "options": [
@@ -91,7 +92,7 @@
           "\"out\""
         ],
         "answer": 0,
-        "explanation": "setup builds label but has no return (3.2.11), so the call evaluates to undefined and that is what prints. The label exists only inside the function and vanishes when the function ends.",
+        "explanation": "setup builds label but has no return (3.2.14), so the call evaluates to undefined and that is what prints. The label exists only inside the function and vanishes when the function ends.",
         "sourceIds": [
           "3-2-11-reading-return-ends-function"
         ]
@@ -171,7 +172,7 @@
       {
         "id": "b-t1-no-return",
         "variant": "b",
-        "source": "3.2.11",
+        "source": "3.2.14",
         "question": "What does this program print?",
         "code": "function greeting(name) {\n  const line = \"Hello \" + name;\n}\n\nconst out = greeting(\"Sam\");\nconsole.log(out);",
         "options": [
@@ -181,7 +182,7 @@
           "The program stops with an error"
         ],
         "answer": 0,
-        "explanation": "Same shape, different values: greeting builds line but returns nothing (3.2.11), so the call is undefined and undefined is what prints.",
+        "explanation": "Same shape, different values: greeting builds line but returns nothing (3.2.14), so the call is undefined and undefined is what prints.",
         "sourceIds": [
           "3-2-11-reading-return-ends-function"
         ]
@@ -261,7 +262,7 @@
       {
         "id": "c-t1-no-return",
         "variant": "c",
-        "source": "3.2.11",
+        "source": "3.2.14",
         "question": "What does this program print?",
         "code": "function tag(item) {\n  const text = item.name + \" — \" + item.price;\n}\n\nconst out = tag({ name: \"Clip\", price: 1.2 });\nconsole.log(out);",
         "options": [
@@ -271,7 +272,7 @@
           "The program stops with an error"
         ],
         "answer": 0,
-        "explanation": "tag builds text and returns nothing (3.2.11), so out is undefined and undefined is what prints. Printing inside would not have helped: the caller would still receive undefined.",
+        "explanation": "tag builds text and returns nothing (3.2.14), so out is undefined and undefined is what prints. Printing inside would not have helped: the caller would still receive undefined.",
         "sourceIds": [
           "3-2-11-reading-return-ends-function"
         ]

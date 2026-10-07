@@ -1,4 +1,4 @@
-// 2.3.21 A14.1 Car on a Ramp (reference solution).
+// 6.3.10 A14.1 Car on a Ramp (reference solution).
 // Two-wheeled chassis joined by WheelJoints; WASD drives the wheels.
 
 let ground, ramp, chassis, leftWheel, rightWheel;
@@ -12,7 +12,7 @@ function setup() {
 
   ramp = new Sprite(450, 340, 200, 20, 'static');
   ramp.color = '#666';
-  ramp.rotation = -Math.PI / 8;
+  ramp.rotation = -20;
 
   chassis = new Sprite(120, 280, 70, 20);
   chassis.color = 'deepskyblue';

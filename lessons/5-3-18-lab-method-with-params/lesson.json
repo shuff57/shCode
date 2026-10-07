@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "addBy(n) method declared",
-      "description": "Write an `addBy(n)` method inside `Counter` that takes a parameter and uses it.",
+      "description": "Write an `addBy(n)` method inside `Counter` that takes a parameter and uses it. Help: 5.4.1 (Methods: functions that live on a class)",
       "type": "regex",
       "file": "script.js",
       "pattern": "addBy\\s*\\(\\s*\\w+\\s*\\)\\s*\\{",
@@ -37,7 +37,7 @@
     {
       "id": "r2",
       "title": "Parameter used inside method body",
-      "description": "The parameter passed to `addBy` is referenced inside the method body (e.g. `this.n += n`).",
+      "description": "The parameter passed to `addBy` is referenced inside the method body (e.g. `this.n += n`). Help: 3.2.5 (Parameters and Arguments)",
       "type": "regex",
       "file": "script.js",
       "pattern": "addBy\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{[\\s\\S]*?this\\.n\\s*(?:\\+=\\s*\\1|=\\s*this\\.n\\s*\\+\\s*\\1)",

@@ -1,4 +1,4 @@
-// 2.3.20 A14.1 Space Jumper (reference solution).
+// 6.3.9 A14.1 Space Jumper (reference solution).
 // WASD player + ground-gated jump (kb.presses(' ') + .colliding(ground))
 // + goal overlap.
 

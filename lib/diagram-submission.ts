@@ -6,6 +6,7 @@
 
 import type { DiagramDoc } from './diagram-types';
 import type { CheckResult } from './diagram-check';
+import { sanitizeDiagramDoc } from './diagram-artifact';
 
 /**
  * A stored response, if it is a flowchart. Returns null for prose, for
@@ -18,15 +19,27 @@ export function parseDiagramResponse(raw: string | null | undefined): DiagramDoc
   // Cheap reject before spending a JSON.parse on a long essay.
   if (!text.startsWith('{')) return null;
   try {
-    const parsed = JSON.parse(text);
-    if (!parsed || !Array.isArray(parsed.nodes) || !Array.isArray(parsed.edges)) return null;
-    // Node shape matters: an unrelated {nodes, edges} object would render as an
-    // empty canvas, which reads as "the student submitted nothing".
-    const nodesOk = parsed.nodes.every(
-      (n: any) => n && typeof n.id === 'string' && typeof n.shape === 'string',
-    );
-    if (!nodesOk) return null;
-    return { version: 1, nodes: parsed.nodes, edges: parsed.edges };
+    // One validator for every reader (lib/diagram-artifact.ts): a row written by the uncapped or
+    // 'client' route is whatever the browser sent, and a null arrow or a numeric label must never
+    // reach docToFlow (round 7: it took the whole /teacher page down).
+    return sanitizeDiagramDoc(JSON.parse(text));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The chart a capped AI-graded flowchart part kept with its counted row
+ * (grade_json.artifact, written by grade-written from cleanArtifact). The row's `response` is
+ * the Mermaid text the model read, so the drawn chart lives here. Null when absent or malformed.
+ */
+export function parseDiagramArtifact(raw: string | null | undefined): DiagramDoc | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    const doc = parsed && typeof parsed === 'object' ? (parsed as { artifact?: { doc?: unknown } }).artifact?.doc : null;
+    if (!doc || typeof doc !== 'object') return null;
+    return parseDiagramResponse(JSON.stringify(doc));
   } catch {
     return null;
   }
@@ -61,14 +74,38 @@ export function parseDiagramGrade(raw: string | null | undefined): DiagramGradeJ
   try {
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return null;
-    const hasStructural = Array.isArray(parsed.structural);
+    // A capped AI part keeps its browser-side checks beside the grade, under `artifact.checks`.
+    const artifactChecks = parsed.artifact && Array.isArray(parsed.artifact.checks) ? parsed.artifact.checks : null;
+    const hasStructural = Array.isArray(parsed.structural) || (artifactChecks !== null && artifactChecks.length > 0);
     const hasAi = parsed.ai && Array.isArray(parsed.ai.criteria);
     if (!hasStructural && !hasAi) return null;
     return {
-      structural: hasStructural ? parsed.structural : undefined,
+      structural: hasStructural ? cleanChecks(Array.isArray(parsed.structural) ? parsed.structural : artifactChecks) : undefined,
       ai: hasAi ? parsed.ai : undefined,
     };
   } catch {
     return null;
   }
+}
+
+/**
+ * A stored check list is whatever a browser sent on the uncapped and 'client' routes, and the
+ * reader renders `c.passed` / `c.title` straight off it, so a null entry took the page down. Keep
+ * only entries that are objects and give each a boolean `passed` and a string `title` (round 7).
+ */
+function cleanChecks(list: unknown): CheckResult[] {
+  if (!Array.isArray(list)) return [];
+  const out: CheckResult[] = [];
+  for (const c of list.slice(0, 60)) {
+    if (!c || typeof c !== 'object') continue;
+    const k = c as { id?: unknown; title?: unknown; passed?: unknown; detail?: unknown; offenders?: unknown };
+    out.push({
+      id: typeof k.id === 'string' ? k.id.slice(0, 40) : '',
+      title: typeof k.title === 'string' ? k.title.slice(0, 200) : String(k.id ?? 'check').slice(0, 40),
+      passed: k.passed === true,
+      detail: typeof k.detail === 'string' ? k.detail.slice(0, 500) : '',
+      offenders: Array.isArray(k.offenders) ? k.offenders.filter((o): o is string => typeof o === 'string').slice(0, 50) : [],
+    } as CheckResult);
+  }
+  return out;
 }

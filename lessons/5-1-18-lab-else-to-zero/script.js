@@ -1,4 +1,4 @@
-// 2.1.7d Lab: Delete the else, watch drift.
+// 5.1.18 Lab: Delete the else, watch drift.
 
 // This lab ships with a BROKEN movement pattern: both `else` lines that reset
 // velocity to 0 are missing. The auto-grader checks that you put them back.

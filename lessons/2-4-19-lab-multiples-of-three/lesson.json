@@ -28,17 +28,17 @@
     {
       "id": "r1",
       "title": "for loop present",
-      "description": "A for loop from 1 to 20 uses %3 to decide when to continue, and logs the number otherwise, all inside the loop's own body",
+      "description": "A for loop from 1 to 20 uses %3 to decide when to continue, and logs the number otherwise, all inside the loop's own body. Help: 2.2.9 (The for Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\1\\s*(?:<=\\s*20|<\\s*21)[^)]*\\)\\s*\\{[^{}]*if\\s*\\([^)]*\\1\\s*%\\s*3[^)]*\\)\\s*\\{(?=[^{}]*\\bcontinue\\b)[^{}]*\\}[^{}]*console\\.log\\s*\\(\\s*\\1\\s*\\)[^{}]*\\}",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+([A-Za-z_$]\\w*)\\s*=\\s*1\\s*;\\s*\\1\\s*(?:<=\\s*20|<\\s*21)[^)]*\\)\\s*\\{[^{}]*if\\s*\\(\\s*\\(?[^)]*\\1\\s*%\\s*3[^)]*\\)\\s*\\)?\\s*\\{(?=[^{}]*\\bcontinue\\b)(?:[^{}]|\\$\\{[^}]*\\})*\\}(?:[^{}]|\\$\\{[^}]*\\})*console\\.log\\s*\\([^)]*\\b\\1\\b(?:[^{}]|\\$\\{[^}]*\\})*\\}",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "continue present",
-      "description": "Code contains a continue statement",
+      "description": "Code contains a continue statement. Help: 2.4.13 (Skipping a Round with continue)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bcontinue\\b",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "remainder operator used",
-      "description": "Code uses % to test for a multiple of 3",
+      "description": "Code uses % to test for a multiple of 3. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
       "pattern": "%\\s*3",
@@ -58,7 +58,7 @@
     {
       "id": "r4",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 2.4.13 (Skipping a Round with continue)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

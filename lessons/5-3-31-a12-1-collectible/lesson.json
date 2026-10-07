@@ -40,7 +40,7 @@
     {
       "id": "s4",
       "title": "Detect overlaps and collect",
-      "instructions": "In `draw()`, iterate the `collectibles` array. When the player overlaps a collectible's sprite, call its `collect()` method, add the returned value to `totalScore`, and remove that item from the array.",
+      "instructions": "In `draw()`, iterate the `collectibles` array. When the player overlaps a collectible's sprite (player.overlaps(c.sprite)), call its `collect()` method, add the returned value to `totalScore`, and remove that item from the array.",
       "hints": [
         "Check the Sprite section of the moSHion docs drawer for the overlap check.",
         "Removing items while iterating forwards skips neighbours: search for 'iterate backwards to splice' if you hit that bug."
@@ -51,7 +51,7 @@
     {
       "id": "r1",
       "title": "Constructor stores state on the object",
-      "description": "The constructor body assigns at least one argument onto this: the class shell is provided, so this checks the part the student writes",
+      "description": "The constructor body assigns at least one argument onto this: the class shell is provided, so this checks the part the student writes. Help: 5.4.17 (When to reach for OOP)",
       "type": "regex",
       "file": "script.js",
       "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?this\\.\\w+\\s*=",
@@ -61,7 +61,7 @@
     {
       "id": "r2",
       "title": "Constructor creates the sprite",
-      "description": "The constructor creates the sprite this collectible owns",
+      "description": "The constructor creates the sprite this collectible owns. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
       "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?this\\.sprite\\s*=\\s*new\\s+Sprite",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "collect() method does work",
-      "description": "A collect() method whose body returns something AND deletes the sprite (via this.sprite.delete() or sprite.remove()).",
+      "description": "A collect() method whose body returns something AND deletes the sprite (via this.sprite.delete() or sprite.remove()). Help: 5.4.17 (When to reach for OOP)",
       "type": "regex",
       "file": "script.js",
       "pattern": "collect\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?(this\\.sprite\\.delete|\\.remove)[\\s\\S]*?return\\b|collect\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?return[\\s\\S]*?(this\\.sprite\\.delete|\\.remove)",
@@ -81,7 +81,7 @@
     {
       "id": "r4",
       "title": "At least one instance",
-      "description": "At least one Collectible is instantiated.",
+      "description": "At least one Collectible is instantiated. Help: 5.4.17 (When to reach for OOP)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Collectible\\s*\\(",
@@ -91,11 +91,11 @@
     {
       "id": "r5",
       "title": "Overlap detection",
-      "description": "The code checks for overlap between player and a sprite.",
+      "description": "The code checks for overlap between player and a sprite (.overlaps() or .overlapping()).",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "\\.overlaps\\s*\\(",
+      "pattern": "\\.overlap(?:s|ping)\\s*\\(",
       "flags": "",
       "points": 0
     }

@@ -102,13 +102,16 @@ const PLANE_WORD = { xy: 'top', xz: 'front', yz: 'side' };
  *  perpendicular pair grid, its Pin a corner row), 1-based, matching
  *  lib/reshape-script.ts's SketchHandle methods exactly (see that file's own
  *  comment on why "across"/"up" rather than a synonym like "level"). */
-function constraintCallLine(v, c) {
+function constraintCallLine(v, c, bindings) {
+    // A value the script gave as a param() keeps its name (the slot names are the interpreter's: len{edge}, dx{a}_{b}, ...); without
+    // this a param()-driven .length() came back as a literal and the slider was gone after a save.
+    const bound = (slot, value) => numText(bindings, v, slot, lit(value));
     if (c.kind === 'horizontal')
         return `${v}.across(${c.edge + 1})`;
     if (c.kind === 'vertical')
         return `${v}.up(${c.edge + 1})`;
     if (c.kind === 'length')
-        return `${v}.length(${c.edge + 1}, ${lit(c.value)})`;
+        return `${v}.length(${c.edge + 1}, ${bound(`len${c.edge}`, c.value)})`;
     if (c.kind === 'lock')
         return `${v}.pin(${c.corner + 1})`;
     // The four Point-rules rows below USED to throw here: P1d (packages/sketch)
@@ -121,13 +124,13 @@ function constraintCallLine(v, c) {
     // purpose: distanceX/distanceY/symmetric carry no .edge and would fall
     // into that line, emitting undefined.
     if (c.kind === 'distanceX')
-        return `${v}.distX(${c.a + 1}, ${c.b + 1}, ${lit(c.value)})`;
+        return `${v}.distX(${c.a + 1}, ${c.b + 1}, ${bound(`dx${c.a}_${c.b}`, c.value)})`;
     if (c.kind === 'distanceY')
-        return `${v}.distY(${c.a + 1}, ${c.b + 1}, ${lit(c.value)})`;
+        return `${v}.distY(${c.a + 1}, ${c.b + 1}, ${bound(`dy${c.a}_${c.b}`, c.value)})`;
     if (c.kind === 'symmetric')
         return `${v}.symmetric(${c.a + 1}, ${c.b + 1}, ${c.center + 1})`;
     if (c.kind === 'angle')
-        return `${v}.angle(${c.edge + 1}, ${c.other + 1}, ${lit(c.degrees)})`;
+        return `${v}.angle(${c.edge + 1}, ${c.other + 1}, ${bound(`ang${c.edge}_${c.other}`, c.degrees)})`;
     return `${v}.${c.kind}(${c.edge + 1}, ${c.other + 1})`; // equal / parallel / perpendicular
 }
 /** For every feature id, the script variable that currently represents it --
@@ -199,8 +202,13 @@ function draftFromWord(doc, rootId, pull, neutral) {
  *  RunResult.namedParams; empty when the doc was never built by a script
  *  (the ordinary Build-mode case), so every lookup below misses and this
  *  file's output is unchanged from before named params existed. */
+/** Per bindings map: every bound slot the emitter actually wrote a variable name for, with the literal it would otherwise have
+ *  written (the doc's current value there). The param() declarations are built from THIS, after the body: a name written into the
+ *  body with no declaration above it stops the saved script ("w is not a tool here"), whatever generatedParams() lists. */
+const usedSlots = new WeakMap();
 function paramBindings(namedParams) {
     const map = new Map();
+    usedSlots.set(map, new Map());
     if (!namedParams)
         return map;
     for (const p of namedParams) {
@@ -255,16 +263,16 @@ function ruleRowText(bindings, featureId, index, r) {
     const val = (value) => numText(bindings, featureId, `rule${index}-value`, lit9(value));
     const pt = (side, ref, end) => ` ${side}:${n(ref)}${end ? `, ${side}End:'${end}'` : ''}`;
     switch (r.k) {
-        case 'coincident': return `{ k:'coincident',${pt('a', r.a, r.aEnd)}${pt('b', r.b, r.bEnd)} }`;
+        case 'coincident': return `{ k:'coincident',${pt('a', r.a, r.aEnd)},${pt('b', r.b, r.bEnd)} }`;
         case 'pointOnObject': return `{ k:'pointOnObject', a:${n(r.a)}${r.aEnd ? `, aEnd:'${r.aEnd}'` : ''}, b:${n(r.b)} }`;
         case 'horizontal': return `{ k:'horizontal', a:${n(r.a)} }`;
         case 'vertical': return `{ k:'vertical', a:${n(r.a)} }`;
         case 'parallel': return `{ k:'parallel', a:${n(r.a)}, b:${n(r.b)} }`;
         case 'perpendicular': return `{ k:'perpendicular', a:${n(r.a)}, b:${n(r.b)} }`;
         case 'tangent': {
-            const ends = r.aEnd !== undefined || r.bEnd !== undefined
-                ? `${r.aEnd ? `, aEnd:'${r.aEnd}'` : ''}${r.bEnd ? `, bEnd:'${r.bEnd}'` : ''}`
-                : '';
+            // aEnd goes between a and b; bEnd follows b (it was also emitted here,
+            // so a tangent row came out with bEnd twice -- harmless JS, ugly text).
+            const ends = r.aEnd ? `, aEnd:'${r.aEnd}'` : '';
             const side = r.side !== undefined ? `, side:${n(r.side)}` : '';
             const mode = r.mode ? `, mode:'${r.mode}'` : '';
             return `{ k:'tangent', a:${n(r.a)}${ends}, b:${n(r.b)}${r.bEnd ? `, bEnd:'${r.bEnd}'` : ''}${side}${mode} }`;
@@ -283,8 +291,24 @@ function ruleRowText(bindings, featureId, index, r) {
         case 'lock': return `{ k:'lock', a:${n(r.a)}${r.aEnd ? `, aEnd:'${r.aEnd}'` : ''} }`;
     }
 }
+/** `turn(id, [rx, ry, rz])` for a primitive that carries a rotation. The box, cylinder and cone branches spell this out inline;
+ *  the ring branch did not emit it at all, so a turned ring came back from a save unturned (a different part, silently).
+ *  Prism and wedge are deliberately NOT given one: canRotate() is false for them, so turn() refuses them and the script would
+ *  stop; nothing in the language or the studio can put a rotation on either. */
+function emitTurn(bindings, lines, f) {
+    if (!f.rotate || !f.rotate.some((n) => n !== 0))
+        return;
+    const rx = numText(bindings, f.id, 'rx', lit(f.rotate[0]));
+    const ry = numText(bindings, f.id, 'ry', lit(f.rotate[1]));
+    const rz = numText(bindings, f.id, 'rz', lit(f.rotate[2]));
+    lines.push(`turn(${f.id}, [${rx}, ${ry}, ${rz}])`);
+}
 function numText(bindings, featureId, slot, literalText) {
-    return bindings.get(pname(featureId, slot)) ?? literalText;
+    const key = pname(featureId, slot);
+    const bound = bindings.get(key);
+    if (bound !== undefined)
+        usedSlots.get(bindings)?.set(key, literalText);
+    return bound ?? literalText;
 }
 /** One `key: value` entry in an options object, or the bare-shorthand `key`
  *  when the bound param's own name happens to match the option key (the
@@ -293,6 +317,7 @@ function optText(bindings, featureId, slot, key, literalText) {
     const paramName = bindings.get(pname(featureId, slot));
     if (!paramName)
         return `${key}: ${literalText}`;
+    usedSlots.get(bindings)?.set(pname(featureId, slot), literalText);
     return paramName === key ? key : `${key}: ${paramName}`;
 }
 export function toScript(doc, namedParams) {
@@ -321,7 +346,14 @@ export function toScript(doc, namedParams) {
     // this is a stale namedParams array from a different doc entirely) is
     // skipped rather than emitted dead: declaring `wall` and never using it is
     // not what round-tripping a doc should produce.
-    if (namedParams) {
+    // The declarations are BUILT after the body (declareParams() below) and put in front of it: a name the body used must be
+    // declared, even when generatedParams() has no row for the slot (a sketch's rect width/height, a .length() value, ...);
+    // before this, `s.rect(w, h)` was saved with `w` and `h` undeclared and the saved script stopped on reopen.
+    const decls = [];
+    const declareParams = () => {
+        if (!namedParams)
+            return;
+        const used = usedSlots.get(bindings) ?? new Map();
         for (const p of namedParams) {
             // Skip a param() whose every bound slot has gone missing from THIS
             // doc (its feature was deleted, or namedParams came from a different
@@ -330,11 +362,12 @@ export function toScript(doc, namedParams) {
             if (p.slots.length === 0)
                 continue;
             const liveSlot = p.slots.find((s) => liveValues.has(s));
-            if (liveSlot === undefined)
+            const usedSlot = p.slots.find((s) => used.has(s));
+            if (liveSlot === undefined && usedSlot === undefined)
                 continue;
             // The doc's OWN current value at that slot, not p.value -- see
             // liveValues's own comment for why those two can disagree.
-            const currentValue = liveValues.get(liveSlot);
+            const currentValue = liveSlot !== undefined ? liveValues.get(liveSlot) : Number(used.get(usedSlot));
             const opts = [];
             if (!near(p.min, 0))
                 opts.push(`min: ${lit(p.min)}`);
@@ -345,9 +378,9 @@ export function toScript(doc, namedParams) {
             if (p.caption !== p.name)
                 opts.push(`caption: '${p.caption.replace(/'/g, "\\'")}'`);
             const optsText = opts.length ? `, { ${opts.join(', ')} }` : '';
-            lines.push(`const ${p.name} = param('${p.name}', ${lit(currentValue)}${optsText})`);
+            decls.push(`const ${p.name} = param('${p.name}', ${lit(currentValue)}${optsText})`);
         }
-    }
+    };
     doc.features.forEach((f, i) => {
         if (f.kind === 'box') {
             const def = defaultCenter(doc, i, 'box');
@@ -413,6 +446,7 @@ export function toScript(doc, namedParams) {
             const def = defaultCenter(doc, i, 'torus');
             const at = emitAt(bindings, f.id, f.center, def);
             lines.push(`const ${f.id} = torus(${lit(across)}, ${lit(tubeAcross)}${at})`);
+            emitTurn(bindings, lines, f);
             return;
         }
         if (f.kind === 'prism') {
@@ -434,10 +468,39 @@ export function toScript(doc, namedParams) {
             lines.push(`const ${f.id} = wedge(${w}, ${d}, ${h}${at})`);
             return;
         }
+        if (f.kind === 'datum') {
+            // A datum plane, in the plane's own named or literal-frame form. It is
+            // emitted even when no sketch uses it (it is a timeline row). A literal
+            // frame has no param slots (stated limit); a named plane's offset does.
+            if (f.frame) {
+                const vec3 = (a) => `[${a.map((n) => lit(n)).join(', ')}]`;
+                lines.push(`const ${f.id} = plane({ origin: ${vec3(f.frame.origin)}, u: ${vec3(f.frame.u)}, v: ${vec3(f.frame.v)} })`);
+            }
+            else {
+                const word = PLANE_WORD[f.plane ?? 'xy'] ?? 'top';
+                const off = f.offset ?? 0;
+                const bound = bindings.has(pname(f.id, 'offset'));
+                const offsetArg = off !== 0 || bound ? `, ${numText(bindings, f.id, 'offset', lit(off))}` : '';
+                lines.push(`const ${f.id} = plane('${word}'${offsetArg})`);
+            }
+            return;
+        }
         if (f.kind === 'sketch') {
-            const plane = PLANE_WORD[f.plane] ?? 'top';
-            const offsetArg = f.offset !== 0 ? `, ${lit(f.offset)}` : '';
-            lines.push(`const ${f.id} = sketch('${plane}'${offsetArg})`);
+            if (f.onDatum && byId.get(f.onDatum)?.kind === 'datum') {
+                // The datum's own statement (above) carries the placement.
+                lines.push(`const ${f.id} = sketch(${f.onDatum})`);
+            }
+            else if (f.frame) {
+                // A framed sketch ignores plane/offset (model-types.ts SketchFrame),
+                // so the frame IS the whole placement. Normal = u x v.
+                const vec3 = (a) => `[${a.map((n) => lit(n)).join(', ')}]`;
+                lines.push(`const ${f.id} = sketch({ origin: ${vec3(f.frame.origin)}, u: ${vec3(f.frame.u)}, v: ${vec3(f.frame.v)} })`);
+            }
+            else {
+                const plane = PLANE_WORD[f.plane] ?? 'top';
+                const offsetArg = f.offset !== 0 ? `, ${lit(f.offset)}` : '';
+                lines.push(`const ${f.id} = sketch('${plane}'${offsetArg})`);
+            }
             // A soup sketch emits its rows INSTEAD of the polygon language: the
             // soup is the newer representation and the one the kernel solves from
             // (SPEC-sketcher2 §6). If a doc somehow carries both, the soup wins --
@@ -491,16 +554,17 @@ export function toScript(doc, namedParams) {
                     // instead and drop them on the Code -> Run round trip; every rule
                     // in `f.constraints` is written here now, so nothing is lost.
                     for (const c of f.constraints ?? []) {
-                        lines.push(constraintCallLine(f.id, c));
+                        lines.push(constraintCallLine(f.id, c, bindings));
                     }
                 }
                 for (const [k, r] of Object.entries(f.rounds ?? {})) {
+                    // The document counts corners from 0; the script counts them from 1, like the panel.
                     if (r > 0)
-                        lines.push(`${f.id}.round(${k}, ${lit(r)})`);
+                        lines.push(`${f.id}.round(${Number(k) + 1}, ${numText(bindings, f.id, `r${k}`, lit(r))})`);
                 }
                 for (const [k, d] of Object.entries(f.chamfers ?? {})) {
                     if (d > 0)
-                        lines.push(`${f.id}.chamfer(${k}, ${lit(d)})`);
+                        lines.push(`${f.id}.chamfer(${Number(k) + 1}, ${lit(d)})`);
                 }
             }
             return;
@@ -585,6 +649,19 @@ export function toScript(doc, namedParams) {
             if (throughDepth == null || !near(f.depth, throughDepth)) {
                 opts.push(optText(bindings, f.id, 'depth', 'deep', lit(f.depth)));
             }
+            // Recesses (SPEC-brep-feature-provenance 5.2b). These leaves are NOT parameter
+            // slots: `optText` binds to a generated param on the feature, and a recess's numbers
+            // are nested fields with no slot of their own. So they are emitted as literals and a
+            // student's binding is not preserved for them, exactly as for any other literal in a
+            // regenerated script. The VALUE surviving is the part that matters -- it is what was
+            // silently lost for `deep` in A0, and losing a recess this way would be the same bug
+            // one level deeper: the hole would come back shallower and nothing would say so.
+            if (f.counterbore) {
+                opts.push(`counterbore: { across: ${lit(f.counterbore.diameter)}, deep: ${lit(f.counterbore.depth)} }`);
+            }
+            if (f.countersink) {
+                opts.push(`countersink: { across: ${lit(f.countersink.diameter)}, angle: ${lit(f.countersink.angleDeg)} }`);
+            }
             if (f.axis !== 'z')
                 opts.push(`along: '${f.axis}'`);
             const [ca, cb, slotA, slotB] = f.axis === 'z' ? [f.center[0], f.center[1], 'x', 'y']
@@ -639,6 +716,8 @@ export function toScript(doc, namedParams) {
             return;
         }
     });
+    declareParams();
+    lines.unshift(...decls);
     return lines.join('\n') + (lines.length ? '\n' : '');
 }
 //# sourceMappingURL=reshape-script-gen.js.map

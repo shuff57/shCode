@@ -120,3 +120,26 @@ export function buildQuizView(
 function identityOrder(q: QuizQuestion): number[] {
   return (q.options ?? []).map((_, i) => i);
 }
+
+/**
+ * How many questions ONE student's paper carries: what a perfect score is out of.
+ *
+ * A quiz with `variants` ships every form's questions, but a student answers one
+ * form (3 shared + 5 of their own, say). The score stored for a hand-in is correct
+ * out of THAT paper, so a denominator that counted every form's questions read a
+ * perfect 8/8 as 8/18 = 44% in the gradebook and on the student's own badge.
+ * Counted per form and the smallest taken, so no student is graded out of more
+ * than their paper held (the grade clamps at 100, never above).
+ *
+ * scripts/generate-lessons-manifest.mjs repeats these few lines for the Pages
+ * Functions (a .mjs cannot import this .ts); scripts/test-attempt-reveal.mjs holds
+ * the two to the same answer for every quiz in the course.
+ */
+export function formQuestionCount(config: Pick<QuizConfig, 'variants' | 'questions'>): number {
+  const all = config.questions.length;
+  if (!config.variants || config.variants.length === 0) return all;
+  const perForm = config.variants.map(
+    (v) => config.questions.filter((q) => !q.variant || q.variant === v).length,
+  );
+  return Math.min(...perForm);
+}

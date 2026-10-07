@@ -32,7 +32,7 @@
     {
       "id": "r1",
       "title": "Helper takes a function parameter",
-      "description": "A function is defined that calls one of its parameters as a function",
+      "description": "A function is defined that calls one of its parameters as a function. Help: 3.4.11 (Passing a Function to a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+\\w+\\s*\\([^)]*\\w+\\s*\\)\\s*\\{[^}]*\\w+\\s*\\(",
@@ -42,7 +42,7 @@
     {
       "id": "r2",
       "title": "Inline arrow passed as an argument",
-      "description": "An arrow function is written inside a call's parentheses",
+      "description": "An arrow function is written inside a call's parentheses. Help: 3.4.11 (Passing a Function to a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\([^)]*\\)\\s*=>\\s*[^{]",
@@ -52,7 +52,7 @@
     {
       "id": "r3",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.4.11 (Passing a Function to a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

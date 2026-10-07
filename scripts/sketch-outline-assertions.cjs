@@ -246,16 +246,21 @@ module.exports = async function run(load) {
     unrounded.points.length === 4 && Math.abs(area(unrounded.points) - 1000) < 1e-6,
     `${unrounded.points.length} points, area ${area(unrounded.points).toFixed(2)}`);
 
-  // The clamp has to report the number the outline USED, not the number this
-  // corner could have taken on its own: corner 2's round eats part of the edge
-  // corner 1 wanted, so 12.5 comes back as 8.5 and the message has to say 8.5.
+  // Every corner's share is decided on the DESIGN polygon, not on a polygon a
+  // neighbour already trimmed (reshape-cad f89d5ef: the old rule held the corner
+  // visited second to half of what its neighbour left, so the outline depended on
+  // the order the corners were visited). Corners 1 and 2 share the 25 mm edge:
+  // 12.5 + 8 = 20.5 fits, so both rounds come back whole and nothing is reported.
   const shared = arc.outlineOf(sk({ rounds: { 1: 12.5, 2: 8 } }));
-  check('...a round clamped by its NEIGHBOUR is reported at the shared number',
-    shared.notes.length === 1 && shared.notes[0].corner === 1
-      && Math.abs(shared.notes[0].want - 12.5) < 1e-9
-      && Math.abs(shared.notes[0].got - 8.5) < 1e-6,
-    `${JSON.stringify(shared.notes)} -- 12.5 is the design-only ceiling, which the student `
-      + 'cannot actually have here');
+  check('...two rounds that fit their shared edge are both taken whole, with no note',
+    shared.notes.length === 0, JSON.stringify(shared.notes));
+  // Two chamfers that want more than the shared 25 mm edge give way in
+  // proportion, and the note reports the number the outline USED (12.5 each).
+  const squeezed = arc.outlineOf(sk({ chamfers: { 1: 20, 2: 20 } }));
+  check('...two chamfers that want more than their shared edge are reported at the shared number',
+    squeezed.notes.length === 2
+      && squeezed.notes.every((n) => Math.abs(n.want - 20) < 1e-9 && Math.abs(n.got - 12.5) < 1e-6),
+    JSON.stringify(squeezed.notes));
 
   // `rounds` is keyed by CORNER while `bulges` is keyed by EDGE, and reindex()
   // has to shift them on their own rules. Pressing Corner splits edge 0, which
@@ -463,15 +468,11 @@ module.exports = async function run(load) {
   console.log('\n=== the wiring, because a fix that never reaches a click is half a fix ===');
 
   const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-  const editorSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx');
+  const editorSrc = read('vendor', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx');
   // The reSHape half of SandboxWorkspace moved into ReshapeStudio.tsx on
   // 2026-09-04 (SPEC-A1); the wiring under test lives there now.
-  const wsSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'ReshapeStudio.tsx');
-  const panelSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'SketchConstraints.tsx');
+  const wsSrc = read('vendor', 'reshape-cad', 'packages', 'studio', 'src', 'ReshapeStudio.tsx');
 
-  check('Round a corner writes a request, not geometry',
-    /rounds: \{ \.\.\.\(f\.rounds \?\? \{\}\), \[corner\]: radius \}/.test(editorSrc),
-    'ModelEditor.tsx does not record the radius on the feature');
   // The import line, not a grep for the name -- the comment above that code
   // deliberately says what it USED to call, and a substring check would read
   // its own explanation as the defect it describes.
@@ -494,22 +495,14 @@ module.exports = async function run(load) {
   check('...and so does the live-preview doc a drag puts on screen',
     /previewDocRef\.current = foldParams\(/.test(wsSrc),
     'the preview doc is built without the gate the committed one goes through');
-  // `!outline.ok` alone only catches a TRUE zero-length collapse -- a rule
-  // can satisfy every residual by squeezing the shape to a sliver well short
-  // of that (S09, 2026-09-04), so the toggle's refusal condition grew a
-  // second half, `collapsedByRatio`, alongside it rather than in place of it.
-  check('...the constraint toggle refuses a collapsing rule out loud',
-    /outlineOf\(\{ \.\.\.f, points \}\)/.test(editorSrc)
-      && /if \(!outline\.ok \|\| shrunk\)/.test(editorSrc)
-      && /collapsedByRatio\(rawPoints, points\)/.test(editorSrc),
-    'ModelEditor.setConstraints applies any rule the solver will accept, collapse included');
-  check('...the Round box shows the radius currently set, so it can be edited or cleared',
-    /defaultValue=\{set !== undefined \? String\(set\) : ''\}/.test(panelSrc),
-    'SketchConstraints.tsx always renders the Round box empty, so nothing shows the radius');
-  check('...and a Length already set on a curved edge stays clearable',
-    /disabled=\{curved && !fixed\}/.test(panelSrc),
-    'the note says "remove one to settle it" while the box that removes it is disabled');
-
+  // Four wiring checks that read the retired Rules panel and ModelEditor's
+  // corner/constraint path were removed here, not weakened: reshape-cad
+  // 2b19a05 deleted SketchConstraints.tsx, ModelEditor's `rounds` request
+  // write and `setConstraints` (with its collapsedByRatio refusal), and the
+  // Round / Length boxes. None of that code exists to be wired any more. The
+  // library-level guarantees (outlineOf, bulges, roundings, rejecting a
+  // collapsing outline) are still asserted above; the foldParams gate checks
+  // below still read ReshapeStudio.tsx.
 
   // ---- reading an outline back as design edges and treated corners --------
   //

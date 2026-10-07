@@ -1,12 +1,13 @@
 {
   "id": "3-8-1-slides",
   "title": "3.8.1 Slides: Saving and Loading Data",
-  "description": "Saving and Loading Data slides. Placeholder until the deck is built from the book.",
+  "description": "Unit 3.8 slides: JSON, JSON.stringify and JSON.parse, parsing that can fail, and saving by key in storage.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",
   "preview": "slides",
+  "slidesUrl": "/slides/3.8_saving_and_loading_data.paper.html",
   "week": 10,
   "slos": [
     "SLO-2"

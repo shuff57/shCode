@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { lessonLabel } from '../lib/lesson-title-order';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -16,6 +17,8 @@ export interface NeedsAttentionData {
 
 interface Props {
   classId: string;
+  /** lesson id -> title, so an item says "3.3.14 Filter" rather than a folder id. */
+  lessonTitles?: Record<string, string>;
   onOpenStudent: (email: string) => void;
   onOpenTeacherEdit: (studentEmail: string, lessonId: string) => void;
 }
@@ -74,7 +77,7 @@ const clickableStyle: React.CSSProperties = {
 };
 
 const mutedStyle: React.CSSProperties = {
-  color: '#6272a4',
+  color: '#8393c4',
   fontSize: '0.78rem',
 };
 
@@ -90,7 +93,7 @@ const awaitingSummaryStyle: React.CSSProperties = {
 // Component
 // ---------------------------------------------------------------------------
 
-export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit }: Props) {
+export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOpenTeacherEdit }: Props) {
   const [data, setData] = useState<NeedsAttentionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -127,7 +130,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
 
   if (loading) {
     return (
-      <div style={{ color: '#6272a4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: '#8393c4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
         Loading attention data...
       </div>
     );
@@ -183,7 +186,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenStudent(item.student_email);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenStudent(item.student_email); }
                   }}
                 >
                   {item.student_email}
@@ -195,10 +198,10 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenTeacherEdit(item.student_email, item.lesson_id);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenTeacherEdit(item.student_email, item.lesson_id); }
                   }}
                 >
-                  {item.lesson_id}
+                  {lessonLabel(item.lesson_id, lessonTitles)}
                 </span>
                 <span style={mutedStyle}>
                   {' '}&middot; waiting {item.days_waiting} day{item.days_waiting === 1 ? '' : 's'}
@@ -225,7 +228,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenStudent(item.student_email);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenStudent(item.student_email); }
                   }}
                 >
                   {item.student_email}
@@ -255,7 +258,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenStudent(item.student_email);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenStudent(item.student_email); }
                   }}
                 >
                   {item.student_email}
@@ -269,10 +272,10 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenTeacherEdit(item.student_email, item.lesson_id);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenTeacherEdit(item.student_email, item.lesson_id); }
                   }}
                 >
-                  {item.lesson_id}
+                  {lessonLabel(item.lesson_id, lessonTitles)}
                 </span>
                 <span style={mutedStyle}>
                   {' '}&middot; {item.score}/{item.possible}
@@ -299,7 +302,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenStudent(item.student_email);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenStudent(item.student_email); }
                   }}
                 >
                   {item.student_email}
@@ -313,10 +316,10 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') onOpenTeacherEdit(item.student_email, item.lesson_id);
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpenTeacherEdit(item.student_email, item.lesson_id); }
                   }}
                 >
-                  {item.lesson_id}
+                  {lessonLabel(item.lesson_id, lessonTitles)}
                 </span>
                 <span style={mutedStyle}>
                   {' '}&middot; {item.days_since_started} day{item.days_since_started === 1 ? '' : 's'} stuck

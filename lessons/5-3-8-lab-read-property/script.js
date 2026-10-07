@@ -1,4 +1,4 @@
-// 2.2.4b Lab: Read a property.
+// 5.3.8 Lab: Read a property.
 
 class Box {
   constructor() {

@@ -1,7 +1,7 @@
 {
   "id": "2-7-1-ch2-individual-pa-concepts",
   "title": "2.7.1 Individual PA Part 1: Concepts and Traces",
-  "description": "Eight questions: three on the ideas of Chapter 2, five where you read a short program and say what it prints. One submission, nothing marked on screen.",
+  "description": "Eight questions: three on the ideas of Chapter 2, five where you read a short program and say what it prints. Three tries: you see your total after each one, your best try counts, and the marking appears after the last.",
   "type": "assignment",
   "estimateMins": 16,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -24,6 +24,8 @@
   "assignmentCode": "A2.7.1",
   "quiz": {
     "summative": true,
+    "maxSubmissions": 3,
+    "revealAfterSubmit": true,
     "shuffle": true,
     "variants": [
       "a",
@@ -42,7 +44,7 @@
           "It treats the line as text and checks whether it spells true"
         ],
         "answer": 0,
-        "explanation": "if converts whatever is inside the parentheses to a boolean (2.1.18). Zero, an empty string, null, undefined, NaN and false convert to false; everything else converts to true. That is why if (x == true) is redundant when x is already a boolean -- if (x) does the same job.",
+        "explanation": "if converts whatever is inside the parentheses to a boolean (2.1.12). Zero, an empty string, null, undefined, NaN and false convert to false; everything else converts to true. That is why if (x == true) is redundant when x is already a boolean -- if (x) does the same job.",
         "sourceIds": [
           "2-1-18-reading-truthy-falsy"
         ]

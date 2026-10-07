@@ -1,7 +1,7 @@
 {
   "id": "3-1-3-reading-parameters-return",
-  "title": "3.2.2 Reading: Parameters & Return Values",
-  "description": "Parameters let you pass inputs into a function. return sends a value back out so you can store or use it.",
+  "title": "3.2.2 Reading: Parameters",
+  "description": "Parameters let you pass inputs into a function, so the same function can give a different result each time you call it.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

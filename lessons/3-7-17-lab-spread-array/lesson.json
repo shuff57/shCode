@@ -38,7 +38,7 @@
     {
       "id": "r1",
       "title": "Spread used",
-      "description": "Uses array spread, written as ... inside an array literal",
+      "description": "Uses array spread, written as ... inside an array literal. Help: 3.7.14 (Spreading into a New Array or Object)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\s*[^\\]]*\\.\\.\\.",
@@ -48,7 +48,7 @@
     {
       "id": "r2",
       "title": "Two spread arrays combined",
-      "description": "Spreads two arrays into one new array literal",
+      "description": "Spreads two arrays into one new array literal. Help: 3.7.14 (Spreading into a New Array or Object)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.\\.\\.[^\\]]*,\\s*\\.\\.\\.",
@@ -58,7 +58,7 @@
     {
       "id": "r3",
       "title": "console.log present",
-      "description": "Calls console.log",
+      "description": "Calls console.log. Help: 3.7.14 (Spreading into a New Array or Object)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
@@ -68,7 +68,7 @@
     {
       "id": "r4",
       "title": "Arrays declared",
-      "description": "Declares at least two arrays",
+      "description": "Declares at least two arrays. Help: 3.7.14 (Spreading into a New Array or Object)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[\\s\\S]*(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",

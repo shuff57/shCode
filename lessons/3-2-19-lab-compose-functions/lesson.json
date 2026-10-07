@@ -1,7 +1,7 @@
 {
   "id": "3-2-19-lab-compose-functions",
-  "title": "3.2.19 Lab: Compose Two Functions",
-  "description": "Write two returning functions, then feed one result into the other and log the chain. Auto-graded.",
+  "title": "3.2.23 Lab: Compose Two Functions",
+  "description": "Write two returning functions, triple and addSeven, then feed one result into the other in both orders and log the chains. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -9,23 +9,24 @@
   "preview": "console",
   "week": 7,
   "slos": [
-    "SLO-2"
+    "SLO-2",
+    "SLO-3"
   ],
   "steps": [
     {
       "id": "s1",
       "title": "Define the first function",
-      "instructions": "Define a function called double that takes one parameter n and returns n multiplied by 2."
+      "instructions": "Define a function called triple that takes one parameter n and returns n multiplied by 3."
     },
     {
       "id": "s2",
       "title": "Define the second function",
-      "instructions": "Define a function called addTen that takes one parameter n and returns n plus 10."
+      "instructions": "Define a function called addSeven that takes one parameter n and returns n plus 7."
     },
     {
       "id": "s3",
       "title": "Compose them in one expression",
-      "instructions": "Call one function with the result of the other, for example addTen(double(5)). Because both return values, the inner call's result can be the outer call's argument."
+      "instructions": "Call one function with the result of the other, for example addSeven(triple(4)). Because both return values, the inner call's result can be the outer call's argument."
     },
     {
       "id": "s4",
@@ -36,53 +37,191 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "double defined",
-      "description": "Code defines a function named double",
+      "title": "triple defined",
+      "description": "Code defines a function named triple. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+double\\s*\\(",
-      "flags": "i",
+      "pattern": "function\\s+triple\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r2",
-      "title": "addTen defined",
-      "description": "Code defines a function named addTen",
+      "title": "addSeven defined",
+      "description": "Code defines a function named addSeven. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+addTen\\s*\\(",
-      "flags": "i",
+      "pattern": "function\\s+addSeven\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r3",
       "title": "returns a value",
-      "description": "Code contains a return statement",
+      "description": "Code contains a return statement. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "return\\s",
-      "flags": "i",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r4",
       "title": "one call nested in another",
-      "description": "A call to one function is written as the argument of the other",
+      "description": "A call to one function is written as the argument of the other. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(double|addTen)\\s*\\(\\s*(double|addTen)\\s*\\(",
-      "flags": "i",
+      "pattern": "\\b(?:triple|addSeven)\\s*\\(\\s*(?:triple|addSeven)\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r5",
       "title": "results are logged",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.2.20 (Building With Returned Values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
+      "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "triple multiplies",
+      "description": "triple multiplies: its body has a * (or adds the number to itself three times). Help: 3.2.20 (Building With Returned Values)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "triple",
+      "pattern": "\\*|\\b(\\w+)\\s*\\+\\s*\\1\\s*\\+\\s*\\1\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "addSeven adds",
+      "description": "addSeven adds: its body has a +. Help: 3.2.20 (Building With Returned Values)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "addSeven",
+      "pattern": "\\+",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r8",
+      "title": "both nesting orders",
+      "description": "Both orders are written: triple inside addSeven and addSeven inside triple. Help: 3.2.20 (Building With Returned Values)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\btriple\\s*\\(\\s*addSeven\\s*\\([\\s\\S]*\\baddSeven\\s*\\(\\s*triple\\s*\\(|\\baddSeven\\s*\\(\\s*triple\\s*\\([\\s\\S]*\\btriple\\s*\\(\\s*addSeven\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "t1",
+      "title": "triple gives back 3 times n",
+      "description": "triple(n) returns n multiplied by 3 for any number. Help: 3.2.20 (Building With Returned Values)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "triple",
+      "points": 0,
+      "hint": "triple should return n * 3 (or n + n + n) and give the value back with return.",
+      "cases": [
+        {
+          "args": [
+            4
+          ],
+          "expect": 12
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": 3
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": 0
+        },
+        {
+          "args": [
+            -2
+          ],
+          "expect": -6
+        },
+        {
+          "args": [
+            1.5
+          ],
+          "expect": 4.5
+        },
+        {
+          "args": [
+            100
+          ],
+          "expect": 300,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "title": "addSeven gives back n plus 7",
+      "description": "addSeven(n) returns n plus 7 for any number. Help: 3.2.20 (Building With Returned Values)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "addSeven",
+      "points": 0,
+      "hint": "addSeven should return n + 7 and give the value back with return.",
+      "cases": [
+        {
+          "args": [
+            4
+          ],
+          "expect": 11
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": 7
+        },
+        {
+          "args": [
+            -7
+          ],
+          "expect": 0
+        },
+        {
+          "args": [
+            10
+          ],
+          "expect": 17
+        },
+        {
+          "args": [
+            2.5
+          ],
+          "expect": 9.5
+        },
+        {
+          "args": [
+            100
+          ],
+          "expect": 107,
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

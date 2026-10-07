@@ -1,4 +1,4 @@
-Write your task set in the box below. List at least two concrete tasks for the "requirements definition" action. Every criterion in the rubric below must be met for the lesson to count as complete.
+Write your task set in the box below. List at least two concrete tasks for the "requirements definition" action. Aim to cover every criterion in the rubric below; the lesson counts as complete once the grader finds at least half of them met, and you can revise and resubmit as many times as you like.
 
 ---
 

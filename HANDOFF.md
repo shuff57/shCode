@@ -1,3 +1,133 @@
+# Handoff — 2026-10-04 (night) · gradebook + teacher-panel overhaul is LIVE and pushed
+
+Four phases shipped to shcode.pages.dev tonight (deployment `5f50e210` = commit `e7777a3a`; **redeployed 2026-10-05 as `f56b4f76` = `cs-3d` at `6c5ba49e`, which adds GitHub's three reshape commits**) and were
+checked on the live site signed in as a throwaway teacher. Everything is committed on the local branch
+`cs-3d` (rebased onto GitHub's tip on 2026-10-05; `gradebook-ux` still points at the old pre-rebase commits), **pushed to `origin/cs-3d` on 2026-10-05 (`6dc32aa2`)** (a push also triggers Cloudflare's own git
+build, which fails on the missing kernel wasm. Noise only, the wrangler-deployed site is unaffected.).
+Working tree is clean except `functions/_shared/module-docs.generated.ts`, which the build regenerates and
+which was deliberately never committed. All test data on prod was deleted (classes 26/31/1 students untouched).
+
+## Do these first tomorrow
+
+1. **Tell the teachers.** Roster grades jumped: median **47% to about 97%** for the 27 live students, nobody went
+   down. Cause: the roster used to count every graded lesson in the course (unattempted = 0); it now counts the
+   grade SO FAR. The class page is also now five tabs. Late work does NOT lower the percent (an all-late student
+   reads 100%); that is current behaviour, decide whether it should be a policy.
+2. **The deploy will be refused after 2026-10-05 14:43 UTC (7:43 am PT).** `stamp-tries-applied --check` rejects a
+   stamp more than 24 h old and `npm run deploy` cannot pass a flag. Commit `0feb78c6` (not live; it is a script
+   only) adds `TRIES_STAMP_ALLOW_OLD=1`. Deploy recipe, unchanged otherwise:
+   `cd ~/Documents/GitHub/shCode-r7 && git checkout --detach gradebook-ux && TRIES_STAMP_ALLOW_OLD=1 npm run deploy`
+   (that worktree holds the git-ignored `pa-pseudocode/`, kernel wasm, models and node_modules symlinks; its
+   `*.generated.ts` files show as dirty after a build, which is normal). Never move the stamp itself.
+3. **`cs-3d` is rebased, deployed and PUSHED (2026-10-05, fast-forward `285f71d1..6dc32aa2`).** On 2026-10-05 the 13 commits were rebased onto GitHub's `cs-3d` (which had gained three
+   `chore(reshape): re-vendor reshape-cad` commits, `230d37b4`, `9bbea64a`, `285f71d1`; no file overlap) so `cs-3d` sat
+   0 behind GitHub's tip before the push. Checked on the
+   rebased tree: the app typecheck has 0 errors (the functions one has the same 9 old ones), the grade/cell/CSV/stamp/http
+   tests and the reshape refusal-gate test pass, and `npm run build` succeeds with the leak checks green. The pre-rebase
+   state is kept as the local branch `backup/cs-3d-before-rebase-2026-10-05` (delete it once you are happy). **Deployed 2026-10-05
+   (`f56b4f76`, from `cs-3d` at `6c5ba49e`, with `TRIES_STAMP_ALLOW_OLD=1`)**, so the live site now includes GitHub's three
+   reshape commits; the owner accepted shipping the unfinished reshape work. Checked after: pages 200, `/api` 401
+   signed out, the tabbed teacher page chunk live, the reshape bundle and 23 MB kernel wasm identical to the build.
+   Not walked: the reshape lessons (module 8.1) as a student, so rough edges there are possible. The `gradebook-ux`
+   branch is the same code as before without the reshape commits (keep it as a fallback). Pushing `cs-3d` deploys
+   nothing by itself: the Cloudflare git build it triggers fails on the missing kernel wasm; if that build is ever
+   fixed, a push would auto-deploy `cs-3d`. Rebase renamed the commits quoted elsewhere in this
+   section; old to new:
+
+| was | now | commit |
+| --- | --- | --- |
+| `55328af5` | `5a77246b` | feat(grades): one grade-so-far rule for roster, drawer and student pag |
+| `2e55cad8` | `61641d3c` | feat(ui): clearer student gradebook and teacher grid |
+| `34d25382` | `b6252cb9` | feat(teacher): names on the roster; drawer lists past-due lessons the  |
+| `ebce8671` | `9b5127c0` | feat(student): tries and best score, "Opens <date>", due soon, teacher |
+| `ab2e58b9` | `1519c547` | fix(deploy): the go-live stamp guard compares author dates, so a rebas |
+| `3a164a29` | `419c5a0c` | feat(teacher): class page in five sections (Today, Students, Gradebook |
+| `3a120033` | `4405e316` | fix(teacher): Schedule opens with due dates and release solutions, sha |
+| `ca11878c` | `0a9612f7` | feat(teacher): grades CSV per student, Override score in the drawer, g |
+| `f4093c90` | `f6ec1bd0` | feat(teacher): toasts, styled confirms, "More" menus, readable errors, |
+| `e7777a3a` | `7e3745e1` | fix(teacher): only the owner is offered "Regenerate code"; one announc |
+| `0feb78c6` | `c91a2b73` | fix(deploy): TRIES_STAMP_ALLOW_OLD=1 lets npm run deploy pass the stam |
+| `273d15ee` | `2901216c` | docs(handoff): 2026-10-04 night, gradebook and teacher-panel overhaul; |
+| `75945b97` | `be44d8f1` | docs(handoff): origin/cs-3d moved (3 reshape-cad re-vendors); a push n |
+
+   (`e7777a3a` was the deployed commit, now `7e3745e1`.)
+
+4. **If `npm test` or any Bun script dies with "Cannot find module .../scratchpad/pa-fixture.mjs"**, it is Bun's runtime
+   transpiler cache, not the code: it passes with `BUN_RUNTIME_TRANSPILER_CACHE_PATH=0`. It hit on 2026-10-05; the cache
+   dir `~/.bun/install/cache/@t@` was moved aside to `@t@.stale-2026-10-05` (1.7 GB, safe to delete) and Bun rebuilt it.
+   Same fix if it recurs: move `@t@` aside.
+
+## What shipped
+
+- **One grade rule** (`studentGrading`, `functions/_shared/grading.ts`): a graded lesson counts when it is done, or
+  its CLASS due date has passed and it is not done and not waived. Not-yet-due work is out of both numerator and
+  denominator; `X of Y graded lessons done` carries the whole-course count. Used by the roster, the drawer and the
+  student's own page (one grade per class they are in). Waivers now clear the zero and the late flag in BOTH
+  gradebooks; both gradebooks build cells with `buildCell`. Details are in CLAUDE.md ("The grade is so far").
+- **Student gradebook** (`/progress`, `components/StudentGradebook.tsx`): "Your grade so far" + a "How your grade
+  works" note, category chips, "Missing or late" split from "In progress", "Tried · N tries left · best X/Y",
+  "Opens <date>", "due soon", "teacher-adjusted" + the teacher's note. Ungraded readings are never "Missing".
+- **Teacher class page** (`app/teacher/page.tsx`): five sticky tabs Today / Students / Gradebook / Schedule /
+  Class settings (`&tab=`, old `roster`/`attention`/`?view=gradebook` links still land), only the open tab mounts;
+  badges (Today = submissions waiting, Students = students behind); opens on Today when something is waiting; class
+  list shows "N to grade / N behind" and the last-opened class first. Grid: search, sort, "problems only", a grade
+  column, a legend, graded lessons only by default (74 columns, not 713), plain tooltips, labelled cells.
+  Drawer: a real dialog, Override score (reuses the review queue's `OverrideForm`), due dates, past-due lessons
+  listed as Missing. Students tab: names on the roster and "Download grades (CSV)" (`lib/grades-csv.ts`, one row per
+  student, formula-injection safe).
+- **Feedback layer** (`components/FeedbackProvider.tsx`, `RowMenu.tsx`, `lib/http-error.ts`): toasts and styled
+  confirms replace all seven native dialogs; destructive actions live in a "More" menu; Remove student has Undo;
+  failures show the server's message, not raw JSON; muted text is `#8393c4` (4.7:1). The old delete-class prompt
+  said progress was preserved; the server actually deletes it for students in no other class. It now says so.
+- **Deploy-guard fixes:** the stamp check compares author dates (a rebase had tripped it), and the env override above.
+
+## Decisions made with the teacher (do not re-litigate)
+
+Grade = only what is due (zero once past due, left out before). One row per student for the grade export, not an
+Aeries import layout. Overrides show a "teacher-adjusted" label plus the note. Each class a student is in gets its own
+grade, labelled. Roster shows "grade so far" plus the progress count. The graded-only grid default was my default
+(the question was never answered); say if they want everything shown.
+
+## Verified, and not
+
+Live, signed in as a throwaway teacher: roster/CSV numbers (100/59/32/0/100/100 as predicted), all five tabs, deep
+links, grid default and toggle, drawer (due dates, Override saved and the student's data followed, Give back one try
+changed 2 submissions to 1), remove/Undo (the student's 6 progress rows survived), new join code, archive, the typed
+delete gate (cancelled, never deleted), release/hold-back/announcement toasts, console clean.
+**Not verified:** a real student's own `/progress` on live (the fake students cannot log in; the demo and
+`scripts/test-my-gradebook-grade.mjs` cover it), real AI-graded tries ("best X/Y" falls back to the latest try if a
+failed attempt does not update the recorded best), one React hydration warning seen once on `/progress` in dev
+(untraced), and the full `npm test` chain (it stops at the old `test-sketch-outline` reshape failure).
+
+## Still open (none urgent)
+
+- **Past due** emails are not links to the drawer; **Needs Attention** and **Past due** both answer "who is behind"
+  and could merge. The grid does not refresh after a drawer override until the tab is reopened.
+- 17 graded lessons have no `maxScore` (the chart/console ones), so their score cannot change the grade (done =
+  100%). Override still saves; a note in the form would help. Decide whether they get a max.
+- The student "Up Next" panel on `/progress` still lists readings. The roster shows both "N completed" and
+  "N of M graded lessons done" (redundant).
+- An external gradebook-sync tool pairs Aeries gradebooks with classes by a leading period number in the class
+  name (comment on `PATCH /api/classes/[id]`); if the CSV should match an Aeries import, the layout is needed.
+
+## How to check the teacher side
+
+- **Demo (no prod):** `DEV_REAL_DB=1 DEV_ROLE=teacher PORT=3033 npm run dev` mounts the real class handlers over
+  in-memory SQLite with a seeded six-student class (`seedClass`, `scripts/dev-demo-api.mjs`). `dev_student=<email>`
+  cookie views a student. **If a dev server already runs in this tree, run the demo from an rsync copy** (two
+  `next dev` on one `.next`, or a `next build` beside one, corrupts it).
+- **Live, throwaway teacher** (the owner approved this pattern for throwaway accounts on 2026-10-04; delete after):
+  `node scripts/gen-test-roster.mjs --owner <teacher email> --out <dir>`, review and run `testroster.sql` with
+  `node scripts/d1.mjs execute shcode-commits --remote --file ... -y`; open the `shcode` playwright profile
+  (`playwright-cli -s=shcode open ... --profile=$HOME/.browser-profiles/shcode`; never touch `mom`/`cad`); sign up
+  `gbtest-teacher@example-test.invalid` with `fetch('/api/auth/signup')` from the page using a random password made
+  in the same command (never printed or stored), `UPDATE students SET role='teacher'`, add it to `class_teachers`
+  for the test class, log out and in again (the JWT carries the role), check, then run `testroster-undo-all.sql`.
+  A co-teacher cannot archive, delete or rotate the code; set the class `owner_email` to the dummy to test those.
+- Expected roster for the generated class: Ada 100, Ben 59, Cleo 32, Dev 0, Eli 100, Fay 100.
+
+---
+
 # Handoff — 2026-09-22 (later) · login was 500ing in prod; migrations 0029/0030 were never applied
 
 Every login on shcode.pages.dev returned **500 `error code: 1101`** (Worker threw) while

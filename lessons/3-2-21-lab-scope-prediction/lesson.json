@@ -1,6 +1,6 @@
 {
   "id": "3-2-21-lab-scope-prediction",
-  "title": "3.2.21 Lab: Scope Prediction Exercise",
+  "title": "3.2.25 Lab: Scope Prediction Exercise",
   "description": "Write a global and a local variable, then try to read the local one outside its function and watch the ReferenceError. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
@@ -37,47 +37,64 @@
     {
       "id": "r1",
       "title": "global variable declared",
-      "description": "A variable named score is declared with let",
+      "description": "A variable named score is declared with let. Help: 3.2.24 (Scope: Local vs Global)",
       "type": "regex",
       "file": "script.js",
       "pattern": "let\\s+score\\b",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r2",
-      "title": "a local variable declared inside a function",
-      "description": "A variable named label is declared with let",
-      "type": "regex",
+      "title": "label declared inside describeScore",
+      "description": "A variable named label is declared with let inside describeScore. Help: 3.2.24 (Scope: Local vs Global)",
+      "type": "inFunction",
       "file": "script.js",
-      "pattern": "let\\s+label\\b",
-      "flags": "i",
-      "points": 0
+      "pattern": "\\blet\\s+label\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "function": "describeScore"
     },
     {
       "id": "r3",
-      "title": "two functions defined",
-      "description": "Code defines the functions showScore and describeScore",
+      "title": "both functions defined",
+      "description": "Code defines both showScore and describeScore. Help: 3.2.24 (Scope: Local vs Global)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+(showScore|describeScore)\\s*\\(",
-      "flags": "i",
+      "pattern": "function\\s+showScore\\s*\\([\\s\\S]*function\\s+describeScore\\s*\\(|function\\s+describeScore\\s*\\([\\s\\S]*function\\s+showScore\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r4",
-      "title": "calls are made",
-      "description": "The functions are called",
+      "title": "both functions called",
+      "description": "Both showScore() and describeScore() are called (not just defined). Help: 3.2.24 (Scope: Local vs Global)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(showScore|describeScore)\\s*\\(\\s*\\)",
-      "flags": "i",
+      "pattern": "(?<!function\\s+)\\bshowScore\\s*\\(\\s*\\)[\\s\\S]*(?<!function\\s+)\\bdescribeScore\\s*\\(\\s*\\)|(?<!function\\s+)\\bdescribeScore\\s*\\(\\s*\\)[\\s\\S]*(?<!function\\s+)\\bshowScore\\s*\\(\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "label read outside its function",
+      "description": "After the calls, label is logged from outside describeScore (it may sit inside try/catch). Help: 3.2.24 (Scope: Local vs Global)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?<!function\\s+)\\bdescribeScore\\s*\\(\\s*\\)[\\s\\S]*console\\.log\\s*\\([^)]*\\blabel\\b",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     }
   ],
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "expectsRuntimeError": true
   }
 }

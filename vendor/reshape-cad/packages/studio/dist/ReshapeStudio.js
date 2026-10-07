@@ -21,22 +21,81 @@ import { noteColor } from './notes.js';
 import ModelEditor from './model/ModelEditor.js';
 import BrepViewport from './model/BrepViewportThree.js';
 import HandleOverlay from './model/HandleOverlay.js';
+import { loadSchemeName, navHint } from './camera-controls.js';
 import SketchCanvas2D from './model/SketchCanvas2D.js';
 import ContextBar from './model/ContextBar.js';
 import { writeSTL, writeOBJ, write3MF } from './mesh-export.js';
+import { add as addSelection, bodiesOf, clear as clearSelection, edgesOf, emptySelection, facesOf, featuresOf, ownerScoped, primaryOf, replace as replaceSelection, selectAllFeatures, toggle as toggleSelection, verticesOf, } from './selection-model.js';
 import { outlineOf } from '@shuff57/reshape-sketch/sketch-arc';
-import { handlesFor, featureCenter } from '@shuff57/reshape-script/model-handles';
-import { EMPTY_DOC, isSketchOnly, nameMap } from '@shuff57/reshape-script/model-types';
+import { handlesFor, featureCenter, flatViewPlane } from '@shuff57/reshape-script/model-handles';
+import { previewTint } from './model/manipulator-core.js';
+import { EMPTY_DOC, isSketchOnly, nameMap, newSketch } from '@shuff57/reshape-script/model-types';
 import { ownerOf } from '@shuff57/reshape-script/model-selection';
 import { partWordFor } from '@shuff57/reshape-script/topo-name';
 import { applyParam, generatedParams, paramValues as docParams, solveDoc, solveSketchDrag, } from '@shuff57/reshape-script/model-codegen';
 import { toScript } from '@shuff57/reshape-script/reshape-script-gen';
-/** Structural equality for a TopoName -- a plain, serializable object (see
- *  lib/topo-name.ts), so JSON.stringify is a safe and cheap comparison. Used
- *  only to dedupe/toggle a Shift-click multi-selection (item E); nothing
- *  here builds a Fillet from the comparison itself. */
-function sameTopo(a, b) {
-    return JSON.stringify(a) === JSON.stringify(b);
+/** Swap the FEATURE ids in a selection, leaving every viewport pick -- the
+ *  edge/face items and the `primary` slot -- exactly where it was. This is
+ *  what each old `setSelected([...])` call did back when `selected` was its
+ *  own useState sitting beside the four pick states selection-model.ts's
+ *  header names, and it is the ONE transition ModelEditor asks for through
+ *  `onSelect`. Returns the SAME state object when the ids are already those
+ *  ids, so the doc-prune effect below stays the no-op its
+ *  `keep.length === s.length` check made it. Feature items lead, in the
+ *  order given: selection ORDER is load-bearing (ModelEditor's combine()
+ *  cuts the first-clicked shape with the second, not the first in list
+ *  order). */
+function withFeatureIds(state, ids) {
+    const features = state.items.filter((i) => i.kind === 'feature');
+    if (features.length === ids.length && features.every((f, i) => f.target === ids[i]))
+        return state;
+    return {
+        ...state,
+        items: [
+            ...ids.map((id) => ({ kind: 'feature', target: id })),
+            ...state.items.filter((i) => i.kind !== 'feature'),
+        ],
+    };
+}
+/** The one SelectionItem a viewport pick IS: kind/target/name straight off
+ *  the payload, plus the kernel-measured `size` the old `pickedSize` state
+ *  held. ViewportPick's own `faceIndex` stays out -- a mesh re-highlight
+ *  shortcut, a rendering concern rather than a selection one (see
+ *  selection-model.ts's deviation list). */
+function itemOfPick(p) {
+    return { kind: p.kind, target: p.target, name: p.name, size: p.size };
+}
+/** Ctrl/Meta-click: add `item` to the selection unless an equal item (same
+ *  kind+target+name -- selection-model.ts's own sameItem() equality, which
+ *  toggle()'s hit-check already uses) is already in it, in which case the
+ *  selection is left untouched. selection-model.ts's own add() is a raw,
+ *  no-presence-check append BY DESIGN (see its doc comment: "a caller that
+ *  wants add only if absent calls toggle() after checking") precisely
+ *  because Ctrl and Shift need DIFFERENT answers to "item already
+ *  selected": Shift removes it (toggle()), Ctrl must never (it only ever
+ *  adds) -- so the presence check happens here, once, rather than being a
+ *  second copy of toggle()'s own. */
+function addIfAbsent(state, item) {
+    const present = state.items.some((i) => i.kind === item.kind && i.target === item.target && JSON.stringify(i.name ?? null) === JSON.stringify(item.name ?? null));
+    return present ? state : addSelection(state, item);
+}
+/** Every DISTINCT feature id that owns at least one of `items`, in
+*  first-seen order. A box-select can span MULTIPLE bodies (unlike a
+*  single click's always-one-owner pick) -- collapsing to just the LAST
+*  item's owner silently dropped every other solid's items from
+*  `selected` (the status bar's "N selected" count and every
+*  owner-scoped reader downstream of it), even though the raw item list
+*  itself was correct. Exported so this box-select-multi-owner regression
+*  has a direct unit test without needing the full React/viewport
+*  harness (see onBoxSelect below, the one caller). */
+export function distinctOwners(doc, items) {
+    const owners = [];
+    for (const item of items) {
+        const o = ownerOf(doc, { target: item.target, name: item.name ?? null });
+        if (o && !owners.includes(o))
+            owners.push(o);
+    }
+    return owners;
 }
 // ---- constants carried over from SandboxWorkspace.tsx verbatim -----------
 // (see that file's own comments for why these particular numbers)
@@ -131,52 +190,31 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
     const [stale, setStale] = useState(null);
     const [refusals, setRefusals] = useState(undefined);
     const [doc, setDoc] = useState(EMPTY_DOC);
-    const [selected, setSelected] = useState([]);
-    useEffect(() => {
-        setSelected((s) => {
-            const keep = s.filter((id) => doc.features.some((f) => f.id === id));
-            return keep.length === s.length ? s : keep;
-        });
-    }, [doc]);
-    const [pickedEdge, setPickedEdge] = useState(null);
-    const [pickedFace, setPickedFace] = useState(null);
-    // Item H (P20): the most recent pick's own size, straight off the kernel
-    // (see BrepViewportThree.tsx's faceSize()/edgeLength()) -- kept separate
-    // from pickedEdge/pickedFace above rather than added onto their shape,
-    // since those two are also ModelEditor's own props and every existing
-    // consumer there (round()'s edge-picked branch, Hole/Hollow's face
-    // requirement, the disabled-state messages) only ever needed WHICH edge
-    // or face, never its size. Purely additive, read only by selectionLabel
-    // below.
-    const [pickedSize, setPickedSize] = useState(null);
-    // Item E: a Shift-held click on a second edge/face adds it to the
-    // selection instead of replacing it, the same way the timeline/sketch
-    // chips already work (ModelEditor.tsx's pick()). `pickedEdge`/`pickedFace`
-    // above stay exactly as they were -- "the most recent pick", which every
-    // existing single-edge/single-face consumer (round(), Hole, Hollow, the
-    // tooltip text) still reads unchanged -- these two arrays are purely
-    // additive, read only by the multi-edge Round path and the selection pill.
-    // BrepViewportThree.tsx's onPick carries no modifier-key info (a separate
-    // team owns that file), so Shift is tracked here independently via
-    // plain window listeners rather than threaded through the pick payload.
-    const shiftHeldRef = useRef(false);
-    useEffect(() => {
-        const down = (e) => { if (e.key === 'Shift')
-            shiftHeldRef.current = true; };
-        const up = (e) => { if (e.key === 'Shift')
-            shiftHeldRef.current = false; };
-        const blur = () => { shiftHeldRef.current = false; };
-        window.addEventListener('keydown', down);
-        window.addEventListener('keyup', up);
-        window.addEventListener('blur', blur);
-        return () => {
-            window.removeEventListener('keydown', down);
-            window.removeEventListener('keyup', up);
-            window.removeEventListener('blur', blur);
-        };
+    // ONE selection state for the whole shell (SPEC-mouse-parity.md Phase 3
+    // item 7). It replaces six useStates that had to be kept in step by hand:
+    // `selected` (the feature ids, set both by ModelEditor's pick() and by a
+    // viewport pick's resolved owner), `pickedEdge`/`pickedFace`/`pickedSize`
+    // (the single most recent viewport pick -- now the one `primary` slot,
+    // which is faithful because onPick has always set one of those two and
+    // nulled the other on every pick), and the two Shift-accumulated
+    // multi-pick arrays beside them -- now the edge/face `items`. Every read
+    // below goes through selection-model.ts's own ops, and ModelEditor is
+    // handed this same object rather than a parallel copy of half of it.
+    const [selection, setSelection] = useState(emptySelection);
+    const selected = useMemo(() => featuresOf(selection), [selection]);
+    const primaryPick = primaryOf(selection);
+    /** Replace the selected feature ids, leaving the viewport picks alone --
+     *  ModelEditor's `onSelect`, and this file's own clear-the-selection
+     *  affordances. */
+    const selectFeatures = useCallback((ids) => {
+        setSelection((s) => withFeatureIds(s, ids));
     }, []);
-    const [pickedEdges, setPickedEdges] = useState([]);
-    const [pickedFaces, setPickedFaces] = useState([]);
+    // A selection can outlive its feature (an undo, a rollback, a delete), so
+    // prune ids the doc no longer has -- withFeatureIds hands back the same
+    // state object when there is nothing to prune, so this stays a no-op.
+    useEffect(() => {
+        setSelection((s) => withFeatureIds(s, featuresOf(s).filter((id) => doc.features.some((f) => f.id === id))));
+    }, [doc]);
     // Item N: when a handle was last actually touched (a drag/commit) -- 
     // BrepViewportThree.tsx uses this to hold its own "A sketch is flat..."
     // Pull hint off screen while a student is visibly busy dragging a handle,
@@ -252,6 +290,13 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
     // until registered" gate needs; the buttons' onRun wrappers read the ref
     // at CLICK time, so every click gets this render's fresh closures.
     const [ctxDismissed, setCtxDismissed] = useState(false);
+    // Phase 5.2's Incremental Move (todo 24): the snap mode + step. Adaptive
+    // by default (the nav bar's own wording); the fixed step is the ruler
+    // convention's 1mm unless the student changes it. Plain UI state --
+    // reset per selection like ctxDismissed above, never in the undo stack.
+    const [moveSnapMode, setMoveSnapMode] = useState('adaptive');
+    const [moveSnapStep, setMoveSnapStep] = useState(1);
+    useEffect(() => { setMoveSnapMode('adaptive'); }, [selected[0]]);
     const ctxActionsRef = useRef(null);
     const [ctxActions, setCtxActions] = useState(false);
     useEffect(() => { setCtxDismissed(false); }, [selected[0]]);
@@ -271,9 +316,29 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
         const t = setTimeout(() => el.classList.remove('reshape-params-flash'), 600);
         return () => clearTimeout(t);
     }, []);
+    // Double-click entry point (SPEC-mouse-parity.md Phase 3.6): a feature
+    // body in the viewport, or a timeline row in ModelEditor.tsx, selects
+    // the feature and then reuses whichever per-kind "open this" action the
+    // context bar already offers a single-selected feature -- Edit 2D for a
+    // sketch (setSketchEditId, same as its own button), focusParams for
+    // every other kind (same flash-and-scroll the Dimensions button already
+    // triggers). Not a second way to open either panel, just a second way
+    // to reach the first one.
+    const editFeature = useCallback((id) => {
+        selectFeatures([id]);
+        const f = doc.features.find((x) => x.id === id);
+        if (f?.kind === 'sketch')
+            setSketchEditId(id);
+        else
+            focusParams();
+    }, [doc, selectFeatures, focusParams]);
     const meshRef = useRef(null);
     const [hasMesh, setHasMesh] = useState(false);
     const [engineReady, setEngineReady] = useState(false);
+    // The status bar's mouse-binding hint, lifted from the viewport (its own
+    // Mouse chip writes the scheme). Seeded from the STORED scheme so the very
+    // first paint already matches the bindings.
+    const [navHintText, setNavHintText] = useState(() => navHint(loadSchemeName()));
     const pickAtRef = useRef(null);
     const specsRef = useRef([]);
     const frameRef = useRef(null);
@@ -297,6 +362,10 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
     // `value` immediately writes a (re-serialized, possibly reformatted)
     // copy of that same text right back over it on every single page load.
     const skipNextRegenRef = useRef(false);
+    // A Run the student pressed is waiting for its doc / the last scriptDoc came from such a Run. Only that doc may replace the
+    // Build doc when they switch Code -> Build (see chooseSide); the hydration and shadow-runner docs may not.
+    const runRequestedRef = useRef(false);
+    const scriptFromRunRef = useRef(false);
     const docRef = useRef(doc);
     useEffect(() => { docRef.current = doc; }, [doc]);
     const effectiveDoc = useMemo(() => (rollbackIndex == null ? doc : { ...doc, features: doc.features.slice(0, rollbackIndex) }), [doc, rollbackIndex]);
@@ -548,6 +617,31 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
                 out.push(del);
             return out;
         }
+        if (ctxFeature.kind === 'hole') {
+            // A hole's own modify verb is its RECESS, not the solid ops the generic
+            // branch below offers. Label tracks state, because the same click removes
+            // it again and a button reading "Counterbore" on a hole that already has
+            // one would misdescribe what the click does.
+            const out = [dims];
+            if (hasActions) {
+                out.push({
+                    label: ctxFeature.counterbore ? 'Remove Counterbore' : 'Counterbore',
+                    title: ctxFeature.counterbore
+                        ? 'Take the flat-bottomed recess off this hole'
+                        : 'Cut a flat-bottomed recess at this hole\u2019s mouth, so a bolt head sits flush',
+                    onRun: () => ctxActionsRef.current?.recess('counterbore'),
+                }, {
+                    label: ctxFeature.countersink ? 'Remove Countersink' : 'Countersink',
+                    title: ctxFeature.countersink
+                        ? 'Take the conical recess off this hole'
+                        : 'Cut a conical recess at this hole\u2019s mouth, so a screw sits flush',
+                    onRun: () => ctxActionsRef.current?.recess('countersink'),
+                });
+            }
+            if (del)
+                out.push(del);
+            return out;
+        }
         // Every other kind (extrude/pocket/fillet/hole/shell/pattern/move/...):
         // the modify verbs need a plain solid, so the bar offers the safe set.
         const out = [dims];
@@ -568,34 +662,65 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
             return null;
         const base = nameMap(doc)[id] ?? id;
         // Item E: "3 edges"/"2 faces" once a Shift-click multi-selection is two
-        // or more deep on the currently selected solid -- ownerOf() filters out
-        // anything a stray pick left pointing at a different solid, the same
-        // guard round()'s multi-edge path applies before it builds anything.
-        const edgesHere = pickedEdges.filter((e) => ownerOf(doc, e) === id);
-        const facesHere = pickedFaces.filter((f) => ownerOf(doc, f) === id);
+        // or more deep on the currently selected solid -- ownerScoped() runs the
+        // same ownerOf() filter this used to spell out over the two multi-pick
+        // arrays, so anything a stray pick left pointing at a different
+        // solid still drops out, the same guard round()'s multi-edge path
+        // applies before it builds anything.
+        const scoped = ownerScoped(selection, doc, id);
+        // P3.3: the kind-filtered views, not hand-rolled .filter calls -- the
+        // same views the commands read, so label and command can never drift.
+        const scopedState = { ...selection, items: scoped };
+        const edgesHere = edgesOf(scopedState);
+        const facesHere = facesOf(scopedState);
+        const verticesHere = verticesOf(scopedState);
+        const bodiesHere = bodiesOf(scopedState);
         // Item H (P20): a single picked edge/face carries its own kernel-
         // measured size as a third segment -- "Box 1 · top face · 40 x 40",
         // "Box 1 · edge · 20" -- but a multi-selection ("3 edges") has no one
-        // size to show, so pickedSize is read only in the single-pick branches.
+        // size to show, so the primary pick's size is read only in the
+        // single-pick branches.
+        const size = primaryPick?.size ?? null;
         const single = edgesHere.length <= 1 && facesHere.length <= 1;
-        const part = edgesHere.length > 1
-            ? `${edgesHere.length} edges`
-            : facesHere.length > 1
-                ? `${facesHere.length} faces`
-                : pickedEdge && ownerOf(doc, pickedEdge) === id
-                    ? (partWordFor(pickedEdge.edge) ?? 'edge')
-                        + (single && typeof pickedSize === 'number' ? ` · ${pickedSize}` : '')
-                    : pickedFace && ownerOf(doc, pickedFace) === id
-                        ? (partWordFor(pickedFace.face) ?? 'face')
-                            + (single && Array.isArray(pickedSize) ? ` · ${pickedSize[0]} x ${pickedSize[1]}` : '')
-                        : null;
+        // The most recent pick, only while it still belongs to this solid --
+        // the `pickedEdge && ownerOf(doc, pickedEdge) === id` guard the two
+        // branches below each used to carry, asked once now that one `primary`
+        // slot holds whichever kind was picked.
+        const here = primaryPick && ownerOf(doc, { target: primaryPick.target, name: primaryPick.name ?? null }) === id
+            ? primaryPick
+            : null;
+        // P3.3: a mixed selection says so -- "1 face + 1 edge + 1 vertex" --
+        // instead of reading as whichever kind happened to be picked last.
+        const held = [
+            facesHere.length ? `${facesHere.length} face${facesHere.length > 1 ? 's' : ''}` : null,
+            edgesHere.length ? `${edgesHere.length} edge${edgesHere.length > 1 ? 's' : ''}` : null,
+            verticesHere.length ? `${verticesHere.length} ${verticesHere.length > 1 ? 'vertices' : 'vertex'}` : null,
+            bodiesHere.length ? `${bodiesHere.length} bod${bodiesHere.length > 1 ? 'ies' : 'y'}` : null,
+        ].filter((s) => s != null);
+        const part = held.length > 1
+            ? held.join(' + ')
+            : edgesHere.length > 1
+                ? `${edgesHere.length} edges`
+                : facesHere.length > 1
+                    ? `${facesHere.length} faces`
+                    : here?.kind === 'edge'
+                        ? (partWordFor(here.name) ?? 'edge')
+                            + (single && typeof size === 'number' ? ` · ${size}` : '')
+                        : here?.kind === 'face'
+                            ? (partWordFor(here.name) ?? 'face')
+                                + (single && Array.isArray(size) ? ` · ${size[0]} x ${size[1]}` : '')
+                            : here?.kind === 'vertex'
+                                ? 'vertex'
+                                : here?.kind === 'body'
+                                    ? 'body'
+                                    : null;
         return part ? `${base} · ${part}` : base;
-    }, [selected, doc, pickedFace, pickedEdge, pickedEdges, pickedFaces, pickedSize]);
+    }, [selected, doc, selection, primaryPick]);
     const activeSketchPlane = useMemo(() => {
         if (selected.length !== 1)
             return null;
         const f = doc.features.find((x) => x.id === selected[0]);
-        return f && f.kind === 'sketch' ? (f.plane ?? 'xy') : null;
+        return flatViewPlane(f);
     }, [selected, doc]);
     const outlines = useMemo(() => {
         return doc.features
@@ -659,6 +784,10 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
             else if (d?.source === 'reshape-doc') {
                 const arrived = d.doc ?? null;
                 setScriptDoc(arrived);
+                if (runRequestedRef.current) {
+                    runRequestedRef.current = false;
+                    scriptFromRunRef.current = arrived != null;
+                }
                 setScriptNamedParams(Array.isArray(d.namedParams) ? d.namedParams : []);
                 setStale(null);
                 setScriptErrorMessage(null);
@@ -675,6 +804,7 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
                 }
             }
             else if (d?.source === 'preview-error') {
+                runRequestedRef.current = false;
                 setStale('error');
                 if (!hydrated)
                     setHydrated(true);
@@ -761,14 +891,20 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
         return () => clearTimeout(t);
     }, [doc, scriptNamedParams, build]);
     function chooseSide(next) {
-        if (next === 'build' && scriptDoc && !build) {
-            // Code -> Build: adopt whatever the last Run built, same as the
-            // sandbox's own chooseBuild() always has.
+        if (next === 'build' && scriptDoc && !build && scriptFromRunRef.current) {
+            // Code -> Build: adopt what the last Run built, same as the sandbox's own chooseBuild() always has -- but ONLY a Run the
+            // student pressed since they left Build. `scriptDoc` is also set by the mount hydration and by the hidden shadow runner,
+            // and a Build edit made after that leaves it stale: adopting it threw the edit away and (the regeneration effect then
+            // writing the old model back through onChange) overwrote the saved script with the old numbers. Measured 2026-10-04:
+            // reload, change a box width on Build, look at Code and come back -> the width is the old one, and so is what was saved.
             loadDoc(scriptDoc);
         }
+        if (next === 'build')
+            scriptFromRunRef.current = false;
         setBuild(next === 'build');
     }
     const run = useCallback(() => {
+        runRequestedRef.current = true;
         setCode(value);
         setRunKey((k) => k + 1);
     }, [value]);
@@ -798,9 +934,11 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
         if (!window.confirm('Clear the model and start again? Unsaved work will be lost.'))
             return;
         loadDoc(EMPTY_DOC);
-        setSelected([]);
-        setPickedEdge(null);
-        setPickedFace(null);
+        // The feature ids and the most recent pick go; the Shift-accumulated
+        // edge/face items stay, exactly as this read when it was setSelected([])
+        // beside setPickedEdge(null)/setPickedFace(null), with the two multi-pick
+        // arrays left alone.
+        setSelection((s) => ({ ...withFeatureIds(s, []), primary: null }));
         past.current = [];
         future.current = [];
         setDepth({ back: 0, forward: 0 });
@@ -930,8 +1068,8 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
             + (build ? ' is-build' : '')
             + (build && toolsHidden ? ' is-tools-hidden' : '')
             + (!build && codeHidden ? ' is-code-collapsed' : '')
-            + (!build && codeFullscreen ? ' is-code-fullscreen' : ''), children: [_jsxs("div", { className: "reshape-studio-toolbar", children: [canBuild && canCode && (_jsxs("div", { className: "sandbox-modes", role: "group", "aria-label": "Editing mode", children: [_jsx("button", { type: "button", "aria-pressed": !build, className: !build ? 'sandbox-mode is-active' : 'sandbox-mode', onClick: () => chooseSide('code'), children: "Code" }), _jsx("button", { type: "button", "aria-pressed": build, className: build ? 'sandbox-mode is-active' : 'sandbox-mode', onClick: () => chooseSide('build'), children: "Build" })] })), _jsx("span", { id: "reshapeRibbon", className: "reshape-studio-ribbon", "aria-hidden": !build }), !build && canCode && (_jsx("button", { className: "btn-run", style: { flexShrink: 0 }, onClick: run, children: "\u25B6 Run" })), toolbarExtra] }), _jsxs("div", { className: "reshape-studio-body", children: [build && (_jsx("div", { className: "reshape-studio-left", children: _jsxs("div", { className: "reshape-studio-tools", children: [_jsx("div", { className: "reshape-studio-tools-kicker", children: "Browser" }), _jsx(ModelEditor, { doc: doc, onChange: applyDoc, selected: selected, onSelect: setSelected, rollbackIndex: rollbackIndex, onRollback: setRollbackIndex, registerContextActions: (a) => { const had = ctxActionsRef.current != null; const has = a != null; ctxActionsRef.current = a; if (had !== has)
-                                        setCtxActions(has); }, onUndo: undo, onRedo: redo, canUndo: depth.back > 0, canRedo: depth.forward > 0, historyGen: historyGen, collapsible: true, onCollapsed: setToolsHidden, pickedEdge: pickedEdge, onClearPickedEdge: () => setPickedEdge(null), pickedFace: pickedFace, onClearPickedFace: () => setPickedFace(null), pickedEdges: pickedEdges, onClearPickedEdges: () => setPickedEdges([]), refusals: refusals, hasMesh: hasMesh, onExportSTL: exportSTL, onExportOBJ: exportOBJ, onExport3MF: export3MF, canClearModel: canBuild, onClearModel: clearModel, activePlane: activePlane, onActivePlaneChange: setActivePlane, sketchMode: sketchEditId !== null, onOpenSketch2D: setSketchEditId, onExitSketch2D: () => setSketchEditId(null) })] }) })), !build && canCode && (_jsx("div", { className: "reshape-studio-code", children: codeHidden ? (_jsx("div", { className: "reshape-code-collapsed", role: "group", "aria-label": "Code editor", children: _jsx("button", { type: "button", onClick: () => setCodeHidden(false), title: "Show the code editor", "aria-label": "Show the code editor", children: _jsx(PanelRightOpen, { size: 14 }) }) })) : (_jsxs(_Fragment, { children: [_jsxs("div", { className: "reshape-code-toolbar", role: "group", "aria-label": "Code panel view controls", children: [_jsx("button", { type: "button", onClick: () => setCodeFullscreen((v) => !v), title: codeFullscreen ? 'Exit full screen (Esc)' : 'Full screen the code editor', "aria-label": codeFullscreen ? 'Exit full screen' : 'Full screen the code editor', "aria-pressed": codeFullscreen, children: codeFullscreen ? _jsx(Minimize2, { size: 14 }) : _jsx(Maximize2, { size: 14 }) }), !codeFullscreen && (_jsx("button", { type: "button", onClick: () => setCodeHidden(true), title: "Collapse the code editor, so the model fills the window", "aria-label": "Collapse the code editor", children: _jsx(PanelRightClose, { size: 14 }) }))] }), _jsx(CodeEditor, {})] })) })), _jsxs("div", { className: "reshape-pane", children: [_jsxs("div", { className: "reshape-pane-view", children: [sketchEditId && (() => {
+            + (!build && codeFullscreen ? ' is-code-fullscreen' : ''), children: [_jsxs("div", { className: "reshape-studio-toolbar", children: [canBuild && canCode && (_jsxs("div", { className: "sandbox-modes", role: "group", "aria-label": "Editing mode", children: [_jsx("button", { type: "button", "aria-pressed": !build, className: !build ? 'sandbox-mode is-active' : 'sandbox-mode', onClick: () => chooseSide('code'), children: "Code" }), _jsx("button", { type: "button", "aria-pressed": build, className: build ? 'sandbox-mode is-active' : 'sandbox-mode', onClick: () => chooseSide('build'), children: "Build" })] })), _jsx("span", { id: "reshapeRibbon", className: "reshape-studio-ribbon", "aria-hidden": !build }), !build && canCode && (_jsx("button", { className: "btn-run", style: { flexShrink: 0 }, onClick: run, children: "\u25B6 Run" })), toolbarExtra] }), _jsxs("div", { className: "reshape-studio-body", children: [build && (_jsx("div", { className: "reshape-studio-left", children: _jsxs("div", { className: "reshape-studio-tools", children: [_jsx("div", { className: "reshape-studio-tools-kicker", children: "Browser" }), _jsx(ModelEditor, { doc: doc, onChange: applyDoc, selection: selection, onSelect: selectFeatures, onSelectionChange: setSelection, rollbackIndex: rollbackIndex, onRollback: setRollbackIndex, registerContextActions: (a) => { const had = ctxActionsRef.current != null; const has = a != null; ctxActionsRef.current = a; if (had !== has)
+                                        setCtxActions(has); }, onUndo: undo, onRedo: redo, canUndo: depth.back > 0, canRedo: depth.forward > 0, historyGen: historyGen, collapsible: true, onCollapsed: setToolsHidden, refusals: refusals, hasMesh: hasMesh, onExportSTL: exportSTL, onExportOBJ: exportOBJ, onExport3MF: export3MF, canClearModel: canBuild, onClearModel: clearModel, activePlane: activePlane, onActivePlaneChange: setActivePlane, sketchMode: sketchEditId !== null, onOpenSketch2D: setSketchEditId, onExitSketch2D: () => setSketchEditId(null), onEditFeature: editFeature })] }) })), !build && canCode && (_jsx("div", { className: "reshape-studio-code", children: codeHidden ? (_jsx("div", { className: "reshape-code-collapsed", role: "group", "aria-label": "Code editor", children: _jsx("button", { type: "button", onClick: () => setCodeHidden(false), title: "Show the code editor", "aria-label": "Show the code editor", children: _jsx(PanelRightOpen, { size: 14 }) }) })) : (_jsxs(_Fragment, { children: [_jsxs("div", { className: "reshape-code-toolbar", role: "group", "aria-label": "Code panel view controls", children: [_jsx("button", { type: "button", onClick: () => setCodeFullscreen((v) => !v), title: codeFullscreen ? 'Exit full screen (Esc)' : 'Full screen the code editor', "aria-label": codeFullscreen ? 'Exit full screen' : 'Full screen the code editor', "aria-pressed": codeFullscreen, children: codeFullscreen ? _jsx(Minimize2, { size: 14 }) : _jsx(Maximize2, { size: 14 }) }), !codeFullscreen && (_jsx("button", { type: "button", onClick: () => setCodeHidden(true), title: "Collapse the code editor, so the model fills the window", "aria-label": "Collapse the code editor", children: _jsx(PanelRightClose, { size: 14 }) }))] }), _jsx(CodeEditor, {})] })) })), _jsxs("div", { className: "reshape-pane", children: [_jsxs("div", { className: "reshape-pane-view", children: [sketchEditId && (() => {
                                         const sk = doc.features.find((f) => f.id === sketchEditId);
                                         return sk && sk.kind === 'sketch' ? (_jsx(SketchCanvas2D, { sketch: sk, doc: doc, onChange: applyDoc, onExit: () => setSketchEditId(null) }, sk.id)) : (setSketchEditId(null),
                                             null);
@@ -950,54 +1088,159 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
                                             setBboxMm(st.dimsMm ?? null);
                                         }, onPick: showBrep ? (p) => {
                                             if (!p) {
-                                                setSelected([]);
-                                                setPickedEdge(null);
-                                                setPickedFace(null);
-                                                setPickedEdges([]);
-                                                setPickedFaces([]);
-                                                setPickedSize(null);
+                                                // A click on nothing clears every axis at once -- what
+                                                // six separate setters used to spell out one per line --
+                                                // regardless of any modifier held: Ctrl+click on empty
+                                                // space clears too (SPEC-mouse-parity.md Phase 3 item 1's
+                                                // "empty click clears"), so there is no way to leave a
+                                                // stale selection stuck on by accident.
+                                                setSelection(clearSelection);
                                                 return;
                                             }
                                             const owner = ownerOf(doc, p);
-                                            if (owner)
-                                                setSelected([owner]);
-                                            setPickedEdge(p.kind === 'edge' ? { target: p.target, edge: p.name } : null);
-                                            setPickedFace(p.kind === 'face' ? { target: p.target, face: p.name } : null);
-                                            setPickedSize(p.size ?? null);
+                                            const item = itemOfPick(p);
                                             // Item E: an unnamed pick (nameEdgeOnCurrentShape/
                                             // nameFaceOnCurrentShape honestly refused it -- see
                                             // ViewportPick's own comment) cannot join a multi-select,
                                             // since Round/Angled Corner need a real name to build
                                             // from same as the single-edge path already does.
-                                            const shift = shiftHeldRef.current;
-                                            if (p.kind === 'edge' && p.name) {
-                                                const name = p.name;
-                                                setPickedEdges((prev) => {
-                                                    const hit = shift && prev.some((e) => e.target === p.target && sameTopo(e.edge, name));
-                                                    if (hit)
-                                                        return prev.filter((e) => !(e.target === p.target && sameTopo(e.edge, name)));
-                                                    return shift ? [...prev, { target: p.target, edge: name }] : [{ target: p.target, edge: name }];
-                                                });
-                                                setPickedFaces([]);
-                                            }
-                                            else if (p.kind === 'face' && p.name) {
-                                                const name = p.name;
-                                                setPickedFaces((prev) => {
-                                                    const hit = shift && prev.some((e) => e.target === p.target && sameTopo(e.face, name));
-                                                    if (hit)
-                                                        return prev.filter((e) => !(e.target === p.target && sameTopo(e.face, name)));
-                                                    return shift ? [...prev, { target: p.target, face: name }] : [{ target: p.target, face: name }];
-                                                });
-                                                setPickedEdges([]);
-                                            }
-                                            else {
-                                                setPickedEdges([]);
-                                                setPickedFaces([]);
-                                            }
-                                        } : () => { }, pick: showBrep && pickedEdge?.edge ? { target: pickedEdge.target, name: pickedEdge.edge } : null, selectedCount: showBrep ? selected.length : 0, selectionLabel: showBrep ? selectionLabel : null, sketchPlane: activeSketchPlane, anchors: specs, onAnchors: setAnchors, onMesh: (m) => {
+                                            //
+                                            // Real modifiers, read off the triggering event at the
+                                            // moment of the pick (ViewportPick's own ctrlKey/shiftKey/
+                                            // metaKey) rather than a window keydown/keyup listener
+                                            // guessing at the live keyboard state -- SPEC-mouse-parity.md
+                                            // Phase 3 item 1. metaKey stands in for ctrlKey so a Mac's
+                                            // Cmd-click matches a PC's Ctrl-click. Both held at once:
+                                            // Shift wins (toggle) -- Fusion does not define this
+                                            // combination, so this file does, the same as it already
+                                            // has to for everything else `[CONFIRM ...]` in the spec.
+                                            const ctrl = p.ctrlKey || p.metaKey;
+                                            const shift = p.shiftKey;
+                                            setSelection((prev) => {
+                                                // SPEC-mouse-parity.md Phase 3 item 3 (mixed selection):
+                                                // Ctrl/Shift accumulate across EVERY kind now, not just
+                                                // the kind just clicked -- toggle()/addIfAbsent() already
+                                                // compare by kind+target+name (selection-model.ts's own
+                                                // sameItem() rule), so a face and an edge are never
+                                                // mistaken for each other; the only thing standing in the
+                                                // way of holding both at once was this reducer
+                                                // pre-filtering `prev.items` down to the just-clicked
+                                                // kind before handing it to them -- the two-separate-
+                                                // arrays quirk P3.2's vertex/body work (commit 1cb9a3b)
+                                                // inherited rather than fixed, since fixing it was always
+                                                // this later item's job. A plain click still replaces
+                                                // everything regardless of kind (replaceSelection ignores
+                                                // `prev.items` entirely), and an unresolved pick still
+                                                // clears everything (clearSelection ditto) -- neither of
+                                                // those two ever read the filtered copy this used to
+                                                // compute, so reading `prev` straight changes nothing
+                                                // about them.
+                                                //
+                                                // vertex/body (SPEC-mouse-parity.md Phase 3 item 2) have
+                                                // no naming machinery of their own -- ViewportPick's own
+                                                // `name` is always null for them, not sometimes-null the
+                                                // way a face/edge pick's resolution can fail (see
+                                                // ViewportPick's own doc comment) -- so the "an unnamed
+                                                // pick can't join a multi-select" rule above only ever
+                                                // meant a resolution FAILURE, not a kind with no name
+                                                // concept to begin with. `target` (the owning feature
+                                                // id) is always fully resolved for them, the same way a
+                                                // plain feature-kind item's already is.
+                                                const canSelect = p.kind === 'vertex' || p.kind === 'body' || !!p.name;
+                                                const members = canSelect
+                                                    ? (shift ? toggleSelection(prev, item) : ctrl ? addIfAbsent(prev, item) : replaceSelection(prev, item))
+                                                    : clearSelection(prev);
+                                                // An owner-less pick leaves the feature ids alone, the
+                                                // same way `if (owner) setSelected([owner])` did -- see
+                                                // ownerOf()'s own comment on why it answers null.
+                                                return {
+                                                    ...withFeatureIds(members, owner ? [owner] : featuresOf(prev)),
+                                                    // `primary` is the RAW pick, set apart from multi-select
+                                                    // membership: pickedEdge/pickedFace/pickedSize were
+                                                    // overwritten by whatever was just clicked even when that
+                                                    // same click Shift-toggled the edge back OFF the
+                                                    // multi-selection, so toggle()'s own primary-on-remove
+                                                    // rule cannot stand in for this (selection-model.ts's
+                                                    // header calls out that exact quirk).
+                                                    primary: item,
+                                                };
+                                            });
+                                        } : () => { }, pick: showBrep && primaryPick?.kind === 'edge' && primaryPick.name ? { target: primaryPick.target, name: primaryPick.name } : null, selectedCount: showBrep ? selected.length : 0, selectionLabel: showBrep ? selectionLabel : null, sketchPlane: activeSketchPlane, selectedDatumIds: selected.filter((id) => doc.features.some((f) => f.id === id && f.kind === 'datum')), onDatumPick: showBrep ? (id, m) => setSelection((prev) => {
+                                            // The same state change a timeline row makes: a plain click
+                                            // replaces the selection with this plane, Ctrl/Shift/Cmd
+                                            // toggles it in or out of the current feature ids.
+                                            const add = m.ctrlKey || m.metaKey || m.shiftKey;
+                                            const ids = featuresOf(prev);
+                                            const next = add ? (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]) : [id];
+                                            return withFeatureIds(add ? prev : clearSelection(prev), next);
+                                        }) : undefined, anchors: specs, onAnchors: setAnchors, onMesh: (m) => {
                                             meshRef.current = m;
                                             setHasMesh(m !== null);
-                                        }, onEngine: () => setEngineReady(true), badgesInStatusBar: true, registerPickAt: (fn) => { pickAtRef.current = fn; } })) : !sketchEditId ? (_jsx(ReshapePreview, { ref: frameRef, code: code, runKey: runKey, engine: "script" })) : null, sketchEditId && build && (_jsx("div", { style: { position: 'absolute', width: 0, height: 0, overflow: 'hidden' }, children: _jsx(ReshapePreview, { ref: frameRef, code: code, runKey: runKey, engine: "script" }) })), wantsHydrationShadow && !sketchEditId && (
+                                        }, onEngine: () => setEngineReady(true), badgesInStatusBar: true, onNavHint: setNavHintText, 
+                                        // Phase 5.3 (todo 25): while a live drag preview exists
+                                        // (previewDoc != null) the viewport draws translucent in the
+                                        // selected feature's op colour; pointerup commits and drops it.
+                                        preview: showBrep && previewDoc != null && ctxFeature
+                                            ? { active: true, tint: previewTint(ctxFeature.kind) ?? 'add' }
+                                            : null, filters: selection.filters, onFiltersChange: (next) => setSelection((s) => ({ ...s, filters: next })), onBoxSelect: showBrep ? (items, shiftKey) => {
+                                            // SPEC-mouse-parity.md Phase 3 item 4: a box-select drag's
+                                            // result lands here -- pure UI state, setSelection only,
+                                            // so it adds ZERO undo entries (undo history is doc
+                                            // history; `past`/`future` above are never touched).
+                                            // Shift held: every item joins whatever is already
+                                            // selected (addIfAbsent, the same no-duplicate rule a
+                                            // Ctrl-click uses); released: the box REPLACES the whole
+                                            // selection, the same way a plain click does. An empty
+                                            // box result replaces with nothing -- the same
+                                            // click-on-empty-space clears.
+                                            setSelection((prev) => {
+                                                // Shift + an empty box result is a complete no-op --
+                                                // "add nothing to what is there" must not fall through
+                                                // to the withFeatureIds() below and wipe the feature ids
+                                                // the drag started from.
+                                                if (shiftKey && items.length === 0)
+                                                    return prev;
+                                                const base = shiftKey ? prev : clearSelection(prev);
+                                                let next = base;
+                                                // addIfAbsent, not add: a box's corner vertex occupies
+                                                // several of the mesh's own position slots, so the raw
+                                                // result carries repeated identical items -- the same
+                                                // no-duplicate rule a Ctrl-click already applies.
+                                                for (const item of items)
+                                                    next = addIfAbsent(next, item);
+                                                const last = items[items.length - 1] ?? null;
+                                                // Every DISTINCT owner among the new items, not just the
+                                                // last one -- a box-select can span MULTIPLE bodies
+                                                // (unlike a single click's always-one-owner pick), and
+                                                // collapsing to the last item's owner alone silently
+                                                // dropped every other solid's items from `selected`
+                                                // (the status bar's "N selected" and every owner-scoped
+                                                // reader downstream of it) even though addIfAbsent()
+                                                // above had already added them to `next.items` -- a
+                                                // window-select across two solids looked like it kept
+                                                // both but visibly reported/scoped to only one.
+                                                const owners = distinctOwners(doc, items);
+                                                const ids = owners.length > 0
+                                                    ? (shiftKey ? Array.from(new Set([...featuresOf(prev), ...owners])) : owners)
+                                                    : items.length > 0 ? featuresOf(prev) : [];
+                                                return {
+                                                    // An empty box result replaces with NOTHING -- the
+                                                    // same click-on-empty-space clears -- so the feature
+                                                    // ids the drag started from are not resurrected here.
+                                                    ...withFeatureIds(next, ids),
+                                                    primary: last,
+                                                };
+                                            });
+                                        } : undefined, onFeatureDoubleClick: showBrep ? editFeature : undefined, onSelectAll: showBrep ? () => setSelection(selectAllFeatures(doc)) : undefined, onDeleteSelected: showBrep ? () => ctxActionsRef.current?.remove() : undefined, onUndo: showBrep ? undo : undefined, onRedo: showBrep ? redo : undefined, onRepeat: showBrep ? () => ctxActionsRef.current?.repeatLast() : undefined, onMoveHotkey: showBrep ? () => ctxActionsRef.current?.moveTool(false) : undefined, onStartSketch: showBrep ? () => {
+                                            // The marking menu's Sketch wedge: the same three steps
+                                            // ModelEditor's own startSketch() runs (ModelEditor.tsx:
+                                            // 884-890), minus its local `say(null)` status message,
+                                            // which has no equivalent here.
+                                            const f = newSketch(doc, activePlane);
+                                            applyDoc({ ...doc, features: [...doc.features, f] });
+                                            selectFeatures([f.id]);
+                                            setSketchEditId(f.id);
+                                        } : undefined, registerPickAt: (fn) => { pickAtRef.current = fn; } })) : !sketchEditId ? (_jsx(ReshapePreview, { ref: frameRef, code: code, runKey: runKey, engine: "script" })) : null, sketchEditId && build && (_jsx("div", { style: { position: 'absolute', width: 0, height: 0, overflow: 'hidden' }, children: _jsx(ReshapePreview, { ref: frameRef, code: code, runKey: runKey, engine: "script" }) })), wantsHydrationShadow && !sketchEditId && (
                                     // Never shown -- see wantsHydrationShadow's own comment. Its
                                     // only job is to run `code` through the sandbox on mount so
                                     // `doc` can be hydrated from `value` while the visible pane
@@ -1021,7 +1264,26 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
                                             // read-only outline; a sketch is edited in SketchCanvas2D's
                                             // 2D canvas now, not by dragging a handle in this view.
                                             return !doc.features.some((f) => f.kind === 'sketch' && a.param.startsWith(`${f.id}_`));
-                                        }), values: paramValues, scales: scales, onDrag: (param, val) => { sendParams({ [param]: val }); touchRuleActivity(); }, onCommit: () => { commitParams(); touchRuleActivity(); }, onTap: (x, y) => pickAtRef.current?.(x, y), outlines: outlines, outlineAnchors: anchors, bottomInset: 0 })), ctxBarVisible && !sketchEditId && ctxFeature && ctxAnchor && (
+                                        }), values: paramValues, scales: scales, onDrag: (param, val) => { sendParams({ [param]: val }); touchRuleActivity(); }, onCommit: () => { commitParams(); touchRuleActivity(); }, onTap: (x, y) => pickAtRef.current?.(x, y), outlineAnchors: anchors, bottomInset: 0, manipulator: build && ctxFeature && selected.length === 1
+                                            ? {
+                                                feature: ctxFeature,
+                                                doc: effectiveDoc,
+                                                // Same param-write path the drag uses (sendParams ->
+                                                // applyParam) -- the convergence todo 22 requires.
+                                                onDragParam: (param, val) => { sendParams({ [param]: val }); touchRuleActivity(); },
+                                                onCommitParam: () => { commitParams(); touchRuleActivity(); },
+                                            }
+                                            : null, incrementalMove: build
+                                            ? {
+                                                mode: moveSnapMode,
+                                                fixedStep: moveSnapStep,
+                                                modelExtent: bboxMm ? Math.max(bboxMm.x, bboxMm.y, bboxMm.z) : 40,
+                                                onModeChange: setMoveSnapMode,
+                                                onStepChange: setMoveSnapStep,
+                                            }
+                                            : null, activeCommand: build && ctxFeature && selected.length === 1
+                                            ? { command: ctxFeature.kind, selectionCount: selected.length }
+                                            : null })), ctxBarVisible && !sketchEditId && ctxFeature && ctxAnchor && (
                                     // Piece B: the context bar. anchor/point/absolute inside
                                     // .reshape-pane-view (position:relative), the same offset
                                     // parent HandleOverlay's handles use, so the bar floats over
@@ -1034,7 +1296,7 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
                                             : 'Pick a step in the timeline, or a face on the model, to see its numbers.')
                                         : "Run a script and its numbers appear here. param('name', value) gives one a caption.", notice: !build && scriptErrorMessage
                                         ? scriptErrorMessage
-                                        : selected.length === 1 ? refusals?.get(selected[0]) ?? null : null, values: paramValues, onChange: sendParams, onCommit: commitParams, lastMs: rebuildMs, stale: stale }) }))] })] }), _jsx("div", { id: "reshapeTimeline", className: build ? 'reshape-studio-timeline' : 'reshape-studio-timeline is-hidden', "aria-hidden": !build }), _jsxs("footer", { className: "reshape-studio-status", role: "status", "aria-live": "polite", children: [selectionLabel ? (_jsx("button", { type: "button", className: "reshape-studio-status-sel", title: "Click to clear the selection", "aria-label": "Clear the selection", onClick: () => setSelected([]), children: selectionLabel })) : showBrep ? (_jsx("span", { className: "reshape-studio-status-sel is-muted", children: "Nothing selected" })) : (_jsx("span", { className: "reshape-studio-status-sel is-muted", children: "Code" })), _jsx("span", { className: "reshape-studio-status-grow" }), statusNote && (_jsxs("span", { className: "reshape-studio-status-note", style: { color: noteColor(statusNote.severity) }, title: statusNote.source ? `${statusNote.source} — ${statusNote.text}` : statusNote.text, children: [statusNote.source ? `${statusNote.source} — ` : '', statusNote.text] })), _jsxs("span", { className: "reshape-studio-status-eng", title: stale == null && rebuildMs != null
+                                        : selected.length === 1 ? refusals?.get(selected[0]) ?? null : null, values: paramValues, onChange: sendParams, onCommit: commitParams, lastMs: rebuildMs, stale: stale }) }))] })] }), _jsx("div", { id: "reshapeTimeline", className: build ? 'reshape-studio-timeline' : 'reshape-studio-timeline is-hidden', "aria-hidden": !build }), _jsxs("footer", { className: "reshape-studio-status", role: "status", "aria-live": "polite", children: [selectionLabel ? (_jsx("button", { type: "button", className: "reshape-studio-status-sel", title: "Click to clear the selection", "aria-label": "Clear the selection", onClick: () => selectFeatures([]), children: selectionLabel })) : showBrep ? (_jsx("span", { className: "reshape-studio-status-sel is-muted", children: "Nothing selected" })) : (_jsx("span", { className: "reshape-studio-status-sel is-muted", children: "Code" })), _jsx("span", { className: "reshape-studio-status-grow" }), statusNote && (_jsxs("span", { className: "reshape-studio-status-note", style: { color: noteColor(statusNote.severity) }, title: statusNote.source ? `${statusNote.source} — ${statusNote.text}` : statusNote.text, children: [statusNote.source ? `${statusNote.source} — ` : '', statusNote.text] })), _jsxs("span", { className: "reshape-studio-status-eng", title: stale == null && rebuildMs != null
                             ? `rebuild ok (${rebuildMs} ms)`
                             : undefined, children: [_jsx("i", { "aria-hidden": "true", className: "reshape-studio-status-eng-dot", style: {
                                     background: engineReady && stale == null
@@ -1042,7 +1304,7 @@ export default function ReshapeStudio({ value, onChange, sides, startSide, onDoc
                                         : stale === 'error'
                                             ? 'var(--reshape-warn)'
                                             : 'var(--reshape-text-muted)',
-                                } }), engineReady ? 'brep-rs' : 'engine loading'] }), showBrep && bboxMm && (_jsxs("span", { className: "reshape-studio-status-bbox", children: [bboxMm.x, " \u00D7 ", bboxMm.y, " \u00D7 ", bboxMm.z, " mm"] })), _jsx("span", { className: "reshape-studio-status-nav", children: "Right-drag orbit \u00B7 Scroll zoom" })] }), _jsx("style", { children: `
+                                } }), engineReady ? 'brep-rs' : 'engine loading'] }), showBrep && bboxMm && (_jsxs("span", { className: "reshape-studio-status-bbox", children: [bboxMm.x, " \u00D7 ", bboxMm.y, " \u00D7 ", bboxMm.z, " mm"] })), _jsx("span", { className: "reshape-studio-status-nav", children: navHintText })] }), _jsx("style", { children: `
         /* The one place every --reshape-* token is defined -- everything
            else in this component (and model/ModelEditor.tsx,
            model/HandleOverlay.tsx,

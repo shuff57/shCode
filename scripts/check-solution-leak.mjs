@@ -122,6 +122,20 @@ for (const id of dirs) {
   }
 }
 
+// 5. The pseudocode shown after the last try (pa-pseudocode/<id>.md) is a
+//    solution too. It lives outside lessons/ so lib/lessons.ts never walks it, and
+//    this proves the starters bundle (the student-facing one) holds none of it.
+let pseudoChecked = 0;
+const pseudoDir = path.join(root, 'pa-pseudocode');
+if (await exists(pseudoDir)) {
+  for (const f of (await fs.readdir(pseudoDir)).filter((n) => n.endsWith('.md'))) {
+    const text = (await fs.readFile(path.join(pseudoDir, f), 'utf8')).trim();
+    if (text.length === 0) continue;
+    pseudoChecked++;
+    if (starters.includes(encoded(text))) fail(`pa-pseudocode/${f}: its full text is in the starters bundle`);
+  }
+}
+
 if (dirForm + fileForm === 0) {
   fail('no solutions found at all — this check would pass vacuously');
 }
@@ -133,5 +147,5 @@ if (failures > 0) {
 
 console.log(
   `[check-solution-leak] OK — ${fileForm} solution.js + ${dirForm} solution/ checked, ` +
-    `none leaked into the starters bundle`,
+    `${pseudoChecked} pa-pseudocode file(s), none leaked into the starters bundle`,
 );

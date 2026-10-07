@@ -2,19 +2,26 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
-import { recordLessonCompleted, useLessonState } from '../lib/progress';
-import { isPassingGrade } from '../lib/grade-pass';
+import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
+import { isPassingGrade, criteriaScore } from '../lib/grade-pass';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
+import LessonNumberLinks, { useSourceHrefs } from './LessonNumberLinks';
 import {
   fetchDraft,
   saveDraft,
   recordSubmission,
   fetchSubmissions,
   streamGrade,
+  type SubmissionRecord,
 } from '../lib/written-grader-store';
+import { countAttempts } from '../lib/attempt-cap';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
+import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import GraderPicker, { hasGraderChoice, useGraderChoice } from './GraderPicker';
 import SolutionPanel from './SolutionPanel';
+import { AttemptBanner, PseudocodePanel } from './AttemptCap';
+import { useRepairLoop } from '../lib/use-attempt-cap';
+import CodeMirrorPane from './CodeMirrorPane';
 
 interface AiRubricItem {
   id: string;
@@ -26,6 +33,12 @@ interface AiRubricItem {
 interface AiGraderConfig {
   /** Test mode -- one submission, no rubric feedback. See lib/types.ts. */
   summative?: boolean;
+  /** With `summative`: the student may revise after feedback. See lib/types.ts. */
+  revisable?: boolean;
+  /** Graded attempts allowed. See lib/types.ts and lib/attempt-cap.ts. */
+  maxSubmissions?: number;
+  /** 'code' draws the JavaScript editor in place of the prose textarea. See lib/types.ts. */
+  input?: 'text' | 'code';
   rubricTitle?: string;
   model?: string;
   contextDocs?: string[];
@@ -55,6 +68,21 @@ interface GradeResult {
   criteria: CriterionResult[];
   summary: string;
   hints: string[];
+}
+
+/** The best of a student's graded tries (a rubric row with criteria), for showing what they earned. */
+function bestGradedTry(records: SubmissionRecord[]): GradeResult | null {
+  let best: GradeResult | null = null;
+  let bestScore = -1;
+  for (const r of records) {
+    const g = r.gradeJson as Partial<GradeResult> | null;
+    if (!g || typeof g !== 'object' || !Array.isArray(g.criteria) || g.criteria.length === 0) continue;
+    if ((g as { gradingFailed?: unknown }).gradingFailed === true) continue;
+    const s = typeof g.totalPossible === 'number' && g.totalPossible > 0 ? Number(g.totalEarned ?? 0) : criteriaScore(g.criteria);
+    // records are oldest-first, so >= keeps the LATEST of equal tries
+    if (s >= bestScore) { best = g as GradeResult; bestScore = s; }
+  }
+  return best;
 }
 
 const STORAGE_PREFIX = 'shCode:written:';
@@ -114,10 +142,16 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   // a stage nobody reported.
   const [stage, setStage] = useState<GradeStage | null>(null);
   const [result, setResult] = useState<GradeResult | null>(null);
+  // The result on screen was rebuilt from the server's best try (a return visit, another device),
+  // not just graded, so the page says whose it is.
+  const [resultIsBest, setResultIsBest] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  // The questions name the lessons to reread ("1.1.17"). The same linkifier the
+  // coding criteria use, so both surfaces behave identically.
+  const sourceHrefs = useSourceHrefs([prompt]);
 
   const progress = useLessonState();
   // Which grader marks this. Remembered per browser; see useGraderChoice.
@@ -125,12 +159,40 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   const totalPossible = config.rubric.reduce((s, r) => s + r.points, 0);
   // A test, not a practice assignment: see AiGraderConfig.summative.
   const summative = !!config.summative;
+  // A revisable test is a practice assignment as far as the screen goes: no lock,
+  // feedback drawn, resubmit as often as wanted. `summative` itself stays true --
+  // it is what keeps the brief out of the page and completes the lesson on
+  // sitting -- so only the one-shot behaviours key off this.
+  const oneShot = summative && !config.revisable;
+  // Attempts allowed, or null for unlimited. Only summative items set it.
+  // A teacher or admin previewing the part is never refused by the server (effectiveCap), so for
+  // them there is no cap to count down.
+  const maxSubmissions =
+    typeof config.maxSubmissions === 'number' && !bypassesLessonLock(progress.role) ? config.maxSubmissions : null;
+  // The JavaScript editor in place of the prose textarea. Presentation only.
+  const codeInput = config.input === 'code';
   // Submitted-before is answered by the SERVER, not by this browser. Seeding it
   // from the localStorage cache alone -- which is all this did until 2026-09-02
   // -- meant clearing site data, switching browser, or picking up a second
   // device handed the student a fresh unlocked Submit on a one-shot assessment.
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
-  const locked = summative && (!!result || alreadySubmitted);
+  // `null` means UNKNOWN, not zero: the request failed, so there is no honest
+  // count. A capped item refuses Submit while that is unknown rather than
+  // assuming the student has attempts left -- the same mistake a6006dd5 fixed,
+  // one level down. It costs a reload to recover, and the copy below says so.
+  const [attempts, setAttempts] = useState<number | null>(null);
+  // Any row at all (counted or the server's free outage marker): what a completion repair keys on.
+  const [anyRow, setAnyRow] = useState(false);
+  const attemptsKnown = attempts !== null;
+  const capReached = maxSubmissions !== null && attemptsKnown && attempts >= maxSubmissions;
+  const capUnknown = maxSubmissions !== null && !attemptsKnown;
+  // The grade arrived but the completion call did not (or a grader outage left the next
+  // part locked): repair it, as the other capped renderers do.
+  useRepairLoop(
+    lessonId,
+    maxSubmissions !== null && attemptsKnown && anyRow && progress.authed && progress.states[lessonId] !== 'completed',
+  );
+  const locked = capUnknown || capReached || (oneShot && (!!result || alreadySubmitted));
 
   useEffect(() => {
     // Local cache is the always-available fallback; server draft is canonical
@@ -138,26 +200,46 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     let cancelled = false;
     const local = loadState(lessonId);
     (async () => {
-      const [serverDraft, priorSubmissions] = await Promise.all([
+      const [serverDraft, prior] = await Promise.all([
         progress.authed ? fetchDraft(lessonId) : Promise.resolve(null),
-        progress.authed && config.summative
+        // Only worth asking when the answer changes something: a one-shot lock or
+        // a cap. A formative item has neither and never made this call.
+        progress.authed && (oneShot || maxSubmissions !== null)
           ? fetchSubmissions(lessonId)
-          : Promise.resolve([]),
+          : Promise.resolve({ records: [], loaded: !progress.authed }),
       ]);
       if (cancelled) return;
-      if (priorSubmissions.length > 0) setAlreadySubmitted(true);
+      if (prior.records.length > 0) setAlreadySubmitted(true);
+      // Signed out there are no server rows to count and none to be had, which is
+      // an honest zero rather than an unknown.
+      if (oneShot || maxSubmissions !== null) {
+        setAttempts(prior.loaded ? countAttempts(prior.records) : null);
+        setAnyRow(prior.loaded && prior.records.length > 0);
+      }
       if (serverDraft && serverDraft.response) {
         setResponse(serverDraft.response);
       } else {
         setResponse(local.response);
       }
-      if (local.lastResult) setResult(local.lastResult);
+      // On a capped part the page must still show what the student EARNED when they come back
+      // (another day, another device, a cleared cache): the locked box used to say "your best one is
+      // your score" and show no score and none of the feedback. Once every try is spent the best
+      // try is the part's grade, so that is what is shown; before then the last try on this device
+      // stays, and the best one stands in only when this device has nothing.
+      if (maxSubmissions !== null && prior.loaded) {
+        const best = bestGradedTry(prior.records);
+        const spent = countAttempts(prior.records) >= maxSubmissions;
+        if (best && (spent || !local.lastResult)) {
+          setResult(best);
+          setResultIsBest(true);
+        } else if (local.lastResult) setResult(local.lastResult);
+      } else if (local.lastResult) setResult(local.lastResult);
       setLoaded(true);
     })();
     return () => {
       cancelled = true;
     };
-  }, [lessonId, progress.authed, config.summative]);
+  }, [lessonId, progress.authed, oneShot, maxSubmissions]);
 
   useEffect(() => {
     if (!loaded) return;
@@ -185,6 +267,20 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
 
   async function recordFailedAttempt(reason: string, httpStatus: number) {
     if (!progress.authed) return;
+    // On a CAPPED part the server writes the marker itself, when the grader really
+    // failed (functions/_shared/attempts.ts recordOutage): a marker the browser can
+    // post is a free row a student can send at will, so the route refuses it. The
+    // draft is still saved here, and the work is already in front of the teacher.
+    // A network drop (no reply at all) writes nothing anywhere: the student retries.
+    if (maxSubmissions !== null) {
+      await saveDraft(lessonId, response);
+      // Still unlock the next part after a grader outage (it is ours, not the
+      // student's). The server only completes a capped part once a row exists, and
+      // the marker it wrote is that row; with no reply at all there is none, the
+      // POST is refused and the student simply tries again.
+      if (progress.states[lessonId] !== 'completed') await recordLessonCompleted(lessonId);
+      return;
+    }
     // A student who hits Submit four times against a dead grader should not
     // land four identical rows in the teacher's queue. Same text = one row.
     if (lastFailedRef.current === response) return;
@@ -221,12 +317,23 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     }
   }
 
+  // Re-read how many tries the SERVER holds. A stream that drops mid-grade, a refused request or a
+  // grader outage can leave the server with a row (or without one) that this page did not see, so
+  // the banner would say one try too many or too few. The server is always right; this re-reads it.
+  async function refreshAttempts() {
+    if (maxSubmissions === null) return;
+    const prior = await fetchSubmissions(lessonId);
+    if (!prior.loaded) return;
+    setAttempts(countAttempts(prior.records));
+    setAnyRow(prior.records.length > 0);
+  }
+
   async function submit() {
     setLoading(true);
     setError(null);
     setOffline(false);
     try {
-      const { status, data } = await streamGrade(
+      const { status, data, network } = await streamGrade(
         {
           lessonId,
           lessonTitle,
@@ -241,19 +348,53 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       );
       const res = { status };
       if (data === null) {
-        const reason = `Grader returned a non-JSON response (HTTP ${res.status}).`;
-        setError(`${reason} Ask your teacher — the Ollama key or endpoint may not be configured. Your answer has been saved and sent to your teacher for marking.`);
+        // Raw status stays in the console and in the row the teacher sees; the
+        // student gets plain words (lib/grade-error.ts).
+        const reason = network
+          ? 'Network error: the grader could not be reached.'
+          : `Grader returned a non-JSON response (HTTP ${res.status}).`;
+        console.warn('[grader]', reason);
+        setError(gradeFailureMessage({
+          kind: classifyGradeFailure(res.status, null, network),
+          status: res.status,
+          keepsTries: maxSubmissions !== null,
+        }));
         await recordFailedAttempt(reason, res.status);
+        await refreshAttempts();
+        return;
+      }
+      if (data && !data.ok && (data as { capReached?: boolean }).capReached === true) {
+        // Every try is spent (a second tab, a stale page). That is the server
+        // doing its job, not a grader outage: NOT written as a failed attempt, which
+        // would put an unmarked fourth answer in front of the teacher.
+        if (maxSubmissions !== null) setAttempts(maxSubmissions);
+        setError(data.error || 'All your tries on this part are already used.');
         return;
       }
       if (!data || !data.ok) {
-        const reason = data?.error || `Grading failed (HTTP ${res.status}).`;
-        setError(`${reason} Your answer has been saved and sent to your teacher for marking.`);
+        // `detail` is the server's staff-only reason (may name the vendor): logged and
+        // sent to the teacher side, never shown.
+        const reason = (data as { detail?: string } | null)?.detail || data?.error || `Grading failed (HTTP ${res.status}).`;
+        console.warn('[grader]', res.status, reason);
+        setError(gradeFailureMessage({
+          kind: classifyGradeFailure(res.status, data),
+          status: res.status,
+          serverMessage: data?.error,
+          keepsTries: maxSubmissions !== null,
+        }));
         if (data?.offline) setOffline(true);
         await recordFailedAttempt(reason, res.status);
+        await refreshAttempts();
         return;
       }
       // A successful grade supersedes any failed attempt for this text.
+      lastFailedRef.current = null;
+      setResult(data as GradeResult);
+      setResultIsBest(false);
+      // One attempt just spent. Unknown stays unknown -- we know this one happened,
+      // not how many came before, and inventing a count would unlock a capped item.
+      setAttempts((n) => (n === null ? null : n + 1));
+      setAnyRow(true);
       lastFailedRef.current = null;
       setResult(data as GradeResult);
       const passed = isPassing(data as GradeResult);
@@ -261,7 +402,17 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       // grade would lock a student out of the rest of their own exam over an
       // answer the teacher has not even seen yet.
       if (summative || passed) {
-        await recordLessonCompleted(lessonId, data.totalEarned);
+        // BEST attempt, not last. The lesson_state upsert is `score =
+        // excluded.score`, so writing this draft's mark over a better one would
+        // erase it. Passing the running maximum keeps the row right whichever way
+        // this draft went, and needs no extra server round trip to do it.
+        // A pass/fail rubric's totalEarned is always 0, so its score is the criteria met (1 each,
+        // partial half), out of the rubric's length: the same number the manifest's maxScore
+        // divides by (lib/grade-pass.ts criteriaScore).
+        const earned = data.totalPossible === 0 ? criteriaScore(data.criteria) : data.totalEarned;
+        const prior = progress.scores[lessonId];
+        const best = typeof prior === 'number' ? Math.max(prior, earned) : earned;
+        await recordLessonCompleted(lessonId, best);
       }
       if (progress.authed) {
         // Persist the submission + sync the draft so a resume shows the
@@ -277,11 +428,13 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       }
     } catch (e) {
       const reason = e instanceof Error ? e.message : String(e);
-      setError(reason);
+      console.warn('[grader]', reason);
+      setError(gradeFailureMessage({ kind: 'network', keepsTries: maxSubmissions !== null }));
       // Best effort — if the network is genuinely down this fails too, and
       // recordFailedAttempt leaves the retry guard clear so the next submit
       // tries again.
       await recordFailedAttempt(reason, 0);
+      await refreshAttempts();
     } finally {
       setLoading(false);
       setStage(null);
@@ -297,10 +450,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         {config.rubricTitle ?? 'Written response — AI-graded'}
       </h2>
       <p style={{ color: '#888', fontSize: 13, margin: '0 0 12px' }}>
-        Answer in your own everyday words — you are graded on having the right idea, not on
-        exact wording, spelling or length. The AI grader checks each criterion and points you
-        back at the lesson to reread if something is missing. You can revise and resubmit as
-        many times as you want.
+        {codeInput
+          ? 'Write your answer as JavaScript. There is no Run button, so read it through the way the computer would before you submit.'
+          : 'Answer in your own everyday words — you are graded on having the right idea, not on exact wording, spelling or length. The AI grader checks each criterion and points you back at the lesson to reread if something is missing.' +
+            (maxSubmissions === null
+              ? ' You can revise and resubmit as many times as you want.'
+              : ` You get ${maxSubmissions} tries: revise and resubmit, and your best one counts.`)}
       </p>
 
       {prompt.trim() ? (
@@ -334,13 +489,16 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
               whiteSpace: 'pre-wrap',
             }}
           >
-            {prompt.trim()}
+            {/* The linkified text is rendered here and never sent anywhere: the
+                grader reads the prompt from public/ai-graders.json, not from the
+                browser, so no markup can leak into what the model sees. */}
+            <LessonNumberLinks text={prompt.trim()} hrefs={sourceHrefs} />
           </div>
         </div>
       ) : null}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <label style={{ fontSize: 13, color: '#aaa' }}>Your response</label>
+        <label style={{ fontSize: 13, color: '#aaa' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
         <SolutionPanel
           lessonId={lessonId}
           onInsert={(files) => {
@@ -349,36 +507,50 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           }}
         />
       </div>
-      <textarea
-        value={response}
-        onChange={(e) => setResponse(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key !== 'Tab') return;
-          e.preventDefault();
-          const el = e.currentTarget;
-          const start = el.selectionStart;
-          const end = el.selectionEnd;
-          const next = response.slice(0, start) + '  ' + response.slice(end);
-          setResponse(next);
-          requestAnimationFrame(() => {
-            el.selectionStart = el.selectionEnd = start + 2;
-          });
-        }}
-        placeholder="Write your response here. Full sentences preferred."
-        rows={10}
-        style={{
-          width: '100%',
-          background: '#282a36',
-          color: '#f8f8f2',
-          border: '1px solid #44475a',
-          borderRadius: 6,
-          padding: 12,
-          fontSize: 14,
-          fontFamily: 'system-ui, sans-serif',
-          lineHeight: 1.5,
-          resize: 'vertical',
-        }}
-      />
+      <AttemptBanner max={maxSubmissions} used={attempts} loading={!loaded} />
+      {codeInput ? (
+        // CodeMirrorPane fills its parent (height: 100%), so the parent needs a
+        // height of its own. No Run button, lint or autocomplete, on purpose:
+        // reading the program through is the skill this paper marks.
+        <div
+          role="group"
+          aria-label="Your program (JavaScript)"
+          style={{ height: 420, background: '#282a36', border: '1px solid #44475a', borderRadius: 6, overflow: 'hidden' }}
+        >
+          <CodeMirrorPane value={response} onChange={setResponse} fileKey={lessonId} language="javascript" />
+        </div>
+      ) : (
+        <textarea
+          value={response}
+          onChange={(e) => setResponse(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key !== 'Tab') return;
+            e.preventDefault();
+            const el = e.currentTarget;
+            const start = el.selectionStart;
+            const end = el.selectionEnd;
+            const next = response.slice(0, start) + '  ' + response.slice(end);
+            setResponse(next);
+            requestAnimationFrame(() => {
+              el.selectionStart = el.selectionEnd = start + 2;
+            });
+          }}
+          placeholder="Write your response here. Full sentences preferred."
+          rows={10}
+          style={{
+            width: '100%',
+            background: '#282a36',
+            color: '#f8f8f2',
+            border: '1px solid #44475a',
+            borderRadius: 6,
+            padding: 12,
+            fontSize: 14,
+            fontFamily: 'system-ui, sans-serif',
+            lineHeight: 1.5,
+            resize: 'vertical',
+          }}
+        />
+      )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
         <button
@@ -404,14 +576,16 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
               // the old wording when no stage arrived.
               stage
               ? `${GRADE_STAGE_LABELS[stage]}…`
-              : summative
+              : oneShot
                 ? 'Submitting…'
                 : 'Grading…'
-            : summative
+            : oneShot
               ? locked
                 ? 'Submitted'
                 : 'Submit my answer'
-              : result
+              : capReached
+                ? 'No tries left'
+                : result
                 ? 'Re-submit for feedback'
                 : 'Submit for feedback'}
         </button>
@@ -438,8 +612,19 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           {saveStatus === 'saved' ? 'Saved ✓' : saveStatus === 'error' ? 'Save failed' : 'Save draft'}
         </button>
         <span style={{ color: '#666', fontSize: 12 }}>
-          {response.trim().length} chars · {response.trim().split(/\s+/).filter(Boolean).length} words
+          {response.trim().length} chars{codeInput ? '' : ` · ${response.trim().split(/\s+/).filter(Boolean).length} words`}
         </span>
+        {maxSubmissions === null ? null : !attemptsKnown ? (
+          <span style={{ color: '#ffb86c', fontSize: 12 }}>
+            {loaded ? 'Couldn\u2019t check your attempts — reload to try again' : 'Checking your attempts…'}
+          </span>
+        ) : (
+          <span style={{ color: capReached ? '#ffb86c' : '#666', fontSize: 12 }}>
+            {capReached
+              ? 'No attempts left — your best one counts'
+              : `${maxSubmissions - attempts} of ${maxSubmissions} attempts left`}
+          </span>
+        )}
         {hasGraderChoice(graders) ? null : config.model ? (
           <code style={{ color: '#6272a4', fontSize: 11, marginLeft: 'auto' }}>
             model: {config.model}
@@ -461,6 +646,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         />
       </div>
 
+      <PseudocodePanel lessonId={lessonId} show={capReached} />
+
       {error && (
         <div
           style={{
@@ -480,7 +667,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         </div>
       )}
 
-      {(result || alreadySubmitted) && summative ? (
+      {(result || alreadySubmitted) && oneShot ? (
         <div
           style={{
             marginTop: 16,
@@ -499,14 +686,20 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         </div>
       ) : null}
 
-      {result && !summative && (() => {
+      {result && !oneShot && (() => {
         const passFail = result.totalPossible === 0;
         const passed = isPassing(result);
-        const okCount = result.criteria.filter(
-          (c) => c.verdict === 'met' || c.verdict === 'partial',
-        ).length;
+        // The score a pass/fail part RECORDS: met = 1, partly met = half (criteriaScore). It used to
+        // read "3 / 3 criteria met" for an answer that was partial on all three, which a student
+        // reads as full marks while the recorded score is 1.5 of 3.
+        const earnedCriteria = criteriaScore(result.criteria);
         return (
         <div style={{ marginTop: 20 }}>
+          {resultIsBest ? (
+            <div style={{ marginBottom: 8, color: '#8be9fd', fontSize: 13 }}>This is your best try, the one that counts.</div>
+          ) : maxSubmissions !== null ? (
+            <div style={{ marginBottom: 8, color: '#8be9fd', fontSize: 13 }}>This is your latest try. Your best try is the one that counts.</div>
+          ) : null}
           <div
             style={{
               display: 'flex',
@@ -520,7 +713,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
             <span>
               <strong style={{ color: '#f8f8f2', fontSize: 16 }}>
                 {passFail
-                  ? `${okCount} / ${result.criteria.length} criteria met`
+                  ? `${Math.round(earnedCriteria * 10) / 10} / ${result.criteria.length} criteria (partly met counts half)`
                   : `${result.totalEarned} / ${result.totalPossible}`}
               </strong>
               {!passFail && (
@@ -609,7 +802,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
                 Continue to next lesson →
               </button>
               <p style={{ margin: '8px 0 0', color: '#888', fontSize: 12 }}>
-                You've passed — keep revising to push your score higher if you want, or move on whenever you're ready.
+                {capReached
+                  ? "You've passed. All your tries are used, so this is your final score. Move on whenever you're ready."
+                  : "You've passed — keep revising to push your score higher if you want, or move on whenever you're ready."}
               </p>
             </div>
           )}

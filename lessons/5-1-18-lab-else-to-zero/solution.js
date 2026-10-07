@@ -1,4 +1,4 @@
-// 2.1.7d Lab: Delete the else, watch drift (reference solution).
+// 5.1.18 Lab: Delete the else, watch drift (reference solution).
 // The starter ships broken on purpose; the student restores both else lines.
 
 let player;

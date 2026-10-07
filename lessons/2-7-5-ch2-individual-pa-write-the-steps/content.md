@@ -2,7 +2,7 @@
 
 **This is the coding part of the test, and you are doing it alone.** One problem, pick
 one of three, write the JavaScript. **20 points**, about **12 minutes**. No Run button.
-You submit once; the paper locks on submit.
+You get three attempts; read the feedback, fix the code, send it again.
 
 **What you write:** A single JavaScript program (one file, no functions, no arrays, no
 objects) that solves the problem you picked. It must contain:
@@ -57,4 +57,15 @@ or negative gallons.
 - **Limit** as a `const`.
 - **Template literal** in at least one `console.log`.
 - **`typeof`** for one value.
-- **No Run button.** One attempt, paper locks on submit.
+- **No Run button.** Three attempts; your best one is the mark that counts.
+
+### What is marked
+
+The 20 points are the **branch** (8), the **nested loop** (9) and the **break or
+`continue`** (3). The header comment, the `const` limit, the template literal, `typeof`,
+the `try/catch` and the `switch` are all required, but they are checked as feedback only and
+earn no points of their own: leave one out and the feedback will say so.
+
+**Fuel Log is the one problem where the nested loop is not obvious.** It is still required:
+for example, an outer loop over days and an inner loop over that day's fuel stops. Seat Map
+and Word Grid nest naturally (rows then seats, rows then columns).

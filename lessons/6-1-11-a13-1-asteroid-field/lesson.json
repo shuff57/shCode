@@ -58,7 +58,7 @@
     {
       "id": "r1",
       "title": "Asteroid Group exists",
-      "description": "Create at least one Group with new Group()",
+      "description": "Create at least one Group with new Group(). Help: 6.1.3 (moSHion docs: Groups)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Group\\s*\\(",
@@ -68,17 +68,17 @@
     {
       "id": "r2",
       "title": "Asteroids have velocity",
-      "description": "Assign to .vel.x or .vel.y on a sprite",
+      "description": "Give each asteroid its own velocity: assign .vel.x / .vel.y on the sprite you just spawned (or on each asteroid in a loop), or set it from random. Set it on the sprite, not on the Group (a Group has no .vel). The ship's own velocity does not count. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.vel\\.(x|y)\\s*=",
+      "pattern": "(?:let|const|var)?\\s*(\\w+)\\s*=\\s*new\\s+\\w+\\.Sprite\\s*\\([^;]*;[\\s\\S]{0,300}?\\b\\1\\.(?:vel\\.[xy]|speed)\\s*=|for\\s*\\(\\s*(?:let|const|var)\\s+(\\w+)\\s+of\\s+[^)]*\\)\\s*\\{?[\\s\\S]{0,200}?\\b\\2\\.(?:vel\\.[xy]|speed)\\s*=|\\.vel\\.[xy]\\s*=\\s*[^;\\n]*random|\\w*[Aa]steroid\\w*\\[[^\\]]*\\]\\.(?:vel\\.[xy]|speed)\\s*=",
       "flags": "",
       "points": 0
     },
     {
       "id": "r3",
       "title": "WASD ship input",
-      "description": "Use kb.pressing with one of 'a', 'd', 'w', 's' inside draw()",
+      "description": "Use kb.pressing with one of 'a', 'd', 'w', 's' inside draw(). Help: 5.1.14 (Keyboard Movement)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -89,7 +89,7 @@
     {
       "id": "r4",
       "title": "Overlap detection",
-      "description": "Use .overlaps() to detect a hit",
+      "description": "Use .overlaps() to detect a hit. Help: 6.2.1 (overlaps() boolean vs callback)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.overlaps\\s*\\(",
@@ -99,10 +99,10 @@
     {
       "id": "r5",
       "title": "Safe despawn loop",
-      "description": "Iterate backwards (i = length - 1) OR iterate a copy ([...group] via for…of, .forEach, .map, etc.)",
+      "description": "Iterate backwards (i = length - 1) OR iterate a copy ([...group], Array.from, .slice()) OR use group.cull(). Help: 6.1.4 (Iterating a Group)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:for\\s*\\(\\s*let\\s+\\w+\\s*=[^;]*\\.length\\s*-\\s*1)|(?:for\\s*\\(\\s*(?:(?:let|const|var)\\s+)?\\w+\\s+of\\s+\\[\\.\\.\\.\\w+\\])|(?:\\[\\.\\.\\.\\w+\\]\\.(forEach|map|some|filter))",
+      "pattern": "(?:for\\s*\\(\\s*let\\s+\\w+\\s*=[^;]*\\.length\\s*-\\s*1)|(?:for\\s*\\(\\s*(?:(?:let|const|var)\\s+)?\\w+\\s+of\\s+\\[\\.\\.\\.\\w+\\])|(?:\\[\\.\\.\\.\\w+\\]\\.(forEach|map|some|filter))|\\[\\.\\.\\.\\w+\\]|Array\\.from\\s*\\(|\\.slice\\s*\\(\\s*\\)|\\.cull\\s*\\(",
       "flags": "",
       "points": 0
     }

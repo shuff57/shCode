@@ -141,3 +141,67 @@ test('a refused feature shows up in refusals', () => {
   assert.ok(built.refusals && built.refusals.has('m1'), 'refusal recorded');
 });
 
+
+// W8 (2026-09-22): overlapping bores FUSE instead of refusing. The doc puts
+// two identical-height bores 4mm apart (r3 each, so they overlap); the
+// hole branch unions them into one tool and cuts once. The fused volume
+// equals box minus (two cylinders minus their lens): 32000 - (2*6pi*8 -
+// lens). Rather than hardcode the stadium volume, assert: no refusal AND
+// the volume equals a single fused-tool subtract computed by the kernel
+// itself (the adapter's own union path is the same code the branch uses).
+test('two overlapping bores: a stadium tool that opens onto the top face builds exactly; one sealed inside the part still refuses', async () => {
+  // Two r=3 discs 4 apart: area 2*pi*9 - lens, lens = 2*9*acos(2/3) - 2*sqrt(20). A depth-8 tool centred at z = 0 is a
+  // SEALED cavity inside the 20 thick box and is refused by the cavity guard; centred at z = 6 it reaches the top face
+  // (z 2..10) and builds through the planar split-and-classify boolean, 32000 - 8 x the stadium area.
+  const area = 2 * Math.PI * 9 - (2 * 9 * Math.acos(2 / 3) - 2 * Math.sqrt(20));
+  const build = (center) => adapter.build({
+    features: [
+      { id: 'b1', kind: 'box', size: [40, 40, 20] },
+      { id: 'h1', kind: 'hole', target: 'b1', diameter: 6, depth: 8, center, axis: 'z', corners: { dx: 2, dy: 0 } },
+    ],
+  });
+  const sealed = build([0, 0, 0]);
+  assert.ok(sealed.refusals && sealed.refusals.has('h1'), 'a sealed cavity is refused');
+  assert.ok(!sealed.shapes.has('h1'), 'no solid');
+  const open = build([0, 0, 6]);
+  assert.ok(!open.refusals || !open.refusals.has('h1'), 'the open stadium builds');
+  const PKG = path.resolve(fileURLToPath(new URL('.', import.meta.url)), '../../brep-rs/pkg');
+  const brep = await import(new URL(`file://${path.join(PKG, 'brep_rs.js')}`).href);
+  brep.initSync({ module: readFileSync(path.join(PKG, 'brep_rs_bg.wasm')) });
+  const doc = JSON.stringify({ version: 1, features: [
+    { id: 'b1', kind: 'box', size: [40, 40, 20] },
+    { id: 'h1', kind: 'hole', target: 'b1', diameter: 6, depth: 8, center: [0, 0, 6], axis: 'z', corners: { dx: 2, dy: 0 } },
+  ], measure: 'h1' });
+  const volume = JSON.parse(brep.measure_doc(doc)).shapes.h1.volume;
+  assert.ok(Math.abs(volume - (32000 - 8 * area)) < 1e-6, `${volume} vs ${32000 - 8 * area}`);
+});
+
+// Shading: normals are computed per face, so a flat face with a hole is exactly flat (it used to pick up the
+// bore wall's normals along the rim and shade pale with streaks), and a curved wall still varies smoothly.
+test('a box with a hole: every flat face has one normal; the bore wall keeps varying normals', () => {
+  const doc = { features: [
+    { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+    { id: 'h1', kind: 'hole', target: 'b1', diameter: 8, depth: 22, center: [0, 0, 0], axis: 'z' },
+  ] };
+  const built = adapter.build(doc);
+  const m = adapter.mesh(built.shapes.get('h1'), { deflection: 0.05 });
+  assert.ok(m, 'meshes');
+  const n = m.geometry.getAttribute('normal');
+  const idx = m.geometry.getIndex();
+  assert.equal(idx.count, m.faces.reduce((a, f) => a + f.count, 0), 'faces tile the index buffer');
+  let flat = 0, curved = 0;
+  for (const f of m.faces) {
+    const seen = new Set();
+    for (let k = f.start; k < f.start + f.count; k++) {
+      const v = idx.getX(k);
+      seen.add([n.getX(v), n.getY(v), n.getZ(v)].map((x) => x.toFixed(4)).join(','));
+    }
+    if (seen.size === 1) {
+      flat++;
+      const [x, y, z] = [...seen][0].split(',').map(Number);
+      assert.ok([Math.abs(x), Math.abs(y), Math.abs(z)].some((c) => Math.abs(c - 1) < 1e-3), `axis-aligned normal ${[...seen][0]}`);
+    } else curved++;
+  }
+  assert.equal(flat, 6, 'top (with the hole), bottom and four sides are each exactly flat');
+  assert.equal(curved, 1, 'the bore wall');
+});

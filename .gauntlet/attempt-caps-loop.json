@@ -1,0 +1,476 @@
+{
+  "spec": ".gauntlet/SPEC-attempt-caps.md",
+  "started": "2026-10-03",
+  "caps": {
+    "roundsPerPhase": 4,
+    "cleanRoundsToExit": 2,
+    "parallelJudges": 3
+  },
+  "decisions": {
+    "score": "best try counts (matches WrittenGrader today)",
+    "scope": "Chapters 1-3 now, every PA this semester via check-pa-attempts.mjs",
+    "ai": "charts and demos; coding parts stay deterministic",
+    "assumptions_pending_confirm": [
+      "Part 5 write-the-steps stays AI-graded",
+      "quiz shows total only until try 3",
+      "attempts spent before go-live are free"
+    ]
+  },
+  "findings": [
+    "spec said 21 PA lessons; there are 24 (found by unit title, 1-6 is named ch1-pa-*)",
+    "solution/pseudocode.md collides with solution.js on 2-7-3 and the group builds; moved to top-level pa-pseudocode/<id>.md"
+  ],
+  "phases": {
+    "0": {
+      "status": "done",
+      "rounds": [
+        {
+          "round": 1,
+          "gate": "scripts/check-pa-attempts.mjs fails: 24 of 24 PA lessons, 52 gaps. 2-7-2 and 2-7-5 already cap at 3 and lack only pseudocode; chart parts (1-6-1, 1-7-4, 2-6-1, 2-7-4, 3-9-1, 3-10-4) lack an aiGrader",
+          "note": "not yet in npm test: it would fail the suite until phase 4"
+        }
+      ]
+    },
+    "1": {
+      "status": "running",
+      "rounds": [
+        {
+          "round": 1,
+          "findings": [
+            "lesson_state upsert is `score = excluded.score`: best-of was only a client courtesy (WrittenGrader sends its own running max); a stale tab or second device can lower the stored best. Fix: MAX in SQL for capped lessons, server-owned cap table.",
+            "summative quiz ships with no key, so the browser cannot show a total between tries and records the row unscored. Fix: server scores each try from the baked key (lesson-submissions POST overrides client score for capped quizzes; quiz-reveal returns totals only until the cap is spent).",
+            "spec gap: summative console parts (x.7.3) have their requirement patterns stripped for the client and nothing server-side scores them, so 'deterministic grading' is the symptom checklist plus the teacher. Mechanism here covers count, banner, best-of, reveal; a score for those parts is not computed in this phase.",
+            "spec gap: the local dev server (server.js) emulates routes with in-memory stubs, no D1; the new routes need stubs sharing the pure decision code (lib/attempt-cap.ts decideReveal) or the browser verification has nothing to call.",
+            "countAttempts default cutoff was ATTEMPT_CAPS_APPLIED (Sep 30); assumption 3 (fresh tries) needs a go-live cutoff, added as TRIES_APPLIED, set to deploy instant in phase 5."
+          ],
+          "fixes": [
+            "functions/_shared/pa-pseudocode.generated.ts (ATTEMPT_CAPS + PA_PSEUDOCODE, from lesson.json and pa-pseudocode/<id>.md, scripts/generate-pa-pseudocode.mjs in prebuild)",
+            "functions/api/attempt-reveal.ts: 401/400/404 fail closed, 403 until counted tries >= cap, then the text; counting in functions/_shared/attempts.ts shares lib/attempt-cap.ts rules",
+            "quiz-reveal: capped quiz returns totals only until the cap is spent; lesson-submissions POST scores a capped quiz from the baked key and discards the browser's score",
+            "lesson-state upsert: MAX(stored, new) with NULL-safe handling for capped lessons only",
+            "lib/attempt-cap.ts: TRIES_APPLIED/COUNT_SINCE go-live cutoff, decideReveal; lib/use-attempt-cap.ts + components/AttemptCap.tsx shared by quiz, diagram, console; WrittenGrader gets the banner and panel",
+            "server.js: dev routes run the REAL lesson-submissions POST, quiz-reveal and attempt-reveal handlers over a D1-shaped view of the in-memory submissions",
+            "check-ai-grader-leak probes pa-pseudocode/ text in public/ and out/ (mutation: a copy in public/ fails)"
+          ],
+          "gate": {
+            "scripts/test-attempt-reveal.mjs (in npm test)": "28 cases pass against SQLite standing in for D1; 6 of 7 mutations fail the test (7th crashed on a bad bind, also exit 1)",
+            "full npm test": "exit 0",
+            "tsc --noEmit": "clean",
+            "browser (dev server, scratch caps on 2-7-1, 2-7-3, 2-7-4, since reverted)": "banner before try 1 on quiz, console and chart; counts down 3 -> 2 -> 1 -> used all; quiz shows total only until try 3 then explanations; pseudocode absent from the DOM and 403 before try 3, shown after; Submit disabled at the cap; a fresh browser and a reload see the same count; a second student is untouched; quiz best score recorded in lesson_state"
+          },
+          "judge": "not run in this round (spec: reviewer hunting an early path to the pseudocode is still to do)",
+          "status": "gate green; needs one judge pass and a second clean round"
+        },
+        {
+          "round": 1,
+          "gate": "built and green (ad6ca919, b34ed94d); blind judge verdict: FAIL",
+          "findings": [
+            "1 CRITICAL quiz key readable early: forged gradingFailed:true + quiz picks is scored by the server but uncounted, GET returns the score -> unlimited free probes",
+            "2 CRITICAL no server cap on writes: POST lesson-submissions never refuses a 4th row, grade-written never checks the cap -> perfect try after the reveal; unlimited AI practice; races",
+            "3 HIGH lesson_state.score is client-sent and the capped MAX makes a forged score permanent",
+            "4 HIGH capped quiz without picks stores the client score/possible",
+            "5 HIGH non-quiz capped parts store client-relayed scores (LessonWorkspace totalScore, AI numbers through the browser)",
+            "6 MEDIUM use-attempt-cap fails OPEN while lesson-state is loading or failed",
+            "7 MEDIUM COUNT_SINCE move resets live 2.7.2/2.7.5 caps (user approved: fresh 3 for everyone; make explicit; phase 5 must set TRIES_APPLIED to deploy time)",
+            "8 MEDIUM repo is PUBLIC and pa-pseudocode + generated modules are committed (also quiz-keys, ai-graders, solution.js already are): USER DECISION, not acted on",
+            "9 LOW diagram.aiGrader.maxSubmissions read by generator but not by DiagramAssignmentView; capped non-summative quiz silently uncapped",
+            "10 LOW teacher unsubmit gives tries back: accepted, recorded in the spec",
+            "11 LOW quiz-reveal key response lacks no-store; check-solution-leak does not know pa-pseudocode/"
+          ],
+          "design": "ATTEMPT_KINDS baked next to ATTEMPT_CAPS: quiz (server scores from key), ai (grade-written writes the counted row itself, score from shapeResult; a client row is a no-op unless it is a gradingFailed marker, which is forced to NULL score), client (deterministic console part: counted row, score clamped, trust limit documented). Counted insert is ONE conditional INSERT...SELECT WHERE count < cap (atomic) -> 409 when spent. lesson_state score on a capped part is derived from the counted rows, body.score ignored.",
+          "fix": {
+            "1": "fixed: on a capped lesson a client gradingFailed is stored as a bare marker with NULL score and discarded picks; quiz rows are scored only from sanitised picks and always counted; a nested marker is refused 400",
+            "2": "fixed: POST lesson-submissions uses one conditional INSERT...SELECT WHERE count<cap (insertCounted) -> 409; grade-written refuses with 409 before the model once spent, records the counted row itself (recordGraded) and withholds the grade from a racer that loses the insert",
+            "3": "fixed: capped lesson_state score = best counted row (bestCountedScore), body.score ignored; uncapped scores must be finite 0..100000 else 400",
+            "4": "fixed: capped quiz hand-in without picks is 400, nothing stored",
+            "5": "fixed: contract below",
+            "6": "fixed: hook has no zero-by-default path; unknown until a submissions fetch succeeds (401 and failures are unknown); source assertion in the test",
+            "7": "fixed: constant comment says plainly it resets 2.7.2/2.7.5; phase5_todo; test asserts a fixed 13-digit literal",
+            "8": "NOT ACTED ON: user decision (public repo)",
+            "9": "fixed: generator rejects diagram.aiGrader.maxSubmissions and a capped non-summative quiz; check-pa-attempts requires the cap in the block the renderer reads (quiz->quiz, diagram->diagram, console->grading|aiGrader, written->aiGrader)",
+            "10": "accepted and recorded in the spec",
+            "11": "fixed: quiz-reveal responses are Cache-Control: no-store; check-solution-leak proves no pa-pseudocode text is in the starters bundle"
+          },
+          "contract_for_phase_2": "ATTEMPT_KINDS decides who writes the counted row. kind ai (any lesson with aiGrader or diagram.aiGrader): the ONLY counted row is the one grade-written writes with the grader totals; the browser POST to /api/lesson-submissions for the same try is acknowledged (200, recorded:\"server\") and NOT stored, except a gradingFailed marker (stored, NULL score, free). So an AI-graded console/chart part must call /api/grade-written for every graded try and must not rely on its own recordSubmission for the score or the count. kind client (no aiGrader, e.g. group builds): counted row from recordSubmission, score clamped to 0..possible else NULL. kind quiz: server scores. lesson_state score is always server-derived on a capped part.",
+          "status": "fixed, awaiting judge round 2",
+          "tests": "scripts/test-attempt-reveal.mjs: 7 mutations of the new guards all fail the test (atomic cap, forged marker, state score, grade-written guard, relay stored, grade-written record, hook open)",
+          "out_of_scope_seen": "check-ai-grader-leak and check-quiz-key-leak fail on the stale out/ build because the phase 2 agent made the group demo parts summative while out/ was built before; not caused by this round"
+        },
+        {
+          "round": 2,
+          "label": "judge round 2 (blind, reviewed b75a646c from a git archive copy)",
+          "gate": {
+            "scripts/test-attempt-reveal.mjs": "100 cases pass (SQLite stands in for D1, now with classes/enrollments/open-date tables)",
+            "mutations": "11 of 11 caught: LIKE rule back, lookalike refusal off, marker bypasses cap, enrolment check off, open-date gate off, teacher bypass off, attempt-reveal gate off, quiz-reveal gate off, WrittenGrader marker on capReached, QuizView spends on a refused row, QuizView completes only via the reveal",
+            "others": "test-quiz-reveal, test-quiz-unsubmit (25/25), check-summative-parts, check-solution-leak, test-grade-pass, test-gradebook-cell all pass; tsc --noEmit clean"
+          },
+          "findings": [
+            "1 HIGH early reveal via a throwaway account: attempt-reveal and quiz-reveal check only the session and the count; lesson-submissions POST has no enrollment/availability check and signup takes any email, so 3 junk rows open the pseudocode/key. DESIGN part (release after due date or teacher release) is a USER decision; safe part (reveal needs an enrolled class that has the lesson available, or a teacher/admin role) done now.",
+            "2 HIGH LIKE-vs-JSON case bypass: SQL count uses LIKE '%\"gradingFailed\":true%' (case-insensitive) while the guard and countAttempts are case-sensitive, so {\"GRADINGFAILED\":true} on a 'client' part is never refused by SQL and is counted by JS: six POSTs gave six 201s",
+            "3 HIGH marker after cap: the gradingFailed marker path inserts with no cap check, so a polished answer can be posted after the reveal as a free row that the teacher hand-grades; WrittenGrader also writes a marker on its own 409 capReached; the stray marker also becomes the latest row (gradebook pending, lesson-unsubmit 409)",
+            "4 MEDIUM sibling-part answer: a chart part's pseudocode opens cheaply (legality checks are free) before the part that builds from it is sat. DESIGN, user decision, same gate as finding 1 (due date / release); reported, not built",
+            "5a MEDIUM DiagramAssignmentView calls recordLessonCompleted before the (un-awaited) recordSubmission, so a client-kind best score omits the current try. File owned by the Phase 2 agent: REPORT ONLY",
+            "5b MEDIUM QuizView completes the part only when quiz-reveal returns: a transient failure or 409 strands the student on a capped quiz; spend() is called even when the POST was a 409",
+            "6 LOW check-ai-grader-leak probes only the first 40+ char line of a pseudocode file (short pseudocode lines go unprobed, silently); scripts/score-quiz.mjs reports the LAST row per student, not the best, and the form shows '-' because the server strips variant from capped rows"
+          ],
+          "design": "ONE counting rule on both sides: SQL uses CASE WHEN json_valid(grade_json) THEN json_type(grade_json,'$.gradingFailed') END = 'true', identical to countAttempts' top-level === true. Any key matching /gradingfailed/i (NFKC, letters only) at any depth is refused 400 unless it is the exact top-level server-trusted marker. A marker is refused 409 once counted tries >= cap, for every kind. WrittenGrader stops writing a marker on a 409/capReached response. For the 'ai' kind the browser still writes the outage marker below the cap: grade-written (Phase 2's file) does not write markers itself, so moving that write server-side is reported, not done.",
+          "fix": {
+            "1": "SAFE PART FIXED: attempt-reveal and the capped path of quiz-reveal call mayReadAnswer: a teacher/admin always, a student only while enrolled in a live (unexpired, unarchived) class AND the lesson passes isLessonAvailableForStudent (open date, early-access override). A throwaway account gets 403 with nothing in the body. NOT done: the uncapped one-row quiz-reveal path (one-shot test, its fixtures predate enrolment, same weakness: one junk row opens the key). OPEN, USER DECISION: release only after the part's due date / a teacher release. It would slot into mayReadAnswer as one more condition: resolveDueForStudent(env, request, email, lessonId) is null or < now, OR a teacher-release row, evaluated after the enrolment check; for finding 4 the condition is per part GROUP (chart + build + write of one problem), so the due date of the LAST sibling gates the first.",
+            "2": "FIXED: one rule. SQL: CASE WHEN json_valid(grade_json) THEN json_type(grade_json,'$.gradingFailed') IS NOT 'true' END (exact key, exact JSON true), same as countAttempts' === true. findMarkerKey (NFKC, letters-only, any depth) refuses any gradingfailed-looking key with 400 once the exact top-level marker has been handled. Tests: GRADINGFAILED, gradingfailed, nested, fullwidth, grading_failed, inside an array, a non-true value; plus JS/SQL agreement on rows {GRADINGFAILED:true}, {gradingFailed:1}, {gradingFailed:'true'}.",
+            "3": "FIXED: the marker goes through the same conditional INSERT...SELECT as a counted try, so once counted >= cap it is 409 (every kind), and markers at cap-1 are free and leave the last real try. WrittenGrader no longer writes a marker for a capReached refusal (sets attempts to the cap instead). lesson-unsubmit now reads the latest NON-marker row. NOT done (reported): the 'ai' kind still lets the BROWSER write the outage marker below the cap, because grade-written.ts (Phase 2's file) does not write markers itself; moving that write server-side needs a grade-written edit. The gradebook still reads the latest row only, so a below-cap outage marker after a real try shows 'pending' (pre-existing behaviour).",
+            "4": "NOT BUILT: user decision (same gate as finding 1, per part group).",
+            "5a": "NOT FIXED: components/DiagramAssignmentView.tsx is the Phase 2 agent's file. Needed there: await recordSubmission first, then recordLessonCompleted, and for a 'client' kind let the server derive the best (lesson-state already ignores the browser score on capped lessons, so only the ORDER matters).",
+            "5b": "FIXED: QuizView spends a try only for a row the server accepted (else re-reads the count: hook gained refresh()); completion follows the RECORDED row, not the reveal fetch; a mount effect completes the part once if a counted row exists and lesson_state is not completed.",
+            "6": "FIXED: check-ai-grader-leak probes every pseudocode line of 25+ chars, falls back to the whole text, and FAILS on an empty file (README.md excluded); mutation: a short-line file copied into public/ is now found, an empty file fails. score-quiz.mjs reports the BEST counted try for a capped quiz (gradingFailed and pre-cutoff rows skipped; ties keep the earlier) and recomputes the form with assignVariant(hashSeed(lessonId:email)); verified against a fake D1 payload."
+          }
+        }
+      ]
+    },
+    "2": {
+      "status": "gate green, live fixtures clean, no independent judge run yet (the worker that built it cannot spawn one)",
+      "decision": "user chose AI marking for the three find-and-fix parts (nothing scores them on the server); charts and demos AI-graded as specified; group builds and Part 1 quizzes untouched",
+      "rounds": [
+        {
+          "round": 1,
+          "findings": [
+            "ROOT: the course-wide grader preamble says 'Grade VERY leniently ... a vague gesture counts'. That is right for practice feedback and wrong for a part whose AI score is now the recorded score: a find-and-fix with a bug still in it could be marked fixed. The earlier Phase 5 note ('summative items are not AI-graded, so leniency never meets a strict rubric') stops being true once these parts are AI-graded. Fix: server-only `strict` flag on the authored aiGrader (default prompt byte-identical, verified), set on the 9 chart and find-and-fix graders; the 3 demos keep the lenient framing (process write-ups).",
+            "The three GROUP chart parts have no `diagram.summative` (their structural gate must stay, so Build opens only on a green chart), and lib/quiz-redact.ts keyed diagram redaction on diagram.summative alone: a new AI brief there would have shipped to the browser. Found by test-pa-ai-graders offline invariants (17 failures). Fix: redaction also keys on diagram.aiGrader.summative.",
+            "grade-written.ts now records the counted row itself on a capped AI part (fix agent). A client that also POSTs recordSubmission after streamGrade spends two tries per grade. The new console path posts no row when capped; DiagramAssignmentView and WrittenGrader still do (not edited here, flagged to the lead).",
+            "check-ai-grader-leak / check-quiz-key-leak fail against the stale out/ because the demos are now summative: the old build ships their brief. Dev-server pages for all 12 parts are clean; a rebuild clears it."
+          ],
+          "live": "39 fixtures on glm-5.3-flash:cloud: every reference passed, every gaming fixture failed (unchanged starter, claimed-fix comments, injected instruction in a comment, kind names swapped, Start-box-End chart, sandwich chart, chart label asking for credit)"
+        },
+        {
+          "round": 2,
+          "findings": [
+            "second gaming set, find-and-fix only: fixes deleted with only comments and print lines kept: 0/20 on all three. Claimed-fix comments re-run: 0 to 3 of 20.",
+            "MEASURED, accepted: naming every kind 'logic' while fixing all four still scores 16/20 (Ch1, Ch3) and 14/20 (Ch2), so the kind is 2 of each bug's 5 points. Decision for the user: raise the weight of the kind if that is too generous."
+          ]
+        }
+      ],
+      "caps": {
+        "charts": "diagram.maxSubmissions",
+        "find_and_fix": "grading.maxSubmissions",
+        "demos": "aiGrader.maxSubmissions"
+      },
+      "not_done": "Independent judge (cs-student-advanced lens) against one chart and one find-and-fix rubric; the two-clean-rounds exit is therefore not claimed."
+    },
+    "1b": {
+      "status": "built; not yet judged",
+      "decision": "user: solution after every try AND teacher release; release now or by date/time, opens by itself",
+      "built": [
+        "migrations/0032_solution_releases.sql (class_solution_releases, applied locally only)",
+        "lib/solution-release-core.ts + functions/_shared/solutionRelease.ts",
+        "functions/api/classes/[id]/solution-releases (GET/PUT, auth like open-dates)",
+        "gate in attempt-reveal and quiz-reveal (capped path); teacher/admin bypass; DB error fails closed",
+        "components/SolutionReleasePanel.tsx on /teacher; SolutionWait + re-check on focus in AttemptCap/QuizView",
+        "scripts/test-attempt-reveal.mjs extended (release matrix, API auth/validation/DST, quiz, pure rules)"
+      ],
+      "mutation_check": "14 of 14 mutations broke the test (release check skipped x2, boundary, held-back, expired/archived enrolment, fail-open, teacher bypass, release-API auth x2, uncapped lesson, roll-over dates, part override, any-class rule)",
+      "findings_by_own_tests": [
+        "schoolInstant rolls '2026-13-45' over into another day; the release route now refuses non-existent days (isRealDate). due/open routes still accept them (not touched)",
+        "Intl short date reads 'Fri, Nov 6'; formatRelease builds 'Fri Nov 6, 3:00 PM' from parts"
+      ]
+    },
+    "4": {
+      "status": "gate green (full npm test exit 0 on a fresh build of HEAD); one design decision pending on group builds; judge round for phase 4 not run (forks cannot spawn)",
+      "rounds": [
+        {
+          "round": 1,
+          "findings": [
+            "check-pa-attempts lists 10 lessons with no maxSubmissions: group builds 1-6-2/2-6-2/3-9-2, quizzes 1-7-1/2-7-1/3-10-1, written 1-7-2/1-7-5/3-10-2/3-10-5",
+            "GROUP BUILDS: a non-summative console part gates Submit on every requirement being green (LessonWorkspace canSubmitByWork). A try therefore only exists when the build is already fully green, so a cap of 3 changes nothing about WHAT a student can submit and the best score is already the maximum on try 1. kind is 'client' (deterministic; the browser's report is the only score, clamped). Decision: give them the cap anyway (spec table) and keep the gate; the cost is that a student who passed first time must submit twice more before the 3-try solution unlocks; recorded as a decision for the user, not hidden",
+            "stale text that contradicts the caps: 1-7-1 ('You submit once... locks'), 1-7-2 and 1-7-5 ('One submission. It locks, nothing comes back'), 3-10-5 ('You submit once; paper locks', 'One attempt'), 3-10-3 and 2-7-3 ('one sitting', 'Your teacher marks it'), and chart parts say 'the teacher grades the submitted chart'",
+            "quizzes: 2-7-1 already sets revealAfterSubmit; a capped quiz implies it (QuizView revealAfterSubmit = config || capped), so it is redundant but harmless and kept",
+            "dev stub in server.js does not know class_solution_releases, so capped parts error on the dev server",
+            "module docs 1.7/2.7/3.10 carry stale 'unlimited'/'one attempt' tables; 2.7 has two contradictory attempts tables"
+          ],
+          "fixes": [
+            "maxSubmissions: 3 added to 1-6-2/2-6-2/3-9-2 (grading), 1-7-1/2-7-1/3-10-1 (quiz), 1-7-2/1-7-5/3-10-2/3-10-5 (aiGrader, revisable). check-pa-attempts is green and runs in npm test",
+            "every stale line removed from the 24 PA lessons: content.md, lesson.json descriptions (quizzes, written parts, find-and-fix, group builds) and the WrittenGrader sentence \"revise and resubmit as many times as you want\" now says N tries when capped",
+            "module docs 1.7/2.7/3.10: attempts rows, reveal tables (2.7 had contradictory duplicates) and the \"attempts: one\" notes rewritten; 1.6/2.6/3.9 gained a tries section",
+            "server.js dev stub understands the class_solution_releases query; POST /api/dev/solution-release sets a release for walks",
+            "FOUND BY FRESH CHECKOUT: test-quiz-reveal passed in the main tree and failed in a worktree. The committed quiz-keys.generated.ts was stale (no caps), so the capped 2.7.1 never reached mayReadAnswer. Fixed: the test runs the one-row path on an uncapped copy of 2.7.1, and the regenerated keys are committed",
+            "FOUND: Bun transpile cache served a stale compile of attempt-reveal.ts to node server.js (the reveal answered 404 for a lesson with pseudocode; BUN_RUNTIME_TRANSPILER_CACHE_PATH=0 fixed it). Restart a dev server that shows that with the cache off"
+          ]
+        }
+      ],
+      "browser_walk": {
+        "quiz 3-10-1": "banner before try 1; 2 of 3 / 1 of 3 / All 3 tries used; total only between tries; GET lesson-state shows completed with best 2; quiz-reveal withheld (not-released) then released through the dev endpoint and the explanations rendered",
+        "group build 3-9-2 (client kind)": "locked until 3.9.1 completed (sibling gating works); banner before try 1; Submit needs all 11 checks green; three Confirm Submission clicks recorded 3 rows, header Submit disabled afterwards; 4th POST 409 capReached; attempt-reveal: tries -> not-released (null, then scheduledAt) -> released with the pseudocode; another student at 0 tries gets reason tries; the panel \"How this is solved\" rendered",
+        "written 3-10-2": "banner before try 1 and the new \"You get 3 tries\" sentence render; NOT walked to used-all because /api/grade-written (the AI) is not served by the dev server; the server side of that path is covered by test-attempt-reveal and test-pa-ai-graders"
+      },
+      "open": [
+        "GROUP BUILDS: a try only exists when every check is green (Submit is gated), so a student who passes first time must submit twice more to unlock the solution. Options: keep (done, documented in 1.6/2.6/3.9), or reveal on one full-marks row (the browser score is forgeable on a client-kind part, so it would be a weak key), or drop the cap on builds (check-pa-attempts then needs an exemption)",
+        "no blind judge round was run on phase 4 (a fork cannot spawn agents): the lead should run the student lenses on one chapter test",
+        "the committed ai-graders/quiz-keys/module-docs generated files go stale between commits; consider gitignoring them like solutions.generated.ts (prebuild and npm test regenerate)"
+      ]
+    },
+    "round3": {
+      "status": "fixed; awaiting a round 4 judge",
+      "findings": [
+        "1 HIGH: POST /api/lesson-state completed on a capped part with no counted row stores score NULL; lessonPercent(completed,null,max) = 100, so a student who never sat the part grades 100% (and one with only free marker rows). test-attempt-reveal asserts that no-score state, locking the bug in.",
+        "2 HIGH: capped variant quiz stores correct-of-own-form (8) but lessons-manifest maxScore counts every variant question (18): a perfect paper grades 44%. Before the feature a summative quiz completed with no score = 100%.",
+        "3 MEDIUM: grade-written returns raw model output (raw.slice(0,500)) on its empty-result branches (stream and non-stream) and records no try: a crafted answer makes the model emit JSON with the rubric in it, and every non-answer is a free feedback probe (30/day is not a cap).",
+        "4 MEDIUM-LOW: the browser can post any {gradingFailed:true} marker on a capped part (quiz/client kinds included) before the cap: free extra rows that reach the review queue as manual-grade work, turn the gradebook cell pending, and let the teacher override write lesson_state.score.",
+        "L1 LOW: DELETE /api/lesson-state/<id> by the student erases a teacher hand grade on a marker row; re-completing then falls back to counted best or NULL (=100%).",
+        "L2 LOW: quiz-redact treats a chart as summative only by diagram.summative; a chart with diagram.summative true whose aiGrader lacks summative would ship prompt/rubric. No lesson is set up that way; nothing checks it stays so."
+      ],
+      "fixes": [
+        "1: lesson-state POST completed on a capped part is refused 409 for a student with no row at all (teacher/admin preview exempt); with only the server outage marker it completes with score 0 (never NULL, which grades 100%); best counted score otherwise.",
+        "2: maxScore for a variant quiz is ONE form (formQuestionCount in lib/quiz-variant.ts, mirrored in generate-lessons-manifest.mjs and app/page.tsx): a perfect paper grades 100 not 44. Test covers every variant quiz and the generated manifest.",
+        "3: grade-written never returns the model text (raw) on either path; it logs it server-side. A non-answer is not a free probe: nothing comes back from it, and each costs one of the 30 daily calls.",
+        "4: the browser may not post gradingFailed on a capped part (ai kind: acknowledged and dropped; quiz/client: 400). The server writes the marker (recordOutage in attempts.ts) on a real grader failure: not once every try is spent, at most cap per part, once per distinct text. WrittenGrader skips its marker on a capped part but still saves the draft and unlocks the next part.",
+        "L1: a student DELETE on a capped part is 409 (teacher/admin still can); L2: quiz-redact forces summative on a summative chart grader; check-summative-parts fails a chart grader in a Performance Assessment or summative chart without summative:true."
+      ],
+      "tests": "scripts/test-attempt-reveal.mjs extended; 13 mutations of the new guards all break it.",
+      "not_done": [
+        "LessonWorkspace and DiagramAssignmentView do not complete the part on a grader outage (they never did); the work reaches the teacher through the server marker only.",
+        "x.6.2 group builds: the browser relays the score (kind client, clamped); the server cannot re-run the requirement checks."
+      ]
+    },
+    "2_judge1": {
+      "status": "fixing (round judge-1)",
+      "findings_before_fix": [
+        "A HIGH regression: 1-7-3/2-7-3/3-10-3 render as the prose WrittenGrader panel (lib/lesson-view.ts rendersAsContent true for any aiGrader): no editor, no Run, no tries banner/count, panel says revise as many times as you want. (fix started before this record was written: lib/lesson-view.ts)",
+        "B rubric ids/titles in the page payload name the bug kinds ('Bug 1 (nothing runs): fixed, and named as a syntax error'); failed-try feedback confirms the kind label and names the cause of bugs 3 and 4",
+        "C chart rubrics: swapped branches, missing at-the-limit outcome, comparison inside loop, wrong-problem outcome words, empty-body hexagon, junk-label skeleton all score 8/10 and pass; one-call chart capped at 8 by an unstated two-call rule",
+        "D a chart failing the structural legality checks goes to the AI and spends a counted try",
+        "F stale text: 3-10-4, 3-9-1 and the 1.7.4/2.7.4/1.6.1/2.6.1 equivalents say the chart is graded as a legal drawing / read by the teacher",
+        "G 'We could not check how many you have used' shows while the count is merely loading",
+        "accepted/low: the legality gate is browser-only (a forged illegal chart text passes grade-written, 8/10)",
+        "note: 60-114 s grade latency under six parallel requests, one 180 s abort (HTTP 502, no row written)",
+        "R4-1 MEDIUM-HIGH: on a grader outage DiagramAssignmentView (~254-263) and LessonWorkspace (~653) only show the error; the server wrote a free outage marker so lesson-state would accept a completion, but nothing asks for one: the NEXT part stays locked for the whole outage (WrittenGrader ~230-237 handles it on purpose). Second path in all three AI renderers: grade arrives on the last try but the completion POST fails; Submit is then disabled and only QuizView repairs on mount (~290). Fix: one shared hook repairing completion on mount and after an error, keyed on 'any row exists (counted or marker)'.",
+        "R4-6 LOW: the streaming race-lost refusal (grade-written ~620) is sent without capReached so WrittenGrader says the answer was saved and sent to the teacher (false); neither DiagramAssignmentView nor LessonWorkspace calls cap.refresh() after a 409 so banner/Submit go stale. Fix: send capReached on that path, refresh after 409, fix the WrittenGrader message."
+      ],
+      "accepted_low": [
+        "The chart legality gate is browser-only: grade-written grades whatever text arrives, so a hand-typed illegal chart text can score (8/10 in the judge's probe). The browser still shows the red checks and, on a capped part, asks for confirmation before a red chart spends a try. A server-side re-check needs the diagram parser on the server (lib/diagram-mermaid.ts is pure TS and could be bundled); not built, nothing is scored from the checker, only feedback and a best-of score the teacher sees."
+      ],
+      "latency_note": "Grade latency: 60-114 s per call with six parallel requests in the judge's harness, one 180 s abort (HTTP 502, no row written, so no try spent). grade-written aborts the Ollama call at 180 s on both paths (the NDJSON stream keeps the connection alive, so a Pages Function CPU limit is not the constraint; the model queue is). A class of 25-30 submitting inside one minute is the real deploy risk: CLAUDE.md measured the same class of thing on the removed Workers AI path (25 simultaneous gave 20/25). Not built. Suggested, cheapest first: (1) run a 25-parallel burst against ollama.com with the real model before test day and read the failure rate; (2) tell students to submit when ready rather than on the bell, and stagger parts; (3) a failed or aborted grade already costs no try, so the student retry is safe; (4) if the burst fails, add client-side jittered retry on 429/502 in streamGrade and a 'grading is busy, trying again' stage label; (5) only then consider a queue."
+    }
+  },
+  "phase5_todo": [
+    "set TRIES_APPLIED (lib/attempt-cap.ts) to the go-live instant: run `node scripts/stamp-tries-applied.mjs --set-now` ONCE at go-live and commit lib/attempt-cap.ts (npm run deploy refuses until it is stamped)",
+    "apply migrations 0032 (class_solution_releases) AND 0033 (lesson_try_resets) to prod BEFORE the deploy (npm run d1:migrate); the deploy preflight refuses with them pending",
+    "deploy from a worktree with pa-pseudocode/ populated (git-ignored); npm run deploy runs check-pa-attempts --require-pseudocode",
+    "teacher release: nothing is released until a teacher presses Release; tell teachers",
+    "burst test: ~25 parallel grade-written calls against ollama.com before test day (see the spec's accepted risks)",
+    "apply migration 0034 (lesson_state.score_override) BEFORE the deploy: the new code selects that column"
+  ],
+  "reference_pass": {
+    "status": "done",
+    "findings_before_fix": [
+      "3.10.5 page asks for 'a const for the limit' but no problem has a limit; reference declares canMl and never uses it; grader prompt says 'one-attempt item' (stale)",
+      "3.10.3 reference comments wrong: Bug2 'throws' (really undefined, TypeError at .name); Bug3 'every line prints undefined' (one undefined); Bug4 '$0.2' (prints 0.19999999999999996); same wording may be in aiGrader prompt/rubric",
+      "3.9.1 reference chart draws lowStock inside the per-item loop (contract: one double-rail after the loop), no makeItem/loadStock double-rails",
+      "3.10.4 reference chart has two outcomes where the problem names three; loop body never accumulates",
+      "2.6.1 reference chart has no classification step for locker 7, no n<1 guard, redundant diamond after the hexagon",
+      "2.7.4 reference chart merges 'met' and 'not reached' into one print; page says use a switch AND five shapes only",
+      "2.6.2 Locker Sweep solution.js marks odd open/even closed and counts odd numbers: wrong, every visited locker ends open",
+      "2.7.5 Seat Map reference never resets the run after a blocked seat, no break, if-chain instead of switch",
+      "1.6 problems Split the Check / Grade Forecast / Fuel Stop do not state the limit direction",
+      "2.7.3 Bug 4 (infinite loop) labelled runtime but the lesson defines runtime as 'stops with an error'",
+      "1.7.3 aiGrader prompt mentions 'Bug 1' headings the starter lacks"
+    ],
+    "fixed": [
+      "3.10.5 page: each problem has a limit const (budget / weekly goal / can size) and prints a comparison; reference uses canMl; grader prompt says three tries and checks the limit is used",
+      "3.10.3 reference comments (Bug 2/3/4) and the aiGrader Bug 3 wording corrected; starter unchanged",
+      "reference charts rewritten and diagram checks green: 3.9.1 (whole-list functions called once after the loop, load/make/save double-rails), 3.10.4 (three outcomes, accumulating loop), 2.6.1 x2 (n<1 guard, locker 7 chained diamonds, no redundant diamond), 2.7.4 (met vs not reached, per-day input)",
+      "2.7.4 page: a switch is drawn as chained diamonds",
+      "2.6.2 Locker Sweep solution: every visited locker ends open; N=0 comment fixed",
+      "2.7.5 Seat Map reference: run resets after a blocked seat, breaks when found, switch on a label",
+      "1.6.1 page states the limit direction for all four problems",
+      "2.7.3 runtime definition covers a loop that never stops (page, steps, pseudocode); rubric label unchanged",
+      "1.7.3 grader prompt no longer mentions starter 'Bug 1' headings",
+      "package.json: the pseudocode generator runs first in npm test (fresh clones failed test-quiz-reveal because the module is git-ignored)"
+    ],
+    "declined": [
+      "2.6.2 requirement patterns and the 2.7.5 rubric were left alone: both are structural (loop, continue, switch, throw / branch, nested loop, loop control) and do not encode the wrong behaviour",
+      "no rubric criterion, weight or passing rule changed on any Chapter 1 or 2 part"
+    ],
+    "gates": "check-starters, check-diagram-solutions, test-lesson-solution-parity, test-find-and-fix, test-2-7-3-comments, test-pa-ai-graders, test-grader, test-grade-stream, audit-grader-tolerance --gate, check-solution-leak, check-summative-parts, check-pa-attempts --require-pseudocode, check-lesson-citations, tsc: green. Full npm test exit 0 from a fresh worktree of HEAD; check-quiz-key-leak (41 pages) and check-ai-grader-leak --require-build (882 probes) OK on that worktree's fresh build. Live glm-5.3-flash: references pass and no gaming fixture passes on 3-10-3, 3-10-4, 3-9-1, 2-7-4, 2-6-1."
+  },
+  "round4": {
+    "judge": "final round 4 (read-only, HEAD)",
+    "findings_written_before_fix": [
+      "2 MEDIUM grades: x.6.3 demos became summative:true for the cap; all-0-point rubric + null maxScore -> lessonPercent 100 for any completed part, so junk demos are 100%. Same latent rule on 1-7-2, 1-7-5 and the x.6.* parts.",
+      "3 MEDIUM test-attempt-reveal.mjs prints SKIP and exits 0 without bun:sqlite: a self-hoster on real Node gets a green suite that ran nothing.",
+      "4 MEDIUM studentReleaseStatus counts a release from ANY live class; students self-join with a code, so a throwaway account joining period 1 reads the solution before period 5 sits the test.",
+      "5 LOW-MEDIUM documented deploy (CLAUDE.md) is bare wrangler: skips check-pa-attempts --require-pseudocode and check-pending-migrations; a clean worktree has no pa-pseudocode/ so every reveal 404s; TRIES_APPLIED is never enforced at deploy time.",
+      "7 LOW lesson-unsubmit only handles quizzes: 21 of 24 capped parts have no teacher remedy to give tries back.",
+      "8 LOW submission-queue override writes score = excluded.score, bypassing best-of: marking a stranded outage-marker row 5 drops a best of 8 to 5.",
+      "9 COSMETIC check-pa-attempts says 'and a pseudocode file each' when files are missing; banner promises 'you will see how it is solved' though release is now the teacher's.",
+      "1 and 6 (renderer outage completion repair, race-lost message) belong to the other agent; not touched here."
+    ],
+    "status": "fixed; awaiting a judge round (no fork can launch one)",
+    "results": {
+      "2": "fixed: criteriaScore (met 1, partial half) in lib/grade-pass.ts; attempts.ts rowScore reads it for pass/fail rows (teacher-marked rows read as stored); manifest + app/page.tsx maxScore = criteria count for a CAPPED pass/fail rubric; scoreKind unchanged (category stays Lab). Completion stays on any hand-in (test-mode rule), decided and written in the spec. Tests: junk demo 0%, one-in-three 33%, strong 100%, best-of, grading.ts category math, manifest agrees for all 25 pass/fail rubrics.",
+      "3": "fixed: scripts/lib/sqlite-adapter.mjs (bun:sqlite or node:sqlite) and requireSqlite() fail loudly without an engine (ALLOW_SKIP_SQLITE=1 opts out); passes under bun:sqlite and under node:sqlite (SQLITE_ENGINE=node:sqlite on Bun). Real Node was NOT available on this machine (node is a Bun shim), so the node:sqlite path ran under Bun's node:sqlite. test-attempt-reveal was the only bun:sqlite test.",
+      "4": "fixed: studentReleaseStatus skips a class whose enrolled_at is after the release; a teacher releasing again includes a late joiner. Remaining limit accepted: joining BEFORE the release.",
+      "5": "fixed: scripts/stamp-tries-applied.mjs (--check in npm run deploy, --set-now once at go-live), lib/attempt-cap.ts TRIES_GO_LIVE_STAMPED, test-stamp-tries-applied.mjs, CLAUDE.md deploy section. check-pa-attempts --require-pseudocode and check-pending-migrations were already in deploy.",
+      "7": "fixed: POST /api/classes/[id]/tries-reset (give-back-one | reset), migration 0033 lesson_try_resets (audit: rows kept as JSON), teacher drawer buttons, manifest carries maxSubmissions. Tests: student/other teacher refused, admin allowed, audit row, lesson_state recompute, capped quiz draft unlocked.",
+      "8": "fixed: submission-queue override on a capped part stores max(mark, best counted try) unless replaceBest; the mark is that row's score; score validated finite 0..100000. UI checkbox in the override form.",
+      "9": "fixed: check-pa-attempts reports missing pseudocode files; banner says 'once your teacher releases it' in both states (test asserts both).",
+      "mutations": "M1 criteria read, M2 enrolled-before, M3 tries-reset auth, M4 override best-of, M5 manifest criteria count, M6 give-back-one removes all, M7 score range: every one makes test-attempt-reveal fail. M8 (banner promise) was first missed (one of two occurrences left); the assertion now requires both."
+    }
+  },
+  "round5": {
+    "source": "final judge, round 5 (blind, HEAD e4e14943)",
+    "status": "fixed and committed; full npm test from a fresh worktree at the final commit",
+    "findings": [
+      {
+        "id": 1,
+        "severity": "medium",
+        "what": "replaceBest (teacher 'use this as the score even if lower') is undone by the next lesson-state completion: the stored score is rebuilt from the tries (best counted, never lowered). Repro: tries 4/4 and 1/4, teacher marks the second 0 with the box ticked -> stored 0; student POSTs completed with curl -> back to 4.",
+        "status": "fixed: lesson_state.score_override persists the teacher choice; lesson-state, tries-reset and the queue respect it; clearOverride and reset drop it"
+      },
+      {
+        "id": 2,
+        "severity": "medium",
+        "what": "tries-reset recomputes the score from post-go-live rows only and logs a wrong best_score_before. Repro: pre-go-live 4/4, then post-go-live 1 then 2; give back one -> stored 1 (should stay 4), best_score_before logged 2 (should be 4). Giving back the LAST try leaves the part 'started' with no score and the page-level completion repair re-completes it at 0 within seconds.",
+        "status": "fixed: recompute over every row (pre-go-live best, teacher mark on an outage row); best_score_before from the stored score; the last give-back removes leftover markers so the part stays started"
+      },
+      {
+        "id": 3,
+        "severity": "low-medium",
+        "what": "capped AI chart rows lose the diagram for the teacher: the counted row grade-written writes holds only the Mermaid/walk text; the browser's own copy (diagram doc + structural checks) is dropped, so the review queue and the drawer show prose.",
+        "status": "fixed: grade-written accepts a bounded, shape-checked artifact (doc + checks) stored in grade_json.artifact on the counted row and the outage marker; never scored, never in the prompt; queue and drawer render it"
+      },
+      {
+        "id": 4,
+        "severity": "low-medium",
+        "what": "pass/fail capped parts store 0 of 0 so the queue shows 'AI score: 0 / 0'; a teacher's mark has no stated unit (criteria met out of N) and replaces that try's own score before best-of, so it can lower the grade without replaceBest.",
+        "status": "fixed: criteria-met unit in the queue/override form, ceiling validation (row possible, criteria count, rubric), a plain mark never lowers the part (aiScore floor)"
+      },
+      {
+        "id": 5,
+        "severity": "low",
+        "what": "teachers/admins are capped at 3 tries on every capped part with no way back: tries-reset and lesson-unsubmit need an enrolled student and teachers cannot enroll; the comment at grade-written ~214 is wrong.",
+        "status": "fixed: teacher/admin exempt from the cap in grade-written and lesson-submissions (effectiveCap), the client hooks skip the countdown for them; their rows never reach a class"
+      },
+      {
+        "id": 6,
+        "severity": "low (accepted trust model)",
+        "what": "any teacher can add any student to their class and then reset tries / override / release for them; comments at tries-reset ~29-30 and lesson-unsubmit claim the enrollment check prevents this. Decision: ACCEPTED (audit table records who). Fix the comments, record in the spec.",
+        "status": "accepted trust model; the false comments in tries-reset and lesson-unsubmit corrected; recorded in the spec"
+      },
+      {
+        "id": 7,
+        "severity": "low",
+        "what": "a release DATE with no time opens at 00:00 school time (startOfSchoolDay), so period-1 finishers see the solution before period 3 sits.",
+        "status": "fixed: a release date requires a time (API 400 needsTime; panel defaults to 15:00)"
+      },
+      {
+        "id": "minor-a",
+        "what": "stamp-tries-applied --check accepts a stamp of any age; a slipped deploy would count every attempt in the gap against the cap.",
+        "status": "fixed: stamp-tries-applied --check refuses a stamp over 24h old; --allow-old warns loudly"
+      },
+      {
+        "id": "minor-b",
+        "what": "CLAUDE.md contradicts itself: 'ALWAYS npm run deploy' vs self-hosters need only d1:migrate; deploy is hard-wired to shcode / shcode-commits.",
+        "status": "fixed: CLAUDE.md says npm run deploy is the original author script and gives a self-hosting recipe"
+      },
+      {
+        "id": "minor-c",
+        "what": "WrittenGrader: a stream dropped mid-grade does not re-read the try count, so the banner can show one try too many (server stays correct).",
+        "status": "fixed: WrittenGrader re-reads the server count after a non-JSON reply, a refused grade and a dropped stream"
+      }
+    ],
+    "mutation_check": "25 guards broken one at a time plus one combined; every one fails test-attempt-reveal alone except two single-layer mutations of the lesson-state override (the SQL CASE and the derivation mask each other; broken together the test fails). The 24h stamp guard is caught by test-stamp-tries-applied."
+  },
+  "round6": {
+    "source": "blind judge round 6 on HEAD 1d3bc13b (fresh archive, empty pa-pseudocode/)",
+    "status": "all five findings fixed; mutation-checked; full suite verified from a fresh worktree (see results)",
+    "findings": [
+      {
+        "n": 1,
+        "severity": "medium",
+        "what": "cleanArtifact (functions/_shared/attempts.ts) checks edges for {source,target}; the browser sends {from,to} (lib/diagram-types.ts FlowEdge). Any chart with an arrow is silently dropped, so the teacher never sees the drawing. Tests used edges: [] and the wrong arrow keys, so they missed it.",
+        "fix": "validate the real DiagramDoc shape (nodes {id,shape,label,x,y}, edges {id,from,to,label?,fromSide?,toSide?}), rebuild from known keys only, edges must reference existing nodes, keep the size cap; fixtures built the way the browser builds them; end-to-end with a real arrow"
+      },
+      {
+        "n": 2,
+        "severity": "medium",
+        "what": "lesson-unsubmit clears score but not score_override (migration 0034): a teacher override of 0 survives the unsubmit, a retake of 2/2 stays at 0.",
+        "fix": "set score_override = NULL in the unsubmit UPDATE; audit every other lesson_state reset path (tries-reset reset, lesson-state DELETE by staff, teacher reopen) for the same omission"
+      },
+      {
+        "n": 3,
+        "severity": "low",
+        "what": "a grader-outage row on a pass/fail capped part has no criteria list so SubmissionQueue markUnit returns nothing: the form says New score: with no maximum, while the server limit is the rubric criteria count.",
+        "fix": "submission-queue API returns the row limit (criteria count or points) for every row; the form always shows out of N"
+      },
+      {
+        "n": 4,
+        "severity": "low",
+        "what": "x.6.2 group build (\"client\" kind): the browser report is stored as sent, so {teacherOverriddenAt, aiScore: 99999} is accepted, read by scoreForBest as 99999 and shown as Teacher score in the queue. No grade effect today (no maxScore) but it is a forged teacher mark.",
+        "fix": "strip teacher*/ai*/override-looking keys from client-supplied gradeJson on the client kind; scoreForBest ignores them"
+      },
+      {
+        "n": 5,
+        "severity": "low",
+        "what": "stamp-tries-applied --check fails on a shallow clone: git log -S finds only the shallow root commit, so the stamp looks earlier than the commit that introduced it.",
+        "fix": "detect git rev-parse --is-shallow-repository; skip the introduced-by comparison with a loud warning (and say how to unshallow)"
+      }
+    ],
+    "results": {
+      "1": "cleanArtifact rebuilt on the real DiagramDoc shape (nodes {id,shape,label,x,y}; arrows {id,from,to,label?,fromSide?,toSide?}); unknown keys dropped, repeated ids / unknown shapes / dangling arrows refused, size cap and marker-key refusal kept (marker key also checked on the raw input). docToFlow moved to lib/diagram-flow.ts so the teacher read path (stored row -> parseDiagramArtifact -> docToFlow) is tested without a browser. Fixtures are built by fromMermaid, the way the browser builds a chart. A test asserts the accepted shapes equal lib/diagram-types.ts FlowShape.",
+      "2": "lesson-unsubmit now sets score_override = NULL. Audit of every lesson_state writer: tries-reset reset (already cleared), lesson-state DELETE (whole row, refused for students on capped parts), class delete (purges), tries-reset give-back (keeps the override on purpose), submission-queue mark (the writer). Judge repro as a test: override 0, unsubmit, retake 2/2 -> completed, score 2. A source assertion fails if any reset to started stops clearing the override.",
+      "3": "submission-queue exports one rowLimit(row): points when the row has possible, else the criteria it carries, else the part rubric (an outage row has neither); GET returns limit {max,unit} on every row, POST enforces exactly that ceiling; the form says criteria met, out of N or points, out of N for any row.",
+      "4": "stripOverrideKeys removes every teacher*/override*/aiScore key (NFKC-folded, any depth, in arrays) from browser-supplied gradeJson at the one write entry (lesson-submissions POST, capped and uncapped); rowScore never returns more than a pointed row possible, so a forged row written before this fix cannot lift the best past its own maximum. A real teacher mark through the queue still works.",
+      "5": "stamp-tries-applied --check detects a shallow repository, skips ONLY the introduced-by comparison with a loud warning that says to git fetch --unshallow, and keeps every other check (future, stale, uncommitted, unstamped). Test uses a real depth-1 clone."
+    },
+    "mutation_check": "14 mutations, each breaks the named test: 1a any arrowed chart dropped, 1b unknown node keys kept, 1c unknown shape accepted, 1d dangling arrow accepted, 1e repeated id accepted, 2 unsubmit keeps override, 3a no rubric fallback for outage rows, 3b server stops enforcing the limit, 3c queue GET drops limit, 4a strip not applied, 4b teacher* not stripped, 4c nested not stripped, 4d no clamp, 5 shallow clone not handled."
+  },
+  "round7": {
+    "source": "delta judge round 7 (blind, HEAD fe69cb77)",
+    "status": "all findings fixed and mutation-checked; full suite verified from a fresh worktree (see results)",
+    "findings": [
+      {
+        "id": "M1",
+        "severity": "medium",
+        "what": "grade-written stores body.artifact (doc + checks) beside body.response, but nothing ties the two: a student edits the fetch body so the AI grades text X while the teacher's card shows chart Y with 'all checks passed' from the student's own artifact.checks (queue shows the artifact INSTEAD of the graded text once every honest chart is stored).",
+        "fix": "server recomputes describeDiagram(cleaned doc) and keeps the artifact only if it equals body.response exactly; checks are recomputed server-side from the lesson's diagram rules (baked into the server-only ai-graders module, else DEFAULT_RULES), never taken from the client; the queue shows the graded text beside the chart."
+      },
+      {
+        "id": "M2",
+        "severity": "medium (pre-existing)",
+        "what": "parseDiagramResponse/parseDiagramArtifact check only node id/shape: a row written by the uncapped or 'client' route with edges:[null] or label:5 makes docToFlow throw during render and takes down the whole /teacher page.",
+        "fix": "one pure lib/ validator (sanitizeDiagramDoc) run by every reader and by cleanArtifact; error boundary around the card's chart/response so a bad row shows 'this submission could not be displayed' plus the raw text."
+      },
+      {
+        "id": "L1",
+        "what": "stripOverrideKeys copies with {}: a __proto__ key re-parents the copy",
+        "fix": "Object.create(null) copy"
+      },
+      {
+        "id": "L2",
+        "what": "clamp skipped when possible <= 0: a 'client' row with possible:0 invents a best",
+        "fix": "a client row with possible <= 0 stores score null"
+      },
+      {
+        "id": "L3",
+        "what": "edge ids may repeat and coordinates may be +-1e308",
+        "fix": "validator de-duplicates edge ids, clamps coordinates"
+      },
+      {
+        "id": "L4",
+        "what": "UI regression: the override form now caps uncapped pointed rows at pointsMax, so extra credit is impossible through the UI; the server only enforces the ceiling on capped parts",
+        "fix": "server tells the queue which rows are capped; the form's ceiling applies to capped rows only (the unit label stays)"
+      },
+      {
+        "id": "accepted",
+        "what": "stamp --allow-old on a shallow clone with a typo'd ancient stamp passes with two warnings"
+      }
+    ],
+    "results": {
+      "M1": "cleanArtifact(raw, response, rules) keeps the artifact only if describeDiagram(rebuilt doc) === response; checks recomputed server-side from the lesson's diagramRules (baked into ai-graders.generated.ts by generate-ai-graders, else DEFAULT_RULES); the browser's checks are never read; the queue shows 'What the AI read' beside the chart.",
+      "M2": "lib/diagram-artifact.ts sanitizeDiagramDoc is the one validator (cleanArtifact, parseDiagramResponse, parseDiagramArtifact); parseDiagramGrade filters the stored check list; app/teacher drawer filters it too; components/SubmissionBoundary.tsx wraps the review card's chart/response.",
+      "L1": "stripOverrideKeys copies onto a null-prototype object.",
+      "L2": "a 'client' row stores a score only as an honest pointed pair (possible > 0); otherwise NULL score and the browser's criteria list is dropped.",
+      "L3": "validator de-duplicates edge ids and clamps coordinates to +-100000.",
+      "L4": "the queue returns capped per row; the override form enforces its ceiling only on capped rows (extra credit possible again elsewhere).",
+      "mutations": "12 guards broken one at a time, each fails the tests; one candidate (null arrow check) is an equivalent mutant because validId already drops it."
+    }
+  }
+}

@@ -16,7 +16,7 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Vel vs applyForce: AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
+    "model": "glm-5.3-flash:cloud",
     "contextDocs": [
       "physics"
     ],

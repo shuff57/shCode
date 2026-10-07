@@ -3,8 +3,9 @@
 // Only the class owner, co-teachers, or an admin may call this endpoint.
 
 import { canManageClass } from '../../../_shared/classAuth';
-import { loadClassDueRows, loadLessonScopeMap } from '../../../_shared/dueDates';
-import { buildDueIndex, isPastDue, resolveDueAt } from '../../../../lib/due-dates-core';
+import { loadClassDueRows, loadClassDueWaivers, loadLessonScopeMap } from '../../../_shared/dueDates';
+import { buildDueIndex, resolveDueAt } from '../../../../lib/due-dates-core';
+import { buildCell } from '../../../../lib/gradebook-cell';
 
 interface Env {
   DB: D1Database;
@@ -27,6 +28,7 @@ interface SubRow {
   score: number | null;
   possible: number | null;
   grade_json: string | null;
+  submitted_at: number;
 }
 
 export interface GradebookCell {
@@ -34,7 +36,7 @@ export interface GradebookCell {
   score: number | null;
   submitted_score: number | null;
   possible: number | null;
-  /** Past due and not completed, or completed after the due date. */
+  /** Past due and not completed, or completed after the due date. A waived due date is never late. */
   late: boolean;
   /**
    * The student's latest submission is an attempt the AI grader failed on, so
@@ -44,16 +46,10 @@ export interface GradebookCell {
    * never opened it.
    */
   pending: boolean;
-}
-
-/** True when a submission's grade_json carries the WrittenGrader outage marker. */
-function isGradingFailed(raw: string | null): boolean {
-  if (!raw) return false;
-  try {
-    return (JSON.parse(raw) as { gradingFailed?: unknown })?.gradingFailed === true;
-  } catch {
-    return false;
-  }
+  completed_at: number | null;
+  submitted_at: number | null;
+  /** The teacher's override comment, same field the student's own gradebook shows. */
+  teacher_feedback: string | null;
 }
 
 export interface GradebookStudent {
@@ -117,10 +113,10 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
 
   // Latest submission per (student_email, lesson_id) using ROW_NUMBER window function.
   const subResult = await env.DB.prepare(
-    `SELECT student_email, lesson_id, score, possible, grade_json
+    `SELECT student_email, lesson_id, score, possible, grade_json, submitted_at
        FROM (
          SELECT
-           student_email, lesson_id, score, possible, grade_json,
+           student_email, lesson_id, score, possible, grade_json, submitted_at,
            ROW_NUMBER() OVER (
              PARTITION BY student_email, lesson_id
              ORDER BY submitted_at DESC
@@ -174,11 +170,15 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
     }
   }
 
+  // A waived due date is no date at all for that student, exactly as in /api/my-gradebook.
+  const waivers = await loadClassDueWaivers(env.DB, classId);
+
   // Assemble the response matrix.
   const students: GradebookStudent[] = roster.map((email) => {
     const stateByLesson = stateMap.get(email);
     const subByLesson = subMap.get(email);
 
+    const waived = waivers.get(email);
     const cells: Record<string, GradebookCell> = {};
 
     // Merge all lesson ids from both state and submission maps for this
@@ -188,27 +188,35 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
     const lessonIds = new Set<string>([
       ...(stateByLesson ? stateByLesson.keys() : []),
       ...(subByLesson ? subByLesson.keys() : []),
-      ...Object.keys(dueDates).filter((id) => dueDates[id] < now),
+      ...Object.keys(dueDates).filter((id) => dueDates[id] < now && !waived?.has(id)),
     ]);
 
     for (const lessonId of lessonIds) {
       const sr = stateByLesson?.get(lessonId);
       const sub = subByLesson?.get(lessonId);
-      const dueAt = dueDates[lessonId] ?? null;
-      cells[lessonId] = {
+      // The ONE cell builder, shared with the student's own gradebook (lib/gradebook-cell.ts): late and
+      // pending can no longer be decided two ways for the same student.
+      const cell = buildCell({
         state: sr?.state ?? null,
         score: sr?.score ?? null,
-        submitted_score: sub?.score ?? null,
+        completedAt: sr?.completed_at ?? null,
+        submittedScore: sub?.score ?? null,
         possible: sub?.possible ?? null,
-        // A completed row with a NULL completed_at (legacy data) counts as on
-        // time rather than late — `?? dueAt` reads as "finished by the
-        // deadline". Guessing late on missing data would accuse a student.
-        late: isPastDue(dueAt, sr?.state === 'completed' ? (sr.completed_at ?? dueAt) : null, now),
-        // Only the LATEST submission votes, and only while it still has no
-        // score. A regrade that succeeded replaces the row; a teacher override
-        // writes a score onto this one but leaves the gradingFailed marker in
-        // place, so the marker alone would keep claiming "pending" forever.
-        pending: sub?.score == null && isGradingFailed(sub?.grade_json ?? null),
+        gradeJson: sub?.grade_json ?? null,
+        submittedAt: sub?.submitted_at ?? null,
+        dueAt: waived?.has(lessonId) ? null : (dueDates[lessonId] ?? null),
+        now,
+      });
+      cells[lessonId] = {
+        state: cell.state,
+        score: cell.score,
+        submitted_score: cell.submittedScore,
+        possible: cell.possible,
+        late: cell.late,
+        pending: cell.pending,
+        completed_at: cell.completedAt,
+        submitted_at: cell.submittedAt,
+        teacher_feedback: cell.teacherFeedback,
       };
     }
 

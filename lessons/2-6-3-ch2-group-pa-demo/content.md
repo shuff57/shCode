@@ -4,9 +4,11 @@
 The chart and the build are done; now you write the report and run the program for the
 teacher. This part is worth **25%**.
 
+**You get three tries.** Each partner submits their own; submit, read the feedback on each criterion, improve and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
+
 ### Part 1: Who did what
 
-Name both partners. Then say who drove the keyboard for the chart (2.6.1), who drove it
+Name both partners (or yourself, if you worked alone). Then say who drove the keyboard for the chart (2.6.1), who drove it
 for the code (2.6.2), and one thing the partner who was not typing caught that the one
 typing had missed.
 
@@ -45,7 +47,8 @@ lifecycle, and how that helped your pair avoid a bug.
 
 ### Part 5: Chapter 2 checklist
 
-Name the specific section where each of these first appeared in your program:
+Say where in your program each of these first appeared, and quote one line of your own
+code for each (not just the section number):
 
 - the loop (2.2)
 - the decision inside the loop (2.1)
@@ -55,8 +58,8 @@ Name the specific section where each of these first appeared in your program:
 
 If you didn't use one, say so.
 
-### Part 6: Extension — the zero-iteration case
+### Part 6: Extension — the zero-iteration case (optional)
 
-If you finished early, you were asked for an input that makes your loop run zero times.
+Optional: if you finished early, you were asked for an input that makes your loop run zero times.
 What was that input, and why did your pair assume it couldn't happen? (Hint: Chapter 1's
 straight line always ran at least once.)

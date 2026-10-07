@@ -7,15 +7,20 @@ import { useLessonStore, flattenFiles } from '../lib/store';
 import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
-import { recordSubmission } from '../lib/written-grader-store';
-import { recordLessonCompleted } from '../lib/progress';
+import { recordSubmission, streamGrade } from '../lib/written-grader-store';
+import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
+import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
+import { AttemptBanner, PseudocodePanel } from './AttemptCap';
+import AiGradeResultPanel, { type AiGradeResultData } from './AiGradeResultPanel';
+import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader';
 import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-mode';
 import type { ModelDoc } from '../lib/model-types';
 
-import { RUNNER_SOURCE, RUN_MAX_LOGS, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
+import { RUN_MAX_LOGS, RUN_TIMEOUT_MS, errorWithLocation, lineColOf, runStudentCode } from '../lib/js-runner-source';
+import { jobsFromRequirements, type TestRunResults } from '../lib/test-harness-source';
 import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
@@ -65,9 +70,10 @@ export default function LessonWorkspace({
   const getDirtyCount = useLessonStore((s) => s.getDirtyCount);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // Live console-lesson runner, so a re-run or an unmount can terminate it.
-  const workerRef = useRef<Worker | null>(null);
-  useEffect(() => () => { workerRef.current?.terminate(); }, []);
+  // Live console-lesson runner, so a re-run or an unmount can stop it — including
+  // one sitting on an open prompt() dialog.
+  const runRef = useRef<{ kill: () => void } | null>(null);
+  useEffect(() => () => { runRef.current?.kill(); }, []);
 
   const handleDownload = () => {
     if (!currentFile) return;
@@ -133,6 +139,22 @@ export default function LessonWorkspace({
   const [historyOpen, setHistoryOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  // Tries on a capped performance-assessment part, counted on the server
+  // (lib/use-attempt-cap.ts). Absent maxSubmissions = uncapped, nothing changes.
+  const lessonProgress = useLessonState();
+  const cap = useAttemptCap(lesson.id, lesson.grading?.maxSubmissions, lessonProgress.authed, bypassesLessonLock(lessonProgress.role));
+  const capped = cap.max !== null;
+  // A grader outage (or a lost completion call) must not leave the NEXT part locked.
+  useCompletionRepair(lesson.id, cap, lessonProgress);
+  // A graded test part that is marked by the AI instead of by requirement patterns
+  // (the find-and-fix parts: nothing scores them on the server). The browser sends
+  // the student's file to /api/grade-written, which holds the rubric and is the
+  // source of the score; see .gauntlet/SPEC-attempt-caps.md.
+  const aiGraded = !!(lesson.grading?.summative && lesson.aiGrader);
+  const [aiResult, setAiResult] = useState<AiGradeResultData | null>(null);
+  const [aiGrading, setAiGrading] = useState(false);
+  const [aiStage, setAiStage] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
   const [gradeReport, setGradeReport] = useState<GradeReportType | null>(null);
   // Set true when an admin/teacher inserts the reference solution; pauses
   // localStorage autosave so their progress record stays clean. Cleared by
@@ -341,7 +363,11 @@ export default function LessonWorkspace({
   // Worker can be terminated, and synchronous JS cannot be interrupted any
   // other way. Module 2.4 teaches infinite loops deliberately, so students
   // now write `while (true)` on purpose — on the main thread that locked the
-  // tab and cost them everything they had typed.
+  // tab and cost them everything they had typed. That guarantee is also why
+  // prompt() is bridged rather than moved into a frame: see
+  // lib/js-runner-source.ts.
+  const testRunRef = useRef<TestRunResults | null>(null);
+
   function runCode() {
     setRuntimeError(null);
     const scriptContent = files['script.js'] || '';
@@ -356,13 +382,15 @@ export default function LessonWorkspace({
       setTimeout(() => runTests(), 200);
     };
 
-    // A previous run may still be spinning; never leave two alive at once.
-    workerRef.current?.terminate();
-    workerRef.current = null;
+    // A previous run may still be spinning, or waiting on a dialog; never
+    // leave two alive at once.
+    runRef.current?.kill();
+    runRef.current = null;
 
+    // The no-Worker fallback (very old browser): the direct call, which is the
+    // path that can hang. Fallback only, never the default. No prompt() here —
+    // there is nothing to raise a dialog with — but no lesson needs one.
     if (typeof Worker === 'undefined') {
-      // No Worker (very old browser): fall back to the direct call. This is
-      // the path that can hang, so it is the fallback and not the default.
       const orig = { log: console.log, warn: console.warn, error: console.error };
       const capture = (type: string) => (...args: unknown[]) => {
         logs.push({ type, message: args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' '), timestamp: time() });
@@ -373,76 +401,83 @@ export default function LessonWorkspace({
       } catch (e: unknown) {
         const name = e instanceof Error ? e.name : 'Error';
         const msg = e instanceof Error ? e.message : String(e);
-        logs.push({ type: 'error', message: msg, timestamp: time() });
-        setRuntimeError(`${name}: ${msg}`);
+        const { line, col } = lineColOf(e);
+        const text = errorWithLocation(name, msg, line, col);
+        logs.push({ type: 'error', message: text, timestamp: time() });
+        setRuntimeError(text);
       }
       console.log = orig.log; console.warn = orig.warn; console.error = orig.error;
       finish();
       return;
     }
 
-    const url = URL.createObjectURL(new Blob([RUNNER_SOURCE], { type: 'text/javascript' }));
-    const worker = new Worker(url);
-    workerRef.current = worker;
-
-    const cleanup = () => {
-      worker.terminate();
-      URL.revokeObjectURL(url);
-      if (workerRef.current === worker) workerRef.current = null;
-    };
-
-    const killer = setTimeout(() => {
-      // On a summative part the stop message reports the stop only. The
-      // practice-path message names the repair ("check that the value in the
-      // condition actually changes"), which on 2.7.3's while-continue bug is
-      // the answer, handed over by the platform on the one Part C item that
-      // can trigger it — the same giveaway the 2026-09-02 checklist narrowing
-      // stripped out of Part C's hints. The runtimeError banner keeps the
-      // diagnosis on both paths: it is the teacher's screen, and the paper
-      // locks on submit anyway.
-      const summative = lesson.grading?.summative === true;
-      logs.push({
-        type: 'error',
-        message: summative
-          ? `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped.`
-          : `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
-        timestamp: time(),
-      });
-      setRuntimeError('Stopped: your code ran too long (likely an infinite loop)');
-      cleanup();
-      finish();
-    }, RUN_TIMEOUT_MS);
-
-    worker.onmessage = (e: MessageEvent) => {
-      const d = e.data as { kind: string; type?: string; message?: string; name?: string; line?: number | null; col?: number | null };
-      if (d.kind === 'log') {
-        logs.push({ type: d.type || 'log', message: d.message || '', timestamp: time() });
-        return;
-      }
-      if (d.kind === 'error') {
-        // issue #25: a line/col from the worker's own stack parsing (see
-        // lib/js-runner-source.ts) gets appended right on the message --
-        // this console has no clickable-jump machinery like Console.tsx's
-        // iframe path, so the line number goes in the text itself.
-        const where = d.line ? ` (line ${d.line}${d.col ? `, col ${d.col}` : ''})` : '';
-        const msg = `${d.message || ''}${where}`;
-        logs.push({ type: 'error', message: msg, timestamp: time() });
-        setRuntimeError(`${d.name || 'Error'}: ${msg}`);
-      }
-      clearTimeout(killer);
-      cleanup();
-      finish();
-    };
-
-    worker.onerror = (e: ErrorEvent) => {
-      clearTimeout(killer);
-      logs.push({ type: 'error', message: e.message || 'Error', timestamp: time() });
-      setRuntimeError(e.message || 'Error');
-      cleanup();
-      finish();
-    };
-
-    worker.postMessage(scriptContent);
+    // `tests` requirements ride along on this one run (lib/test-harness-source.ts).
+    const testJobs = jobsFromRequirements(lesson.requirements);
+    testRunRef.current = null;
+    const run = runStudentCode(
+      scriptContent,
+      (d) => {
+        if (d.kind === 'log') {
+          logs.push({ type: d.type || 'log', message: d.message || '', timestamp: time() });
+          return;
+        }
+        // A run given `tests` jobs reports one result per `tests` requirement
+        // on its last message. Stored in a ref, not state: finish() grades from
+        // a timer, and a closure over state would grade the previous run.
+        if (d.tests) testRunRef.current = d.tests;
+        if (d.kind === 'error') {
+          // issue #25: a line/col parsed out of the run's own stack (see
+          // lib/js-runner-source.ts) rides along on the message. This console
+          // has no clickable-jump machinery like Console.tsx's iframe path, so
+          // the line number goes in the text itself.
+          const text = errorWithLocation(d.name, d.message, d.line, d.col);
+          logs.push({ type: 'error', message: text, timestamp: time() });
+          setRuntimeError(text);
+        }
+        finish();
+      },
+      (info) => {
+        if (info.tests) testRunRef.current = info.tests;
+        // The script finished and one of the `tests` cases then ran too long:
+        // that is the function's loop, not the Run's, so it is reported against
+        // the requirement (the card names the call) and the console, and does
+        // not raise the run-error banner or gate Submit twice.
+        if (info.phase === 'case') {
+          logs.push({
+            type: 'error',
+            message: 'One of the checks on your function did not finish, so it was stopped. That usually means a loop inside the function never reaches its stopping point.',
+            timestamp: time(),
+          });
+          finish();
+          return;
+        }
+        // On a summative part the stop message reports the stop only. The
+        // practice-path message names the repair ("check that the value in the
+        // condition actually changes"), which on 2.7.3's while-continue bug is
+        // the answer, handed over by the platform on the one Part C item that
+        // can trigger it — the same giveaway the 2026-09-02 checklist narrowing
+        // stripped out of Part C's hints. The runtimeError banner keeps the
+        // diagnosis on both paths: it is the teacher's screen, and the paper
+        // locks on submit anyway.
+        const summative = lesson.grading?.summative === true;
+        logs.push({
+          type: 'error',
+          message: summative
+            ? `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped.`
+            : `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
+          timestamp: time(),
+        });
+        setRuntimeError('Stopped: your code ran too long (likely an infinite loop)');
+        finish();
+      },
+      () => {
+        // A prompt() answer restarts the run, and the new pass reprints what
+        // this one printed. Drop it rather than showing every line twice.
+        logs.length = 0;
+      },
+      { tests: testJobs },
+    );
+    runRef.current = run;
   }
 
   // For moSHion lessons: snapshot the current code and bump runKey to reload the iframe.
@@ -474,9 +509,20 @@ export default function LessonWorkspace({
   useEffect(() => {
     const handler = (event: MessageEvent) => {
       const data = event.data;
+      // A reSHape script that builds posts `reshape-doc`. That is the only
+      // "run again" a reSHape lesson has (ReshapeStudio owns its own Run), and
+      // nothing else clears runtimeError there: runCode()/runQ5() never run, so
+      // a fixed script left "Run your code again" on screen and Submit disabled
+      // until a page reload.
+      if (data && data.source === 'reshape-doc') {
+        setRuntimeError(null);
+        return;
+      }
       if (data && data.source === 'preview-error' && data.error) {
-        const err = data.error as { name?: string; message?: string };
-        setRuntimeError(`${err.name || 'Error'}: ${err.message || ''}`);
+        // The moSHion / reSHape runners report a line already (their own frame
+        // parse); keep it rather than flattening the payload to a bare message.
+        const err = data.error as { name?: string; message?: string; line?: number | null; col?: number | null };
+        setRuntimeError(errorWithLocation(err.name, err.message, err.line, err.col));
       }
     };
     window.addEventListener('message', handler);
@@ -560,7 +606,7 @@ export default function LessonWorkspace({
   // reads `latestModelDoc`, which ReshapeStudio keeps current independent of
   // the (debounced, <=300ms) script.js text sync.
   function runTests() {
-    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals };
+    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals, testResults: testRunRef.current };
     const report = grade(
       lesson.requirements,
       files,
@@ -568,16 +614,25 @@ export default function LessonWorkspace({
       context
     );
     setRequirements(
-      lesson.requirements.map((r) => ({
-        ...r,
-        ...report.results.find((d) => d.id === r.id),
-      }))
+      lesson.requirements.map((r) => {
+        const result = report.results.find((d) => d.id === r.id);
+        // A summative lesson's `pattern` is stripped from this copy
+        // (lib/quiz-redact.ts), so the grader cannot check it and now fails
+        // closed. Leaving `status` undefined renders the card in its third
+        // state -- grey, "not graded" -- which is the truth. Writing `failed`
+        // through would tell a student on a test that they had failed a part
+        // nobody is able to grade in the browser. Submit is unaffected:
+        // `canSubmit` is true outright for a summative part.
+        const patternCheck = !r.type || r.type === 'regex' || r.type === 'inFunction';
+        if (patternCheck && !r.pattern) return { ...r };
+        return { ...r, ...result };
+      })
     );
     setGradeReport(report);
   }
 
   const runClientGrade = useCallback(() => {
-    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals };
+    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals, testResults: testRunRef.current };
     const report = grade(
       lesson.requirements,
       files,
@@ -601,7 +656,70 @@ export default function LessonWorkspace({
     }
   };
 
+  const runAiGrade = async () => {
+    if (!lesson.aiGrader || aiGrading || cap.unknown || cap.reached) return;
+    setAiGrading(true);
+    setAiError(null);
+    setAiResult(null);
+    try {
+      const code = useLessonStore.getState().fileContents['script.js'] || '';
+      const { status, data, network } = await streamGrade(
+        {
+          lessonId: lesson.id,
+          lessonTitle: lesson.title,
+          // The server reads the rubric and prompt by lessonId and ignores these.
+          prompt: '',
+          response: code,
+          rubric: lesson.aiGrader.rubric,
+        },
+        (stage) => setAiStage(stage),
+      );
+      if (data === null) {
+        console.warn('[grader]', network ? 'network error' : `non-JSON response (HTTP ${status})`);
+        setAiError(gradeFailureMessage({ kind: classifyGradeFailure(status, null, network), status }));
+        // The server may have written its free outage marker: re-read the rows so
+        // the completion repair can unlock the next part.
+        if (capped) cap.refresh();
+        return;
+      }
+      if (!data.ok) {
+        console.warn('[grader]', status, (data as { detail?: string }).detail || data.error);
+        setAiError(gradeFailureMessage({ kind: classifyGradeFailure(status, data), status, serverMessage: data.error }));
+        // A refused fourth try (409), a lost race or an outage marker all change
+        // what the server holds: re-read it so the banner and Submit are not stale.
+        if (capped) cap.refresh();
+        return;
+      }
+      setAiResult(data as AiGradeResultData);
+      if (lessonProgress.authed) {
+        // On a capped part /api/grade-written records the counted submission itself,
+        // with its own totals, so the browser must not post a second row (it would
+        // spend two tries per grade) or relay a score. An uncapped part has no
+        // server-side row, so the work is recorded here, without a score.
+        if (!capped) {
+          await recordSubmission({ lessonId: lesson.id, response: code, gradeJson: { ai: data } });
+        }
+        // Best try counts; the lesson_state upsert also refuses to lower it.
+        const prior = lessonProgress.scores[lesson.id];
+        const earned = (data as AiGradeResultData).totalEarned;
+        await recordLessonCompleted(lesson.id, typeof prior === 'number' ? Math.max(prior, earned) : earned);
+        if (capped) cap.spend();
+      }
+    } catch (e) {
+      console.warn('[grader]', e);
+      setAiError(gradeFailureMessage({ kind: 'network' }));
+      if (capped) cap.refresh();
+    } finally {
+      setAiGrading(false);
+      setAiStage(null);
+    }
+  };
+
   const handleSubmit = () => {
+    if (aiGraded) {
+      void runAiGrade();
+      return;
+    }
     const report = runClientGrade();
     setGradeReport(report);
     setSubmitOpen(true);
@@ -634,7 +752,16 @@ export default function LessonWorkspace({
         alert('Submission could not be recorded on the server. Please reload and try again.');
         return;
       }
-      await recordLessonCompleted(lesson.id, gradeReport.totalScore);
+      // Best try counts; the lesson_state upsert also refuses to lower it.
+      const prior = lessonProgress.scores[lesson.id];
+      const best = capped && typeof prior === 'number' ? Math.max(prior, gradeReport.totalScore) : gradeReport.totalScore;
+      await recordLessonCompleted(lesson.id, best);
+    }
+    // A capped part is not final and does not walk the student away: they stay
+    // to use their other tries, and the banner shows what is left.
+    if (capped) {
+      cap.spend();
+      return;
     }
     setSubmitted(true);
     navigateToNextLesson(lesson.id);
@@ -677,19 +804,23 @@ export default function LessonWorkspace({
   // both satisfy their regexes and then crash by design, so the generic
   // "don't ship code that crashes" rule made them permanently unsubmittable.
   const expectsRuntimeError = !!lesson.grading?.expectsRuntimeError;
-  const canSubmit =
+  const canSubmitByWork =
     isSummative ||
     ((!runtimeError || expectsRuntimeError) &&
       (isMoshionMode || isNoPoints
         ? allRequirementsPassed
         : totalScore >= (lesson.grading?.passingScore ?? 0)));
+  const canSubmit = canSubmitByWork && !cap.unknown && !cap.reached;
   // Any lesson with graded criteria keeps the score header, not just the
   // assignment routes — ch2's labs are `type: "lesson"` but still scored.
   const showAssignmentHeader = isAssignment || isMoshionMode || totalCriteria > 0;
   // q5 grading is binary/completion-based — show criteria counts, not points.
-  const headerScore = isMoshionMode ? passedCriteria : totalScore;
-  const headerTotal = isMoshionMode ? totalCriteria : totalPossible;
-  const headerUnitLabel = isMoshionMode ? '' : 'pts';
+  // A lesson whose criteria are all worth 0 points (find-and-fix, most console labs) read "0/0 pts"
+  // for the whole lesson; count the criteria passed instead, as moSHion mode already does.
+  const countCriteria = isMoshionMode || isNoPoints;
+  const headerScore = countCriteria ? passedCriteria : totalScore;
+  const headerTotal = countCriteria ? totalCriteria : totalPossible;
+  const headerUnitLabel = countCriteria ? '' : 'pts';
 
   return (
     <>
@@ -839,6 +970,7 @@ export default function LessonWorkspace({
           <h1>{lesson.title}</h1>
         </div>
       )}
+      {capped ? <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} /> : null}
       {lesson.planFrom && (
         <PlanChartPanel
           planFrom={lesson.planFrom}
@@ -1058,6 +1190,17 @@ export default function LessonWorkspace({
           )}
         </div>
       </div>
+      {aiGraded ? (
+        <AiGradeResultPanel
+          title={lesson.aiGrader?.rubricTitle ?? 'AI feedback on your fixes'}
+          titles={Object.fromEntries((lesson.aiGrader?.rubric ?? []).map((r) => [r.id, r.title]))}
+          result={aiResult}
+          grading={aiGrading}
+          stage={aiStage}
+          error={aiError}
+        />
+      ) : null}
+      {capped ? <PseudocodePanel lessonId={lesson.id} show={cap.reached} /> : null}
       {submitted && gradeReport && (
         <GradeReportView
           report={gradeReport}

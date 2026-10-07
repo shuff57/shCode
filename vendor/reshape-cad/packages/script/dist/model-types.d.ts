@@ -158,7 +158,29 @@ export interface ResolvedSketchFrame {
  * sketch with `frame` gets its normal as u x v (normalised), so an arbitrary
  * planar face is expressible while the right-handed convention is preserved.
  */
-export declare function sketchFrameOf(f: Pick<SketchFeature, 'plane' | 'offset' | 'frame'>): ResolvedSketchFrame;
+export declare function sketchFrameOf(f: {
+    plane?: SketchPlane;
+    offset?: number;
+    frame?: SketchFrame;
+}): ResolvedSketchFrame;
+/**
+ * A datum plane (SPEC-datum-family Stage 3): a named place a sketch can sit,
+ * shown in the timeline. It has NO geometry: the kernel builds nothing for it.
+ *
+ * Placement mirrors SketchFeature exactly -- a named `plane` plus `offset`, or
+ * a literal `frame` -- so sketchFrameOf() resolves either one. As on a sketch,
+ * a `frame` wins and `plane`/`offset` are then ignored. A literal frame is
+ * frozen: it does not follow a solid that later changes.
+ */
+export interface DatumFeature {
+    id: string;
+    kind: 'datum';
+    name?: string;
+    type: 'plane';
+    plane?: SketchPlane;
+    offset?: number;
+    frame?: SketchFrame;
+}
 /** A closed outline, drawn flat. Not a solid until something extrudes it. */
 export interface SketchFeature {
     id: string;
@@ -174,6 +196,14 @@ export interface SketchFeature {
      * every sketch saved before frames existed. See [`SketchFrame`] and
      * [`sketchFrameOf`]. */
     frame?: SketchFrame;
+    /**
+     * The datum plane (a `datum` feature id) this sketch sits on, when it was
+     * made with sketch(plane(...)). `plane`/`offset`/`frame` above are ALSO
+     * filled from the datum so every reader and the kernel keep working
+     * unchanged; the kernel ignores this field. It exists for dependsOn(), the
+     * emitter and the timeline.
+     */
+    onDatum?: string;
     /**
      * The DESIGN corners, in plane coordinates and in order -- the points the
      * student actually placed, and the only ones any mover may touch. The
@@ -508,7 +538,11 @@ export interface HoleFeature {
     /** Where the hole's mouth sits, as an offset from `target`'s own
      *  bounding-box centre -- not an absolute world position. [0, 0, 0]
      *  means "dead centre on the target," wherever the target actually is;
-     *  the kernel (lib/occt-build.ts) resolves that offset at build time. */
+     *  the kernel (lib/occt-build.ts) resolves that offset at build time.
+     *  The component ALONG `axis` is derived, not typed: for a blind hole it is
+     *  (thickness - depth) / 2 toward +axis so the bore starts at the drilled
+     *  face (holeAxialOffset / withHoleDepth); 0 for a through hole. toScript
+     *  never emits it as `at:`. */
     center: Vec3;
     /** Which way the drill points. 'z' bores straight down, matching a hole
      *  placed on a flat top face without any tilt. */
@@ -524,6 +558,32 @@ export interface HoleFeature {
     corners?: {
         dx: number;
         dy: number;
+    };
+    /**
+     * A flat-bottomed recess at the hole's mouth, wider than the bore: a
+     * counterbore, so a bolt head sits flush instead of proud. The recess is
+     * cut from the mouth inward along the drill axis, so `depth` is measured
+     * from the same face as the bore and must be less than it.
+     *
+     * The kernel cuts this as ONE revolved stepped profile subtracted once,
+     * never as a boolean of two coaxial cylinders -- the two-diameter geometry
+     * lives in the profile, so the boolean never sees two coaxial tools.
+     */
+    counterbore?: {
+        diameter: number;
+        depth: number;
+    };
+    /**
+     * A conical recess at the hole's mouth, so a screw sits flush: a
+     * countersink. `diameter` is the recess's full width at the mouth and
+     * `angleDeg` the included angle of the cone (90 is the usual choice). The
+     * cone's depth follows from the two, so it is not given separately.
+     *
+     * Mutually exclusive with `counterbore`: one mouth, one shape.
+     */
+    countersink?: {
+        diameter: number;
+        angleDeg: number;
     };
 }
 /**
@@ -624,7 +684,7 @@ export interface MoveFeature {
     offset: Vec3;
     copy: boolean;
 }
-export type Feature = BoxFeature | CylinderFeature | SphereFeature | ConeFeature | TorusFeature | PrismFeature | WedgeFeature | SketchFeature | ExtrudeFeature | CombineFeature | BlendFeature | RevolveFeature | GrooveFeature | PocketFeature | MirrorFeature | PatternFeature | HoleFeature | ShellFeature | MoveFeature | FilletFeature | DraftFeature;
+export type Feature = BoxFeature | CylinderFeature | SphereFeature | ConeFeature | TorusFeature | PrismFeature | WedgeFeature | SketchFeature | DatumFeature | ExtrudeFeature | CombineFeature | BlendFeature | RevolveFeature | GrooveFeature | PocketFeature | MirrorFeature | PatternFeature | HoleFeature | ShellFeature | MoveFeature | FilletFeature | DraftFeature;
 /**
  * Ids of earlier features this one is built from directly.
  *
@@ -636,6 +696,10 @@ export type Feature = BoxFeature | CylinderFeature | SphereFeature | ConeFeature
  * does -- rather than needing a human to remember to add it to a list.
  */
 export declare function dependsOn(f: Feature): string[];
+/** The datum plane a sketch sits on (SPEC-datum-family Stage 3). A separate
+ *  field from `target` on purpose: reusing `target` would collide with every
+ *  `'target' in f` consumer. */
+export declare function datumRefs(f: Feature): string[];
 /**
  * Feature ids a feature reaches through a TopoName rather than through a
  * target field.
@@ -739,6 +803,16 @@ export declare function newSketch(doc: ModelDoc, plane?: SketchPlane): SketchFea
  * be a second source of truth that could drift.
  */
 export declare function newSketchOnFace(doc: ModelDoc, frame: SketchFrame, points?: Array<[number, number]>): SketchFeature;
+/** The words a timeline row shows for where a sketch or datum sits: the named
+ *  plane, or 'custom plane' for a literal frame (whose `plane` field is only a
+ *  placeholder and would otherwise read 'xy'). */
+export declare function placementLabel(f: {
+    plane?: SketchPlane;
+    frame?: SketchFrame;
+}): string;
+/** A datum plane with no placement yet; the caller sets `plane`+`offset` or
+ *  `frame`. Ids are pl1, pl2, ... */
+export declare function newDatum(doc: ModelDoc): DatumFeature;
 /** A circle, drawn as the two ends of a diameter -- see SketchFeature.shape.
  *  Not a rectangle-with-round-corners and not four points: the tag is the
  *  only thing that makes it a circle, so the data says so directly.
@@ -803,6 +877,48 @@ export declare function newMirror(doc: ModelDoc, target: string, plane: SketchPl
  * deliberately ignores that.
  */
 export declare function extentAlong(doc: ModelDoc, featureId: string, axis: Axis3): number | null;
+/** The sweep sign of each NAMED plane: MEASURED, not derived (xz pulls -Y). A
+ *  sketch with a literal `frame` always pulls along u x v. Shared with
+ *  model-handles.ts so there is one table. */
+export declare const SWEEP_DIR: Record<SketchPlane, number>;
+/** How far the named feature's solid reaches along an axis, and whether that is
+ *  its EXACT extent or only an upper bound. null when nothing can be proved. */
+export declare function extentBoundAlong(doc: ModelDoc, featureId: string, axis: Axis3): {
+    extent: number;
+    exact: boolean;
+} | null;
+/**
+ * An UPPER BOUND (or the exact value) on how far the named feature's solid
+ * reaches along one axis, for a hole that has to go all the way through. A bound
+ * is enough: the tool is centred on the part, so a hole longer than the part
+ * cuts only air. Unlike extentAlong() (a default-picker that ignores patterns
+ * and mirrors) this refuses to guess: null for anything it cannot prove -- a
+ * rotated cone or prism, a polar pattern of a derived shape, an intersect, a sketch that is not on a
+ * world-aligned plane -- so hole() can say so instead of drilling a blind hole
+ * the student never asked for.
+ */
+export declare function throughExtentAlong(doc: ModelDoc, featureId: string, axis: Axis3): number | null;
+/** The EXACT extent along an axis, or null when only a bound (or nothing) is
+ *  known. A blind hole's start offset needs this: an over-long extent would
+ *  start the hole short of the face. */
+export declare function exactExtentAlong(doc: ModelDoc, featureId: string, axis: Axis3): number | null;
+/**
+ * Where a hole's tool must sit ALONG its axis so a blind hole starts at the
+ * drilled face. The kernel contract (and the OCCT referee) centres the tool on
+ * the target's bounding-box centre plus HoleFeature.center, with `depth` as the
+ * tool's length -- so a blind `depth` shorter than the part would float a sealed
+ * cavity in the middle. Shifting the tool toward the +axis face by
+ * (extent - depth) / 2 puts its top flush with that face.
+ *
+ * 0 when the hole goes through (depth >= extent). null when the thickness along
+ * the axis cannot be bounded (see throughExtentAlong), so callers can say so.
+ */
+export declare function holeAxialOffset(doc: ModelDoc, target: string, axis: Axis3, depth: number): number | null;
+/** The hole with `depth` set AND its axial offset kept in step. The axial
+ *  component of `center` is DERIVED from depth + target thickness (never typed,
+ *  never emitted as `at:`), so every writer of depth goes through here. When the
+ *  thickness is unknown the axial component is left as it was. */
+export declare function withHoleDepth(doc: ModelDoc, f: HoleFeature, depth: number): HoleFeature;
 export declare function newPattern(doc: ModelDoc, target: string, mode?: 'linear' | 'circular'): PatternFeature;
 /** center: [0, 0, 0] is not world zero -- see HoleFeature.center. It is "no
  *  offset," so the kernel (lib/occt-build.ts) reads it against the TARGET's

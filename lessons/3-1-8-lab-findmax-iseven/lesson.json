@@ -1,15 +1,16 @@
 {
   "id": "3-1-8-lab-findmax-iseven",
-  "title": "3.1.15 Preview: findMax & isEven",
-  "description": "A look ahead at Module 3.2: define two functions, findMax(a, b) and isEven(n), that take parameters and return a value. Auto-graded.",
+  "title": "3.2.26 Lab: findMax & isEven",
+  "description": "Define two functions, findMax(a, b) and isEven(n), that take parameters and return a value. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "3.1 Functions: Definition and Calls",
+  "unit": "3.2 Parameters and Return Values",
   "preview": "console",
   "week": 7,
   "slos": [
     "SLO-2",
+    "SLO-3",
     "SLO-4"
   ],
   "steps": [
@@ -33,32 +34,185 @@
     {
       "id": "r1",
       "title": "findMax defined",
-      "description": "Code defines a function named findMax",
+      "description": "Code defines a function named findMax (exact spelling). Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+findMax\\s*\\(",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r2",
       "title": "isEven defined",
-      "description": "Code defines a function named isEven",
+      "description": "Code defines a function named isEven (exact spelling). Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+isEven\\s*\\(",
-      "flags": "i",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
     },
     {
       "id": "r3",
       "title": "return statement present",
-      "description": "Code contains a return statement",
+      "description": "Code contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "return\\s",
-      "flags": "i",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
       "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "findMax compares its two values",
+      "description": "findMax compares a and b (with > or <, or Math.max) inside its body. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "findMax",
+      "pattern": "[<>]|Math\\.max",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "isEven uses the remainder operator",
+      "description": "isEven uses % inside its body. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "isEven",
+      "pattern": "%",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0
+    },
+    {
+      "id": "t1",
+      "title": "findMax returns the larger value",
+      "description": "findMax(a, b) gives back whichever of the two numbers is larger, whichever order they come in. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "findMax",
+      "points": 0,
+      "hint": "findMax must hand back the LARGER of a and b. Check which way your comparison points, and that both branches return a value.",
+      "cases": [
+        {
+          "args": [
+            3,
+            9
+          ],
+          "expect": 9
+        },
+        {
+          "args": [
+            9,
+            3
+          ],
+          "expect": 9
+        },
+        {
+          "args": [
+            -5,
+            -2
+          ],
+          "expect": -2
+        },
+        {
+          "args": [
+            4,
+            4
+          ],
+          "expect": 4,
+          "description": "equal values"
+        },
+        {
+          "args": [
+            0,
+            -1
+          ],
+          "expect": 0
+        },
+        {
+          "args": [
+            100,
+            99
+          ],
+          "expect": 100,
+          "hidden": true
+        },
+        {
+          "args": [
+            -1000,
+            5
+          ],
+          "expect": 5,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "title": "isEven is true for even numbers only",
+      "description": "isEven(n) returns true when n is even and false when it is odd, including 0 and negative numbers. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "isEven",
+      "points": 0,
+      "hint": "isEven must return true or false (not 0 or 1): an even number has a remainder of 0 when divided by 2.",
+      "cases": [
+        {
+          "args": [
+            4
+          ],
+          "expect": true
+        },
+        {
+          "args": [
+            7
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            6
+          ],
+          "expect": true
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": true
+        },
+        {
+          "args": [
+            -3
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            -4
+          ],
+          "expect": true,
+          "hidden": true
+        },
+        {
+          "args": [
+            9
+          ],
+          "expect": false,
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

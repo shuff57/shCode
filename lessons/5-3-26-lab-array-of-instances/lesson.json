@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "enemies.push(new Enemy(...)) used at least once",
-      "description": "Use `enemies.push(new Enemy(...))` to add Enemy instances to the array.",
+      "description": "Use `enemies.push(new Enemy(...))` to add Enemy instances to the array. Help: 5.4.1 (Methods: functions that live on a class)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:enemies\\.push\\s*\\(\\s*new\\s+Enemy[\\s\\S]*?){5}|for\\s*\\([\\s\\S]{0,120}?\\)[\\s\\S]{0,60}?enemies\\.push\\s*\\(\\s*new\\s+Enemy",

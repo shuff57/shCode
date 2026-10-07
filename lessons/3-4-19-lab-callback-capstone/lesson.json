@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "Helper defined",
-      "description": "A function is defined that accepts an array and a test function",
+      "description": "A function is defined that accepts an array and a test function. Help: 3.4.11 (Passing a Function to a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*\\w+\\s*\\)",
@@ -43,7 +43,7 @@
     {
       "id": "r2",
       "title": "for loop present",
-      "description": "Code contains a for loop",
+      "description": "Code contains a for loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(",
@@ -53,17 +53,17 @@
     {
       "id": "r3",
       "title": "Callback called inside the helper",
-      "description": "The test function parameter is called inside the helper",
+      "description": "The test function parameter is called inside the helper. Help: 3.4.11 (Passing a Function to a Function)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\w+\\s*\\(",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*(\\w+)\\s*\\)[\\s\\S]*?\\b\\1\\s*\\(",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r4",
       "title": "At least two inline arrows passed",
-      "description": "Two arrow functions appear in the file",
+      "description": "Two arrow functions appear in the file. Help: 3.4.6 (Arrow Functions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "=>[\\s\\S]*=>",
@@ -73,7 +73,7 @@
     {
       "id": "r5",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 3.4.11 (Passing a Function to a Function)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

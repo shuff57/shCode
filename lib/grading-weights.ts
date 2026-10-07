@@ -129,8 +129,6 @@ export function weightedGradePercent(
   }
   if (totalWeight === 0) return 0;
   return Math.round(weightedSum / totalWeight);
-  if (totalWeight === 0) return 0;
-  return Math.round(weightedSum / totalWeight);
 }
 
 // One lesson's completion as a 0-100 percent. Isomorphic, so the student's

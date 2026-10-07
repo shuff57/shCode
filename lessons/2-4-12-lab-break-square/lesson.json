@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "while (true) loop present",
-      "description": "n is declared and set to 1",
+      "description": "n is declared and set to 1. Help: 2.4.9 (Leaving Early with break)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|var|const)\\s+n\\s*=\\s*1\\b",
@@ -38,17 +38,17 @@
     {
       "id": "r2",
       "title": "break present",
-      "description": "Inside the while (true) loop, n * n is compared to 50 and break runs when it is greater, with console.log also inside that check",
+      "description": "Inside the while (true) loop, n * n is compared to 50 and break runs when it is greater, with console.log also inside that check. Help: 2.4.9 (Leaving Early with break)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(\\s*\\(?\\s*true\\s*\\)?\\s*\\)\\s*\\{[\\s\\S]*?if\\s*\\([^)]*n\\s*\\*\\s*n\\s*>\\s*50[^)]*\\)\\s*\\{(?=[^{}]*console\\.log)(?=[^{}]*\\bbreak\\b)[^{}]*\\}[\\s\\S]*?\\}",
+      "pattern": "while\\s*\\(\\s*\\(?\\s*true\\s*\\)?\\s*\\)\\s*\\{[\\s\\S]*?if\\s*\\(\\s*\\(?[^)]*n\\s*\\*\\s*n\\s*>\\s*50[^)]*\\)\\s*\\)?\\s*\\{(?=(?:[^{}]|\\$\\{[^}]*\\})*console\\.log)(?=(?:[^{}]|\\$\\{[^}]*\\})*\\bbreak\\b)(?:[^{}]|\\$\\{[^}]*\\})*\\}[\\s\\S]*?\\}",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "console.log present",
-      "description": "Code calls console.log",
+      "description": "Code calls console.log. Help: 2.4.9 (Leaving Early with break)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "Object declared",
-      "description": "Declares an object with curly braces",
+      "description": "Declares an object with curly braces. Help: 3.8.6 (What Does Not Survive)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\{",
@@ -43,17 +43,17 @@
     {
       "id": "r2",
       "title": "A function value in the object",
-      "description": "One property's value is a function",
+      "description": "One property's value is a function. Help: 3.8.6 (What Does Not Survive)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\s*:\\s*function\\s*\\(",
+      "pattern": "\\w+\\s*:\\s*(?:function\\s*\\(|\\([^)]*\\)\\s*=>|[A-Za-z_$][\\w$]*\\s*=>)",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "JSON.stringify used",
-      "description": "Calls JSON.stringify on the object",
+      "description": "Calls JSON.stringify on the object. Help: 3.8.4 (JSON.stringify — Object to Text)",
       "type": "regex",
       "file": "script.js",
       "pattern": "JSON\\.stringify\\s*\\(",
@@ -63,7 +63,7 @@
     {
       "id": "r4",
       "title": "Result logged",
-      "description": "Calls console.log on the stringified value",
+      "description": "Calls console.log on the stringified value. Help: 3.8.6 (What Does Not Survive)",
       "type": "regex",
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",

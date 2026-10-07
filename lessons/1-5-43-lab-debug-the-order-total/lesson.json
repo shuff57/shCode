@@ -19,12 +19,12 @@
     {
       "id": "s2",
       "title": "Add labelled prints",
-      "instructions": "Print each intermediate value with a label: subtotal, discount, taxed, so you can see where the numbers stop matching your expectation."
+      "instructions": "Print each intermediate value with a label: subtotal, discounted, tax, so you can see where the numbers stop matching your expectation."
     },
     {
       "id": "s3",
       "title": "Fix all three bugs",
-      "instructions": "There are three. One is an operator, one is a quantity that was never used, and one applies a percentage the wrong way round."
+      "instructions": "There are three, and all three are a wrong operator: one in the subtotal, one in the discounted amount, and one in the final total."
     },
     {
       "id": "s4",
@@ -41,7 +41,7 @@
     {
       "id": "r1",
       "title": "subtotal multiplies price by quantity",
-      "description": "The quantity is actually used, with multiplication",
+      "description": "The quantity is actually used, with multiplication. Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
       "pattern": "subtotal\\s*=[^;]*unitPrice[^;]*\\*[^;]*quantity|subtotal\\s*=[^;]*quantity[^;]*\\*[^;]*unitPrice",
@@ -51,17 +51,17 @@
     {
       "id": "r2",
       "title": "The discount is subtracted",
-      "description": "The discounted amount is the subtotal minus the discount, not plus",
+      "description": "The discounted amount is the subtotal minus the discount, not plus. Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "=\\s*subtotal\\s*-\\s*",
+      "pattern": "=\\s*subtotal\\s*(?:-\\s*|\\*\\s*\\(\\s*1\\s*-\\s*)",
       "flags": "",
       "points": 0
     },
     {
       "id": "r3",
       "title": "Tax is added to the discounted amount",
-      "description": "The final total adds tax rather than subtracting it",
+      "description": "The final total adds tax rather than subtracting it. Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
       "pattern": "total\\s*=[^;]*\\+[^;]*tax",
@@ -71,20 +71,20 @@
     {
       "id": "r4",
       "title": "At least three labelled prints",
-      "description": "Three or more console.log calls whose text includes a label (string concatenation or a template literal both count)",
+      "description": "Three or more console.log calls whose text includes a label (string concatenation or a template literal both count). Help: 1.5.41 (Debugging with console.log)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?console\\.log\\s*\\(\\s*(?:[\"'][^\"']+[\"']\\s*\\+|`[^`]*\\$\\{)){3}",
+      "pattern": "(?:[\\s\\S]*?console\\.log\\s*\\(\\s*(?:[\"'`][^\"'`]+[\"'`]\\s*[+,]|`[^`]*\\$\\{)){3}",
       "flags": "",
       "points": 0
     },
     {
       "id": "r5",
       "title": "A PASS/FAIL check is present",
-      "description": "An if/else comparing the total against the expected value and printing PASS or FAIL",
+      "description": "An if/else comparing the total against the expected value and printing PASS or FAIL. Help: 1.5.40 (Testing and Test Cases)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?=[\\s\\S]*if\\s*\\()(?=[\\s\\S]*[\"']PASS)(?=[\\s\\S]*[\"']FAIL)[\\s\\S]*",
+      "pattern": "(?=[\\s\\S]*if\\s*\\()(?=[\\s\\S]*[\"'`]PASS)(?=[\\s\\S]*[\"'`]FAIL)[\\s\\S]*",
       "flags": "",
       "points": 0
     }

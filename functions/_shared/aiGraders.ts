@@ -2,8 +2,12 @@
 //
 // The rubric and prompt are declared to the model as trusted teacher context
 // (see lib/grade-written-core.ts), so they must NOT come from the request body.
-// They are read here from public/ai-graders.json, baked at build time by
-// scripts/generate-ai-graders.mjs.
+// They are read from ai-graders.generated.ts, baked at build time by
+// scripts/generate-ai-graders.mjs and bundled into this worker.
+//
+// It is deliberately NOT a static asset. It used to be public/ai-graders.json,
+// which anyone could fetch without logging in, and it holds the rubric (and so
+// the answers) for the chapter tests. A bundled module has no URL.
 //
 // Unlike the sibling-gate manifest in lessonAccess.ts, which fails OPEN so an
 // asset hiccup can't lock students out of lessons, this fails CLOSED: a lookup
@@ -11,6 +15,8 @@
 // copy. Falling back is the exact hole this module exists to close.
 
 import type { RubricItem } from '../../lib/grade-written-core';
+import type { DiagramGate, DiagramRule } from '../../lib/diagram-types';
+import { AI_GRADERS } from './ai-graders.generated';
 
 export interface AiGraderConfig {
   lessonTitle: string;
@@ -18,32 +24,30 @@ export interface AiGraderConfig {
   rubric: RubricItem[];
   model?: string;
   contextDocs?: string[];
+  /** Graded test part: the strict marking framing instead of the lenient default. */
+  strict?: boolean;
+  /**
+   * A flowchart part's own structural rules (lesson.diagram.rules), so the server can recompute the
+   * checks it keeps beside a graded chart instead of trusting the browser's. Not secret: the page
+   * shows the same list to the student. Absent = DEFAULT_RULES.
+   */
+  diagramRules?: DiagramRule[];
+  /**
+   * Hybrid chart: relevance gate (lib/diagram-score.ts). SERVER ONLY, like each rubric item's
+   * `check`: both are copied here from diagram.aiGrader by generate-ai-graders.mjs and stripped
+   * from the browser's copy by lib/quiz-redact.ts.
+   */
+  gate?: DiagramGate;
 }
 
-interface GraderEnv {
-  ASSETS?: Fetcher;
-}
-
-let cache: Record<string, AiGraderConfig> | null = null;
-
+// `env` and `request` are no longer needed (there is nothing to fetch) but the
+// signature stays so the caller does not change.
 export async function loadAiGrader(
-  env: GraderEnv,
-  request: Request,
+  _env: unknown,
+  _request: Request,
   lessonId: string,
 ): Promise<AiGraderConfig | null> {
-  if (!cache) {
-    const url = new URL(request.url);
-    url.pathname = '/ai-graders.json';
-    url.search = '';
-    try {
-      const res = env.ASSETS
-        ? await env.ASSETS.fetch(new Request(url.toString()))
-        : await fetch(url.toString());
-      if (!res.ok) return null;
-      cache = (await res.json()) as Record<string, AiGraderConfig>;
-    } catch {
-      return null;
-    }
-  }
-  return cache[lessonId] || null;
+  // Own properties only: a lessonId of "__proto__" or "constructor" must not
+  // resolve to something off Object.prototype.
+  return Object.prototype.hasOwnProperty.call(AI_GRADERS, lessonId) ? AI_GRADERS[lessonId] : null;
 }

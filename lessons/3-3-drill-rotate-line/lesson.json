@@ -1,0 +1,180 @@
+{
+  "id": "3-3-drill-rotate-line",
+  "title": "3.3.9 Lab: rotate(items)",
+  "description": "Write rotate(items): the first item goes to the back of the array and the function returns the array. Practice with shift and push, not graded: the checks call your function.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.3 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Take the first item off the front",
+      "instructions": "Inside rotate, remove the first item with items.shift() and keep it in a variable (3.3.7). The shell of the function is given: items is a parameter that holds the whole array."
+    },
+    {
+      "id": "s2",
+      "title": "Put it on the back",
+      "instructions": "Add that same item to the end of the array with items.push() (3.3.2)."
+    },
+    {
+      "id": "s3",
+      "title": "Return the array",
+      "instructions": "Return items with return. rotate works on the array you give it, the same way the queue lab worked on line, and returning it lets the caller use the result too."
+    },
+    {
+      "id": "s4",
+      "title": "Call it",
+      "instructions": "Call rotate on an array of three names and console.log what comes back."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "rotate is defined with one parameter",
+      "description": "Code defines a function named rotate with exactly one parameter. Help: 3.3.7 (Adding and Removing from the Front)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+rotate\\s*\\(\\s*[\\w$]+\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Keep the header function rotate(items) as it is."
+    },
+    {
+      "id": "r2",
+      "title": "rotate takes the first item off with shift",
+      "description": "rotate calls .shift() in its body. Help: 3.3.7 (Adding and Removing from the Front)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "rotate",
+      "pattern": "\\.shift\\s*\\(\\s*\\)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "The first item comes off the front with .shift(), written after the array's name."
+    },
+    {
+      "id": "r3",
+      "title": "rotate hands the array back with return",
+      "description": "rotate contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "rotate",
+      "pattern": "\\breturn\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "The last line of rotate should return the array."
+    },
+    {
+      "id": "t1",
+      "title": "rotate moves the first item to the back",
+      "description": "rotate(items) gives back the same items with the first one moved to the end, and every item still there. Help: 3.3.7 (Adding and Removing from the Front)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "rotate",
+      "points": 0,
+      "hint": "Every item must still be there afterwards, with the first one now last: [1, 2, 3] becomes [2, 3, 1]. If one is missing, you took it off but never put it back. If the order is wrong, check you used shift (front) to remove and push (back) to add.",
+      "cases": [
+        {
+          "args": [
+            [
+              "ana",
+              "bob",
+              "cy"
+            ]
+          ],
+          "expect": [
+            "bob",
+            "cy",
+            "ana"
+          ]
+        },
+        {
+          "args": [
+            [
+              1,
+              2
+            ]
+          ],
+          "expect": [
+            2,
+            1
+          ]
+        },
+        {
+          "args": [
+            [
+              "solo"
+            ]
+          ],
+          "expect": [
+            "solo"
+          ],
+          "description": "a line of one"
+        },
+        {
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          ],
+          "expect": [
+            2,
+            3,
+            4,
+            5,
+            1
+          ]
+        },
+        {
+          "args": [
+            [
+              "a",
+              "a",
+              "b"
+            ]
+          ],
+          "expect": [
+            "a",
+            "b",
+            "a"
+          ],
+          "description": "a repeated item"
+        },
+        {
+          "args": [
+            [
+              10,
+              20,
+              30,
+              40
+            ]
+          ],
+          "expect": [
+            20,
+            30,
+            40,
+            10
+          ],
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

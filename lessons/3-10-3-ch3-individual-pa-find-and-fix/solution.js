@@ -15,15 +15,18 @@ const priceList = [
 
 // BUG 2 — runtime: the file was valid and started, then stopped.
 // priceList.length is 3 and the last index is 2; indexing with length
-// reads one past the end and throws "Cannot read properties of
-// undefined". Fix: length - 1, or .at(-1) from 3.3.2.
+// reads one past the end and gives undefined (no error yet). The crash
+// comes one line later, at lastItem.name: "Cannot read properties of
+// undefined (reading 'name')". Fix: length - 1.
 const lastItem = priceList[priceList.length - 1];
 
-// BUG 3 — logic: the program ran to the end and printed undefined for
-// every line. The arrow has a block body, and a block body returns
-// undefined unless it says return (3.4.8) -- the built string was
-// thrown away and map collected nothing but undefineds. Fix: say
-// return, or drop the braces.
+// BUG 3 — logic: the program ran to the end and printed one undefined
+// where the three receipt lines should be. Two returns are missing. The
+// outer arrow has a block body and never returns the mapped array (3.2.14),
+// so receiptLines(...) is undefined. The inner arrow also has a block body
+// that never says return (3.4.8), so the built string is thrown away and
+// map would have collected only undefineds. Fix: say return in both places,
+// or drop the braces on the inner one.
 const receiptLines = (list) => {
   return list.map((item) => {
     return item.name + " — $" + item.price;
@@ -33,7 +36,8 @@ const receiptLines = (list) => {
 // BUG 4 — logic: the "backup" changed the item it was handed and then
 // returned it, so there was no backup at all -- both names held the
 // same object and the sale had already happened (3.6.3). The report
-// printed $0.2 for both. Fix: build the copy with spread first
+// printed $0.19999999999999996 for both (1.2 - 1 is not exactly 0.2 in
+// floating point; that long decimal is expected, not a bug to fix). Fix: build the copy with spread first
 // (3.7.15), then change the copy.
 function backupWithSale(item) {
   return { ...item, price: item.price - 1 };
