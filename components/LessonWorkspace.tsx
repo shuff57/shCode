@@ -20,6 +20,7 @@ import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-
 import type { ModelDoc } from '../lib/model-types';
 
 import { RUN_MAX_LOGS, RUN_TIMEOUT_MS, errorWithLocation, lineColOf, runStudentCode } from '../lib/js-runner-source';
+import { jobsFromRequirements, type TestRunResults } from '../lib/test-harness-source';
 import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
@@ -365,6 +366,8 @@ export default function LessonWorkspace({
   // tab and cost them everything they had typed. That guarantee is also why
   // prompt() is bridged rather than moved into a frame: see
   // lib/js-runner-source.ts.
+  const testRunRef = useRef<TestRunResults | null>(null);
+
   function runCode() {
     setRuntimeError(null);
     const scriptContent = files['script.js'] || '';
@@ -408,6 +411,9 @@ export default function LessonWorkspace({
       return;
     }
 
+    // `tests` requirements ride along on this one run (lib/test-harness-source.ts).
+    const testJobs = jobsFromRequirements(lesson.requirements);
+    testRunRef.current = null;
     const run = runStudentCode(
       scriptContent,
       (d) => {
@@ -415,6 +421,10 @@ export default function LessonWorkspace({
           logs.push({ type: d.type || 'log', message: d.message || '', timestamp: time() });
           return;
         }
+        // A run given `tests` jobs reports one result per `tests` requirement
+        // on its last message. Stored in a ref, not state: finish() grades from
+        // a timer, and a closure over state would grade the previous run.
+        if (d.tests) testRunRef.current = d.tests;
         if (d.kind === 'error') {
           // issue #25: a line/col parsed out of the run's own stack (see
           // lib/js-runner-source.ts) rides along on the message. This console
@@ -426,7 +436,21 @@ export default function LessonWorkspace({
         }
         finish();
       },
-      () => {
+      (info) => {
+        if (info.tests) testRunRef.current = info.tests;
+        // The script finished and one of the `tests` cases then ran too long:
+        // that is the function's loop, not the Run's, so it is reported against
+        // the requirement (the card names the call) and the console, and does
+        // not raise the run-error banner or gate Submit twice.
+        if (info.phase === 'case') {
+          logs.push({
+            type: 'error',
+            message: 'One of the checks on your function did not finish, so it was stopped. That usually means a loop inside the function never reaches its stopping point.',
+            timestamp: time(),
+          });
+          finish();
+          return;
+        }
         // On a summative part the stop message reports the stop only. The
         // practice-path message names the repair ("check that the value in the
         // condition actually changes"), which on 2.7.3's while-continue bug is
@@ -451,6 +475,7 @@ export default function LessonWorkspace({
         // this one printed. Drop it rather than showing every line twice.
         logs.length = 0;
       },
+      { tests: testJobs },
     );
     runRef.current = run;
   }
@@ -581,7 +606,7 @@ export default function LessonWorkspace({
   // reads `latestModelDoc`, which ReshapeStudio keeps current independent of
   // the (debounced, <=300ms) script.js text sync.
   function runTests() {
-    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals };
+    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals, testResults: testRunRef.current };
     const report = grade(
       lesson.requirements,
       files,
@@ -607,7 +632,7 @@ export default function LessonWorkspace({
   }
 
   const runClientGrade = useCallback(() => {
-    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals };
+    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals, testResults: testRunRef.current };
     const report = grade(
       lesson.requirements,
       files,

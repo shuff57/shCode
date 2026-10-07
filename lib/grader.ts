@@ -1,6 +1,7 @@
 import type { Requirement } from './types';
 import type { ModelDoc } from './model-types';
 import { checkModel, type Refusals } from './model-check';
+import type { TestRunResults } from './test-harness-source';
 
 /** The reSHape ModelDoc a `model` requirement checks against. Optional and
  *  last so every existing caller — which passes only
@@ -12,6 +13,12 @@ export interface GradeContext {
   /** Feature ids the kernel refused to build, with its reason; a refused
    *  feature does not count towards a `model` requirement. */
   refusals?: Refusals | null;
+  /** What the last Run's `tests` cases found (lib/test-harness-source.ts). Kept
+   *  out of grade() itself so grade() stays synchronous: running the student's
+   *  code is async and belongs to the runner. Absent, a `tests` requirement
+   *  fails with "run your code"; present but made from different code than
+   *  files[req.file || 'script.js'], it fails as stale. */
+  testResults?: TestRunResults | null;
 }
 
 interface GradeResult {
@@ -220,6 +227,7 @@ export function grade(
     const type = req.type || 'regex';
     let passed = false;
     let modelMessage: string | null = null;
+    let testMessage: string | null = null;
 
     switch (type) {
       case 'regex':
@@ -235,6 +243,22 @@ export function grade(
         break;
       case 'custom':
         passed = false;
+        break;
+      case 'tests':
+        {
+          const tr = context?.testResults;
+          const res = tr?.byId[req.id];
+          if (!tr) {
+            testMessage = 'Press Run so your code can be checked.';
+          } else if (tr.code !== (files[req.file || 'script.js'] ?? '')) {
+            testMessage = 'You changed your code since the last run. Press Run again to check it.';
+          } else if (!res) {
+            testMessage = 'This check has not run yet. Press Run again.';
+          } else {
+            passed = res.status === 'passed';
+            if (!passed) testMessage = res.message ?? 'A check failed.';
+          }
+        }
         break;
       case 'model':
         {
@@ -258,7 +282,7 @@ export function grade(
       // why, so a correct-looking answer that missed by one token read as
       // the grader being arbitrary (issue report #9). Both renderers
       // already handled `messages`; nothing ever filled it.
-      messages: passed ? [] : [...(modelMessage ? [modelMessage] : []), ...(req.hint ? [req.hint] : [])],
+      messages: passed ? [] : [...(modelMessage ? [modelMessage] : []), ...(testMessage ? [testMessage] : []), ...(req.hint ? [req.hint] : [])],
       pointsEarned: passed ? points : 0,
       pointsPossible: points,
     };

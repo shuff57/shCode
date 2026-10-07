@@ -72,15 +72,18 @@ let failures = 0;
 try {
   execFileSync(process.execPath, [
     path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-    'lib/grader.ts', '--outDir', out, '--module', 'commonjs',
+    'lib/run-tests-node.ts', '--outDir', out, '--module', 'commonjs',
     '--target', 'es2022', '--skipLibCheck',
   ], { cwd: root, stdio: 'inherit' });
   writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
-  const { grade } = createRequire(import.meta.url)(
-    path.join(out, 'grader.js').replace(/\\/g, '/'));
+  // gradeWithTests also runs a lesson's runtime `tests` cases (lib/run-tests-node.ts),
+  // so "the reference passes ALL requirements" includes them and "the starter does
+  // not" is measured on them too. For a lesson with none it is plain grade().
+  const { gradeWithTests } = createRequire(import.meta.url)(
+    path.join(out, 'run-tests-node.js').replace(/\\/g, '/'));
 
-  const passed = (reqs, files) =>
-    grade(reqs, files, 0).results.filter((r) => r.status === 'passed').length;
+  const passed = async (reqs, files) =>
+    (await gradeWithTests(reqs, files, 0)).results.filter((r) => r.status === 'passed').length;
 
   let checked = 0;
   const noReference = [];
@@ -101,16 +104,16 @@ try {
     if (!starter) { noStarter.push(id); continue; }
     checked++;
 
-    const refScore = passed(reqs, ref);
+    const refScore = await passed(reqs, ref);
     if (refScore !== reqs.length) {
       failures++;
-      const failing = grade(reqs, ref, 0).results
+      const failing = (await gradeWithTests(reqs, ref, 0)).results
         .filter((r) => r.status === 'failed').map((r) => r.id).join(', ');
       console.error(`FAIL ${id}\n     reference scores ${refScore}/${reqs.length}`
         + ` — its own answer fails: ${failing}`);
     }
 
-    const starterScore = passed(reqs, starter);
+    const starterScore = await passed(reqs, starter);
     if (starterScore === reqs.length) {
       failures++;
       console.error(`FAIL ${id}\n     the untouched starter scores ${reqs.length}/${reqs.length}`

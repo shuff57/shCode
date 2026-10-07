@@ -32,6 +32,8 @@ export const RUN_TIMEOUT_MS = 3000;
 // the exact failure the Worker exists to prevent.
 export const RUN_MAX_LOGS = 1000;
 
+import { TEST_HARNESS_SOURCE, createTestSession, type TestJob, type TestRunResults } from './test-harness-source';
+
 // The Function constructor's preamble is exactly two lines (see the parse in
 // RUNNER_SOURCE), so a V8 stack line is the student's line + 2.
 const FUNCTION_PREAMBLE_LINES = 2;
@@ -56,6 +58,9 @@ export interface RunnerRequest {
   code: string;
   answers?: string[];
   attempt?: number;
+  /** Runtime test cases (lib/test-harness-source.ts): run after the script,
+   *  from the runner's own closure, tagged with a nonce the script never sees. */
+  tests?: { jobs: TestJob[]; nonce: string };
 }
 
 // What a host gets back. `needs-input` is the prompt handshake; `attempt` is on
@@ -69,6 +74,17 @@ export interface RunnerMessage {
   name?: string;
   line?: number | null;
   col?: number | null;
+  /** On the final message of a run that was given test jobs: one result per
+   *  `tests` requirement. Absent when the run was not asked to test. */
+  tests?: TestRunResults;
+}
+
+/** What the host's kill timer reports. `phase: 'case'` means the script itself
+ *  finished and one test case then ran too long; `tests` carries every result
+ *  gathered up to that point, the case that hung marked as not finished. */
+export interface RunTimeout {
+  phase: 'run' | 'case';
+  tests?: TestRunResults;
 }
 
 // The no-Worker fallback (very old browsers) runs `new Function` on the main
@@ -111,22 +127,49 @@ export function lineColOf(err: unknown): { line: number | null; col: number | nu
 export function runStudentCode(
   code: string,
   onMessage: (m: RunnerMessage) => void,
-  onTimeout: () => void,
+  onTimeout: (info: RunTimeout) => void,
   onSuperseded: () => void,
+  opts?: { tests?: TestJob[] },
 ): { kill: () => void } {
   const url = URL.createObjectURL(new Blob([RUNNER_SOURCE], { type: 'text/javascript' }));
   const worker = new Worker(url);
   const answers: string[] = [];
   let attempt = 1;
 
-  const killer = setTimeout(onTimeout, RUN_TIMEOUT_MS);
+  // Test jobs (see lib/test-harness-source.ts). Each attempt gets a fresh
+  // session and so a fresh nonce: a prompt() restart re-sends the request, and
+  // a listener the script left behind must not be able to reuse an old one.
+  const jobs = opts?.tests && opts.tests.length ? opts.tests : null;
+  let session = jobs ? createTestSession(jobs) : null;
+
+  let killer: ReturnType<typeof setTimeout>;
   const cleanup = () => {
     clearTimeout(killer);
     worker.terminate();
     URL.revokeObjectURL(url);
   };
+  // The kill timer terminates the Worker itself, then tells the caller. A
+  // case-phase timer is re-armed per test case, so a hung case is reported
+  // against its own budget and the results that already came in survive.
+  const arm = (ms: number) => {
+    clearTimeout(killer);
+    killer = setTimeout(() => {
+      const phase = session && session.inCasePhase() ? 'case' : 'run';
+      const tests = session ? session.finish('timeout', code) : undefined;
+      cleanup();
+      onTimeout({ phase, tests });
+    }, ms);
+  };
+  arm(RUN_TIMEOUT_MS);
 
   worker.onmessage = (e: MessageEvent) => {
+    if (session) {
+      const r = session.accept(e.data);
+      if (r.consumed) {
+        if (r.armMs) arm(r.armMs);
+        return;
+      }
+    }
     const d = e.data as RunnerMessage;
     // A newer attempt supersedes everything printed by the one before it.
     if (d.attempt && d.attempt !== attempt) {
@@ -141,26 +184,31 @@ export function runStudentCode(
       // of turning a dismissed dialog into a crash.
       answers.push(window.prompt(d.message || '') ?? '');
       attempt += 1;
-      worker.postMessage({ code, answers: answers.slice(), attempt } satisfies RunnerRequest);
+      if (jobs) session = createTestSession(jobs);
+      worker.postMessage({ code, answers: answers.slice(), attempt, tests: session?.payload } satisfies RunnerRequest);
       return;
     }
     // A log is not the end of the run. Only `done`, `error` and `needs-input`
     // are, and needs-input has returned above -- so anything that is not a log
     // tears the worker down. Getting this wrong kills the run after its first
     // line, which shows the student an empty panel and no clue why.
+    if (session && d.kind === 'done') d.tests = session.finish('done', code);
+    else if (session && d.kind === 'error') d.tests = session.finish('error', code);
     onMessage(d);
     if (d.kind !== 'log') cleanup();
   };
   worker.onerror = (e: ErrorEvent) => {
+    const tests = session ? session.finish('error', code) : undefined;
     cleanup();
-    onMessage({ kind: 'error', message: e.message || 'Error' });
+    onMessage({ kind: 'error', message: e.message || 'Error', tests });
   };
 
-  worker.postMessage({ code, answers: [], attempt } satisfies RunnerRequest);
+  worker.postMessage({ code, answers: [], attempt, tests: session?.payload } satisfies RunnerRequest);
   return { kill: cleanup };
 }
 
 export const RUNNER_SOURCE = `
+${TEST_HARNESS_SOURCE}
 const MAX = ${RUN_MAX_LOGS};
 let sent = 0;
 // Which pass of the script this is. A prompt() answer restarts the run, so the
@@ -266,7 +314,18 @@ self.onmessage = (e) => {
     codeText = req.code;
     const runStudent = new Function(codeText); // a compile error is thrown HERE, before any student line runs
     compiled = true;
-    runStudent(); // student code execution (educational tool)
+    // With test jobs, the SAME script is compiled once more with a trailing
+    // statement that returns its functions, and that copy is the one run: the
+    // script still runs exactly once, so its output and side effects are
+    // unchanged. If the extra statement will not compile (a stray top-level
+    // return, say) the plain copy runs and the checks report "did not run".
+    const tj = req.tests && Array.isArray(req.tests.jobs) && typeof req.tests.nonce === 'string' ? req.tests : null;
+    let withTests = null;
+    if (tj) {
+      try { withTests = new Function(codeText + '\\n;' + __testLookupSource(tj.jobs)); } catch (_) { withTests = null; }
+    }
+    const fns = (withTests || runStudent)(); // student code execution (educational tool)
+    if (tj && withTests) __runTestJobs(tj.jobs, fns, tj.nonce);
     self.postMessage({ kind: 'done', attempt });
   } catch (err) {
     if (err === NEEDS_INPUT) {

@@ -39,7 +39,7 @@ export type FileHistory = Record<string, Version[]>;
 // ---- Lessons & Assignments ----
 
 type LessonType = 'lesson' | 'assignment' | 'project' | 'example' | 'challenge';
-type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom' | 'model';
+type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom' | 'model' | 'tests';
 
 interface Step {
   id: string;
@@ -87,6 +87,33 @@ export interface Requirement {
   /** type: 'model' only. Absolute tolerance for numeric field comparisons.
    *  Defaults to 0.01 (see lib/model-check.ts). */
   tolerance?: number;
+  /** type: 'tests' only. The cases to run against the student's function
+   *  `function` (a name, not a list); see lib/test-harness-source.ts. */
+  cases?: TestCase[];
+  /** type: 'tests' only. Per-case time budget in ms (default 1000, max 10000);
+   *  a case still running when it ends is stopped and reported "did not finish".
+   *  `tolerance` (above) is the allowed numeric difference, default 1e-9. */
+  timeout?: number;
+}
+
+/** One runtime case of a `tests` requirement. Pure JSON: undefined, NaN,
+ *  Infinity and -0 are written {"$":"undefined"} / {"$":"NaN"} / {"$":"Infinity"}
+ *  / {"$":"-Infinity"} / {"$":"-0"}. */
+export interface TestCase {
+  /** Arguments for the call; fresh copies are built for every case. */
+  args?: unknown[];
+  /** The value the call must return. Omit to not check the return value. */
+  expect?: unknown;
+  /** Lines the call must print with console.log (one entry per line). */
+  expectOutput?: string[];
+  /** Argument index (or indexes) that must be unchanged after the call. */
+  unchanged?: number | number[];
+  /** Expected final value of arguments after the call, keyed by index: {"0": [1,2,3]}. */
+  after?: Record<string, unknown>;
+  /** Failure says only "A hidden check failed." with no values. */
+  hidden?: boolean;
+  /** Short words for the case, appended to the call in the failure message. */
+  description?: string;
 }
 
 export interface Grading {
