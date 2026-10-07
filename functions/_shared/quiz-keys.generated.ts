@@ -320,7 +320,7 @@ export const QUIZ_KEYS: Record<string, QuizKey> = {
           "id": "a-t1-no-return",
           "answer": 0,
           "optionText": "undefined",
-          "explanation": "setup builds label but has no return (3.2.11), so the call evaluates to undefined and that is what prints. The label exists only inside the function and vanishes when the function ends.",
+          "explanation": "setup builds label but has no return (3.2.14), so the call evaluates to undefined and that is what prints. The label exists only inside the function and vanishes when the function ends.",
           "variant": "a"
         },
         {
@@ -355,7 +355,7 @@ export const QUIZ_KEYS: Record<string, QuizKey> = {
           "id": "b-t1-no-return",
           "answer": 0,
           "optionText": "undefined",
-          "explanation": "Same shape, different values: greeting builds line but returns nothing (3.2.11), so the call is undefined and undefined is what prints.",
+          "explanation": "Same shape, different values: greeting builds line but returns nothing (3.2.14), so the call is undefined and undefined is what prints.",
           "variant": "b"
         },
         {
@@ -390,7 +390,7 @@ export const QUIZ_KEYS: Record<string, QuizKey> = {
           "id": "c-t1-no-return",
           "answer": 0,
           "optionText": "undefined",
-          "explanation": "tag builds text and returns nothing (3.2.11), so out is undefined and undefined is what prints. Printing inside would not have helped: the caller would still receive undefined.",
+          "explanation": "tag builds text and returns nothing (3.2.14), so out is undefined and undefined is what prints. Printing inside would not have helped: the caller would still receive undefined.",
           "variant": "c"
         },
         {
