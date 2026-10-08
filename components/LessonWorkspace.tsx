@@ -20,6 +20,7 @@ import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-
 import type { ModelDoc } from '../lib/model-types';
 
 import { RUN_MAX_LOGS, RUN_TIMEOUT_MS, errorWithLocation, lineColOf, runStudentCode } from '../lib/js-runner-source';
+import { RequirementBatcher } from '../lib/requirement-batch';
 import { jobsFromRequirements, type TestRunResults } from '../lib/test-harness-source';
 import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
@@ -368,6 +369,57 @@ export default function LessonWorkspace({
   // lib/js-runner-source.ts.
   const testRunRef = useRef<TestRunResults | null>(null);
 
+  // "Most missed requirement" tracking (POST /api/requirement-events, lib/requirement-batch.ts).
+  // Best effort and invisible: batched in the browser, sent at most every 20 s and on page hide or
+  // unmount, silent on any error, never read by grading, completion or Submit. Students only, and
+  // only on a console lab that has requirements.
+  const reqBatcherRef = useRef<RequirementBatcher | null>(null);
+  useEffect(() => {
+    if (!isConsoleMode || !lessonProgress.authed || lessonProgress.role !== 'student' || lesson.requirements.length === 0) return;
+    const b = new RequirementBatcher({
+      lessonId: lesson.id,
+      now: () => Date.now(),
+      send: (payload) => {
+        fetch('/api/requirement-events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          keepalive: true,
+        }).catch(() => { /* best effort */ });
+      },
+    });
+    reqBatcherRef.current = b;
+    const onHide = () => { if (document.visibilityState === 'hidden') b.flush(true); };
+    const onPageHide = () => { b.flush(true); };
+    window.addEventListener('pagehide', onPageHide);
+    document.addEventListener('visibilitychange', onHide);
+    return () => {
+      document.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('pagehide', onPageHide);
+      b.flush(true);
+      if (reqBatcherRef.current === b) reqBatcherRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConsoleMode, lessonProgress.authed, lessonProgress.role, lesson.id]);
+
+  function trackRun(report: ReturnType<typeof grade>) {
+    const b = reqBatcherRef.current;
+    if (!b) return;
+    // An untouched starter fails everything; that is not a student missing a requirement.
+    const starter = flattenFiles(lesson.files).find((f) => f.path === 'script.js');
+    if (starter && normalizeEol(files['script.js'] ?? '') === normalizeEol(starter.content || '')) return;
+    const outcomes = lesson.requirements
+      .filter((r) => {
+        // Same test runTests() uses for "not graded here" (a summative part's stripped pattern).
+        const patternCheck = !r.type || r.type === 'regex' || r.type === 'inFunction';
+        return !(patternCheck && !r.pattern);
+      })
+      .map((r) => ({ reqId: r.id, result: report.results.find((d) => d.id === r.id) }))
+      .filter((o) => o.result)
+      .map((o) => ({ reqId: o.reqId, passed: o.result!.status === 'passed' }));
+    if (outcomes.length > 0) b.record(outcomes);
+  }
+
   function runCode() {
     setRuntimeError(null);
     const scriptContent = files['script.js'] || '';
@@ -379,7 +431,7 @@ export default function LessonWorkspace({
       setRunKey((k) => k + 1);
       setConsoleResetKey((k) => k + 1);
       setConsoleOpen(true);
-      setTimeout(() => runTests(), 200);
+      setTimeout(() => trackRun(runTests()), 200);
     };
 
     // A previous run may still be spinning, or waiting on a dialog; never
@@ -629,6 +681,7 @@ export default function LessonWorkspace({
       })
     );
     setGradeReport(report);
+    return report;
   }
 
   const runClientGrade = useCallback(() => {
