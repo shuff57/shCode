@@ -185,7 +185,9 @@ function DateTimeField({
   };
 
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+    // flexWrap + maxWidth: at phone width the label, calendar, date, time and clear controls are wider than the
+    // row, and a nowrap field pushed the page 23px past the screen.
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, flexWrap: 'wrap', maxWidth: '100%' }}>
       <span style={{ fontSize: 11, color, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
         {label}
       </span>

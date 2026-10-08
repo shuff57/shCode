@@ -16,7 +16,7 @@ copy `public/reshape/kernel` and `pa-pseudocode/*.md`), merge back by fast-forwa
 - [x] **P1 Docs cleanup.** Fix the stale "shift/unshift not covered" row in the 3.3 density table; make the 3.2 and 3.3 module docs (`curriculum/modules/3.2_*.md`, `3.3_*.md`) describe the starter-based array labs and the counted charts A3.2.2 / A3.2.3 (Lab, pass at 80%, done = 100%); make the 3.2 Day 3 note match the real lesson count. Checks: check-lesson-citations, check-slot-map, check-hints, generate-module-docs.
 - [x] **P2 Trim the repeated 3.2.3 lesson.** Cut the duplicated explanation, keep the one example later lessons point to. No id changes, titles stay sequential. Checks: check-lesson-citations, check-help-pointer-titles --only 3.2,3.3, check-lesson-numbers, check-slot-map.
 - [x] **P3 Figures with alt text.** Add figures (the ```flow fence, see `.claude/skills/flowchart-diagrams/SKILL.md`) where a diagram replaces a paragraph in the 3.2 and 3.3 readings; every figure has alt text; check phone width (390px) in a browser on the dev server. Checks: check-flow-figures, check-reachable.
-- [ ] **P4 Due-dates panel overflow.** `components/DueDatesPanel.tsx` rows overflow ~23px at 390px; fix; verify at 390px in a browser.
+- [x] **P4 Due-dates panel overflow.** `components/DueDatesPanel.tsx` rows overflow ~23px at 390px; fix; verify at 390px in a browser.
 - [ ] **P5 Most-missed-requirement view (STOP BEFORE THE MIGRATION).** Build everything locally and test it, then stop and ask the owner:
   - migration `0035`: `requirement_events(student_email, lesson_id, req_id, fails, first_pass_at, updated_at)`, `IF NOT EXISTS`, primary key (student_email, lesson_id, req_id);
   - `POST /api/requirement-events` (student, batched counts per Run, bounded sizes) and a teacher read scoped to the teacher's own class;
@@ -34,3 +34,4 @@ copy `public/reshape/kernel` and `pa-pseudocode/*.md`), merge back by fast-forwa
 - 2026-10-08 P1 docs cleanup: 3.2/3.3 module docs describe the counted charts, starter-based array labs; stale audit rows fixed.
 - 2026-10-08 P2 trim 3.2.3: dropped the duplicated static example and the two-parameter block that 3.2.2 already teaches; live-block snapshot updated.
 - 2026-10-08 P3 figures: flowchart with full-description caption added to 3.2.14 (early return) and 3.3.17 (build a new list); checked at 390px. Skipped 3.3.5 and 3.2.21 on purpose (they would give away the charts students draw).
+- 2026-10-08 P4 due-dates panel: DateTimeField wraps and caps at the row width; with every module expanded the page no longer scrolls sideways at 390px (was 23px over). Seen and left: the lesson-mode chooser (lmc-choices) on the Schedule tab is 14px over at 360px.
