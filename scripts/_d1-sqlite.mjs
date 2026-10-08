@@ -15,11 +15,13 @@ export function compileHandler(entry, outDir) {
   mkdirSync(outDir, { recursive: true });
   const tsc = spawnSync('node', [
     join(root, 'node_modules/typescript/bin/tsc'), join(root, 'functions', entry),
-    '--outDir', outDir, '--rootDir', join(root, 'functions'), '--module', 'commonjs', '--target', 'es2022',
+    '--outDir', outDir, '--rootDir', root, '--module', 'commonjs', '--target', 'es2022',
     '--moduleResolution', 'node', '--skipLibCheck', '--esModuleInterop', '--types', '@cloudflare/workers-types',
   ], { cwd: root, encoding: 'utf8' });
   writeFileSync(join(outDir, 'package.json'), '{"type":"commonjs"}');
-  const js = join(outDir, entry.replace(/\.ts$/, '.js'));
+  // rootDir is the repo root (handlers import ../../lib/*), so output mirrors the repo: <out>/functions/<entry>.
+  // A narrower rootDir makes tsc emit lib/*.js next to the sources, which breaks `next dev`.
+  const js = join(outDir, 'functions', entry.replace(/\.ts$/, '.js'));
   if (!existsSync(js)) throw new Error(`tsc did not emit ${entry}\n${tsc.stdout}${tsc.stderr}`);
   return require(js);
 }
