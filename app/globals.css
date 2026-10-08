@@ -1905,3 +1905,14 @@ details.console > summary::-webkit-details-marker { display: none; }
   white-space: nowrap;
   border: 0;
 }
+
+/* Student gradebook: the long "Practice, not graded" tag is a short "Practice" on a phone. The long
+   text stays in the DOM, visually hidden, so assistive tech still reads the full words. */
+.gb-practice-short { display: none; }
+@media (max-width: 480px) {
+  .gb-practice-short { display: inline; }
+  .gb-practice-full {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+}

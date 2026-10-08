@@ -113,7 +113,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
   // if unauthed or already started/completed, so this is safe to call
   // on every mount.
   useEffect(() => {
-    recordLessonStarted(currentLessonId);
+    recordLessonStarted(currentLessonId, lessons.map((l) => l.id));
   }, [currentLessonId]);
 
   // Publish our own rendered height as a CSS var, the same trick

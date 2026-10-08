@@ -16,6 +16,7 @@ import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
 import { criteriaScore } from '../../lib/grade-pass';
+import { practiceDisplay } from '../../lib/gradebook-cell';
 import { CATEGORY_LABEL, GRADE_CATEGORIES, lessonGradeCategory, lessonPercent, type GradeCategory } from '../../lib/grading-weights';
 import { buildGradesCsv } from '../../lib/grades-csv';
 import { FeedbackProvider, useFeedback } from '../../components/FeedbackProvider';
@@ -730,7 +731,7 @@ function StudentDrawer({
   // submission on file — a free-response answer that did not pass. Without
   // this it fell through to "Not started", which is the opposite of true and
   // worse than the missing row it replaced.
-  function stateBadge(state: 'started' | 'completed' | undefined, submitted = false, missing = false) {
+  function stateBadge(state: 'started' | 'completed' | undefined, submitted = false, missing = false, practice = false) {
     if (!state && !submitted && missing) {
       return (
         <span style={{ background: '#ff5555', color: '#282a36', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }} title="Past its due date and never opened">
@@ -742,6 +743,14 @@ function StudentDrawer({
       return (
         <span style={{ background: '#ffb86c', color: '#282a36', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
           Submitted
+        </span>
+      );
+    }
+    if (state === 'completed' && practice) {
+      // Same rule as the grid and the student's page (practiceDisplay): finished, but it does not count.
+      return (
+        <span style={{ background: 'rgba(80,250,123,0.15)', color: '#8393c4', border: '1px solid #44475a', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }} title="Finished. This lesson is practice and does not count toward the grade.">
+          Done {'\u00b7'} practice (not graded)
         </span>
       );
     }
@@ -853,6 +862,16 @@ function StudentDrawer({
                   const ls = detail.lessonState[lesson.id];
                   const sub = detail.latestSubmissions[lesson.id];
                   const isExpanded = expandedSubs.has(lesson.id);
+                  // A lesson with no grade category does not count: say so instead of "Complete" / "N pts".
+                  // An id with no current lesson.json keeps the counted look (nothing to classify it by).
+                  const meta = lessonMap.get(lesson.id);
+                  const practice =
+                    !!meta &&
+                    !!practiceDisplay(
+                      lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null,
+                      'done',
+                    ) &&
+                    ls?.state === 'completed';
 
                   let gradeData: GradeResponse | null = null;
                   if (sub?.grade_json) {
@@ -889,8 +908,8 @@ function StudentDrawer({
                             </span>
                           )}
                         </span>
-                        {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id))}
-                        {ls?.state === 'completed' && ls.score !== null && (
+                        {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id), practice)}
+                        {ls?.state === 'completed' && !practice && ls.score !== null && (
                           <span style={{ fontSize: 12, color: '#8be9fd', fontFamily: 'monospace', flexShrink: 0 }}>
                             {ls.score} pts
                           </span>
@@ -1315,7 +1334,9 @@ function GradebookView({
   function cellTitle(cell: GradebookCell | undefined, lessonTitle: string, lessonId?: string, maxScore?: number | null, graded = true): string {
     const dueAt = lessonId ? gbData?.dueDates?.[lessonId] : undefined;
     const lines = [lessonTitle, cellWords(cell, maxScore, graded)];
-    if (cell && cell.possible !== null && cell.possible > 0 && cell.submitted_score !== null) {
+    // Practice work reads as practice only: its stored score is a placeholder and a try's number beside
+    // "not graded" invites reading it as a mark. submitted_score is the latest try, so the label is right.
+    if (graded && cell && cell.possible !== null && cell.possible > 0 && cell.submitted_score !== null) {
       lines.push(`Latest try: ${cell.submitted_score} of ${cell.possible}`);
     }
     if (dueAt) lines.push(`Due ${formatDue(dueAt)}`);

@@ -244,6 +244,11 @@ export default function ProgressPage() {
 
 const containerStyle: React.CSSProperties = {
   maxWidth: 960,
+  // body is display:flex, so without width:100% + minWidth:0 this item sizes to its widest child and
+  // pushes the whole page sideways on a phone.
+  width: '100%',
+  minWidth: 0,
+  boxSizing: 'border-box',
   margin: '0 auto',
   padding: '24px 20px 48px',
 };

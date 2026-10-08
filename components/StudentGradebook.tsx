@@ -268,7 +268,7 @@ export default function StudentGradebook({ lessons }: Props) {
             : 'Nothing is missing or late. Everything past its due date is done.'}
         </p>
       ) : (
-        <div style={scrollWrapStyle}>
+        <div style={scrollWrapStyle} tabIndex={0} role="region" aria-label="Assignments table">
           <table style={tableStyle}>
             <thead>
               <tr style={theadRowStyle}>
@@ -340,7 +340,8 @@ export default function StudentGradebook({ lessons }: Props) {
                         )}
                         {practice && (
                           <span style={{ ...chipStyle, borderColor: 'transparent', color: '#8393c4' }} title="This lesson is practice. It does not count toward your grade.">
-                            {practice.tag}
+                            <span className="gb-practice-full">{practice.tag}</span>
+                            <span className="gb-practice-short" aria-hidden="true">Practice</span>
                           </span>
                         )}
                         {category && (
@@ -416,6 +417,7 @@ const cardStyle: React.CSSProperties = {
   borderRadius: 8,
   padding: '20px 24px',
   marginBottom: 20,
+  minWidth: 0,
 };
 
 const headingStyle: React.CSSProperties = {
@@ -448,6 +450,7 @@ const mutedStyle: React.CSSProperties = { opacity: 0.5, fontSize: 14 };
 const scrollWrapStyle: React.CSSProperties = {
   overflowX: 'auto',
   minWidth: 0,
+  maxWidth: '100%',
 };
 
 const tableStyle: React.CSSProperties = {

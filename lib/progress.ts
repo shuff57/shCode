@@ -20,9 +20,8 @@ export interface LessonStateSnapshot {
 
 // Admins and teachers bypass green-to-advance gating in the UI. Used by
 // every lock-rendering component so they share one source of truth.
-export function bypassesLessonLock(role: Role | null): boolean {
-  return role === 'admin' || role === 'teacher';
-}
+export { bypassesLessonLock, isSequenceLocked } from './lesson-lock';
+import { isSequenceLocked } from './lesson-lock';
 
 const empty: LessonStateSnapshot = { loaded: false, authed: false, states: {}, scores: {}, role: null };
 let cache: LessonStateSnapshot = empty;
@@ -88,9 +87,12 @@ async function postState(lessonId: string, state: LessonState, score?: number): 
   }
 }
 
-export async function recordLessonStarted(lessonId: string): Promise<void> {
+export async function recordLessonStarted(lessonId: string, siblingIds?: readonly string[]): Promise<void> {
   await ensureLessonStateLoaded();
   if (!cache.authed) return;
+  // A locked lesson shows the lock panel, and the server refuses to start it (403): do not ask, so the
+  // console stays quiet. The server check is unchanged; this only skips a request known to be refused.
+  if (siblingIds && isSequenceLocked(siblingIds, lessonId, cache.states, cache.role)) return;
   // 'completed' is sticky server-side; skip the POST if we already know it's set.
   if (cache.states[lessonId]) return;
   const ok = await postState(lessonId, 'started');

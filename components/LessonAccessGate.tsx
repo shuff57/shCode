@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { bypassesLessonLock, useLessonState } from '../lib/progress';
+import { bypassesLessonLock, isSequenceLocked, useLessonState } from '../lib/progress';
 import { lessonHref } from '../lib/lesson-href';
 import { formatDue, formatTime, useLessonAvailability } from '../lib/due-dates';
 
@@ -94,10 +94,7 @@ export default function LessonAccessGate({
 
   if (bypassesLessonLock(snap.role)) return <>{children}</>;
 
-  const allPriorComplete = siblings
-    .slice(0, idx)
-    .every((id) => snap.states[id] === 'completed');
-  if (allPriorComplete) return <>{children}</>;
+  if (!isSequenceLocked(siblings, currentLessonId, snap.states, snap.role)) return <>{children}</>;
 
   return (
     <div
