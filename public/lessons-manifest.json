@@ -4585,9 +4585,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
       "assignmentCode": "A3.2.3",
-      "maxScore": 20,
+      "maxScore": null,
       "maxSubmissions": null,
-      "scoreKind": "written"
+      "scoreKind": null
     },
     {
       "id": "3-2-19-lab-compose-functions",
@@ -4780,9 +4780,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
       "assignmentCode": "A3.2.2",
-      "maxScore": 20,
+      "maxScore": null,
       "maxSubmissions": null,
-      "scoreKind": "written"
+      "scoreKind": null
     },
     {
       "id": "3-2-9-reading-return",

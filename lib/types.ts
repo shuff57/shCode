@@ -186,6 +186,9 @@ export interface Grading {
   /** Practice, not graded: a lesson with a weighted rubric (so it still has a pass line) that
    *  must stay out of the course grade. The manifest then carries no scoreKind or maxScore. */
   formative?: boolean;
+  /** Counted, but done = 100%: the pass line decides "done" and the stored score is not the grade.
+   *  A rubric-pointed lesson (a counted flowchart) whose manifest then carries no maxScore. */
+  completionCredit?: boolean;
   /**
    * The lesson's CORRECT answer includes an uncaught runtime error -- 2.5.3
    * asks the student to log an undeclared variable and watch it fail, before

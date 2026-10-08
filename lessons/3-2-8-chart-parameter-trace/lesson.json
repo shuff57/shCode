@@ -141,7 +141,8 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "completionCredit": true
   },
   "steps": [],
   "requirements": []

@@ -322,6 +322,8 @@ check('guard: the four runtime-tested labs carry codes and no try cap; 3.2.8 and
   for (const [id, code] of [['3-2-8-chart-parameter-trace', 'A3.2.2'], ['3-2-18-chart-chained-calls', 'A3.2.3']]) {
     const meta = read(id);
     assert.ok(!meta.grading?.formative, id);
+    assert.equal(meta.grading?.completionCredit, true, id);
+    assert.equal(manifest.get(id).maxScore, null, `${id}: done = 100%`);
     assert.equal(meta.assignmentCode, code, id);
     assert.ok(!meta.diagram?.maxSubmissions && !meta.maxSubmissions, `${id} stays unlimited tries`);
     const m = manifest.get(id);
