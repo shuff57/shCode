@@ -60,9 +60,8 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async 
     // number the browser sent could not be checked, and because a capped score
     // can only rise, a forged one would have been permanent. The stored value
     // still only ever goes up (a failed grade or an unsubmit-less re-completion
-    // leaves it alone). Uncapped lessons keep `score = excluded.score`, because a
-    // formative retake may legitimately replace its score -- but a score must be
-    // a finite number >= 0 there too.
+    // leaves it alone). Uncapped lessons take the browser's score (MAX with the
+    // stored one, see scoreSql); it must be a finite number >= 0.
     const capped = capFor(lessonId) !== undefined;
     const staff = data.role === 'teacher' || data.role === 'admin';
     let score: number | null;
@@ -91,14 +90,17 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async 
     } else {
       return json({ error: 'score must be a finite number between 0 and 100000' }, 400);
     }
-    const scoreSql = capped
-      ? `CASE
+    // Best try counts on EVERY lesson that carries a score (uncapped included): a retake reveals the
+    // explanations, so without MAX a student could lower their own mark with a weaker later pass.
+    // A null new score never erases a stored one (WrittenGrader/QuizView complete with no score), a
+    // teacher's score_override wins, and the teacher reset flows (lesson-unsubmit, tries-reset) write
+    // score = NULL themselves, so the next completion starts fresh.
+    const scoreSql = `CASE
            WHEN lesson_state.score_override IS NOT NULL THEN lesson_state.score_override
            WHEN excluded.score IS NULL THEN lesson_state.score
            WHEN lesson_state.score IS NULL THEN excluded.score
            ELSE MAX(lesson_state.score, excluded.score)
-         END`
-      : 'excluded.score';
+         END`;
     await env.DB.prepare(
       `INSERT INTO lesson_state (student_email, lesson_id, state, started_at, completed_at, score)
        VALUES (?, ?, 'completed', ?, ?, ?)

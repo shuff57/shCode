@@ -29,6 +29,7 @@ import { useFeedback } from './FeedbackProvider';
 import { Calendar, ChevronDown, ChevronRight, X } from 'lucide-react';
 import CalendarPopover from './CalendarPopover';
 import LessonAccessChip from './LessonAccessChip';
+import { lessonGradeCategory } from '../lib/grading-weights';
 import {
   buildDueIndex,
   buildOpenIndex,
@@ -47,6 +48,9 @@ interface ManifestLesson {
   title: string;
   unit: string | null;
   category: string | null;
+  preview?: string | null;
+  scoreKind?: 'quiz' | 'written' | null;
+  assignmentCode?: string | null;
 }
 
 // Both endpoints echo back date + time already split for the inputs, so the
@@ -64,7 +68,7 @@ interface ModuleGroup {
   moduleId: string;   // "1.1"
   label: string;      // "1.1 Software Lifecycle"
   unitId: string;     // "Unit 1: JavaScript Fundamentals"
-  lessons: { id: string; title: string }[];
+  lessons: { id: string; title: string; counts: boolean }[];
 }
 
 interface UnitGroup {
@@ -75,6 +79,8 @@ interface UnitGroup {
 // Which of the two date kinds a control is editing. Every write, index and
 // summary below is parameterised by this rather than duplicated.
 type Kind = 'open' | 'due';
+
+const COUNTS_TEXT = 'Counts toward grade';
 
 const ENDPOINT: Record<Kind, string> = { open: 'open-dates', due: 'due-dates' };
 
@@ -123,7 +129,7 @@ function groupLessons(lessons: ManifestLesson[]): UnitGroup[] {
       group = { moduleId, label: lesson.unit ?? moduleId, unitId, lessons: [] };
       modules.set(key, group);
     }
-    group.lessons.push({ id: lesson.id, title: lesson.title });
+    group.lessons.push({ id: lesson.id, title: lesson.title, counts: lessonGradeCategory(lesson) !== null });
   }
 
   const units = new Map<string, UnitGroup>();
@@ -547,6 +553,9 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     {mod.lessons.map((lesson) => {
                       const openRow = byKey.open.get(`lesson:${lesson.id}`);
                       const dueRow = byKey.due.get(`lesson:${lesson.id}`);
+                      // Counted items only: a reading, slide or practice drill has no grade category, so a
+                      // date on it changes a badge and nothing else. The marker text is in the fields' names too.
+                      const fieldName = lesson.counts ? `${lesson.title}, ${COUNTS_TEXT.toLowerCase()}` : lesson.title;
                       return (
                         <div
                           key={lesson.id}
@@ -560,6 +569,16 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             }}
                           >
                             {lesson.title}
+                            {lesson.counts && (
+                              <span
+                                style={{
+                                  marginLeft: 8, padding: '1px 6px', fontSize: 11, whiteSpace: 'nowrap',
+                                  color: C.text, border: `1px solid ${C.dim}`, borderRadius: 999,
+                                }}
+                              >
+                                {COUNTS_TEXT}
+                              </span>
+                            )}
                             {!openRow && !dueRow && (
                               <span style={{ fontSize: 12, color: C.dim }}> · inherits</span>
                             )}
@@ -571,7 +590,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             row={openRow}
                             onWrite={(date, time) => { void write('open', [{ scope: 'lesson', scopeId: lesson.id, date, time }]); }}
                             onClear={() => { void write('open', [{ scope: 'lesson', scopeId: lesson.id, date: null }]); }}
-                            ariaSuffix={lesson.title}
+                            ariaSuffix={fieldName}
                             pastHint={OPEN_PAST_HINT}
                           />
 
@@ -581,7 +600,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             row={dueRow}
                             onWrite={(date, time) => { void write('due', [{ scope: 'lesson', scopeId: lesson.id, date, time }]); }}
                             onClear={() => { void write('due', [{ scope: 'lesson', scopeId: lesson.id, date: null }]); }}
-                            ariaSuffix={lesson.title}
+                            ariaSuffix={fieldName}
                           />
 
                           <LessonAccessChip classId={classId} lessonId={lesson.id} lessonTitle={lesson.title} kind="early" />

@@ -25,9 +25,12 @@ export async function fetchDraft(lessonId: string): Promise<DraftPayload | null>
     const res = await fetch(`/api/lesson-drafts/${encodeURIComponent(lessonId)}`, {
       credentials: 'include',
     });
+    // 404 is what a server from before the 200-with-null change answers; keep treating it as "no draft".
     if (res.status === 404 || res.status === 401) return null;
     if (!res.ok) return null;
-    return (await res.json()) as DraftPayload;
+    const body = (await res.json()) as { response: string | null; updatedAt: number | null };
+    if (body.response == null) return null;
+    return { response: body.response, updatedAt: body.updatedAt ?? 0 };
   } catch {
     return null;
   }

@@ -6,6 +6,7 @@ import { getCurrentUser, type CurrentUser } from '../../lib/auth';
 import { useLessonState } from '../../lib/progress';
 import { lessonGradeCategory, lessonPercent } from '../../lib/grading-weights';
 import { sortLessons } from '../../lib/lesson-order';
+import { pickUpNext } from '../../lib/up-next';
 import StudentGradebook from '../../components/StudentGradebook';
 
 interface ManifestLesson {
@@ -91,10 +92,8 @@ export default function ProgressPage() {
     .slice(-5)
     .reverse();
 
-  // Next locked: first 5 incomplete lessons the student hasn't started
-  const nextLocked = orderedLessons
-    .filter((l) => !progress.states[l.id])
-    .slice(0, 5);
+  // Up Next: not-completed lessons AFTER the furthest completed one, graded items first (lib/up-next.ts).
+  const nextLocked = pickUpNext(orderedLessons, progress.states, (l) => lessonGradeCategory(l) !== null);
 
   // Per-unit breakdown
   const unitMap = new Map<string, { completed: number; total: number; category?: string }>();
@@ -196,7 +195,7 @@ export default function ProgressPage() {
                     padding: '2px 10px',
                     fontWeight: 600,
                   }}>
-                    Not started
+                    {progress.states[l.id] === 'started' ? 'In progress' : 'Not started'}
                   </span>
                 </li>
               ))}

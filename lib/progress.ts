@@ -102,6 +102,11 @@ export async function recordLessonStarted(lessonId: string, siblingIds?: readonl
   }
 }
 
+/** Best try counts: a later weaker score never lowers a stored one (the server's lesson_state upsert does the same). */
+export function bestOfScore(prior: number | null | undefined, next: number): number {
+  return typeof prior === 'number' && Number.isFinite(prior) ? Math.max(prior, next) : next;
+}
+
 export async function recordLessonCompleted(lessonId: string, score?: number): Promise<void> {
   await ensureLessonStateLoaded();
   if (!cache.authed) return;

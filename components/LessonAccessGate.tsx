@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { bypassesLessonLock, isSequenceLocked, useLessonState } from '../lib/progress';
 import { lessonHref } from '../lib/lesson-href';
+import MarkStarted from './MarkStarted';
 import { formatDue, formatTime, useLessonAvailability } from '../lib/due-dates';
 
 interface ManifestLesson {
@@ -45,6 +46,12 @@ export default function LessonAccessGate({
   const availability = useLessonAvailability(currentLessonId, moduleId, unitId);
   const [manifest, setManifest] = useState<ManifestLesson[] | null>(null);
   const idx = siblings.findIndex((id) => id === currentLessonId);
+  const open = (
+    <>
+      <MarkStarted lessonId={currentLessonId} siblings={siblings} moduleId={moduleId} unitId={unitId} />
+      {children}
+    </>
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -72,7 +79,7 @@ export default function LessonAccessGate({
 
   // Lessons outside any module (idx === -1) or the first-in-module
   // (idx === 0) are always accessible. Matches the home-screen rule.
-  if (idx <= 0) return <>{children}</>;
+  if (idx <= 0) return open;
 
   // Until the snapshot loads we don't know role or completion state.
   // Show a non-content placeholder so we don't briefly flash a locked
@@ -92,9 +99,9 @@ export default function LessonAccessGate({
     );
   }
 
-  if (bypassesLessonLock(snap.role)) return <>{children}</>;
+  if (bypassesLessonLock(snap.role)) return open;
 
-  if (!isSequenceLocked(siblings, currentLessonId, snap.states, snap.role)) return <>{children}</>;
+  if (!isSequenceLocked(siblings, currentLessonId, snap.states, snap.role)) return open;
 
   return (
     <div

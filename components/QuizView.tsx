@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CircleCheck, CircleX, Circle, ListChecks } from 'lucide-react';
 import type { QuizConfig } from '../lib/types';
-import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
+import { bestOfScore, bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { getHrefsByLessonNumber, navigateToNextLesson } from '../lib/lesson-neighbors';
 import { fetchDraft, saveDraft, recordSubmission } from '../lib/written-grader-store';
 import { countCorrect, passThreshold } from '../lib/quiz-grade';
@@ -227,7 +227,7 @@ export default function QuizView({ lessonId, config }: Props) {
     // through their own exam. A capped quiz records its completion AFTER the
     // row is in, because the score it records is the server's best total.
     if (!capped && (summative || correctCount >= needed)) {
-      await recordLessonCompleted(lessonId, hasKey ? correctCount : undefined);
+      await recordLessonCompleted(lessonId, hasKey ? bestOfScore(progress.scores[lessonId], correctCount) : undefined);
       // Skipped when the marking is about to be revealed. 1800ms is enough to
       // notice a screen change and not enough to read eight answers and their
       // explanations, so navigating here would take the paper away at exactly

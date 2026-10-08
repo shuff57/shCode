@@ -36,7 +36,7 @@ const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   ssr: false,
   loading: () => <EditorPlaceholder height={570} />,
 });
-import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
+import { bestOfScore, bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
@@ -206,8 +206,7 @@ export default function DiagramAssignmentView({
   // Best try counts: the stored score can only go up (and the server's
   // lesson_state upsert enforces the same on a capped part).
   function bestOf(score: number): number {
-    const prior = progress.scores[lessonId];
-    return typeof prior === 'number' ? Math.max(prior, score) : score;
+    return bestOfScore(progress.scores[lessonId], score);
   }
 
   async function submit() {
@@ -318,7 +317,7 @@ export default function DiagramAssignmentView({
       if (capped) {
         await recordLessonCompleted(lessonId, bestOf(data.totalEarned));
       } else if (isPassing(data as GradeResult)) {
-        await recordLessonCompleted(lessonId, data.totalEarned);
+        await recordLessonCompleted(lessonId, bestOf(data.totalEarned));
         setTimeout(() => navigateToNextLesson(lessonId), 1500);
       }
       if (progress.authed) {

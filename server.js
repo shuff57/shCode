@@ -202,13 +202,13 @@ app.prepare().catch((err) => {
   });
   // Written-answer drafts. Real route: functions/api/lesson-drafts/[lessonId].ts
   // (D1 table lesson_drafts, one row per student+lesson). Held in memory here,
-  // keyed the same way. NOTE the 404 on a missing draft is CORRECT and matches
-  // production -- a student who has not saved yet has no row.
+  // keyed the same way. A missing draft answers 200 {response:null,updatedAt:null},
+  // like production (a 404 was a console error on every first visit).
   const devDrafts = new Map(); // `${identity}\u0000${lessonId}` -> {response, updatedAt}
   const draftKey = (req) => `${devIdentity(req)}\u0000${req.params.lessonId}`;
   server.get('/api/lesson-drafts/:lessonId', (req, res) => {
     const row = devDrafts.get(draftKey(req));
-    if (!row) return res.status(404).json({ error: 'Not found' });
+    if (!row) return res.json({ response: null, updatedAt: null });
     res.json(row);
   });
   server.post('/api/lesson-drafts/:lessonId', express.json({ limit: '1mb' }), (req, res) => {
@@ -314,7 +314,7 @@ app.prepare().catch((err) => {
     if (state === 'completed') {
       st.states[lessonId] = 'completed';
       // A capped part keeps the BEST score, as the real route does
-      // (functions/api/lesson-state/[lessonId].ts); anything else replaces it.
+      // (functions/api/lesson-state/[lessonId].ts); anything else keeps the better of old and new.
       if (ATTEMPT_CAPS[lessonId] !== undefined) {
         // On a capped part the score is derived from the counted submission rows
         // and the browser's number is ignored, exactly as the real route does.
@@ -329,7 +329,8 @@ app.prepare().catch((err) => {
           st.scores[lessonId] = typeof st.scores[lessonId] === 'number' ? Math.max(st.scores[lessonId], best) : best;
         }
       } else if (typeof score === 'number') {
-        st.scores[lessonId] = score;
+        // Uncapped scores are best-of too (the real route: MAX(stored, new); null never erases).
+        st.scores[lessonId] = typeof st.scores[lessonId] === 'number' ? Math.max(st.scores[lessonId], score) : score;
       }
     } else if (state === 'started' && !st.states[lessonId]) {
       st.states[lessonId] = 'started';

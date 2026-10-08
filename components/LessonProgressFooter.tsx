@@ -3,7 +3,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { createPortal } from 'react-dom';
-import { bypassesLessonLock, recordLessonStarted, useLessonState } from '../lib/progress';
+import { bypassesLessonLock, useLessonState } from '../lib/progress';
 import { lessonHref } from '../lib/lesson-href';
 
 interface ModuleLesson {
@@ -109,12 +109,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
     return () => window.removeEventListener('resize', clearTip);
   }, []);
 
-  // Auto-mark this lesson as "started" on mount. The helper short-circuits
-  // if unauthed or already started/completed, so this is safe to call
-  // on every mount.
-  useEffect(() => {
-    recordLessonStarted(currentLessonId, lessons.map((l) => l.id));
-  }, [currentLessonId]);
+  // The mark-started POST lives in <MarkStarted>, mounted by LessonAccessGate only when the lesson is open.
 
   // Publish our own rendered height as a CSS var, the same trick
   // TabbedRightDrawer already uses for its width (--shd-tabbed) -- so the

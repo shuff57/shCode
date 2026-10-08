@@ -616,7 +616,9 @@ const stored = (db, lessonId) => db.raw.query('SELECT score FROM lesson_state WH
   const un = makeDb();
   await setScore(un, 'fx-uncapped', 14);
   await setScore(un, 'fx-uncapped', 9);
-  eq(stored(un, 'fx-uncapped'), 9, 'uncapped: the score still replaces (formative retakes unchanged)');
+  eq(stored(un, 'fx-uncapped'), 14, 'uncapped: a weaker later pass keeps the better score (best-of, 2026-10-07; was: replaces)');
+  await setScore(un, 'fx-uncapped', 16);
+  eq(stored(un, 'fx-uncapped'), 16, 'uncapped: a stronger pass raises it');
   const bad = await setScore(un, 'fx-uncapped', -5);
   eq(bad.status, 400, 'uncapped: a negative score is refused');
   const bad2 = await call(stateMod.onRequestPost, un, '/api/lesson-state/fx-uncapped', A, 'teacher', { method: 'POST', body: JSON.stringify({ state: 'completed', score: 'lots' }) }, { lessonId: 'fx-uncapped' });

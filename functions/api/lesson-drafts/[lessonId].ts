@@ -1,4 +1,5 @@
-// GET    /api/lesson-drafts/[lessonId] -> { response, updatedAt } | 404
+// GET    /api/lesson-drafts/[lessonId] -> { response, updatedAt }; no draft yet is 200 { response: null, updatedAt: null }
+//                                       (a 404 shows as a red console error on every first visit)
 // POST   /api/lesson-drafts/[lessonId] body { response } -> upsert
 // DELETE /api/lesson-drafts/[lessonId] -> remove
 //
@@ -25,7 +26,7 @@ export const onRequestGet: PagesFunction<Env, 'lessonId', { email: string }> = a
   )
     .bind(data.email, lessonId)
     .first<DraftRow>();
-  if (!row) return json({ error: 'Not found' }, 404);
+  if (!row) return json({ response: null, updatedAt: null });
   return json({ response: row.response, updatedAt: row.updated_at });
 };
 
