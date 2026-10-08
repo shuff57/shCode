@@ -1,7 +1,7 @@
 {
   "id": "3-3-4-lab-update-by-index",
   "title": "3.3.4 Lab: Update Scores by Index",
-  "description": "Reassign one value inside an array by its index to update a score in place. Auto-graded.",
+  "description": "Reassign values inside an array by their index to update scores in place. Auto-graded: the code runs and the final scores are checked.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -14,18 +14,23 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Create a scores array",
-      "instructions": "Create a variable called scores and assign it an array containing at least four number values."
+      "title": "Start with the scores",
+      "instructions": "The starter already creates the array: let scores = [72, 85, 90, 64];. Leave that line exactly as it is."
     },
     {
       "id": "s2",
       "title": "Update the first score by index",
-      "instructions": "Reassign the value at index 0 using scores[0] = ... . Use index assignment, not push or pop, so the array keeps the same length."
+      "instructions": "One student retook the first test. Reassign the value at index 0 to 77 using scores[0] = ... . Use index assignment, not push or pop, so the array keeps the same length."
     },
     {
       "id": "s3",
+      "title": "Raise the last score by index",
+      "instructions": "The last score (index 3) goes up by 6 points. Update it by its index as well: either scores[3] = 70 or scores[3] += 6 works."
+    },
+    {
+      "id": "s4",
       "title": "Log the whole array",
-      "instructions": "Use console.log to print the scores array so you can see the updated value."
+      "instructions": "After both updates, use console.log to print the scores array. Check that the first and last values changed and the middle two did not."
     }
   ],
   "requirements": [
@@ -38,7 +43,8 @@
       "pattern": "(\\bscores\\s*\\[[^\\]]+\\])\\s*(?:[-+*/]=(?!=)|\\+\\+|--|=(?!=)(?!\\s*\\1\\s*(?:;|\\r?\\n|$)))",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Change an item with its index, like scores[0] = 77. Writing scores[0] = scores[0] changes nothing, and a new array does not count."
     },
     {
       "id": "r2",
@@ -49,18 +55,53 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "After the updates, add console.log(scores); so the array shows in the output."
     },
     {
       "id": "r3",
-      "title": "scores has at least four values",
-      "description": "scores is an array containing at least four values. Help: 3.3.3 (Changing an Item by Index)",
+      "title": "scores starts as 72, 85, 90, 64",
+      "description": "The code creates scores with the four starting values 72, 85, 90, 64 (the line the starter gives you). Help: 3.3.3 (Changing an Item by Index)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const|var)\\s+scores\\s*=\\s*\\[[^\\]]+(?:,[^\\]]+){3,}\\]",
+      "pattern": "(?:let|const|var)\\s+scores\\s*=\\s*\\[\\s*72\\s*,\\s*85\\s*,\\s*90\\s*,\\s*64\\s*\\]",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Keep the starter's first line exactly: let scores = [72, 85, 90, 64]; The checks start from those four numbers."
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "scores ends as 77, 85, 90, 70",
+      "description": "After the code runs, scores holds 77, 85, 90, 70: the first value is now 77, the last went up by 6, the middle two are unchanged, and it is still an array of four. Help: 3.3.3 (Changing an Item by Index)",
+      "type": "tests",
+      "variables": [
+        {
+          "name": "scores",
+          "expect": [
+            77,
+            85,
+            90,
+            70
+          ]
+        }
+      ],
+      "hint": "Run it and compare. Index 0 becomes 77; index 3 goes up by 6 (64 plus 6). Indexes 1 and 2 must stay 85 and 90."
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t2",
+      "title": "the updated scores are printed",
+      "description": "The output shows the updated scores, so 77 and 70 appear in what console.log printed. Help: 3.3.3 (Changing an Item by Index)",
+      "type": "tests",
+      "expectOutputContains": [
+        "77",
+        "70"
+      ],
+      "hint": "Print the array after BOTH updates, so the new values 77 and 70 are in the output."
     }
   ],
   "grading": {

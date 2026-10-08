@@ -233,7 +233,14 @@ const ser = (a) => {
   if (typeof a !== 'object' || a === null) return String(a);
   try { return JSON.stringify(a, null, 2); } catch (_) { return String(a); }
 };
+// What the script itself printed with console.log, kept for the script-level
+// checks of a tests requirement (lib/test-harness-source.ts). Held in this
+// closure only; the student's script cannot reach the array.
+const __scriptLines = [];
 const cap = (type) => (...args) => {
+  if (type === 'log' && __scriptLines.length < 500) {
+    __scriptLines.push(...args.map(ser).join(' ').split(String.fromCharCode(10)));
+  }
   if (sent >= MAX) return;
   sent++;
   self.postMessage({
@@ -311,6 +318,7 @@ self.onmessage = (e) => {
   answers = Array.isArray(req.answers) ? req.answers.slice() : [];
   attempt = req.attempt || 1;
   sent = 0;
+  __scriptLines.length = 0;
   let compiled = false;
   let codeText = '';
   try {
@@ -324,11 +332,17 @@ self.onmessage = (e) => {
     // return, say) the plain copy runs and the checks report "did not run".
     const tj = req.tests && Array.isArray(req.tests.jobs) && typeof req.tests.nonce === 'string' ? req.tests : null;
     let withTests = null;
+    // A fresh secret per run, written only into the appended statement: a
+    // top-level return in the student's script cannot imitate the lookup.
+    const marker = 'm' + Math.random().toString(36).slice(2) + Date.now().toString(36);
     if (tj) {
-      try { withTests = new Function(codeText + '\\n;' + __testLookupSource(tj.jobs)); } catch (_) { withTests = null; }
+      try { withTests = new Function(codeText + '\\n;' + __testLookupSource(tj.jobs, marker)); } catch (_) { withTests = null; }
     }
-    const fns = (withTests || runStudent)(); // student code execution (educational tool)
-    if (tj && withTests) __runTestJobs(tj.jobs, fns, tj.nonce);
+    const looked = (withTests || runStudent)(); // student code execution (educational tool)
+    if (tj && withTests) {
+      const ok = Array.isArray(looked) && looked.length === 3 && looked[0] === marker;
+      __runTestJobs(tj.jobs, ok ? looked[1] : null, ok ? looked[2] : null, __scriptLines, tj.nonce);
+    }
     self.postMessage({ kind: 'done', attempt });
   } catch (err) {
     if (err === NEEDS_INPUT) {

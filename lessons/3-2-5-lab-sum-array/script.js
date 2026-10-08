@@ -1,8 +1,7 @@
 // 3.3.12 Sum an Array
 
-// STEP 1: Create a variable called numbers and assign it an array
-//         containing at least four number values.
-//         Example shape (choose your own values): [10, 25, 7, 42]
+// STEP 1: The numbers are already here. Leave this line as it is.
+let numbers = [10, 25, 7, 42];
 
 // STEP 2: Create a variable called total and set it to 0.
 //         Write a for loop that visits every element in the array: either by

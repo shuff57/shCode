@@ -1,7 +1,7 @@
 {
   "id": "3-3-17-lab-nested-array-update",
   "title": "3.3.22 Lab: Read and Update a Nested Array",
-  "description": "Read and reassign values in a nested array with double-index syntax, then sum every cell with a nested loop. Auto-graded.",
+  "description": "Read and reassign values in a nested array with double-index syntax, then sum every cell with a nested loop. Auto-graded: the code runs and the final grid and total are checked.",
   "type": "assignment",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -14,23 +14,23 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Create a nested array",
-      "instructions": "Create a variable called grid and assign it a 2x2 (or larger) nested array of numbers."
+      "title": "Start with the grid",
+      "instructions": "The starter already creates the grid: let grid = [[1, 2], [3, 4]];. Leave that line exactly as it is."
     },
     {
       "id": "s2",
       "title": "Log one inner value",
-      "instructions": "Use double-index syntax like grid[r][c] to console.log one specific inner value."
+      "instructions": "Use double-index syntax, grid[1][0], to console.log the value in row 1, column 0. It prints 3."
     },
     {
       "id": "s3",
       "title": "Update one inner value",
-      "instructions": "Reassign one inner value using grid[r][c] = ... ."
+      "instructions": "Reassign that same cell with grid[1][0] = 8."
     },
     {
       "id": "s4",
       "title": "Sum every number",
-      "instructions": "Use a nested loop (outer over rows, inner over cells) to add up every number in the grid, then console.log the total."
+      "instructions": "Create a variable called total. Use a nested loop (outer over rows, inner over cells) to add up every number in the grid, then console.log the total."
     }
   ],
   "requirements": [
@@ -43,7 +43,8 @@
       "pattern": "\\[\\s*\\[",
       "flags": "i",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "The grid is a list of lists, written like [[1, 2], [3, 4]]. The starter already has it."
     },
     {
       "id": "r2",
@@ -54,7 +55,8 @@
       "pattern": "\\]\\s*\\[",
       "flags": "i",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Read a cell with two indexes: grid[row][column], for example grid[1][0]."
     },
     {
       "id": "r3",
@@ -65,7 +67,8 @@
       "pattern": "for\\s*\\([^{]*?\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?for\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Put one for loop inside another: the outer one visits the rows, the inner one visits the cells of a row."
     },
     {
       "id": "r4",
@@ -76,7 +79,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Print with console.log: the cell's old value first, then the total at the end."
     },
     {
       "id": "r5",
@@ -87,7 +91,8 @@
       "pattern": "(\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\])\\s*(?:[-+*/]=(?!=)|\\+\\+|--|=(?!=)(?!\\s*\\1\\s*(?:;|\\r?\\n|$)))",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Write a new value into one cell with two indexes, like grid[1][0] = 8. Writing a cell back to itself changes nothing."
     },
     {
       "id": "r6",
@@ -98,7 +103,54 @@
       "pattern": "([\\w$]+)\\s*(?:\\+=|=\\s*\\1\\s*\\+|=[^;\\n=]*\\+\\s*\\1\\b)[\\s\\S]*\\bconsole\\.log\\s*\\([^)]*\\b\\1\\b",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Start total at 0, add each cell to it inside the inner loop (total += ...), then console.log(total) after the loops."
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "grid ends updated and total adds every cell",
+      "description": "After the code runs, grid is [[1, 2], [8, 4]] (only the cell grid[1][0] changed) and total equals the sum of every cell of the updated grid. Help: 3.3.20 (Lists Inside Lists)",
+      "type": "tests",
+      "variables": [
+        {
+          "name": "grid",
+          "expect": [
+            [
+              1,
+              2
+            ],
+            [
+              8,
+              4
+            ]
+          ]
+        },
+        {
+          "name": "total"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "total === grid.flat().reduce((sum, n) => sum + n, 0)",
+          "fail": "total should be the sum of every cell in grid AFTER the update. Add up the grid once the cell has been changed."
+        }
+      ],
+      "hint": "Change grid[1][0] to 8 BEFORE you add things up. Then total adds 1 + 2 + 8 + 4. Check the loop visits every row and every cell."
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t2",
+      "title": "the old cell value and the total are printed",
+      "description": "The output shows 3 (the cell's value before the update) and 15 (the total of the updated grid). Help: 3.3.20 (Lists Inside Lists)",
+      "type": "tests",
+      "expectOutputContains": [
+        "3",
+        "15"
+      ],
+      "hint": "Print grid[1][0] before you change it (3), and print total after the loops (15)."
     }
   ],
   "grading": {

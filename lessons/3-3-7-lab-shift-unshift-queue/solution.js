@@ -1,6 +1,6 @@
-let line = ["ada", "sam"];
+let line = ["ana", "bob"];
 
-line.push("rio");
+line.push("cy");
 
 let served = line.shift();
 

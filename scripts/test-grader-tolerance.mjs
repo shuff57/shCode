@@ -707,12 +707,13 @@ for (const id of Object.values(L)) {
     'function describeScore() { let label = "pts"; console.log(score, label); }', 'showScore();', 'describeScore();'));
 
   // 3.3.4 update by index
+  // The starter now gives the scores (72, 85, 90, 64) and the lab ends with 77, 85, 90, 70.
   accept(T.upd, 'last item through scores.length - 1', js(
-    'let scores = [88, 91, 76, 60];', 'scores[scores.length - 1] = 99;', 'console.log(scores);'));
-  accept(T.upd, 'compound assignment and ++', js(
-    'let scores = [88, 91, 76, 60];', 'scores[0] += 5;', 'scores[1]++;', 'console.log(scores);'));
+    'let scores = [72, 85, 90, 64];', 'scores[0] = 77;', 'scores[scores.length - 1] = 70;', 'console.log(scores);'));
+  accept(T.upd, 'compound assignment', js(
+    'let scores = [72, 85, 90, 64];', 'scores[0] += 5;', 'scores[3] += 6;', 'console.log(scores);'));
   accept(T.upd, 'index from a variable', js(
-    'const scores = [88, 91, 76, 60];', 'let i = 0;', 'scores[i + 1] = 100;', 'console.log("Scores:", scores);'));
+    'const scores = [72, 85, 90, 64];', 'let i = 0;', 'scores[i] = 77;', 'scores[i + 3] = 70;', 'console.log("Scores:", scores);'));
   reject(T.upd, 'only a string that looks like an assignment', 'r1', js('console.log("scores[0] = 1")'));
   reject(T.upd, 'assigns, but not to scores', 'r1', js('let a=[1,2,3,4];a[0]=2;console.log(a)'));
   reject(T.upd, 'comparisons are not assignments', 'r1', js(
@@ -727,14 +728,15 @@ for (const id of Object.values(L)) {
   reject(T.upd, 'scores[1] = scores[1] with no semicolon', 'r1', js(
     'let scores = [88, 91, 76, 60];', 'scores[1] = scores[1]', 'console.log(scores);'));
   accept(T.upd, 'an update that reads the old value (scores[0] = scores[0] + 5)', js(
-    'let scores = [88, 91, 76, 60];', 'scores[0] = scores[0] + 5;', 'console.log(scores);'));
+    'let scores = [72, 85, 90, 64];', 'scores[0] = scores[0] + 5;', 'scores[3] = scores[3] + 6;', 'console.log(scores);'));
 
   // 3.3.8 queue
   accept(T.q, 'push chained over a newline', js(
     'let line = ["ana", "bob"];', 'line', '  .push("cy");', 'const served = line.shift();', 'console.log(served);', 'console.log(line);'));
   accept(T.q, 'shift into a variable declared earlier', js(
-    'let line = ["ana", "bob"];', 'let who;', 'line.push("cy");', 'who = line.shift();', 'console.log(who, line);'));
-  accept(T.q, 'shift logged directly', js(
+    'let line = ["ana", "bob"];', 'let served;', 'line.push("cy");', 'served = line.shift();', 'console.log(served, line);'));
+  // The regexes still allow logging the shift directly, but the lab asks for a variable called served.
+  reject(T.q, 'shift logged directly, no variable called served', 't1', js(
     'let line = ["ana", "bob"];', 'line.push("cy");', 'console.log(line.shift());', 'console.log(line);'));
   reject(T.q, 'push and shift on different arrays', 'r1', js(
     'let a = ["x"];', 'let b = ["y"];', 'a.push("z");', 'let s = b.shift();', 'console.log(s);'));
@@ -806,11 +808,11 @@ for (const id of Object.values(L)) {
 
   // 3.3.22: a cell is really updated and a total is really logged
   accept(T.nest, 'update with += and a template-literal total', js(
-    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[0][1]);', 'grid[0][1] += 5;', 'let sum = 0;',
-    'for (const row of grid) { for (const n of row) { sum += n; } }', 'console.log(' + BT + 'Total: ${sum}' + BT + ');'));
-  accept(T.nest, 'update with ++ and sum = n + sum', js(
-    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[0][0]);', 'grid[1][1]++;', 'let sum = 0;',
-    'for (let r = 0; r < grid.length; r++) for (let c = 0; c < grid[r].length; c++) sum = grid[r][c] + sum;', 'console.log("Total", sum);'));
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] += 5;', 'let total = 0;',
+    'for (const row of grid) { for (const n of row) { total += n; } }', 'console.log(' + BT + 'Total: ${total}' + BT + ');'));
+  accept(T.nest, 'update by reading the old cell and total = n + total', js(
+    'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = grid[1][0] + 5;', 'let total = 0;',
+    'for (let r = 0; r < grid.length; r++) for (let c = 0; c < grid[r].length; c++) total = grid[r][c] + total;', 'console.log("Total", total);'));
   reject(T.nest, 'a cell written back to itself', 'r5', js(
     'let grid = [[1, 2], [3, 4]];', 'console.log(grid[1][0]);', 'grid[1][0] = grid[1][0];', 'let total = 0;',
     'for (const row of grid) for (const n of row) total += n;', 'console.log(total);'));

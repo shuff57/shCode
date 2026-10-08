@@ -63,8 +63,47 @@
 // exact shape {"$":"undefined"} / {"$":"NaN"} / {"$":"Infinity"} /
 // {"$":"-Infinity"} / {"$":"-0"} anywhere in `args`, `expect` or `after` stands
 // for that value.
+//
+// SCRIPT-LEVEL CHECKS (a `tests` requirement with no function). For a lab whose
+// code is top-level statements (array labs before array parameters are taught),
+// check what the script LEFT BEHIND instead of calling a function. Fields sit on
+// the requirement itself, beside or instead of `function` + `cases`:
+//   variables   [{name, expect?, fail?, hidden?}]  after the script has run once,
+//               the named TOP-LEVEL let/const/var is read and compared with
+//               `expect` (deep equality, `tolerance`, the JSON tags above). Omit
+//               `expect` to require only that it exists. A declared variable
+//               holding undefined is found; a name never declared is missing:
+//               "I could not find a variable called scores. Check its name."
+//               Mismatch: "scores should end as [77, 85] but is [72, 85]" (`fail`
+//               replaces that sentence; `hidden` says only "A hidden check failed.").
+//   checks      [{expr, fail?, hidden?}]  author-written JavaScript expressions
+//               over the listed `variables` (read-only deep copies, frozen) and
+//               `output` (the printed lines), e.g.
+//               {"expr":"total === grid.flat().reduce((a, b) => a + b, 0)",
+//               "fail":"total should add every cell of grid after the update."}.
+//               Truthy passes; false, a throw or a syntax error fails with `fail`.
+//               A variable not listed in `variables` is not visible to `expr`.
+//   expectOutput / expectOutputContains   the same as on a case (exact lines /
+//               loose needles) but over everything the WHOLE SCRIPT printed with
+//               console.log; wording "Your program should print ...".
+// Order, first failure only: variables (in order), checks, expectOutput,
+// expectOutputContains; then any function `cases`. Give the STARTER the starting
+// state (`let scores = [72, 85, 90, 64];`) so the final state is deterministic,
+// and keep a regex requirement when the lesson is about a syntax (index
+// assignment, push/shift): a hard-coded final value passes the variable check
+// but fails the regex. Example:
+//   {"id":"t1","type":"tests","file":"script.js","points":0,
+//    "variables":[{"name":"scores","expect":[77,85,90,70]}],
+//    "hint":"Index 0 becomes 77; index 3 goes up by 6."}
+// Mechanics: the same appended statement that returns the functions also returns
+// the variables, stamped with a fresh per-run secret, so a top-level `return` in
+// the student's code cannot imitate it; values are rebuilt from own data
+// properties (a getter is refused), bounded in depth and size; a script that
+// throws or never finishes is "could not be checked", never a pass. `expr` is
+// evaluated with new Function over those copies only (lesson.json is trusted
+// author text; student text is never evaluated).
 
-import type { Requirement, TestCase } from './types';
+import type { Requirement, TestCase, ScriptCheck, VariableCheck } from './types';
 
 /** Default per-case budget in ms. A case that has not returned by then is
  *  killed (the whole Worker is terminated) and reported as "did not finish". */
@@ -78,6 +117,14 @@ export interface TestJob {
    *  the one called; a lab whose steps let the student pick the name lists them. */
   fns: string[];
   cases: TestCase[];
+  /** Script-level checks (what the script LEFT BEHIND: variables, the whole
+   *  script's printed lines). Present only when the requirement has any. */
+  script?: {
+    variables: VariableCheck[];
+    checks: ScriptCheck[];
+    expectOutput?: string[];
+    expectOutputContains?: string[];
+  };
   timeout: number;
   tolerance: number;
 }
@@ -105,11 +152,17 @@ export function jobsFromRequirements(reqs: Requirement[]): TestJob[] {
     if (r.type !== 'tests') continue;
     const names = (Array.isArray(r.function) ? r.function : [r.function]).filter((n): n is string => typeof n === 'string' && n !== '');
     const fn = names[0];
+    const variables = Array.isArray(r.variables) ? r.variables : [];
+    const checks = Array.isArray(r.checks) ? r.checks : [];
+    const eo = Array.isArray(r.expectOutput) && r.expectOutput.length > 0 ? r.expectOutput : undefined;
+    const eoc = Array.isArray(r.expectOutputContains) && r.expectOutputContains.length > 0 ? r.expectOutputContains : undefined;
+    const hasScript = variables.length > 0 || checks.length > 0 || !!eo || !!eoc;
     jobs.push({
       id: r.id,
       fn: typeof fn === 'string' ? fn : '',
       fns: names,
       cases: Array.isArray(r.cases) ? r.cases : [],
+      ...(hasScript ? { script: { variables, checks, ...(eo ? { expectOutput: eo } : {}), ...(eoc ? { expectOutputContains: eoc } : {}) } } : {}),
       timeout: Math.min(Math.max(Number(r.timeout) || TEST_CASE_TIMEOUT_MS, 50), 10000),
       tolerance: typeof r.tolerance === 'number' && r.tolerance >= 0 ? r.tolerance : 1e-9,
     });
@@ -187,8 +240,9 @@ export function createTestSession(jobs: TestJob[], nonce: string = randomNonce()
         const s = state[job.id];
         const fail = (message: string) => { out[job.id] = { status: 'failed', message }; };
         const names = job.fns && job.fns.length ? job.fns : [job.fn];
-        if (!names.every((n) => IDENT.test(n))) { fail('This check has no valid function name, so it cannot run.'); continue; }
-        if (job.cases.length === 0) { fail('This check has no cases, so it cannot run.'); continue; }
+        const hasCases = job.cases.length > 0;
+        if (hasCases && !names.every((n) => IDENT.test(n))) { fail('This check has no valid function name, so it cannot run.'); continue; }
+        if (!hasCases && !job.script) { fail('This check has no cases, so it cannot run.'); continue; }
         if (s.notfound) {
           fail(names.length > 1
             ? `None of these functions was found: ${names.join(', ')}. Check that you wrote one of them as function name(...) with exactly that name.`
@@ -226,6 +280,7 @@ const __runTestJobs = (() => {
   const OBJ_PROTO = Object.prototype;
   const getProto = Object.getPrototypeOf;
   const MAX_CAPTURED = 500;
+  const IDENT_RE = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
   // {"$":"NaN"} style tags -> the real value; every call builds fresh objects,
   // so a case that mutates its arguments cannot poison the next case.
@@ -362,6 +417,115 @@ const __runTestJobs = (() => {
     return out;
   }
 
+  // The shared wording for "these strings must appear in what was printed".
+  function outputContainsMsg(call, needles, lines) {
+    const printed = norm(lines.join(' '));
+    for (let i = 0; i < needles.length; i++) {
+      if (!hasNeedle(printed, norm(needles[i]))) {
+        if (digitsInside(printed, norm(needles[i]))) {
+          return call + ' should print the number ' + clip(String(needles[i]).trim(), 40) + ' on its own, but printed ' + clip(lines.map((l) => JSON.stringify(l.replace(/\s+$/, ''))).join(', '), 80);
+        }
+        return call + ' should print a line that includes ' + clip(JSON.stringify(String(needles[i])), 60) + ' but printed ' + (lines.length === 0 ? 'nothing' : clip(lines.map((l) => JSON.stringify(l.replace(/\s+$/, ''))).join(', '), 80));
+      }
+    }
+    return null;
+  }
+
+  // ---- script-level checks: what the whole script left behind -------------
+  // A copy of a value that student code can no longer reach: arrays and plain
+  // objects are rebuilt from own DATA properties (a getter is refused, so a
+  // property cannot compute a different answer each time it is read); anything
+  // else is kept as is and so only equals itself. Bounded in depth and size.
+  const gopd = Object.getOwnPropertyDescriptor;
+  function snap(v, st, d) {
+    if (v === null || typeof v !== 'object') return v;
+    if (d > 40 || ++st.n > 5000) { st.over = true; return undefined; }
+    if (isArr(v)) {
+      const o = [];
+      const len = v.length;
+      for (let i = 0; i < len; i++) {
+        const ds = gopd(v, String(i));
+        if (ds && (ds.get || ds.set)) { st.accessor = true; o.push(undefined); continue; }
+        o.push(ds ? snap(ds.value, st, d + 1) : undefined);
+      }
+      return o;
+    }
+    const pr = getProto(v);
+    if (pr !== OBJ_PROTO && pr !== null) return v;
+    const o = {};
+    const ks = keysOf(v);
+    for (let i = 0; i < ks.length; i++) {
+      const ds = gopd(v, ks[i]);
+      if (ds && (ds.get || ds.set)) { st.accessor = true; continue; }
+      o[ks[i]] = snap(ds ? ds.value : undefined, st, d + 1);
+    }
+    return o;
+  }
+  function freezeDeep(v, d) {
+    if (v === null || typeof v !== 'object' || d > 40) return v;
+    if (isArr(v) || getProto(v) === OBJ_PROTO || getProto(v) === null) {
+      Object.freeze(v);
+      const ks = keysOf(v);
+      for (let i = 0; i < ks.length; i++) freezeDeep(v[ks[i]], d + 1);
+    }
+    return v;
+  }
+  const showWide = (v) => clip(show(v, 0), 90);
+
+  // vars: {name: [1, value]} (found) or {name: [0]} (no such variable), read by
+  // the lookup statement appended to the script. lines: what the script printed.
+  function runScriptChecks(job, vars, lines) {
+    const sc = job.script;
+    const bad = (msg, hidden, own) => ({ ok: false, msg: hidden ? 'A hidden check failed.' : clip(own || msg, 220) });
+    const seen = {};
+    const names = [];
+    const vals = [];
+    for (let i = 0; i < sc.variables.length; i++) {
+      const e = sc.variables[i] || {};
+      const name = e.name;
+      const hidden = e.hidden === true;
+      if (typeof name !== 'string' || !IDENT_RE.test(name) || name === 'output') {
+        return bad('This check names a variable that cannot be read.', false);
+      }
+      const rec = hasOwn.call(vars, name) ? vars[name] : null;
+      if (!rec || rec[0] !== 1) return bad('I could not find a variable called ' + name + '. Check its name.', hidden);
+      const st = { n: 0, over: false, accessor: false };
+      const val = snap(rec[1], st, 0);
+      if (st.over) return bad(name + ' is too big, or loops back on itself, so it cannot be checked.', hidden);
+      if (st.accessor) return bad(name + ' holds a value that cannot be checked (it has a getter or setter).', hidden);
+      if (!seen[name]) { seen[name] = true; names.push(name); vals.push(val); }
+      if (hasOwn.call(e, 'expect')) {
+        const exp = decode(e.expect);
+        if (!eq(val, exp, job.tolerance, 0)) {
+          return bad(name + ' should end as ' + showWide(exp) + ' but is ' + showWide(val), hidden, typeof e.fail === 'string' ? e.fail : undefined);
+        }
+      }
+    }
+    for (let i = 0; i < sc.checks.length; i++) {
+      const c = sc.checks[i] || {};
+      const hidden = c.hidden === true;
+      const fail = typeof c.fail === 'string' && c.fail !== '' ? c.fail : 'A check on your results failed.';
+      let ok = false;
+      try {
+        // Author-written text from lesson.json, never student text. It sees the
+        // frozen copies and the printed lines, and nothing else of the script.
+        const f = new Function('output', ...names, '"use strict"; return (' + String(c.expr) + ');');
+        const frozen = vals.map((v) => freezeDeep(snap(v, { n: 0, over: false, accessor: false }, 0), 0));
+        ok = !!f.apply(undefined, [freezeDeep(lines.slice(), 0), ...frozen]);
+      } catch (_) { ok = false; }
+      if (!ok) return bad(fail, hidden);
+    }
+    if (isArr(sc.expectOutput)) {
+      const m = outputMsg('Your program', sc.expectOutput, lines);
+      if (m !== null) return bad(m, false);
+    }
+    if (isArr(sc.expectOutputContains)) {
+      const m = outputContainsMsg('Your program', sc.expectOutputContains, lines);
+      if (m !== null) return bad(m, false);
+    }
+    return { ok: true };
+  }
+
   function runCase(fn, c, job) {
     const hidden = c.hidden === true;
     const rawArgs = isArr(c.args) ? c.args : [];
@@ -406,15 +570,8 @@ const __runTestJobs = (() => {
       }
     }
     if (isArr(c.expectOutputContains)) {
-      const printed = norm(lines.join(' '));
-      for (let i = 0; i < c.expectOutputContains.length; i++) {
-        if (!hasNeedle(printed, norm(c.expectOutputContains[i]))) {
-          if (digitsInside(printed, norm(c.expectOutputContains[i]))) {
-            return bad(call + ' should print the number ' + clip(String(c.expectOutputContains[i]).trim(), 40) + ' on its own, but printed ' + clip(lines.map((l) => JSON.stringify(l.replace(/\s+$/, ''))).join(', '), 80));
-          }
-          return bad(call + ' should print a line that includes ' + clip(JSON.stringify(String(c.expectOutputContains[i])), 60) + ' but printed ' + (lines.length === 0 ? 'nothing' : clip(lines.map((l) => JSON.stringify(l.replace(/\s+$/, ''))).join(', '), 80)));
-        }
-      }
+      const m = outputContainsMsg(call, c.expectOutputContains, lines);
+      if (m !== null) return bad(m);
     }
     if (c.unchanged !== undefined) {
       const idx = isArr(c.unchanged) ? c.unchanged : [c.unchanged];
@@ -438,9 +595,18 @@ const __runTestJobs = (() => {
   }
 
   // Calls only hold ids and plain data; each message carries the nonce.
-  return function (jobs, fns, nonce) {
+  // fns / vars come from the lookup statement appended to the script (null when
+  // it did not run); lines is what the whole script printed.
+  return function (jobs, fns, vars, lines, nonce) {
     for (let j = 0; j < jobs.length; j++) {
       const job = jobs[j];
+      if (job.script) {
+        if (!vars) continue; // the script never reached its end: the check "did not finish"
+        const sr = runScriptChecks(job, vars, lines || []);
+        post({ kind: 'test-case', nonce, id: job.id, i: -1, ok: sr.ok, msg: sr.msg });
+        if (!sr.ok) { post({ kind: 'test-job', nonce, id: job.id, status: 'ran' }); continue; }
+        if (job.cases.length === 0) { post({ kind: 'test-job', nonce, id: job.id, status: 'ran' }); continue; }
+      }
       const names = isArr(job.fns) && job.fns.length ? job.fns : [job.fn];
       let fn, used = job.fn;
       for (let k = 0; k < names.length && typeof fn !== 'function'; k++) {
@@ -464,10 +630,13 @@ const __runTestJobs = (() => {
   };
 })();
 
-// The script's own scope hands its functions back by returning them.
-function __testLookupSource(jobs) {
+// The script's own scope hands its functions and the named variables back by
+// returning them, inside a record stamped with this run's secret marker.
+function __testLookupSource(jobs, marker) {
   const seen = {};
   const parts = [];
+  const vseen = {};
+  const vparts = [];
   for (let i = 0; i < jobs.length; i++) {
     const list = jobs[i] && Array.isArray(jobs[i].fns) && jobs[i].fns.length ? jobs[i].fns : [jobs[i] && jobs[i].fn];
     for (let k = 0; k < list.length; k++) {
@@ -476,7 +645,16 @@ function __testLookupSource(jobs) {
       seen[n] = true;
       parts.push(JSON.stringify(n) + ': (typeof ' + n + " === 'function' ? " + n + ' : undefined)');
     }
+    const vs = jobs[i] && jobs[i].script && Array.isArray(jobs[i].script.variables) ? jobs[i].script.variables : [];
+    for (let k = 0; k < vs.length; k++) {
+      const n = vs[k] && vs[k].name;
+      if (typeof n !== 'string' || !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(n) || vseen[n]) continue;
+      vseen[n] = true;
+      // A declared variable that holds undefined is FOUND; only a name the
+      // script never declared throws ReferenceError and reads as missing.
+      vparts.push(JSON.stringify(n) + ': (() => { try { return [1, ' + n + ']; } catch (e) { return [0]; } })()');
+    }
   }
-  return 'return {' + parts.join(', ') + '};';
+  return 'return [' + JSON.stringify(String(marker)) + ', {' + parts.join(', ') + '}, {' + vparts.join(', ') + '}];';
 }
 `;

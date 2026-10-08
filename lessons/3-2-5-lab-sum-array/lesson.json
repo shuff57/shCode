@@ -1,7 +1,7 @@
 {
   "id": "3-2-5-lab-sum-array",
   "title": "3.3.12 Sum an Array",
-  "description": "Use a for loop to add up all numbers in an array, then log the total. Auto-graded.",
+  "description": "Use a for loop to add up all numbers in an array, then log the total. Auto-graded: the code runs and the total is checked.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -14,8 +14,8 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Create a number array",
-      "instructions": "Create a variable called numbers and assign it an array containing at least four number values."
+      "title": "Start with the numbers",
+      "instructions": "The starter already creates the array: let numbers = [10, 25, 7, 42];. Leave that line exactly as it is."
     },
     {
       "id": "s2",
@@ -38,7 +38,8 @@
       "pattern": "for\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Write a for loop (for (let i = 0; ...) or for (const n of numbers)) that visits every element."
     },
     {
       "id": "r2",
@@ -49,7 +50,8 @@
       "pattern": "for\\s*\\([^)]*\\)\\s*\\{?[^}]*(?:\\+=(?!\\s*\\d+(?:\\.\\d+)?\\s*(?:[;}\\n]|$))|=\\s*[\\w$.]+(?:\\[[^\\]]*\\])?\\s*\\+(?!\\s*\\d)\\s*[\\w$])",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Inside the loop, add the current element itself to the total (total += numbers[i]). Adding the same number every time counts items instead."
     },
     {
       "id": "r3",
@@ -60,7 +62,44 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "After the loop, print with console.log(total);"
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "total is the sum of numbers",
+      "description": "After the code runs, numbers is still 10, 25, 7, 42 and total holds their sum, 84. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "type": "tests",
+      "variables": [
+        {
+          "name": "numbers",
+          "expect": [
+            10,
+            25,
+            7,
+            42
+          ]
+        },
+        {
+          "name": "total",
+          "expect": 84
+        }
+      ],
+      "hint": "Start total at 0 and add every element once. The loop must reach the last element, and numbers must stay exactly as the starter gave it."
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t2",
+      "title": "the total is printed",
+      "description": "The output shows the total, 84. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "type": "tests",
+      "expectOutputContains": [
+        "84"
+      ],
+      "hint": "Print total AFTER the loop ends, so the finished sum (84) is in the output."
     }
   ],
   "grading": {

@@ -94,6 +94,35 @@ export interface Requirement {
    *  a case still running when it ends is stopped and reported "did not finish".
    *  `tolerance` (above) is the allowed numeric difference, default 1e-9. */
   timeout?: number;
+  /** type: 'tests' only, SCRIPT-LEVEL checks (no function needed): named
+   *  top-level variables the script ends with, compared to `expect`. */
+  variables?: VariableCheck[];
+  /** type: 'tests' only. Author-written boolean expressions over the captured
+   *  `variables` (and `output`, the script's printed lines). */
+  checks?: ScriptCheck[];
+  /** type: 'tests' only. The WHOLE script's console.log lines, exact. */
+  expectOutput?: string[];
+  /** type: 'tests' only. Each string must appear in the script's printed text. */
+  expectOutputContains?: string[];
+}
+
+/** One named top-level variable of a script-level `tests` requirement. */
+export interface VariableCheck {
+  name: string;
+  /** The value it must end as (deep equality, numeric `tolerance`; JSON tags
+   *  as in TestCase). Omit to only require that the variable exists. */
+  expect?: unknown;
+  /** Replaces the default "x should end as ... but is ..." sentence. */
+  fail?: string;
+  /** Failure says only "A hidden check failed." */
+  hidden?: boolean;
+}
+
+/** An expression over the captured variables, e.g. "Array.isArray(scores) && scores.length === 4". */
+export interface ScriptCheck {
+  expr: string;
+  fail?: string;
+  hidden?: boolean;
 }
 
 /** One runtime case of a `tests` requirement. Pure JSON: undefined, NaN,

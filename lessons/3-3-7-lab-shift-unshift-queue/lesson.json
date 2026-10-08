@@ -1,7 +1,7 @@
 {
   "id": "3-3-7-lab-shift-unshift-queue",
   "title": "3.3.8 Lab: Front-of-Line Queue",
-  "description": "Use push and shift to move people through a queue, first in first out. Auto-graded.",
+  "description": "Use push and shift to move people through a queue, first in first out. Auto-graded: the code runs and the final line and the person served are checked.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -14,23 +14,23 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Create a line array",
-      "instructions": "Create a variable called line and assign it an array containing at least two name strings."
+      "title": "Start with the line",
+      "instructions": "The starter already creates the line: let line = [\"ana\", \"bob\"];. Leave that line exactly as it is. Ana is first, so she will be served first."
     },
     {
       "id": "s2",
       "title": "Add someone to the back",
-      "instructions": "Use .push() to add one more name onto the back of the line."
+      "instructions": "Use .push() to add one more name, \"cy\", onto the back of the line."
     },
     {
       "id": "s3",
       "title": "Serve the first person",
-      "instructions": "Use .shift() to remove the first person from the line and store the returned value in a variable."
+      "instructions": "Use .shift() to remove the first person from the line and store the returned value in a variable called served."
     },
     {
       "id": "s4",
       "title": "Log who is served and the rest",
-      "instructions": "Use console.log to print who is being served, then console.log the remaining line array."
+      "instructions": "Use console.log to print who is being served (served), then console.log the remaining line array."
     }
   ],
   "requirements": [
@@ -43,7 +43,8 @@
       "pattern": "([\\w$]+)\\s*\\.push\\s*\\([\\s\\S]*\\b\\1\\s*\\.shift\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Add to the back with line.push(\"cy\") first, then take from the front with line.shift() on that same array."
     },
     {
       "id": "r2",
@@ -54,7 +55,8 @@
       "pattern": "(?:(?:let|const|var)\\s+)?([\\w$]+)\\s*=\\s*[\\w$]+\\s*\\.shift\\s*\\(\\s*\\)[\\s\\S]*\\bconsole\\.log\\s*\\([^)]*\\b\\1\\b|console\\.log\\s*\\([^)]*\\.shift\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "line.shift() hands back the person it removes. Store it (let served = line.shift();) and print that variable."
     },
     {
       "id": "r3",
@@ -65,7 +67,44 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Print with console.log: first who is served, then the remaining line."
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "line ends as bob, cy and served is ana",
+      "description": "After the code runs, line holds \"bob\" then \"cy\" (cy joined the back, ana left the front) and served holds \"ana\". Help: 3.3.7 (Adding and Removing from the Front)",
+      "type": "tests",
+      "variables": [
+        {
+          "name": "line",
+          "expect": [
+            "bob",
+            "cy"
+          ]
+        },
+        {
+          "name": "served",
+          "expect": "ana"
+        }
+      ],
+      "hint": "push adds \"cy\" to the back, shift takes \"ana\" off the front. The variable must be called served, and line is left as bob, cy."
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t2",
+      "title": "who is served and the rest are printed",
+      "description": "The output shows ana (who was served) and the remaining line, bob and cy. Help: 3.3.7 (Adding and Removing from the Front)",
+      "type": "tests",
+      "expectOutputContains": [
+        "ana",
+        "bob",
+        "cy"
+      ],
+      "hint": "Print served and then line after the changes, so ana, bob and cy all show in the output."
     }
   ],
   "grading": {

@@ -295,6 +295,111 @@ try {
     check('...and not the input either', !/123|369/.test(r.msg), r.msg);
   }
 
+
+  console.log('\nscript-level checks: variables / checks / whole-script output');
+  {
+    // A requirement with NO function: it reads what the script left behind.
+    const V = (id, extra) => ({ id, title: id, description: '', status: 'pending', type: 'tests', points: 1, ...extra });
+    const final = V('fin', { variables: [{ name: 'scores', expect: [77, 85, 90, 64] }] });
+    const good = 'let scores = [72, 85, 90, 64];\nscores[0] = 77;\nconsole.log(scores);\n';
+    check('let: matching final array passes', (await one(good, final)).passed, (await one(good, final)).msg);
+    check('const (array mutated in place) passes', (await one('const scores = [72, 85, 90, 64];\nscores[0] = 77;', final)).passed, '');
+    check('var passes', (await one('var scores = [72, 85, 90, 64];\nscores[0] = 77;', final)).passed, '');
+    check('a different route to the same array passes', (await one('let scores = [77, 85, 90, 64];', final)).passed, '');
+    check('a student who reassigns the variable AFTER is judged on the final value',
+      !(await one('let scores = [77, 85, 90, 64];\nscores = [0];', final)).passed, '');
+    check('...and one who fixes it after passes', (await one('let scores = [0];\nscores = [77, 85, 90, 64];', final)).passed, '');
+    await expectFail('mismatch names the variable, the wanted value and the actual one',
+      'let scores = [72, 85, 90, 64];', final, /^scores should end as \[77, 85, 90, 64\] but is \[72, 85, 90, 64\]$/);
+    await expectFail('missing variable is named in student words', 'let marks = [77, 85, 90, 64];', final,
+      /^I could not find a variable called scores\. Check its name\.$/);
+    await expectFail('a variable declared inside a block is not top level', '{ let scores = [77, 85, 90, 64]; }', final,
+      /^I could not find a variable called scores/);
+    await expectFail('a declared but empty variable is found, and wrong', 'let scores;', final, /^scores should end as \[77, 85, 90, 64\] but is undefined$/);
+    await expectFail('an array of the wrong length', 'let scores = [77, 85, 90];', final, /but is \[77, 85, 90\]$/);
+    await expectFail('a string "77" is not 77', 'let scores = ["77", 85, 90, 64];', final, /but is \["77", 85, 90, 64\]$/);
+    await expectFail('an object is not an array', 'let scores = {0: 77, 1: 85, 2: 90, 3: 64, length: 4};', final, /^scores should end as/);
+    // scalars, tolerance, nested, NaN tag, only the FIRST failing variable is named
+    const two = V('two', { variables: [{ name: 'a', expect: 1 }, { name: 'b', expect: 2 }] });
+    await expectFail('only the first failing variable is named', 'let a = 5; let b = 6;', two, /^a should end as 1 but is 5$/);
+    await expectFail('the second variable is named once the first is right', 'let a = 1; let b = 6;', two, /^b should end as 2 but is 6$/);
+    check('nested arrays compare deeply', (await one('let g = [[1, 2], [3, 8]];', V('g', { variables: [{ name: 'g', expect: [[1, 2], [3, 8]] }] }))).passed, '');
+    check('a nested difference fails', !(await one('let g = [[1, 2], [3, 9]];', V('g', { variables: [{ name: 'g', expect: [[1, 2], [3, 8]] }] }))).passed, '');
+    check('objects compare regardless of key order', (await one('let o = {b: [1], a: 2};', V('o', { variables: [{ name: 'o', expect: { a: 2, b: [1] } }] }))).passed, '');
+    check('tolerance: 0.1 + 0.2 equals 0.3', (await one('let t = 0.1 + 0.2;', V('t', { variables: [{ name: 't', expect: 0.3 }] }))).passed, '');
+    check('NaN tag', (await one('let n = 0 / 0;', V('n', { variables: [{ name: 'n', expect: { $: 'NaN' } }] }))).passed, '');
+    check('-0 equals 0', (await one('let z = -0;', V('z', { variables: [{ name: 'z', expect: 0 }] }))).passed, '');
+    check('undefined tag', (await one('let u;', V('u', { variables: [{ name: 'u', expect: { $: 'undefined' } }] }))).passed, '');
+    check('existence only (no expect) passes for any value', (await one('let q = 5;', V('q', { variables: [{ name: 'q' }] }))).passed, '');
+    await expectFail('existence only: missing', 'let r = 5;', V('q', { variables: [{ name: 'q' }] }), /could not find a variable called q/);
+    check('requirement tolerance applies', (await one('let t = 3.14159;', V('t', { tolerance: 0.01, variables: [{ name: 't', expect: 3.14 }] }))).passed, '');
+    // author sentence + hidden
+    await expectFail('fail: replaces the default sentence', 'let a = 5;', V('f', { variables: [{ name: 'a', expect: 1, fail: 'Set a to 1.' }] }), /^Set a to 1\.$/);
+    await expectFail('hidden variable reveals nothing', 'let a = 5;', V('h', { variables: [{ name: 'a', expect: 1, hidden: true }] }), /^A hidden check failed\.$/);
+    await expectFail('hidden missing variable reveals nothing', 'let b = 5;', V('h', { variables: [{ name: 'a', expect: 1, hidden: true }] }), /^A hidden check failed\.$/);
+    // forgery: the lookup is real bindings, stamped with a per-run secret
+    await expectFail('a top-level return that imitates the lookup does not pass',
+      'let scores = [1];\nreturn ["x", {}, { scores: [1, [77, 85, 90, 64]] }];', final, /.+/);
+    await expectFail('a top-level return of the bare shape does not pass',
+      'let scores = [1];\nreturn { scores: [1, [77, 85, 90, 64]] };', final, /.+/);
+    await expectFail('a getter that fakes the value is refused',
+      'const scores = [];\nObject.defineProperty(scores, "0", { get() { return 77; } });\nscores.length = 4;', final, /^scores should end as|holds a value that cannot be checked/);
+    await expectFail('a getter on an object property is refused',
+      'const o = {}; Object.defineProperty(o, "a", { get() { return 1; }, enumerable: true });', V('og', { variables: [{ name: 'o', expect: { a: 1 } }] }), /cannot be checked/);
+    await expectFail('overwriting Array.prototype.toString/valueOf changes nothing',
+      'Array.prototype.toString = () => "77,85,90,64"; Array.prototype.valueOf = () => [77, 85, 90, 64]; let scores = [72, 85, 90, 64];', final,
+      /^scores should end as \[77, 85, 90, 64\] but is \[72, 85, 90, 64\]$/);
+    await expectFail('setting __proto__ on the array does not make it equal', 'let scores = [72, 85, 90, 64]; scores.__proto__ = { x: 1 };', final, /^scores should end as/);
+    await expectFail('a message listener / postMessage forgery gains nothing',
+      'let scores = [1];\nself.postMessage({kind:"test-case", id:"fin", i:-1, ok:true});self.postMessage({kind:"test-job", id:"fin", status:"ran"});', final, /^scores should end as/);
+    await expectFail('a cycle is refused, not hung', 'let a = []; a.push(a);', V('cy', { variables: [{ name: 'a', expect: [[]] }] }), /too big, or loops back/);
+    // checks
+    const arr = V('chk', { variables: [{ name: 'scores' }], checks: [{ expr: 'Array.isArray(scores) && scores.length === 4', fail: 'scores must keep its four values.' }, { expr: 'scores[0] !== 72', fail: 'The first score must change.' }] });
+    check('checks: both hold', (await one('let scores = [1, 2, 3, 4];', arr)).passed, '');
+    await expectFail('checks: the first failing check is named', 'let scores = [1, 2, 3];', arr, /^scores must keep its four values\.$/);
+    await expectFail('checks: the second failing check is named', 'let scores = [72, 2, 3, 4];', arr, /^The first score must change\.$/);
+    await expectFail('checks: default sentence', 'let x = 1;', V('d', { variables: [{ name: 'x' }], checks: [{ expr: 'x === 2' }] }), /^A check on your results failed\.$/);
+    await expectFail('checks: hidden', 'let x = 1;', V('d', { variables: [{ name: 'x' }], checks: [{ expr: 'x === 2', fail: 'secret', hidden: true }] }), /^A hidden check failed\.$/);
+    await expectFail('checks: an expression that mutates the copy fails (frozen)', 'let s = [1];',
+      V('m', { variables: [{ name: 's' }], checks: [{ expr: '(s.push(2), true)', fail: 'frozen' }] }), /^frozen$/);
+    await expectFail('checks: a variable that was not listed is not visible', 'let hidden1 = 1; let x = 1;',
+      V('v', { variables: [{ name: 'x' }], checks: [{ expr: 'hidden1 === 1', fail: 'not captured' }] }), /^not captured$/);
+    await expectFail('checks: a syntax error in the expression fails closed', 'let x = 1;', V('se', { variables: [{ name: 'x' }], checks: [{ expr: 'x ===', fail: 'broken' }] }), /^broken$/);
+    check('checks: a sum over a nested copy', (await one('let g = [[1, 2], [3, 8]]; let total = 14;',
+      V('sum', { variables: [{ name: 'g' }, { name: 'total' }], checks: [{ expr: 'g.flat().reduce((a, b) => a + b, 0) === total' }] }))).passed, '');
+    check('checks: the printed lines are available as output', (await one('let x = 1; console.log("x is", x);',
+      V('o', { variables: [{ name: 'x' }], checks: [{ expr: 'output.length === 1 && output[0] === "x is 1"' }] }))).passed, '');
+    // whole-script output
+    const printed = V('out', { expectOutput: ['Ada', '[ 1, 2 ]'] });
+    check('whole-script expectOutput passes', (await one('console.log("Ada"); console.log("[ 1, 2 ]");', printed)).passed, (await one('console.log("Ada"); console.log("[ 1, 2 ]");', printed)).msg);
+    await expectFail('whole-script expectOutput: wrong line', 'console.log("Ada"); console.log("x");', printed, /^Your program should print "\[ 1, 2 \]" on line 2 but printed "x"$/);
+    await expectFail('whole-script expectOutput: nothing printed', 'let a = 1;', printed, /^Your program should print "Ada" on line 1 but printed nothing$/);
+    const has = V('has', { expectOutputContains: ['15'] });
+    check('whole-script contains: passes', (await one('console.log("total", 15);', has)).passed, '');
+    await expectFail('whole-script contains: 115 is not 15', 'console.log("total", 115);', has, /^Your program should print the number 15 on its own, but printed "total 115"$/);
+    await expectFail('whole-script contains: not printed', 'let t = 15;', has, /^Your program should print a line that includes "15" but printed nothing$/);
+    check('a script that prints an object line is captured as JSON text', (await one('console.log({ a: 1 });', V('j', { expectOutputContains: ['"a": 1'] }))).passed, '');
+    // variables + output + function cases, one requirement
+    const mixed = V('mix', { function: 'double', variables: [{ name: 'n', expect: 4 }], expectOutputContains: ['4'], cases: [{ args: [2], expect: 4 }] });
+    check('variables, output and function cases together pass', (await one('function double(x){ return x * 2; }\nlet n = double(2);\nconsole.log(n);', mixed)).passed, (await one('function double(x){ return x * 2; }\nlet n = double(2);\nconsole.log(n);', mixed)).msg);
+    await expectFail('...the function part still fails by name', 'function double(x){ return x + 1; }\nlet n = 4;\nconsole.log(n);', mixed, /^double\(2\) should give 4 but gave 3$/);
+    await expectFail('...the variable part is judged first', 'function double(x){ return x * 2; }\nlet n = 5;\nconsole.log(n);', mixed, /^n should end as 4 but is 5$/);
+    await expectFail('...a function that is missing is still reported', 'let n = 4;\nconsole.log(n);', mixed, /^Function double was not found/);
+    // run-level behaviour is unchanged
+    {
+      const run = await runCodeWithTests('while (true) {}', jobsFromRequirements([final]), 500);
+      check('a top-level hang is still a run-phase timeout and fails the check',
+        run.outcome === 'timeout' && run.timeoutPhase === 'run' && run.tests.byId.fin.status === 'failed' && /could not be checked/.test(run.tests.byId.fin.message), JSON.stringify(run.tests.byId));
+    }
+    await expectFail('a script error before the end fails the check with a pointer', 'let scores = [77, 85, 90, 64]; undefinedThing();', final, /stopped with an error before this could be checked/);
+    {
+      const run = await runCodeWithTests('let scores = [77, 85, 90, 64]; console.log("once");', jobsFromRequirements([final]));
+      check('the script still runs once and its own console is untouched', run.logs.length === 1 && run.logs[0].message === 'once', JSON.stringify(run.logs));
+    }
+    await expectFail('no cases and nothing script-level still fails closed', 'let x = 1;', V('none', { variables: [] }), /no cases/);
+    await expectFail('a variable name that is not an identifier fails closed (never evaluated)', 'let x = 1;', V('bn', { variables: [{ name: 'x);alert(1', expect: 1 }] }), /cannot be read/);
+  }
+
   console.log('\nplumbing');
   {
     const r = await one('function findMax(a){ return Math.max(...a); }', { ...findMax, hint: 'Look at the comparison.' });

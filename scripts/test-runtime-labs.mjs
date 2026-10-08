@@ -74,7 +74,10 @@ try {
     check(`${id} rejects ${name}`, r.ids.includes(req) && msg.test(r.msgs[req]),
       `failed [${r.ids.join(', ')}]; ${req} said ${JSON.stringify(r.msgs[req])}`);
     if (shaped) {
-      check(`${id} / ${name}: the regex requirements alone would have passed it`, r.ids.every((i) => i === req),
+      // Every regex requirement passes it; another `tests` requirement (the printed-output one
+      // of the script-level labs) may fail alongside, because a wrong result prints wrong too.
+      const isTests = (i) => reqs(id).find((q) => q.id === i)?.type === 'tests';
+      check(`${id} / ${name}: the regex requirements alone would have passed it`, r.ids.every((i) => i === req || isTests(i)),
         `also failed ${r.ids.filter((i) => i !== req).join(', ')}`);
     }
   };
@@ -473,6 +476,170 @@ try {
       't1', /^smallest\(\[4, 2, 9\]\) should give 2 but gave 4$/);
     await reject(id, 'sorting the original array to find it', lines('function smallest(numbers) {', '  numbers.sort();', '  let best = numbers[0];', '  return best;', '}') + call,
       't1', /^smallest\(\[4, 2, 9\]\) changed the array you gave it\. It should leave the original untouched$/);
+  }
+
+  // ============================================================ script-level array labs
+  // These four labs have no function to call (array parameters come later, at 3.3.15), so
+  // their `tests` requirements read what the SCRIPT LEFT BEHIND: named top-level variables
+  // (`variables`, `checks`) and the whole script's printed lines (`expectOutputContains`).
+  // The starter hands out the starting state, so the final state is checkable.
+  const SCRIPT_LABS = {
+    upd: '3-3-4-lab-update-by-index', q: '3-3-7-lab-shift-unshift-queue',
+    nest: '3-3-17-lab-nested-array-update', sa: '3-2-5-lab-sum-array',
+  };
+  for (const [key, id] of Object.entries(SCRIPT_LABS)) {
+    const ref = read(`lessons/${id}/solution.js`);
+    const r = await grade(id, ref);
+    check(`${id}: reference scores full`, r.ids.length === 0, `lost ${r.ids.join(', ')}: ${r.ids.map((i) => r.msgs[i]).join(' || ')}`);
+    const st = await grade(id, read(`lessons/${id}/script.js`));
+    check(`${id}: the untouched starter does not`, st.ids.length > 0 && st.ids.includes('t1'), `failed [${st.ids.join(', ')}]`);
+    const all = reqs(id);
+    check(`${id}: every requirement has a hint`, all.every((q) => typeof q.hint === 'string' && q.hint.trim() !== ''), 'a requirement has no hint');
+    check(`${id}: a script-level tests requirement with no function`, all.some((q) => q.type === 'tests' && Array.isArray(q.variables) && !q.function), key);
+    // A script that does not even run to the end cannot be checked.
+    const crash = await grade(id, read(`lessons/${id}/script.js`) + '\nnope();\n');
+    check(`${id}: a script that throws fails the variable check with a pointer`, /stopped with an error before this could be checked/.test(crash.msgs.t1), crash.msgs.t1);
+  }
+  // The starter's first line is the given start: a starter that shipped it must not already be "done".
+  for (const [id, line] of [[SCRIPT_LABS.upd, 'let scores = [72, 85, 90, 64];'], [SCRIPT_LABS.q, 'let line = ["ana", "bob"];'],
+    [SCRIPT_LABS.nest, 'let grid = [[1, 2], [3, 4]];'], [SCRIPT_LABS.sa, 'let numbers = [10, 25, 7, 42];']]) {
+    check(`${id}: the starter gives its starting state`, read(`lessons/${id}/script.js`).split('\n').includes(line), line);
+    check(`${id}: the reference starts from the same line`, read(`lessons/${id}/solution.js`).split('\n')[0] === line, line);
+  }
+
+  // ------------------------------------------------------------ 3.3.4 update by index
+  {
+    const id = SCRIPT_LABS.upd;
+    const START = 'let scores = [72, 85, 90, 64];\n';
+    const prog = (...body) => START + lines(...body);
+    await accept(id, 'two assignments', prog('scores[0] = 77;', 'scores[3] = 70;', 'console.log(scores);'));
+    await accept(id, 'compound assignment on the last index through length - 1', prog('scores[0] = 77;', 'scores[scores.length - 1] += 6;', 'console.log(scores);'));
+    await accept(id, 'const array, old value read (scores[3] = scores[3] + 6), logged with a label', 'const scores = [72, 85, 90, 64];\nscores[0] = 77;\nscores[3] = scores[3] + 6;\nconsole.log("Scores:", scores);\n');
+    await accept(id, 'the last update first, an index in a variable', prog('let last = 3;', 'scores[last] += 6;', 'scores[0] = 77;', 'console.log(scores);'));
+    await accept(id, 'logging before and after', prog('console.log(scores);', 'scores[0] = 77;', 'scores[3] += 6;', 'console.log(scores);'));
+    await reject(id, 'a hard-coded final array with no index assignment', 'let scores = [77, 85, 90, 70];\nconsole.log(scores);\n',
+      'r1', /Change an item with its index/, { shaped: false });
+    await reject(id, 'the start changed to the final values, then the same assignments', 'let scores = [77, 85, 90, 70];\nscores[0] = 77;\nscores[3] = 70;\nconsole.log(scores);\n',
+      'r3', /Keep the starter's first line/);
+    await reject(id, 'an off-by-one index (1 instead of 0)', prog('scores[1] = 77;', 'scores[3] += 6;', 'console.log(scores);'),
+      't1', /^scores should end as \[77, 85, 90, 70\] but is \[72, 77, 90, 70\]$/);
+    await reject(id, 'the wrong element raised (index 2)', prog('scores[0] = 77;', 'scores[2] += 6;', 'console.log(scores);'),
+      't1', /^scores should end as \[77, 85, 90, 70\] but is \[77, 85, 96, 64\]$/);
+    await reject(id, 'only the first update', prog('scores[0] = 77;', 'console.log(scores);'),
+      't1', /^scores should end as \[77, 85, 90, 70\] but is \[77, 85, 90, 64\]$/);
+    await reject(id, 'scores[0] = 77 and scores[3] += 60 (wrong amount)', prog('scores[0] = 77;', 'scores[3] += 60;', 'console.log(scores);'),
+      't1', /but is \[77, 85, 90, 124\]$/);
+    await reject(id, 'self-assignments change nothing', prog('scores[0] = scores[0];', 'scores[3] = scores[3];', 'console.log(scores);'),
+      't1', /^scores should end as \[77, 85, 90, 70\] but is \[72, 85, 90, 64\]$/, { shaped: false });
+    await reject(id, 'self-assignments change nothing (r1 names it too)', prog('scores[0] = scores[0];', 'scores[3] = scores[3];', 'console.log(scores);'),
+      'r1', /Change an item with its index/, { shaped: false });
+    await reject(id, 'push instead of index assignment (array grows)', prog('scores.push(77);', 'scores.push(70);', 'console.log(scores);'),
+      't1', /but is \[72, 85, 90, 64, 77, 70\]$/, { shaped: false });
+    await reject(id, 'the scores updated but then replaced by another array', prog('scores[0] = 77;', 'scores[3] += 6;', 'console.log(scores);', 'scores = [1, 2];'),
+      't1', /^scores should end as \[77, 85, 90, 70\] but is \[1, 2\]$/);
+    await reject(id, 'another variable name', 'let marks = [72, 85, 90, 64];\nmarks[0] = 77;\nmarks[3] += 6;\nconsole.log(marks);\n',
+      't1', /^I could not find a variable called scores\. Check its name\.$/, { shaped: false });
+    await reject(id, 'right updates, never printed', prog('scores[0] = 77;', 'scores[3] += 6;'),
+      't2', /^Your program should print a line that includes "77" but printed nothing$/, { shaped: false });
+    await reject(id, 'printed only before the updates', prog('console.log(scores);', 'scores[0] = 77;', 'scores[3] += 6;'),
+      't2', /^Your program should print a line that includes "77" but printed/, { shaped: false });
+    // wrong element is also shaped: every regex requirement passes it
+    const w = await grade(id, prog('scores[0] = 77;', 'scores[2] += 6;', 'console.log(scores);'));
+    check(`${id}: the wrong-element program passes every regex requirement`, w.ids.includes('t1') && w.ids.every((i) => i.startsWith('t')), w.ids.join(','));
+  }
+
+  // ------------------------------------------------------------ 3.3.8 queue
+  {
+    const id = SCRIPT_LABS.q;
+    const START = 'let line = ["ana", "bob"];\n';
+    const prog = (...body) => START + lines(...body);
+    await accept(id, 'push then shift into const', prog('line.push("cy");', 'const served = line.shift();', 'console.log(served);', 'console.log(line);'));
+    await accept(id, 'push chained over a newline, one log with two values', prog('line', '  .push("cy");', 'let served = line.shift();', 'console.log(served, line);'));
+    await accept(id, 'served declared first, labelled logs', prog('let served;', 'line.push("cy");', 'served = line.shift();', 'console.log("Serving:", served);', 'console.log("Waiting:", line);'));
+    await accept(id, 'single quotes in the strings', "let line = ['ana', 'bob'];\nline.push('cy');\nlet served = line.shift();\nconsole.log(served);\nconsole.log(line);\n");
+    await reject(id, 'the shift result thrown away', prog('line.push("cy");', 'line.shift();', 'console.log(line);'),
+      't1', /^I could not find a variable called served\. Check its name\.$/, { shaped: false });
+    await reject(id, 'the shift result stored under another name', prog('line.push("cy");', 'let who = line.shift();', 'console.log(who);', 'console.log(line);'),
+      't1', /^I could not find a variable called served\. Check its name\.$/);
+    await reject(id, 'unshift instead of push (cy joins the front)', prog('line.unshift("cy");', 'let served = line.shift();', 'console.log(served);', 'console.log(line);'),
+      'r1', /Add to the back with line\.push/, { shaped: false });
+    await reject(id, 'a different name pushed', prog('line.push("dee");', 'let served = line.shift();', 'console.log(served);', 'console.log(line);'),
+      't1', /^line should end as \["bob", "cy"\] but is \["bob", "dee"\]$/);
+    await reject(id, 'shifting twice', prog('line.push("cy");', 'line.shift();', 'let served = line.shift();', 'console.log(served);', 'console.log(line);'),
+      't1', /^line should end as \["bob", "cy"\] but is \["cy"\]$/);
+    await reject(id, 'pop (the back) instead of shift', prog('line.push("cy");', 'let served = line.pop();', 'console.log(served);', 'console.log(line);'),
+      'r1', /Add to the back with line\.push/, { shaped: false });
+    await reject(id, 'the hard-coded final values with push and shift never used', 'let line = ["bob", "cy"];\nlet served = "ana";\nconsole.log(served);\nconsole.log(line);\n',
+      'r1', /Add to the back with line\.push/, { shaped: false });
+    await reject(id, 'served printed, the remaining line is not', prog('line.push("cy");', 'let served = line.shift();', 'console.log(served);'),
+      't2', /^Your program should print a line that includes "bob" but printed "ana"$/);
+    await reject(id, 'nothing printed', prog('line.push("cy");', 'let served = line.shift();'),
+      't2', /includes "ana" but printed nothing$/, { shaped: false });
+  }
+
+  // ------------------------------------------------------------ 3.3.22 nested update
+  {
+    const id = SCRIPT_LABS.nest;
+    const START = 'let grid = [[1, 2], [3, 4]];\n';
+    const prog = (...body) => START + lines(...body);
+    const sumLoop = ['let total = 0;', 'for (let r = 0; r < grid.length; r++) {', '  for (let c = 0; c < grid[r].length; c++) {', '    total += grid[r][c];', '  }', '}', 'console.log(total);'];
+    await accept(id, 'for...of rows and cells', prog('console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;', 'for (const row of grid) {', '  for (const n of row) {', '    total += n;', '  }', '}', 'console.log(total);'));
+    await accept(id, 'index loops, += on the updated cell', prog('console.log(grid[1][0]);', 'grid[1][0] += 5;', ...sumLoop));
+    await accept(id, 'a labelled total and total = total + cell', prog('console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;', 'for (let r = 0; r < grid.length; r++) {', '  for (let c = 0; c < grid[r].length; c++) {', '    total = total + grid[r][c];', '  }', '}', 'console.log("Total:", total);'));
+    await accept(id, 'const grid, template-literal total', 'const grid = [[1, 2], [3, 4]];\nconsole.log(grid[1][0]);\ngrid[1][0] = 8;\nlet total = 0;\nfor (let r = 0; r < 2; r++) for (let c = 0; c < 2; c++) total += grid[r][c];\nconsole.log(`Total: ${total}`);\n');
+    await reject(id, 'the cell is never written (only read)', prog('console.log(grid[1][0]);', ...sumLoop),
+      't1', /^grid should end as \[\[1, 2\], \[8, 4\]\] but is \[\[1, 2\], \[3, 4\]\]$/, { shaped: false });
+    await reject(id, 'the same, named by r5', prog('console.log(grid[1][0]);', ...sumLoop),
+      'r5', /Write a new value into one cell/, { shaped: false });
+    await reject(id, 'the wrong cell written (grid[0][1])', prog('console.log(grid[1][0]);', 'grid[0][1] = 8;', ...sumLoop),
+      't1', /^grid should end as \[\[1, 2\], \[8, 4\]\] but is \[\[1, 8\], \[3, 4\]\]$/);
+    await reject(id, 'a row written instead of a cell', prog('console.log(grid[1][0]);', 'grid[1][0] = 8;', 'grid[0][0] = 5;', ...sumLoop),
+      't1', /but is \[\[5, 2\], \[8, 4\]\]$/);
+    await reject(id, 'the total is added up BEFORE the cell is updated', prog('console.log(grid[1][0]);', ...sumLoop.slice(0, 6), 'grid[1][0] = 8;', 'console.log(total);'),
+      't1', /^total should be the sum of every cell in grid AFTER the update/);
+    await reject(id, 'the sum goes into another variable and total stays 0', prog('console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;', 'let sum = 0;', 'for (let r = 0; r < grid.length; r++) {', '  for (let c = 0; c < grid[r].length; c++) {', '    sum += grid[r][c];', '  }', '}', 'console.log(sum);'),
+      't1', /^total should be the sum of every cell/);
+    await reject(id, 'the sum visits only the first row', prog('console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;', 'for (let r = 0; r < 1; r++) {', '  for (let c = 0; c < grid[r].length; c++) {', '    total += grid[r][c];', '  }', '}', 'console.log(total);'),
+      't1', /^total should be the sum of every cell/);
+    await reject(id, 'total never computed (no variable called total)', prog('console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let sum = 0;', 'for (const row of grid) { for (const n of row) { sum += n; } }', 'console.log(sum);'),
+      't1', /^I could not find a variable called total\. Check its name\.$/);
+    await reject(id, 'the old cell value is not printed first', prog('grid[1][0] = 8;', ...sumLoop),
+      't2', /^Your program should print a line that includes "3" but printed "15"$/);
+    await reject(id, 'the total is not printed', prog('console.log(grid[1][0]);', 'grid[1][0] = 8;', 'let total = 0;', 'for (const row of grid) { for (const n of row) { total += n; } }', 'console.log(grid);'),
+      't2', /includes "15"/, { shaped: false });
+  }
+
+  // ------------------------------------------------------------ 3.3.12 sum an array
+  {
+    const id = SCRIPT_LABS.sa;
+    const START = 'let numbers = [10, 25, 7, 42];\n';
+    const prog = (...body) => START + lines(...body);
+    await accept(id, 'for...of', prog('let total = 0;', 'for (const n of numbers) {', '  total += n;', '}', 'console.log(total);'));
+    await accept(id, 'a reverse index loop, brace-less', prog('let total = 0;', 'for (let i = numbers.length - 1; i >= 0; i--) total += numbers[i];', 'console.log(total);'));
+    await accept(id, 'total = numbers[i] + total and a labelled log', prog('let total = 0;', 'for (let i = 0; i < numbers.length; i++) {', '  total = numbers[i] + total;', '}', 'console.log("Total: " + total);'));
+    await accept(id, 'const array, for...of with let n', 'const numbers = [10, 25, 7, 42];\nlet total = 0;\nfor (let n of numbers) { total += n; }\nconsole.log(total);\n');
+    await reject(id, 'adds 1 per item', prog('let total = 0;', 'for (const n of numbers) {', '  total += 1;', '}', 'console.log(total);'),
+      't1', /^total should end as 84 but is 4$/, { shaped: false });
+    await reject(id, 'adds 1 per item (named by r2)', prog('let total = 0;', 'for (const n of numbers) {', '  total += 1;', '}', 'console.log(total);'),
+      'r2', /Inside the loop, add the current element/, { shaped: false });
+    await reject(id, 'stops one short (i < length - 1)', prog('let total = 0;', 'for (let i = 0; i < numbers.length - 1; i++) {', '  total += numbers[i];', '}', 'console.log(total);'),
+      't1', /^total should end as 84 but is 42$/);
+    await reject(id, 'starts at index 1', prog('let total = 0;', 'for (let i = 1; i < numbers.length; i++) {', '  total += numbers[i];', '}', 'console.log(total);'),
+      't1', /^total should end as 84 but is 74$/);
+    await reject(id, 'the total starts at 1', prog('let total = 1;', 'for (const n of numbers) {', '  total += n;', '}', 'console.log(total);'),
+      't1', /^total should end as 84 but is 85$/);
+    await reject(id, 'adds each element twice', prog('let total = 0;', 'for (const n of numbers) {', '  total += n + n;', '}', 'console.log(total);'),
+      't1', /^total should end as 84 but is 168$/);
+    await reject(id, 'a hard-coded total next to a loop that does nothing', prog('let total = 84;', 'for (let i = 0; i < 0; i++) {', '}', 'console.log(total);'),
+      'r2', /Inside the loop, add the current element/, { shaped: false });
+    await reject(id, 'the numbers are zeroed while summing', prog('let total = 0;', 'for (let i = 0; i < numbers.length; i++) {', '  total += numbers[i];', '  numbers[i] = 0;', '}', 'console.log(total);'),
+      't1', /^numbers should end as \[10, 25, 7, 42\] but is \[0, 0, 0, 0\]$/);
+    await reject(id, 'the sum is kept in a variable called sum', prog('let sum = 0;', 'for (const n of numbers) {', '  sum += n;', '}', 'console.log(sum);'),
+      't1', /^I could not find a variable called total\. Check its name\.$/);
+    await reject(id, 'summed but never printed', prog('let total = 0;', 'for (const n of numbers) {', '  total += n;', '}'),
+      't2', /^Your program should print a line that includes "84" but printed nothing$/, { shaped: false });
+    await reject(id, 'printed before the loop (0)', prog('let total = 0;', 'console.log(total);', 'for (const n of numbers) {', '  total += n;', '}'),
+      't2', /includes "84" but printed "0"$/);
   }
 } finally {
   rmSync(out, { recursive: true, force: true });
