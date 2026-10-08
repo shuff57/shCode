@@ -44,6 +44,8 @@ import { onRequestPost as classDeletePost } from '../functions/api/classes/[id]/
 import { onRequestGet as classAnnGet, onRequestPost as classAnnPost, onRequestDelete as classAnnDelete } from '../functions/api/classes/[id]/announcements/index.ts';
 import { onRequestPost as classArchivePost } from '../functions/api/classes/[id]/archive.ts';
 import { onRequestPost as classRegenPost } from '../functions/api/classes/[id]/regenerate-code.ts';
+import { onRequestPost as reqEventsPost } from '../functions/api/requirement-events.ts';
+import { onRequestGet as classReqEventsGet } from '../functions/api/classes/[id]/requirement-events/index.ts';
 
 const FAR = 4102444800000;
 const CLASS_ID = 'dev-class';
@@ -192,7 +194,7 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
     db.raw.run('INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, 0, ?)', [CLASS_ID, email, FAR]);
   };
 
-  const route = (handler, paramNames = []) => async (req, res) => {
+  const route = (handler, paramNames = [], roleOverride) => async (req, res) => {
     const email = devIdentity(req);
     ensure(email);
     const url = `http://localhost${req.originalUrl}`;
@@ -205,7 +207,7 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
     const params = {};
     for (const n of paramNames) params[n] = req.params[n];
     try {
-      const out = await handler({ request, env, params, data: { email, role }, waitUntil() {} });
+      const out = await handler({ request, env, params, data: { email, role: roleOverride ?? role }, waitUntil() {} });
       res.status(out.status);
       const type = out.headers.get('content-type');
       if (type) res.type(type);
@@ -234,6 +236,9 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   server.get('/api/classes/:id/gradebook', route(classGradebookGet, ['id']));
   server.get('/api/classes/:id/progress', route(classProgressGet, ['id']));
   server.get('/api/classes/:id/students/:email', route(classStudentGet, ['id', 'email']));
+  server.get('/api/classes/:id/requirement-events', route(classReqEventsGet, ['id']));
+  // Dev only: whoever posts is treated as a student, so a dev_student cookie can seed data while DEV_ROLE=teacher.
+  server.post('/api/requirement-events', json, route(reqEventsPost, [], 'student'));
   server.get('/api/classes/:id/needs-attention', route(classNeedsAttentionGet, ['id']));
   server.get('/api/classes/:id/past-due', route(classPastDueGet, ['id']));
   server.get('/api/classes/:id/due-dates', route(classDueDatesGet, ['id']));

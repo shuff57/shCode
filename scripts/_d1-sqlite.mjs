@@ -33,6 +33,12 @@ export function makeD1() {
   }
   const db = {
     sqlite,
+    // All-or-nothing, like D1's batch: every statement runs in one transaction.
+    async batch(stmts) {
+      sqlite.exec('BEGIN');
+      try { for (const q of stmts) await q.run(); sqlite.exec('COMMIT'); } catch (e) { sqlite.exec('ROLLBACK'); throw e; }
+      return stmts.map(() => ({ success: true }));
+    },
     prepare(sql) {
       const st = sqlite.prepare(sql);
       let args = [];

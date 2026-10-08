@@ -73,3 +73,34 @@ export async function resolveUnitForLesson(
   if (!map) return null; // fail to the shared bucket, never to client input
   return map.get(lessonId) ?? null;
 }
+
+let idSetCache: Set<string> | null = null;
+
+/**
+ * True when the build-time catalog lists this lesson id. null when the catalog
+ * cannot be read, so a caller that must not trust the request can fail closed.
+ */
+export async function lessonInCatalog(
+  env: UnitEnv,
+  request: Request,
+  lessonId: string,
+): Promise<boolean | null> {
+  if (!lessonId) return false;
+  if (!idSetCache) {
+    const url = new URL(request.url);
+    url.pathname = '/lessons-manifest.json';
+    url.search = '';
+    try {
+      const res = env.ASSETS
+        ? await env.ASSETS.fetch(new Request(url.toString()))
+        : await fetch(url.toString());
+      if (!res.ok) return null;
+      const manifest = (await res.json()) as Manifest;
+      if (!manifest || !Array.isArray(manifest.lessons)) return null;
+      idSetCache = new Set(manifest.lessons.filter((l) => l && typeof l.id === 'string').map((l) => l.id));
+    } catch {
+      return null;
+    }
+  }
+  return idSetCache.has(lessonId);
+}
