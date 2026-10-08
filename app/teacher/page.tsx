@@ -12,6 +12,7 @@ import { AnnouncementsPanel } from '../../components/AnnouncementsPanel';
 import DueDatesPanel from '../../components/DueDatesPanel';
 import GradingWeightsPanel from '../../components/GradingWeightsPanel';
 import SolutionReleasePanel from '../../components/SolutionReleasePanel';
+import MostMissedPanel from '../../components/MostMissedPanel';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
@@ -2502,6 +2503,10 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
               lessonMap={lessonMap}
               onOpenStudent={(email) => setDrawerEmail(email)}
             />
+          </div>
+          <div style={{ ...S.card, marginBottom: 28 }}>
+            <h2 style={{ ...S.h2, marginBottom: 16 }}>Most missed</h2>
+            <MostMissedPanel classId={classId} />
           </div>
         </div>
       )}

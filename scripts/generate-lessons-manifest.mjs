@@ -11,6 +11,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 const lessonsDir = path.join(root, 'lessons');
 const outPath = path.join(root, 'public', 'lessons-manifest.json');
+// Requirement titles per lesson, for the teacher's "Most missed" panel only (id + title; no patterns).
+const reqPath = path.join(root, 'public', 'lesson-requirements.json');
+const reqTitles = {};
 
 const entries = await fs.readdir(lessonsDir, { withFileTypes: true });
 const dirs = entries
@@ -29,6 +32,11 @@ const results = await Promise.all(
       return null;
     }
     const meta = JSON.parse(raw);
+    if (Array.isArray(meta.requirements) && meta.requirements.length > 0) {
+      reqTitles[meta.id ?? id] = meta.requirements
+        .filter((r) => r && typeof r.id === 'string')
+        .map((r) => ({ id: r.id, title: String(r.title ?? r.id) }));
+    }
     // maxScore: quiz question count, or the written/diagram rubric's point
     // total. Null when every criterion is 0 points (a pass/fail rubric), which
     // is most of them -- see lib/grade-pass.ts. Mirrors app/page.tsx's
@@ -96,4 +104,6 @@ const lessons = results.filter((l) => l !== null);
 lessons.sort((a, b) => a.id.localeCompare(b.id));
 
 await fs.writeFile(outPath, JSON.stringify({ lessons }, null, 2));
+const sortedReqs = Object.fromEntries(Object.keys(reqTitles).sort().map((k) => [k, reqTitles[k]]));
+await fs.writeFile(reqPath, JSON.stringify(sortedReqs));
 console.log(`[generate-lessons-manifest] wrote ${lessons.length} lessons → public/lessons-manifest.json`);
