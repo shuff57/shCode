@@ -153,11 +153,7 @@ try {
     check(heavy.every((r) => r.check) && aiItems.length === 3 && aiItems.every((r) => r.points === 2), 'both heavy criteria are rule-scored; the three wording criteria (2 each) stay with the AI');
     check(!!g && g.rubric.every((r) => r.description && r.id), 'criteria have descriptions');
     check(!!g.gate && g.gate.anyOf.length === 5 && g.gate.min === 2 && g.gate.capTo === 13, 'relevance gate: 5 token groups, min 2, capTo 13');
-    const counted = id !== '3-3-11-chart-the-array-loop';
-    check(counted
-      ? (!cfg.grading.formative && !!cfg.assignmentCode && !g.maxSubmissions && !cfg.diagram.maxSubmissions)
-      : (cfg.grading && cfg.grading.formative === true && !cfg.assignmentCode && !g.maxSubmissions && !cfg.diagram.maxSubmissions),
-      counted ? 'counted: a lab code, unlimited tries' : 'not counted yet: formative, no code (needs real submissions to measure)');
+    check(!cfg.grading.formative && !!cfg.assignmentCode && !g.maxSubmissions && !cfg.diagram.maxSubmissions, 'counted: a lab code, unlimited tries');
     check(describeDiagram(fromMermaid(ref)).includes(SHAPE_WORD[id]), `the walk the model reads names "${SHAPE_WORD[id]}"`);
     check(heavy.some((r) => /function-call|hexagon/.test(r.description)) && ruleItems.some((r) => JSON.stringify(r.check).includes(SHAPE_KIND[id])), 'a rule item asks for that shape kind');
     check(aiItems.every((r) => !/double-rail|hexagon|function-call|loop-setup|predefined/i.test(r.description)), 'the AI-marked items never ask the model about shape kinds');

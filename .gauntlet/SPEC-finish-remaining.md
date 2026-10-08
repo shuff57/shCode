@@ -27,7 +27,7 @@ copy `public/reshape/kernel` and `pa-pseudocode/*.md`), merge back by fast-forwa
 
 ## Outside the loop (owner)
 - Set class due dates for the counted labs (teacher view).
-- 3.3.11: flip to Lab (A3.3.2, `grading.completionCredit`, remove `grading.formative`, update `test-grading.mjs`) only after ~20 real submissions and a fresh chart data pull the owner approves.
+- 3.3.11: flipped to Lab (A3.3.2) on 2026-10-08 on the owner's instruction, before any student had drawn it. Optional: re-run the chart data pull (owner approval) once ~20 students have, as a sanity check, not a gate.
 
 ## Log
 (one line per finished pass: date, commit)

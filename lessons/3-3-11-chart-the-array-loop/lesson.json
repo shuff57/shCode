@@ -3,6 +3,7 @@
   "title": "3.3.14 Chart the Code: Looping Over an Array",
   "description": "Draw the menu loop with the hexagon, and get the arrow that leaves the loop pointing at the right place.",
   "type": "lesson",
+  "assignmentCode": "A3.3.2",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
@@ -138,7 +139,7 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true,
-    "formative": true
+    "completionCredit": true
   },
   "steps": [],
   "requirements": [],
