@@ -4282,19 +4282,6 @@
       }
     ]
   },
-  "3-2-3-reading-passing-information-in#1": {
-    "code": "function describe(name, age) {\n  console.log(name + \" is \" + age + \" years old.\");\n}\n\ndescribe(\"Dev\", 19);\ndescribe(\"Priya\", 17);",
-    "output": [
-      {
-        "type": "log",
-        "text": "Dev is 19 years old."
-      },
-      {
-        "type": "log",
-        "text": "Priya is 17 years old."
-      }
-    ]
-  },
   "3-2-4-example-one-parameter#0": {
     "code": "function greet() {\n  console.log(\"Hello, Marisol!\");\n}\n\ngreet();\ngreet();",
     "output": [
