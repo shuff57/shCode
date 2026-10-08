@@ -1,3 +1,21 @@
+# Handoff — 2026-10-08 · P5 "Most missed requirement" is built on branch `most-missed`, NOT applied or deployed
+
+**Apply migration 0035 BEFORE the deploy** (`npm run d1:migrate`). `POST /api/requirement-events` and
+`GET /api/classes/[id]/requirement-events` read and write `requirement_events`, which does not exist until the
+migration runs; deploying first would 500 those two routes only (students' Runs still work: the browser sends
+silently and ignores failure; the Gradebook tab's "Most missed" panel would show a load error toast). Nothing
+was applied, deployed, pushed or sent to production in this pass. Then deploy from a clean worktree as usual,
+and do a signed-in live check with a throwaway student and teacher, and clean up the rows.
+
+Verified locally: `npx tsc --noEmit` clean; `scripts/test-requirement-events.mjs` (44 checks, real handlers on
+sqlite with every migration including 0035) and `scripts/test-requirement-batch.mjs` (20 checks), both in
+`npm test`; dev-server browser check of the panel (empty state and filled in, 390px, no sideways scroll) and a
+failing script on a console lab with no console errors. Decisions: panel sits on the Gradebook tab (least
+churn); no IP rate limit (shared school IP); `public/lesson-requirements.json` is a new generated, committed
+file (id + title only, no patterns).
+
+---
+
 # Handoff — 2026-10-04 (night) · gradebook + teacher-panel overhaul is LIVE and pushed
 
 Four phases shipped to shcode.pages.dev tonight (deployment `5f50e210` = commit `e7777a3a`; **redeployed 2026-10-05 as `f56b4f76` = `cs-3d` at `6c5ba49e`, which adds GitHub's three reshape commits**) and were

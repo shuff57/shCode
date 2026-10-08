@@ -262,6 +262,11 @@ retries Cloudflare's transient failures; bare `wrangler` does not).
   an orphaned due row only loses a badge, an orphaned open row leaves a lesson
   locked with no findable date holding it shut, and an orphaned release row
   quietly withholds a solution nobody can find the row for.
+- `requirement_events` (0035) is per-student "most missed requirement" data for console labs: one row per
+  `(student_email, lesson_id, req_id)` holding `fails` (Runs the requirement was red, added up from batches)
+  and `first_pass_at` (NULL = still failing). The browser reports it in batches (`lib/requirement-batch.ts`,
+  at most every 20 s plus page hide and unmount). It is best effort and informational: it never affects a
+  grade, completion or Submit, and nothing but the teacher's "Most missed" panel reads it.
 - Both `due_at` and `open_at` now carry a real time of day. Every row written
   before 0023 sits at 23:59:59.999, and the due-dates route special-cases the
   `23:59` an `<input type="time">` reads back so re-saving one does not
@@ -276,6 +281,19 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 
 - There is no `PUT /api/lesson-state` and no per-lesson GET — read state from
   the bulk `GET /api/lesson-state`.
+- `POST /api/requirement-events` takes `{ lessonId, results: [{ reqId, fails, passed }] }` from the signed-in
+  student (email from the session only; <=60 results, `reqId` <=80 chars, `fails` an integer 0..50,
+  `lessonId` must be in the lessons manifest, <=200 requirement rows per student per lesson, else 429) and
+  upserts: `fails` is added to the stored count (capped at 10000), `first_pass_at` is set the first time
+  `passed` is true and never moves. A teacher or admin posting gets `200 {ok:true,stored:false}` and nothing
+  is written, so previewing a lab cannot pollute the data. No IP rate limit: `checkRateLimit` is per-IP and a
+  school lab shares one address; the size caps and the client's 20 s batching bound the writes instead.
+  `GET /api/classes/[id]/requirement-events` (owner, co-teacher or admin; 403/404 otherwise) returns rows
+  with `fails > 0` for students ENROLLED (unexpired) in that class only, plus `topMissed` (per lesson and
+  requirement: `studentsFailed`, `totalFails`, `studentsNotPast`; the 20 largest). Panel:
+  `components/MostMissedPanel.tsx` under the Gradebook tab; requirement titles come from
+  `public/lesson-requirements.json` (written by `generate-lessons-manifest.mjs`). Tests:
+  `scripts/test-requirement-events.mjs`, `scripts/test-requirement-batch.mjs`.
 - `GET|PUT /api/classes/[id]/open-dates` is the "available after" editor, the
   deliberate sibling of `due-dates` (same auth, same entries array, same
   batching). Both entry shapes take an optional `time: 'HH:MM'`.
