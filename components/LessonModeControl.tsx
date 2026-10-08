@@ -144,7 +144,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
           flex: 1 1 200px; min-width: 0; color: var(--text);
           font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
-        .lmc-choices { display: inline-flex; gap: 4px; flex-shrink: 0; }
+        .lmc-choices { display: inline-flex; flex-wrap: wrap; gap: 4px; max-width: 100%; }
         .lmc-choices button {
           padding: 3px 9px; font-size: 12px; cursor: pointer;
           background: transparent; color: #6272a4;
