@@ -20,6 +20,18 @@ This block only **defines** the function and never calls it, so pressing Run sho
 
 The loop visits every score once. Each one is either pushed into `result` (it passed) or skipped (it did not). Nothing is removed from the original — `scores` still holds every value.
 
+```flow readonly caption="Figure 3.3.17: the passing function drawn as a chart. It starts with an empty result array. The diamond asks whether another score is left. If so, a second diamond asks whether the score is 60 or more: yes pushes it onto result, no skips it, and both arrows return to the first diamond. When no scores are left, the function returns result and ends."
+flowchart TD
+  A([Start]) --> B[result = empty array]
+  B --> C{another score left}
+  C -- yes --> D{s >= 60}
+  D -- yes --> E[push s onto result]
+  D -- no --> C
+  E --> C
+  C -- no --> F[/return result/]
+  F --> G([End])
+```
+
 ## Step 2: Call it with a mixed set
 
 Run this and confirm only the passing scores come back.

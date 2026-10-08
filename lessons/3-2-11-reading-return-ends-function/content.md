@@ -48,6 +48,18 @@ console.log(describeNumber(7));
 
 There is no `else` anywhere, and none is needed. Once a `return` runs, the function is finished, so reaching the line after an `if` already tells you that `if` was false.
 
+```flow readonly caption="Figure 3.2.14: describeNumber drawn as a chart. Each diamond asks one question. Its yes arrow goes to a return and then to End, so the function stops there. Its no arrow goes on to the next question. The last return has no question in front of it because every other case has already left."
+flowchart TD
+  A([Start]) --> B{n < 0}
+  B -- yes --> C[return "negative"]
+  B -- no --> D{n === 0}
+  D -- yes --> E[return "zero"]
+  D -- no --> F[return "positive"]
+  C --> G([End])
+  E --> G
+  F --> G
+```
+
 **Try it:** Change `describeNumber(-4)` to `describeNumber(5)` and predict the output before running it.
 
 ```js live plain
