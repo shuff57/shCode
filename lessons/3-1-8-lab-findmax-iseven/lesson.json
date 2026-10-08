@@ -41,7 +41,8 @@
       "pattern": "function\\s+findMax\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Spell it exactly: function findMax(a, b) { ... }. Capital M, no spaces in the name."
     },
     {
       "id": "r2",
@@ -52,7 +53,8 @@
       "pattern": "function\\s+isEven\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Spell it exactly: function isEven(n) { ... }. Capital E, no spaces in the name."
     },
     {
       "id": "r3",
@@ -63,7 +65,8 @@
       "pattern": "\\breturn\\b",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "return sends a value back to the caller. See Reading 3.2.11."
     },
     {
       "id": "r4",
@@ -75,7 +78,8 @@
       "pattern": "[<>]|Math\\.max",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Ask which of a and b is bigger with > or <, or let Math.max decide. Work inside findMax."
     },
     {
       "id": "r5",
@@ -87,7 +91,8 @@
       "pattern": "%",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "The remainder operator % gives what is left after dividing. What is left over when an even number is divided by 2?"
     },
     {
       "id": "t1",

@@ -45,7 +45,8 @@
       "file": "script.js",
       "pattern": "function\\s+decideGrade\\s*\\(\\s*\\)\\s*\\{",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "Write function decideGrade() { ... } with empty parentheses and that exact name."
     },
     {
       "id": "r2",
@@ -55,7 +56,8 @@
       "file": "script.js",
       "pattern": "function\\s+printAdvice\\s*\\(\\s*\\)\\s*\\{",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "Write function printAdvice() { ... } with empty parentheses and that exact name."
     },
     {
       "id": "r3",
@@ -65,7 +67,8 @@
       "file": "script.js",
       "pattern": "else\\s+if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*console\\.log[^}]*\\}[\\s\\S]*else\\s+if\\s*\\([^{]*\\bscore\\b\\s*(?:<=|>=|===|==|<|>)\\s*\\d+[^{]*\\)\\s*\\{[^}]*console\\.log[^}]*\\}",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "hint": "Chain else if branches. Each one tests score against a number and logs a message."
     },
     {
       "id": "r4",
@@ -75,7 +78,8 @@
       "file": "script.js",
       "pattern": "if\\s*\\((?=[^{]*(?:&&|\\|\\|))(?=[^{]*attendance\\s*(?:<=|>=|===|==|<|>)\\s*\\d+)(?=[^{]*lateAssignments\\s*(?:<=|>=|===|==|<|>)\\s*\\d+)[^{]*\\)",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "hint": "Join two tests with && (both true) or || (either true), each comparing attendance or lateAssignments to a number."
     },
     {
       "id": "r5",
@@ -85,7 +89,8 @@
       "file": "script.js",
       "pattern": "\\bdecideGrade\\s*\\(\\s*\\)\\s*;",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "The function only runs when called. Add decideGrade(); on its own line."
     },
     {
       "id": "r6",
@@ -95,7 +100,8 @@
       "file": "script.js",
       "pattern": "\\bprintAdvice\\s*\\(\\s*\\)\\s*;",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "The function only runs when called. Add printAdvice(); on its own line."
     }
   ],
   "grading": {

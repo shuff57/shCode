@@ -38,7 +38,8 @@
       "file": "script.js",
       "pattern": "function\\s+printHeader\\s*\\(\\s*\\)\\s*\\{",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "Write function printHeader() { ... } with empty parentheses. It needs no input."
     },
     {
       "id": "r2",
@@ -48,7 +49,8 @@
       "file": "script.js",
       "pattern": "function\\s+printHeader\\s*\\([^)]*\\)\\s*\\{[^}]*LIBRARY CHECKOUT[^}]*\\}",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "hint": "Move the header line into printHeader so the text is written once, inside the braces."
     },
     {
       "id": "r3",
@@ -58,7 +60,8 @@
       "file": "script.js",
       "pattern": "(printHeader\\s*\\(\\s*\\)\\s*;[\\s\\S]*){3}",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "Replace each copy of the header line with a call, printHeader();, so the function is called three times."
     },
     {
       "id": "r4",
@@ -68,7 +71,8 @@
       "file": "script.js",
       "pattern": "The Hobbit[\\s\\S]*Dune[\\s\\S]*Kindred",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "Only the header moves. The three book lines stay where they were, in the same order."
     }
   ],
   "grading": {

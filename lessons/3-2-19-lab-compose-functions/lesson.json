@@ -45,7 +45,8 @@
       "pattern": "function\\s+triple\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Spell it exactly: function triple(n) { ... }."
     },
     {
       "id": "r2",
@@ -56,7 +57,8 @@
       "pattern": "function\\s+addSeven\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Spell it exactly: function addSeven(n) { ... }."
     },
     {
       "id": "r3",
@@ -67,7 +69,8 @@
       "pattern": "\\breturn\\b",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Each function must hand its answer back with return, or the next function receives undefined. See Reading 3.2.20."
     },
     {
       "id": "r4",
@@ -78,7 +81,8 @@
       "pattern": "\\b(?:triple|addSeven)\\s*\\(\\s*(?:triple|addSeven)\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "A call can sit inside another call as its argument, like outer(inner(5)). See Reading 3.2.20."
     },
     {
       "id": "r5",
@@ -89,7 +93,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Log each composed result with console.log so you can read it."
     },
     {
       "id": "r6",
@@ -101,7 +106,8 @@
       "pattern": "\\*|\\b(\\w+)\\s*\\+\\s*\\1\\s*\\+\\s*\\1\\b",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "triple turns n into three times n. Which operator multiplies?"
     },
     {
       "id": "r7",
@@ -113,7 +119,8 @@
       "pattern": "\\+",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "addSeven turns n into n plus seven. Which operator adds?"
     },
     {
       "id": "r8",
@@ -124,7 +131,8 @@
       "pattern": "\\btriple\\s*\\(\\s*addSeven\\s*\\([\\s\\S]*\\baddSeven\\s*\\(\\s*triple\\s*\\(|\\baddSeven\\s*\\(\\s*triple\\s*\\([\\s\\S]*\\btriple\\s*\\(\\s*addSeven\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Order matters. Write one line with triple on the outside and one with addSeven on the outside, and compare the results."
     },
     {
       "id": "t1",

@@ -44,7 +44,8 @@
       "file": "script.js",
       "pattern": "function\\s+greet\\s*\\(",
       "flags": "i",
-      "points": 10
+      "points": 10,
+      "hint": "A function declaration starts with the word function, then the name greet, then parentheses and a body in braces."
     },
     {
       "id": "req2",
@@ -54,7 +55,8 @@
       "file": "script.js",
       "pattern": "return\\s+",
       "flags": "i",
-      "points": 5
+      "points": 5,
+      "hint": "A function can hand a value back. Use the return keyword followed by the value you want to give back."
     },
     {
       "id": "req3",
@@ -64,7 +66,8 @@
       "file": "script.js",
       "pattern": "=>\\s*",
       "flags": "i",
-      "points": 10
+      "points": 10,
+      "hint": "An arrow function is written with =>. Put the parameters before the arrow and the body after it."
     },
     {
       "id": "req4",
@@ -74,7 +77,8 @@
       "file": "script.js",
       "pattern": "greet\\s*\\(",
       "flags": "i",
-      "points": 5
+      "points": 5,
+      "hint": "Defining a function does nothing until you call it. Write its name followed by parentheses."
     },
     {
       "id": "req5",
@@ -84,7 +88,8 @@
       "file": "script.js",
       "pattern": "(function\\s+\\w+\\s*\\(.*?\\)\\s*\\{.*?){2,}",
       "flags": "is",
-      "points": 10
+      "points": 10,
+      "hint": "Write two separate function definitions, not one. Give each its own name and body."
     }
   ],
   "grading": {

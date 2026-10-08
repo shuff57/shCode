@@ -41,7 +41,8 @@
       "pattern": "function\\s+sumToN\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Spell it exactly: function sumToN(n) { ... }. Capital T and capital N."
     },
     {
       "id": "r2",
@@ -52,7 +53,8 @@
       "pattern": "for\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "You need to repeat an addition. A for loop that counts from 1 up to n fits."
     },
     {
       "id": "r3",
@@ -63,7 +65,8 @@
       "pattern": "\\breturn\\b",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "return sends the finished answer back to the caller. See Reading 3.2.11."
     },
     {
       "id": "r4",
@@ -75,7 +78,8 @@
       "pattern": "for\\s*\\((?![^;)]*;\\s*(?:0|false|null)\\s*;)[^)]*\\)\\s*\\{?[^}]*(?:\\+=|=\\s*[\\w$.]+(?:\\[[^\\]]*\\])?\\s*\\+\\s*[\\w$])[\\s\\S]*\\breturn\\b",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Start a total at 0 before the loop, add to it each time round, and put the return after the closing brace of the loop."
     },
     {
       "id": "t1",

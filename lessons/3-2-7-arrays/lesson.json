@@ -54,7 +54,8 @@
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
       "flags": "",
       "ignoreStrings": true,
-      "points": 10
+      "points": 10,
+      "hint": "An array is a list in square brackets, such as let items = [1, 2, 3];. See Reading 3.3.2."
     },
     {
       "id": "req2",
@@ -65,7 +66,8 @@
       "pattern": "\\.push\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 5
+      "points": 5,
+      "hint": ".push() adds an item to the end of an array. Call it on your array with the value in parentheses."
     },
     {
       "id": "req3",
@@ -76,7 +78,8 @@
       "pattern": "\\.pop\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 5
+      "points": 5,
+      "hint": ".pop() removes the last item. Call it on your array with empty parentheses."
     },
     {
       "id": "req4",
@@ -87,7 +90,8 @@
       "pattern": "\\bfor\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*(?:\\{\\s*[^\\s};]|[^\\s{};])",
       "flags": "",
       "ignoreStrings": true,
-      "points": 10
+      "points": 10,
+      "hint": "A for loop visits each position in turn. Put at least one statement inside its braces. See Reading 3.3.5."
     },
     {
       "id": "req5",
@@ -98,7 +102,8 @@
       "pattern": "\\bfor\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*\\{?[^}]*\\bif\\s*\\([^;{}]*?(?:={2,3}|\\.includes\\s*\\(|\\.indexOf\\s*\\()|\\.(?:includes|indexOf)\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 5
+      "points": 5,
+      "hint": "Inside the loop, use if with === to compare each item to the one you want. See Reading 3.3.5."
     },
     {
       "id": "req6",

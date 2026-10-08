@@ -44,7 +44,8 @@
       "pattern": "function\\s+\\w+\\s*\\(\\s*([\\w$]+)\\s*(?:,[^)]*)?\\)(?![\\s\\S]*\\b\\1\\s*(?:\\.(?:push|pop|shift|unshift|splice|sort|reverse|fill)\\s*\\(|\\[[^\\]]*\\]\\s*=(?!=)))",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Read the array but never change it: no push, pop, sort or index assignment on the parameter. See Reading 3.3.15."
     },
     {
       "id": "r2",
@@ -55,7 +56,8 @@
       "pattern": "for\\s*\\(",
       "flags": "i",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Use a for loop to visit every item of the input array. See Reading 3.3.5."
     },
     {
       "id": "r3",
@@ -66,7 +68,8 @@
       "pattern": "\\.push\\s*\\(",
       "flags": "i",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Build the result in a new array. .push() adds each kept or changed item to it."
     },
     {
       "id": "r4",
@@ -77,7 +80,8 @@
       "pattern": "function\\s+\\w+\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*\\breturn\\b",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "The function must return the new array, not print it, so the caller can use it. See Reading 3.3.15."
     },
     {
       "id": "r5",
@@ -88,7 +92,8 @@
       "pattern": "\\.push\\s*\\((?:[^()]|\\([^()]*\\))*(?:[-+*/%]|[\\w$.]+\\s*\\()|\\bif\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*\\{?[^}]*\\.push\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "The result should not be a plain copy. Only push items that pass an if, or push a changed value."
     },
     {
       "id": "r6",
@@ -99,7 +104,8 @@
       "pattern": "console\\.log\\s*\\([\\s\\S]*console\\.log\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Log twice: once for the array the function returned, once for the original, to show the original is untouched."
     },
     {
       "id": "t1",

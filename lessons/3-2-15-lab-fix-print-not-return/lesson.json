@@ -44,7 +44,8 @@
       "pattern": "function\\s+area\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Keep the name area exactly as it is: function area(...) { ... }."
     },
     {
       "id": "r2",
@@ -56,6 +57,7 @@
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
+      "hint": "console.log only shows a value; it does not give it back. Swap it for return. See Reading 3.2.16.",
       "function": "area"
     },
     {
@@ -67,7 +69,8 @@
       "pattern": "\\barea\\s*\\([^)]*\\)\\s*(?:[-*/]|\\+(?!\\s*[\"\\'`]))|(?<![\"\\'`]\\s*)[-+*/]\\s*\\barea\\s*\\([^)]*\\)|(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*area\\s*\\([^)]*\\)[\\s\\S]*?(?:\\b\\1\\b\\s*(?:[-*/]|\\+(?!\\s*[\"\\'`]))|(?<![\"\\'`]\\s*)[-+*/]\\s*\\b\\1\\b)",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Prove a number came back by using the call in arithmetic, such as doubling area(3, 4). Reading 3.2.16 shows why this works."
     },
     {
       "id": "r4",
@@ -78,7 +81,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Log what you print on the outside, around the call, for example console.log(area(3, 4));"
     },
     {
       "id": "t1",

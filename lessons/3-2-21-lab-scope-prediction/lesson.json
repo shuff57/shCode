@@ -43,7 +43,8 @@
       "pattern": "let\\s+score\\b",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Declare score with let at the top level, outside every function, so any function can read it. See Reading 3.2.24."
     },
     {
       "id": "r2",
@@ -55,6 +56,7 @@
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
+      "hint": "Declare label with let inside describeScore, so it exists only there. See Reading 3.2.24.",
       "function": "describeScore"
     },
     {
@@ -66,7 +68,8 @@
       "pattern": "function\\s+showScore\\s*\\([\\s\\S]*function\\s+describeScore\\s*\\(|function\\s+describeScore\\s*\\([\\s\\S]*function\\s+showScore\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Write function showScore() { ... } and function describeScore() { ... }, both with these exact names."
     },
     {
       "id": "r4",
@@ -77,7 +80,8 @@
       "pattern": "(?<!function\\s+)\\bshowScore\\s*\\(\\s*\\)[\\s\\S]*(?<!function\\s+)\\bdescribeScore\\s*\\(\\s*\\)|(?<!function\\s+)\\bdescribeScore\\s*\\(\\s*\\)[\\s\\S]*(?<!function\\s+)\\bshowScore\\s*\\(\\s*\\)",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Defining is not running. Call showScore() and describeScore() on their own lines after the definitions."
     },
     {
       "id": "r5",
@@ -88,7 +92,8 @@
       "pattern": "(?<!function\\s+)\\bdescribeScore\\s*\\(\\s*\\)[\\s\\S]*console\\.log\\s*\\([^)]*\\blabel\\b",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Try to log label after calling describeScore(). Predict what happens first, then wrap it in try/catch to see. Reading 3.2.24."
     }
   ],
   "grading": {

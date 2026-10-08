@@ -39,7 +39,8 @@
       "pattern": "function\\s+findRectangleArea\\s*\\(",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Spell it exactly: function findRectangleArea(width, height) { ... }."
     },
     {
       "id": "r2",
@@ -50,7 +51,8 @@
       "pattern": "function\\s+findRectangleArea\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*,\\s*[A-Za-z_$][\\w$]*\\s*\\)",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Put two names inside the parentheses, separated by a comma. See Reading 3.2.2."
     },
     {
       "id": "r3",
@@ -62,6 +64,7 @@
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
+      "hint": "This version prints its answer. Put a console.log inside the function body.",
       "function": "findRectangleArea"
     },
     {
@@ -73,7 +76,8 @@
       "pattern": "^\\s*findRectangleArea\\s*\\(\\s*-?[\\w.]+[^,()]*,\\s*-?[\\w.]+[^()]*\\)[\\s\\S]*^\\s*findRectangleArea\\s*\\(\\s*-?[\\w.]+[^,()]*,\\s*-?[\\w.]+[^()]*\\)",
       "flags": "m",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Call the function at least twice, each time with two values separated by a comma, such as (3, 4)."
     },
     {
       "id": "r5",
@@ -85,7 +89,8 @@
       "pattern": "[A-Za-z_$][\\w$]*\\s*\\*\\s*[A-Za-z_$][\\w$]*",
       "flags": "",
       "ignoreStrings": true,
-      "points": 0
+      "points": 0,
+      "hint": "Area of a rectangle comes from multiplying its two sides. Which operator multiplies?"
     },
     {
       "id": "t1",

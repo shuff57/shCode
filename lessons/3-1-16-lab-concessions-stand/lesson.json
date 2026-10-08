@@ -38,7 +38,8 @@
       "file": "script.js",
       "pattern": "function\\s+concessions\\s*\\(\\s*\\)\\s*\\{",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "Write function concessions() { ... } with that exact name and nothing between the parentheses."
     },
     {
       "id": "r2",
@@ -48,7 +49,8 @@
       "file": "script.js",
       "pattern": "console\\.log\\([^)]*Popcorn[^)]*Candy[^)]*Soft drink[^)]*\\)",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "hint": "Inside the function, one console.log should list Popcorn, Candy and Soft drink in that order."
     },
     {
       "id": "r3",
@@ -58,7 +60,8 @@
       "file": "script.js",
       "pattern": "\\bconcessions\\s*\\(\\s*\\)\\s*;",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "Defining is not running. Below the function, write concessions(); to call it."
     }
   ],
   "grading": {

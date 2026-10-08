@@ -37,7 +37,8 @@
       "file": "script.js",
       "pattern": "function\\s+showTotal\\s*\\(\\s*\\)\\s*\\{",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "Names in this course start with a lowercase letter and capitalise each new word. Check the spelling and the empty ( )."
     },
     {
       "id": "r2",
@@ -47,7 +48,8 @@
       "file": "script.js",
       "pattern": "console\\.log\\([^)]*Total[^)]*42[^)]*\\)",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "hint": "Inside the braces, one console.log should print the total with the number 42 in it."
     },
     {
       "id": "r3",
@@ -57,7 +59,8 @@
       "file": "script.js",
       "pattern": "\\bshowTotal\\s*\\(\\s*\\)\\s*;",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "A call is the name plus parentheses, and the line ends with a semicolon. Add it below the function."
     }
   ],
   "grading": {

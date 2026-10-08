@@ -38,7 +38,8 @@
       "file": "script.js",
       "pattern": "function\\s+terms\\s*\\(\\s*\\)\\s*\\{",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "Write function terms() { ... } with that exact name and empty parentheses."
     },
     {
       "id": "r2",
@@ -48,7 +49,8 @@
       "file": "script.js",
       "pattern": "prompt\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "hint": "prompt() asks the user a question and gives back what they type. Call it inside terms and keep the answer."
     },
     {
       "id": "r3",
@@ -58,7 +60,8 @@
       "file": "script.js",
       "pattern": "if\\s*\\([^{]*===\\s*[\"']Y[\"'][^{]*\\)\\s*\\{[^}]*\\}\\s*else\\s*\\{[^}]*\\}",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "Compare the answer to the text \"Y\" with ===, then give both the if and the else branch a console.log."
     },
     {
       "id": "r4",
@@ -68,7 +71,8 @@
       "file": "script.js",
       "pattern": "for\\s*\\([^)]*\\)\\s*\\{[^}]*terms\\s*\\(\\s*\\)[^}]*\\}",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "hint": "A for loop repeats its body. Put the call terms() inside the loop braces so it runs once per user."
     }
   ],
   "grading": {
