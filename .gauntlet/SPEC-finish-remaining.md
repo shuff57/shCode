@@ -17,7 +17,7 @@ copy `public/reshape/kernel` and `pa-pseudocode/*.md`), merge back by fast-forwa
 - [x] **P2 Trim the repeated 3.2.3 lesson.** Cut the duplicated explanation, keep the one example later lessons point to. No id changes, titles stay sequential. Checks: check-lesson-citations, check-help-pointer-titles --only 3.2,3.3, check-lesson-numbers, check-slot-map.
 - [x] **P3 Figures with alt text.** Add figures (the ```flow fence, see `.claude/skills/flowchart-diagrams/SKILL.md`) where a diagram replaces a paragraph in the 3.2 and 3.3 readings; every figure has alt text; check phone width (390px) in a browser on the dev server. Checks: check-flow-figures, check-reachable.
 - [x] **P4 Due-dates panel overflow.** `components/DueDatesPanel.tsx` rows overflow ~23px at 390px; fix; verify at 390px in a browser.
-- [ ] **P5 Most-missed-requirement view (STOP BEFORE THE MIGRATION).** Build everything locally and test it, then stop and ask the owner:
+- [x] **P5 (BUILT, awaiting owner for migration + deploy) Most-missed-requirement view (STOP BEFORE THE MIGRATION).** Build everything locally and test it, then stop and ask the owner:
   - migration `0035`: `requirement_events(student_email, lesson_id, req_id, fails, first_pass_at, updated_at)`, `IF NOT EXISTS`, primary key (student_email, lesson_id, req_id);
   - `POST /api/requirement-events` (student, batched counts per Run, bounded sizes) and a teacher read scoped to the teacher's own class;
   - client batching on Run in the console lab view; a "Most missed" tab or panel on the teacher page;
@@ -35,3 +35,4 @@ copy `public/reshape/kernel` and `pa-pseudocode/*.md`), merge back by fast-forwa
 - 2026-10-08 P2 trim 3.2.3: dropped the duplicated static example and the two-parameter block that 3.2.2 already teaches; live-block snapshot updated.
 - 2026-10-08 P3 figures: flowchart with full-description caption added to 3.2.14 (early return) and 3.3.17 (build a new list); checked at 390px. Skipped 3.3.5 and 3.2.21 on purpose (they would give away the charts students draw).
 - 2026-10-08 P4 due-dates panel: DateTimeField wraps and caps at the row width; with every module expanded the page no longer scrolls sideways at 390px (was 23px over). Seen and left: the lesson-mode chooser (lmc-choices) on the Schedule tab is 14px over at 360px.
+- 2026-10-08 P5 built and tested locally on cs-3d (8f408189..dee5fc3b): 44+20 new checks, full npm test exit 0, browser-checked at 390px. NOT applied: migration 0035, deploy, live check. Owner decides.
