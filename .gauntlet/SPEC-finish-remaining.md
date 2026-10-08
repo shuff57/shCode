@@ -13,7 +13,7 @@ copy `public/reshape/kernel` and `pa-pseudocode/*.md`), merge back by fast-forwa
 - Leave `.gauntlet/occt-checks.json`, `functions/_shared/module-docs.generated.ts` (unless the module-doc generator changed it on purpose) and `replica/` alone.
 
 ## Passes
-- [ ] **P1 Docs cleanup.** Fix the stale "shift/unshift not covered" row in the 3.3 density table; make the 3.2 and 3.3 module docs (`curriculum/modules/3.2_*.md`, `3.3_*.md`) describe the starter-based array labs and the counted charts A3.2.2 / A3.2.3 (Lab, pass at 80%, done = 100%); make the 3.2 Day 3 note match the real lesson count. Checks: check-lesson-citations, check-slot-map, check-hints, generate-module-docs.
+- [x] **P1 Docs cleanup.** Fix the stale "shift/unshift not covered" row in the 3.3 density table; make the 3.2 and 3.3 module docs (`curriculum/modules/3.2_*.md`, `3.3_*.md`) describe the starter-based array labs and the counted charts A3.2.2 / A3.2.3 (Lab, pass at 80%, done = 100%); make the 3.2 Day 3 note match the real lesson count. Checks: check-lesson-citations, check-slot-map, check-hints, generate-module-docs.
 - [ ] **P2 Trim the repeated 3.2.3 lesson.** Cut the duplicated explanation, keep the one example later lessons point to. No id changes, titles stay sequential. Checks: check-lesson-citations, check-help-pointer-titles --only 3.2,3.3, check-lesson-numbers, check-slot-map.
 - [ ] **P3 Figures with alt text.** Add figures (the ```flow fence, see `.claude/skills/flowchart-diagrams/SKILL.md`) where a diagram replaces a paragraph in the 3.2 and 3.3 readings; every figure has alt text; check phone width (390px) in a browser on the dev server. Checks: check-flow-figures, check-reachable.
 - [ ] **P4 Due-dates panel overflow.** `components/DueDatesPanel.tsx` rows overflow ~23px at 390px; fix; verify at 390px in a browser.
@@ -31,3 +31,4 @@ copy `public/reshape/kernel` and `pa-pseudocode/*.md`), merge back by fast-forwa
 
 ## Log
 (one line per finished pass: date, commit)
+- 2026-10-08 P1 docs cleanup: 3.2/3.3 module docs describe the counted charts, starter-based array labs; stale audit rows fixed.
