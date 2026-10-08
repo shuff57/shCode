@@ -4584,10 +4584,10 @@
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
-      "assignmentCode": null,
-      "maxScore": null,
+      "assignmentCode": "A3.2.3",
+      "maxScore": 20,
       "maxSubmissions": null,
-      "scoreKind": null
+      "scoreKind": "written"
     },
     {
       "id": "3-2-19-lab-compose-functions",
@@ -4779,10 +4779,10 @@
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
-      "assignmentCode": null,
-      "maxScore": null,
+      "assignmentCode": "A3.2.2",
+      "maxScore": 20,
       "maxSubmissions": null,
-      "scoreKind": null
+      "scoreKind": "written"
     },
     {
       "id": "3-2-9-reading-return",

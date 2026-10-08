@@ -3,6 +3,7 @@
   "title": "3.2.22 Chart the Code: Data Flow Through Chained Calls",
   "description": "Draw two nested calls so the value handed from the inner function to the outer one is visible on the chart.",
   "type": "lesson",
+  "assignmentCode": "A3.2.3",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",
@@ -143,8 +144,7 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true,
-    "formative": true
+    "allowLateSubmit": true
   },
   "steps": [],
   "requirements": []

@@ -17,6 +17,7 @@
 import type { CheckStep, DiagramDoc, DiagramGate, FlowNode, FlowShape, Matcher, RubricCheck } from './diagram-types';
 import { buildGraph, reachableFrom, startNodes } from './diagram-check';
 import type { Graph } from './diagram-check';
+import { HYBRID_PASS_FRACTION } from './grade-pass';
 
 // ---------------------------------------------------------------------------
 // Types shared with the server (structural, so this file imports nothing heavy)
@@ -589,7 +590,7 @@ export function mergeGrade(
   // The authoritative numbers come first and are the only place a total is stated: the model
   // sees only the wording items, so its own words can never speak for the whole chart. Its text
   // is shown unedited, beneath a label that says what it is about.
-  const passAt = Math.ceil(possible * 0.7 - 1e-9);
+  const passAt = Math.ceil(possible * HYBRID_PASS_FRACTION - 1e-9);
   const lines: string[] = [];
   const parts = [`Shapes and order: ${det.earned} of ${det.possible}.`];
   if (aiItems.length > 0) parts.push(`Wording: ${aiEarned} of ${aiPossible}.`);

@@ -42,6 +42,7 @@ import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { fetchDraft, saveDraft, recordSubmission, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
+import { passFraction } from '../lib/grade-pass';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
 import GraderPicker, { useGraderChoice } from './GraderPicker';
 import { checkDiagram, allPassed, type CheckResult } from '../lib/diagram-check';
@@ -99,7 +100,7 @@ function isPassing(r: GradeResult): boolean {
     const ok = r.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length;
     return ok >= Math.ceil(r.criteria.length / 2);
   }
-  return r.totalEarned / r.totalPossible >= 0.7;
+  return r.totalEarned / r.totalPossible >= passFraction(r.criteria);
 }
 
 export default function DiagramAssignmentView({

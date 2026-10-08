@@ -264,7 +264,7 @@ check('formative flag: every flagged lesson in the tree has no score fields in t
     assert.equal(l.scoreKind, null, l.id);
     assert.equal(l.maxScore, null, l.id);
   }
-  assert.ok(flagged >= 3);
+  assert.ok(flagged >= 1); // 3-3-11 until it has real submissions to measure (decided 2026-10-07)
 });
 
 // --- counted console labs: completion credit (decided 2026-10-07) -----------------------------
@@ -303,7 +303,7 @@ check('counted console lab: not due (future date or no date) and not done is exc
   }
 });
 
-check('guard: the four runtime-tested labs carry codes and no try cap; the three practice charts carry none and stay formative', () => {
+check('guard: the four runtime-tested labs carry codes and no try cap; 3.2.8 and 3.2.18 count as Labs, 3.3.11 stays formative', () => {
   const read = (id) => JSON.parse(fs.readFileSync(new URL(`../lessons/${id}/lesson.json`, import.meta.url), 'utf8'));
   const manifest = new Map(JSON.parse(fs.readFileSync(new URL('../public/lessons-manifest.json', import.meta.url), 'utf8')).lessons.map((l) => [l.id, l]));
   const labs = { '3-1-8-lab-findmax-iseven': 'A3.2.4', '3-2-19-lab-compose-functions': 'A3.2.5', '3-1-9-lab-sum-to-n': 'A3.2.6', '3-3-14-lab-filter-function': 'A3.3.3' };
@@ -318,15 +318,25 @@ check('guard: the four runtime-tested labs carry codes and no try cap; the three
     assert.equal(m.maxSubmissions, null, id);
     assert.equal(lessonGradeCategory({ title: m.title, preview: m.preview, scoreKind: m.scoreKind, assignmentCode: m.assignmentCode }), 'lab', id);
   }
-  for (const id of ['3-2-8-chart-parameter-trace', '3-2-18-chart-chained-calls', '3-3-11-chart-the-array-loop']) {
+  // Counted charts (decided 2026-10-07 after 38 real drafts were measured): Lab category, pass at 80%.
+  for (const [id, code] of [['3-2-8-chart-parameter-trace', 'A3.2.2'], ['3-2-18-chart-chained-calls', 'A3.2.3']]) {
+    const meta = read(id);
+    assert.ok(!meta.grading?.formative, id);
+    assert.equal(meta.assignmentCode, code, id);
+    assert.ok(!meta.diagram?.maxSubmissions && !meta.maxSubmissions, `${id} stays unlimited tries`);
+    const m = manifest.get(id);
+    assert.equal(lessonGradeCategory({ title: m.title, preview: m.preview, scoreKind: m.scoreKind, assignmentCode: m.assignmentCode }), 'lab', id);
+  }
+  {
+    const id = '3-3-11-chart-the-array-loop';
     const meta = read(id);
     assert.equal(meta.grading?.formative, true, id);
-    assert.ok(!meta.assignmentCode, `${id} must carry no code (A3.2.2, A3.2.3, A3.3.2 are reserved)`);
+    assert.ok(!meta.assignmentCode, `${id} stays uncounted until measured (A3.3.2 is reserved)`);
     const m = manifest.get(id);
     assert.equal(lessonGradeCategory({ title: m.title, preview: m.preview, scoreKind: m.scoreKind, assignmentCode: m.assignmentCode }), null, id);
   }
   const taken = new Set([...manifest.values()].map((l) => l.assignmentCode).filter(Boolean));
-  for (const reserved of ['A3.2.2', 'A3.2.3', 'A3.3.2']) assert.ok(!taken.has(reserved), `${reserved} is reserved for a chart`);
+  assert.ok(!taken.has('A3.3.2'), 'A3.3.2 is reserved for the 3.3.11 chart');
 });
 
 console.log(results.join('\n'));

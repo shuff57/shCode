@@ -840,11 +840,11 @@ const SC = require(LIB + '/diagram-score.js');
   const aiGood = { ...aiRes, summary: 'Excellent work! You earned all 6 points on this rubric.', totalEarned: 6, criteria: aiRes.criteria.map((c) => ({ ...c, earned: c.max, verdict: 'met' })) };
   const detLow = { ...det, earned: 7, criteria: det.criteria.map((c, i) => (i === 0 ? { ...c, earned: 0, verdict: 'missing' } : c)) }; // one 7-point rule item lost: 7 of 14
   const mlow = SC.mergeGrade(detLow, aiGood, aiItems);
-  ok('mergeGrade: a 13/20 summary starts with the authoritative line', mlow.totalEarned === 13 && mlow.summary.startsWith('Shapes and order: 7 of 14. Wording: 6 of 6. Total 13 of 20 (pass at 14).'), mlow.summary);
+  ok('mergeGrade: a 13/20 summary starts with the authoritative line', mlow.totalEarned === 13 && mlow.summary.startsWith('Shapes and order: 7 of 14. Wording: 6 of 6. Total 13 of 20 (pass at 16).'), mlow.summary);
   ok('mergeGrade: below the pass line says Not passed yet BEFORE the model text, which is labelled and unedited',
     mlow.summary.includes('Not passed yet.') && mlow.summary.indexOf('Not passed yet.') < mlow.summary.indexOf('Wording feedback: Excellent work! You earned all 6 points on this rubric.'), mlow.summary);
   const mfull = SC.mergeGrade(det, { ...aiGood }, aiItems);
-  ok('mergeGrade: a 20/20 has the authoritative line, no Not passed yet', mfull.totalEarned === 20 && mfull.summary.startsWith('Shapes and order: 14 of 14. Wording: 6 of 6. Total 20 of 20 (pass at 14).') && !/Not passed yet/.test(mfull.summary), mfull.summary);
+  ok('mergeGrade: a 20/20 has the authoritative line, no Not passed yet', mfull.totalEarned === 20 && mfull.summary.startsWith('Shapes and order: 14 of 14. Wording: 6 of 6. Total 20 of 20 (pass at 16).') && !/Not passed yet/.test(mfull.summary), mfull.summary);
   ok('mergeGrade: a capped total also says Not passed yet', /Not passed yet/.test(mc.summary) && mc.summary.includes('Total 13 of 20'));
   ok('mergeGrade: no AI text means no Wording feedback label', !/Wording feedback/.test(SC.mergeGrade(det, { ...aiRes, summary: '' }, aiItems).summary));
 

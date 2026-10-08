@@ -3,6 +3,7 @@
   "title": "3.2.10 Chart the Code: Tracing Parameter Values",
   "description": "Draw a program that passes a value into a function with a parameter, and get the call shape and the value flow right.",
   "type": "lesson",
+  "assignmentCode": "A3.2.2",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",
@@ -140,8 +141,7 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true,
-    "formative": true
+    "allowLateSubmit": true
   },
   "steps": [],
   "requirements": []

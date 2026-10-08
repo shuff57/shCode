@@ -17,6 +17,18 @@
 
 interface PassCriterion {
   verdict: 'met' | 'partial' | 'missing';
+  source?: string;
+}
+
+/**
+ * A pointed rubric passes at 70%, except a hybrid flowchart (some criteria scored by rules, source
+ * 'rules'): there the rules alone can earn exactly 70%, which would leave the wording points unable to
+ * fail anyone. Measured on 38 real chart drafts, 2026-10-07: 37 scored 14/14 on the rules, six of them
+ * with junk labels. At 80% a chart needs real wording for 2 of the 6 AI points.
+ */
+export const HYBRID_PASS_FRACTION = 0.8;
+export function passFraction(criteria: ReadonlyArray<{ source?: string }> | null | undefined): number {
+  return Array.isArray(criteria) && criteria.some((c) => c && c.source === 'rules') ? HYBRID_PASS_FRACTION : 0.7;
 }
 
 export interface PassInput {
@@ -32,7 +44,7 @@ export function isPassingGrade(r: PassInput): boolean {
     const ok = r.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length;
     return ok >= Math.ceil(r.criteria.length / 2);
   }
-  return r.totalEarned / r.totalPossible >= 0.7;
+  return r.totalEarned / r.totalPossible >= passFraction(r.criteria);
 }
 
 /**
@@ -48,7 +60,8 @@ export function isPassingSubmission(
   gradeJson: string | null,
 ): boolean | null {
   if (possible !== null && possible > 0) {
-    return score === null ? null : score / possible >= 0.7;
+    if (score === null) return null;
+    return score / possible >= (gradeJson && gradeJson.includes('"source":"rules"') ? HYBRID_PASS_FRACTION : 0.7);
   }
   if (!gradeJson) return null;
   let parsed: unknown;

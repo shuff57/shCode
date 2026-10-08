@@ -90,6 +90,8 @@ export function lessonGradeCategory(l: CategorizableLesson): GradeCategory | nul
   if (moduleId && Q4_MODULES.has(moduleId)) return 'q4';
   if (moduleId && CHAPTER_TEST_MODULES.has(moduleId)) return 'chapterTest';
   if (l.preview === 'quiz') return 'quiz';
+  // A flowchart with a lab code is a Lab (pass to complete), though its rubric carries points.
+  if (l.preview === 'diagram' && l.assignmentCode) return 'lab';
   if (l.scoreKind === 'written') return 'written';
   if (l.assignmentCode) return 'lab';
   return null; // a reading/example/slide -- formative, not part of the grade
