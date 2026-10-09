@@ -36,9 +36,10 @@
       "description": "A function is defined that accepts an array and a test function. Help: 3.4.11 (Passing a Function to a Function)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*\\w+\\s*\\)",
+      "pattern": "(?:function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*\\w+\\s*\\)|(?:const|let|var)\\s+\\w+\\s*=\\s*(?:function\\s*\\(\\s*\\w+\\s*,\\s*\\w+\\s*\\)|\\(\\s*\\w+\\s*,\\s*\\w+\\s*\\)\\s*=>))",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -48,7 +49,8 @@
       "file": "script.js",
       "pattern": "for\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -56,9 +58,10 @@
       "description": "The test function parameter is called inside the helper. Help: 3.4.11 (Passing a Function to a Function)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*(\\w+)\\s*\\)[\\s\\S]*?\\b\\1\\s*\\(",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*(\\w+)\\s*\\)[\\s\\S]*?(?:^|[^.\\w$])\\1\\s*\\(|(?:const|let|var)\\s+\\w+\\s*=\\s*function\\s*\\(\\s*\\w+\\s*,\\s*(\\w+)\\s*\\)[\\s\\S]*?(?:^|[^.\\w$])\\2\\s*\\(|(?:const|let|var)\\s+\\w+\\s*=\\s*\\(\\s*\\w+\\s*,\\s*(\\w+)\\s*\\)\\s*=>[\\s\\S]*?(?:^|[^.\\w$])\\3\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -68,7 +71,8 @@
       "file": "script.js",
       "pattern": "=>[\\s\\S]*=>",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r5",
@@ -78,7 +82,8 @@
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

@@ -44,7 +44,8 @@
       "file": "script.js",
       "pattern": "localStorage\\.setItem\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -54,7 +55,8 @@
       "file": "script.js",
       "pattern": "JSON\\.stringify\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -64,7 +66,8 @@
       "file": "script.js",
       "pattern": "localStorage\\.getItem\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -74,7 +77,8 @@
       "file": "script.js",
       "pattern": "===\\s*null|==\\s*null|!==?\\s*null|!\\s*[A-Za-z_$]\\w*|if\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*\\)",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r5",
@@ -84,7 +88,8 @@
       "file": "script.js",
       "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r6",
@@ -94,7 +99,8 @@
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

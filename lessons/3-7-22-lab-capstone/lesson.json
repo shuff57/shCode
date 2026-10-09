@@ -54,7 +54,8 @@
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[\\s\\S]*\\.push\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -64,7 +65,8 @@
       "file": "script.js",
       "pattern": "\\.map\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -74,7 +76,8 @@
       "file": "script.js",
       "pattern": "\\.slice\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -84,7 +87,8 @@
       "file": "script.js",
       "pattern": "(\\.concat\\s*\\(|\\[[^\\]]*\\.\\.\\.)",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r5",
@@ -92,9 +96,10 @@
       "description": "Builds an object copy with a property written after the spread. Help: 3.7.14 (Spreading into a New Array or Object)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\{\\s*\\.\\.\\.[^}]*,\\s*[\"\\']?\\w+[\"\\']?\\s*:",
+      "pattern": "\\{\\s*\\.\\.\\.[^}]*,\\s*(?:[\"'] *[\"']|\\w+)\\s*:",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r6",
@@ -104,7 +109,8 @@
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

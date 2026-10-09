@@ -53,7 +53,8 @@
       "file": "script.js",
       "pattern": "\\[\\s*\\{[^}]*\\}",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -63,7 +64,8 @@
       "file": "script.js",
       "pattern": "\\{[^}]*\\{[^}]*\\}",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -73,7 +75,8 @@
       "file": "script.js",
       "pattern": "\\w+\\.\\w+",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -83,7 +86,8 @@
       "file": "script.js",
       "pattern": "\\w+\\[",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r5",
@@ -93,7 +97,8 @@
       "file": "script.js",
       "pattern": "for\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r6",
@@ -103,7 +108,8 @@
       "file": "script.js",
       "pattern": "(?:const|let|var)\\s*\\{[^}]*\\}\\s*=",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r7",
@@ -113,7 +119,8 @@
       "file": "script.js",
       "pattern": "Object\\.keys",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r8",
@@ -123,7 +130,8 @@
       "file": "script.js",
       "pattern": "console\\.log",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

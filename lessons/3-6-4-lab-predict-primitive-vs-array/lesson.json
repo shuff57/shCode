@@ -35,9 +35,10 @@
       "description": "Code defines a function named changeNum. Help: 3.6.2 (Pass by Value vs Reference)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+changeNum\\s*\\(",
+      "pattern": "(?:function\\s+changeNum\\s*\\(|(?:const|let|var)\\s+changeNum\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -45,9 +46,10 @@
       "description": "Code defines a function named changeArr. Help: 3.6.2 (Pass by Value vs Reference)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+changeArr\\s*\\(",
+      "pattern": "(?:function\\s+changeArr\\s*\\(|(?:const|let|var)\\s+changeArr\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -57,7 +59,8 @@
       "file": "script.js",
       "pattern": "\\.push\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -67,7 +70,8 @@
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

@@ -42,10 +42,11 @@
       "description": "Declare a function called greet. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+greet\\s*\\(",
+      "pattern": "(?:function\\s+greet\\s*\\(|(?:const|let|var)\\s+greet\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
       "points": 10,
-      "hint": "A function declaration starts with the word function, then the name greet, then parentheses and a body in braces."
+      "hint": "A function declaration starts with the word function, then the name greet, then parentheses and a body in braces.",
+      "ignoreStrings": true
     },
     {
       "id": "req2",
@@ -56,7 +57,8 @@
       "pattern": "return\\s+",
       "flags": "i",
       "points": 5,
-      "hint": "A function can hand a value back. Use the return keyword followed by the value you want to give back."
+      "hint": "A function can hand a value back. Use the return keyword followed by the value you want to give back.",
+      "ignoreStrings": true
     },
     {
       "id": "req3",
@@ -67,7 +69,8 @@
       "pattern": "=>\\s*",
       "flags": "i",
       "points": 10,
-      "hint": "An arrow function is written with =>. Put the parameters before the arrow and the body after it."
+      "hint": "An arrow function is written with =>. Put the parameters before the arrow and the body after it.",
+      "ignoreStrings": true
     },
     {
       "id": "req4",
@@ -75,10 +78,11 @@
       "description": "Call the greet function. Help: 3.1.11 (The Function-Call Shape)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "greet\\s*\\(",
+      "pattern": "(?:^|[=(+,;{}\\n])\\s*greet\\s*\\(",
       "flags": "i",
       "points": 5,
-      "hint": "Defining a function does nothing until you call it. Write its name followed by parentheses."
+      "hint": "Defining a function does nothing until you call it. Write its name followed by parentheses.",
+      "ignoreStrings": true
     },
     {
       "id": "req5",
@@ -86,10 +90,11 @@
       "description": "Define at least 2 functions. Help: 3.2.11 (Getting a Value Back with `return`)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(function\\s+\\w+\\s*\\(.*?\\)\\s*\\{.*?){2,}",
+      "pattern": "(?:\\bfunction\\b|=>)[\\s\\S]*(?:\\bfunction\\b|=>)",
       "flags": "is",
       "points": 10,
-      "hint": "Write two separate function definitions, not one. Give each its own name and body."
+      "hint": "Write two separate function definitions, not one. Give each its own name and body.",
+      "ignoreStrings": true
     }
   ],
   "grading": {

@@ -42,7 +42,8 @@
       "file": "script.js",
       "pattern": "(?:const|let|var)\\s*\\{[^}]*\\}\\s*=",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -50,9 +51,10 @@
       "description": "A function parameter is a brace pattern. Help: 3.5.19 (Destructuring)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+\\w+\\s*\\(\\s*\\{",
+      "pattern": "function\\s+\\w+\\s*\\(\\s*\\{|=\\s*(?:function\\s*)?\\(\\s*\\{[^}]*\\}\\s*\\)\\s*(?:=>|\\{)",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -62,7 +64,8 @@
       "file": "script.js",
       "pattern": "console\\.log",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

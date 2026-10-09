@@ -37,7 +37,8 @@
       "file": "script.js",
       "pattern": "\\[\\s*\\{[^}]*\\}",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -45,9 +46,10 @@
       "description": "Reads arr[i].field. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\[\\s*\\w+\\s*\\]\\s*\\.\\s*\\w+|(?:const|let)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*\\w+\\s*\\[\\s*\\w+\\s*\\][\\s\\S]*?\\b\\1\\.\\w+",
+      "pattern": "\\[\\s*\\w+\\s*\\]\\s*\\.\\s*\\w+|(?:const|let)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*\\w+\\s*\\[\\s*\\w+\\s*\\][\\s\\S]*?\\b\\1\\.\\w+|for\\s*\\(\\s*(?:const|let|var)\\s+(\\w+)\\s+of\\s+[\\w.]+\\s*\\)[\\s\\S]*?\\b\\2\\.\\w+",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -57,7 +59,8 @@
       "file": "script.js",
       "pattern": "for\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -67,7 +70,8 @@
       "file": "script.js",
       "pattern": "console\\.log",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

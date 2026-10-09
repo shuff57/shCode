@@ -43,7 +43,8 @@
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -53,7 +54,8 @@
       "file": "script.js",
       "pattern": "\\.(?:push|unshift|pop|shift|splice|sort|reverse)\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -61,9 +63,10 @@
       "description": "Calls .map(), .slice() or .concat(), which return a new array. Help: 3.7.19 (What Else Is Out There)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.(?:map|slice|concat)\\s*\\(",
+      "pattern": "\\.(?:map|slice|concat|filter|reduce|toSorted|toReversed)\\s*\\(|\\[\\s*\\.\\.\\.",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -73,7 +76,8 @@
       "file": "script.js",
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {
