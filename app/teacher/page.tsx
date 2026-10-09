@@ -12,6 +12,8 @@ import { AnnouncementsPanel } from '../../components/AnnouncementsPanel';
 import DueDatesPanel from '../../components/DueDatesPanel';
 import GradingWeightsPanel from '../../components/GradingWeightsPanel';
 import SolutionReleasePanel from '../../components/SolutionReleasePanel';
+import { moduleOptions, selectGradebookLessons } from '../../lib/gradebook-view';
+import { describeGrade, opensInCodeEditor, showLateBadge, stillFailingRequirements, submissionWasLate, verdictWord, type RequirementEventRow } from '../../lib/teacher-drawer';
 import MostMissedPanel from '../../components/MostMissedPanel';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
@@ -93,6 +95,8 @@ interface SubmissionEntry {
   grade_json: string | null;
   /** The student's own answer. A diagram assignment stores its DiagramDoc here. */
   response: string | null;
+  /** The class due date in force when this was handed in; null = none. Late = submitted_at after it. */
+  due_at_submit?: number | null;
 }
 
 interface StudentDetail {
@@ -203,7 +207,7 @@ interface LessonMeta {
  * the matrix. Listing what IS code means the next preview type added defaults
  * to "not code" instead of silently joining that list.
  */
-const CODE_PREVIEWS = new Set(['console', 'example', 'moshion']);
+const CODE_PREVIEWS: ReadonlySet<string> = new Set(['console', 'example', 'moshion']); // same list as opensInCodeEditor (lib/teacher-drawer.ts)
 
 // A student's lesson_state/commits rows can reference an id from before a
 // renumbering (ids recycle across years — see project memory). That id no
@@ -548,11 +552,14 @@ function StudentDrawer({
   classId,
   email,
   lessonMap,
+  focusLessonId,
   onClose,
 }: {
   classId: string;
   email: string;
   lessonMap: Map<string, LessonMeta>;
+  /** Open with this lesson's submission expanded and scrolled into view (from the Today queue or a grid cell). */
+  focusLessonId?: string | null;
   onClose: () => void;
 }) {
   const [detail, setDetail] = useState<StudentDetail | null>(null);
@@ -583,6 +590,31 @@ function StudentDrawer({
   }, []);
   const [err, setErr] = useState('');
   const [expandedSubs, setExpandedSubs] = useState<Set<string>>(new Set());
+  // Phone width: lesson titles get their own line and the buttons stack under them.
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const sync = () => setCompact(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+  // Best-effort checklist data for console labs: which requirements this student has missed and not yet
+  // passed (the same endpoint as the Most missed panel, filtered to this student). Never a grade input.
+  const [reqRows, setReqRows] = useState<RequirementEventRow[]>([]);
+  const [reqTitles, setReqTitles] = useState<Record<string, Array<{ id: string; title: string }>>>({});
+  useEffect(() => {
+    let live = true;
+    Promise.all([
+      fetch(`/api/classes/${encodeURIComponent(classId)}/requirement-events`, { credentials: 'same-origin' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch('/lesson-requirements.json').then((r) => (r.ok ? r.json() : null)).catch(() => null),
+    ]).then(([ev, titles]) => {
+      if (!live) return;
+      if (ev && Array.isArray(ev.rows)) setReqRows(ev.rows as RequirementEventRow[]);
+      if (titles && typeof titles === 'object') setReqTitles(titles as Record<string, Array<{ id: string; title: string }>>);
+    });
+    return () => { live = false; };
+  }, [classId]);
   // Bumped after an unsubmit to re-run the fetch below; `unsubmitting` is the
   // lesson id in flight, so its button can't be double-fired.
   const [reloadKey, setReloadKey] = useState(0);
@@ -607,6 +639,19 @@ function StudentDrawer({
       setLoading(false);
     });
   }, [classId, email, reloadKey]);
+
+  // Arrived from a queue row or a grid cell: open that lesson's submission and bring it into view once.
+  const focusedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!detail || !focusLessonId || focusedRef.current === focusLessonId) return;
+    focusedRef.current = focusLessonId;
+    if (detail.latestSubmissions[focusLessonId]) {
+      setExpandedSubs((prev) => new Set(prev).add(focusLessonId));
+    }
+    window.setTimeout(() => {
+      document.getElementById(`drawer-lesson-${focusLessonId}`)?.scrollIntoView({ block: 'center' });
+    }, 50);
+  }, [detail, focusLessonId]);
 
   function toggleSub(lessonId: string) {
     setExpandedSubs((prev) => {
@@ -898,10 +943,10 @@ function StudentDrawer({
                   }
 
                   return (
-                    <div key={lesson.id} style={{ marginBottom: 8, background: '#282a36', borderRadius: 6, padding: '10px 14px', border: '1px solid #44475a33' }}>
+                    <div key={lesson.id} id={`drawer-lesson-${lesson.id}`} style={{ marginBottom: 8, background: '#282a36', borderRadius: 6, padding: '10px 14px', border: `1px solid ${focusLessonId === lesson.id ? '#8be9fd' : '#44475a33'}` }}>
                       {/* Lesson row */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                        <span style={{ flex: 1, fontSize: 13, color: '#f8f8f2', minWidth: 0 }}>
+                        <span style={{ flex: compact ? '1 1 100%' : 1, fontSize: 13, color: '#f8f8f2', minWidth: 0, overflowWrap: 'anywhere' }}>
                           {lesson.title}
                           {detail.dueDates?.[lesson.id] && (
                             <span style={{ marginLeft: 8, fontSize: 11, color: '#8393c4' }} title="This class's due date for the lesson">
@@ -910,6 +955,11 @@ function StudentDrawer({
                           )}
                         </span>
                         {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id), practice)}
+                        {sub && showLateBadge(!!meta && !practice && lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null, submissionWasLate(sub.submitted_at, sub.due_at_submit)) && (
+                          <span style={{ background: 'rgba(255,85,85,0.18)', color: '#ff5555', border: '1px solid #ff5555', borderRadius: 4, padding: '1px 7px', fontSize: 11, fontWeight: 700, flexShrink: 0 }} title={`Handed in after the due date (${sub.due_at_submit ? formatDue(sub.due_at_submit) : ''})`}>
+                            Late
+                          </span>
+                        )}
                         {ls?.state === 'completed' && !practice && ls.score !== null && (
                           <span style={{ fontSize: 12, color: '#8be9fd', fontFamily: 'monospace', flexShrink: 0 }}>
                             {ls.score} pts
@@ -970,6 +1020,26 @@ function StudentDrawer({
                         )}
                       </div>
 
+                      {/* Console labs: the checklist items this student has missed and not passed yet. */}
+                      {meta && meta.preview === 'console' && ls?.state !== 'completed' && (() => {
+                        const failing = stillFailingRequirements(reqRows, email, lesson.id, reqTitles[lesson.id]);
+                        if (failing.length === 0) return null;
+                        return (
+                          <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #44475a33', fontSize: 12 }}>
+                            <div style={{ color: '#ffb86c', fontWeight: 600, marginBottom: 4 }}>
+                              Still failing {failing.length} {failing.length === 1 ? 'requirement' : 'requirements'}
+                            </div>
+                            <ul style={{ margin: 0, paddingLeft: 18, color: '#f8f8f2', display: 'grid', gap: 2 }}>
+                              {failing.map((f) => (
+                                <li key={f.reqId} style={{ overflowWrap: 'anywhere' }}>
+                                  {f.title} <span style={{ color: '#8393c4' }}>({f.fails} {f.fails === 1 ? 'miss' : 'misses'})</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        );
+                      })()}
+
                       {/* Override score: the same form the review queue uses, so the rules (the part's maximum, "keep the
                           higher score" on a part with a try limit, the persisted choice) are one set of rules. */}
                       {overrideOpen === lesson.id && sub && (
@@ -997,6 +1067,9 @@ function StudentDrawer({
                         <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #44475a33' }}>
                           <div style={{ fontSize: 11, color: '#8393c4', marginBottom: 8 }}>
                             Submitted: {fmtTs(sub.submitted_at)}
+                            {showLateBadge(!!meta && lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null, submissionWasLate(sub.submitted_at, sub.due_at_submit)) && (
+                              <span style={{ marginLeft: 8, color: '#ff5555', fontWeight: 700 }}>Late, was due {formatDue(sub.due_at_submit as number)}</span>
+                            )}
                             {submissionScoreLabel(sub) && (
                               <span style={{ marginLeft: 12, color: '#f1fa8c' }}>
                                 {submissionScoreLabel(sub)}
@@ -1004,7 +1077,48 @@ function StudentDrawer({
                             )}
                           </div>
 
-                          {gradeData && (
+                          {(() => {
+                            // A chart keeps its hybrid result (rules plus wording) under `ai`; show what it says.
+                            const gd = describeGrade(sub.grade_json);
+                            if (!gd || gd.from !== 'ai') return null;
+                            return (
+                              <div style={{ marginBottom: 8 }}>
+                                <div style={{ fontSize: 12, fontWeight: 600, color: '#50fa7b', marginBottom: 6 }}>
+                                  {gd.totalEarned !== null && gd.totalPossible !== null && gd.totalPossible > 0
+                                    ? `${gd.totalEarned} / ${gd.totalPossible} pts`
+                                    : `${gd.lines.filter((l) => l.verdict === 'met' || l.verdict === 'partial').length} of ${gd.lines.length} criteria met`}
+                                </div>
+                                {gd.capped && (
+                                  <div role="note" style={{ fontSize: 12, color: '#282a36', background: '#ffb86c', borderRadius: 4, padding: '6px 10px', marginBottom: 6, fontWeight: 600 }}>
+                                    {gd.cappedNote}
+                                  </div>
+                                )}
+                                {gd.summary && (
+                                  <div style={{ fontSize: 12, color: '#f8f8f2', background: '#1e1f29', borderRadius: 4, padding: '6px 10px', marginBottom: 6, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+                                    {gd.summary}
+                                  </div>
+                                )}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                  {gd.lines.map((c) => (
+                                    <div key={c.id || c.title} style={{ fontSize: 12, background: '#1e1f29', borderRadius: 4, padding: '6px 10px' }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: c.feedback ? 3 : 0 }}>
+                                        <span style={{ color: '#f8f8f2', minWidth: 0, overflowWrap: 'anywhere' }}>
+                                          {c.title}
+                                          {c.source && <span style={{ color: '#8393c4', fontSize: 10, marginLeft: 6 }}>{c.source === 'rules' ? 'shape / order' : 'wording'}</span>}
+                                        </span>
+                                        <span style={{ fontFamily: 'monospace', flexShrink: 0, color: c.verdict === 'met' ? '#50fa7b' : c.verdict === 'partial' ? '#f1fa8c' : '#ff5555' }}>
+                                          {verdictWord(c.verdict)}{c.max > 0 ? ` ${c.earned}/${c.max}` : ''}
+                                        </span>
+                                      </div>
+                                      {c.feedback && <div style={{ color: '#8393c4', fontSize: 11, overflowWrap: 'anywhere' }}>{c.feedback}</div>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          })()}
+
+                          {gradeData && describeGrade(sub.grade_json)?.from !== 'ai' && (
                             <div style={{ marginBottom: 8 }}>
                               <div style={{ fontSize: 12, fontWeight: 600, color: '#50fa7b', marginBottom: 6 }}>
                                 {/* A pass/fail rubric has no point total, and a diagram
@@ -1016,7 +1130,9 @@ function StudentDrawer({
                                     ? `${gradeData.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length} of ${gradeData.criteria.length} criteria met`
                                     : gradeData.structural && gradeData.structural.length > 0
                                       ? `${gradeData.structural.filter((s) => s.passed).length} of ${gradeData.structural.length} checks passed`
-                                      : 'graded'}
+                                      : /"gradingFailed"\s*:\s*true/.test(sub.grade_json ?? '')
+                                        ? 'Needs your score: the AI grader could not score this'
+                                        : 'graded'}
                               </div>
 
                               {/* Diagram assignments store their browser-side checks here.
@@ -1098,7 +1214,7 @@ function GradebookView({
   classId: string;
   className: string;
   lessonMap: Map<string, LessonMeta>;
-  onOpenStudent: (email: string) => void;
+  onOpenStudent: (email: string, lessonId?: string) => void;
 }) {
   const router = useRouter();
   const [gbData, setGbData] = useState<GradebookData | null>(null);
@@ -1111,6 +1227,8 @@ function GradebookView({
   // Off by default: the grid is the graded lessons only (about a tenth of the columns). Readings, slides and
   // examples carry no grade, so they were 640 columns of dots between the ones a teacher came to read.
   const [showAll, setShowAll] = useState(false);
+  // One module's columns (its `unit` string), or null for every module.
+  const [moduleFilter, setModuleFilter] = useState<string | null>(null);
   const [grades, setGrades] = useState<Map<string, GridGrade>>(new Map());
 
   // The grade so far beside each name: the same number the roster shows (one endpoint, one rule).
@@ -1191,27 +1309,19 @@ function GradebookView({
   unitOrder.sort(compareUnitLabels);
   for (const u of unitOrder) byUnit[u].sort(compareLessons);
 
-  // Flatten to an ordered array; track unit spans for colspan.
+  // Flatten to an ordered array, then let lib/gradebook-view.ts pick the columns: one module or all of
+  // them, counted lessons only unless the teacher asks for the rest.
   const orderedLessons: LessonMeta[] = [];
-  const unitSpans: Array<{ unit: string; count: number }> = [];
-  for (const u of unitOrder) {
-    orderedLessons.push(...byUnit[u]);
-    unitSpans.push({ unit: u, count: byUnit[u].length });
-  }
-
-  // If lesson manifest is empty (not yet loaded), fall back to lessons seen in data.
+  for (const u of unitOrder) orderedLessons.push(...byUnit[u]);
   const isGradedLesson = (l: LessonMeta) =>
     lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null;
-  const gradedOnly = orderedLessons.filter(isGradedLesson);
-  // Fall back to everything when the manifest names no graded lesson at all (an older manifest), rather than an empty grid.
-  const narrowed = !showAll && gradedOnly.length > 0;
-  const hiddenCount = narrowed ? orderedLessons.length - gradedOnly.length : 0;
-  let displayLessons = narrowed ? gradedOnly : orderedLessons;
-  let displaySpans = narrowed
-    ? unitOrder
-        .map((u) => ({ unit: u, count: byUnit[u].filter(isGradedLesson).length }))
-        .filter((u) => u.count > 0)
-    : unitSpans;
+  const moduleChoices = moduleOptions(orderedLessons, isGradedLesson);
+  // A module that vanished (manifest changed) falls back to all rather than an empty grid.
+  const moduleSel = moduleFilter !== null && moduleChoices.some((m) => m.unit === moduleFilter) ? moduleFilter : null;
+  const picked = selectGradebookLessons(orderedLessons, { module: moduleSel, showAll, isCounted: isGradedLesson });
+  const hiddenCount = picked.hidden;
+  let displayLessons = picked.lessons;
+  let displaySpans = picked.spans;
   if (displayLessons.length === 0) {
     const allIds = new Set<string>();
     for (const s of gbData.students) for (const lid of Object.keys(s.cells)) allIds.add(lid);
@@ -1326,10 +1436,10 @@ function GradebookView({
     }
     if (cell.state === 'started') {
       const partial = cell.score ?? cell.submitted_score;
-      return `In progress${partial !== null ? `, ${partial} points so far` : ''}${cell.late ? ', past due' : ''}`;
+      return `In progress${partial !== null ? `, ${partial} points so far` : ''}${cell.late && graded ? ', past due' : ''}`;
     }
     if (cell.submitted_score !== null) return `Handed in, ${cell.submitted_score} points`;
-    return cell.late ? 'Missing: past due, not started' : 'Not started';
+    return cell.late && graded ? 'Missing: past due, not started' : 'Not started';
   }
 
   function cellTitle(cell: GradebookCell | undefined, lessonTitle: string, lessonId?: string, maxScore?: number | null, graded = true): string {
@@ -1418,9 +1528,20 @@ function GradebookView({
           <option value="grade">Order: lowest grade first</option>
           <option value="missing">Order: most past due first</option>
         </select>
-        <label style={{ fontSize: 12, color: '#f8f8f2', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }} title="Readings, slides and examples have no grade. They are hidden unless you ask for them.">
+        <select
+          value={moduleSel ?? ''}
+          onChange={(e) => setModuleFilter(e.target.value === '' ? null : e.target.value)}
+          aria-label="Show one module's columns"
+          style={{ background: '#1e1f29', color: '#f8f8f2', border: '1px solid #44475a', borderRadius: 4, padding: '4px 6px', fontSize: 12, maxWidth: narrow ? '100%' : 280 }}
+        >
+          <option value="">All modules</option>
+          {moduleChoices.map((m) => (
+            <option key={m.unit} value={m.unit}>{m.unit} ({m.counted} counted / {m.total})</option>
+          ))}
+        </select>
+        <label style={{ fontSize: 12, color: '#f8f8f2', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }} title="By default the grid shows only the lessons that count toward the grade. Tick this to add the ones that do not (readings, slides, examples, and any lab or chart with no grade category). They show a check mark, never a score.">
           <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
-          Show readings and slides{hiddenCount > 0 ? ` (${hiddenCount} hidden)` : ''}
+          Also show lessons that do not count toward the grade{hiddenCount > 0 ? ` (${hiddenCount} hidden)` : ''}
         </label>
         <label style={{ fontSize: 12, color: '#f8f8f2', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
           <input type="checkbox" checked={problemsOnly} onChange={(e) => setProblemsOnly(e.target.checked)} />
@@ -1717,17 +1838,19 @@ function GradebookView({
                         borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a22',
                         textAlign: 'center', verticalAlign: 'middle',
                         background: cellTint(cell, gradedIds.has(lesson.id), lessonPercent(cell?.state, cell?.score, lesson.maxScore)),
-                        ...(isCodingLesson ? { cursor: 'pointer' } : {}),
+                        ...(isCodingLesson || cell ? { cursor: 'pointer' } : {}),
                       }}
                       title={cellTitle(cell, lesson.title, lesson.id, lesson.maxScore, gradedIds.has(lesson.id))}
                       aria-label={`${fullName(student.firstName, student.lastName) || student.email}, ${lesson.title}: ${cellWords(cell, lesson.maxScore, gradedIds.has(lesson.id))}`}
-                      tabIndex={isCodingLesson ? 0 : undefined}
+                      tabIndex={isCodingLesson || cell ? 0 : undefined}
                       onKeyDown={isCodingLesson ? (e) => {
                         if (e.key === 'Enter') router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(student.email)}&lesson=${encodeURIComponent(lesson.id)}`);
+                      } : cell ? (e) => {
+                        if (e.key === 'Enter') onOpenStudent(student.email, lesson.id);
                       } : undefined}
                       onClick={isCodingLesson ? () => {
                         router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(student.email)}&lesson=${encodeURIComponent(lesson.id)}`);
-                      } : undefined}
+                      } : cell ? () => onOpenStudent(student.email, lesson.id) : undefined}
                     >
                       {cellContent(cell, lesson.maxScore, gradedIds.has(lesson.id))}
                     </td>
@@ -1971,6 +2094,8 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   const [lessonMap, setLessonMap] = useState<Map<string, LessonMeta>>(new Map());
   const lessonTitles = Object.fromEntries([...lessonMap.values()].map((l) => [l.id, l.title]));
   const [drawerEmail, setDrawerEmail] = useState<string | null>(null);
+  // The lesson to open expanded inside the drawer (a chart or quiz from the Today queue, a grid cell).
+  const [drawerLesson, setDrawerLesson] = useState<string | null>(null);
 
   // Section tabs. Seeded from ?tab= (or the top-nav "Gradebook" shortcut's ?view=gradebook) on mount only.
   // With no explicit tab the page opens on Students, and moves itself to Today once if submissions are
@@ -2330,9 +2455,16 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <NeedsAttentionPanel
               classId={classId}
               lessonTitles={lessonTitles}
-              onOpenStudent={(email: string) => setDrawerEmail(email)}
+              onOpenStudent={(email: string) => { setDrawerLesson(null); setDrawerEmail(email); }}
               onOpenTeacherEdit={(studentEmail: string, lessonId: string) => {
-                router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(studentEmail)}&lesson=${encodeURIComponent(lessonId)}`);
+                // /teacher-edit is a code-only editor. A chart, quiz or written answer is read in the student's
+                // drawer, opened on that lesson's submission.
+                if (opensInCodeEditor(lessonMap.get(lessonId)?.preview)) {
+                  router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(studentEmail)}&lesson=${encodeURIComponent(lessonId)}`);
+                } else {
+                  setDrawerLesson(lessonId);
+                  setDrawerEmail(studentEmail);
+                }
               }}
             />
           </div>
@@ -2446,7 +2578,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                       <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                         <button
                           style={S.btn('#8be9fd')}
-                          onClick={() => setDrawerEmail(row.student_email)}
+                          onClick={() => { setDrawerLesson(null); setDrawerEmail(row.student_email); }}
                         >
                           Open
                         </button>
@@ -2501,12 +2633,12 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
               classId={classId}
               className={cls.name}
               lessonMap={lessonMap}
-              onOpenStudent={(email) => setDrawerEmail(email)}
+              onOpenStudent={(email, lessonId) => { setDrawerLesson(lessonId ?? null); setDrawerEmail(email); }}
             />
           </div>
           <div style={{ ...S.card, marginBottom: 28 }}>
             <h2 style={{ ...S.h2, marginBottom: 16 }}>Most missed</h2>
-            <MostMissedPanel classId={classId} />
+            <MostMissedPanel classId={classId} onOpenStudent={(email) => { setDrawerLesson(null); setDrawerEmail(email); }} />
           </div>
         </div>
       )}
@@ -2634,7 +2766,8 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           classId={classId}
           email={drawerEmail}
           lessonMap={lessonMap}
-          onClose={() => setDrawerEmail(null)}
+          focusLessonId={drawerLesson}
+          onClose={() => { setDrawerEmail(null); setDrawerLesson(null); }}
         />
       )}
     </div>

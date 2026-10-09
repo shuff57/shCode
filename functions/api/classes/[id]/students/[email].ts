@@ -32,6 +32,7 @@ interface SubmissionRow {
   possible: number | null;
   grade_json: string | null;
   response: string | null;
+  due_at_submit: number | null;
 }
 
 export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = async (
@@ -82,10 +83,10 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
   // Fetch latest submission per lesson using ROW_NUMBER window function.
   // rn = 1 means the most recent submission for that lesson.
   const submissionRows = await env.DB.prepare(
-    `SELECT id, lesson_id, submitted_at, score, possible, grade_json, response
+    `SELECT id, lesson_id, submitted_at, score, possible, grade_json, response, due_at_submit
        FROM (
          SELECT
-           id, lesson_id, submitted_at, score, possible, grade_json, response,
+           id, lesson_id, submitted_at, score, possible, grade_json, response, due_at_submit,
            ROW_NUMBER() OVER (PARTITION BY lesson_id ORDER BY submitted_at DESC) AS rn
          FROM lesson_submissions
          WHERE student_email = ?
@@ -118,6 +119,7 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
       possible: number | null;
       grade_json: string | null;
       response: string | null;
+      due_at_submit: number | null;
     }
   > = {};
   for (const row of submissionRows.results ?? []) {
@@ -132,6 +134,8 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
       // submitted and scored but never what was drawn. Bounded: rn = 1 means
       // one row per lesson, not every attempt.
       response: row.response,
+      // The class due date in force when it was handed in (NULL = none then). Late = submitted_at after it.
+      due_at_submit: row.due_at_submit ?? null,
     };
   }
   // Grade-weighted percentage + per-category breakdown, under THIS class's

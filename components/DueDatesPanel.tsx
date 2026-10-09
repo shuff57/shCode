@@ -37,6 +37,7 @@ import {
   formatDueTime,
   moduleDueSummary,
   moduleIdFromTitle,
+  resolveDueAt,
   schoolDateString,
   type DueDateRow,
   type DueScope,
@@ -109,7 +110,8 @@ const dateInput: React.CSSProperties = {
   colorScheme: 'dark',
 };
 
-const timeInput: React.CSSProperties = { ...dateInput, width: 96 };
+// 96px clipped "08:00 AM" to "08:00 A"; the AM/PM segment and the clock icon need about 120px.
+const timeInput: React.CSSProperties = { ...dateInput, width: 124, minWidth: 124 };
 
 function numericCompare(a: string, b: string): number {
   return a.localeCompare(b, undefined, { numeric: true });
@@ -419,7 +421,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       <p style={{ color: C.dim, fontSize: 13, margin: '0 0 14px 0' }}>
         <strong style={{ color: C.open }}>Available after</strong> is a lock: before it, students see the lesson
         greyed out with the date on it and cannot open it. Leave it blank and the lesson is available
-        immediately, which is how all 512 lessons behave today.{' '}
+        immediately, which is how all {lessons.length > 0 ? lessons.length : 'the'} lessons behave today.{' '}
         <strong>Due</strong> never locks — a past-due lesson still opens and still submits. Set a date
         and leave the time blank and Available after starts at midnight, Due lands at 11:59 PM. All times are
         school time.
@@ -581,9 +583,21 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                                 {COUNTS_TEXT}
                               </span>
                             )}
-                            {!openRow && !dueRow && (
-                              <span style={{ fontSize: 12, color: C.dim }}> · inherits</span>
-                            )}
+                            {!openRow && !dueRow && (() => {
+                              // Say WHICH date it inherits (lesson > module > unit), not just that it does.
+                              const ids = { lessonId: lesson.id, moduleId: mod.moduleId, unitId: mod.unitId };
+                              const dueAt = resolveDueAt(index.due, ids);
+                              const openAt = resolveDueAt(index.open, ids);
+                              const parts = [
+                                openAt !== null ? `opens ${formatDueTime(openAt)}` : null,
+                                dueAt !== null ? `due ${formatDueTime(dueAt)}` : null,
+                              ].filter(Boolean);
+                              return (
+                                <span style={{ fontSize: 12, color: C.dim }}>
+                                  {parts.length > 0 ? ` · inherits ${parts.join(', ')}` : ' · inherits (no date set)'}
+                                </span>
+                              );
+                            })()}
                           </span>
 
                           <DateTimeField

@@ -8,6 +8,7 @@ import { lessonAvailability, resolveDue, resolveModuleSummary, useDueDates, useN
 import DueBadge, { ModuleDueBadge, OpensBadge } from './DueBadge';
 import DueClassPicker from './DueClassPicker';
 import DueDateChip from './DueDateChip';
+import { useCountedLessons } from '../lib/lesson-counted';
 import LessonAccessChip from './LessonAccessChip';
 import { moduleSummaryForClass, ownDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
 
@@ -43,6 +44,7 @@ export default function ModuleLessonsList({
 }) {
   const progress = useLessonState();
   const due = useDueDates();
+  const counted = useCountedLessons();
   // One clock for the whole list. Availability is resolved per row with the
   // pure lessonAvailability(), not the hook — a hook inside .map() would be
   // a different number of hooks per render.
@@ -208,6 +210,7 @@ export default function ModuleLessonsList({
             <DueBadge
               dueAt={lessonDue?.dueAt ?? null}
               completed={lessonState === 'completed'}
+              counted={counted?.get(l.id) === true}
               className={lessonDue?.className}
               ambiguous={lessonDue?.ambiguous}
             />

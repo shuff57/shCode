@@ -9,6 +9,7 @@ import { lessonHref } from '../lib/lesson-href';
 import { moduleIdFromTitle, resolveDue, useDueDates, useLessonAvailability } from '../lib/due-dates';
 import DueBadge, { OpensBadge } from './DueBadge';
 import DueDateChip from './DueDateChip';
+import { useCountedLessons } from '../lib/lesson-counted';
 import LessonAccessChip from './LessonAccessChip';
 import { ownDate, ownOpenDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
 
@@ -38,6 +39,7 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
   const pBadge = badgeForLesson({ type: lesson.type, preview: lesson.preview });
   const progress = useLessonState();
   const due = useDueDates();
+  const counted = useCountedLessons();
   const teacherDue = useTeacherDue();
   const lessonState = progress.states[lesson.id];
   const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
@@ -101,6 +103,7 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
         <DueBadge
           dueAt={lessonDue?.dueAt ?? null}
           completed={lessonState === 'completed'}
+          counted={counted?.get(lesson.id) === true}
           className={lessonDue?.className}
           ambiguous={lessonDue?.ambiguous}
         />

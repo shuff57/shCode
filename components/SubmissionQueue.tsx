@@ -117,6 +117,15 @@ function parseFailedGrade(raw: string): FailedGrade | null {
   }
 }
 
+/** A multiple-choice quiz stores its per-question picks under `quiz` (the same test the student drawer uses). */
+function isQuizGrade(raw: string): boolean {
+  try {
+    return Array.isArray((JSON.parse(raw) as { quiz?: unknown })?.quiz);
+  } catch {
+    return false;
+  }
+}
+
 /** True when the grade_json shows a human has set this row's score since the
  *  AI failed on it. The override endpoint stamps teacherReviewedAt (with
  *  feedback) or teacherOverriddenAt (score only) — same fields the student
@@ -410,6 +419,12 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* The list below is the most recent graded work of every kind, so say that first and count what is
+          listed; the orange note then counts only the rows the AI grader failed on. */}
+      <div style={{ fontSize: '0.84rem', color: '#a9b7e0' }}>
+        {submissions.length} recent submission{submissions.length === 1 ? '' : 's'}, newest first
+        {needsManual > 0 ? '' : '. Every one has a score; override it below if you disagree'}.
+      </div>
       {needsManual > 0 && (
         <div
           style={{
@@ -421,8 +436,8 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
             fontWeight: 600,
           }}
         >
-          {needsManual} submission{needsManual === 1 ? '' : 's'} the AI grader could not score.
-          Set a score by hand below — the students&apos; answers were saved.
+          {needsManual} of the {submissions.length} {needsManual === 1 ? 'is' : 'are'} marked &ldquo;Needs manual grade&rdquo;: the AI grader could not score {needsManual === 1 ? 'it' : 'them'}.
+          Set a score by hand below. The students&apos; answers were saved.
         </div>
       )}
       {submissions.map((sub) => {
@@ -494,7 +509,9 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                       : `AI: ${criteriaScore(gradeData?.criteria as Array<{ verdict: string }>)} of ${unit.total} criteria met`
                     : hasTeacherReview(sub.grade_json)
                       ? `Teacher score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
-                      : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
+                      : isQuizGrade(sub.grade_json)
+                        ? `Quiz score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
+                        : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
               </div>
             </div>
 
