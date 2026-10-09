@@ -1,0 +1,53 @@
+feature,area,priority,original,clone,notes
+Class grid: students down rows and items across columns,grid,must,yes,no,
+Total points and percent per student,grid,must,yes,no,
+Category total columns with a color per category,grid,must,yes,no,
+Collapse or expand a category's items,grid,should,yes,no,
+Sort by any column,grid,must,yes,no,
+Filter by category,grid,must,yes,no,
+Filter by past due / available / all,grid,should,yes,no,
+Hide or show not-counted items,grid,should,yes,no,
+Show or hide locked students,grid,could,yes,no,
+Score cell links to the attempt,grid,must,yes,no,
+Cell marks: none / excused / exception / not counted / in progress,grid,must,yes,no,original uses cryptic letter marks; use plain words or icons
+Color the cells by score cutoffs,grid,should,yes,no,original's cutoff pairs are cryptic
+Check boxes with bulk actions,grid,should,yes,no,
+Bulk message and copy emails,grid,could,yes,no,
+Bulk make exception (new due date),grid,should,yes,no,
+Print report for selected students,grid,could,yes,no,
+Single-student detail page,student,must,yes,no,
+Student switcher on detail page,student,could,yes,no,
+Student gradebook comment and private instructor note,student,should,yes,no,
+Login log and activity log per student,student,could,yes,no,
+Late pass count and use,student,could,yes,no,
+Excuse or un-excuse a grade,student,must,yes,no,
+Attempt review with per-question scores,attempt,should,yes,no,
+Override an attempt score,attempt,must,yes,no,
+Add per-question feedback,attempt,should,yes,no,
+Delete an attempt,attempt,could,yes,no,destructive; needs a confirm that says what is lost
+Grade by best attempt (rule shown on page),attempt,should,yes,no,
+Points-earned vs category-weights grading mode,settings,must,yes,no,
+Category: drop lowest or keep highest N,settings,must,yes,no,
+Category: scale and cap total,settings,should,yes,no,
+Category: fixed point total,settings,could,yes,no,
+Offline (manual) scores column,offline,must,yes,no,
+Export CSV with options,export,must,yes,no,
+Export for Excel,export,could,yes,no,
+Gradebook-wide comments,comments,could,yes,no,
+Question bank and answer-grading engine,platform,could,yes,skip,the original's content and engine are not part of what a gradebook rebuild needs
+LTI grade pass-back,integrations,could,yes,skip,tied to other LMS vendors
+Letter grade next to the percent per student,grid,must,yes,no,Aeries: Aeries shows Grd/%/Mark columns
+Legend explaining every cell color and mark,grid,must,yes,no,Aeries: Aeries has one; MyOpenMath has none
+Weighted categories that must total 100,settings,must,yes,no,Aeries: Aeries Manage > Categories
+Scores over 100% shown distinctly,grid,should,yes,no,Aeries: green cell for # Correct > Max
+Saved filter sets,grid,should,yes,no,Aeries: Aeries Filter Sets
+Show trend toggle,grid,could,yes,no,"Aeries: Aeries ""Show Trend"""
+Assignment list menu with search and add,navigation,should,yes,no,Aeries
+Student picker and next-student arrow,student,should,yes,no,Aeries
+Only show assignments missing scores,student,must,yes,no,Aeries: Aeries A04 checkbox
+Attendance on assigned and due date per assignment,student,could,yes,no,Aeries: ties gradebook to attendance
+Copy gradebook between classes,class,should,yes,no,Aeries
+Link gradebooks across sections,class,could,yes,no,Aeries
+Import assignments from Google,class,could,yes,no,Aeries
+Backups and restore of the gradebook,class,could,yes,no,Aeries
+Final marks and narrative grades for the report card,reporting,could,yes,skip,Aeries: district SIS reporting; not part of shCode's gradebook
