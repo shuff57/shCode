@@ -128,9 +128,6 @@ export default function ModuleLessonsList({
         const locked = (progress.loaded && idx > firstUnlocked && !lockBypass) || timeLocked;
 
         const rowStyle: React.CSSProperties = {
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
           padding: '10px 14px',
           borderLeft: '4px solid ' + badge.color,
           borderRight: '4px solid ' + stripeColor,
@@ -143,6 +140,7 @@ export default function ModuleLessonsList({
         const inner = (
           <>
             <span
+              className="mod-row-badge"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -153,7 +151,6 @@ export default function ModuleLessonsList({
                 border: '1px solid ' + badge.color + '55',
                 borderRadius: 999,
                 padding: '3px 10px',
-                minWidth: 140,
                 textTransform: 'uppercase',
                 fontWeight: 600,
                 letterSpacing: '0.04em',
@@ -162,10 +159,11 @@ export default function ModuleLessonsList({
               <badge.Icon size={12} strokeWidth={2.25} />
               {badge.label}
             </span>
-            <span style={{ opacity: 0.5, fontFamily: 'monospace', minWidth: 50 }}>
+            <span className="mod-row-num" style={{ opacity: 0.5, fontFamily: 'monospace' }}>
               {l.numberedId}
             </span>
-            <span style={{ flex: 1, fontWeight: 500 }}>{l.displayTitle}</span>
+            <span className="mod-row-title" style={{ fontWeight: 500 }}>{l.displayTitle}</span>
+            <span className="mod-row-meta">
             {locked ? (
               <span
                 style={{
@@ -246,6 +244,7 @@ export default function ModuleLessonsList({
                 />
               </>
             )}
+            </span>
           </>
         );
 
@@ -253,7 +252,7 @@ export default function ModuleLessonsList({
           <li key={l.id} style={{ marginBottom: 8 }}>
             {locked ? (
               <div
-                className="bg-card border-border border rounded block"
+                className="mod-row bg-card border-border border rounded block"
                 style={rowStyle}
                 aria-disabled="true"
               >
@@ -262,7 +261,7 @@ export default function ModuleLessonsList({
             ) : (
               <Link
                 href={href}
-                className="bg-card border-border border rounded block hover:bg-muted shadow-lg"
+                className="mod-row bg-card border-border border rounded block hover:bg-muted shadow-lg"
                 style={rowStyle}
               >
                 {inner}

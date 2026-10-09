@@ -62,9 +62,17 @@ export default function AssignmentHeader({
 
   const unmetHint =
     !submitted && !canSubmit && unmetTitles && unmetTitles.length > 0 ? (
-      <div className="assignment-unmet-hint" title={unmetTitles.join(', ')}>
-        Still needed: {unmetTitles.join(', ')}
-      </div>
+      // One requirement per line, never joined with commas: a title can hold a
+      // comma of its own ("Save function stores by key, ..."), and a joined
+      // line then reads as more items than the "/N" counter says there are.
+      <details className="assignment-unmet-hint">
+        <summary>Still needed ({unmetTitles.length})</summary>
+        <ul>
+          {unmetTitles.map((t, i) => (
+            <li key={i}>{t}</li>
+          ))}
+        </ul>
+      </details>
     ) : null;
 
   const submitButton = showSubmit ? (

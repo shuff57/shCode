@@ -32,15 +32,17 @@ export default function RequirementCard({
       className={classes.join(' ')}
       style={{ borderLeft: `4px solid ${borderColor}` }}
     >
-      <h3 className="text-xl">
-        {req.title}
+      <h3 className="text-xl req-title-row">
+        <span className="req-title">{req.title}</span>
         {/* Colour alone said pass/fail; say it in words too. role=status on just
             this word means a Run only announces the cards whose result changed
-            (a live region announces text that changes, not the whole card). */}
+            (a live region announces text that changed, not the whole card). The
+            badge is its own flex item so a long title wraps beside it, never
+            underneath it. */}
         <span
           role="status"
           className="req-status"
-          style={{ color: status.color, marginLeft: 10, fontSize: 14, fontWeight: 600 }}
+          style={{ color: status.color, fontSize: 14, fontWeight: 600 }}
         >
           {status.text ? (
             <>

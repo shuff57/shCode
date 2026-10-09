@@ -314,7 +314,8 @@ export default function ContentLessonView({ lesson }: Props) {
         .content-prose th, .content-prose td { border: 1px solid #444; padding: 6px 10px; vertical-align: top; }
         .content-prose th { background: #44475a; }
         .content-prose code { background: #282a36; padding: 1px 5px; border-radius: 3px; color: #ffb86c; }
-        .content-prose pre { background: #282a36; padding: 12px; border-radius: 6px; overflow-x: auto; }
+        .content-prose { min-width: 0; max-width: 100%; }
+        .content-prose pre { background: #282a36; padding: 12px; border-radius: 6px; overflow-x: auto; max-width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
         .content-prose pre code { background: transparent; padding: 0; color: #f8f8f2; }
         .content-prose a { color: #8be9fd; }
         .content-prose blockquote { border-left: 3px solid #bd93f9; margin: 12px 0; padding: 4px 14px; color: #ccc; background: rgba(189,147,249,0.08); }
