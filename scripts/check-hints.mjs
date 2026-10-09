@@ -1,4 +1,4 @@
-// Every requirement of a console lab in Units 3.1-3.3 must carry a `hint`.
+// Every requirement of a console lab in Units 3.1-3.8 must carry a `hint`.
 // lib/grader.ts shows the hint under a failing requirement; a requirement
 // without one leaves the student with only the title. Hints are a nudge toward
 // the idea, never the answer, and about 140 characters.
@@ -16,7 +16,7 @@ const MAX = 250;
 const problems = [];
 let checked = 0;
 for (const dir of fs.readdirSync(lessonsDir)) {
-  if (!/^3-[123]-/.test(dir)) continue;
+  if (!/^3-[1-8]-/.test(dir)) continue;
   const p = path.join(lessonsDir, dir, 'lesson.json');
   if (!fs.existsSync(p)) continue;
   const lesson = JSON.parse(fs.readFileSync(p, 'utf8'));

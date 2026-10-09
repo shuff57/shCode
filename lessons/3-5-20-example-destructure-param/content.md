@@ -2,7 +2,7 @@
 
 ## Step 1: Reading an options object with dots
 
-This is the options-object version from the previous lesson. It works, but `options.` is repeated on every line.
+This is the options-object version from Lessons 3.5.16 and 3.5.17. It works, but `options.` is repeated on every line.
 
 ```js live plain
 function describeBox(options) {

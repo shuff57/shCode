@@ -1,7 +1,7 @@
 {
   "id": "3-8-18-lab-save-by-key",
   "title": "3.8.18 Lab: Save a State Object by Key",
-  "description": "Turn a state object into JSON text and store it under a key so it survives the page closing. Auto-graded.",
+  "description": "Turn a state object into JSON text and store it under a key, the way a page would keep it between visits. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -39,7 +39,8 @@
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\{",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Declare a variable called state holding an object with at least two properties."
     },
     {
       "id": "r2",
@@ -50,7 +51,8 @@
       "pattern": "localStorage\\.setItem\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "localStorage.setItem takes two things: a key name and the text to store under it."
     },
     {
       "id": "r3",
@@ -61,7 +63,8 @@
       "pattern": "JSON\\.stringify\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "The store only holds text, so turn the object into text with JSON.stringify before you pass it in."
     },
     {
       "id": "r4",
@@ -72,7 +75,8 @@
       "pattern": "localStorage\\.getItem\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Read it back with localStorage.getItem, using the same key you saved under."
     },
     {
       "id": "r5",
@@ -83,7 +87,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Wrap the getItem call in console.log so the stored text is printed."
     },
     {
       "file": "script.js",

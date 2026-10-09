@@ -36,6 +36,8 @@ console.log(prices);
 
 `.map()` calls your callback once for each element, collects what each call returns, and hands back a **new array**. The original is untouched, which is why the result has to be assigned to something.
 
+If one of the results prints with a long tail of digits, such as `32.400000000000006`, that is how computers store decimal fractions. The `.map()` call did its job, and the value is correct to the digits that matter.
+
 The callback can do anything, including change the type. Strings in, numbers out:
 
 ```js live plain

@@ -45,7 +45,8 @@
       "pattern": "localStorage\\.setItem\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "saveState should call localStorage.setItem with a key and the text."
     },
     {
       "id": "r2",
@@ -56,7 +57,8 @@
       "pattern": "JSON\\.stringify\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Turn the state into text with JSON.stringify before you store it."
     },
     {
       "id": "r3",
@@ -67,7 +69,8 @@
       "pattern": "localStorage\\.getItem\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "loadState should read the same key with localStorage.getItem."
     },
     {
       "id": "r4",
@@ -78,7 +81,8 @@
       "pattern": "===\\s*null|==\\s*null|!==?\\s*null|!\\s*[A-Za-z_$]\\w*|if\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*\\)",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "If the text read back is null, return the defaults right away, before any parsing."
     },
     {
       "id": "r5",
@@ -89,7 +93,8 @@
       "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Put JSON.parse inside try, and return the defaults from catch."
     },
     {
       "id": "r6",
@@ -100,7 +105,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Call saveState, then loadState, and print one property of what loadState returns."
     },
     {
       "file": "script.js",

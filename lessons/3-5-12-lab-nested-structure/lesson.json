@@ -48,7 +48,8 @@
       "pattern": "\\{[^}]*\\{[^}]*\\}",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "One of the order's properties must itself be an object: put a second pair of braces inside the first."
     },
     {
       "id": "r2",
@@ -59,7 +60,8 @@
       "pattern": "\\[\\s*\\{[^}]*\\}",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Give the order an items property that is an array whose elements are objects, each in its own braces."
     },
     {
       "id": "r3",
@@ -70,7 +72,8 @@
       "pattern": "\\w+\\.\\w+\\.\\w+",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Chain the dots one step at a time: the order, then customer, then name."
     },
     {
       "id": "r4",
@@ -81,7 +84,8 @@
       "pattern": "\\[\\s*\\w+\\s*\\]\\s*\\.\\s*\\w+|(?:const|let)\\s+(\\w+)\\s*=\\s*[\\w.]+\\s*\\[\\s*\\w+\\s*\\][\\s\\S]*?\\b\\1\\.\\w+|for\\s*\\(\\s*(?:const|let|var)\\s+(\\w+)\\s+of\\s+[\\w.]+\\s*\\)[\\s\\S]*?\\b\\2\\.\\w+",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Pick one item with its index in square brackets, then read a field off it with a dot."
     },
     {
       "id": "r5",
@@ -92,7 +96,8 @@
       "pattern": "for\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Use a for loop to visit each item in the items array, one pass per item."
     },
     {
       "file": "script.js",

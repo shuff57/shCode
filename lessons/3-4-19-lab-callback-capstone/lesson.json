@@ -39,7 +39,8 @@
       "pattern": "(?:function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*\\w+\\s*\\)|(?:const|let|var)\\s+\\w+\\s*=\\s*(?:function\\s*\\(\\s*\\w+\\s*,\\s*\\w+\\s*\\)|\\(\\s*\\w+\\s*,\\s*\\w+\\s*\\)\\s*=>))",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "The helper takes two parameters: the array first, then the function that tests each element."
     },
     {
       "id": "r2",
@@ -50,7 +51,8 @@
       "pattern": "for\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Walk the array with a for loop and look at one element per pass."
     },
     {
       "id": "r3",
@@ -61,7 +63,8 @@
       "pattern": "function\\s+\\w+\\s*\\(\\s*\\w+\\s*,\\s*(\\w+)\\s*\\)[\\s\\S]*?(?:^|[^.\\w$])\\1\\s*\\(|(?:const|let|var)\\s+\\w+\\s*=\\s*function\\s*\\(\\s*\\w+\\s*,\\s*(\\w+)\\s*\\)[\\s\\S]*?(?:^|[^.\\w$])\\2\\s*\\(|(?:const|let|var)\\s+\\w+\\s*=\\s*\\(\\s*\\w+\\s*,\\s*(\\w+)\\s*\\)\\s*=>[\\s\\S]*?(?:^|[^.\\w$])\\3\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Inside the loop, call the test parameter with the current element and use its true/false answer to decide whether to count it."
     },
     {
       "id": "r4",
@@ -72,7 +75,8 @@
       "pattern": "=>[\\s\\S]*=>",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Call the helper twice and write a different one-line arrow as the test each time. Two arrows, two different conditions."
     },
     {
       "id": "r5",
@@ -83,7 +87,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
       "file": "script.js",

@@ -38,7 +38,8 @@
       "pattern": "for\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Use a for loop to visit each position in the array."
     },
     {
       "id": "r2",
@@ -49,7 +50,8 @@
       "pattern": "\\w+\\s*\\[\\s*\\w+\\s*\\]\\s*(?:[-+*/]?=(?!=)|\\+\\+|--)",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Write each new value into the array the parameter already points at: the parameter, then [i], an equals sign, the new value."
     },
     {
       "id": "r3",
@@ -60,7 +62,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Log the caller's array after the call, not a variable inside the function."
     },
     {
       "id": "r4",
@@ -71,7 +74,8 @@
       "pattern": "^(?![\\s\\S]*function\\s+addOne\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?(?<![\\w$.])\\1\\s*=(?!=))",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Delete the line that gives the parameter a brand-new array. That move only changes the function's own name."
     },
     {
       "file": "script.js",

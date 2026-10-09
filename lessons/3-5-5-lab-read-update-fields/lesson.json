@@ -48,7 +48,8 @@
       "pattern": "(?:const|let|var)\\s+\\w+\\s*=",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Declare a variable named book and give it an object in braces with at least two name: value pairs."
     },
     {
       "id": "r2",
@@ -59,7 +60,8 @@
       "pattern": "\\w+\\.\\w+",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Reach a property with the object name, a dot, then the property name, inside console.log."
     },
     {
       "id": "r3",
@@ -70,7 +72,8 @@
       "pattern": "\\w+\\.\\w+\\s*=",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Assign a new value to a property that already exists: the object, a dot, the property, an equals sign, the value."
     },
     {
       "id": "r4",
@@ -81,7 +84,8 @@
       "pattern": "console\\.log",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Pass the object itself to console.log (not one property) so the changed and added fields show."
     },
     {
       "file": "script.js",

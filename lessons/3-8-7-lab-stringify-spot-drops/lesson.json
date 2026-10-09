@@ -39,7 +39,8 @@
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\{",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Declare counter as an object in braces with a number property."
     },
     {
       "id": "r2",
@@ -50,7 +51,8 @@
       "pattern": "\\w+\\s*:\\s*(?:function\\s*\\(|\\([^)]*\\)\\s*=>|[A-Za-z_$][\\w$]*\\s*=>)",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Give the object a method: a property whose value is a function."
     },
     {
       "id": "r3",
@@ -61,7 +63,8 @@
       "pattern": "JSON\\.stringify\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Call JSON.stringify on counter and keep the text in a second variable."
     },
     {
       "id": "r4",
@@ -72,7 +75,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print the text and read it carefully: look for which properties are missing from it."
     },
     {
       "file": "script.js",

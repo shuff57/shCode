@@ -5777,6 +5777,23 @@
       }
     ]
   },
+  "3-6-9-reading-side-effects-copies#3": {
+    "code": "const team = { name: \"Ravens\", scores: [90, 85] };\n\nconst shallow = { ...team };\nconst deep = structuredClone(team);\n\nshallow.scores.push(70);\ndeep.scores.push(60);\n\nconsole.log(\"team:\", team.scores);\nconsole.log(\"shallow:\", shallow.scores);\nconsole.log(\"deep:\", deep.scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "team: [\n  90,\n  85,\n  70\n]"
+      },
+      {
+        "type": "log",
+        "text": "shallow: [\n  90,\n  85,\n  70\n]"
+      },
+      {
+        "type": "log",
+        "text": "deep: [\n  90,\n  85,\n  60\n]"
+      }
+    ]
+  },
   "3-7-10-example-concat-non-mutating#0": {
     "code": "const first = [1, 2];\nconst second = [3, 4];\n\nconst joined = first.concat(second);\n\nconsole.log(joined);",
     "output": [

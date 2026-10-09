@@ -32,24 +32,26 @@
     {
       "id": "r1",
       "title": "birthday defined",
-      "description": "Code defines a function named birthday. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+      "description": "Code defines a function named birthday. Help: 3.6.5 (Changing vs. Reassigning)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:function\\s+birthday\\s*\\(|(?:const|let|var)\\s+birthday\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Define a function called birthday with one parameter, the person object."
     },
     {
       "id": "r2",
       "title": "property mutated",
-      "description": "Code assigns to a property on the parameter object. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+      "description": "Code assigns to a property on the parameter object. Help: 3.6.5 (Changing vs. Reassigning)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.\\w+\\s*(?:[-+*/]?=(?!=)|\\+\\+|--)",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Change a property the object already has by assigning to it, such as person.age. Do not point the parameter at a new object."
     },
     {
       "id": "r3",
@@ -60,7 +62,8 @@
       "pattern": "(?:function\\s+birthdaySafe\\s*\\(|(?:const|let|var)\\s+birthdaySafe\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Define a second function called birthdaySafe that also takes one object."
     },
     {
       "id": "r4",
@@ -71,7 +74,8 @@
       "pattern": "\\{\\s*\\.\\.\\.",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Copy the object with spread in braces, then write the changed property after it, so the original is not touched."
     },
     {
       "id": "r5",
@@ -82,7 +86,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
       "file": "script.js",

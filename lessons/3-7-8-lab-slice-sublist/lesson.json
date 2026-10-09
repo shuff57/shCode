@@ -43,7 +43,8 @@
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Declare an array with at least five values in square brackets."
     },
     {
       "id": "r2",
@@ -54,7 +55,8 @@
       "pattern": "(?:[\\s\\S]*\\.slice\\s*\\([\\s\\S]*\\.slice\\s*\\()",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Call .slice twice: once with a start and an end index, once with only a start. Keep each result in a variable."
     },
     {
       "id": "r3",
@@ -65,7 +67,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print both slices and the original items array."
     },
     {
       "file": "script.js",

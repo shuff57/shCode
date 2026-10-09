@@ -85,7 +85,7 @@
     {
       "id": "s9",
       "title": "Write saveStock and loadStock",
-      "instructions": "Save: the list goes to localStorage as JSON text under a key you choose (3.8.15). Load: read the key back. A key that was never saved reads as null -- return the seed list then (3.8.15). Text you did not write can fail to parse, and 3.8.12 says what to do about it: do not let a bad value throw.",
+      "instructions": "Save: the list goes to localStorage as JSON text under a key you choose (3.8.15). Load: read the key back. A key that was never saved reads as null -- return the seed list then (3.8.15). Text you did not write can fail to parse, and 3.8.12 says what to do about it: do not let a bad value throw. When the seed list is handed back (a first run, or a bad value), return copies of its records built with spread ({ ...item }, 3.7.15), so nothing the program does later edits the seed data itself.",
       "hints": [
         "localStorage.setItem(KEY, JSON.stringify(list)); -- 3.8.4",
         "const text = localStorage.getItem(KEY);  if (text === null) { ... } -- 3.8.15",
@@ -167,10 +167,10 @@
     {
       "id": "r6",
       "title": "The data is an array of record objects",
-      "description": "The seed data is an array whose elements are object literals with the same properties. Help: 3.3.2 (Array Basics: Index, push, pop)",
+      "description": "The seed data is an array whose elements are object literals (or makeItem calls) with the same properties. Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "=\\s*\\[\\s*\\{[^\\]]*\\}\\s*\\]",
+      "pattern": "=\\s*\\[\\s*(?:\\{[^\\]]*\\}|[A-Za-z_$][\\w$]*\\s*\\()",
       "flags": "",
       "points": 0,
       "hint": "const stock = [{ name: 'Popcorn', price: 3.5, qty: 12 }, ...]; -- square brackets around a list of { objects }.",

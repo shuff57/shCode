@@ -44,7 +44,8 @@
       "pattern": "\\[\\s*[^\\]]*\\.\\.\\.",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Spread is three dots in front of an array, written inside the square brackets of a new array."
     },
     {
       "id": "r2",
@@ -55,7 +56,8 @@
       "pattern": "\\.\\.\\.[^\\]]*,\\s*\\.\\.\\.",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Put both arrays, each with three dots in front, inside one new pair of square brackets."
     },
     {
       "id": "r3",
@@ -66,7 +68,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
       "id": "r4",
@@ -77,7 +80,8 @@
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[\\s\\S]*(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Declare two arrays in square brackets, each with at least two values."
     },
     {
       "file": "script.js",

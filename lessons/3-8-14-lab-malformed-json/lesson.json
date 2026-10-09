@@ -39,7 +39,8 @@
       "pattern": "function\\s+\\w+\\s*\\(|(?:const|let)\\s+\\w+\\s*=\\s*(?:function\\s*\\(|\\([^)]*\\)\\s*=>|[A-Za-z_$][\\w$]*\\s*=>)",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Define a function called readSave that takes one parameter, the text."
     },
     {
       "id": "r2",
@@ -50,7 +51,8 @@
       "pattern": "JSON\\.parse\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Inside the function, call JSON.parse on the text it was given."
     },
     {
       "id": "r3",
@@ -61,7 +63,8 @@
       "pattern": "try\\s*\\{",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Put the JSON.parse call inside a try block."
     },
     {
       "id": "r4",
@@ -72,7 +75,8 @@
       "pattern": "catch\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Add a catch block after the try, and return a fallback object from it."
     },
     {
       "id": "r5",
@@ -83,7 +87,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Call the function twice inside console.log: once with valid JSON text and once with garbage."
     },
     {
       "file": "script.js",

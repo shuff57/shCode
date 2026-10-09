@@ -54,7 +54,8 @@
       "pattern": "\\[\\s*\\{[^}]*\\}",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Make one array with at least three objects in it, and give every object the same kinds of fields."
     },
     {
       "id": "r2",
@@ -65,18 +66,20 @@
       "pattern": "\\{[^}]*\\{[^}]*\\}",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Give one record a field whose value is another object in braces, for example details: { color: \"blue\" }."
     },
     {
       "id": "r3",
       "title": "dot access used",
-      "description": "Reads a property with a dot. Help: 3.5.2 (Grouping Related Values)",
+      "description": "Reads a property with a dot. Help: 3.5.4 (Reading and Changing Properties)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\.\\w+",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Read a plain property with a dot: the record, a dot, the field name."
     },
     {
       "id": "r4",
@@ -87,7 +90,8 @@
       "pattern": "\\w+\\[",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "A key with a space in it must be written in quotes, and is read with square brackets and the quoted key."
     },
     {
       "id": "r5",
@@ -98,7 +102,8 @@
       "pattern": "for\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Use a for loop to visit each record in the array."
     },
     {
       "id": "r6",
@@ -109,18 +114,20 @@
       "pattern": "(?:const|let|var)\\s*\\{[^}]*\\}\\s*=",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Put the field names in braces on the left of the equals sign and one record on the right."
     },
     {
       "id": "r7",
       "title": "Object.keys used",
-      "description": "Walks the object's keys. Help: 3.5.2 (Grouping Related Values)",
+      "description": "Walks the object's keys. Help: 3.5.6 (Square Brackets and Computed Keys)",
       "type": "regex",
       "file": "script.js",
       "pattern": "Object\\.keys",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Object.keys(record) gives a list of the record's keys. Loop over that list and fetch each value with brackets."
     },
     {
       "id": "r8",
@@ -131,7 +138,8 @@
       "pattern": "console\\.log",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
       "file": "script.js",

@@ -1,7 +1,7 @@
 {
   "id": "3-1-10-functions",
   "title": "3.4.21 Lab: Parameters, Return Values, and Arrow Syntax",
-  "description": "Group code into reusable logic blocks with parameters and return values.",
+  "description": "Write a function with a parameter and a return value, a second function of your own, and an arrow function, then call them and print the results. Auto-graded.",
   "type": "assignment",
   "estimateMins": 40,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -24,15 +24,18 @@
     },
     {
       "id": "s2",
-      "title": "Add parameters"
+      "title": "Write a second function",
+      "instructions": "Write a second function of your own, with at least one parameter, that returns a value built from its parameter."
     },
     {
       "id": "s3",
-      "title": "Return a value"
+      "title": "Write an arrow function",
+      "instructions": "Write an arrow function using the short form from the reading: a const, the parameters, =>, then the expression."
     },
     {
       "id": "s4",
-      "title": "Call your functions"
+      "title": "Call your functions and print",
+      "instructions": "Call greet with a name and print what it hands back with console.log. Call the other two as well and print their results."
     }
   ],
   "requirements": [

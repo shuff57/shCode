@@ -1,7 +1,7 @@
 {
   "id": "3-5-26-objects-quiz",
   "title": "3.5.26 Objects and Properties",
-  "description": "Eight multiple-choice questions on object literals, dot vs bracket access, nesting, methods, options objects, and destructuring. Checked instantly.",
+  "description": "Eight multiple-choice questions on object literals, dot vs bracket access, nesting, methods, and options objects. Checked instantly.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

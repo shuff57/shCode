@@ -55,7 +55,8 @@
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[\\s\\S]*\\.push\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Start prices as an empty array and add each value with .push, one call per value."
     },
     {
       "id": "r2",
@@ -66,7 +67,8 @@
       "pattern": "\\.map\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Use .map on prices with a function that increases each price, and keep the result in a second variable."
     },
     {
       "id": "r3",
@@ -77,7 +79,8 @@
       "pattern": "\\.slice\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Use .slice with a start and an end index to copy part of the transformed array."
     },
     {
       "id": "r4",
@@ -88,7 +91,8 @@
       "pattern": "(\\.concat\\s*\\(|\\[[^\\]]*\\.\\.\\.)",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Join two arrays with .concat, or with both spread inside new square brackets."
     },
     {
       "id": "r5",
@@ -99,7 +103,8 @@
       "pattern": "\\{\\s*\\.\\.\\.[^}]*,\\s*(?:[\"'] *[\"']|\\w+)\\s*:",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Copy an object with spread in braces and write the changed property after the spread."
     },
     {
       "id": "r6",
@@ -110,7 +115,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Log the arrays, both objects, and the original prices to confirm it did not change."
     },
     {
       "file": "script.js",

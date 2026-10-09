@@ -44,7 +44,8 @@
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\{",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Declare an object in braces with at least three name: value pairs."
     },
     {
       "id": "r2",
@@ -55,7 +56,8 @@
       "pattern": "\\{\\s*\\.\\.\\.",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Spread is three dots in front of an object, written inside the braces of a new object."
     },
     {
       "id": "r3",
@@ -66,7 +68,8 @@
       "pattern": "\\.\\.\\.[^}]*,\\s*(?:[\"'] *[\"']|\\w+)\\s*:",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Write the property you want to change AFTER the spread. The later entry wins."
     },
     {
       "id": "r4",
@@ -77,7 +80,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
       "file": "script.js",

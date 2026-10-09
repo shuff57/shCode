@@ -44,7 +44,8 @@
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Declare an array in square brackets."
     },
     {
       "id": "r2",
@@ -55,7 +56,8 @@
       "pattern": "\\.(?:push|unshift|pop|shift|splice|sort|reverse)\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Call a method that changes the array in place, such as .push, then log the array to see it change."
     },
     {
       "id": "r3",
@@ -66,7 +68,8 @@
       "pattern": "\\.(?:map|slice|concat|filter|reduce|toSorted|toReversed)\\s*\\(|\\[\\s*\\.\\.\\.",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Call a method that returns a new array and leaves the original alone, such as .map, .slice or .concat."
     },
     {
       "id": "r4",
@@ -77,7 +80,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Log before and after so you can see which call changed the original."
     }
   ],
   "grading": {

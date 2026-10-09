@@ -1,5 +1,7 @@
 **Goal:** See the difference between JSON that a person can read and the parts of an object that do not survive the trip to text.
 
+*A preview:* `JSON.stringify(value)` turns a value into text. The next readings explain it properly (Readings 3.8.4 to 3.8.6); here you only watch what comes out.
+
 ## Step 1: The readable form
 
 The second and third arguments to `JSON.stringify` turn compact text into output a person can read. Run this and look at the shape.

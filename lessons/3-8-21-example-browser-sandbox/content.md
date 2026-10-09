@@ -16,7 +16,7 @@ The page can save under keys it chooses and read them back. This is the store th
 
 ## Step 2: The functions a page does not get
 
-Other languages save with `open()`, `read()` and `write()`. A browser page has none of them. Run this and read the four lines.
+Other languages save with `open()`, `read()` and `write()`. A browser page has none of them. Run this and read the three lines.
 
 ```js live plain
 console.log(typeof read);

@@ -39,7 +39,8 @@
       "pattern": "(?:function\\s+\\w+\\s*\\(|(?:const|let|var)\\s+\\w+\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Define the function with the function keyword and a name of your choice."
     },
     {
       "id": "r2",
@@ -50,7 +51,8 @@
       "pattern": "function\\s+\\w+\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{[\\s\\S]*?\\b\\1\\.\\w+|=\\s*function\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{[\\s\\S]*?\\b\\2\\.\\w+|=\\s*\\(?\\s*([A-Za-z_$][\\w$]*)\\s*\\)?\\s*=>[\\s\\S]*?\\b\\3\\.\\w+|(?:function\\s*\\w*\\s*|=\\s*)\\(\\s*\\{[^}]*\\}\\s*\\)",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "The single parameter is the options object. Read each value off it with a dot, like options.width."
     },
     {
       "id": "r3",
@@ -61,7 +63,8 @@
       "pattern": "(?:^|[^.\\w$])\\w+\\s*\\(\\s*\\{",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Call the function with one object in braces that names each key, such as { width: 10, height: 4 }."
     },
     {
       "id": "r4",
@@ -72,7 +75,8 @@
       "pattern": "console\\.log",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
       "file": "script.js",

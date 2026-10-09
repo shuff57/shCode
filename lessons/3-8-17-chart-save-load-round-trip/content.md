@@ -52,7 +52,7 @@ The first decision is the one students skip. If you jump straight to parsing, `J
 
 ### The arrows that matter
 
-- Both **`yes`** paths out of a return box lead to the **same print** shape at the bottom.
+- Every return box (the parsed object, and the defaults in both places) leads to the **same print** shape at the bottom.
 - Both **defaults** returns (`text === null` and the catch) land on that same print, because a defaults object is still a value the program prints.
 - The print is **outside** both decisions: the flow only reaches it once the restore has produced a value.
 

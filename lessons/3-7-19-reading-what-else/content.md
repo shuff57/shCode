@@ -38,9 +38,18 @@ Here is the full list, each in one line:
 - **`.reduce(callback, start)`** — combines all the elements into one value, such as a total.
 - **`.indexOf(value)` and `.includes(value)`** — search for a value, giving its position or `true`/`false`.
 - **`.sort()` and `.reverse()`** — reorder the array **in place**, changing the original, unlike everything this module taught.
+- **`.splice(start, count)`** — removes items from the array **in place** and returns them.
 - **`.every(callback)`** — checks the callback against every element and answers a single `true`/`false`: `true` only if every element passed.
 
-Notice the split. `.filter()`, `.forEach()` and `.reduce()` leave the original alone. `.sort()` and `.reverse()` do not — they reorder the array they are called on, which is why the demo above sorts a `.slice()` copy. Chapter 11 implements sorting and searching by hand rather than calling `.sort()`, because writing them is the lesson there.
+### Sorting numbers: the comparison function
+
+`.sort()` with nothing in the parentheses sorts as **text**, so `[10, 9, 1]` becomes `[1, 10, 9]`. To sort numbers, hand it a comparison function with two parameters, `a` and `b`. It returns a **negative** number when `a` should come first, a **positive** one when `b` should, and `0` for a tie. So `(a, b) => a - b` puts the smallest first and `(a, b) => b - a` puts the largest first. Sorting changes the array it is called on, so copy first, as the demo does.
+
+### Removing items: `.splice`
+
+`.splice(start, count)` removes `count` items beginning at position `start`, and gives back the items it removed. `list.splice(1, 1)` removes the item at index 1. Like `.sort()`, it changes the original array in place.
+
+Notice the split. `.filter()`, `.forEach()` and `.reduce()` leave the original alone. `.sort()`, `.reverse()` and `.splice()` do not — they change the array they are called on, which is why the demo above sorts a `.slice()` copy. Chapter 11 implements sorting and searching by hand rather than calling `.sort()`, because writing them is the lesson there.
 
 ---
 
@@ -53,4 +62,5 @@ Notice the split. `.filter()`, `.forEach()` and `.reduce()` leave the original a
 | **`.reduce(callback, start)`** | Combines all elements into one value, such as a total |
 | **`.indexOf(value)` / `.includes(value)`** | Search for a value: its position, or `true`/`false` |
 | **`.sort()` / `.reverse()`** | Reorder the array **in place**, changing the original |
+| **`.splice(start, count)`** | Removes items from the array **in place** and returns them |
 | **`.every(callback)`** | `true` only if every element passes the callback's test |

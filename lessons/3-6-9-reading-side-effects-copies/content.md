@@ -73,6 +73,24 @@ console.log(scores);
 
 A copy made this way is **shallow**: the new array is genuinely new, but if its items are themselves objects, both arrays still point at those same inner objects. For a flat list of numbers or strings a shallow copy is all you need. When you need a copy that goes all the way down, `structuredClone(value)` does that.
 
+**Try it:** Both copies start as copies of `team`. Push a score into each copy's nested `scores` array, then compare what `team` holds. Which copy reached back and changed the original?
+
+```js live plain
+const team = { name: "Ravens", scores: [90, 85] };
+
+const shallow = { ...team };
+const deep = structuredClone(team);
+
+shallow.scores.push(70);
+deep.scores.push(60);
+
+console.log("team:", team.scores);
+console.log("shallow:", shallow.scores);
+console.log("deep:", deep.scores);
+```
+
+The spread copy shares the nested `scores` array with `team`, so the push shows up in both. The `structuredClone` copy has its own array, so its push stays in the copy.
+
 ---
 
 ## Short glossary (quick reference)

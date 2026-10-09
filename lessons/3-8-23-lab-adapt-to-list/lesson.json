@@ -38,13 +38,14 @@
     {
       "id": "r1",
       "title": "Array of objects declared",
-      "description": "Declares an array whose elements are objects. Help: 3.8.15 (Saving by Key)",
+      "description": "Declares an array whose elements are objects. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\[\\s*\\{",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Declare an array whose elements are objects, each with a name and a value."
     },
     {
       "id": "r2",
@@ -55,7 +56,8 @@
       "pattern": "localStorage\\.setItem\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Store the list with localStorage.setItem under a key of your choice."
     },
     {
       "id": "r3",
@@ -66,7 +68,8 @@
       "pattern": "JSON\\.stringify\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "The store holds text, so run the list through JSON.stringify first."
     },
     {
       "id": "r4",
@@ -77,7 +80,8 @@
       "pattern": "JSON\\.parse\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Read the key with getItem and turn the text back into an array with JSON.parse."
     },
     {
       "id": "r5",
@@ -88,7 +92,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print the restored array's length and one record's field."
     },
     {
       "file": "script.js",

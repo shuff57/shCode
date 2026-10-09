@@ -33,9 +33,12 @@ Findings, ranked. Tick a step when it is committed and `npm test` is green.
       NOT counted toward the grade: none has an `assignmentCode`; owner decides (no real student drafts exist to measure, unlike 3.2/3.3).
       Limits: the rules cannot read WHICH question a diamond asks (except 3.8.17), so a chart with the right shapes and
       on-topic words in the wrong places can still earn partial credit; the gate only needs 2 of 4-5 word groups.
-- [ ] **5. Hints on all 146 requirements**, then content fixes: 3.4.21 steps 2-4 have no instructions; 3.9.2 r10 (spread) asked by no
-      step and r6 refuses `makeItem(...)` seeds; 3.6 promises 3.7 explains `sort`/`splice` (it does not); 3.6.13/16 need a
-      `structuredClone` live block first; 3.6.10 before 3.6.9; 3.8.3 before the JSON readings; 3.4.9/3.6.7/3.7.5/3.8.17 chart
-      a decision or print the code lacks; 3.10.5 needs "mark one record on its own copy" taught; wrong Help links
-      (3.5.25, 3.6.12, 3.6.16, 3.8.23); 3.8 claims storage survives the page but the console runner resets it per Run;
-      3.8.24 says eight questions (nine), 3.8.21 four lines (three); 3.7.23 key is B in 6 of 8; 3.5.17 pasted text.
+- [x] **5. Hints and content fixes** (2026-10-09). 146 hints added (3.4-3.8, every console-lab requirement now has one; `check-hints`
+      covers 3.1-3.8). Content: 3.4.21 steps 2-4 written; 3.9.2 asks for spread (s9) and r6 accepts `makeItem(...)` seeds; 3.7.19 now
+      explains the sort comparison function and `.splice` (3.6 promised it); 3.6.9 has a live `structuredClone` block before the labs
+      that need it (and `check-live-blocks` gives its sandbox `structuredClone`); 3.6.10's "all flat" line points to it; 3.8.3 has a
+      preview line for `JSON.stringify`; 3.8.15 says the practice console forgets the store each Run; 3.8.19 step 1 says to remove the
+      save to test the missing-key path; wrong Help links fixed (3.5.25, 3.6.12, 3.6.16, 3.8.23); counts fixed (3.8.24 nine questions,
+      3.8.21 three lines); 3.5.17/3.5.20/3.5.26/3.7.2 small text errors; 3.7.23 answer positions rebalanced (1,3,0,2,1,3,0,2).
+      Not done on purpose: 3.6.10 was not moved before 3.6.9 (titles carry the order; the text now reads correctly in place);
+      3.10.5's "own copy" is the single-record spread override that 3.6.12 and 3.7.15 already teach.

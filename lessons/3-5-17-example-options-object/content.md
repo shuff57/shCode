@@ -2,7 +2,7 @@
 
 ## Step 1: The positional version
 
-Four arguments, all in a row. The call reads `10, 4, 6, "red"` with nothing to say which number is which.
+Four arguments, all in a row. The call reads `"HELLO", 14, true, "red"` with nothing to say which number is which.
 
 ```js live plain
 function makeLabel(text, size, bold, color) {

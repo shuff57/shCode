@@ -7,7 +7,7 @@
 - That a key which was never saved returns `null`, not `undefined`
 - Why a load function has to test for that `null` before parsing
 
-JSON gives you text. Storing that text so it survives the page closing is a separate job, and in a browser the simplest tool for it is **`localStorage`**. It works like an object with three methods, and it holds **strings only**:
+JSON gives you text. Storing that text so it survives the page closing is a separate job, and in a browser the simplest tool for it is **`localStorage`**. (The practice console in this course keeps its store only for the one run, so the save-and-load code works there, but the text is gone on the next Run. A real browser page keeps it.) It works like an object with three methods, and it holds **strings only**:
 
 - `localStorage.setItem(key, text)` — save under a name.
 - `localStorage.getItem(key)` — read it back, or `null` if nothing was saved.

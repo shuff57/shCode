@@ -44,7 +44,8 @@
       "pattern": "(?:function\\s+addScore\\s*\\(|(?:const|let|var)\\s+addScore\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Define a function called addScore that takes the scores and the new score."
     },
     {
       "id": "r2",
@@ -55,29 +56,32 @@
       "pattern": "\\[\\s*\\.\\.\\.",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Build the new array with spread: a pair of square brackets holding the old scores spread out, then the new one."
     },
     {
       "id": "r3",
       "title": "recordPlay defined",
-      "description": "Code defines a function named recordPlay. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+      "description": "Code defines a function named recordPlay. Help: 3.6.5 (Changing vs. Reassigning)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:function\\s+recordPlay\\s*\\(|(?:const|let|var)\\s+recordPlay\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Define a function called recordPlay that takes one song object."
     },
     {
       "id": "r4",
       "title": "plays property updated",
-      "description": "recordPlay assigns to the plays property. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+      "description": "recordPlay assigns to the plays property. Help: 3.6.5 (Changing vs. Reassigning)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.plays\\s*(?:[-+*/]?=(?!=)|\\+\\+|--)",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Add 1 to the song's plays property by assigning to it. This one is meant to change the caller's object."
     },
     {
       "id": "r5",
@@ -88,18 +92,20 @@
       "pattern": "function\\s+copyBook\\s*\\([^)]*\\)\\s*\\{[^}]*structuredClone\\s*\\(|(?:const|let|var)\\s+copyBook\\s*=\\s*(?:function\\s*\\([^)]*\\)\\s*\\{[^}]*|(?:\\([^)]*\\)|\\w+)\\s*=>\\s*(?:\\{[^}]*|[^;{}]*?))structuredClone\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "copyBook should return a deep copy. The work is done by structuredClone inside copyBook."
     },
     {
       "id": "r6",
       "title": "structuredClone used",
-      "description": "Code calls structuredClone for a deep copy",
+      "description": "Code calls structuredClone for a deep copy Help: 3.6.9 (Side Effects and Copies)",
       "type": "regex",
       "file": "script.js",
       "pattern": "structuredClone\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Pass the library to structuredClone so changes to the copy's nested array never reach the original."
     },
     {
       "id": "r7",
@@ -110,7 +116,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Log the caller's data before and after each call to show which function changed it."
     },
     {
       "file": "script.js",

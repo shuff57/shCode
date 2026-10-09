@@ -103,7 +103,7 @@ function runBlock(code) {
     removeItem: (k) => { store.delete(String(k)); },
     clear: () => { store.clear(); },
   };
-  const context = vm.createContext({ console: { log: capture('log'), warn: capture('warn'), error: capture('error') }, localStorage });
+  const context = vm.createContext({ console: { log: capture("log"), warn: capture("warn"), error: capture("error") }, localStorage, structuredClone });
   const result = { output };
   try {
     vm.runInContext(code, context, { timeout: RUN_TIMEOUT_MS });

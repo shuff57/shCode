@@ -39,7 +39,8 @@
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\{",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Declare an object in braces for the game state."
     },
     {
       "id": "r2",
@@ -50,7 +51,8 @@
       "pattern": "\\[\\s*\\{",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Give it a property that is an array whose elements are objects, each with a name and a price."
     },
     {
       "id": "r3",
@@ -61,7 +63,8 @@
       "pattern": "JSON\\.stringify\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "JSON.stringify(gameState) turns the whole thing into text."
     },
     {
       "id": "r4",
@@ -72,7 +75,8 @@
       "pattern": "JSON\\.parse\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "JSON.parse on the saved text gives back an object you can read from."
     },
     {
       "id": "r5",
@@ -83,7 +87,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print the second item's price plus ten, and its name, reading from the restored object."
     },
     {
       "file": "script.js",

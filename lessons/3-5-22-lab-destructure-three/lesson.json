@@ -43,7 +43,8 @@
       "pattern": "(?:const|let|var)\\s*\\{[^}]*\\}\\s*=",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Put the names you want in braces on the left of the equals sign, and the object on the right. The names must match the keys."
     },
     {
       "id": "r2",
@@ -54,7 +55,8 @@
       "pattern": "function\\s+\\w+\\s*\\(\\s*\\{|=\\s*(?:function\\s*)?\\(\\s*\\{[^}]*\\}\\s*\\)\\s*(?:=>|\\{)",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Put the braces and key names right in the function's parentheses, instead of one ordinary parameter name."
     },
     {
       "id": "r3",
@@ -65,7 +67,8 @@
       "pattern": "console\\.log",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
       "file": "script.js",

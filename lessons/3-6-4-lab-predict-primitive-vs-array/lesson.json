@@ -38,7 +38,8 @@
       "pattern": "(?:function\\s+changeNum\\s*\\(|(?:const|let|var)\\s+changeNum\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Define a function called changeNum with one parameter and assign that parameter a different number inside."
     },
     {
       "id": "r2",
@@ -49,7 +50,8 @@
       "pattern": "(?:function\\s+changeArr\\s*\\(|(?:const|let|var)\\s+changeArr\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Define a function called changeArr with one parameter. Inside it, add an item to that parameter."
     },
     {
       "id": "r3",
@@ -60,7 +62,8 @@
       "pattern": "\\.push\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Use .push on the array parameter. This changes the one array the caller also holds."
     },
     {
       "id": "r4",
@@ -71,7 +74,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Log the number and the array in the main program, after both calls, then compare with your prediction."
     },
     {
       "file": "script.js",

@@ -48,7 +48,8 @@
       "pattern": "\\w+\\[",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Square brackets go after the object name and hold the key, like object[\"key\"] or object[variable]."
     },
     {
       "id": "r2",
@@ -59,7 +60,8 @@
       "pattern": "\\[\\s*[\"'][^\"']+ [^\"']*[\"']\\s*\\]",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "A key with a space cannot be written with a dot. Put the quoted key in square brackets."
     },
     {
       "id": "r3",
@@ -70,7 +72,8 @@
       "pattern": "Object\\.keys\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Object.keys(object) gives a list of the keys. Loop over that list."
     },
     {
       "id": "r4",
@@ -81,7 +84,8 @@
       "pattern": "\\w+\\[\\s*[A-Za-z_$][\\w$]*\\s*[\\]\\[]",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Inside the loop the key is held in a variable, so fetch the value with that variable in square brackets."
     }
   ],
   "grading": {

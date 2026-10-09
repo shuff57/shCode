@@ -38,7 +38,8 @@
       "pattern": "=>[\\s\\S]*=>[\\s\\S]*=>",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Each arrow is a const with a name, an equals sign, its parameters, =>, then the body. You need three of them."
     },
     {
       "id": "r2",
@@ -49,7 +50,8 @@
       "pattern": "=>\\s*[^{\\s]",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Drop the braces and the word return. The one expression after => is returned for you."
     },
     {
       "id": "r3",
@@ -60,7 +62,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
       "file": "script.js",

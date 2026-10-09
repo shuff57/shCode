@@ -25,7 +25,7 @@ let copy = {...original};
 
 Same idea for plain objects. The `...` inside `{...}` copies every key-value pair into a new object.
 
-> **One-level deep only.** Spread makes a *shallow* copy: nested arrays or objects inside are still shared. For now, all the arrays and objects in this course are flat, so spread is the right tool.
+> **One-level deep only.** Spread makes a *shallow* copy: nested arrays or objects inside are still shared. The arrays and objects in this reading are flat, so spread is the right tool here. When a copy holds nested arrays or objects, spread is not enough: Reading 3.6.9 shows `structuredClone`, which copies all the way down.
 
 **Try it:** Predict what each `console.log` will print, then run it.
 

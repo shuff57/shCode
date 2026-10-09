@@ -39,7 +39,8 @@
       "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Keep the prices array the starter gives you. It stays as it is."
     },
     {
       "id": "r2",
@@ -50,7 +51,8 @@
       "pattern": "\\.map\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Call .map on prices with a function that changes each number, and keep the result in a second variable."
     },
     {
       "id": "r3",
@@ -61,7 +63,8 @@
       "pattern": "console\\.log\\s*\\(",
       "flags": "i",
       "points": 0,
-      "ignoreStrings": true
+      "ignoreStrings": true,
+      "hint": "Print the new array and then prices, so you can see the original did not change."
     },
     {
       "file": "script.js",
