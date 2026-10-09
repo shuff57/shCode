@@ -1,0 +1,26 @@
+flowchart TD
+  A([Start])
+  B[scores = 10, 20, 30]
+  C[[process scores]]
+  D[nums 0 = 0: change the shared array]
+  E{did this write escape to the caller?}
+  F[caller's scores now starts with 0]
+  G[nums = 9, 9: point the local name at a new array]
+  H{did this write escape to the caller?}
+  I[caller's scores unchanged]
+  J[caller's scores becomes 9, 9]
+  K[/print scores: 0, 20, 30/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D --> E
+  E -->|yes| F
+  E -->|no| G
+  F --> G
+  G --> H
+  H -->|no| I
+  H -->|yes| J
+  I --> K
+  J --> K
+  K --> Z

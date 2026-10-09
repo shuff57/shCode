@@ -5,7 +5,7 @@
 - Charting *what the caller sees* after each write
 - Seeing why one change escapes the function and the other does not
 
-A trace chart is a picture of a program running, step by step. This one follows a function that does the two things from Definition 3.6.1 to the same array — one after the other — so the difference is impossible to blur.
+A trace chart is a picture of a program running, step by step. This one follows a function that does the two kinds of write you met in this module to the same array — one after the other — so the difference is impossible to blur.
 
 ### The code
 

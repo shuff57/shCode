@@ -21,9 +21,18 @@ Findings, ranked. Tick a step when it is committed and `npm test` is green.
       Left for later: 3.5.8 (dot vs bracket: needs `for` + `Object.keys` bound together), 3.4.5 (declaration-to-expression is only
       shape-checked), 3.4.21, 3.6.13 (only checks four printed lines), 3.7.x free-name labs (11, 17, 8: line counts only),
       3.8.19 r2/r4 (null guard / parse-inside-try patterns are still loose).
-- [ ] **4. Charts (3.4.9, 3.4.15, 3.4.20, 3.5.11, 3.5.21, 3.6.7, 3.7.5, 3.7.16, 3.8.17)** accept nonsense labels (structural rules only).
-      Measure like 3.2/3.3 (`scripts/measure-chart-agreement.mjs`), then add gate + AI rubric + `solution/chart.mmd`
-      (3.6.7, 3.7.5, 3.7.16 have none). Decide which count toward the grade (owner).
+- [x] **4. Charts** (2026-10-09). All nine now carry a RULES-ONLY `diagram.aiGrader` (20 points, pass 80% = 16, no model call, so no
+      cost per submission): three label-free structural items scored from shape kinds and arrow topology (loop-back, order,
+      different exits, hexagon, way out of the loop, print before End, ...) plus the relevance gate (caps at 13, below the pass
+      line). One deliberate label read: 3.8.17 reads its two decision labels to put the missing-key question before the parse
+      question. Specs in `scripts/_chart-3x-spec.cjs`, applied by `scripts/apply-chart-3x.cjs` (idempotent), pinned by
+      `scripts/test-diagram-charts-3x.mjs` (reference earns all points; a variant passes; "step N" labels, all-rectangles,
+      Start->End and the wrong-arrow mutations fail) and `scripts/test-grade-rules-only.mjs` (the real Pages Function, rules-only).
+      Reference charts authored for 3.6.7, 3.7.5, 3.7.16 (`solution/chart.mmd`). Content made to agree with the rubric: 3.7.5 arrows
+      (the old text contradicted itself), 3.4.9 implicit-return claim, 3.6.7 "Definition 3.6.1", 3.8.17 code now prints.
+      NOT counted toward the grade: none has an `assignmentCode`; owner decides (no real student drafts exist to measure, unlike 3.2/3.3).
+      Limits: the rules cannot read WHICH question a diamond asks (except 3.8.17), so a chart with the right shapes and
+      on-topic words in the wrong places can still earn partial credit; the gate only needs 2 of 4-5 word groups.
 - [ ] **5. Hints on all 146 requirements**, then content fixes: 3.4.21 steps 2-4 have no instructions; 3.9.2 r10 (spread) asked by no
       step and r6 refuses `makeItem(...)` seeds; 3.6 promises 3.7 explains `sort`/`splice` (it does not); 3.6.13/16 need a
       `structuredClone` live block first; 3.6.10 before 3.6.9; 3.8.3 before the JSON readings; 3.4.9/3.6.7/3.7.5/3.8.17 chart

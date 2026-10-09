@@ -49,12 +49,113 @@
         "id": "min-nodes",
         "count": 6
       }
-    ]
+    ],
+    "aiGrader": {
+      "rubricTitle": "Destructuring chart: structure check",
+      "model": "glm-5.3-flash:cloud",
+      "contextDocs": [],
+      "strict": true,
+      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
+      "rubric": [
+        {
+          "id": "unpack-first",
+          "title": "The unpack comes before the decision",
+          "points": 7,
+          "description": "Scored by the editor (arrow order): a task comes before the decision on every route.",
+          "check": {
+            "steps": [
+              {
+                "op": "sequence",
+                "of": [
+                  {
+                    "kind": "process"
+                  },
+                  {
+                    "kind": "decision"
+                  }
+                ],
+                "fail": "The unpack is its own task, drawn before the decision that uses the names.",
+                "pass": "A task comes before the decision."
+              }
+            ]
+          }
+        },
+        {
+          "id": "exits",
+          "title": "The wide path adds to the note",
+          "points": 7,
+          "description": "Scored by the editor: the decision has two different exits, and the yes exit goes to a task.",
+          "check": {
+            "steps": [
+              {
+                "op": "branch",
+                "at": {
+                  "kind": "decision"
+                },
+                "distinct": true,
+                "yes": {
+                  "kind": "process"
+                },
+                "fail": "The yes arrow must lead to the task that appends to the note, and the no arrow to somewhere different.",
+                "pass": "The yes arrow goes to the task that adds to the note."
+              }
+            ]
+          }
+        },
+        {
+          "id": "one-print",
+          "title": "The print comes after the decision",
+          "points": 6,
+          "description": "Scored by the editor: an input/output step for the print, after the decision.",
+          "check": {
+            "steps": [
+              {
+                "op": "count",
+                "match": {
+                  "kind": "io"
+                },
+                "min": 1,
+                "fail": "Both paths finish at one print. Draw an input/output step for the print.",
+                "pass": "There is a print."
+              },
+              {
+                "op": "sequence",
+                "of": [
+                  {
+                    "kind": "decision"
+                  },
+                  {
+                    "kind": "io"
+                  },
+                  {
+                    "kind": "terminal"
+                  }
+                ],
+                "fail": "Both paths must meet at the print, and the print must come after the decision, before End.",
+                "pass": "Both paths meet at the print before End."
+              }
+            ]
+          }
+        }
+      ],
+      "gate": {
+        "anyOf": [
+          "unpack|destructur|width|height|color|options",
+          "note|box|build",
+          "wide|greater|>|bigger",
+          "print|show|log|output|return"
+        ],
+        "min": 2,
+        "capTo": 13,
+        "fail": "None of your shapes say what this program does. Label each shape in your own words."
+      }
+    }
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "formative": true
   },
   "steps": [],
   "requirements": []

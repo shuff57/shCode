@@ -28,6 +28,8 @@ function loadSettings() {
     return defaults;
   }
 }
+
+console.log(loadSettings());
 ```
 
 ### What to draw

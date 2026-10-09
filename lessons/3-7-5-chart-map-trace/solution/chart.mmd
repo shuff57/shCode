@@ -1,0 +1,15 @@
+flowchart TD
+  A([Start])
+  B[withTax = empty list]
+  C{{for each price in prices}}
+  D{is there another price?}
+  E[add price * 1.08 to withTax]
+  F[/print withTax/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -->|yes| E
+  E --> C
+  D -->|no| F
+  F --> Z

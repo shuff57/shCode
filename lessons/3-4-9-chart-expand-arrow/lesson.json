@@ -52,12 +52,100 @@
         "id": "min-nodes",
         "count": 7
       }
-    ]
+    ],
+    "aiGrader": {
+      "rubricTitle": "Arrow expansion chart: structure check",
+      "model": "glm-5.3-flash:cloud",
+      "contextDocs": [],
+      "strict": true,
+      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
+      "rubric": [
+        {
+          "id": "loop-back",
+          "title": "The second application goes back to the decision",
+          "points": 7,
+          "description": "Scored by the editor (arrow order): the decision is part of a repeat, because the step after \"no\" leads back to it.",
+          "check": {
+            "steps": [
+              {
+                "op": "in-cycle",
+                "match": {
+                  "kind": "decision"
+                },
+                "fail": "The decision \"applied twice yet?\" has to be asked again after the second application: an arrow must lead back to it. In your chart nothing leads back.",
+                "pass": "The decision is asked again after the second application."
+              }
+            ]
+          }
+        },
+        {
+          "id": "order",
+          "title": "Read, apply, decide, then print",
+          "points": 7,
+          "description": "Scored by the editor (arrow order): a task, then the decision, then an input/output step, on every route.",
+          "check": {
+            "steps": [
+              {
+                "op": "sequence",
+                "of": [
+                  {
+                    "kind": "process"
+                  },
+                  {
+                    "kind": "decision"
+                  },
+                  {
+                    "kind": "io"
+                  }
+                ],
+                "fail": "The steps must come in the order the code runs them: work first, then the decision, then the print.",
+                "pass": "Work, decision, print come in the right order."
+              }
+            ]
+          }
+        },
+        {
+          "id": "exits",
+          "title": "The two exits go to different places",
+          "points": 6,
+          "description": "Scored by the editor: the decision has a yes and a no arrow that lead to two different shapes, and the no arrow leads to a task.",
+          "check": {
+            "steps": [
+              {
+                "op": "branch",
+                "at": {
+                  "kind": "decision"
+                },
+                "distinct": true,
+                "no": {
+                  "kind": "process"
+                },
+                "fail": "The no arrow must lead to the task that applies the operation again, and the yes arrow to somewhere different.",
+                "pass": "The no arrow goes to the second application."
+              }
+            ]
+          }
+        }
+      ],
+      "gate": {
+        "anyOf": [
+          "operation|function|callback|apply",
+          "value|number|input|\\bn\\b",
+          "twice|again|second|first|once",
+          "print|show|display|log|output",
+          "result|return|double"
+        ],
+        "min": 2,
+        "capTo": 13,
+        "fail": "None of your shapes say what this program does. Label each shape in your own words."
+      }
+    }
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "formative": true
   },
   "steps": [],
   "requirements": []

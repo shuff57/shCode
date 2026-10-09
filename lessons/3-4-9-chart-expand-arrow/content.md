@@ -6,7 +6,7 @@
 - Putting a decision inside a helper that calls a function twice
 - Getting the loop-free "call it again?" arrows landing correctly
 
-A one-line arrow hides a whole little program. `applyTwice` takes a function and a value, calls the function on the value, then calls it **again** on that result. Expressed as an arrow, that is one short line. Charted, it is read-parameters, first call, decide-if-done, second call, print.
+A one-line arrow hides a whole little program. `applyTwice` takes a function and a value, calls the function on the value, then calls it **again** on that result. Written out, that is one short line. Charted, it is read-parameters, first call, decide-if-done, second call, print.
 
 ### The code
 
@@ -43,7 +43,7 @@ That third arrow is the classic error. If the second application drops straight 
 
 ### The point of the lesson
 
-The implicit return is why the print can hang off the `yes` branch at all: the arrow's single expression *is* the value sent back. If `applyTwice`'s body had braces without a `return`, the decision's `yes` branch would lead to `undefined`, and the chart would have to say so.
+A function that takes a function is just a few steps in a fixed order. The "twice yet?" question is how a chart shows that the same operation runs a second time: ask, apply again, ask again, and only then move on to the print.
 
 ### Before you submit
 

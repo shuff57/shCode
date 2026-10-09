@@ -31,7 +31,7 @@
       },
       {
         "id": "min-process",
-        "count": 2
+        "count": 3
       },
       {
         "id": "min-decisions",
@@ -53,12 +53,94 @@
         "id": "min-nodes",
         "count": 6
       }
-    ]
+    ],
+    "aiGrader": {
+      "rubricTitle": "Form decision chart: structure check",
+      "model": "glm-5.3-flash:cloud",
+      "contextDocs": [],
+      "strict": true,
+      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
+      "rubric": [
+        {
+          "id": "two-questions",
+          "title": "A second question follows the first",
+          "points": 7,
+          "description": "Scored by the editor (arrow order): one decision comes before another on the route.",
+          "check": {
+            "steps": [
+              {
+                "op": "sequence",
+                "of": [
+                  {
+                    "kind": "decision"
+                  },
+                  {
+                    "kind": "decision"
+                  }
+                ],
+                "fail": "The rule asks two questions, one after the other. Draw a second diamond that comes after the first one.",
+                "pass": "The second question follows the first."
+              }
+            ]
+          }
+        },
+        {
+          "id": "three-forms",
+          "title": "Three forms to choose from",
+          "points": 7,
+          "description": "Scored by the editor (shape kind): at least three task rectangles, one for each way to write the function.",
+          "check": {
+            "steps": [
+              {
+                "op": "count",
+                "match": {
+                  "kind": "process"
+                },
+                "min": 3,
+                "fail": "There are three ways to write the function (a declaration, a one-line arrow, an arrow with a block body). Draw a task rectangle for each.",
+                "pass": "There is a task for each form."
+              }
+            ]
+          }
+        },
+        {
+          "id": "no-loops",
+          "title": "A rule, not a repeat",
+          "points": 6,
+          "description": "Scored by the editor (arrow order): no decision is part of a repeat.",
+          "check": {
+            "steps": [
+              {
+                "op": "not-in-cycle",
+                "match": {
+                  "kind": "decision"
+                },
+                "fail": "This is a decision tree, so no arrow should lead back to a diamond. In your chart one does.",
+                "pass": "No arrow leads back to a diamond."
+              }
+            ]
+          }
+        }
+      ],
+      "gate": {
+        "anyOf": [
+          "declaration|function|named|main",
+          "arrow|expression|one-line|implicit|callback",
+          "called|several|places|body|single|block",
+          "write|use|choose|return",
+          "yes|no|job|read"
+        ],
+        "min": 2,
+        "capTo": 13,
+        "fail": "None of your shapes say what this program does. Label each shape in your own words."
+      }
+    }
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "formative": true
   },
   "steps": [],
   "requirements": []

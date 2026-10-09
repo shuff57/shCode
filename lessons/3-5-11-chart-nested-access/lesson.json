@@ -48,13 +48,98 @@
       {
         "id": "min-nodes",
         "count": 7
+      },
+      {
+        "id": "min-shape",
+        "shape": "preparation",
+        "count": 1
       }
-    ]
+    ],
+    "aiGrader": {
+      "rubricTitle": "Nested access chart: structure check",
+      "model": "glm-5.3-flash:cloud",
+      "contextDocs": [],
+      "strict": true,
+      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
+      "rubric": [
+        {
+          "id": "hexagon",
+          "title": "The loop is drawn with the loop-setup hexagon",
+          "points": 6,
+          "description": "Scored by the editor (shape kind).",
+          "check": {
+            "steps": [
+              {
+                "op": "count",
+                "match": {
+                  "kind": "preparation"
+                },
+                "min": 1,
+                "fail": "The for-loop header has its own shape, the loop-setup hexagon from the shape palette.",
+                "pass": "A loop-setup hexagon is on the path."
+              }
+            ]
+          }
+        },
+        {
+          "id": "after-loop",
+          "title": "The loop, then more steps after it",
+          "points": 7,
+          "description": "Scored by the editor (arrow order): the loop repeats, and the arrow that leaves it leads on to the steps after it.",
+          "check": {
+            "steps": [
+              {
+                "op": "loop-exit",
+                "loop": {
+                  "kind": "preparation"
+                },
+                "minAfter": 2,
+                "from": "any",
+                "orSetup": true,
+                "fail": "The adding task must lead back to the hexagon, and the arrow that leaves the loop must lead on to the name task, the decision and the print (at least two more steps before End).",
+                "pass": "The way out of the loop leads on to the steps after it."
+              }
+            ]
+          }
+        },
+        {
+          "id": "decision-outside",
+          "title": "The VIP decision is outside the loop",
+          "points": 7,
+          "description": "Scored by the editor (arrow order): the decision is not part of a repeat.",
+          "check": {
+            "steps": [
+              {
+                "op": "not-in-cycle",
+                "match": {
+                  "kind": "decision"
+                },
+                "fail": "The VIP test runs once, after the loop. In your chart an arrow leads back to the diamond, so it runs on every pass.",
+                "pass": "The decision is outside the loop."
+              }
+            ]
+          }
+        }
+      ],
+      "gate": {
+        "anyOf": [
+          "total|price|items|order",
+          "name|customer|vip",
+          "loop|each|every|next|\\bi\\b|length",
+          "print|show|log|output",
+          "yes|no|\\+|add"
+        ],
+        "min": 2,
+        "capTo": 13,
+        "fail": "None of your shapes say what this program does. Label each shape in your own words."
+      }
+    }
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "formative": true
   },
   "steps": [],
   "requirements": []

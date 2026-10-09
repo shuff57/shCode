@@ -31,7 +31,7 @@
       },
       {
         "id": "min-decisions",
-        "count": 1
+        "count": 2
       },
       {
         "id": "decision-two-exits"
@@ -48,13 +48,118 @@
       {
         "id": "min-nodes",
         "count": 7
+      },
+      {
+        "id": "min-shape",
+        "shape": "subroutine",
+        "count": 1
       }
-    ]
+    ],
+    "aiGrader": {
+      "rubricTitle": "Reassign vs mutate chart: structure check",
+      "model": "glm-5.3-flash:cloud",
+      "contextDocs": [],
+      "strict": true,
+      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
+      "rubric": [
+        {
+          "id": "call-shape",
+          "title": "The call is one function-call shape",
+          "points": 5,
+          "description": "Scored by the editor (shape kind): a double-rail function-call shape on the path.",
+          "check": {
+            "steps": [
+              {
+                "op": "count",
+                "match": {
+                  "kind": "subroutine"
+                },
+                "min": 1,
+                "fail": "A call to a function has its own shape, the double-rail rectangle from the shape palette.",
+                "pass": "A function-call shape is on the path."
+              }
+            ]
+          }
+        },
+        {
+          "id": "order",
+          "title": "Call, two decisions, then one print",
+          "points": 8,
+          "description": "Scored by the editor (arrow order): the call, then a decision, then another decision, then the print, on every route.",
+          "check": {
+            "steps": [
+              {
+                "op": "sequence",
+                "of": [
+                  {
+                    "kind": "subroutine"
+                  },
+                  {
+                    "kind": "decision"
+                  },
+                  {
+                    "kind": "decision"
+                  },
+                  {
+                    "kind": "io"
+                  },
+                  {
+                    "kind": "terminal"
+                  }
+                ],
+                "fail": "The order matters: the call comes first, then the question after the mutation, then the question after the reassignment, then the print once.",
+                "pass": "Call, two questions and the print are in order."
+              }
+            ]
+          }
+        },
+        {
+          "id": "different-exits",
+          "title": "Each question splits into two different results",
+          "points": 7,
+          "description": "Scored by the editor: a decision whose yes and no arrows lead to two different shapes, and a print.",
+          "check": {
+            "steps": [
+              {
+                "op": "branch",
+                "at": {
+                  "kind": "decision"
+                },
+                "distinct": true,
+                "fail": "Each diamond must have a yes and a no arrow that lead to two different places.",
+                "pass": "The decision has two different exits."
+              },
+              {
+                "op": "count",
+                "match": {
+                  "kind": "io"
+                },
+                "min": 1,
+                "fail": "The two paths rejoin before one print. Draw an input/output step for the print.",
+                "pass": "There is a print."
+              }
+            ]
+          }
+        }
+      ],
+      "gate": {
+        "anyOf": [
+          "nums|scores|array|\\[",
+          "mutat|reassign|escape|caller|shared|local|change",
+          "process|call|\\(",
+          "print|show|log|output"
+        ],
+        "min": 2,
+        "capTo": 13,
+        "fail": "None of your shapes say what this program does. Label each shape in your own words."
+      }
+    }
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "formative": true
   },
   "steps": [],
   "requirements": []

@@ -31,17 +31,17 @@ At least seven shapes, at least one diamond.
 
 ### The three arrows that decide whether this is right
 
-This chart has a decision nested inside a loop, so three arrows need to land exactly.
+This chart has a decision inside a loop, so three arrows need to land exactly.
 
 1. **The `yes` arrow** goes to "apply the callback to the price, add the result to `withTax`".
-2. **The `no` arrow** does **not** stop. It skips the callback body and joins the route to the print, because once the list is exhausted the job is the collected array.
-3. **Both of them** end up back at the loop setup, not the decision. The next item has to be fetched and re-checked, and the hexagon is where that happens.
+2. **After that task**, an arrow goes **back to the loop setup**, not on to the print. The next price has to be fetched and re-checked, and the hexagon is where that happens.
+3. **The `no` arrow** leaves the loop. Once there are no more prices, it goes to the print.
 
-That second one is the classic error. A `no` branch that dead-ends is a program that stops the first time it runs out of prices, and never prints anything.
+The classic error is the second one. If the adding task goes straight to the print, the chart shows a program that handles one price and stops.
 
 ### Where the result goes
 
-The `print` is **outside** the loop. On the chart, it hangs off the hexagon: the path taken once there are no more prices, not off anything in the loop body. And the collected array is built **inside** the loop, one entry per pass, which is why it always ends up the same length as the input.
+The `print` is **outside** the loop. On the chart, it hangs off the `no` arrow: the path taken once there are no more prices, not off anything in the loop body. And the collected array is built **inside** the loop, one entry per pass, which is why it always ends up the same length as the input.
 
 ### Before you submit
 

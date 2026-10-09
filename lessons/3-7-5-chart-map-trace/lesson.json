@@ -52,13 +52,104 @@
       {
         "id": "min-nodes",
         "count": 7
+      },
+      {
+        "id": "min-shape",
+        "shape": "preparation",
+        "count": 1
       }
-    ]
+    ],
+    "aiGrader": {
+      "rubricTitle": "Map trace chart: structure check",
+      "model": "glm-5.3-flash:cloud",
+      "contextDocs": [],
+      "strict": true,
+      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
+      "rubric": [
+        {
+          "id": "hexagon",
+          "title": "The loop is drawn with the loop-setup hexagon",
+          "points": 6,
+          "description": "Scored by the editor (shape kind): a loop-setup (hexagon) shape on the Start-to-End path.",
+          "check": {
+            "steps": [
+              {
+                "op": "count",
+                "match": {
+                  "kind": "preparation"
+                },
+                "min": 1,
+                "fail": "A for-loop header has its own shape, the loop-setup hexagon from the shape palette. None of the shapes on your path is one.",
+                "pass": "A loop-setup hexagon is on the path."
+              }
+            ]
+          }
+        },
+        {
+          "id": "way-out",
+          "title": "The print is after the loop, off the way out",
+          "points": 7,
+          "description": "Scored by the editor (arrow order): the steps that repeat have an arrow leading back, and the arrow that leaves the repeat leads on to a step that runs once, before End.",
+          "check": {
+            "steps": [
+              {
+                "op": "loop-exit",
+                "loop": {
+                  "kind": "preparation"
+                },
+                "minAfter": 1,
+                "from": "any",
+                "orSetup": true,
+                "fail": "Two things must hold: the steps that run each time round must have an arrow leading back (to the hexagon, or to the diamond that asks whether there is another), and the arrow that leaves that repeat must lead to a step that runs once, after it, before End.",
+                "pass": "The way out of the loop leads on to the step after it."
+              }
+            ]
+          }
+        },
+        {
+          "id": "yes-no",
+          "title": "The \"another price?\" question sends yes to the callback and no to the print",
+          "points": 7,
+          "description": "Scored by the editor (arrow order): a decision whose yes exit goes to a task and whose no exit goes to the print or return, two different places.",
+          "check": {
+            "steps": [
+              {
+                "op": "branch",
+                "at": {
+                  "kind": "decision"
+                },
+                "distinct": true,
+                "yes": {
+                  "kind": "process"
+                },
+                "no": {
+                  "kind": "io"
+                },
+                "fail": "The diamond has to split into two different results: its yes arrow goes to the task that does the work, its no arrow goes to the input/output step.",
+                "pass": "The decision splits into the task and the print."
+              }
+            ]
+          }
+        }
+      ],
+      "gate": {
+        "anyOf": [
+          "price|prices|\\b10\\b|\\b20\\b|\\b30\\b|item",
+          "tax|withtax|callback|1\\.08|apply|add|collect|result",
+          "next|another|more|each|loop|\\bi\\b|list",
+          "print|show|log|output"
+        ],
+        "min": 2,
+        "capTo": 13,
+        "fail": "None of your shapes say what this program does. Label each shape in your own words."
+      }
+    }
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "formative": true
   },
   "steps": [],
   "requirements": []

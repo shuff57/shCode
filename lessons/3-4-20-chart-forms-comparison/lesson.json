@@ -53,12 +53,111 @@
         "id": "min-nodes",
         "count": 8
       }
-    ]
+    ],
+    "aiGrader": {
+      "rubricTitle": "Forms comparison chart: structure check",
+      "model": "glm-5.3-flash:cloud",
+      "contextDocs": [],
+      "strict": true,
+      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
+      "rubric": [
+        {
+          "id": "two-questions",
+          "title": "Naming first, then braces",
+          "points": 7,
+          "description": "Scored by the editor (arrow order): one decision comes before another on the route.",
+          "check": {
+            "steps": [
+              {
+                "op": "sequence",
+                "of": [
+                  {
+                    "kind": "decision"
+                  },
+                  {
+                    "kind": "decision"
+                  }
+                ],
+                "fail": "The comparison asks two questions in order: is the function named, then does the body use braces. Draw the second diamond after the first.",
+                "pass": "The second question follows the first."
+              }
+            ]
+          }
+        },
+        {
+          "id": "three-forms",
+          "title": "One task for each form",
+          "points": 7,
+          "description": "Scored by the editor (shape kind): at least three task rectangles.",
+          "check": {
+            "steps": [
+              {
+                "op": "count",
+                "match": {
+                  "kind": "process"
+                },
+                "min": 3,
+                "fail": "Draw a task rectangle for each of the three forms.",
+                "pass": "There is a task for each form."
+              }
+            ]
+          }
+        },
+        {
+          "id": "one-print",
+          "title": "All three forms reach the print",
+          "points": 6,
+          "description": "Scored by the editor: an input/output step for the print, which comes after the decisions.",
+          "check": {
+            "steps": [
+              {
+                "op": "count",
+                "match": {
+                  "kind": "io"
+                },
+                "min": 1,
+                "fail": "The three forms are one choice made three times, so they should all lead to one print. Draw an input/output step for the print.",
+                "pass": "There is a print."
+              },
+              {
+                "op": "sequence",
+                "of": [
+                  {
+                    "kind": "decision"
+                  },
+                  {
+                    "kind": "io"
+                  },
+                  {
+                    "kind": "terminal"
+                  }
+                ],
+                "fail": "Every route has to pass a decision and then the print before End: one of your forms skips the print.",
+                "pass": "Every route passes the decisions, then the print, then End."
+              }
+            ]
+          }
+        }
+      ],
+      "gate": {
+        "anyOf": [
+          "named|name|declaration|function",
+          "braces|brace|block|return|implicit|explicit",
+          "expression|const|arrow|assign",
+          "print|show|log|output|result",
+          "\\b3\\b|add|sum|1 \\+ 2"
+        ],
+        "min": 2,
+        "capTo": 13,
+        "fail": "None of your shapes say what this program does. Label each shape in your own words."
+      }
+    }
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "formative": true
   },
   "steps": [],
   "requirements": []
