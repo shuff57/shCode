@@ -1,6 +1,6 @@
 // 3.4.13 Write a One-Line Arrow Callback
 
-// STEP 1: Define a function with two parameters: a value and a function.
+// STEP 1: Define a function called transform with two parameters: a value and a function.
 //         Inside it, call the function you were handed, passing it the
 //         value, and return whatever that call gives back. The helper
 //         should not know or care what the function does.

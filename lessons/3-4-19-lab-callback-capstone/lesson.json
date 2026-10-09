@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Write the counting helper",
-      "instructions": "Define a function that takes an array and a test function. It should walk the array with a for loop, call the test on each element, and return how many elements passed the test."
+      "instructions": "Define a function called countMatching that takes an array and a test function. It should walk the array with a for loop, call the test on each element, and return how many elements passed the test."
     },
     {
       "id": "s2",
@@ -84,6 +84,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "countMatching counts the elements the test accepts",
+      "description": "countMatching([4, -2, 7, 0, -9, 3], n => n > 0) is 3, an array where nothing passes counts 0, and an empty array counts 0. Help: 3.4.12 (Example: Arrow Callback)",
+      "type": "tests",
+      "hint": "Start a counter at 0. For each element, call the test with it, and add one only when the test comes back true. Return the counter after the loop.",
+      "variables": [
+        {
+          "name": "countMatching"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "typeof countMatching === 'function' && countMatching([4,-2,7,0,-9,3], n => n > 0) === 3 && countMatching([1,2,3,4,5,6], n => n % 2 === 0) === 3 && countMatching([1,2], n => false) === 0 && countMatching([], n => true) === 0",
+          "fail": "countMatching should count only the elements the test accepts: countMatching([4, -2, 7, 0, -9, 3], n => n > 0) is 3, and when nothing passes it is 0."
+        }
+      ]
     }
   ],
   "grading": {

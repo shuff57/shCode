@@ -61,6 +61,21 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "all three results are printed",
+      "description": "The output has at least three printed lines, one for each arrow you call. Help: 3.4.8 (Shorthand Rules)",
+      "type": "tests",
+      "hint": "Call each of the three arrows and print every result with console.log.",
+      "checks": [
+        {
+          "expr": "output.length >= 3",
+          "fail": "Print one line for each of your three arrows: call each one and wrap the call in console.log."
+        }
+      ]
     }
   ],
   "grading": {

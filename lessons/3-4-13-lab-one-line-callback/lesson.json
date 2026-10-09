@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Write a helper that takes a function",
-      "instructions": "Define a function with two parameters: a value and a function. Inside it, call the function you were handed and return its result. The helper should not know what the function does."
+      "instructions": "Define a function called transform with two parameters: a value and a function. Inside it, call the function you were handed and return its result. The helper should not know what the function does."
     },
     {
       "id": "s2",
@@ -61,6 +61,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "transform calls the function it is given and returns the result",
+      "description": "transform(2, n => n + 1) is 3, and transform(\"a\", s => s + \"b\") is \"ab\". Help: 3.4.11 (Passing a Function)",
+      "type": "tests",
+      "hint": "transform must call the second parameter with the first and return what comes back: return fn(value). It must not decide what the function does.",
+      "variables": [
+        {
+          "name": "transform"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "typeof transform === 'function' && transform(2, n => n + 1) === 3 && transform('a', s => s + 'b') === 'ab'",
+          "fail": "transform(2, n => n + 1) should give 3 and transform(\"a\", s => s + \"b\") should give \"ab\". Call the function you were handed with the value, and return the result."
+        }
+      ]
     }
   ],
   "grading": {

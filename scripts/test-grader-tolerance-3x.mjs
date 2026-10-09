@@ -81,8 +81,8 @@ accept('3-4-13-lab-one-line-callback', 'n => n + 4 without parentheses',
   js('function transform(value, fn) { return fn(value); }', 'console.log(transform(6, n => n + 4));'));
 accept('3-4-13-lab-one-line-callback', 'helper written as an arrow',
   js('const transform = (value, fn) => fn(value);', 'console.log(transform(6, (n) => n + 4));'));
-accept('3-4-13-lab-one-line-callback', 'helper written as a function expression, callback first',
-  js('const run = function (fn, value) { return fn(value); };', 'console.log(run(n => n * 3, 5));'));
+accept('3-4-13-lab-one-line-callback', 'helper written as a function expression',
+  js('const transform = function (value, fn) { return fn(value); };', 'console.log(transform(5, n => n * 3));'));
 reject('3-4-13-lab-one-line-callback', 'a block-bodied arrow is not the one-line callback', 'r2',
   js('function transform(value, fn) { return fn(value); }', 'console.log(transform(6, (n) => { return n + 4; }));'));
 reject('3-4-13-lab-one-line-callback', 'helper never calls its function parameter', 'r1',
@@ -146,6 +146,33 @@ accept('3-7-21-lab-mutating-sort-drill', 'filter as the non-mutating call',
   js('const a = [1, 2, 3];', 'a.push(4);', 'console.log(a.filter((n) => n > 1));', 'console.log(a);'));
 accept('3-7-18-lab-spread-object', 'quoted key as the override',
   js('const s = { theme: "dark" };', 'const t = { ...s, "font size": 14 };', 'console.log(t);'));
+
+// ---- runtime checks (step 3 of .gauntlet/SPEC-module-3x-hardening.md): 3.4
+reject('3-4-17-lab-fix-broken-arrow', 'parenthesised but the body is wrong (=> 0)', 't1',
+  js('const area = (w, h) => 0;', 'console.log(area(3, 4));'));
+reject('3-4-17-lab-fix-broken-arrow', 'parenthesised but adds instead of multiplying', 't1',
+  js('const area = (w, h) => w + h;', 'console.log(area(3, 4));'));
+accept('3-4-17-lab-fix-broken-arrow', 'a block body with return is fine',
+  js('const area = (w, h) => { return w * h; };', 'console.log(area(3, 4));'));
+reject('3-4-13-lab-one-line-callback', 'transform ignores its function and returns the value', 't1',
+  js('function transform(value, fn) { return value; }', 'console.log(transform(6, n => n + 4));'));
+reject('3-4-13-lab-one-line-callback', 'transform calls the function but forgets to return', 't1',
+  js('function transform(value, fn) { fn(value); }', 'console.log(transform(6, n => n + 4));'));
+accept('3-4-13-lab-one-line-callback', 'transform as an arrow',
+  js('const transform = (value, fn) => fn(value);', 'console.log(transform(6, n => n + 4));'));
+reject('3-4-19-lab-callback-capstone', 'counter goes up for every element, test ignored', 't1',
+  js('function countMatching(a, t) { let c = 0; for (const x of a) { t(x); c++; } return c; }',
+     'const r = [1, 2, 3, 4, 5];', 'console.log(countMatching(r, n => n > 2), countMatching(r, n => n < 2));'));
+reject('3-4-19-lab-callback-capstone', 'helper returns the array length', 't1',
+  js('function countMatching(a, t) { for (let i = 0; i < a.length; i++) { t(a[i]); } return a.length; }',
+     'const r = [1, 2, 3, 4, 5];', 'console.log(countMatching(r, n => n > 2), countMatching(r, n => n < 2));'));
+accept('3-4-19-lab-callback-capstone', 'while-free: forEach is not asked for, a for loop with a ternary is fine',
+  js('const countMatching = (a, t) => { let c = 0; for (let i = 0; i < a.length; i++) { c += t(a[i]) ? 1 : 0; } return c; };',
+     'const r = [1, 2, 3, 4, 5];', 'console.log(countMatching(r, n => n > 2), countMatching(r, n => n < 2));'));
+reject('3-4-10-lab-implicit-return-drill', 'three arrows written, only one result printed', 't1',
+  js('const a = n => n * 2;', 'const b = n => n > 0;', 'const c = (x, y) => x + y;', 'console.log(a(2));'));
+reject('3-4-16-lab-rewrite-three-arrows', 'three arrows written, only one result printed', 't1',
+  js('const a = n => n * 2;', 'const b = n => n > 0;', 'const c = (x, y) => x + y;', 'console.log(a(2));'));
 
 try {
   execFileSync(process.execPath, [

@@ -1,6 +1,6 @@
 // 3.4.19 Callback Capstone
 
-// STEP 1: Define a function that takes an array and a test function.
+// STEP 1: Define a function called countMatching that takes an array and a test function.
 //         Inside it, set a counter to 0, then walk the array with a
 //         for loop. On each element, call the test function; if it comes
 //         back true, add one to the counter. Return the counter.

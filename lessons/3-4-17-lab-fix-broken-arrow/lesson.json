@@ -61,6 +61,33 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "area returns the product of its two arguments",
+      "description": "area(3, 4) is 12 and area(5, 6) is 30. Help: 3.4.8 (Shorthand Rules)",
+      "type": "tests",
+      "hint": "Only the parameter list is broken. Wrap both parameters in parentheses and leave the body (w * h) exactly as it is.",
+      "function": "area",
+      "cases": [
+        {
+          "args": [
+            3,
+            4
+          ],
+          "expect": 12
+        },
+        {
+          "args": [
+            5,
+            6
+          ],
+          "expect": 30,
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {
