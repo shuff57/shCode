@@ -24,6 +24,10 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [closeBtnHovered, setCloseBtnHovered] = useState(false);
   const [width, setWidth] = useState<number>(DEFAULT_W);
+  // Phone-width screens: the drawer overlays the page instead of reflowing it
+  // (a 320px drawer plus the page gutter would leave ~30px for the lesson) and
+  // the tab strip moves to a horizontal bar along the bottom edge.
+  const [narrow, setNarrow] = useState(false);
   const widthRef = useRef(width);
   widthRef.current = width;
 
@@ -31,8 +35,18 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
   const widthStorage = `${storageKey}:width`;
 
   useEffect(() => {
+    const mq = window.matchMedia('(max-width: 720px)');
+    const sync = () => setNarrow(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
     const savedActive = localStorage.getItem(activeStorage);
-    if (savedActive && tabs.some((t) => t.key === savedActive)) {
+    // A phone starts with the drawer closed: an overlay left open from a
+    // desktop session would hide the whole lesson on load.
+    if (savedActive && tabs.some((t) => t.key === savedActive) && !window.matchMedia('(max-width: 720px)').matches) {
       setActiveKey(savedActive);
     }
     const savedWidth = parseInt(localStorage.getItem(widthStorage) ?? '', 10);
@@ -51,7 +65,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
   // Publish open width so body padding can reflow.
   useEffect(() => {
     const cssVar = '--shd-tabbed';
-    if (activeKey && mounted) {
+    if (activeKey && mounted && !narrow) {
       document.documentElement.style.setProperty(cssVar, `${width}px`);
     } else {
       document.documentElement.style.removeProperty(cssVar);
@@ -59,7 +73,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
     return () => {
       document.documentElement.style.removeProperty(cssVar);
     };
-  }, [activeKey, width, mounted]);
+  }, [activeKey, width, mounted, narrow]);
 
   const onHandlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -92,6 +106,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
     <>
       <div
         aria-label={active?.label ?? 'Drawer'}
+        className="shd-drawer"
         style={{
           position: 'fixed',
           top: 0,
@@ -184,6 +199,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
 
       {/* Clustered vertical tab stack — slides with the drawer when open. */}
       <div
+        className="shd-tabstrip"
         style={{
           position: 'fixed',
           right: 'var(--shd-tabbed, 0px)',
@@ -203,6 +219,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
               key={t.key}
               aria-label={`${t.label} tab`}
               aria-pressed={isActive}
+              className="shd-tab"
               onClick={() => setActiveKey(isActive ? null : t.key)}
               style={{
                 background: isActive ? '#282a36' : '#21222c',
