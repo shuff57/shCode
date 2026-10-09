@@ -10,6 +10,7 @@
 
 import { CalendarClock, LockKeyhole } from 'lucide-react';
 import { dueStatus, formatDue, formatDueTime, type DueStatus } from '../lib/due-dates';
+import { showLateBadge } from '../lib/teacher-drawer';
 
 const STYLES: Record<Exclude<DueStatus, 'none' | 'done' | 'done-late'>, { color: string; prefix: string }> = {
   upcoming: { color: '#6272a4', prefix: 'Due ' },
@@ -25,6 +26,12 @@ export interface DueBadgeProps {
   className?: string;
   ambiguous?: boolean;
   size?: 'sm' | 'md';
+  /**
+   * Whether the lesson counts toward the grade (lib/lesson-counted.ts). The red "Late" form is shown
+   * only for a lesson KNOWN to count: a reading, slide or example has no grade to be late for, and
+   * until the manifest has loaded nothing is called late. Leave undefined for "Due ..." only.
+   */
+  counted?: boolean;
 }
 
 export default function DueBadge({
@@ -33,11 +40,14 @@ export default function DueBadge({
   className,
   ambiguous = false,
   size = 'sm',
+  counted,
 }: DueBadgeProps) {
   if (dueAt === null || completed) return null;
 
   const status = dueStatus(dueAt, null, Date.now());
   if (status === 'none' || status === 'done' || status === 'done-late') return null;
+
+  if (status === 'late' && !showLateBadge(counted === true, true)) return null;
 
   const style = STYLES[status];
   const label = `${style.prefix}${formatDue(dueAt)}`;

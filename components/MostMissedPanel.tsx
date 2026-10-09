@@ -48,7 +48,7 @@ function who(r: EventRow): string {
   return name || r.studentEmail;
 }
 
-export default function MostMissedPanel({ classId }: { classId: string }) {
+export default function MostMissedPanel({ classId, onOpenStudent }: { classId: string; onOpenStudent?: (email: string) => void }) {
   const { toast } = useFeedback();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -148,7 +148,18 @@ export default function MostMissedPanel({ classId }: { classId: string }) {
                       <ul style={{ listStyle: 'none', margin: '8px 0 0', padding: 0, display: 'grid', gap: 6 }}>
                         {students.map((r) => (
                           <li key={r.studentEmail} style={{ display: 'flex', flexWrap: 'wrap', gap: '2px 12px', fontSize: 14, ...box }}>
-                            <span style={{ color: '#f8f8f2', ...box }}>{who(r)}</span>
+                            {onOpenStudent ? (
+                              <button
+                                type="button"
+                                onClick={() => onOpenStudent(r.studentEmail)}
+                                title={`Open ${who(r)}'s progress`}
+                                style={{ background: 'transparent', border: 'none', color: '#8be9fd', cursor: 'pointer', padding: 0, fontSize: 14, textDecoration: 'underline', textAlign: 'left', ...box }}
+                              >
+                                {who(r)}
+                              </button>
+                            ) : (
+                              <span style={{ color: '#f8f8f2', ...box }}>{who(r)}</span>
+                            )}
                             <span style={{ color: MUTED }}>{plural(r.fails, 'miss', 'misses')}</span>
                             <span style={{ color: r.firstPassAt === null ? '#ffb86c' : '#50fa7b' }}>
                               {r.firstPassAt === null ? 'still failing' : 'passed since'}
