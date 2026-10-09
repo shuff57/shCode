@@ -17,6 +17,10 @@ interface EditableEdgeData extends Record<string, unknown> {
   onBeginEdit?: (id: string) => void;
   /** Highlighted because dropping a shape here would splice it into the path. */
   spliceTarget?: boolean;
+  /** This arrow leaves a diamond: offer a yes/no toggle while it is selected. */
+  choice?: boolean;
+  active?: boolean;
+  onPickLabel?: (id: string, label: string) => void;
 }
 
 function EditableEdge({
@@ -45,6 +49,9 @@ function EditableEdge({
   });
 
   const text = typeof label === 'string' ? label : '';
+  // The editor's own selection (a fresh arrow it selected for the student) counts
+  // as selected even though React Flow's internal flag was never set.
+  selected = selected || !!d.active;
   // An unlabelled arrow shows its chip only once selected, so a finished
   // diagram isn't littered with empty prompts.
   const showChip = d.editing || text.trim() !== '' || selected;
@@ -60,6 +67,7 @@ function EditableEdge({
               position: 'absolute',
               transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
               pointerEvents: 'all',
+              whiteSpace: 'nowrap',
               zIndex: 5,
             }}
           >
@@ -113,6 +121,39 @@ function EditableEdge({
                 }}
               >
                 {text.trim() || 'label…'}
+              </span>
+            )}
+            {selected && d.choice && !d.editing && (
+              <span style={{ display: 'inline-flex', gap: 3, marginLeft: 4 }}>
+                {(['yes', 'no'] as const).map((answer) => {
+                  const on = text.trim().toLowerCase() === answer;
+                  return (
+                    <button
+                      key={answer}
+                      type="button"
+                      className="nodrag nopan"
+                      aria-pressed={on}
+                      aria-label={`Label this arrow ${answer}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        d.onPickLabel?.(id, answer);
+                      }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      style={{
+                        background: on ? '#ff79c6' : '#21222c',
+                        color: on ? '#282a36' : '#f8f8f2',
+                        border: '1px solid #44475a',
+                        borderRadius: 4,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {answer}
+                    </button>
+                  );
+                })}
               </span>
             )}
           </div>

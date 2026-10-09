@@ -11,7 +11,7 @@ if (!LIB) {
 }
 const { fromMermaid, toMermaid, describeDiagram } = require(LIB + '/diagram-mermaid.js');
 const { checkDiagram, allPassed } = require(LIB + '/diagram-check.js');
-const { nextFreeSlot } = require(LIB + '/diagram-layout.js');
+const { nextFreeSlot, placeBelow, nextDecisionLabel, DUPLICATE_ARROW_NOTICE } = require(LIB + '/diagram-layout.js');
 const { DEFAULT_RULES } = require(LIB + '/diagram-types.js');
 
 let fails = 0;
@@ -464,6 +464,42 @@ section('nextFreeSlot — palette shapes do not stack');
   for (let i = 0; i < 300; i++) crowded.push({ x: 40 + (i % 4) * step, y: 40 + Math.floor(i / 4) * 112, ...size });
   const fb = nextFreeSlot(crowded, size, origin);
   ok('a full grid falls back to a finite position', Number.isFinite(fb.x) && Number.isFinite(fb.y));
+}
+
+section('placeBelow / nextDecisionLabel / duplicate notice');
+{
+  const a = { x: 100, y: 40, w: 176, h: 72 };
+  const size = { w: 176, h: 72 };
+  const p = placeBelow(a, [a], size);
+  ok('new shape lands directly below its anchor, same column', p.x === 100 && p.y > 40 + 72, JSON.stringify(p));
+  const wide = placeBelow({ x: 100, y: 40, w: 176, h: 72 }, [a], { w: 100, h: 60 });
+  ok('narrower shape is centred on the anchor column', wide.x === 138, JSON.stringify(wide));
+  const a2 = placeBelow(a, [a, { ...p, ...size }], size);
+  ok('a taken slot goes beside, never on top', a2.y === p.y && a2.x !== p.x, JSON.stringify(a2));
+  const a2l = placeBelow(a, [a, { ...p, ...size }, { ...a2, ...size }], size);
+  const col = [a, { ...p, ...size }, { ...a2, ...size }, { ...a2l, ...size }];
+  const a3 = placeBelow(a, col, size);
+  ok('all three slots in the row taken: slide down the column',
+    a3.x === 100 && a3.y > p.y + 72, JSON.stringify(a3));
+  ok('existing shapes are never overlapped',
+    !col.concat([{ ...a3, ...size }]).some((r, i, arr) => arr.some((q, j) => j > i &&
+      r.x < q.x + q.w && r.x + r.w > q.x && r.y < q.y + q.h && r.y + r.h > q.y)));
+  ok('first exit offered is yes', nextDecisionLabel([]) === 'yes');
+  ok('second exit after yes is no', nextDecisionLabel(['yes']) === 'no');
+  ok('second exit after a corrected no is yes (no-first case)', nextDecisionLabel(['no']) === 'yes');
+  ok('case/space tolerant', nextDecisionLabel([' No ']) === 'yes');
+  ok('a third exit gets no label', nextDecisionLabel(['yes', 'no']) === '');
+  ok('an unrelated first label gets no guess', nextDecisionLabel(['age?']) === '');
+  ok('refusal notice says what happened and what to do',
+    /already have an arrow/.test(DUPLICATE_ARROW_NOTICE) && /own step|different shape/.test(DUPLICATE_ARROW_NOTICE));
+}
+
+section('decision-two-exits failure text names the same-target case');
+{
+  const g = fromMermaid('flowchart TD\n  A([Start]) --> B{Ready?}\n  B -->|yes| C[Go]\n  C --> D([End])');
+  const r = checkDiagram(g, [{ id: 'decision-two-exits' }]).find((x) => x.id === 'decision-two-exits');
+  ok('fails with one exit', r && !r.passed);
+  ok('detail mentions different shapes', r && /different shape/.test(r.detail), r && r.detail);
 }
 
 section('describeDiagram');

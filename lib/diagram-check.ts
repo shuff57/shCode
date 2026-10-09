@@ -294,7 +294,7 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
                 const count = (g.outgoing.get(n.id) ?? []).length;
                 return `${nameList([n.id], g)} has ${count} ${plural(count, 'exit', 'exits')}`;
               })
-              .join('; ') + '. A decision asks a yes/no question, so exactly two arrows leave it.',
+              .join('; ') + '. A decision asks a yes/no question, so exactly two arrows leave it, each to a different shape. (The editor will not draw two arrows between the same pair of shapes: give each answer its own step.)',
             offenders: expand(bad.map((n) => n.id), g),
           };
     }

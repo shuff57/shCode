@@ -40,7 +40,12 @@ import type { DiagramDoc, FlowShape, SideId } from '../../lib/diagram-types';
 import { SHAPE_HINTS, SHAPE_LABELS } from '../../lib/diagram-types';
 import { docToFlow } from '../../lib/diagram-flow';
 import { nodeTypes, SHAPE_COLORS, SHAPE_SIZE } from './FlowShapeNodes';
-import { nextFreeSlot } from '../../lib/diagram-layout';
+import {
+  nextFreeSlot,
+  placeBelow,
+  nextDecisionLabel,
+  DUPLICATE_ARROW_NOTICE,
+} from '../../lib/diagram-layout';
 import { edgeTypes } from './EditableEdge';
 
 // ---- doc <-> react-flow ----
@@ -271,6 +276,22 @@ function Canvas({
   const [isFull, setIsFull] = useState(false);
   // Spoken by the polite live region below the toolbar (keyboard + screen reader path).
   const [announce, setAnnounce] = useState('');
+  // A calm, visible message for something the editor declined to do. Also
+  // spoken through the live region.
+  const [notice, setNotice] = useState('');
+  const noticeTimer = useRef<number | null>(null);
+  const showNotice = useCallback((text: string) => {
+    setNotice(text);
+    setAnnounce(text);
+    if (noticeTimer.current) window.clearTimeout(noticeTimer.current);
+    noticeTimer.current = window.setTimeout(() => setNotice(''), 8000);
+  }, []);
+  useEffect(
+    () => () => {
+      if (noticeTimer.current) window.clearTimeout(noticeTimer.current);
+    },
+    [],
+  );
   const [connectTo, setConnectTo] = useState('');
   useEffect(() => setConnectTo(''), [selNode]);
   // Opens itself if the diagram already uses one of the extra shapes, so a
@@ -386,21 +407,34 @@ function Canvas({
   const onConnect = useCallback(
     (c: Connection) => {
       if (!c.source || !c.target) return;
+      // Don't let a student stack two identical arrows between the same
+      // pair — it looks like one arrow but breaks the exit-count check. Say so
+      // at the moment of refusal instead of leaving a silent no-op.
+      if (edges.some((e) => e.source === c.source && e.target === c.target)) {
+        showNotice(DUPLICATE_ARROW_NOTICE);
+        return;
+      }
       snapshot();
+      const newId = newEdgeId();
+      const fromNode = nodes.find((n) => n.id === c.source);
+      const fromDecision = (fromNode?.data as any)?.shape === 'decision';
       setEdges((es) => {
-        // Don't let a student stack two identical arrows between the same
-        // pair — it looks like one arrow but breaks the exit-count check.
         if (es.some((e) => e.source === c.source && e.target === c.target)) return es;
-        const from = nodes.find((n) => n.id === c.source);
-        // A diamond's exits are the one place a label is mandatory, so
-        // pre-fill yes then no and let the student correct it.
-        const isDecision = (from?.data as any)?.shape === 'decision';
-        const already = es.filter((e) => e.source === c.source).length;
-        const label = isDecision ? (already === 0 ? 'yes' : already === 1 ? 'no' : '') : '';
+        // A diamond's exits are the one place a label is mandatory. Offer yes
+        // for the first, the opposite of the first for the second; the student
+        // sees a yes/no toggle on the arrow to flip it.
+        const label = fromDecision
+          ? nextDecisionLabel(
+              es.filter((e) => e.source === c.source).map((e) => String(e.label ?? '')),
+            )
+          : '';
         return [
-          ...es,
+          // Select the new exit in React Flow's own state too (not just ours),
+          // so clicking the diamond again afterwards still counts as a change.
+          ...(fromDecision ? es.map((e) => (e.selected ? { ...e, selected: false } : e)) : es),
           {
-            id: newEdgeId(),
+            id: newId,
+            ...(fromDecision ? { selected: true } : {}),
             source: c.source!,
             target: c.target!,
             // Keep the dots the student actually joined, so the arrow stays
@@ -411,8 +445,14 @@ function Canvas({
           },
         ];
       });
+      if (fromDecision) {
+        // Select the new exit so its yes/no toggle is on screen right away.
+        setSelEdge(newId);
+        setSelNode(null);
+        setNodes((ns) => (ns.some((n) => n.selected) ? ns.map((n) => ({ ...n, selected: false })) : ns));
+      }
     },
-    [nodes, snapshot, newEdgeId],
+    [nodes, edges, snapshot, newEdgeId, showNotice],
   );
 
   /** Keyboard path for onConnect: draws an arrow from the selected shape to a
@@ -424,13 +464,17 @@ function Canvas({
       const from = nodes.find((n) => n.id === selNode);
       const to = nodes.find((n) => n.id === targetId);
       if (es_has(edges, selNode, targetId)) {
-        setAnnounce('Those two shapes are already joined by an arrow.');
+        showNotice(DUPLICATE_ARROW_NOTICE);
         return;
       }
       const isDecision = (from?.data as any)?.shape === 'decision';
-      const already = edges.filter((e) => e.source === selNode).length;
+      const offered = isDecision
+        ? nextDecisionLabel(
+            edges.filter((e) => e.source === selNode).map((e) => String(e.label ?? '')),
+          )
+        : '';
       onConnect({ source: selNode, target: targetId, sourceHandle: null, targetHandle: null });
-      const label = isDecision ? (already === 0 ? ', labelled yes' : already === 1 ? ', labelled no' : '') : '';
+      const label = offered ? `, labelled ${offered}` : '';
       const name = (n?: Node) => String((n?.data as any)?.label || '').trim() || 'a blank shape';
       setAnnounce(`Arrow added from ${name(from)} to ${name(to)}${label}.`);
       setConnectTo('');
@@ -494,11 +538,35 @@ function Canvas({
           if (Number.isFinite(tl.x) && Number.isFinite(tl.y)) origin = { x: tl.x + 40, y: tl.y + 40 };
         }
         const size = SHAPE_SIZE[shape] ?? SHAPE_SIZE.process;
+        // First shape on an empty canvas: start in the middle of the view, not
+        // hard against the left edge, so arrows that loop round the left of a
+        // column (a loop's return arrow) have room and stay on screen.
+        if (nodesRef.current.length === 0 && rect && rect.width > 0) {
+          const mid = screenToFlowPosition({ x: rect.left + rect.width / 2, y: rect.top });
+          if (Number.isFinite(mid.x)) origin = { x: Math.round(mid.x - size.w / 2), y: origin.y };
+        }
         const existing = nodesRef.current.map((n) => {
           const s = SHAPE_SIZE[(n.data as any).shape as FlowShape] ?? SHAPE_SIZE.process;
           return { x: n.position.x, y: n.position.y, w: s.w, h: s.h };
         });
-        position = nextFreeSlot(existing, size, origin);
+        // Below the selected shape (or, with none selected, the shape added
+        // last) so a straight run of steps falls in one column. Nothing that is
+        // already placed moves; the old grid is the fallback.
+        const anchorNode =
+          nodesRef.current.find((n) => n.id === selNode) ??
+          nodesRef.current[nodesRef.current.length - 1];
+        const anchorSize = anchorNode
+          ? SHAPE_SIZE[(anchorNode.data as any).shape as FlowShape] ?? SHAPE_SIZE.process
+          : null;
+        const below =
+          anchorNode && anchorSize
+            ? placeBelow(
+                { x: anchorNode.position.x, y: anchorNode.position.y, ...anchorSize },
+                existing,
+                size,
+              )
+            : null;
+        position = below ?? nextFreeSlot(existing, size, origin);
       }
       const placedByGrid = !at;
       const added: Node = { id, type: shape, position, data: { label: '', shape } };
@@ -527,7 +595,7 @@ function Canvas({
       setEditNode(id);
       setEditEdge(null);
     },
-    [snapshot, spliceInto, screenToFlowPosition, getViewport, fitView],
+    [snapshot, spliceInto, screenToFlowPosition, getViewport, fitView, selNode],
   );
 
   const setNodeLabel = useCallback((id: string, label: string) => {
@@ -543,6 +611,15 @@ function Canvas({
   const setEdgeLabel = useCallback((id: string, label: string) => {
     setEdges((es) => es.map((e) => (e.id === id ? { ...e, label: label || undefined } : e)));
   }, []);
+
+  /** The yes/no toggle on a diamond's exit: one click sets the answer. */
+  const pickEdgeLabel = useCallback(
+    (id: string, label: string) => {
+      snapshot();
+      setEdgeLabel(id, label);
+    },
+    [snapshot, setEdgeLabel],
+  );
 
   const deleteSelected = useCallback(() => {
     snapshot();
@@ -727,9 +804,14 @@ function Canvas({
         onLabelChange: setEdgeLabel,
         onEditEnd: endEdit,
         onBeginEdit: beginEditEdge,
+        // A diamond's exits get a visible yes/no choice while selected.
+        choice:
+          !readOnly && (nodes.find((n) => n.id === e.source)?.data as any)?.shape === 'decision',
+        onPickLabel: pickEdgeLabel,
+        active: e.id === selEdge,
       },
     }));
-  }, [edges, nodes, selEdge, spliceTarget, editEdge, setEdgeLabel, endEdit, beginEditEdge]);
+  }, [edges, nodes, selEdge, spliceTarget, editEdge, setEdgeLabel, endEdit, beginEditEdge, pickEdgeLabel, readOnly]);
 
   const selectedNode = nodes.find((n) => n.id === selNode) ?? null;
   const selectedEdge = edges.find((e) => e.id === selEdge) ?? null;
@@ -875,6 +957,34 @@ function Canvas({
             )}
             <IconButton onClick={clearAll} title="Clear the canvas" Icon={Eraser} />
           </div>
+        </div>
+      )}
+
+      {notice && (
+        <div
+          role="status"
+          data-testid="flow-notice"
+          style={{
+            display: 'flex',
+            gap: 10,
+            alignItems: 'flex-start',
+            padding: '8px 12px',
+            background: '#44475a',
+            borderBottom: '1px solid #6272a4',
+            color: '#f8f8f2',
+            fontSize: 12.5,
+            lineHeight: 1.4,
+          }}
+        >
+          <span style={{ flex: 1 }}>{notice}</span>
+          <button
+            type="button"
+            onClick={() => setNotice('')}
+            aria-label="Dismiss message"
+            style={{ background: 'none', border: 0, color: '#f8f8f2', cursor: 'pointer', fontSize: 14 }}
+          >
+            ×
+          </button>
         </div>
       )}
 
@@ -1061,6 +1171,32 @@ function Canvas({
                 placeholder="yes / no — leave blank for a plain arrow"
                 style={inputStyle}
               />
+              {(nodes.find((n) => n.id === selectedEdge.source)?.data as any)?.shape ===
+                'decision' &&
+                !readOnly &&
+                (['yes', 'no'] as const).map((answer) => {
+                  const on = String(selectedEdge.label ?? '').trim().toLowerCase() === answer;
+                  return (
+                    <button
+                      key={answer}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => pickEdgeLabel(selectedEdge.id, answer)}
+                      style={{
+                        padding: '6px 12px',
+                        background: on ? '#ff79c6' : '#21222c',
+                        border: '1px solid #44475a',
+                        borderRadius: 6,
+                        color: on ? '#282a36' : '#f8f8f2',
+                        fontSize: 12.5,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {answer === 'yes' ? 'Yes' : 'No'}
+                    </button>
+                  );
+                })}
             </>
           ) : (
             <span style={{ fontSize: 12.5, color: '#6272a4' }}>
