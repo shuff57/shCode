@@ -73,6 +73,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "counter has a number, a method and an undefined value, and the JSON text is printed",
+      "description": "counter holds a number, a function and a property whose value is undefined, and the JSON text was printed. Help: 3.8.6 (What Does Not Survive)",
+      "type": "tests",
+      "hint": "Give counter a number property, a method (a function value) and a property set to undefined, then print JSON.stringify(counter).",
+      "variables": [
+        {
+          "name": "counter"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "counter !== null && typeof counter === 'object' && Object.values(counter).some(v => typeof v === 'number') && Object.values(counter).some(v => typeof v === 'function') && Object.keys(counter).some(k => counter[k] === undefined) && output.some(l => l.trim().startsWith('{'))",
+          "fail": "counter needs a number property, a method and a property whose value is undefined, and the program must print the JSON text (it starts with an opening brace)."
+        }
+      ]
     }
   ],
   "grading": {

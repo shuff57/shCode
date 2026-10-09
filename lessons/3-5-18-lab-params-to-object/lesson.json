@@ -16,17 +16,17 @@
     {
       "id": "s1",
       "title": "Write the positional original",
-      "instructions": "Write a function that takes three positional parameters (for example width, height and color) and returns a string built from them."
+      "instructions": "Write a function called describeBox that takes three positional parameters (width, height and color) and returns a string built from them."
     },
     {
       "id": "s2",
       "title": "Rewrite it to take one object",
-      "instructions": "Change the function so it takes a single parameter, an options object, and reads each value off that object with a dot."
+      "instructions": "Change describeBox so it takes a single parameter, an options object, and reads width, height and color off that object with a dot."
     },
     {
       "id": "s3",
       "title": "Call it with an options object",
-      "instructions": "Call the function, passing one object literal with the three keys named, and print the result."
+      "instructions": "Call describeBox with one object literal that names the three keys, and print the result."
     }
   ],
   "requirements": [
@@ -73,6 +73,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "describeBox takes one options object and uses all three values",
+      "description": "describeBox({ width: 2, height: 3, color: \"red\" }) returns text containing red, 2 and 3, a second object gives its own values, and the function takes exactly one parameter. Help: 3.5.17 (Example: An Options Object)",
+      "type": "tests",
+      "hint": "describeBox should have ONE parameter, the options object. Read options.width, options.height and options.color, and put all three in the string it returns.",
+      "variables": [
+        {
+          "name": "describeBox"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "typeof describeBox === 'function' && describeBox.length === 1 && (s => s.includes('red') && s.includes('2') && s.includes('3'))(String(describeBox({ width: 2, height: 3, color: 'red' }))) && (s => s.includes('blue') && s.includes('7') && s.includes('9'))(String(describeBox({ color: 'blue', height: 9, width: 7 })))",
+          "fail": "describeBox should take one options object and use all three values: describeBox({ width: 2, height: 3, color: \"red\" }) must give text that contains red, 2 and 3."
+        }
+      ]
     }
   ],
   "grading": {

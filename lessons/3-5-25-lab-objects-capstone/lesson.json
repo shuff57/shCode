@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Build an array of records",
-      "instructions": "Create one array whose elements are objects. Give each object the same fields, for example a name, a price and a quantity. Include at least three records."
+      "instructions": "Create one array called cart whose elements are objects. Give each object the same fields, for example a name, a price and a quantity. Include at least three records."
     },
     {
       "id": "s2",
@@ -132,6 +132,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "cart holds three or more records, one with a nested object and one with a spaced key",
+      "description": "cart is an array of at least three objects, one record holds a nested object, one record has a key containing a space, and the program prints at least eight lines. Help: 3.5.23 (Example: Record Shape)",
+      "type": "tests",
+      "hint": "Build cart with three or more objects. Give one a nested object as a field and one a quoted key with a space in it, then print what the steps ask for.",
+      "variables": [
+        {
+          "name": "cart"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "Array.isArray(cart) && cart.length >= 3 && cart.every(r => r && typeof r === 'object' && !Array.isArray(r)) && cart.some(r => Object.values(r).some(v => v && typeof v === 'object' && !Array.isArray(v))) && cart.some(r => Object.keys(r).some(k => k.includes(' '))) && output.length >= 8",
+          "fail": "cart should be an array of at least three records, one with a nested object field and one with a key that contains a space, and the program should print at least eight lines."
+        }
+      ]
     }
   ],
   "grading": {

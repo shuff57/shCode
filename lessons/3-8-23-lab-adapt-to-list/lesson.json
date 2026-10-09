@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Build a list of records",
-      "instructions": "Create a variable holding an array of at least two objects. Each object should describe one thing with a name and a value."
+      "instructions": "Create a variable called records holding an array of at least two objects. Each object should describe one thing with a name and a value."
     },
     {
       "id": "s2",
@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Load it back",
-      "instructions": "Read the key with localStorage.getItem, then parse it back into an array using JSON.parse. An array round-trips exactly like an object."
+      "instructions": "Read the key with localStorage.getItem, then parse it back into an array called restored using JSON.parse. An array round-trips exactly like an object."
     },
     {
       "id": "s4",
@@ -89,6 +89,29 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "restored is a separate array rebuilt from storage",
+      "description": "restored is an array holding the same records as records, rebuilt from the stored text, and the length and a field were printed. Help: 3.8.15 (Reading: Saving by Key)",
+      "type": "tests",
+      "hint": "Save JSON.stringify(records) under a key, read it back with getItem and rebuild restored with JSON.parse. Print restored.length and a field of one record.",
+      "variables": [
+        {
+          "name": "records"
+        },
+        {
+          "name": "restored"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "Array.isArray(records) && records.length >= 2 && Array.isArray(restored) && JSON.stringify(restored) === JSON.stringify(records) && output.length >= 2",
+          "fail": "restored should be an array rebuilt from the text you stored, with the same records as records, and you should print its length and one record's field."
+        }
+      ]
     }
   ],
   "grading": {

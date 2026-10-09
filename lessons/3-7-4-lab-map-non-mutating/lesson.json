@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Create the source list",
-      "instructions": "Create a variable called prices and assign it an array of numbers."
+      "instructions": "The starter gives you prices, an array of numbers: const prices = [10, 20, 30]; Leave that line as it is."
     },
     {
       "id": "s2",
@@ -62,6 +62,31 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "prices still holds its starting values and both arrays are printed",
+      "description": "After the code runs, prices is still [10, 20, 30] and at least two lines were printed. Help: 3.7.2 (Reading: .map())",
+      "type": "tests",
+      "hint": ".map() builds a new array and leaves prices alone. Store the result in a second variable and do not assign into prices.",
+      "variables": [
+        {
+          "name": "prices",
+          "expect": [
+            10,
+            20,
+            30
+          ]
+        }
+      ],
+      "checks": [
+        {
+          "expr": "output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 2",
+          "fail": "Print the transformed array and then the original prices array."
+        }
+      ]
     }
   ],
   "grading": {

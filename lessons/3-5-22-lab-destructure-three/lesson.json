@@ -30,7 +30,7 @@
     {
       "id": "s4",
       "title": "Destructure a parameter",
-      "instructions": "Write a function that takes one options object and destructures two or more of its keys directly in the parameter list, then returns a string from the bare names."
+      "instructions": "Write a function called describe that takes one options object and destructures two or more of its keys directly in the parameter list, then returns a string from the bare names."
     }
   ],
   "requirements": [
@@ -66,6 +66,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "describe takes one object and uses its fields",
+      "description": "describe({ title: \"Pen\", quantity: 10, cost: 2 }) returns text containing Pen and 10, and the function takes exactly one parameter. Help: 3.5.20 (Example: Destructure a Parameter)",
+      "type": "tests",
+      "hint": "describe takes ONE parameter (an object) and unpacks title and quantity from it with braces in the parameter list. Return a string that uses both names.",
+      "variables": [
+        {
+          "name": "describe"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "typeof describe === 'function' && describe.length === 1 && (s => s.includes('Pen') && s.includes('10'))(String(describe({ title: 'Pen', quantity: 10, cost: 2 }))) && (s => s.includes('Cup') && s.includes('4'))(String(describe({ cost: 1, quantity: 4, title: 'Cup' })))",
+          "fail": "describe should take one object and use its fields: describe({ title: \"Pen\", quantity: 10, cost: 2 }) must give text that contains Pen and 10."
+        }
+      ]
     }
   ],
   "grading": {

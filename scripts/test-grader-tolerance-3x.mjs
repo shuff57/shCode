@@ -103,10 +103,10 @@ reject('3-1-10-functions', 'greet defined but never called', 'req4',
 
 // ---- 3.5.12: alias and for...of both read a field off a record
 accept('3-5-12-lab-nested-structure', 'for...of over the array, field read off the loop variable',
-  js('const order = { customer: { name: "Ana" }, items: [{ name: "pen", qty: 2 }, { name: "ink", qty: 1 }] };',
+  js('const order = { customer: { name: "Ana" }, items: [{ name: "pen", price: 2 }, { name: "ink", price: 1 }] };',
      'console.log(order.customer.name);', 'for (const item of order.items) { console.log(item.name); }'));
 accept('3-5-12-lab-nested-structure', 'index into the array through an alias',
-  js('const order = { customer: { name: "Ana" }, items: [{ name: "pen", qty: 2 }] };',
+  js('const order = { customer: { name: "Ana" }, items: [{ name: "pen", price: 2 }, { name: "ink", price: 1 }] };',
      'console.log(order.customer.name);', 'for (let i = 0; i < order.items.length; i++) { const item = order.items[i]; console.log(item.name); }'));
 
 // ---- 3.5.15: arrow method
@@ -115,16 +115,16 @@ accept('3-5-15-lab-add-method', 'method written as an arrow',
 
 // ---- 3.5.18: arrow, expression and destructured one-parameter functions; console.log({..}) is no call
 accept('3-5-18-lab-params-to-object', 'one-parameter arrow reading a property',
-  js('const describe = (o) => o.width * o.height;', 'console.log(describe({ width: 2, height: 3 }));'));
+  js('const describeBox = (o) => o.color + o.width + o.height;', 'console.log(describeBox({ width: 2, height: 3, color: "red" }));'));
 accept('3-5-18-lab-params-to-object', 'function expression',
-  js('const describe = function (o) { return o.width * o.height; };', 'console.log(describe({ width: 2, height: 3 }));'));
+  js('const describeBox = function (o) { return o.color + o.width + o.height; };', 'console.log(describeBox({ width: 2, height: 3, color: "red" }));'));
 reject('3-5-18-lab-params-to-object', 'function never called, only an object logged', 'r3',
-  js('function describe(o) { return o.width; }', 'console.log({ width: 2 });'));
+  js('function describeBox(o) { return o.width; }', 'console.log({ width: 2 });'));
 
 // ---- 3.5.22: arrow with a destructured parameter
 accept('3-5-22-lab-destructure-three', 'arrow with destructured parameter',
   js('const book = { title: "T", author: "A", pages: 9 };', 'const { title, author, pages } = book;',
-     'const d = ({ title, pages }) => title + pages;', 'console.log(d(book), author);'));
+     'const describe = ({ title, quantity }) => title + " " + quantity;', 'console.log(describe({ title: "Pen", quantity: 10 }), author);'));
 
 // ---- 3.6: arrow versions of the named functions; copyBook that just returns its argument
 accept('3-6-4-lab-predict-primitive-vs-array', 'arrow versions',
@@ -145,7 +145,7 @@ reject('3-6-16-lab-capstone', 'copyBook returns its argument; structuredClone us
 accept('3-7-21-lab-mutating-sort-drill', 'filter as the non-mutating call',
   js('const a = [1, 2, 3];', 'a.push(4);', 'console.log(a.filter((n) => n > 1));', 'console.log(a);'));
 accept('3-7-18-lab-spread-object', 'quoted key as the override',
-  js('const s = { theme: "dark" };', 'const t = { ...s, "font size": 14 };', 'console.log(t);'));
+  js('const settings = { theme: "dark", fontSize: 14, wrap: true };', 'const t = { ...settings, "font size": 14 };', 'const u = { ...settings, wrap: false };', 'console.log(t);', 'console.log(u);', 'console.log(settings);'));
 
 // ---- runtime checks (step 3 of .gauntlet/SPEC-module-3x-hardening.md): 3.4
 reject('3-4-17-lab-fix-broken-arrow', 'parenthesised but the body is wrong (=> 0)', 't1',
@@ -173,6 +173,114 @@ reject('3-4-10-lab-implicit-return-drill', 'three arrows written, only one resul
   js('const a = n => n * 2;', 'const b = n => n > 0;', 'const c = (x, y) => x + y;', 'console.log(a(2));'));
 reject('3-4-16-lab-rewrite-three-arrows', 'three arrows written, only one result printed', 't1',
   js('const a = n => n * 2;', 'const b = n => n > 0;', 'const c = (x, y) => x + y;', 'console.log(a(2));'));
+
+// ---- runtime checks: 3.5
+reject('3-5-5-lab-read-update-fields', 'a number named book', 't1',
+  js('let book = 1;', 'book.b = 2;', 'console.log(book.b);', 'console.log(book);'));
+reject('3-5-12-lab-nested-structure', 'braces everywhere, no customer object', 't1',
+  js('const order = { items: [{ a: 1 }, { b: 2 }] };', 'const x = { p: { q: 1 } };', 'console.log(x.p.q);',
+     'for (let i = 0; i < order.items.length; i++) { console.log(order.items[i].a); }'));
+reject('3-5-15-lab-add-method', 'method with an empty body prints undefined', 't1',
+  js('const s = { name: "Ana", hi: function () {} };', 'console.log(s.hi());'));
+reject('3-5-18-lab-params-to-object', 'describeBox ignores two of the three values', 't1',
+  js('function describeBox(o) { return o.color; }', 'console.log(describeBox({ width: 2, height: 3, color: "red" }));'));
+reject('3-5-18-lab-params-to-object', 'still three positional parameters', 't1',
+  js('function describeBox(w, h, c) { return c + w + h; }', 'console.log(describeBox({ width: 2, height: 3, color: "red" }));'));
+reject('3-5-22-lab-destructure-three', 'describe returns a fixed sentence', 't1',
+  js('const book = { title: "T", author: "A", pages: 9 };', 'const { title, author, pages } = book;',
+     'function describe({ title, pages }) { return "Pen 10"; }', 'console.log(describe(book), author);'));
+reject('3-5-24-lab-parallel-arrays-refactor', 'records built but the old arrays kept', 'r5',
+  js('const names = ["Marisol", "Dev", "Priya"];', 'const players = [{ name: "Marisol", score: 92, group: "A" }, { name: "Dev", score: 78, group: "B" }, { name: "Priya", score: 85, group: "A" }];',
+     'for (let i = 0; i < players.length; i++) { console.log(players[i].name + players[i].score); }'));
+reject('3-5-24-lab-parallel-arrays-refactor', 'parallel arrays kept, one extra record added', 't1',
+  js('const names = ["Marisol", "Dev", "Priya"];', 'const players = [{ n: 1 }];',
+     'for (let i = 0; i < names.length; i++) { console.log(names[i] + players[0].n); }'));
+accept('3-5-24-lab-parallel-arrays-refactor', 'for...of over players',
+  js('const players = [{ name: "Marisol", score: 92, group: "A" }, { name: "Dev", score: 78, group: "B" }, { name: "Priya", score: 85, group: "A" }];',
+     'for (const p of players) { console.log(p.name + " (" + p.group + "): " + p.score); }'));
+reject('3-5-25-lab-objects-capstone', 'empty shapes that satisfy every pattern', 't1',
+  js('const x = [{ a: {} }];', 'for (;0;) {}', 'const { a } = x;', 'Object.keys(x);', 'console.log(x[0]);'));
+
+// ---- runtime checks: 3.6
+reject('3-6-4-lab-predict-primitive-vs-array', 'changeArr never touches its array', 't1',
+  js('function changeNum(n) { n = 99; }', 'function changeArr(a) { }', 'let x = 1; const l = [1];', 'changeNum(x); changeArr(l);', 'console.log(x);', 'console.log(l);'));
+reject('3-6-8-lab-fix-reassign-bug', 'addOne does nothing, the caller loop does the work', 't1',
+  js('function addOne(scores) { }', 'let quizScores = [10, 20, 30];', 'addOne(quizScores);',
+     'for (let i = 0; i < quizScores.length; i++) { quizScores[i] = quizScores[i] + 1; }', 'console.log(quizScores);'));
+reject('3-6-8-lab-fix-reassign-bug', 'addOne still reassigns its parameter', 't1',
+  js('function addOne(scores) { for (let i = 0; i < scores.length; i++) { scores = scores.map(x => x + 1); } }',
+     'let quizScores = [10, 20, 30];', 'addOne(quizScores);', 'console.log(quizScores);'));
+accept('3-6-8-lab-fix-reassign-bug', 'for...of over keys() writes by index',
+  js('function addOne(scores) { for (const i of scores.keys()) { scores[i]++; } }', 'let quizScores = [10, 20, 30];', 'addOne(quizScores);', 'console.log(quizScores);'));
+reject('3-6-12-lab-object-param-mutation', 'birthday copies, birthdaySafe mutates (swapped)', 't1',
+  js('function birthday(p) { return { ...p, age: p.age + 1 }; }', 'function birthdaySafe(p) { p.age++; return p; }',
+     'const a = { name: "A", age: 10 };', 'birthday(a);', 'console.log(a, birthdaySafe(a));'));
+reject('3-6-12-lab-object-param-mutation', 'birthdaySafe mutates its argument', 't2',
+  js('function birthday(p) { p.age++; }', 'function birthdaySafe(p) { p.age++; return p; }',
+     'const a = { name: "A", age: 10 };', 'birthday(a);', 'console.log(a, { ...a, x: 1 });'));
+accept('3-6-12-lab-object-param-mutation', 'Object.assign copy',
+  js('function birthday(p) { p.age += 1; }', 'function birthdaySafe(p) { const c = Object.assign({}, p); c.age = p.age + 1; return c; }',
+     'const a = { name: "A", age: 10 };', 'birthday(a);', 'console.log(a, { ...a });', 'console.log(birthdaySafe(a));'));
+reject('3-6-13-lab-nested-mutation', 'copies made, nothing printed', 't1',
+  js('const s = { n: "A", scores: [1] };', 'const a = { ...s };', 'a.scores.push(2);', 'const b = structuredClone(s);', 'b.scores.push(3);'));
+reject('3-6-16-lab-capstone', 'addScore pushes onto the caller\'s array', 't1',
+  js('function addScore(s, n) { s.push(n); return s; }', 'function recordPlay(song) { song.plays++; }',
+     'function copyBook(b) { return structuredClone(b); }', 'console.log([...[1]], 1);', 'const song = { plays: 0 };', 'recordPlay(song);', 'console.log(song, copyBook({ books: [] }));'));
+reject('3-6-16-lab-capstone', 'recordPlay copies instead of changing the song', 't2',
+  js('function addScore(s, n) { return [...s, n]; }', 'function recordPlay(song) { return { ...song, plays: song.plays + 1 }; }',
+     'function copyBook(b) { return structuredClone(b); }', 'console.log(addScore([1], 2));', 'const song = { plays: 0 };', 'recordPlay(song);', 'console.log(song, copyBook({ books: [] }));'));
+reject('3-6-16-lab-capstone', 'copyBook is a shallow copy', 't3',
+  js('function addScore(s, n) { return [...s, n]; }', 'function recordPlay(song) { song.plays++; }',
+     'function copyBook(b) { const x = structuredClone(1); return { ...b }; }', 'console.log(addScore([1], 2));', 'const song = { plays: 0 };', 'recordPlay(song);', 'console.log(song, copyBook({ books: [] }));'));
+
+// ---- runtime checks: 3.7
+reject('3-7-4-lab-map-non-mutating', 'map callback overwrites prices', 't1',
+  js('const prices = [10, 20, 30];', 'const doubled = prices.map((x, i) => { prices[i] = x * 2; return x * 2; });', 'console.log(doubled);', 'console.log(prices);'));
+accept('3-7-4-lab-map-non-mutating', 'map into a new variable, both printed',
+  js('const prices = [10, 20, 30];', 'const withTax = prices.map(p => p * 2);', 'console.log(withTax);', 'console.log(prices);'));
+reject('3-7-8-lab-slice-sublist', 'items too short, nothing printed', 't1',
+  js('const items = [1, 2];', 'const a = items.slice(0, 1);', 'const b = items.slice(1);'));
+reject('3-7-11-lab-concat-two-lists', 'joined but only one line printed', 't1',
+  js('const a = [1, 2, 3];', 'const b = [4, 5, 6];', 'const c = a.concat(b);', 'console.log(c);'));
+reject('3-7-17-lab-spread-array', 'one line printed', 't1',
+  js('const a = [1, 2];', 'const b = [3, 4];', 'const c = [...a, ...b];', 'const d = [0, ...a, 9];', 'console.log(c);'));
+reject('3-7-18-lab-spread-object', 'the original settings object is changed', 't1',
+  js('const settings = { theme: "dark", fontSize: 14, wrap: true };', 'settings.fontSize = 18;',
+     'const a = { ...settings, wrap: false };', 'const b = { ...settings, language: "en" };', 'console.log(a);', 'console.log(b);', 'console.log(settings);'));
+reject('3-7-22-lab-capstone', 'empty shapes that satisfy every pattern', 't1',
+  js('let a = [];', 'a.push(1);', 'a.map(x => x);', 'a.slice();', 'a.concat();', '({ ...a, b: 1 });', 'console.log(1);'));
+
+// ---- runtime checks: 3.8 (the node twin of the runner now has the localStorage stand-in too)
+reject('3-8-7-lab-stringify-spot-drops', 'plain object, JSON text printed', 't1',
+  js('const counter = { count: 1 };', 'const json = JSON.stringify(counter);', 'console.log(json);'));
+reject('3-8-10-lab-round-trip-object', 'restored is the very same object, no round trip', 't1',
+  js('const player = { name: "A", score: 4 };', 'const saved = JSON.stringify(1);', 'const restored = player;', 'JSON.parse(saved);', 'console.log(restored.score + 1);', 'console.log(player.name);'));
+accept('3-8-10-lab-round-trip-object', 'full round trip',
+  js('const player = { name: "A", score: 4 };', 'const saved = JSON.stringify(player);', 'const restored = JSON.parse(saved);', 'console.log(restored.score + 1);', 'console.log(player.name);'));
+reject('3-8-11-lab-round-trip-array', 'stringify and parse of something else', 't1',
+  js('const gameState = { player: "A", items: [{ name: "x", price: 1 }, { name: "y", price: 2 }] };', 'const saved = JSON.stringify(1);', 'const restored = JSON.parse("1");', 'console.log(12);', 'console.log("y");'));
+reject('3-8-14-lab-malformed-json', 'parse outside the try, function still throws', 't1',
+  js('function readSave(t) { const r = JSON.parse(t); try { return r; } catch (e) { return {}; } }', 'console.log(readSave("{}"));', 'console.log(readSave("{}"));'));
+accept('3-8-14-lab-malformed-json', 'arrow function, ok:false fallback',
+  js('const readSave = (text) => { try { return JSON.parse(text); } catch (err) { return { ok: false }; } };', 'console.log(readSave(\'{"a":1}\'));', 'console.log(readSave("junk"));'));
+reject('3-8-18-lab-save-by-key', 'a string is stored, not the state', 't1',
+  js('const state = { score: 1, level: 2 };', 'JSON.stringify(1);', 'localStorage.setItem("k", "hello");', 'console.log(localStorage.getItem("k"));'));
+reject('3-8-19-lab-load-restore', 'restored is a string and nothing real is printed', 't1',
+  js('localStorage.setItem("k", JSON.stringify({ a: 1 }));', 'const text = localStorage.getItem("k");', 'let restored = text;', 'if (text === null) { restored = {}; }', 'try { JSON.parse("1"); } catch (e) { }', 'console.log(1);'));
+accept('3-8-19-lab-load-restore', 'ternary null guard',
+  js('const defaults = { score: 0 };', 'localStorage.setItem("k", JSON.stringify({ score: 5 }));', 'const text = localStorage.getItem("k");',
+     'let restored = defaults;', 'if (text) { try { restored = JSON.parse(text); } catch (e) { restored = defaults; } }', 'console.log(restored.score);'));
+reject('3-8-22-lab-capstone', 'no functions defined at all', 't1',
+  js('const t = localStorage.getItem("k");', 'if (t === null) { }', 'try { JSON.parse("1"); } catch (e) { }', 'localStorage.setItem("k", JSON.stringify({}));', 'console.log(1);'));
+reject('3-8-22-lab-capstone', 'loadState returns a hard-coded object', 't1',
+  js('const defaults = { score: 0, level: 1 };', 'function saveState(s) { localStorage.setItem("k", JSON.stringify(s)); }',
+     'function loadState() { return { score: 75, level: 5 }; }', 'saveState({ score: 75, level: 5 });', 'console.log(loadState().score);'));
+accept('3-8-22-lab-capstone', 'all-arrow version',
+  js('const defaults = { score: 0, level: 1 };', 'const saveState = (s) => localStorage.setItem("state", JSON.stringify(s));',
+     'const loadState = () => { const t = localStorage.getItem("state"); if (t === null) return defaults; try { return JSON.parse(t); } catch (e) { return defaults; } };',
+     'saveState({ score: 75, level: 5 });', 'const restored = loadState();', 'console.log(restored.score);'));
+reject('3-8-23-lab-adapt-to-list', 'the list is never restored', 't1',
+  js('const records = [{ name: "a", v: 1 }, { name: "b", v: 2 }];', 'localStorage.setItem("k", JSON.stringify(1));', 'const restored = JSON.parse("1");', 'console.log(1);', 'console.log(2);'));
 
 try {
   execFileSync(process.execPath, [

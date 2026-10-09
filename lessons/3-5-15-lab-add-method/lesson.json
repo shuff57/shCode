@@ -72,6 +72,21 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "the method returns a value that is printed",
+      "description": "The call prints something real: at least one line, and not undefined. Help: 3.5.13 (Methods)",
+      "type": "tests",
+      "hint": "A method that returns nothing prints undefined. Have the function return a string, call it with parentheses and print the result.",
+      "checks": [
+        {
+          "expr": "output.length >= 1 && output.every(l => l.trim() !== '' && l.trim() !== 'undefined')",
+          "fail": "The call printed nothing useful. Have the method return a string with return, then print the call: console.log(object.method())."
+        }
+      ]
     }
   ],
   "grading": {

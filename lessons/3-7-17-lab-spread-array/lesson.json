@@ -78,6 +78,21 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "both new arrays and an original are printed",
+      "description": "At least three lines were printed: the combined array, the framed array and one original. Help: 3.7.14 (Reading: Spread Into a New Array)",
+      "type": "tests",
+      "hint": "Print the combined array, the array with loose values around a spread, and one of the originals.",
+      "checks": [
+        {
+          "expr": "output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 3",
+          "fail": "Print three arrays: both new ones and one of the originals."
+        }
+      ]
     }
   ],
   "grading": {

@@ -83,6 +83,86 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "birthday raises the age on the object it is given",
+      "description": "birthday({ name: \"A\", age: 10 }) leaves that same object with age 11. Help: 3.6.5 (Changing vs. Reassigning)",
+      "type": "tests",
+      "hint": "birthday must change the age property of the object it receives: person.age = person.age + 1. Do not return a new object here.",
+      "function": "birthday",
+      "cases": [
+        {
+          "args": [
+            {
+              "name": "A",
+              "age": 10
+            }
+          ],
+          "after": {
+            "0": {
+              "name": "A",
+              "age": 11
+            }
+          }
+        },
+        {
+          "args": [
+            {
+              "name": "B",
+              "age": 0
+            }
+          ],
+          "after": {
+            "0": {
+              "name": "B",
+              "age": 1
+            }
+          },
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t2",
+      "title": "birthdaySafe returns an older copy and leaves the original alone",
+      "description": "birthdaySafe({ name: \"A\", age: 10 }) returns { name: \"A\", age: 11 } and the object passed in still has age 10. Help: 3.6.9 (Side Effects and Copies)",
+      "type": "tests",
+      "hint": "Build and return a new object ({ ...person, age: person.age + 1 }). Never assign to a property of the object you were given.",
+      "function": "birthdaySafe",
+      "cases": [
+        {
+          "args": [
+            {
+              "name": "A",
+              "age": 10
+            }
+          ],
+          "expect": {
+            "name": "A",
+            "age": 11
+          },
+          "unchanged": 0
+        },
+        {
+          "args": [
+            {
+              "name": "B",
+              "age": 0
+            }
+          ],
+          "expect": {
+            "name": "B",
+            "age": 1
+          },
+          "unchanged": 0,
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

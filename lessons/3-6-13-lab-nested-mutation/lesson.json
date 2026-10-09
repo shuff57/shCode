@@ -72,6 +72,21 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "the shallow and the deep copy are both shown",
+      "description": "At least four lines are printed: the copy and the original after the spread change, then again after the structuredClone change. Help: 3.6.9 (Side Effects and Copies)",
+      "type": "tests",
+      "hint": "Log the copy and the original after the spread push, then log both again after the structuredClone push.",
+      "checks": [
+        {
+          "expr": "output.filter(l => l.includes('[')).length >= 4",
+          "fail": "Print the copy and the original after each push: two lines for the spread copy, two for the structuredClone copy."
+        }
+      ]
     }
   ],
   "grading": {

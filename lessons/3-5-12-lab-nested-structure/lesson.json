@@ -93,6 +93,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "order holds a customer object and a list of items, and each item is printed",
+      "description": "order.customer has a name, order.items is an array of at least two objects each with a name and a price, and the customer and every item are printed. Help: 3.5.9 (Nested Objects)",
+      "type": "tests",
+      "hint": "Build order with a customer object (with a name) and an items array holding at least two objects, each with a name and a price. Then print the customer name and loop over the items.",
+      "variables": [
+        {
+          "name": "order"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "order && order.customer && typeof order.customer.name === 'string' && Array.isArray(order.items) && order.items.length >= 2 && order.items.every(i => i && typeof i.name === 'string' && typeof i.price === 'number') && output.length >= 1 + order.items.length",
+          "fail": "order needs a customer object with a name and an items array of at least two objects, each with a name (text) and a price (number). Print the customer name, then one line for every item."
+        }
+      ]
     }
   ],
   "grading": {

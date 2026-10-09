@@ -20,7 +20,7 @@
     {
       "id": "s2",
       "title": "Collapse them into one array of records",
-      "instructions": "Replace the three parallel arrays with a single array whose elements are objects, each object holding name, score and group for one player."
+      "instructions": "Replace the three parallel arrays with a single array called players whose elements are objects, each object holding name, score and group for one player."
     },
     {
       "id": "s3",
@@ -72,6 +72,57 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "players holds one record per player, with the same data",
+      "description": "players is the three records { name, score, group } for Marisol, Dev and Priya, in that order, and the program prints each player. Help: 3.5.23 (Example: Record Shape)",
+      "type": "tests",
+      "hint": "Build players as an array of three objects with the keys name, score and group, using the values from the old arrays in the same order. Delete the old parallel arrays.",
+      "variables": [
+        {
+          "name": "players",
+          "expect": [
+            {
+              "name": "Marisol",
+              "score": 92,
+              "group": "A"
+            },
+            {
+              "name": "Dev",
+              "score": 78,
+              "group": "B"
+            },
+            {
+              "name": "Priya",
+              "score": 85,
+              "group": "A"
+            }
+          ]
+        }
+      ],
+      "expectOutputContains": [
+        "Marisol",
+        "Dev",
+        "Priya",
+        "92",
+        "78",
+        "85"
+      ]
+    },
+    {
+      "id": "r5",
+      "title": "the parallel arrays are gone",
+      "description": "The old names, scores and groups arrays are deleted: players is the only place the data lives. Help: 3.5.2 (Grouping Related Values)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*\\b(?:const|let|var)\\s+(?:names|scores|groups)\\b)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Once players holds everything, delete the three old arrays. If they are still there, the program still has two copies of the data."
     }
   ],
   "grading": {

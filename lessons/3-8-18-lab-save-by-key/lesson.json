@@ -84,6 +84,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "the stored text is state turned into JSON and it is printed back",
+      "description": "The line printed from localStorage.getItem is the JSON text of state. Help: 3.8.15 (Reading: Saving by Key)",
+      "type": "tests",
+      "hint": "Store JSON.stringify(state) under a key, then print localStorage.getItem with that same key. Storing the object itself or other text would not match state.",
+      "variables": [
+        {
+          "name": "state"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "state !== null && typeof state === 'object' && Object.keys(state).length >= 2 && output.some(l => { try { return JSON.stringify(JSON.parse(l)) === JSON.stringify(state); } catch (e) { return false; } })",
+          "fail": "The printed line should be the JSON text of state: save JSON.stringify(state) under a key and print localStorage.getItem with the same key."
+        }
+      ]
     }
   ],
   "grading": {

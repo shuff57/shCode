@@ -16,17 +16,17 @@
     {
       "id": "s1",
       "title": "Create an object",
-      "instructions": "Create a variable holding an object with at least two properties, one of them a number."
+      "instructions": "Create a variable called player holding an object with at least two properties, one of them a number."
     },
     {
       "id": "s2",
       "title": "Save it to text",
-      "instructions": "Use JSON.stringify to turn the object into a string and store that string in a second variable."
+      "instructions": "Use JSON.stringify to turn player into a string, and store that string in a variable called saved."
     },
     {
       "id": "s3",
       "title": "Restore it",
-      "instructions": "Use JSON.parse on the string to build a third variable back into a usable object."
+      "instructions": "Use JSON.parse on saved to build a variable called restored back into a usable object."
     },
     {
       "id": "s4",
@@ -78,6 +78,32 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "restored is a separate object rebuilt from the saved text",
+      "description": "saved is a string, and restored is a different object holding the same data as player. Help: 3.8.9 (Example: A Round Trip)",
+      "type": "tests",
+      "hint": "Do the full trip: saved = JSON.stringify(player), then restored = JSON.parse(saved). Do not just assign restored = player.",
+      "variables": [
+        {
+          "name": "player"
+        },
+        {
+          "name": "saved"
+        },
+        {
+          "name": "restored"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "typeof saved === 'string' && restored !== null && typeof restored === 'object' && JSON.stringify(JSON.parse(saved)) === JSON.stringify(player) && JSON.stringify(restored) === JSON.stringify(player) && Object.keys(player).length >= 2",
+          "fail": "saved should be the JSON text of player, and restored should be an object rebuilt from saved that holds the same data as player."
+        }
+      ]
     }
   ],
   "grading": {

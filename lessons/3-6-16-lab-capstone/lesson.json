@@ -111,6 +111,105 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "addScore returns a new array and leaves the original alone",
+      "description": "addScore([10, 20], 30) returns [10, 20, 30] and the array passed in is still [10, 20]. Help: 3.6.10 (Defensive Copying)",
+      "type": "tests",
+      "hint": "Return a new array built with spread: [...scores, score]. Do not push onto scores.",
+      "function": "addScore",
+      "cases": [
+        {
+          "args": [
+            [
+              10,
+              20
+            ],
+            30
+          ],
+          "expect": [
+            10,
+            20,
+            30
+          ],
+          "unchanged": 0
+        },
+        {
+          "args": [
+            [],
+            5
+          ],
+          "expect": [
+            5
+          ],
+          "unchanged": 0,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t2",
+      "title": "recordPlay raises plays on the object it is given",
+      "description": "recordPlay({ title: \"x\", plays: 4 }) leaves that same object with plays 5. Help: 3.6.5 (Changing vs. Reassigning)",
+      "type": "tests",
+      "hint": "recordPlay must change the plays property of the song it receives. Do not copy here: a play count is shared state.",
+      "function": "recordPlay",
+      "cases": [
+        {
+          "args": [
+            {
+              "title": "x",
+              "plays": 4
+            }
+          ],
+          "after": {
+            "0": {
+              "title": "x",
+              "plays": 5
+            }
+          }
+        },
+        {
+          "args": [
+            {
+              "title": "y",
+              "plays": 0
+            }
+          ],
+          "after": {
+            "0": {
+              "title": "y",
+              "plays": 1
+            }
+          },
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t3",
+      "title": "copyBook returns a deep copy",
+      "description": "Changing the nested array of copyBook(library) leaves library.books unchanged. Help: 3.6.9 (Side Effects and Copies)",
+      "type": "tests",
+      "hint": "Return structuredClone(library). A spread copy or returning the same object would still share the nested array.",
+      "variables": [
+        {
+          "name": "copyBook"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "typeof copyBook === 'function' && (l => { const c = copyBook(l); c.books.push('C'); return c !== l && c.books !== l.books && l.books.length === 2 && c.books.length === 3; })({ name: 'S', books: ['A', 'B'] })",
+          "fail": "copyBook should give back a deep copy: after pushing onto the copy's books, the original library.books must still have its two items."
+        }
+      ]
     }
   ],
   "grading": {

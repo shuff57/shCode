@@ -16,17 +16,17 @@
     {
       "id": "s1",
       "title": "Build the game-state object",
-      "instructions": "Create a variable holding an object with a player name and an array of at least two item objects. Each item should have a name and a price."
+      "instructions": "Create a variable called gameState holding an object with a player name and an array called items of at least two item objects. Each item should have a name and a price."
     },
     {
       "id": "s2",
       "title": "Save the whole thing",
-      "instructions": "Use JSON.stringify to turn the game state into text."
+      "instructions": "Use JSON.stringify to turn gameState into text, stored in a variable called saved."
     },
     {
       "id": "s3",
       "title": "Restore it and reach a nested field",
-      "instructions": "Use JSON.parse to rebuild it, then use console.log to print the price of the second item plus ten, and the item's name. The nesting is array inside object."
+      "instructions": "Use JSON.parse on saved to rebuild it into a variable called restored, then use console.log to print the price of the second item plus ten, and the item's name. The nesting is array inside object."
     }
   ],
   "requirements": [
@@ -84,6 +84,32 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "restored is rebuilt from the saved text and the second item is read",
+      "description": "saved is a string, restored holds the same data as gameState, and the second item's price plus ten and its name were printed. Help: 3.8.9 (Example: A Round Trip)",
+      "type": "tests",
+      "hint": "saved = JSON.stringify(gameState), restored = JSON.parse(saved), then print restored.items[1].price + 10 and restored.items[1].name.",
+      "variables": [
+        {
+          "name": "gameState"
+        },
+        {
+          "name": "saved"
+        },
+        {
+          "name": "restored"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "typeof saved === 'string' && JSON.stringify(JSON.parse(saved)) === JSON.stringify(gameState) && Array.isArray(gameState.items) && gameState.items.length >= 2 && JSON.stringify(restored) === JSON.stringify(gameState) && output.map(l => l.trim()).includes(String(restored.items[1].price + 10)) && output.map(l => l.trim()).includes(String(restored.items[1].name))",
+          "fail": "saved should be the JSON text of gameState, restored should hold the same data rebuilt from it, and you should print the second item's price plus ten and its name."
+        }
+      ]
     }
   ],
   "grading": {

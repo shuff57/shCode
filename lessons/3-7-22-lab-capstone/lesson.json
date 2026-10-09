@@ -111,6 +111,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "prices holds five or more numbers and every result is printed",
+      "description": "prices is an array of at least five numbers and at least six lines were printed. Help: 3.7.20 (Example: push, then map)",
+      "type": "tests",
+      "hint": "Build prices with five or more numbers using push, then print the three arrays, both objects and the original prices.",
+      "variables": [
+        {
+          "name": "prices"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "Array.isArray(prices) && prices.length >= 5 && prices.every(p => typeof p === 'number') && output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 6",
+          "fail": "prices should be an array of at least five numbers, and you should print the transformed, sliced and joined arrays, both objects and the original prices (six lines)."
+        }
+      ]
     }
   ],
   "grading": {

@@ -66,6 +66,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "items has five values and the slices and the original are printed",
+      "description": "items is an array of at least five values, and at least three lines were printed (two slices and the original). Help: 3.7.6 (Reading: .slice())",
+      "type": "tests",
+      "hint": "Make items a list of five or more values, take the two slices into their own variables, and print both slices and items.",
+      "variables": [
+        {
+          "name": "items"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "Array.isArray(items) && items.length >= 5 && output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 3",
+          "fail": "items should be an array of at least five values, and you should print both slices and the original items array (three lines)."
+        }
+      ]
     }
   ],
   "grading": {

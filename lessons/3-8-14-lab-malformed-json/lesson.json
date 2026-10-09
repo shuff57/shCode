@@ -84,6 +84,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "readSave parses good text and falls back on bad text",
+      "description": "readSave('{\"a\":1}') returns { a: 1 }, and readSave(\"corrupted!!\") returns a fallback object instead of throwing. Help: 3.8.13 (Example: try/catch Around a Parse)",
+      "type": "tests",
+      "hint": "readSave must return JSON.parse(text) inside try, and return a fallback object from catch. A bad string must not throw.",
+      "variables": [
+        {
+          "name": "readSave"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "typeof readSave === 'function' && JSON.stringify(readSave('{\"a\":1}')) === '{\"a\":1}' && (() => { try { const r = readSave('corrupted!!'); return r !== null && typeof r === 'object'; } catch (e) { return false; } })()",
+          "fail": "readSave('{\"a\":1}') should return { a: 1 }, and readSave(\"corrupted!!\") should return a fallback object without throwing."
+        }
+      ]
     }
   ],
   "grading": {

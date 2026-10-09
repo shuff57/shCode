@@ -1,4 +1,4 @@
-function safeParse(text) {
+function readSave(text) {
   try {
     return JSON.parse(text);
   } catch (err) {
@@ -6,6 +6,6 @@ function safeParse(text) {
   }
 }
 
-const settings = safeParse('{"theme":"dark","fontSize":18}');
+const settings = readSave('{"theme":"dark","fontSize":18}');
 console.log(settings.theme);
-console.log(safeParse("corrupted!!"));
+console.log(readSave("corrupted!!"));

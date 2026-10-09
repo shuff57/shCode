@@ -72,6 +72,58 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "addOne adds 1 to every score in the caller's array",
+      "description": "addOne([10, 20, 30]) changes that same array to [11, 21, 31], and any other array the same way. Help: 3.6.6 (Example: Reassigning Does Not Escape)",
+      "type": "tests",
+      "hint": "Write into the array the parameter already points at: scores[i] = scores[i] + 1 inside a loop. Do not build a new array.",
+      "function": "addOne",
+      "cases": [
+        {
+          "args": [
+            [
+              10,
+              20,
+              30
+            ]
+          ],
+          "after": {
+            "0": [
+              11,
+              21,
+              31
+            ]
+          }
+        },
+        {
+          "args": [
+            []
+          ],
+          "after": {
+            "0": []
+          },
+          "description": "an empty array"
+        },
+        {
+          "args": [
+            [
+              0,
+              5
+            ]
+          ],
+          "after": {
+            "0": [
+              1,
+              6
+            ]
+          },
+          "hidden": true
+        }
+      ]
     }
   ],
   "grading": {

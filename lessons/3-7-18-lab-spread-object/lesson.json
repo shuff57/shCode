@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Create the base object",
-      "instructions": "Create a variable called settings and assign it an object with at least three properties."
+      "instructions": "The starter gives you settings, an object with three properties: const settings = { theme: \"dark\", fontSize: 14, wrap: true }; Leave that line as it is."
     },
     {
       "id": "s2",
@@ -78,6 +78,31 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "settings is unchanged and both copies differ from it in the right way",
+      "description": "After the code runs, settings is still { theme: \"dark\", fontSize: 14, wrap: true } and at least three lines were printed. Help: 3.7.15 (Example: Spread Override)",
+      "type": "tests",
+      "hint": "Build each copy with object spread ({ ...settings, fontSize: 18 }) and print all three. Never assign into settings itself.",
+      "variables": [
+        {
+          "name": "settings",
+          "expect": {
+            "theme": "dark",
+            "fontSize": 14,
+            "wrap": true
+          }
+        }
+      ],
+      "checks": [
+        {
+          "expr": "output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 3",
+          "fail": "Print both copies and the original settings object (three lines)."
+        }
+      ]
     }
   ],
   "grading": {

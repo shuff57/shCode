@@ -6,7 +6,8 @@
 // STEP 2: Use localStorage.getItem into a variable. A key that was never
 //         saved returns null, so check for null before you parse.
 
-// STEP 3: If text was found, parse it with JSON.parse inside a try block. In
+// STEP 3: If text was found, parse it with JSON.parse inside a try block into
+//         a variable called restored. In
 //         the catch block, fall back to a default object instead of letting the
 //         error stop the program.
 

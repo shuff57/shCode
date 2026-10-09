@@ -82,6 +82,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "book is an object with at least three fields, and results are printed",
+      "description": "After the code runs, book is an object with at least three properties (two to start, one added) and at least two lines were printed. Help: 3.5.3 (Example: An Object Literal)",
+      "type": "tests",
+      "hint": "book must be an object literal with two or more properties, and you then add one more by assigning to it with a dot. Print one field, then the whole object.",
+      "variables": [
+        {
+          "name": "book"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "book !== null && typeof book === 'object' && !Array.isArray(book) && Object.keys(book).length >= 3 && output.some(l => /^\\s*\\{/.test(l)) && output.some(l => !/^\\s*[{}]/.test(l))",
+          "fail": "book should end as an object with at least three properties (the two you started with plus the one you added), and you should print one field and then the whole object."
+        }
+      ]
     }
   ],
   "grading": {

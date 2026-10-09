@@ -9,6 +9,6 @@
 // STEP 3: Build a sentence from the three bare variable names (no dot, no
 //         object name) and print it.
 
-// STEP 4: Write a function that takes one options object and destructures
+// STEP 4: Write a function called describe that takes one options object and destructures
 //         two or more of its keys right in the parameter list, then returns
 //         a string built from the bare names.

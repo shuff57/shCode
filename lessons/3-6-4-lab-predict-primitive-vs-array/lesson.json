@@ -72,6 +72,29 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "changeArr adds to the array it is given, and both caller variables are printed",
+      "description": "changeArr([1, 2]) leaves that same array as [1, 2, <one more item>], and at least two lines are printed. Help: 3.6.3 (Example: Mutating an Array Parameter)",
+      "type": "tests",
+      "hint": "changeArr must call .push on the parameter itself. Then print the number and the array, in that order, after both calls.",
+      "variables": [
+        {
+          "name": "changeNum"
+        },
+        {
+          "name": "changeArr"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "typeof changeNum === 'function' && typeof changeArr === 'function' && (a => { changeArr(a); return a.length === 3 && a[0] === 1 && a[1] === 2; })([1, 2]) && output.length >= 2",
+          "fail": "changeArr should add one item to the array it receives, so changeArr([1, 2]) leaves [1, 2, something]. Print the number and the array after calling both functions."
+        }
+      ]
     }
   ],
   "grading": {

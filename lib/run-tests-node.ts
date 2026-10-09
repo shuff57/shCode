@@ -20,7 +20,10 @@ const SHIM = `
 const { parentPort } = require('worker_threads');
 globalThis.self = globalThis;
 globalThis.postMessage = (v) => parentPort.postMessage(v);
-${RUNNER_SOURCE}
+// A classic browser Worker runs the runner as a script, so its top-level const
+// declarations (the localStorage stand-in) are in the global lexical scope and
+// the student's new Function code can see them. Evaluate it the same way here.
+require('vm').runInThisContext(${JSON.stringify(RUNNER_SOURCE)});
 parentPort.on('message', (data) => globalThis.onmessage({ data }));
 `;
 

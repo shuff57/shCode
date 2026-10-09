@@ -1,6 +1,6 @@
 // 3.5.25 Objects Capstone: Build, Read, Destructure
 
-// STEP 1: Create one array whose elements are objects. Give every object the
+// STEP 1: Create one array called cart whose elements are objects. Give every object the
 //         same fields (a name, a price, a quantity, whatever you like), and
 //         include at least three records.
 
