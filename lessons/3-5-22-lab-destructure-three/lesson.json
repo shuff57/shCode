@@ -38,10 +38,10 @@
     {
       "id": "r1",
       "title": "object destructuring used",
-      "description": "Unpacks with a brace pattern. Help: 3.5.19 (Destructuring)",
+      "description": "Unpacks at least three fields with a brace pattern.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:const|let|var)\\s*\\{[^}]*\\}\\s*=",
+      "pattern": "(?:const|let|var)\\s*\\{[^}]*,[^}]*,[^}]*\\}\\s*=",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
@@ -86,7 +86,7 @@
       ],
       "checks": [
         {
-          "expr": "typeof describe === 'function' && describe.length === 1 && (s => s.includes('Pen') && s.includes('10'))(String(describe({ title: 'Pen', quantity: 10, cost: 2 }))) && (s => s.includes('Cup') && s.includes('4'))(String(describe({ cost: 1, quantity: 4, title: 'Cup' })))",
+          "expr": "typeof describe === 'function' && describe.length <= 1 && (s => s.includes('Pen') && s.includes('10'))(String(describe({ title: 'Pen', quantity: 10, cost: 2 }))) && (s => s.includes('Cup') && s.includes('4'))(String(describe({ cost: 1, quantity: 4, title: 'Cup' })))",
           "fail": "describe should take one object and use its fields: describe({ title: \"Pen\", quantity: 10, cost: 2 }) must give text that contains Pen and 10."
         }
       ]

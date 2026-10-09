@@ -60,7 +60,7 @@
         {
           "id": "unpack-first",
           "title": "The unpack comes before the decision",
-          "points": 7,
+          "points": 6,
           "description": "Scored by the editor (arrow order): a task comes before the decision on every route.",
           "check": {
             "steps": [
@@ -68,7 +68,8 @@
                 "op": "sequence",
                 "of": [
                   {
-                    "kind": "process"
+                    "kind": "process",
+                    "re": "unpack|destructur|width|height|color|options|take|pull|extract|read|get"
                   },
                   {
                     "kind": "decision"
@@ -83,7 +84,7 @@
         {
           "id": "exits",
           "title": "The wide path adds to the note",
-          "points": 7,
+          "points": 6,
           "description": "Scored by the editor: the decision has two different exits, and the yes exit goes to a task.",
           "check": {
             "steps": [
@@ -106,7 +107,7 @@
         {
           "id": "one-print",
           "title": "The print comes after the decision",
-          "points": 6,
+          "points": 4,
           "description": "Scored by the editor: an input/output step for the print, after the decision.",
           "check": {
             "steps": [
@@ -134,6 +135,26 @@
                 ],
                 "fail": "Both paths must meet at the print, and the print must come after the decision, before End.",
                 "pass": "Both paths meet at the print before End."
+              }
+            ]
+          }
+        },
+        {
+          "id": "wide-question",
+          "title": "The decision compares width and height",
+          "points": 4,
+          "description": "Scored by the editor: a diamond asks whether width is greater than height.",
+          "check": {
+            "steps": [
+              {
+                "op": "label",
+                "match": {
+                  "kind": "decision",
+                  "re": "width|height|wide|greater|>|bigger|larger|taller"
+                },
+                "min": 1,
+                "fail": "The diamond should compare the width with the height.",
+                "pass": "The diamond compares width and height."
               }
             ]
           }

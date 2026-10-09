@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Join them with .concat()",
-      "instructions": "Use .concat() on first to join second's values onto the end, and store the result in a variable called joined."
+      "instructions": "Use .concat() on first to join second's values onto the end, and store the result in a variable called joined. Use .concat() here; spread is the next lab."
     },
     {
       "id": "s3",
@@ -76,7 +76,7 @@
       "hint": "Print the joined array, then the first array, then the second, to prove the originals did not change.",
       "checks": [
         {
-          "expr": "Array.isArray(first) && Array.isArray(second) && first.length >= 3 && second.length >= 3 && JSON.stringify(joined) === JSON.stringify(first.concat(second)) && (J => joined.every(x => J.includes(String(x))))(output.join(' '))",
+          "expr": "Array.isArray(first) && Array.isArray(second) && first.length >= 3 && second.length >= 3 && JSON.stringify(joined) === JSON.stringify(first.concat(second)) && (J => joined.every(x => J.includes(String(x))))(output.join(' ')) && !same('joined', 'first') && !same('joined', 'second')",
           "fail": "joined should be first followed by second (and neither original changed), and your output should show it."
         }
       ],

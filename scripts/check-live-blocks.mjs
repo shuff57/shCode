@@ -102,6 +102,8 @@ function runBlock(code) {
     getItem: (k) => (store.has(String(k)) ? store.get(String(k)) : null),
     removeItem: (k) => { store.delete(String(k)); },
     clear: () => { store.clear(); },
+    key: (i) => { const ks = [...store.keys()]; return i >= 0 && i < ks.length ? ks[i] : null; },
+    get length() { return store.size; },
   };
   const context = vm.createContext({ console: { log: capture("log"), warn: capture("warn"), error: capture("error") }, localStorage, structuredClone });
   const result = { output };

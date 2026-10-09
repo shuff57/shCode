@@ -283,6 +283,8 @@ try {
     check(nonsense.earned < nonsense.passAt, `${id}: the reference structure with every label "step N" fails (${nonsense.earned}/${nonsense.possible})`);
     const rects = t(flat(fromMermaid(ref)));
     check(rects.earned < rects.passAt, `${id}: the reference words in plain rectangles fail (${rects.earned}/${rects.possible})`);
+    const oneWord = t({ ...fromMermaid(ref), nodes: fromMermaid(ref).nodes.map((nd) => (nd.shape === 'terminal' ? nd : { ...nd, label: 'print result' })) });
+    check(oneWord.earned < oneWord.passAt, `${id}: every shape labelled with the same two on-topic words fails (${oneWord.earned}/${oneWord.possible})`);
     const bare = t('flowchart TD\n  A([Start])\n  Z([End])\n  A --> Z');
     check(bare.earned < bare.passAt, `${id}: Start -> End fails`);
     for (const [name, mutate] of Object.entries(c.mutations)) {

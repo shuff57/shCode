@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Write a non-mutating version",
-      "instructions": "Define a second function called birthdaySafe that returns a new object with the age increased, without changing the object it was given. Call it and log both the original and the returned object to prove the original is untouched. Write the changed property after the spread, like { ...person, age: 31 }."
+      "instructions": "Define a second function called birthdaySafe that returns a new object with the age increased, without changing the object it was given. Call it and log both the original and the returned object to prove the original is untouched. Write the changed property after the spread, like { ...person, age: 31 }. Make the copy with spread."
     }
   ],
   "requirements": [

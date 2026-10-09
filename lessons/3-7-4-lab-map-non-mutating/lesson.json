@@ -90,7 +90,7 @@
       ],
       "checks": [
         {
-          "expr": "Array.isArray(doubled) && doubled.length === 3 && doubled.some((x, i) => x !== prices[i]) && (J => doubled.every(x => J.includes(String(x))))(output.join(' '))",
+          "expr": "Array.isArray(doubled) && doubled.length === 3 && doubled.some((x, i) => x !== prices[i]) && (J => doubled.every(x => J.includes(String(x))))(output.join(' ')) && !same('doubled', 'prices')",
           "fail": "doubled should hold the three transformed numbers, and your output should show them (and the original prices)."
         }
       ]

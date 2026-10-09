@@ -106,7 +106,7 @@
       ],
       "checks": [
         {
-          "expr": "state !== null && typeof state === 'object' && Object.keys(state).length >= 2 && output.some(l => { const i = l.indexOf('{'); if (i < 0) return false; try { return JSON.stringify(JSON.parse(l.slice(i))) === JSON.stringify(state); } catch (e) { return false; } })",
+          "expr": "state !== null && typeof state === 'object' && Object.keys(state).length >= 2 && output.some(l => { const i = l.indexOf('{'); if (i < 0) return false; try { return JSON.stringify(JSON.parse(l.slice(i))) === JSON.stringify(state); } catch (e) { return false; } }) && (() => { for (let i = 0; i < localStorage.length; i++) { try { if (JSON.stringify(JSON.parse(localStorage.getItem(localStorage.key(i)))) === JSON.stringify(state)) return true; } catch (e) { } } return false; })()",
           "fail": "The printed line should be the JSON text of state: save JSON.stringify(state) under a key and print localStorage.getItem with the same key."
         }
       ]

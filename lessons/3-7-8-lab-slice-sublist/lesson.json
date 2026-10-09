@@ -92,7 +92,7 @@
       ],
       "checks": [
         {
-          "expr": "Array.isArray(items) && items.length >= 5 && Array.isArray(middle) && middle.length >= 1 && middle.length < items.length && Array.isArray(tail) && tail.length >= 1 && tail.length < items.length && (J => middle.every(x => J.includes(String(x))) && tail.every(x => J.includes(String(x))))(output.join(' '))",
+          "expr": "Array.isArray(items) && items.length >= 5 && Array.isArray(middle) && middle.length >= 1 && middle.length < items.length && Array.isArray(tail) && tail.length >= 1 && tail.length < items.length && (J => middle.every(x => J.includes(String(x))) && tail.every(x => J.includes(String(x))))(output.join(' ')) && !same('middle', 'items') && !same('tail', 'items')",
           "fail": "items needs five or more values, middle and tail should each be a part of it, and your output should show both slices."
         }
       ]

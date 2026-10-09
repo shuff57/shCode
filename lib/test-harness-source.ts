@@ -82,6 +82,8 @@
 //               {"expr":"total === grid.flat().reduce((a, b) => a + b, 0)",
 //               "fail":"total should add every cell of grid after the update."}.
 //               Truthy passes; false, a throw or a syntax error fails with `fail`.
+//               `same('a', 'b')` is true when variables a and b are the very same
+//               object or array (the copies above cannot show that).
 //               A variable not listed in `variables` is not visible to `expr`.
 //   expectOutput / expectOutputContains   the same as on a case (exact lines /
 //               loose needles) but over everything the WHOLE SCRIPT printed with
@@ -484,7 +486,7 @@ const __runTestJobs = (() => {
       const e = sc.variables[i] || {};
       const name = e.name;
       const hidden = e.hidden === true;
-      if (typeof name !== 'string' || !IDENT_RE.test(name) || name === 'output') {
+      if (typeof name !== 'string' || !IDENT_RE.test(name) || name === 'output' || name === 'same') {
         return bad('This check names a variable that cannot be read.', false);
       }
       const rec = hasOwn.call(vars, name) ? vars[name] : null;
@@ -509,9 +511,12 @@ const __runTestJobs = (() => {
       try {
         // Author-written text from lesson.json, never student text. It sees the
         // frozen copies and the printed lines, and nothing else of the script.
-        const f = new Function('output', ...names, '"use strict"; return (' + String(c.expr) + ');');
+        // same('a', 'b'): are the variables a and b the very same object? The frozen copies
+        // below lose identity, so this answers it from the live values (restored = player).
+        const same = (x, y) => hasOwn.call(vars, x) && hasOwn.call(vars, y) && vars[x][0] === 1 && vars[y][0] === 1 && vars[x][1] === vars[y][1] && vars[x][1] !== null && typeof vars[x][1] === 'object';
+        const f = new Function('output', 'same', ...names, '"use strict"; return (' + String(c.expr) + ');');
         const frozen = vals.map((v) => freezeDeep(snap(v, { n: 0, over: false, accessor: false }, 0), 0));
-        ok = !!f.apply(undefined, [freezeDeep(lines.slice(), 0), ...frozen]);
+        ok = !!f.apply(undefined, [freezeDeep(lines.slice(), 0), same, ...frozen]);
       } catch (_) { ok = false; }
       if (!ok) return bad(fail, hidden);
     }

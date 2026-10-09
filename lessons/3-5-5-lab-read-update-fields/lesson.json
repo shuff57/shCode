@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Change a field",
-      "instructions": "Assign a new value to one of the properties that already exists on the object."
+      "instructions": "Assign a new value to one of the properties that already exists on the object. Use a dot to assign (book.pages = 480); brackets come in the next lessons."
     },
     {
       "id": "s4",

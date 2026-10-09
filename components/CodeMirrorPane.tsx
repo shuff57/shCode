@@ -50,6 +50,9 @@ const draculaHighlight = HighlightStyle.define([
 ]);
 
 const darkTheme = EditorView.theme({
+  // lineWrapping defaults to overflow-wrap: anywhere, which splits a word in half at phone width.
+  // Wrap at spaces and only break a single over-long word when it cannot fit at all.
+  '.cm-lineWrapping': { wordBreak: 'normal', overflowWrap: 'break-word' },
   '&': {
     backgroundColor: dracula.bg,
     color: dracula.fg,

@@ -65,7 +65,7 @@
         {
           "id": "hexagon",
           "title": "The loop is drawn with the loop-setup hexagon",
-          "points": 6,
+          "points": 5,
           "description": "Scored by the editor (shape kind).",
           "check": {
             "steps": [
@@ -84,7 +84,7 @@
         {
           "id": "after-loop",
           "title": "The loop, then more steps after it",
-          "points": 7,
+          "points": 6,
           "description": "Scored by the editor (arrow order): the loop repeats, and the arrow that leaves it leads on to the steps after it.",
           "check": {
             "steps": [
@@ -105,7 +105,7 @@
         {
           "id": "decision-outside",
           "title": "The VIP decision is outside the loop",
-          "points": 7,
+          "points": 5,
           "description": "Scored by the editor (arrow order): the decision is not part of a repeat.",
           "check": {
             "steps": [
@@ -116,6 +116,26 @@
                 },
                 "fail": "The VIP test runs once, after the loop. In your chart an arrow leads back to the diamond, so it runs on every pass.",
                 "pass": "The decision is outside the loop."
+              }
+            ]
+          }
+        },
+        {
+          "id": "vip-question",
+          "title": "The decision asks about the customer",
+          "points": 4,
+          "description": "Scored by the editor: a diamond asks about the customer (the vip flag).",
+          "check": {
+            "steps": [
+              {
+                "op": "label",
+                "match": {
+                  "kind": "decision",
+                  "re": "vip|customer|member|order"
+                },
+                "min": 1,
+                "fail": "The diamond should ask about the customer: is the order from a VIP.",
+                "pass": "The diamond asks about the customer."
               }
             ]
           }

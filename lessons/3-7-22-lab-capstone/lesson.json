@@ -143,7 +143,7 @@
       ],
       "checks": [
         {
-          "expr": "Array.isArray(prices) && prices.length >= 5 && prices.every(p => typeof p === 'number') && bumped.length === prices.length && middle.length >= 1 && middle.length < bumped.length && joined.length > middle.length && (J => bumped.every(x => J.includes(String(x))) && middle.every(x => J.includes(String(x))) && joined.every(x => J.includes(String(x))))(output.join(' '))",
+          "expr": "Array.isArray(prices) && prices.length >= 5 && prices.every(p => typeof p === 'number') && bumped.length === prices.length && middle.length >= 1 && middle.length < bumped.length && joined.length > middle.length && (J => bumped.every(x => J.includes(String(x))) && middle.every(x => J.includes(String(x))) && joined.every(x => J.includes(String(x))))(output.join(' ')) && !same('bumped', 'prices') && !same('middle', 'bumped') && !same('joined', 'middle')",
           "fail": "prices needs five or more numbers; bumped should be a changed copy of the same length, middle a part of it, and joined longer than middle; your output should show them."
         }
       ]

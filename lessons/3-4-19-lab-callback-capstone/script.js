@@ -5,7 +5,8 @@
 //         for loop. On each element, call the test function; if it comes
 //         back true, add one to the counter. Return the counter.
 
-// STEP 2: Create a variable holding an array of at least five numbers.
+// STEP 2: Create a variable called readings holding an array of at least five
+//         numbers.
 
 // STEP 3: Call your helper twice, once with a one-line arrow testing one
 //         condition (for example "greater than 0") and once with a

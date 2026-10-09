@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Make a deep copy instead",
-      "instructions": "Use structuredClone to make a copy called deep that goes all the way down. Push a DIFFERENT value into the nested array of deep, then log both again to prove student is now untouched."
+      "instructions": "Use structuredClone to make a copy called deep that goes all the way down. Push a DIFFERENT value into the nested array of deep, then log both again to prove student is now untouched. Make the deep copy with structuredClone; that is what this lab is about."
     }
   ],
   "requirements": [
@@ -88,7 +88,7 @@
       "hint": "Push into shallow.scores and student.scores changes too. Push a different number into deep.scores and student.scores stays as it was.",
       "checks": [
         {
-          "expr": "JSON.stringify(shallow.scores) === JSON.stringify(student.scores) && JSON.stringify(deep.scores) !== JSON.stringify(student.scores) && output.filter(l => l.includes('[')).length >= 4",
+          "expr": "JSON.stringify(shallow.scores) === JSON.stringify(student.scores) && JSON.stringify(deep.scores) !== JSON.stringify(student.scores) && output.filter(l => l.includes('[')).length >= 4 && !same('deep', 'student') && !same('shallow', 'student') && !same('deep', 'shallow')",
           "fail": "Make student, a spread copy called shallow and a structuredClone copy called deep. After pushing into each copy, the shallow copy matches student (they share the array) and the deep copy differs. Print the arrays after each change."
         }
       ],

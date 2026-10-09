@@ -60,7 +60,7 @@
         {
           "id": "order",
           "title": "Read the key, check for nothing, then check the parse",
-          "points": 8,
+          "points": 6,
           "description": "Scored by the editor (arrow order): a task, then a decision, then a second decision, on every route.",
           "check": {
             "steps": [
@@ -88,7 +88,7 @@
         {
           "id": "missing-first",
           "title": "Nothing stored leads to the defaults, not to the parse",
-          "points": 6,
+          "points": 5,
           "description": "Scored by the editor: one of the first decision's exits leads straight to a task (the defaults), the other to the second decision.",
           "check": {
             "steps": [
@@ -113,7 +113,7 @@
         {
           "id": "one-print",
           "title": "Every path ends at the print",
-          "points": 6,
+          "points": 4,
           "description": "Scored by the editor: an input/output step for the print, after the decisions.",
           "check": {
             "steps": [
@@ -141,6 +141,26 @@
                 ],
                 "fail": "Every path must pass the decisions and then the print before End.",
                 "pass": "Every path passes the decisions, then the print, then End."
+              }
+            ]
+          }
+        },
+        {
+          "id": "print-says",
+          "title": "The print says what came back",
+          "points": 5,
+          "description": "Scored by the editor: the input/output shape is about the restored value.",
+          "check": {
+            "steps": [
+              {
+                "op": "label",
+                "match": {
+                  "kind": "io",
+                  "re": "restored|print|show|value|result|settings|log|output|object"
+                },
+                "min": 1,
+                "fail": "Say in the print step what it shows: the restored value.",
+                "pass": "The print step says what it shows."
               }
             ]
           }

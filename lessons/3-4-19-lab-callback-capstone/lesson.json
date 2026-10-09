@@ -22,7 +22,7 @@
     {
       "id": "s2",
       "title": "Prepare an array of values",
-      "instructions": "Create a variable holding an array of at least five numbers."
+      "instructions": "Create a variable called readings holding an array of at least five numbers."
     },
     {
       "id": "s3",
@@ -102,12 +102,15 @@
       "variables": [
         {
           "name": "countMatching"
+        },
+        {
+          "name": "readings"
         }
       ],
       "checks": [
         {
-          "expr": "typeof countMatching === 'function' && countMatching([4,-2,7,0,-9,3], n => n > 0) === 3 && countMatching([1,2,3,4,5,6], n => n % 2 === 0) === 3 && countMatching([1,2], n => false) === 0 && countMatching([], n => true) === 0",
-          "fail": "countMatching should count only the elements the test accepts: countMatching([4, -2, 7, 0, -9, 3], n => n > 0) is 3, and when nothing passes it is 0."
+          "expr": "typeof countMatching === 'function' && countMatching([4,-2,7,0,-9,3], n => n > 0) === 3 && countMatching([1,2,3,4,5,6], n => n % 2 === 0) === 3 && countMatching([1,2], n => false) === 0 && countMatching([], n => true) === 0 && Array.isArray(readings) && readings.length >= 5 && readings.every(n => typeof n === 'number') && /\\bfor\\s*\\(/.test(String(countMatching))",
+          "fail": "countMatching should count only the elements the test accepts: countMatching([4, -2, 7, 0, -9, 3], n => n > 0) is 3, and when nothing passes it is 0. Also: readings needs at least five numbers, and countMatching must use a for loop."
         }
       ]
     }

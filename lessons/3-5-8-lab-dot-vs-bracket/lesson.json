@@ -36,7 +36,7 @@
     {
       "id": "s5",
       "title": "Walk every key",
-      "instructions": "Use Object.keys with a loop to print every key and its value, using brackets to fetch each value."
+      "instructions": "Use Object.keys with a loop to print every key and its value, using brackets to fetch each value. Use Object.keys with a for...of loop; for...in is not part of this course."
     }
   ],
   "requirements": [

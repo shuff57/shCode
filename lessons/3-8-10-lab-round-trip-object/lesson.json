@@ -105,7 +105,7 @@
       ],
       "checks": [
         {
-          "expr": "typeof saved === 'string' && restored !== null && typeof restored === 'object' && JSON.stringify(JSON.parse(saved)) === JSON.stringify(player) && JSON.stringify(restored) === JSON.stringify(player) && Object.keys(player).length >= 2",
+          "expr": "typeof saved === 'string' && restored !== null && typeof restored === 'object' && JSON.stringify(JSON.parse(saved)) === JSON.stringify(player) && JSON.stringify(restored) === JSON.stringify(player) && Object.keys(player).length >= 2 && !same('restored', 'player')",
           "fail": "saved should be the JSON text of player, and restored should be an object rebuilt from saved that holds the same data as player."
         }
       ]

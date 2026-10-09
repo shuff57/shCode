@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Build an object with data",
-      "instructions": "Create a variable holding an object literal with at least one data property, such as a name."
+      "instructions": "Create a variable called student holding an object literal with at least one data property, such as a name."
     },
     {
       "id": "s2",
@@ -83,13 +83,18 @@
       "points": 0,
       "id": "t1",
       "title": "the method returns a value that is printed",
-      "description": "The call prints something real: at least one line, and not undefined. Help: 3.5.13 (Methods)",
+      "description": "student has a method, and the output shows what that method returns. Help: 3.5.13 (Methods)",
       "type": "tests",
       "hint": "A method that returns nothing prints undefined. Have the function return a string, call it with parentheses and print the result.",
       "checks": [
         {
-          "expr": "output.length >= 1 && output.every(l => l.trim() !== '' && l.trim() !== 'undefined')",
-          "fail": "The call printed nothing useful. Have the method return a string with return, then print the call: console.log(object.method())."
+          "expr": "student !== null && typeof student === 'object' && output.length >= 1 && output.every(l => l.trim() !== '' && l.trim() !== 'undefined') && Object.values(student).some(f => typeof f === 'function' && (() => { try { return output.some(l => l.includes(String(f.call(student)))); } catch (e) { return false; } })())",
+          "fail": "student needs a method that returns a string, and you must print what it returns: console.log(student.methodName())."
+        }
+      ],
+      "variables": [
+        {
+          "name": "student"
         }
       ]
     }

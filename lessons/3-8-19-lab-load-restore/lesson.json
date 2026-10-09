@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "Save something first",
-      "instructions": "Store an object under a key using JSON.stringify and localStorage.setItem, so there is something to load. Once your load code works, delete or comment out this save line and run again: with nothing stored, your code should take the missing-key path."
+      "instructions": "Store an object under a key using JSON.stringify and localStorage.setItem, so there is something to load. Once your load code works, delete or comment out this save line and run again: with nothing stored, your code should take the missing-key path. Put the save line back before you submit."
     },
     {
       "id": "s2",
@@ -111,7 +111,7 @@
       ],
       "checks": [
         {
-          "expr": "restored !== null && typeof restored === 'object' && output.length >= 1 && (J => Object.values(restored).some(v => J.includes(String(v))))(output.join(' '))",
+          "expr": "restored !== null && typeof restored === 'object' && output.length >= 1 && (J => Object.values(restored).some(v => J.includes(String(v))))(output.join(' ')) && (() => { for (let i = 0; i < localStorage.length; i++) { try { if (JSON.stringify(JSON.parse(localStorage.getItem(localStorage.key(i)))) === JSON.stringify(restored)) return true; } catch (e) { } } return false; })()",
           "fail": "restored should be an object parsed from the stored text, and the last thing you print should be one of its properties."
         }
       ]

@@ -64,7 +64,7 @@
         {
           "id": "two-questions",
           "title": "A second question follows the first",
-          "points": 7,
+          "points": 6,
           "description": "Scored by the editor (arrow order): one decision comes before another on the route.",
           "check": {
             "steps": [
@@ -87,7 +87,7 @@
         {
           "id": "three-forms",
           "title": "Three forms to choose from",
-          "points": 7,
+          "points": 6,
           "description": "Scored by the editor (shape kind): at least three task rectangles, one for each way to write the function.",
           "check": {
             "steps": [
@@ -106,7 +106,7 @@
         {
           "id": "no-loops",
           "title": "A rule, not a repeat",
-          "points": 6,
+          "points": 4,
           "description": "Scored by the editor (arrow order): no decision is part of a repeat.",
           "check": {
             "steps": [
@@ -117,6 +117,26 @@
                 },
                 "fail": "This is a decision tree, so no arrow should lead back to a diamond. In your chart one does.",
                 "pass": "No arrow leads back to a diamond."
+              }
+            ]
+          }
+        },
+        {
+          "id": "questions-on-topic",
+          "title": "The questions are about the functions",
+          "points": 4,
+          "description": "Scored by the editor: at least two diamonds ask about the function (where it is called, or what its body is).",
+          "check": {
+            "steps": [
+              {
+                "op": "label",
+                "match": {
+                  "kind": "decision",
+                  "re": "called|several|places|body|single|expression|main|operation|statements?|short|helper|callback|one line"
+                },
+                "min": 2,
+                "fail": "Ask each question about the function itself: where it is called from, and what its body looks like.",
+                "pass": "The diamonds ask about the function."
               }
             ]
           }

@@ -112,7 +112,7 @@
       ],
       "checks": [
         {
-          "expr": "typeof saved === 'string' && JSON.stringify(JSON.parse(saved)) === JSON.stringify(gameState) && Array.isArray(gameState.items) && gameState.items.length >= 2 && JSON.stringify(restored) === JSON.stringify(gameState) && (J => J.includes(String(restored.items[1].price + 10)) && J.includes(String(restored.items[1].name)))(output.join(' '))",
+          "expr": "typeof saved === 'string' && JSON.stringify(JSON.parse(saved)) === JSON.stringify(gameState) && Array.isArray(gameState.items) && gameState.items.length >= 2 && JSON.stringify(restored) === JSON.stringify(gameState) && (J => J.includes(String(restored.items[1].price + 10)) && J.includes(String(restored.items[1].name)))(output.join(' ')) && !same('restored', 'gameState')",
           "fail": "saved should be the JSON text of gameState, restored should hold the same data rebuilt from it, and you should print the second item's price plus ten and its name."
         }
       ]

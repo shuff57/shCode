@@ -269,6 +269,8 @@ const localStorage = {
   getItem: (k) => (__store.has(String(k)) ? __store.get(String(k)) : null),
   removeItem: (k) => { __store.delete(String(k)); },
   clear: () => { __store.clear(); },
+  key: (i) => { const ks = [...__store.keys()]; return i >= 0 && i < ks.length ? ks[i] : null; },
+  get length() { return __store.size; },
 };
 // Where a compile error is. V8 reports a SyntaxError from the Function
 // constructor without a position in the student's code, so ask the engine

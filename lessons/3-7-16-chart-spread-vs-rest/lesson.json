@@ -69,7 +69,7 @@
         {
           "id": "hexagon",
           "title": "The loop is drawn with the loop-setup hexagon",
-          "points": 6,
+          "points": 5,
           "description": "Scored by the editor (shape kind): a loop-setup (hexagon) shape on the Start-to-End path.",
           "check": {
             "steps": [
@@ -88,7 +88,7 @@
         {
           "id": "way-out",
           "title": "The return is after the loop, off the way out",
-          "points": 7,
+          "points": 5,
           "description": "Scored by the editor (arrow order): the steps that repeat have an arrow leading back, and the arrow that leaves the repeat leads on to a step that runs once, before End.",
           "check": {
             "steps": [
@@ -109,7 +109,7 @@
         {
           "id": "yes-no",
           "title": "The \"another number?\" question sends yes to the add and no to the return",
-          "points": 7,
+          "points": 5,
           "description": "Scored by the editor (arrow order): a decision whose yes exit goes to a task and whose no exit goes to the print or return, two different places.",
           "check": {
             "steps": [
@@ -128,6 +128,36 @@
                 },
                 "fail": "The diamond has to split into two different results: its yes arrow goes to the task that does the work, its no arrow goes to the input/output step.",
                 "pass": "The decision splits into the task and the print."
+              }
+            ]
+          }
+        },
+        {
+          "id": "labels-on-topic",
+          "title": "The diamond and the output say what they do",
+          "points": 5,
+          "description": "Scored by the editor: the diamond asks about the next number and the output shape says what comes out.",
+          "check": {
+            "steps": [
+              {
+                "op": "label",
+                "match": {
+                  "kind": "decision",
+                  "re": "another|more|left|next|any|number|remain|item|list|done|end|still"
+                },
+                "min": 1,
+                "fail": "The diamond should ask whether there is another number.",
+                "pass": "The diamond asks about the next number."
+              },
+              {
+                "op": "label",
+                "match": {
+                  "kind": "io",
+                  "re": "print|show|display|log|output|return|result|total|sum|list|array|withtax"
+                },
+                "min": 1,
+                "fail": "The output step should say what it prints or returns.",
+                "pass": "The output step says what it prints or returns."
               }
             ]
           }

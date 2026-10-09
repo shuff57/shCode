@@ -59,7 +59,7 @@
         {
           "id": "three-steps",
           "title": "Read, first call, second call, then the print",
-          "points": 7,
+          "points": 5,
           "description": "Scored by the editor (shape kind): at least four task or input/output shapes, for reading the parameters, the two calls and the print.",
           "check": {
             "steps": [
@@ -81,7 +81,7 @@
         {
           "id": "order",
           "title": "The work comes first, then the print, then End",
-          "points": 7,
+          "points": 6,
           "description": "Scored by the editor (arrow order): tasks, then an input/output step, then End, on every route.",
           "check": {
             "steps": [
@@ -107,7 +107,7 @@
         {
           "id": "straight",
           "title": "A straight line, no repeat",
-          "points": 6,
+          "points": 5,
           "description": "Scored by the editor (arrow order): no task is part of a repeat.",
           "check": {
             "steps": [
@@ -118,6 +118,26 @@
                 },
                 "fail": "This code runs once from top to bottom, so no arrow should lead back to an earlier step. In your chart one does.",
                 "pass": "No arrow leads back."
+              }
+            ]
+          }
+        },
+        {
+          "id": "print-says",
+          "title": "The print says what it shows",
+          "points": 4,
+          "description": "Scored by the editor: the input/output shape is about the result.",
+          "check": {
+            "steps": [
+              {
+                "op": "label",
+                "match": {
+                  "kind": "io",
+                  "re": "print|show|display|log|output|result|answer|second|value"
+                },
+                "min": 1,
+                "fail": "Say in the print step what it shows: the result of the second call.",
+                "pass": "The print step says what it shows."
               }
             ]
           }

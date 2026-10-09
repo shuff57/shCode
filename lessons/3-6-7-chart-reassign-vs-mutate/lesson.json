@@ -65,7 +65,7 @@
         {
           "id": "call-shape",
           "title": "The call is one function-call shape",
-          "points": 5,
+          "points": 4,
           "description": "Scored by the editor (shape kind): a double-rail function-call shape on the path.",
           "check": {
             "steps": [
@@ -84,7 +84,7 @@
         {
           "id": "order",
           "title": "Call, two decisions, then one print",
-          "points": 8,
+          "points": 6,
           "description": "Scored by the editor (arrow order): the call, then a decision, then another decision, then the print, on every route.",
           "check": {
             "steps": [
@@ -116,7 +116,7 @@
         {
           "id": "different-exits",
           "title": "Each question splits into two different results",
-          "points": 7,
+          "points": 6,
           "description": "Scored by the editor: a decision whose yes and no arrows lead to two different shapes, and a print.",
           "check": {
             "steps": [
@@ -137,6 +137,26 @@
                 "min": 1,
                 "fail": "The two paths rejoin before one print. Draw an input/output step for the print.",
                 "pass": "There is a print."
+              }
+            ]
+          }
+        },
+        {
+          "id": "questions-on-topic",
+          "title": "The questions ask whether the caller sees the change",
+          "points": 4,
+          "description": "Scored by the editor: at least two diamonds ask whether a write reached the caller.",
+          "check": {
+            "steps": [
+              {
+                "op": "label",
+                "match": {
+                  "kind": "decision",
+                  "re": "escape|caller|change|shared|local|see|mutat|reassign|original|same"
+                },
+                "min": 2,
+                "fail": "Both diamonds should ask whether that write reached the caller.",
+                "pass": "Both diamonds ask about the caller."
               }
             ]
           }

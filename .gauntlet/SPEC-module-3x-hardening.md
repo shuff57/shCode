@@ -60,3 +60,13 @@ Findings, ranked. Tick a step when it is committed and `npm test` is green.
 - [ ] **Batch 3, teacher screens and phone layout** (see the teacher agent's list): gradebook module filter; chart score explanation in the drawer;
       red requirements per student; Today queue routing for charts; `/module/3.x` at 390px; Late badge only on graded lessons; drawer Late tag;
       review-queue copy; time input clipping; inherited date text; "512 lessons"; Quest badges; lab page at 390px; editor notice for a refused arrow.
+- [x] **Batch 4, remaining hollow answers** (2026-10-09). Test harness: `same('a','b')` answers "is variable a the very same object as b" from the live values
+      (the frozen copies lose identity); the `localStorage` stand-in gained `key(i)` and `length`. 3.8.10/11/23 and the 3.7 derived arrays now need a NEW object;
+      3.8.18 and 3.8.19 need the state really stored; 3.5.15 ties the printed line to the method's return value; 3.5.22 needs three unpacked fields;
+      3.4.19 needs a `readings` array of 5+ numbers and a helper that really contains a `for` loop. Lab steps now say which technique the lab is about
+      (spread not Object.assign, structuredClone, .concat(), the literal in the call, Object.keys not for...in, dot assignment).
+      Charts: each of the nine gained a label-on-topic item (the diamond asks about the program, the print says what it prints; 3.5.21's unpack task must
+      say it unpacks); points rebalanced to 20. A chart stuffed with every keyword on every shape can still pass: only labels that say nothing are caught.
+      3.10.5 uses the code editor (`aiGrader.input: "code"`, as 2.7.5 does); CodeMirror wraps at spaces, not mid-word.
+      Left alone: starters that start partly green (fix-it labs and labs that ship a data line: that is the starter doing its job); array output prints
+      one element per line while some readings quote `[1,2,3]`; 3.5.24 loop, 3.5.5 `book.title = book.title`, 3.4.13 stray arrow, 3.6.8 nested-brace reassign.

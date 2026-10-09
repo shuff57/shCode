@@ -17,3 +17,4 @@
 // TO TEST THE MISSING-KEY PATH: once your load code works, delete or comment
 // out the localStorage.setItem line from STEP 1 and run again. With nothing
 // stored, getItem returns null and your code should fall back to the default.
+// Put the line back before you submit.

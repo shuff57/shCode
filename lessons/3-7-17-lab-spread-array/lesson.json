@@ -94,7 +94,7 @@
       "hint": "Print the combined array, the array with loose values around a spread, and one of the originals.",
       "checks": [
         {
-          "expr": "JSON.stringify(combined) === JSON.stringify([...first, ...second]) && framed.length === first.length + 2 && JSON.stringify(framed.slice(1, -1)) === JSON.stringify(first) && (J => combined.every(x => J.includes(String(x))) && framed.every(x => J.includes(String(x))))(output.join(' '))",
+          "expr": "JSON.stringify(combined) === JSON.stringify([...first, ...second]) && framed.length === first.length + 2 && JSON.stringify(framed.slice(1, -1)) === JSON.stringify(first) && (J => combined.every(x => J.includes(String(x))) && framed.every(x => J.includes(String(x))))(output.join(' ')) && !same('combined', 'first') && !same('framed', 'first')",
           "fail": "combined should hold first then second, framed should be first with one loose value on each side, and your output should show both."
         }
       ],

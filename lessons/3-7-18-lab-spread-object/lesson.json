@@ -110,7 +110,7 @@
       ],
       "checks": [
         {
-          "expr": "Object.keys(changed).length === 3 && Object.keys(changed).filter(k => changed[k] !== settings[k]).length === 1 && Object.keys(extended).length === 4 && Object.keys(settings).every(k => extended[k] === settings[k]) && (J => Object.values(changed).every(v => J.includes(String(v))) && Object.values(extended).every(v => J.includes(String(v))))(output.join(' '))",
+          "expr": "Object.keys(changed).length === 3 && Object.keys(changed).filter(k => changed[k] !== settings[k]).length === 1 && Object.keys(extended).length === 4 && Object.keys(settings).every(k => extended[k] === settings[k]) && (J => Object.values(changed).every(v => J.includes(String(v))) && Object.values(extended).every(v => J.includes(String(v))))(output.join(' ')) && !same('changed', 'settings') && !same('extended', 'settings')",
           "fail": "changed should be settings with exactly one property changed, extended should be settings plus one new property, settings itself must stay the same, and your output should show both copies."
         }
       ]

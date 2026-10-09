@@ -1527,7 +1527,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "two-questions",
         "title": "A second question follows the first",
-        "points": 7,
+        "points": 6,
         "description": "Scored by the editor (arrow order): one decision comes before another on the route.",
         "check": {
           "steps": [
@@ -1550,7 +1550,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "three-forms",
         "title": "Three forms to choose from",
-        "points": 7,
+        "points": 6,
         "description": "Scored by the editor (shape kind): at least three task rectangles, one for each way to write the function.",
         "check": {
           "steps": [
@@ -1569,7 +1569,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "no-loops",
         "title": "A rule, not a repeat",
-        "points": 6,
+        "points": 4,
         "description": "Scored by the editor (arrow order): no decision is part of a repeat.",
         "check": {
           "steps": [
@@ -1580,6 +1580,26 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               },
               "fail": "This is a decision tree, so no arrow should lead back to a diamond. In your chart one does.",
               "pass": "No arrow leads back to a diamond."
+            }
+          ]
+        }
+      },
+      {
+        "id": "questions-on-topic",
+        "title": "The questions are about the functions",
+        "points": 4,
+        "description": "Scored by the editor: at least two diamonds ask about the function (where it is called, or what its body is).",
+        "check": {
+          "steps": [
+            {
+              "op": "label",
+              "match": {
+                "kind": "decision",
+                "re": "called|several|places|body|single|expression|main|operation|statements?|short|helper|callback|one line"
+              },
+              "min": 2,
+              "fail": "Ask each question about the function itself: where it is called from, and what its body looks like.",
+              "pass": "The diamonds ask about the function."
             }
           ]
         }
@@ -1646,7 +1666,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "two-questions",
         "title": "Naming first, then braces",
-        "points": 7,
+        "points": 6,
         "description": "Scored by the editor (arrow order): one decision comes before another on the route.",
         "check": {
           "steps": [
@@ -1669,7 +1689,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "three-forms",
         "title": "One task for each form",
-        "points": 7,
+        "points": 5,
         "description": "Scored by the editor (shape kind): at least three task rectangles.",
         "check": {
           "steps": [
@@ -1688,7 +1708,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "one-print",
         "title": "All three forms reach the print",
-        "points": 6,
+        "points": 5,
         "description": "Scored by the editor: an input/output step for the print, which comes after the decisions.",
         "check": {
           "steps": [
@@ -1716,6 +1736,26 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               ],
               "fail": "Every route has to pass a decision and then the print before End: one of your forms skips the print.",
               "pass": "Every route passes the decisions, then the print, then End."
+            }
+          ]
+        }
+      },
+      {
+        "id": "questions-on-topic",
+        "title": "The questions are about the three forms",
+        "points": 4,
+        "description": "Scored by the editor: at least two diamonds ask about the function (its name, its braces).",
+        "check": {
+          "steps": [
+            {
+              "op": "label",
+              "match": {
+                "kind": "decision",
+                "re": "name|named|brace|body|function|return"
+              },
+              "min": 2,
+              "fail": "Ask about the function: is it named, and does its body use braces.",
+              "pass": "The diamonds ask about the function."
             }
           ]
         }
@@ -1782,7 +1822,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "three-steps",
         "title": "Read, first call, second call, then the print",
-        "points": 7,
+        "points": 5,
         "description": "Scored by the editor (shape kind): at least four task or input/output shapes, for reading the parameters, the two calls and the print.",
         "check": {
           "steps": [
@@ -1804,7 +1844,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "order",
         "title": "The work comes first, then the print, then End",
-        "points": 7,
+        "points": 6,
         "description": "Scored by the editor (arrow order): tasks, then an input/output step, then End, on every route.",
         "check": {
           "steps": [
@@ -1830,7 +1870,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "straight",
         "title": "A straight line, no repeat",
-        "points": 6,
+        "points": 5,
         "description": "Scored by the editor (arrow order): no task is part of a repeat.",
         "check": {
           "steps": [
@@ -1841,6 +1881,26 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               },
               "fail": "This code runs once from top to bottom, so no arrow should lead back to an earlier step. In your chart one does.",
               "pass": "No arrow leads back."
+            }
+          ]
+        }
+      },
+      {
+        "id": "print-says",
+        "title": "The print says what it shows",
+        "points": 4,
+        "description": "Scored by the editor: the input/output shape is about the result.",
+        "check": {
+          "steps": [
+            {
+              "op": "label",
+              "match": {
+                "kind": "io",
+                "re": "print|show|display|log|output|result|answer|second|value"
+              },
+              "min": 1,
+              "fail": "Say in the print step what it shows: the result of the second call.",
+              "pass": "The print step says what it shows."
             }
           ]
         }
@@ -1903,7 +1963,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "hexagon",
         "title": "The loop is drawn with the loop-setup hexagon",
-        "points": 6,
+        "points": 5,
         "description": "Scored by the editor (shape kind).",
         "check": {
           "steps": [
@@ -1922,7 +1982,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "after-loop",
         "title": "The loop, then more steps after it",
-        "points": 7,
+        "points": 6,
         "description": "Scored by the editor (arrow order): the loop repeats, and the arrow that leaves it leads on to the steps after it.",
         "check": {
           "steps": [
@@ -1943,7 +2003,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "decision-outside",
         "title": "The VIP decision is outside the loop",
-        "points": 7,
+        "points": 5,
         "description": "Scored by the editor (arrow order): the decision is not part of a repeat.",
         "check": {
           "steps": [
@@ -1954,6 +2014,26 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               },
               "fail": "The VIP test runs once, after the loop. In your chart an arrow leads back to the diamond, so it runs on every pass.",
               "pass": "The decision is outside the loop."
+            }
+          ]
+        }
+      },
+      {
+        "id": "vip-question",
+        "title": "The decision asks about the customer",
+        "points": 4,
+        "description": "Scored by the editor: a diamond asks about the customer (the vip flag).",
+        "check": {
+          "steps": [
+            {
+              "op": "label",
+              "match": {
+                "kind": "decision",
+                "re": "vip|customer|member|order"
+              },
+              "min": 1,
+              "fail": "The diamond should ask about the customer: is the order from a VIP.",
+              "pass": "The diamond asks about the customer."
             }
           ]
         }
@@ -2021,7 +2101,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "unpack-first",
         "title": "The unpack comes before the decision",
-        "points": 7,
+        "points": 6,
         "description": "Scored by the editor (arrow order): a task comes before the decision on every route.",
         "check": {
           "steps": [
@@ -2029,7 +2109,8 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "op": "sequence",
               "of": [
                 {
-                  "kind": "process"
+                  "kind": "process",
+                  "re": "unpack|destructur|width|height|color|options|take|pull|extract|read|get"
                 },
                 {
                   "kind": "decision"
@@ -2044,7 +2125,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "exits",
         "title": "The wide path adds to the note",
-        "points": 7,
+        "points": 6,
         "description": "Scored by the editor: the decision has two different exits, and the yes exit goes to a task.",
         "check": {
           "steps": [
@@ -2067,7 +2148,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "one-print",
         "title": "The print comes after the decision",
-        "points": 6,
+        "points": 4,
         "description": "Scored by the editor: an input/output step for the print, after the decision.",
         "check": {
           "steps": [
@@ -2095,6 +2176,26 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               ],
               "fail": "Both paths must meet at the print, and the print must come after the decision, before End.",
               "pass": "Both paths meet at the print before End."
+            }
+          ]
+        }
+      },
+      {
+        "id": "wide-question",
+        "title": "The decision compares width and height",
+        "points": 4,
+        "description": "Scored by the editor: a diamond asks whether width is greater than height.",
+        "check": {
+          "steps": [
+            {
+              "op": "label",
+              "match": {
+                "kind": "decision",
+                "re": "width|height|wide|greater|>|bigger|larger|taller"
+              },
+              "min": 1,
+              "fail": "The diamond should compare the width with the height.",
+              "pass": "The diamond compares width and height."
             }
           ]
         }
@@ -2156,7 +2257,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "call-shape",
         "title": "The call is one function-call shape",
-        "points": 5,
+        "points": 4,
         "description": "Scored by the editor (shape kind): a double-rail function-call shape on the path.",
         "check": {
           "steps": [
@@ -2175,7 +2276,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "order",
         "title": "Call, two decisions, then one print",
-        "points": 8,
+        "points": 6,
         "description": "Scored by the editor (arrow order): the call, then a decision, then another decision, then the print, on every route.",
         "check": {
           "steps": [
@@ -2207,7 +2308,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "different-exits",
         "title": "Each question splits into two different results",
-        "points": 7,
+        "points": 6,
         "description": "Scored by the editor: a decision whose yes and no arrows lead to two different shapes, and a print.",
         "check": {
           "steps": [
@@ -2228,6 +2329,26 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "min": 1,
               "fail": "The two paths rejoin before one print. Draw an input/output step for the print.",
               "pass": "There is a print."
+            }
+          ]
+        }
+      },
+      {
+        "id": "questions-on-topic",
+        "title": "The questions ask whether the caller sees the change",
+        "points": 4,
+        "description": "Scored by the editor: at least two diamonds ask whether a write reached the caller.",
+        "check": {
+          "steps": [
+            {
+              "op": "label",
+              "match": {
+                "kind": "decision",
+                "re": "escape|caller|change|shared|local|see|mutat|reassign|original|same"
+              },
+              "min": 2,
+              "fail": "Both diamonds should ask whether that write reached the caller.",
+              "pass": "Both diamonds ask about the caller."
             }
           ]
         }
@@ -2294,7 +2415,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "hexagon",
         "title": "The loop is drawn with the loop-setup hexagon",
-        "points": 6,
+        "points": 5,
         "description": "Scored by the editor (shape kind): a loop-setup (hexagon) shape on the Start-to-End path.",
         "check": {
           "steps": [
@@ -2313,7 +2434,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "way-out",
         "title": "The return is after the loop, off the way out",
-        "points": 7,
+        "points": 5,
         "description": "Scored by the editor (arrow order): the steps that repeat have an arrow leading back, and the arrow that leaves the repeat leads on to a step that runs once, before End.",
         "check": {
           "steps": [
@@ -2334,7 +2455,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "yes-no",
         "title": "The \"another number?\" question sends yes to the add and no to the return",
-        "points": 7,
+        "points": 5,
         "description": "Scored by the editor (arrow order): a decision whose yes exit goes to a task and whose no exit goes to the print or return, two different places.",
         "check": {
           "steps": [
@@ -2353,6 +2474,36 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               },
               "fail": "The diamond has to split into two different results: its yes arrow goes to the task that does the work, its no arrow goes to the input/output step.",
               "pass": "The decision splits into the task and the print."
+            }
+          ]
+        }
+      },
+      {
+        "id": "labels-on-topic",
+        "title": "The diamond and the output say what they do",
+        "points": 5,
+        "description": "Scored by the editor: the diamond asks about the next number and the output shape says what comes out.",
+        "check": {
+          "steps": [
+            {
+              "op": "label",
+              "match": {
+                "kind": "decision",
+                "re": "another|more|left|next|any|number|remain|item|list|done|end|still"
+              },
+              "min": 1,
+              "fail": "The diamond should ask whether there is another number.",
+              "pass": "The diamond asks about the next number."
+            },
+            {
+              "op": "label",
+              "match": {
+                "kind": "io",
+                "re": "print|show|display|log|output|return|result|total|sum|list|array|withtax"
+              },
+              "min": 1,
+              "fail": "The output step should say what it prints or returns.",
+              "pass": "The output step says what it prints or returns."
             }
           ]
         }
@@ -2423,7 +2574,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "hexagon",
         "title": "The loop is drawn with the loop-setup hexagon",
-        "points": 6,
+        "points": 5,
         "description": "Scored by the editor (shape kind): a loop-setup (hexagon) shape on the Start-to-End path.",
         "check": {
           "steps": [
@@ -2442,7 +2593,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "way-out",
         "title": "The print is after the loop, off the way out",
-        "points": 7,
+        "points": 5,
         "description": "Scored by the editor (arrow order): the steps that repeat have an arrow leading back, and the arrow that leaves the repeat leads on to a step that runs once, before End.",
         "check": {
           "steps": [
@@ -2463,7 +2614,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "yes-no",
         "title": "The \"another price?\" question sends yes to the callback and no to the print",
-        "points": 7,
+        "points": 5,
         "description": "Scored by the editor (arrow order): a decision whose yes exit goes to a task and whose no exit goes to the print or return, two different places.",
         "check": {
           "steps": [
@@ -2482,6 +2633,36 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               },
               "fail": "The diamond has to split into two different results: its yes arrow goes to the task that does the work, its no arrow goes to the input/output step.",
               "pass": "The decision splits into the task and the print."
+            }
+          ]
+        }
+      },
+      {
+        "id": "labels-on-topic",
+        "title": "The diamond and the output say what they do",
+        "points": 5,
+        "description": "Scored by the editor: the diamond asks about the next price and the output shape says what comes out.",
+        "check": {
+          "steps": [
+            {
+              "op": "label",
+              "match": {
+                "kind": "decision",
+                "re": "another|more|left|next|any|price|remain|item|list|done|end|still"
+              },
+              "min": 1,
+              "fail": "The diamond should ask whether there is another price.",
+              "pass": "The diamond asks about the next price."
+            },
+            {
+              "op": "label",
+              "match": {
+                "kind": "io",
+                "re": "print|show|display|log|output|return|result|total|sum|list|array|withtax"
+              },
+              "min": 1,
+              "fail": "The output step should say what it prints or returns.",
+              "pass": "The output step says what it prints or returns."
             }
           ]
         }
@@ -2552,7 +2733,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "order",
         "title": "Read the key, check for nothing, then check the parse",
-        "points": 8,
+        "points": 6,
         "description": "Scored by the editor (arrow order): a task, then a decision, then a second decision, on every route.",
         "check": {
           "steps": [
@@ -2580,7 +2761,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "missing-first",
         "title": "Nothing stored leads to the defaults, not to the parse",
-        "points": 6,
+        "points": 5,
         "description": "Scored by the editor: one of the first decision's exits leads straight to a task (the defaults), the other to the second decision.",
         "check": {
           "steps": [
@@ -2605,7 +2786,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "one-print",
         "title": "Every path ends at the print",
-        "points": 6,
+        "points": 4,
         "description": "Scored by the editor: an input/output step for the print, after the decisions.",
         "check": {
           "steps": [
@@ -2633,6 +2814,26 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               ],
               "fail": "Every path must pass the decisions and then the print before End.",
               "pass": "Every path passes the decisions, then the print, then End."
+            }
+          ]
+        }
+      },
+      {
+        "id": "print-says",
+        "title": "The print says what came back",
+        "points": 5,
+        "description": "Scored by the editor: the input/output shape is about the restored value.",
+        "check": {
+          "steps": [
+            {
+              "op": "label",
+              "match": {
+                "kind": "io",
+                "re": "restored|print|show|value|result|settings|log|output|object"
+              },
+              "min": 1,
+              "fail": "Say in the print step what it shows: the restored value.",
+              "pass": "The print step says what it shows."
             }
           ]
         }

@@ -91,7 +91,7 @@ reject('3-4-13-lab-one-line-callback', 'helper never calls its function paramete
 // ---- 3.4.19: arrow helper; a callback named `log` is not console.log
 accept('3-4-19-lab-callback-capstone', 'helper written as an arrow',
   js('const countMatching = (nums, test) => {', '  let c = 0;', '  for (const n of nums) { if (test(n)) { c++; } }', '  return c;', '};',
-     'console.log(countMatching([1, 2, 3, 4], n => n > 2), countMatching([1, 2, 3, 4], n => n % 2 === 0));'));
+     'const readings = [1, 2, 3, 4, 5];', 'console.log(countMatching(readings, n => n > 2), countMatching(readings, n => n % 2 === 0));'));
 reject('3-4-19-lab-callback-capstone', 'second parameter called `log`, never called', 'r3',
   js('function f(a, log) { for (const x of a) { console.log(x); } }', 'console.log(f([1], x => 1), f([2], y => 2));'));
 
@@ -111,7 +111,7 @@ accept('3-5-12-lab-nested-structure', 'index into the array through an alias',
 
 // ---- 3.5.15: arrow method
 accept('3-5-15-lab-add-method', 'method written as an arrow',
-  js('const s = { name: "Ana", hi: () => "Hello!" };', 'console.log(s.hi());'));
+  js('const student = { name: "Ana", hi: () => "Hello!" };', 'console.log(student.hi());'));
 
 // ---- 3.5.18: arrow, expression and destructured one-parameter functions; console.log({..}) is no call
 accept('3-5-18-lab-params-to-object', 'one-parameter arrow reading a property',
@@ -168,7 +168,7 @@ reject('3-4-19-lab-callback-capstone', 'helper returns the array length', 't1',
      'const r = [1, 2, 3, 4, 5];', 'console.log(countMatching(r, n => n > 2), countMatching(r, n => n < 2));'));
 accept('3-4-19-lab-callback-capstone', 'while-free: forEach is not asked for, a for loop with a ternary is fine',
   js('const countMatching = (a, t) => { let c = 0; for (let i = 0; i < a.length; i++) { c += t(a[i]) ? 1 : 0; } return c; };',
-     'const r = [1, 2, 3, 4, 5];', 'console.log(countMatching(r, n => n > 2), countMatching(r, n => n < 2));'));
+     'const readings = [1, 2, 3, 4, 5];', 'console.log(countMatching(readings, n => n > 2), countMatching(readings, n => n < 2));'));
 reject('3-4-10-lab-implicit-return-drill', 'three arrows written, only one result printed', 't1',
   js('const a = n => n * 2;', 'const b = n => n > 0;', 'const c = (x, y) => x + y;', 'console.log(a(2));'));
 reject('3-4-16-lab-rewrite-three-arrows', 'three arrows written, only one result printed', 't1',
@@ -289,7 +289,7 @@ accept('3-4-10-lab-implicit-return-drill', 'three results in one console.log',
 accept('3-4-13-lab-one-line-callback', 'function first, value second',
   js('function transform(fn, value) { return fn(value); }', 'console.log(transform((n) => n + 4, 6));'));
 accept('3-5-15-lab-add-method', 'shorthand method',
-  js('const dog = { name: "Rex", speak() { return "Woof"; } };', 'console.log(dog.speak());'));
+  js('const student = { name: "Rex", speak() { return "Woof"; } };', 'console.log(student.speak());'));
 accept('3-8-7-lab-stringify-spot-drops', 'shorthand method, labelled print',
   js('const counter = { count: 1, note: undefined, describe() { return "hi"; } };', 'const json = JSON.stringify(counter);', 'console.log("json:", json);'));
 accept('3-8-14-lab-malformed-json', 'catch without a binding',
@@ -323,6 +323,31 @@ reject('3-8-22-lab-capstone', 'loadState has no guard around the parse', 't1',
   js('const defaults = { score: 0, level: 1 };', 'function saveState(s) { localStorage.setItem("k", JSON.stringify(s)); }',
      'function loadState() { const t = localStorage.getItem("k"); if (t === null) { return defaults; } return JSON.parse(t); }',
      'try { } catch (e) { }', 'saveState({ score: 75, level: 5 });', 'console.log(loadState().score);'));
+
+// ---- batch 4: identity, stored values and printed-method checks (2026-10-09)
+reject('3-8-10-lab-round-trip-object', 'restored is the very same object as player', 't1',
+  js('const player = { name: "A", score: 4 };', 'const saved = JSON.stringify(player);', 'const restored = player;', 'JSON.parse(saved);', 'console.log(restored.score + 1);', 'console.log(player.name);'));
+reject('3-8-23-lab-adapt-to-list', 'restored is the very same array as records', 't1',
+  js('const records = [{ name: "Pen", price: 2 }, { name: "Pad", price: 5 }];', 'localStorage.setItem("records", JSON.stringify(records));',
+     'const restored = records;', 'JSON.parse(localStorage.getItem("records"));', 'console.log(restored.length, restored[0].name);'));
+reject('3-7-11-lab-concat-two-lists', 'joined is just first', 't1',
+  js('const first = [1, 2, 3];', 'const second = [4, 5, 6];', 'const joined = first;', 'first.push(4, 5, 6);', 'console.log(joined, first, second);'));
+reject('3-6-13-lab-nested-mutation', 'deep is the same object as student', 't1',
+  js('const student = { name: "A", scores: [1] };', 'const shallow = { ...student };', 'const deep = student;', 'structuredClone(1);', 'shallow.scores.push(2);', 'deep.scores.push(3);', 'console.log(shallow.scores);', 'console.log(student.scores);', 'console.log(deep.scores);', 'console.log(deep.scores);'));
+reject('3-8-18-lab-save-by-key', 'state is printed as JSON but never stored', 't1',
+  js('const state = { score: 1, level: 2 };', 'localStorage.setItem("k", "x");', 'localStorage.getItem("k");', 'console.log(JSON.stringify(state));'));
+reject('3-8-19-lab-load-restore', 'restored is a literal, nothing loaded', 't1',
+  js('const restored = { score: 1 };', 'JSON.parse("{}");', 'localStorage.getItem("k");', 'if (restored) { }', 'try { } catch (e) { }', 'console.log(restored.score);'));
+reject('3-5-15-lab-add-method', 'the printed line is not what the method returns', 't1',
+  js('const student = { name: "Ana", hi: function () { return "Hello"; } };', 'console.log("hi");'));
+reject('3-5-22-lab-destructure-three', 'destructuring zero fields', 'r1',
+  js('const item = { title: "Pen", cost: 2, quantity: 10 };', 'const {} = item;', 'function describe({ title, quantity }) { return title + quantity; }', 'console.log(describe(item));'));
+reject('3-4-19-lab-callback-capstone', 'the helper has no for loop', 't1',
+  js('function countMatching(a, t) { let c = 0; let i = 0; while (i < a.length) { if (t(a[i])) { c++; } i++; } return c; }',
+     'const readings = [1, 2, 3, 4, 5];', 'console.log(countMatching(readings, n => n > 2), countMatching(readings, n => n < 2));'));
+accept('3-5-22-lab-destructure-three', 'default for the whole parameter',
+  js('const item = { title: "Pen", cost: 2, quantity: 10 };', 'const { title, cost, quantity } = item;', 'console.log(title + cost + quantity);',
+     'function describe({ title, quantity } = {}) { return title + " x" + quantity; }', 'console.log(describe(item));'));
 
 try {
   execFileSync(process.execPath, [

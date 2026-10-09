@@ -114,7 +114,7 @@
       ],
       "checks": [
         {
-          "expr": "Array.isArray(records) && records.length >= 2 && Array.isArray(restored) && JSON.stringify(restored) === JSON.stringify(records) && (J => J.includes(String(restored.length)) && J.includes(String(Object.values(restored[0])[0])))(output.join(' '))",
+          "expr": "Array.isArray(records) && records.length >= 2 && Array.isArray(restored) && JSON.stringify(restored) === JSON.stringify(records) && (J => J.includes(String(restored.length)) && J.includes(String(Object.values(restored[0])[0])))(output.join(' ')) && !same('restored', 'records')",
           "fail": "restored should be an array rebuilt from the text you stored, with the same records as records, and you should print its length and one record's field."
         }
       ]

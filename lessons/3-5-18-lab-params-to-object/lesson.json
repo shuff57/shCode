@@ -27,7 +27,7 @@
     {
       "id": "s3",
       "title": "Call it with an options object",
-      "instructions": "Call describeBox with one object literal that names the three keys, and print the result."
+      "instructions": "Call describeBox with one object literal that names the three keys, and print the result. Put the object literal directly inside the call parentheses; a variable holding the object does not count."
     }
   ],
   "requirements": [
