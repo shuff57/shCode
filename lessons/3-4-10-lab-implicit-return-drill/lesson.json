@@ -3,6 +3,7 @@
   "title": "3.4.10 Lab: Implicit-Return Rewrite Drill",
   "description": "Write three one-line arrow functions using implicit return, and call each one. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.4.3",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",
@@ -70,13 +71,13 @@
       "points": 0,
       "id": "t1",
       "title": "all three results are printed",
-      "description": "The output has at least three printed lines, one for each arrow you call. Help: 3.4.8 (Shorthand Rules)",
+      "description": "At least three values are printed, and they are not all the same. Help: 3.4.8 (Shorthand Rules)",
       "type": "tests",
-      "hint": "Call each of the three arrows and print every result with console.log.",
+      "hint": "Call each of the three arrows and print every result. Printing the three results on one line, separated by commas, is fine.",
       "checks": [
         {
-          "expr": "output.length >= 3",
-          "fail": "Print one line for each of your three arrows: call each one and wrap the call in console.log."
+          "expr": "(T => T.length >= 3 && new Set(T).size >= 2)(output.join(' ').split(/\\s+/).filter(Boolean))",
+          "fail": "Print the result of each of your three arrows (one console.log each, or all three in one). Three different jobs should give different results."
         }
       ]
     }

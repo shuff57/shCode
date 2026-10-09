@@ -3,11 +3,11 @@
 // STEP 1: settings is given to you below: an object with three properties.
 //         Leave it as it is.
 
-// STEP 2: Use object spread to build a copy of settings with one existing
+// STEP 2: Use object spread to build a copy of settings, called changed, with one existing
 //         property changed. Write the override AFTER the spread, so the
 //         later entry wins.
 
-// STEP 3: Use object spread again to build a second copy with a new property
+// STEP 3: Use object spread again to build a second copy, called extended, with a new property
 //         that settings did not already have.
 
 // STEP 4: Use console.log to print both copies and the original settings

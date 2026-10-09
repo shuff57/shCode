@@ -1,8 +1,9 @@
 {
   "id": "3-7-21-lab-mutating-sort-drill",
-  "title": "3.7.21 Lab: Mutating vs. Non-Mutating Method Sort Drill",
+  "title": "3.7.21 Lab: Mutating vs. Non-Mutating Methods Drill",
   "description": "Demonstrate one method that changes its array and one that returns a new array, logging before and after each. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.7.7",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",
@@ -82,6 +83,21 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Log before and after so you can see which call changed the original."
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "before and after are printed",
+      "description": "At least two different values are printed. Help: 3.7.19 (Reading: What Else Is Out There)",
+      "type": "tests",
+      "hint": "Print the array before and after each call so you can see which method changed it and which did not.",
+      "checks": [
+        {
+          "expr": "(T => T.length >= 2 && new Set(T).size >= 2)(output.join(' ').split(/\\s+/).filter(Boolean))",
+          "fail": "Print the array before and after the calls, so the output shows which method changed it."
+        }
+      ]
     }
   ],
   "grading": {

@@ -6,6 +6,19 @@ const SPEC = require('./_chart-3x-spec.cjs');
 const root = path.resolve(__dirname, '..');
 
 const REFS = {
+  '3-4-9-chart-expand-arrow': `flowchart TD
+  A([Start])
+  B[read operation and value]
+  C[first = operation of value]
+  D[second = operation of first]
+  E[/print second/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D --> E
+  E --> Z
+`,
   '3-6-7-chart-reassign-vs-mutate': `flowchart TD
   A([Start])
   B[scores = 10, 20, 30]
@@ -75,6 +88,7 @@ for (const [id, spec] of Object.entries(SPEC)) {
   // structural rules: same ids, new counts
   const rules = j.diagram.rules;
   for (const [rid, v] of Object.entries(spec.rules)) {
+    if (v === null) { const k = rules.findIndex((r) => r.id === rid); if (k >= 0) rules.splice(k, 1); continue; }
     const want = typeof v === 'number' ? { id: rid, count: v } : { id: rid, ...v };
     const i = rules.findIndex((r) => r.id === rid);
     if (i >= 0) rules[i] = want; else rules.push(want);

@@ -3,6 +3,7 @@
   "title": "3.8.10 Lab: Round-Trip an Object Through JSON",
   "description": "Save an object to JSON text, restore it with JSON.parse, and prove the restored copy is independent of the original. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.8.3",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",

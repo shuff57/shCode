@@ -3,6 +3,7 @@
   "title": "3.6.13 Lab: Nested-Structure Mutation",
   "description": "Show that a spread copy is only one level deep: change a nested array inside the copy and the original still changes. Then fix it with a deep copy. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.6.6",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.6 Functions: Pass by Value/Reference",
@@ -15,17 +16,17 @@
     {
       "id": "s1",
       "title": "Copy the outer object with spread",
-      "instructions": "Create an object that contains a nested array (for example, a student with a list of scores). Make a shallow copy with the object spread syntax: a new object with the same keys."
+      "instructions": "Create an object called student that contains a nested array (for example, a list of scores). Make a shallow copy called shallow with the object spread syntax: a new object with the same keys."
     },
     {
       "id": "s2",
       "title": "Change the nested array inside the copy",
-      "instructions": "Push a new value into the nested array of the copy. Then log both the copy and the original. Notice the original changed too, because a shallow copy still shares the nested array."
+      "instructions": "Push a new value into the nested array of shallow. Then log both shallow and student. Notice student changed too, because a shallow copy still shares the nested array."
     },
     {
       "id": "s3",
       "title": "Make a deep copy instead",
-      "instructions": "Use structuredClone to make a copy that goes all the way down. Change the nested array inside that copy, then log both again to prove the original is now untouched."
+      "instructions": "Use structuredClone to make a copy called deep that goes all the way down. Push a DIFFERENT value into the nested array of deep, then log both again to prove student is now untouched."
     }
   ],
   "requirements": [
@@ -81,14 +82,25 @@
       "file": "script.js",
       "points": 0,
       "id": "t1",
-      "title": "the shallow and the deep copy are both shown",
-      "description": "At least four lines are printed: the copy and the original after the spread change, then again after the structuredClone change. Help: 3.6.9 (Side Effects and Copies)",
+      "title": "the shallow copy shares the nested array, the deep copy does not",
+      "description": "shallow.scores matches student.scores (they are the same array), deep.scores is different from it, and the output shows the arrays. Help: 3.6.9 (Side Effects and Copies)",
       "type": "tests",
-      "hint": "Log the copy and the original after the spread push, then log both again after the structuredClone push.",
+      "hint": "Push into shallow.scores and student.scores changes too. Push a different number into deep.scores and student.scores stays as it was.",
       "checks": [
         {
-          "expr": "output.filter(l => l.includes('[')).length >= 4",
-          "fail": "Print the copy and the original after each push: two lines for the spread copy, two for the structuredClone copy."
+          "expr": "JSON.stringify(shallow.scores) === JSON.stringify(student.scores) && JSON.stringify(deep.scores) !== JSON.stringify(student.scores) && output.filter(l => l.includes('[')).length >= 4",
+          "fail": "Make student, a spread copy called shallow and a structuredClone copy called deep. After pushing into each copy, the shallow copy matches student (they share the array) and the deep copy differs. Print the arrays after each change."
+        }
+      ],
+      "variables": [
+        {
+          "name": "student"
+        },
+        {
+          "name": "shallow"
+        },
+        {
+          "name": "deep"
         }
       ]
     }

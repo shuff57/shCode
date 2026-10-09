@@ -1,6 +1,6 @@
 {
   "id": "3-6-14-example-6-2-defensive-copy",
-  "title": "3.6.14 Worked Example: Why 6.2 Copies Before It Loops",
+  "title": "3.6.14 Worked Example: Why a Function Copies Before It Loops",
   "type": "lesson",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",

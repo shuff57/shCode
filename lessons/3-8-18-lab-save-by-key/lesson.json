@@ -3,6 +3,7 @@
   "title": "3.8.18 Lab: Save a State Object by Key",
   "description": "Turn a state object into JSON text and store it under a key, the way a page would keep it between visits. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.8.6",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",
@@ -105,7 +106,7 @@
       ],
       "checks": [
         {
-          "expr": "state !== null && typeof state === 'object' && Object.keys(state).length >= 2 && output.some(l => { try { return JSON.stringify(JSON.parse(l)) === JSON.stringify(state); } catch (e) { return false; } })",
+          "expr": "state !== null && typeof state === 'object' && Object.keys(state).length >= 2 && output.some(l => { const i = l.indexOf('{'); if (i < 0) return false; try { return JSON.stringify(JSON.parse(l.slice(i))) === JSON.stringify(state); } catch (e) { return false; } })",
           "fail": "The printed line should be the JSON text of state: save JSON.stringify(state) under a key and print localStorage.getItem with the same key."
         }
       ]

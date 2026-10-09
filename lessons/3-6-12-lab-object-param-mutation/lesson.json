@@ -3,6 +3,7 @@
   "title": "3.6.12 Lab: Object-Parameter Mutation",
   "description": "Mutate a property on an object parameter and prove the caller sees it, then write a non-mutating version that keeps the original untouched. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.6.5",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.6 Functions: Pass by Value/Reference",
@@ -20,12 +21,12 @@
     {
       "id": "s2",
       "title": "Call it and log the caller's object",
-      "instructions": "Create an object variable with a name and an age. Call birthday with it, then console.log the caller's object. Confirm the age changed, because objects pass as a reference."
+      "instructions": "Create an object variable called user with a name and an age. Call birthday with it, then console.log the caller's object. Confirm the age changed, because objects pass as a reference."
     },
     {
       "id": "s3",
       "title": "Write a non-mutating version",
-      "instructions": "Define a second function called birthdaySafe that returns a new object with the age increased, without changing the object it was given. Call it and log both the original and the returned object to prove the original is untouched."
+      "instructions": "Define a second function called birthdaySafe that returns a new object with the age increased, without changing the object it was given. Call it and log both the original and the returned object to prove the original is untouched. Write the changed property after the spread, like { ...person, age: 31 }."
     }
   ],
   "requirements": [
@@ -166,6 +167,26 @@
           },
           "unchanged": 0,
           "hidden": true
+        }
+      ]
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t3",
+      "title": "the caller's object is printed after the call",
+      "description": "user holds a name and an age, and the printed output shows both the name and the age user ends with. Help: 3.6.5 (Changing vs. Reassigning)",
+      "type": "tests",
+      "hint": "Call birthday(user), then print user itself so its new age shows in the output.",
+      "variables": [
+        {
+          "name": "user"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "user !== null && typeof user === 'object' && typeof user.name === 'string' && typeof user.age === 'number' && (J => J.includes(user.name) && J.includes(String(user.age)))(output.join(' '))",
+          "fail": "user should hold a name and an age, and you should print user after calling birthday so its new age shows."
         }
       ]
     }

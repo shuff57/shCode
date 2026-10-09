@@ -3,6 +3,7 @@
   "title": "3.8.7 Lab: Stringify an Object and Spot What Got Dropped",
   "description": "Build an object that has a method and an undefined property, stringify it, and find out in the output what JSON refused to carry. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.8.2",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",
@@ -48,7 +49,7 @@
       "description": "One property's value is a function. Help: 3.8.6 (What Does Not Survive)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\s*:\\s*(?:function\\s*\\(|\\([^)]*\\)\\s*=>|[A-Za-z_$][\\w$]*\\s*=>)",
+      "pattern": "\\w+\\s*:\\s*(?:function\\s*\\(|\\([^)]*\\)\\s*=>|[A-Za-z_$][\\w$]*\\s*=>)|(?:^|[,{\\n])\\s*(?!(?:if|for|while|switch|catch|function)\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
@@ -93,8 +94,8 @@
       ],
       "checks": [
         {
-          "expr": "counter !== null && typeof counter === 'object' && Object.values(counter).some(v => typeof v === 'number') && Object.values(counter).some(v => typeof v === 'function') && Object.keys(counter).some(k => counter[k] === undefined) && output.some(l => l.trim().startsWith('{'))",
-          "fail": "counter needs a number property, a method and a property whose value is undefined, and the program must print the JSON text (it starts with an opening brace)."
+          "expr": "counter !== null && typeof counter === 'object' && Object.values(counter).some(v => typeof v === 'number') && Object.values(counter).some(v => typeof v === 'function') && Object.keys(counter).some(k => counter[k] === undefined) && output.some(l => { const i = l.indexOf('{'); if (i < 0) return false; try { const o = JSON.parse(l.slice(i)); return o !== null && typeof o === 'object' && Object.keys(o).length >= 1 && Object.keys(o).length < Object.keys(counter).length; } catch (e) { return false; } })",
+          "fail": "counter needs a number, a method and an undefined property, and you must print the JSON text of counter. That text is shorter than counter: it leaves out the method and the undefined value."
         }
       ]
     }

@@ -38,7 +38,7 @@ if (order.customer.vip) {
 | Shape | Use it for |
 |---|---|
 | **Start / End** (oval) | One of each. |
-| **Loop setup** (hexagon) | `i = 0 to order.items.length - 1` |
+| **Loop setup** (hexagon: press **+ more shapes**) | `i = 0 to order.items.length - 1` |
 | **Task** (rectangle) | `total = 0`, `total = total + order.items[i].price`, `name = order.customer.name` |
 | **Decision** (diamond) | `order.customer.vip` |
 | **Input / Output** (parallelogram) | The final print |

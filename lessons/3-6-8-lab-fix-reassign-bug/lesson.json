@@ -3,6 +3,7 @@
   "title": "3.6.8 Lab: Fix a Function That Reassigns Instead of Mutating",
   "description": "A function is supposed to update the caller's array but reassigns its parameter instead, so nothing changes. Fix the body so the update reaches the caller. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.6.4",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.6 Functions: Pass by Value/Reference",

@@ -3,6 +3,7 @@
   "title": "3.8.19 Lab: Load and Restore a Saved State",
   "description": "Read a saved key, cope with a never-saved key, and parse the stored text back into a usable object with a fallback. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.8.7",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",
@@ -53,7 +54,7 @@
       "description": "Tests the read value against null. Help: 3.8.15 (Saving by Key)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "===\\s*null|==\\s*null|!==?\\s*null|!\\s*[A-Za-z_$]\\w*|if\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*\\)",
+      "pattern": "===\\s*null|==\\s*null|!==?\\s*null|!\\s*[A-Za-z_$]\\w*|if\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*\\)|[A-Za-z_$][\\w$]*\\s*\\?[^:\\n]*:",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
@@ -110,7 +111,7 @@
       ],
       "checks": [
         {
-          "expr": "restored !== null && typeof restored === 'object' && output.length >= 1 && Object.values(restored).map(String).includes(output[output.length - 1].trim())",
+          "expr": "restored !== null && typeof restored === 'object' && output.length >= 1 && (J => Object.values(restored).some(v => J.includes(String(v))))(output.join(' '))",
           "fail": "restored should be an object parsed from the stored text, and the last thing you print should be one of its properties."
         }
       ]

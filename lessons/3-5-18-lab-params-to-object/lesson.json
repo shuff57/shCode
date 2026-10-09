@@ -3,6 +3,7 @@
   "title": "3.5.18 Lab: Rewrite a Multi-Parameter Function to Take an Object",
   "description": "Take a function with three positional parameters and rewrite it to read one options object instead. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.5.6",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",

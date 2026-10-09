@@ -3,6 +3,7 @@
   "title": "3.7.11 Lab: `.concat()` Two Lists",
   "description": "Join two arrays into a new one with .concat(), then show both originals are unchanged. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.7.4",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",
@@ -15,12 +16,12 @@
     {
       "id": "s1",
       "title": "Create two arrays",
-      "instructions": "Create two variables that each hold an array of at least three values."
+      "instructions": "Create two variables, first and second, that each hold an array of at least three values."
     },
     {
       "id": "s2",
       "title": "Join them with .concat()",
-      "instructions": "Use .concat() on the first array to join the second array's values onto the end, and store the result in a third variable."
+      "instructions": "Use .concat() on first to join second's values onto the end, and store the result in a variable called joined."
     },
     {
       "id": "s3",
@@ -70,13 +71,24 @@
       "points": 0,
       "id": "t1",
       "title": "the joined list and both originals are printed",
-      "description": "At least three lines were printed: the joined array and each original. Help: 3.7.9 (Reading: .concat())",
+      "description": "joined holds first followed by second, neither original was changed, and the output shows the joined array. Help: 3.7.9 (Reading: .concat())",
       "type": "tests",
       "hint": "Print the joined array, then the first array, then the second, to prove the originals did not change.",
       "checks": [
         {
-          "expr": "output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 3",
-          "fail": "Print three arrays: the joined one and each original."
+          "expr": "Array.isArray(first) && Array.isArray(second) && first.length >= 3 && second.length >= 3 && JSON.stringify(joined) === JSON.stringify(first.concat(second)) && (J => joined.every(x => J.includes(String(x))))(output.join(' '))",
+          "fail": "joined should be first followed by second (and neither original changed), and your output should show it."
+        }
+      ],
+      "variables": [
+        {
+          "name": "first"
+        },
+        {
+          "name": "second"
+        },
+        {
+          "name": "joined"
         }
       ]
     }

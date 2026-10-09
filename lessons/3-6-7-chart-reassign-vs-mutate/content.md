@@ -29,10 +29,10 @@ Before you draw anything, predict the output. Then run it in your head line by l
 | **Start / End** (oval) | One of each. |
 | **Function call** (double rail) | `process(scores)`: press **+ more shapes** |
 | **Task** (rectangle) | `scores = [10, 20, 30]`, `nums[0] = 0`, `nums = [9, 9]` |
-| **Decision** (diamond) | "Did this write change the shared object, or move a local name?" |
+| **Decision** (diamond) | "Did this write change the shared object, or move a local name?" Draw it **twice**, once after each write |
 | **Input / Output** (parallelogram) | The final print |
 
-At least seven shapes, at least one diamond.
+At least seven shapes, at least two diamonds. Give each exit of a diamond its own task before the paths meet at the print: two arrows from one diamond cannot both go to the same shape.
 
 ### The two writes to chart separately
 
@@ -46,7 +46,7 @@ Chart them as two separate tasks with a decision after each one asking whether t
 
 - The `yes` (escapes) exit belongs to the mutation, leading to a step that updates what the caller sees.
 - The `no` (stays local) exit belongs to the reassignment.
-- Both paths rejoin before the final print. The print happens once, after the function has returned.
+- Both paths rejoin before the final print, through a task of their own on each exit. The print happens once, after the function has returned.
 
 ### Before you submit
 

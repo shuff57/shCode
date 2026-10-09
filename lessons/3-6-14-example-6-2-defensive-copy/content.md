@@ -16,7 +16,7 @@ for (const score of scores) {
 console.log(scores);
 ```
 
-Two methods here are new, and you only need to read them: `scores.indexOf(score)` gives the position of that value in the array, and `scores.splice(position, 1)` removes one item at that position. Module 3.7 and the game units come back to them.
+Two methods here are new, and you only need to read them: `scores.indexOf(score)` gives the position of that value in the array, and `scores.splice(position, 1)` removes one item at that position. Reading 3.7.19 explains `splice`, and the game units come back to both.
 
 `30` survives even though it is below 50. Removing an item shifts every later item down one position, but the loop has already moved past that position. The same trap shows up later in the game units, when bullets leave the canvas and get removed from a list the loop is still walking.
 

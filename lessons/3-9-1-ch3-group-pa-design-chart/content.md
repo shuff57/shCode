@@ -9,7 +9,7 @@ first. Neither of you opens an editor until this chart is green.
   back (3.2.2)
 - Turning a word problem into a set of function contracts, then into a chart
 - Using the six shapes released through §3.1 — oval, rectangle, diamond, parallelogram,
-  the loop-setup hexagon (§2.2), and the **double-rail subroutine** (3.1.2)
+  the loop-setup hexagon (§2.2), and the **double-rail subroutine** (3.1.11)
 
 ### Step 1: pick one problem
 

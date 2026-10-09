@@ -3,6 +3,7 @@
   "title": "3.8.14 Lab: Handle a Malformed JSON String",
   "description": "Write a function that parses text and returns a usable fallback instead of letting a bad string stop the program. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.8.5",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",
@@ -72,7 +73,7 @@
       "description": "Uses a catch clause. Help: 2.5.4 (try...catch: Attempt and Recover)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "catch\\s*\\(",
+      "pattern": "catch\\s*[({]",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
@@ -95,7 +96,7 @@
       "points": 0,
       "id": "t1",
       "title": "readSave parses good text and falls back on bad text",
-      "description": "readSave('{\"a\":1}') returns { a: 1 }, and readSave(\"corrupted!!\") returns a fallback object instead of throwing. Help: 3.8.13 (Example: try/catch Around a Parse)",
+      "description": "readSave('{\"a\":1}') returns { a: 1 }, and readSave(\"corrupted!!\") and readSave('{\"a\":') return a fallback object instead of throwing. Help: 3.8.13 (Example: try/catch Around a Parse)",
       "type": "tests",
       "hint": "readSave must return JSON.parse(text) inside try, and return a fallback object from catch. A bad string must not throw.",
       "variables": [
@@ -105,7 +106,7 @@
       ],
       "checks": [
         {
-          "expr": "typeof readSave === 'function' && JSON.stringify(readSave('{\"a\":1}')) === '{\"a\":1}' && (() => { try { const r = readSave('corrupted!!'); return r !== null && typeof r === 'object'; } catch (e) { return false; } })()",
+          "expr": "typeof readSave === 'function' && JSON.stringify(readSave('{\"a\":1}')) === '{\"a\":1}' && ['corrupted!!', '{\"a\":', '[1,', ''].every(bad => { try { const r = readSave(bad); return r !== null && typeof r === 'object'; } catch (e) { return false; } })",
           "fail": "readSave('{\"a\":1}') should return { a: 1 }, and readSave(\"corrupted!!\") should return a fallback object without throwing."
         }
       ]

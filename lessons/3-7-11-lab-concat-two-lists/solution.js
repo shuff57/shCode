@@ -1,8 +1,8 @@
-const weekdays = ["Mon", "Tue", "Wed"];
-const weekend = ["Sat", "Sun"];
+const first = ["Mon", "Tue", "Wed"];
+const second = ["Thu", "Fri", "Sat"];
 
-const allDays = weekdays.concat(weekend);
+const joined = first.concat(second);
 
-console.log(allDays);
-console.log(weekdays);
-console.log(weekend);
+console.log(joined);
+console.log(first);
+console.log(second);

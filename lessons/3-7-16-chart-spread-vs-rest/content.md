@@ -31,8 +31,8 @@ Chart the **body of `total`** — the part that runs once the arguments have arr
 |---|---|
 | **Start / End** (oval) | One of each |
 | **Task** (rectangle) | Starting `sum` at 0, and adding each number to it |
-| **Loop setup** (hexagon) | The `for` header: the next index, or "past the end" |
-| **Decision** (diamond) | "Is there another number?" |
+| **Loop setup** (hexagon: press **+ more shapes**) | The `for` header: the next index, or "past the end" |
+| **Decision** (diamond) | "Is there another number?" Ask it this way, so `yes` means keep going and `no` means done |
 | **Input / Output** (parallelogram) | The `return sum` at the end |
 
 At least seven shapes, at least one diamond.

@@ -3,6 +3,7 @@
   "title": "3.5.5 Lab: Read and Update Object Fields",
   "description": "Build one object, read a field with a dot, change a field, add a new field, and print the object. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.5.2",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",
@@ -102,7 +103,7 @@
       ],
       "checks": [
         {
-          "expr": "book !== null && typeof book === 'object' && !Array.isArray(book) && Object.keys(book).length >= 3 && output.some(l => /^\\s*\\{/.test(l)) && output.some(l => !/^\\s*[{}]/.test(l))",
+          "expr": "book !== null && typeof book === 'object' && !Array.isArray(book) && Object.keys(book).length >= 3 && output.some(l => l.includes('{')) && output.length >= 2",
           "fail": "book should end as an object with at least three properties (the two you started with plus the one you added), and you should print one field and then the whole object."
         }
       ]

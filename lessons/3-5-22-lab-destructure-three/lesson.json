@@ -3,6 +3,7 @@
   "title": "3.5.22 Lab: Destructure 3 Fields From an Object",
   "description": "Unpack three fields in one statement, use the bare names, and rewrite a function to destructure its parameter. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.5.7",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",

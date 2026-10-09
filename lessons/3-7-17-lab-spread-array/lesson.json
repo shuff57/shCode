@@ -3,6 +3,7 @@
   "title": "3.7.17 Lab: Build a New Array with Spread",
   "description": "Use spread to combine two arrays and to add loose values around a copied one, without changing any input. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.7.5",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",
@@ -16,17 +17,17 @@
     {
       "id": "s1",
       "title": "Create two arrays",
-      "instructions": "Create two variables that each hold an array of at least two values."
+      "instructions": "Create two variables, first and second, that each hold an array of at least two values."
     },
     {
       "id": "s2",
       "title": "Combine them with spread",
-      "instructions": "Build a new array that contains every value from both arrays using array spread, and store it in a third variable."
+      "instructions": "Build a new array called combined that contains every value from both arrays using array spread."
     },
     {
       "id": "s3",
       "title": "Add loose values around a copy",
-      "instructions": "Build another new array that puts a loose value at the front and another at the back, with one of your arrays spread in between."
+      "instructions": "Build another new array called framed that puts a loose value at the front and another at the back, with first spread in between."
     },
     {
       "id": "s4",
@@ -93,8 +94,22 @@
       "hint": "Print the combined array, the array with loose values around a spread, and one of the originals.",
       "checks": [
         {
-          "expr": "output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 3",
-          "fail": "Print three arrays: both new ones and one of the originals."
+          "expr": "JSON.stringify(combined) === JSON.stringify([...first, ...second]) && framed.length === first.length + 2 && JSON.stringify(framed.slice(1, -1)) === JSON.stringify(first) && (J => combined.every(x => J.includes(String(x))) && framed.every(x => J.includes(String(x))))(output.join(' '))",
+          "fail": "combined should hold first then second, framed should be first with one loose value on each side, and your output should show both."
+        }
+      ],
+      "variables": [
+        {
+          "name": "first"
+        },
+        {
+          "name": "second"
+        },
+        {
+          "name": "combined"
+        },
+        {
+          "name": "framed"
         }
       ]
     }

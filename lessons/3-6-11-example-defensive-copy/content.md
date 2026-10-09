@@ -51,7 +51,7 @@ console.log(highestThree(original));
 console.log(original);
 ```
 
-Two pieces here are new, and you only need to read them. `function (a, b) { return b - a; }` tells `sort` to put the biggest numbers first; you will write your own in Module 3.7. `copy.slice(0, 3)` hands back the first three items as another new array.
+Two pieces here are new, and you only need to read them. `function (a, b) { return b - a; }` tells `sort` to put the biggest numbers first; Reading 3.7.19 explains how it works. `copy.slice(0, 3)` hands back the first three items as another new array.
 
 ## Key takeaways
 

@@ -3,6 +3,7 @@
   "title": "3.7.22 Lab: Array-Methods Capstone",
   "description": "Combine the module's non-mutating tools: build a list, transform it with .map(), take a range with .slice(), join with .concat() or spread, and copy an object with an override. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.7.8",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",
@@ -22,17 +23,17 @@
     {
       "id": "s2",
       "title": "Transform with .map()",
-      "instructions": "Use .map() to build a new array where every price is increased by a fixed amount or percentage, and store it in a second variable."
+      "instructions": "Use .map() to build a new array called bumped where every price is increased by a fixed amount or percentage. Decimal results can print with a long tail of digits (such as 55.00000000000001); that is how computers store decimals, not a mistake."
     },
     {
       "id": "s3",
       "title": "Take a range with .slice()",
-      "instructions": "Use .slice() to copy a part of the transformed array into a third variable."
+      "instructions": "Use .slice() to copy a part of bumped into a variable called middle."
     },
     {
       "id": "s4",
       "title": "Join two arrays",
-      "instructions": "Create a second array and join it with the range using .concat() or array spread, into a fourth variable."
+      "instructions": "Create a second array and join it with middle using .concat() or array spread, into a variable called joined."
     },
     {
       "id": "s5",
@@ -129,12 +130,21 @@
       "variables": [
         {
           "name": "prices"
+        },
+        {
+          "name": "bumped"
+        },
+        {
+          "name": "middle"
+        },
+        {
+          "name": "joined"
         }
       ],
       "checks": [
         {
-          "expr": "Array.isArray(prices) && prices.length >= 5 && prices.every(p => typeof p === 'number') && output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 6",
-          "fail": "prices should be an array of at least five numbers, and you should print the transformed, sliced and joined arrays, both objects and the original prices (six lines)."
+          "expr": "Array.isArray(prices) && prices.length >= 5 && prices.every(p => typeof p === 'number') && bumped.length === prices.length && middle.length >= 1 && middle.length < bumped.length && joined.length > middle.length && (J => bumped.every(x => J.includes(String(x))) && middle.every(x => J.includes(String(x))) && joined.every(x => J.includes(String(x))))(output.join(' '))",
+          "fail": "prices needs five or more numbers; bumped should be a changed copy of the same length, middle a part of it, and joined longer than middle; your output should show them."
         }
       ]
     }

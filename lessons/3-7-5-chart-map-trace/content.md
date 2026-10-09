@@ -23,8 +23,8 @@ console.log(withTax);
 |---|---|
 | **Start / End** (oval) | One of each |
 | **Task** (rectangle) | Starting `withTax` as an empty result, and adding a taxed price to it |
-| **Loop setup** (hexagon) | The `for` header `.map()` runs for you: the next price, or "no more" |
-| **Decision** (diamond) | "Is there another price?" |
+| **Loop setup** (hexagon: press **+ more shapes**) | The `for` header `.map()` runs for you: the next price, or "no more" |
+| **Decision** (diamond) | "Is there another price?" Ask it this way, so `yes` means keep going and `no` means done |
 | **Input / Output** (parallelogram) | The final `console.log` |
 
 At least seven shapes, at least one diamond.

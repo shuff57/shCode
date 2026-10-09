@@ -5,8 +5,8 @@ prices.push(30);
 prices.push(40);
 prices.push(50);
 
-const withTax = prices.map((price) => price * 1.08);
-const middle = withTax.slice(1, 4);
+const bumped = prices.map((price) => price * 1.08);
+const middle = bumped.slice(1, 4);
 
 const extra = [99];
 const joined = middle.concat(extra);
@@ -14,7 +14,7 @@ const joined = middle.concat(extra);
 const settings = { theme: "dark", fontSize: 14 };
 const bigger = { ...settings, fontSize: 18 };
 
-console.log(withTax);
+console.log(bumped);
 console.log(middle);
 console.log(joined);
 console.log(bigger);

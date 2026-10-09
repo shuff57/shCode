@@ -31,7 +31,7 @@ console.log(describeBox({ width: 10, height: 4, color: "red" }));
 |---|---|
 | **Start / End** (oval) | One of each. |
 | **Task** (rectangle) | The unpack (`width, height, color = options`), building `note`, appending `" (wide)"` |
-| **Decision** (diamond) | `width > height` |
+| **Decision** (diamond) | `width > height` (so `yes` is the wide case) |
 | **Input / Output** (parallelogram) | The final print |
 
 At least six shapes, at least one diamond.

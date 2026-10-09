@@ -3,6 +3,7 @@
   "title": "3.7.8 Lab: Extract a Sub-List with `.slice()`",
   "description": "Create an array, copy a middle range and a run to the end with .slice(), then show the original is unchanged. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.7.3",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",
@@ -20,12 +21,12 @@
     {
       "id": "s2",
       "title": "Extract a middle range",
-      "instructions": "Use .slice(start, end) to copy a middle part of items into a variable. Remember the end index is not included."
+      "instructions": "Use .slice(start, end) to copy a middle part of items into a variable called middle. Remember the end index is not included."
     },
     {
       "id": "s3",
       "title": "Extract to the end",
-      "instructions": "Use .slice(start) with only a start index to copy everything from a position to the end of the array."
+      "instructions": "Use .slice(start) with only a start index to copy everything from a position to the end of the array into a variable called tail."
     },
     {
       "id": "s4",
@@ -81,12 +82,18 @@
       "variables": [
         {
           "name": "items"
+        },
+        {
+          "name": "middle"
+        },
+        {
+          "name": "tail"
         }
       ],
       "checks": [
         {
-          "expr": "Array.isArray(items) && items.length >= 5 && output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 3",
-          "fail": "items should be an array of at least five values, and you should print both slices and the original items array (three lines)."
+          "expr": "Array.isArray(items) && items.length >= 5 && Array.isArray(middle) && middle.length >= 1 && middle.length < items.length && Array.isArray(tail) && tail.length >= 1 && tail.length < items.length && (J => middle.every(x => J.includes(String(x))) && tail.every(x => J.includes(String(x))))(output.join(' '))",
+          "fail": "items needs five or more values, middle and tail should each be a part of it, and your output should show both slices."
         }
       ]
     }

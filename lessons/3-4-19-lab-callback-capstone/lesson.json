@@ -3,6 +3,7 @@
   "title": "3.4.19 Lab: Callback Capstone",
   "description": "Write a counting helper that takes a callback, then use it with a one-line arrow to count matching values in an array. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.4.7",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",

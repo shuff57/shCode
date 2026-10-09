@@ -92,6 +92,7 @@
                 "at": {
                   "kind": "decision"
                 },
+                "orientation": "labelled",
                 "distinct": true,
                 "yes": {
                   "kind": "process"
@@ -145,7 +146,7 @@
           "wide|greater|>|bigger",
           "print|show|log|output|return"
         ],
-        "min": 2,
+        "min": 3,
         "capTo": 13,
         "fail": "None of your shapes say what this program does. Label each shape in your own words."
       }

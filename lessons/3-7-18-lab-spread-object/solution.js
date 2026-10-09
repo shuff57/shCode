@@ -1,8 +1,8 @@
 const settings = { theme: "dark", fontSize: 14, wrap: true };
 
-const bigger = { ...settings, fontSize: 18 };
-const localized = { ...settings, language: "en" };
+const changed = { ...settings, fontSize: 18 };
+const extended = { ...settings, language: "en" };
 
-console.log(bigger);
-console.log(localized);
+console.log(changed);
+console.log(extended);
 console.log(settings);

@@ -3,6 +3,7 @@
   "title": "3.5.24 Lab: Parallel-Arrays-vs-Object Refactor",
   "description": "Refactor three parallel arrays into one array of records, then read the fields back with a dot. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.5.8",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",

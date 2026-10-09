@@ -154,7 +154,7 @@
           "stringify|save|store|setitem",
           "print|show|log|output|restored"
         ],
-        "min": 2,
+        "min": 3,
         "capTo": 13,
         "fail": "None of your shapes say what this program does. Label each shape in your own words."
       }

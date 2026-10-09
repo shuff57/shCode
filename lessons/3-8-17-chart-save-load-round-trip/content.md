@@ -38,7 +38,7 @@ console.log(loadSettings());
 |---|---|
 | **Start / End** (oval) | One of each |
 | **Task** (rectangle) | Stringifying the state, storing it under the key, reading the key, and each `return` |
-| **Decision** (diamond) | "Is anything stored?" and "Did the parse succeed?" |
+| **Decision** (diamond) | "Is the text `null`?" (nothing stored) and "Did the parse succeed?" |
 | **Input / Output** (parallelogram) | The final print |
 
 At least ten shapes, at least two diamonds.

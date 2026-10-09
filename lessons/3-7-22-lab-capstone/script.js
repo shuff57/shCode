@@ -4,13 +4,12 @@
 //         numbers, using .push() as you build.
 
 // STEP 2: Use .map() to build a new array where every price is increased by
-//         a fixed amount or percentage. Store it in a second variable.
+//         a fixed amount or percentage. Store it in a variable called bumped.
 
-// STEP 3: Use .slice() to copy a part of the transformed array into a third
-//         variable.
+// STEP 3: Use .slice() to copy a part of bumped into a variable called middle.
 
 // STEP 4: Create a second array and join it with your range using .concat()
-//         or array spread. Store the join in a fourth variable.
+//         or array spread. Store the join in a variable called joined.
 
 // STEP 5: Create an object with at least two properties, then build a copy
 //         with one property changed using object spread. The override must

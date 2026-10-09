@@ -3,6 +3,7 @@
   "title": "3.7.4 Lab: Transform a List Without Mutating the Input",
   "description": "Use .map() to build a transformed copy of an array, then demonstrate the original is unchanged. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.7.2",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",
@@ -21,7 +22,7 @@
     {
       "id": "s2",
       "title": "Build a transformed copy with .map()",
-      "instructions": "Use .map() on prices to build a new array where each number is transformed (for example, doubled), and store the result in a second variable."
+      "instructions": "Use .map() on prices to build a new array where each number is transformed (for example, doubled), and store the result in a variable called doubled."
     },
     {
       "id": "s3",
@@ -71,7 +72,7 @@
       "points": 0,
       "id": "t1",
       "title": "prices still holds its starting values and both arrays are printed",
-      "description": "After the code runs, prices is still [10, 20, 30] and at least two lines were printed. Help: 3.7.2 (Reading: .map())",
+      "description": "prices is still [10, 20, 30], doubled holds three transformed numbers, and the output shows them. Help: 3.7.2 (Reading: .map())",
       "type": "tests",
       "hint": ".map() builds a new array and leaves prices alone. Store the result in a second variable and do not assign into prices.",
       "variables": [
@@ -82,12 +83,15 @@
             20,
             30
           ]
+        },
+        {
+          "name": "doubled"
         }
       ],
       "checks": [
         {
-          "expr": "output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 2",
-          "fail": "Print the transformed array and then the original prices array."
+          "expr": "Array.isArray(doubled) && doubled.length === 3 && doubled.some((x, i) => x !== prices[i]) && (J => doubled.every(x => J.includes(String(x))))(output.join(' '))",
+          "fail": "doubled should hold the three transformed numbers, and your output should show them (and the original prices)."
         }
       ]
     }

@@ -16,7 +16,7 @@ Primitives are: `number`, `string`, `boolean`, `undefined`, `null`.
 - Which kinds of values JavaScript passes by reference
 - Why pushing to an array inside a function changes the original
 
-When you pass an **object** or an **array**, JavaScript hands the function a **reference**: a direct pointer to the same spot in memory. If the function modifies the object or array, the original is modified too.
+When you pass an **object** or an **array**, JavaScript hands the function a **copy of the reference**: its own name for the same spot in memory. If the function modifies the object or array, the original is modified too.
 
 **Try it:** Read the code and predict what each `console.log` will print. Then run it and check.
 

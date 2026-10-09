@@ -332,5 +332,27 @@ check('guard: the four runtime-tested labs carry codes and no try cap; all three
   const taken = new Set([...manifest.values()].map((l) => l.assignmentCode).filter(Boolean));
 });
 
+check('guard: every 3.4-3.8 console lab counts as a Lab (completion credit, unlimited tries); the nine charts there stay practice', () => {
+  const manifest = JSON.parse(fs.readFileSync(new URL('../public/lessons-manifest.json', import.meta.url), 'utf8')).lessons;
+  let labs = 0;
+  let charts = 0;
+  for (const m of manifest) {
+    if (!/^3\.[4-8]\.\d+\s/.test(m.title)) continue;
+    const cat = lessonGradeCategory({ title: m.title, preview: m.preview, scoreKind: m.scoreKind, assignmentCode: m.assignmentCode });
+    if (m.type === 'assignment' && m.preview === 'console') {
+      labs++;
+      assert.equal(cat, 'lab', `${m.id} is a console lab and must count`);
+      assert.equal(m.maxScore, null, `${m.id}: done = 100%`);
+      assert.equal(m.maxSubmissions, null, `${m.id} stays unlimited tries`);
+    }
+    if (m.type === 'lesson' && m.preview === 'diagram') {
+      charts++;
+      assert.equal(cat, null, `${m.id} is a practice chart and must not count`);
+    }
+  }
+  assert.equal(labs, 35, 'expected 35 counted labs in 3.4-3.8');
+  assert.equal(charts, 9, 'expected 9 practice charts in 3.4-3.8');
+});
+
 console.log(results.join('\n'));
 console.log(process.exitCode ? '\ngrading tests FAILED' : '\ngrading tests passed');

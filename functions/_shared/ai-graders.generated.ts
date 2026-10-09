@@ -1596,7 +1596,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "write|use|choose|return",
         "yes|no|job|read"
       ],
-      "min": 2,
+      "min": 3,
       "capTo": 13,
       "fail": "None of your shapes say what this program does. Label each shape in your own words."
     },
@@ -1732,7 +1732,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "print|show|log|output|result",
         "\\b3\\b|add|sum|1 \\+ 2"
       ],
-      "min": 2,
+      "min": 3,
       "capTo": 13,
       "fail": "None of your shapes say what this program does. Label each shape in your own words."
     },
@@ -1780,28 +1780,32 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
     "rubric": [
       {
-        "id": "loop-back",
-        "title": "The second application goes back to the decision",
+        "id": "three-steps",
+        "title": "Read, first call, second call, then the print",
         "points": 7,
-        "description": "Scored by the editor (arrow order): the decision is part of a repeat, because the step after \"no\" leads back to it.",
+        "description": "Scored by the editor (shape kind): at least four task or input/output shapes, for reading the parameters, the two calls and the print.",
         "check": {
           "steps": [
             {
-              "op": "in-cycle",
+              "op": "count",
               "match": {
-                "kind": "decision"
+                "kind": [
+                  "process",
+                  "io"
+                ]
               },
-              "fail": "The decision \"applied twice yet?\" has to be asked again after the second application: an arrow must lead back to it. In your chart nothing leads back.",
-              "pass": "The decision is asked again after the second application."
+              "min": 4,
+              "fail": "The code does four things: it reads operation and value, calls operation once, calls it again on that result, and prints. Draw a shape for each.",
+              "pass": "There is a shape for each step."
             }
           ]
         }
       },
       {
         "id": "order",
-        "title": "Read, apply, decide, then print",
+        "title": "The work comes first, then the print, then End",
         "points": 7,
-        "description": "Scored by the editor (arrow order): a task, then the decision, then an input/output step, on every route.",
+        "description": "Scored by the editor (arrow order): tasks, then an input/output step, then End, on every route.",
         "check": {
           "steps": [
             {
@@ -1811,36 +1815,32 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
                   "kind": "process"
                 },
                 {
-                  "kind": "decision"
+                  "kind": "io"
                 },
                 {
-                  "kind": "io"
+                  "kind": "terminal"
                 }
               ],
-              "fail": "The steps must come in the order the code runs them: work first, then the decision, then the print.",
-              "pass": "Work, decision, print come in the right order."
+              "fail": "The print comes after the work, and it is the last step before End.",
+              "pass": "The tasks come first and the print is last."
             }
           ]
         }
       },
       {
-        "id": "exits",
-        "title": "The two exits go to different places",
+        "id": "straight",
+        "title": "A straight line, no repeat",
         "points": 6,
-        "description": "Scored by the editor: the decision has a yes and a no arrow that lead to two different shapes, and the no arrow leads to a task.",
+        "description": "Scored by the editor (arrow order): no task is part of a repeat.",
         "check": {
           "steps": [
             {
-              "op": "branch",
-              "at": {
-                "kind": "decision"
-              },
-              "distinct": true,
-              "no": {
+              "op": "not-in-cycle",
+              "match": {
                 "kind": "process"
               },
-              "fail": "The no arrow must lead to the task that applies the operation again, and the yes arrow to somewhere different.",
-              "pass": "The no arrow goes to the second application."
+              "fail": "This code runs once from top to bottom, so no arrow should lead back to an earlier step. In your chart one does.",
+              "pass": "No arrow leads back."
             }
           ]
         }
@@ -1857,7 +1857,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "print|show|display|log|output",
         "result|return|double"
       ],
-      "min": 2,
+      "min": 3,
       "capTo": 13,
       "fail": "None of your shapes say what this program does. Label each shape in your own words."
     },
@@ -1879,10 +1879,6 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "count": 2
       },
       {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
         "id": "decision-two-exits"
       },
       {
@@ -1896,7 +1892,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       },
       {
         "id": "min-nodes",
-        "count": 7
+        "count": 6
       }
     ]
   },
@@ -1974,7 +1970,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "print|show|log|output",
         "yes|no|\\+|add"
       ],
-      "min": 2,
+      "min": 3,
       "capTo": 13,
       "fail": "None of your shapes say what this program does. Label each shape in your own words."
     },
@@ -2057,6 +2053,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "at": {
                 "kind": "decision"
               },
+              "orientation": "labelled",
               "distinct": true,
               "yes": {
                 "kind": "process"
@@ -2113,7 +2110,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "wide|greater|>|bigger",
         "print|show|log|output|return"
       ],
-      "min": 2,
+      "min": 3,
       "capTo": 13,
       "fail": "None of your shapes say what this program does. Label each shape in your own words."
     },
@@ -2246,7 +2243,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "process|call|\\(",
         "print|show|log|output"
       ],
-      "min": 2,
+      "min": 3,
       "capTo": 13,
       "fail": "None of your shapes say what this program does. Label each shape in your own words."
     },
@@ -2346,6 +2343,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "at": {
                 "kind": "decision"
               },
+              "orientation": "labelled",
               "distinct": true,
               "yes": {
                 "kind": "process"
@@ -2367,10 +2365,10 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       "anyOf": [
         "sum|total|numbers|\\[i\\]|add",
         "next|another|more|each|loop|\\bi\\b|index",
-        "\\b0\\b|start|zero",
+        "\\b0\\b|zero|initial",
         "return|print|show|log|output"
       ],
-      "min": 2,
+      "min": 3,
       "capTo": 13,
       "fail": "None of your shapes say what this program does. Label each shape in your own words."
     },
@@ -2474,6 +2472,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "at": {
                 "kind": "decision"
               },
+              "orientation": "labelled",
               "distinct": true,
               "yes": {
                 "kind": "process"
@@ -2498,7 +2497,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "next|another|more|each|loop|\\bi\\b|list",
         "print|show|log|output"
       ],
-      "min": 2,
+      "min": 3,
       "capTo": 13,
       "fail": "None of your shapes say what this program does. Label each shape in your own words."
     },
@@ -2650,7 +2649,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "stringify|save|store|setitem",
         "print|show|log|output|restored"
       ],
-      "min": 2,
+      "min": 3,
       "capTo": 13,
       "fail": "None of your shapes say what this program does. Label each shape in your own words."
     },

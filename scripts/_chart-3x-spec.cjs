@@ -9,8 +9,9 @@ const cyc = (kind, fail, pass) => ({ op: 'in-cycle', match: K(kind), fail, pass 
 const ncyc = (kind, fail, pass) => ({ op: 'not-in-cycle', match: K(kind), fail, pass });
 const loopExit = (fail, pass) => ({ op: 'loop-exit', loop: K('preparation'), minAfter: 1, from: 'any', orSetup: true, fail, pass });
 const branch = (yes, no, fail, pass) => ({ op: 'branch', at: K('decision'), distinct: true, ...(yes ? { yes } : {}), ...(no ? { no } : {}), fail, pass });
+const branchL = (yes, no, fail, pass) => ({ op: 'branch', at: K('decision'), orientation: 'labelled', distinct: true, ...(yes ? { yes } : {}), ...(no ? { no } : {}), fail, pass });
 const item = (id, title, points, description, ...steps) => ({ id, title, points, description, check: { steps } });
-const GATE = (anyOf) => ({ anyOf, min: 2, capTo: 13, fail: 'None of your shapes say what this program does. Label each shape in your own words.' });
+const GATE = (anyOf) => ({ anyOf, min: 3, capTo: 13, fail: 'None of your shapes say what this program does. Label each shape in your own words.' });
 
 const LOOP_ITEMS = (what, exitWhat) => [
   item('hexagon', 'The loop is drawn with the loop-setup hexagon', 6, 'Scored by the editor (shape kind): a loop-setup (hexagon) shape on the Start-to-End path.',
@@ -18,21 +19,21 @@ const LOOP_ITEMS = (what, exitWhat) => [
   item('way-out', exitWhat, 7, 'Scored by the editor (arrow order): the steps that repeat have an arrow leading back, and the arrow that leaves the repeat leads on to a step that runs once, before End.',
     loopExit('Two things must hold: the steps that run each time round must have an arrow leading back (to the hexagon, or to the diamond that asks whether there is another), and the arrow that leaves that repeat must lead to a step that runs once, after it, before End.', 'The way out of the loop leads on to the step after it.')),
   item('yes-no', what, 7, 'Scored by the editor (arrow order): a decision whose yes exit goes to a task and whose no exit goes to the print or return, two different places.',
-    branch(K('process'), K('io'), 'The diamond has to split into two different results: its yes arrow goes to the task that does the work, its no arrow goes to the input/output step.', 'The decision splits into the task and the print.')),
+    branchL(K('process'), K('io'), 'The diamond has to split into two different results: its yes arrow goes to the task that does the work, its no arrow goes to the input/output step.', 'The decision splits into the task and the print.')),
 ];
 
 module.exports = {
   '3-4-9-chart-expand-arrow': {
     rubricTitle: 'Arrow expansion chart: structure check',
     gate: GATE(['operation|function|callback|apply', 'value|number|input|\\bn\\b', 'twice|again|second|first|once', 'print|show|display|log|output', 'result|return|double']),
-    rules: { 'min-process': 2, 'min-decisions': 1, 'min-nodes': 7 },
+    rules: { 'min-process': 2, 'min-decisions': null, 'min-nodes': 6 },
     rubric: [
-      item('loop-back', 'The second application goes back to the decision', 7, 'Scored by the editor (arrow order): the decision is part of a repeat, because the step after "no" leads back to it.',
-        cyc('decision', 'The decision "applied twice yet?" has to be asked again after the second application: an arrow must lead back to it. In your chart nothing leads back.', 'The decision is asked again after the second application.')),
-      item('order', 'Read, apply, decide, then print', 7, 'Scored by the editor (arrow order): a task, then the decision, then an input/output step, on every route.',
-        seq([K('process'), K('decision'), K('io')], 'The steps must come in the order the code runs them: work first, then the decision, then the print.', 'Work, decision, print come in the right order.')),
-      item('exits', 'The two exits go to different places', 6, 'Scored by the editor: the decision has a yes and a no arrow that lead to two different shapes, and the no arrow leads to a task.',
-        branch(null, K('process'), 'The no arrow must lead to the task that applies the operation again, and the yes arrow to somewhere different.', 'The no arrow goes to the second application.')),
+      item('three-steps', 'Read, first call, second call, then the print', 7, 'Scored by the editor (shape kind): at least four task or input/output shapes, for reading the parameters, the two calls and the print.',
+        { op: 'count', match: { kind: ['process', 'io'] }, min: 4, fail: 'The code does four things: it reads operation and value, calls operation once, calls it again on that result, and prints. Draw a shape for each.', pass: 'There is a shape for each step.' }),
+      item('order', 'The work comes first, then the print, then End', 7, 'Scored by the editor (arrow order): tasks, then an input/output step, then End, on every route.',
+        seq([K('process'), K('io'), K('terminal')], 'The print comes after the work, and it is the last step before End.', 'The tasks come first and the print is last.')),
+      item('straight', 'A straight line, no repeat', 6, 'Scored by the editor (arrow order): no task is part of a repeat.',
+        ncyc('process', 'This code runs once from top to bottom, so no arrow should lead back to an earlier step. In your chart one does.', 'No arrow leads back.')),
     ],
   },
   '3-4-15-chart-form-decision': {
@@ -83,7 +84,7 @@ module.exports = {
       item('unpack-first', 'The unpack comes before the decision', 7, 'Scored by the editor (arrow order): a task comes before the decision on every route.',
         seq([K('process'), K('decision')], 'The unpack is its own task, drawn before the decision that uses the names.', 'A task comes before the decision.')),
       item('exits', 'The wide path adds to the note', 7, 'Scored by the editor: the decision has two different exits, and the yes exit goes to a task.',
-        branch(K('process'), null, 'The yes arrow must lead to the task that appends to the note, and the no arrow to somewhere different.', 'The yes arrow goes to the task that adds to the note.')),
+        branchL(K('process'), null, 'The yes arrow must lead to the task that appends to the note, and the no arrow to somewhere different.', 'The yes arrow goes to the task that adds to the note.')),
       item('one-print', 'The print comes after the decision', 6, 'Scored by the editor: an input/output step for the print, after the decision.',
         cnt('io', 1, 'Both paths finish at one print. Draw an input/output step for the print.', 'There is a print.'),
         seq([K('decision'), K('io'), K('terminal')], 'Both paths must meet at the print, and the print must come after the decision, before End.', 'Both paths meet at the print before End.')),
@@ -111,7 +112,7 @@ module.exports = {
   },
   '3-7-16-chart-spread-vs-rest': {
     rubricTitle: 'Spread vs rest chart: structure check',
-    gate: GATE(['sum|total|numbers|\\[i\\]|add', 'next|another|more|each|loop|\\bi\\b|index', '\\b0\\b|start|zero', 'return|print|show|log|output']),
+    gate: GATE(['sum|total|numbers|\\[i\\]|add', 'next|another|more|each|loop|\\bi\\b|index', '\\b0\\b|zero|initial', 'return|print|show|log|output']),
     rules: { 'min-process': 2, 'min-decisions': 1, 'min-nodes': 7, 'min-shape': { shape: 'preparation', count: 1 } },
     rubric: LOOP_ITEMS('The "another number?" question sends yes to the add and no to the return', 'The return is after the loop, off the way out'),
   },

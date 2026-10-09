@@ -3,6 +3,7 @@
   "title": "3.4.5 Lab: Rewrite a Declaration as an Expression",
   "description": "Take a named function declaration and rewrite it as a function expression assigned to a const, then call it. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.4.2",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",
@@ -64,6 +65,21 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Print with console.log so you can see the result and check it against what you expected."
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "the call prints a value",
+      "description": "At least one line is printed and it is not undefined. Help: 3.4.4 (Function Expressions)",
+      "type": "tests",
+      "hint": "Call the function through its const and print what it returns. A function with no return prints undefined.",
+      "checks": [
+        {
+          "expr": "output.length >= 1 && !output.some(l => l.trim() === 'undefined')",
+          "fail": "Print the value your function returns: console.log(yourConst(7)). The function needs a return."
+        }
+      ]
     }
   ],
   "grading": {

@@ -118,6 +118,7 @@
                 "at": {
                   "kind": "decision"
                 },
+                "orientation": "labelled",
                 "distinct": true,
                 "yes": {
                   "kind": "process"
@@ -136,10 +137,10 @@
         "anyOf": [
           "sum|total|numbers|\\[i\\]|add",
           "next|another|more|each|loop|\\bi\\b|index",
-          "\\b0\\b|start|zero",
+          "\\b0\\b|zero|initial",
           "return|print|show|log|output"
         ],
-        "min": 2,
+        "min": 3,
         "capTo": 13,
         "fail": "None of your shapes say what this program does. Label each shape in your own words."
       }

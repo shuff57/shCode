@@ -85,7 +85,7 @@
     {
       "id": "s9",
       "title": "Write saveStock and loadStock",
-      "instructions": "Save: the list goes to localStorage as JSON text under a key you choose (3.8.15). Load: read the key back. A key that was never saved reads as null -- return the seed list then (3.8.15). Text you did not write can fail to parse, and 3.8.12 says what to do about it: do not let a bad value throw. When the seed list is handed back (a first run, or a bad value), return copies of its records built with spread ({ ...item }, 3.7.15), so nothing the program does later edits the seed data itself.",
+      "instructions": "Save: the list goes to localStorage as JSON text under a key you choose (3.8.15). Load: read the key back. A key that was never saved reads as null -- return the seed list then (3.8.15). Text you did not write can fail to parse, and 3.8.12 says what to do about it: do not let a bad value throw. When the seed list is handed back (a first run, or a bad value), return copies of its records built with spread ({ ...item }, 3.7.15), so nothing the program does later edits the seed data itself. One catch: an arrow that returns an object literal needs parentheses around the braces, or JavaScript reads the braces as a function body: (item) => ({ ...item }).",
       "hints": [
         "localStorage.setItem(KEY, JSON.stringify(list)); -- 3.8.4",
         "const text = localStorage.getItem(KEY);  if (text === null) { ... } -- 3.8.15",

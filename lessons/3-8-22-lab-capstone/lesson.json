@@ -3,6 +3,7 @@
   "title": "3.8.22 Lab: Saving-and-Loading Capstone",
   "description": "Combine the whole module: save a state object by key, load it back with the missing-key and bad-parse guards, and print the restored values. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.8.8",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",
@@ -113,7 +114,7 @@
       "points": 0,
       "id": "t1",
       "title": "saveState and loadState round-trip a state, and a missing key gives an object",
-      "description": "After saveState({ score: 7, level: 2 }), loadState() returns { score: 7, level: 2 }; saving a second state replaces it; with nothing stored loadState() returns an object. Help: 3.8.16 (Example: The Whole Pattern)",
+      "description": "After saveState({ score: 7, level: 2 }), loadState() returns { score: 7, level: 2 }; saving a second state replaces it; with nothing stored loadState() returns an object. Help: 3.8.16 (Example: The Whole Pattern) Text that will not parse gives the defaults, not an error.",
       "type": "tests",
       "hint": "saveState stores JSON.stringify(state) under a key; loadState reads the same key, returns the defaults when it is null, and otherwise returns JSON.parse of the text.",
       "variables": [
@@ -126,8 +127,8 @@
       ],
       "checks": [
         {
-          "expr": "typeof saveState === 'function' && typeof loadState === 'function' && (() => { saveState({ score: 7, level: 2 }); const a = loadState(); saveState({ score: 9, level: 5 }); const b = loadState(); localStorage.clear(); const d = loadState(); return JSON.stringify(a) === JSON.stringify({ score: 7, level: 2 }) && JSON.stringify(b) === JSON.stringify({ score: 9, level: 5 }) && d !== null && typeof d === 'object'; })()",
-          "fail": "saveState({ score: 7, level: 2 }) then loadState() should give back { score: 7, level: 2 }, a second save should replace it, and loadState() with nothing stored should return your defaults object."
+          "expr": "typeof saveState === 'function' && typeof loadState === 'function' && (() => { saveState({ score: 7, level: 2 }); const a = loadState(); saveState({ score: 9, level: 5 }); const b = loadState(); const orig = JSON.parse; let g; try { JSON.parse = () => { throw new SyntaxError('bad'); }; g = loadState(); } catch (e) { g = null; } finally { JSON.parse = orig; } localStorage.clear(); const d = loadState(); return JSON.stringify(a) === JSON.stringify({ score: 7, level: 2 }) && JSON.stringify(b) === JSON.stringify({ score: 9, level: 5 }) && g !== null && typeof g === 'object' && d !== null && typeof d === 'object'; })()",
+          "fail": "saveState({ score: 7, level: 2 }) then loadState() should give back { score: 7, level: 2 }, a second save should replace it, text that will not parse and a missing key should both give back your defaults object."
         }
       ]
     }

@@ -138,6 +138,32 @@ function blankStringContents(src: string): string {
       continue;
     }
     if (c === '`') { out += c; inTemplate = true; i++; continue; }
+    // A regular-expression literal is text, not code: `const r = /a.push(.)/` calls nothing.
+    // A '/' starts one when the last thing before it is an operator, an opening bracket, a
+    // separator, or return/typeof; after an identifier, a number or ')' / ']' it is division.
+    if (c === '/') {
+      const before = out.replace(/\s+$/, '');
+      const last = before[before.length - 1];
+      const startsRegex = before === '' || /[(,=:\[!&|?{};+\-*%<>~^]/.test(last) || /(?:^|[^\w$])(?:return|typeof)$/.test(before);
+      if (startsRegex) {
+        let j = i + 1;
+        let inClass = false;
+        let closed = false;
+        while (j < n && src[j] !== '\n') {
+          const d = src[j];
+          if (d === '\\') { j += 2; continue; }
+          if (d === '[') inClass = true;
+          else if (d === ']') inClass = false;
+          else if (d === '/' && !inClass) { closed = true; break; }
+          j++;
+        }
+        if (closed && j > i + 1) {
+          out += '/' + ' '.repeat(j - i - 1) + '/';
+          i = j + 1;
+          continue;
+        }
+      }
+    }
     if (braces.length) {
       if (c === '{') braces[braces.length - 1]++;
       else if (c === '}') {

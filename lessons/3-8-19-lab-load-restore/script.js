@@ -13,3 +13,7 @@
 
 // STEP 4: Use console.log to print a property of the restored object, proving
 //         it came back as a real object and not a string.
+
+// TO TEST THE MISSING-KEY PATH: once your load code works, delete or comment
+// out the localStorage.setItem line from STEP 1 and run again. With nothing
+// stored, getItem returns null and your code should fall back to the default.

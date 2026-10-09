@@ -3,6 +3,7 @@
   "title": "3.6.16 Lab: Pass-by-Reference Capstone Practice",
   "description": "Build a small scorebook that adds scores without harming the caller's array, and a function that updates an object's property the caller can see. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.6.7",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.6 Functions: Pass by Value/Reference",
@@ -215,6 +216,21 @@
         {
           "expr": "typeof copyBook === 'function' && (l => { const c = copyBook(l); c.books.push('C'); return c !== l && c.books !== l.books && l.books.length === 2 && c.books.length === 3; })({ name: 'S', books: ['A', 'B'] })",
           "fail": "copyBook should give back a deep copy: after pushing onto the copy's books, the original library.books must still have its two items."
+        }
+      ]
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t4",
+      "title": "the callers' data is printed",
+      "description": "At least one array and one object are printed. Help: 3.6.5 (Changing vs. Reassigning)",
+      "type": "tests",
+      "hint": "Print the scores array, the song object and the library before and after each call, so the output shows what each function did.",
+      "checks": [
+        {
+          "expr": "output.some(l => l.includes('[')) && output.some(l => l.includes('{')) && output.length >= 4",
+          "fail": "Print the caller's arrays and objects after each call so the output shows which function changed what."
         }
       ]
     }

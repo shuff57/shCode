@@ -3,6 +3,7 @@
   "title": "3.4.13 Lab: Write a One-Line Arrow Callback",
   "description": "Write a helper that takes a callback, then pass it a one-line arrow. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.4.4",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",
@@ -15,7 +16,7 @@
     {
       "id": "s1",
       "title": "Write a helper that takes a function",
-      "instructions": "Define a function called transform with two parameters: a value and a function. Inside it, call the function you were handed and return its result. The helper should not know what the function does."
+      "instructions": "Define a function called transform with two parameters: a value and a function (in either order). Inside it, call the function you were handed on the value and return the result. The helper should not know what the function does."
     },
     {
       "id": "s2",
@@ -70,7 +71,7 @@
       "points": 0,
       "id": "t1",
       "title": "transform calls the function it is given and returns the result",
-      "description": "transform(2, n => n + 1) is 3, and transform(\"a\", s => s + \"b\") is \"ab\". Help: 3.4.11 (Passing a Function)",
+      "description": "transform(2, n => n + 1) is 3 and transform(\"a\", s => s + \"b\") is \"ab\", with the value and the function given in either order. Help: 3.4.11 (Passing a Function)",
       "type": "tests",
       "hint": "transform must call the second parameter with the first and return what comes back: return fn(value). It must not decide what the function does.",
       "variables": [
@@ -80,7 +81,7 @@
       ],
       "checks": [
         {
-          "expr": "typeof transform === 'function' && transform(2, n => n + 1) === 3 && transform('a', s => s + 'b') === 'ab'",
+          "expr": "typeof transform === 'function' && (ok => (ok(2, n => n + 1) === 3 && ok('a', s => s + 'b') === 'ab') || (ok(n => n + 1, 2) === 3 && ok(s => s + 'b', 'a') === 'ab'))((a, b) => { try { return transform(a, b); } catch (e) { return undefined; } })",
           "fail": "transform(2, n => n + 1) should give 3 and transform(\"a\", s => s + \"b\") should give \"ab\". Call the function you were handed with the value, and return the result."
         }
       ]

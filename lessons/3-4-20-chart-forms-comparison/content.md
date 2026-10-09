@@ -43,6 +43,8 @@ At least eight shapes, at least two decision diamonds, at least three task recta
 
 That last question is the whole comparison. Braces mean a block body and an explicit `return`; no braces on a single-expression arrow means the implicit return does the work.
 
+Each exit of that last question gets its own task (one for the braces form, one for the arrow form), and then all three forms meet at the one print.
+
 ### The point of the lesson
 
 The three forms are one operation, written three ways — the chart should say so. If your chart has three separate Start-to-End strips that never meet, it is describing three programs rather than one choice made three times. All paths belong to the same print at the end.

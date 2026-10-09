@@ -3,6 +3,7 @@
   "title": "3.4.16 Lab: Rewrite 3 Named Functions as Arrows",
   "description": "Convert three function declarations into one-line arrow expressions and confirm each still behaves the same. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.4.5",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",
@@ -20,7 +21,7 @@
     {
       "id": "s2",
       "title": "Convert each to an arrow",
-      "instructions": "Rewrite each declaration as a const assigned a one-line arrow function, using implicit return. Keep the same parameters and the same returned value as the declaration it replaces."
+      "instructions": "Rewrite each declaration as a const assigned a one-line arrow function, using implicit return. Keep the same parameters and the same returned value as the declaration it replaces. Give each arrow a new name; reusing a declaration's name in the same file is a SyntaxError."
     },
     {
       "id": "s3",
@@ -70,13 +71,13 @@
       "points": 0,
       "id": "t1",
       "title": "all three results are printed",
-      "description": "The output has at least three printed lines, one for each arrow you call. Help: 3.4.8 (Shorthand Rules)",
+      "description": "At least three values are printed, and they are not all the same. Help: 3.4.8 (Shorthand Rules)",
       "type": "tests",
-      "hint": "Call each of the three arrows and print every result with console.log.",
+      "hint": "Call each of the three arrows and print every result. Printing the three results on one line, separated by commas, is fine.",
       "checks": [
         {
-          "expr": "output.length >= 3",
-          "fail": "Print one line for each of your three arrows: call each one and wrap the call in console.log."
+          "expr": "(T => T.length >= 3 && new Set(T).size >= 2)(output.join(' ').split(/\\s+/).filter(Boolean))",
+          "fail": "Print the result of each of your three arrows (one console.log each, or all three in one). Three different jobs should give different results."
         }
       ]
     }

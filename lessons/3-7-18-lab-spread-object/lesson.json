@@ -3,6 +3,7 @@
   "title": "3.7.18 Lab: Build a New Object with Spread + Override",
   "description": "Use object spread to copy an object with one property overridden and one property added, leaving the original untouched. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.7.6",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",
@@ -21,12 +22,12 @@
     {
       "id": "s2",
       "title": "Copy with one property overridden",
-      "instructions": "Use object spread to build a copy of settings with one existing property changed. The override must be written after the spread."
+      "instructions": "Use object spread to build a copy of settings called changed, with one existing property changed. The override must be written after the spread."
     },
     {
       "id": "s3",
       "title": "Copy with a new property added",
-      "instructions": "Use object spread again to build a second copy with a new property that settings did not have."
+      "instructions": "Use object spread again to build a second copy called extended, with a new property that settings did not have."
     },
     {
       "id": "s4",
@@ -99,12 +100,18 @@
             "fontSize": 14,
             "wrap": true
           }
+        },
+        {
+          "name": "changed"
+        },
+        {
+          "name": "extended"
         }
       ],
       "checks": [
         {
-          "expr": "output.filter(l => /^\\s*[\\[{]/.test(l)).length >= 3",
-          "fail": "Print both copies and the original settings object (three lines)."
+          "expr": "Object.keys(changed).length === 3 && Object.keys(changed).filter(k => changed[k] !== settings[k]).length === 1 && Object.keys(extended).length === 4 && Object.keys(settings).every(k => extended[k] === settings[k]) && (J => Object.values(changed).every(v => J.includes(String(v))) && Object.values(extended).every(v => J.includes(String(v))))(output.join(' '))",
+          "fail": "changed should be settings with exactly one property changed, extended should be settings plus one new property, settings itself must stay the same, and your output should show both copies."
         }
       ]
     }

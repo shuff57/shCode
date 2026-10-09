@@ -4103,7 +4103,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.4.8",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5104,7 +5104,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.4.3",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5143,7 +5143,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.4.4",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5182,7 +5182,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.4.5",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5195,7 +5195,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.4.6",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5221,7 +5221,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.4.7",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5299,7 +5299,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.4.2",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5403,7 +5403,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.5.4",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5442,7 +5442,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.5.5",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5481,7 +5481,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.5.6",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5546,7 +5546,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.5.7",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5572,7 +5572,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.5.8",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5585,7 +5585,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.5.9",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5637,7 +5637,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.5.2",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5676,7 +5676,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8,
-      "assignmentCode": null,
+      "assignmentCode": "A3.5.3",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5728,7 +5728,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
-      "assignmentCode": null,
+      "assignmentCode": "A3.6.5",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5741,14 +5741,14 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
-      "assignmentCode": null,
+      "assignmentCode": "A3.6.6",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
     },
     {
       "id": "3-6-14-example-6-2-defensive-copy",
-      "title": "3.6.14 Worked Example: Why 6.2 Copies Before It Loops",
+      "title": "3.6.14 Worked Example: Why a Function Copies Before It Loops",
       "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "example",
       "type": "lesson",
@@ -5767,7 +5767,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
-      "assignmentCode": null,
+      "assignmentCode": "A3.6.7",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5806,7 +5806,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
-      "assignmentCode": null,
+      "assignmentCode": "A3.6.3",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5858,7 +5858,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
-      "assignmentCode": null,
+      "assignmentCode": "A3.6.4",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5910,7 +5910,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9,
-      "assignmentCode": null,
+      "assignmentCode": "A3.7.4",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -5988,7 +5988,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9,
-      "assignmentCode": null,
+      "assignmentCode": "A3.7.5",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6001,7 +6001,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9,
-      "assignmentCode": null,
+      "assignmentCode": "A3.7.6",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6047,13 +6047,13 @@
     },
     {
       "id": "3-7-21-lab-mutating-sort-drill",
-      "title": "3.7.21 Lab: Mutating vs. Non-Mutating Method Sort Drill",
+      "title": "3.7.21 Lab: Mutating vs. Non-Mutating Methods Drill",
       "unit": "3.7 Array Methods",
       "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9,
-      "assignmentCode": null,
+      "assignmentCode": "A3.7.7",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6066,7 +6066,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9,
-      "assignmentCode": null,
+      "assignmentCode": "A3.7.8",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6105,7 +6105,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9,
-      "assignmentCode": null,
+      "assignmentCode": "A3.7.2",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6157,7 +6157,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9,
-      "assignmentCode": null,
+      "assignmentCode": "A3.7.3",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6196,7 +6196,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 10,
-      "assignmentCode": null,
+      "assignmentCode": "A3.8.3",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6209,7 +6209,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 10,
-      "assignmentCode": null,
+      "assignmentCode": "A3.8.4",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6248,7 +6248,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 10,
-      "assignmentCode": null,
+      "assignmentCode": "A3.8.5",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6300,7 +6300,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 10,
-      "assignmentCode": null,
+      "assignmentCode": "A3.8.6",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6313,7 +6313,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 10,
-      "assignmentCode": null,
+      "assignmentCode": "A3.8.7",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6365,7 +6365,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 10,
-      "assignmentCode": null,
+      "assignmentCode": "A3.8.8",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6378,7 +6378,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 10,
-      "assignmentCode": null,
+      "assignmentCode": "A3.8.9",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
@@ -6456,7 +6456,7 @@
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 10,
-      "assignmentCode": null,
+      "assignmentCode": "A3.8.2",
       "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null

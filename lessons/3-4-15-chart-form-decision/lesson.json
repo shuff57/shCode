@@ -1,7 +1,7 @@
 {
   "id": "3-4-15-chart-form-decision",
   "title": "3.4.15 Chart the Code: Decision Tree for Form Choice",
-  "description": "Chart the rule for choosing between a declaration, an expression, and an arrow: is it a main operation or a short helper, and how many parameters does it take?",
+  "description": "Chart the rule for choosing between a declaration, an expression, and an arrow: is it a main operation called from several places, and is its body a single expression?",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -130,7 +130,7 @@
           "write|use|choose|return",
           "yes|no|job|read"
         ],
-        "min": 2,
+        "min": 3,
         "capTo": 13,
         "fail": "None of your shapes say what this program does. Label each shape in your own words."
       }

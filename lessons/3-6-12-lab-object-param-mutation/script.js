@@ -7,7 +7,7 @@
 //         Add 1 to that object's age property. Change the PROPERTY the object
 //         already has; do not point the parameter at a new object.
 
-// STEP 2: Create an object with a name and an age. Call birthday with it.
+// STEP 2: Create an object called user with a name and an age. Call birthday with it.
 //         console.log the caller's object afterwards and confirm the age
 //         changed, because both names point at the same object.
 

@@ -3,6 +3,7 @@
   "title": "3.4.21 Lab: Parameters, Return Values, and Arrow Syntax",
   "description": "Write a function with a parameter and a return value, a second function of your own, and an arrow function, then call them and print the results. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.4.8",
   "estimateMins": 40,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",

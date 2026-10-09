@@ -3,6 +3,7 @@
   "title": "3.5.8 Lab: Dot vs. Bracket — When You're Forced to Bracket",
   "description": "Read a key with a space and a key held in a variable, and print every key/value pair with Object.keys. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.5.3",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",
@@ -15,7 +16,7 @@
     {
       "id": "s1",
       "title": "Build an object with a spaced key",
-      "instructions": "Create an object that has at least one property whose key contains a space, written in quotes, such as \"screen size\"."
+      "instructions": "Create an object called laptop that has at least one property whose key contains a space, written in quotes, such as \"screen size\"."
     },
     {
       "id": "s2",
@@ -86,6 +87,26 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Inside the loop the key is held in a variable, so fetch the value with that variable in square brackets."
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "id": "t1",
+      "title": "laptop has a spaced key, and every key and value is printed",
+      "description": "laptop has a key containing a space, and the output shows every key and every value of laptop. Help: 3.5.6 (Square Brackets and Computed Keys)",
+      "type": "tests",
+      "hint": "Loop over Object.keys(laptop) and print each key with its value (fetched with brackets). Every key and value should appear in the output.",
+      "variables": [
+        {
+          "name": "laptop"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "laptop !== null && typeof laptop === 'object' && Object.keys(laptop).some(k => k.includes(' ')) && (J => Object.keys(laptop).every(k => J.includes(k)) && Object.values(laptop).every(v => J.includes(String(v))))(output.join(' '))",
+          "fail": "laptop needs a key with a space in it, and your output must show every key and every value, so loop over Object.keys(laptop) and print them all."
+        }
+      ]
     }
   ],
   "grading": {

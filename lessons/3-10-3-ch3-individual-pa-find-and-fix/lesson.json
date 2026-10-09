@@ -68,7 +68,7 @@
       "pattern": "return\\s+(?:[A-Za-z_$][\\w$]*\\s*\\+|[A-Za-z_$][\\w$]*\\s*===|item\\.)|=>\\s*(?:[A-Za-z_$][\\w$]*\\s*\\+|item\\.\\w+\\s*\\+)",
       "flags": "",
       "points": 0,
-      "hint": "Run it. The receipt prints undefined for every line. Work out on paper what three price lines should say, then compare. If they disagree, ask what an arrow with braces returns when it never says return (3.4.8).",
+      "hint": "Run it. The receipt prints a single undefined where three price lines should be. Work out on paper what three price lines should say, then compare. An arrow with braces returns nothing unless it says return (3.4.8); check BOTH the inner arrow and the function around it.",
       "stripComments": false
     },
     {

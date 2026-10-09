@@ -1,6 +1,6 @@
 // 3.5.8 Dot vs. Bracket
 
-// STEP 1: Create an object that has at least one property whose name
+// STEP 1: Create an object called laptop that has at least one property whose name
 //         contains a space. Write that key in quotes.
 
 // STEP 2: Print the value of the spaced-out property. A dot cannot reach

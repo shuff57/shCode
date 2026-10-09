@@ -3,6 +3,7 @@
   "title": "3.5.25 Lab: Objects Capstone — Build, Read, Destructure",
   "description": "Build an array of records, read fields with dots and brackets, and destructure a record into variables. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.5.9",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",
@@ -41,7 +42,7 @@
     {
       "id": "s6",
       "title": "Walk the keys",
-      "instructions": "Use Object.keys with a loop to print every key and value of one record, fetching each value with brackets."
+      "instructions": "Use Object.keys with a loop to print every key and value of one record, fetching each value with brackets. A nested object prints as [object Object] when you join it into text; that is expected here."
     }
   ],
   "requirements": [
@@ -146,7 +147,7 @@
       "points": 0,
       "id": "t1",
       "title": "cart holds three or more records, one with a nested object and one with a spaced key",
-      "description": "cart is an array of at least three objects, one record holds a nested object, one record has a key containing a space, and the program prints at least eight lines. Help: 3.5.23 (Example: Record Shape)",
+      "description": "cart is an array of at least three objects, one record holds a nested object, one record has a key containing a space, and the program prints at least eight lines. Help: 3.5.23 (Example: Record Shape) Each record's cost (price times quantity) is in the output.",
       "type": "tests",
       "hint": "Build cart with three or more objects. Give one a nested object as a field and one a quoted key with a space in it, then print what the steps ask for.",
       "variables": [
@@ -156,7 +157,7 @@
       ],
       "checks": [
         {
-          "expr": "Array.isArray(cart) && cart.length >= 3 && cart.every(r => r && typeof r === 'object' && !Array.isArray(r)) && cart.some(r => Object.values(r).some(v => v && typeof v === 'object' && !Array.isArray(v))) && cart.some(r => Object.keys(r).some(k => k.includes(' '))) && output.length >= 8",
+          "expr": "Array.isArray(cart) && cart.length >= 3 && cart.every(r => r && typeof r === 'object' && !Array.isArray(r)) && cart.some(r => Object.values(r).some(v => v && typeof v === 'object' && !Array.isArray(v))) && cart.some(r => Object.keys(r).some(k => k.includes(' '))) && output.length >= 8 && (rs => rs.length >= 3 && (J => rs.every(r => J.includes(String(Math.round(r.price * r.quantity * 100) / 100))))(output.join(' ')))(cart.filter(r => typeof r.price === 'number' && typeof r.quantity === 'number'))",
           "fail": "cart should be an array of at least three records, one with a nested object field and one with a key that contains a space, and the program should print at least eight lines."
         }
       ]

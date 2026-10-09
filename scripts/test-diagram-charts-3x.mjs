@@ -35,6 +35,7 @@ function total(cfg, doc) {
 }
 const rename = (doc) => ({ ...doc, nodes: doc.nodes.map((nd, i) => (nd.shape === 'terminal' ? nd : { ...nd, label: `step ${i}` })) });
 const flat = (doc) => ({ ...doc, nodes: doc.nodes.map((nd) => (nd.shape === 'terminal' ? nd : { ...nd, shape: 'process' })) });
+const flip = (text) => text.replace(/\|yes\|/g, '|TMP|').replace(/\|no\|/g, '|yes|').replace(/\|TMP\|/g, '|no|');
 const swap = (text, a, b) => { if (!text.includes(a)) throw new Error('anchor missing: ' + a); return text.replace(a, b); };
 
 const CASES = {
@@ -43,20 +44,17 @@ const CASES = {
   A([Start])
   B[/take in the function and the number/]
   C[call the function once on the number]
-  D{have I called it twice?}
-  E[call the function on that answer]
-  F[/show the answer/]
+  D[call the function on that answer]
+  E[/show the answer/]
   Z([End])
   A --> B
   B --> C
   C --> D
-  D -->|no| E
-  E --> D
-  D -->|yes| F
-  F --> Z`,
+  D --> E
+  E --> Z`,
     mutations: {
-      'second application drops straight to the print (no loop back)': (t) => swap(t, '  E --> D\n', '  E --> F\n'),
-      'print before the decision': (t) => swap(swap(t, '  D -->|yes| F\n  F --> Z', '  D -->|yes| Z'), '  B --> C', '  B --> F\n  F --> C'),
+      'a loop that is not in the code': (t) => swap(t, '  D --> E\n', '  D --> C\n  D --> E\n'),
+      'only two steps before the print': (t) => swap(swap(t, '  C --> D\n  D --> E\n', '  C --> E\n'), '  D[second = operation of first]\n', ''),
     },
   },
   '3-4-15-chart-form-decision': {
@@ -155,6 +153,7 @@ const CASES = {
   E --> F
   F --> Z`,
     mutations: {
+      'yes and no arrows swapped': (t) => flip(t),
       'decision before any task': (t) => swap(swap(t, '  A --> B\n  B --> C\n  C --> D\n', '  A --> D\n  D --> B\n  B --> C\n'), '  D -->|yes| E\n  D -->|no| F\n', '  C -->|yes| E\n  C -->|no| F\n'),
       'both exits go to the same place': (t) => swap(t, '  D -->|yes| E\n', '  D -->|yes| F\n'),
     },
@@ -208,6 +207,7 @@ const CASES = {
   D -->|no| F
   F --> Z`,
     mutations: {
+      'yes and no arrows swapped': (t) => flip(t),
       'print inside the loop, the loop never ends': (t) => swap(swap(t, '  D -->|no| F\n  F --> Z', '  D -->|no| F\n  F --> C\n  C --> Z'), '  E --> C\n', '  E --> C\n'),
       'no arrow back': (t) => swap(t, '  E --> C\n', '  E --> F\n'),
       'no hexagon': (t) => swap(t, '{{for each price in prices}}', '[for each price in prices]'),
@@ -230,6 +230,7 @@ const CASES = {
   D -->|no| F
   F --> Z`,
     mutations: {
+      'yes and no arrows swapped': (t) => flip(t),
       'no arrow back': (t) => swap(t, '  E --> C\n', '  E --> F\n'),
       'no hexagon': (t) => swap(t, '{{for i from 0 to numbers.length - 1}}', '[for i from 0 to numbers.length - 1]'),
     },

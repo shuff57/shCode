@@ -3,6 +3,7 @@
   "title": "3.5.12 Lab: Build a Small Nested-Object Structure",
   "description": "Build an object with a nested object and an array of objects, then read values out of it. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.5.4",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",
@@ -104,7 +105,7 @@
       "points": 0,
       "id": "t1",
       "title": "order holds a customer object and a list of items, and each item is printed",
-      "description": "order.customer has a name, order.items is an array of at least two objects each with a name and a price, and the customer and every item are printed. Help: 3.5.9 (Nested Objects)",
+      "description": "order.customer has a name, order.items is an array of at least two objects each with a name and a price, and the output shows the customer name and every item name and price. Help: 3.5.9 (Objects Inside Objects and Arrays)",
       "type": "tests",
       "hint": "Build order with a customer object (with a name) and an items array holding at least two objects, each with a name and a price. Then print the customer name and loop over the items.",
       "variables": [
@@ -114,8 +115,8 @@
       ],
       "checks": [
         {
-          "expr": "order && order.customer && typeof order.customer.name === 'string' && Array.isArray(order.items) && order.items.length >= 2 && order.items.every(i => i && typeof i.name === 'string' && typeof i.price === 'number') && output.length >= 1 + order.items.length",
-          "fail": "order needs a customer object with a name and an items array of at least two objects, each with a name (text) and a price (number). Print the customer name, then one line for every item."
+          "expr": "order && order.customer && typeof order.customer.name === 'string' && Array.isArray(order.items) && order.items.length >= 2 && order.items.every(i => i && typeof i.name === 'string' && typeof i.price === 'number') && (J => J.includes(order.customer.name) && order.items.every(i => J.includes(i.name) && J.includes(String(i.price))))(output.join(' '))",
+          "fail": "order needs a customer object with a name and an items array of at least two objects, each with a name (text) and a price (number), and the output must show the customer name and every item name and price."
         }
       ]
     }

@@ -42,3 +42,21 @@ Findings, ranked. Tick a step when it is committed and `npm test` is green.
       3.8.21 three lines); 3.5.17/3.5.20/3.5.26/3.7.2 small text errors; 3.7.23 answer positions rebalanced (1,3,0,2,1,3,0,2).
       Not done on purpose: 3.6.10 was not moved before 3.6.9 (titles carry the order; the text now reads correctly in place);
       3.10.5's "own copy" is the single-record spread override that 3.6.12 and 3.7.15 already teach.
+
+## Round 2: browser walkthroughs (2026-10-09, four agents: beginner, moderate, advanced, teacher)
+
+- [x] **Batch 1, graders.** Regex literals are blanked like strings (`/a.push(.)/` no longer counts). Honest answers that were refused now pass:
+      shorthand methods (3.5.15, 3.8.7), `catch {` (3.8.14), a ternary guard (3.8.19), several results in one `console.log`
+      (3.4.10, 3.4.16, 3.8.23), labelled prints (`console.log("doubled:", doubled)`), `transform(fn, value)` in either order (3.4.13).
+      Hollow answers that passed now fail: the output checks match printed CONTENT against named variables (`doubled`, `middle`, `tail`, `first`/`second`/`joined`,
+      `combined`/`framed`, `changed`/`extended`, `bumped`, `laptop`, `user`, `student`/`shallow`/`deep`) instead of counting lines;
+      3.8.14 and 3.8.22 try bad text (`{"a":`, a throwing `JSON.parse`); 3.5.25 and 3.5.12 need the computed costs / names printed.
+- [x] **Batch 2, charts.** `orientation:'labelled'` pins yes/no on 3.5.21, 3.7.5, 3.7.16 (the lesson now says how to phrase the question);
+      the relevance gate needs 3 of 4-5 word groups; the 3.7.16 gate no longer matches the "Start" oval; 3.4.9 is a straight-line chart
+      (the old text invented a decision the code does not have); 3.6.7 / 3.4.20 / 3.8.17 text agrees with their checkers.
+- [x] **Counted labs (owner decision 2026-10-09: "count every 3.4-3.8 lab").** All 35 console labs got codes A3.4.2-A3.4.8, A3.5.2-A3.5.9,
+      A3.6.3-A3.6.7, A3.7.2-A3.7.8, A3.8.2-A3.8.9 (skipping the numbers `curriculum-plan.md` reserves), completion credit, unlimited tries.
+      Charts stay practice. Pinned in `scripts/test-grading.mjs`.
+- [ ] **Batch 3, teacher screens and phone layout** (see the teacher agent's list): gradebook module filter; chart score explanation in the drawer;
+      red requirements per student; Today queue routing for charts; `/module/3.x` at 390px; Late badge only on graded lessons; drawer Late tag;
+      review-queue copy; time input clipping; inherited date text; "512 lessons"; Quest badges; lab page at 390px; editor notice for a refused arrow.

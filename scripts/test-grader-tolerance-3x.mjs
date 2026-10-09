@@ -104,10 +104,10 @@ reject('3-1-10-functions', 'greet defined but never called', 'req4',
 // ---- 3.5.12: alias and for...of both read a field off a record
 accept('3-5-12-lab-nested-structure', 'for...of over the array, field read off the loop variable',
   js('const order = { customer: { name: "Ana" }, items: [{ name: "pen", price: 2 }, { name: "ink", price: 1 }] };',
-     'console.log(order.customer.name);', 'for (const item of order.items) { console.log(item.name); }'));
+     'console.log(order.customer.name);', 'for (const item of order.items) { console.log(item.name, item.price); }'));
 accept('3-5-12-lab-nested-structure', 'index into the array through an alias',
   js('const order = { customer: { name: "Ana" }, items: [{ name: "pen", price: 2 }, { name: "ink", price: 1 }] };',
-     'console.log(order.customer.name);', 'for (let i = 0; i < order.items.length; i++) { const item = order.items[i]; console.log(item.name); }'));
+     'console.log(order.customer.name);', 'for (let i = 0; i < order.items.length; i++) { const item = order.items[i]; console.log(item.name + " " + item.price); }'));
 
 // ---- 3.5.15: arrow method
 accept('3-5-15-lab-add-method', 'method written as an arrow',
@@ -132,7 +132,7 @@ accept('3-6-4-lab-predict-primitive-vs-array', 'arrow versions',
      'let x = 1; const l = [1];', 'changeNum(x); changeArr(l);', 'console.log(x, l);'));
 accept('3-6-12-lab-object-param-mutation', 'arrow versions',
   js('const birthday = (p) => { p.age++; };', 'const birthdaySafe = (p) => ({ ...p, age: p.age + 1 });',
-     'const a = { age: 10 };', 'birthday(a);', 'console.log(a, birthdaySafe(a));'));
+     'const user = { name: "A", age: 10 };', 'birthday(user);', 'console.log(user, birthdaySafe(user));'));
 accept('3-6-16-lab-capstone', 'arrow versions, structuredClone inside copyBook',
   js('const addScore = (s, n) => [...s, n];', 'const recordPlay = (song) => { song.plays++; };',
      'const copyBook = (b) => structuredClone(b);', 'console.log(addScore([1], 2), copyBook({ a: [1] }));',
@@ -145,7 +145,7 @@ reject('3-6-16-lab-capstone', 'copyBook returns its argument; structuredClone us
 accept('3-7-21-lab-mutating-sort-drill', 'filter as the non-mutating call',
   js('const a = [1, 2, 3];', 'a.push(4);', 'console.log(a.filter((n) => n > 1));', 'console.log(a);'));
 accept('3-7-18-lab-spread-object', 'quoted key as the override',
-  js('const settings = { theme: "dark", fontSize: 14, wrap: true };', 'const t = { ...settings, "font size": 14 };', 'const u = { ...settings, wrap: false };', 'console.log(t);', 'console.log(u);', 'console.log(settings);'));
+  js('const settings = { theme: "dark", fontSize: 14, wrap: true };', 'const extended = { ...settings, "font size": 14 };', 'const changed = { ...settings, wrap: false };', 'console.log(extended);', 'console.log(changed);', 'console.log(settings);'));
 
 // ---- runtime checks (step 3 of .gauntlet/SPEC-module-3x-hardening.md): 3.4
 reject('3-4-17-lab-fix-broken-arrow', 'parenthesised but the body is wrong (=> 0)', 't1',
@@ -218,9 +218,9 @@ reject('3-6-12-lab-object-param-mutation', 'birthday copies, birthdaySafe mutate
 reject('3-6-12-lab-object-param-mutation', 'birthdaySafe mutates its argument', 't2',
   js('function birthday(p) { p.age++; }', 'function birthdaySafe(p) { p.age++; return p; }',
      'const a = { name: "A", age: 10 };', 'birthday(a);', 'console.log(a, { ...a, x: 1 });'));
-accept('3-6-12-lab-object-param-mutation', 'Object.assign copy',
+reject('3-6-12-lab-object-param-mutation', 'Object.assign copy: step 3 asks for spread', 'r4',
   js('function birthday(p) { p.age += 1; }', 'function birthdaySafe(p) { const c = Object.assign({}, p); c.age = p.age + 1; return c; }',
-     'const a = { name: "A", age: 10 };', 'birthday(a);', 'console.log(a, { ...a });', 'console.log(birthdaySafe(a));'));
+     'const user = { name: "A", age: 10 };', 'birthday(user);', 'console.log("user:", user);', 'console.log(birthdaySafe(user));'));
 reject('3-6-13-lab-nested-mutation', 'copies made, nothing printed', 't1',
   js('const s = { n: "A", scores: [1] };', 'const a = { ...s };', 'a.scores.push(2);', 'const b = structuredClone(s);', 'b.scores.push(3);'));
 reject('3-6-16-lab-capstone', 'addScore pushes onto the caller\'s array', 't1',
@@ -237,7 +237,7 @@ reject('3-6-16-lab-capstone', 'copyBook is a shallow copy', 't3',
 reject('3-7-4-lab-map-non-mutating', 'map callback overwrites prices', 't1',
   js('const prices = [10, 20, 30];', 'const doubled = prices.map((x, i) => { prices[i] = x * 2; return x * 2; });', 'console.log(doubled);', 'console.log(prices);'));
 accept('3-7-4-lab-map-non-mutating', 'map into a new variable, both printed',
-  js('const prices = [10, 20, 30];', 'const withTax = prices.map(p => p * 2);', 'console.log(withTax);', 'console.log(prices);'));
+  js('const prices = [10, 20, 30];', 'const doubled = prices.map(p => p * 2);', 'console.log("doubled:", doubled);', 'console.log(prices);'));
 reject('3-7-8-lab-slice-sublist', 'items too short, nothing printed', 't1',
   js('const items = [1, 2];', 'const a = items.slice(0, 1);', 'const b = items.slice(1);'));
 reject('3-7-11-lab-concat-two-lists', 'joined but only one line printed', 't1',
@@ -281,6 +281,48 @@ accept('3-8-22-lab-capstone', 'all-arrow version',
      'saveState({ score: 75, level: 5 });', 'const restored = loadState();', 'console.log(restored.score);'));
 reject('3-8-23-lab-adapt-to-list', 'the list is never restored', 't1',
   js('const records = [{ name: "a", v: 1 }, { name: "b", v: 2 }];', 'localStorage.setItem("k", JSON.stringify(1));', 'const restored = JSON.parse("1");', 'console.log(1);', 'console.log(2);'));
+
+// ---- batch 1 of the browser walkthrough fixes (2026-10-09)
+// honest answers that were refused
+accept('3-4-10-lab-implicit-return-drill', 'three results in one console.log',
+  js('const a = (n) => n * 2;', 'const b = (n) => n > 0;', 'const c = (x, y) => x + " " + y;', 'console.log(a(4), b(2), c("Ada", "Lovelace"));'));
+accept('3-4-13-lab-one-line-callback', 'function first, value second',
+  js('function transform(fn, value) { return fn(value); }', 'console.log(transform((n) => n + 4, 6));'));
+accept('3-5-15-lab-add-method', 'shorthand method',
+  js('const dog = { name: "Rex", speak() { return "Woof"; } };', 'console.log(dog.speak());'));
+accept('3-8-7-lab-stringify-spot-drops', 'shorthand method, labelled print',
+  js('const counter = { count: 1, note: undefined, describe() { return "hi"; } };', 'const json = JSON.stringify(counter);', 'console.log("json:", json);'));
+accept('3-8-14-lab-malformed-json', 'catch without a binding',
+  js('function readSave(text) { try { return JSON.parse(text); } catch { return { ok: false }; } }', 'console.log(readSave(\'{"a":1}\'));', 'console.log(readSave("junk"));'));
+accept('3-8-19-lab-load-restore', 'ternary guard',
+  js('const defaults = { score: 0 };', 'localStorage.setItem("k", JSON.stringify({ score: 5 }));', 'const text = localStorage.getItem("k");',
+     'let restored = defaults;', 'try { restored = text ? JSON.parse(text) : defaults; } catch (e) { restored = defaults; }', 'console.log("score:", restored.score);'));
+accept('3-8-23-lab-adapt-to-list', 'length and field in one console.log',
+  js('const records = [{ name: "Pen", price: 2 }, { name: "Pad", price: 5 }];', 'localStorage.setItem("records", JSON.stringify(records));',
+     'const restored = JSON.parse(localStorage.getItem("records"));', 'console.log(restored.length, restored[0].name);'));
+accept('3-7-11-lab-concat-two-lists', 'labelled prints',
+  js('const first = [1, 2, 3];', 'const second = [4, 5, 6];', 'const joined = first.concat(second);', 'console.log("joined:", joined);', 'console.log("first:", first);', 'console.log("second:", second);'));
+// answers that only look right
+reject('3-4-10-lab-implicit-return-drill', 'three arrows that all return the same thing', 't1',
+  js('const a = () => 1;', 'const b = () => 1;', 'const c = () => 1;', 'console.log(1);', 'console.log(1);', 'console.log(1);'));
+reject('3-5-8-lab-dot-vs-bracket', 'regex literals instead of code', 'r3',
+  js('const a = /o["a b"]/, b = /Object.keys(.)/, c = /o[k]/;'));
+reject('3-7-21-lab-mutating-sort-drill', 'regex literals instead of code', 'r2',
+  js('const r = /a.push(.)/, s = /a.map(.)/;', 'console.log(1);'));
+reject('3-5-8-lab-dot-vs-bracket', 'bare lines and nothing printed', 't1',
+  js('const laptop = { brand: "F", "screen size": 13 };', 'laptop["screen size"];', 'const k = "brand";', 'laptop[k];', 'Object.keys(laptop);'));
+reject('3-5-12-lab-nested-structure', 'bare reads, empty loop, placeholder prints', 't1',
+  js('const order = { customer: { name: "Ana" }, items: [{ name: "pen", price: 2 }, { name: "ink", price: 1 }] };', 'order.customer.name;',
+     'for (let i = 0; i < 0; i++) { }', 'console.log("x");', 'console.log("x");', 'console.log("x");'));
+reject('3-5-25-lab-objects-capstone', 'counter output instead of costs', 't1',
+  js('const cart = [{ name: "a", price: 1.5, quantity: 10, details: { c: 1 } }, { name: "b", price: 3, quantity: 4, "item code": "x" }, { name: "c", price: 2, quantity: 5 }];',
+     'cart[0].name;', 'for (let k = 0; k < 8; k++) { console.log(k); }'));
+reject('3-8-14-lab-malformed-json', 'only text that starts with a brace is parsed', 't1',
+  js('function readSave(t) { if (t[0] === "{") { return JSON.parse(t); } return { ok: false }; }', 'console.log(readSave(\'{"a":1}\'));', 'console.log(readSave("junk"));'));
+reject('3-8-22-lab-capstone', 'loadState has no guard around the parse', 't1',
+  js('const defaults = { score: 0, level: 1 };', 'function saveState(s) { localStorage.setItem("k", JSON.stringify(s)); }',
+     'function loadState() { const t = localStorage.getItem("k"); if (t === null) { return defaults; } return JSON.parse(t); }',
+     'try { } catch (e) { }', 'saveState({ score: 75, level: 5 });', 'console.log(loadState().score);'));
 
 try {
   execFileSync(process.execPath, [

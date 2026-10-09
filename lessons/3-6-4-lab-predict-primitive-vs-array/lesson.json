@@ -3,6 +3,7 @@
   "title": "3.6.4 Lab: Predict Output — Primitive vs. Array Argument",
   "description": "Write one function that reassigns a number parameter and one that mutates an array parameter, then log the caller's variables to prove which change escaped. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.6.3",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.6 Functions: Pass by Value/Reference",
@@ -95,7 +96,7 @@
       ],
       "checks": [
         {
-          "expr": "typeof changeNum === 'function' && typeof changeArr === 'function' && (a => { changeArr(a); return a.length === 3 && a[0] === 1 && a[1] === 2; })([1, 2]) && output.length >= 2",
+          "expr": "typeof changeNum === 'function' && typeof changeArr === 'function' && (a => { changeArr(a); return a.length === 3 && a[0] === 1 && a[1] === 2; })([1, 2]) && output.length >= 2 && output.some(l => l.includes('['))",
           "fail": "changeArr should add one item to the array it receives, so changeArr([1, 2]) leaves [1, 2, something]. Print the number and the array after calling both functions."
         }
       ]

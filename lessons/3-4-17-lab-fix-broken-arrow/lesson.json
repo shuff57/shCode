@@ -3,6 +3,7 @@
   "title": "3.4.17 Lab: Fix a Broken Arrow",
   "description": "A two-parameter arrow function was written without the parentheses around its parameters, so the line will not parse. Fix it. Auto-graded.",
   "type": "assignment",
+  "assignmentCode": "A3.4.6",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",
@@ -15,7 +16,7 @@
     {
       "id": "s1",
       "title": "Run the broken code",
-      "instructions": "Run the starter. The line where the arrow is defined throws a syntax error before anything else runs."
+      "instructions": "Run the starter. The line where the arrow is defined throws a syntax error before anything else runs. The message may not mention parentheses; the clue is that the error is on the line that defines the arrow."
     },
     {
       "id": "s2",
@@ -88,6 +89,22 @@
             6
           ],
           "expect": 30,
+          "hidden": true
+        },
+        {
+          "args": [
+            7,
+            8
+          ],
+          "expect": 56,
+          "hidden": true
+        },
+        {
+          "args": [
+            1,
+            9
+          ],
+          "expect": 9,
           "hidden": true
         }
       ]
