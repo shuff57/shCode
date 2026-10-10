@@ -14,7 +14,7 @@ import {
   CATEGORY_LABEL,
   lessonGradeCategory,
   lessonPercent,
-  weightedGradePercent,
+  coarseGrade,
   DEFAULT_WEIGHTS,
   GRADE_CATEGORIES,
   type GradeCategory,
@@ -115,8 +115,11 @@ export function studentGrading(
   const stateByLesson = new Map<string, StateRow>();
   for (const s of states) stateByLesson.set(s.lesson_id, s);
 
-  // Group course lessons by category, once, then read this student's state.
-  const grouped = new Map<GradeCategory, { percents: number[]; done: number }>();
+  // Collect every lesson that counts (done, or past due and not done), with its
+  // submodule, then let coarseGrade() roll it up: lessons -> submodule -> role.
+  const items: Array<{ category: GradeCategory; percent: number; moduleId: string | null }> = [];
+  const doneByRole = new Map<GradeCategory, number>();
+  const countedByRole = new Map<GradeCategory, number>();
   let gradedTotal = 0;
   let doneCount = 0;
   let missingCount = 0;
@@ -144,34 +147,28 @@ export function studentGrading(
       }
     }
     if (!counts) continue;
-    let bucket = grouped.get(category);
-    if (!bucket) {
-      bucket = { percents: [], done: 0 };
-      grouped.set(category, bucket);
-    }
-    bucket.percents.push(lessonPercent(state?.state, state?.score, scope.maxScore));
-    if (isDone) bucket.done += 1;
+    items.push({
+      category,
+      percent: lessonPercent(state?.state, state?.score, scope.maxScore),
+      moduleId: scope.moduleId ?? null,
+    });
+    const role = coarseGrade([{ category, percent: 0 }], weights).roles[0]?.role ?? category;
+    countedByRole.set(role, (countedByRole.get(role) ?? 0) + 1);
+    if (isDone) doneByRole.set(role, (doneByRole.get(role) ?? 0) + 1);
   }
 
-  const items: Array<{ category: GradeCategory; percent: number }> = [];
-  const categories: CategoryBreakdown[] = [];
-  for (const category of GRADE_CATEGORIES) {
-    const bucket = grouped.get(category);
-    if (!bucket) continue;
-    const avg = Math.round(bucket.percents.reduce((s, p) => s + p, 0) / bucket.percents.length);
-    categories.push({
-      category,
-      label: CATEGORY_LABEL[category],
-      weight: weights[category],
-      percent: avg,
-      done: bucket.done,
-      total: bucket.percents.length,
-    });
-    for (const p of bucket.percents) items.push({ category, percent: p });
-  }
+  const coarse = coarseGrade(items, weights);
+  const categories: CategoryBreakdown[] = coarse.roles.map((r) => ({
+    category: r.role,
+    label: CATEGORY_LABEL[r.role],
+    weight: weights[r.role],
+    percent: r.percent,
+    done: doneByRole.get(r.role) ?? 0,
+    total: countedByRole.get(r.role) ?? 0,
+  }));
 
   return {
-    percent: items.length === 0 ? 0 : weightedGradePercent(items, weights),
+    percent: items.length === 0 ? 0 : coarse.percent,
     categories,
     gradedTotal,
     doneCount,

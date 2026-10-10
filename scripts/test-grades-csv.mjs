@@ -31,16 +31,17 @@ check('commas, quotes and newlines are quoted and quotes doubled', () => {
 check('one header row and one row per student, with a column for every grade category', () => {
   const lines = buildGradesCsv([S(), S({ email: 'b@x.test', firstName: 'Ben', lastName: 'Franklin' })]).split('\r\n');
   assert.equal(lines.length, 3);
-  assert.equal(lines[0].split(',').length, 7 + 8);
+  assert.equal(lines[0].split(',').length, 7 + 9);
   assert.ok(lines[0].startsWith('last_name,first_name,email,grade_so_far_percent'));
 });
 
 check('a category the student has nothing counted in is blank, not 0', () => {
   const row = buildGradesCsv([S()]).split('\r\n')[1].split(',');
   assert.equal(row[3], '87');
-  assert.equal(row[7], '90'); // Weekly Lab
-  assert.equal(row[8], ''); // Written: nothing counted
-  assert.equal(row[9], '70'); // Quizzes
+  assert.equal(row[7], '90'); // Regular submodules
+  assert.equal(row[8], ''); // Group Performance Assessments: nothing counted
+  assert.equal(row[9], ''); // Written: nothing counted
+  assert.equal(row[10], '70'); // Quizzes
 });
 
 check('a student with nothing counted yet has a blank grade, not 0%', () => {

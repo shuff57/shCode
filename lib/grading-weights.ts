@@ -14,6 +14,7 @@
 
 export type GradeCategory =
   | 'lab'
+  | 'group'
   | 'written'
   | 'quiz'
   | 'chapterTest'
@@ -24,6 +25,7 @@ export type GradeCategory =
 
 export const GRADE_CATEGORIES: GradeCategory[] = [
   'lab',
+  'group',
   'written',
   'quiz',
   'chapterTest',
@@ -34,9 +36,10 @@ export const GRADE_CATEGORIES: GradeCategory[] = [
 ];
 
 export const CATEGORY_LABEL: Record<GradeCategory, string> = {
-  lab: 'Weekly Lab Assignments',
-  written: 'Written Assignments',
-  quiz: 'Quizzes',
+  lab: 'Regular submodules',
+  group: 'Group Performance Assessments',
+  written: 'Written Assignments (counted in regular submodules)',
+  quiz: 'Quizzes (counted in regular submodules)',
   chapterTest: 'Individual Chapter Tests',
   finalExam: 'Final Exams',
   q1: 'Q1 Synthesis',
@@ -44,13 +47,25 @@ export const CATEGORY_LABEL: Record<GradeCategory, string> = {
   q4: 'Q4 Synthesis',
 };
 
-// curriculum-plan.md GRADING STRUCTURE, adopted 2026-09-23. Sums to 100.
-// A class with no class_grading_weights rows uses this untouched.
+// COARSE GRADE (User decision 2026-10-09, explicit): the course grade is built
+// from SUBMODULES, not from individual lessons. Every graded lesson counts the
+// same inside its submodule; a submodule's grade is the mean of those; submodules
+// of the same ROLE count the same; and each role carries one weight. A role with
+// no counted submodule yet drops out and the rest renormalize (same as Aeries'
+// category math over 100-point assignments, which is what keeps the two equal).
+//
+// Roles reuse the category keys so stored class_grading_weights rows still
+// apply: 'lab' is the regular submodules, 'chapterTest' the individual
+// assessments, 'group' the group assessments, 'finalExam' and q1/q2/q4 as before.
+// 'written' and 'quiz' are lesson classes INSIDE a regular submodule and carry no
+// weight of their own; they stay in the table so existing rows remain valid.
+// Sums to 100 over the roles that exist today.
 export const DEFAULT_WEIGHTS: Record<GradeCategory, number> = {
-  lab: 30,
-  written: 10,
-  quiz: 5,
-  chapterTest: 15,
+  lab: 40,
+  group: 10,
+  written: 0,
+  quiz: 0,
+  chapterTest: 25,
   finalExam: 10,
   q1: 10,
   q2: 10,
@@ -62,11 +77,13 @@ export const DEFAULT_WEIGHTS: Record<GradeCategory, number> = {
 // have zero lessons at all. weightedGradePercent()'s renormalization is
 // what keeps an empty category from being a permanent drag on every grade.
 const CHAPTER_TEST_MODULES = new Set(['1.7', '2.7', '3.10']);
+// Group Performance Assessments (Part 3 "Demo It" etc.): their own role.
+const GROUP_MODULES = new Set(['1.6', '2.6', '3.9']);
 const Q1_MODULE = '4.1';
 const Q2_MODULE = '7.1';
 const Q4_MODULES = new Set(['13.1', '13.2', '13.3']);
 
-function moduleIdFromTitle(title: string): string | null {
+export function moduleIdFromTitle(title: string): string | null {
   const m = /^(\d+\.\d+)\.\d+/.exec(title);
   return m ? m[1] : null;
 }
@@ -89,6 +106,7 @@ export function lessonGradeCategory(l: CategorizableLesson): GradeCategory | nul
   if (moduleId === Q2_MODULE) return 'q2';
   if (moduleId && Q4_MODULES.has(moduleId)) return 'q4';
   if (moduleId && CHAPTER_TEST_MODULES.has(moduleId)) return 'chapterTest';
+  if (moduleId && GROUP_MODULES.has(moduleId)) return 'group';
   if (l.preview === 'quiz') return 'quiz';
   // A flowchart with a lab code is a Lab (pass to complete), though its rubric carries points.
   if (l.preview === 'diagram' && l.assignmentCode) return 'lab';
@@ -97,40 +115,87 @@ export function lessonGradeCategory(l: CategorizableLesson): GradeCategory | nul
   return null; // a reading/example/slide -- formative, not part of the grade
 }
 
-// Weighted average across whatever categories are actually present in
-// `items`, renormalized so a category with nothing in it yet (Final Exams,
-// Q4 Synthesis, 5 of the 8 chapter tests) doesn't drag the percentage down
-// before there's anything there to grade -- confirmed 2026-09-23: "these are
-// the weights for the grade, so if its empty shouldnt affect the grade
-// until there is something." Falls back to a flat average when NOTHING in
-// the group carries a category (a reading-only module).
-export function weightedGradePercent(
-  items: Array<{ category: GradeCategory | null; percent: number }>,
+// The role a lesson class is weighted under: quizzes and written work are part
+// of a regular submodule, so they roll up under 'lab' (the regular role).
+const ROLE_OF: Record<GradeCategory, GradeCategory> = {
+  lab: 'lab',
+  written: 'lab',
+  quiz: 'lab',
+  group: 'group',
+  chapterTest: 'chapterTest',
+  finalExam: 'finalExam',
+  q1: 'q1',
+  q2: 'q2',
+  q4: 'q4',
+};
+
+export interface CoarseItem {
+  category: GradeCategory | null;
+  percent: number;
+  /** The submodule this lesson belongs to ("1.1"). Items without one each count as their own submodule. */
+  moduleId?: string | null;
+}
+
+export interface CoarseRole {
+  role: GradeCategory;
+  /** 0-100, mean of the role's submodule grades. */
+  percent: number;
+  /** Submodules counted in this role. */
+  modules: number;
+}
+
+/**
+ * The coarse course grade. Mean of lessons per submodule, mean of submodules per
+ * role, weighted mean of roles renormalized over the roles present. A role whose
+ * weight is 0 is ignored. Falls back to a flat average when nothing is
+ * categorised, exactly as before.
+ */
+export function coarseGrade(
+  items: CoarseItem[],
   weights: Record<GradeCategory, number>,
-): number {
-  const byCategory = new Map<GradeCategory, number[]>();
-  for (const { category, percent } of items) {
+): { percent: number; roles: CoarseRole[] } {
+  const moduleBuckets = new Map<string, { role: GradeCategory; percents: number[] }>();
+  let anon = 0;
+  let categorised = 0;
+  for (const { category, percent, moduleId } of items) {
     if (category == null) continue;
-    if (!byCategory.has(category)) byCategory.set(category, []);
-    byCategory.get(category)!.push(percent);
+    categorised += 1;
+    const key = moduleId ? `${ROLE_OF[category]}:${moduleId}` : `${ROLE_OF[category]}:#${anon++}`;
+    let b = moduleBuckets.get(key);
+    if (!b) moduleBuckets.set(key, (b = { role: ROLE_OF[category], percents: [] }));
+    b.percents.push(percent);
+  }
+  if (categorised === 0) {
+    if (items.length === 0) return { percent: 0, roles: [] };
+    return { percent: Math.round(items.reduce((sum, i) => sum + i.percent, 0) / items.length), roles: [] };
   }
 
-  if (byCategory.size === 0) {
-    if (items.length === 0) return 0;
-    return Math.round(items.reduce((sum, i) => sum + i.percent, 0) / items.length);
+  const byRole = new Map<GradeCategory, number[]>();
+  for (const { role, percents } of moduleBuckets.values()) {
+    const mean = percents.reduce((sum, p) => sum + p, 0) / percents.length;
+    if (!byRole.has(role)) byRole.set(role, []);
+    byRole.get(role)!.push(mean);
   }
 
+  const roles: CoarseRole[] = [];
   let totalWeight = 0;
   let weightedSum = 0;
-  for (const [category, percents] of byCategory) {
+  for (const category of GRADE_CATEGORIES) {
+    const means = byRole.get(category);
+    if (!means) continue;
+    const avg = means.reduce((sum, p) => sum + p, 0) / means.length;
+    roles.push({ role: category, percent: Math.round(avg), modules: means.length });
     const w = weights[category] ?? 0;
     if (w <= 0) continue;
-    const avg = percents.reduce((sum, p) => sum + p, 0) / percents.length;
     weightedSum += avg * w;
     totalWeight += w;
   }
-  if (totalWeight === 0) return 0;
-  return Math.round(weightedSum / totalWeight);
+  if (totalWeight === 0) return { percent: 0, roles };
+  return { percent: Math.round(weightedSum / totalWeight), roles };
+}
+
+export function weightedGradePercent(items: CoarseItem[], weights: Record<GradeCategory, number>): number {
+  return coarseGrade(items, weights).percent;
 }
 
 // One lesson's completion as a 0-100 percent. Isomorphic, so the student's

@@ -11,6 +11,7 @@ import {
   GRADE_CATEGORIES,
   lessonGradeCategory,
   weightedGradePercent,
+  moduleIdFromTitle,
   type GradeCategory,
 } from '../lib/grading-weights';
 
@@ -188,6 +189,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
   const categorized = lessons.map((l) => ({
     category: lessonGradeCategory(l),
     percent: lessonPercent(snap.states[l.id], snap.scores[l.id], l.maxScore),
+    moduleId: moduleIdFromTitle(l.title),
   }));
   const pct = weightedGradePercent(categorized, weightsSnap.weights);
   const allDone = done === total;

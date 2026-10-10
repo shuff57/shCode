@@ -117,16 +117,48 @@ check('an empty category does not drag the grade down', () => {
   assert.equal(pct, 100);
 });
 
-check('present categories weight against each other, not against the total', () => {
-  // lab(30) at 0, quiz(5) at 100 -> 5/35 -> 14%.
+check('present roles weight against each other, not against the total', () => {
+  // regular (lab, 40) at 0, group (10) at 100 -> 10/50 -> 20%.
   const pct = weightedGradePercent(
     [
-      { category: 'lab', percent: 0 },
-      { category: 'quiz', percent: 100 },
+      { category: 'lab', percent: 0, moduleId: '1.1' },
+      { category: 'group', percent: 100, moduleId: '1.6' },
     ],
     DEFAULT_WEIGHTS,
   );
-  assert.equal(pct, Math.round((0 * 30 + 100 * 5) / 35));
+  assert.equal(pct, Math.round((0 * 40 + 100 * 10) / 50));
+});
+
+// --- the coarse model (User decision 2026-10-09): lessons -> submodule -> role ---------------
+check('coarse: a submodule counts once, however many lessons it has', () => {
+  // 1.1 has nine perfect lessons, 1.2 has one failed lesson. Per lesson that is 90%;
+  // per submodule it is (100 + 0) / 2 = 50%.
+  const items = [
+    ...Array.from({ length: 9 }, () => ({ category: 'lab', percent: 100, moduleId: '1.1' })),
+    { category: 'lab', percent: 0, moduleId: '1.2' },
+  ];
+  assert.equal(weightedGradePercent(items, DEFAULT_WEIGHTS), 50);
+});
+check('coarse: quizzes and written work count as lessons inside a regular submodule', () => {
+  // One submodule: a lab at 100 and a quiz at 50 average to 75 -- the quiz has no weight of its own.
+  const items = [
+    { category: 'lab', percent: 100, moduleId: '1.1' },
+    { category: 'quiz', percent: 50, moduleId: '1.1' },
+    { category: 'written', percent: 50, moduleId: '1.1' },
+  ];
+  assert.equal(weightedGradePercent(items, DEFAULT_WEIGHTS), 67);
+});
+check('coarse: individual assessments carry their own role weight', () => {
+  // regular 40 at 100, individual 25 at 60 -> (4000 + 1500) / 65 = 85.
+  const items = [
+    { category: 'lab', percent: 100, moduleId: '1.1' },
+    { category: 'chapterTest', percent: 60, moduleId: '1.7' },
+  ];
+  assert.equal(weightedGradePercent(items, DEFAULT_WEIGHTS), 85);
+});
+check('coarse: group assessments are classified by module and are a separate role', () => {
+  assert.equal(lessonGradeCategory({ title: '1.6.3 Group PA Part 3', preview: 'assignment', assignmentCode: 'A1.6.3' }), 'group');
+  assert.equal(lessonGradeCategory({ title: '3.9.1 Group PA Part 1', preview: 'console', assignmentCode: 'A3.9.1' }), 'group');
 });
 
 check('a group with nothing graded falls back to a flat average', () => {
@@ -167,7 +199,7 @@ const done = (id, score = null) => ({ lesson_id: id, state: 'completed', score }
 check('studentGrading: only completed work counts when nothing has a due date', () => {
   const g = studentGrading(scopeMap, [done('quiz-1', 6)], DEFAULT_WEIGHTS, noDue);
   assert.equal(g.percent, 60); // the quiz alone, at 6/10; the two untouched labs are not yet due
-  assert.deepEqual(g.categories.map((c) => c.category), ['quiz']);
+  assert.deepEqual(g.categories.map((c) => c.category), ['lab']); // a quiz is a lesson inside a regular submodule
   assert.equal(g.gradedTotal, 3); // reading is not graded
   assert.equal(g.doneCount, 1);
   assert.equal(g.counted, 1);
@@ -176,8 +208,9 @@ check('studentGrading: only completed work counts when nothing has a due date', 
 
 check('studentGrading: a past-due lesson that is not done counts as a zero', () => {
   const g = studentGrading(scopeMap, [done('quiz-1', 10)], DEFAULT_WEIGHTS, dueOn([['lab-1', NOW - DAY]]));
-  // lab(30) at 0 (missing), quiz(5) at 100 -> 100*5/35 = 14
-  assert.equal(g.percent, Math.round((0 * 30 + 100 * 5) / 35));
+  // lab-1 (submodule 1.1) is a missing 0 and quiz-1 (submodule 1.3) is 100: two regular
+  // submodules, so (0 + 100) / 2 = 50.
+  assert.equal(g.percent, 50);
   assert.equal(g.missingCount, 1);
   assert.equal(g.counted, 2);
 });
@@ -246,7 +279,7 @@ check('formative flag: a flagged chart is excluded from the grade; an unflagged 
   const withFlag = studentGrading(new Map([...base, ['chart', flagged]]), [done('quiz-1', 10), done('chart', 6)], DEFAULT_WEIGHTS, noDue);
   assert.equal(withFlag.percent, without.percent);
   assert.equal(withFlag.gradedTotal, without.gradedTotal); // not in the denominator
-  assert.deepEqual(withFlag.categories.map((c) => c.category), ['quiz']);
+  assert.deepEqual(withFlag.categories.map((c) => c.category), ['lab']);
   const withPlain = studentGrading(new Map([...base, ['chart', plain]]), [done('quiz-1', 10), done('chart', 6)], DEFAULT_WEIGHTS, noDue);
   assert.equal(withPlain.gradedTotal, 2);
   assert.notEqual(withPlain.percent, 100);
