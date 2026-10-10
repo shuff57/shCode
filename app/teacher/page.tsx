@@ -246,6 +246,7 @@ interface GridGrade {
 /** Header stripe and total-column tint per grade category. None of these is a state colour (green, yellow, red, orange). */
 const CAT_COLOR: Record<GradeCategory, string> = {
   lab: '#8be9fd',
+  group: '#69d2c3',
   written: '#ff79c6',
   quiz: '#bd93f9',
   chapterTest: '#6c9ef8',
@@ -256,6 +257,7 @@ const CAT_COLOR: Record<GradeCategory, string> = {
 };
 const CAT_SHORT: Record<GradeCategory, string> = {
   lab: 'Labs',
+  group: 'Group assessments',
   written: 'Written',
   quiz: 'Quizzes',
   chapterTest: 'Chapter tests',

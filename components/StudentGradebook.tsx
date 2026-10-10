@@ -60,6 +60,7 @@ type Filter = 'all' | 'attention' | 'progress';
 /** Short names for the chip beside each assignment: which part of the grade it counts toward. */
 const CATEGORY_SHORT: Record<GradeCategory, string> = {
   lab: 'Lab',
+  group: 'Group assessment',
   written: 'Written',
   quiz: 'Quiz',
   chapterTest: 'Chapter test',
