@@ -15,8 +15,6 @@
 export type GradeCategory =
   | 'lab'
   | 'group'
-  | 'written'
-  | 'quiz'
   | 'chapterTest'
   | 'finalExam'
   | 'q1'
@@ -26,8 +24,6 @@ export type GradeCategory =
 export const GRADE_CATEGORIES: GradeCategory[] = [
   'lab',
   'group',
-  'written',
-  'quiz',
   'chapterTest',
   'finalExam',
   'q1',
@@ -38,8 +34,6 @@ export const GRADE_CATEGORIES: GradeCategory[] = [
 export const CATEGORY_LABEL: Record<GradeCategory, string> = {
   lab: 'Regular submodules',
   group: 'Group Performance Assessments',
-  written: 'Written Assignments (counted in regular submodules)',
-  quiz: 'Quizzes (counted in regular submodules)',
   chapterTest: 'Individual Chapter Tests',
   finalExam: 'Final Exams',
   q1: 'Q1 Synthesis',
@@ -57,14 +51,13 @@ export const CATEGORY_LABEL: Record<GradeCategory, string> = {
 // Roles reuse the category keys so stored class_grading_weights rows still
 // apply: 'lab' is the regular submodules, 'chapterTest' the individual
 // assessments, 'group' the group assessments, 'finalExam' and q1/q2/q4 as before.
-// 'written' and 'quiz' are lesson classes INSIDE a regular submodule and carry no
-// weight of their own; they stay in the table so existing rows remain valid.
+// Quizzes and written work are NOT roles: they are lessons inside a regular
+// submodule and count the same as the labs there. A stored class_grading_weights
+// row for the retired 'written' or 'quiz' categories is simply ignored.
 // Sums to 100 over the roles that exist today.
 export const DEFAULT_WEIGHTS: Record<GradeCategory, number> = {
   lab: 40,
   group: 10,
-  written: 0,
-  quiz: 0,
   chapterTest: 25,
   finalExam: 10,
   q1: 10,
@@ -107,27 +100,12 @@ export function lessonGradeCategory(l: CategorizableLesson): GradeCategory | nul
   if (moduleId && Q4_MODULES.has(moduleId)) return 'q4';
   if (moduleId && CHAPTER_TEST_MODULES.has(moduleId)) return 'chapterTest';
   if (moduleId && GROUP_MODULES.has(moduleId)) return 'group';
-  if (l.preview === 'quiz') return 'quiz';
-  // A flowchart with a lab code is a Lab (pass to complete), though its rubric carries points.
-  if (l.preview === 'diagram' && l.assignmentCode) return 'lab';
-  if (l.scoreKind === 'written') return 'written';
-  if (l.assignmentCode) return 'lab';
+  // A quiz, a written rubric or a coded lab is a lesson inside a regular
+  // submodule. Whether it is GRADED is what this decides; the kind no longer
+  // picks a weight.
+  if (l.preview === 'quiz' || l.scoreKind === 'written' || l.assignmentCode) return 'lab';
   return null; // a reading/example/slide -- formative, not part of the grade
 }
-
-// The role a lesson class is weighted under: quizzes and written work are part
-// of a regular submodule, so they roll up under 'lab' (the regular role).
-const ROLE_OF: Record<GradeCategory, GradeCategory> = {
-  lab: 'lab',
-  written: 'lab',
-  quiz: 'lab',
-  group: 'group',
-  chapterTest: 'chapterTest',
-  finalExam: 'finalExam',
-  q1: 'q1',
-  q2: 'q2',
-  q4: 'q4',
-};
 
 export interface CoarseItem {
   category: GradeCategory | null;
@@ -160,9 +138,9 @@ export function coarseGrade(
   for (const { category, percent, moduleId } of items) {
     if (category == null) continue;
     categorised += 1;
-    const key = moduleId ? `${ROLE_OF[category]}:${moduleId}` : `${ROLE_OF[category]}:#${anon++}`;
+    const key = moduleId ? `${category}:${moduleId}` : `${category}:#${anon++}`;
     let b = moduleBuckets.get(key);
-    if (!b) moduleBuckets.set(key, (b = { role: ROLE_OF[category], percents: [] }));
+    if (!b) moduleBuckets.set(key, (b = { role: category, percents: [] }));
     b.percents.push(percent);
   }
   if (categorised === 0) {

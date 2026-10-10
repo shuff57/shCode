@@ -61,8 +61,6 @@ type Filter = 'all' | 'attention' | 'progress';
 const CATEGORY_SHORT: Record<GradeCategory, string> = {
   lab: 'Lab',
   group: 'Group assessment',
-  written: 'Written',
-  quiz: 'Quiz',
   chapterTest: 'Chapter test',
   finalExam: 'Final exam',
   q1: 'Q1 project',

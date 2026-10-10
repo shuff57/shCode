@@ -16,6 +16,7 @@ import {
   lessonPercent,
   weightedGradePercent,
   DEFAULT_WEIGHTS,
+  GRADE_CATEGORIES,
 } from '../lib/grading-weights.ts';
 import { studentGrading } from '../functions/_shared/grading.ts';
 import { lessonScoreFields } from './lesson-score-fields.mjs';
@@ -34,11 +35,13 @@ function check(name, fn) {
 
 // --- classification -------------------------------------------------------
 
-check('quiz is recognised by preview, not type', () => {
+check('a quiz is graded, as a lesson inside a regular submodule (quiz is not a role)', () => {
   assert.equal(
     lessonGradeCategory({ title: '1.3.9 Unit quiz', preview: 'quiz', assignmentCode: 'A1.3.9' }),
-    'quiz',
+    'lab',
   );
+  assert.equal(lessonGradeCategory({ title: '1.3.9 Unit quiz', preview: 'quiz' }), 'lab', 'a quiz needs no assignment code to count');
+  assert.ok(!GRADE_CATEGORIES.includes('quiz') && !GRADE_CATEGORIES.includes('written'), 'quiz and written are not roles');
 });
 
 check('a lab is recognised by assignmentCode and nothing else', () => {
@@ -47,8 +50,8 @@ check('a lab is recognised by assignmentCode and nothing else', () => {
   assert.equal(lessonGradeCategory({ title: '1.1.2 Reading', preview: 'reading' }), null);
 });
 
-check('a written assignment is recognised by scoreKind', () => {
-  assert.equal(lessonGradeCategory({ title: '1.3.20 Written', preview: 'assignment', scoreKind: 'written' }), 'written');
+check('a written assignment is graded by scoreKind, as a regular-submodule lesson', () => {
+  assert.equal(lessonGradeCategory({ title: '1.3.20 Written', preview: 'assignment', scoreKind: 'written' }), 'lab');
 });
 
 check('module id beats every other signal (chapter test parts are not quizzes)', () => {
@@ -105,12 +108,12 @@ check('a score over maxScore clamps to 100', () => {
 // --- renormalization ------------------------------------------------------
 
 check('an empty category does not drag the grade down', () => {
-  // Finals(10) and Q4(10) have no lessons. Only lab(30) and quiz(5) are
-  // present, both at 100 -> 100, NOT 100*(35/100)=35.
+  // Finals(10) and Q4(10) have no lessons. Only regular (40) and group (10) are
+  // present, both at 100 -> 100, NOT 100*(50/100)=50.
   const pct = weightedGradePercent(
     [
-      { category: 'lab', percent: 100 },
-      { category: 'quiz', percent: 100 },
+      { category: 'lab', percent: 100, moduleId: '1.1' },
+      { category: 'group', percent: 100, moduleId: '1.6' },
     ],
     DEFAULT_WEIGHTS,
   );
@@ -143,8 +146,8 @@ check('coarse: quizzes and written work count as lessons inside a regular submod
   // One submodule: a lab at 100 and a quiz at 50 average to 75 -- the quiz has no weight of its own.
   const items = [
     { category: 'lab', percent: 100, moduleId: '1.1' },
-    { category: 'quiz', percent: 50, moduleId: '1.1' },
-    { category: 'written', percent: 50, moduleId: '1.1' },
+    { category: 'lab', percent: 50, moduleId: '1.1' },
+    { category: 'lab', percent: 50, moduleId: '1.1' },
   ];
   assert.equal(weightedGradePercent(items, DEFAULT_WEIGHTS), 67);
 });
@@ -272,7 +275,7 @@ check('formative flag: a flagged chart is excluded from the grade; an unflagged 
   const flagged = chartScope(lessonScoreFields(chartMeta({ formative: true }), null));
   const plain = chartScope(lessonScoreFields(chartMeta({}), null));
   assert.equal(lessonGradeCategory(flagged), null);
-  assert.equal(lessonGradeCategory(plain), 'written');
+  assert.equal(lessonGradeCategory(plain), 'lab');
   const startedChart = { lesson_id: 'chart', state: 'started', score: null };
   const base = new Map([['quiz-1', lesson('1.3.9 Quiz', { preview: 'quiz', maxScore: 10, scoreKind: 'quiz' })]]);
   const without = studentGrading(base, [done('quiz-1', 10)], DEFAULT_WEIGHTS, noDue);

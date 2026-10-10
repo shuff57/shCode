@@ -247,8 +247,6 @@ interface GridGrade {
 const CAT_COLOR: Record<GradeCategory, string> = {
   lab: '#8be9fd',
   group: '#69d2c3',
-  written: '#ff79c6',
-  quiz: '#bd93f9',
   chapterTest: '#6c9ef8',
   finalExam: '#e0c3fc',
   q1: '#d4a373',
@@ -258,8 +256,6 @@ const CAT_COLOR: Record<GradeCategory, string> = {
 const CAT_SHORT: Record<GradeCategory, string> = {
   lab: 'Labs',
   group: 'Group assessments',
-  written: 'Written',
-  quiz: 'Quizzes',
   chapterTest: 'Chapter tests',
   finalExam: 'Final exams',
   q1: 'Q1 synthesis',
