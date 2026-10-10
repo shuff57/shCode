@@ -70,13 +70,21 @@
       "id": "r4",
       "title": "parameter not reassigned",
       "description": "The function writes into the array instead of pointing its parameter at a new one. Help: 3.6.5 (Changing vs. Reassigning)",
-      "type": "regex",
+      "type": "tests",
       "file": "script.js",
-      "pattern": "^(?![\\s\\S]*function\\s+addOne\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?(?<![\\w$.])\\1\\s*=(?!=))",
-      "flags": "i",
       "points": 0,
-      "ignoreStrings": true,
-      "hint": "Delete the line that gives the parameter a brand-new array. That move only changes the function's own name."
+      "hint": "Delete the line that gives the parameter a brand-new array. That move only changes the function's own name.",
+      "variables": [
+        {
+          "name": "addOne"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "typeof addOne === 'function' && (function(src) {\n      const m = /^(?:function\\s*[\\w$]*\\s*\\(|\\(|)\\s*([A-Za-z_$][\\w$]*)/.exec(src);\n      if (!m)\n        return !0;\n      const p = m[1], i = Math.min(...[\"{\", \"=>\"].map((t) => {\n        const k = src.indexOf(t);\n        return k < 0 ? 1e9 : k;\n      }));\n      let body = src.slice(i);\n      body = body.replace(/\\/\\/.*|\\/\\*[\\s\\S]*?\\*\\//g, \" \").replace(/\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*'|`(?:[^`\\\\]|\\\\.)*`/g, '\"\"');\n      return !new RegExp(\"(?:^|[^\\\\w$.])\" + p + \"\\\\s*(?:[-+*/%&|^]|\\\\*\\\\*|<<|>>>?|&&|\\\\|\\\\||\\\\?\\\\?)?=(?![=>])\").test(body);\n    })(String(addOne))",
+          "fail": "Do not give the parameter a new value inside the function. Write into the array it already points at, by index."
+        }
+      ]
     },
     {
       "file": "script.js",

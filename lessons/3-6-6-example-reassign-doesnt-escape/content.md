@@ -29,7 +29,7 @@ replace(scores);
 console.log("outside:", scores);
 ```
 
-`inside` prints `[9,9,9]`; `outside` prints `[1,2,3]`. The function really did the work — it just did it on a name the caller cannot see.
+`inside` prints the new array, one item per line (9, 9, 9); `outside` prints the original, one item per line (1, 2, 3). The function really did the work — it just did it on a name the caller cannot see.
 
 ## Step 3: Contrast with a mutation
 

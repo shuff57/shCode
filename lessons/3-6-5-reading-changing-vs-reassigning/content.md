@@ -43,7 +43,7 @@ replace(scores);
 console.log("outside:", scores);
 ```
 
-`inside` shows the brand-new array; `outside` still shows `[1,2,3]`. The parameter `arr` and the variable `scores` are two separate names that happened to start out pointing at the same array.
+`inside` shows the brand-new array; `outside` still shows the original three items, 1, 2 and 3. The parameter `arr` and the variable `scores` are two separate names that happened to start out pointing at the same array.
 
 ## `const` locks the name, not the contents
 

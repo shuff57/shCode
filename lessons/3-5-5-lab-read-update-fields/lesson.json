@@ -66,15 +66,15 @@
     },
     {
       "id": "r3",
-      "title": "existing field changed",
-      "description": "Assigns a new value to a property. Help: 3.5.4 (Reading and Changing Properties)",
+      "title": "a field changed and a field added",
+      "description": "Two dot assignments that really change something: one to a field, one to a new field. Help: 3.5.4 (Reading and Changing Properties)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\.\\w+\\s*=",
-      "flags": "i",
+      "pattern": "(?:^|[^\\w$.])(\\w+)\\.(\\w+)\\s*[-+*/]?=(?!=)(?!\\s*\\1\\.\\2\\s*(?:[;\\n)}]|$))[\\s\\S]*?(?:^|[^\\w$.])(\\w+)\\.(\\w+)\\s*[-+*/]?=(?!=)(?!\\s*\\3\\.\\4\\s*(?:[;\\n)}]|$))",
+      "flags": "",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Assign a new value to a property that already exists: the object, a dot, the property, an equals sign, the value."
+      "hint": "Use two assignments with a dot: one changes a property that already exists (book.pages = 480), one adds a new property. Assigning a property to itself changes nothing."
     },
     {
       "id": "r4",

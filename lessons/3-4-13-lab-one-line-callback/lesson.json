@@ -44,15 +44,15 @@
     },
     {
       "id": "r2",
-      "title": "Inline arrow passed as an argument",
-      "description": "An arrow function is written inside a call's parentheses. Help: 3.4.11 (Passing a Function to a Function)",
+      "title": "Inline arrow passed to transform",
+      "description": "transform is called with a one-line arrow written inside its parentheses. Help: 3.4.11 (Passing a Function to a Function)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "[(,]\\s*(?:\\([^)]*\\)|\\w+)\\s*=>\\s*[^{\\s]",
+      "pattern": "(?:^|[^\\w$.])transform\\s*\\((?:(?:[^()]|\\([^()]*\\))*?,)?\\s*(?:\\([^)]*\\)|\\w+)\\s*=>\\s*[^{\\s]",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Write the arrow right where the call takes its argument, inside the parentheses, not on a line of its own."
+      "hint": "Call transform and write the arrow right inside its parentheses, as the function argument: transform(6, n => n + 4)."
     },
     {
       "id": "r3",

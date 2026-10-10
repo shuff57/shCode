@@ -16,7 +16,7 @@ console.log(result);
 console.log(myList);
 ```
 
-Both lines print `["a","b","c"]` — there is only one array, and `push` reached it.
+Both lines print the same three items, `"a"`, `"b"` and `"c"`, one per line — there is only one array, and `push` reached it.
 
 ## Step 2: Copy first
 
@@ -33,7 +33,7 @@ console.log(result);
 console.log(myList);
 ```
 
-Now it prints `["a","b","c"]` then `["a","b"]`. The original array survives because the function never wrote into it.
+Now it prints the three items `"a"`, `"b"`, `"c"`, then the two items `"a"`, `"b"`. The original array survives because the function never wrote into it.
 
 ## Step 3: Copy before a mutating method
 

@@ -349,6 +349,31 @@ accept('3-5-22-lab-destructure-three', 'default for the whole parameter',
   js('const item = { title: "Pen", cost: 2, quantity: 10 };', 'const { title, cost, quantity } = item;', 'console.log(title + cost + quantity);',
      'function describe({ title, quantity } = {}) { return title + " x" + quantity; }', 'console.log(describe(item));'));
 
+// ---- batch 5: the four minor lab holes and the 3.5.24 starter signal
+reject('3-5-24-lab-parallel-arrays-refactor', 'records built, printed by a literal, no loop over players', 'r3',
+  js('const players = [{ name: "Marisol", score: 92, group: "A" }, { name: "Dev", score: 78, group: "B" }, { name: "Priya", score: 85, group: "A" }];',
+     'console.log("Marisol Dev Priya 92 78 85");'));
+reject('3-5-24-lab-parallel-arrays-refactor', 'the old loop over names is not the new loop', 'r3',
+  js('const names = ["Marisol", "Dev", "Priya"];', 'const players = [{ name: "Marisol", score: 92, group: "A" }, { name: "Dev", score: 78, group: "B" }, { name: "Priya", score: 85, group: "A" }];',
+     'for (let i = 0; i < names.length; i++) { console.log(names[i]); }'));
+reject('3-5-5-lab-read-update-fields', 'a property assigned to itself changes nothing', 'r3',
+  js('const book = { title: "T", pages: 472 };', 'console.log(book.title);', 'book.title = book.title;', 'console.log(book);'));
+accept('3-5-5-lab-read-update-fields', 'one += and one new field',
+  js('const book = { title: "T", pages: 472 };', 'console.log(book.title);', 'book.pages += 10;', 'book.author = "H";', 'console.log(book);'));
+reject('3-4-13-lab-one-line-callback', 'an arrow elsewhere, transform given a named function', 'r2',
+  js('function transform(value, fn) { return fn(value); }', 'const plus = (n) => n + 4;', 'console.log([1, 2].map(n => n * 2));', 'console.log(transform(6, plus));'));
+accept('3-4-13-lab-one-line-callback', 'arrow in the first argument slot, multi-line call',
+  js('function transform(fn, value) { return fn(value); }', 'console.log(transform(', '  (n) => n + 4,', '  6));'));
+reject('3-6-8-lab-fix-reassign-bug', 'the parameter is reassigned deep inside nested blocks', 'r4',
+  js('function addOne(scores) { for (let i = 0; i < scores.length; i++) { if (i >= 0) { if (true) { scores = []; } } } scores[0] = scores[0] + 1; }',
+     'let quizScores = [10, 20, 30];', 'addOne(quizScores);', 'console.log(quizScores);'));
+reject('3-6-8-lab-fix-reassign-bug', 'reassigned with +=', 'r4',
+  js('function addOne(scores) { scores += 1; for (let i = 0; i < scores.length; i++) { scores[i] = scores[i] + 1; } }',
+     'let quizScores = [10, 20, 30];', 'addOne(quizScores);', 'console.log(quizScores);'));
+accept('3-6-8-lab-fix-reassign-bug', 'comments and strings that mention the old line',
+  js('function addOne(scores) {', '  // the broken version did scores = [scores[0] + 1]', '  const note = "scores = x";', '  for (let i = 0; i < scores.length; i++) { scores[i] = scores[i] + 1; }', '}',
+     'let quizScores = [10, 20, 30];', 'addOne(quizScores);', 'console.log(quizScores);'));
+
 try {
   execFileSync(process.execPath, [
     path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'), 'lib/run-tests-node.ts',

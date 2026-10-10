@@ -56,15 +56,15 @@
     },
     {
       "id": "r3",
-      "title": "loop present",
-      "description": "Contains a for loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "title": "loop over players prints each record",
+      "description": "A loop over the players array prints each record. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(",
+      "pattern": "for\\s*\\([^)]*\\bplayers\\b[^)]*\\)\\s*(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?)?console\\.log|\\bplayers\\s*\\.\\s*forEach\\s*\\([\\s\\S]*?console\\.log",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Use a for loop that visits each record in the new array."
+      "hint": "Loop over players (for or for...of) and print inside the loop, so each record is printed by the loop."
     },
     {
       "id": "r4",

@@ -70,3 +70,9 @@ Findings, ranked. Tick a step when it is committed and `npm test` is green.
       3.10.5 uses the code editor (`aiGrader.input: "code"`, as 2.7.5 does); CodeMirror wraps at spaces, not mid-word.
       Left alone: starters that start partly green (fix-it labs and labs that ship a data line: that is the starter doing its job); array output prints
       one element per line while some readings quote `[1,2,3]`; 3.5.24 loop, 3.5.5 `book.title = book.title`, 3.4.13 stray arrow, 3.6.8 nested-brace reassign.
+- [x] **Batch 5, from the Plan agent's review** (2026-10-09; owner chose gaps 4, 2 and 3; array printing stays one element per line). 3.5.24 r3 now needs a loop over
+      `players` that prints; 3.5.5 r3 needs two real dot assignments (a property assigned to itself does not count, `+=` does); 3.4.13 r2 needs the inline arrow
+      inside the `transform(...)` call; 3.6.8 r4 is now a `tests` check on the function's own source (comments and strings ignored, any assignment to the first
+      parameter fails). 3.6.5, 3.6.6, 3.6.11 describe array prints as one item per line. Decided NOT to do: the chart near-duplicate-label rule (opt-in
+      `gate.repeat`: a chart stuffed with distinct filler words still passes, and these charts are practice; see the Plan agent's table for the ideas that
+      reject honest charts), the other twelve partly-green starters (a fix-it lab or a given data line starts green by design), and Node-style compact arrays.
