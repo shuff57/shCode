@@ -1,4 +1,4 @@
-## Chart the Code: Expanding an Arrow to Its Full Form
+## Chart the Code: A Function That Calls Its Parameter Twice
 
 **What you'll practise:**
 - Turning a one-line function into the steps the machine actually runs
@@ -6,7 +6,7 @@
 - Keeping a straight-line program straight: no decision, no repeat
 - Ending on one print
 
-A function that takes a function can hide a whole little program. `applyTwice` takes an operation and a value, calls the operation on the value, then calls it **again** on that result. Written out, that is one short line. Charted, it is read-the-parameters, first call, second call, print.
+`operation` is a function handed in from outside; you will meet passing a function to a function properly in 3.4.11, and here you only need to chart what happens inside. A function that takes a function can hide a whole little program. `applyTwice` takes an operation and a value, calls the operation on the value, then calls it **again** on that result. Written out, that is one short line. Charted, it is read-the-parameters, first call, second call, print.
 
 ### The code
 
@@ -25,7 +25,7 @@ Chart the **body of `applyTwice`**. The arrow `(n) => n * 2` is the `operation` 
 | Shape | Use it for |
 |---|---|
 | **Start / End** (oval) | One of each |
-| **Task** (rectangle) | Reading in `operation` and `value`, applying `operation` once, applying it a second time on that result |
+| **Task** (rectangle) | Reading in `operation` and `value`, applying `operation` once, applying it a second time on that result. The double-rail function-call shape is also accepted for the two applications |
 | **Input / Output** (parallelogram) | The final `console.log` |
 
 At least six shapes. There is **no decision** in this program, so there is no diamond: the code does the same four things in the same order every time.

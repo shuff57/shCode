@@ -106,7 +106,7 @@ const CASES = {
   I --> Z`,
     mutations: {
       'one form dead-ends before the print': (t) => swap(swap(t, '  H --> I\n', ''), '  I --> Z', '  H --> Z\n  I --> Z'),
-      'no braces question': (t) => swap(swap(t, '  E --> F\n', '  E --> H\n'), '  F -->|yes| G\n  F -->|no| H\n', '  G --> I\n'),
+      'no arrow question': (t) => swap(swap(t, '  C -->|no| F\n', '  C -->|no| G\n'), '  F -->|no| G\n  F -->|yes| H\n', ''),
     },
   },
   '3-5-11-chart-nested-access': {

@@ -92,6 +92,18 @@
       "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
+      "id": "r6",
+      "title": "Two calls, each with its own arrow",
+      "description": "countMatching is called twice, and each call has an arrow written inside its parentheses. Help: 3.4.12 (Example: Arrow Callback)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:^|[^.\\w$])countMatching\\s*\\((?:[^)]|\\((?:[^()]|\\([^()]*\\))*\\))*?=>[\\s\\S]*?(?:^|[^.\\w$])countMatching\\s*\\((?:[^)]|\\((?:[^()]|\\([^()]*\\))*\\))*?=>",
+      "flags": "i",
+      "points": 0,
+      "ignoreStrings": true,
+      "hint": "Call countMatching twice and write a different one-line arrow inside each call: countMatching(readings, n => n > 0)."
+    },
+    {
       "file": "script.js",
       "points": 0,
       "id": "t1",

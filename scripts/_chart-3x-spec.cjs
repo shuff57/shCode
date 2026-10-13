@@ -57,17 +57,17 @@ module.exports = {
   },
   '3-4-20-chart-forms-comparison': {
     rubricTitle: 'Forms comparison chart: structure check',
-    gate: GATE(['named|name|declaration|function', 'braces|brace|block|return|implicit|explicit', 'expression|const|arrow|assign', 'print|show|log|output|result', '\\b3\\b|add|sum|1 \\+ 2']),
+    gate: GATE(['named|name|declaration|function', 'braces|brace|block|return|implicit|explicit|arrow|=>', 'expression|const|arrow|assign', 'print|show|log|output|result', '\\b3\\b|add|sum|1 \\+ 2']),
     rules: { 'min-process': 3, 'min-decisions': 2, 'min-nodes': 8 },
     rubric: [
-      item('two-questions', 'Naming first, then braces', 6, 'Scored by the editor (arrow order): one decision comes before another on the route.',
-        seq([K('decision'), K('decision')], 'The comparison asks two questions in order: is the function named, then does the body use braces. Draw the second diamond after the first.', 'The second question follows the first.')),
+      item('two-questions', 'Naming first, then the arrow question', 6, 'Scored by the editor (arrow order): one decision comes before another on the route.',
+        seq([K('decision'), K('decision')], 'The comparison asks two questions in order: is the function named, then is it written with =>. Draw the second diamond after the first.', 'The second question follows the first.')),
       item('three-forms', 'One task for each form', 5, 'Scored by the editor (shape kind): at least three task rectangles.',
         cnt('process', 3, 'Draw a task rectangle for each of the three forms.', 'There is a task for each form.')),
       item('one-print', 'All three forms reach the print', 5, 'Scored by the editor: an input/output step for the print, which comes after the decisions.',
         cnt('io', 1, 'The three forms are one choice made three times, so they should all lead to one print. Draw an input/output step for the print.', 'There is a print.'),
         seq([K('decision'), K('io'), K('terminal')], 'Every route has to pass a decision and then the print before End: one of your forms skips the print.', 'Every route passes the decisions, then the print, then End.')),
-      item('questions-on-topic', 'The questions are about the three forms', 4, 'Scored by the editor: at least two diamonds ask about the function (its name, its braces).', lab('decision', 'name|named|brace|body|function|return', 2, 'Ask about the function: is it named, and does its body use braces.', 'The diamonds ask about the function.')),
+      item('questions-on-topic', 'The questions are about the three forms', 4, 'Scored by the editor: at least two diamonds ask about the function (its name, its arrow).', lab('decision', 'name|named|brace|body|function|return|arrow|=>', 2, 'Ask about the function: is it named, and is it written with =>.', 'The diamonds ask about the function.')),
     ],
   },
   '3-5-11-chart-nested-access': {

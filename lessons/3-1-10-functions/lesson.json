@@ -48,19 +48,19 @@
       "file": "script.js",
       "pattern": "(?:function\\s+greet\\s*\\(|(?:const|let|var)\\s+greet\\s*=\\s*(?:function\\s*\\(|(?:\\([^)]*\\)|\\w+)\\s*=>))",
       "flags": "i",
-      "points": 10,
+      "points": 4,
       "hint": "A function declaration starts with the word function, then the name greet, then parentheses and a body in braces.",
       "ignoreStrings": true
     },
     {
       "id": "req2",
       "title": "Return value",
-      "description": "Use a return statement",
+      "description": "Return a value: a return statement, or an arrow whose body is one expression",
       "type": "regex",
       "file": "script.js",
-      "pattern": "return\\s+",
+      "pattern": "\\breturn\\b|=>\\s*[^{\\s]",
       "flags": "i",
-      "points": 5,
+      "points": 4,
       "hint": "A function can hand a value back. Use the return keyword followed by the value you want to give back.",
       "ignoreStrings": true
     },
@@ -72,7 +72,7 @@
       "file": "script.js",
       "pattern": "=>\\s*",
       "flags": "i",
-      "points": 10,
+      "points": 4,
       "hint": "An arrow function is written with =>. Put the parameters before the arrow and the body after it.",
       "ignoreStrings": true
     },
@@ -82,9 +82,9 @@
       "description": "Call the greet function. Help: 3.1.11 (The Function-Call Shape)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:^|[=(+,;{}\\n])\\s*greet\\s*\\(",
+      "pattern": "(?:^|[=(+,;{}\\n:?>\\[!&|]|\\breturn)\\s*greet\\s*\\(",
       "flags": "i",
-      "points": 5,
+      "points": 4,
       "hint": "Defining a function does nothing until you call it. Write its name followed by parentheses.",
       "ignoreStrings": true
     },
@@ -96,14 +96,51 @@
       "file": "script.js",
       "pattern": "(?:\\bfunction\\b|=>)[\\s\\S]*(?:\\bfunction\\b|=>)",
       "flags": "is",
-      "points": 10,
+      "points": 4,
       "hint": "Write two separate function definitions, not one. Give each its own name and body.",
+      "ignoreStrings": true
+    },
+    {
+      "id": "t1",
+      "title": "greet returns a greeting with the name",
+      "description": "greet(\"Ava\") returns a greeting that contains Ava, and the same works for another name. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "tests",
+      "file": "script.js",
+      "function": "greet",
+      "points": 15,
+      "hint": "greet must hand back a string built from its parameter: return \"Hello, \" + name + \"!\". Printing inside greet is not the same as returning.",
+      "cases": [
+        {
+          "args": [
+            "Ava"
+          ],
+          "expectContains": "Ava"
+        },
+        {
+          "args": [
+            "Zed"
+          ],
+          "expectContains": "Zed",
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "req6",
+      "title": "Results printed",
+      "description": "Print what your functions return with console.log. Help: 3.2.11 (Getting a Value Back with `return`)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(",
+      "flags": "i",
+      "points": 5,
+      "hint": "Wrap each call in console.log so you can see what it hands back: console.log(greet(\"Ava\")).",
       "ignoreStrings": true
     }
   ],
   "grading": {
     "totalPoints": 40,
-    "passingScore": 25,
+    "passingScore": 30,
     "allowLateSubmit": true,
     "reviewCommitHistory": true
   }

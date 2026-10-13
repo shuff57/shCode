@@ -44,6 +44,9 @@ import { onRequestPost as classDeletePost } from '../functions/api/classes/[id]/
 import { onRequestGet as classAnnGet, onRequestPost as classAnnPost, onRequestDelete as classAnnDelete } from '../functions/api/classes/[id]/announcements/index.ts';
 import { onRequestPost as classArchivePost } from '../functions/api/classes/[id]/archive.ts';
 import { onRequestPost as classRegenPost } from '../functions/api/classes/[id]/regenerate-code.ts';
+import { onRequestPost as classUnsubmitPost } from '../functions/api/classes/[id]/lesson-unsubmit/index.ts';
+import { onRequestGet as classOpenDatesGet, onRequestPut as classOpenDatesPut } from '../functions/api/classes/[id]/open-dates/index.ts';
+import { onRequestGet as classWaiverGet, onRequestPut as classWaiverPut } from '../functions/api/classes/[id]/lesson-due-waiver/index.ts';
 import { onRequestPost as reqEventsPost } from '../functions/api/requirement-events.ts';
 import { onRequestGet as classReqEventsGet } from '../functions/api/classes/[id]/requirement-events/index.ts';
 
@@ -186,6 +189,10 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   };
 
   seedClass(db.raw, root, devIdentity({ headers: {} }));
+  // DEV_SEED_MODULE=<path to .mjs>: extra rows for a teacher-side walk of one module (default export gets the raw sqlite handle).
+  if (process.env.DEV_SEED_MODULE) {
+    import(path.resolve(process.env.DEV_SEED_MODULE)).then((m) => m.default(db.raw, { classId: CLASS_ID, teacherEmail: devIdentity({ headers: {} }), root }));
+  }
   const enrolled = new Set();
   const ensure = (email) => {
     if (enrolled.has(email)) return;
@@ -249,6 +256,11 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   server.post('/api/classes/:id/submission-queue', json, route(classQueuePost, ['id']));
   server.post('/api/classes/:id/enrollments', json, route(classEnrollPost, ['id']));
   server.delete('/api/classes/:id/enrollments/:email', route(classEnrollDelete, ['id', 'email']));
+  server.post('/api/classes/:id/lesson-unsubmit', json, route(classUnsubmitPost, ['id']));
+  server.get('/api/classes/:id/open-dates', route(classOpenDatesGet, ['id']));
+  server.put('/api/classes/:id/open-dates', json, route(classOpenDatesPut, ['id']));
+  server.get('/api/classes/:id/lesson-due-waiver', route(classWaiverGet, ['id']));
+  server.put('/api/classes/:id/lesson-due-waiver', json, route(classWaiverPut, ['id']));
   server.post('/api/classes/:id/tries-reset', json, route(classTriesResetPost, ['id']));
   server.post('/api/classes/:id/delete', json, route(classDeletePost, ['id']));
   server.get('/api/classes/:id/announcements', route(classAnnGet, ['id']));

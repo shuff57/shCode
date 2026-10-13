@@ -130,7 +130,7 @@
           "applyTwice(\"double\", 5)"
         ],
         "answer": 1,
-        "explanation": "A callback is passed as the function value itself, with no parentheses: applyTwice(double, 5). writing double() would call it first and hand over its result, a number, which applyTwice would then try to call and fail.",
+        "explanation": "A callback is passed as the function value itself, with no parentheses: applyTwice(double, 5). Writing double() would call it first and hand over its result, a number, which applyTwice would then try to call and fail.",
         "sourceIds": [
           "3-4-11-reading-passing-a-function"
         ]
@@ -142,11 +142,11 @@
         "options": [
           "Declarations are prepared before any code runs (hoisting); an expression's variable is only filled in when its line executes",
           "Function expressions are slower to create, so they are not ready yet",
-          "Expressions must be written with let instead of const to be hoisted",
+          "Expressions can be called early if they are written with let instead of const",
           "Declarations are hoisted only when called from inside another function"
         ],
         "answer": 0,
-        "explanation": "JavaScript reads the whole file and prepares every function declaration in advance, so a declared function can be called from above. A function expression or arrow is not hoisted: its const holds nothing until execution reaches that line, so an earlier call throws a ReferenceError.",
+        "explanation": "JavaScript reads the whole file and prepares every function declaration in advance, so a declared function can be called from above. A function expression or arrow cannot be used early: its const holds nothing until execution reaches that line, so an earlier call throws a ReferenceError.",
         "sourceIds": [
           "3-4-14-reading-declaration-or-expression"
         ]

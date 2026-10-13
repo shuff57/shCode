@@ -45,10 +45,10 @@
     {
       "id": "r2",
       "title": "Implicit return used",
-      "description": "An arrow body is a bare expression with no opening brace. Help: 3.4.8 (The Shorthand Rules)",
+      "description": "Every arrow body is a bare expression: no arrow body starts with a brace. Help: 3.4.8 (The Shorthand Rules)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "=>\\s*[^{\\s]",
+      "pattern": "^(?![\\s\\S]*=>\\s*\\{)[\\s\\S]*=>",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
@@ -67,17 +67,29 @@
       "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
+      "id": "r4",
+      "title": "Three named arrows, each called",
+      "description": "Three different const names each hold an arrow with at least one parameter, and each one is called. Help: 3.4.8 (The Shorthand Rules)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*?(?:const|let|var)\\s+(\\w+)\\s*=\\s*(?:\\(\\s*\\w[^)]*\\)|\\w+)\\s*=>[\\s\\S]*?(?:^|[^.\\w$])\\1\\s*\\()(?=[\\s\\S]*?(?:const|let|var)\\s+(?!\\1\\b)(\\w+)\\s*=\\s*(?:\\(\\s*\\w[^)]*\\)|\\w+)\\s*=>[\\s\\S]*?(?:^|[^.\\w$])\\2\\s*\\()(?=[\\s\\S]*?(?:const|let|var)\\s+(?!\\1\\b|\\2\\b)(\\w+)\\s*=\\s*(?:\\(\\s*\\w[^)]*\\)|\\w+)\\s*=>[\\s\\S]*?(?:^|[^.\\w$])\\3\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "ignoreStrings": true,
+      "hint": "Give each arrow its own const name and at least one parameter, then call each one by its name: console.log(triple(4))."
+    },
+    {
       "file": "script.js",
       "points": 0,
       "id": "t1",
       "title": "all three results are printed",
-      "description": "At least three values are printed, and they are not all the same. Help: 3.4.8 (Shorthand Rules)",
+      "description": "At least three values are printed. Help: 3.4.8 (Shorthand Rules)",
       "type": "tests",
       "hint": "Call each of the three arrows and print every result. Printing the three results on one line, separated by commas, is fine.",
       "checks": [
         {
-          "expr": "(T => T.length >= 3 && new Set(T).size >= 2)(output.join(' ').split(/\\s+/).filter(Boolean))",
-          "fail": "Print the result of each of your three arrows (one console.log each, or all three in one). Three different jobs should give different results."
+          "expr": "(T => T.length >= 3)(output.join(' ').split(/\\s+/).filter(Boolean))",
+          "fail": "Print the result of each of your three arrows (one console.log each, or all three in one)."
         }
       ]
     }

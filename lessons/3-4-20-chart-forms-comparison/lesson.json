@@ -63,7 +63,7 @@
       "rubric": [
         {
           "id": "two-questions",
-          "title": "Naming first, then braces",
+          "title": "Naming first, then the arrow question",
           "points": 6,
           "description": "Scored by the editor (arrow order): one decision comes before another on the route.",
           "check": {
@@ -78,7 +78,7 @@
                     "kind": "decision"
                   }
                 ],
-                "fail": "The comparison asks two questions in order: is the function named, then does the body use braces. Draw the second diamond after the first.",
+                "fail": "The comparison asks two questions in order: is the function named, then is it written with =>. Draw the second diamond after the first.",
                 "pass": "The second question follows the first."
               }
             ]
@@ -142,17 +142,17 @@
           "id": "questions-on-topic",
           "title": "The questions are about the three forms",
           "points": 4,
-          "description": "Scored by the editor: at least two diamonds ask about the function (its name, its braces).",
+          "description": "Scored by the editor: at least two diamonds ask about the function (its name, or whether it is written with =>).",
           "check": {
             "steps": [
               {
                 "op": "label",
                 "match": {
                   "kind": "decision",
-                  "re": "name|named|brace|body|function|return"
+                  "re": "name|named|brace|body|function|return|arrow|=>"
                 },
                 "min": 2,
-                "fail": "Ask about the function: is it named, and does its body use braces.",
+                "fail": "Ask about the function: is it named, and is it written with =>.",
                 "pass": "The diamonds ask about the function."
               }
             ]
@@ -162,7 +162,7 @@
       "gate": {
         "anyOf": [
           "named|name|declaration|function",
-          "braces|brace|block|return|implicit|explicit",
+          "braces|brace|block|return|implicit|explicit|arrow|=>",
           "expression|const|arrow|assign",
           "print|show|log|output|result",
           "\\b3\\b|add|sum|1 \\+ 2"

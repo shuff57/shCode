@@ -30,7 +30,7 @@ console.log(addA(1, 2), addB(1, 2), addC(1, 2));
 |---|---|
 | **Start / End** (oval) | One of each |
 | **Task** (rectangle) | Writing the declaration, writing the expression, writing the arrow, then reading the results |
-| **Decision** (diamond) | "Is the function named?" and "Does the body use braces?" |
+| **Decision** (diamond) | "Is the function named?" and "Is it written with `=>`?" |
 | **Input / Output** (parallelogram) | The final `console.log` |
 
 At least eight shapes, at least two decision diamonds, at least three task rectangles.
@@ -38,12 +38,10 @@ At least eight shapes, at least two decision diamonds, at least three task recta
 ### The three arrows that decide whether this is right
 
 1. **The `yes` exit** of "is the function named?" goes to the declaration's task: `function addA` keeps its name and its own `return`.
-2. **The `no` exit** goes on to the expression's task, where the value is assigned to a `const` and the function itself is unnamed.
-3. **Both tasks feed one more question** — "does the body use braces?" — because that is what decides whether `return` is required or can be dropped for the arrow form.
+2. **The `no` exit** goes on to one more question — "is it written with `=>`?" — because an unnamed function is either a function expression or an arrow.
+3. **Each exit of that question gets its own task**: `no` is the function expression (`function (a, b) { return ... }` assigned to a `const`), `yes` is the arrow (`(a, b) => a + b`, no `function` keyword and no `return`).
 
-That last question is the whole comparison. Braces mean a block body and an explicit `return`; no braces on a single-expression arrow means the implicit return does the work.
-
-Each exit of that last question gets its own task (one for the braces form, one for the arrow form), and then all three forms meet at the one print.
+That last question is the whole comparison. The declaration is the one with a name; of the unnamed two, only the arrow uses `=>`. All three forms then meet at the one print.
 
 ### The point of the lesson
 

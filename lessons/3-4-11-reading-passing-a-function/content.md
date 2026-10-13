@@ -40,6 +40,8 @@ console.log(applyTwice((n) => n - 1, 5));
 console.log(applyTwice((s) => s + "!", "hi"));
 ```
 
+It prints `20`, `3`, then `hi!!`. The third arrow adds `!` to `hi`, and `applyTwice` does that twice, so two `!` end up on the end.
+
 The real payoff is separating two jobs that would otherwise be tangled together: the loop that walks a list, and the rule that says what counts.
 
 **Try it:** One loop, written once, answers three different questions. The loop knows how to count; the callback knows what counts.
@@ -61,6 +63,8 @@ console.log(countMatching(readings, (n) => n > 0));
 console.log(countMatching(readings, (n) => n < 0));
 console.log(countMatching(readings, (n) => n % 2 === 0));
 ```
+
+It prints `3`, `2`, then `3`: three positives, two negatives, three even numbers.
 
 Swap the callback and you swap the question, without touching the loop. This is the idea the array methods build on.
 

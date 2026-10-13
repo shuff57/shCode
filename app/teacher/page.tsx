@@ -322,6 +322,9 @@ interface GradeResponse {
   /** Multiple-choice quizzes: one { id, picked, correct? } per question. Its
    *  presence is how the drawer tells a quiz from any other graded submission. */
   quiz?: unknown[];
+  /** Code labs: the GradeReport the workspace saved (one result per requirement, score as totalScore). */
+  results?: Array<{ id?: unknown; title?: unknown; status?: unknown; messages?: unknown }>;
+  totalScore?: number;
 }
 
 // Nearly every rubric in the course awards points: 0 per criterion and grades
@@ -420,6 +423,8 @@ function buildGradebookCsv(
       // score, so it would otherwise export as "C" — a finished lesson — into
       // the one file a teacher pastes straight into a grade system.
       if (c.pending) return 'P' + suffix;
+      // A 0-point (mastery) lab stores score 0 of 0 and reads done on screen; "0" would paste as no credit.
+      if (c.state === 'completed' && c.possible === 0) return 'C' + suffix;
       if (c.score !== null) return String(c.score) + suffix;
       if (c.state === 'completed') return 'C' + suffix;
       if (c.state === 'started') return 'S' + suffix;
@@ -927,6 +932,23 @@ function StudentDrawer({
                       if (gradeData && !gradeData.structural && Array.isArray(kept) && kept.length > 0) {
                         gradeData = { ...gradeData, structural: kept };
                       }
+                      // A code lab saves the workspace's GradeReport: `results` and `totalScore`, not the
+                      // `structural` / `totalEarned` the rest of this panel reads. Map it, or a 25 of 40
+                      // lab shows "undefined / 40 pts" and the failed requirement is nowhere to be seen.
+                      if (gradeData && !gradeData.structural && Array.isArray(gradeData.results)) {
+                        gradeData = {
+                          ...gradeData,
+                          totalEarned: typeof gradeData.totalEarned === 'number' ? gradeData.totalEarned : (gradeData.totalScore ?? 0),
+                          structural: gradeData.results
+                            .filter((r) => !!r && typeof r === 'object')
+                            .map((r) => ({
+                              id: String(r.id ?? ''),
+                              title: typeof r.title === 'string' && r.title ? r.title : String(r.id ?? 'Requirement'),
+                              passed: r.status === 'passed',
+                              detail: Array.isArray(r.messages) ? r.messages.filter((m) => typeof m === 'string').join(' ') : '',
+                            })),
+                        };
+                      }
                       // The check list is whatever the student's browser sent on some routes; the
                       // list below reads `.passed` off every entry, so keep only real objects.
                       if (gradeData && Array.isArray(gradeData.structural)) {
@@ -958,9 +980,10 @@ function StudentDrawer({
                             Late
                           </span>
                         )}
-                        {ls?.state === 'completed' && !practice && ls.score !== null && (
+                        {/* A 0-point (mastery) lab stores score 0 of 0: "0 pts" beside "Complete" reads as a zero. */}
+                        {ls?.state === 'completed' && !practice && ls.score !== null && !(sub && sub.possible === 0) && (
                           <span style={{ fontSize: 12, color: '#8be9fd', fontFamily: 'monospace', flexShrink: 0 }}>
-                            {ls.score} pts
+                            {ls.score}{sub?.possible ? ` of ${sub.possible}` : ''} pts
                           </span>
                         )}
                         {/* lessonMap.has(...) guards against a stale/renumbered id with
@@ -1055,7 +1078,7 @@ function StudentDrawer({
                             }
                             pointsMax={sub.possible !== null && sub.possible > 0 ? sub.possible : null}
                             enforceMax={typeof lesson.maxSubmissions === 'number'}
-                            onOverride={() => { setOverrideOpen(null); setNotice(`Saved. ${lesson.title} now carries your score. The student sees it on their gradebook, marked teacher-adjusted.`); setReloadKey((k) => k + 1); }}
+                            onOverride={() => { setOverrideOpen(null); setNotice(`Saved. ${lesson.title} now carries your score. ${meta?.maxScore == null ? 'The course grade does not change: this lab counts as done at 100% whatever its points.' : 'The student sees it on their gradebook, marked teacher-adjusted.'}`); setReloadKey((k) => k + 1); }}
                           />
                         </div>
                       )}

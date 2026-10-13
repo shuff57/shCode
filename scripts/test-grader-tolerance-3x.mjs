@@ -53,6 +53,8 @@ const LABS = readdirSync(path.join(root, 'lessons')).filter((d) => {
 const cases = [];
 const accept = (id, name, script) => cases.push({ id, name, files: { 'script.js': script }, expect: 'pass' });
 const reject = (id, name, req, script) => cases.push({ id, name, files: { 'script.js': script }, expect: 'fail', req });
+// A points-graded lab (3-1-10): the answer must also score below the lesson's passing score.
+const rejectBelowPass = (id, name, req, script) => cases.push({ id, name, files: { 'script.js': script }, expect: 'fail', req, belowPass: true });
 
 for (const id of LABS) {
   const sol = solutionFiles(id);
@@ -303,7 +305,9 @@ accept('3-8-23-lab-adapt-to-list', 'length and field in one console.log',
 accept('3-7-11-lab-concat-two-lists', 'labelled prints',
   js('const first = [1, 2, 3];', 'const second = [4, 5, 6];', 'const joined = first.concat(second);', 'console.log("joined:", joined);', 'console.log("first:", first);', 'console.log("second:", second);'));
 // answers that only look right
-reject('3-4-10-lab-implicit-return-drill', 'three arrows that all return the same thing', 't1',
+// (t1 no longer asks for different printed values -- honest arrows can print `true true true`;
+// r4 refuses this one instead: no parameters, and none of the three is ever called)
+reject('3-4-10-lab-implicit-return-drill', 'three arrows that all return the same thing', 'r4',
   js('const a = () => 1;', 'const b = () => 1;', 'const c = () => 1;', 'console.log(1);', 'console.log(1);', 'console.log(1);'));
 reject('3-5-8-lab-dot-vs-bracket', 'regex literals instead of code', 'r3',
   js('const a = /o["a b"]/, b = /Object.keys(.)/, c = /o[k]/;'));
@@ -360,8 +364,9 @@ reject('3-5-5-lab-read-update-fields', 'a property assigned to itself changes no
   js('const book = { title: "T", pages: 472 };', 'console.log(book.title);', 'book.title = book.title;', 'console.log(book);'));
 accept('3-5-5-lab-read-update-fields', 'one += and one new field',
   js('const book = { title: "T", pages: 472 };', 'console.log(book.title);', 'book.pages += 10;', 'book.author = "H";', 'console.log(book);'));
-reject('3-4-13-lab-one-line-callback', 'an arrow elsewhere, transform given a named function', 'r2',
-  js('function transform(value, fn) { return fn(value); }', 'const plus = (n) => n + 4;', 'console.log([1, 2].map(n => n * 2));', 'console.log(transform(6, plus));'));
+// (a one-line arrow stored in a const and passed by name is accepted since batch 6; a declaration is not)
+reject('3-4-13-lab-one-line-callback', 'an arrow elsewhere, transform given a named declaration', 'r2',
+  js('function transform(value, fn) { return fn(value); }', 'function plus(n) { return n + 4; }', 'console.log([1, 2].map(n => n * 2));', 'console.log(transform(6, plus));'));
 accept('3-4-13-lab-one-line-callback', 'arrow in the first argument slot, multi-line call',
   js('function transform(fn, value) { return fn(value); }', 'console.log(transform(', '  (n) => n + 4,', '  6));'));
 reject('3-6-8-lab-fix-reassign-bug', 'the parameter is reassigned deep inside nested blocks', 'r4',
@@ -373,6 +378,153 @@ reject('3-6-8-lab-fix-reassign-bug', 'reassigned with +=', 'r4',
 accept('3-6-8-lab-fix-reassign-bug', 'comments and strings that mention the old line',
   js('function addOne(scores) {', '  // the broken version did scores = [scores[0] + 1]', '  const note = "scores = x";', '  for (let i = 0; i < scores.length; i++) { scores[i] = scores[i] + 1; }', '}',
      'let quizScores = [10, 20, 30];', 'addOne(quizScores);', 'console.log(quizScores);'));
+
+// ---- batch 6: module 3.4 graders after the three-lens review (2026-10-13)
+// 3.4.10 and 3.4.16: three DIFFERENT named arrows, each with a parameter and each called (r4); no
+// arrow body starts with a brace (r2); three printed values (t1), which may coincide (E1).
+{
+  const D16 = js('function triple(n) { return n * 3; }', 'function isNeg(n) { return n < 0; }', 'function label(a, b) { return a + ": " + b; }');
+  for (const [id, pre] of [['3-4-10-lab-implicit-return-drill', ''], ['3-4-16-lab-rewrite-three-arrows', D16]]) {
+    accept(id, 'E1: three booleans that all print true',
+      pre + js('const isEven = n => n % 2 === 0;', 'const isPositive = n => n > 0;', 'const isSmall = n => n < 10;', 'console.log(isEven(4), isPositive(4), isSmall(4));'));
+    accept(id, 'E1: double, add and square of 2 all print 4',
+      pre + js('const double = n => n * 2;', 'const add = (a, b) => a + b;', 'const square = n => n * n;', 'console.log(double(2));', 'console.log(add(2, 2));', 'console.log(square(2));'));
+    accept(id, 'object-literal body, body on the next line, each call right after its arrow',
+      pre + js('const mk = n => ({ v: n });', 'console.log(mk(1).v);', 'const dbl = n =>', '  n * 2;', 'console.log(dbl(2));', 'const up = s => s.toUpperCase();', 'console.log(up("a"));'));
+    accept(id, 'let and var, three calls in one template literal',
+      pre + js('let a = n => n + 1;', 'var b = (n) => n * 5;', 'const c = (x, y) => x + y;', 'console.log(`${a(1)} ${b(2)} ${c(3, 4)}`);'));
+    reject(id, 'three arrows never called, a literal printed', 'r4',
+      pre + js('const a = n => n;', 'const b = n => n;', 'const c = n => n;', 'console.log("one two three");'));
+    reject(id, 'one arrow called three times', 'r4',
+      pre + js('const a = n => n;', 'const b = n => n;', 'const c = n => n;', 'console.log(a(1), a(2), a(3));'));
+    reject(id, 'three zero-parameter constants', 'r4',
+      pre + js('const a = () => 1;', 'const b = () => 2;', 'const c = () => 3;', 'console.log(a(), b(), c());'));
+    reject(id, 'three anonymous arrows', 'r4',
+      pre + js('n => n;', 'n => n;', 'n => n;', 'console.log(1, 2, 3);'));
+    reject(id, 'two of the three arrows keep a block body', 'r2',
+      pre + js('const a = n => { return n; };', 'const b = n => { return n * 2; };', 'const c = n => n + 1;', 'console.log(a(1), b(1), c(1));'));
+    reject(id, 'only two results printed', 't1',
+      pre + js('const a = n => n + 1;', 'const b = n => n * 5;', 'const c = n => n - 1;', 'console.log(a(1), b(2));', 'c(3);'));
+  }
+  // 3.4.16 step 1: the three declarations stay in the file beside the arrows (r5)
+  reject('3-4-16-lab-rewrite-three-arrows', 'step 1 skipped: arrows only, no declarations', 'r5',
+    js('const a = n => n * 2;', 'const b = n => n > 0;', 'const c = (x, y) => x + y;', 'console.log(a(2), b(2), c(2, 3));'));
+  reject('3-4-16-lab-rewrite-three-arrows', 'two declarations only', 'r5',
+    js('function f(n) { return n + 1; }', 'function g(n) { return n; }', 'const a = n => n * 2;', 'const b = n => n > 0;', 'const c = (x, y) => x + y;', 'console.log(a(2), b(2), c(2, 3));'));
+  reject('3-4-16-lab-rewrite-three-arrows', 'the declarations exist only inside a string', 'r5',
+    js('const s = "function a(n) { } function b(n) { } function c(n) { }";', 'const a = n => n * 2;', 'const b = n => n > 0;', 'const c = (x, y) => x + y;', 'console.log(a(2), b(2), c(2, 3));'));
+}
+
+// 3.4.5: the body uses the parameter (r4); no printed line may contain undefined (t1)
+accept('3-4-5-lab-declaration-to-expression', 'no semicolons, let',
+  js('let double = function (n) { return n * 2 }', 'console.log(double(7))'));
+accept('3-4-5-lab-declaration-to-expression', 'intermediate variable over several lines',
+  js('const f =', '  function (n) {', '    const r = n * 2;', '    return r;', '  };', 'console.log(f(7));'));
+accept('3-4-5-lab-declaration-to-expression', 'if/else with nested braces',
+  js('const sign = function (n) {', "  if (n > 0) { return 'plus'; } else { return 'minus'; }", '};', 'console.log(sign(7));'));
+accept('3-4-5-lab-declaration-to-expression', 'two parameters, called twice',
+  js('var add = function (a, b) { return a + b; };', 'const x = add(3, 4);', 'console.log(x, add(1, 1));'));
+reject('3-4-5-lab-declaration-to-expression', 'returns a constant and ignores its parameter', 'r4',
+  js('const f = function (x) { return 1; };', 'console.log(f(0));'));
+reject('3-4-5-lab-declaration-to-expression', 'no parameter at all', 'r4',
+  js('const f = function () { return 5; };', 'console.log(f());'));
+reject('3-4-5-lab-declaration-to-expression', 'no return: prints undefined beside a 1', 't1',
+  js('const f = function (x) { x; };', 'console.log(f(1), 1);'));
+reject('3-4-5-lab-declaration-to-expression', 'no return: prints "result: undefined"', 't1',
+  js('const f = function (x) { x * 2; };', 'console.log("result:", f(1));'));
+
+// 3.4.17: area ITSELF is the two-parameter arrow (r4); r3 needs the file to run and print, so the
+// starter's own console.log line no longer turns it green before the fix
+accept('3-4-17-lab-fix-broken-arrow', 'block body, renamed parameters',
+  js('const area = (width, height) => { return width * height; };', 'console.log(area(3, 4));'));
+accept('3-4-17-lab-fix-broken-arrow', 'the starter with only the parentheses added',
+  read('lessons/3-4-17-lab-fix-broken-arrow/script.js').replace('const area = w, h => w * h;', 'const area = (w, h) => w * h;'));
+reject('3-4-17-lab-fix-broken-arrow', 'the untouched starter fails r5 as well', 'r5',
+  read('lessons/3-4-17-lab-fix-broken-arrow/script.js'));
+reject('3-4-17-lab-fix-broken-arrow', 'fixed, but nothing printed', 'r5',
+  js('const area = (w, h) => w * h;', 'area(3, 4);'));
+reject('3-4-17-lab-fix-broken-arrow', 'a declaration beside a decoy arrow', 'r4',
+  js('function area(w, h) { return w * h; }', 'const decoy = (a, b) => 0;', 'console.log(area(3, 4));'));
+reject('3-4-17-lab-fix-broken-arrow', 'a function expression beside a decoy arrow', 'r4',
+  js('const area = function (w, h) { return w * h; };', 'const _ = (a, b) => a;', 'console.log(area(3, 4));'));
+
+// 3.4.19: two countMatching call sites, each with its own arrow inside the parentheses (r6)
+accept('3-4-19-lab-callback-capstone', 'results stored first, helper an arrow',
+  js('const countMatching = (arr, test) => { let n = 0; for (const x of arr) { if (test(x)) n += 1; } return n; };', 'const readings = [4, -2, 7, 0, -9, 3];',
+     'const pos = countMatching(readings, n => n > 0);', 'const even = countMatching(readings, n => n % 2 === 0);', 'console.log(pos, even);'));
+accept('3-4-19-lab-callback-capstone', 'both calls in one log, parenthesised bodies',
+  js('function countMatching(list, predicate) { let total = 0; for (let i = 0; i < list.length; i++) { if (predicate(list[i])) { total++; } } return total; }',
+     'const readings = [4, -2, 7, 0, -9, 3];', 'console.log(countMatching(readings, (n) => (n % 2) === 0), countMatching(readings, (n) => (n % 2) === 1));'));
+accept('3-4-19-lab-callback-capstone', 'each call spread over several lines',
+  js('function countMatching(a, t) { let c = 0; for (let i = 0; i < a.length; i++) { if (t(a[i])) { c++; } } return c; }', 'const readings = [4, -2, 7, 0, -9, 3];',
+     'console.log(countMatching(', '  readings,', '  (n) => n > 0', '));', 'console.log(countMatching(', '  readings,', '  (n) => n < 0', '));'));
+reject('3-4-19-lab-callback-capstone', 'one call only', 'r6',
+  js('const countMatching = (a, t) => { let c = 0; for (let i = 0; i < a.length; i++) { if (t(a[i])) c++; } return c; };', 'const readings = [1, 2, 3, 4, 5];',
+     'console.log(countMatching(readings, n => n > 2));'));
+reject('3-4-19-lab-callback-capstone', 'test passed by name, an unused arrow elsewhere', 'r6',
+  js('const countMatching = (a, t) => { let c = 0; for (let i = 0; i < a.length; i++) { if (t(a[i])) c++; } return c; };', 'function big(n) { return n > 2; }',
+     'const readings = [1, 2, 3, 4, 5];', 'const unused = n => n;', 'console.log(countMatching(readings, big));'));
+reject('3-4-19-lab-callback-capstone', 'two calls by name, no semicolons, arrows on the lines after', 'r6',
+  js('function countMatching(a, t) { let c = 0; for (let i = 0; i < a.length; i++) { if (t(a[i])) c++ } return c }', 'function big(n) { return n > 2 }',
+     'const readings = [1, 2, 3, 4, 5]', 'console.log(countMatching(readings, big))', 'console.log(countMatching(readings, big))', 'const x = n => n', 'const y = n => n'));
+reject('3-4-19-lab-callback-capstone', 'an arrow inside the helper body, one real call', 'r6',
+  js('function countMatching(a, t) { let c = 0; for (let i = 0; i < a.length; i++) { c += [a[i]].filter((x) => t(x)).length; } return c; }',
+     'const readings = [1, 2, 3, 4, 5];', 'console.log(countMatching(readings, n => n > 2));'));
+
+// 3.4.13: a one-line arrow stored in a const and passed by name counts (r2); the helper must still
+// call its function parameter (r1, t1); the call's result must be what is printed (r4)
+accept('3-4-13-lab-one-line-callback', 'a named one-line arrow passed by name',
+  js('function transform(value, fn) { return fn(value); }', 'const double = (n) => n * 2;', 'console.log(transform(5, double));'));
+accept('3-4-13-lab-one-line-callback', 'a named arrow with no parentheses, function first',
+  js('function transform(fn, value) { return fn(value); }', 'const plus4 = n => n + 4;', 'console.log(transform(plus4, 6));'));
+accept('3-4-13-lab-one-line-callback', 'result stored, then printed with a label',
+  js('function transform(value, fn) { return fn(value); }', 'const result = transform(6, n => n + 4);', 'console.log("result:", result);'));
+accept('3-4-13-lab-one-line-callback', 'call inside String(...) inside console.log',
+  js('function transform(value, fn) { return fn(value); }', 'console.log(String(transform(6, n => n + 4)));'));
+accept('3-4-13-lab-one-line-callback', 'labelled log built with +',
+  js('function transform(value, fn) { return fn(value); }', 'console.log("6 + 4 = " + transform(6, n => n + 4));'));
+accept('3-4-13-lab-one-line-callback', 'call inside a template literal',
+  js('const transform = (value, callback) => callback(value);', 'console.log(`${transform("a", s => s + "b")}`);'));
+accept('3-4-13-lab-one-line-callback', 'first argument nests two calls deep',
+  js('function transform(value, fn) { return fn(value); }', 'console.log(transform(Math.max(Math.abs(-3), 2), n => n + 4));'));
+reject('3-4-13-lab-one-line-callback', 'a named block-bodied arrow passed by name', 'r2',
+  js('function transform(value, fn) { return fn(value); }', 'const plus = (n) => { return n + 4; };', 'console.log(transform(6, plus));'));
+reject('3-4-13-lab-one-line-callback', 'the named arrow is CALLED in the argument, not passed', 'r2',
+  js('function transform(value, fn) { return typeof fn === "function" ? fn(value) : fn; }', 'const plus = (n) => n + 4;', 'console.log(transform(6, plus(1)));'));
+reject('3-4-13-lab-one-line-callback', 'helper never calls its parameter, named arrow passed', 'r1',
+  js('function transform(value, fn) { return value; }', 'const plus = n => n + 4;', 'console.log(transform(6, plus));'));
+reject('3-4-13-lab-one-line-callback', 'transform called, an unrelated value printed', 'r4',
+  js('function transform(v, f) { return f(v); }', 'transform(6, n => n + 4);', 'console.log("hi");'));
+reject('3-4-13-lab-one-line-callback', 'log on one line, the call on the next, no semicolons', 'r4',
+  js('function transform(v, f) { return f(v) }', 'console.log(1)', 'transform(6, n => n + 4)'));
+
+// 3.4.21 (3-1-10, A3.4.8): implicit-return arrows and `return(` count as returning (req2); greet
+// called after `return`, `?`, `:` or `=>` counts (req4); greet must really return a greeting with the
+// name (t1) and something must be printed (req6). Grading stays points-based: 40, pass at 25.
+accept('3-1-10-functions', 'every function an arrow with an implicit return',
+  js('const greet = (name) => "Hello, " + name + "!";', 'const farewell = (name) => "Bye, " + name;', 'const shout = name => name.toUpperCase();',
+     'console.log(greet("Ava"));', 'console.log(farewell("Ava"));', 'console.log(shout("Ava"));'));
+accept('3-1-10-functions', 'E3: greet called only from another function',
+  js('function greet(name) { return "Hello, " + name; }', 'function loud(name) { return greet(name).toUpperCase(); }', 'const twice = (s) => s + s;', 'console.log(loud("Ava"), twice("x"));'));
+accept('3-1-10-functions', 'E3: greet called inside an arrow body',
+  js('function greet(name) { return "Hello, " + name; }', 'const loud = (n) => greet(n).toUpperCase();', 'const twice = (s) => s + s;', 'console.log(loud("Ava"), twice("x"));'));
+accept('3-1-10-functions', 'E4: return( with no space, greet picked by a ternary',
+  js('function greet(name) { return("Hello, " + name); }', 'function bye(name) { return "Bye, " + name; }', 'const up = (s) => s.toUpperCase();', 'const formal = true;',
+     'console.log(formal ? greet("Ava") : bye("Ava"), up("a"));'));
+accept('3-1-10-functions', 'greet called inside an array literal',
+  js('function greet(name) { return "Hi " + name; }', 'const bye = (n) => "Bye " + n;', 'const list = [greet("Ava"), bye("Ava")];', 'console.log(list);'));
+rejectBelowPass('3-1-10-functions', 'gameable minimum: greet returns 1, nothing printed', 't1',
+  js('function greet(n) { return 1 }', 'const f = () => 0;', 'greet();'));
+rejectBelowPass('3-1-10-functions', 'gameable minimum: wrong greet, printed, every regex satisfied', 't1',
+  js('function greet(n) { return 1 }', 'const f = () => 0;', 'console.log(greet(), f());'));
+rejectBelowPass('3-1-10-functions', 'gameable minimum: does not parse', 't1',
+  js('function greet(n) { return n }', 'const f = () =>;', 'greet(;'));
+reject('3-1-10-functions', 'gameable minimum: everything inside if (false)', 't1',
+  js("if (false) { function greet(n) { return 'Hi ' + n; } const f = () => 0; console.log(greet('a')); }"));
+reject('3-1-10-functions', 'greet prints instead of returning', 't1',
+  js('function greet(name) { console.log("Hi " + name); }', 'const f = (n) => n;', 'greet("Ava");', 'console.log(f(1));'));
+reject('3-1-10-functions', 'nothing printed', 'req6',
+  js('function greet(name) { return "Hi " + name; }', 'const f = (n) => n;', 'greet("Ava");', 'f(1);'));
 
 try {
   execFileSync(process.execPath, [
@@ -396,6 +548,8 @@ try {
     } else if (c.req) {
       ok = failed.some((f) => f.id === c.req);
       if (!ok) detail = failed.length ? `expected ${c.req} to fail, ${failed.map((f) => f.id).join(', ')} did` : `expected ${c.req} to fail, everything passed`;
+      const passLine = lesson(c.id).grading?.passingScore ?? 0;
+      if (ok && c.belowPass && !(report.totalScore < passLine)) { ok = false; detail = `scored ${report.totalScore}/${report.totalPossible}, at or above the pass line ${passLine}`; }
     } else {
       ok = failed.length > 0;
       if (!ok) detail = 'expected some requirement to fail, everything passed';

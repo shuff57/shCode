@@ -38,7 +38,7 @@ function sayHello() {
 
 Run it. This works, even though the call comes *before* the definition on the page. Before running anything, JavaScript scans the whole file and registers every `function` declaration first. By the time the first line actually executes, `sayHello` already exists. This scan-first behavior is called **hoisting**.
 
-Do not lean on this. Hoisting is real, but code that calls things before defining them is harder for another reader to follow, and it does not apply to every way of making a function — you will meet the ways it *doesn't* apply in Section 3.2. Define first, call after. Knowing hoisting exists mostly helps you understand why a call that "should" have failed did not.
+Do not lean on this. Hoisting is real, but code that calls things before defining them is harder for another reader to follow, and it does not apply to every way of making a function — you will meet the ways it *doesn't* apply in Section 3.4 (3.4.14). Define first, call after. Knowing hoisting exists mostly helps you understand why a call that "should" have failed did not.
 
 ---
 

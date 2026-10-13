@@ -16,7 +16,7 @@ It prints `5`. Nothing surprising yet.
 
 ## Step 2: The same function as an expression
 
-Move the function to the right of an `=`. The name and the `function` keyword stay, but the whole thing is now a value assigned to a const.
+Move the function to the right of an `=`. The `function` keyword stays, but the name moves out in front of the `=`: the whole thing is now a value assigned to a const, and the const supplies the name.
 
 ```js live plain
 const addExpressed = function (a, b) {
@@ -26,7 +26,7 @@ const addExpressed = function (a, b) {
 console.log(addExpressed(2, 3));
 ```
 
-Still `5`. The expression has no name after `function`; the const supplies the name.
+Still `5`. There is no name after `function`; write `function (a, b)`, not `function add(a, b)`.
 
 ## Step 3: The same function as an arrow
 

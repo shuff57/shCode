@@ -43,7 +43,7 @@ console.log(countMatching(readings, (n) => n < 0));
 console.log(countMatching(readings, (n) => n % 2 === 0));
 ```
 
-`3`, then `2`, then `3`. One loop, written once, answers three questions.
+These two lines print `2` then `3`. Together with the `3` from step 1, that is `3`, `2`, `3`: one loop, written once, answers three questions.
 
 ## Step 3: The mistake the parentheses cause
 

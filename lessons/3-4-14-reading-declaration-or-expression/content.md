@@ -20,9 +20,9 @@ function declared(n) {
 }
 ```
 
-JavaScript reads the whole file before running it and prepares every function declaration in advance. This is called **hoisting**.
+JavaScript reads the whole file before running it and prepares every function declaration in advance. This is the **hoisting** you met in 3.1.4.
 
-A function **expression** — including an arrow — gets no such treatment.
+A function **expression** — including an arrow — gets no such treatment: the variable that holds it cannot be used before its line has run.
 
 **Try it:** The same call, above the line, but now the function is an expression. It fails.
 
@@ -76,6 +76,6 @@ console.log(areas);
 |------|---------|
 | **hoisting** | Preparing function declarations before any code runs |
 | **declaration** | Hoisted: callable from above its definition |
-| **expression / arrow** | Not hoisted: its variable is empty until that line runs |
+| **expression / arrow** | Not usable early: its variable cannot be used until that line has run |
 | **`ReferenceError`** | The error a call before an expression's line produces |
 | **when to choose** | Declaration for main operations; arrow for short helpers and callbacks |

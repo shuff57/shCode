@@ -1,7 +1,19 @@
-const triple = (n) => n * 3;
-const isNegative = (n) => n < 0;
-const label = (name, score) => name + ": " + score;
+function triple(n) {
+  return n * 3;
+}
 
-console.log(triple(5));
-console.log(isNegative(-1));
-console.log(label("Ada", 100));
+function isNegative(n) {
+  return n < 0;
+}
+
+function label(name, score) {
+  return name + ": " + score;
+}
+
+const tripleArrow = (n) => n * 3;
+const isNegativeArrow = (n) => n < 0;
+const labelArrow = (name, score) => name + ": " + score;
+
+console.log(tripleArrow(5), triple(5));
+console.log(isNegativeArrow(-1), isNegative(-1));
+console.log(labelArrow("Ada", 100), label("Ada", 100));

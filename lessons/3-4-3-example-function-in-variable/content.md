@@ -57,5 +57,5 @@ try {
 
 - A function is a value: it can be stored in a variable and printed like any other.
 - `greet` is the value; `greet()` is a call that produces a value.
-- `const copy = greet;` aliases the same function under a new name.
+- `const copy = greet;` gives the same function a second name; both names hold the same function.
 - A stray `()` at the moment of copying stores the return value instead of the function.

@@ -67,6 +67,18 @@
       "hint": "Print with console.log so you can see the result and check it against what you expected."
     },
     {
+      "id": "r4",
+      "title": "The function uses its parameter",
+      "description": "The function expression has a parameter and its body uses it. Help: 3.4.4 (Function Expressions)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:const|let|var)\\s+\\w+\\s*=\\s*function\\s*\\(\\s*(\\w+)[^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?(?:^|[^\\w$.])\\1\\b",
+      "flags": "i",
+      "points": 0,
+      "ignoreStrings": true,
+      "hint": "Give the function a parameter and compute the returned value from it: function (n) { return n * 2; }."
+    },
+    {
       "file": "script.js",
       "points": 0,
       "id": "t1",
@@ -76,7 +88,7 @@
       "hint": "Call the function through its const and print what it returns. A function with no return prints undefined.",
       "checks": [
         {
-          "expr": "output.length >= 1 && !output.some(l => l.trim() === 'undefined')",
+          "expr": "output.length >= 1 && !output.some(l => /\\bundefined\\b/.test(l))",
           "fail": "Print the value your function returns: console.log(yourConst(7)). The function needs a return."
         }
       ]

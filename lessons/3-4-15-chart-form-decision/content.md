@@ -23,7 +23,7 @@ Two questions settle it: *is this a main operation called from several places?* 
 | **Task** (rectangle) | Write a function declaration / write a one-line arrow with implicit return / write an arrow with a block body and an explicit `return` |
 | **Input / Output** (parallelogram) | Reading in the function's job before the first question |
 
-At least six shapes, at least two decision diamonds, at least two task rectangles.
+At least six shapes, at least two decision diamonds, at least three task rectangles (one for each form you might choose).
 
 ### The three things that decide whether this is right
 

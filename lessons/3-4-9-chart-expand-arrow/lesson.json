@@ -1,6 +1,6 @@
 {
   "id": "3-4-9-chart-expand-arrow",
-  "title": "3.4.9 Chart the Code: Expanding an Arrow to Its Full Form",
+  "title": "3.4.9 Chart the Code: A Function That Calls Its Parameter Twice",
   "description": "Chart a function that calls another function twice: read the parameters, make the first call, make the second call on its result, and print.",
   "type": "lesson",
   "estimateMins": 20,
@@ -27,10 +27,6 @@
       },
       {
         "id": "no-orphans"
-      },
-      {
-        "id": "min-process",
-        "count": 2
       },
       {
         "id": "decision-two-exits"
@@ -60,7 +56,7 @@
           "id": "three-steps",
           "title": "Read, first call, second call, then the print",
           "points": 5,
-          "description": "Scored by the editor (shape kind): at least four task or input/output shapes, for reading the parameters, the two calls and the print.",
+          "description": "Scored by the editor (shape kind): at least four task, function-call or input/output shapes, for reading the parameters, the two calls and the print.",
           "check": {
             "steps": [
               {
@@ -68,6 +64,7 @@
                 "match": {
                   "kind": [
                     "process",
+                    "subroutine",
                     "io"
                   ]
                 },
@@ -82,14 +79,17 @@
           "id": "order",
           "title": "The work comes first, then the print, then End",
           "points": 6,
-          "description": "Scored by the editor (arrow order): tasks, then an input/output step, then End, on every route.",
+          "description": "Scored by the editor (arrow order): tasks or function calls, then an input/output step, then End, on every route.",
           "check": {
             "steps": [
               {
                 "op": "sequence",
                 "of": [
                   {
-                    "kind": "process"
+                    "kind": [
+                      "process",
+                      "subroutine"
+                    ]
                   },
                   {
                     "kind": "io"
@@ -108,13 +108,16 @@
           "id": "straight",
           "title": "A straight line, no repeat",
           "points": 5,
-          "description": "Scored by the editor (arrow order): no task is part of a repeat.",
+          "description": "Scored by the editor (arrow order): no task or function call is part of a repeat.",
           "check": {
             "steps": [
               {
                 "op": "not-in-cycle",
                 "match": {
-                  "kind": "process"
+                  "kind": [
+                    "process",
+                    "subroutine"
+                  ]
                 },
                 "fail": "This code runs once from top to bottom, so no arrow should lead back to an earlier step. In your chart one does.",
                 "pass": "No arrow leads back."

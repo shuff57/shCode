@@ -33,7 +33,7 @@
     {
       "id": "r1",
       "title": "Parameters wrapped in parentheses",
-      "description": "An arrow function is written with parentheses around its parameter list. Help: 3.4.6 (Arrow Functions)",
+      "description": "An arrow function is written with parentheses around its parameter list. Help: 3.4.8 (The Shorthand Rules)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\([^)]*\\)\\s*=>",
@@ -45,7 +45,7 @@
     {
       "id": "r2",
       "title": "Two parameters inside the parentheses",
-      "description": "The parenthesised parameter list holds two comma-separated parameters. Help: 3.4.6 (Arrow Functions)",
+      "description": "The parenthesised parameter list holds two comma-separated parameters. Help: 3.4.8 (The Shorthand Rules)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\([^)]*,[^)]*\\)\\s*=>",
@@ -55,16 +55,31 @@
       "hint": "Both names, separated by a comma, go inside the one pair of parentheses before =>."
     },
     {
-      "id": "r3",
-      "title": "console.log present",
-      "description": "Code calls console.log. Help: 3.4.6 (Arrow Functions)",
+      "file": "script.js",
+      "points": 0,
+      "id": "r5",
+      "title": "The fixed code runs and prints",
+      "description": "Once the arrow parses, the console.log line runs and prints a result. Help: 3.4.8 (The Shorthand Rules)",
+      "type": "tests",
+      "hint": "A syntax error stops the whole file, so nothing prints until the parameter list is fixed. Fix it and press Run.",
+      "checks": [
+        {
+          "expr": "output.length >= 1",
+          "fail": "Nothing was printed. Fix the arrow so the file runs, and keep the console.log line."
+        }
+      ]
+    },
+    {
+      "id": "r4",
+      "title": "area is an arrow with two parameters",
+      "description": "area itself is a const holding an arrow with two parameters in parentheses. Help: 3.4.8 (The Shorthand Rules)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(",
+      "pattern": "(?:const|let|var)\\s+area\\s*=\\s*\\(\\s*\\w+\\s*,\\s*\\w+\\s*\\)\\s*=>",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Print with console.log so you can see the result and check it against what you expected."
+      "hint": "Fix the arrow that is there: const area = (w, h) => w * h; Do not swap it for a function declaration."
     },
     {
       "file": "script.js",
