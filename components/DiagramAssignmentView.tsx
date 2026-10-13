@@ -128,6 +128,10 @@ export default function DiagramAssignmentView({
   const { graders, grader, setGrader } = useGraderChoice();
   const [error, setError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
+  // The part is complete and the student has not moved on. Advancing is always the
+  // student's click: the page used to navigate away 1.2-1.5 s after a pass, which
+  // took the feedback off the screen before it could be read.
+  const [canAdvance, setCanAdvance] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   const progress = useLessonState();
@@ -263,8 +267,7 @@ export default function DiagramAssignmentView({
         if (capped) cap.spend();
       }
       await recordLessonCompleted(lessonId, capped ? bestOf(passedCount) : 0);
-      // A capped part stays on the page so the student can use their other tries.
-      if (!capped) setTimeout(() => navigateToNextLesson(lessonId), 1200);
+      setCanAdvance(true);
       return;
     }
 
@@ -319,8 +322,8 @@ export default function DiagramAssignmentView({
         await recordLessonCompleted(lessonId, bestOf(data.totalEarned));
       } else if (isPassing(data as GradeResult)) {
         await recordLessonCompleted(lessonId, bestOf(data.totalEarned));
-        setTimeout(() => navigateToNextLesson(lessonId), 1500);
       }
+      setCanAdvance(capped || isPassing(data as GradeResult));
       if (progress.authed) {
         recordSubmission({
           lessonId,
@@ -438,16 +441,17 @@ export default function DiagramAssignmentView({
           }}
         >
           {grading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-          {/* Structure-only lessons have no feedback to offer — the checks are the
-              grade — so promising it on the button misnames what the click does. */}
+          {/* A chart with an aiGrader is graded: the rules checks and the AI-judged
+              criteria both carry points, so "for feedback" undersold what the click
+              does. A structure-only chart is just "Submit". */}
           {grading
             ? stage
               ? `${GRADE_STAGE_LABELS[stage]}…`
               : 'Grading…'
             : config.aiGrader
               ? result
-                ? 'Re-submit for feedback'
-                : 'Submit for feedback'
+                ? 'Re-submit for grading'
+                : 'Submit for grading'
               : summative && checks !== null && failedCount > 0
                 ? 'Hand in what I have'
                 : 'Submit'}
@@ -596,11 +600,47 @@ export default function DiagramAssignmentView({
         </div>
       )}
 
+      {canAdvance && (
+        <div
+          style={{
+            marginTop: 16,
+            padding: 12,
+            borderRadius: 6,
+            border: '1px solid #50fa7b55',
+            background: 'rgba(80,250,123,0.06)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            flexWrap: 'wrap',
+          }}
+        >
+          <span style={{ color: '#f8f8f2', fontSize: 13.5, flex: '1 1 240px' }}>
+            {result
+              ? 'This part is complete. Read your feedback below, then move on when you are ready.'
+              : 'All checks passed and this part is complete.'}
+          </span>
+          <button
+            onClick={() => navigateToNextLesson(lessonId)}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 6,
+              border: 'none',
+              fontWeight: 600,
+              cursor: 'pointer',
+              background: '#50fa7b',
+              color: '#282a36',
+            }}
+          >
+            Next lesson →
+          </button>
+        </div>
+      )}
+
       {result && (
         <div style={{ marginTop: 20 }}>
           <h3 style={{ fontSize: 14, color: '#bd93f9', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <Sparkles size={16} />
-            {config.aiGrader?.rubricTitle ?? 'AI feedback on your logic'}
+            {config.aiGrader?.rubricTitle ?? 'Your grade and feedback'}
           </h3>
           {result.summary && (
             <div

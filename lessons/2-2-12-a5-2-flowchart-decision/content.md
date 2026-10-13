@@ -32,6 +32,6 @@ Use the canvas below. The **Start** and **End** ovals are already placed: everyt
 
 ### Before you submit
 
-Press **Check my diagram** first. That runs the structure checks: one Start, one End, no floating shapes, two labelled exits on every diamond, and tells you exactly which shape is wrong. Fix anything red, then press **Submit for feedback** and the AI grader will look at whether your logic actually charges the right price to the right customer.
+Press **Check my diagram** first. That runs the structure checks: one Start, one End, no floating shapes, two labelled exits on every diamond, and tells you exactly which shape is wrong. Fix anything red, then press **Submit for grading**. Some of the points come from the AI grader, which looks at whether your logic actually charges the right price to the right customer.
 
 You can revise and resubmit as many times as you want. Getting this green unlocks 2.2.8 A2.2.1 (Part A) next: the same chart-before-you-write habit you will use for every graded project from here on.
