@@ -2,10 +2,11 @@
 // POST /api/classes/[id]/submission-queue   body: { submissionId, score, feedback? }
 //
 // Teacher review queue for AI-graded written submissions.
-// GET returns the 50 most recent graded submissions across all enrolled
-// students. That includes attempts the grader FAILED on: those carry a
-// gradingFailed marker in grade_json with score NULL, so they match this
-// query unchanged and surface as "needs manual grade" in the UI.
+// GET returns, across all enrolled students, every row that still needs a human
+// first (an attempt the grader FAILED on: a gradingFailed marker in grade_json and
+// score NULL, shown as "needs manual grade"), then the 50 most recent other graded
+// rows; at most 100 in all (lib/submission-queue-order.ts). The rows needing a human
+// are fetched by their own query so routine rows can never push them off the list.
 // POST lets a teacher override the AI score and optionally attach feedback.
 //
 // Auth: caller must be an owner / co-teacher of the class OR an admin.
@@ -13,6 +14,7 @@
 import { canManageClass } from '../../../../_shared/classAuth';
 import { bestScoreOverAllRows, capFor, rowScore, scoreOverride } from '../../../../_shared/attempts';
 import { loadAiGrader } from '../../../../_shared/aiGraders';
+import { orderQueue, QUEUE_ROUTINE_CAP, QUEUE_TOTAL_CAP } from '../../../../../lib/submission-queue-order';
 
 interface Env {
   DB: D1Database;
@@ -76,7 +78,7 @@ async function rowLimit(
   return null;
 }
 
-// GET — return the 50 most recent AI-graded submissions for this class.
+// GET — rows needing a human first, then the most recent graded submissions, for this class.
 export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
   context: Ctx,
 ) => {
@@ -93,7 +95,28 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
 
   const now = Date.now();
 
-  const result = await env.DB.prepare(
+  // Rows a human must grade: the outage marker by the same exact JSON rule attempts.ts counts with
+  // (json_valid first, so one malformed legacy row cannot raise), and no score yet. orderQueue
+  // re-checks each in JS.
+  const pending = await env.DB.prepare(
+    `SELECT id, student_email, lesson_id, response, grade_json, score, possible, submitted_at
+       FROM lesson_submissions
+      WHERE grade_json IS NOT NULL
+        AND score IS NULL
+        AND CASE WHEN json_valid(grade_json)
+                 THEN json_type(grade_json, '$.gradingFailed') = 'true'
+                 ELSE 0 END
+        AND student_email IN (
+          SELECT student_email FROM enrollments
+           WHERE class_id = ?1 AND expires_at > ?2
+        )
+      ORDER BY submitted_at DESC
+      LIMIT ?3`,
+  )
+    .bind(classId, now, QUEUE_TOTAL_CAP)
+    .all<SubmissionRow>();
+
+  const recent = await env.DB.prepare(
     `SELECT id, student_email, lesson_id, response, grade_json, score, possible, submitted_at
        FROM lesson_submissions
       WHERE grade_json IS NOT NULL
@@ -102,16 +125,18 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
            WHERE class_id = ?1 AND expires_at > ?2
         )
       ORDER BY submitted_at DESC
-      LIMIT 50`,
+      LIMIT ?3`,
   )
-    .bind(classId, now)
+    .bind(classId, now, QUEUE_ROUTINE_CAP)
     .all<SubmissionRow>();
+
+  const rows = orderQueue(pending.results ?? [], recent.results ?? []);
 
   // `capped` tells the form whether the ceiling is ENFORCED: only a part with a try limit has one
   // (the POST below refuses a mark above it there); on any other part the unit is a label and a
   // teacher may still give extra credit (round 7).
   const submissions = await Promise.all(
-    (result.results ?? []).map(async (r) => ({ ...r, limit: await rowLimit(env, request, r), capped: capFor(r.lesson_id) !== undefined })),
+    rows.map(async (r) => ({ ...r, limit: await rowLimit(env, request, r), capped: capFor(r.lesson_id) !== undefined })),
   );
   return json({ submissions });
 };

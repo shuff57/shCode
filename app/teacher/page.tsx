@@ -424,7 +424,8 @@ function buildGradebookCsv(
       // the one file a teacher pastes straight into a grade system.
       if (c.pending) return 'P' + suffix;
       // A 0-point (mastery) lab stores score 0 of 0 and reads done on screen; "0" would paste as no credit.
-      if (c.state === 'completed' && c.possible === 0) return 'C' + suffix;
+      // A teacher's mark on one (override score) is the one non-zero number such a lab can hold: keep it.
+      if (c.state === 'completed' && c.possible === 0) return (c.score ? String(c.score) : 'C') + suffix;
       if (c.score !== null) return String(c.score) + suffix;
       if (c.state === 'completed') return 'C' + suffix;
       if (c.state === 'started') return 'S' + suffix;
@@ -981,7 +982,7 @@ function StudentDrawer({
                           </span>
                         )}
                         {/* A 0-point (mastery) lab stores score 0 of 0: "0 pts" beside "Complete" reads as a zero. */}
-                        {ls?.state === 'completed' && !practice && ls.score !== null && !(sub && sub.possible === 0) && (
+                        {ls?.state === 'completed' && !practice && ls.score !== null && !(sub && sub.possible === 0 && !ls.score) && (
                           <span style={{ fontSize: 12, color: '#8be9fd', fontFamily: 'monospace', flexShrink: 0 }}>
                             {ls.score}{sub?.possible ? ` of ${sub.possible}` : ''} pts
                           </span>
@@ -1078,6 +1079,7 @@ function StudentDrawer({
                             }
                             pointsMax={sub.possible !== null && sub.possible > 0 ? sub.possible : null}
                             enforceMax={typeof lesson.maxSubmissions === 'number'}
+                            zeroPoint={meta?.maxScore == null && !(sub.possible !== null && sub.possible > 0) && !(gradeData && Array.isArray(gradeData.criteria) && gradeData.criteria.length > 0)}
                             onOverride={() => { setOverrideOpen(null); setNotice(`Saved. ${lesson.title} now carries your score. ${meta?.maxScore == null ? 'The course grade does not change: this lab counts as done at 100% whatever its points.' : 'The student sees it on their gradebook, marked teacher-adjusted.'}`); setReloadKey((k) => k + 1); }}
                           />
                         </div>
@@ -1452,7 +1454,9 @@ function GradebookView({
     if (cell.state === 'completed') {
       const pct = lessonPercent(cell.state, cell.score, maxScore);
       if (!graded) return `${cell.late ? 'Completed late' : 'Done'}, practice (not graded)`;
-      const pts = cell.score !== null && maxScore != null && maxScore > 0 ? `, best ${Math.round(cell.score * 100) / 100} of ${maxScore} points` : '';
+      let pts = cell.score !== null && maxScore != null && maxScore > 0 ? `, best ${Math.round(cell.score * 100) / 100} of ${maxScore} points` : '';
+      // A 0-point lab reads 100% whatever it holds; the one number it can carry is the teacher's mark.
+      if (cell.possible === 0 && cell.score) pts = `, teacher mark ${cell.score}`;
       return `${cell.late ? 'Completed late' : 'Done'}, ${pct}%${pts}`;
     }
     if (cell.state === 'started') {

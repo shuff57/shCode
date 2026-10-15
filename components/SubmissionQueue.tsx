@@ -126,6 +126,19 @@ function isQuizGrade(raw: string): boolean {
   }
 }
 
+/** A console code lab saves the workspace's GradeReport: one `results` entry per requirement, passed or failed.
+ *  Nothing AI scored it, so the row says how many checks passed instead of "AI score: 0 / 0". */
+function labChecks(raw: string): { passed: number; total: number } | null {
+  try {
+    const results = (JSON.parse(raw) as { results?: unknown })?.results;
+    if (!Array.isArray(results) || results.length === 0) return null;
+    const rows = results.filter((r): r is { status?: unknown } => !!r && typeof r === 'object');
+    return { passed: rows.filter((r) => r.status === 'passed').length, total: rows.length };
+  } catch {
+    return null;
+  }
+}
+
 /** True when the grade_json shows a human has set this row's score since the
  *  AI failed on it. The override endpoint stamps teacherReviewedAt (with
  *  feedback) or teacherOverriddenAt (score only) — same fields the student
@@ -150,8 +163,14 @@ interface OverrideFormProps {
   unitTotal: number | null;
   /** A pointed part: the mark is points, out of this many. Null: unknown. */
   pointsMax?: number | null;
-  /** The ceiling is enforced (a capped part). Elsewhere the unit is a label and extra credit is allowed. */
+  /** The part has a try limit (the server's capFor): the ceiling is enforced, and "keep the higher of
+   *  the mark and the best try" plus the persisted score choice apply. Elsewhere the unit is a label,
+   *  extra credit is allowed, the mark simply becomes the score, and there is no choice to clear (the
+   *  server 400s a clear there), so neither the box nor the clear button is shown. */
   enforceMax?: boolean;
+  /** A 0-point part (no criteria, no points): the mark is recorded for the teacher and the course
+   *  grade does not change (the lab counts as done at 100%). */
+  zeroPoint?: boolean;
   onOverride: () => void;
 }
 
@@ -162,10 +181,10 @@ function markUnit(g: GradeJson | null): { total: number } | null {
   return { total: g.criteria.length };
 }
 
-export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, enforceMax = false, onOverride }: OverrideFormProps) {
+export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, enforceMax = false, zeroPoint = false, onOverride }: OverrideFormProps) {
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
-  // Capped parts only matter, but the box is harmless elsewhere (the server ignores it).
+  // Capped parts only: the box is not rendered elsewhere (the server ignores it there anyway).
   const [replaceBest, setReplaceBest] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -254,7 +273,13 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <label htmlFor={`override-score-${submissionId}`} style={{ fontSize: '0.82rem', color: '#f8f8f2' }}>
-          {unitTotal !== null ? `New mark (criteria met, out of ${unitTotal}):` : pointsMax !== null ? `New score (points, out of ${pointsMax}):` : 'New score:'}
+          {unitTotal !== null
+            ? `New mark (criteria met, out of ${unitTotal}):`
+            : pointsMax !== null
+              ? `New score (points, out of ${pointsMax}):`
+              : zeroPoint
+                ? 'New mark (0-point lab: recorded for you, does not change the course grade):'
+                : 'New score:'}
         </label>
         <input
           id={`override-score-${submissionId}`}
@@ -300,10 +325,12 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         />
       </div>
 
-      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#8393c4' }}>
-        <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
-        Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit). This stays until you change or clear it; the student&apos;s later tries do not undo it.
-      </label>
+      {enforceMax && (
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#8393c4' }}>
+          <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
+          Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit). This stays until you change or clear it; the student&apos;s later tries do not undo it.
+        </label>
+      )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <button
@@ -323,6 +350,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         >
           {submitting ? 'Overriding...' : 'Override grade'}
         </button>
+        {enforceMax && (
         <button
           type="button"
           onClick={handleClear}
@@ -332,6 +360,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         >
           Clear my score choice
         </button>
+        )}
 
         {msg && (
           <span style={{ fontSize: '0.82rem', color: msg.type === 'success' ? '#50fa7b' : '#ff5555' }}>
@@ -422,7 +451,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
       {/* The list below is the most recent graded work of every kind, so say that first and count what is
           listed; the orange note then counts only the rows the AI grader failed on. */}
       <div style={{ fontSize: '0.84rem', color: '#a9b7e0' }}>
-        {submissions.length} recent submission{submissions.length === 1 ? '' : 's'}, newest first
+        {submissions.length} recent submission{submissions.length === 1 ? '' : 's'}, {needsManual > 0 ? 'the ones needing a manual grade first, then ' : ''}newest first
         {needsManual > 0 ? '' : '. Every one has a score; override it below if you disagree'}.
       </div>
       {needsManual > 0 && (
@@ -508,10 +537,15 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                       ? `Teacher mark: ${sub.score ?? '—'} of ${unit.total} criteria`
                       : `AI: ${criteriaScore(gradeData?.criteria as Array<{ verdict: string }>)} of ${unit.total} criteria met`
                     : hasTeacherReview(sub.grade_json)
-                      ? `Teacher score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
+                      ? // A 0-point lab stores 0 of 0, so "7 / 0" would be the teacher's own mark over nothing.
+                        sub.possible === 0
+                        ? `Teacher mark: ${sub.score ?? '—'}`
+                        : `Teacher score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
                       : isQuizGrade(sub.grade_json)
                         ? `Quiz score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
-                        : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
+                        : labChecks(sub.grade_json)
+                          ? `Lab checks: ${labChecks(sub.grade_json)!.passed} of ${labChecks(sub.grade_json)!.total} passed`
+                          : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
               </div>
             </div>
 
@@ -673,7 +707,15 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
             )}
 
             {/* Override form */}
-            <OverrideForm classId={classId} submissionId={sub.id} unitTotal={unit?.total ?? null} pointsMax={sub.limit?.unit === 'points' ? sub.limit.max : null} enforceMax={sub.capped === true} onOverride={handleOverride} />
+            <OverrideForm
+              classId={classId}
+              submissionId={sub.id}
+              unitTotal={unit?.total ?? null}
+              pointsMax={sub.limit?.unit === 'points' ? sub.limit.max : null}
+              enforceMax={sub.capped === true}
+              zeroPoint={!unit && sub.limit?.unit !== 'points' && sub.possible === 0 && !isQuizGrade(sub.grade_json)}
+              onOverride={handleOverride}
+            />
           </div>
         );
       })}
