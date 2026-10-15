@@ -104,6 +104,21 @@ export interface Requirement {
   expectOutput?: string[];
   /** type: 'tests' only. Each string must appear in the script's printed text. */
   expectOutputContains?: string[];
+  /** type: 'tests' only, opt-in. Watch which console.log calls RUN: each call
+   *  site is tracked, and `checks` see a `trace` binding ({prints, perturbed,
+   *  code, text}); see "EXECUTION TRACE" in lib/test-harness-source.ts. */
+  trace?: boolean;
+  /** type: 'tests' only, with `trace`. Top-level names whose data is changed in
+   *  a second, silent run, so a check can tell a printed value that came from
+   *  that data (it changes) from typed-in text (it does not). "*" is every
+   *  literal assigned to a name; "{}" adds a run that marks each key a
+   *  destructuring declaration unpacks. */
+  perturb?: string[];
+  /** type: 'regex' only. The id of a `tests` requirement of the same lesson whose
+   *  pass, on the code exactly as it is now, also passes this one: the run proved
+   *  at run time what the pattern looks for in the text (a print reached through a
+   *  helper, an alias or a variable the pattern cannot follow). */
+  orTest?: string;
 }
 
 /** One named top-level variable of a script-level `tests` requirement. */
@@ -122,6 +137,10 @@ export interface VariableCheck {
 export interface ScriptCheck {
   expr: string;
   fail?: string;
+  /** Optional author expression (same bindings as `expr`) giving the failure
+   *  sentence, so it can name what the student wrote; a throw or a non-string
+   *  falls back to `fail`. */
+  failExpr?: string;
   hidden?: boolean;
 }
 

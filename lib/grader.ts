@@ -258,6 +258,12 @@ export function grade(
     switch (type) {
       case 'regex':
         passed = checkRegex(req, files);
+        if (!passed && typeof req.orTest === 'string' && req.orTest !== '') {
+          // The named tests requirement proved this at run time (see Requirement.orTest);
+          // results from older code never count.
+          const tr = context?.testResults;
+          passed = !!tr && tr.code === (files[req.file || 'script.js'] ?? '') && tr.byId[req.orTest]?.status === 'passed';
+        }
         break;
       case 'inFunction':
         passed = checkInFunction(req, files);

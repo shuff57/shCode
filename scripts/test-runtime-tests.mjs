@@ -400,6 +400,116 @@ try {
     await expectFail('a variable name that is not an identifier fails closed (never evaluated)', 'let x = 1;', V('bn', { variables: [{ name: 'x);alert(1', expect: 1 }] }), /cannot be read/);
   }
 
+  console.log('\nexecution trace: which console.log calls ran, and whether their text came from the data');
+  {
+    const V = (id, extra) => ({ id, title: id, description: '', status: 'pending', type: 'tests', points: 1, ...extra });
+    // Run once with an author check over `trace`; on failure the message carries the trace (clipped).
+    async function traceCheck(name, code, perturb, expr) {
+      const r = await one(code, V('tr', { trace: true, ...(perturb ? { perturb } : {}), checks: [{ expr, failExpr: 'JSON.stringify(trace.prints.map((p) => [p.ran, p.out, p.out2])) + " " + trace.perturbed' }] }));
+      check(name, r.passed, r.msg);
+    }
+    const CHANGED = 'trace.prints.map((p) => JSON.stringify(p.out) !== JSON.stringify(p.out2)).join(",")';
+    await traceCheck('every call site is listed with its argument text', 'console.log("a");\nif (false) { console.log("b"); }\nfor (const x of []) console.log(x);\nfunction never() { console.log("c"); }\n[1, 2].forEach((n) => console.log(n * 2));', null,
+      'trace.prints.length === 5 && trace.prints[0].src === \'"a"\' && trace.prints[4].src === "n * 2"');
+    await traceCheck('a site that ran counts its runs; dead ones count zero', 'console.log("a");\nif (false) { console.log("b"); }\nfor (const x of []) console.log(x);\nfunction never() { console.log("c"); }\n[1, 2].forEach((n) => console.log(n * 2));', null,
+      'trace.prints.map((p) => p.ran).join(",") === "1,0,0,0,2" && trace.prints[4].out.join(",") === "2,4"');
+    await traceCheck('without perturb there is no second run', 'console.log("a");', null, 'trace.prints[0].out2 === null && trace.perturbed === false');
+    const TRICKY = '// console.log("in a comment")\nconst s = "console.log(1)";\nconst r = /console.log(x)/;\nconst q = `console.log(${1 + 1})`;\nconsole.log(s.length, r.source.length, q);\nconsole . log ( `t ${ console.log("inner") }` );';
+    await traceCheck('comments, strings, regular expressions and template text hold no call sites', TRICKY, null,
+      'trace.prints.length === 3 && trace.prints[0].src === "s.length, r.source.length, q" && trace.prints[2].src === \'"inner"\' && trace.prints[0].out[0] === "14 14 console.log(2)"');
+    await traceCheck('the code field blanks string contents, the template part stays code', TRICKY, null,
+      'trace.prints[1].code.includes("console.log(") && !trace.prints[1].code.includes("inner") && !trace.prints[1].code.includes("t ") && trace.code.length === trace.text.length');
+    {
+      const code = 'const book = { title: "Dune", pages: 412 };\nconsole.log(book.title);\nconsole.log("Dune");\nlet t = "Dune";\nif (false) { t = book.title; }\nconsole.log(t);\nconsole.log(book.title.slice(0, 0) + "Dune");\nconsole.log(book.pages * 2);\nconsole.log(book);';
+      await traceCheck('perturb: a read of the data prints differently, typed text and a thrown-away read do not', code, ['book'],
+        CHANGED + ' === "true,false,false,false,true,true" && trace.perturbed === true');
+      const run = await runCodeWithTests(code, jobsFromRequirements([V('tr', { trace: true, perturb: ['book'], checks: [{ expr: 'true' }] })]));
+      check('the second run prints nothing: output is exactly the real run', run.logs.map((l) => l.message).join('|') === 'Dune|Dune|Dune|Dune|824|{\n  "title": "Dune",\n  "pages": 412\n}', JSON.stringify(run.logs));
+    }
+    await traceCheck('perturb: a method\'s result printed changes; a discarded call, a dead branch, a built-in do not',
+      'const student = { name: "Ana", greet() { return "Hi " + this.name; }, hi: () => "Hello" };\nconsole.log(student.greet());\nconsole.log((student.greet(), "Hi Ana"));\nconsole.log(0 ? student.greet() : "Hi Ana");\nconsole.log(student.hi());\nconst g = student.hi;\nconsole.log(g());\nconsole.log(student["toString"]());\nstudent.bye = (w) => "Bye " + w;\nconsole.log(student.bye("Dev"));', ['student'],
+      CHANGED + ' === "true,false,false,true,true,false,true"');
+    await traceCheck('perturb: a named function\'s result printed changes, a discarded one does not',
+      'function describeBox(o) { return o.color + " " + o.width; }\nconsole.log(describeBox({ color: "red", width: 2 }));\nconsole.log((describeBox({ color: "red", width: 2 }), "red 2"));\nconst d2 = (o) => o.color;\nconsole.log(d2({ color: "x" }));', ['describeBox', 'd2'],
+      CHANGED + ' === "true,false,true"');
+    await traceCheck('perturb: records in an array change through the loop and a destructure; the length (so the index) does not',
+      'const players = [{ name: "A", score: 3 }, { name: "B", score: 4 }];\nfor (const p of players) { console.log(p.name, p.score); }\nfor (let i = 0; i < players.length; i++) console.log(i);\nconst { name } = players[0];\nconsole.log(name);', ['players'],
+      CHANGED + ' === "true,false,true" && trace.prints[1].out2.length === 2');
+    await traceCheck('perturb "*": every declared literal changes; a literal destructured in place does not',
+      'const item = { t: "Pen", n: 2 };\nconst { t, n } = item;\nconsole.log(t, n);\nconst { a } = { a: "x" };\nconsole.log(a);\nconst list = [{ k: "v" }];\nconsole.log(list[0].k);', ['*'],
+      CHANGED + ' === "true,false,true" && trace.prints[0].out2[0] === trace.mk + "Pen" + trace.mk + " " + (2 * trace.k + trace.c)');
+    await traceCheck('a function\'s result is marked apart from data (its own random marker in guillemets), and recorded',
+      'function d(o) { return "r" + o.k; }\nconsole.log(d({ k: 1 }));\nfunction n() { return 2; }\nconsole.log(n());', ['d', 'n'],
+      '/^«[a-z]{3}»$/.test(trace.rk) && trace.prints[0].out2[0] === trace.rk + "r1" + trace.rk && trace.results.length === 2 && trace.prints[1].out2[0] === String(trace.results[1]) && trace.results[1] !== 2');
+    await traceCheck('a second run that throws is reported, the real run is untouched',
+      'const b = { t: "x" };\nconsole.log(b.t);\nif (b.t !== "x") { throw new Error("boom"); }', ['b'],
+      'trace.perturbed === false && trace.prints[0].ran === 1 && trace.prints[0].out[0] === "x"');
+    {
+      // Errors keep their line and column; console.log passed as a value or reassigned still works.
+      const traced = (c) => runCodeWithTests(c, jobsFromRequirements([V('tr', { trace: true, checks: [{ expr: 'true' }] })]));
+      const plain = (c) => runCodeWithTests(c, jobsFromRequirements([V('pl', { variables: [], checks: [{ expr: 'true' }] })]));
+      const bad = 'console.log(1); console.log(2); null.x;';
+      const a = await traced(bad);
+      const b = await plain(bad);
+      check('an error after traced calls keeps its line and column', a.error && b.error && a.error.line === b.error.line && a.error.col === b.error.col && a.error.line === 1, JSON.stringify([a.error, b.error]));
+      const c = await traced('[1, 2].forEach(console.log);\nconst old = console.log;\nconsole.log = (x) => old("wrapped " + x);\nconsole.log("y");');
+      check('console.log as a value, and a reassigned console.log, behave as written', c.logs.map((l) => l.message).join('|') === '1 0 [\n  1,\n  2\n]|2 1 [\n  1,\n  2\n]|wrapped y', JSON.stringify(c.logs));
+    }
+    // Pass 5: random markers, a crashed or skipped changed run, stability, globals put back, a
+    // console.log that prints nothing, a shadowed console, the destructure run, a real run that throws.
+    await traceCheck('the changed run\'s marker and numbers are random per Run (nothing fixed to type in)', 'const b = { t: "x", n: 2 };\nconsole.log(b.t, b.n);', ['b'],
+      '/^~[a-z]{3}~$/.test(trace.mk) && trace.k >= 11 && trace.c >= 101 && trace.prints[0].out2[0] === trace.mk + "x" + trace.mk + " " + (2 * trace.k + trace.c)');
+    await traceCheck('a print skipped in the changed run leaves out2 empty', 'const b = { t: "x" };\nif (b.t === "x") { console.log(b.t); }', ['b'],
+      'trace.perturbed === true && trace.prints[0].ran === 1 && trace.prints[0].out2.length === 0');
+    await traceCheck('Math.random and the clock are not stable between the two changed runs; the data is',
+      'const b = { t: 1 };\nconsole.log(b.t + Math.random());\nconsole.log(b.t, Date.now());\nconsole.log(b.t);', ['b'],
+      'trace.prints.map((p) => p.stable).join(",") === "false,false,true"');
+    await traceCheck('a flag left on globalThis, a note on Math and localStorage are put back before each changed run',
+      'const s = globalThis.__q ? "seen" : "fresh";\nglobalThis.__q = 1;\nMath.__q = (Math.__q || 0) + 1;\nconst n = Number(localStorage.getItem("q") || 0) + 1;\nlocalStorage.setItem("q", n);\nconst b = { t: "x" };\nconsole.log(s, Math.__q, n, b.t);', ['b'],
+      'trace.prints[0].out[0] === "fresh 1 1 x" && trace.prints[0].out2[0] === "fresh 1 1 " + trace.mk + "x" + trace.mk && trace.prints[0].stable');
+    {
+      const r = await runCodeWithTests('const b = { t: "x" };\nconsole.log = function () {};\nconsole.log(b.t);', jobsFromRequirements([V('nl', { trace: true, perturb: ['b'], checks: [{ expr: 'trace.prints[0].ran === 1 && trace.prints[0].out.length === 0 && trace.prints[0].out2.length === 0' }] })]));
+      check('a console.log replaced by one that prints nothing: the call ran, nothing counts as printed', r.tests.byId.nl && r.tests.byId.nl.status === 'passed' && r.logs.length === 0, JSON.stringify([r.tests.byId, r.logs]));
+    }
+    await expectFail('code that declares its own console is not traced', '{ const console = { log() {} };\nconsole.log(1); }',
+      V('sh', { trace: true, checks: [{ expr: 'true' }] }), /could not be watched/);
+    await traceCheck('"{}": each key a destructuring declaration unpacks is marked on its own; a literal written in place is not',
+      'const o = { a: "x", n: 2 };\nconst { a, n } = o;\nconsole.log(a);\nconsole.log(n);\nconst { z } = { z: "w" };\nconsole.log(z);', ['{}'],
+      'trace.dreads.map((d) => d[0] + d[1]).join(",") === "0a,0n" && trace.prints[0].outD[0] === trace.dreads[0][2] && trace.prints[0].outD[0] !== "x" && trace.prints[1].outD[0] === String(trace.dreads[1][2]) && trace.prints[2].outD[0] === "w"');
+    await traceCheck('"*": a literal assigned later, or frozen as it is assigned, is changed too',
+      'let a;\na = { t: "x" };\nconst f = Object.freeze({ t: "y" });\nconsole.log(a.t, f.t);', ['*'],
+      'trace.prints[0].out2[0] === trace.mk + "x" + trace.mk + " " + trace.mk + "y" + trace.mk');
+    {
+      // A real run that throws: the job that perturbs is checked on what ran first, the other is not.
+      const jobs = jobsFromRequirements([
+        V('pt', { trace: true, perturb: ['b'], variables: [{ name: 'b' }], checks: [{ expr: 'trace.threw && trace.perturbed && b.t === "x" && trace.prints[0].out2[0] === trace.mk + "x" + trace.mk' }] }),
+        V('pl', { trace: true, variables: [{ name: 'b' }], checks: [{ expr: 'true' }] }),
+      ]);
+      const r = await runCodeWithTests('const b = { t: "x" };\nconsole.log(b.t);\nnull.f;', jobs);
+      check('a run that throws: a perturb job passes on the prints before the error', r.outcome === 'error' && r.tests.byId.pt.status === 'passed', JSON.stringify([r.outcome, r.tests.byId]));
+      check('a run that throws: a job without perturb still says the code stopped', r.tests.byId.pl.status === 'failed' && /stopped with an error/.test(r.tests.byId.pl.message), JSON.stringify(r.tests.byId.pl));
+      check('a run that throws: the error keeps its line', r.error && r.error.line === 3, JSON.stringify(r.error));
+      const r2 = await runCodeWithTests('const b = { t: "x" };\nnull.f;\nconsole.log(b.t);', jobs);
+      check('a run that throws before the print: the perturb job is not passed', r2.tests.byId.pt.status === 'failed' && /stopped with an error/.test(r2.tests.byId.pt.message), JSON.stringify(r2.tests.byId));
+    }
+    {
+      // orTest: a regex card passes on its tests requirement's pass, only on the same code.
+      const { grade } = req(path.join(out, 'grader.js'));
+      const rx = { id: 'r', title: 'r', description: '', status: 'pending', type: 'regex', file: 'script.js', pattern: 'never-there', orTest: 't', points: 1 };
+      const code = 'console.log(1);';
+      const g = (tr) => grade([rx], { 'script.js': code }, 0, tr ? { testResults: tr } : {}).results[0].status;
+      check('orTest: the regex card passes when its tests requirement passed on this code', g({ code, byId: { t: { status: 'passed' } } }) === 'passed', '');
+      check('orTest: not when that requirement failed, ran on older code, or never ran', g({ code, byId: { t: { status: 'failed' } } }) === 'failed' && g({ code: 'old', byId: { t: { status: 'passed' } } }) === 'failed' && g(null) === 'failed', '');
+    }
+    await expectFail('failExpr words the failure from what was written', 'const k = "rom";\nconsole.log(k);',
+      V('fe', { trace: true, checks: [{ expr: 'false', fail: 'plain', failExpr: '"You printed " + trace.prints[0].src' }] }), /^You printed k$/);
+    await expectFail('a failExpr that throws falls back to fail', 'console.log(1);',
+      V('fe2', { trace: true, checks: [{ expr: 'false', fail: 'plain', failExpr: 'nope.x' }] }), /^plain$/);
+    await expectFail('a hidden check never runs its failExpr', 'console.log(1);',
+      V('fe3', { trace: true, checks: [{ expr: 'false', fail: 'plain', failExpr: '"secret"', hidden: true }] }), /^A hidden check failed\.$/);
+    check('trace is not visible to a check that did not ask for it', (await one('console.log(1);', V('nt', { variables: [], checks: [{ expr: 'typeof trace === "undefined"' }] }))).passed, '');
+  }
+
   console.log('\nplumbing');
   {
     const r = await one('function findMax(a){ return Math.max(...a); }', { ...findMax, hint: 'Look at the comparison.' });

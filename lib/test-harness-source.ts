@@ -101,7 +101,8 @@
 // the variables, stamped with a fresh per-run secret, so a top-level `return` in
 // the student's code cannot imitate it; values are rebuilt from own data
 // properties (a getter is refused), bounded in depth and size; a script that
-// throws or never finishes is "could not be checked", never a pass. `expr` is
+// throws or never finishes is "could not be checked", never a pass (a traced job that
+// perturbs may still pass on what ran before the error; see EXECUTION TRACE). `expr` is
 // evaluated with new Function over those copies only (lesson.json is trusted
 // author text; student text is never evaluated).
 
@@ -126,6 +127,9 @@ export interface TestJob {
     checks: ScriptCheck[];
     expectOutput?: string[];
     expectOutputContains?: string[];
+    /** Opt-in execution trace (see EXECUTION TRACE below). */
+    trace?: boolean;
+    perturb?: string[];
   };
   timeout: number;
   tolerance: number;
@@ -159,12 +163,16 @@ export function jobsFromRequirements(reqs: Requirement[]): TestJob[] {
     const eo = Array.isArray(r.expectOutput) && r.expectOutput.length > 0 ? r.expectOutput : undefined;
     const eoc = Array.isArray(r.expectOutputContains) && r.expectOutputContains.length > 0 ? r.expectOutputContains : undefined;
     const hasScript = variables.length > 0 || checks.length > 0 || !!eo || !!eoc;
+    // Only a requirement that asks for it gets the trace; every other job is sent exactly as before.
+    const trace = hasScript && r.trace === true;
+    const perturb = trace && Array.isArray(r.perturb) ? r.perturb.filter((n): n is string => typeof n === 'string' && (n === '*' || n === '{}' || IDENT.test(n))) : [];
+    const traceFields = trace ? { trace: true, ...(perturb.length ? { perturb } : {}) } : {};
     jobs.push({
       id: r.id,
       fn: typeof fn === 'string' ? fn : '',
       fns: names,
       cases: Array.isArray(r.cases) ? r.cases : [],
-      ...(hasScript ? { script: { variables, checks, ...(eo ? { expectOutput: eo } : {}), ...(eoc ? { expectOutputContains: eoc } : {}) } } : {}),
+      ...(hasScript ? { script: { variables, checks, ...(eo ? { expectOutput: eo } : {}), ...(eoc ? { expectOutputContains: eoc } : {}), ...traceFields } } : {}),
       timeout: Math.min(Math.max(Number(r.timeout) || TEST_CASE_TIMEOUT_MS, 50), 10000),
       tolerance: typeof r.tolerance === 'number' && r.tolerance >= 0 ? r.tolerance : 1e-9,
     });
@@ -476,9 +484,28 @@ const __runTestJobs = (() => {
 
   // vars: {name: [1, value]} (found) or {name: [0]} (no such variable), read by
   // the lookup statement appended to the script. lines: what the script printed.
-  function runScriptChecks(job, vars, lines) {
+  function runScriptChecks(job, vars, lines, tr) {
     const sc = job.script;
     const bad = (msg, hidden, own) => ({ ok: false, msg: hidden ? 'A hidden check failed.' : clip(own || msg, 220) });
+    const traced = sc.trace === true;
+    // The trace binding: a frozen copy of what each console.log call site did.
+    let traceVal;
+    if (traced) {
+      if (!tr) return bad('Your program could not be watched while it ran (code that declares its own console, or is too long to follow, cannot be), so this could not be checked.', false);
+      traceVal = freezeDeep({
+        prints: tr.recs.map((r) => ({ src: r.src, code: r.code, ran: r.ran, out: r.out.slice(), out2: r.out2 ? r.out2.slice() : null, stable: r.stable === true, outD: r.outD ? r.outD.slice() : null })),
+        perturbed: tr.perturbed === true,
+        threw: tr.threw === true,
+        mk: typeof tr.mk === 'string' ? tr.mk : null,
+        k: tr.k || 0,
+        c: tr.c || 0,
+        rk: typeof tr.rk === 'string' ? tr.rk : null,
+        results: (tr.results || []).slice(0, 50),
+        dreads: (tr.dreads || []).slice(0, 100).map((d) => d.slice()),
+        code: tr.blank,
+        text: tr.text,
+      }, 0);
+    }
     const seen = {};
     const names = [];
     const vals = [];
@@ -486,7 +513,7 @@ const __runTestJobs = (() => {
       const e = sc.variables[i] || {};
       const name = e.name;
       const hidden = e.hidden === true;
-      if (typeof name !== 'string' || !IDENT_RE.test(name) || name === 'output' || name === 'same') {
+      if (typeof name !== 'string' || !IDENT_RE.test(name) || name === 'output' || name === 'same' || (traced && name === 'trace')) {
         return bad('This check names a variable that cannot be read.', false);
       }
       const rec = hasOwn.call(vars, name) ? vars[name] : null;
@@ -508,17 +535,33 @@ const __runTestJobs = (() => {
       const hidden = c.hidden === true;
       const fail = typeof c.fail === 'string' && c.fail !== '' ? c.fail : 'A check on your results failed.';
       let ok = false;
-      try {
-        // Author-written text from lesson.json, never student text. It sees the
-        // frozen copies and the printed lines, and nothing else of the script.
-        // same('a', 'b'): are the variables a and b the very same object? The frozen copies
-        // below lose identity, so this answers it from the live values (restored = player).
-        const same = (x, y) => hasOwn.call(vars, x) && hasOwn.call(vars, y) && vars[x][0] === 1 && vars[y][0] === 1 && vars[x][1] === vars[y][1] && vars[x][1] !== null && typeof vars[x][1] === 'object';
-        const f = new Function('output', 'same', ...names, '"use strict"; return (' + String(c.expr) + ');');
+      // Author-written text from lesson.json, never student text. It sees the
+      // frozen copies and the printed lines, and nothing else of the script.
+      // same('a', 'b'): are the variables a and b the very same object? The frozen copies
+      // below lose identity, so this answers it from the live values (restored = player).
+      const same = (x, y) => hasOwn.call(vars, x) && hasOwn.call(vars, y) && vars[x][0] === 1 && vars[y][0] === 1 && vars[x][1] === vars[y][1] && vars[x][1] !== null && typeof vars[x][1] === 'object';
+      const params = traced ? ['output', 'same', 'trace', ...names] : ['output', 'same', ...names];
+      const argsFor = () => {
         const frozen = vals.map((v) => freezeDeep(snap(v, { n: 0, over: false, accessor: false }, 0), 0));
-        ok = !!f.apply(undefined, [freezeDeep(lines.slice(), 0), same, ...frozen]);
+        return traced ? [freezeDeep(lines.slice(), 0), same, traceVal, ...frozen] : [freezeDeep(lines.slice(), 0), same, ...frozen];
+      };
+      try {
+        const f = new Function(...params, '"use strict"; return (' + String(c.expr) + ');');
+        ok = !!f.apply(undefined, argsFor());
       } catch (_) { ok = false; }
-      if (!ok) return bad(fail, hidden);
+      if (!ok) {
+        // failExpr: an author expression over the same bindings that words the failure
+        // (it may quote what the student wrote); anything but a non-empty string falls back.
+        let own;
+        if (!hidden && typeof c.failExpr === 'string' && c.failExpr !== '') {
+          try {
+            const g = new Function(...params, '"use strict"; return (' + c.failExpr + ');');
+            const s = g.apply(undefined, argsFor());
+            if (typeof s === 'string' && s.trim() !== '') own = s;
+          } catch (_) { own = undefined; }
+        }
+        return bad(own || fail, hidden);
+      }
     }
     if (isArr(sc.expectOutput)) {
       const m = outputMsg('Your program', sc.expectOutput, lines);
@@ -602,12 +645,34 @@ const __runTestJobs = (() => {
   // Calls only hold ids and plain data; each message carries the nonce.
   // fns / vars come from the lookup statement appended to the script (null when
   // it did not run); lines is what the whole script printed.
-  return function (jobs, fns, vars, lines, nonce) {
+  // tr: the execution trace (EXECUTION TRACE below), or null when none was taken.
+  // threw: the script stopped with an error. Then only the jobs that perturb are
+  // checked, on what ran before the error (vars from the capture run); one that
+  // passes is posted, anything else is left to "Your code stopped with an error".
+  return function (jobs, fns, vars, lines, nonce, tr, threw) {
+    // In a traced run, a function a check calls prints nowhere (not to the student's output).
+    const con = console;
+    const savedLog = con.log;
+    if (tr) con.log = function () {};
+    try { runJobs(jobs, fns, vars, lines, nonce, tr, threw === true); } finally { if (tr) con.log = savedLog; }
+  };
+  function runJobs(jobs, fns, vars, lines, nonce, tr, threw) {
     for (let j = 0; j < jobs.length; j++) {
       const job = jobs[j];
+      if (threw) {
+        const sc = job.script;
+        if (!sc || !tr || sc.trace !== true || !isArr(sc.perturb) || !sc.perturb.length || job.cases.length || !vars) continue;
+        if (!sc.variables.every((e) => e && typeof e.name === 'string' && hasOwn.call(vars, e.name))) continue;
+        const sr = runScriptChecks(job, vars, lines || [], tr);
+        if (sr.ok) {
+          post({ kind: 'test-case', nonce, id: job.id, i: -1, ok: true });
+          post({ kind: 'test-job', nonce, id: job.id, status: 'ran' });
+        }
+        continue;
+      }
       if (job.script) {
         if (!vars) continue; // the script never reached its end: the check "did not finish"
-        const sr = runScriptChecks(job, vars, lines || []);
+        const sr = runScriptChecks(job, vars, lines || [], tr || null);
         post({ kind: 'test-case', nonce, id: job.id, i: -1, ok: sr.ok, msg: sr.msg });
         if (!sr.ok) { post({ kind: 'test-job', nonce, id: job.id, status: 'ran' }); continue; }
         if (job.cases.length === 0) { post({ kind: 'test-job', nonce, id: job.id, status: 'ran' }); continue; }
@@ -632,7 +697,540 @@ const __runTestJobs = (() => {
       }
       post({ kind: 'test-job', nonce, id: job.id, status: 'ran' });
     }
-  };
+  }
+})();
+
+// EXECUTION TRACE (opt-in per requirement: "trace": true, optional "perturb").
+// Only built when a job asks for it; every other run is byte-for-byte as before.
+//   1. Each console.log(...) CALL site in the student's code gets its own stand-in
+//      for the word console, an identifier of exactly the same length ($ + three
+//      random letters + a 3-digit index) passed in as a parameter of the compiled
+//      function. Same length and no new lines, so every line and column an error
+//      reports is unchanged. The stand-in counts the call and hands the arguments
+//      to whatever console.log is at that moment, so a console.log the student
+//      reassigned behaves as written. What the call printed is what reached the
+//      real console while it ran (a probe sits in console.log for the run): a
+//      console.log replaced by one that prints nothing leaves the call's out empty.
+//      Code that declares its own console is not traced at all (a check then says
+//      it could not be watched).
+//   2. With "perturb": ["book"], the script runs again, silently (nothing is printed
+//      or posted), with book's data changed: an object or array literal assigned to
+//      book (Object.freeze(...) around it included) is wrapped in a proxy whose
+//      reads give mk + text + mk for a string and n * k + c for a number, where mk
+//      is a tilde, three random letters and a tilde, and k and c are random whole
+//      numbers, all fresh on every Run so none can be typed in advance. A method
+//      read off it (and a call book(...)) gives its result back as rk + text + rk
+//      (rk: three random letters in guillemets) or n * rkk + rkc, and every such
+//      result is kept in results. The name "*" wraps every object or array literal
+//      assigned to any name. Object.freeze, seal and preventExtensions do nothing in
+//      a silent run. The changed run happens TWICE with the same changes: a call
+//      whose two outputs differ printed something the data alone does not decide
+//      (Math.random, the clock) and is not stable. Before each silent run the
+//      globals the script added or replaced, and the host's own state (the
+//      localStorage stand-in, prompt answers), are put back, so a flag set by one
+//      run cannot tell the next one apart.
+//   3. The pseudo-name "{}" adds one more silent run, without the data changes, in
+//      which the right-hand side of each destructuring declaration
+//      (const { a, b } = x) is wrapped so every key it unpacks is marked on its own
+//      (its own random marker, or its own k and c); dreads lists [site, key, value].
+//   4. When the real run throws, the jobs that perturb are still checked on what ran
+//      before the throw. Their variables come from one more silent run that only
+//      records each literal assigned to a name. A job that passes counts; any other
+//      job keeps "Your code stopped with an error". Jobs without perturb are not
+//      checked, so a run that throws never completes a lab.
+// A check sees trace = { prints: [{src, code, ran, out, out2, stable, outD}],
+//   perturbed, threw, mk, k, c, rk, results, dreads, code, text }:
+// src is the call's argument text as written, code the same with comments and
+// string contents blanked, ran how many times it ran in the real run, out what it
+// printed then (each call one string, at most 50), out2 the same for the changed
+// run (null without perturb), stable whether the second changed run printed the
+// same, outD what it printed in the destructure run (null without "{}");
+// perturbed is true when the changed run finished (or the real run threw as well);
+// threw is true when the real run threw; code and text are the whole script,
+// blanked and as written.
+const __traceKit = (() => {
+  const BT = String.fromCharCode(96);
+  const DOLLAR = String.fromCharCode(36);
+  const OPEN_BRACE = String.fromCharCode(123);
+  const isWs = (ch) => ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r' || ch === '\f' || ch === '\v';
+  const isWord = (ch) => ch !== undefined && /[A-Za-z0-9_$]/.test(ch);
+  const keep = (ch) => (ch === '\n' || ch === '\r' ? ch : ' ');
+
+  // Same length as src: comments, string contents, template text and the inside of
+  // regular-expression literals become spaces (line breaks kept). The quote marks,
+  // the template's dollar-brace parts and every other character stay.
+  function blankCode(src) {
+    const n = src.length;
+    const parts = [];
+    let i = 0;
+    let lastSig = '';
+    let lastWord = '';
+    let lastWordDot = false;
+    let prevWord = false;
+    const braces = [];
+    let inT = false;
+    const push = (s) => { parts.push(s); prevWord = false; };
+    const code = (ch) => {
+      const wasWord = prevWord;
+      parts.push(ch);
+      if (isWord(ch)) {
+        if (wasWord) lastWord += ch;
+        else { lastWord = ch; lastWordDot = lastSig === '.'; }
+        prevWord = true;
+      } else prevWord = false;
+      if (!isWs(ch)) lastSig = ch;
+    };
+    // The identifier just before a '/', when that is the last code: return / typeof
+    // start a regular expression, any other word (or obj.return) is a division.
+    const wordBefore = () => (isWord(lastSig) && !lastWordDot ? lastWord : '');
+    while (i < n) {
+      const c = src[i];
+      if (inT) {
+        if (c === '\\') { push(' ' + (i + 1 < n ? keep(src[i + 1]) : '')); i += 2; continue; }
+        if (c === BT) { code(c); inT = false; i++; continue; }
+        if (c === DOLLAR && src[i + 1] === OPEN_BRACE) { push(DOLLAR); code(OPEN_BRACE); braces.push(0); inT = false; i += 2; continue; }
+        push(keep(c)); i++; continue;
+      }
+      if (c === '/' && src[i + 1] === '/') {
+        let j = i;
+        while (j < n && src[j] !== '\n') j++;
+        push(' '.repeat(j - i)); i = j; continue;
+      }
+      if (c === '/' && src[i + 1] === '*') {
+        let j = i + 2;
+        while (j < n && !(src[j] === '*' && src[j + 1] === '/')) j++;
+        j = Math.min(n, j + 2);
+        let s = '';
+        for (let k = i; k < j; k++) s += keep(src[k]);
+        push(s); i = j; continue;
+      }
+      if (c === '"' || c === "'") {
+        let j = i + 1;
+        let closed = false;
+        while (j < n && src[j] !== '\n') {
+          if (src[j] === '\\') { j += 2; continue; }
+          if (src[j] === c) { closed = true; break; }
+          j++;
+        }
+        if (!closed || j >= n) { code(c); i++; continue; }
+        push(c + ' '.repeat(j - i - 1)); code(c); i = j + 1; continue;
+      }
+      if (c === BT) { code(c); inT = true; i++; continue; }
+      if (c === '/') {
+        let startsRe = lastSig === '' || /[(,=:\[!&|?{};+\-*%<>~^]/.test(lastSig);
+        if (!startsRe && isWord(lastSig)) { const w = wordBefore(); startsRe = w === 'return' || w === 'typeof'; }
+        if (startsRe) {
+          let j = i + 1;
+          let inClass = false;
+          let closed = false;
+          while (j < n && src[j] !== '\n') {
+            const d = src[j];
+            if (d === '\\') { j += 2; continue; }
+            if (d === '[') inClass = true;
+            else if (d === ']') inClass = false;
+            else if (d === '/' && !inClass) { closed = true; break; }
+            j++;
+          }
+          if (closed && j > i + 1 && j < n) { push('/' + ' '.repeat(j - i - 1)); code('/'); i = j + 1; continue; }
+        }
+      }
+      if (braces.length) {
+        if (c === OPEN_BRACE) braces[braces.length - 1]++;
+        else if (c === '}') {
+          if (braces[braces.length - 1] === 0) { braces.pop(); code(c); inT = true; i++; continue; }
+          braces[braces.length - 1]--;
+        }
+      }
+      code(c);
+      i++;
+    }
+    const out = parts.join('');
+    return out.length === n ? out : null;
+  }
+
+  // Index of the bracket that closes the one at open (in blanked text), or -1.
+  function matchClose(b, open) {
+    let d = 0;
+    for (let j = open; j < b.length; j++) {
+      const ch = b[j];
+      if (ch === '(' || ch === '[' || ch === OPEN_BRACE) d++;
+      else if (ch === ')' || ch === ']' || ch === '}') { d--; if (d === 0) return j; if (d < 0) return -1; }
+    }
+    return -1;
+  }
+
+  const rnd3 = () => { let s = ''; for (let k = 0; k < 3; k++) s += 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 26)]; return s; };
+  const rint = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+  const LQ = String.fromCharCode(171);
+  const RQ = String.fromCharCode(187);
+  const TILDE = String.fromCharCode(126);
+  const slice = (a) => Array.prototype.slice.call(a);
+  const IDENT_RE = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+  // The real ones, taken before any student code runs.
+  const R = { freeze: Object.freeze, seal: Object.seal, pext: Object.preventExtensions, ownKeys: Reflect.ownKeys, gopd: Reflect.getOwnPropertyDescriptor, def: Reflect.defineProperty, now: Date.now };
+
+  function fmt(args) {
+    try {
+      return args.map((a) => {
+        if (typeof a !== 'object' || a === null) return String(a);
+        try { const s = JSON.stringify(a, null, 2); return s === undefined ? String(a) : s; } catch (_) { return String(a); }
+      }).join(' ');
+    } catch (_) { return ''; }
+  }
+
+  // A name console declared by the script (const console, function console, a
+  // parameter or catch binding called console): the stand-ins would call the
+  // wrong one, so such code is not traced.
+  const SHADOW = /(?<![\w$.])(?:const|let|var|function|class)\s+console(?![\w$])|\bcatch\s*\(\s*console\s*\)|(?<![\w$.])console\s*=>|\(\s*(?:[A-Za-z_$][\w$]*\s*,\s*)*console\s*(?:,[^()]*)?\)\s*(?:=>|\{)/;
+
+  // The console.log call sites, and the code with each one's console swapped for
+  // its same-length stand-in. null when the code cannot be read, has too many, or
+  // declares its own console.
+  function instrument(text) {
+    const blank = blankCode(String(text));
+    if (blank === null || SHADOW.test(blank)) return null;
+    const re = /(?<![\w$.])console(?=\s*\.\s*log\s*\()/g;
+    const sites = [];
+    let m;
+    while ((m = re.exec(blank))) {
+      const lp = blank.indexOf('(', m.index + 7);
+      const close = lp >= 0 ? matchClose(blank, lp) : -1;
+      sites.push({ at: m.index, src: close > lp ? text.slice(lp + 1, close) : '', code: close > lp ? blank.slice(lp + 1, close) : '' });
+      if (sites.length > 999) return null;
+    }
+    const tag = DOLLAR + rnd3();
+    const ids = sites.map((s, k) => tag + String(k).padStart(3, '0'));
+    let out = '';
+    let from = 0;
+    for (let k = 0; k < sites.length; k++) {
+      out += text.slice(from, sites[k].at) + ids[k];
+      from = sites[k].at + 7;
+    }
+    out += text.slice(from);
+    const RL = console.log;
+    const st = {
+      phase: 1, key: '', perturbed: false, threw: false, blank, text: String(text), cap: null, RL,
+      mk: null, k: 0, c: 0, rk: null, rkk: 0, rkc: 0, results: [], dreads: [], g0: null, restore: null,
+      recs: sites.map((s) => ({ src: s.src, code: s.code, ran: 0, out: [], out2: null, out3: null, stable: false, outD: null })),
+    };
+    // Sits in console.log while a traced run is going: notes what reaches the real
+    // console during a call site's own call, and prints only in the real run.
+    st.probe = function () {
+      const a = slice(arguments);
+      if (st.cap) st.cap.push(fmt(a));
+      return st.phase === 1 ? RL.apply(console, a) : undefined;
+    };
+    // One call of a stand-in: hand the arguments on, and keep what reached the real
+    // console during the call under key ('' keeps nothing).
+    st.call = (r, args, key) => {
+      if (!key) return console.log.apply(console, args);
+      const prev = st.cap;
+      const got = [];
+      st.cap = got;
+      try {
+        return console.log.apply(console, args);
+      } finally {
+        st.cap = prev;
+        const o = r[key];
+        if (o && got.length && o.length < 50) o.push(got.join('\n'));
+      }
+    };
+    // The real run's stand-ins (a silent run makes its own, see silentRun).
+    st.objs = st.recs.map((r) => ({
+      log: function () {
+        if (st.phase === 1) r.ran++;
+        return st.call(r, slice(arguments), st.phase === 1 ? 'out' : '');
+      },
+    }));
+    return { code: out, ids, st };
+  }
+
+  // The globals and built-ins a script could leave a note on for a later run.
+  const HELD = () => [self, Math, JSON, Object, Array, String, Number, Boolean, Date, Reflect, Promise, console, Object.prototype, Array.prototype, String.prototype, Number.prototype, Boolean.prototype, Function.prototype, Promise.prototype];
+  function snapshot(st, restore) {
+    st.g0 = HELD().map((o) => {
+      const m = new Map();
+      const ks = R.ownKeys(o);
+      for (let i = 0; i < ks.length; i++) m.set(ks[i], R.gopd(o, ks[i]));
+      return [o, m];
+    });
+    st.restore = typeof restore === 'function' ? restore : null;
+  }
+  // Put every held object's own properties back as they were before the real run.
+  function resetGlobals(st) {
+    if (st.g0) {
+      for (let i = 0; i < st.g0.length; i++) {
+        const o = st.g0[i][0];
+        const m = st.g0[i][1];
+        const ks = R.ownKeys(o);
+        for (let j = 0; j < ks.length; j++) {
+          const d0 = m.get(ks[j]);
+          if (!d0) { try { delete o[ks[j]]; } catch (_) { /* keep */ } continue; }
+          const d = R.gopd(o, ks[j]);
+          if (d && 'value' in d0 && (!('value' in d) || d.value !== d0.value)) { try { R.def(o, ks[j], d0); } catch (_) { /* keep */ } }
+        }
+        m.forEach((d0, k) => { if (!R.gopd(o, k)) { try { R.def(o, k, d0); } catch (_) { /* keep */ } } });
+      }
+    }
+    if (st.restore) { try { st.restore(); } catch (_) { /* keep */ } }
+  }
+  // Before the real run: remember the globals, then put the probe in console.log.
+  function begin(tr, restore) {
+    snapshot(tr.st, restore);
+    console.log = tr.st.probe;
+  }
+  function end(tr) {
+    tr.st.phase = 3;
+    resetGlobals(tr.st);
+  }
+
+  // The changed run's data. A string becomes mk + s + mk, a number n * k + c; a
+  // function gives its result back marked (rk + s + rk, or n * rkk + rkc), and with
+  // record each result is kept; plain objects and arrays become proxies that do the
+  // same to every own value read off them (an array's length is left alone).
+  function makePerturber(st, record) {
+    const cache = new WeakMap();
+    const ours = new WeakSet();
+    const own = Object.prototype.hasOwnProperty;
+    const OP = Object.prototype;
+    const num = (v, k, c) => (v === v && v !== Infinity && v !== -Infinity ? v * k + c : v);
+    function tweak(v) {
+      if (typeof v === 'string') return st.mk + v + st.mk;
+      if (typeof v === 'number') return num(v, st.k, st.c);
+      if (typeof v === 'function') return wrapFn(v);
+      if (v !== null && typeof v === 'object') return wrapObj(v);
+      return v;
+    }
+    function tweakResult(r) {
+      let t;
+      if (typeof r === 'string') t = st.rk + r + st.rk;
+      else if (typeof r === 'number') t = num(r, st.rkk, st.rkc);
+      else t = tweak(r);
+      if (record && st.results.length < 50 && (t === null || (typeof t !== 'object' && typeof t !== 'function'))) st.results.push(t);
+      return t;
+    }
+    function wrapFn(f) {
+      if (ours.has(f)) return f;
+      if (cache.has(f)) return cache.get(f);
+      const w = function () { return tweakResult(f.apply(this, arguments)); };
+      try { Object.defineProperty(w, 'length', { value: f.length }); } catch (_) { /* keep */ }
+      cache.set(f, w); ours.add(w);
+      return w;
+    }
+    function wrapObj(o) {
+      if (ours.has(o)) return o;
+      if (cache.has(o)) return cache.get(o);
+      const arr = Array.isArray(o);
+      const pr = Object.getPrototypeOf(o);
+      if (!arr && pr !== OP && pr !== null) return o;
+      const p = new Proxy(o, {
+        get(t, k, r) {
+          const v = Reflect.get(t, k, r);
+          if (typeof k === 'symbol' || !own.call(t, k) || (arr && k === 'length')) return v;
+          const d = Object.getOwnPropertyDescriptor(t, k);
+          if (d && d.configurable === false && d.writable === false) return v;
+          return tweak(v);
+        },
+      });
+      cache.set(o, p); ours.add(p);
+      return p;
+    }
+    return (name, v) => tweak(v);
+  }
+
+  // The destructure run's wrapper: every key a destructuring declaration unpacks
+  // reads back with a marker (or k and c) of its own; each read is listed in dreads.
+  function makeDestructurer(st) {
+    const marks = {};
+    const own = Object.prototype.hasOwnProperty;
+    return (site, v) => {
+      if (v === null || typeof v !== 'object') return v;
+      return new Proxy(v, {
+        get(t, k, r) {
+          const x = Reflect.get(t, k, r);
+          if (typeof k === 'symbol' || !own.call(t, k)) return x;
+          const d = Object.getOwnPropertyDescriptor(t, k);
+          if (d && d.configurable === false && d.writable === false) return x;
+          const id = site + ':' + String(k);
+          const m = marks[id] || (marks[id] = { s: TILDE + rnd3() + TILDE, k: rint(101, 997), c: rint(1009, 9973) });
+          let y;
+          if (typeof x === 'string') y = m.s + x + m.s;
+          else if (typeof x === 'number' && x === x && x !== Infinity && x !== -Infinity) y = x * m.k + m.c;
+          else return x;
+          if (st.dreads.length < 100) st.dreads.push([site, String(k), y]);
+          return y;
+        },
+      });
+    };
+  }
+
+  // A silent run's code: each named literal wrapped in pn(name, ...), each named
+  // call routed through pn(name, fn)(...), and with dn each destructuring
+  // declaration's right-hand side wrapped in dn(site, ...).
+  function perturbSource(code, blank, names, pn, dn) {
+    const ins = [];
+    const wrapped = {};
+    const q = (s) => JSON.stringify(s);
+    for (let qn = 0; qn < names.length; qn++) {
+      const nm = names[qn];
+      if (nm === '{}') continue;
+      const esc = nm.replace(/\$/g, '\\$');
+      const ra = new RegExp('(?<![\\w$.])(' + (nm === '*' ? '[A-Za-z_$][\\w$]*' : esc) + ')\\s*=(?![=>])\\s*(?=[\\[{]|Object\\s*\\.\\s*freeze\\s*\\()', 'g');
+      let m;
+      while ((m = ra.exec(blank))) {
+        const open = m.index + m[0].length;
+        let close = -1;
+        if (blank[open] === '[' || blank[open] === OPEN_BRACE) close = matchClose(blank, open);
+        else { const lp = blank.indexOf('(', open); if (lp >= 0) close = matchClose(blank, lp); }
+        if (close < 0 || wrapped[open]) continue;
+        wrapped[open] = true;
+        ins.push([open, 0, pn + '(' + q(m[1]) + ',']);
+        ins.push([close + 1, 0, ')']);
+      }
+      if (nm === '*') continue;
+      const rb = new RegExp('(?<![\\w$.])' + esc + '(?=\\s*\\()', 'g');
+      while ((m = rb.exec(blank))) {
+        const before = blank.slice(Math.max(0, m.index - 40), m.index);
+        if (/(?:\bfunction\s*\*?|\bnew)\s*$/.test(before)) continue;
+        const lp = blank.indexOf('(', m.index + nm.length);
+        const close = matchClose(blank, lp);
+        if (close < 0) continue;
+        let k = close + 1;
+        while (k < blank.length && isWs(blank[k])) k++;
+        if (blank[k] === OPEN_BRACE) continue; // a method written name(...) { }, not a call
+        ins.push([m.index, 0, pn + '(' + q(nm) + ',']);
+        ins.push([m.index + nm.length, 0, ')']);
+      }
+    }
+    if (dn) {
+      const rd = /(?<![\w$.])(?:const|let|var)\s*(?=\{)/g;
+      let m;
+      let site = 0;
+      while ((m = rd.exec(blank))) {
+        const cb = matchClose(blank, m.index + m[0].length);
+        if (cb < 0) continue;
+        let k = cb + 1;
+        while (k < blank.length && isWs(blank[k])) k++;
+        if (blank[k] !== '=' || blank[k + 1] === '=' || blank[k + 1] === '>') continue;
+        k++;
+        while (k < blank.length && isWs(blank[k])) k++;
+        const s = k;
+        let d = 0;
+        for (; k < blank.length; k++) {
+          const ch = blank[k];
+          if (ch === '(' || ch === '[' || ch === OPEN_BRACE) d++;
+          else if (ch === ')' || ch === ']' || ch === '}') { if (d === 0) break; d--; }
+          else if (d === 0 && (ch === ';' || ch === ',' || ch === '\n')) break;
+        }
+        let e = k;
+        while (e > s && isWs(blank[e - 1])) e--;
+        // A literal written in place is not data the script built: left unmarked.
+        if (e <= s || blank[s] === OPEN_BRACE || blank[s] === '[') continue;
+        ins.push([s, 1, dn + '(' + site + ',']);
+        ins.push([e, -1, ')']);
+        site++;
+      }
+    }
+    // Right to left; at one position an outer wrapper's opening goes left of an
+    // inner one's and its closing right of it.
+    ins.sort((a, b) => b[0] - a[0] || a[1] - b[1]);
+    let out = code;
+    for (let k = 0; k < ins.length; k++) out = out.slice(0, ins[k][0]) + ins[k][2] + out.slice(ins[k][0]);
+    return out;
+  }
+
+  // One silent run of the traced code: globals put back first and after, nothing
+  // printed or posted, each call site's output kept under key (none when key is '').
+  function silentRun(tr, srcOf, key, pnF, dnF) {
+    const st = tr.st;
+    if (key) for (let k = 0; k < st.recs.length; k++) st.recs[k][key] = [];
+    resetGlobals(st);
+    const pmOwn = Object.prototype.hasOwnProperty.call(self, 'postMessage');
+    const pm = self.postMessage;
+    const noop = function () {};
+    const same = function (o) { return o; };
+    let ok = false;
+    // This run's own stand-ins: silent for good once the run is over, so a callback it
+    // left behind (a timer, a promise) cannot print the changed data later.
+    let alive = true;
+    const objs = st.recs.map((r) => ({ log: function () { return alive ? st.call(r, slice(arguments), key) : undefined; } }));
+    const timers = ['setTimeout', 'setInterval', 'setImmediate', 'queueMicrotask', 'requestAnimationFrame'].filter((n) => typeof self[n] === 'function');
+    const then0 = Promise.prototype.then;
+    st.phase = 2;
+    st.key = key;
+    try {
+      const pn = DOLLAR + rnd3() + 'P';
+      const dn = DOLLAR + rnd3() + 'D';
+      const f2 = new Function(...tr.ids, pn, dn, srcOf(pn, dn));
+      console.log = st.probe;
+      console.warn = console.error = noop;
+      self.postMessage = noop;
+      Object.freeze = Object.seal = Object.preventExtensions = same;
+      // Nothing a silent run schedules ever runs.
+      timers.forEach((n) => { self[n] = function () { return 0; }; });
+      Promise.prototype.then = function () { return then0.call(this); };
+      f2(...objs, pnF || ((n, v) => v), dnF || ((s, v) => v));
+      ok = true;
+    } catch (_) {
+      ok = false;
+    } finally {
+      alive = false;
+      st.phase = 3;
+      st.key = '';
+      Promise.prototype.then = then0;
+      Object.freeze = R.freeze; Object.seal = R.seal; Object.preventExtensions = R.pext;
+      if (pmOwn) self.postMessage = pm; else { try { delete self.postMessage; } catch (_) { self.postMessage = pm; } if (self.postMessage !== pm) self.postMessage = pm; }
+      resetGlobals(st);
+    }
+    return ok;
+  }
+
+  // The names the jobs perturb ("{}" is the destructure run, not a name).
+  function perturbNames(jobs) {
+    const names = [];
+    let destr = false;
+    for (let j = 0; j < jobs.length; j++) {
+      const ps = jobs[j] && jobs[j].script && jobs[j].script.trace === true && Array.isArray(jobs[j].script.perturb) ? jobs[j].script.perturb : [];
+      for (let k = 0; k < ps.length; k++) {
+        if (ps[k] === '{}') destr = true;
+        else if (typeof ps[k] === 'string' && (ps[k] === '*' || IDENT_RE.test(ps[k])) && names.indexOf(ps[k]) < 0) names.push(ps[k]);
+      }
+    }
+    return { names, destr };
+  }
+
+  // After the real run: the changed run twice, then the destructure run (see above).
+  function perturbRun(tr, jobs) {
+    const st = tr.st;
+    st.phase = 3;
+    resetGlobals(st);
+    const pl = perturbNames(jobs);
+    if (!pl.names.length && !pl.destr) return;
+    st.mk = TILDE + rnd3() + TILDE; st.k = rint(11, 97); st.c = rint(101, 997);
+    st.rk = LQ + rnd3() + RQ; st.rkk = rint(11, 97); st.rkc = rint(101, 997);
+    if (pl.names.length) {
+      const srcOf = (pn) => perturbSource(tr.code, st.blank, pl.names, pn, null);
+      const ok2 = silentRun(tr, srcOf, 'out2', makePerturber(st, true), null);
+      st.perturbed = ok2 || st.threw;
+      // Let the clock move on, so a print of the time cannot come out the same twice.
+      const t0 = R.now();
+      while (R.now() === t0) { /* at most a millisecond */ }
+      silentRun(tr, srcOf, 'out3', makePerturber(st, false), null);
+      for (let k = 0; k < st.recs.length; k++) st.recs[k].stable = JSON.stringify(st.recs[k].out2) === JSON.stringify(st.recs[k].out3);
+    }
+    if (pl.destr) silentRun(tr, (pn, dn) => perturbSource(tr.code, st.blank, [], pn, dn), 'outD', null, makeDestructurer(st));
+  }
+
+  // After a real run that threw: what each literal assigned to a name held when the
+  // run stopped, from one more silent run that only records them.
+  function captureRun(tr, jobs) {
+    const names = perturbNames(jobs).names.filter((n) => n !== '*').concat('*');
+    const caps = {};
+    silentRun(tr, (pn) => perturbSource(tr.code, tr.st.blank, names, pn, null), '', (n, v) => { caps[n] = v; return v; }, null);
+    return caps;
+  }
+
+  return { blankCode, instrument, begin, end, perturbRun, captureRun, resetGlobals };
 })();
 
 // The script's own scope hands its functions and the named variables back by

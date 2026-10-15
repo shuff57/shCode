@@ -323,6 +323,10 @@ self.onmessage = (e) => {
   __scriptLines.length = 0;
   let compiled = false;
   let codeText = '';
+  // Hoisted so the error path can still check a traced run (see below).
+  let tj = null;
+  let trace = null;
+  let ran = false;
   try {
     codeText = req.code;
     const runStudent = new Function(codeText); // a compile error is thrown HERE, before any student line runs
@@ -332,21 +336,63 @@ self.onmessage = (e) => {
     // script still runs exactly once, so its output and side effects are
     // unchanged. If the extra statement will not compile (a stray top-level
     // return, say) the plain copy runs and the checks report "did not run".
-    const tj = req.tests && Array.isArray(req.tests.jobs) && typeof req.tests.nonce === 'string' ? req.tests : null;
+    tj = req.tests && Array.isArray(req.tests.jobs) && typeof req.tests.nonce === 'string' ? req.tests : null;
     let withTests = null;
     // A fresh secret per run, written only into the appended statement: a
     // top-level return in the student's script cannot imitate the lookup.
     const marker = 'm' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    if (tj) {
+    // Execution trace (lib/test-harness-source.ts, EXECUTION TRACE): only when a job
+    // asks for it. The traced copy differs from the student's code only in each
+    // console.log call's same-length stand-in for console, so lines, columns and
+    // output are unchanged; if it will not compile, the untraced copy runs.
+    if (tj && tj.jobs.some((j) => j && j.script && j.script.trace === true)) {
+      try {
+        trace = __traceKit.instrument(codeText);
+        if (trace) withTests = new Function(...trace.ids, trace.code + '\\n;' + __testLookupSource(tj.jobs, marker));
+      } catch (_) { trace = null; withTests = null; }
+    }
+    if (tj && !withTests) {
       try { withTests = new Function(codeText + '\\n;' + __testLookupSource(tj.jobs, marker)); } catch (_) { withTests = null; }
     }
-    const looked = (withTests || runStudent)(); // student code execution (educational tool)
+    if (trace) {
+      // What a later silent run must find as it was: the localStorage stand-in and
+      // the prompt answers (globals are put back by the trace kit itself).
+      const store0 = Array.from(__store.entries());
+      const answers0 = answers.slice();
+      __traceKit.begin(trace, () => {
+        __store.clear();
+        for (let i = 0; i < store0.length; i++) __store.set(store0[i][0], store0[i][1]);
+        answers = answers0.slice();
+      });
+    }
+    ran = true;
+    const looked = withTests ? (trace ? withTests(...trace.st.objs) : withTests()) : runStudent(); // student code execution (educational tool)
     if (tj && withTests) {
       const ok = Array.isArray(looked) && looked.length === 3 && looked[0] === marker;
-      __runTestJobs(tj.jobs, ok ? looked[1] : null, ok ? looked[2] : null, __scriptLines, tj.nonce);
+      if (trace) { if (ok) __traceKit.perturbRun(trace, tj.jobs); else __traceKit.end(trace); }
+      __runTestJobs(tj.jobs, ok ? looked[1] : null, ok ? looked[2] : null, __scriptLines, tj.nonce, trace ? trace.st : null);
+    } else if (trace) {
+      __traceKit.end(trace);
     }
     self.postMessage({ kind: 'done', attempt });
   } catch (err) {
+    if (trace) {
+      // A traced run that threw: the jobs that perturb are checked on what ran
+      // before the error (lib/test-harness-source.ts, EXECUTION TRACE, item 4).
+      // A prompt() pause is not an error, and a failure here leaves the usual
+      // "stopped with an error" for every check.
+      try {
+        if (ran && err !== NEEDS_INPUT && tj) {
+          trace.st.threw = true;
+          __traceKit.perturbRun(trace, tj.jobs);
+          const caps = __traceKit.captureRun(trace, tj.jobs);
+          const vars = {};
+          Object.keys(caps).forEach((k) => { vars[k] = [1, caps[k]]; });
+          __runTestJobs(tj.jobs, null, vars, __scriptLines, tj.nonce, trace.st, true);
+        }
+      } catch (_) { /* the checks stay unchecked */ }
+      try { __traceKit.end(trace); } catch (_) { /* nothing more to put back */ }
+    }
     if (err === NEEDS_INPUT) {
       // Not a crash: the run is paused at a prompt() waiting for the host to
       // raise the dialog and post the script back with one more answer.

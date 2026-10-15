@@ -34,7 +34,7 @@ export interface NodeRun {
   outcome: 'done' | 'error' | 'timeout';
   /** 'run' if the script itself hung, 'case' if a test case did. */
   timeoutPhase?: 'run' | 'case';
-  error?: { name?: string; message?: string; line?: number | null };
+  error?: { name?: string; message?: string; line?: number | null; col?: number | null };
   tests: TestRunResults;
 }
 
@@ -70,7 +70,7 @@ export function runCodeWithTests(code: string, jobs: TestJob[], runTimeoutMs: nu
       }
       if (d.kind === 'log') { logs.push({ type: d.type || 'log', message: d.message || '' }); return; }
       if (d.kind === 'done') end('done');
-      else if (d.kind === 'error') end('error', { error: { name: d.name, message: d.message, line: d.line } });
+      else if (d.kind === 'error') end('error', { error: { name: d.name, message: d.message, line: d.line, col: d.col } });
     });
     worker.on('error', (e: Error) => end('error', { error: { name: e.name, message: e.message } }));
     worker.postMessage({ code, answers: [], attempt: 1, tests: session.payload });
