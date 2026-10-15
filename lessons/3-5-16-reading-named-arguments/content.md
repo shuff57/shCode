@@ -38,7 +38,7 @@ console.log(describeBox({ color: "blue", depth: 6, height: 4, width: 10 }));
 
 Both calls give the same measurements, because the keys — not their order — decide what goes where. The swap bug cannot happen.
 
-This is the dominant style in the libraries you meet later. A call like `circle({ radius: 10 })` is one function, one argument, and that argument is an object literal being built on the spot.
+This is the dominant style in the libraries you meet later. A call like `describeBox({ width: 10, height: 4, depth: 6, color: "red" })` is one function, one argument, and that argument is an object literal being built on the spot.
 
 ---
 

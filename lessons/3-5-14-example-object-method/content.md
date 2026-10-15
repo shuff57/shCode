@@ -32,7 +32,7 @@ console.log(student.greet());
 
 ## Step 3: A method that reads another property
 
-A method body can read the object's other fields by name. (Referring to the object itself needs `this`, which arrives with classes in Chapter 5, so this example passes the name in.)
+A method body can read the object's other fields through the object's own variable name: here `student.name`. A method can also take parameters like any other function: `who` is the name of the person being greeted, passed in by the call. (A method can also refer to its object as `this`, which arrives with classes in Chapter 5. Until then, use the variable name.)
 
 ```js live plain
 const student = {

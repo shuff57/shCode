@@ -38,6 +38,92 @@ const flat = (doc) => ({ ...doc, nodes: doc.nodes.map((nd) => (nd.shape === 'ter
 const flip = (text) => text.replace(/\|yes\|/g, '|TMP|').replace(/\|no\|/g, '|yes|').replace(/\|TMP\|/g, '|no|');
 const swap = (text, a, b) => { if (!text.includes(a)) throw new Error('anchor missing: ' + a); return text.replace(a, b); };
 
+// 3.5.11 with the reference's shapes and arrows, three labels of the caller's choosing (second
+// pass, 2026-10-14): the adding task is the one that names an item AND adds, so a set-up box such
+// as "sum = 0" or "total price = 0" before the loop, or a "+" after it, no longer costs 5 points.
+const chart11 = ({ B = 'total = 0', D = 'total = total + order.items[i].price', E = 'name = order.customer.name', C = 'i = 0 to order.items.length - 1', F = 'order.customer.vip', G = 'print name + " (VIP) total: " + total', H = 'print name + " total: " + total' } = {}) => `flowchart TD
+  A([Start])
+  B[${B}]
+  C{{${C}}}
+  D[${D}]
+  E[${E}]
+  F{${F}}
+  G[/${G}/]
+  H[/${H}/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D --> C
+  C --> E
+  E --> F
+  F -->|yes| G
+  F -->|no| H
+  G --> Z
+  H --> Z`;
+// 3.5.21 with one unpack box replaced by the given boxes, in a row before the note
+const chart21 = (boxes) => `flowchart TD
+  A([Start])
+${boxes.map((b, i) => `  B${i}[${b}]`).join('\n')}
+  C[build note: color + " box " + width + "x" + height]
+  D{width > height}
+  E[note = note + " (wide)"]
+  F[/print note/]
+  Z([End])
+  A --> B0
+${boxes.slice(1).map((_, i) => `  B${i} --> B${i + 1}`).join('\n')}${boxes.length > 1 ? '\n' : ''}  B${boxes.length - 1} --> C
+  C --> D
+  D -->|yes| E
+  D -->|no| F
+  E --> F
+  F --> Z`;
+
+// 3.5.11, fourth pass: the name task before the loop, and a while-style chart (the hexagon sets up
+// the counter, a "more items?" diamond runs the loop). Both are legal and earn every point.
+const CHART11_NAME_FIRST = `flowchart TD
+  A([Start])
+  B[total = 0]
+  E[name = order.customer.name]
+  C{{i = 0 to order.items.length - 1}}
+  D[total = total + order.items[i].price]
+  F{order.customer.vip}
+  G[/print name + " (VIP) total: " + total/]
+  H[/print name + " total: " + total/]
+  Z([End])
+  A --> B
+  B --> E
+  E --> C
+  C --> D
+  D --> C
+  C --> F
+  F -->|yes| G
+  F -->|no| H
+  G --> Z
+  H --> Z`;
+const CHART11_WHILE = `flowchart TD
+  A([Start])
+  B[total = 0]
+  C{{i = 0}}
+  W{more items in the order?}
+  D[total = total + order.items[i].price]
+  E[name = order.customer.name]
+  F{is the customer a VIP?}
+  G[/print name + " (VIP) total: " + total/]
+  H[/print name + " total: " + total/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> W
+  W -->|yes| D
+  D --> W
+  W -->|no| E
+  E --> F
+  F -->|yes| G
+  F -->|no| H
+  G --> Z
+  H --> Z
+`;
+
 const CASES = {
   '3-4-9-chart-expand-arrow': {
     variant: `flowchart TD
@@ -134,6 +220,63 @@ const CASES = {
       'adding task goes on to the decision, not back to the loop': (t) => swap(t, '  D --> C\n', '  D --> F\n'),
       'decision inside the loop': (t) => swap(swap(t, '  C --> E\n  E --> F\n', '  C --> E\n  E --> C\n'), '  D --> C\n', '  D --> F\n  F -->|again| C\n'),
       'no hexagon': (t) => swap(t, '{{i = 0 to order.items.length - 1}}', '[i = 0 to order.items.length - 1]'),
+      'the loop body only says "add"': (t) => swap(t, 'D[total = total + order.items[i].price]', 'D[add]'),
+      'the loop body never names an item ("add 1")': (t) => swap(t, 'D[total = total + order.items[i].price]', 'D[add 1]'),
+      'the adding task after the loop, the name task inside it': (t) => swap(swap(t, 'D[total = total + order.items[i].price]', 'D[name = order.customer.name]'), 'E[name = order.customer.name]', 'E[total = total + order.items[i].price]'),
+      // third pass (2026-10-14): the four arrow-order checks are worth 6 of 29 each (pass at 24), so
+      // each one alone fails the chart; at 4 or 5 of 20 the old pass line of 16 let them slide
+      'yes and no arrows swapped': (t) => flip(t),
+      'both exits lead to the one print': (t) => swap(swap(swap(t, '  F -->|no| H\n', '  F -->|no| G\n'), '  H[/print name + " total: " + total/]\n', ''), '  H --> Z\n', ''),
+      'the VIP print does not say VIP': (t) => swap(t, 'G[/print name + " (VIP) total: " + total/]', 'G[/print name + " total: " + total/]'),
+      'one print before the diamond, its exits go to End': (t) => swap(swap(swap(swap(t, '  E --> F\n', '  E --> G\n  G --> F\n'), '  F -->|yes| G\n  F -->|no| H\n', '  F -->|yes| Z\n  F -->|no| Z\n'), '  G --> Z\n  H --> Z\n', ''), '  H[/print name + " total: " + total/]\n', ''),
+      // fourth pass (2026-10-15): an arrow around the loop straight to the name task
+      'a bypass arrow skips the loop (B --> E)': (t) => swap(t, '  B --> C\n', '  B --> C\n  B --> E\n'),
+    },
+    accepts: {
+      'set-up box "sum = 0"': chart11({ B: 'sum = 0', D: 'sum = sum + order.items[i].price' }),
+      'set-up box "cost = 0"': chart11({ B: 'cost = 0', D: 'cost = cost + order.items[i].price' }),
+      'set-up box "total price = 0"': chart11({ B: 'total price = 0', D: 'total price = total price + order.items[i].price' }),
+      'set-up box "set the total cost to 0"': chart11({ B: 'set the total cost to 0', D: 'add the item price to the total cost' }),
+      'set-up box "start total at 0, no prices yet"': chart11({ B: 'start total at 0, no prices yet' }),
+      'a box after the loop with a +': chart11({ E: 'note = order.customer.name + " total: " + total' }),
+      'loop body "add the item\'s price to the total"': chart11({ D: "add the item's price to the total" }),
+      'loop body "total += order.items[i].price"': chart11({ D: 'total += order.items[i].price' }),
+      'loop body "sum = sum + current item"': chart11({ D: 'sum = sum + current item' }),
+      'loop body "running total grows by the price"': chart11({ D: 'running total grows by the price' }),
+      'loop body "total = total plus this item cost"': chart11({ D: 'total = total plus this item cost' }),
+      'VIP print written "member total"': chart11({ G: 'print member total', H: 'print total' }),
+      'prints in prose: "show the name, VIP and the total"': chart11({ G: "show the customer's name, VIP, and total", H: 'show the name and total' }),
+      // fourth pass (2026-10-15): the name task drawn before the loop; a while-style loop whose
+      // hexagon is the set-up and whose "more items?" diamond sits inside the repeat
+      'the name task before the loop': CHART11_NAME_FIRST,
+      'while-style: hexagon as set-up, a "more items?" diamond': CHART11_WHILE,
+      'while-style, the counter steps in its own box': CHART11_WHILE.replace('  D --> W\n', '  D --> I\n  I[i = i + 1]\n  I --> W\n'),
+    },
+    rejects: {
+      'while-style with the VIP yes and no swapped': flip(CHART11_WHILE).replace('W -->|no| E', 'W -->|yes| E').replace('W -->|yes| D', 'W -->|no| D'),
+      'while-style with both VIP exits to End': CHART11_WHILE.replace('  F -->|yes| G\n  F -->|no| H\n', '  F -->|yes| Z\n  F -->|no| Z\n').replace('  G --> Z\n  H --> Z\n', '').replace('  G[/print name + " (VIP) total: " + total/]\n  H[/print name + " total: " + total/]\n', ''),
+      'while-style with no print': CHART11_WHILE.replace('G[/print name + " (VIP) total: " + total/]', 'G[mark the order as VIP]').replace('H[/print name + " total: " + total/]', 'H[mark the order as normal]'),
+      'while-style with the VIP diamond inside the loop': CHART11_WHILE.replace('  W -->|no| E\n', '  W -->|no| Z\n').replace('  D --> W\n', '  D --> E\n').replace('  G --> Z\n  H --> Z\n', '  G --> W\n  H --> W\n'),
+      'one-word labels (total / loop / add / name / vip? / print)': `flowchart TD
+  A([Start])
+  B[total]
+  C{{loop}}
+  D[add]
+  E[name]
+  F{vip?}
+  G[/print/]
+  H[/print2/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D --> C
+  C --> E
+  E --> F
+  F -->|yes| G
+  F -->|no| H
+  G --> Z
+  H --> Z`,
     },
   },
   '3-5-21-chart-destructure-vs-access': {
@@ -156,6 +299,34 @@ const CASES = {
       'yes and no arrows swapped': (t) => flip(t),
       'decision before any task': (t) => swap(swap(t, '  A --> B\n  B --> C\n  C --> D\n', '  A --> D\n  D --> B\n  B --> C\n'), '  D -->|yes| E\n  D -->|no| F\n', '  C -->|yes| E\n  C -->|no| F\n'),
       'both exits go to the same place': (t) => swap(t, '  D -->|yes| E\n', '  D -->|yes| F\n'),
+      // third pass (2026-10-14): every check is worth 6 of 24 (pass at 20), so each one alone fails
+      'a bypass arrow skips the decision': (t) => swap(t, '  C --> D\n', '  C --> D\n  C --> F\n'),
+      'the diamond asks width < height': (t) => swap(t, '{width > height}', '{width < height}'),
+      'the diamond asks height > width': (t) => swap(t, '{width > height}', '{height > width}'),
+      'the diamond names width with no direction': (t) => swap(t, '{width > height}', '{width and height}'),
+      'no note is built before the decision': (t) => swap(swap(t, '  C[build note: color + " box " + width + "x" + height]\n', ''), '  B --> C\n  C --> D\n', '  B --> D\n'),
+      'the yes arrow leads to an unrelated task': (t) => swap(t, 'E[note = note + " (wide)"]', 'E[do something]'),
+      'the print is a plain task': (t) => swap(t, 'F[/print note/]', 'F[show the note]'),
+      // fourth pass (2026-10-15): the negated question, and "or equal" (a square is not wide)
+      'the diamond asks "is the box NOT wide?"': (t) => swap(t, '{width > height}', '{is the box NOT wide?}'),
+      'the diamond asks width >= height': (t) => swap(t, '{width > height}', '{width >= height}'),
+      'the diamond asks "is width greater than or equal to height?"': (t) => swap(t, '{width > height}', '{is width greater than or equal to height?}'),
+    },
+    // the unpack is ONE task: a box per field read out of options is plain access (second pass)
+    accepts: {
+      'const { width, height, color } = options': chart21(['const { width, height, color } = options']),
+      'unpack options': chart21(['unpack options']),
+      'destructure options into width, height, color': chart21(['destructure options into width, height, color']),
+      'the note box names options again': chart21(['unpack width, height, color from options', 'note uses the values from options: color, width and height']),
+      'decision "is the box wide?"': chart21(['unpack width, height, color from options']).replace('{width > height}', '{is the box wide?}'),
+      'decision "is width bigger than height?"': chart21(['unpack width, height, color from options']).replace('{width > height}', '{is width bigger than height?}'),
+      'yes box "append wide to the note"': chart21(['unpack width, height, color from options']).replace('E[note = note + " (wide)"]', 'E[append wide to the note]'),
+      'build box "make the string"': chart21(['unpack width, height, color from options']).replace('C[build note: color + " box " + width + "x" + height]', 'C[make the string]'),
+    },
+    rejects: {
+      'three scattered reads, one field each': chart21(['get width from options', 'get height from options', 'get color from options']),
+      'two fields unpacked, the third read on its own': chart21(['unpack width, height from options', 'get color from options']),
+      'one field read from options': chart21(['read width from options']),
     },
   },
   '3-6-7-chart-reassign-vs-mutate': {
@@ -291,6 +462,22 @@ try {
       const m = t(mutate(ref));
       check(m.earned < m.passAt, `${id}: ${name} fails (${m.earned}/${m.possible})`);
     }
+    for (const [name, text] of Object.entries(c.accepts ?? {})) {
+      const a = t(text);
+      check(a.earned === a.possible, `${id}: ${name} earns every point (${a.earned}/${a.possible})`);
+    }
+    for (const [name, text] of Object.entries(c.rejects ?? {})) {
+      const x = t(text);
+      check(x.earned < x.passAt, `${id}: ${name} fails (${x.earned}/${x.possible})`);
+    }
+  }
+  {
+    // fourth pass: the bypass costs exactly the after-loop item (6 of 29): 23, under the pass line
+    const id = '3-5-11-chart-nested-access';
+    const cfg = JSON.parse(readFileSync(path.join(root, 'lessons', id, 'lesson.json'), 'utf8'));
+    const ref = readFileSync(path.join(root, 'lessons', id, 'solution', 'chart.mmd'), 'utf8');
+    const b = total(cfg, fromMermaid(swap(ref, '  B --> C\n', '  B --> C\n  B --> E\n')));
+    check(b.earned === 23 && b.possible === 29, `${id}: the bypass arrow scores 23/29 (${b.earned}/${b.possible})`);
   }
 } finally {
   cleanup();

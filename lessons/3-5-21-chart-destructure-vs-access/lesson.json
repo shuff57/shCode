@@ -59,9 +59,9 @@
       "rubric": [
         {
           "id": "unpack-first",
-          "title": "The unpack comes before the decision",
+          "title": "The unpack, then the note, then the decision",
           "points": 6,
-          "description": "Scored by the editor (arrow order): a task comes before the decision on every route.",
+          "description": "Scored by the editor (arrow order): the unpack task, then the task that builds the note, come before the decision on every route.",
           "check": {
             "steps": [
               {
@@ -69,14 +69,29 @@
                 "of": [
                   {
                     "kind": "process",
-                    "re": "unpack|destructur|width|height|color|options|take|pull|extract|read|get"
+                    "re": "^(?!.*options\\s*\\.)(?=.*(?:unpack|destructur|take|pull|extract|width\\s*,\\s*height|from\\s+options|=\\s*options))"
+                  },
+                  {
+                    "kind": "process",
+                    "re": "note|box|build|string|text|make|\\+"
                   },
                   {
                     "kind": "decision"
                   }
                 ],
-                "fail": "The unpack is its own task, drawn before the decision that uses the names.",
-                "pass": "A task comes before the decision."
+                "fail": "The unpack is its own task, drawn first: one box that takes width, height and color out of options (not a box that reads options.width). Then build the note in its own task, before the decision.",
+                "pass": "The unpack, then the note, then the decision."
+              },
+              {
+                "op": "count",
+                "match": {
+                  "kind": "process",
+                  "re": "^(?=.*options)(?:(?=.*width)(?!.*height)(?!.*color)|(?=.*height)(?!.*width)(?!.*color)|(?=.*color)(?!.*width)(?!.*height))"
+                },
+                "min": 0,
+                "max": 0,
+                "fail": "Take all three values out of options in one task. A separate box for each field is plain access, one value at a time.",
+                "pass": "No task reads a single field out of options."
               }
             ]
           }
@@ -85,7 +100,7 @@
           "id": "exits",
           "title": "The wide path adds to the note",
           "points": 6,
-          "description": "Scored by the editor: the decision has two different exits, and the yes exit goes to a task.",
+          "description": "Scored by the editor: the decision has two different exits, and the yes exit goes to the task that adds to the note.",
           "check": {
             "steps": [
               {
@@ -96,7 +111,8 @@
                 "orientation": "labelled",
                 "distinct": true,
                 "yes": {
-                  "kind": "process"
+                  "kind": "process",
+                  "re": "wide|note|add|append|\\+|plus|extend|attach"
                 },
                 "fail": "The yes arrow must lead to the task that appends to the note, and the no arrow to somewhere different.",
                 "pass": "The yes arrow goes to the task that adds to the note."
@@ -107,7 +123,7 @@
         {
           "id": "one-print",
           "title": "The print comes after the decision",
-          "points": 4,
+          "points": 6,
           "description": "Scored by the editor: an input/output step for the print, after the decision.",
           "check": {
             "steps": [
@@ -142,18 +158,18 @@
         {
           "id": "wide-question",
           "title": "The decision compares width and height",
-          "points": 4,
-          "description": "Scored by the editor: a diamond asks whether width is greater than height.",
+          "points": 6,
+          "description": "Scored by the editor: a diamond asks whether the width is greater than the height (or whether the box is wide).",
           "check": {
             "steps": [
               {
                 "op": "label",
                 "match": {
                   "kind": "decision",
-                  "re": "width|height|wide|greater|>|bigger|larger|taller"
+                  "re": "^(?!.*(?:\\b(?:not|isn'?t|never)\\b|or\\s+equal|>=|<=|\\u2265|\\u2264))(?=.*(?:width\\s*(?:is\\s+)?(?:the\\s+)?(?:>(?!=)|greater|larger|bigger|wider|more|exceeds?|over)|height\\s*(?:is\\s+)?(?:the\\s+)?(?:<(?!=)|less|smaller|shorter|narrower|under)|\\bwide\\b|\\bwider\\b))"
                 },
                 "min": 1,
-                "fail": "The diamond should compare the width with the height.",
+                "fail": "The diamond should ask whether the width is greater than the height, so that yes is the wide case (not \"or equal\", and not the negated question).",
                 "pass": "The diamond compares width and height."
               }
             ]

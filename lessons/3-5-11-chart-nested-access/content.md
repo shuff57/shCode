@@ -41,7 +41,7 @@ if (order.customer.vip) {
 | **Loop setup** (hexagon: press **+ more shapes**) | `i = 0 to order.items.length - 1` |
 | **Task** (rectangle) | `total = 0`, `total = total + order.items[i].price`, `name = order.customer.name` |
 | **Decision** (diamond) | `order.customer.vip` |
-| **Input / Output** (parallelogram) | The final print |
+| **Input / Output** (parallelogram) | The two prints: one for a VIP, one for everyone else |
 
 At least seven shapes, at least one diamond.
 
@@ -49,7 +49,7 @@ At least seven shapes, at least one diamond.
 
 1. **The loop body** runs the adding task, then goes **back to the hexagon**, not on to the decision.
 2. **After the loop**, the flow leaves the hexagon for the `name = ...` task — the decision is *outside* the loop.
-3. **Both diamond exits** rejoin at the single print, so neither path dead-ends.
+3. **Each diamond exit** leads to its own print, just as the code has one `console.log` in the `if` and one in the `else`. Both prints then lead on to End, so neither path dead-ends.
 
 ### Before you submit
 

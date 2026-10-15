@@ -1665,7 +1665,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "rubric": [
       {
         "id": "two-questions",
-        "title": "Naming first, then braces",
+        "title": "Naming first, then the arrow question",
         "points": 6,
         "description": "Scored by the editor (arrow order): one decision comes before another on the route.",
         "check": {
@@ -1680,7 +1680,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
                   "kind": "decision"
                 }
               ],
-              "fail": "The comparison asks two questions in order: is the function named, then does the body use braces. Draw the second diamond after the first.",
+              "fail": "The comparison asks two questions in order: is the function named, then is it written with =>. Draw the second diamond after the first.",
               "pass": "The second question follows the first."
             }
           ]
@@ -1744,17 +1744,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "questions-on-topic",
         "title": "The questions are about the three forms",
         "points": 4,
-        "description": "Scored by the editor: at least two diamonds ask about the function (its name, its braces).",
+        "description": "Scored by the editor: at least two diamonds ask about the function (its name, or whether it is written with =>).",
         "check": {
           "steps": [
             {
               "op": "label",
               "match": {
                 "kind": "decision",
-                "re": "name|named|brace|body|function|return"
+                "re": "name|named|brace|body|function|return|arrow|=>"
               },
               "min": 2,
-              "fail": "Ask about the function: is it named, and does its body use braces.",
+              "fail": "Ask about the function: is it named, and is it written with =>.",
               "pass": "The diamonds ask about the function."
             }
           ]
@@ -1767,7 +1767,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "gate": {
       "anyOf": [
         "named|name|declaration|function",
-        "braces|brace|block|return|implicit|explicit",
+        "braces|brace|block|return|implicit|explicit|arrow|=>",
         "expression|const|arrow|assign",
         "print|show|log|output|result",
         "\\b3\\b|add|sum|1 \\+ 2"
@@ -1816,14 +1816,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ]
   },
   "3-4-9-chart-expand-arrow": {
-    "lessonTitle": "3.4.9 Chart the Code: Expanding an Arrow to Its Full Form",
+    "lessonTitle": "3.4.9 Chart the Code: A Function That Calls Its Parameter Twice",
     "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
     "rubric": [
       {
         "id": "three-steps",
         "title": "Read, first call, second call, then the print",
         "points": 5,
-        "description": "Scored by the editor (shape kind): at least four task or input/output shapes, for reading the parameters, the two calls and the print.",
+        "description": "Scored by the editor (shape kind): at least four task, function-call or input/output shapes, for reading the parameters, the two calls and the print.",
         "check": {
           "steps": [
             {
@@ -1831,6 +1831,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "match": {
                 "kind": [
                   "process",
+                  "subroutine",
                   "io"
                 ]
               },
@@ -1845,14 +1846,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "order",
         "title": "The work comes first, then the print, then End",
         "points": 6,
-        "description": "Scored by the editor (arrow order): tasks, then an input/output step, then End, on every route.",
+        "description": "Scored by the editor (arrow order): tasks or function calls, then an input/output step, then End, on every route.",
         "check": {
           "steps": [
             {
               "op": "sequence",
               "of": [
                 {
-                  "kind": "process"
+                  "kind": [
+                    "process",
+                    "subroutine"
+                  ]
                 },
                 {
                   "kind": "io"
@@ -1871,13 +1875,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "straight",
         "title": "A straight line, no repeat",
         "points": 5,
-        "description": "Scored by the editor (arrow order): no task is part of a repeat.",
+        "description": "Scored by the editor (arrow order): no task or function call is part of a repeat.",
         "check": {
           "steps": [
             {
               "op": "not-in-cycle",
               "match": {
-                "kind": "process"
+                "kind": [
+                  "process",
+                  "subroutine"
+                ]
               },
               "fail": "This code runs once from top to bottom, so no arrow should lead back to an earlier step. In your chart one does.",
               "pass": "No arrow leads back."
@@ -1935,10 +1942,6 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "no-orphans"
       },
       {
-        "id": "min-process",
-        "count": 2
-      },
-      {
         "id": "decision-two-exits"
       },
       {
@@ -1963,7 +1966,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "hexagon",
         "title": "The loop is drawn with the loop-setup hexagon",
-        "points": 5,
+        "points": 3,
         "description": "Scored by the editor (shape kind).",
         "check": {
           "steps": [
@@ -1980,10 +1983,29 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         }
       },
       {
+        "id": "adds-price",
+        "title": "A task inside the loop adds each price to the total",
+        "points": 6,
+        "description": "Scored by the editor (arrow order): the task that adds the price sits inside the repeat.",
+        "check": {
+          "steps": [
+            {
+              "op": "in-cycle",
+              "match": {
+                "kind": "process",
+                "re": "^(?!.*(?:=\\s*0(?![\\d.])|\\b(?:to|at)\\s+(?:0|zero)\\b))(?=.*(?:price|cost|amount|item))(?=.*(?:\\+|\\badd|\\bplus|\\bsum|\\btotal))"
+              },
+              "fail": "The loop body is the task that adds each item's price to the total, and it must lead back to the hexagon so it runs once per item.",
+              "pass": "The adding task runs once per item, inside the loop."
+            }
+          ]
+        }
+      },
+      {
         "id": "after-loop",
         "title": "The loop, then more steps after it",
         "points": 6,
-        "description": "Scored by the editor (arrow order): the loop repeats, and the arrow that leaves it leads on to the steps after it.",
+        "description": "Scored by the editor (arrow order): the loop repeats, the arrow that leaves it leads on to the steps after it, and no arrow goes around the loop to the VIP test.",
         "check": {
           "steps": [
             {
@@ -1996,6 +2018,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "orSetup": true,
               "fail": "The adding task must lead back to the hexagon, and the arrow that leaves the loop must lead on to the name task, the decision and the print (at least two more steps before End).",
               "pass": "The way out of the loop leads on to the steps after it."
+            },
+            {
+              "op": "sequence",
+              "of": [
+                {
+                  "kind": "preparation"
+                },
+                {
+                  "kind": "decision",
+                  "re": "^(?!.*(?:\\bmore\\b|\\bleft\\b|\\bnext\\b|\\banother\\b|\\bremaining\\b|\\blength\\b|\\bitems?\\b|\\bi\\s*<))(?=.*(?:vip|customer|member|special))"
+                }
+              ],
+              "fail": "The loop must run before the VIP test on every route: no arrow may go around the hexagon straight to the steps after it.",
+              "pass": "Every route to the VIP test goes through the loop."
             }
           ]
         }
@@ -2003,16 +2039,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "decision-outside",
         "title": "The VIP decision is outside the loop",
-        "points": 5,
-        "description": "Scored by the editor (arrow order): the decision is not part of a repeat.",
+        "points": 6,
+        "description": "Scored by the editor (arrow order): the decision that asks about the customer is not part of a repeat. A diamond that runs the loop (\"more items?\") may sit inside it.",
         "check": {
           "steps": [
             {
               "op": "not-in-cycle",
               "match": {
-                "kind": "decision"
+                "kind": "decision",
+                "re": "^(?!.*(?:\\bmore\\b|\\bleft\\b|\\bnext\\b|\\banother\\b|\\bremaining\\b|\\blength\\b|\\bitems?\\b|\\bi\\s*<))(?=.*(?:vip|customer|member|special))"
               },
-              "fail": "The VIP test runs once, after the loop. In your chart an arrow leads back to the diamond, so it runs on every pass.",
+              "fail": "The VIP test runs once, after the loop. In your chart an arrow leads back to the diamond that asks about the customer, so it runs on every pass (or no diamond asks about the customer at all).",
               "pass": "The decision is outside the loop."
             }
           ]
@@ -2021,7 +2058,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "vip-question",
         "title": "The decision asks about the customer",
-        "points": 4,
+        "points": 2,
         "description": "Scored by the editor: a diamond asks about the customer (the vip flag).",
         "check": {
           "steps": [
@@ -2034,6 +2071,33 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "min": 1,
               "fail": "The diamond should ask about the customer: is the order from a VIP.",
               "pass": "The diamond asks about the customer."
+            }
+          ]
+        }
+      },
+      {
+        "id": "exits",
+        "title": "Each exit of the VIP decision has its own print",
+        "points": 6,
+        "description": "Scored by the editor (arrow order): the yes arrow of the VIP decision leads to the VIP print and the no arrow to a different print.",
+        "check": {
+          "steps": [
+            {
+              "op": "branch",
+              "at": {
+                "kind": "decision"
+              },
+              "orientation": "labelled",
+              "distinct": true,
+              "yes": {
+                "kind": "io",
+                "re": "vip|member|special"
+              },
+              "no": {
+                "kind": "io"
+              },
+              "fail": "Each exit of the diamond leads to its own print: the yes arrow to the VIP print (say VIP in it), the no arrow to the other print.",
+              "pass": "Each exit of the diamond has its own print."
             }
           ]
         }
@@ -2100,9 +2164,9 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "rubric": [
       {
         "id": "unpack-first",
-        "title": "The unpack comes before the decision",
+        "title": "The unpack, then the note, then the decision",
         "points": 6,
-        "description": "Scored by the editor (arrow order): a task comes before the decision on every route.",
+        "description": "Scored by the editor (arrow order): the unpack task, then the task that builds the note, come before the decision on every route.",
         "check": {
           "steps": [
             {
@@ -2110,14 +2174,29 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "of": [
                 {
                   "kind": "process",
-                  "re": "unpack|destructur|width|height|color|options|take|pull|extract|read|get"
+                  "re": "^(?!.*options\\s*\\.)(?=.*(?:unpack|destructur|take|pull|extract|width\\s*,\\s*height|from\\s+options|=\\s*options))"
+                },
+                {
+                  "kind": "process",
+                  "re": "note|box|build|string|text|make|\\+"
                 },
                 {
                   "kind": "decision"
                 }
               ],
-              "fail": "The unpack is its own task, drawn before the decision that uses the names.",
-              "pass": "A task comes before the decision."
+              "fail": "The unpack is its own task, drawn first: one box that takes width, height and color out of options (not a box that reads options.width). Then build the note in its own task, before the decision.",
+              "pass": "The unpack, then the note, then the decision."
+            },
+            {
+              "op": "count",
+              "match": {
+                "kind": "process",
+                "re": "^(?=.*options)(?:(?=.*width)(?!.*height)(?!.*color)|(?=.*height)(?!.*width)(?!.*color)|(?=.*color)(?!.*width)(?!.*height))"
+              },
+              "min": 0,
+              "max": 0,
+              "fail": "Take all three values out of options in one task. A separate box for each field is plain access, one value at a time.",
+              "pass": "No task reads a single field out of options."
             }
           ]
         }
@@ -2126,7 +2205,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "exits",
         "title": "The wide path adds to the note",
         "points": 6,
-        "description": "Scored by the editor: the decision has two different exits, and the yes exit goes to a task.",
+        "description": "Scored by the editor: the decision has two different exits, and the yes exit goes to the task that adds to the note.",
         "check": {
           "steps": [
             {
@@ -2137,7 +2216,8 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "orientation": "labelled",
               "distinct": true,
               "yes": {
-                "kind": "process"
+                "kind": "process",
+                "re": "wide|note|add|append|\\+|plus|extend|attach"
               },
               "fail": "The yes arrow must lead to the task that appends to the note, and the no arrow to somewhere different.",
               "pass": "The yes arrow goes to the task that adds to the note."
@@ -2148,7 +2228,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "one-print",
         "title": "The print comes after the decision",
-        "points": 4,
+        "points": 6,
         "description": "Scored by the editor: an input/output step for the print, after the decision.",
         "check": {
           "steps": [
@@ -2183,18 +2263,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "wide-question",
         "title": "The decision compares width and height",
-        "points": 4,
-        "description": "Scored by the editor: a diamond asks whether width is greater than height.",
+        "points": 6,
+        "description": "Scored by the editor: a diamond asks whether the width is greater than the height (or whether the box is wide).",
         "check": {
           "steps": [
             {
               "op": "label",
               "match": {
                 "kind": "decision",
-                "re": "width|height|wide|greater|>|bigger|larger|taller"
+                "re": "^(?!.*(?:\\b(?:not|isn'?t|never)\\b|or\\s+equal|>=|<=|\\u2265|\\u2264))(?=.*(?:width\\s*(?:is\\s+)?(?:the\\s+)?(?:>(?!=)|greater|larger|bigger|wider|more|exceeds?|over)|height\\s*(?:is\\s+)?(?:the\\s+)?(?:<(?!=)|less|smaller|shorter|narrower|under)|\\bwide\\b|\\bwider\\b))"
               },
               "min": 1,
-              "fail": "The diamond should compare the width with the height.",
+              "fail": "The diamond should ask whether the width is greater than the height, so that yes is the wide case (not \"or equal\", and not the negated question).",
               "pass": "The diamond compares width and height."
             }
           ]
@@ -3062,34 +3142,6 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       "sprite"
     ]
   },
-  "5-2-14-a5-2-2-vel-vs-applyforce": {
-    "lessonTitle": "5.2.14 Vel vs applyForce",
-    "prompt": "Everything you need is in 5.2.8 (Reading: Forces vs Velocity) and 5.2.9 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.8, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.8 and 5.2.9)",
-    "rubric": [
-      {
-        "id": "q1-fight-explanation",
-        "title": "Q1: Explains why .vel fights the physics engine",
-        "description": "Student explains that setting .vel directly every frame overrides whatever the physics engine (gravity, applyForce, collisions) already computed for that sprite that frame, so the engine's own influence gets thrown away and re-imposed instead of blending with it. Accept any everyday phrasing of overriding, resetting, or cancelling out the physics engine's own effect; it doesn't need textbook precision.",
-        "points": 1
-      },
-      {
-        "id": "q2-applyforce-scenario",
-        "title": "Q2: Describes a real scenario where applyForce is the better tool",
-        "description": "Student names a concrete scenario (wind, thrust, a magnet, a continuous push layered on top of gravity, etc.) where applyForce is the better tool, and gives a reason: it respects mass and adds to existing motion instead of replacing it. Credit any concrete scenario with a reason attached, even loosely worded.",
-        "points": 1
-      },
-      {
-        "id": "writing-clarity",
-        "title": "Writing clarity",
-        "description": "Response is clearly organized and easy to follow. Deduct this point only for significant issues: incoherent structure, or writing that makes it difficult to assess the content. Do not deduct for length.",
-        "points": 1
-      }
-    ],
-    "model": "glm-5.3-flash:cloud",
-    "contextDocs": [
-      "physics"
-    ]
-  },
   "5-3-32-a12-2-oop-writeup": {
     "lessonTitle": "5.4.19 Procedural vs OOP Writeup",
     "prompt": "Answer all four questions. Questions 1 and 4 come from the readings; questions 2 and 3 come from code you have written yourself. Your own everyday words throughout: do not copy definitions from the internet.\n\nQuestion 1: Definitions in your own words. What does procedural programming mean? What does object-oriented programming mean? (1.4.8 for procedural; 5.3.3, 5.4.14 and the side-by-side worked example in 5.4.15 for object-oriented)\n\nQuestion 2: A specific procedural example from your first-quarter code (Units 1 to 3, before moSHion). Name a specific assignment or program you wrote then that used a procedural approach, and describe it in one or two sentences. Name the assignment.\n\nQuestion 3: A specific moSHion OOP example. Name a specific place in your moSHion code: the A12.1 Collectible class, or an earlier class you wrote: where you used OOP. Describe how the class organised your code: what data and what behaviour did it group together? (5.3.7 and 5.4.1)\n\nQuestion 4: When OOP wins. Describe one situation, hypothetical is fine, where OOP is clearly the better choice than procedural code. Explain why, using at least one of these: readability, extensibility, or keeping data and behaviour together. (5.4.16 and 5.4.17)",
@@ -3156,5 +3208,33 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
+  },
+  "5-2-14-a5-2-2-vel-vs-applyforce": {
+    "lessonTitle": "5.2.14 Vel vs applyForce",
+    "prompt": "Everything you need is in 5.2.8 (Reading: Forces vs Velocity) and 5.2.9 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.8, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.8 and 5.2.9)",
+    "rubric": [
+      {
+        "id": "q1-fight-explanation",
+        "title": "Q1: Explains why .vel fights the physics engine",
+        "description": "Student explains that setting .vel directly every frame overrides whatever the physics engine (gravity, applyForce, collisions) already computed for that sprite that frame, so the engine's own influence gets thrown away and re-imposed instead of blending with it. Accept any everyday phrasing of overriding, resetting, or cancelling out the physics engine's own effect; it doesn't need textbook precision.",
+        "points": 1
+      },
+      {
+        "id": "q2-applyforce-scenario",
+        "title": "Q2: Describes a real scenario where applyForce is the better tool",
+        "description": "Student names a concrete scenario (wind, thrust, a magnet, a continuous push layered on top of gravity, etc.) where applyForce is the better tool, and gives a reason: it respects mass and adds to existing motion instead of replacing it. Credit any concrete scenario with a reason attached, even loosely worded.",
+        "points": 1
+      },
+      {
+        "id": "writing-clarity",
+        "title": "Writing clarity",
+        "description": "Response is clearly organized and easy to follow. Deduct this point only for significant issues: incoherent structure, or writing that makes it difficult to assess the content. Do not deduct for length.",
+        "points": 1
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": [
+      "physics"
+    ]
   }
 };
