@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
@@ -17,6 +20,26 @@ const nextConfig = {
   // preserveSymlinks, which fixes the same duplication for type-checking.
   webpack: (config) => {
     config.resolve.symlinks = false;
+    // Every student page with an editor broke ("Unrecognized extension value ...
+    // multiple instances of @codemirror/state are loaded", then "t is not
+    // iterable" in the highlighter): the production bundle held five copies of
+    // @codemirror/state and more of the @lezer packages, because their package
+    // maps `import` and `require` to different files. These objects are
+    // checked with instanceof and shared NodeProp/Tag identities, so pin each
+    // package to its one ESM file. Check with: grep -o 'Unrecognized extension
+    // value' out/_next/static/chunks/*.js (one match in one chunk, not five).
+    const singletons = [
+      '@codemirror/state', '@codemirror/view', '@codemirror/language', '@codemirror/commands',
+      '@codemirror/autocomplete', '@codemirror/search', '@codemirror/lint', '@codemirror/lang-javascript',
+      '@lezer/common', '@lezer/highlight', '@lezer/lr', '@lezer/javascript',
+    ];
+    const alias = { ...config.resolve.alias };
+    for (const name of singletons) {
+      const dir = path.resolve(import.meta.dirname, 'node_modules', name);
+      const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
+      alias[name + '$'] = path.join(dir, pkg.module || 'dist/index.js');
+    }
+    config.resolve.alias = alias;
     return config;
   },
   // NOTE: do not run `npm run build` while `npm run dev` is running. Both own
