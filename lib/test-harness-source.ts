@@ -492,6 +492,11 @@ const __runTestJobs = (() => {
     let traceVal;
     if (traced) {
       if (!tr) return bad('Your program could not be watched while it ran (code that declares its own console, or is too long to follow, cannot be), so this could not be checked.', false);
+      // The silent runs did not fit in the time left (EXECUTION TRACE, drive): say so, not a plain fail.
+      if (tr.slow && isArr(sc.perturb) && sc.perturb.length) {
+        const secs = Math.max(0.1, Math.round(tr.slow / 100) / 10);
+        return bad('Your program takes about ' + secs + ' seconds to run: too slow to run again with changed data inside the ' + Math.round((tr.budget || 3000) / 1000) + '-second limit, so this could not be checked. Make it faster (a loop that runs too many times?) and Run again.', false);
+      }
       traceVal = freezeDeep({
         prints: tr.recs.map((r) => ({ src: r.src, code: r.code, ran: r.ran, out: r.out.slice(), out2: r.out2 ? r.out2.slice() : null, stable: r.stable === true, outD: r.outD ? r.outD.slice() : null })),
         perturbed: tr.perturbed === true,
@@ -738,6 +743,16 @@ const __runTestJobs = (() => {
 //      records each literal assigned to a name. A job that passes counts; any other
 //      job keeps "Your code stopped with an error". Jobs without perturb are not
 //      checked, so a run that throws never completes a lab.
+//   5. The runs cannot be told apart from inside the script: every one is compiled by the same
+//      call (compile), with the same parameters (the stand-ins, two hooks and, in code that is not
+//      strict, an empty arguments), and entered through the same frames (drive, enter), so a stack
+//      trace reads the same; performance marks are cleared, the RegExp statics reset, and every
+//      function the global object holds (Error.stackTraceLimit ...) and the global object's own
+//      prototype chain are put back. Still visible from inside: what a silent run replaces (timers,
+//      Promise.then, Object.freeze, postMessage), a getter's or a method's frames when called through
+//      the changed data, the time, and columns on a line the changed run rewrote.
+//   6. A silent run starts only when it fits in what is left of the run's time limit; when one does
+//      not, the checks that needed it say the program is too slow to check (st.slow).
 // A check sees trace = { prints: [{src, code, ran, out, out2, stable, outD}],
 //   perturbed, threw, mk, k, c, rk, results, dreads, code, text }:
 // src is the call's argument text as written, code the same with comments and
@@ -868,6 +883,10 @@ const __traceKit = (() => {
   const IDENT_RE = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
   // The real ones, taken before any student code runs.
   const R = { freeze: Object.freeze, seal: Object.seal, pext: Object.preventExtensions, ownKeys: Reflect.ownKeys, gopd: Reflect.getOwnPropertyDescriptor, def: Reflect.defineProperty, now: Date.now };
+  const PERF = typeof performance === 'object' && performance !== null ? performance : null;
+  const pbind = (n) => (PERF && typeof PERF[n] === 'function' ? PERF[n].bind(PERF) : null);
+  R.pnow = pbind('now'); R.clearMarks = pbind('clearMarks'); R.clearMeasures = pbind('clearMeasures');
+  const clock = () => (R.pnow ? R.pnow() : R.now());
 
   function fmt(args) {
     try {
@@ -912,6 +931,10 @@ const __traceKit = (() => {
       phase: 1, key: '', perturbed: false, threw: false, blank, text: String(text), cap: null, RL,
       mk: null, k: 0, c: 0, rk: null, rkk: 0, rkc: 0, results: [], dreads: [], g0: null, restore: null,
       recs: sites.map((s) => ({ src: s.src, code: s.code, ran: 0, out: [], out2: null, out3: null, stable: false, outD: null })),
+      // Every run's hook parameters, the same names in each; argp: whether the code also takes a
+      // parameter called arguments (not in strict code); gen: which silent run's stand-ins are live;
+      // durs: how long each run took (ms); slow: the real run's ms when the silent runs did not fit.
+      pn: DOLLAR + rnd3() + 'P', dn: DOLLAR + rnd3() + 'D', argp: null, gen: 0, durs: [], slow: 0, caps: null, budget: 0,
     };
     // Sits in console.log while a traced run is going: notes what reaches the real
     // console during a call site's own call, and prints only in the real run.
@@ -935,18 +958,84 @@ const __traceKit = (() => {
         if (o && got.length && o.length < 50) o.push(got.join('\n'));
       }
     };
-    // The real run's stand-ins (a silent run makes its own, see silentRun).
-    st.objs = st.recs.map((r) => ({
-      log: function () {
-        if (st.phase === 1) r.ran++;
-        return st.call(r, slice(arguments), st.phase === 1 ? 'out' : '');
-      },
-    }));
+    // The real run's stand-ins (a silent run makes its own from the same factory).
+    st.objs = standIns(st, 0);
     return { code: out, ids, st };
   }
 
+  // The stand-ins of one run, all from this one factory so every run's look the same. gen 0 is the
+  // real run's: it counts its calls and keeps what they print. A silent run's (gen > 0) are live only
+  // while that run is going, so a callback it left behind (an await) cannot print the changed data later.
+  function standIns(st, gen) {
+    return st.recs.map((r) => ({ log: function () { return standIn(st, r, gen, arguments); } }));
+  }
+  function standIn(st, r, gen, args) {
+    if (gen === 0) {
+      if (st.phase === 1) r.ran++;
+      return st.call(r, slice(args), st.phase === 1 ? 'out' : '');
+    }
+    return gen === st.gen && st.phase === 2 ? st.call(r, slice(args), st.key) : undefined;
+  }
+  // The hook parameters every run gets (a silent run's code calls them; the real run's does not).
+  function hook(impl) { return function (a, b) { return impl(a, b); }; }
+  const same2 = (a, b) => b;
+  // A fresh, empty arguments object for the parameter called arguments.
+  const argsObj = function () { return arguments; };
+  function runArgs(st, gen, pnF, dnF) {
+    const a = standIns(st, gen).concat([hook(pnF || same2), hook(dnF || same2)]);
+    if (st.argp) a.push(argsObj());
+    return a;
+  }
+  // The one place a traced script is compiled, real run and silent runs alike. In code that is not
+  // strict a last parameter called arguments hides the call's own arguments object (its callee is
+  // the compiled source, which differs between runs); strict code refuses that name, and there
+  // arguments.callee throws anyway.
+  function fnew(ps, body) { return new Function(...ps, body); }
+  function compile(tr, body) {
+    const st = tr.st;
+    const ps = tr.ids.concat([st.pn, st.dn]);
+    if (st.argp !== false) {
+      try {
+        const f = fnew(ps.concat(['arguments']), body);
+        st.argp = true;
+        return f;
+      } catch (e) {
+        if (st.argp === true) throw e;
+        st.argp = false;
+      }
+    }
+    return fnew(ps, body);
+  }
+  // Right before any run enters the student's code: performance marks and measures cleared, and the
+  // legacy RegExp statics (RegExp.$1, lastMatch, input) set by one fixed match, so neither can
+  // tell one run from another.
+  function fresh() {
+    try { if (R.clearMarks) R.clearMarks(); if (R.clearMeasures) R.clearMeasures(); } catch (_) { /* keep */ }
+    /(?:)/.exec('');
+  }
+  function enter(f, a) { return f(...a); }
+
   // The globals and built-ins a script could leave a note on for a later run.
-  const HELD = () => [self, Math, JSON, Object, Array, String, Number, Boolean, Date, Reflect, Promise, console, Object.prototype, Array.prototype, String.prototype, Number.prototype, Boolean.prototype, Function.prototype, Promise.prototype];
+  // Besides the usual ones: every function the global object holds (Error and its stackTraceLimit,
+  // RegExp, Map, Symbol ...) with its prototype, the namespaces, performance, and the global
+  // object's own prototype chain.
+  const HELD = () => {
+    const out = [];
+    const seen = new Set();
+    const add = (o) => { if (o !== null && (typeof o === 'object' || typeof o === 'function') && !seen.has(o)) { seen.add(o); out.push(o); } };
+    [self, Math, JSON, Object, Array, String, Number, Boolean, Date, Reflect, Promise, console, Object.prototype, Array.prototype, String.prototype, Number.prototype, Boolean.prototype, Function.prototype, Promise.prototype].forEach(add);
+    for (let p = Object.getPrototypeOf(self); p && p !== Object.prototype; p = Object.getPrototypeOf(p)) add(p);
+    ['Atomics', 'Intl', 'WebAssembly'].forEach((n) => { const d = R.gopd(self, n); if (d && 'value' in d) add(d.value); });
+    add(PERF);
+    const ks = R.ownKeys(self);
+    for (let i = 0; i < ks.length; i++) {
+      const d = R.gopd(self, ks[i]);
+      if (!d || !('value' in d) || typeof d.value !== 'function') continue;
+      add(d.value);
+      try { const pd = R.gopd(d.value, 'prototype'); if (pd && 'value' in pd) add(pd.value); } catch (_) { /* keep */ }
+    }
+    return out;
+  };
   function snapshot(st, restore) {
     st.g0 = HELD().map((o) => {
       const m = new Map();
@@ -1139,50 +1228,49 @@ const __traceKit = (() => {
     return out;
   }
 
-  // One silent run of the traced code: globals put back first and after, nothing
-  // printed or posted, each call site's output kept under key (none when key is '').
-  function silentRun(tr, srcOf, key, pnF, dnF) {
+  // Before and after one silent run of the traced code: globals put back first and after,
+  // nothing printed or posted, each call site's output kept under s.key (none when key is '').
+  // The code is compiled by compile() and entered by drive(), the same as the real run.
+  function silentPre(tr, s) {
     const st = tr.st;
-    if (key) for (let k = 0; k < st.recs.length; k++) st.recs[k][key] = [];
+    if (s.key) for (let k = 0; k < st.recs.length; k++) st.recs[k][s.key] = [];
     resetGlobals(st);
-    const pmOwn = Object.prototype.hasOwnProperty.call(self, 'postMessage');
-    const pm = self.postMessage;
-    const noop = function () {};
-    const same = function (o) { return o; };
-    let ok = false;
-    // This run's own stand-ins: silent for good once the run is over, so a callback it
-    // left behind (a timer, a promise) cannot print the changed data later.
-    let alive = true;
-    const objs = st.recs.map((r) => ({ log: function () { return alive ? st.call(r, slice(arguments), key) : undefined; } }));
-    const timers = ['setTimeout', 'setInterval', 'setImmediate', 'queueMicrotask', 'requestAnimationFrame'].filter((n) => typeof self[n] === 'function');
-    const then0 = Promise.prototype.then;
+    s.pmOwn = Object.prototype.hasOwnProperty.call(self, 'postMessage');
+    s.pm = self.postMessage;
+    s.then0 = Promise.prototype.then;
+    s.timers = ['setTimeout', 'setInterval', 'setImmediate', 'queueMicrotask', 'requestAnimationFrame'].filter((n) => typeof self[n] === 'function');
+    st.gen++;
+    s.gen = st.gen;
     st.phase = 2;
-    st.key = key;
+    st.key = s.key;
+    let f = null;
     try {
-      const pn = DOLLAR + rnd3() + 'P';
-      const dn = DOLLAR + rnd3() + 'D';
-      const f2 = new Function(...tr.ids, pn, dn, srcOf(pn, dn));
+      f = compile(tr, s.srcOf(st.pn, st.dn));
       console.log = st.probe;
-      console.warn = console.error = noop;
-      self.postMessage = noop;
-      Object.freeze = Object.seal = Object.preventExtensions = same;
+      // console.warn and console.error stay the runner's own: they post, and posting goes nowhere.
+      self.postMessage = function postMessage() {};
+      // Each its own function, so Object.freeze === Object.seal stays false as in the real run.
+      Object.freeze = function freeze(o) { return o; };
+      Object.seal = function seal(o) { return o; };
+      Object.preventExtensions = function preventExtensions(o) { return o; };
       // Nothing a silent run schedules ever runs.
-      timers.forEach((n) => { self[n] = function () { return 0; }; });
-      Promise.prototype.then = function () { return then0.call(this); };
-      f2(...objs, pnF || ((n, v) => v), dnF || ((s, v) => v));
-      ok = true;
+      const then0 = s.then0;
+      s.timers.forEach((n) => { self[n] = function () { return 0; }; });
+      Promise.prototype.then = function then() { return then0.call(this); };
     } catch (_) {
-      ok = false;
-    } finally {
-      alive = false;
-      st.phase = 3;
-      st.key = '';
-      Promise.prototype.then = then0;
-      Object.freeze = R.freeze; Object.seal = R.seal; Object.preventExtensions = R.pext;
-      if (pmOwn) self.postMessage = pm; else { try { delete self.postMessage; } catch (_) { self.postMessage = pm; } if (self.postMessage !== pm) self.postMessage = pm; }
-      resetGlobals(st);
+      f = null;
     }
-    return ok;
+    return f;
+  }
+  function silentPost(tr, s) {
+    const st = tr.st;
+    st.phase = 3;
+    st.key = '';
+    Promise.prototype.then = s.then0;
+    Object.freeze = R.freeze; Object.seal = R.seal; Object.preventExtensions = R.pext;
+    const pm = s.pm;
+    if (s.pmOwn) self.postMessage = pm; else { try { delete self.postMessage; } catch (_) { self.postMessage = pm; } if (self.postMessage !== pm) self.postMessage = pm; }
+    resetGlobals(st);
   }
 
   // The names the jobs perturb ("{}" is the destructure run, not a name).
@@ -1199,38 +1287,87 @@ const __traceKit = (() => {
     return { names, destr };
   }
 
-  // After the real run: the changed run twice, then the destructure run (see above).
-  function perturbRun(tr, jobs) {
+  // The silent runs after the real one: the changed run twice, then the destructure run (see
+  // above); after a real run that threw, one more that only records what each literal assigned to
+  // a name held when the run stopped (st.caps).
+  function plan(tr, jobs, steps, threw) {
     const st = tr.st;
     st.phase = 3;
     resetGlobals(st);
     const pl = perturbNames(jobs);
-    if (!pl.names.length && !pl.destr) return;
-    st.mk = TILDE + rnd3() + TILDE; st.k = rint(11, 97); st.c = rint(101, 997);
-    st.rk = LQ + rnd3() + RQ; st.rkk = rint(11, 97); st.rkc = rint(101, 997);
-    if (pl.names.length) {
-      const srcOf = (pn) => perturbSource(tr.code, st.blank, pl.names, pn, null);
-      const ok2 = silentRun(tr, srcOf, 'out2', makePerturber(st, true), null);
-      st.perturbed = ok2 || st.threw;
-      // Let the clock move on, so a print of the time cannot come out the same twice.
-      const t0 = R.now();
-      while (R.now() === t0) { /* at most a millisecond */ }
-      silentRun(tr, srcOf, 'out3', makePerturber(st, false), null);
-      for (let k = 0; k < st.recs.length; k++) st.recs[k].stable = JSON.stringify(st.recs[k].out2) === JSON.stringify(st.recs[k].out3);
+    if (pl.names.length || pl.destr) {
+      st.mk = TILDE + rnd3() + TILDE; st.k = rint(11, 97); st.c = rint(101, 997);
+      st.rk = LQ + rnd3() + RQ; st.rkk = rint(11, 97); st.rkc = rint(101, 997);
+      if (pl.names.length) {
+        const srcOf = (pn) => perturbSource(tr.code, st.blank, pl.names, pn, null);
+        steps.push({ key: 'out2', srcOf, pnF: makePerturber(st, true), after: (ok) => { st.perturbed = ok || st.threw; } });
+        steps.push({
+          key: 'out3', srcOf, pnF: makePerturber(st, false),
+          // Let the clock move on, so a print of the time cannot come out the same twice.
+          before: () => { const t = R.now(); while (R.now() === t) { /* at most a millisecond */ } },
+          after: () => { for (let k = 0; k < st.recs.length; k++) st.recs[k].stable = JSON.stringify(st.recs[k].out2) === JSON.stringify(st.recs[k].out3); },
+        });
+      }
+      if (pl.destr) steps.push({ key: 'outD', srcOf: (pn, dn) => perturbSource(tr.code, st.blank, [], pn, dn), dnF: makeDestructurer(st) });
     }
-    if (pl.destr) silentRun(tr, (pn, dn) => perturbSource(tr.code, st.blank, [], pn, dn), 'outD', null, makeDestructurer(st));
+    if (threw) {
+      const names = pl.names.filter((n) => n !== '*').concat('*');
+      const caps = {};
+      st.caps = caps;
+      steps.push({ key: '', srcOf: (pn) => perturbSource(tr.code, st.blank, names, pn, null), pnF: (n, v) => { caps[n] = v; return v; } });
+    }
   }
 
-  // After a real run that threw: what each literal assigned to a name held when the
-  // run stopped, from one more silent run that only records them.
-  function captureRun(tr, jobs) {
-    const names = perturbNames(jobs).names.filter((n) => n !== '*').concat('*');
-    const caps = {};
-    silentRun(tr, (pn) => perturbSource(tr.code, tr.st.blank, names, pn, null), '', (n, v) => { caps[n] = v; return v; }, null);
-    return caps;
+  // Every run of a traced script, the real one and the silent ones, enters the student's code
+  // through this one loop, enter() and code that compile() made: the frames above the student's
+  // code, their names and their places are the same in every run, so a stack trace cannot tell
+  // them apart. ok(value) says the real run reached its end (the lookup statement). A silent run
+  // starts only when it fits in the time left (budget ms after t0); if one does not, st.slow holds
+  // the real run's ms and the checks that needed it say the program is too slow to check.
+  function drive(tr, fn, jobs, ok, opts) {
+    const st = tr.st;
+    const o = opts || {};
+    const t0 = typeof o.t0 === 'number' ? o.t0 : clock();
+    st.budget = typeof o.budget === 'number' && o.budget > 0 ? o.budget : 3000;
+    const steps = [{ real: true }];
+    const res = { value: undefined, threw: false, err: undefined };
+    for (let i = 0; i < steps.length; i++) {
+      const s = steps[i];
+      let f = fn;
+      if (!s.real) {
+        // Every silent run still to come, each as slow as the slowest so far: skipped only when they
+        // cannot fit, so nothing that used to finish in time is refused.
+        const per = Math.max.apply(null, st.durs);
+        if (clock() - t0 + per * (steps.length - i) + 50 > st.budget) { st.slow = st.durs[0] || 1; break; }
+        if (s.before) s.before();
+        f = silentPre(tr, s);
+      }
+      const args = runArgs(st, s.real ? 0 : s.gen, s.pnF, s.dnF);
+      fresh();
+      const t = clock();
+      let v;
+      let threw = false;
+      let err;
+      try {
+        if (typeof f !== 'function') throw null;
+        v = enter(f, args);
+      } catch (e) { threw = true; err = e; }
+      st.durs.push(clock() - t);
+      if (s.real) {
+        res.value = v; res.threw = threw; res.err = err;
+        if (threw ? err !== o.stop && !!jobs : !!jobs && ok(v)) {
+          if (threw) st.threw = true;
+          plan(tr, jobs, steps, threw);
+        }
+      } else {
+        silentPost(tr, s);
+        if (s.after) s.after(!threw);
+      }
+    }
+    return res;
   }
 
-  return { blankCode, instrument, begin, end, perturbRun, captureRun, resetGlobals };
+  return { blankCode, instrument, begin, end, compile, drive, clock, resetGlobals };
 })();
 
 // The script's own scope hands its functions and the named variables back by

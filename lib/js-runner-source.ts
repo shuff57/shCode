@@ -316,6 +316,8 @@ function locateSyntaxError(code, message) {
 self.onmessage = (e) => {
   // {code, answers, attempt} from a browser host; a bare string from the node
   // harnesses in scripts/, which have no dialog to raise.
+  // When this Run began: the trace kit fits its silent runs in what is left of the kill timer.
+  const t0 = __traceKit.clock();
   const req = typeof e.data === 'string' ? { code: e.data } : (e.data || {});
   answers = Array.isArray(req.answers) ? req.answers.slice() : [];
   attempt = req.attempt || 1;
@@ -348,7 +350,7 @@ self.onmessage = (e) => {
     if (tj && tj.jobs.some((j) => j && j.script && j.script.trace === true)) {
       try {
         trace = __traceKit.instrument(codeText);
-        if (trace) withTests = new Function(...trace.ids, trace.code + '\\n;' + __testLookupSource(tj.jobs, marker));
+        if (trace) withTests = __traceKit.compile(trace, trace.code + '\\n;' + __testLookupSource(tj.jobs, marker));
       } catch (_) { trace = null; withTests = null; }
     }
     if (tj && !withTests) {
@@ -366,10 +368,18 @@ self.onmessage = (e) => {
       });
     }
     ran = true;
-    const looked = withTests ? (trace ? withTests(...trace.st.objs) : withTests()) : runStudent(); // student code execution (educational tool)
+    let looked;
+    if (trace) {
+      // The real run and every silent run enter the student's code the same way (see drive).
+      const d = __traceKit.drive(trace, withTests, tj.jobs, (v) => Array.isArray(v) && v.length === 3 && v[0] === marker, { stop: NEEDS_INPUT, t0, budget: ${RUN_TIMEOUT_MS} });
+      if (d.threw) throw d.err;
+      looked = d.value;
+    } else {
+      looked = withTests ? withTests() : runStudent(); // student code execution (educational tool)
+    }
     if (tj && withTests) {
       const ok = Array.isArray(looked) && looked.length === 3 && looked[0] === marker;
-      if (trace) { if (ok) __traceKit.perturbRun(trace, tj.jobs); else __traceKit.end(trace); }
+      if (trace && !ok) __traceKit.end(trace);
       __runTestJobs(tj.jobs, ok ? looked[1] : null, ok ? looked[2] : null, __scriptLines, tj.nonce, trace ? trace.st : null);
     } else if (trace) {
       __traceKit.end(trace);
@@ -382,10 +392,9 @@ self.onmessage = (e) => {
       // A prompt() pause is not an error, and a failure here leaves the usual
       // "stopped with an error" for every check.
       try {
-        if (ran && err !== NEEDS_INPUT && tj) {
-          trace.st.threw = true;
-          __traceKit.perturbRun(trace, tj.jobs);
-          const caps = __traceKit.captureRun(trace, tj.jobs);
+        if (ran && err !== NEEDS_INPUT && tj && trace.st.threw) {
+          // The silent runs already ran in drive; caps is what the last one recorded.
+          const caps = trace.st.caps || {};
           const vars = {};
           Object.keys(caps).forEach((k) => { vars[k] = [1, caps[k]]; });
           __runTestJobs(tj.jobs, null, vars, __scriptLines, tj.nonce, trace.st, true);

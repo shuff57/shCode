@@ -1223,6 +1223,83 @@ const rejectNotMsg = (id, name, req, notReq, msg, script) => cases.push({ id, na
   reject(id, 'A4: the names beside Math.random', 't2', js(CT, ...READS, LOOP, 'const { name, price } = cart[0];', 'console.log(cart[0].name, Math.random() + name.length * 0 + price * 0);', KEYS));
 }
 
+// ---- batch 12: module 3.5 sixth pass (2026-10-15). What the student SEES must be what the data
+// printed: the real run's line must match the changed run's line at the same call (markers taken
+// out, numbers read as '#'), or differ only in words while every marked value is in it too (a label
+// the changed numbers flipped). Typed text in the real run behind a test of the data no longer passes.
+{
+  const B = 'const book = { title: "Dune", pages: 412 };';
+  const TAIL = ['book.pages = 480;', 'book.author = "H";', 'console.log(book);'];
+  const id5 = '3-5-5-lab-read-update-fields';
+  reject(id5, 'echo: TYPED behind a test of the title', 't2', js(B, 'const live = book.title !== "Dune";', 'console.log(live ? book.title : "TY" + "PED");', ...TAIL));
+  reject(id5, 'echo: TYPED behind a performance.mark count', 't2', js(B, 'performance.mark("zq");', 'const live = performance.getEntriesByName("zq").length > 1;', 'console.log(live ? book.title : "TY" + "PED");', ...TAIL));
+  reject(id5, 'echo: TYPED behind Error.stackTraceLimit', 't2', js(B, 'Error.stackTraceLimit = Error.stackTraceLimit === 10 ? 11 : Error.stackTraceLimit + 1;', 'const live = Error.stackTraceLimit > 11;', 'console.log(live ? book.title : "TY" + "PED");', ...TAIL));
+  accept(id5, 'echo: a label the changed numbers flip, beside the title', js(B, 'console.log(book.title + " is " + (book.pages > 500 ? "long" : "short"));', ...TAIL));
+  accept(id5, 'echo: the title upper-cased', js(B, 'console.log(book.title.toUpperCase());', ...TAIL));
+  accept(id5, 'echo: pages with a thousands comma', js(B, 'console.log("Pages: " + book.pages.toLocaleString("en-US"));', ...TAIL));
+
+  const id8 = '3-5-8-lab-dot-vs-bracket';
+  const LA = 'const laptop = { brand: "F", ram: 16, "screen size": 13 };';
+  reject(id8, 'echo: TYPED behind a test of a value', 't2', js(LA, 'const k = "ram";', 'const live = laptop["screen size"] !== 13;', 'console.log(live ? laptop["screen size"] : "TY" + "PED");', 'console.log(live ? laptop[k] : "TY" + "PED");', 'for (const key of Object.keys(laptop)) { console.log(key + ": " + (live ? laptop[key] : "TY" + "PED")); }'));
+
+  const id12 = '3-5-12-lab-nested-structure';
+  const O = 'const order = { customer: { name: "Ana" }, items: [{ name: "Pen", price: 2 }, { name: "Ink", price: 30 }] };';
+  reject(id12, 'echo: typed lines behind a test of the name', 't2', js(O, 'const live = order.customer.name !== "Ana";', 'console.log(live ? order.customer.name : "TY" + "PED");', 'for (const item of order.items) { console.log(live ? item.name + ": " + item.price : "TY" + "PED"); }'));
+  reject(id12, 'echo: only the item lines typed', 't2', js(O, 'const live = order.customer.name !== "Ana";', 'console.log(order.customer.name);', 'for (const item of order.items) { console.log(live ? item.name + ": " + item.price : "TY" + "PED"); }'));
+  accept(id12, 'echo: a cheap tag the changed prices flip', js(O, 'console.log(order.customer.name);', 'for (const item of order.items) { console.log(item.name + ": " + item.price + (item.price < 10 ? " cheap" : "")); }'));
+
+  const id22 = '3-5-22-lab-destructure-three';
+  const D = 'function describe({ title, quantity }) { return title + " x" + quantity; }';
+  reject(id22, 'echo: TYPED behind a test of an unpacked name', 't2', js('const item = { title: "Pen", cost: 2, quantity: 10 };', 'const { title, cost, quantity } = item;', 'const live = title !== "Pen";', 'console.log(live ? title + " costs " + cost + ", " + quantity + " left" : "TY" + "PED");', D));
+  accept(id22, 'echo: a stock label the changed numbers flip', js('const item = { title: "Pen", cost: 2, quantity: 10 };', 'const { title, cost, quantity } = item;', 'console.log(title + " costs " + cost + ", " + quantity + (quantity > 50 ? " plenty" : " low"));', D));
+
+  const id24 = '3-5-24-lab-parallel-arrays-refactor';
+  const PL = 'const players = [{ name: "Marisol", score: 92, group: "A" }, { name: "Dev", score: 78, group: "B" }, { name: "Priya", score: 85, group: "A" }];';
+  reject(id24, 'echo: typed lines behind a test of a name', 't2', js(PL, 'const live = players[0].name !== "Marisol";', 'for (const p of players) { console.log(live ? p.name + " (" + p.group + "): " + p.score : "TY" + "PED"); }'));
+  accept(id24, 'echo: passed / needs work, flipped by the changed scores', js(PL, 'for (const p of players) { console.log(p.name + " (" + p.group + "): " + p.score + (p.score >= 80 ? " passed" : " needs work")); }'));
+
+  const id25 = '3-5-25-lab-objects-capstone';
+  const CT = 'const cart = [{ name: "A", price: 1.5, quantity: 2, details: { color: "red" } }, { name: "B", price: 3, quantity: 4, "item code": "x" }, { name: "C", price: 5, quantity: 6 }];';
+  const LOOP = 'for (const item of cart) { console.log(item.name + ": " + item.price * item.quantity); }';
+  const NAMES = ['const { name, price } = cart[0];', 'console.log(name + " costs " + price);'];
+  const KEYS = 'for (const key of Object.keys(cart[0])) { console.log(key + ": " + cart[0][key]); }';
+  reject(id25, 'echo: the three head prints typed behind a test', 't2', js(CT, 'const live = cart[0].name !== "A";', 'console.log(live ? cart[0].name : "TY" + "PED");', 'console.log(live ? cart[1]["item code"] : "TY" + "PED");', 'console.log(live ? cart[0].details.color : "TY" + "PED");', LOOP, ...NAMES, KEYS));
+  // The harness cannot be told apart from inside the script: every run enters through the same frames
+  // (same names, places and depth), marks and measures are cleared, Error and every built-in and the
+  // global object's prototype chain are put back, arguments is an empty arguments object in every run,
+  // and Object.freeze is not Object.seal. Each cheat prints the right text TYPED when it thinks it is seen.
+  const SEEN = (test) => js(B, 'const live = ' + test + ';', 'console.log(live ? book.title : "Dune");', ...TAIL);
+  reject(id5, 'detect: a harness name in the stack', 't2', SEEN('/perturbRun|silentRun|silentPre|captureRun|makePerturber|__traceKit/.test(new Error().stack || "")'));
+  reject(id5, 'detect: the stack deeper than in the real run', 't2', js(B, 'const depth = new Error().stack.split(String.fromCharCode(10)).length;', 'globalThis.d0 = globalThis.d0 || depth;', 'Error.d0 = Error.d0 || depth;', 'const live = depth !== Error.d0;', 'console.log(live ? book.title : "Dune");', ...TAIL));
+  reject(id5, 'detect: performance.mark entries', 't2', js(B, 'performance.mark("zq");', 'const live = performance.getEntriesByName("zq").length > 1;', 'console.log(live ? book.title : "Dune");', ...TAIL));
+  reject(id5, 'detect: Error.stackTraceLimit as a counter', 't2', js(B, 'Error.stackTraceLimit = Error.stackTraceLimit === 10 ? 11 : Error.stackTraceLimit + 1;', 'const live = Error.stackTraceLimit > 11;', 'console.log(live ? book.title : "Dune");', ...TAIL));
+  reject(id5, 'detect: a counter on the global object\'s prototype', 't2', js(B, 'const gp = Object.getPrototypeOf(globalThis);', 'gp.zq = (gp.zq || 0) + 1;', 'const live = gp.zq > 1;', 'console.log(live ? book.title : "Dune");', ...TAIL));
+  reject(id5, 'detect: a counter on Map.prototype', 't2', js(B, 'Map.prototype.zq = (Map.prototype.zq || 0) + 1;', 'const live = Map.prototype.zq > 1;', 'console.log(live ? book.title : "Dune");', ...TAIL));
+  reject(id5, 'detect: arguments.length', 't2', SEEN('arguments.length > 0'));
+  reject(id5, 'detect: the compiled source through arguments.callee', 't2', SEEN('String(arguments.callee).includes("(\\"book\\"")'));
+  reject(id5, 'detect: the legacy RegExp statics', 't2', SEEN('RegExp.input !== ""'));
+  reject(id5, 'detect: Object.freeze === Object.seal', 't2', SEEN('Object.freeze === Object.seal'));
+  // 3.5.15 step 1: at least one data property beside the method
+  const id15 = '3-5-15-lab-add-method';
+  rejectMsg(id15, 'step 1: an object with a method and no data property', 't1', /no data property yet/, js('const student = { greet: function () { return "Hi"; } };', 'console.log(student.greet());'));
+  accept(id15, 'step 1: a number as the one data property', js('const student = { visits: 2, greet: function () { return "Visits: " + this.visits; } };', 'console.log(student.greet());'));
+  // Messages: 3.5.18 a describeBox that prints by itself, a misspelled key named in full, the braces
+  // in the call; 3.5.8 for...in and Object.entries both say "use Object.keys".
+  const id18 = '3-5-18-lab-params-to-object';
+  const D18 = 'function describeBox(options) { return options.color + " " + options.width + "x" + options.height; }';
+  rejectMsg(id18, 'msg: a describeBox that prints by itself, called bare', 't2', /Return the text instead of printing it/, js('function describeBox(options) { console.log(options.color + " " + options.width + "x" + options.height); }', 'describeBox({ width: 2, height: 3, color: "red" });'));
+  rejectMsg(id18, 'msg: a misspelled key at the call, the whole sentence shown', 't1', /called without height \(the object you passed has hieght instead\)\. Pass height in the call, spelled exactly\./, js(D18, 'console.log(describeBox({ width: 10, hieght: 4, color: "red" }));'));
+  rejectMsg(id18, 'msg: a variable holding the literal: the braces go in the call', 'r3', /Pass the braces right in the call/, js(D18, 'const box = { width: 2, height: 3, color: "red" };', 'console.log(describeBox(box));'));
+  const L8 = [LA, 'console.log(laptop["screen size"]);', 'const k = "ram";', 'console.log(laptop[k]);'];
+  rejectMsg(id8, 'msg: for...in says use Object.keys', 't2', /does not count here: use Object\.keys/, js(...L8, 'for (const key in laptop) { console.log(key, laptop[key]); }'));
+  rejectMsg(id8, 'msg: Object.entries read back with brackets says use Object.keys', 't2', /Object\.entries does not count here: use Object\.keys/, js(...L8, 'for (const [key] of Object.entries(laptop)) { console.log(key, laptop[key]); }'));
+  // A real run too slow for the changed runs to fit in the time left says so, instead of a plain fail.
+  rejectMsg(id5, 'slow: a 1.1 s busy loop, then the honest steps', 't2', /too slow to run again with changed data/, js(B, 'const until = Date.now() + 1100;', 'while (Date.now() < until) { /* wait */ }', 'console.log(book.title);', ...TAIL));
+  accept(id5, 'strict code is still traced', js('"use strict";', B, 'console.log(book.title);', ...TAIL));
+  accept(id5, 'a top-level arguments read does not break the run', js(B, 'console.log(book.title, arguments.length);', ...TAIL));
+  accept(id25, 'echo: a "(big)" tag the changed costs flip',js(CT, 'console.log(cart[0].name);', 'console.log(cart[1]["item code"]);', 'console.log(cart[0].details.color);', 'for (const item of cart) { const c = item.price * item.quantity; console.log(item.name + ": " + c + (c > 20 ? " (big)" : "")); }', ...NAMES, KEYS));
+}
+
 try {
   execFileSync(process.execPath, [
     path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'), 'lib/run-tests-node.ts',

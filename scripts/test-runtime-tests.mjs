@@ -492,6 +492,29 @@ try {
       const r2 = await runCodeWithTests('const b = { t: "x" };\nnull.f;\nconsole.log(b.t);', jobs);
       check('a run that throws before the print: the perturb job is not passed', r2.tests.byId.pt.status === 'failed' && /stopped with an error/.test(r2.tests.byId.pt.message), JSON.stringify(r2.tests.byId));
     }
+    // Pass 6: the runs cannot be told apart from inside the script. A fingerprint that does not
+    // depend on the data (the stack's frames, depth and places, arguments, the RegExp statics,
+    // performance entries, Error.stackTraceLimit, Object.freeze vs seal, notes left on the global
+    // object's prototype and on a built-in's prototype) prints the same in every run.
+    {
+      const FP = [
+        'const b = { t: "x" };',
+        'const fp = [new Error().stack.split(String.fromCharCode(10)).slice(1).join("|"), arguments.length, String(arguments.callee).length, RegExp.input, RegExp.lastMatch, performance.getEntries().length, Error.stackTraceLimit, Object.freeze === Object.seal, Object.getPrototypeOf(globalThis).zq, Map.prototype.zq, typeof setTimeout].join(" ; ");',
+        'performance.mark("zq"); Error.stackTraceLimit = 50; Object.getPrototypeOf(globalThis).zq = 1; Map.prototype.zq = 2;',
+        'console.log(b.t.length * 0, fp);',
+        'function inner() { return new Error().stack.split(String.fromCharCode(10)).length; }',
+        'console.log(b.t.length * 0, inner());',
+      ].join('\n');
+      await traceCheck('the changed run and the destructure run print the same fingerprint as the real run', FP, ['b', '{}'],
+        'trace.perturbed && trace.prints.every((p) => p.out.length === 1 && p.out2[0] === p.out[0] && p.outD[0] === p.out[0] && p.stable)');
+      const strict = await one('"use strict";\n' + FP.replace('String(arguments.callee).length, ', ''), V('tr', { trace: true, perturb: ['b'], checks: [{ expr: 'trace.perturbed && trace.prints.every((p) => p.out.length === 1 && p.out2[0] === p.out[0])', failExpr: 'JSON.stringify(trace.prints.map((p) => [p.out, p.out2]))' }] }));
+      check('strict code is traced, and its fingerprint is the same too', strict.passed, strict.msg);
+      // A real run too slow for the silent runs to fit in the time left: the check says so.
+      const slow = await runCodeWithTests('const b = { t: "x" };\nconst end = Date.now() + 1100;\nwhile (Date.now() < end) { /* busy */ }\nconsole.log(b.t);', jobsFromRequirements([V('sl', { trace: true, perturb: ['b'], checks: [{ expr: 'true' }] })]));
+      check('a real run too slow to run again: done, the check says the program is too slow', slow.outcome === 'done' && slow.tests.byId.sl.status === 'failed' && /too slow to run again/.test(slow.tests.byId.sl.message) && slow.logs.map((l) => l.message).join('|') === 'x', JSON.stringify([slow.outcome, slow.tests.byId, slow.logs]));
+      const quick = await runCodeWithTests('const b = { t: "x" };\nconst end = Date.now() + 150;\nwhile (Date.now() < end) { /* busy */ }\nconsole.log(b.t);', jobsFromRequirements([V('qk', { trace: true, perturb: ['b'], checks: [{ expr: 'trace.perturbed && trace.prints[0].out2[0] === trace.mk + "x" + trace.mk' }] })]));
+      check('a run that leaves time for the silent runs is checked as usual', quick.outcome === 'done' && quick.tests.byId.qk.status === 'passed', JSON.stringify([quick.outcome, quick.tests.byId]));
+    }
     {
       // orTest: a regex card passes on its tests requirement's pass, only on the same code.
       const { grade } = req(path.join(out, 'grader.js'));
