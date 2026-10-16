@@ -65,7 +65,7 @@
         {
           "id": "call-shape",
           "title": "The call is one function-call shape",
-          "points": 4,
+          "points": 3,
           "description": "Scored by the editor (shape kind): a double-rail function-call shape on the path.",
           "check": {
             "steps": [
@@ -84,7 +84,7 @@
         {
           "id": "order",
           "title": "Call, two decisions, then one print",
-          "points": 6,
+          "points": 5,
           "description": "Scored by the editor (arrow order): the call, then a decision, then another decision, then the print, on every route.",
           "check": {
             "steps": [
@@ -116,7 +116,7 @@
         {
           "id": "different-exits",
           "title": "Each question splits into two different results",
-          "points": 6,
+          "points": 4,
           "description": "Scored by the editor: a decision whose yes and no arrows lead to two different shapes, and a print.",
           "check": {
             "steps": [
@@ -144,7 +144,7 @@
         {
           "id": "questions-on-topic",
           "title": "The questions ask whether the caller sees the change",
-          "points": 4,
+          "points": 3,
           "description": "Scored by the editor: at least two diamonds ask whether a write reached the caller.",
           "check": {
             "steps": [
@@ -157,6 +157,36 @@
                 "min": 2,
                 "fail": "Both diamonds should ask whether that write reached the caller.",
                 "pass": "Both diamonds ask about the caller."
+              }
+            ]
+          }
+        },
+        {
+          "id": "right-trace",
+          "title": "The trace is right: the reassignment is charted and the print is not [9, 9]",
+          "points": 5,
+          "description": "Scored by the editor: a task that shows the new array, and a print that is not the reassigned array.",
+          "check": {
+            "steps": [
+              {
+                "op": "label",
+                "match": {
+                  "kind": "process",
+                  "re": "new array|\\[\\s*9|9\\W+9|reassign|local name|points? (at|to) a|brand"
+                },
+                "min": 1,
+                "fail": "Chart the reassignment as a task of its own: the function points its local name at a new array.",
+                "pass": "The reassignment is charted."
+              },
+              {
+                "op": "label",
+                "match": {
+                  "kind": "io",
+                  "re": "^(?!.*\\b9\\W+9\\b)"
+                },
+                "min": 1,
+                "fail": "The caller never sees the new array, so the print must not show [9, 9].",
+                "pass": "The print is not the reassigned array."
               }
             ]
           }

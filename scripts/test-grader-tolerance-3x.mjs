@@ -137,11 +137,57 @@ accept('3-6-12-lab-object-param-mutation', 'arrow versions',
      'const user = { name: "A", age: 10 };', 'birthday(user);', 'console.log(user, birthdaySafe(user));'));
 accept('3-6-16-lab-capstone', 'arrow versions, structuredClone inside copyBook',
   js('const addScore = (s, n) => [...s, n];', 'const recordPlay = (song) => { song.plays++; };',
-     'const copyBook = (b) => structuredClone(b);', 'console.log(addScore([1], 2), copyBook({ a: [1] }));',
+     'const copyBook = (b) => structuredClone(b);', 'const sc = [1]; const bk = { a: [1] };', 'console.log(addScore(sc, 2), copyBook(bk));',
      'const song = { plays: 0 }; recordPlay(song); console.log(song);'));
 reject('3-6-16-lab-capstone', 'copyBook returns its argument; structuredClone used elsewhere', 'r5',
   js('function addScore(s, n) { return [...s, n]; }', 'function recordPlay(song) { song.plays++; }',
      'function copyBook(b) { return b; }', 'const z = structuredClone({});', 'console.log(addScore([1], 2), copyBook({}), z);'));
+// ---- 3.6 pass 7: never-called functions, typed prints, a dead structuredClone, taught print shapes
+const G36_4 = ['function changeNum(n) { n = n + 1; }', 'function changeArr(a) { a.push(9); }', 'let x = 1; const l = [1, 2];'];
+reject('3-6-4-lab-predict-primitive-vs-array', 'neither function is ever called', 'r6',
+  js(...G36_4, 'console.log(x);', 'console.log(l);'));
+reject('3-6-4-lab-predict-primitive-vs-array', 'changeNum does nothing to its parameter', 'r5',
+  js('function changeNum(n) { }', 'function changeArr(a) { a.push(9); }', 'let x = 1; const l = [1];', 'changeNum(x); changeArr(l);', 'console.log(x, l);'));
+reject('3-6-4-lab-predict-primitive-vs-array', 'typed output, the calls are made', 't2',
+  js(...G36_4, 'changeNum(x); changeArr(l);', 'console.log(1);', 'console.log("[1, 2, 9]");'));
+for (const [nm, f] of [['function expression', 'const changeNum = function (n) { n = n + 1; };'], ['prefix increment', 'function changeNum(n) { ++n; }'], ['default parameter', 'function changeNum(n = 0) { n = 99; }'], ['a brace before the assignment', 'function changeNum(n) { const o = { v: 1 }; n = 99; }']]) {
+  accept('3-6-4-lab-predict-primitive-vs-array', 'changeNum reassigns: ' + nm,
+    js(f, 'function changeArr(a) { a.push(9); }', 'let x = 1; const l = [1];', 'changeNum(x); changeArr(l);', 'console.log(x, l);'));
+}
+reject('3-6-4-lab-predict-primitive-vs-array', 'changeNum only returns a new value', 'r5',
+  js('function changeNum(n) { return n + 1; }', 'function changeArr(a) { a.push(9); }', 'let x = 1; const l = [1];', 'changeNum(x); changeArr(l);', 'console.log(x, l);'));
+accept('3-6-4-lab-predict-primitive-vs-array', 'prints joined with + (an array becomes 1,2,9)',
+  js(...G36_4, 'changeNum(x); changeArr(l);', 'console.log("num: " + x);', 'console.log("arr: " + l);'));
+const G36_12 = ['function birthday(p) { p.age++; }', 'function birthdaySafe(p) { return { ...p, age: p.age + 1 }; }', 'const user = { name: "Ana", age: 30 };'];
+reject('3-6-12-lab-object-param-mutation', 'neither function is called', 'r6',
+  js(...G36_12, 'console.log("Ana 30");'));
+reject('3-6-12-lab-object-param-mutation', 'typed output after the calls', 't4',
+  js(...G36_12, 'birthday(user); birthdaySafe(user);', 'console.log("Ana 31");'));
+const G36_13 = ['const student = { name: "A", scores: [90, 85] };', 'const shallow = { ...student };', 'shallow.scores.push(100);'];
+reject('3-6-13-lab-nested-mutation', 'deep is hand made; structuredClone is called and thrown away', 'r3',
+  js(...G36_13, 'const deep = { scores: [...student.scores] }; deep.scores.push(70); structuredClone(student);', 'console.log(student, shallow, deep);', 'console.log(student.scores);'));
+reject('3-6-13-lab-nested-mutation', 'typed output, the copies are made', 't2',
+  js(...G36_13, 'const deep = structuredClone(student); deep.scores.push(70);', 'console.log("[1]");', 'console.log("[2]");', 'console.log("[3]");', 'console.log("[4]");'));
+accept('3-6-13-lab-nested-mutation', 'push through an alias and through brackets; prints joined with +',
+  js('const student = { name: "A", scores: [90, 85] };', 'const shallow = { ...student };', 'const list = shallow.scores; list.push(100);',
+     'const deep = structuredClone(student); deep["scores"].push(70);',
+     'console.log("shallow: " + shallow.scores);', 'console.log("student: " + student.scores);', 'console.log("deep: " + deep.scores);', 'console.log("student again: " + student.scores);'));
+const G36_16 = ['function addScore(s, x) { return [...s, x]; }', 'function recordPlay(o) { o.plays++; }'];
+reject('3-6-16-lab-capstone', 'nothing is called, typed prints', 'r8',
+  js(...G36_16, 'function copyBook(l) { return structuredClone(l); }', 'console.log("[");', 'console.log("{");', 'console.log(1);', 'console.log(2);'));
+reject('3-6-16-lab-capstone', 'typed prints after real calls', 't5',
+  js(...G36_16, 'function copyBook(l) { return structuredClone(l); }', 'const a = [1]; const o = { plays: 0 };',
+     'addScore(a, 2); recordPlay(o); copyBook({ b: [] });', 'console.log("[");', 'console.log("{");', 'console.log(1);', 'console.log(2);'));
+reject('3-6-16-lab-capstone', 'structuredClone is called and thrown away, the copy is hand made', 't3',
+  js(...G36_16, 'function copyBook(l) { structuredClone(l); return { ...l, books: [...l.books] }; }', 'const o = { plays: 0 }; recordPlay(o); console.log(o, addScore([1], 2));'));
+accept('3-6-16-lab-capstone', 'copyBook with a guard before structuredClone; numbers printed with +',
+  js(...G36_16, 'function copyBook(l) { if (l === null) { return null; } return structuredClone(l); }',
+     'const a = [1]; const o = { plays: 0 }; const lib = { books: ["A"] };',
+     'console.log("scores: " + addScore(a, 2));', 'recordPlay(o); console.log("plays: " + o.plays);', 'const c = copyBook(lib); c.books.push("B"); console.log("books: " + lib.books + " " + c.books);'));
+accept('3-6-16-lab-capstone', 'song["plays"] += 1',
+  js(...G36_16.slice(0, 1), 'function recordPlay(song) { song["plays"] += 1; }', 'function copyBook(l) { const c = structuredClone(l); return c; }',
+     'const a = [1]; const o = { plays: 0 }; const lib = { books: ["A"] };',
+     'console.log(addScore(a, 2));', 'recordPlay(o); console.log(o);', 'console.log(copyBook(lib));'));
 
 // ---- 3.7: filter is a non-mutating method; a quoted key can be the override
 accept('3-7-21-lab-mutating-sort-drill', 'filter as the non-mutating call',

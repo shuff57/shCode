@@ -44,9 +44,9 @@ Chart them as two separate tasks with a decision after each one asking whether t
 
 ### The arrows that decide whether this is right
 
-- The `yes` (escapes) exit belongs to the mutation, leading to a step that updates what the caller sees.
-- The `no` (stays local) exit belongs to the reassignment.
-- Both paths rejoin before the final print, through a task of their own on each exit. The print happens once, after the function has returned.
+- After `nums[0] = 0` the first diamond's answer is **yes**: the caller sees it. Give that exit a task such as "caller sees 0 at index 0".
+- After `nums = [9, 9]` the second diamond's answer is **no**: only the local name moved. Give that exit a task such as "caller's scores unchanged".
+- Each diamond's other exit goes to a task of its own too. Everything rejoins before the final print, which happens once, after the function has returned.
 
 ### Before you submit
 

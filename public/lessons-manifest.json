@@ -4340,7 +4340,7 @@
       "assignmentCode": null,
       "maxScore": 4,
       "maxSubmissions": null,
-      "scoreKind": null
+      "scoreKind": "written"
     },
     {
       "id": "3-1-7a-a3-1-0-flowchart-gate",

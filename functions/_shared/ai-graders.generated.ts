@@ -988,25 +988,25 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "value-defined",
         "title": "Pass by value explained correctly",
         "description": "Explains pass-by-value: the function gets a copy; changes inside don't affect the original. Correctly says primitives (number/string/boolean) are passed by value.",
-        "points": 0
+        "points": 1
       },
       {
         "id": "reference-defined",
         "title": "Pass by reference explained correctly",
         "description": "Explains pass-by-reference: the function shares the same object/array; changes inside DO affect the original. Correctly says objects/arrays are passed by reference. Also accept the more precise phrasing that a reference (a pointer to the same object) is itself passed by value, or that the function receives a copy of the reference; that is the same idea and must not lose credit.",
-        "points": 0
+        "points": 1
       },
       {
         "id": "example-each",
         "title": "One example of each",
         "description": "Gives a plausible example of each (e.g., changing a number param has no outside effect; pushing to an array param does).",
-        "points": 0
+        "points": 1
       },
       {
         "id": "why-it-matters",
         "title": "Describes a real consequence",
         "description": "Describes a real consequence: an unintended-mutation bug, or why you'd copy before changing.",
-        "points": 0
+        "points": 1
       }
     ],
     "model": "glm-5.3-flash:cloud",
@@ -2337,7 +2337,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "call-shape",
         "title": "The call is one function-call shape",
-        "points": 4,
+        "points": 3,
         "description": "Scored by the editor (shape kind): a double-rail function-call shape on the path.",
         "check": {
           "steps": [
@@ -2356,7 +2356,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "order",
         "title": "Call, two decisions, then one print",
-        "points": 6,
+        "points": 5,
         "description": "Scored by the editor (arrow order): the call, then a decision, then another decision, then the print, on every route.",
         "check": {
           "steps": [
@@ -2388,7 +2388,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "different-exits",
         "title": "Each question splits into two different results",
-        "points": 6,
+        "points": 4,
         "description": "Scored by the editor: a decision whose yes and no arrows lead to two different shapes, and a print.",
         "check": {
           "steps": [
@@ -2416,7 +2416,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "questions-on-topic",
         "title": "The questions ask whether the caller sees the change",
-        "points": 4,
+        "points": 3,
         "description": "Scored by the editor: at least two diamonds ask whether a write reached the caller.",
         "check": {
           "steps": [
@@ -2429,6 +2429,36 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
               "min": 2,
               "fail": "Both diamonds should ask whether that write reached the caller.",
               "pass": "Both diamonds ask about the caller."
+            }
+          ]
+        }
+      },
+      {
+        "id": "right-trace",
+        "title": "The trace is right: the reassignment is charted and the print is not [9, 9]",
+        "points": 5,
+        "description": "Scored by the editor: a task that shows the new array, and a print that is not the reassigned array.",
+        "check": {
+          "steps": [
+            {
+              "op": "label",
+              "match": {
+                "kind": "process",
+                "re": "new array|\\[\\s*9|9\\W+9|reassign|local name|points? (at|to) a|brand"
+              },
+              "min": 1,
+              "fail": "Chart the reassignment as a task of its own: the function points its local name at a new array.",
+              "pass": "The reassignment is charted."
+            },
+            {
+              "op": "label",
+              "match": {
+                "kind": "io",
+                "re": "^(?!.*\\b9\\W+9\\b)"
+              },
+              "min": 1,
+              "fail": "The caller never sees the new array, so the print must not show [9, 9].",
+              "pass": "The print is not the reassigned array."
             }
           ]
         }

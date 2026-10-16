@@ -73,7 +73,7 @@ console.log(scores);
 
 A copy made this way is **shallow**: the new array is genuinely new, but if its items are themselves objects, both arrays still point at those same inner objects. For a flat list of numbers or strings a shallow copy is all you need. When you need a copy that goes all the way down, `structuredClone(value)` does that.
 
-**Try it:** Both copies start as copies of `team`. Push a score into each copy's nested `scores` array, then compare what `team` holds. Which copy reached back and changed the original?
+**Try it:** (`{ ...team }` copies an object the same way `[...scores]` copies an array; Reading 3.6.10 explains it.) Both copies start as copies of `team`. Push a score into each copy's nested `scores` array, then compare what `team` holds. Which copy reached back and changed the original?
 
 ```js live plain
 const team = { name: "Ravens", scores: [90, 85] };

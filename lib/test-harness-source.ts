@@ -1253,6 +1253,23 @@ const __traceKit = (() => {
       Object.freeze = function freeze(o) { return o; };
       Object.seal = function seal(o) { return o; };
       Object.preventExtensions = function preventExtensions(o) { return o; };
+      // The changed data is a proxy and structuredClone refuses a proxy: copy what it reads as, then clone.
+      s.sc0 = typeof self.structuredClone === 'function' ? self.structuredClone : null;
+      if (s.sc0) {
+        const sc0 = s.sc0;
+        const plain = (v, seen) => {
+          if (v === null || typeof v !== 'object') return v;
+          if (seen.has(v)) return seen.get(v);
+          const pr = Object.getPrototypeOf(v);
+          if (!Array.isArray(v) && pr !== Object.prototype && pr !== null) return v;
+          const out = Array.isArray(v) ? [] : {};
+          seen.set(v, out);
+          const ks = Object.keys(v);
+          for (let i = 0; i < ks.length; i++) out[ks[i]] = plain(v[ks[i]], seen);
+          return out;
+        };
+        self.structuredClone = function structuredClone(v, o) { return arguments.length > 1 ? sc0(plain(v, new Map()), o) : sc0(plain(v, new Map())); };
+      }
       // Nothing a silent run schedules ever runs.
       const then0 = s.then0;
       s.timers.forEach((n) => { self[n] = function () { return 0; }; });
@@ -1268,6 +1285,7 @@ const __traceKit = (() => {
     st.key = '';
     Promise.prototype.then = s.then0;
     Object.freeze = R.freeze; Object.seal = R.seal; Object.preventExtensions = R.pext;
+    if (s.sc0) self.structuredClone = s.sc0;
     const pm = s.pm;
     if (s.pmOwn) self.postMessage = pm; else { try { delete self.postMessage; } catch (_) { self.postMessage = pm; } if (self.postMessage !== pm) self.postMessage = pm; }
     resetGlobals(st);

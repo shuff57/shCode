@@ -360,6 +360,38 @@ const CASES = {
       'plain rectangle for the call': (t) => swap(t, 'C[[process scores]]', 'C[process scores]'),
       'only one question': (t) => swap(swap(swap(t, '  G --> H\n  H -->|no| I\n  H -->|yes| J\n  I --> K\n  J --> K\n', '  G --> I\n  I --> K\n'), 'F --> G', 'F --> G'), '  E -->|no| G\n', '  E -->|no| G\n'),
     },
+    rejects: {
+      'prints the reassigned array': (() => {
+        const base = readFileSync(path.join(root, 'lessons/3-6-7-chart-reassign-vs-mutate/solution/chart.mmd'), 'utf8');
+        return swap(base, 'K[/print scores: 0, 20, 30/]', 'K[/print scores: 9, 9/]');
+      })(),
+      'keyword soup, no reassignment task': `flowchart TD
+  A([Start])
+  B[scores shared with caller]
+  C[[process scores]]
+  D[change shared scores]
+  E{caller sees change?}
+  F[caller sees shared scores]
+  G[local scores]
+  H{caller sees local?}
+  I[caller scores]
+  J[shared caller scores]
+  K[/print caller scores/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D --> E
+  E -->|yes| F
+  E -->|no| G
+  F --> G
+  G --> H
+  H -->|no| I
+  H -->|yes| J
+  I --> K
+  J --> K
+  K --> Z`,
+    },
   },
   '3-7-5-chart-map-trace': {
     variant: `flowchart TD

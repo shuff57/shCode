@@ -607,6 +607,15 @@ function StudentDrawer({
   // passed (the same endpoint as the Most missed panel, filtered to this student). Never a grade input.
   const [reqRows, setReqRows] = useState<RequirementEventRow[]>([]);
   const [reqTitles, setReqTitles] = useState<Record<string, Array<{ id: string; title: string }>>>({});
+  // Quiz question text by lesson then question id (public/quiz-stems.json), for the "missed" list.
+  const [quizStems, setQuizStems] = useState<Record<string, Record<string, string>>>({});
+  useEffect(() => {
+    let live = true;
+    fetch('/quiz-stems.json').then((r) => (r.ok ? r.json() : null)).catch(() => null).then((d) => {
+      if (live && d && typeof d === 'object') setQuizStems(d as Record<string, Record<string, string>>);
+    });
+    return () => { live = false; };
+  }, []);
   useEffect(() => {
     let live = true;
     Promise.all([
@@ -967,7 +976,7 @@ function StudentDrawer({
                     <div key={lesson.id} id={`drawer-lesson-${lesson.id}`} style={{ marginBottom: 8, background: '#282a36', borderRadius: 6, padding: '10px 14px', border: `1px solid ${focusLessonId === lesson.id ? '#8be9fd' : '#44475a33'}` }}>
                       {/* Lesson row */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                        <span style={{ flex: compact ? '1 1 100%' : 1, fontSize: 13, color: '#f8f8f2', minWidth: 0, overflowWrap: 'anywhere' }}>
+                        <span style={{ flex: compact ? '1 1 100%' : '1 1 240px', fontSize: 13, color: '#f8f8f2', minWidth: 0, overflowWrap: 'anywhere' }}>
                           {lesson.title}
                           {detail.dueDates?.[lesson.id] && (
                             <span style={{ marginLeft: 8, fontSize: 11, color: '#8393c4' }} title="This class's due date for the lesson">
@@ -1200,7 +1209,23 @@ function StudentDrawer({
                           {/* The answer itself. Diagram submissions store a
                               DiagramDoc, so render the Mermaid projection of it
                               rather than raw JSON; everything else is prose. */}
-                          {sub.response && (
+                          {Array.isArray(gradeData?.quiz) && (() => {
+                            const rows = (gradeData!.quiz as Array<{ id?: unknown; correct?: unknown }>).filter((q) => q && typeof q.id === 'string');
+                            const missed = rows.filter((q) => q.correct === false);
+                            return (
+                              <div style={{ marginBottom: 8 }}>
+                                <div style={{ fontSize: 11, color: '#8393c4', marginBottom: 4 }}>
+                                  {missed.length === 0 ? 'No questions missed' : `Missed ${missed.length} of ${rows.length}`}
+                                </div>
+                                {missed.map((q) => (
+                                  <div key={String(q.id)} style={{ fontSize: 12, background: '#1e1f29', borderRadius: 4, padding: '6px 10px', marginBottom: 4, color: '#f8f8f2', overflowWrap: 'anywhere' }}>
+                                    {quizStems[lesson.id]?.[String(q.id)] ?? String(q.id)}
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          })()}
+                          {sub.response && !Array.isArray(gradeData?.quiz) && (
                             <div>
                               <div style={{ fontSize: 11, color: '#8393c4', marginBottom: 4 }}>
                                 {asDiagramMermaid(sub.response) || (gradeData as { artifact?: unknown } | null)?.artifact ? 'Their chart' : 'Their answer'}
@@ -1463,7 +1488,10 @@ function GradebookView({
       const partial = cell.score ?? cell.submitted_score;
       return `In progress${partial !== null ? `, ${partial} points so far` : ''}${cell.late && graded ? ', past due' : ''}`;
     }
-    if (cell.submitted_score !== null) return `Handed in, ${cell.submitted_score} points`;
+    if (cell.submitted_score !== null) {
+      const of = maxScore != null && maxScore > 0 ? ` of ${maxScore}` : '';
+      return `Handed in, ${cell.submitted_score}${of} points, not passed yet`;
+    }
     return cell.late && graded ? 'Missing: past due, not started' : 'Not started';
   }
 

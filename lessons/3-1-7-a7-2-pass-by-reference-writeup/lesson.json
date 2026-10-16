@@ -23,25 +23,25 @@
         "id": "value-defined",
         "title": "Pass by value explained correctly",
         "description": "Explains pass-by-value: the function gets a copy; changes inside don't affect the original. Correctly says primitives (number/string/boolean) are passed by value.",
-        "points": 0
+        "points": 1
       },
       {
         "id": "reference-defined",
         "title": "Pass by reference explained correctly",
         "description": "Explains pass-by-reference: the function shares the same object/array; changes inside DO affect the original. Correctly says objects/arrays are passed by reference. Also accept the more precise phrasing that a reference (a pointer to the same object) is itself passed by value, or that the function receives a copy of the reference; that is the same idea and must not lose credit.",
-        "points": 0
+        "points": 1
       },
       {
         "id": "example-each",
         "title": "One example of each",
         "description": "Gives a plausible example of each (e.g., changing a number param has no outside effect; pushing to an array param does).",
-        "points": 0
+        "points": 1
       },
       {
         "id": "why-it-matters",
         "title": "Describes a real consequence",
         "description": "Describes a real consequence: an unintended-mutation bug, or why you'd copy before changing.",
-        "points": 0
+        "points": 1
       }
     ]
   },

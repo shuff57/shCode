@@ -75,7 +75,7 @@
       },
       {
         "id": "q4-trace-array",
-        "source": "3.6.4",
+        "source": "3.6.8",
         "code": "function addOne(nums) {\n  for (let i = 0; i < nums.length; i++) {\n    nums[i] = nums[i] + 1;\n  }\n}\n\nlet scores = [10, 20, 30];\naddOne(scores);\nconsole.log(scores);",
         "question": "What does this print?",
         "options": [
@@ -87,7 +87,7 @@
         "answer": 3,
         "explanation": "`nums[i] = ...` writes into the shared array, which is mutation rather than reassignment. The caller sees every change, so scores becomes [11, 21, 31].",
         "sourceIds": [
-          "3-6-4-lab-predict-primitive-vs-array"
+          "3-6-8-lab-fix-reassign-bug"
         ]
       },
       {

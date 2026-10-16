@@ -9,6 +9,7 @@ import { criteriaScore } from '../lib/grade-pass';
 import { errorText } from '../lib/http-error';
 import { diagramFrameHeight } from '../lib/diagram-types';
 import SubmissionBoundary from './SubmissionBoundary';
+import { useFeedback } from './FeedbackProvider';
 
 // Only pulled in when a flowchart submission is actually on screen — a class
 // with no diagram assignments never downloads React Flow.
@@ -182,6 +183,8 @@ function markUnit(g: GradeJson | null): { total: number } | null {
 }
 
 export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, enforceMax = false, zeroPoint = false, onOverride }: OverrideFormProps) {
+  // The queue reloads after a save and unmounts this form, taking its inline message with it; a toast survives that.
+  const { toast } = useFeedback();
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
   // Capped parts only: the box is not rendered elsewhere (the server ignores it there anyway).
@@ -202,6 +205,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
       });
       if (!res.ok) throw new Error(await errorText(res));
       setMsg({ type: 'success', text: 'Cleared. The score is now the student\u2019s best again.' });
+      toast('Cleared. The score is now the student\u2019s best again.');
       onOverride();
     } catch (err) {
       setMsg({ type: 'error', text: err instanceof Error ? err.message : 'Clear failed' });
@@ -258,6 +262,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
           ? `Saved on this try. A score you set earlier is still in force (${out.stateScore}); tick the box to change it.`
           : 'Grade overridden successfully.',
       });
+      toast(out && out.overrideActive && !replaceBest ? 'Saved on this try. An earlier score is still in force.' : 'Score saved.');
       onOverride();
     } catch (err) {
       setMsg({ type: 'error', text: err instanceof Error ? err.message : 'Override failed' });

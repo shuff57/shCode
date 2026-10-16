@@ -14,6 +14,10 @@ const outPath = path.join(root, 'public', 'lessons-manifest.json');
 // Requirement titles per lesson, for the teacher's "Most missed" panel only (id + title; no patterns).
 const reqPath = path.join(root, 'public', 'lesson-requirements.json');
 const reqTitles = {};
+// Quiz question stems per lesson (id -> question text, no options and no key), for the teacher drawer's
+// "missed" list. A student's saved quiz holds only question ids and picked indexes.
+const stemPath = path.join(root, 'public', 'quiz-stems.json');
+const quizStems = {};
 
 const entries = await fs.readdir(lessonsDir, { withFileTypes: true });
 const dirs = entries
@@ -36,6 +40,15 @@ const results = await Promise.all(
       reqTitles[meta.id ?? id] = meta.requirements
         .filter((r) => r && typeof r.id === 'string')
         .map((r) => ({ id: r.id, title: String(r.title ?? r.id) }));
+    }
+    {
+      const qs = [];
+      const collect = (list) => { if (Array.isArray(list)) qs.push(...list); };
+      collect(meta.quiz?.questions);
+      if (Array.isArray(meta.quiz?.variants)) for (const v of meta.quiz.variants) collect(v?.questions);
+      const stems = {};
+      for (const q of qs) if (q && typeof q.id === 'string' && typeof q.question === 'string') stems[q.id] = q.question;
+      if (Object.keys(stems).length > 0) quizStems[meta.id ?? id] = stems;
     }
     // maxScore: quiz question count, or the written/diagram rubric's point
     // total. Null when every criterion is 0 points (a pass/fail rubric), which
@@ -106,4 +119,5 @@ lessons.sort((a, b) => a.id.localeCompare(b.id));
 await fs.writeFile(outPath, JSON.stringify({ lessons }, null, 2));
 const sortedReqs = Object.fromEntries(Object.keys(reqTitles).sort().map((k) => [k, reqTitles[k]]));
 await fs.writeFile(reqPath, JSON.stringify(sortedReqs));
+await fs.writeFile(stemPath, JSON.stringify(Object.fromEntries(Object.keys(quizStems).sort().map((k) => [k, quizStems[k]]))));
 console.log(`[generate-lessons-manifest] wrote ${lessons.length} lessons → public/lessons-manifest.json`);

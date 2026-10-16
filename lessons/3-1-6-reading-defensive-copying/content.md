@@ -5,7 +5,7 @@
 - How to copy an array with the spread syntax `[...arr]`
 - How to copy an object with the spread syntax `{...obj}`
 
-From the previous reading you know that arrays and objects are passed by reference. That means if you pass an array to a function and the function changes it, the original is changed too.
+From Reading 3.6.2 you know that arrays and objects are passed by reference. That means if you pass an array to a function and the function changes it, the original is changed too.
 
 **Defensive copying** is a habit: make a copy first, then change the copy. The original stays untouched.
 

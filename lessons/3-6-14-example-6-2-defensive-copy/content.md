@@ -58,5 +58,5 @@ for (const n of [...list]) {
 
 - `[...scores]` builds a new array holding the same items — a snapshot the loop can trust.
 - Removing from an array while iterating it directly can skip entries, because each removal shifts the rest down.
-- Looping a copy is the same defensive-copy rule from 3.6.9, seen in the wild: you are not the only holder of that array.
+- Looping a copy is the same defensive-copy rule from 3.6.10, seen in the wild: you are not the only holder of that array.
 - The copy is shallow, which is exactly enough here — the loop only needs the list of items, not copies of the items themselves.
