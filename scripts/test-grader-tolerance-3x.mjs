@@ -258,6 +258,8 @@ reject('3-6-8-lab-fix-reassign-bug', 'addOne does nothing, the caller loop does 
 reject('3-6-8-lab-fix-reassign-bug', 'addOne still reassigns its parameter', 't1',
   js('function addOne(scores) { for (let i = 0; i < scores.length; i++) { scores = scores.map(x => x + 1); } }',
      'let quizScores = [10, 20, 30];', 'addOne(quizScores);', 'console.log(quizScores);'));
+accept('3-6-8-lab-fix-reassign-bug', 'a while loop writes by index',
+  js('function addOne(scores) { let i = 0; while (i < scores.length) { scores[i] += 1; i++; } }', 'const quizScores = [10, 20, 30];', 'addOne(quizScores);', 'console.log(quizScores);'));
 accept('3-6-8-lab-fix-reassign-bug', 'for...of over keys() writes by index',
   js('function addOne(scores) { for (const i of scores.keys()) { scores[i]++; } }', 'let quizScores = [10, 20, 30];', 'addOne(quizScores);', 'console.log(quizScores);'));
 reject('3-6-12-lab-object-param-mutation', 'birthday copies, birthdaySafe mutates (swapped)', 't1',

@@ -32,15 +32,15 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "for loop present",
-      "description": "Code contains a for loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+      "title": "a loop visits each position",
+      "description": "Code loops over the array (for, while or forEach). Help: 3.3.5 (Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(",
+      "pattern": "\\b(?:for|while)\\s*\\(|\\.forEach\\s*\\(",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Use a for loop to visit each position in the array."
+      "hint": "Use a loop to visit each position in the array: a for loop is the usual choice, but a while loop or forEach also works."
     },
     {
       "id": "r2",
