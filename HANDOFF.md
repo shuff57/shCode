@@ -1,3 +1,17 @@
+# 2026-10-16 (later): 3.5 labs accept the student's own names (committed locally, NOT pushed, NOT deployed)
+
+A requirement can carry `"names": {"book": "object"}` (kinds: `object`, `array`, `records`, `function`). If the script
+does not declare `book` at the top level, the first top-level declaration of that kind stands in for it
+(`lib/student-names.ts`). Regex patterns read the student's name in place of the written one; `tests` jobs are rewritten by
+`jobsFromRequirements(reqs, code)` (variable, function, `perturb`, check expressions and `fail` text), so the author's
+checks stand as written. A script that uses the lesson's own names behaves exactly as before. Applied to 3.5.5, 8, 12,
+15, 18, 22, 24, 25 (all `names` entries go on EVERY requirement of the lab). Tolerance suite renames each reference twice
+(727 cases). Known edge: the stand-in is the FIRST declaration of the kind, so a student whose first object is not the
+one the lab is about gets a stand-in that is wrong. Object KEYS are still fixed (customer, items, name, price, width,
+height, color, quantity): the steps spell them out and the checks read them.
+New `lib/js-source-clean.ts` holds the comment/string strippers so `student-names` does not import `grader` (that pulls in
+`model-check`, which the node runner cannot load).
+
 # 2026-10-16: module 3.6 reviewed (committed locally, NOT pushed, NOT deployed)
 
 Four lenses (beginner/moderate/advanced + teacher walk) and one regression round. `npm test` passes (tolerance suite 710,

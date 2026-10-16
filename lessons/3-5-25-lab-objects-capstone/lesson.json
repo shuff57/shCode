@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "Build an array of records",
-      "instructions": "Create one array called cart whose elements are objects. Give each object the same fields, for example a name, a price and a quantity. Include at least three records."
+      "instructions": "Create one array (the lesson calls it cart; use any name that fits) whose elements are objects. Give each object the same fields, for example a name, a price and a quantity. Include at least three records."
     },
     {
       "id": "s2",
@@ -56,7 +56,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Make one array with at least three objects in it, and give every object the same kinds of fields."
+      "hint": "Make one array with at least three objects in it, and give every object the same kinds of fields.",
+      "names": {
+        "cart": "records"
+      }
     },
     {
       "id": "r2",
@@ -68,7 +71,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Give one record a field whose value is another object in braces, for example details: { color: \"blue\" }."
+      "hint": "Give one record a field whose value is another object in braces, for example details: { color: \"blue\" }.",
+      "names": {
+        "cart": "records"
+      }
     },
     {
       "id": "r3",
@@ -80,7 +86,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Pick one record by its number and print one of its fields with a dot: console.log(cart[0].name)."
+      "hint": "Pick one record by its number and print one of its fields with a dot: console.log(cart[0].name).",
+      "names": {
+        "cart": "records"
+      }
     },
     {
       "id": "r4",
@@ -92,7 +101,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": false,
-      "hint": "A key with a space in it is read with square brackets and the quoted key. Print that read with console.log."
+      "hint": "A key with a space in it is read with square brackets and the quoted key. Print that read with console.log.",
+      "names": {
+        "cart": "records"
+      }
     },
     {
       "id": "r9",
@@ -104,7 +116,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Reach into the nested object with a chain, one dot after another (the record, the nested field, its field), and print it."
+      "hint": "Reach into the nested object with a chain, one dot after another (the record, the nested field, its field), and print it.",
+      "names": {
+        "cart": "records"
+      }
     },
     {
       "id": "r5",
@@ -117,7 +132,10 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Loop over cart and, inside the loop, print the cost: the record's price times its quantity, each read with a dot (item.price * item.quantity). A helper the loop calls, that prints or returns the cost, counts too: that is checked when you press Run.",
-      "orTest": "t2"
+      "orTest": "t2",
+      "names": {
+        "cart": "records"
+      }
     },
     {
       "id": "r6",
@@ -130,7 +148,10 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Put the field names in braces on the left of the equals sign and one record on the right, then print a sentence that uses those names.",
-      "orTest": "t2"
+      "orTest": "t2",
+      "names": {
+        "cart": "records"
+      }
     },
     {
       "id": "r7",
@@ -142,7 +163,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Loop over Object.keys(record) with for...of: each key comes out in turn. Inside the loop, print the value fetched with record[key]. for...in is not part of this course, so it does not count here."
+      "hint": "Loop over Object.keys(record) with for...of: each key comes out in turn. Inside the loop, print the value fetched with record[key]. for...in is not part of this course, so it does not count here.",
+      "names": {
+        "cart": "records"
+      }
     },
     {
       "id": "r8",
@@ -154,7 +178,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Print with console.log so you can see the result and check it against what you expected."
+      "hint": "Print with console.log so you can see the result and check it against what you expected.",
+      "names": {
+        "cart": "records"
+      }
     },
     {
       "file": "script.js",
@@ -186,7 +213,10 @@
           "expr": "cart.filter(r => typeof r.price === 'number' && typeof r.quantity === 'number').length >= 3",
           "fail": "At least three records need a price and a quantity that are numbers (no quotes around them), so the loop can multiply them."
         }
-      ]
+      ],
+      "names": {
+        "cart": "records"
+      }
     },
     {
       "file": "script.js",
@@ -250,7 +280,10 @@
           "expr": "output.length >= 8",
           "fail": "Fewer than eight lines were printed. Steps 3 to 6 each print: three reads, one line per record, the sentence, and one line per key."
         }
-      ]
+      ],
+      "names": {
+        "cart": "records"
+      }
     }
   ],
   "grading": {

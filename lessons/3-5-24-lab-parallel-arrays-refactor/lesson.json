@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Collapse them into one array of records",
-      "instructions": "Replace the three parallel arrays with a single array called players whose elements are objects, each object holding name, score and group for one player."
+      "instructions": "Replace the three parallel arrays with a single array (the lesson calls it players; use any name that fits) whose elements are objects, each object holding name, score and group for one player."
     },
     {
       "id": "s3",
@@ -40,7 +40,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Build one array of objects, one per player, each with name, score and group. Write them in the brackets, push them in, or build each in its own variable and list them: const players = [player1, player2, player3]."
+      "hint": "Build one array of objects, one per player, each with name, score and group. Write them in the brackets, push them in, or build each in its own variable and list them: const players = [player1, player2, player3].",
+      "names": {
+        "players": "records"
+      }
     },
     {
       "id": "r2",
@@ -53,7 +56,10 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Pick a record (players[i], or the loop variable) and print each field read off it with a dot: console.log(players[i].name). A helper or a stored result counts too (checked when you press Run).",
-      "orTest": "t2"
+      "orTest": "t2",
+      "names": {
+        "players": "records"
+      }
     },
     {
       "id": "r3",
@@ -66,7 +72,10 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Loop over players and put the console.log inside the loop, printing the current record's fields, not fixed text.",
-      "orTest": "t2"
+      "orTest": "t2",
+      "names": {
+        "players": "records"
+      }
     },
     {
       "id": "r4",
@@ -78,7 +87,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Print with console.log so you can see the result and check it against what you expected."
+      "hint": "Print with console.log so you can see the result and check it against what you expected.",
+      "names": {
+        "players": "records"
+      }
     },
     {
       "file": "script.js",
@@ -109,7 +121,10 @@
             }
           ]
         }
-      ]
+      ],
+      "names": {
+        "players": "records"
+      }
     },
     {
       "id": "r5",
@@ -121,7 +136,10 @@
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
-      "hint": "Once players holds everything, delete the old arrays of names, scores and groups, whatever they are called. Two copies of the data can drift apart."
+      "hint": "Once players holds everything, delete the old arrays of names, scores and groups, whatever they are called. Two copies of the data can drift apart.",
+      "names": {
+        "players": "records"
+      }
     },
     {
       "file": "script.js",
@@ -159,7 +177,10 @@
           "expr": "players.every(p => output.some(l => l.includes(p.name) && players.every(o => o === p || !l.includes(o.name))))",
           "fail": "Print each player on a line of its own from the loop: a line that names one player should not name the others."
         }
-      ]
+      ],
+      "names": {
+        "players": "records"
+      }
     }
   ],
   "grading": {

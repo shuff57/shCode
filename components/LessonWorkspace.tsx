@@ -464,7 +464,7 @@ export default function LessonWorkspace({
     }
 
     // `tests` requirements ride along on this one run (lib/test-harness-source.ts).
-    const testJobs = jobsFromRequirements(lesson.requirements);
+    const testJobs = jobsFromRequirements(lesson.requirements, scriptContent);
     testRunRef.current = null;
     const run = runStudentCode(
       scriptContent,

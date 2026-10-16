@@ -119,6 +119,14 @@ export interface Requirement {
    *  at run time what the pattern looks for in the text (a print reached through a
    *  helper, an alias or a variable the pattern cannot follow). */
   orTest?: string;
+  /** The names this requirement was written with, and what each one stands for:
+   *  { "book": "object", "players": "records", "describe": "function" }. A student
+   *  may call their variable or function anything; when the written name is not
+   *  declared at the top of their script, the first declaration of that kind
+   *  stands in for it (lib/student-names.ts). Regex patterns read the student's
+   *  name in place of the written one, and `tests` variables and functions are
+   *  looked up under it. */
+  names?: Record<string, 'object' | 'array' | 'records' | 'function'>;
 }
 
 /** One named top-level variable of a script-level `tests` requirement. */

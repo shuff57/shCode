@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Create the object",
-      "instructions": "Create a variable named book and assign it an object literal with at least two properties, for example a title and a pages count."
+      "instructions": "Create a variable for it (the lesson calls it book; use any name that fits what you are building) and assign it an object literal with at least two properties, for example a title and a pages count."
     },
     {
       "id": "s2",
@@ -50,7 +50,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Declare a variable named book and give it an object in braces with at least two name: value pairs."
+      "hint": "Declare a variable (the lesson calls it book; use any name that fits) and give it an object in braces with at least two name: value pairs.",
+      "names": {
+        "book": "object"
+      }
     },
     {
       "id": "r2",
@@ -63,7 +66,10 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Inside console.log, reach a property of book with a dot: console.log(book.title). Storing it first (const t = book.title;) and printing t works too. A helper, an alias or a stored result counts too: that is checked when you press Run.",
-      "orTest": "t2"
+      "orTest": "t2",
+      "names": {
+        "book": "object"
+      }
     },
     {
       "id": "r3",
@@ -75,7 +81,10 @@
       "flags": "",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "With a dot for both: change a property the object was built with (book.pages = 480), then add one it did not have (book.author = ...). Square brackets (book[\"pages\"]) come later in this module. Changing the same field twice adds nothing."
+      "hint": "With a dot for both: change a property the object was built with (book.pages = 480), then add one it did not have (book.author = ...). Square brackets (book[\"pages\"]) come later in this module. Changing the same field twice adds nothing.",
+      "names": {
+        "book": "object"
+      }
     },
     {
       "id": "r4",
@@ -87,7 +96,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Pass the object itself to console.log (not one property) so the changed and added fields show."
+      "hint": "Pass the object itself to console.log (not one property) so the changed and added fields show.",
+      "names": {
+        "book": "object"
+      }
     },
     {
       "file": "script.js",
@@ -116,7 +128,10 @@
           "fail": "book ends with only the fields its literal was written with. Add a new one by assigning to a name the literal did not have: book.year = 1965;"
         }
       ],
-      "trace": true
+      "trace": true,
+      "names": {
+        "book": "object"
+      }
     },
     {
       "file": "script.js",
@@ -155,7 +170,10 @@
           "fail": "The whole object is not printed by code that runs. Pass book itself to console.log, console.log(book), after the change and the add, so every field shows.",
           "failExpr": "(() => { const P = trace.prints; const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9); const O2 = (p) => (p.out2 || []).join('\\n'); const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0; const MKIN = (p) => !!trace.mk && LC(O2(p)).includes(LC(trace.mk)); const NUMCH = (p) => p.stable === true && p.out.some((l, i) => { const b = NUMS(i < p.out2.length ? p.out2[i] : ''); return b.length > 0 && JSON.stringify(NUMS(l)) !== JSON.stringify(b); }); const NORM = (s) => LC(s).replace(/~[a-z]{3}~/g, '').replace(/(\\d),(?=\\d)/g, '$1').replace(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/g, '#'); const SEGS = (s) => { const out = []; const re = /(~[a-z]{3}~)([\\s\\S]*?)\\1/g; const t = LC(s).slice(0, 4000); let m; while ((m = re.exec(t))) out.push(m[2].replace(/~[a-z]{3}~/g, '')); return out; }; const NCNT = (s) => NUMS(String(s).replace(/(\\d),(?=\\d)/g, '$1')).length; const SAMEL = (a, b) => NORM(a) === NORM(b) || (NCNT(a) === NCNT(b) && SEGS(b).every((t) => LC(a).includes(t))); const ECHOL = (a, b) => a.length === b.length && a.every((l, i) => SAMEL(l, b[i])); const ECHO = (p) => p.out2 !== null && ECHOL(p.out, p.out2); const ECHOD = (p) => p.outD !== null && ECHOL(p.out, p.outD); const MV = (p) => LIVE(p) && ECHO(p) && (MKIN(p) || NUMCH(p)); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' ? v * trace.k + trace.c : v; const HASIN = (lines, v) => typeof v === 'number' ? v === v && isFinite(v) && lines.some((l) => NUMS(l).some((x) => NEAR(x, TW(v)))) : !!trace.mk && LC(lines.join('\\n')).includes(LC(TW(v))); const HAS = (p, v) => LIVE(p) && HASIN(p.out2, v) && ECHO(p); const RKIN = (p) => !!trace.rk && LC(O2(p)).includes(LC(trace.rk)); const RNUM = (p) => trace.results.some((r) => typeof r === 'number' && r === r && isFinite(r) && p.out2.some((l) => NUMS(l).some((x) => NEAR(x, r)))); const RBOOL = (p) => p.stable === true && JSON.stringify(p.out) !== JSON.stringify(p.out2) && trace.results.some((r) => typeof r === 'boolean' && p.out2.some((l) => new RegExp('\\\\b' + r + '\\\\b').test(l))); const RES = (p) => LIVE(p) && (RKIN(p) || RNUM(p) || RBOOL(p)); const DKEYS = () => { const D = trace.dreads; const sites = []; D.forEach((d) => { if (!sites.includes(d[0])) sites.push(d[0]); }); return sites.map((s) => { const keys = []; D.forEach((d) => { if (d[0] === s && !keys.includes(d[1])) keys.push(d[1]); }); return { s, keys }; }); }; const DPRINTED = (s, k) => trace.dreads.some((d) => d[0] === s && d[1] === k && P.some((p) => p.ran > 0 && p.outD !== null && ECHOD(p) && (typeof d[2] === 'number' ? p.outD.some((l) => NUMS(l).some((x) => NEAR(x, d[2])) || l.includes(String(d[2]))) : LC(p.outD.join('\\n')).includes(LC(d[2]))))); const DSAID = (n) => DKEYS().some((g) => g.keys.length >= n && g.keys.every((k) => DPRINTED(g.s, k))); const ID = (v) => new RegExp('(?<![\\\\w$.])' + v.replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re, raw) => { const c = trace.code, t = trace.text, out = [], ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*[-+*/]?=(?![=>])([^;\\n]*)/g; let m; while ((m = ar.exec(c))) { const e = m.index + m[0].length; if (re.test((raw ? t : c).slice(e - m[2].length, e))) out.push(m[1]); } return out; }; const SHAPE = (re, raw) => { const vs = VARS(re, raw); return P.filter((p) => p.ran > 0 && MV(p) && (re.test(raw ? p.src : p.code) || vs.some((v) => ID(v).test(p.code)))); }; const CL = (s) => String(s).replace(/\\s+/g, ' ').trim().slice(0, 70); const Q = String.fromCharCode(34); const part = P.find((p) => MV(p) && p.out.some((l) => l.includes('{'))); if (part) { const miss = Object.keys(book).find((k) => !part.out.some((l) => l.includes(Q + k + Q))); return 'console.log(' + CL(part.src) + ') prints an object, but not book itself: it has no ' + miss + '. Pass book to console.log, console.log(book), after the change and the add.'; } const re = /^\\s*book\\s*$/; const c = P.filter((p) => re.test(p.code)); const typed = c.find((p) => p.ran > 0 && !MV(p)); const dead = c.find((p) => p.ran === 0); if (typed) return 'console.log(' + CL(typed.src) + ') runs, but what it prints does not come from book. Print the object itself.'; if (dead) return 'console.log(' + CL(dead.src) + ') never runs: it sits inside a function nobody calls, or behind a test that is never true (if (false), false &&, a loop over an empty list). Put the print where it runs.'; return ''; })()"
         }
-      ]
+      ],
+      "names": {
+        "book": "object"
+      }
     }
   ],
   "grading": {

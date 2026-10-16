@@ -107,6 +107,7 @@
 // author text; student text is never evaluated).
 
 import type { Requirement, TestCase, ScriptCheck, VariableCheck } from './types';
+import { studentNames, bindText, bindCode } from './student-names';
 
 /** Default per-case budget in ms. A case that has not returned by then is
  *  killed (the whole Worker is terminated) and reported as "did not finish". */
@@ -152,20 +153,30 @@ export interface TestRunResults {
 const IDENT = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
 /** The `tests` requirements of a lesson, as jobs the runner understands. */
-export function jobsFromRequirements(reqs: Requirement[]): TestJob[] {
+export function jobsFromRequirements(reqs: Requirement[], code?: string): TestJob[] {
   const jobs: TestJob[] = [];
   for (const r of reqs) {
     if (r.type !== 'tests') continue;
-    const names = (Array.isArray(r.function) ? r.function : [r.function]).filter((n): n is string => typeof n === 'string' && n !== '');
+    // The student's own names for what the requirement was written with (lib/student-names.ts).
+    // The job is rewritten to read THEIR name: the variable, the function, the perturbed name
+    // and every author expression, so the checks stand exactly as written.
+    const own = r.names && typeof code === 'string' ? studentNames(code, r.names) : {};
+    const renamed = Object.keys(own).length > 0;
+    const names = (Array.isArray(r.function) ? r.function : [r.function]).filter((n): n is string => typeof n === 'string' && n !== '').map((n) => own[n] || n);
     const fn = names[0];
-    const variables = Array.isArray(r.variables) ? r.variables : [];
-    const checks = Array.isArray(r.checks) ? r.checks : [];
+    const variables = (Array.isArray(r.variables) ? r.variables : []).map((v) => (renamed ? { ...v, name: own[v.name] || v.name, ...(typeof v.fail === 'string' ? { fail: bindText(v.fail, own) } : {}) } : v));
+    const checks = (Array.isArray(r.checks) ? r.checks : []).map((c) => (renamed ? {
+      ...c,
+      expr: bindCode(c.expr, own),
+      ...(typeof c.fail === 'string' ? { fail: bindText(c.fail, own) } : {}),
+      ...(typeof c.failExpr === 'string' ? { failExpr: bindCode(c.failExpr, own) } : {}),
+    } : c));
     const eo = Array.isArray(r.expectOutput) && r.expectOutput.length > 0 ? r.expectOutput : undefined;
     const eoc = Array.isArray(r.expectOutputContains) && r.expectOutputContains.length > 0 ? r.expectOutputContains : undefined;
     const hasScript = variables.length > 0 || checks.length > 0 || !!eo || !!eoc;
     // Only a requirement that asks for it gets the trace; every other job is sent exactly as before.
     const trace = hasScript && r.trace === true;
-    const perturb = trace && Array.isArray(r.perturb) ? r.perturb.filter((n): n is string => typeof n === 'string' && (n === '*' || n === '{}' || IDENT.test(n))) : [];
+    const perturb = trace && Array.isArray(r.perturb) ? r.perturb.filter((n): n is string => typeof n === 'string' && (n === '*' || n === '{}' || IDENT.test(n))).map((n) => own[n] || n) : [];
     const traceFields = trace ? { trace: true, ...(perturb.length ? { perturb } : {}) } : {};
     jobs.push({
       id: r.id,

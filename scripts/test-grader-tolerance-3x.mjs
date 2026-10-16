@@ -56,6 +56,21 @@ const reject = (id, name, req, script) => cases.push({ id, name, files: { 'scrip
 // A points-graded lab (3-1-10): the answer must also score below the lesson's passing score.
 const rejectBelowPass = (id, name, req, script) => cases.push({ id, name, files: { 'script.js': script }, expect: 'fail', req, belowPass: true });
 
+// Students name things for what they build. Every lab whose requirements carry `names`
+// must still score full marks when the reference is written with other names, and
+// the new names must be ones the lesson never used (so the stand-in is what is tested).
+const OWN = { object: 'gadget', records: 'rows', array: 'rows', function: 'summarize' };
+const OWN2 = { object: 'thing', records: 'entries', array: 'entries', function: 'render' };
+for (const id of LABS) {
+  const names = (lesson(id).requirements || []).find((r) => r.names)?.names;
+  if (!names) continue;
+  for (const [label, table] of [['first', OWN], ['second', OWN2]]) {
+    let sol = solutionFiles(id)['script.js'];
+    for (const [w, kind] of Object.entries(names)) sol = sol.replace(new RegExp('(?<![\\w$.])' + w + '(?![\\w$])', 'g'), table[kind]);
+    cases.push({ id, name: `renamed to ${Object.values(names).map((k) => table[k]).join(', ')} (${label} set)`, files: { 'script.js': sol }, expect: 'pass' });
+  }
+}
+
 for (const id of LABS) {
   const sol = solutionFiles(id);
   cases.push({ id, name: 'reference solution', files: sol, expect: 'pass' });
@@ -228,7 +243,7 @@ reject('3-5-5-lab-read-update-fields', 'a number named book', 't1',
 reject('3-5-12-lab-nested-structure', 'braces everywhere, no customer object', 't1',
   js('const order = { items: [{ a: 1 }, { b: 2 }] };', 'const x = { p: { q: 1 } };', 'console.log(x.p.q);',
      'for (let i = 0; i < order.items.length; i++) { console.log(order.items[i].a); }'));
-reject('3-5-15-lab-add-method', 'method with an empty body prints undefined', 't1',
+reject('3-5-15-lab-add-method', 'method with an empty body prints undefined', 't2',
   js('const s = { name: "Ana", hi: function () {} };', 'console.log(s.hi());'));
 reject('3-5-18-lab-params-to-object', 'describeBox ignores two of the three values', 't1',
   js('function describeBox(o) { return o.color; }', 'console.log(describeBox({ width: 2, height: 3, color: "red" }));'));

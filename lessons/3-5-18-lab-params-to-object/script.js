@@ -1,6 +1,6 @@
 // 3.5.18 Rewrite a Multi-Parameter Function to Take an Object
 
-// STEP 1: Write a function called describeBox that takes three positional
+// STEP 1: Write a function (the lesson calls it describeBox; name it for what you are building) that takes three positional
 //         parameters (width, height and color) and returns a string built
 //         from those three values.
 

@@ -88,7 +88,7 @@ export async function gradeWithTests(
   passingScore: number = 0,
   context: GradeContext = {},
 ): Promise<GradeReport> {
-  const jobs = jobsFromRequirements(reqs);
+  const jobs = jobsFromRequirements(reqs, files["script.js"] ?? "");
   if (jobs.length === 0) return grade(reqs, files, passingScore, context);
   const run = await runCodeWithTests(files['script.js'] ?? '', jobs);
   return grade(reqs, files, passingScore, { ...context, testResults: run.tests });

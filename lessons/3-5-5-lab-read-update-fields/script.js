@@ -1,6 +1,6 @@
 // 3.5.5 Read and Update Object Fields
 
-// STEP 1: Create a variable named book and give it an object literal
+// STEP 1: Create a variable for it (the lesson calls it book; use any name that fits what you are building) and give it an object literal
 //         holding at least two properties, such as a title and a page count.
 
 // STEP 2: Print one of those properties. Reach it with a dot: the object

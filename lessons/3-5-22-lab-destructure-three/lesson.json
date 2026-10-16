@@ -31,7 +31,7 @@
     {
       "id": "s4",
       "title": "Destructure a parameter",
-      "instructions": "Write a function called describe that takes one options object and destructures two or more of its keys directly in the parameter list (the keys are your choice), then returns a string built from the bare names."
+      "instructions": "Write a function (the lesson calls it describe; name it for what you are building) that takes one options object and destructures two or more of its keys directly in the parameter list (the keys are your choice), then returns a string built from the bare names."
     }
   ],
   "requirements": [
@@ -45,7 +45,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Put the names you want in braces on the left of the equals sign, and the object on the right. The names must match the keys."
+      "hint": "Put the names you want in braces on the left of the equals sign, and the object on the right. The names must match the keys.",
+      "names": {
+        "describe": "function"
+      }
     },
     {
       "id": "r2",
@@ -57,7 +60,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Put the braces and key names right in describe's parentheses, instead of one ordinary parameter name: function describe({ title, quantity })."
+      "hint": "Put the braces and key names right in describe's parentheses, instead of one ordinary parameter name: function describe({ title, quantity }).",
+      "names": {
+        "describe": "function"
+      }
     },
     {
       "id": "r3",
@@ -70,7 +76,10 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Use each unpacked name on its own, like title + \" costs \" + cost, inside console.log or in a sentence variable you then print. A name copied into a variable nobody prints does not count.",
-      "orTest": "t2"
+      "orTest": "t2",
+      "names": {
+        "describe": "function"
+      }
     },
     {
       "file": "script.js",
@@ -90,7 +99,10 @@
           "expr": "typeof describe === 'function' && describe.length <= 1 && (() => { const m = /^[^(]*\\(\\s*\\{([^}]*)\\}/.exec(String(describe)); if (!m) return false; const keys = m[1].split(',').map((x) => x.trim().split(/[\\s:=]/)[0]).filter((k) => /^[A-Za-z_$][\\w$]*$/.test(k)); if (keys.length < 2) return false; const kinds = [[(j) => 3 + 2 * j, (j) => [1000 + j, 0]], [(j) => String(3 + 2 * j), (j) => [String(1000 + j), '0']], [(j) => 'Word' + 'ABCDEFGH'[j % 8], (j) => ['Other' + j]]]; return kinds.some(([b, alts]) => { try { const base = () => { const o = {}; keys.forEach((k, j) => { o[k] = b(j); }); return o; }; const r0 = String(describe(base())); if (r0 !== String(describe(base()))) return false; return keys.filter((k, j) => alts(j).some((a) => { const o = base(); o[k] = a; return String(describe(o)) !== r0; })).length >= 2; } catch (e) { return false; } }); })()",
           "fail": "describe should take one object, unpack two or more of its keys with braces in the parameter list, and build the text it returns from those names: give it new values and the text should change."
         }
-      ]
+      ],
+      "names": {
+        "describe": "function"
+      }
     },
     {
       "file": "script.js",
@@ -120,7 +132,10 @@
           "fail": "The unpacked names are not all printed by code that runs. Build a sentence from each of them, title + \" costs \" + cost, and print it.",
           "failExpr": "(() => { const P = trace.prints; const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9); const O2 = (p) => (p.out2 || []).join('\\n'); const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0; const MKIN = (p) => !!trace.mk && LC(O2(p)).includes(LC(trace.mk)); const NUMCH = (p) => p.stable === true && p.out.some((l, i) => { const b = NUMS(i < p.out2.length ? p.out2[i] : ''); return b.length > 0 && JSON.stringify(NUMS(l)) !== JSON.stringify(b); }); const NORM = (s) => LC(s).replace(/~[a-z]{3}~/g, '').replace(/(\\d),(?=\\d)/g, '$1').replace(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/g, '#'); const SEGS = (s) => { const out = []; const re = /(~[a-z]{3}~)([\\s\\S]*?)\\1/g; const t = LC(s).slice(0, 4000); let m; while ((m = re.exec(t))) out.push(m[2].replace(/~[a-z]{3}~/g, '')); return out; }; const NCNT = (s) => NUMS(String(s).replace(/(\\d),(?=\\d)/g, '$1')).length; const SAMEL = (a, b) => NORM(a) === NORM(b) || (NCNT(a) === NCNT(b) && SEGS(b).every((t) => LC(a).includes(t))); const ECHOL = (a, b) => a.length === b.length && a.every((l, i) => SAMEL(l, b[i])); const ECHO = (p) => p.out2 !== null && ECHOL(p.out, p.out2); const ECHOD = (p) => p.outD !== null && ECHOL(p.out, p.outD); const MV = (p) => LIVE(p) && ECHO(p) && (MKIN(p) || NUMCH(p)); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' ? v * trace.k + trace.c : v; const HASIN = (lines, v) => typeof v === 'number' ? v === v && isFinite(v) && lines.some((l) => NUMS(l).some((x) => NEAR(x, TW(v)))) : !!trace.mk && LC(lines.join('\\n')).includes(LC(TW(v))); const HAS = (p, v) => LIVE(p) && HASIN(p.out2, v) && ECHO(p); const RKIN = (p) => !!trace.rk && LC(O2(p)).includes(LC(trace.rk)); const RNUM = (p) => trace.results.some((r) => typeof r === 'number' && r === r && isFinite(r) && p.out2.some((l) => NUMS(l).some((x) => NEAR(x, r)))); const RBOOL = (p) => p.stable === true && JSON.stringify(p.out) !== JSON.stringify(p.out2) && trace.results.some((r) => typeof r === 'boolean' && p.out2.some((l) => new RegExp('\\\\b' + r + '\\\\b').test(l))); const RES = (p) => LIVE(p) && (RKIN(p) || RNUM(p) || RBOOL(p)); const DKEYS = () => { const D = trace.dreads; const sites = []; D.forEach((d) => { if (!sites.includes(d[0])) sites.push(d[0]); }); return sites.map((s) => { const keys = []; D.forEach((d) => { if (d[0] === s && !keys.includes(d[1])) keys.push(d[1]); }); return { s, keys }; }); }; const DPRINTED = (s, k) => trace.dreads.some((d) => d[0] === s && d[1] === k && P.some((p) => p.ran > 0 && p.outD !== null && ECHOD(p) && (typeof d[2] === 'number' ? p.outD.some((l) => NUMS(l).some((x) => NEAR(x, d[2])) || l.includes(String(d[2]))) : LC(p.outD.join('\\n')).includes(LC(d[2]))))); const DSAID = (n) => DKEYS().some((g) => g.keys.length >= n && g.keys.every((k) => DPRINTED(g.s, k))); const ID = (v) => new RegExp('(?<![\\\\w$.])' + v.replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re, raw) => { const c = trace.code, t = trace.text, out = [], ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*[-+*/]?=(?![=>])([^;\\n]*)/g; let m; while ((m = ar.exec(c))) { const e = m.index + m[0].length; if (re.test((raw ? t : c).slice(e - m[2].length, e))) out.push(m[1]); } return out; }; const SHAPE = (re, raw) => { const vs = VARS(re, raw); return P.filter((p) => p.ran > 0 && MV(p) && (re.test(raw ? p.src : p.code) || vs.some((v) => ID(v).test(p.code)))); }; const CL = (s) => String(s).replace(/\\s+/g, ' ').trim().slice(0, 70); const dm = /(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=/.exec(trace.code); const NAMEOF = (k) => { if (!dm) return k; const e = dm[1].split(',').map((x) => x.trim()).find((x) => x.split(':')[0].split('=')[0].trim() === k); return e && e.includes(':') ? e.split(':')[1].split('=')[0].trim() : k; }; const g = DKEYS().sort((a, b) => b.keys.length - a.keys.length)[0]; if (!g) return 'Nothing was unpacked with braces while the code ran. Unpack three names from item, const { title, cost, quantity } = item;, then print a sentence made from them.'; if (g.keys.length < 3) return 'Only ' + g.keys.length + ' name' + (g.keys.length === 1 ? ' is' : 's are') + ' unpacked (' + g.keys.map(NAMEOF).join(', ') + '). Unpack three keys of item.'; const miss = g.keys.find((k) => !DPRINTED(g.s, k)); if (!miss) return ''; const nm = NAMEOF(miss); const site = P.find((p) => ID(nm).test(p.code)); if (site && site.ran === 0) return 'console.log(' + CL(site.src) + ') never runs: it sits inside a function nobody calls, or behind a test that is never true. Put the print where it runs.'; return 'Nothing that runs prints the value of ' + nm + ' that you unpacked: it is named, but its value does not reach the printed text (typed-in text, typeof ' + nm + ', a name thrown away beside other text, or a name unpacked from a literal written in place do not count). Use ' + nm + ' itself in the printed sentence.'; })()"
         }
-      ]
+      ],
+      "names": {
+        "describe": "function"
+      }
     }
   ],
   "grading": {

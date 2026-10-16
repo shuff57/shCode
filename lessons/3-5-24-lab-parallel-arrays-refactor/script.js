@@ -13,7 +13,7 @@ for (let i = 0; i < names.length; i++) {
   console.log(names[i] + " (" + groups[i] + "): " + scores[i]);
 }
 
-// STEP 2: Replace the three parallel arrays with ONE array called players
+// STEP 2: Replace the three parallel arrays with ONE array (the lesson calls it players; use any name that fits)
 //         whose elements are objects. Each object holds name, score and group for one player.
 
 // STEP 3: Loop over the new array and print each player's fields by picking

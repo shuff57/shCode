@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "Write the positional original",
-      "instructions": "Write a function called describeBox that takes three positional parameters (width, height and color) and returns a string built from them."
+      "instructions": "Write a function (the lesson calls it describeBox; name it for what you are building) that takes three positional parameters (width, height and color) and returns a string built from them."
     },
     {
       "id": "s2",
@@ -41,7 +41,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define the function with the function keyword and a name of your choice."
+      "hint": "Define the function with the function keyword and a name of your choice.",
+      "names": {
+        "describeBox": "function"
+      }
     },
     {
       "id": "r2",
@@ -53,7 +56,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "The single parameter is the options object. Read each value off it with a dot, like options.width."
+      "hint": "The single parameter is the options object. Read each value off it with a dot, like options.width.",
+      "names": {
+        "describeBox": "function"
+      }
     },
     {
       "id": "r3",
@@ -65,7 +71,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Call describeBox with one object in braces naming each key, and print what it returns: console.log(describeBox({ width: 10, height: 4, color: \"red\" })). Pass the braces right in the call: a variable holding the object does not count."
+      "hint": "Call describeBox with one object in braces naming each key, and print what it returns: console.log(describeBox({ width: 10, height: 4, color: \"red\" })). Pass the braces right in the call: a variable holding the object does not count.",
+      "names": {
+        "describeBox": "function"
+      }
     },
     {
       "id": "r4",
@@ -77,7 +86,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Print with console.log so you can see the result and check it against what you expected."
+      "hint": "Print with console.log so you can see the result and check it against what you expected.",
+      "names": {
+        "describeBox": "function"
+      }
     },
     {
       "file": "script.js",
@@ -112,7 +124,10 @@
           "failExpr": "(() => { const READS = (() => { const src = String(describeBox); const d = /^[^(]*\\(\\s*\\{([^}]*)\\}/.exec(src); if (d) return { dot: d[1].split(',').map((x) => x.trim().split(/[\\s:=]/)[0]).filter((k) => /^[A-Za-z_$][\\w$]*$/.test(k)), br: [], param: '' }; const m = /^(?:async\\s+)?(?:function\\s*[\\w$]*\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/.exec(src); if (!m) return { dot: [], br: [], param: '' }; const pe = m[1].replace(/\\$/g, '\\\\$'); const dot = []; const br = []; let x; const re = new RegExp('(?<![\\\\w$.])' + pe + '\\\\s*\\\\.\\\\s*([A-Za-z_$][\\\\w$]*)', 'g'); while ((x = re.exec(src))) if (!dot.includes(x[1])) dot.push(x[1]); const bd = new RegExp('(?:const|let|var)\\\\s*\\\\{([^}]*)\\\\}\\\\s*=\\\\s*' + pe + '(?![\\\\w$])').exec(src); if (bd) bd[1].split(',').map((y) => y.trim().split(/[\\s:=]/)[0]).filter((k) => /^[A-Za-z_$][\\w$]*$/.test(k) && !dot.includes(k)).forEach((k) => dot.push(k)); const rb = new RegExp('(?<![\\\\w$.])' + pe + '\\\\s*\\\\[\\\\s*[\"\\x27]([^\"\\x27]*)[\"\\x27]\\\\s*\\\\]', 'g'); while ((x = rb.exec(src))) if (!br.includes(x[1])) br.push(x[1]); return { dot, br, param: m[1] }; })(); if (READS.br.length) return 'describeBox reads ' + READS.param + '[' + JSON.stringify(READS.br[0]) + '] with square brackets. This lab practises dot reads: read each value with a dot, ' + READS.param + '.width, ' + READS.param + '.height, ' + READS.param + '.color.'; return READS.dot.length ? 'describeBox reads only ' + READS.dot.join(', ') + ' off ' + (READS.param || 'its parameter') + '. Read all three values with a dot: options.width, options.height, options.color.' : ''; })()"
         }
       ],
-      "trace": true
+      "trace": true,
+      "names": {
+        "describeBox": "function"
+      }
     },
     {
       "file": "script.js",
@@ -146,7 +161,10 @@
           "fail": "No console.log that runs prints what describeBox returned. Print the call: console.log(describeBox({ width: 10, height: 4, color: \"red\" })).",
           "failExpr": "(() => { const P = trace.prints; const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9); const O2 = (p) => (p.out2 || []).join('\\n'); const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0; const MKIN = (p) => !!trace.mk && LC(O2(p)).includes(LC(trace.mk)); const NUMCH = (p) => p.stable === true && p.out.some((l, i) => { const b = NUMS(i < p.out2.length ? p.out2[i] : ''); return b.length > 0 && JSON.stringify(NUMS(l)) !== JSON.stringify(b); }); const NORM = (s) => LC(s).replace(/~[a-z]{3}~/g, '').replace(/(\\d),(?=\\d)/g, '$1').replace(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/g, '#'); const SEGS = (s) => { const out = []; const re = /(~[a-z]{3}~)([\\s\\S]*?)\\1/g; const t = LC(s).slice(0, 4000); let m; while ((m = re.exec(t))) out.push(m[2].replace(/~[a-z]{3}~/g, '')); return out; }; const NCNT = (s) => NUMS(String(s).replace(/(\\d),(?=\\d)/g, '$1')).length; const SAMEL = (a, b) => NORM(a) === NORM(b) || (NCNT(a) === NCNT(b) && SEGS(b).every((t) => LC(a).includes(t))); const ECHOL = (a, b) => a.length === b.length && a.every((l, i) => SAMEL(l, b[i])); const ECHO = (p) => p.out2 !== null && ECHOL(p.out, p.out2); const ECHOD = (p) => p.outD !== null && ECHOL(p.out, p.outD); const MV = (p) => LIVE(p) && ECHO(p) && (MKIN(p) || NUMCH(p)); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' ? v * trace.k + trace.c : v; const HASIN = (lines, v) => typeof v === 'number' ? v === v && isFinite(v) && lines.some((l) => NUMS(l).some((x) => NEAR(x, TW(v)))) : !!trace.mk && LC(lines.join('\\n')).includes(LC(TW(v))); const HAS = (p, v) => LIVE(p) && HASIN(p.out2, v) && ECHO(p); const RKIN = (p) => !!trace.rk && LC(O2(p)).includes(LC(trace.rk)); const RNUM = (p) => trace.results.some((r) => typeof r === 'number' && r === r && isFinite(r) && p.out2.some((l) => NUMS(l).some((x) => NEAR(x, r)))); const RBOOL = (p) => p.stable === true && JSON.stringify(p.out) !== JSON.stringify(p.out2) && trace.results.some((r) => typeof r === 'boolean' && p.out2.some((l) => new RegExp('\\\\b' + r + '\\\\b').test(l))); const RES = (p) => LIVE(p) && (RKIN(p) || RNUM(p) || RBOOL(p)); const DKEYS = () => { const D = trace.dreads; const sites = []; D.forEach((d) => { if (!sites.includes(d[0])) sites.push(d[0]); }); return sites.map((s) => { const keys = []; D.forEach((d) => { if (d[0] === s && !keys.includes(d[1])) keys.push(d[1]); }); return { s, keys }; }); }; const DPRINTED = (s, k) => trace.dreads.some((d) => d[0] === s && d[1] === k && P.some((p) => p.ran > 0 && p.outD !== null && ECHOD(p) && (typeof d[2] === 'number' ? p.outD.some((l) => NUMS(l).some((x) => NEAR(x, d[2])) || l.includes(String(d[2]))) : LC(p.outD.join('\\n')).includes(LC(d[2]))))); const DSAID = (n) => DKEYS().some((g) => g.keys.length >= n && g.keys.every((k) => DPRINTED(g.s, k))); const ID = (v) => new RegExp('(?<![\\\\w$.])' + v.replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re, raw) => { const c = trace.code, t = trace.text, out = [], ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*[-+*/]?=(?![=>])([^;\\n]*)/g; let m; while ((m = ar.exec(c))) { const e = m.index + m[0].length; if (re.test((raw ? t : c).slice(e - m[2].length, e))) out.push(m[1]); } return out; }; const SHAPE = (re, raw) => { const vs = VARS(re, raw); return P.filter((p) => p.ran > 0 && MV(p) && (re.test(raw ? p.src : p.code) || vs.some((v) => ID(v).test(p.code)))); }; const CL = (s) => String(s).replace(/\\s+/g, ' ').trim().slice(0, 70); const re = /(?<![\\w$.])describeBox\\s*\\(/; const c = P.filter((p) => re.test(p.code)); const SELF = (() => { try { const L = console.log; let n = 0; console.log = function () { n++; }; let r; try { r = describeBox({ width: 2, height: 3, color: 'red' }); } finally { console.log = L; } return r === undefined && n > 0; } catch (e) { return false; } })(); if (SELF) return 'describeBox prints its text itself and returns nothing, so the call has nothing to print. Return the text instead of printing it, then print the call: console.log(describeBox({ width: 10, height: 4, color: \"red\" })).'; const typed = c.find((p) => p.ran > 0); const dead = c.find((p) => p.ran === 0); if (typed) return 'console.log(' + CL(typed.src) + ') runs, but what it prints is not what describeBox returned. Print the call itself.'; if (dead) return 'console.log(' + CL(dead.src) + ') never runs: it sits inside a function nobody calls, or behind a test that is never true. Put the print where it runs.'; return ''; })()"
         }
-      ]
+      ],
+      "names": {
+        "describeBox": "function"
+      }
     }
   ],
   "grading": {

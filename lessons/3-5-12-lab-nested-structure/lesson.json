@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Outer object",
-      "instructions": "Create a variable named order and assign it an object literal."
+      "instructions": "Create a variable for it (the lesson calls it order; use any name that fits what you are building) and assign it an object literal."
     },
     {
       "id": "s2",
@@ -50,7 +50,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "One of the order's properties must itself be an object: put a second pair of braces inside the first."
+      "hint": "One of the order's properties must itself be an object: put a second pair of braces inside the first.",
+      "names": {
+        "order": "object"
+      }
     },
     {
       "id": "r2",
@@ -62,7 +65,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Give the order an items property that is an array whose elements are objects, each in its own braces."
+      "hint": "Give the order an items property that is an array whose elements are objects, each in its own braces.",
+      "names": {
+        "order": "object"
+      }
     },
     {
       "id": "r3",
@@ -74,7 +80,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Chain the dots one step at a time and print the result: console.log(order.customer.name). order.items.length is a different chain, and a read on a line of its own prints nothing."
+      "hint": "Chain the dots one step at a time and print the result: console.log(order.customer.name). order.items.length is a different chain, and a read on a line of its own prints nothing.",
+      "names": {
+        "order": "object"
+      }
     },
     {
       "id": "r4",
@@ -87,7 +96,10 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Pick one item with its index in square brackets, then read a field off it with a dot, inside console.log: console.log(order.items[i].name). A helper that returns the text, printed from the loop, counts too: that is checked when you press Run.",
-      "orTest": "t2"
+      "orTest": "t2",
+      "names": {
+        "order": "object"
+      }
     },
     {
       "id": "r5",
@@ -100,7 +112,10 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Loop over order.items and, inside the loop, print the current item's name and price read with a dot (order.items[i].name), not fixed text. A helper the loop calls that prints or returns the line counts too (checked on Run).",
-      "orTest": "t2"
+      "orTest": "t2",
+      "names": {
+        "order": "object"
+      }
     },
     {
       "file": "script.js",
@@ -132,7 +147,10 @@
           "expr": "order.items.every(i => typeof i.name === 'string' && typeof i.price === 'number')",
           "fail": "Every item needs a name (text in quotes) and a price (a number, with no quotes around it)."
         }
-      ]
+      ],
+      "names": {
+        "order": "object"
+      }
     },
     {
       "file": "script.js",
@@ -175,7 +193,10 @@
           "expr": "order.items.every(i => output.some(l => l.includes(i.name) && order.items.every(o => o === i || i.name.includes(o.name) || !l.includes(o.name))))",
           "fail": "Two items are printed on the same line. Print one item per line, from inside the loop, instead of one line that lists them all."
         }
-      ]
+      ],
+      "names": {
+        "order": "object"
+      }
     }
   ],
   "grading": {
