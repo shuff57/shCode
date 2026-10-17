@@ -134,6 +134,16 @@ function buildDocOutline(): string {
 }
 
 /**
+ * How hard the model may think before it answers (Ollama's `think` option), sent on every
+ * grading call. Measured 2026-10-17 on glm-5.3-flash:cloud with the real prompts (3 lessons x 3
+ * runs): the default spent 12-31 s reasoning on the longer rubrics (median 16-19 s) and "low"
+ * answered in about 2 s with the same verdicts. `false` was NOT the answer: it was no faster on
+ * the long prompts and returned unparseable JSON in 5 of 9 runs. A student reported the wait
+ * on Submit for feedback (#53).
+ */
+export const GRADER_THINK = 'low' as const;
+
+/**
  * Seals a string into the """ data fences. The one thing a fenced value must
  * never be able to do is close its own fence: run-of-three-or-more double
  * quotes are broken into space-separated pairs, which leaves every character

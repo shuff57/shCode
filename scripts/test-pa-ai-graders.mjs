@@ -140,7 +140,7 @@ try {
       const body = {
         model: g.model || 'glm-5.3-flash:cloud',
         messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-        stream: false, format: 'json', options: { temperature: 0.2 },
+        stream: false, format: 'json', think: core.GRADER_THINK, options: { temperature: 0.2 },
       };
       for (let attempt = 0; attempt < 3; attempt++) {
         const res = await fetch('https://ollama.com/api/chat', {
