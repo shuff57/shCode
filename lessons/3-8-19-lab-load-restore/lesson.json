@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "Save something first",
-      "instructions": "Store an object under a key using JSON.stringify and localStorage.setItem, so there is something to load. Once your load code works, delete or comment out this save line and run again: with nothing stored, your code should take the missing-key path. Put the save line back before you submit."
+      "instructions": "Store an object under a key using JSON.stringify and localStorage.setItem, so there is something to load. Once your load code works, you may delete or comment out this save line and run again to watch the missing-key path: your checks go red while the line is gone, on purpose (nothing is saved, so nothing can be restored). Put the save line back before you submit. The checker also runs your code once with nothing saved, so the missing-key path is checked either way."
     },
     {
       "id": "s2",
@@ -27,7 +27,7 @@
     {
       "id": "s3",
       "title": "Restore inside a try/catch",
-      "instructions": "If text was found, parse it with JSON.parse inside a try block into a variable called restored. In the catch block, fall back to a default object instead of letting the error stop the program."
+      "instructions": "If text was found, parse it with JSON.parse inside a try block into a variable (the lesson calls it restored; any name works). In the catch block, fall back to a default object instead of letting the error stop the program."
     },
     {
       "id": "s4",
@@ -46,7 +46,13 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Read the saved text into a variable with localStorage.getItem and the same key you saved under."
+      "hint": "Read the saved text into a variable with localStorage.getItem and the same key you saved under.",
+      "names": {
+        "restored": {
+          "kind": "value",
+          "has": "JSON\\s*\\.\\s*parse"
+        }
+      }
     },
     {
       "id": "r2",
@@ -54,11 +60,17 @@
       "description": "Tests the read value against null. Help: 3.8.15 (Saving by Key)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "===\\s*null|==\\s*null|!==?\\s*null|!\\s*[A-Za-z_$]\\w*|if\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*\\)|[A-Za-z_$][\\w$]*\\s*\\?[^:\\n]*:",
+      "pattern": "===\\s*null|==\\s*null|!==?\\s*null|!\\s*[A-Za-z_$]\\w*|if\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*\\)|[A-Za-z_$][\\w$]*\\s*\\?[^:\\n]*:|(?:\\|\\||\\?\\?)\\s*[A-Za-z_$\\x7b]",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "A key that was never saved comes back as null. Test the variable before you try to parse it."
+      "hint": "A key that was never saved comes back as null. Test the variable before you try to parse it: if (text === null), if (!text), a ternary, or text ? ... : defaults.",
+      "names": {
+        "restored": {
+          "kind": "value",
+          "has": "JSON\\s*\\.\\s*parse"
+        }
+      }
     },
     {
       "id": "r3",
@@ -70,7 +82,13 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "JSON.parse turns the stored text back into an object."
+      "hint": "JSON.parse turns the stored text back into an object.",
+      "names": {
+        "restored": {
+          "kind": "value",
+          "has": "JSON\\s*\\.\\s*parse"
+        }
+      }
     },
     {
       "id": "r4",
@@ -78,11 +96,17 @@
       "description": "Wraps the parse in try and catch. Help: 2.5.4 (try...catch: Attempt and Recover)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\(",
+      "pattern": "try\\s*\\{[\\s\\S]*catch\\s*[({]",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Put the JSON.parse call in a try block and give the catch block a default object to fall back on."
+      "hint": "Put the JSON.parse call in a try block and give the catch block a default object to fall back on.",
+      "names": {
+        "restored": {
+          "kind": "value",
+          "has": "JSON\\s*\\.\\s*parse"
+        }
+      }
     },
     {
       "id": "r5",
@@ -94,14 +118,20 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Print one property of the restored object, to show it came back as a real object."
+      "hint": "Print one property of the restored object, to show it came back as a real object.",
+      "names": {
+        "restored": {
+          "kind": "value",
+          "has": "JSON\\s*\\.\\s*parse"
+        }
+      }
     },
     {
       "file": "script.js",
       "points": 0,
       "id": "t1",
       "title": "restored is a real object and one of its values is printed",
-      "description": "restored is an object, and the last line printed is one of its values. Help: 3.8.16 (Example: The Whole Pattern)",
+      "description": "restored is an object, and the last line printed is one of its values. Help: 3.8.16 (The Whole Pattern)",
       "type": "tests",
       "hint": "Parse the stored text into restored, then print one property of it: console.log(restored.score).",
       "variables": [
@@ -114,7 +144,47 @@
           "expr": "restored !== null && typeof restored === 'object' && output.length >= 1 && (J => Object.values(restored).some(v => J.includes(String(v))))(output.join(' ')) && (() => { for (let i = 0; i < localStorage.length; i++) { try { if (JSON.stringify(JSON.parse(localStorage.getItem(localStorage.key(i)))) === JSON.stringify(restored)) return true; } catch (e) { } } return false; })()",
           "fail": "restored should be an object parsed from the stored text, and the last thing you print should be one of its properties."
         }
-      ]
+      ],
+      "names": {
+        "restored": {
+          "kind": "value",
+          "has": "JSON\\s*\\.\\s*parse"
+        }
+      }
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "type": "tests",
+      "id": "t2",
+      "title": "with nothing saved, the code still finishes and restored is a default object",
+      "description": "The code runs once more with nothing saved under any key: it must not stop with an error, and restored must be a default object. Help: 3.8.15 (Saving by Key)",
+      "hint": "getItem gives null for a key that was never saved, and JSON.parse(null) is null, not an object. Check for null first and give restored your defaults in that case.",
+      "trace": true,
+      "perturb": [
+        "!storage"
+      ],
+      "variables": [
+        {
+          "name": "restored"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "trace.empty !== null && trace.empty.threw === false",
+          "fail": "With nothing saved under the key, your code stops with an error. getItem gives null for a key that was never saved: check for null BEFORE you parse, and use your defaults then."
+        },
+        {
+          "expr": "trace.empty !== null && trace.empty.vars !== null && trace.empty.vars['restored'] !== null && typeof trace.empty.vars['restored'] === 'object'",
+          "fail": "With nothing saved under the key, restored should be your default object. getItem gives null for a key that was never saved, and JSON.parse(null) is null, not an object: check for null BEFORE you parse."
+        }
+      ],
+      "names": {
+        "restored": {
+          "kind": "value",
+          "has": "JSON\\s*\\.\\s*parse"
+        }
+      }
     }
   ],
   "grading": {

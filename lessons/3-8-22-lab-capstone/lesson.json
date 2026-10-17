@@ -23,12 +23,12 @@
     {
       "id": "s2",
       "title": "Write a save function",
-      "instructions": "Define a function called saveState that takes a state object and stores it under a key with localStorage.setItem, converting it with JSON.stringify first."
+      "instructions": "Define a function (the lesson calls it saveState; any name works) that takes a state object and stores it under a key with localStorage.setItem, converting it with JSON.stringify first."
     },
     {
       "id": "s3",
       "title": "Write a load function with all three questions",
-      "instructions": "Define a function called loadState that reads the same key. If nothing is stored, return the defaults. Otherwise parse the text inside a try block, and return the defaults from the catch block if the text will not parse."
+      "instructions": "Define a function (the lesson calls it loadState) that reads the same key. If nothing is stored, return the defaults. Otherwise parse the text inside a try block, and return the defaults from the catch block if the text will not parse."
     },
     {
       "id": "s4",
@@ -47,7 +47,17 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "saveState should call localStorage.setItem with a key and the text."
+      "hint": "saveState should call localStorage.setItem with a key and the text.",
+      "names": {
+        "saveState": {
+          "kind": "function",
+          "has": "setItem"
+        },
+        "loadState": {
+          "kind": "function",
+          "has": "getItem"
+        }
+      }
     },
     {
       "id": "r2",
@@ -59,7 +69,17 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Turn the state into text with JSON.stringify before you store it."
+      "hint": "Turn the state into text with JSON.stringify before you store it.",
+      "names": {
+        "saveState": {
+          "kind": "function",
+          "has": "setItem"
+        },
+        "loadState": {
+          "kind": "function",
+          "has": "getItem"
+        }
+      }
     },
     {
       "id": "r3",
@@ -71,7 +91,17 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "loadState should read the same key with localStorage.getItem."
+      "hint": "loadState should read the same key with localStorage.getItem.",
+      "names": {
+        "saveState": {
+          "kind": "function",
+          "has": "setItem"
+        },
+        "loadState": {
+          "kind": "function",
+          "has": "getItem"
+        }
+      }
     },
     {
       "id": "r4",
@@ -79,11 +109,21 @@
       "description": "Tests the read value against null. Help: 3.8.15 (Saving by Key)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "===\\s*null|==\\s*null|!==?\\s*null|!\\s*[A-Za-z_$]\\w*|if\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*\\)",
+      "pattern": "===\\s*null|==\\s*null|!==?\\s*null|!\\s*[A-Za-z_$]\\w*|if\\s*\\(\\s*[A-Za-z_$][\\w$]*\\s*\\)|[A-Za-z_$][\\w$]*\\s*\\?[^:\\n]*:|(?:\\|\\||\\?\\?)\\s*[A-Za-z_$\\x7b]",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "If the text read back is null, return the defaults right away, before any parsing."
+      "hint": "If the text read back is null, return the defaults right away, before any parsing: if (text === null), if (!text), or text ? JSON.parse(text) : defaults.",
+      "names": {
+        "saveState": {
+          "kind": "function",
+          "has": "setItem"
+        },
+        "loadState": {
+          "kind": "function",
+          "has": "getItem"
+        }
+      }
     },
     {
       "id": "r5",
@@ -91,11 +131,21 @@
       "description": "Wraps JSON.parse in try and catch. Help: 2.5.4 (try...catch: Attempt and Recover)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\(",
+      "pattern": "try\\s*\\{[\\s\\S]*catch\\s*[({]",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Put JSON.parse inside try, and return the defaults from catch."
+      "hint": "Put JSON.parse inside try, and return the defaults from catch.",
+      "names": {
+        "saveState": {
+          "kind": "function",
+          "has": "setItem"
+        },
+        "loadState": {
+          "kind": "function",
+          "has": "getItem"
+        }
+      }
     },
     {
       "id": "r6",
@@ -107,14 +157,24 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Call saveState, then loadState, and print one property of what loadState returns."
+      "hint": "Call saveState, then loadState, and print one property of what loadState returns.",
+      "names": {
+        "saveState": {
+          "kind": "function",
+          "has": "setItem"
+        },
+        "loadState": {
+          "kind": "function",
+          "has": "getItem"
+        }
+      }
     },
     {
       "file": "script.js",
       "points": 0,
       "id": "t1",
       "title": "saveState and loadState round-trip a state, and a missing key gives an object",
-      "description": "After saveState({ score: 7, level: 2 }), loadState() returns { score: 7, level: 2 }; saving a second state replaces it; with nothing stored loadState() returns an object. Help: 3.8.16 (Example: The Whole Pattern) Text that will not parse gives the defaults, not an error.",
+      "description": "After saveState({ score: 7, level: 2 }), loadState() returns { score: 7, level: 2 }; saving a second state replaces it; when the stored text changes, loadState() reads the new text; text that will not parse and a missing key both give your defaults object, not an error. Help: 3.8.16 (The Whole Pattern)",
       "type": "tests",
       "hint": "saveState stores JSON.stringify(state) under a key; loadState reads the same key, returns the defaults when it is null, and otherwise returns JSON.parse of the text.",
       "variables": [
@@ -127,10 +187,33 @@
       ],
       "checks": [
         {
-          "expr": "typeof saveState === 'function' && typeof loadState === 'function' && (() => { saveState({ score: 7, level: 2 }); const a = loadState(); saveState({ score: 9, level: 5 }); const b = loadState(); const orig = JSON.parse; let g; try { JSON.parse = () => { throw new SyntaxError('bad'); }; g = loadState(); } catch (e) { g = null; } finally { JSON.parse = orig; } localStorage.clear(); const d = loadState(); return JSON.stringify(a) === JSON.stringify({ score: 7, level: 2 }) && JSON.stringify(b) === JSON.stringify({ score: 9, level: 5 }) && g !== null && typeof g === 'object' && d !== null && typeof d === 'object'; })()",
-          "fail": "saveState({ score: 7, level: 2 }) then loadState() should give back { score: 7, level: 2 }, a second save should replace it, text that will not parse and a missing key should both give back your defaults object."
+          "expr": "typeof saveState === 'function' && typeof loadState === 'function' && (() => { saveState({ score: 7, level: 2 }); const a = loadState(); saveState({ score: 9, level: 5 }); const b = loadState(); return JSON.stringify(a) === JSON.stringify({ score: 7, level: 2 }) && JSON.stringify(b) === JSON.stringify({ score: 9, level: 5 }); })()",
+          "fail": "saveState({ score: 7, level: 2 }) then loadState() should give back { score: 7, level: 2 }, and a second save should replace it."
+        },
+        {
+          "expr": "typeof saveState === 'function' && typeof loadState === 'function' && (() => { saveState({ score: 7, level: 2 }); for (let i = 0; i < localStorage.length; i++) localStorage.setItem(localStorage.key(i), JSON.stringify({ score: 123, level: 9 })); return JSON.stringify(loadState()) === JSON.stringify({ score: 123, level: 9 }); })()",
+          "fail": "loadState() must read the saved text from localStorage every time it is called: when the stored text changes, what loadState() gives back must change too. Keeping the state in a variable instead does not count."
+        },
+        {
+          "expr": "typeof saveState === 'function' && typeof loadState === 'function' && (() => { saveState({ score: 7, level: 2 }); const orig = JSON.parse; let g; try { JSON.parse = () => { throw new SyntaxError('bad'); }; g = loadState(); } catch (e) { g = null; } finally { JSON.parse = orig; } return g !== null && typeof g === 'object'; })()",
+          "fail": "When the stored text will not parse, loadState() should return your defaults from the catch block, not stop with an error."
+        },
+        {
+          "expr": "typeof saveState === 'function' && typeof loadState === 'function' && (() => { saveState({ score: 7, level: 2 }); const orig = JSON.parse; let g; try { JSON.parse = () => { throw new SyntaxError('bad'); }; g = loadState(); } catch (e) { g = null; } finally { JSON.parse = orig; } localStorage.clear(); let d; try { d = loadState(); } catch (e) { d = null; } return d !== null && typeof d === 'object' && JSON.stringify(d) === JSON.stringify(g) && JSON.stringify(d) !== JSON.stringify({ score: 7, level: 2 }); })()",
+          "fail": "With nothing stored under the key, loadState() should return your defaults: the same object it returns for text that will not parse."
         }
-      ]
+      ],
+      "trace": true,
+      "names": {
+        "saveState": {
+          "kind": "function",
+          "has": "setItem"
+        },
+        "loadState": {
+          "kind": "function",
+          "has": "getItem"
+        }
+      }
     }
   ],
   "grading": {

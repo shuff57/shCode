@@ -1,15 +1,17 @@
 // 3.7.22 Array-Methods Capstone
 
-// STEP 1: Create a variable called prices and fill it with at least five
-//         numbers, using .push() as you build.
+// STEP 1: Create a variable (the lesson calls it prices; use any name that fits)
+//         and fill it with at least five numbers, using prices.push() as you build.
 
 // STEP 2: Use .map() to build a new array where every price is increased by
-//         a fixed amount or percentage. Store it in a variable called bumped.
+//         a fixed amount or percentage. Store it in a new variable (the lesson
+//         calls it bumped).
 
-// STEP 3: Use .slice() to copy a part of bumped into a variable called middle.
+// STEP 3: Use .slice() to copy a part of bumped into a variable (the lesson calls
+//         it middle).
 
 // STEP 4: Create a second array and join it with your range using .concat()
-//         or array spread. Store the join in a variable called joined.
+//         or array spread. Store the join in a variable (the lesson calls it joined).
 
 // STEP 5: Create an object with at least two properties, then build a copy
 //         with one property changed using object spread. The override must

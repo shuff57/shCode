@@ -16,17 +16,17 @@
     {
       "id": "s1",
       "title": "Create the list",
-      "instructions": "Create a variable called items and assign it an array of at least five values."
+      "instructions": "Create a variable (the lesson calls it items; use any name that fits your list) and assign it an array of at least five values."
     },
     {
       "id": "s2",
       "title": "Extract a middle range",
-      "instructions": "Use .slice(start, end) to copy a middle part of items into a variable called middle. Remember the end index is not included."
+      "instructions": "Use .slice(start, end) to copy a middle part of items into a new variable (the lesson calls it middle). Remember the end index is not included."
     },
     {
       "id": "s3",
       "title": "Extract to the end",
-      "instructions": "Use .slice(start) with only a start index to copy everything from a position to the end of the array into a variable called tail."
+      "instructions": "Use .slice(start) with only a start index to copy everything from a position to the end of the array into another variable (the lesson calls it tail)."
     },
     {
       "id": "s4",
@@ -45,7 +45,19 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Declare an array with at least five values in square brackets."
+      "hint": "Declare an array (the lesson calls it items) with at least five values in square brackets.",
+      "names": {
+        "items": "array",
+        "middle": {
+          "kind": "value",
+          "has": "\\.slice\\s*\\([^),]*,"
+        },
+        "tail": {
+          "kind": "value",
+          "has": "\\.slice\\s*\\(",
+          "lacks": "\\.slice\\s*\\([^),]*,"
+        }
+      }
     },
     {
       "id": "r2",
@@ -57,7 +69,19 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Call .slice twice: once with a start and an end index, once with only a start. Keep each result in a variable."
+      "hint": "Call .slice twice: once with a start and an end index, once with only a start. Keep each result in a variable.",
+      "names": {
+        "items": "array",
+        "middle": {
+          "kind": "value",
+          "has": "\\.slice\\s*\\([^),]*,"
+        },
+        "tail": {
+          "kind": "value",
+          "has": "\\.slice\\s*\\(",
+          "lacks": "\\.slice\\s*\\([^),]*,"
+        }
+      }
     },
     {
       "id": "r3",
@@ -69,14 +93,26 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Print both slices and the original items array."
+      "hint": "Print both slices and the original items array.",
+      "names": {
+        "items": "array",
+        "middle": {
+          "kind": "value",
+          "has": "\\.slice\\s*\\([^),]*,"
+        },
+        "tail": {
+          "kind": "value",
+          "has": "\\.slice\\s*\\(",
+          "lacks": "\\.slice\\s*\\([^),]*,"
+        }
+      }
     },
     {
       "file": "script.js",
       "points": 0,
       "id": "t1",
       "title": "items has five values and the slices and the original are printed",
-      "description": "items is an array of at least five values, and at least three lines were printed (two slices and the original). Help: 3.7.6 (Reading: .slice())",
+      "description": "items is an array of at least five values, and at least three lines were printed (two slices and the original). Help: 3.7.6 (Taking Part of a List with .slice())",
       "type": "tests",
       "hint": "Make items a list of five or more values, take the two slices into their own variables, and print both slices and items.",
       "variables": [
@@ -95,7 +131,69 @@
           "expr": "Array.isArray(items) && items.length >= 5 && Array.isArray(middle) && middle.length >= 1 && middle.length < items.length && Array.isArray(tail) && tail.length >= 1 && tail.length < items.length && (J => middle.every(x => J.includes(String(x))) && tail.every(x => J.includes(String(x))))(output.join(' ')) && !same('middle', 'items') && !same('tail', 'items')",
           "fail": "items needs five or more values, middle and tail should each be a part of it, and your output should show both slices."
         }
-      ]
+      ],
+      "names": {
+        "items": "array",
+        "middle": {
+          "kind": "value",
+          "has": "\\.slice\\s*\\([^),]*,"
+        },
+        "tail": {
+          "kind": "value",
+          "has": "\\.slice\\s*\\(",
+          "lacks": "\\.slice\\s*\\([^),]*,"
+        }
+      }
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "type": "tests",
+      "id": "t2",
+      "title": "middle and tail are sliced out of items and printed by code that runs",
+      "description": "When items holds other values, middle and tail change with it, and console.log calls that run print both slices. Help: 3.7.6 (Taking Part of a List with .slice())",
+      "hint": "Make middle and tail with items.slice(...) and print each of them. A list typed in by hand, or typed-in output, does not change when items does.",
+      "trace": true,
+      "perturb": [
+        "items"
+      ],
+      "variables": [
+        {
+          "name": "items"
+        },
+        {
+          "name": "middle"
+        },
+        {
+          "name": "tail"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return (SAMEA(TWD(middle), V2['middle']) && CONTIG(middle, items)); })()",
+          "fail": "middle has to be copied out of items with .slice(start, end): when the checker changes the values in items, middle must change with them. A list typed in by hand stays the same."
+        },
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return (SAMEA(TWD(tail), V2['tail']) && CONTIG(tail, items)); })()",
+          "fail": "tail has to be copied out of items with .slice(start): when the checker changes the values in items, tail must change with them. A list typed in by hand stays the same."
+        },
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return (SHOWN(middle, V2['middle']) && SHOWN(tail, V2['tail'])); })()",
+          "fail": "Print both slices, middle and tail, with console.log calls that run. Typed-in text does not count."
+        }
+      ],
+      "names": {
+        "items": "array",
+        "middle": {
+          "kind": "value",
+          "has": "\\.slice\\s*\\([^),]*,"
+        },
+        "tail": {
+          "kind": "value",
+          "has": "\\.slice\\s*\\(",
+          "lacks": "\\.slice\\s*\\([^),]*,"
+        }
+      }
     }
   ],
   "grading": {

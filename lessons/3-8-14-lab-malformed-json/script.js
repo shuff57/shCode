@@ -1,6 +1,7 @@
 // 3.8.14 Handle a Malformed JSON String
 
-// STEP 1: Define a function named readSave that takes one parameter, a string.
+// STEP 1: Define a function (the lesson calls it readSave; any name works) that
+//         takes one parameter, a string.
 //         Inside it, attempt to parse the text with JSON.parse.
 
 // STEP 2: Wrap the JSON.parse call in a try block. In the catch block, return

@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "Build an object with a method and an undefined value",
-      "instructions": "Create a variable called counter and assign it an object. Give it a number property, a function property (a method), and a third property whose value is undefined."
+      "instructions": "Create a variable (the lesson calls it counter; use any name that fits) and assign it an object. Give it a number property, a function property (a method), and a third property whose value is undefined."
     },
     {
       "id": "s2",
@@ -41,7 +41,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Declare counter as an object in braces with a number property."
+      "hint": "Declare an object in braces (the lesson calls it counter) with a number property.",
+      "names": {
+        "counter": "object"
+      }
     },
     {
       "id": "r2",
@@ -53,7 +56,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Give the object a method: a property whose value is a function."
+      "hint": "Give the object a method: a property whose value is a function.",
+      "names": {
+        "counter": "object"
+      }
     },
     {
       "id": "r3",
@@ -65,7 +71,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Call JSON.stringify on counter and keep the text in a second variable."
+      "hint": "Call JSON.stringify on counter and keep the text in a second variable.",
+      "names": {
+        "counter": "object"
+      }
     },
     {
       "id": "r4",
@@ -77,7 +86,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Print the text and read it carefully: look for which properties are missing from it."
+      "hint": "Print the text and read it carefully: look for which properties are missing from it.",
+      "names": {
+        "counter": "object"
+      }
     },
     {
       "file": "script.js",
@@ -94,10 +106,40 @@
       ],
       "checks": [
         {
-          "expr": "counter !== null && typeof counter === 'object' && Object.values(counter).some(v => typeof v === 'number') && Object.values(counter).some(v => typeof v === 'function') && Object.keys(counter).some(k => counter[k] === undefined) && output.some(l => { const i = l.indexOf('{'); if (i < 0) return false; try { const o = JSON.parse(l.slice(i)); return o !== null && typeof o === 'object' && Object.keys(o).length >= 1 && Object.keys(o).length < Object.keys(counter).length; } catch (e) { return false; } })",
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; return (counter !== null && typeof counter === 'object' && Object.values(counter).some(v => typeof v === 'number') && Object.values(counter).some(v => typeof v === 'function') && Object.keys(counter).some(k => counter[k] === undefined) && JSONS(output.join('\\n')).some((o) => o !== null && typeof o === 'object' && !Array.isArray(o) && JEQ(o, JSON.parse(JSON.stringify(counter))))); })()",
           "fail": "counter needs a number, a method and an undefined property, and you must print the JSON text of counter. That text is shorter than counter: it leaves out the method and the undefined value."
         }
-      ]
+      ],
+      "names": {
+        "counter": "object"
+      }
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "type": "tests",
+      "id": "t2",
+      "title": "the JSON text printed is made from counter by code that runs",
+      "description": "A console.log that runs prints the text JSON.stringify made from counter, and that text changes when counter does. Help: 3.8.6 (What Does Not Survive)",
+      "hint": "Keep JSON.stringify(counter) in a variable and print that variable. console.log(counter) prints the object, not the JSON text, and typed-in text does not count.",
+      "trace": true,
+      "perturb": [
+        "counter"
+      ],
+      "variables": [
+        {
+          "name": "counter"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return (P.some((p) => LIVE(p) && VIA(p, /JSON\\s*\\.\\s*stringify/) && JSONS(OUT(p)).some((o) => JEQ(o, JSON.parse(JSON.stringify(counter)))) && JSONS(OUT2(p)).some((o) => JEQ(o, JSON.parse(JSON.stringify(V2['counter'])))))); })()",
+          "fail": "Print the JSON text made from counter, console.log(json), with a console.log that runs. console.log(counter) prints the object, not the JSON text; typed-in text does not count."
+        }
+      ],
+      "names": {
+        "counter": "object"
+      }
     }
   ],
   "grading": {

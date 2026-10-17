@@ -3437,7 +3437,7 @@
     "output": [
       {
         "type": "log",
-        "text": "Took 3 shuffle(s) to get an ace."
+        "text": "Took 7 shuffle(s) to get an ace."
       }
     ],
     "nondeterministic": true
@@ -6270,7 +6270,7 @@
     ]
   },
   "3-8-13-example-try-catch-parse#3": {
-    "code": "function safeParse(text) {\n  try {\n    return JSON.parse(text);\n  } catch (err) {\n    return \"unreadable\";\n  }\n}\n\nconsole.log(safeParse('{\"ok\":true}'));\nconsole.log(safeParse(\"{oops\"));",
+    "code": "function safeParse(text) {\n  try {\n    return JSON.parse(text);\n  } catch (err) {\n    return { error: \"unreadable\" };\n  }\n}\n\nconsole.log(safeParse('{\"ok\":true}'));\nconsole.log(safeParse(\"{oops\"));",
     "output": [
       {
         "type": "log",
@@ -6278,7 +6278,7 @@
       },
       {
         "type": "log",
-        "text": "unreadable"
+        "text": "{\n  \"error\": \"unreadable\"\n}"
       }
     ]
   },

@@ -176,7 +176,7 @@ export function jobsFromRequirements(reqs: Requirement[], code?: string): TestJo
     const hasScript = variables.length > 0 || checks.length > 0 || !!eo || !!eoc;
     // Only a requirement that asks for it gets the trace; every other job is sent exactly as before.
     const trace = hasScript && r.trace === true;
-    const perturb = trace && Array.isArray(r.perturb) ? r.perturb.filter((n): n is string => typeof n === 'string' && (n === '*' || n === '{}' || IDENT.test(n))).map((n) => own[n] || n) : [];
+    const perturb = trace && Array.isArray(r.perturb) ? r.perturb.filter((n): n is string => typeof n === 'string' && (n === '*' || n === '{}' || n === '!storage' || IDENT.test(n))).map((n) => own[n] || n) : [];
     const traceFields = trace ? { trace: true, ...(perturb.length ? { perturb } : {}) } : {};
     jobs.push({
       id: r.id,
@@ -458,6 +458,8 @@ const __runTestJobs = (() => {
   // property cannot compute a different answer each time it is read); anything
   // else is kept as is and so only equals itself. Bounded in depth and size.
   const gopd = Object.getOwnPropertyDescriptor;
+  // st.live: read each data property with an ordinary read instead of from its descriptor, so
+  // the changed run's data (a proxy over the literal, EXECUTION TRACE item 2) reads as changed.
   function snap(v, st, d) {
     if (v === null || typeof v !== 'object') return v;
     if (d > 40 || ++st.n > 5000) { st.over = true; return undefined; }
@@ -467,7 +469,7 @@ const __runTestJobs = (() => {
       for (let i = 0; i < len; i++) {
         const ds = gopd(v, String(i));
         if (ds && (ds.get || ds.set)) { st.accessor = true; o.push(undefined); continue; }
-        o.push(ds ? snap(ds.value, st, d + 1) : undefined);
+        o.push(ds ? snap(st.live ? v[i] : ds.value, st, d + 1) : undefined);
       }
       return o;
     }
@@ -478,7 +480,22 @@ const __runTestJobs = (() => {
     for (let i = 0; i < ks.length; i++) {
       const ds = gopd(v, ks[i]);
       if (ds && (ds.get || ds.set)) { st.accessor = true; continue; }
-      o[ks[i]] = snap(ds ? ds.value : undefined, st, d + 1);
+      o[ks[i]] = snap(ds ? (st.live ? v[ks[i]] : ds.value) : undefined, st, d + 1);
+    }
+    return o;
+  }
+  // A silent run's variables (the lookup's {name: [1, value]} record), read for the job's own
+  // variable names only: {name: copy}. null when that run did not reach its end.
+  function snapRun(raw, sc) {
+    if (!raw || typeof raw !== 'object') return null;
+    const o = {};
+    for (let i = 0; i < sc.variables.length; i++) {
+      const n = sc.variables[i] && sc.variables[i].name;
+      if (typeof n !== 'string' || !hasOwn.call(raw, n) || !isArr(raw[n]) || raw[n][0] !== 1) continue;
+      const st = { n: 0, over: false, accessor: false, live: true };
+      let val;
+      try { val = snap(raw[n][1], st, 0); } catch (_) { continue; }
+      if (!st.over && !st.accessor) o[n] = val;
     }
     return o;
   }
@@ -520,6 +537,8 @@ const __runTestJobs = (() => {
         dreads: (tr.dreads || []).slice(0, 100).map((d) => d.slice()),
         code: tr.blank,
         text: tr.text,
+        vars2: snapRun(tr.vars2, sc),
+        empty: tr.emptyRun ? { threw: tr.emptyRun.threw === true, vars: snapRun(tr.emptyRun.vars, sc) } : null,
       }, 0);
     }
     const seen = {};
@@ -764,8 +783,18 @@ const __runTestJobs = (() => {
 //      the changed data, the time, and columns on a line the changed run rewrote.
 //   6. A silent run starts only when it fits in what is left of the run's time limit; when one does
 //      not, the checks that needed it say the program is too slow to check (st.slow).
+//   7. Every silent run ends with the same lookup statement as the real run, and the first changed
+//      run's record is kept: vars2 is the job's variables as that run left them, read through the
+//      changed data, so a check can tell a result the script COMPUTED from the data (it changed
+//      with it) from one typed in (it did not). null when that run did not reach its end.
+//   8. The pseudo-name "!storage" adds one more silent run, the data as written, in which the
+//      host's localStorage stand-in reads as empty and drops every write (the host passes the
+//      switch as drive's mute option): a script's missing-key path, run for real. empty is
+//      { threw, vars } for that run (vars as in 7), or null when it did not run.
+//   The host gets an afterReal call right after the real run, so the checks can see the
+//   localStorage the real run left, not the one the silent runs put back.
 // A check sees trace = { prints: [{src, code, ran, out, out2, stable, outD}],
-//   perturbed, threw, mk, k, c, rk, results, dreads, code, text }:
+//   perturbed, threw, mk, k, c, rk, results, dreads, code, text, vars2, empty }:
 // src is the call's argument text as written, code the same with comments and
 // string contents blanked, ran how many times it ran in the real run, out what it
 // printed then (each call one string, at most 50), out2 the same for the changed
@@ -946,6 +975,10 @@ const __traceKit = (() => {
       // parameter called arguments (not in strict code); gen: which silent run's stand-ins are live;
       // durs: how long each run took (ms); slow: the real run's ms when the silent runs did not fit.
       pn: DOLLAR + rnd3() + 'P', dn: DOLLAR + rnd3() + 'D', argp: null, gen: 0, durs: [], slow: 0, caps: null, budget: 0,
+      // tail: the lookup statement the real run ends with, so every silent run ends with it too;
+      // look: tells its record from any other value; vars2 / emptyRun: what items 7 and 8 kept;
+      // mute: the host's switch for an empty, write-dropping localStorage (item 8).
+      tail: '', look: null, vars2: null, emptyRun: null, mute: null,
     };
     // Sits in console.log while a traced run is going: notes what reaches the real
     // console during a call site's own call, and prints only in the real run.
@@ -1256,7 +1289,7 @@ const __traceKit = (() => {
     st.key = s.key;
     let f = null;
     try {
-      f = compile(tr, s.srcOf(st.pn, st.dn));
+      f = compile(tr, s.srcOf(st.pn, st.dn) + st.tail);
       console.log = st.probe;
       // console.warn and console.error stay the runner's own: they post, and posting goes nowhere.
       self.postMessage = function postMessage() {};
@@ -1302,18 +1335,21 @@ const __traceKit = (() => {
     resetGlobals(st);
   }
 
-  // The names the jobs perturb ("{}" is the destructure run, not a name).
+  // The names the jobs perturb ("{}" is the destructure run and "!storage" the empty-storage
+  // run, not names).
   function perturbNames(jobs) {
     const names = [];
     let destr = false;
+    let empty = false;
     for (let j = 0; j < jobs.length; j++) {
       const ps = jobs[j] && jobs[j].script && jobs[j].script.trace === true && Array.isArray(jobs[j].script.perturb) ? jobs[j].script.perturb : [];
       for (let k = 0; k < ps.length; k++) {
         if (ps[k] === '{}') destr = true;
+        else if (ps[k] === '!storage') empty = true;
         else if (typeof ps[k] === 'string' && (ps[k] === '*' || IDENT_RE.test(ps[k])) && names.indexOf(ps[k]) < 0) names.push(ps[k]);
       }
     }
-    return { names, destr };
+    return { names, destr, empty };
   }
 
   // The silent runs after the real one: the changed run twice, then the destructure run (see
@@ -1324,12 +1360,13 @@ const __traceKit = (() => {
     st.phase = 3;
     resetGlobals(st);
     const pl = perturbNames(jobs);
+    const lookOf = (ok, v) => (ok && typeof st.look === 'function' && st.look(v) ? v[2] : null);
     if (pl.names.length || pl.destr) {
       st.mk = TILDE + rnd3() + TILDE; st.k = rint(11, 97); st.c = rint(101, 997);
       st.rk = LQ + rnd3() + RQ; st.rkk = rint(11, 97); st.rkc = rint(101, 997);
       if (pl.names.length) {
         const srcOf = (pn) => perturbSource(tr.code, st.blank, pl.names, pn, null);
-        steps.push({ key: 'out2', srcOf, pnF: makePerturber(st, true), after: (ok) => { st.perturbed = ok || st.threw; } });
+        steps.push({ key: 'out2', srcOf, pnF: makePerturber(st, true), after: (ok, v) => { st.perturbed = ok || st.threw; st.vars2 = lookOf(ok, v); } });
         steps.push({
           key: 'out3', srcOf, pnF: makePerturber(st, false),
           // Let the clock move on, so a print of the time cannot come out the same twice.
@@ -1338,6 +1375,14 @@ const __traceKit = (() => {
         });
       }
       if (pl.destr) steps.push({ key: 'outD', srcOf: (pn, dn) => perturbSource(tr.code, st.blank, [], pn, dn), dnF: makeDestructurer(st) });
+    }
+    if (pl.empty && typeof st.mute === 'function') {
+      // The data as written, with nothing saved and nothing that saves (item 8).
+      steps.push({
+        key: '', srcOf: (pn) => perturbSource(tr.code, st.blank, [], pn, null),
+        before: () => { st.mute(true); },
+        after: (ok, v) => { st.mute(false); st.emptyRun = { threw: !ok, vars: lookOf(ok, v) }; },
+      });
     }
     if (threw) {
       const names = pl.names.filter((n) => n !== '*').concat('*');
@@ -1358,6 +1403,9 @@ const __traceKit = (() => {
     const o = opts || {};
     const t0 = typeof o.t0 === 'number' ? o.t0 : clock();
     st.budget = typeof o.budget === 'number' && o.budget > 0 ? o.budget : 3000;
+    st.tail = typeof o.tail === 'string' ? o.tail : '';
+    st.look = ok;
+    st.mute = typeof o.mute === 'function' ? o.mute : null;
     const steps = [{ real: true }];
     const res = { value: undefined, threw: false, err: undefined };
     for (let i = 0; i < steps.length; i++) {
@@ -1384,13 +1432,15 @@ const __traceKit = (() => {
       st.durs.push(clock() - t);
       if (s.real) {
         res.value = v; res.threw = threw; res.err = err;
+        // The host keeps what the real run left (its localStorage stand-in) for the checks.
+        if (typeof o.afterReal === 'function') { try { o.afterReal(); } catch (_) { /* keep */ } }
         if (threw ? err !== o.stop && !!jobs : !!jobs && ok(v)) {
           if (threw) st.threw = true;
           plan(tr, jobs, steps, threw);
         }
       } else {
         silentPost(tr, s);
-        if (s.after) s.after(!threw);
+        if (s.after) s.after(!threw, v);
       }
     }
     return res;

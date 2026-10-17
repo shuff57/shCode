@@ -7,7 +7,7 @@
 //         saved returns null, so check for null before you parse.
 
 // STEP 3: If text was found, parse it with JSON.parse inside a try block into
-//         a variable called restored. In
+//         a variable (the lesson calls it restored; any name works). In
 //         the catch block, fall back to a default object instead of letting the
 //         error stop the program.
 
@@ -17,4 +17,6 @@
 // TO TEST THE MISSING-KEY PATH: once your load code works, delete or comment
 // out the localStorage.setItem line from STEP 1 and run again. With nothing
 // stored, getItem returns null and your code should fall back to the default.
-// Put the line back before you submit.
+// Your checks go red while the line is gone; that is on purpose (nothing saved,
+// nothing to restore). Put the line back before you submit. The checker also runs
+// your code once with nothing saved, so the missing-key path is checked anyway.

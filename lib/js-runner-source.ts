@@ -264,13 +264,16 @@ console.error = cap('error');
 // moved here so every console surface (Lessons, sandbox, docs, live blocks)
 // gets it from one place.
 const __store = new Map();
+// On only during a traced check's empty-storage run (lib/test-harness-source.ts, EXECUTION
+// TRACE item 8): the store then reads as empty and keeps nothing.
+let __storeOff = false;
 const localStorage = {
-  setItem: (k, v) => { __store.set(String(k), String(v)); },
-  getItem: (k) => (__store.has(String(k)) ? __store.get(String(k)) : null),
-  removeItem: (k) => { __store.delete(String(k)); },
-  clear: () => { __store.clear(); },
-  key: (i) => { const ks = [...__store.keys()]; return i >= 0 && i < ks.length ? ks[i] : null; },
-  get length() { return __store.size; },
+  setItem: (k, v) => { if (!__storeOff) __store.set(String(k), String(v)); },
+  getItem: (k) => (!__storeOff && __store.has(String(k)) ? __store.get(String(k)) : null),
+  removeItem: (k) => { if (!__storeOff) __store.delete(String(k)); },
+  clear: () => { if (!__storeOff) __store.clear(); },
+  key: (i) => { const ks = __storeOff ? [] : [...__store.keys()]; return i >= 0 && i < ks.length ? ks[i] : null; },
+  get length() { return __storeOff ? 0 : __store.size; },
 };
 // Where a compile error is. V8 reports a SyntaxError from the Function
 // constructor without a position in the student's code, so ask the engine
@@ -371,7 +374,18 @@ self.onmessage = (e) => {
     let looked;
     if (trace) {
       // The real run and every silent run enter the student's code the same way (see drive).
-      const d = __traceKit.drive(trace, withTests, tj.jobs, (v) => Array.isArray(v) && v.length === 3 && v[0] === marker, { stop: NEEDS_INPUT, t0, budget: ${RUN_TIMEOUT_MS} });
+      // Every silent run ends with the same lookup; the checks see the store the REAL run left.
+      let storeReal = null;
+      const d = __traceKit.drive(trace, withTests, tj.jobs, (v) => Array.isArray(v) && v.length === 3 && v[0] === marker, {
+        stop: NEEDS_INPUT, t0, budget: ${RUN_TIMEOUT_MS}, tail: '\\n;' + __testLookupSource(tj.jobs, marker),
+        mute: (on) => { __storeOff = on === true; },
+        afterReal: () => { storeReal = Array.from(__store.entries()); },
+      });
+      __storeOff = false;
+      if (storeReal) {
+        __store.clear();
+        for (let i = 0; i < storeReal.length; i++) __store.set(storeReal[i][0], storeReal[i][1]);
+      }
       if (d.threw) throw d.err;
       looked = d.value;
     } else {

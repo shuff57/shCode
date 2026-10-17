@@ -208,8 +208,9 @@ accept('3-6-16-lab-capstone', 'song["plays"] += 1',
      'console.log(addScore(a, 2));', 'recordPlay(o); console.log(o);', 'console.log(copyBook(lib));'));
 
 // ---- 3.7: filter is a non-mutating method; a quoted key can be the override
+// (since 2026-10-17 the array must be printed before AND after the in-place call: t2)
 accept('3-7-21-lab-mutating-sort-drill', 'filter as the non-mutating call',
-  js('const a = [1, 2, 3];', 'a.push(4);', 'console.log(a.filter((n) => n > 1));', 'console.log(a);'));
+  js('const a = [1, 2, 3];', 'console.log(a);', 'a.push(4);', 'console.log(a);', 'console.log(a.filter((n) => n > 1));', 'console.log(a);'));
 accept('3-7-18-lab-spread-object', 'quoted key as the override',
   js('const settings = { theme: "dark", fontSize: 14, wrap: true };', 'const extended = { ...settings, "font size": 14 };', 'const changed = { ...settings, wrap: false };', 'console.log(extended);', 'console.log(changed);', 'console.log(settings);'));
 
@@ -308,7 +309,8 @@ accept('3-7-4-lab-map-non-mutating', 'map into a new variable, both printed',
   js('const prices = [10, 20, 30];', 'const doubled = prices.map(p => p * 2);', 'console.log("doubled:", doubled);', 'console.log(prices);'));
 reject('3-7-8-lab-slice-sublist', 'items too short, nothing printed', 't1',
   js('const items = [1, 2];', 'const a = items.slice(0, 1);', 'const b = items.slice(1);'));
-reject('3-7-11-lab-concat-two-lists', 'joined but only one line printed', 't1',
+// (t2 since 2026-10-17: names find a, b and c, and the originals must be printed)
+reject('3-7-11-lab-concat-two-lists', 'joined but only one line printed', 't2',
   js('const a = [1, 2, 3];', 'const b = [4, 5, 6];', 'const c = a.concat(b);', 'console.log(c);'));
 reject('3-7-17-lab-spread-array', 'one line printed', 't1',
   js('const a = [1, 2];', 'const b = [3, 4];', 'const c = [...a, ...b];', 'const d = [0, ...a, 9];', 'console.log(c);'));
@@ -1393,6 +1395,189 @@ reject('3-6-13-lab-nested-mutation', 'own names, but the "deep" copy is a spread
   'const kid = { name: "Alex", scores: [90, 85] };', 'const a = { ...kid };', 'a.scores.push(100);',
   'console.log(a.scores);', 'console.log(kid.scores);',
   'const b = { ...kid };', 'b.scores.push(70);', 'console.log(b.scores);', 'console.log(kid.scores);'));
+
+// ---- batch 13: modules 3.7 and 3.8 after the three-lens review (2026-10-17). The student's own
+// names (every reference is renamed twice above); a result must be COMPUTED from its inputs (the
+// changed run's variables, trace.vars2, must follow the changed data); prints must come from the
+// data; the originals the steps ask for must be printed; and the taught forms the review found
+// refused are accepted. 3.8.19 also runs once with nothing saved (perturb "!storage").
+{
+  // 3.7.4
+  const id = '3-7-4-lab-map-non-mutating';
+  const PR = 'const prices = [10, 20, 30];';
+  reject(id, 'typed result, dead map call', 't2', js(PR, 'const doubled = [20, 40, 60];', 'prices.map((p) => p);', 'console.log(doubled);', 'console.log(prices);'));
+  reject(id, 'typed result printed beside prices on one line', 't2', js(PR, 'const doubled = [20, 40, 60];', 'prices.map((p) => p * 2);', 'console.log(doubled, prices);'));
+  reject(id, 'real map, typed output', 't2', js(PR, 'const doubled = prices.map((p) => p * 2);', 'console.log("[20, 40, 60]");', 'console.log(prices);'));
+  reject(id, 'map that gives the same number for everything', 't2', js(PR, 'const doubled = prices.map((p) => 0);', 'console.log(doubled);', 'console.log(prices);'));
+  accept(id, 'own names', js('const costs = [10, 20, 30];', 'const twice = costs.map((c) => c * 2);', 'console.log(twice);', 'console.log(costs);'));
+  accept(id, 'joined with a label, increased by 5', js(PR, 'const doubled = prices.map(function (p) { return p + 5; });', 'console.log("new: " + doubled.join(", "));', 'console.log(prices);'));
+  accept(id, 'printed one by one in a loop', js(PR, 'const doubled = prices.map((p) => p * 2);', 'for (const d of doubled) { console.log(d); }', 'console.log(prices);'));
+}
+{
+  // 3.7.8
+  const id = '3-7-8-lab-slice-sublist';
+  const IT = 'const items = ["a", "b", "c", "d", "e"];';
+  reject(id, 'middle typed by hand, slice thrown away', 't2', js(IT, 'items.slice(1, 4);', 'const middle = ["b", "c", "d"];', 'const tail = items.slice(3);', 'console.log(middle);', 'console.log(tail);', 'console.log(items);'));
+  reject(id, 'tail typed by hand', 't2', js(IT, 'const middle = items.slice(1, 4);', 'items.slice(3);', 'const tail = ["d", "e"];', 'console.log(middle, tail, items);'));
+  reject(id, 'real slices, typed output', 't2', js(IT, 'const middle = items.slice(1, 4);', 'const tail = items.slice(3);', 'console.log("b,c,d");', 'console.log("d,e");', 'console.log("a,b,c,d,e");'));
+  accept(id, 'own names, numbers, one print', js('const nums = [5, 10, 15, 20, 25];', 'const mid = nums.slice(1, 3);', 'const end = nums.slice(2);', 'console.log(mid, end, nums);'));
+  accept(id, 'negative start for the tail, printed with forEach', js(IT, 'const middle = items.slice(1, 3);', 'const tail = items.slice(-2);', 'middle.forEach((x) => console.log(x));', 'tail.forEach((x) => console.log(x));', 'console.log(items);'));
+}
+{
+  // 3.7.11
+  const id = '3-7-11-lab-concat-two-lists';
+  accept(id, 'both arrays in one statement', js('const first = [1, 2, 3], second = [4, 5, 6];', 'const joined = first.concat(second);', 'console.log(joined);', 'console.log(first);', 'console.log(second);'));
+  reject(id, 'joined typed by hand, concat thrown away', 't2', js('const first = [1, 2, 3];', 'const second = [4, 5, 6];', 'first.concat(second);', 'const joined = [1, 2, 3, 4, 5, 6];', 'console.log(joined);', 'console.log(first);', 'console.log(second);'));
+  reject(id, 'one original never printed', 't2', js('const first = [1, 2, 3];', 'const second = [4, 5, 6];', 'const joined = first.concat(second);', 'console.log(joined);', 'console.log(first);'));
+  accept(id, 'own names, all three in one print', js('const mon = ["math", "art", "pe"];', 'const tue = ["music", "lab", "gym"];', 'const week = mon.concat(tue);', 'console.log(week, mon, tue);'));
+}
+{
+  // 3.7.17
+  const id = '3-7-17-lab-spread-array';
+  const AB = ['const first = [1, 2];', 'const second = [3, 4];'];
+  rejectMsg(id, 'framed spreads both arrays: the message says why', 't1', /exactly two more values than first/, js(...AB, 'const combined = [...first, ...second];', 'const framed = [0, ...first, ...second, 99];', 'console.log(combined);', 'console.log(framed);', 'console.log(first);'));
+  rejectMsg(id, 'combined in the wrong order: the message says why', 't1', /every value of first, then every value of second/, js(...AB, 'const combined = [...second, ...first];', 'const framed = [0, ...first, 99];', 'console.log(combined);', 'console.log(framed);', 'console.log(first);'));
+  reject(id, 'combined typed by hand, a spread thrown away', 't2', js(...AB, 'const unused = [...first, ...second];', 'const combined = [1, 2, 3, 4];', 'const framed = [0, ...first, 99];', 'console.log(combined);', 'console.log(framed);', 'console.log(first);'));
+  reject(id, 'framed typed by hand', 't2', js(...AB, 'const combined = [...first, ...second];', 'const framed = [0, 1, 2, 99];', 'console.log(combined);', 'console.log(framed);', 'console.log(first);'));
+  reject(id, 'no original printed', 't2', js(...AB, 'const combined = [...first, ...second];', 'const framed = [0, ...first, 99];', 'console.log(combined);', 'console.log(framed);'));
+  accept(id, 'both arrays in one statement, labelled prints', js('const first = ["a", "b"], second = ["c", "d"];', 'const combined = [...first, ...second];', 'const framed = ["<", ...first, ">"];', 'console.log("combined: " + combined.join(" "));', 'console.log("framed:", framed);', 'console.log("first:", first);'));
+}
+{
+  // 3.7.18
+  const id = '3-7-18-lab-spread-object';
+  const ST = 'const settings = { theme: "dark", fontSize: 14, wrap: true };';
+  const TAIL = ['const extended = { ...settings, language: "en" };', 'console.log(changed);', 'console.log(extended);', 'console.log(settings);'];
+  accept(id, 'shorthand override', js(ST, 'const fontSize = 18;', 'const changed = { ...settings, fontSize };', ...TAIL));
+  rejectMsg(id, 'override written before the spread: the message says why', 't1', /AFTER the spread/, js(ST, 'const changed = { fontSize: 18, ...settings };', ...TAIL));
+  reject(id, 'changed typed by hand, a spread thrown away', 't2', js(ST, 'const copy = { ...settings };', 'const changed = { theme: "dark", fontSize: 18, wrap: true };', ...TAIL));
+  reject(id, 'extended typed by hand', 't2', js(ST, 'const changed = { ...settings, wrap: false };', 'const extended = { theme: "dark", fontSize: 14, wrap: true, language: "en" };', 'console.log(changed);', 'console.log(extended);', 'console.log(settings);'));
+  reject(id, 'settings never printed', 't2', js(ST, 'const changed = { ...settings, wrap: false };', 'const extended = { ...settings, language: "en" };', 'console.log(changed);', 'console.log(extended);'));
+  accept(id, 'own names', js('const prefs = { theme: "dark", fontSize: 14, wrap: true };', 'const big = { ...prefs, fontSize: 20 };', 'const more = { ...prefs, lines: 40 };', 'console.log(big, more, prefs);'));
+}
+{
+  // 3.7.21 (and its name: "Methods Drill" everywhere)
+  const id = '3-7-21-lab-mutating-sort-drill';
+  reject(id, 'typed output, the method calls never run', 't2', js('const a = [1, 2, 3];', 'if (false) { a.push(4); a.map((x) => x); }', 'console.log("a b");', 'console.log("c d");'));
+  reject(id, 'the array is printed only after the change', 't2', js('const a = [1, 2, 3];', 'a.push(4);', 'const b = a.map((x) => x * 2);', 'console.log(a);', 'console.log(b);', 'console.log(a);'));
+  reject(id, 'nothing changes the array; the map print differs', 't2', js('const a = [1, 2, 3];', 'if (false) { a.push(1); }', 'console.log(a);', 'const b = a.map((x) => x * 2);', 'console.log(a.map((x) => x * 2));', 'console.log(a);'));
+  accept(id, 'printed with .join() and labels', js('const a = ["x", "y", "z"];', 'console.log("before: " + a.join(", "));', 'a.push("w");', 'console.log("after: " + a.join(", "));', 'const up = a.map((s) => s.toUpperCase());', 'console.log(up.join(", "));', 'console.log(a.join(", "));'));
+  accept(id, 'template literals, pop as the in-place call', js('const nums = [4, 5, 6, 7];', 'console.log(`before: ${nums}`);', 'nums.pop();', 'console.log(`after pop: ${nums}`);', 'const part = nums.slice(1);', 'console.log(`slice: ${part}`);', 'console.log(`original: ${nums}`);'));
+  const meta = (f) => readFileSync(path.join(root, 'lessons', id, f), 'utf8');
+  for (const f of ['lesson.json', 'script.js', 'index.html', 'style.css']) {
+    if (/Sort Drill/.test(meta(f))) { cases.push({ id, name: `${f} still says "Sort Drill"`, files: { 'script.js': '' }, expect: 'pass' }); }
+  }
+}
+{
+  // 3.7.22
+  const id = '3-7-22-lab-capstone';
+  const PU = ['const prices = [];', 'prices.push(10);', 'prices.push(20);', 'prices.push(30);', 'prices.push(40);', 'prices.push(50);'];
+  const OB = ['const settings = { theme: "dark", fontSize: 14 };', 'const bigger = { ...settings, fontSize: 18 };'];
+  const PRINTS = ['console.log(bumped);', 'console.log(middle);', 'console.log(joined);', 'console.log(bigger);', 'console.log(settings);', 'console.log(prices);'];
+  const GOOD = ['const bumped = prices.map((p) => p + 5);', 'const middle = bumped.slice(1, 4);', 'const joined = middle.concat([1, 2]);'];
+  reject(id, 'the pushes go onto another array', 'r1', js('const prices = [10, 20, 30, 40, 50];', 'const extra = [];', 'extra.push(99);', ...GOOD, ...OB, ...PRINTS));
+  reject(id, 'bumped typed by hand, map thrown away', 't2', js(...PU, 'prices.map((p) => p);', 'const bumped = [15, 25, 35, 45, 55];', 'const middle = bumped.slice(1, 4);', 'const joined = middle.concat([1, 2]);', ...OB, ...PRINTS));
+  reject(id, 'map(p => p) is no transform', 't1', js(...PU, 'const bumped = prices.map((p) => p);', 'const middle = bumped.slice(1, 4);', 'const joined = middle.concat([1, 2]);', ...OB, ...PRINTS));
+  reject(id, 'middle typed by hand', 't2', js(...PU, 'const bumped = prices.map((p) => p + 5);', 'bumped.slice(1, 4);', 'const middle = [25, 35, 45];', 'const joined = middle.concat([1, 2]);', ...OB, ...PRINTS));
+  reject(id, 'prices never printed', 't2', js(...PU, ...GOOD, ...OB, ...PRINTS.slice(0, 5)));
+  reject(id, 'the original object never printed', 't2', js(...PU, ...GOOD, ...OB, ...PRINTS.filter((l) => l !== 'console.log(settings);')));
+  accept(id, 'own names, spread join, shorthand override', js('const costs = [];', 'for (const c of [3, 6, 9, 12, 15]) { costs.push(c); }', 'const taxed = costs.map((c) => c * 2);', 'const few = taxed.slice(0, 2);', 'const all = [...few, ...[100]];',
+    'const shop = { name: "Deli", open: true };', 'const open = false;', 'const shut = { ...shop, open };', 'console.log(taxed, few, all);', 'console.log(shut, shop);', 'console.log(costs);'));
+}
+{
+  // 3.8.7
+  const id = '3-8-7-lab-stringify-spot-drops';
+  const CO = 'const counter = { count: 5, describe: function () { return "hi"; }, note: undefined };';
+  accept(id, 'pretty JSON (taught in 3.8.5)', js(CO, 'const json = JSON.stringify(counter, null, 2);', 'console.log(json);'));
+  accept(id, 'label on the same line', js(CO, 'const json = JSON.stringify(counter);', 'console.log("Saved text: " + json);'));
+  reject(id, 'the object printed, not the JSON text', 't2', js(CO, 'const json = JSON.stringify(counter);', 'console.log(counter);'));
+  reject(id, 'JSON text of something else', 't1', js(CO, 'const json = JSON.stringify({ a: 1 });', 'console.log(json);'));
+  reject(id, 'typed JSON text', 't2', js(CO, 'const json = JSON.stringify(counter);', 'console.log(\'{"count":5}\');'));
+  reject(id, 'nothing printed', 't1', js(CO, 'const json = JSON.stringify(counter);'));
+}
+{
+  // 3.8.10
+  const id = '3-8-10-lab-round-trip-object';
+  const PL = 'const player = { name: "Marisol", score: 40 };';
+  reject(id, 'saved typed by hand', 't2', js(PL, 'JSON.stringify(player);', 'const saved = \'{"name":"Marisol","score":40}\';', 'const restored = JSON.parse(saved);', 'console.log(restored.score + 1);', 'console.log(player.name);'));
+  reject(id, 'typed number printed', 't2', js(PL, 'const saved = JSON.stringify(player);', 'const restored = JSON.parse(saved);', 'console.log(41);', 'console.log(player.name);'));
+  reject(id, 'no property of player printed', 't2', js(PL, 'const saved = JSON.stringify(player);', 'const restored = JSON.parse(saved);', 'console.log(restored.score + 1);', 'console.log("Marisol");'));
+  accept(id, 'destructured from restored, labelled', js(PL, 'const saved = JSON.stringify(player);', 'const restored = JSON.parse(saved);', 'const { score } = restored;', 'console.log("next:", score + 1);', 'console.log("name: " + player.name);'));
+}
+{
+  // 3.8.11
+  const id = '3-8-11-lab-round-trip-array';
+  const TAIL = ['const saved = JSON.stringify(gameState);', 'const restored = JSON.parse(saved);'];
+  accept(id, 'items made from variables', js('const pen = { name: "Pen", price: 2 };', 'const pad = { name: "Pad", price: 5 };', 'const gameState = { player: "M", items: [pen, pad] };', ...TAIL, 'console.log(restored.items[1].price + 10);', 'console.log(restored.items[1].name);'));
+  accept(id, 'items pushed, the second item kept in a variable', js('const gameState = { player: "M", items: [] };', 'gameState.items.push({ name: "Pen", price: 2 });', 'gameState.items.push({ name: "Pad", price: 5 });', ...TAIL, 'const second = restored.items[1];', 'console.log(second.price + 10, second.name);'));
+  const GS = 'const gameState = { player: "M", items: [{ name: "Pen", price: 2 }, { name: "Pad", price: 5 }] };';
+  reject(id, 'typed print', 't2', js(GS, ...TAIL, 'console.log("15 Pad");'));
+  reject(id, 'read from gameState, not from restored', 't2', js(GS, ...TAIL, 'console.log(gameState.items[1].price + 10, gameState.items[1].name);'));
+}
+{
+  // 3.8.14
+  const id = '3-8-14-lab-malformed-json';
+  reject(id, 'good text always gives the same object', 't1', js('function readSave(t) { try { JSON.parse(t); return { a: 1 }; } catch (e) { return { ok: false }; } }', 'console.log(readSave(\'{"a":1}\'));', 'console.log(readSave("junk"));'));
+  accept(id, 'own name, the catch prints a note', js('function loadText(text) { try { return JSON.parse(text); } catch (err) { console.log("bad save"); return { ok: false }; } }', 'console.log(loadText(\'{"a":1}\'));', 'console.log(loadText("junk"));'));
+}
+{
+  // 3.8.18
+  const id = '3-8-18-lab-save-by-key';
+  const ST = 'const state = { score: 1200, level: 3 };';
+  accept(id, 'pretty JSON stored and printed', js(ST, 'localStorage.setItem("k", JSON.stringify(state, null, 2));', 'console.log(localStorage.getItem("k"));'));
+  accept(id, 'read into a variable, printed with a label', js(ST, 'localStorage.setItem("k", JSON.stringify(state));', 'const text = localStorage.getItem("k");', 'console.log("Saved text: " + text);'));
+  reject(id, 'typed JSON printed', 't2', js(ST, 'localStorage.setItem("k", JSON.stringify(state));', 'localStorage.getItem("k");', 'console.log(\'{"score":1200,"level":3}\');'));
+  reject(id, 'JSON.stringify(state) printed instead of what was read', 't2', js(ST, 'localStorage.setItem("k", JSON.stringify(state));', 'localStorage.getItem("k");', 'console.log(JSON.stringify(state));'));
+}
+{
+  // 3.8.19
+  const id = '3-8-19-lab-load-restore';
+  const SV = ['const defaults = { score: 0, level: 1 };', 'localStorage.setItem("k", JSON.stringify({ score: 5, level: 2 }));', 'const text = localStorage.getItem("k");'];
+  reject(id, 'decoration: an empty if (text) {}, then a bare parse', 't2', js(...SV, 'if (text) { }', 'let restored;', 'try { restored = JSON.parse(text); } catch (e) { restored = defaults; }', 'console.log(restored.score);'));
+  reject(id, 'decoration, the whole object printed', 't2', js(...SV, 'if (text) { }', 'let restored;', 'try { restored = JSON.parse(text); } catch (e) { restored = defaults; }', 'console.log(restored);'));
+  reject(id, 'the save line removed (red on purpose)', 't1', js(SV[0], 'const text = localStorage.getItem("k");', 'let restored = defaults;', 'if (text !== null) { try { restored = JSON.parse(text); } catch (e) { restored = defaults; } }', 'console.log(restored.score);'));
+  accept(id, 'catch without a binding', js(...SV, 'let restored = defaults;', 'if (text !== null) { try { restored = JSON.parse(text); } catch { restored = defaults; } }', 'console.log(restored.score);'));
+  accept(id, '|| defaults inside the try', js(...SV, 'let restored = defaults;', 'try { restored = JSON.parse(text) || defaults; } catch (e) { restored = defaults; }', 'console.log(restored.score);'));
+  accept(id, '?? defaults inside the try', js(...SV, 'let restored;', 'try { restored = JSON.parse(text) ?? defaults; } catch (e) { restored = defaults; }', 'console.log(restored.level);'));
+  accept(id, 'own name, declared with a default first', js(...SV, 'let loaded = defaults;', 'if (text !== null) { try { loaded = JSON.parse(text); } catch (e) { loaded = defaults; } }', 'console.log(loaded.score);'));
+}
+{
+  // 3.8.22
+  const id = '3-8-22-lab-capstone';
+  const DF = 'const defaults = { score: 0, level: 1 };';
+  const SAVE = 'function saveState(s) { localStorage.setItem("k", JSON.stringify(s)); }';
+  const RUN = ['saveState({ score: 75, level: 5 });', 'console.log(loadState().score);'];
+  accept(id, 'ternary in the load', js(DF, SAVE, 'const loadState = () => { const t = localStorage.getItem("k"); try { return t ? JSON.parse(t) : defaults; } catch (e) { return defaults; } };', ...RUN));
+  accept(id, '|| defaults and catch without a binding', js(DF, SAVE, 'function loadState() { const t = localStorage.getItem("k"); try { return JSON.parse(t) || defaults; } catch { return defaults; } }', ...RUN));
+  reject(id, 'state kept in a variable, storage only decoration', 't1', js(DF, 'let cache = null;', 'function saveState(s) { cache = s; if (false) { localStorage.setItem("k", JSON.stringify(s)); } }',
+    'function loadState() { const t = localStorage.getItem("k"); if (t === null && cache === null) { return defaults; } try { return cache || JSON.parse(t); } catch (e) { return defaults; } }', ...RUN));
+  reject(id, 'the missing key gives something other than the defaults', 't1', js(DF, SAVE, 'function loadState() { const t = localStorage.getItem("k"); if (t === null) { return {}; } try { return JSON.parse(t); } catch (e) { return defaults; } }', ...RUN));
+  accept(id, 'own names', js(DF, 'function store(s) { localStorage.setItem("save", JSON.stringify(s)); }', 'function fetchState() { const t = localStorage.getItem("save"); if (t === null) { return defaults; } try { return JSON.parse(t); } catch (e) { return defaults; } }', 'store({ score: 75, level: 5 });', 'console.log(fetchState().score);'));
+}
+{
+  // 3.8.23
+  const id = '3-8-23-lab-adapt-to-list';
+  const LOAD = ['localStorage.setItem("records", JSON.stringify(records));', 'const restored = JSON.parse(localStorage.getItem("records"));'];
+  accept(id, 'records built with push', js('const records = [];', 'records.push({ name: "Pen", price: 2 });', 'records.push({ name: "Pad", price: 5 });', ...LOAD, 'console.log(restored.length);', 'console.log(restored[0].name);'));
+  accept(id, 'records from variables; a field of the second record', js('const pen = { name: "Pen", price: 2 };', 'const pad = { name: "Pad", price: 5 };', 'const records = [pen, pad];', ...LOAD, 'console.log(restored.length);', 'console.log(restored[1].price);'));
+  accept(id, 'fields printed in a for...of loop', js('const records = [{ name: "Pen", price: 2 }, { name: "Pad", price: 5 }];', ...LOAD, 'console.log("count: " + restored.length);', 'for (const r of restored) { console.log(r.name); }'));
+  const RC = 'const records = [{ name: "Pen", price: 2 }, { name: "Pad", price: 5 }];';
+  reject(id, 'setItem never runs, the copy is made in memory', 't1', js(RC, 'if (false) { localStorage.setItem("k", JSON.stringify(records)); }', 'const restored = JSON.parse(JSON.stringify(records));', 'console.log(restored.length, restored[0].name);'));
+  reject(id, 'typed field printed', 't2', js(RC, ...LOAD, 'console.log(restored.length);', 'console.log("Pen");'));
+}
+
+{
+  // batch 13, taught variants the probes tried (each must stay green)
+  accept('3-7-22-lab-capstone', 'decimal tails rounded with toFixed(2), template print, own object names', js('const prices = [];', 'prices.push(12.5); prices.push(20); prices.push(31); prices.push(44); prices.push(50);',
+    'const bumped = prices.map((p) => p * 1.1);', 'const middle = bumped.slice(2);', 'const joined = [...middle, 0];', 'const pet = { name: "Rex", age: 3 };', 'const older = { ...pet, age: 4 };',
+    'console.log("bumped: " + bumped.map((b) => b.toFixed(2)).join(", "));', 'console.log(`middle: ${middle}`);', 'console.log("joined:", joined);', 'console.log(pet, older);', 'console.log(prices);'));
+  accept('3-7-21-lab-mutating-sort-drill', '.sort() as the in-place call, .slice() copy', js('const letters = ["c", "a", "b"];', 'console.log("before:", letters);', 'letters.sort();', 'console.log("after sort:", letters);', 'const copy = letters.slice();', 'console.log("copy:", copy);', 'console.log("original:", letters);'));
+  accept('3-7-8-lab-slice-sublist', 'no semicolons, let, template prints', js('let items = [1, 2, 3, 4, 5, 6]', 'let middle = items.slice(2, 4)', 'let tail = items.slice(4)', 'console.log(`middle: ${middle}`)', 'console.log(`tail: ${tail}`)', 'console.log(items)'));
+  accept('3-8-11-lab-round-trip-array', 'one template print of name and price', js('const gameState = { player: "Ana", items: [{ name: "Pen", price: 2 }, { name: "Pad", price: 5 }] };', 'const saved = JSON.stringify(gameState);', 'const restored = JSON.parse(saved);', 'console.log(`${restored.items[1].name}: ${restored.items[1].price + 10}`);'));
+  accept('3-8-10-lab-round-trip-object', 'plus one on another number key', js('const player = { name: "A", level: 3, score: 40 };', 'const saved = JSON.stringify(player);', 'const restored = JSON.parse(saved);', 'console.log("level up:", restored.level + 1);', 'console.log(player.score);'));
+  accept('3-8-23-lab-adapt-to-list', 'getItem into a variable, fields printed with forEach', js('const records = [{ name: "Pen", price: 2 }, { name: "Pad", price: 5 }];', 'localStorage.setItem("list", JSON.stringify(records));', 'const text = localStorage.getItem("list");', 'const restored = JSON.parse(text);', 'console.log(restored.length);', 'restored.forEach((r) => console.log(r.name + " " + r.price));'));
+  accept('3-8-19-lab-load-restore', 'ternary around an arrow that tries the parse', js('const defaults = { score: 0 };', 'localStorage.setItem("save", JSON.stringify({ score: 8 }));', 'const text = localStorage.getItem("save");', 'const restored = text === null ? defaults : (() => { try { return JSON.parse(text); } catch { return defaults; } })();', 'console.log(restored.score);'));
+  accept('3-7-18-lab-spread-object', 'theme overridden, labelled prints', js('const settings = { theme: "dark", fontSize: 14, wrap: true };', 'const changed = { ...settings, theme: "light" };', 'const extended = { ...settings, tabs: 2 };', 'console.log("changed:", changed);', 'console.log("extended:", extended);', 'console.log("settings:", settings);'));
+}
 
 try {
   execFileSync(process.execPath, [

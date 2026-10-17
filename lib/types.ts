@@ -112,7 +112,9 @@ export interface Requirement {
    *  a second, silent run, so a check can tell a printed value that came from
    *  that data (it changes) from typed-in text (it does not). "*" is every
    *  literal assigned to a name; "{}" adds a run that marks each key a
-   *  destructuring declaration unpacks. */
+   *  destructuring declaration unpacks; "!storage" adds a run with localStorage
+   *  empty and dropping writes (checks read it as trace.empty). The changed run's
+   *  variables are trace.vars2. */
   perturb?: string[];
   /** type: 'regex' only. The id of a `tests` requirement of the same lesson whose
    *  pass, on the code exactly as it is now, also passes this one: the run proved

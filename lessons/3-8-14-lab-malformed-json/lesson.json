@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "Write the parsing function",
-      "instructions": "Define a function named readSave that takes one parameter, a string. Inside it, attempt to parse the text with JSON.parse."
+      "instructions": "Define a function (the lesson calls it readSave; any name works) that takes one parameter, a string. Inside it, attempt to parse the text with JSON.parse."
     },
     {
       "id": "s2",
@@ -41,7 +41,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define a function called readSave that takes one parameter, the text."
+      "hint": "Define a function (the lesson calls it readSave) that takes one parameter, the text.",
+      "names": {
+        "readSave": "function"
+      }
     },
     {
       "id": "r2",
@@ -53,7 +56,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Inside the function, call JSON.parse on the text it was given."
+      "hint": "Inside the function, call JSON.parse on the text it was given.",
+      "names": {
+        "readSave": "function"
+      }
     },
     {
       "id": "r3",
@@ -65,7 +71,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Put the JSON.parse call inside a try block."
+      "hint": "Put the JSON.parse call inside a try block.",
+      "names": {
+        "readSave": "function"
+      }
     },
     {
       "id": "r4",
@@ -77,7 +86,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Add a catch block after the try, and return a fallback object from it."
+      "hint": "Add a catch block after the try, and return a fallback object from it.",
+      "names": {
+        "readSave": "function"
+      }
     },
     {
       "id": "r5",
@@ -89,14 +101,17 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Call the function twice inside console.log: once with valid JSON text and once with garbage."
+      "hint": "Call the function twice inside console.log: once with valid JSON text and once with garbage.",
+      "names": {
+        "readSave": "function"
+      }
     },
     {
       "file": "script.js",
       "points": 0,
       "id": "t1",
       "title": "readSave parses good text and falls back on bad text",
-      "description": "readSave('{\"a\":1}') returns { a: 1 }, and readSave(\"corrupted!!\") and readSave('{\"a\":') return a fallback object instead of throwing. Help: 3.8.13 (Example: try/catch Around a Parse)",
+      "description": "readSave('{\"a\":1}') returns { a: 1 } and readSave('{\"b\":[1,2]}') returns { b: [1, 2] }, and readSave(\"corrupted!!\") and readSave('{\"a\":') return a fallback object instead of throwing. Help: 3.8.13 (try/catch Around a Bad Parse)",
       "type": "tests",
       "hint": "readSave must return JSON.parse(text) inside try, and return a fallback object from catch. A bad string must not throw.",
       "variables": [
@@ -106,10 +121,14 @@
       ],
       "checks": [
         {
-          "expr": "typeof readSave === 'function' && JSON.stringify(readSave('{\"a\":1}')) === '{\"a\":1}' && ['corrupted!!', '{\"a\":', '[1,', ''].every(bad => { try { const r = readSave(bad); return r !== null && typeof r === 'object'; } catch (e) { return false; } })",
-          "fail": "readSave('{\"a\":1}') should return { a: 1 }, and readSave(\"corrupted!!\") should return a fallback object without throwing."
+          "expr": "typeof readSave === 'function' && JSON.stringify(readSave('{\"a\":1}')) === '{\"a\":1}' && JSON.stringify(readSave('{\"b\":[1,2]}')) === '{\"b\":[1,2]}' && ['corrupted!!', '{\"a\":', '[1,', ''].every(bad => { try { const r = readSave(bad); return r !== null && typeof r === 'object'; } catch (e) { return false; } })",
+          "fail": "readSave('{\"a\":1}') should return { a: 1 } (and any other good text its own object), and readSave(\"corrupted!!\") should return a fallback object without throwing."
         }
-      ]
+      ],
+      "trace": true,
+      "names": {
+        "readSave": "function"
+      }
     }
   ],
   "grading": {

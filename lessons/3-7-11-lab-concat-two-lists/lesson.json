@@ -16,12 +16,12 @@
     {
       "id": "s1",
       "title": "Create two arrays",
-      "instructions": "Create two variables, first and second, that each hold an array of at least three values."
+      "instructions": "Create two arrays (the lesson calls them first and second; use any names that fit), each holding at least three values."
     },
     {
       "id": "s2",
       "title": "Join them with .concat()",
-      "instructions": "Use .concat() on first to join second's values onto the end, and store the result in a variable called joined. Use .concat() here; spread is the next lab."
+      "instructions": "Use .concat() on the first array to join the second array's values onto the end, and store the result in a new variable (the lesson calls it joined). Use .concat() here; spread is the next lab."
     },
     {
       "id": "s3",
@@ -36,11 +36,19 @@
       "description": "Declares at least two arrays with square brackets. Help: 3.7.9 (Joining Lists with .concat())",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[\\s\\S]*(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[\\s\\S]*(?:(?:let|const|var)\\s+|,\\s*)\\w+\\s*=\\s*\\[",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Declare two separate arrays, each in square brackets with at least three values."
+      "hint": "Declare two separate arrays (the lesson calls them first and second), each in square brackets with at least three values.",
+      "names": {
+        "first": "array",
+        "second": "array",
+        "joined": {
+          "kind": "value",
+          "has": "\\.concat\\s*\\("
+        }
+      }
     },
     {
       "id": "r2",
@@ -52,7 +60,15 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Call .concat on the first array and pass the second array in the parentheses."
+      "hint": "Call .concat on the first array and pass the second array in the parentheses.",
+      "names": {
+        "first": "array",
+        "second": "array",
+        "joined": {
+          "kind": "value",
+          "has": "\\.concat\\s*\\("
+        }
+      }
     },
     {
       "id": "r3",
@@ -64,14 +80,22 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Print the joined array and both originals so you can check that neither changed."
+      "hint": "Print the joined array and both originals so you can check that neither changed.",
+      "names": {
+        "first": "array",
+        "second": "array",
+        "joined": {
+          "kind": "value",
+          "has": "\\.concat\\s*\\("
+        }
+      }
     },
     {
       "file": "script.js",
       "points": 0,
       "id": "t1",
       "title": "the joined list and both originals are printed",
-      "description": "joined holds first followed by second, neither original was changed, and the output shows the joined array. Help: 3.7.9 (Reading: .concat())",
+      "description": "joined holds first followed by second, neither original was changed, and the output shows the joined array. Help: 3.7.9 (Joining Lists with .concat())",
       "type": "tests",
       "hint": "Print the joined array, then the first array, then the second, to prove the originals did not change.",
       "checks": [
@@ -90,7 +114,62 @@
         {
           "name": "joined"
         }
-      ]
+      ],
+      "names": {
+        "first": "array",
+        "second": "array",
+        "joined": {
+          "kind": "value",
+          "has": "\\.concat\\s*\\("
+        }
+      }
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "type": "tests",
+      "id": "t2",
+      "title": "joined is built from both lists, and all three are printed by code that runs",
+      "description": "When first and second hold other values, joined changes with them, and console.log calls that run print joined and both originals. Help: 3.7.9 (Joining Lists with .concat())",
+      "hint": "Make joined with first.concat(second), then print joined, first and second. A list typed in by hand, or typed-in output, does not change when the originals do.",
+      "trace": true,
+      "perturb": [
+        "first",
+        "second"
+      ],
+      "variables": [
+        {
+          "name": "first"
+        },
+        {
+          "name": "second"
+        },
+        {
+          "name": "joined"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return (SAMEA(TWD(joined), V2['joined'])); })()",
+          "fail": "joined has to be built from first and second with .concat(): when the checker changes their values, joined must change with them. A list typed in by hand stays the same."
+        },
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return (SHOWN(joined, V2['joined'])); })()",
+          "fail": "Print joined with console.log, by code that runs. Typed-in text does not count."
+        },
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return (SAID('first', first) && SAID('second', second)); })()",
+          "fail": "Print both originals too, console.log(first) and console.log(second), so the output shows neither one changed."
+        }
+      ],
+      "names": {
+        "first": "array",
+        "second": "array",
+        "joined": {
+          "kind": "value",
+          "has": "\\.concat\\s*\\("
+        }
+      }
     }
   ],
   "grading": {

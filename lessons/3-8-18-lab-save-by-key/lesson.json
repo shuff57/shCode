@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "Create the state object",
-      "instructions": "Create a variable called state holding an object with at least two properties, for example a score and a level."
+      "instructions": "Create a variable (the lesson calls it state; use any name that fits) holding an object with at least two properties, for example a score and a level."
     },
     {
       "id": "s2",
@@ -41,7 +41,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Declare a variable called state holding an object with at least two properties."
+      "hint": "Declare an object (the lesson calls it state) with at least two properties.",
+      "names": {
+        "state": "object"
+      }
     },
     {
       "id": "r2",
@@ -53,7 +56,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "localStorage.setItem takes two things: a key name and the text to store under it."
+      "hint": "localStorage.setItem takes two things: a key name and the text to store under it.",
+      "names": {
+        "state": "object"
+      }
     },
     {
       "id": "r3",
@@ -65,7 +71,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "The store only holds text, so turn the object into text with JSON.stringify before you pass it in."
+      "hint": "The store only holds text, so turn the object into text with JSON.stringify before you pass it in.",
+      "names": {
+        "state": "object"
+      }
     },
     {
       "id": "r4",
@@ -77,7 +86,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Read it back with localStorage.getItem, using the same key you saved under."
+      "hint": "Read it back with localStorage.getItem, using the same key you saved under.",
+      "names": {
+        "state": "object"
+      }
     },
     {
       "id": "r5",
@@ -89,14 +101,17 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Wrap the getItem call in console.log so the stored text is printed."
+      "hint": "Wrap the getItem call in console.log so the stored text is printed.",
+      "names": {
+        "state": "object"
+      }
     },
     {
       "file": "script.js",
       "points": 0,
       "id": "t1",
       "title": "the stored text is state turned into JSON and it is printed back",
-      "description": "The line printed from localStorage.getItem is the JSON text of state. Help: 3.8.15 (Reading: Saving by Key)",
+      "description": "The text printed from localStorage.getItem is the JSON text of state (written on one line or spread over several). Help: 3.8.15 (Saving by Key)",
       "type": "tests",
       "hint": "Store JSON.stringify(state) under a key, then print localStorage.getItem with that same key. Storing the object itself or other text would not match state.",
       "variables": [
@@ -106,10 +121,40 @@
       ],
       "checks": [
         {
-          "expr": "state !== null && typeof state === 'object' && Object.keys(state).length >= 2 && output.some(l => { const i = l.indexOf('{'); if (i < 0) return false; try { return JSON.stringify(JSON.parse(l.slice(i))) === JSON.stringify(state); } catch (e) { return false; } }) && (() => { for (let i = 0; i < localStorage.length; i++) { try { if (JSON.stringify(JSON.parse(localStorage.getItem(localStorage.key(i)))) === JSON.stringify(state)) return true; } catch (e) { } } return false; })()",
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; return (state !== null && typeof state === 'object' && Object.keys(state).length >= 2 && JSONS(output.join('\\n')).some((o) => JEQ(o, state)) && (() => { for (let i = 0; i < localStorage.length; i++) { try { if (JSON.stringify(JSON.parse(localStorage.getItem(localStorage.key(i)))) === JSON.stringify(state)) return true; } catch (e) { } } return false; })()); })()",
           "fail": "The printed line should be the JSON text of state: save JSON.stringify(state) under a key and print localStorage.getItem with the same key."
         }
-      ]
+      ],
+      "names": {
+        "state": "object"
+      }
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "type": "tests",
+      "id": "t2",
+      "title": "what getItem reads back is printed, by code that runs",
+      "description": "A console.log that runs prints what localStorage.getItem reads back, and that text changes when state does. Help: 3.8.15 (Saving by Key)",
+      "hint": "Print the getItem call itself: console.log(localStorage.getItem(\"yourKey\")). Printing JSON.stringify(state) directly, or typed-in text, does not show what was stored.",
+      "trace": true,
+      "perturb": [
+        "state"
+      ],
+      "variables": [
+        {
+          "name": "state"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return (V2['state'] !== undefined && P.some((p) => LIVE(p) && VIA(p, /localStorage\\s*\\.\\s*getItem/) && JSONS(OUT(p)).some((o) => JEQ(o, state)) && JSONS(OUT2(p)).some((o) => JEQ(o, V2['state'])))); })()",
+          "fail": "Print what localStorage.getItem reads back, console.log(localStorage.getItem(key)), with a console.log that runs. Printing JSON.stringify(state) directly, or typed-in text, does not show what was stored."
+        }
+      ],
+      "names": {
+        "state": "object"
+      }
     }
   ],
   "grading": {

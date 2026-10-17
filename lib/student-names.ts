@@ -10,6 +10,8 @@
 //        array    const x = [ ... ]
 //        records  const x = [ { ... } ]  (or [] that is pushed an object)
 //        function function x(...) / const x = function / const x = (..) => ...
+//        value    any other declaration, `let x;` included; its `has`/`lacks` text is the
+//                 initializer plus the right-hand side of every later `x = ...`
 import type { Requirement } from './types';
 import { blankStringContents, stripJsComments } from './js-source-clean';
 
@@ -44,8 +46,24 @@ function topLevelDecls(code: string): Decl[] {
     else if (c === '}' || c === ')' || c === ']') d = Math.max(0, d - 1);
   }
   const out: Decl[] = [];
+  // The right-hand side of every later `name = ...` (any depth): a `has` test on a variable
+  // reads what it is GIVEN, not only what it starts as (let restored; ... restored = JSON.parse(t)).
+  // `skip`: where the declaration's own name is, so its initializer is not read twice.
+  const assigned = (name: string, skip: number): string => {
+    const re = new RegExp(`(?<![\\w$.])${name.replace(/\$/g, '\\$')}\\s*=(?![=>])\\s*([^;\\n]*)`, 'g');
+    let a: RegExpExecArray | null;
+    let s = '';
+    while ((a = re.exec(src))) if (a.index !== skip) s += ' ' + a[1];
+    return s;
+  };
   const decl = new RegExp(`\\b(?:const|let|var)\\s+(${ID})\\s*=\\s*`, 'g');
   let m: RegExpExecArray | null;
+  // let x;  (declared, given a value later)
+  const bare = new RegExp(`\\b(?:let|var)\\s+(${ID})\\s*(?=[;\\n]|$)`, 'g');
+  while ((m = bare.exec(src))) {
+    if (depth[m.index] !== 0) continue;
+    out.push({ name: m[1], kind: ['value'], at: m.index, text: assigned(m[1], -1) });
+  }
   while ((m = decl.exec(src))) {
     if (depth[m.index] !== 0) continue;
     const start = m.index + m[0].length;
@@ -60,7 +78,9 @@ function topLevelDecls(code: string): Decl[] {
       text = arrow && !rest.slice(arrow.index + arrow[0].length).startsWith('{') ? rest.split(/[;\n]/)[0] : o >= 0 ? braceBody(src, o) : rest;
     } else {
       kind.push('value');
-      text = src.slice(start, start + 600).split(/;\s*(?:\n|$)/)[0];
+      // up to the end of the statement: a `;` at a line end, or (code without semicolons) a
+      // line that starts the next statement
+      text = src.slice(start, start + 600).split(/;\s*(?:\n|$)|\n(?=\s*(?:const|let|var|function|class|if|for|while|console)\b)/)[0] + assigned(name, m.index + m[0].indexOf(name, m[0].search(/\s/)));
       if (rest.startsWith('{')) kind.push('object');
       else if (rest.startsWith('[')) {
         kind.push('array');
@@ -130,7 +150,8 @@ export function bindText(text: string, map: Record<string, string>): string {
 }
 
 /** An author expression (JavaScript text) with each written name replaced by the
- *  student's: a name the text uses as a binding, and one inside a regex literal. */
+ *  student's: a name the text uses as a binding (spread ones included, [...first]),
+ *  and one inside a regex literal. A property name after a single dot is left alone. */
 export function bindCode(expr: string, map: Record<string, string>): string {
-  return swapWords(expr, map, '(?:(?<![A-Za-z0-9_$.])|(?<=\\\\b))', '(?![\\w$])', (x) => x);
+  return swapWords(expr, map, '(?:(?<![A-Za-z0-9_$.])|(?<=\\\\b)|(?<=\\.\\.\\.))', '(?![\\w$])', (x) => x);
 }

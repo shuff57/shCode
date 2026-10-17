@@ -55,7 +55,7 @@ function safeParse(text) {
   try {
     return JSON.parse(text);
   } catch (err) {
-    return "unreadable";
+    return { error: "unreadable" };
   }
 }
 
@@ -63,7 +63,7 @@ console.log(safeParse('{"ok":true}'));
 console.log(safeParse("{oops"));
 ```
 
-The first call returns the parsed object; the second returns `"unreadable"`. That is the shape every load function in this module uses.
+The first call returns the parsed object; the second returns the fallback object `{ error: "unreadable" }`. That is the shape every load function in this module uses: it always gives back an object, so the caller can read a property of the result either way.
 
 ## Key takeaways
 

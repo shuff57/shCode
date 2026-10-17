@@ -1,4 +1,4 @@
-// 3.7.21 Mutating vs. Non-Mutating Method Sort Drill
+// 3.7.21 Mutating vs. Non-Mutating Methods Drill
 
 // STEP 1: Create a variable holding an array of at least three values.
 //         You will demonstrate two different methods on it.

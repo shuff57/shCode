@@ -17,17 +17,17 @@
     {
       "id": "s1",
       "title": "Create the base object",
-      "instructions": "The starter gives you settings, an object with three properties: const settings = { theme: \"dark\", fontSize: 14, wrap: true }; Leave that line as it is."
+      "instructions": "The starter gives you an object with three properties (the lesson calls it settings; you may rename it): const settings = { theme: \"dark\", fontSize: 14, wrap: true }; Leave its keys and values as they are."
     },
     {
       "id": "s2",
       "title": "Copy with one property overridden",
-      "instructions": "Use object spread to build a copy of settings called changed, with one existing property changed. The override must be written after the spread."
+      "instructions": "Use object spread to build a copy of settings (the lesson calls it changed; use any name that fits), with one existing property changed. The override must be written after the spread."
     },
     {
       "id": "s3",
       "title": "Copy with a new property added",
-      "instructions": "Use object spread again to build a second copy called extended, with a new property that settings did not have."
+      "instructions": "Use object spread again to build a second copy (the lesson calls it extended), with a new property that settings did not have."
     },
     {
       "id": "s4",
@@ -46,7 +46,22 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Declare an object in braces with at least three name: value pairs."
+      "hint": "Declare an object in braces with at least three name: value pairs.",
+      "names": {
+        "settings": {
+          "kind": "object",
+          "lacks": "^\\s*\\{\\s*\\.\\.\\."
+        },
+        "changed": {
+          "kind": "object",
+          "has": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        },
+        "extended": {
+          "kind": "object",
+          "has": "\\.\\.\\.",
+          "lacks": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        }
+      }
     },
     {
       "id": "r2",
@@ -58,7 +73,22 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Spread is three dots in front of an object, written inside the braces of a new object."
+      "hint": "Spread is three dots in front of an object, written inside the braces of a new object.",
+      "names": {
+        "settings": {
+          "kind": "object",
+          "lacks": "^\\s*\\{\\s*\\.\\.\\."
+        },
+        "changed": {
+          "kind": "object",
+          "has": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        },
+        "extended": {
+          "kind": "object",
+          "has": "\\.\\.\\.",
+          "lacks": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        }
+      }
     },
     {
       "id": "r3",
@@ -66,11 +96,26 @@
       "description": "Writes a property after the spread so the override wins. Help: 3.7.14 (Spreading into a New Array or Object)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.\\.\\.[^}]*,\\s*(?:[\"'] *[\"']|\\w+)\\s*:",
+      "pattern": "\\.\\.\\.[^}]*,\\s*(?:(?:[\"'] *[\"']|\\w+)\\s*:|[A-Za-z_$][\\w$]*\\s*[,}])",
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Write the property you want to change AFTER the spread. The later entry wins."
+      "hint": "Write the property you want to change AFTER the spread: { ...settings, fontSize: 18 }. The later entry wins.",
+      "names": {
+        "settings": {
+          "kind": "object",
+          "lacks": "^\\s*\\{\\s*\\.\\.\\."
+        },
+        "changed": {
+          "kind": "object",
+          "has": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        },
+        "extended": {
+          "kind": "object",
+          "has": "\\.\\.\\.",
+          "lacks": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        }
+      }
     },
     {
       "id": "r4",
@@ -82,14 +127,29 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Print with console.log so you can see the result and check it against what you expected."
+      "hint": "Print with console.log so you can see the result and check it against what you expected.",
+      "names": {
+        "settings": {
+          "kind": "object",
+          "lacks": "^\\s*\\{\\s*\\.\\.\\."
+        },
+        "changed": {
+          "kind": "object",
+          "has": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        },
+        "extended": {
+          "kind": "object",
+          "has": "\\.\\.\\.",
+          "lacks": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        }
+      }
     },
     {
       "file": "script.js",
       "points": 0,
       "id": "t1",
       "title": "settings is unchanged and both copies differ from it in the right way",
-      "description": "After the code runs, settings is still { theme: \"dark\", fontSize: 14, wrap: true } and at least three lines were printed. Help: 3.7.15 (Example: Spread Override)",
+      "description": "After the code runs, settings is still { theme: \"dark\", fontSize: 14, wrap: true }, changed overrides one of its values, extended adds one new key, and the output shows both copies. Help: 3.7.15 (Copying an Object with Changes)",
       "type": "tests",
       "hint": "Build each copy with object spread ({ ...settings, fontSize: 18 }) and print all three. Never assign into settings itself.",
       "variables": [
@@ -110,10 +170,98 @@
       ],
       "checks": [
         {
-          "expr": "Object.keys(changed).length === 3 && Object.keys(changed).filter(k => changed[k] !== settings[k]).length === 1 && Object.keys(extended).length === 4 && Object.keys(settings).every(k => extended[k] === settings[k]) && (J => Object.values(changed).every(v => J.includes(String(v))) && Object.values(extended).every(v => J.includes(String(v))))(output.join(' ')) && !same('changed', 'settings') && !same('extended', 'settings')",
-          "fail": "changed should be settings with exactly one property changed, extended should be settings plus one new property, settings itself must stay the same, and your output should show both copies."
+          "expr": "changed !== null && typeof changed === 'object' && Object.keys(changed).some((k) => changed[k] !== settings[k])",
+          "fail": "changed has the same values as settings: the override did not win. Write it AFTER the spread, { ...settings, fontSize: 18 }; a property written before the spread is replaced by the copied one."
+        },
+        {
+          "expr": "Object.keys(changed).length === 3 && Object.keys(settings).every((k) => k in changed)",
+          "fail": "changed should have the same three keys as settings (theme, fontSize, wrap), with one of their values changed. Adding a new key is what extended is for."
+        },
+        {
+          "expr": "Object.keys(changed).filter((k) => changed[k] !== settings[k]).length === 1",
+          "fail": "changed should change exactly one of settings' values."
+        },
+        {
+          "expr": "extended !== null && typeof extended === 'object' && Object.keys(extended).length === 4 && Object.keys(settings).every((k) => k in extended && extended[k] === settings[k])",
+          "fail": "extended should be settings plus ONE new key that settings does not have, with theme, fontSize and wrap left as they are: { ...settings, language: \"en\" }."
+        },
+        {
+          "expr": "(J => Object.values(changed).every(v => J.includes(String(v))) && Object.values(extended).every(v => J.includes(String(v))))(output.join(' ')) && !same('changed', 'settings') && !same('extended', 'settings')",
+          "fail": "Print changed and extended with console.log so the output shows both copies."
         }
-      ]
+      ],
+      "names": {
+        "settings": {
+          "kind": "object",
+          "lacks": "^\\s*\\{\\s*\\.\\.\\."
+        },
+        "changed": {
+          "kind": "object",
+          "has": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        },
+        "extended": {
+          "kind": "object",
+          "has": "\\.\\.\\.",
+          "lacks": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        }
+      }
+    },
+    {
+      "file": "script.js",
+      "points": 0,
+      "type": "tests",
+      "id": "t2",
+      "title": "changed and extended are spread from settings and printed by code that runs",
+      "description": "When settings holds other values, the values changed and extended copy from it change too, and console.log calls that run print both copies and settings. Help: 3.7.15 (Copying an Object with Changes)",
+      "hint": "Build both copies with { ...settings, ... } and print changed, extended and settings. An object typed in by hand, or typed-in output, does not change when settings does.",
+      "trace": true,
+      "perturb": [
+        "settings"
+      ],
+      "variables": [
+        {
+          "name": "settings"
+        },
+        {
+          "name": "changed"
+        },
+        {
+          "name": "extended"
+        }
+      ],
+      "checks": [
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return ((() => { const c0 = changed; const c2 = V2['changed']; if (!c0 || typeof c0 !== 'object' || !c2 || typeof c2 !== 'object') return false; const ks = Object.keys(c0).filter((k) => k in settings && SAMEV(c0[k], settings[k])); return ks.some((k) => typeof c0[k] !== 'boolean') && ks.every((k) => SAMEV(TWD(c0[k]), c2[k])); })()); })()",
+          "fail": "changed has to be copied from settings with spread: when the checker changes the values in settings, the values changed keeps from it must change too. An object typed in by hand stays the same."
+        },
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return ((() => { const c0 = extended; const c2 = V2['extended']; if (!c0 || typeof c0 !== 'object' || !c2 || typeof c2 !== 'object') return false; const ks = Object.keys(c0).filter((k) => k in settings && SAMEV(c0[k], settings[k])); return ks.some((k) => typeof c0[k] !== 'boolean') && ks.every((k) => SAMEV(TWD(c0[k]), c2[k])); })()); })()",
+          "fail": "extended has to be copied from settings with spread: when the checker changes the values in settings, the values extended keeps from it must change too. An object typed in by hand stays the same."
+        },
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return (SHOWN(changed, V2['changed']) && SHOWN(extended, V2['extended'])); })()",
+          "fail": "Print changed and extended with console.log calls that run. Typed-in text does not count."
+        },
+        {
+          "expr": "(() => { const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => typeof x === 'number' && typeof y === 'number' && (x === y || Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9)); const SAMEV = (x, y) => typeof x === 'number' && typeof y === 'number' ? NEAR(x, y) : JSON.stringify(x) === JSON.stringify(y); const SAMEA = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => SAMEV(x, b[i])); const CONTIG = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && a.length <= b.length && b.some((_, at) => at + a.length <= b.length && a.every((x, i) => SAMEV(x, b[at + i]))); const JEQ = (a, b) => JSON.stringify(a) === JSON.stringify(b); const JSONS = (t) => { const found = []; const txt = String(t).slice(0, 20000); for (let i = 0; i < txt.length && found.length < 40; i++) { if (txt[i] !== '{' && txt[i] !== '[') continue; let d = 0; let q = false; for (let j = i; j < txt.length; j++) { const ch = txt[j]; if (q) { if (ch === '\\\\') j++; else if (ch === '\"') q = false; continue; } if (ch === '\"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (d === 0) { try { found.push(JSON.parse(txt.slice(i, j + 1))); } catch (e) { } break; } } } } return found; }; const P = trace.prints; const V2 = trace.vars2 || {}; const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0 && p.stable === true; const OUT = (p) => p.out.join('\\n'); const OUT2 = (p) => (p.out2 || []).join('\\n'); const MOVED = (p) => LIVE(p) && OUT(p) !== OUT2(p); const VALS = (v) => v !== null && typeof v === 'object' ? Object.values(v).reduce((a, x) => a.concat(VALS(x)), []) : [v]; const SHOWS = (t, vs) => { const ns = NUMS(t); const lt = LC(t); return vs.every((v) => typeof v === 'number' ? ns.some((x) => NEAR(x, v)) : typeof v === 'string' ? lt.includes(LC(v)) : true); }; const SHOWN = (a, b) => a !== undefined && b !== undefined && P.some((p) => LIVE(p) && SHOWS(OUT(p), VALS(a)) && SHOWS(OUT2(p), VALS(b))); const ID = (n) => new RegExp('(?<![\\\\w$.])' + String(n).replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re) => { const c = trace.code; const vs = []; let m; const ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*=(?![=>])([^;\\n]*)/g; while ((m = ar.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fo = /\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s+of\\s+([^)\\n]*)/g; while ((m = fo.exec(c))) if (re.test(m[2])) vs.push(m[1]); const fe = /([A-Za-z_$][\\w$.\\[\\]]*)\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/g; while ((m = fe.exec(c))) if (re.test(m[1])) vs.push(m[2]); const de = /\\b(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*([^;\\n]*)/g; while ((m = de.exec(c))) if (re.test(m[2])) m[1].split(',').forEach((s) => { const k = /([A-Za-z_$][\\w$]*)\\s*(?:=[^,]*)?$/.exec(s.trim()); if (k) vs.push(k[1]); }); return vs; }; const MENT = (p, n) => { let ns = [n]; for (let r = 0; r < 3; r++) { const more = []; ns.forEach((x) => VARS(ID(x)).forEach((v) => { if (!ns.includes(v) && !more.includes(v)) more.push(v); })); if (!more.length) break; ns = ns.concat(more); } return ns.some((x) => ID(x).test(p.code)); }; const VIA = (p, re) => re.test(p.code) || VARS(re).some((v) => MENT(p, v)); const SAID = (n, real) => Object.prototype.hasOwnProperty.call(V2, n) && P.some((p) => LIVE(p) && ID(n).test(p.code) && SHOWS(OUT(p), VALS(real)) && SHOWS(OUT2(p), VALS(V2[n]))); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' && v === v && isFinite(v) ? v * trace.k + trace.c : v; const TWD = (v) => Array.isArray(v) ? v.map(TWD) : v !== null && typeof v === 'object' ? Object.keys(v).reduce((o, k) => { o[k] = TWD(v[k]); return o; }, {}) : TW(v); const XFORM = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && !SAMEA(a, b) && a.every((x, i) => typeof x !== 'number' || !SAMEV(x, b[i])); return (SAID('settings', settings)); })()",
+          "fail": "Print settings too, console.log(settings), so the output shows the original did not change."
+        }
+      ],
+      "names": {
+        "settings": {
+          "kind": "object",
+          "lacks": "^\\s*\\{\\s*\\.\\.\\."
+        },
+        "changed": {
+          "kind": "object",
+          "has": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        },
+        "extended": {
+          "kind": "object",
+          "has": "\\.\\.\\.",
+          "lacks": "\\.\\.\\.[^}]*,\\s*(?:theme|fontSize|wrap)\\b"
+        }
+      }
     }
   ],
   "grading": {

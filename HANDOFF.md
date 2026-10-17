@@ -1,3 +1,40 @@
+# 2026-10-17 (later): 3.7 and 3.8 labs: student names, hollow-answer traces, taught forms accepted (committed locally, NOT pushed)
+
+From the three student-lens reviews of 3.7/3.8. **Already live, partly:** another session ran `npm run deploy` from
+the main checkout at 11:08 (deployment `b92e391d`) while this work sat uncommitted in the working tree, so production
+carries an intermediate copy of it (harness + most lab changes; not the 3.7.22 rounded-decimal fix or two shortened
+messages). The next deploy brings it level with this commit.
+- **Names** on every requirement of 3.7.4/8/11/17/18/22 and 3.8.7/10/11/14/18/19/22/23 (the lists in the 3.5/3.6 sections
+  below; steps and starters say "the lesson calls it X"). 3.7.21 has none: its steps never named the array. 3.7.22 also
+  names its object pair (settings / bigger, told apart by a leading `{ ...`) so "both objects printed" can be checked.
+  `lib/student-names.ts`: `let x;` is a declaration (kind `value`); a value's has/lacks text also reads every later
+  `x = ...`; a statement ends at a line that starts the next one (code without semicolons); `bindCode` now renames a
+  spread name (`[...first]`), which it skipped, so a renamed reference failed any check written with spread.
+- **Harness** (`lib/test-harness-source.ts` EXECUTION TRACE items 7-8, `lib/js-runner-source.ts`): every silent run ends
+  with the lookup statement and `trace.vars2` is the job's variables as the first changed run left them, so a check can
+  require a result to be COMPUTED from its inputs (a typed literal beside a dead `.map()` stays the same). Pseudo-perturb
+  `"!storage"` adds a run with localStorage empty and write-dropping: `trace.empty = {threw, vars}`. A traced run now hands
+  the checks the localStorage the REAL run left (the silent runs used to leave the pre-run store; no traced lab used it).
+- **Labs**: each has a traced t2. 3.7.x results must follow the changed inputs, be printed from data, and (3.7.11/17/18/22)
+  the originals must be printed. 3.7.17/18 t1 is one check per cause (spread order, override before the spread).
+  3.7.21 is "Methods Drill" everywhere (starter, index.html, style.css, module doc); t2 wants 3+ data prints and two
+  different prints of the array itself. 3.7.22 r1 wants pushes onto prices. 3.8.7/18 find JSON anywhere in the output
+  (pretty JSON passes) and t2 wants the print to be what JSON.stringify / getItem gave. 3.8.10/11/23: saved and restored
+  follow the changed data; the prints come from restored. 3.8.11 r2 and 3.8.23 r1 (inline array-of-objects regex) are
+  deleted. 3.8.14 has a second good input and a traced t1, so its checks no longer print into the Output pane. 3.8.19 t2
+  runs with nothing saved; step 1 says the checks go red on purpose. 3.8.22 overwrites the store (an in-memory cache
+  fails), missing key and bad parse must give the same defaults; ternary / `||` / `??` / `catch {` accepted (3.8.19 too).
+  3.8.13's worked example now falls back to an object. Help pointers in 3.7/3.8 match the lesson titles.
+- Suite `scripts/test-grader-tolerance-3x.mjs`: 855 cases (batch 13). Two older 3.7 cases changed: the filter accept now
+  prints before the push (t2 needs before/after), "joined but only one line printed" now fails t2, not t1.
+- **Known edges.** An original counts as printed only when the print names it (`console.log(first)`, label fine), not
+  through a loop variable or `[...first]`. A slice or concat copy shows the same changed values as the original, so
+  printing only `items` satisfies "middle is printed". 3.7.21: a `let` array REASSIGNED between two prints passes the
+  before/after check. 3.7.8 accepts a part built by index (r2 still wants two `.slice(`). Stand-ins: 3.7.22 prices is
+  the first top-level array; 3.7.18 tells changed from extended by an override of theme/fontSize/wrap (a quoted key is
+  not recognised); 3.8.11 gameState is the first object holding a `[`. 3.7.4 t1 still matches printed numbers as text
+  (3.7.22 reads numbers, so `toFixed(2)` passes there).
+
 # 2026-10-17: 3.6 labs accept the student's own names (committed locally, NOT pushed, NOT deployed)
 
 Same `names` mechanism as 3.5 (see the section below), extended: a name may be `{kind, has, lacks}` where the regexes are
