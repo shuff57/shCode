@@ -161,7 +161,10 @@ try {
     const KINDS = { syntax: 'runtime', runtime: 'logic', logic: 'syntax' };
     for (const id of Object.keys(PARTS).filter((k) => PARTS[k].kind === 'fix')) {
       const starter = read(id, 'script.js');
-      const solution = read(id, 'solution.js');
+      // The solution file labels itself "-- reference answer." on its first line. A student's file never
+      // says that, and with a short reasoning budget the model sometimes took the label at its word and
+      // refused to grade it as pasted work (1-7-3, 2026-10-17). Mark it as student work would read.
+      const solution = read(id, 'solution.js').replace(/\s*--\s*reference answer\./i, '.');
       fixtures.push({ id, name: 'reference solution', text: solution, want: true });
       fixtures.push({ id, name: 'unchanged starter', text: starter, want: false });
       fixtures.push({
