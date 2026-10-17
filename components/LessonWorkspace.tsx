@@ -101,6 +101,7 @@ export default function LessonWorkspace({
   const [runKey, setRunKey] = useState(0);
   const [q5Code, setQ5Code] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  const consoleLogsRef = useRef<Array<{ type: string; message: string; timestamp: string }>>([]);
   // reSHape's own latest built ModelDoc, for a 'model' requirement (see
   // lib/grader.ts's TODO(A2) call site below) -- ReshapeStudio reports it
   // through onDocChange, null until its first successful build.
@@ -427,6 +428,7 @@ export default function LessonWorkspace({
     const logs: Array<{type: string; message: string; timestamp: string}> = [];
 
     const finish = () => {
+      setIsRunning(false);
       setConsoleOutput(logs);
       setRunKey((k) => k + 1);
       setConsoleResetKey((k) => k + 1);
@@ -530,6 +532,22 @@ export default function LessonWorkspace({
       { tests: testJobs },
     );
     runRef.current = run;
+    consoleLogsRef.current = logs;
+    setIsRunning(true);
+  }
+
+  // #55: Stop for a console run. The Worker is killed, what it printed so far stays on
+  // screen with a note, and the lesson's checks are not run on a half-finished program.
+  function stopConsoleRun() {
+    runRef.current?.kill();
+    runRef.current = null;
+    const logs = consoleLogsRef.current;
+    logs.push({ type: 'warn', message: 'Stopped. Press Run to start again.', timestamp: new Date().toLocaleTimeString() });
+    setConsoleOutput(logs);
+    setRunKey((k) => k + 1);
+    setConsoleResetKey((k) => k + 1);
+    setConsoleOpen(true);
+    setIsRunning(false);
   }
 
   // For moSHion lessons: snapshot the current code and bump runKey to reload the iframe.
@@ -1041,11 +1059,11 @@ export default function LessonWorkspace({
                     side (hidden entirely on its Build side) -- see that
                     component's own toolbar. */}
                 {!isReshapeMode && (
-                  isRunning && isMoshionMode ? (
+                  isRunning && (isMoshionMode || isConsoleMode) ? (
                     <button
                       className="btn-run"
                       style={{ background: '#ff5555', borderColor: '#ff5555' }}
-                      onClick={stopRun}
+                      onClick={isMoshionMode ? stopRun : stopConsoleRun}
                     >
                       ■ Stop
                     </button>
