@@ -27,13 +27,21 @@ messages). The next deploy brings it level with this commit.
   3.8.13's worked example now falls back to an object. Help pointers in 3.7/3.8 match the lesson titles.
 - Suite `scripts/test-grader-tolerance-3x.mjs`: 855 cases (batch 13). Two older 3.7 cases changed: the filter accept now
   prints before the push (t2 needs before/after), "joined but only one line printed" now fails t2, not t1.
+- **Batch 14 closed three of the edges below** (877 cases): a slice / join / spread result must be printed ITSELF (the
+  print names it or a plain alias / loop variable of it, computes it in the print, or for a slice is not a print of
+  the whole array): printing only `items`, `bumped`, `joined`, or `first, second` no longer passes (3.7.8, 3.7.11,
+  3.7.17, 3.7.22). 3.7.21 groups before/after prints only for an array that is the receiver of an in-place method
+  (`push/unshift/pop/shift/splice/sort/reverse/fill/copyWithin`) and is never assigned again, so `nums = [...]` fails.
+  The 3.7.4/8/11/17/18 t1 output checks read printed numbers as numbers within 0.0051 (toFixed(2) passes, a whole-
+  number Math.round of a decimal does not).
 - **Known edges.** An original counts as printed only when the print names it (`console.log(first)`, label fine), not
-  through a loop variable or `[...first]`. A slice or concat copy shows the same changed values as the original, so
-  printing only `items` satisfies "middle is printed". 3.7.21: a `let` array REASSIGNED between two prints passes the
-  before/after check. 3.7.8 accepts a part built by index (r2 still wants two `.slice(`). Stand-ins: 3.7.22 prices is
-  the first top-level array; 3.7.18 tells changed from extended by an override of theme/fontSize/wrap (a quoted key is
-  not recognised); 3.8.11 gameState is the first object holding a `[`. 3.7.4 t1 still matches printed numbers as text
-  (3.7.22 reads numbers, so `toFixed(2)` passes there).
+  through a loop variable or `[...first]`. A result printed through a variable computed from it
+  (`const t = middle.join()`) counts only when that print does not also show the whole array. 3.7.21: an array changed
+  through an alias (`const b = a; b.push(1)`) is not recognised as changed in place; a dead `a.push()` plus an index
+  write (`a[0] = 9`) passes. 3.7.8 accepts a part built by index (r2 still wants two `.slice(`). Stand-ins: 3.7.22
+  prices is the first top-level array; 3.7.18 tells changed from extended by an override of theme/fontSize/wrap (a
+  quoted key is not recognised); 3.8.11 gameState is the first object holding a `[`. 3.8.x t1 output checks still
+  match printed numbers as text.
 
 # 2026-10-17: 3.6 labs accept the student's own names (committed locally, NOT pushed, NOT deployed)
 

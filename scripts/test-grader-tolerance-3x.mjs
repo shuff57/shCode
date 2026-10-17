@@ -1579,6 +1579,52 @@ reject('3-6-13-lab-nested-mutation', 'own names, but the "deep" copy is a spread
   accept('3-7-18-lab-spread-object', 'theme overridden, labelled prints', js('const settings = { theme: "dark", fontSize: 14, wrap: true };', 'const changed = { ...settings, theme: "light" };', 'const extended = { ...settings, tabs: 2 };', 'console.log("changed:", changed);', 'console.log("extended:", extended);', 'console.log("settings:", settings);'));
 }
 
+// ---- batch 14 (2026-10-17): the three edges batch 13 left open.
+// 1. A slice (or a join) shows the same values as the array it came from, so the print must be of the
+//    result itself: it names it (or computes it in the print), or it is not just a print of the whole.
+// 2. 3.7.21: the two different prints must be of an array that is changed IN PLACE and never given
+//    a new array.
+// 3. The t1 output checks read printed numbers as numbers (within 0.0051), so toFixed(2) passes.
+{
+  const IT = 'const items = ["a", "b", "c", "d", "e"];';
+  const SL = ['const middle = items.slice(1, 4);', 'const tail = items.slice(3);'];
+  reject('3-7-8-lab-slice-sublist', 'only items is printed', 't2', js(IT, ...SL, 'console.log(items);'));
+  reject('3-7-8-lab-slice-sublist', 'middle printed, tail only through items', 't2', js(IT, ...SL, 'console.log(middle);', 'console.log(items);'));
+  accept('3-7-8-lab-slice-sublist', 'a slice printed inline, the other in a template', js(IT, ...SL, 'console.log(items.slice(1, 4));', 'console.log(`tail: ${tail}`);', 'console.log(items);'));
+  accept('3-7-8-lab-slice-sublist', 'both slices and items in one print', js(IT, ...SL, 'console.log(middle, tail, items);'));
+  const PU = ['const prices = [];', 'prices.push(10);', 'prices.push(20);', 'prices.push(30);', 'prices.push(40);', 'prices.push(50);'];
+  const MID = ['const bumped = prices.map((p) => p + 5);', 'const middle = bumped.slice(1, 4);', 'const joined = middle.concat([1, 2]);', 'const settings = { theme: "dark", fontSize: 14 };', 'const bigger = { ...settings, fontSize: 18 };'];
+  const OUTS = ['console.log(bigger);', 'console.log(settings);', 'console.log(prices);'];
+  reject('3-7-22-lab-capstone', 'middle never printed (bumped and joined are)', 't2', js(...PU, ...MID, 'console.log(bumped);', 'console.log(joined);', ...OUTS));
+  reject('3-7-22-lab-capstone', 'joined never printed (middle and the extra are)', 't2', js(...PU, ...MID, 'console.log(bumped);', 'console.log(middle, [1, 2]);', ...OUTS));
+  accept('3-7-22-lab-capstone', 'middle printed with forEach, joined with join()', js(...PU, ...MID, 'console.log(bumped);', 'middle.forEach((m) => console.log(m));', 'console.log(joined.join(" "));', ...OUTS));
+  const AB = ['const first = [1, 2, 3];', 'const second = [4, 5, 6];'];
+  reject('3-7-11-lab-concat-two-lists', 'joined never printed (first and second on one line)', 't2', js(...AB, 'const joined = first.concat(second);', 'console.log(first, second);'));
+  accept('3-7-11-lab-concat-two-lists', 'joined printed with join()', js(...AB, 'const joined = first.concat(second);', 'console.log(joined.join(" + "));', 'console.log(first);', 'console.log(second);'));
+  reject('3-7-17-lab-spread-array', 'combined never printed (first and second on one line)', 't2', js('const first = [1, 2];', 'const second = [3, 4];', 'const combined = [...first, ...second];', 'const framed = [0, ...first, 99];', 'console.log(first, second);', 'console.log(framed);'));
+}
+{
+  const id = '3-7-21-lab-mutating-sort-drill';
+  reject(id, 'let array given a new literal between the prints', 't2', js('let nums = [1, 2, 3];', 'console.log("before:", nums);', 'nums = [1, 2, 3, 4];', 'if (false) { nums.push(4); }', 'const doubled = nums.map((n) => n * 2);', 'console.log("after:", nums);', 'console.log(doubled);', 'console.log(nums);'));
+  reject(id, 'a copy is pushed, then the variable is pointed at the copy', 't2', js('let nums = [1, 2, 3];', 'console.log(nums);', 'const more = [...nums];', 'more.push(4);', 'nums = more;', 'console.log(nums);', 'console.log(nums.map((n) => n * 2));'));
+  accept(id, 'let array reversed in place', js('let nums = [1, 2, 3];', 'console.log(nums);', 'nums.reverse();', 'console.log(nums);', 'const more = nums.concat([9]);', 'console.log(more);', 'console.log(nums);'));
+  accept(id, 'splice, then shift, on the same array', js('const q = ["a", "b", "c", "d"];', 'console.log(q.join(" "));', 'q.splice(1, 1);', 'console.log(q.join(" "));', 'q.shift();', 'console.log(q.join(" "));', 'const up = q.map((s) => s.toUpperCase());', 'console.log(up);'));
+}
+{
+  const PR = 'const prices = [10, 20, 30];';
+  accept('3-7-4-lab-map-non-mutating', 'toFixed(2) of prices * 1.15', js(PR, 'const doubled = prices.map((p) => p * 1.15);', 'console.log(doubled.map((d) => d.toFixed(2)).join(", "));', 'console.log(prices);'));
+  reject('3-7-4-lab-map-non-mutating', 'printed numbers are off by 0.1', 't1', js(PR, 'const doubled = prices.map((p) => p * 1.15);', 'console.log(doubled.map((d) => (d + 0.1).toFixed(2)).join(", "));', 'console.log(prices);'));
+  const DI = 'const items = [0.1 * 3, 1.5, 2.25, 3.75, 5];';
+  accept('3-7-8-lab-slice-sublist', 'decimal values printed with toFixed(2)', js(DI, 'const middle = items.slice(0, 2);', 'const tail = items.slice(3);', 'console.log(middle.map((n) => n.toFixed(2)));', 'console.log(tail.map((n) => n.toFixed(2)));', 'console.log(items);'));
+  reject('3-7-8-lab-slice-sublist', 'decimal slice printed rounded to whole numbers', 't1', js(DI, 'const middle = items.slice(0, 2);', 'const tail = items.slice(3);', 'console.log(middle.map((n) => n.toFixed(0)));', 'console.log(tail);', 'console.log(items.map((n) => Math.round(n)));'));
+  const DA = ['const first = [0.1 + 0.2, 1, 2];', 'const second = [3, 4, 5];'];
+  accept('3-7-11-lab-concat-two-lists', 'decimal values printed with toFixed(2)', js(...DA, 'const joined = first.concat(second);', 'console.log(joined.map((n) => n.toFixed(2)).join(" "));', 'console.log(first.map((n) => n.toFixed(2)));', 'console.log(second);'));
+  reject('3-7-11-lab-concat-two-lists', 'joined printed with wrong numbers', 't1', js(...DA, 'const joined = first.concat(second);', 'console.log(joined.map((n) => n + 1));', 'console.log(first.map((n) => n + 1));', 'console.log(second.map((n) => n + 1));'));
+  const DS = ['const first = [0.1 + 0.2, 1.5];', 'const second = [2, 3];', 'const combined = [...first, ...second];', 'const framed = [0, ...first, 99];'];
+  accept('3-7-17-lab-spread-array', 'decimal values printed with toFixed(2)', js(...DS, 'console.log(combined.map((n) => n.toFixed(2)).join(" "));', 'console.log(framed.map((n) => n.toFixed(2)).join(" "));', 'console.log(first.map((n) => n.toFixed(2)));'));
+  reject('3-7-17-lab-spread-array', 'combined printed with wrong numbers', 't1', js(...DS, 'console.log(combined.map((n) => n * 10));', 'console.log(framed);', 'console.log(first);'));
+}
+
 try {
   execFileSync(process.execPath, [
     path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'), 'lib/run-tests-node.ts',
