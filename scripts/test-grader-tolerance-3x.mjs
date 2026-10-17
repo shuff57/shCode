@@ -59,15 +59,18 @@ const rejectBelowPass = (id, name, req, script) => cases.push({ id, name, files:
 // Students name things for what they build. Every lab whose requirements carry `names`
 // must still score full marks when the reference is written with other names, and
 // the new names must be ones the lesson never used (so the stand-in is what is tested).
-const OWN = { object: 'gadget', records: 'rows', array: 'rows', function: 'summarize' };
-const OWN2 = { object: 'thing', records: 'entries', array: 'entries', function: 'render' };
+const OWN_SETS = [['first', (i) => 'gadget' + i], ['second', (i) => 'my_thing' + i]];
 for (const id of LABS) {
   const names = (lesson(id).requirements || []).find((r) => r.names)?.names;
   if (!names) continue;
-  for (const [label, table] of [['first', OWN], ['second', OWN2]]) {
+  for (const [label, make] of OWN_SETS) {
     let sol = solutionFiles(id)['script.js'];
-    for (const [w, kind] of Object.entries(names)) sol = sol.replace(new RegExp('(?<![\\w$.])' + w + '(?![\\w$])', 'g'), table[kind]);
-    cases.push({ id, name: `renamed to ${Object.values(names).map((k) => table[k]).join(', ')} (${label} set)`, files: { 'script.js': sol }, expect: 'pass' });
+    const made = [];
+    // one pass, each written name to its own new name (never two names to one)
+    const keys = Object.keys(names);
+    const re = new RegExp('(?:(?<![\\w$.])|(?<=\\.\\.\\.))(' + keys.join('|') + ')(?![\\w$])', 'g');
+    sol = sol.replace(re, (m) => { const n = make(keys.indexOf(m)); made.push(n); return n; });
+    cases.push({ id, name: `renamed (${label} set: ${[...new Set(made)].join(', ')})`, files: { 'script.js': sol }, expect: 'pass' });
   }
 }
 
@@ -1362,6 +1365,34 @@ const rejectNotMsg = (id, name, req, notReq, msg, script) => cases.push({ id, na
   accept(id5, 'a top-level arguments read does not break the run', js(B, 'console.log(book.title, arguments.length);', ...TAIL));
   accept(id25, 'echo: a "(big)" tag the changed costs flip',js(CT, 'console.log(cart[0].name);', 'console.log(cart[1]["item code"]);', 'console.log(cart[0].details.color);', 'for (const item of cart) { const c = item.price * item.quantity; console.log(item.name + ": " + c + (c > 20 ? " (big)" : "")); }', ...NAMES, KEYS));
 }
+
+// Two functions of one lab, written in the OTHER order and under other names: the stand-ins are
+// told apart by what each body does (a return, a push, structuredClone), not by position.
+accept('3-6-12-lab-object-param-mutation', 'own names, safe copy defined first', js(
+  'function makeOlder(p) { return { ...p, age: p.age + 1 }; }',
+  'function addYear(p) { p.age = p.age + 1; }',
+  'const pal = { name: "Ana", age: 30 };', 'addYear(pal);', 'console.log(pal);',
+  'const next = makeOlder(pal);', 'console.log(next);', 'console.log(pal);'));
+accept('3-6-4-lab-predict-primitive-vs-array', 'own names, array function defined first', js(
+  'function addTo(list) { list.push(99); }', 'function bump(n) { n = 99; }',
+  'let x = 10;', 'let xs = [1, 2, 3];', 'bump(x);', 'addTo(xs);', 'console.log(x);', 'console.log(xs);'));
+accept('3-6-16-lab-capstone', 'own names, clone first and add last', js(
+  'function dupe(lib) { return structuredClone(lib); }',
+  'function spin(track) { track.plays = track.plays + 1; }',
+  'function plus(list, v) { return [...list, v]; }',
+  'const nums = [10, 20];', 'const more = plus(nums, 30);', 'console.log("nums:", nums);', 'console.log("more:", more);',
+  'const hit = { title: "Daylight", plays: 4 };', 'spin(hit);', 'console.log("hit:", hit);',
+  'const shelf = { name: "Shelf", books: ["A", "B"] };', 'const twin = dupe(shelf);', 'twin.books.push("C");',
+  'console.log("shelf:", shelf.books);', 'console.log("twin:", twin.books);'));
+// A stand-in must not rescue a function that does the wrong job.
+reject('3-6-12-lab-object-param-mutation', 'own names, but the "safe" one mutates', 't2', js(
+  'function addYear(p) { p.age = p.age + 1; }', 'function makeOlder(p) { p.age = p.age + 1; return p; }',
+  'const pal = { name: "Ana", age: 30 };', 'addYear(pal);', 'console.log(pal);',
+  'const next = makeOlder(pal);', 'console.log(next);', 'console.log(pal);'));
+reject('3-6-13-lab-nested-mutation', 'own names, but the "deep" copy is a spread', 't1', js(
+  'const kid = { name: "Alex", scores: [90, 85] };', 'const a = { ...kid };', 'a.scores.push(100);',
+  'console.log(a.scores);', 'console.log(kid.scores);',
+  'const b = { ...kid };', 'b.scores.push(70);', 'console.log(b.scores);', 'console.log(kid.scores);'));
 
 try {
   execFileSync(process.execPath, [

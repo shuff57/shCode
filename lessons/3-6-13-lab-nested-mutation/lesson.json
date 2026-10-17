@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Copy the outer object with spread",
-      "instructions": "Create an object called student that contains a nested array called scores (for example, scores: [90, 85]). Make a shallow copy called shallow with the object spread syntax: a new object with the same keys."
+      "instructions": "Create an object (the lesson calls it student; name it for what you are building) that contains a nested array called scores (for example, scores: [90, 85]). Make a shallow copy called shallow with the object spread syntax: a new object with the same keys."
     },
     {
       "id": "s2",
@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Make a deep copy instead",
-      "instructions": "Use structuredClone to make a copy called deep that goes all the way down. Push a DIFFERENT value into the nested array of deep, then log both again to prove student is now untouched. Make the deep copy with structuredClone; that is what this lab is about."
+      "instructions": "Use structuredClone to make a copy (the lesson calls it deep; any name works) that goes all the way down. Push a DIFFERENT value into the nested array of deep, then log both again to prove student is now untouched. Make the deep copy with structuredClone; that is what this lab is about."
     }
   ],
   "requirements": [
@@ -40,7 +40,18 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Make a copy with spread in braces. It is a new object, but anything nested inside is still shared."
+      "hint": "Make a copy with spread in braces. It is a new object, but anything nested inside is still shared.",
+      "names": {
+        "student": "object",
+        "shallow": {
+          "kind": "value",
+          "has": "\\.\\.\\.|Object\\s*\\.\\s*assign"
+        },
+        "deep": {
+          "kind": "value",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r2",
@@ -52,7 +63,18 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Push into the nested array: reach it through the copy (shallow.scores) and call .push on it."
+      "hint": "Push into the nested array: reach it through the copy (shallow.scores) and call .push on it.",
+      "names": {
+        "student": "object",
+        "shallow": {
+          "kind": "value",
+          "has": "\\.\\.\\.|Object\\s*\\.\\s*assign"
+        },
+        "deep": {
+          "kind": "value",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r3",
@@ -64,7 +86,18 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Assign the deep copy with structuredClone: const deep = structuredClone(student);"
+      "hint": "Assign the deep copy with structuredClone: const deep = structuredClone(student);",
+      "names": {
+        "student": "object",
+        "shallow": {
+          "kind": "value",
+          "has": "\\.\\.\\.|Object\\s*\\.\\s*assign"
+        },
+        "deep": {
+          "kind": "value",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r4",
@@ -76,7 +109,18 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Log the copy and the original after each change, so you can see whether the original moved."
+      "hint": "Log the copy and the original after each change, so you can see whether the original moved.",
+      "names": {
+        "student": "object",
+        "shallow": {
+          "kind": "value",
+          "has": "\\.\\.\\.|Object\\s*\\.\\s*assign"
+        },
+        "deep": {
+          "kind": "value",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "file": "script.js",
@@ -106,7 +150,18 @@
         {
           "name": "deep"
         }
-      ]
+      ],
+      "names": {
+        "student": "object",
+        "shallow": {
+          "kind": "value",
+          "has": "\\.\\.\\.|Object\\s*\\.\\s*assign"
+        },
+        "deep": {
+          "kind": "value",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "file": "script.js",
@@ -125,7 +180,18 @@
           "expr": "(() => { const P = trace.prints; const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9); const O2 = (p) => (p.out2 || []).join('\\n'); const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0; const MKIN = (p) => !!trace.mk && LC(O2(p)).includes(LC(trace.mk)); const NUMCH = (p) => p.stable === true && p.out.some((l, i) => { const b = NUMS(i < p.out2.length ? p.out2[i] : ''); return b.length > 0 && JSON.stringify(NUMS(l)) !== JSON.stringify(b); }); const MV = (p) => LIVE(p) && (MKIN(p) || NUMCH(p)); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' ? v * trace.k + trace.c : v; const HASIN = (lines, v) => typeof v === 'number' ? v === v && isFinite(v) && lines.some((l) => NUMS(l).some((x) => NEAR(x, TW(v)))) : !!trace.mk && LC(lines.join('\\n')).includes(LC(TW(v))); const HAS = (p, v) => LIVE(p) && HASIN(p.out2, v); const RKIN = (p) => !!trace.rk && LC(O2(p)).includes(LC(trace.rk)); const RNUM = (p) => trace.results.some((r) => typeof r === 'number' && r === r && isFinite(r) && p.out2.some((l) => NUMS(l).some((x) => NEAR(x, r)))); const RBOOL = (p) => p.stable === true && JSON.stringify(p.out) !== JSON.stringify(p.out2) && trace.results.some((r) => typeof r === 'boolean' && p.out2.some((l) => new RegExp('\\\\b' + r + '\\\\b').test(l))); const RES = (p) => LIVE(p) && (RKIN(p) || RNUM(p) || RBOOL(p)); const DKEYS = () => { const D = trace.dreads; const sites = []; D.forEach((d) => { if (!sites.includes(d[0])) sites.push(d[0]); }); return sites.map((s) => { const keys = []; D.forEach((d) => { if (d[0] === s && !keys.includes(d[1])) keys.push(d[1]); }); return { s, keys }; }); }; const DPRINTED = (s, k) => trace.dreads.some((d) => d[0] === s && d[1] === k && P.some((p) => p.ran > 0 && p.outD !== null && (typeof d[2] === 'number' ? p.outD.some((l) => NUMS(l).some((x) => NEAR(x, d[2])) || l.includes(String(d[2]))) : LC(p.outD.join('\\n')).includes(LC(d[2]))))); const DSAID = (n) => DKEYS().some((g) => g.keys.length >= n && g.keys.every((k) => DPRINTED(g.s, k))); const ID = (v) => new RegExp('(?<![\\\\w$.])' + v.replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re, raw) => { const c = trace.code, t = trace.text, out = [], ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*[-+*/]?=(?![=>])([^;\\n]*)/g; let m; while ((m = ar.exec(c))) { const e = m.index + m[0].length; if (re.test((raw ? t : c).slice(e - m[2].length, e))) out.push(m[1]); } return out; }; const SHAPE = (re, raw) => { const vs = VARS(re, raw); return P.filter((p) => p.ran > 0 && MV(p) && (re.test(raw ? p.src : p.code) || vs.some((v) => ID(v).test(p.code)))); }; const CL = (s) => String(s).replace(/\\s+/g, ' ').trim().slice(0, 70); return P.filter((p) => p.ran > 0 && MV(p)).reduce((n, p) => n + p.ran, 0) >= 2; })()",
           "fail": "Print the arrays after each change with console.log calls that run, at least three prints; typed text does not count."
         }
-      ]
+      ],
+      "names": {
+        "student": "object",
+        "shallow": {
+          "kind": "value",
+          "has": "\\.\\.\\.|Object\\s*\\.\\s*assign"
+        },
+        "deep": {
+          "kind": "value",
+          "has": "structuredClone"
+        }
+      }
     }
   ],
   "grading": {

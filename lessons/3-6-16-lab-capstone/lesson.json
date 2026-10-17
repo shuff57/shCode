@@ -17,17 +17,17 @@
     {
       "id": "s1",
       "title": "A safe function that returns a new array",
-      "instructions": "Define addScore(scores, score) that returns a NEW array containing the old scores plus the new one, without changing the array it was given. Use spread to build the new array."
+      "instructions": "Define a function (the lesson calls it addScore; use any name that fits) taking (scores, score) that returns a NEW array containing the old scores plus the new one, without changing the array it was given. Use spread to build the new array."
     },
     {
       "id": "s2",
       "title": "A function that mutates a property on purpose",
-      "instructions": "Define recordPlay(song) that increases a plays property on the object it is given by 1. This one is meant to change the caller's object, because a play count is shared state."
+      "instructions": "Define a function (the lesson calls it recordPlay; use any name that fits) taking (song) that increases a plays property on the object it is given by 1. This one is meant to change the caller's object, because a play count is shared state."
     },
     {
       "id": "s3",
       "title": "A deep-copy function for a nested structure",
-      "instructions": "Define copyBook(library) that returns a deep copy of an object holding a nested array, using structuredClone, so the caller's library is never touched when the copy changes."
+      "instructions": "Define a function (the lesson calls it copyBook; use any name that fits) taking (library) that returns a deep copy of an object holding a nested array, using structuredClone, so the caller's library is never touched when the copy changes."
     },
     {
       "id": "s4",
@@ -46,7 +46,19 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define a function called addScore that takes the scores and the new score."
+      "hint": "Define a function called addScore that takes the scores and the new score.",
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r2",
@@ -58,7 +70,19 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Build the new array with spread: a pair of square brackets holding the old scores spread out, then the new one."
+      "hint": "Build the new array with spread: a pair of square brackets holding the old scores spread out, then the new one.",
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r3",
@@ -70,7 +94,19 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define a function called recordPlay that takes one song object."
+      "hint": "Define a function called recordPlay that takes one song object.",
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r4",
@@ -83,7 +119,19 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "Add 1 to the song's plays property by assigning to it. This one is meant to change the caller's object.",
-      "orTest": "t2"
+      "orTest": "t2",
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r5",
@@ -96,7 +144,19 @@
       "points": 0,
       "ignoreStrings": true,
       "hint": "copyBook should return a deep copy. The work is done by structuredClone inside copyBook.",
-      "orTest": "t3"
+      "orTest": "t3",
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r6",
@@ -108,7 +168,19 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Pass the library to structuredClone so changes to the copy's nested array never reach the original."
+      "hint": "Pass the library to structuredClone so changes to the copy's nested array never reach the original.",
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r7",
@@ -120,7 +192,19 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Log the caller's data before and after each call to show which function changed it."
+      "hint": "Log the caller's data before and after each call to show which function changed it.",
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "file": "script.js",
@@ -158,7 +242,19 @@
           "unchanged": 0,
           "hidden": true
         }
-      ]
+      ],
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "file": "script.js",
@@ -199,7 +295,19 @@
           },
           "hidden": true
         }
-      ]
+      ],
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "file": "script.js",
@@ -223,7 +331,19 @@
           "expr": "typeof copyBook === 'function' && (() => { const o = globalThis.structuredClone; let last; globalThis.structuredClone = (...a) => (last = o(...a)); let r; try { r = copyBook({ name: 'S', books: ['A', 'B'] }); } finally { globalThis.structuredClone = o; } return last !== undefined && (r === last || (!!r && !!last && r.books === last.books)); })()",
           "fail": "copyBook should make its copy by calling structuredClone on the library and returning that result (a call whose result is thrown away, or a copy made some other way, does not count)."
         }
-      ]
+      ],
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "file": "script.js",
@@ -238,7 +358,19 @@
           "expr": "output.length >= 3 && output.some(l => /\\d/.test(l))",
           "fail": "Print the caller's data (the scores, the song's plays and the library's books) before and after each call, at least three lines, so the output shows which function changed what."
         }
-      ]
+      ],
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r8",
@@ -250,7 +382,19 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define addScore, then call it: addScore(...). A function nobody calls changes nothing."
+      "hint": "Define addScore, then call it: addScore(...). A function nobody calls changes nothing.",
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r9",
@@ -262,7 +406,19 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define recordPlay, then call it: recordPlay(...). A function nobody calls changes nothing."
+      "hint": "Define recordPlay, then call it: recordPlay(...). A function nobody calls changes nothing.",
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "id": "r10",
@@ -274,7 +430,19 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define copyBook, then call it: copyBook(...). A function nobody calls changes nothing."
+      "hint": "Define copyBook, then call it: copyBook(...). A function nobody calls changes nothing.",
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     },
     {
       "file": "script.js",
@@ -293,7 +461,19 @@
           "expr": "(() => { const P = trace.prints; const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9); const O2 = (p) => (p.out2 || []).join('\\n'); const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0; const MKIN = (p) => !!trace.mk && LC(O2(p)).includes(LC(trace.mk)); const NUMCH = (p) => p.stable === true && p.out.some((l, i) => { const b = NUMS(i < p.out2.length ? p.out2[i] : ''); return b.length > 0 && JSON.stringify(NUMS(l)) !== JSON.stringify(b); }); const MV = (p) => LIVE(p) && (MKIN(p) || NUMCH(p)); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' ? v * trace.k + trace.c : v; const HASIN = (lines, v) => typeof v === 'number' ? v === v && isFinite(v) && lines.some((l) => NUMS(l).some((x) => NEAR(x, TW(v)))) : !!trace.mk && LC(lines.join('\\n')).includes(LC(TW(v))); const HAS = (p, v) => LIVE(p) && HASIN(p.out2, v); const RKIN = (p) => !!trace.rk && LC(O2(p)).includes(LC(trace.rk)); const RNUM = (p) => trace.results.some((r) => typeof r === 'number' && r === r && isFinite(r) && p.out2.some((l) => NUMS(l).some((x) => NEAR(x, r)))); const RBOOL = (p) => p.stable === true && JSON.stringify(p.out) !== JSON.stringify(p.out2) && trace.results.some((r) => typeof r === 'boolean' && p.out2.some((l) => new RegExp('\\\\b' + r + '\\\\b').test(l))); const RES = (p) => LIVE(p) && (RKIN(p) || RNUM(p) || RBOOL(p)); const DKEYS = () => { const D = trace.dreads; const sites = []; D.forEach((d) => { if (!sites.includes(d[0])) sites.push(d[0]); }); return sites.map((s) => { const keys = []; D.forEach((d) => { if (d[0] === s && !keys.includes(d[1])) keys.push(d[1]); }); return { s, keys }; }); }; const DPRINTED = (s, k) => trace.dreads.some((d) => d[0] === s && d[1] === k && P.some((p) => p.ran > 0 && p.outD !== null && (typeof d[2] === 'number' ? p.outD.some((l) => NUMS(l).some((x) => NEAR(x, d[2])) || l.includes(String(d[2]))) : LC(p.outD.join('\\n')).includes(LC(d[2]))))); const DSAID = (n) => DKEYS().some((g) => g.keys.length >= n && g.keys.every((k) => DPRINTED(g.s, k))); const ID = (v) => new RegExp('(?<![\\\\w$.])' + v.replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re, raw) => { const c = trace.code, t = trace.text, out = [], ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*[-+*/]?=(?![=>])([^;\\n]*)/g; let m; while ((m = ar.exec(c))) { const e = m.index + m[0].length; if (re.test((raw ? t : c).slice(e - m[2].length, e))) out.push(m[1]); } return out; }; const SHAPE = (re, raw) => { const vs = VARS(re, raw); return P.filter((p) => p.ran > 0 && MV(p) && (re.test(raw ? p.src : p.code) || vs.some((v) => ID(v).test(p.code)))); }; const CL = (s) => String(s).replace(/\\s+/g, ' ').trim().slice(0, 70); return P.filter((p) => p.ran > 0 && MV(p)).reduce((n, p) => n + p.ran, 0) >= 2; })()",
           "fail": "Print the caller's scores, song and library before and after each call with console.log calls that run (at least four prints); typed text does not count."
         }
-      ]
+      ],
+      "names": {
+        "addScore": {
+          "kind": "function",
+          "has": "\\.\\.\\.|\\.\\s*concat\\s*\\(|\\.\\s*slice\\s*\\(|Array\\s*\\.\\s*from",
+          "lacks": "structuredClone"
+        },
+        "recordPlay": "function",
+        "copyBook": {
+          "kind": "function",
+          "has": "structuredClone"
+        }
+      }
     }
   ],
   "grading": {

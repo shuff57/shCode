@@ -40,7 +40,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Use a loop to visit each position in the array: a for loop is the usual choice, but a while loop or forEach also works."
+      "hint": "Use a loop to visit each position in the array: a for loop is the usual choice, but a while loop or forEach also works.",
+      "names": {
+        "addOne": "function"
+      }
     },
     {
       "id": "r2",
@@ -52,7 +55,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Write each new value into the array the parameter already points at: the parameter, then [i], an equals sign, the new value."
+      "hint": "Write each new value into the array the parameter already points at: the parameter, then [i], an equals sign, the new value.",
+      "names": {
+        "addOne": "function"
+      }
     },
     {
       "id": "r3",
@@ -64,7 +70,10 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Log the caller's array after the call, not a variable inside the function."
+      "hint": "Log the caller's array after the call, not a variable inside the function.",
+      "names": {
+        "addOne": "function"
+      }
     },
     {
       "id": "r4",
@@ -84,7 +93,10 @@
           "expr": "typeof addOne === 'function' && (function(src) {\n      const m = /^(?:function\\s*[\\w$]*\\s*\\(|\\(|)\\s*([A-Za-z_$][\\w$]*)/.exec(src);\n      if (!m)\n        return !0;\n      const p = m[1], i = Math.min(...[\"{\", \"=>\"].map((t) => {\n        const k = src.indexOf(t);\n        return k < 0 ? 1e9 : k;\n      }));\n      let body = src.slice(i);\n      body = body.replace(/\\/\\/.*|\\/\\*[\\s\\S]*?\\*\\//g, \" \").replace(/\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*'|`(?:[^`\\\\]|\\\\.)*`/g, '\"\"');\n      return !new RegExp(\"(?:^|[^\\\\w$.])\" + p + \"\\\\s*(?:[-+*/%&|^]|\\\\*\\\\*|<<|>>>?|&&|\\\\|\\\\||\\\\?\\\\?)?=(?![=>])\").test(body);\n    })(String(addOne))",
           "fail": "Do not give the parameter a new value inside the function. Write into the array it already points at, by index."
         }
-      ]
+      ],
+      "names": {
+        "addOne": "function"
+      }
     },
     {
       "file": "script.js",
@@ -136,7 +148,10 @@
           },
           "hidden": true
         }
-      ]
+      ],
+      "names": {
+        "addOne": "function"
+      }
     }
   ],
   "grading": {

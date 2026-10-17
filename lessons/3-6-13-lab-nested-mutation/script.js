@@ -3,7 +3,7 @@
 // A spread copy of an object is SHALLOW: the new object is genuinely new, but
 // any nested array or object inside it is still shared with the original.
 
-// STEP 1: Create an object called student that holds a nested array called
+// STEP 1: Create an object (the lesson calls it student; name it for what you are building) that holds a nested array called
 //         scores (for example scores: [90, 85]). Then make a copy called shallow using spread: a new
 //         object built from the original's keys.
 

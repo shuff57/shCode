@@ -125,8 +125,9 @@ export interface Requirement {
    *  declared at the top of their script, the first declaration of that kind
    *  stands in for it (lib/student-names.ts). Regex patterns read the student's
    *  name in place of the written one, and `tests` variables and functions are
-   *  looked up under it. */
-  names?: Record<string, 'object' | 'array' | 'records' | 'function'>;
+   *  looked up under it. A name may carry a `has` / `lacks` regex, tested on a
+   *  function's body or a variable's initializer, to tell two of a kind apart. */
+  names?: Record<string, 'object' | 'array' | 'records' | 'function' | 'value' | { kind: 'object' | 'array' | 'records' | 'function' | 'value'; has?: string; lacks?: string }>;
 }
 
 /** One named top-level variable of a script-level `tests` requirement. */

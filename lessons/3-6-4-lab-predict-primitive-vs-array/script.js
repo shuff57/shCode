@@ -2,11 +2,11 @@
 
 // Before you run anything, predict what the caller's variables will print.
 
-// STEP 1: Define a function called changeNum. It takes one parameter.
+// STEP 1: Define a function (the lesson calls it changeNum; name it for what you are building). It takes one parameter.
 //         Inside the body, reassign the parameter to a different number.
 //         (This stands in for a primitive argument: the function gets a copy.)
 
-// STEP 2: Define a function called changeArr. It takes one parameter.
+// STEP 2: Define a function (the lesson calls it changeArr; name it for what you are building). It takes one parameter.
 //         Inside the body, add an item to it with the array's push method.
 //         (This stands in for an array argument: the function gets a copy of
 //         the reference, so both names point at the same array.)

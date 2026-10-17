@@ -16,12 +16,12 @@
     {
       "id": "s1",
       "title": "Write a function that reassigns a number parameter",
-      "instructions": "Define a function called changeNum that takes one parameter and reassigns it to a different number inside the body. This models a primitive argument arriving as a copy."
+      "instructions": "Define a function (the lesson calls it changeNum; name it for what you are building) that takes one parameter and reassigns it to a different number inside the body. This models a primitive argument arriving as a copy."
     },
     {
       "id": "s2",
       "title": "Write a function that mutates an array parameter",
-      "instructions": "Define a second function called changeArr that takes one parameter and adds an item to it with .push. This models an array argument arriving as a copy of a reference."
+      "instructions": "Define a second function (the lesson calls it changeArr; name it for what you are building) that takes one parameter and adds an item to it with .push. This models an array argument arriving as a copy of a reference."
     },
     {
       "id": "s3",
@@ -40,7 +40,14 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define a function called changeNum with one parameter and assign that parameter a different number inside."
+      "hint": "Define a function (the lesson calls it changeNum; name it for what you are building) with one parameter and assign that parameter a different number inside.",
+      "names": {
+        "changeArr": {
+          "kind": "function",
+          "has": "\\.\\s*push\\b"
+        },
+        "changeNum": "function"
+      }
     },
     {
       "id": "r2",
@@ -52,7 +59,14 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define a function called changeArr with one parameter. Inside it, add an item to that parameter."
+      "hint": "Define a function (the lesson calls it changeArr; name it for what you are building) with one parameter. Inside it, add an item to that parameter.",
+      "names": {
+        "changeArr": {
+          "kind": "function",
+          "has": "\\.\\s*push\\b"
+        },
+        "changeNum": "function"
+      }
     },
     {
       "id": "r3",
@@ -64,7 +78,14 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Use .push on the array parameter. This changes the one array the caller also holds."
+      "hint": "Use .push on the array parameter. This changes the one array the caller also holds.",
+      "names": {
+        "changeArr": {
+          "kind": "function",
+          "has": "\\.\\s*push\\b"
+        },
+        "changeNum": "function"
+      }
     },
     {
       "id": "r4",
@@ -76,7 +97,14 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Log the number and the array in the main program, after both calls, then compare with your prediction."
+      "hint": "Log the number and the array in the main program, after both calls, then compare with your prediction.",
+      "names": {
+        "changeArr": {
+          "kind": "function",
+          "has": "\\.\\s*push\\b"
+        },
+        "changeNum": "function"
+      }
     },
     {
       "file": "script.js",
@@ -103,7 +131,14 @@
           "expr": "output.length >= 1",
           "fail": "Print the number and the array in the main program after calling both functions, so the output shows the array with its new item."
         }
-      ]
+      ],
+      "names": {
+        "changeArr": {
+          "kind": "function",
+          "has": "\\.\\s*push\\b"
+        },
+        "changeNum": "function"
+      }
     },
     {
       "file": "script.js",
@@ -123,7 +158,14 @@
           "expr": "typeof changeNum === 'function' && (() => { const src = String(changeNum).replace(/\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\//g, ''); const m = /^(?:async\\s+)?(?:function\\s*[\\w$]*\\s*)?\\(?\\s*([A-Za-z_$][\\w$]*)/.exec(src); if (!m) return false; const p = m[1].replace(/\\$/g, '\\\\$'); const body = src.slice(src.indexOf('=>') >= 0 && src.indexOf('=>') < src.indexOf('{') + 1 ? src.indexOf('=>') + 2 : src.indexOf('{')); return new RegExp('(?<![\\\\w$.])' + p + '\\\\s*(?:[-+*/]?=(?!=)|\\\\+\\\\+|--)').test(body) || new RegExp('(?:\\\\+\\\\+|--)\\\\s*' + p + '(?![\\\\w$])').test(body); })()",
           "fail": "changeNum should assign its own parameter a different number inside the body, like n = n + 1;"
         }
-      ]
+      ],
+      "names": {
+        "changeArr": {
+          "kind": "function",
+          "has": "\\.\\s*push\\b"
+        },
+        "changeNum": "function"
+      }
     },
     {
       "id": "r6",
@@ -135,7 +177,14 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define changeNum, then call it: changeNum(...). A function nobody calls changes nothing."
+      "hint": "Define changeNum, then call it: changeNum(...). A function nobody calls changes nothing.",
+      "names": {
+        "changeArr": {
+          "kind": "function",
+          "has": "\\.\\s*push\\b"
+        },
+        "changeNum": "function"
+      }
     },
     {
       "id": "r7",
@@ -147,7 +196,14 @@
       "flags": "i",
       "points": 0,
       "ignoreStrings": true,
-      "hint": "Define changeArr, then call it: changeArr(...). A function nobody calls changes nothing."
+      "hint": "Define changeArr, then call it: changeArr(...). A function nobody calls changes nothing.",
+      "names": {
+        "changeArr": {
+          "kind": "function",
+          "has": "\\.\\s*push\\b"
+        },
+        "changeNum": "function"
+      }
     },
     {
       "file": "script.js",
@@ -166,7 +222,14 @@
           "expr": "(() => { const P = trace.prints; const LC = (s) => String(s).toLowerCase(); const NUMS = (s) => (String(s).match(/-?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?/gi) || []).map(Number); const NEAR = (x, y) => Math.abs(x - y) <= Math.max(0.0051, Math.abs(y) * 1e-9); const O2 = (p) => (p.out2 || []).join('\\n'); const LIVE = (p) => trace.perturbed && p.ran > 0 && p.out2 !== null && p.out2.length > 0; const MKIN = (p) => !!trace.mk && LC(O2(p)).includes(LC(trace.mk)); const NUMCH = (p) => p.stable === true && p.out.some((l, i) => { const b = NUMS(i < p.out2.length ? p.out2[i] : ''); return b.length > 0 && JSON.stringify(NUMS(l)) !== JSON.stringify(b); }); const MV = (p) => LIVE(p) && (MKIN(p) || NUMCH(p)); const TW = (v) => typeof v === 'string' ? trace.mk + v + trace.mk : typeof v === 'number' ? v * trace.k + trace.c : v; const HASIN = (lines, v) => typeof v === 'number' ? v === v && isFinite(v) && lines.some((l) => NUMS(l).some((x) => NEAR(x, TW(v)))) : !!trace.mk && LC(lines.join('\\n')).includes(LC(TW(v))); const HAS = (p, v) => LIVE(p) && HASIN(p.out2, v); const RKIN = (p) => !!trace.rk && LC(O2(p)).includes(LC(trace.rk)); const RNUM = (p) => trace.results.some((r) => typeof r === 'number' && r === r && isFinite(r) && p.out2.some((l) => NUMS(l).some((x) => NEAR(x, r)))); const RBOOL = (p) => p.stable === true && JSON.stringify(p.out) !== JSON.stringify(p.out2) && trace.results.some((r) => typeof r === 'boolean' && p.out2.some((l) => new RegExp('\\\\b' + r + '\\\\b').test(l))); const RES = (p) => LIVE(p) && (RKIN(p) || RNUM(p) || RBOOL(p)); const DKEYS = () => { const D = trace.dreads; const sites = []; D.forEach((d) => { if (!sites.includes(d[0])) sites.push(d[0]); }); return sites.map((s) => { const keys = []; D.forEach((d) => { if (d[0] === s && !keys.includes(d[1])) keys.push(d[1]); }); return { s, keys }; }); }; const DPRINTED = (s, k) => trace.dreads.some((d) => d[0] === s && d[1] === k && P.some((p) => p.ran > 0 && p.outD !== null && (typeof d[2] === 'number' ? p.outD.some((l) => NUMS(l).some((x) => NEAR(x, d[2])) || l.includes(String(d[2]))) : LC(p.outD.join('\\n')).includes(LC(d[2]))))); const DSAID = (n) => DKEYS().some((g) => g.keys.length >= n && g.keys.every((k) => DPRINTED(g.s, k))); const ID = (v) => new RegExp('(?<![\\\\w$.])' + v.replace(/\\$/g, '\\\\$') + '(?![\\\\w$])'); const VARS = (re, raw) => { const c = trace.code, t = trace.text, out = [], ar = /(?<![\\w$.])([A-Za-z_$][\\w$]*)\\s*[-+*/]?=(?![=>])([^;\\n]*)/g; let m; while ((m = ar.exec(c))) { const e = m.index + m[0].length; if (re.test((raw ? t : c).slice(e - m[2].length, e))) out.push(m[1]); } return out; }; const SHAPE = (re, raw) => { const vs = VARS(re, raw); return P.filter((p) => p.ran > 0 && MV(p) && (re.test(raw ? p.src : p.code) || vs.some((v) => ID(v).test(p.code)))); }; const CL = (s) => String(s).replace(/\\s+/g, ' ').trim().slice(0, 70); return P.filter((p) => p.ran > 0 && MV(p)).reduce((n, p) => n + p.ran, 0) >= 1; })()",
           "fail": "Print the caller's number and array (after calling both functions) with a console.log that runs; text typed into the print does not count."
         }
-      ]
+      ],
+      "names": {
+        "changeArr": {
+          "kind": "function",
+          "has": "\\.\\s*push\\b"
+        },
+        "changeNum": "function"
+      }
     }
   ],
   "grading": {

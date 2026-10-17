@@ -1,3 +1,15 @@
+# 2026-10-17: 3.6 labs accept the student's own names (committed locally, NOT pushed, NOT deployed)
+
+Same `names` mechanism as 3.5 (see the section below), extended: a name may be `{kind, has, lacks}` where the regexes are
+tested on a function's body or a variable's initializer, so two functions of one lab are told apart by what they DO, not
+by position (birthdaySafe = has `return`; changeArr = has `.push`; copyBook = has `structuredClone`; addScore = has a
+spread/concat/slice and lacks `structuredClone`; shallow = has `...`; deep = has `structuredClone`). Narrow names settle
+first, plain ones take what is left. New kind `value` (any non-function declaration). Binding is now one pass, so a swap
+cannot chain. Applied to 3.6.4, 8, 12, 13, 16. Suite: 742 cases (each reference renamed twice, plus reversed-order and
+wrong-job cases). Known edge: a student whose "safe" function does not return, or whose addScore uses none of spread/
+concat/slice/Array.from, is not recognised and is checked under the written name (fails with "could not find").
+Object KEYS (scores, age, plays, name) are still fixed.
+
 # 2026-10-16 (later): 3.5 labs accept the student's own names (committed locally, NOT pushed, NOT deployed)
 
 A requirement can carry `"names": {"book": "object"}` (kinds: `object`, `array`, `records`, `function`). If the script
