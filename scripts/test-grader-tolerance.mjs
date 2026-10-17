@@ -773,6 +773,10 @@ for (const id of Object.values(L)) {
   accept(T.filt, 'for...of with push(n + n)', js(
     'function doubled(numbers) {', '  let result = [];', '  for (let n of numbers) {', '    result.push(n + n);', '  }', '  return result;', '}',
     'let g=[72,55];', 'console.log(doubled(g));', 'console.log(g);'));
+  // #57: the doubled value held in a variable first is still a changed value.
+  accept(T.filt, 'doubled value held in a variable, then pushed', js(
+    'function doubled(numbers) {', '  let result = [];', '  for (let n of numbers) {', '    let a = (n * 2);', '    result.push(a);', '  }', '  return result;', '}',
+    'console.log(doubled([2, 4, 5]));', 'console.log([2, 4, 5]);'));
   // 3.3.19 now names the function and the transformation (doubled), so a filter no longer scores.
   reject(T.filt, 'the 3.3.17 filter shape instead of doubled', 't1', js(
     'function passing(scores) {', '  let result = [];', '  for (let s of scores) {', '    if (s >= 60) {', '      result.push(s);', '    }', '  }', '  return result;', '}',

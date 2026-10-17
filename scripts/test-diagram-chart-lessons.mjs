@@ -70,6 +70,8 @@ try {
     const ruleMax = ruleItems.reduce((a, r) => a + r.points, 0);
 
     check(pass(ref), 'reference chart passes the structural rules');
+    // #62: a rule title states its count once ("at least one ... (at least 3)" contradicted itself).
+    check(checkDiagram(fromMermaid(ref), rules).every((r) => !(/at least one/.test(r.title) && /\(at least/.test(r.title))), 'no rule title says "at least one" and then "(at least N)"');
     check(!pass(cfg.diagram.starter), 'untouched starter fails the structural rules');
     // junk has no required shape, so min-shape (a structural rule now) is the one rule it fails;
     // everything else about it is legal, which is why the rule SCORE has to fail it too.

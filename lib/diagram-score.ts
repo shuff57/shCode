@@ -48,6 +48,8 @@ export interface GateResult {
   min: number;
   capTo: number;
   fail: string;
+  /** One plain example word for each topic group no label uses yet (#61). */
+  missing: string[];
 }
 
 export interface DiagramScore {
@@ -527,7 +529,14 @@ export function gateMatches(doc: DiagramDoc, gate: DiagramGate): number {
 export function evalGate(doc: DiagramDoc, gate: DiagramGate | null | undefined): GateResult | null {
   if (!gate) return null;
   const matched = gateMatches(doc, gate);
-  return { passed: matched >= gate.min, matched, min: gate.min, capTo: gate.capTo, fail: gate.fail };
+  const labels = doc.nodes.filter((n) => n.shape !== 'comment').map((n) => foldLabel(n.label));
+  const missing: string[] = [];
+  for (const src of gate.anyOf) {
+    const re = compile(src);
+    const word = src.split('|').find((w) => /^[a-z][a-z-]+$/.test(w));
+    if (re && word && !labels.some((l) => re.test(l))) missing.push(word);
+  }
+  return { passed: matched >= gate.min, matched, min: gate.min, capTo: gate.capTo, fail: gate.fail, missing };
 }
 
 // ---------------------------------------------------------------------------
@@ -598,6 +607,10 @@ export function mergeGrade(
   lines.push(parts.join(' '));
   if (det.gate && !det.gate.passed) {
     lines.push(`${det.gate.fail}` + (capped ? ` Your total is held at ${det.gate.capTo} of ${possible} until it does.` : ''));
+    const g = det.gate;
+    if (g.missing.length > 0) {
+      lines.push(`Your labels cover ${g.matched} of the ${g.min} topics needed. Words that would count: ${g.missing.slice(0, Math.max(1, g.min - g.matched + 1)).join(', ')}.`);
+    }
   }
   if (totalEarned < passAt) lines.push('Not passed yet.');
   if (ai?.summary) lines.push(`Wording feedback: ${ai.summary}`);

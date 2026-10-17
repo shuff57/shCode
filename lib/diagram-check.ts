@@ -447,7 +447,10 @@ export function checkDiagram(doc: DiagramDoc, rules: DiagramRule[]): CheckResult
     if (!rule.title && rule.id === 'min-shape' && rule.shape && rule.shape in SHAPE_LABELS) {
       title = `Uses ${rule.count && rule.count > 1 ? `at least ${rule.count} ` : 'a '}${SHAPE_LABELS[rule.shape].toLowerCase()} shape${rule.count && rule.count > 1 ? 's' : ''}`;
     } else if (!rule.title && rule.count !== undefined && rule.id.startsWith('min-')) {
-      title = `${fallback} (at least ${rule.count})`;
+      // "Uses at least one decision diamond (at least 3)" contradicts itself (#62): state the count once.
+      title = /\bat least one\b/.test(fallback)
+        ? (rule.count === 1 ? fallback : `${fallback.replace(/\bat least one\b/, `at least ${rule.count}`)}s`)
+        : `${fallback} (at least ${rule.count})`;
     }
     return { ...outcome, title };
   });

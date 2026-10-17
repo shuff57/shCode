@@ -90,6 +90,7 @@
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.push\\s*\\((?:[^()]|\\([^()]*\\))*(?:[-+*/%]|[\\w$.]+\\s*\\()|\\bif\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*\\{?[^}]*\\.push\\s*\\(",
+      "orTest": "t1",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
