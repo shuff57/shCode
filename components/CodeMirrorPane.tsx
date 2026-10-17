@@ -5,7 +5,7 @@ import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLi
 import { EditorState } from '@codemirror/state';
 import { javascript, javascriptLanguage } from '@codemirror/lang-javascript';
 import { defaultKeymap, indentWithTab, history, historyKeymap } from '@codemirror/commands';
-import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting, foldGutter, foldKeymap } from '@codemirror/language';
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { highlightSelectionMatches } from '@codemirror/search';
 import { tags as t } from '@lezer/highlight';
@@ -69,6 +69,21 @@ const darkTheme = EditorView.theme({
     color: dracula.gutterFg,
     border: 'none',
     paddingRight: '8px',
+  },
+  '.cm-foldGutter .cm-gutterElement': {
+    cursor: 'pointer',
+    color: dracula.gutterFg,
+    padding: '0 2px',
+  },
+  '.cm-foldGutter .cm-gutterElement:hover': {
+    color: dracula.fg,
+  },
+  '.cm-foldPlaceholder': {
+    backgroundColor: dracula.selection,
+    color: dracula.fg,
+    border: `1px solid ${dracula.purple}`,
+    borderRadius: '3px',
+    padding: '0 6px',
   },
   '.cm-activeLineGutter': {
     backgroundColor: dracula.activeLine,
@@ -157,6 +172,13 @@ function makeExtensions(
     exts.push(javascriptLanguage.data.of({
       closeBrackets: { brackets: ['(', '[', "'", '"', '`'] },
     }));
+  }
+
+  // #52: a student's own switch, loop or function can be folded to one line (the arrow in the
+  // gutter, or Ctrl+Shift+[ and ]). Editable panes only: a reading page carries many small
+  // read-only samples, and an arrow on every block there is noise.
+  if (language === 'javascript' && !readOnly) {
+    exts.push(foldGutter({ openText: '\u25BE', closedText: '\u25B8' }), keymap.of(foldKeymap));
   }
 
   if (readOnly) {
