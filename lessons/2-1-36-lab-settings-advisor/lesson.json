@@ -29,6 +29,9 @@
       "instructions": "Add a separate if statement that uses && or || to warn when layerHeight is outside a safe range (for example, less than 0.1 or greater than 0.4). Log a warning message when that's true."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[set filamentType and layerHeight]\n  B --> C{a known filament}\n  C -- yes --> D[/log its temperature/]\n  C -- no --> E[/log Unknown filament type/]\n  E --> F{layer height outside the safe range}\n  D --> F\n  F -- yes --> G[/log a warning/]\n  F -- no --> H([End])\n  G --> H"
+  },
   "requirements": [
     {
       "id": "r1",
