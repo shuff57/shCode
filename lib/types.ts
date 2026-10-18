@@ -265,6 +265,10 @@ export interface Lesson {
    * seeds the starter with its pseudocode — see components/PlanChartPanel.tsx.
    * Set on 1.5.31, whose plan lives in 1.5.30.
    */
+  /** An authored flowchart of the plan, shown collapsed-or-open above the
+   *  editor of a lab (components/LabPlanChart.tsx). Mermaid, same subset as a
+   *  ```flow fence. Shows what to do, not this lab's answer. */
+  planChart?: { mermaid: string; caption?: string };
   planFrom?: string;
   /** Display label for `planFrom`, e.g. "1.5.30". */
   planFromLabel?: string;
