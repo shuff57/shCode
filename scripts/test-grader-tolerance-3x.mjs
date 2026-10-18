@@ -129,6 +129,20 @@ accept('3-5-12-lab-nested-structure', 'index into the array through an alias',
   js('const order = { customer: { name: "Ana" }, items: [{ name: "pen", price: 2 }, { name: "ink", price: 1 }] };',
      'console.log(order.customer.name);', 'for (let i = 0; i < order.items.length; i++) { const item = order.items[i]; console.log(item.name + " " + item.price); }'));
 
+// #63: the fields inside the customer and each item are the student's to name
+accept('3-5-12-lab-nested-structure', 'item fields called title and cost, customer field called fullName',
+  js('const order = { customer: { fullName: "Ana Ruiz" }, items: [{ title: "pen", cost: 2 }, { title: "ink", cost: 1 }] };',
+     'console.log(order.customer.fullName);', 'for (const item of order.items) { console.log(item.title, item.cost); }'));
+accept('3-5-12-lab-nested-structure', 'item fields called label and amount, read with forEach',
+  js('const order = { customer: { name: "Ana" }, items: [{ label: "pen", amount: 2 }, { label: "ink", amount: 1 }] };',
+     'console.log(order.customer.name);', 'order.items.forEach(t => console.log(t.label + ": " + t.amount));'));
+reject('3-5-12-lab-nested-structure', 'fields renamed but the old names are still read', 't2',
+  js('const order = { customer: { name: "Ana" }, items: [{ title: "pen", cost: 2 }, { title: "ink", cost: 1 }] };',
+     'console.log(order.customer.name);', 'for (const item of order.items) { console.log(item.name + " " + item.price); }'));
+reject('3-5-12-lab-nested-structure', 'items hold numbers only, no name text', 't1',
+  js('const order = { customer: { name: "Ana" }, items: [{ price: 2 }, { price: 1 }] };',
+     'console.log(order.customer.name);', 'for (const item of order.items) { console.log(item.price); }'));
+
 // ---- 3.5.15: arrow method
 accept('3-5-15-lab-add-method', 'method written as an arrow',
   js('const student = { name: "Ana", hi: () => "Hello!" };', 'console.log(student.hi());'));
