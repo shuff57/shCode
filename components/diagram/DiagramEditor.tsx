@@ -6,7 +6,7 @@
 // straight onto the diagram, and a shape dropped on an arrow splicing itself
 // into the path.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -245,6 +245,17 @@ interface Props {
   fitMinZoom?: number;
   /** Restores the lesson's starter diagram. Hidden when absent. */
   onReset?: () => void;
+  /**
+   * Tabs for a drawer that opens over the canvas in full screen only. Browser
+   * full screen shows just this component's box, so anything the page keeps
+   * outside it (the task, the check results) has to be passed in to stay
+   * reachable. Absent: full screen is the bare canvas, as before.
+   */
+  drawerTabs?: { key: string; label: string; content: ReactNode }[];
+  /** Pinned under the drawer's tabs, e.g. the Check button. */
+  drawerFooter?: ReactNode;
+  /** Bumping this opens the drawer on `drawerFocus`'s tab (e.g. after Check). */
+  drawerFocus?: { tab: string; nonce: number };
 }
 
 // The starter four come first and are always visible: the book's three
@@ -264,6 +275,9 @@ function Canvas({
   height = 460,
   fitMinZoom = 0.55,
   onReset,
+  drawerTabs,
+  drawerFooter,
+  drawerFocus,
 }: Props) {
   const initial = useMemo(() => docToFlow(value), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [nodes, setNodes] = useState<Node[]>(initial.nodes);
@@ -274,6 +288,18 @@ function Canvas({
   const [editEdge, setEditEdge] = useState<string | null>(null);
   const [spliceTarget, setSpliceTarget] = useState<string | null>(null);
   const [isFull, setIsFull] = useState(false);
+  // Closed on entering full screen: the drawer covers a third of a 1366px
+  // canvas, and one click opens it.
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerTab, setDrawerTab] = useState<string | null>(null);
+  const lastFocus = useRef(0);
+  useEffect(() => {
+    if (!drawerFocus || drawerFocus.nonce === lastFocus.current) return;
+    lastFocus.current = drawerFocus.nonce;
+    if (!isFull) return;
+    setDrawerTab(drawerFocus.tab);
+    setDrawerOpen(true);
+  }, [drawerFocus, isFull]);
   // Spoken by the polite live region below the toolbar (keyboard + screen reader path).
   const [announce, setAnnounce] = useState('');
   // A calm, visible message for something the editor declined to do. Also
@@ -352,12 +378,20 @@ function Canvas({
     const onChangeFs = () => {
       const active = document.fullscreenElement === wrapRef.current;
       setIsFull(active);
+      if (!active) setDrawerOpen(false);
       // The canvas just changed size by a lot; refit once it has settled.
       setTimeout(() => fitView({ padding: 0.2, duration: 200 }), 80);
     };
     document.addEventListener('fullscreenchange', onChangeFs);
     return () => document.removeEventListener('fullscreenchange', onChangeFs);
   }, [fitView]);
+
+  // The canvas just got narrower or wider; refit once it has settled.
+  useEffect(() => {
+    if (!isFull) return;
+    const t = setTimeout(() => fitView({ padding: 0.2, duration: 200 }), 80);
+    return () => clearTimeout(t);
+  }, [drawerOpen, isFull, fitView]);
 
   const toggleFullscreen = useCallback(() => {
     if (document.fullscreenElement) {
@@ -862,10 +896,30 @@ function Canvas({
           display: flex;
           flex-direction: column;
         }
-        .shcode-flow:fullscreen .shcode-flow-canvas {
+        .shcode-flow-stage { position: relative; }
+        .shcode-flow:fullscreen .shcode-flow-stage {
           flex: 1 1 auto;
+          min-height: 0;
+          display: flex;
+          flex-direction: row;
+        }
+        .shcode-flow:fullscreen .shcode-flow-canvas {
+          flex: 1 1 0;
+          min-width: 0;
           height: auto !important;
         }
+        /* Beside the canvas, not over it: an overlay hid whatever shape sat
+           under it, and the diagram is refitted into the room that is left. */
+        .shcode-flow-drawer {
+          flex: 0 0 min(380px, 85%);
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+          background: #282a36;
+          border-left: 1px solid #bd93f9;
+          box-shadow: -4px 0 14px rgba(0, 0, 0, 0.45);
+        }
+        .shcode-flow-drawer .drawer-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 10px 12px; font-size: 13px; line-height: 1.55; color: #e0e2ee; }
       `}</style>
 
       {!readOnly && (
@@ -952,6 +1006,25 @@ function Canvas({
               title={isFull ? 'Leave fullscreen (Esc)' : 'Fullscreen'}
               Icon={isFull ? Minimize : Maximize}
             />
+            {isFull && drawerTabs && drawerTabs.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setDrawerOpen((o) => !o)}
+                aria-expanded={drawerOpen}
+                title={drawerOpen ? 'Hide the task and checks' : 'Show the task and checks'}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  border: '1px solid #bd93f9',
+                  background: drawerOpen ? '#44475a' : 'transparent',
+                  color: '#f8f8f2',
+                  cursor: 'pointer',
+                  fontSize: 12.5,
+                }}
+              >
+                Task &amp; checks
+              </button>
+            )}
             {onReset && (
               <IconButton onClick={onReset} title="Reset to the starter diagram" Icon={RotateCcw} />
             )}
@@ -988,6 +1061,7 @@ function Canvas({
         </div>
       )}
 
+      <div className="shcode-flow-stage">
       <div
         className="shcode-flow-canvas"
         style={{ height, background: '#21222c' }}
@@ -1072,6 +1146,42 @@ function Canvas({
           <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#3b3d4d" />
           {!readOnly && <Controls showInteractive={false} />}
         </ReactFlow>
+      </div>
+      {isFull && drawerOpen && drawerTabs && drawerTabs.length > 0 && (() => {
+        const active = drawerTabs.find((t) => t.key === drawerTab) ?? drawerTabs[0];
+        return (
+          <div className="shcode-flow-drawer" role="complementary" aria-label="Task and checks">
+            <div role="tablist" style={{ display: 'flex', borderBottom: '1px solid #44475a', flex: '0 0 auto' }}>
+              {drawerTabs.map((t) => (
+                <button
+                  key={t.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={t.key === active.key}
+                  onClick={() => setDrawerTab(t.key)}
+                  style={{
+                    flex: '1 1 0',
+                    padding: '8px 10px',
+                    background: 'transparent',
+                    border: 0,
+                    borderBottom: '2px solid ' + (t.key === active.key ? '#f1fa8c' : 'transparent'),
+                    color: t.key === active.key ? '#f1fa8c' : '#a9aecb',
+                    cursor: 'pointer',
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <div className="drawer-body" role="tabpanel">{active.content}</div>
+            {drawerFooter ? (
+              <div style={{ flex: '0 0 auto', padding: '8px 12px', borderTop: '1px solid #44475a' }}>{drawerFooter}</div>
+            ) : null}
+          </div>
+        );
+      })()}
       </div>
 
       {!readOnly && (

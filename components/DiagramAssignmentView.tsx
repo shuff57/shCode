@@ -29,6 +29,7 @@ import {
 import EditorPlaceholder from './diagram/EditorPlaceholder';
 import SolutionPanel from './SolutionPanel';
 import DiagramHintPanel from './DiagramHintPanel';
+import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
 
 // React Flow is a large chunk of the client bundle. Loading it lazily keeps it
 // out of the 270-odd lesson pages that have no diagram on them at all.
@@ -78,6 +79,8 @@ interface Props {
   fallbackPrompt?: string;
   /** Buckets the AI-hint quota, the same way the code tutor is bucketed. */
   unit?: string | null;
+  /** The lesson text worth keeping beside the canvas in full screen (see lib/diagram-task-sections). */
+  taskMd?: string;
 }
 
 function parseDoc(raw: string | null): DiagramDoc | null {
@@ -109,6 +112,7 @@ export default function DiagramAssignmentView({
   config,
   fallbackPrompt,
   unit,
+  taskMd,
 }: Props) {
   const starter = useMemo(
     () => (config.starter ? fromMermaid(config.starter) : emptyDiagram()),
@@ -200,6 +204,53 @@ export default function DiagramAssignmentView({
     setChecks(results);
     return results;
   }, [doc, rules]);
+
+  // Full screen shows only the editor box, so the task and the check results
+  // are handed to it as a drawer. Check from inside the drawer opens the
+  // Checks tab, since the list under the editor is out of sight there.
+  const [drawerFocus, setDrawerFocus] = useState<{ tab: string; nonce: number }>({ tab: 'checks', nonce: 0 });
+  const checkFromDrawer = useCallback(() => {
+    runChecks();
+    setDrawerFocus((d) => ({ tab: 'checks', nonce: d.nonce + 1 }));
+  }, [runChecks]);
+
+  // One row per check. The page list carries the ids focus jumps to when a
+  // blocked Submit points at the first red check; the drawer copy must not,
+  // or the id would exist twice.
+  function renderChecks(list: CheckResult[], withIds: boolean) {
+    return (
+      <div style={{ display: 'grid', gap: 8 }}>
+        {list.map((c, ci) => (
+          <div
+            key={c.id + c.title}
+            id={withIds ? `diagram-check-${ci}` : undefined}
+            tabIndex={withIds ? -1 : undefined}
+            style={{
+              padding: '9px 12px',
+              background: '#282a36',
+              borderRadius: 6,
+              border: '1px solid ' + (c.passed ? '#50fa7b44' : '#ff555577'),
+              display: 'flex',
+              gap: 9,
+              alignItems: 'flex-start',
+            }}
+          >
+            {c.passed ? (
+              <CircleCheck size={17} color="#50fa7b" style={{ flex: '0 0 auto', marginTop: 1 }} />
+            ) : (
+              <CircleX size={17} color="#ff5555" style={{ flex: '0 0 auto', marginTop: 1 }} />
+            )}
+            <div>
+              <strong style={{ color: '#f8f8f2', fontSize: 13.5 }}>{c.title}</strong>
+              <p style={{ margin: '2px 0 0', color: '#bbb', fontSize: 12.5, lineHeight: 1.5 }}>
+                {c.detail}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   async function saveNow() {
     setSaveStatus('saving');
@@ -370,6 +421,49 @@ export default function DiagramAssignmentView({
         onChange={onChange}
         highlight={highlight}
         height={480}
+        drawerFocus={drawerFocus}
+        drawerTabs={[
+          ...(taskMd
+            ? [{
+                key: 'task',
+                label: 'Task',
+                content: <MarkdownWithLiveBlocks src={taskMd} lessonId={`${lessonId}:fullscreen-task`} />,
+              }]
+            : []),
+          {
+            key: 'checks',
+            label: checks ? `Checks ${checks.filter((c) => c.passed).length}/${checks.length}` : 'Checks',
+            content: checks ? (
+              renderChecks(checks, false)
+            ) : (
+              <p style={{ color: '#a9aecb', margin: 0 }}>
+                Press <strong>Check my diagram</strong> to see which rules your chart meets.
+              </p>
+            ),
+          },
+        ]}
+        drawerFooter={
+          <button
+            type="button"
+            onClick={checkFromDrawer}
+            style={{
+              padding: '7px 14px',
+              borderRadius: 6,
+              border: '1px solid #8be9fd',
+              fontWeight: 600,
+              cursor: 'pointer',
+              background: 'transparent',
+              color: '#8be9fd',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 13,
+            }}
+          >
+            <ListChecks size={15} />
+            Check my diagram
+          </button>
+        }
         onReset={
           config.starter
             ? () => {
@@ -533,36 +627,7 @@ export default function DiagramAssignmentView({
               next part and your teacher marks it — come back if you have time.
             </p>
           )}
-          <div style={{ display: 'grid', gap: 8 }}>
-            {checks.map((c, ci) => (
-              <div
-                key={c.id + c.title}
-                id={`diagram-check-${ci}`}
-                tabIndex={-1}
-                style={{
-                  padding: '9px 12px',
-                  background: '#282a36',
-                  borderRadius: 6,
-                  border: '1px solid ' + (c.passed ? '#50fa7b44' : '#ff555577'),
-                  display: 'flex',
-                  gap: 9,
-                  alignItems: 'flex-start',
-                }}
-              >
-                {c.passed ? (
-                  <CircleCheck size={17} color="#50fa7b" style={{ flex: '0 0 auto', marginTop: 1 }} />
-                ) : (
-                  <CircleX size={17} color="#ff5555" style={{ flex: '0 0 auto', marginTop: 1 }} />
-                )}
-                <div>
-                  <strong style={{ color: '#f8f8f2', fontSize: 13.5 }}>{c.title}</strong>
-                  <p style={{ margin: '2px 0 0', color: '#bbb', fontSize: 12.5, lineHeight: 1.5 }}>
-                    {c.detail}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          {renderChecks(checks, true)}
           {structureOk && config.aiGrader && !summative ? (
             <p style={{ color: '#8393c4', fontSize: 12.5, marginTop: 8 }}>
               Order and wording are checked when you submit.

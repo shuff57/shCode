@@ -7,6 +7,7 @@ import { badgeFor } from '../lib/lesson-badges';
 import CompletionPanel from './CompletionPanel';
 import WrittenGrader from './WrittenGrader';
 import DiagramAssignmentView from './DiagramAssignmentView';
+import { taskSections } from '../lib/diagram-task-sections';
 import QuizView from './QuizView';
 import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
 import HeaderLessonNav from './HeaderLessonNav';
@@ -282,6 +283,7 @@ export default function ContentLessonView({ lesson }: Props) {
           config={meta.diagram}
           fallbackPrompt={contentMd.slice(0, 2000)}
           unit={lesson.unit}
+          taskMd={contentMd ? taskSections(contentMd) : undefined}
         />
       ) : meta.aiGrader ? (
         <WrittenGrader
