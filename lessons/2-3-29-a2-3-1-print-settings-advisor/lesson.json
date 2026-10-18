@@ -116,7 +116,7 @@
       "description": "A filament case's console.log call prints a recommended print speed. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s*['\"](?:PLA|ABS|PETG|TPU)['\"]\\s*:(?:(?!case\\s*['\"]|default\\s*:)[\\s\\S])*?console\\.log\\s*\\([^)]*speed",
+      "pattern": "case\\s*['\"](?:PLA|ABS|PETG|TPU)['\"]\\s*:(?:(?!case\\s*['\"]|default\\s*:)[\\s\\S])*?console\\.log\\s*\\([^;\\n]*speed",
       "flags": "i",
       "points": 0
     },

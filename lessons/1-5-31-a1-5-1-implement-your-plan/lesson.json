@@ -64,7 +64,7 @@
       "description": "An if statement compares pagesRequested against creditRemaining",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^)]*(pagesRequested[^)]*creditRemaining|creditRemaining[^)]*pagesRequested)[^)]*\\)",
+      "pattern": "if\\s*\\([^)]*(pagesRequested[^)]*creditRemaining|creditRemaining[^)]*pagesRequested)[^)]*\\)|(?:let|const|var)\\s+(?<flag>[A-Za-z_$][\\w$]*)\\s*=\\s*[^;\\n]*(?:pagesRequested[^;\\n]*creditRemaining|creditRemaining[^;\\n]*pagesRequested)[^;\\n]*;[\\s\\S]*?if\\s*\\(\\s*!?\\s*\\k<flag>\\s*\\)",
       "flags": "",
       "points": 0
     },
