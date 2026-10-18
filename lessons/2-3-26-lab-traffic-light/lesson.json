@@ -41,7 +41,7 @@
       "description": "case 'green' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s*['\"]green['\"]\\s*:\\s*console\\.log",
+      "pattern": "case\\s*['\"]green['\"]\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*console\\.log",
       "flags": "i",
       "points": 0
     },
@@ -51,7 +51,7 @@
       "description": "case 'yellow' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s*['\"]yellow['\"]\\s*:\\s*console\\.log",
+      "pattern": "case\\s*['\"]yellow['\"]\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*console\\.log",
       "flags": "i",
       "points": 0
     },
@@ -61,7 +61,7 @@
       "description": "case 'red' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s*['\"]red['\"]\\s*:\\s*console\\.log",
+      "pattern": "case\\s*['\"]red['\"]\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*console\\.log",
       "flags": "i",
       "points": 0
     },
@@ -71,7 +71,7 @@
       "description": "The default label is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "default\\s*:\\s*console\\.log",
+      "pattern": "default\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*console\\.log",
       "flags": "i",
       "points": 0
     },

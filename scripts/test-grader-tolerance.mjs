@@ -865,6 +865,54 @@ for (const id of Object.values(L)) {
     'const a=["x"];', 'a.push("y");', 'a.pop();', 'for (const x of a) { console.log(x); }', 'if (1 === 1) { console.log("hi"); }'));
 }
 
+// ---------------------------------------------------------------- audit sweep, 2026-10-18 (batch 1)
+//
+// The same defect as report #63, found in older labs: a regex hard-coded one way of
+// writing a correct answer that the lesson never asked for. Each lab below gets
+// the answers that were refused, and a near miss that must still be refused, so a
+// widening here cannot quietly turn into "anything passes".
+{
+  const D = '2-4-4-lab-write-both-loops';
+  const sol = solutionFiles(D);
+  const loop = (cond, body) => edit(sol, `while (total <= 100) {${nl}  total = total * 2;${nl}}`, `while (${cond}) {${nl}  ${body}${nl}}`);
+  accept(D, 'total + total', loop('total <= 100', 'total = total + total;'));
+  accept(D, '2 * total', loop('total <= 100', 'total = 2 * total;'));
+  accept(D, 'total += total', loop('total <= 100', 'total += total;'));
+  accept(D, 'total < 101', loop('total < 101', 'total *= 2;'));
+  accept(D, 'not greater than 100', loop('!(total > 100)', 'total = total * 2;'));
+  reject(D, 'adds one each pass, not a doubling', 'r2', loop('total <= 100', 'total = total + 1;'));
+  reject(D, 'loop that never doubles', 'r2', loop('total <= 100', 'console.log(total); total = 200;'));
+}
+{
+  const D = '2-3-29-a2-3-1-print-settings-advisor';
+  const sol = solutionFiles(D);
+  accept(D, 'a bracket in the printed text', edit(sol, "console.log('Temperature: 200, Speed: 60');", "console.log('PLA temperature (C): 200, speed (mm/s): 60');"));
+  // r9 matches ANY filament case, so the near miss has to take the word out of all four.
+  reject(D, 'the word speed only in a comment', 'r9', { 'script.js': sol['script.js'].replace(/, Speed: (\d+)'\);/g, "'); // speed $1") });
+}
+{
+  const D = '1-5-43-lab-debug-the-order-total';
+  const sol = solutionFiles(D);
+  accept(D, 'discounted = subtotal * 0.9', edit(sol, 'let discounted = subtotal - discount;', 'let discounted = subtotal * 0.9;'));
+  accept(D, 'discounted = (1 - rate) * subtotal', edit(sol, 'let discounted = subtotal - discount;', 'let discounted = (1 - discountRate) * subtotal;'));
+  accept(D, 'total = tax + discounted', edit(sol, 'let total = discounted + tax;', 'let total = tax + discounted;'));
+  reject(D, 'discount added, not taken off', 'r2', edit(sol, 'let discounted = subtotal - discount;', 'let discounted = subtotal + discount;'));
+  reject(D, 'tax taken off, not added', 'r3', edit(sol, 'let total = discounted + tax;', 'let total = discounted - tax;'));
+}
+{
+  const D = '2-7-3-ch2-individual-pa-find-and-fix';
+  const sol = solutionFiles(D);
+  accept(D, 'total = subtotal + shipping + tax', edit(sol, 'let total = beforeTax + tax;', 'let total = subtotal + shipping + tax;'));
+  reject(D, 'the misspelled name left in', 'r2', edit(sol, 'let total = beforeTax + tax;', 'let total = beforTax + tax;'));
+}
+{
+  const D = '2-3-26-lab-traffic-light';
+  const sol = solutionFiles(D);
+  accept(D, 'a comment between the label and the log', edit(sol, "case 'green':\n    console.log('Go');", "case 'green':\n    // go\n    console.log('Go');"));
+  accept(D, 'braces around the case body', edit(sol, "case 'red':\n    console.log('Stop');\n    break;", "case 'red': {\n    console.log('Stop');\n    break;\n  }"));
+  reject(D, 'the green case has no console.log', 'r2', edit(sol, "case 'green':\n    console.log('Go');", "case 'green':\n    break;\n  case 'unused':\n    console.log('Go');"));
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(
