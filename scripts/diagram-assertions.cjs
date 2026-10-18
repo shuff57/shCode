@@ -52,6 +52,22 @@ flowchart TD
   ok('branch siblings differ in x', byId.D.x !== byId.E.x, byId.D.x + ' vs ' + byId.E.x);
 }
 
+section('fromMermaid — left to right');
+{
+  const src = 'flowchart LR\n  A([Start]) --> B[set up]\n  B --> C{more left}\n  C -- yes --> D[work]\n  D --> C\n  C -- no --> E([End])';
+  const lr = fromMermaid(src);
+  const at = (id) => lr.nodes.find((n) => n.id === id);
+  const edge = (f, t) => lr.edges.find((e) => e.from === f && e.to === t);
+  ok('ranks run left to right', at('A').x < at('B').x && at('B').x < at('C').x && at('C').x < at('D').x);
+  ok('the straight run shares a row', at('A').y === at('B').y && at('B').y === at('C').y);
+  ok('the second answer sits below the first', at('E').y > at('C').y && at('D').y === at('C').y);
+  ok('the next step leaves right and enters left', edge('A', 'B').fromSide === 'r' && edge('A', 'B').toSide === 'l');
+  ok('a second way out leaves from the bottom', edge('C', 'E').fromSide === 'b' && edge('C', 'E').toSide === 'l');
+  ok('a loop return goes over the top', edge('D', 'C').fromSide === 't' && edge('D', 'C').toSide === 't');
+  const td = fromMermaid(src.replace('flowchart LR', 'flowchart TD'));
+  ok('top to bottom is untouched: ranks run down, no sides stated', td.nodes.find((n) => n.id === 'B').y > td.nodes.find((n) => n.id === 'A').y && td.edges.every((e) => !e.fromSide && !e.toSide));
+}
+
 section('fromMermaid — pipe-label + chain + late declaration');
 {
   const d = fromMermaid(`

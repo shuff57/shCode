@@ -13,7 +13,7 @@
     "SLO-3"
   ],
   "planChart": {
-    "mermaid": "flowchart TD\n  A([Start]) --> B[make the order, with a customer object and an items array]\n  B --> C[/print the customer name/]\n  C --> D{more items left}\n  D -- yes --> E[/print this items name and price/]\n  E --> D\n  D -- no --> F([End])",
+    "mermaid": "flowchart LR\n  A([Start]) --> B[make the order, with a customer object and an items array]\n  B --> C[/print the customer name/]\n  C --> D{more items left}\n  D -- yes --> E[/print this items name and price/]\n  E --> D\n  D -- no --> F([End])",
     "caption": "The plan. Steps 1 to 3 are the first box, step 4 is the second, step 5 is the loop."
   },
   "steps": [
