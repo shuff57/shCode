@@ -50,7 +50,7 @@ export default function LabPlanChart({ lessonId, mermaid, caption }: Props) {
       style={{ background: '#282a36', border: '1px solid #44475a', borderRadius: 6, padding: '8px 12px', marginBottom: 12 }}
     >
       <summary style={{ cursor: 'pointer', color: '#8be9fd', fontSize: 14, fontWeight: 600 }}>
-        Plan chart: the whole plan on one page
+        Flow Chart
       </summary>
       {open ? (
         <DiagramBlock
