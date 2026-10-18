@@ -42,6 +42,7 @@ import TextureEditor from './TextureEditor';
 import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
+import LabPlanChart from './LabPlanChart';
 import KeyboardShortcutModal from './KeyboardShortcutModal';
 import { RotateCcw, Send } from 'lucide-react';
 
@@ -1049,6 +1050,9 @@ export default function LessonWorkspace({
           onScaffold={setPlanLines}
           stale={planStale}
         />
+      )}
+      {lesson.planChart && (
+        <LabPlanChart lessonId={lesson.id} mermaid={lesson.planChart.mermaid} caption={lesson.planChart.caption} />
       )}
       <div className="editor-card">
         <div className="editor-body">

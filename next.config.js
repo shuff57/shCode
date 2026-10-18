@@ -32,6 +32,14 @@ const nextConfig = {
       '@codemirror/state', '@codemirror/view', '@codemirror/language', '@codemirror/commands',
       '@codemirror/autocomplete', '@codemirror/search', '@codemirror/lint', '@codemirror/lang-javascript',
       '@lezer/common', '@lezer/highlight', '@lezer/lr', '@lezer/javascript',
+      // React Flow's pan/zoom runs on d3. d3-transition adds .interrupt() to
+      // d3-selection's prototype as a side effect, so a second copy of
+      // d3-selection (one that d3-transition never touched) throws
+      // "selection.interrupt is not a function" the first time anything sets
+      // the viewport from code. Wheel and drag never hit that path, so the
+      // figures looked fine and fitView / setViewport silently did nothing.
+      'd3-selection', 'd3-transition', 'd3-zoom', 'd3-drag', 'd3-interpolate',
+      'd3-dispatch', 'd3-timer', 'd3-ease', 'd3-color',
     ];
     const alias = { ...config.resolve.alias };
     for (const name of singletons) {

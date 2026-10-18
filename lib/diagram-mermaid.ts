@@ -86,6 +86,9 @@ export function fromMermaid(src: string): DiagramDoc {
   const nodes = new Map<string, FlowNode>();
   const edges: FlowEdge[] = [];
   let edgeSeq = 0;
+  // `flowchart LR` (or RL, which is laid out the same way) runs the chart left
+  // to right. Anything else, including no direction line, is top to bottom.
+  const horizontal = /^\s*(?:flowchart|graph)\s+(?:LR|RL)\b/im.test(src);
 
   const touch = (ref: ParsedRef): FlowNode => {
     const existing = nodes.get(ref.id);
@@ -143,20 +146,24 @@ export function fromMermaid(src: string): DiagramDoc {
     }
   }
 
-  return layout({ version: 1, nodes: [...nodes.values()], edges });
+  return layout({ version: 1, nodes: [...nodes.values()], edges }, horizontal);
 }
 
 // ---- Layout ----
 
 const COL_W = 240;
 const ROW_H = 150;
+// Left to right: a rank is a column of shapes 245 apart (the widest shape is
+// ~190), and a second answer sits one 130-unit lane below the first.
+const RANK_W = 245;
+const LANE_H = 130;
 
 /**
  * Rank nodes by longest path from a start node, then spread each rank
  * horizontally. Crude, but a flowchart is nearly a tree and the student can
  * drag anything that lands badly.
  */
-function layout(doc: DiagramDoc): DiagramDoc {
+function layout(doc: DiagramDoc, horizontal = false): DiagramDoc {
   const { nodes, edges } = doc;
   if (nodes.length === 0) return doc;
 
@@ -263,12 +270,40 @@ function layout(doc: DiagramDoc): DiagramDoc {
   for (const [r, group] of byRank) {
     for (const n of group) {
       const target = index.get(n.id)!;
-      target.x = Math.round((col.get(n.id) ?? 0) * COL_W + 360);
-      target.y = r * ROW_H + 40;
+      if (horizontal) {
+        target.x = r * RANK_W + 40;
+        target.y = Math.round((col.get(n.id) ?? 0) * LANE_H + 60);
+      } else {
+        target.x = Math.round((col.get(n.id) ?? 0) * COL_W + 360);
+        target.y = r * ROW_H + 40;
+      }
     }
   }
 
-  return { ...doc, nodes: placed };
+  if (!horizontal) return { ...doc, nodes: placed };
+
+  // The editor routes an arrow with no stated sides for a top-to-bottom chart,
+  // so a left-to-right one states them here (it keeps the sides it is given).
+  // Mirror of the vertical convention: the ordinary next step leaves right and
+  // enters left; a second way out of a shape leaves from the bottom; a loop's
+  // return arrow goes over the TOP (the bottom belongs to the branch exit); an
+  // arrow that skips a rank in its own lane passes underneath.
+  const exits = new Map<string, number>();
+  for (const e of edges) exits.set(e.from, (exits.get(e.from) ?? 0) + 1);
+  const routed = edges.map((e, i) => {
+    if (e.fromSide || e.toSide) return e;
+    const a = index.get(e.from);
+    const b = index.get(e.to);
+    if (!a || !b) return e;
+    if (back.has(i)) return { ...e, fromSide: 't' as const, toSide: 't' as const };
+    const skips = (rank.get(e.to) ?? 0) - (rank.get(e.from) ?? 0) > 1;
+    if (skips && b.y === a.y) return { ...e, fromSide: 'b' as const, toSide: 'b' as const };
+    if (b.y > a.y) return { ...e, fromSide: 'b' as const, toSide: 'l' as const };
+    if (b.y < a.y) return { ...e, fromSide: 't' as const, toSide: 'l' as const };
+    return { ...e, fromSide: 'r' as const, toSide: 'l' as const };
+  });
+
+  return { ...doc, nodes: placed, edges: routed };
 }
 
 // ---- Serializing ----
