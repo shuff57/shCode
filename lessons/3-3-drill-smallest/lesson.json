@@ -33,6 +33,9 @@
       "instructions": "After the loop, return best with return. Leave the array alone."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[best starts as the first number]\n  B --> C{more numbers}\n  C -- yes --> D{this number is smaller than best}\n  D -- yes --> E[best becomes this number]\n  D -- no --> F[go to the next number]\n  E --> F\n  F --> C\n  C -- no --> G[/return best/]\n  G --> H([End])"
+  },
   "requirements": [
     {
       "id": "r1",

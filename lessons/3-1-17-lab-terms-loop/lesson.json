@@ -29,6 +29,9 @@
       "instructions": "Read a number of users with Number(prompt(...)), then write a for loop that calls terms() once for each user."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[read the number of users]\n  B --> C{more users to ask}\n  C -- yes --> D[/call terms: log the question, read Y or N/]\n  D --> E{the answer is Y}\n  E -- yes --> F[/log Thank you for accepting/]\n  E -- no --> G[/log Have a good day/]\n  F --> H[go to the next user]\n  G --> H\n  H --> C\n  C -- no --> I([End])"
+  },
   "requirements": [
     {
       "id": "r1",
