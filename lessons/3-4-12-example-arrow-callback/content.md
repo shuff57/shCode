@@ -22,6 +22,18 @@ console.log(countMatching(readings, (n) => n > 0));
 
 The arrow `(n) => n > 0` is the rule. It is passed *without* being named first, and the loop calls it on each number.
 
+```flow readonly caption="Figure 3.4.12: the counting loop. The diamond inside the loop is the callback: the loop asks it a yes or no question about each number, and never decides the answer itself."
+flowchart TD
+  A([Start]) --> B[count = 0]
+  B --> C{more numbers left}
+  C -- yes --> D{the callback says true for this number}
+  D -- yes --> E[count = count + 1]
+  E --> C
+  D -- no --> C
+  C -- no --> F[/return count/]
+  F --> G([End])
+```
+
 ## Step 2: Swap the callback, swap the question
 
 The loop is untouched. Only the arrow changes.

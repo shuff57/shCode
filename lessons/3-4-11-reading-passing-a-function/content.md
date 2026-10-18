@@ -24,6 +24,15 @@ console.log(applyTwice(addTen, 5));
 
 It prints `20` then `25`. Handed `double`, it doubled `5` to `10` and again to `20`; handed `addTen`, the same code produced `25`.
 
+```flow readonly caption="Figure 3.4.11: what happens inside applyTwice(double, 5). The function it was handed is called twice, and the second call receives the first call's answer."
+flowchart TD
+  A([Start]) --> B[/call applyTwice with double and 5/]
+  B --> C[[operation runs on 5, answer 10]]
+  C --> D[[operation runs on 10, answer 20]]
+  D --> E[/return 20/]
+  E --> F([End])
+```
+
 Note carefully: `applyTwice(double, 5)` passes `double` **without parentheses**. Writing `applyTwice(double(), 5)` would call `double` first and hand over its *result* — a number — which `applyTwice` would then try to call, and fail.
 
 Because a callback is often used in only one place, it is usually written inline as an arrow rather than named first.

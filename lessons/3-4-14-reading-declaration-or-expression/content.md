@@ -38,6 +38,16 @@ const expressed = (n) => n + 1;
 
 It prints `ReferenceError: Cannot access 'expressed' before initialization`. The variable is not filled in until execution reaches that line, so the call above it has nothing to call. This is the same rule that governs any `const` — the function part changes nothing.
 
+```flow readonly caption="Figure 3.4.14: what happens when a call sits above the line that defines the function. Only a declaration is prepared early; an expression or arrow can be called once its line has run."
+flowchart TD
+  A([Start]) --> B[JavaScript prepares every declaration, then runs the lines from the top]
+  B --> C{is the function a declaration}
+  C -- yes --> D[the call works]
+  C -- no --> E[/ReferenceError: not initialized yet/]
+  D --> F([End])
+  E --> F
+```
+
 ### Which should you use?
 
 Both are correct, and real code mixes them. A workable habit:
