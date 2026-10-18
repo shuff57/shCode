@@ -29,6 +29,9 @@
       "instructions": "In the catch block, log a friendly message using err.message that names which reading was skipped: do not just log a generic \"Error!\"."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[reading starts at 1]\n  B --> C{reading is 3 or less}\n  C -- no --> I([End])\n  C -- yes --> D{a good reading}\n  D -- yes --> G[/log the reading and its value/]\n  D -- no --> E[/throw an error, log Skipped reading and why/]\n  G --> H[go to the next reading]\n  E --> H\n  H --> C"
+  },
   "requirements": [
     {
       "id": "r1",

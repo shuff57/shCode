@@ -24,6 +24,9 @@
       "instructions": "Inside the loop, if the current number is not a multiple of 3, use continue to skip it. Otherwise, log the number."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[i starts at 1]\n  B --> C{i is 20 or less}\n  C -- yes --> D{i is a multiple of 3}\n  C -- no --> G([End])\n  D -- yes --> E[/log i/]\n  D -- no --> F[go to the next i]\n  E --> F\n  F --> C"
+  },
   "requirements": [
     {
       "id": "r1",
