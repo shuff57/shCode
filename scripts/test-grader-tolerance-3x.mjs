@@ -1639,6 +1639,32 @@ reject('3-6-13-lab-nested-mutation', 'own names, but the "deep" copy is a spread
   reject('3-7-17-lab-spread-array', 'combined printed with wrong numbers', 't1', js(...DS, 'console.log(combined.map((n) => n * 10));', 'console.log(framed);', 'console.log(first);'));
 }
 
+// ---- batch 15 (2026-10-18): 3.7.21 watches the arrays in the real run ("!arrays"): one and the same
+// array, printed twice with different contents, must have been changed in place by a method that RAN
+// between the prints (on it, an alias or a parameter). 3.8 t1 output checks read numbers as numbers.
+{
+  const id = '3-7-21-lab-mutating-sort-drill';
+  accept(id, 'pushed through an alias', js('const a = [1, 2, 3];', 'const b = a;', 'console.log(a);', 'b.push(4);', 'console.log(a);', 'console.log(a.map((x) => x * 2));'));
+  accept(id, 'pushed inside a function it is passed to', js('function add(arr) { arr.push(4); }', 'const nums = [1, 2, 3];', 'console.log("before:", nums);', 'add(nums);', 'console.log("after:", nums);', 'const twice = nums.map((n) => n * 2);', 'console.log(twice);'));
+  accept(id, 'sorted, the alias printed with join()', js('const a = [3, 1, 2];', 'const view = a;', 'console.log(view.join(" "));', 'a.sort();', 'console.log(view.join(" "));', 'console.log(a.slice(1));'));
+  reject(id, 'the function returns a new array and the variable is given it', 't2', js('function add(arr) { return [...arr, 4]; }', 'let nums = [1, 2, 3];', 'console.log(nums);', 'nums = add(nums);', 'if (false) { nums.push(5); }', 'console.log(nums);', 'console.log(nums.map((n) => n * 2));'));
+  reject(id, 'a push that never runs, an index write instead', 't2', js('const a = [1, 2, 3];', 'console.log(a);', 'if (false) { a.push(9); }', 'a[0] = 9;', 'console.log(a);', 'console.log(a.map((x) => x * 2));'));
+  reject(id, 'an empty push, an index write instead', 't2', js('const a = [1, 2, 3];', 'console.log(a);', 'a.push();', 'a[0] = 9;', 'console.log(a);', 'console.log(a.map((x) => x * 2));'));
+  reject(id, 'the push runs on another array', 't2', js('const a = [1, 2, 3];', 'const other = [];', 'console.log(a);', 'other.push(1);', 'a[0] = 9;', 'console.log(a);', 'console.log(a.map((x) => x * 2));'));
+}
+{
+  const GS = 'const gameState = { player: "M", items: [{ name: "Pen", price: 2 }, { name: "Pad", price: 1.12 }] };';
+  const TR = ['const saved = JSON.stringify(gameState);', 'const restored = JSON.parse(saved);'];
+  accept('3-8-11-lab-round-trip-array', 'price plus ten rounded with toFixed(2)', js(GS, ...TR, 'console.log((restored.items[1].price + 10).toFixed(2));', 'console.log(restored.items[1].name);'));
+  reject('3-8-11-lab-round-trip-array', 'price plus eleven printed', 't1', js(GS, ...TR, 'console.log((restored.items[1].price + 11).toFixed(2));', 'console.log(restored.items[1].name);'));
+  const SV = ['const defaults = { score: 0, level: 1 };', 'localStorage.setItem("k", JSON.stringify({ score: 0.1 + 0.2, level: 2.5 }));', 'const text = localStorage.getItem("k");', 'let restored = defaults;', 'if (text !== null) { try { restored = JSON.parse(text); } catch (e) { restored = defaults; } }'];
+  accept('3-8-19-lab-load-restore', 'a decimal score printed with toFixed(2)', js(...SV, 'console.log("score: " + restored.score.toFixed(2));'));
+  reject('3-8-19-lab-load-restore', 'a number that is none of restored\'s values printed', 't1', js(...SV, 'console.log((restored.score + 1).toFixed(2));'));
+  const RC = ['const records = [{ name: "Pen", price: 0.1 + 0.2 }, { name: "Pad", price: 5 }];', 'localStorage.setItem("records", JSON.stringify(records));', 'const restored = JSON.parse(localStorage.getItem("records"));'];
+  accept('3-8-23-lab-adapt-to-list', 'a decimal field printed with toFixed(2)', js(...RC, 'console.log(restored.length);', 'console.log(restored[0].price.toFixed(2));'));
+  reject('3-8-23-lab-adapt-to-list', 'the length printed wrong, a decimal rounded away', 't1', js(...RC, 'console.log(restored.length + 1);', 'console.log(Math.round(restored[0].price));'));
+}
+
 try {
   execFileSync(process.execPath, [
     path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'), 'lib/run-tests-node.ts',

@@ -36,12 +36,19 @@ messages). The next deploy brings it level with this commit.
   number Math.round of a decimal does not).
 - **Known edges.** An original counts as printed only when the print names it (`console.log(first)`, label fine), not
   through a loop variable or `[...first]`. A result printed through a variable computed from it
-  (`const t = middle.join()`) counts only when that print does not also show the whole array. 3.7.21: an array changed
-  through an alias (`const b = a; b.push(1)`) is not recognised as changed in place; a dead `a.push()` plus an index
-  write (`a[0] = 9`) passes. 3.7.8 accepts a part built by index (r2 still wants two `.slice(`). Stand-ins: 3.7.22
-  prices is the first top-level array; 3.7.18 tells changed from extended by an override of theme/fontSize/wrap (a
-  quoted key is not recognised); 3.8.11 gameState is the first object holding a `[`. 3.8.x t1 output checks still
-  match printed numbers as text.
+  (`const t = middle.join()`) counts only when that print does not also show the whole array. 3.7.8 accepts a part
+  built by index (r2 still wants two `.slice(`). Stand-ins: 3.7.22 prices is the first top-level array; 3.7.18 tells
+  changed from extended by an override of theme/fontSize/wrap (a quoted key is not recognised); 3.8.11 gameState is
+  the first object holding a `[`.
+- **Batch 15 (2026-10-18, 894 cases):** 3.7.21 now uses array identity, not text. Pseudo-perturb `"!arrays"`
+  (EXECUTION TRACE item 9) wraps the in-place array methods and `join` for the real run only and lists each method call
+  (array identity, contents changed or not) and each print (the arrays it printed or joined) as `trace.arrays`. The
+  check wants one and the same array printed twice with different output and a content-changing in-place call on it
+  that RAN between the prints, so an alias or a function parameter passes, and a dead push, an empty `push()`, a push
+  on another array, or a new array assigned to the variable fails. 3.8.11/19/23 t1 read printed numbers as numbers.
+  Edges: a print of the array via `JSON.stringify(a)` or `console.log(...a)` carries no identity and does not count;
+  the wrapped methods are visible to the script in the real run only (a detection cheat could tell that run apart);
+  arrays over 200 long count every in-place call as a change.
 
 # 2026-10-17: 3.6 labs accept the student's own names (committed locally, NOT pushed, NOT deployed)
 

@@ -176,7 +176,7 @@ export function jobsFromRequirements(reqs: Requirement[], code?: string): TestJo
     const hasScript = variables.length > 0 || checks.length > 0 || !!eo || !!eoc;
     // Only a requirement that asks for it gets the trace; every other job is sent exactly as before.
     const trace = hasScript && r.trace === true;
-    const perturb = trace && Array.isArray(r.perturb) ? r.perturb.filter((n): n is string => typeof n === 'string' && (n === '*' || n === '{}' || n === '!storage' || IDENT.test(n))).map((n) => own[n] || n) : [];
+    const perturb = trace && Array.isArray(r.perturb) ? r.perturb.filter((n): n is string => typeof n === 'string' && (n === '*' || n === '{}' || n === '!storage' || n === '!arrays' || IDENT.test(n))).map((n) => own[n] || n) : [];
     const traceFields = trace ? { trace: true, ...(perturb.length ? { perturb } : {}) } : {};
     jobs.push({
       id: r.id,
@@ -539,6 +539,7 @@ const __runTestJobs = (() => {
         text: tr.text,
         vars2: snapRun(tr.vars2, sc),
         empty: tr.emptyRun ? { threw: tr.emptyRun.threw === true, vars: snapRun(tr.emptyRun.vars, sc) } : null,
+        arrays: tr.arr ? tr.arr.events.map((e) => (e.k === 'p' ? { k: 'p', s: e.s, n: e.n, ids: e.ids.slice() } : { k: 'm', m: e.m, id: e.id, ch: e.ch === true })) : null,
       }, 0);
     }
     const seen = {};
@@ -791,10 +792,18 @@ const __runTestJobs = (() => {
 //      host's localStorage stand-in reads as empty and drops every write (the host passes the
 //      switch as drive's mute option): a script's missing-key path, run for real. empty is
 //      { threw, vars } for that run (vars as in 7), or null when it did not run.
+//   9. The pseudo-name "!arrays" watches the arrays in the real run: while it goes, the methods that
+//      change an array in place (push, unshift, pop, shift, splice, sort, reverse, fill, copyWithin)
+//      and join (which String(), + and a template also call) are wrapped, and put back right after.
+//      arrays lists, in order, each such method call ({k: 'm', m, id, ch}: id the array's identity,
+//      ch whether its contents changed) and each console.log call ({k: 'p', s, n, ids}: prints[s],
+//      its call n, the arrays it printed as an argument or joined just before). So a check can ask
+//      that one and the same array, printed twice with different contents, was changed in place by
+//      a method that ran between the prints, through an alias or a parameter as well.
 //   The host gets an afterReal call right after the real run, so the checks can see the
 //   localStorage the real run left, not the one the silent runs put back.
 // A check sees trace = { prints: [{src, code, ran, out, out2, stable, outD}],
-//   perturbed, threw, mk, k, c, rk, results, dreads, code, text, vars2, empty }:
+//   perturbed, threw, mk, k, c, rk, results, dreads, code, text, vars2, empty, arrays }:
 // src is the call's argument text as written, code the same with comments and
 // string contents blanked, ran how many times it ran in the real run, out what it
 // printed then (each call one string, at most 50), out2 the same for the changed
@@ -970,7 +979,7 @@ const __traceKit = (() => {
     const st = {
       phase: 1, key: '', perturbed: false, threw: false, blank, text: String(text), cap: null, RL,
       mk: null, k: 0, c: 0, rk: null, rkk: 0, rkc: 0, results: [], dreads: [], g0: null, restore: null,
-      recs: sites.map((s) => ({ src: s.src, code: s.code, ran: 0, out: [], out2: null, out3: null, stable: false, outD: null })),
+      recs: sites.map((s, k) => ({ i: k, src: s.src, code: s.code, ran: 0, out: [], out2: null, out3: null, stable: false, outD: null })),
       // Every run's hook parameters, the same names in each; argp: whether the code also takes a
       // parameter called arguments (not in strict code); gen: which silent run's stand-ins are live;
       // durs: how long each run took (ms); slow: the real run's ms when the silent runs did not fit.
@@ -979,6 +988,8 @@ const __traceKit = (() => {
       // look: tells its record from any other value; vars2 / emptyRun: what items 7 and 8 kept;
       // mute: the host's switch for an empty, write-dropping localStorage (item 8).
       tail: '', look: null, vars2: null, emptyRun: null, mute: null,
+      // arr: the array watch of item 9, while the real run is going (null otherwise)
+      arr: null,
     };
     // Sits in console.log while a traced run is going: notes what reaches the real
     // console during a call site's own call, and prints only in the real run.
@@ -1007,6 +1018,60 @@ const __traceKit = (() => {
     return { code: out, ids, st };
   }
 
+  // EXECUTION TRACE item 9: in the real run, the in-place array methods and join are watched.
+  // Each call of a method that changes an array in place on an array is an event {k: 'm', m, id,
+  // ch} (id: the array's identity, ch: its contents changed), and each console.log call is an
+  // event {k: 'p', s, n, ids}: s the call site, n which of its calls, ids the arrays it printed
+  // (an argument, or an array joined, or turned into text, since the last event).
+  const MUTATORS = ['push', 'unshift', 'pop', 'shift', 'splice', 'sort', 'reverse', 'fill', 'copyWithin'];
+  function armArrays(st) {
+    const AP = Array.prototype;
+    const ids = new WeakMap();
+    let next = 1;
+    const saved = {};
+    const J0 = AP.join;
+    const w = { events: [], pend: [], quiet: 0, idOf: null, off: null };
+    w.idOf = (o) => { let i = ids.get(o); if (i === undefined) { i = next++; ids.set(o, i); } return i; };
+    const sig = (a) => (a.length > 200 ? null : a.length + ':' + J0.call(a, String.fromCharCode(1)));
+    const live = (o) => w.quiet === 0 && st.phase === 1 && Array.isArray(o) && w.events.length < 2000;
+    const named = (f, n, len) => { try { R.def(f, 'name', { value: n, configurable: true }); R.def(f, 'length', { value: len, configurable: true }); } catch (_) { /* keep */ } return f; };
+    MUTATORS.forEach((m) => {
+      const f = AP[m];
+      if (typeof f !== 'function') return;
+      saved[m] = f;
+      AP[m] = named(function () {
+        if (!live(this)) return f.apply(this, arguments);
+        let before = null;
+        w.quiet++;
+        try { before = sig(this); } catch (_) { before = null; } finally { w.quiet--; }
+        const out = f.apply(this, arguments);
+        w.quiet++;
+        try {
+          const after = sig(this);
+          w.events[w.events.length] = { k: 'm', m, id: w.idOf(this), ch: before === null || after === null || before !== after };
+          w.pend = [];
+        } catch (_) { /* keep */ } finally { w.quiet--; }
+        return out;
+      }, m, f.length);
+    });
+    saved.join = J0;
+    AP.join = named(function () {
+      if (live(this) && w.pend.length < 20) w.pend[w.pend.length] = w.idOf(this);
+      return J0.apply(this, arguments);
+    }, 'join', J0.length);
+    w.off = () => { Object.keys(saved).forEach((m) => { AP[m] = saved[m]; }); };
+    st.arr = w;
+  }
+  function arrPrint(w, r, args) {
+    if (w.events.length >= 2000) { w.pend = []; return; }
+    const ids = w.pend.slice(0, 20);
+    for (let i = 0; i < args.length && ids.length < 40; i++) {
+      if (Array.isArray(args[i])) { const id = w.idOf(args[i]); if (ids.indexOf(id) < 0) ids[ids.length] = id; }
+    }
+    w.events[w.events.length] = { k: 'p', s: r.i, n: r.ran - 1, ids };
+    w.pend = [];
+  }
+
   // The stand-ins of one run, all from this one factory so every run's look the same. gen 0 is the
   // real run's: it counts its calls and keeps what they print. A silent run's (gen > 0) are live only
   // while that run is going, so a callback it left behind (an await) cannot print the changed data later.
@@ -1016,7 +1081,12 @@ const __traceKit = (() => {
   function standIn(st, r, gen, args) {
     if (gen === 0) {
       if (st.phase === 1) r.ran++;
-      return st.call(r, slice(args), st.phase === 1 ? 'out' : '');
+      const w = st.arr;
+      if (!w) return st.call(r, slice(args), st.phase === 1 ? 'out' : '');
+      if (st.phase === 1) arrPrint(w, r, args);
+      // What console.log does with the arguments is the harness's, not the script's.
+      w.quiet++;
+      try { return st.call(r, slice(args), st.phase === 1 ? 'out' : ''); } finally { w.quiet--; }
     }
     return gen === st.gen && st.phase === 2 ? st.call(r, slice(args), st.key) : undefined;
   }
@@ -1335,21 +1405,23 @@ const __traceKit = (() => {
     resetGlobals(st);
   }
 
-  // The names the jobs perturb ("{}" is the destructure run and "!storage" the empty-storage
-  // run, not names).
+  // The names the jobs perturb ("{}" is the destructure run, "!storage" the empty-storage run and
+  // "!arrays" the array watch, not names).
   function perturbNames(jobs) {
     const names = [];
     let destr = false;
     let empty = false;
+    let arrays = false;
     for (let j = 0; j < jobs.length; j++) {
       const ps = jobs[j] && jobs[j].script && jobs[j].script.trace === true && Array.isArray(jobs[j].script.perturb) ? jobs[j].script.perturb : [];
       for (let k = 0; k < ps.length; k++) {
         if (ps[k] === '{}') destr = true;
         else if (ps[k] === '!storage') empty = true;
+        else if (ps[k] === '!arrays') arrays = true;
         else if (typeof ps[k] === 'string' && (ps[k] === '*' || IDENT_RE.test(ps[k])) && names.indexOf(ps[k]) < 0) names.push(ps[k]);
       }
     }
-    return { names, destr, empty };
+    return { names, destr, empty, arrays };
   }
 
   // The silent runs after the real one: the changed run twice, then the destructure run (see
@@ -1406,6 +1478,7 @@ const __traceKit = (() => {
     st.tail = typeof o.tail === 'string' ? o.tail : '';
     st.look = ok;
     st.mute = typeof o.mute === 'function' ? o.mute : null;
+    const watchArrays = !!jobs && perturbNames(jobs).arrays;
     const steps = [{ real: true }];
     const res = { value: undefined, threw: false, err: undefined };
     for (let i = 0; i < steps.length; i++) {
@@ -1421,6 +1494,7 @@ const __traceKit = (() => {
       }
       const args = runArgs(st, s.real ? 0 : s.gen, s.pnF, s.dnF);
       fresh();
+      if (s.real && watchArrays) armArrays(st);
       const t = clock();
       let v;
       let threw = false;
@@ -1429,6 +1503,7 @@ const __traceKit = (() => {
         if (typeof f !== 'function') throw null;
         v = enter(f, args);
       } catch (e) { threw = true; err = e; }
+      if (s.real && st.arr) st.arr.off();
       st.durs.push(clock() - t);
       if (s.real) {
         res.value = v; res.threw = threw; res.err = err;
