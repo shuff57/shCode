@@ -109,7 +109,7 @@
       "description": "The snake_case or all-lowercase name has become camelCase. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const|var)\\s+favouriteColour\\s*=",
+      "pattern": "(?:let|const|var)\\s+favou?riteColou?r\\s*=",
       "flags": "",
       "points": 0
     },

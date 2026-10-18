@@ -913,6 +913,37 @@ for (const id of Object.values(L)) {
   reject(D, 'the green case has no console.log', 'r2', edit(sol, "case 'green':\n    console.log('Go');", "case 'green':\n    break;\n  case 'unused':\n    console.log('Go');"));
 }
 
+// ---------------------------------------------------------------- audit sweep, 2026-10-18 (batch 2)
+{
+  const D = '1-2-28-a1-2-1-fix-ten-declarations';
+  const sol = solutionFiles(D);
+  const rename = (name) => ({ 'script.js': sol['script.js'].split('favouriteColour').join(name) });
+  accept(D, 'favoriteColor, the American spelling', rename('favoriteColor'));
+  accept(D, 'favoriteColour, mixed', rename('favoriteColour'));
+  reject(D, 'still snake_case', 'r8', rename('favourite_colour'));
+  reject(D, 'lowercase run together', 'r8', rename('favouritecolour'));
+}
+{
+  const D = '1-5-31-a1-5-1-implement-your-plan';
+  const sol = solutionFiles(D);
+  accept(D, 'comparison stored in a const, then if (flag)',
+    edit(sol, 'if (pagesRequested <= creditRemaining) {', 'const canPrint = pagesRequested <= creditRemaining;' + nl + 'if (canPrint) {'));
+  reject(D, 'a const that is never compared', 'r4',
+    edit(sol, 'if (pagesRequested <= creditRemaining) {', 'const canPrint = true;' + nl + 'if (canPrint) {'));
+}
+{
+  const D = '1-5-37-lab-settle-it-in-the-console';
+  const logs = ['console.log(2 + 2 * 3)', 'console.log((2 + 2) * 3)', 'console.log(typeof "x")'].join(nl);
+  accept(D, 'Without brackets it is 8, with brackets it is 12',
+    { 'script.js': `// Without brackets the answer is 8, with brackets it is 12${nl}${logs}` });
+}
+{
+  const D = '2-1-5-lab-first-if';
+  const sol = solutionFiles(D);
+  accept(D, '70 <= score, the other way round', edit(sol, 'if (score >= 70) {', 'if (70 <= score) {'));
+  reject(D, 'score > 70 leaves out exactly 70', 'r1', edit(sol, 'if (score >= 70) {', 'if (score > 70) {'));
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(
