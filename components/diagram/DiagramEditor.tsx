@@ -916,8 +916,8 @@ function Canvas({
           display: flex;
           flex-direction: column;
           background: #282a36;
-          border-right: 1px solid #bd93f9;
-          box-shadow: 4px 0 14px rgba(0, 0, 0, 0.45);
+          border-left: 1px solid #bd93f9;
+          box-shadow: -4px 0 14px rgba(0, 0, 0, 0.45);
         }
         .shcode-flow-drawer .drawer-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 10px 12px; font-size: 13px; line-height: 1.55; color: #e0e2ee; }
       `}</style>
@@ -1062,41 +1062,6 @@ function Canvas({
       )}
 
       <div className="shcode-flow-stage">
-      {isFull && drawerOpen && drawerTabs && drawerTabs.length > 0 && (() => {
-        const active = drawerTabs.find((t) => t.key === drawerTab) ?? drawerTabs[0];
-        return (
-          <div className="shcode-flow-drawer" role="complementary" aria-label="Task and checks">
-            <div role="tablist" style={{ display: 'flex', borderBottom: '1px solid #44475a', flex: '0 0 auto' }}>
-              {drawerTabs.map((t) => (
-                <button
-                  key={t.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={t.key === active.key}
-                  onClick={() => setDrawerTab(t.key)}
-                  style={{
-                    flex: '1 1 0',
-                    padding: '8px 10px',
-                    background: 'transparent',
-                    border: 0,
-                    borderBottom: '2px solid ' + (t.key === active.key ? '#f1fa8c' : 'transparent'),
-                    color: t.key === active.key ? '#f1fa8c' : '#a9aecb',
-                    cursor: 'pointer',
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-            <div className="drawer-body" role="tabpanel">{active.content}</div>
-            {drawerFooter ? (
-              <div style={{ flex: '0 0 auto', padding: '8px 12px', borderTop: '1px solid #44475a' }}>{drawerFooter}</div>
-            ) : null}
-          </div>
-        );
-      })()}
       <div
         className="shcode-flow-canvas"
         style={{ height, background: '#21222c' }}
@@ -1182,6 +1147,41 @@ function Canvas({
           {!readOnly && <Controls showInteractive={false} />}
         </ReactFlow>
       </div>
+      {isFull && drawerOpen && drawerTabs && drawerTabs.length > 0 && (() => {
+        const active = drawerTabs.find((t) => t.key === drawerTab) ?? drawerTabs[0];
+        return (
+          <div className="shcode-flow-drawer" role="complementary" aria-label="Task and checks">
+            <div role="tablist" style={{ display: 'flex', borderBottom: '1px solid #44475a', flex: '0 0 auto' }}>
+              {drawerTabs.map((t) => (
+                <button
+                  key={t.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={t.key === active.key}
+                  onClick={() => setDrawerTab(t.key)}
+                  style={{
+                    flex: '1 1 0',
+                    padding: '8px 10px',
+                    background: 'transparent',
+                    border: 0,
+                    borderBottom: '2px solid ' + (t.key === active.key ? '#f1fa8c' : 'transparent'),
+                    color: t.key === active.key ? '#f1fa8c' : '#a9aecb',
+                    cursor: 'pointer',
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <div className="drawer-body" role="tabpanel">{active.content}</div>
+            {drawerFooter ? (
+              <div style={{ flex: '0 0 auto', padding: '8px 12px', borderTop: '1px solid #44475a' }}>{drawerFooter}</div>
+            ) : null}
+          </div>
+        );
+      })()}
       </div>
 
       {!readOnly && (
