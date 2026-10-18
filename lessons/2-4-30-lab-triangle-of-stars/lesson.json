@@ -29,6 +29,9 @@
       "instructions": "After the inner loop closes, log line. You should see 1 star on the first line, up to 5 stars on the last."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[row starts at 1]\n  B --> C{row is 5 or less}\n  C -- yes --> D[make line empty, star starts at 1]\n  D --> E{star is up to row}\n  E -- yes --> F[add a star to line]\n  F --> E\n  E -- no --> G[/log line/]\n  G --> H[go to the next row]\n  H --> C\n  C -- no --> I([End])"
+  },
   "requirements": [
     {
       "id": "r1",

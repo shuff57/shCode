@@ -24,6 +24,9 @@
       "instructions": "Write a while (true) loop. Inside, check whether n * n is greater than 50. If it is, log n and its square, then break. Otherwise add 1 to n and let the loop continue."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[set n to 1]\n  B --> C{n times n is greater than 50}\n  C -- no --> F[add 1 to n]\n  F --> C\n  C -- yes --> D[/log n and its square/]\n  D --> E([End])"
+  },
   "requirements": [
     {
       "id": "r1",

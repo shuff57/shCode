@@ -29,6 +29,9 @@
       "instructions": "In the catch block, log err.message. Test with \"abc\", then change password to a longer value and confirm it logs \"Password accepted\" instead."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[set password to abc]\n  B --> C{shorter than 8 characters}\n  C -- yes --> D[throw an error]\n  D --> E[/log the error message/]\n  C -- no --> F[no error is thrown]\n  F --> H[/log Password accepted/]\n  E --> G([End])\n  H --> G"
+  },
   "requirements": [
     {
       "id": "r1",
