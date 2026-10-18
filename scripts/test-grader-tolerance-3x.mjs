@@ -1738,6 +1738,47 @@ reject('3-6-13-lab-nested-mutation', 'own names, but the "deep" copy is a spread
   reject('3-8-7-lab-stringify-spot-drops', 'the JSON text is never kept in a variable', 'r3', js('const counter = { count: 5, describe: function () { return "hi"; }, note: undefined };', 'console.log(JSON.stringify(counter));'));
 }
 
+// ---- batch 17 (2026-10-18): the call spy (EXECUTION TRACE item 12). A function call counts only
+// when it RUNS, on the caller's own variable, and that variable (or the result) is printed after it:
+// a call behind if (false), a call on a typed-in literal and a call never made all fail; a call
+// through an alias or as a callback counts; a renamed function is the one watched.
+{
+  const B12 = ['function birthday(p) { p.age = p.age + 1; }', 'function birthdaySafe(p) { return { ...p, age: p.age + 1 }; }'];
+  const id12 = '3-6-12-lab-object-param-mutation';
+  const SAFE = ['const older = birthdaySafe(user);', 'console.log(older);', 'console.log(user);'];
+  reject(id12, 'birthday(user) behind if (false), the age set by hand', 'r6', js(...B12, 'const user = { name: "Marisol", age: 30 };', 'if (false) { birthday(user); }', 'user.age = 31;', 'console.log(user);', ...SAFE));
+  reject(id12, 'birthday called on a typed-in object', 'r6', js(...B12, 'const user = { name: "Marisol", age: 31 };', 'birthday({ name: "x", age: 1 });', 'console.log(user);', ...SAFE));
+  reject(id12, 'birthdaySafe called, its result never printed', 'r7', js(...B12, 'const user = { name: "Marisol", age: 30 };', 'birthday(user);', 'console.log(user);', 'birthdaySafe(user);', 'console.log(user);'));
+  accept(id12, 'birthday through an alias, birthdaySafe as a map callback', js('const birthday = (p) => { p.age += 1; };', 'function birthdaySafe(p) { return { ...p, age: p.age + 1 }; }', 'const user = { name: "Marisol", age: 30 };', 'const grow = birthday;', 'grow(user);', 'console.log(user);', 'const older = [user].map(birthdaySafe)[0];', 'console.log(older);', 'console.log(user);'));
+  accept(id12, '"use strict", calls before the functions are written', js('"use strict";', 'const user = { name: "Marisol", age: 30 };', 'birthday(user);', 'console.log(user);', 'const older = birthdaySafe(user);', 'console.log(older, user);', ...B12));
+  const N4 = ['function changeNum(n) { n = 99; }', 'function changeArr(a) { a.push(99); }', 'let myNum = 10;', 'let myArr = [1, 2, 3];'];
+  const id4 = '3-6-4-lab-predict-primitive-vs-array';
+  reject(id4, 'changeArr behind if (false), the push done by hand', 'r7', js(...N4, 'changeNum(myNum);', 'if (false) { changeArr(myArr); }', 'myArr.push(99);', 'console.log(myNum);', 'console.log(myArr);'));
+  reject(id4, 'changeNum called on a typed-in number', 'r6', js(...N4, 'changeNum(5);', 'changeArr(myArr);', 'console.log(myNum);', 'console.log(myArr);'));
+  accept(id4, 'changeArr as a forEach callback', js(...N4, 'changeNum(myNum);', '[myArr].forEach(changeArr);', 'console.log(myNum);', 'console.log(myArr);'));
+  const A8 = 'function addOne(scores) { for (let i = 0; i < scores.length; i++) { scores[i] = scores[i] + 1; } }';
+  const id8 = '3-6-8-lab-fix-reassign-bug';
+  reject(id8, 'addOne behind if (false), the caller loop does the work', 'r5', js(A8, 'let quizScores = [10, 20, 30];', 'if (false) { addOne(quizScores); }', 'for (let i = 0; i < quizScores.length; i++) { quizScores[i]++; }', 'console.log(quizScores);'));
+  reject(id8, 'addOne called on a typed-in array', 'r5', js(A8, 'let quizScores = [11, 21, 31];', 'addOne([10, 20, 30]);', 'console.log(quizScores);'));
+  reject(id8, 'addOne never called', 'r5', js(A8, 'let quizScores = [11, 21, 31];', 'console.log(quizScores);'));
+  accept(id8, 'addOne through an alias', js(A8, 'const quizScores = [10, 20, 30];', 'const bump = addOne;', 'bump(quizScores);', 'console.log(quizScores);'));
+  const S13 = ['const student = { name: "A", scores: [90, 85] };', 'const shallow = { ...student };', 'shallow.scores.push(100);', 'console.log(shallow.scores);', 'console.log(student.scores);'];
+  const id13 = '3-6-13-lab-nested-mutation';
+  reject(id13, 'deep given another object after structuredClone', 'r5', js(...S13, 'let deep = structuredClone(student);', 'deep = { name: "A", scores: [90, 85, 100] };', 'deep.scores.push(70);', 'console.log(deep.scores);', 'console.log(student.scores);'));
+  reject(id13, 'structuredClone of a typed-in object', 'r5', js(...S13, 'const deep = structuredClone({ name: "A", scores: [90, 85, 100] });', 'deep.scores.push(70);', 'console.log(deep.scores);', 'console.log(student.scores);'));
+  accept(id13, 'structuredClone inside a helper', js(...S13, 'const copyOf = (o) => structuredClone(o);', 'const deep = copyOf(student);', 'deep.scores.push(70);', 'console.log(deep.scores);', 'console.log(student.scores);'));
+  const F16 = ['function addScore(s, x) { return [...s, x]; }', 'function recordPlay(song) { song.plays++; }', 'function copyBook(l) { return structuredClone(l); }', 'const original = [10, 20];', 'const song = { title: "D", plays: 4 };', 'const library = { name: "S", books: ["A", "B"] };'];
+  const id16 = '3-6-16-lab-capstone';
+  reject(id16, 'recordPlay behind if (false), plays set by hand', 'r9', js(...F16, 'const withNew = addScore(original, 30);', 'console.log(original, withNew);', 'if (false) { recordPlay(song); }', 'song.plays = 5;', 'console.log(song);', 'const clone = copyBook(library);', 'clone.books.push("C");', 'console.log(library.books, clone.books);'));
+  reject(id16, 'copyBook called on a typed-in object', 'r10', js(...F16, 'const withNew = addScore(original, 30);', 'console.log(original, withNew);', 'recordPlay(song);', 'console.log(song);', 'copyBook({ books: [] });', 'console.log(library.books);'));
+  accept(id16, 'recordPlay as a forEach callback', js(...F16, 'const withNew = addScore(original, 30);', 'console.log(original, withNew);', '[song].forEach(recordPlay);', 'console.log(song);', 'const clone = copyBook(library);', 'clone.books.push("C");', 'console.log(library.books, clone.books);'));
+  const R14 = 'function readSave(text) { try { return JSON.parse(text); } catch (e) { return { ok: false }; } }';
+  const id14 = '3-8-14-lab-malformed-json';
+  reject(id14, 'the bad-text call behind if (false)', 't1', js(R14, 'console.log(readSave(\'{"a":1}\'));', 'if (false) { console.log(readSave("junk")); }'));
+  reject(id14, 'two calls, both with good text', 't1', js(R14, 'console.log(readSave(\'{"a":1}\'));', 'console.log(readSave(\'{"b":2}\'));'));
+  accept(id14, 'one call in a loop over a good and a bad text', js(R14, 'for (const t of [\'{"a":1}\', "junk"]) { console.log(readSave(t)); }'));
+}
+
 try {
   execFileSync(process.execPath, [
     path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'), 'lib/run-tests-node.ts',

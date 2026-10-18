@@ -131,6 +131,8 @@ export interface TestJob {
     /** Opt-in execution trace (see EXECUTION TRACE below). */
     trace?: boolean;
     perturb?: string[];
+    /** Opt-in call spy (EXECUTION TRACE item 12): the student's functions to watch. */
+    spy?: string[];
   };
   timeout: number;
   tolerance: number;
@@ -177,7 +179,8 @@ export function jobsFromRequirements(reqs: Requirement[], code?: string): TestJo
     // Only a requirement that asks for it gets the trace; every other job is sent exactly as before.
     const trace = hasScript && r.trace === true;
     const perturb = trace && Array.isArray(r.perturb) ? r.perturb.filter((n): n is string => typeof n === 'string' && (n === '*' || n === '{}' || n === '!storage' || n === '!arrays' || n === '!numbers' || n === '!stored' || IDENT.test(n))).map((n) => own[n] || n) : [];
-    const traceFields = trace ? { trace: true, ...(perturb.length ? { perturb } : {}) } : {};
+    const spy = trace && Array.isArray(r.spy) ? r.spy.filter((n): n is string => typeof n === 'string' && IDENT.test(n)).map((n) => own[n] || n) : [];
+    const traceFields = trace ? { trace: true, ...(perturb.length ? { perturb } : {}), ...(spy.length ? { spy } : {}) } : {};
     jobs.push({
       id: r.id,
       fn: typeof fn === 'string' ? fn : '',
@@ -540,6 +543,7 @@ const __runTestJobs = (() => {
         vars2: snapRun(tr.vars2, sc),
         empty: tr.emptyRun ? { threw: tr.emptyRun.threw === true, vars: snapRun(tr.emptyRun.vars, sc) } : null,
         stored: tr.storedRun ? { threw: tr.storedRun.threw === true, vars: snapRun(tr.storedRun.vars, sc) } : null,
+        calls: tr.spyRun ? { threw: tr.spyRun.threw === true, events: tr.spyRun.events } : null,
         arrays: tr.arr ? tr.arr.events.map((e) => (e.k === 'p' ? { k: 'p', s: e.s, n: e.n, ids: e.ids.slice(), sigs: (e.sigs || []).slice() } : { k: 'm', m: e.m, id: e.id, ch: e.ch === true, b: e.b === undefined ? null : e.b, a: e.a === undefined ? null : e.a })) : null,
       }, 0);
     }
@@ -811,10 +815,18 @@ const __runTestJobs = (() => {
 //      (mk around strings, n * k + c) before the script sees it. stored is { threw, vars } for that
 //      run (vars as in 7) and each print's outS what it printed then: a value loaded from storage
 //      changes there, a typed one does not.
+//  12. A tests requirement's "spy": ["fn", ...] adds one more silent run, the script as written, in which
+//      each named function (a student's, found under the student's own name; or a built-in such as
+//      structuredClone) is wrapped where it is defined, so every call that RUNS is recorded, through
+//      an alias or as a callback too. calls is { threw, events } for that run: each call
+//      {k: 'c', fn, args, same, ids, ret, retSame, retId} and each print {k: 'p', s, same, ids} in
+//      order, where args are copies made at the call, same[i] the top-level names whose final value
+//      is argument i (the same object, or the same number or text), ids an identity per object.
+//      A call behind if (false) is never recorded; a call on a literal has no name in same.
 //   The host gets an afterReal call right after the real run, so the checks can see the
 //   localStorage the real run left, not the one the silent runs put back.
 // A check sees trace = { prints: [{src, code, ran, out, out2, stable, outD}],
-//   perturbed, threw, mk, k, c, rk, results, dreads, code, text, vars2, empty, arrays, stored }:
+//   perturbed, threw, mk, k, c, rk, results, dreads, code, text, vars2, empty, arrays, stored, calls }:
 //   (each print also has outS, item 11)
 // src is the call's argument text as written, code the same with comments and
 // string contents blanked, ran how many times it ran in the real run, out what it
@@ -1003,6 +1015,8 @@ const __traceKit = (() => {
       // arr: the array watch of item 9, while the real run is going (null otherwise); numOnly:
       // item 10; storedRun / tweakStore: item 11.
       arr: null, numOnly: false, storedRun: null, tweakStore: null,
+      // spyLog / spyRun / spyMark: the call spy of item 12
+      spyLog: null, spyRun: null, spyMark: null,
     };
     // Sits in console.log while a traced run is going: notes what reaches the real
     // console during a call site's own call, and prints only in the real run.
@@ -1125,7 +1139,10 @@ const __traceKit = (() => {
       w.quiet++;
       try { return st.call(r, slice(args), st.phase === 1 ? 'out' : ''); } finally { w.quiet--; }
     }
-    return gen === st.gen && st.phase === 2 ? st.call(r, slice(args), st.key) : undefined;
+    if (gen !== st.gen || st.phase !== 2) return undefined;
+    const log = st.spyLog;
+    if (log && st.key === 'outC' && log.length < 300) log[log.length] = { k: 'p', s: r.i, live: slice(args) };
+    return st.call(r, slice(args), st.key);
   }
   // The hook parameters every run gets (a silent run's code calls them; the real run's does not).
   function hook(impl) { return function (a, b) { return impl(a, b); }; }
@@ -1396,7 +1413,7 @@ const __traceKit = (() => {
     st.key = s.key;
     let f = null;
     try {
-      f = compile(tr, s.srcOf(st.pn, st.dn) + st.tail);
+      f = compile(tr, s.srcOf(st.pn, st.dn) + (typeof s.tail === 'string' ? s.tail : st.tail));
       console.log = st.probe;
       // console.warn and console.error stay the runner's own: they post, and posting goes nowhere.
       self.postMessage = function postMessage() {};
@@ -1451,7 +1468,10 @@ const __traceKit = (() => {
     let arrays = false;
     let numbers = false;
     let stored = false;
+    const spies = [];
     for (let j = 0; j < jobs.length; j++) {
+      const sp = jobs[j] && jobs[j].script && jobs[j].script.trace === true && Array.isArray(jobs[j].script.spy) ? jobs[j].script.spy : [];
+      for (let k = 0; k < sp.length; k++) if (typeof sp[k] === 'string' && IDENT_RE.test(sp[k]) && spies.indexOf(sp[k]) < 0) spies.push(sp[k]);
       const ps = jobs[j] && jobs[j].script && jobs[j].script.trace === true && Array.isArray(jobs[j].script.perturb) ? jobs[j].script.perturb : [];
       for (let k = 0; k < ps.length; k++) {
         if (ps[k] === '{}') destr = true;
@@ -1462,7 +1482,130 @@ const __traceKit = (() => {
         else if (typeof ps[k] === 'string' && (ps[k] === '*' || IDENT_RE.test(ps[k])) && names.indexOf(ps[k]) < 0) names.push(ps[k]);
       }
     }
-    return { names, destr, empty, arrays, numbers, stored };
+    return { names, destr, empty, arrays, numbers, stored, spies };
+  }
+
+  // Item 12, the call spy. Bracket depth before each character of blanked code.
+  function depthsOf(b) {
+    const dp = new Int32Array(b.length + 1);
+    let d = 0;
+    for (let i = 0; i < b.length; i++) {
+      dp[i] = d;
+      const ch = b[i];
+      if (ch === '(' || ch === '[' || ch === OPEN_BRACE) d++;
+      else if (ch === ')' || ch === ']' || ch === '}') d = Math.max(0, d - 1);
+    }
+    dp[b.length] = d;
+    return dp;
+  }
+  // Where an initializer that starts at s ends: a , or ; at its own depth, the bracket that closes
+  // around it, or a line that starts the next statement.
+  function initEndOf(b, s) {
+    let k = 0;
+    for (let i = s; i < b.length; i++) {
+      const ch = b[i];
+      if (ch === '(' || ch === '[' || ch === OPEN_BRACE) k++;
+      else if (ch === ')' || ch === ']' || ch === '}') { if (k === 0) return i; k--; }
+      else if (k === 0 && (ch === ',' || ch === ';')) return i;
+      else if (k === 0 && ch === '\n' && /^\s*(?:const|let|var|function|class|if|for|while|console)\b/.test(b.slice(i + 1, i + 40))) return i;
+    }
+    return b.length;
+  }
+  // The top-level names a script declares (the spy run hands their values back at its end).
+  function topNames(b) {
+    const dp = depthsOf(b);
+    const out = [];
+    const re = /(?<![\w$.])(?:(?:const|let|var)\s+|function\s*\*?\s*)([A-Za-z_$][\w$]*)/g;
+    let m;
+    while ((m = re.exec(b)) && out.length < 80) if (dp[m.index] === 0 && out.indexOf(m[1]) < 0) out.push(m[1]);
+    const more = /,\s*([A-Za-z_$][\w$]*)\s*=(?![=>])/g;
+    while ((m = more.exec(b)) && out.length < 80) if (dp[m.index] === 0 && out.indexOf(m[1]) < 0) out.push(m[1]);
+    return out;
+  }
+  function spyTail(mark, tops) {
+    const parts = tops.map((n) => JSON.stringify(n) + ': (() => { try { return [1, ' + n + ']; } catch (e) { return [0]; } })()');
+    return '\n;return [' + JSON.stringify(mark) + ', {' + parts.join(', ') + '}];';
+  }
+  // The spy run's code: a watched function declared with function name() is wrapped at the top
+  // (after any "use strict"), so every call, through an alias or as a callback too, goes through
+  // the wrapper; one declared as const name = ... has its initializer wrapped; a name the script
+  // does not declare (a built-in such as structuredClone) is wrapped at the top.
+  function spySource(code, b, names, pn) {
+    const dp = depthsOf(b);
+    const ins = [];
+    const pro = /^(?:\s*(["'])[^"'\n]*\1[ \t]*(?:;|\n))*/.exec(b);
+    const top = pro ? pro[0].length : 0;
+    const q = (s) => JSON.stringify(s);
+    for (let k = 0; k < names.length; k++) {
+      const n = names[k];
+      const esc = n.replace(/\$/g, '\\$');
+      let m;
+      let done = false;
+      const fd = new RegExp('(?<![\\w$.])function\\s*\\*?\\s+' + esc + '\\s*\\(', 'g');
+      while ((m = fd.exec(b))) { if (dp[m.index] === 0) { ins.push([top, 0, ';' + n + ' = ' + pn + '(' + q(n) + ', ' + n + ');']); done = true; break; } }
+      if (done) continue;
+      const vd = new RegExp('(?<![\\w$.])(?:const|let|var)\\s+' + esc + '\\s*=(?![=>])\\s*', 'g');
+      while ((m = vd.exec(b))) {
+        if (dp[m.index] !== 0) continue;
+        const s = m.index + m[0].length;
+        const e = initEndOf(b, s);
+        ins.push([s, 1, pn + '(' + q(n) + ', ']);
+        ins.push([e, -1, ')']);
+        done = true;
+        break;
+      }
+      if (!done && typeof self[n] === 'function') ins.push([top, 0, ';' + n + ' = ' + pn + '(' + q(n) + ', ' + n + ');']);
+    }
+    ins.sort((x, y) => y[0] - x[0] || x[1] - y[1]);
+    let out = code;
+    for (let k = 0; k < ins.length; k++) out = out.slice(0, ins[k][0]) + ins[k][2] + out.slice(ins[k][0]);
+    return out;
+  }
+  // A plain copy of a value for the record: what an argument held when the call was made.
+  function copyVal(v, d) {
+    if (v === null || (typeof v !== 'object' && typeof v !== 'function')) return v;
+    if (typeof v === 'function') return '[function]';
+    if (d > 4) return '...';
+    try {
+      if (Array.isArray(v)) { const o = []; for (let i = 0; i < v.length && i < 50; i++) { const ds = R.gopd(v, String(i)); o[i] = ds && 'value' in ds ? copyVal(ds.value, d + 1) : undefined; } return o; }
+      const pr = Object.getPrototypeOf(v);
+      if (pr !== Object.prototype && pr !== null) return String(v);
+      const o = {};
+      const ks = Object.keys(v);
+      for (let i = 0; i < ks.length && i < 50; i++) { const ds = R.gopd(v, ks[i]); if (ds && 'value' in ds) o[ks[i]] = copyVal(ds.value, d + 1); }
+      return o;
+    } catch (_) { return '?'; }
+  }
+  function spyWrap(st, name, fn) {
+    const w = function () {
+      const log = st.spyLog;
+      let ev = null;
+      if (log && st.phase === 2 && log.length < 300) {
+        const live = slice(arguments);
+        ev = { k: 'c', fn: name, live, args: live.map((a) => copyVal(a, 0)), retLive: undefined };
+        log[log.length] = ev;
+      }
+      const out = fn.apply(this, arguments);
+      if (ev) ev.retLive = out;
+      return out;
+    };
+    try { R.def(w, 'name', { value: fn.name, configurable: true }); R.def(w, 'length', { value: fn.length, configurable: true }); } catch (_) { /* keep */ }
+    return w;
+  }
+  // The record a check sees: each call {k: 'c', fn, args, same, ids, ret, retSame, retId} and each
+  // print {k: 'p', s, same, ids}, in order. same[i]: the top-level names whose final value IS
+  // argument i (the same object, or the same primitive value); ids: an identity per object.
+  function finishSpy(st, ok, v) {
+    const vars = ok && Array.isArray(v) && v[0] === st.spyMark && v[1] && typeof v[1] === 'object' ? v[1] : null;
+    const ids = new WeakMap();
+    let next = 1;
+    const isObj = (x) => x !== null && (typeof x === 'object' || typeof x === 'function');
+    const idOf = (x) => { if (!isObj(x)) return null; let i = ids.get(x); if (i === undefined) { i = next++; ids.set(x, i); } return i; };
+    const namesOf = (x) => (vars ? Object.keys(vars).filter((k) => Array.isArray(vars[k]) && vars[k][0] === 1 && vars[k][1] === x && (isObj(x) || typeof x === 'number' || typeof x === 'string')).slice(0, 10) : []);
+    const events = (st.spyLog || []).map((e) => (e.k === 'c'
+      ? { k: 'c', fn: e.fn, args: e.args, same: e.live.map(namesOf), ids: e.live.map(idOf), ret: copyVal(e.retLive, 0), retSame: namesOf(e.retLive), retId: idOf(e.retLive) }
+      : { k: 'p', s: e.s, same: e.live.map(namesOf), ids: e.live.map(idOf) }));
+    return { threw: !ok, events };
   }
 
   // Item 11: stored JSON text read back changed the way the changed run changes data (a string
@@ -1504,6 +1647,17 @@ const __traceKit = (() => {
         });
       }
       if (pl.destr) steps.push({ key: 'outD', srcOf: (pn, dn) => perturbSource(tr.code, st.blank, [], pn, dn), dnF: makeDestructurer(st) });
+    }
+    if (pl.spies.length) {
+      // The script as written, each watched function wrapped where it is defined (item 12).
+      st.spyMark = 'spy' + rnd3() + rnd3() + rnd3();
+      const tops = topNames(st.blank);
+      steps.push({
+        key: 'outC', srcOf: (pn) => spySource(tr.code, st.blank, pl.spies, pn), tail: spyTail(st.spyMark, tops),
+        pnF: (n, v) => (typeof v === 'function' ? spyWrap(st, n, v) : v),
+        before: () => { st.spyLog = []; },
+        after: (ok, v) => { st.spyRun = finishSpy(st, ok, v); st.spyLog = null; },
+      });
     }
     if (pl.stored && typeof st.tweakStore === 'function') {
       // The script as written, but every text it reads back from localStorage is changed (item 11).

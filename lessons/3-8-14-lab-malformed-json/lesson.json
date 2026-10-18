@@ -125,14 +125,17 @@
           "fail": "readSave('{\"a\":1}') should return { a: 1 } (and any other good text its own object), and readSave(\"corrupted!!\") should return a fallback object without throwing."
         },
         {
-          "expr": "(trace.code.match(new RegExp('(?<![\\\\w$.])' + 'readSave'.replace(/\\$/g, '\\\\$') + '\\\\s*\\\\(', 'g')) || []).length - (new RegExp('function\\\\s+' + 'readSave'.replace(/\\$/g, '\\\\$') + '\\\\s*\\\\(').test(trace.code) ? 1 : 0) >= 2",
-          "fail": "Call readSave twice: once with good JSON text and once with text that will not parse, and print both results."
+          "expr": "trace.calls !== null && (() => { const $xs = trace.calls.events.filter(($e) => $e.k === 'c' && $e.fn === 'readSave' && typeof $e.args[0] === 'string').map(($e) => $e.args[0]); const $ok = ($s) => { try { JSON.parse($s); return true; } catch (e) { return false; } }; return $xs.some($ok) && $xs.some(($s) => !$ok($s)); })()",
+          "fail": "Call readSave twice where the program reaches it: once with good JSON text and once with text that will not parse, and print both results."
         }
       ],
       "trace": true,
       "names": {
         "readSave": "function"
-      }
+      },
+      "spy": [
+        "readSave"
+      ]
     }
   ],
   "grading": {

@@ -119,6 +119,10 @@ export interface Requirement {
    *  (trace.stored, prints' outS). The changed run's
    *  variables are trace.vars2. */
   perturb?: string[];
+  /** type: 'tests' only, with `trace`. Functions (the written names; a student's own
+   *  name is found through `names`) whose calls a silent run records: trace.calls,
+   *  see "EXECUTION TRACE" item 12 in lib/test-harness-source.ts. */
+  spy?: string[];
   /** type: 'regex' only. The id of a `tests` requirement of the same lesson whose
    *  pass, on the code exactly as it is now, also passes this one: the run proved
    *  at run time what the pattern looks for in the text (a print reached through a
