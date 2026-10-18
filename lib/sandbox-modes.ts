@@ -1,19 +1,30 @@
-// The three things the sandbox can run. Each mode is its own lesson id, so the
-// store keeps three independent drafts — switching modes does not clobber the
+// The four things the sandbox can hold. Each mode is its own lesson id, so the
+// store keeps four independent drafts — switching modes does not clobber the
 // code you left in another one.
 
 import type { Lesson } from './types';
 
-export type SandboxModeId = 'js' | 'moshion' | 'reshape';
+export type SandboxModeId = 'js' | 'moshion' | 'reshape' | 'flow';
 
 export interface SandboxMode {
   id: SandboxModeId;
   label: string;
   blurb: string;
-  preview: 'console' | 'moshion' | 'reshape';
+  preview: 'console' | 'moshion' | 'reshape' | 'diagram';
   docsHref: string | null;
+  /** The one saved file. Code modes keep script.js; a flowchart keeps its DiagramDoc as JSON. */
+  file: string;
   starter: string;
 }
+
+// A flowchart is not run, so the starter is a canvas with one oval on it
+// rather than a blank page: the first thing a student needs is a place to start.
+export const FLOW_FILE = 'chart.json';
+const FLOW_STARTER = JSON.stringify({
+  version: 1,
+  nodes: [{ id: 'start', shape: 'terminal', label: 'Start', x: 360, y: 40 }],
+  edges: [],
+});
 
 const JS_STARTER = `// JavaScript sandbox — output goes to the console below.
 
@@ -56,6 +67,7 @@ export const SANDBOX_MODES: SandboxMode[] = [
     blurb: 'Plain JavaScript. Output goes to the console.',
     preview: 'console',
     docsHref: null,
+    file: 'script.js',
     starter: JS_STARTER,
   },
   {
@@ -64,6 +76,7 @@ export const SANDBOX_MODES: SandboxMode[] = [
     blurb: 'A blank moSHion canvas to try out ideas.',
     preview: 'moshion',
     docsHref: '/docs/moshion',
+    file: 'script.js',
     starter: MOSHION_STARTER,
   },
   {
@@ -72,7 +85,17 @@ export const SANDBOX_MODES: SandboxMode[] = [
     blurb: 'Solid modelling. Drag a dimension and the model rebuilds.',
     preview: 'reshape',
     docsHref: '/docs/reshape',
+    file: 'script.js',
     starter: RESHAPE_STARTER,
+  },
+  {
+    id: 'flow',
+    label: 'Flowchart',
+    blurb: 'A free canvas for flowcharts. No checks, no grade.',
+    preview: 'diagram',
+    docsHref: null,
+    file: FLOW_FILE,
+    starter: FLOW_STARTER,
   },
 ];
 
@@ -92,8 +115,8 @@ export function sandboxLesson(mode: SandboxMode): Lesson {
       {
         type: 'file',
         id: `sandbox-${mode.id}-script`,
-        name: 'script.js',
-        path: 'script.js',
+        name: mode.file,
+        path: mode.file,
         content: mode.starter,
       },
     ],

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { ChevronDown, ChevronUp, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from 'lucide-react';
 import { useLessonStore } from '../lib/store';
+import { saveProgress } from '../lib/version-control';
 import CodeEditor from './CodeEditor';
 import MoshionPreview from './MoshionPreview';
 import Console from './Console';
@@ -20,6 +21,8 @@ import {
   whyLocked,
   type TeacherModes,
 } from '../lib/lesson-mode';
+import EditorPlaceholder from './diagram/EditorPlaceholder';
+import { emptyDiagram, type DiagramDoc } from '../lib/diagram-types';
 import {
   SANDBOX_MODES,
   getMode,
@@ -31,6 +34,26 @@ import {
 // sandbox session should never pay for them. Same dynamic-import pattern
 // DiagramAssignmentView uses for DiagramEditor.
 const ReshapeStudio = dynamic(() => import('./reshape/ReshapeStudio'), { ssr: false });
+// Same lazy chunk the lesson diagrams use; React Flow stays out of the other modes.
+const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
+  ssr: false,
+  loading: () => <EditorPlaceholder height={420} />,
+});
+
+// The palette row above the canvas and the hint line below it, so the canvas height is
+// the frame's height minus this.
+const FLOW_PALETTE_H = 130;
+
+// The saved chart is JSON text in the draft. A draft that does not parse, or
+// has no node list, opens as an empty canvas rather than breaking the page.
+function parseChart(text: string | undefined): DiagramDoc {
+  if (!text) return emptyDiagram();
+  try {
+    const d = JSON.parse(text);
+    if (d && Array.isArray(d.nodes) && Array.isArray(d.edges)) return d as DiagramDoc;
+  } catch { /* fall through to the empty canvas */ }
+  return emptyDiagram();
+}
 
 const MODE_KEY = 'shCode:sandbox-mode';
 // Which side (Build/Code) reSHape opens on. Read once at page load and
@@ -63,10 +86,27 @@ export default function SandboxWorkspace() {
   const setLesson = useLessonStore((s) => s.setLesson);
   const fileContents = useLessonStore((s) => s.fileContents);
   const updateFile = useLessonStore((s) => s.updateFile);
+  const resetLesson = useLessonStore((s) => s.resetLesson);
 
   const [modeId, setModeId] = useState<SandboxModeId>('moshion');
   const mode = useMemo(() => getMode(modeId), [modeId]);
   const lesson = useMemo(() => sandboxLesson(mode), [mode]);
+
+  const isFlow = mode.preview === 'diagram';
+  const chart = useMemo(() => (isFlow ? parseChart(fileContents[mode.file]) : null), [isFlow, fileContents, mode.file]);
+  const onChartChange = useCallback((doc: DiagramDoc) => updateFile(mode.file, JSON.stringify(doc)), [updateFile, mode.file]);
+  // The canvas wants a pixel height; the split is the flexible box, so measure it.
+  const flowFrameRef = useRef<HTMLDivElement>(null);
+  const [flowH, setFlowH] = useState(480);
+  useEffect(() => {
+    const el = flowFrameRef.current;
+    if (!el || !isFlow) return;
+    const measure = () => setFlowH(Math.max(240, el.clientHeight - FLOW_PALETTE_H));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isFlow]);
 
   const [code, setCode] = useState('');
   const [runKey, setRunKey] = useState(0);
@@ -139,6 +179,32 @@ export default function SandboxWorkspace() {
     setLogs([]);
   }, [lesson, setLesson]);
 
+  // Keep the draft. Nothing else in the sandbox writes it, so without this a
+  // reload dropped the student's code or chart back to the starter. Debounced
+  // like the lesson workspace, and flushed when the tab is hidden so the last
+  // second of work is not lost.
+  useEffect(() => {
+    const save = () => {
+      try {
+        const st = useLessonStore.getState();
+        if (!st.lesson || st.lesson.id !== lesson.id) return;
+        saveProgress(st.lesson.id, {
+          fileContents: st.fileContents,
+          commits: st.commits,
+          lastCommittedFileContents: st.lastCommittedFileContents,
+          completedSteps: [],
+        });
+      } catch { /* private mode or quota: the draft stays in memory */ }
+    };
+    const timer = setTimeout(save, 800);
+    const onHide = () => { if (document.visibilityState === 'hidden') save(); };
+    document.addEventListener('visibilitychange', onHide);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onHide);
+    };
+  }, [fileContents, lesson.id]);
+
   function chooseMode(next: SandboxModeId) {
     if (next === modeId) return;
     runRef.current?.kill();
@@ -208,8 +274,9 @@ export default function SandboxWorkspace() {
   }
 
   function reset() {
-    if (window.confirm('Reset code to the starter? Unsaved work will be lost.')) {
-      setLesson(lesson);
+    if (window.confirm(isFlow ? 'Clear the chart and start over? This cannot be undone.' : 'Reset code to the starter? Unsaved work will be lost.')) {
+      // resetLesson also wipes the saved draft; setLesson would load it back.
+      resetLesson(lesson);
       stopRun();
       setLogs([]);
       // ReshapeStudio's own "Clear model" button (inside its Build toolbar)
@@ -225,7 +292,7 @@ export default function SandboxWorkspace() {
         e.preventDefault();
         // reSHape has its own Ctrl+Enter handling scoped to its Code side --
         // see ReshapeStudio's own keydown effect.
-        if (mode.preview !== 'reshape') run();
+        if (mode.preview !== 'reshape' && mode.preview !== 'diagram') run();
       }
     };
     window.addEventListener('keydown', handler);
@@ -361,7 +428,26 @@ export default function SandboxWorkspace() {
     };
   }, [modeId]);
 
-  const drawerTabs: DrawerTab[] = [
+  const drawerTabs: DrawerTab[] = isFlow ? [
+    {
+      key: 'flow-help',
+      label: 'Help',
+      color: '#ffb86c',
+      content: (
+        <div style={{ padding: 12, fontSize: 13, lineHeight: 1.6, color: '#e0e2ee' }}>
+          <p style={{ marginTop: 0 }}>Draw any flowchart you like. Nothing here is checked or graded.</p>
+          <ul style={{ paddingLeft: 18 }}>
+            <li><strong>Oval</strong>: where the chart starts or ends.</li>
+            <li><strong>Rectangle</strong>: one step.</li>
+            <li><strong>Diamond</strong>: a yes or no question. Give each arrow out of it a label.</li>
+            <li><strong>Slanted box</strong>: input or output.</li>
+          </ul>
+          <p>Click a shape in the row above the canvas to add it, then drag from one shape&apos;s edge to another to join them. Double-click a shape to type in it.</p>
+          <p style={{ marginBottom: 0 }}>Your chart saves on its own and is waiting for you next time.</p>
+        </div>
+      ),
+    },
+  ] : [
     // moSHion only. reSHape has no sprites and the JS console has no canvas,
     // so a texture editor there is a tab that can never be acted on.
     ...(mode.preview === 'moshion'
@@ -491,8 +577,8 @@ export default function SandboxWorkspace() {
                 </button>
               ))}
             </div>
-            <button className="btn-run" onClick={run}>▶ Run</button>
-            {isRunning && (
+            {!isFlow && <button className="btn-run" onClick={run}>▶ Run</button>}
+            {isRunning && !isFlow && (
               <button
                 className="btn-secondary btn-sm"
                 style={{ color: '#ff5555', borderColor: '#ff5555' }}
@@ -505,15 +591,17 @@ export default function SandboxWorkspace() {
               <RotateCcw size={12} />
               Reset
             </button>
-            <button
-              style={chipStyle}
-              onClick={toggleFull}
-              title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
-            >
-              {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
-              {full ? 'Exit full screen' : 'Full screen'}
-            </button>
-            <span className="run-hint">Ctrl+Enter</span>
+            {!isFlow && (
+              <button
+                style={chipStyle}
+                onClick={toggleFull}
+                title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
+              >
+                {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+                {full ? 'Exit full screen' : 'Full screen'}
+              </button>
+            )}
+            {!isFlow && <span className="run-hint">Ctrl+Enter</span>}
           </div>
         )}
 
@@ -535,6 +623,10 @@ export default function SandboxWorkspace() {
               autoRunOnMount={false}
               lessonId="sandbox"
             />
+          ) : isFlow && chart ? (
+            <div className="sandbox-flow" ref={flowFrameRef}>
+              <DiagramEditor value={chart} onChange={onChartChange} height={flowH} />
+            </div>
           ) : (
             <>
               <div className="pane" id="editorPane">
@@ -579,7 +671,7 @@ export default function SandboxWorkspace() {
             </>
           )}
         </div>
-        {full && !isReshape && (
+        {full && !isReshape && !isFlow && (
           <button
             type="button"
             className="sandbox-editor-toggle"
@@ -591,7 +683,7 @@ export default function SandboxWorkspace() {
           </button>
         )}
 
-        {!isConsole && !reshapeIsBuild && (
+        {!isConsole && !reshapeIsBuild && !isFlow && (
           <div className="sandbox-console-wrap">
             <div className="output-header">Console</div>
             <div className="sandbox-console-body">
@@ -599,7 +691,7 @@ export default function SandboxWorkspace() {
             </div>
           </div>
         )}
-        {full && !isConsole && !reshapeIsBuild && (
+        {full && !isConsole && !reshapeIsBuild && !isFlow && (
           <button
             type="button"
             className="sandbox-console-toggle"
@@ -651,6 +743,7 @@ export default function SandboxWorkspace() {
           flex: 1 1 auto;
           min-height: 280px;
         }
+        .sandbox-flow { flex: 1 1 auto; min-width: 0; min-height: 0; }
         .sandbox-console-wrap {
           display: flex;
           flex-direction: column;
