@@ -34,6 +34,9 @@
       "instructions": "Use console.log to print the grade recommendation and, if it applies, the review warning."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[set score, attendance and lateAssignments]\n  B --> C[/log the recommendation for the score/]\n  C --> D{low attendance or many late}\n  D -- yes --> E[/log the review warning/]\n  D -- no --> F([End])\n  E --> F"
+  },
   "requirements": [
     {
       "id": "r1",

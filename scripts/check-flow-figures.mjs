@@ -115,6 +115,30 @@ try {
       }
     }
   }
+
+  // A lab's `planChart` is shown beside the editor as the plan to follow, so it is a
+  // claim in the same way a readonly figure is: it has to parse and pass the rules.
+  for (const d of readdirSync(path.join(root, 'lessons'))) {
+    const f = path.join(root, 'lessons', d, 'lesson.json');
+    if (!existsSync(f)) continue;
+    const plan = JSON.parse(readFileSync(f, 'utf8')).planChart;
+    if (!plan) continue;
+    checked++;
+    let doc;
+    try {
+      doc = fromMermaid(plan.mermaid);
+    } catch (e) {
+      failures++;
+      console.log(`FAIL lessons/${d}/lesson.json — planChart does not parse: ${e.message}`);
+      continue;
+    }
+    const bad = checkDiagram(doc, DEFAULT_RULES).filter((r) => !r.passed);
+    if (bad.length > 0) {
+      failures++;
+      console.log(`FAIL lessons/${d}/lesson.json — planChart is shown as the plan but breaks a rule:`);
+      for (const r of bad) console.log(`       ${r.id}: ${r.detail}`);
+    }
+  }
 } finally {
   rmSync(out, { recursive: true, force: true });
 }

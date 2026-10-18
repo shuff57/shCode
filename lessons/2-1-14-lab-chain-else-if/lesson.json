@@ -24,6 +24,9 @@
       "instructions": "Write an if / else if / else if / else chain that logs a status: below 20 logs 'Low battery', below 50 logs 'Battery ok', below 90 logs 'Battery good', and anything else logs 'Battery full'. This chain uses < comparisons, not >=, so check the lowest cutoff first -- the opposite order from the grade example, which uses >= and checks the highest cutoff first."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[set batteryPercent from 0 to 100]\n  B --> C{below 20}\n  C -- yes --> D[/log Low battery/]\n  C -- no --> E{below 50}\n  E -- yes --> F[/log Battery ok/]\n  E -- no --> G{below 90}\n  G -- yes --> H[/log Battery good/]\n  G -- no --> I[/log Battery full/]\n  D --> J([End])\n  F --> J\n  H --> J\n  I --> J"
+  },
   "requirements": [
     {
       "id": "r1",

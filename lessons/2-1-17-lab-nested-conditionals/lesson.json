@@ -24,6 +24,9 @@
       "instructions": "Write an outer if that checks isLoggedIn. Inside that block, write a nested if / else that checks isAdmin: log 'Welcome, admin.' if true, log 'Welcome, user.' if false. Add an outer else that logs 'Please log in.'"
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[set isLoggedIn and isAdmin]\n  B --> C{logged in}\n  C -- no --> D[/log Please log in/]\n  C -- yes --> E{admin}\n  E -- yes --> F[/log Welcome, admin/]\n  E -- no --> G[/log Welcome, user/]\n  D --> H([End])\n  F --> H\n  G --> H"
+  },
   "requirements": [
     {
       "id": "r1",

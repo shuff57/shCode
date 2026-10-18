@@ -29,6 +29,9 @@
       "instructions": "When the if matches, add 1 to count. After the loop finishes, log count."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[set word and count to 0]\n  B --> C{more letters}\n  C -- yes --> D{letter matches}\n  D -- yes --> E[add 1 to count]\n  D -- no --> C\n  E --> C\n  C -- no --> F[/log count/]\n  F --> G([End])"
+  },
   "requirements": [
     {
       "id": "r1",
