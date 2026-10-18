@@ -64,11 +64,21 @@ function topLevelDecls(code: string): Decl[] {
     if (depth[m.index] !== 0) continue;
     out.push({ name: m[1], kind: ['value'], at: m.index, text: assigned(m[1], -1) });
   }
-  while ((m = decl.exec(src))) {
-    if (depth[m.index] !== 0) continue;
-    const start = m.index + m[0].length;
+  // Where one declarator's initializer ends: a `,` or `;` at its own depth, the bracket that closes
+  // around it, or (code without semicolons) a line that starts the next statement.
+  const initEnd = (start: number): number => {
+    let k = 0;
+    for (let i = start; i < src.length; i++) {
+      const c = src[i];
+      if (c === '{' || c === '(' || c === '[') k++;
+      else if (c === '}' || c === ')' || c === ']') { if (k === 0) return i; k--; }
+      else if (k === 0 && (c === ',' || c === ';')) return i;
+      else if (k === 0 && c === '\n' && /^\s*(?:const|let|var|function|class|if|for|while|console)\b/.test(src.slice(i + 1, i + 40))) return i;
+    }
+    return src.length;
+  };
+  const declare = (name: string, start: number, at: number, nameAt: number) => {
     const rest = src.slice(start, start + 400);
-    const name = m[1];
     const kind: Kind[] = [];
     let text = '';
     if (new RegExp(`^(?:async\\s+)?(?:function\\b|\\([^)]*\\)\\s*=>|${ID}\\s*=>)`).test(rest)) {
@@ -78,9 +88,9 @@ function topLevelDecls(code: string): Decl[] {
       text = arrow && !rest.slice(arrow.index + arrow[0].length).startsWith('{') ? rest.split(/[;\n]/)[0] : o >= 0 ? braceBody(src, o) : rest;
     } else {
       kind.push('value');
-      // up to the end of the statement: a `;` at a line end, or (code without semicolons) a
-      // line that starts the next statement
-      text = src.slice(start, start + 600).split(/;\s*(?:\n|$)|\n(?=\s*(?:const|let|var|function|class|if|for|while|console)\b)/)[0] + assigned(name, m.index + m[0].indexOf(name, m[0].search(/\s/)));
+      // up to the end of the declarator: a `;` at a line end, a `,` before the next declarator,
+      // or (code without semicolons) a line that starts the next statement
+      text = src.slice(start, Math.min(start + 600, initEnd(start))).split(/;\s*(?:\n|$)|\n(?=\s*(?:const|let|var|function|class|if|for|while|console)\b)/)[0] + assigned(name, nameAt);
       if (rest.startsWith('{')) kind.push('object');
       else if (rest.startsWith('[')) {
         kind.push('array');
@@ -88,7 +98,22 @@ function topLevelDecls(code: string): Decl[] {
         if (/^\[\s*\{/.test(rest) || (/^\[\s*\]/.test(rest) && pushed.test(src))) kind.push('records');
       }
     }
-    out.push({ name, kind, at: m.index, text });
+    out.push({ name, kind, at, text });
+  };
+  const more = new RegExp(`^,\\s*(${ID})\\s*=(?![=>])\\s*`);
+  while ((m = decl.exec(src))) {
+    if (depth[m.index] !== 0) continue;
+    const start = m.index + m[0].length;
+    declare(m[1], start, m.index, m.index + m[0].indexOf(m[1], m[0].search(/\s/)));
+    // const a = [1, 2], b = [3, 4];  each further declarator is a declaration of its own
+    let e = initEnd(start);
+    for (let guard = 0; guard < 50 && src[e] === ','; guard++) {
+      const mm = more.exec(src.slice(e, e + 200));
+      if (!mm) break;
+      const s2 = e + mm[0].length;
+      declare(mm[1], s2, e, e + mm[0].indexOf(mm[1]));
+      e = initEnd(s2);
+    }
   }
   const fn = new RegExp(`\\bfunction\\s+(${ID})\\s*\\(`, 'g');
   while ((m = fn.exec(src))) {

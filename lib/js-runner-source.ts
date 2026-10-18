@@ -267,9 +267,14 @@ const __store = new Map();
 // On only during a traced check's empty-storage run (lib/test-harness-source.ts, EXECUTION
 // TRACE item 8): the store then reads as empty and keeps nothing.
 let __storeOff = false;
+// Set only during a traced check's changed-storage run (EXECUTION TRACE item 11): what getItem reads back.
+let __storeTweak = null;
 const localStorage = {
   setItem: (k, v) => { if (!__storeOff) __store.set(String(k), String(v)); },
-  getItem: (k) => (!__storeOff && __store.has(String(k)) ? __store.get(String(k)) : null),
+  getItem: (k) => {
+    const v = !__storeOff && __store.has(String(k)) ? __store.get(String(k)) : null;
+    return v !== null && __storeTweak ? __storeTweak(v) : v;
+  },
   removeItem: (k) => { if (!__storeOff) __store.delete(String(k)); },
   clear: () => { if (!__storeOff) __store.clear(); },
   key: (i) => { const ks = __storeOff ? [] : [...__store.keys()]; return i >= 0 && i < ks.length ? ks[i] : null; },
@@ -379,9 +384,11 @@ self.onmessage = (e) => {
       const d = __traceKit.drive(trace, withTests, tj.jobs, (v) => Array.isArray(v) && v.length === 3 && v[0] === marker, {
         stop: NEEDS_INPUT, t0, budget: ${RUN_TIMEOUT_MS}, tail: '\\n;' + __testLookupSource(tj.jobs, marker),
         mute: (on) => { __storeOff = on === true; },
+        tweakStore: (f) => { __storeTweak = typeof f === 'function' ? f : null; },
         afterReal: () => { storeReal = Array.from(__store.entries()); },
       });
       __storeOff = false;
+      __storeTweak = null;
       if (storeReal) {
         __store.clear();
         for (let i = 0; i < storeReal.length; i++) __store.set(storeReal[i][0], storeReal[i][1]);

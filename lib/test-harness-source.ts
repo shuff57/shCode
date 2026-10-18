@@ -176,7 +176,7 @@ export function jobsFromRequirements(reqs: Requirement[], code?: string): TestJo
     const hasScript = variables.length > 0 || checks.length > 0 || !!eo || !!eoc;
     // Only a requirement that asks for it gets the trace; every other job is sent exactly as before.
     const trace = hasScript && r.trace === true;
-    const perturb = trace && Array.isArray(r.perturb) ? r.perturb.filter((n): n is string => typeof n === 'string' && (n === '*' || n === '{}' || n === '!storage' || n === '!arrays' || IDENT.test(n))).map((n) => own[n] || n) : [];
+    const perturb = trace && Array.isArray(r.perturb) ? r.perturb.filter((n): n is string => typeof n === 'string' && (n === '*' || n === '{}' || n === '!storage' || n === '!arrays' || n === '!numbers' || n === '!stored' || IDENT.test(n))).map((n) => own[n] || n) : [];
     const traceFields = trace ? { trace: true, ...(perturb.length ? { perturb } : {}) } : {};
     jobs.push({
       id: r.id,
@@ -526,7 +526,7 @@ const __runTestJobs = (() => {
         return bad('Your program takes about ' + secs + ' seconds to run: too slow to run again with changed data inside the ' + Math.round((tr.budget || 3000) / 1000) + '-second limit, so this could not be checked. Make it faster (a loop that runs too many times?) and Run again.', false);
       }
       traceVal = freezeDeep({
-        prints: tr.recs.map((r) => ({ src: r.src, code: r.code, ran: r.ran, out: r.out.slice(), out2: r.out2 ? r.out2.slice() : null, stable: r.stable === true, outD: r.outD ? r.outD.slice() : null })),
+        prints: tr.recs.map((r) => ({ src: r.src, code: r.code, ran: r.ran, out: r.out.slice(), out2: r.out2 ? r.out2.slice() : null, stable: r.stable === true, outD: r.outD ? r.outD.slice() : null, outS: r.outS ? r.outS.slice() : null })),
         perturbed: tr.perturbed === true,
         threw: tr.threw === true,
         mk: typeof tr.mk === 'string' ? tr.mk : null,
@@ -539,7 +539,8 @@ const __runTestJobs = (() => {
         text: tr.text,
         vars2: snapRun(tr.vars2, sc),
         empty: tr.emptyRun ? { threw: tr.emptyRun.threw === true, vars: snapRun(tr.emptyRun.vars, sc) } : null,
-        arrays: tr.arr ? tr.arr.events.map((e) => (e.k === 'p' ? { k: 'p', s: e.s, n: e.n, ids: e.ids.slice() } : { k: 'm', m: e.m, id: e.id, ch: e.ch === true })) : null,
+        stored: tr.storedRun ? { threw: tr.storedRun.threw === true, vars: snapRun(tr.storedRun.vars, sc) } : null,
+        arrays: tr.arr ? tr.arr.events.map((e) => (e.k === 'p' ? { k: 'p', s: e.s, n: e.n, ids: e.ids.slice(), sigs: (e.sigs || []).slice() } : { k: 'm', m: e.m, id: e.id, ch: e.ch === true, b: e.b === undefined ? null : e.b, a: e.a === undefined ? null : e.a })) : null,
       }, 0);
     }
     const seen = {};
@@ -794,16 +795,27 @@ const __runTestJobs = (() => {
 //      { threw, vars } for that run (vars as in 7), or null when it did not run.
 //   9. The pseudo-name "!arrays" watches the arrays in the real run: while it goes, the methods that
 //      change an array in place (push, unshift, pop, shift, splice, sort, reverse, fill, copyWithin)
-//      and join (which String(), + and a template also call) are wrapped, and put back right after.
+//      and the ways a print reads a whole array (join, which String(), + and a template call; slice,
+//      concat and the iterator, which spread and Array.from use) are wrapped, and put back after.
+//      A print's sigs hold the contents of JSON text of an array it printed; a method call holds
+//      the contents before (b) and after (a).
 //      arrays lists, in order, each such method call ({k: 'm', m, id, ch}: id the array's identity,
 //      ch whether its contents changed) and each console.log call ({k: 'p', s, n, ids}: prints[s],
 //      its call n, the arrays it printed as an argument or joined just before). So a check can ask
 //      that one and the same array, printed twice with different contents, was changed in place by
 //      a method that ran between the prints, through an alias or a parameter as well.
+//  10. "!numbers": the changed run changes numbers only and leaves strings as written, for a script
+//      whose logic compares text from the data with a literal (items.find((i) => i.name === "Mug")).
+//  11. "!stored": one more silent run, the script as written, in which every text read back from
+//      localStorage (the host's tweakStore option) is parsed and changed like the changed run's data
+//      (mk around strings, n * k + c) before the script sees it. stored is { threw, vars } for that
+//      run (vars as in 7) and each print's outS what it printed then: a value loaded from storage
+//      changes there, a typed one does not.
 //   The host gets an afterReal call right after the real run, so the checks can see the
 //   localStorage the real run left, not the one the silent runs put back.
 // A check sees trace = { prints: [{src, code, ran, out, out2, stable, outD}],
-//   perturbed, threw, mk, k, c, rk, results, dreads, code, text, vars2, empty, arrays }:
+//   perturbed, threw, mk, k, c, rk, results, dreads, code, text, vars2, empty, arrays, stored }:
+//   (each print also has outS, item 11)
 // src is the call's argument text as written, code the same with comments and
 // string contents blanked, ran how many times it ran in the real run, out what it
 // printed then (each call one string, at most 50), out2 the same for the changed
@@ -931,7 +943,7 @@ const __traceKit = (() => {
   const slice = (a) => Array.prototype.slice.call(a);
   const IDENT_RE = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
   // The real ones, taken before any student code runs.
-  const R = { freeze: Object.freeze, seal: Object.seal, pext: Object.preventExtensions, ownKeys: Reflect.ownKeys, gopd: Reflect.getOwnPropertyDescriptor, def: Reflect.defineProperty, now: Date.now };
+  const R = { freeze: Object.freeze, seal: Object.seal, pext: Object.preventExtensions, ownKeys: Reflect.ownKeys, gopd: Reflect.getOwnPropertyDescriptor, def: Reflect.defineProperty, now: Date.now, parse: JSON.parse, stringify: JSON.stringify };
   const PERF = typeof performance === 'object' && performance !== null ? performance : null;
   const pbind = (n) => (PERF && typeof PERF[n] === 'function' ? PERF[n].bind(PERF) : null);
   R.pnow = pbind('now'); R.clearMarks = pbind('clearMarks'); R.clearMeasures = pbind('clearMeasures');
@@ -979,7 +991,7 @@ const __traceKit = (() => {
     const st = {
       phase: 1, key: '', perturbed: false, threw: false, blank, text: String(text), cap: null, RL,
       mk: null, k: 0, c: 0, rk: null, rkk: 0, rkc: 0, results: [], dreads: [], g0: null, restore: null,
-      recs: sites.map((s, k) => ({ i: k, src: s.src, code: s.code, ran: 0, out: [], out2: null, out3: null, stable: false, outD: null })),
+      recs: sites.map((s, k) => ({ i: k, src: s.src, code: s.code, ran: 0, out: [], out2: null, out3: null, stable: false, outD: null, outS: null })),
       // Every run's hook parameters, the same names in each; argp: whether the code also takes a
       // parameter called arguments (not in strict code); gen: which silent run's stand-ins are live;
       // durs: how long each run took (ms); slow: the real run's ms when the silent runs did not fit.
@@ -988,8 +1000,9 @@ const __traceKit = (() => {
       // look: tells its record from any other value; vars2 / emptyRun: what items 7 and 8 kept;
       // mute: the host's switch for an empty, write-dropping localStorage (item 8).
       tail: '', look: null, vars2: null, emptyRun: null, mute: null,
-      // arr: the array watch of item 9, while the real run is going (null otherwise)
-      arr: null,
+      // arr: the array watch of item 9, while the real run is going (null otherwise); numOnly:
+      // item 10; storedRun / tweakStore: item 11.
+      arr: null, numOnly: false, storedRun: null, tweakStore: null,
     };
     // Sits in console.log while a traced run is going: notes what reaches the real
     // console during a call site's own call, and prints only in the real run.
@@ -1030,9 +1043,10 @@ const __traceKit = (() => {
     let next = 1;
     const saved = {};
     const J0 = AP.join;
-    const w = { events: [], pend: [], quiet: 0, idOf: null, off: null };
+    const w = { events: [], pend: [], quiet: 0, idOf: null, off: null, sig: null };
     w.idOf = (o) => { let i = ids.get(o); if (i === undefined) { i = next++; ids.set(o, i); } return i; };
     const sig = (a) => (a.length > 200 ? null : a.length + ':' + J0.call(a, String.fromCharCode(1)));
+    w.sig = sig;
     const live = (o) => w.quiet === 0 && st.phase === 1 && Array.isArray(o) && w.events.length < 2000;
     const named = (f, n, len) => { try { R.def(f, 'name', { value: n, configurable: true }); R.def(f, 'length', { value: len, configurable: true }); } catch (_) { /* keep */ } return f; };
     MUTATORS.forEach((m) => {
@@ -1048,27 +1062,50 @@ const __traceKit = (() => {
         w.quiet++;
         try {
           const after = sig(this);
-          w.events[w.events.length] = { k: 'm', m, id: w.idOf(this), ch: before === null || after === null || before !== after };
+          w.events[w.events.length] = { k: 'm', m, id: w.idOf(this), ch: before === null || after === null || before !== after, b: before, a: after };
           w.pend = [];
         } catch (_) { /* keep */ } finally { w.quiet--; }
         return out;
       }, m, f.length);
     });
-    saved.join = J0;
-    AP.join = named(function () {
+    // The ways a print reads an array whole: join (String(), + and a template call it), a copy
+    // (slice, concat, spread and Array.from go through the iterator) are noted as "printed".
+    const reads = (f, n) => named(function () {
       if (live(this) && w.pend.length < 20) w.pend[w.pend.length] = w.idOf(this);
-      return J0.apply(this, arguments);
-    }, 'join', J0.length);
-    w.off = () => { Object.keys(saved).forEach((m) => { AP[m] = saved[m]; }); };
+      return f.apply(this, arguments);
+    }, n, f.length);
+    ['join', 'slice', 'concat'].forEach((m) => { const f = AP[m]; if (typeof f === 'function') { saved[m] = f; AP[m] = reads(f, m); } });
+    const IT = Symbol.iterator;
+    const it0 = AP[IT];
+    const values0 = AP.values;
+    if (typeof it0 === 'function') {
+      const wit = reads(it0, 'values');
+      AP[IT] = wit;
+      if (values0 === it0) AP.values = wit;
+    }
+    w.off = () => {
+      Object.keys(saved).forEach((m) => { AP[m] = saved[m]; });
+      if (typeof it0 === 'function') { AP[IT] = it0; AP.values = values0; }
+    };
     st.arr = w;
   }
+  // sigs: the contents of JSON text of an array the call printed (JSON.stringify(a) reads the array
+  // without calling any of its methods), so a check can match that snapshot to the array.
   function arrPrint(w, r, args) {
     if (w.events.length >= 2000) { w.pend = []; return; }
     const ids = w.pend.slice(0, 20);
+    const sigs = [];
+    const add = (s) => { if (s !== null && sigs.indexOf(s) < 0 && sigs.length < 40) sigs[sigs.length] = s; };
     for (let i = 0; i < args.length && ids.length < 40; i++) {
-      if (Array.isArray(args[i])) { const id = w.idOf(args[i]); if (ids.indexOf(id) < 0) ids[ids.length] = id; }
+      const a = args[i];
+      if (Array.isArray(a)) {
+        const id = w.idOf(a);
+        if (ids.indexOf(id) < 0) ids[ids.length] = id;
+      } else if (typeof a === 'string' && a.length < 5000 && /^\s*\[/.test(a)) {
+        try { const v = R.parse(a); if (Array.isArray(v)) add(w.sig(v)); } catch (_) { /* not JSON */ }
+      }
     }
-    w.events[w.events.length] = { k: 'p', s: r.i, n: r.ran - 1, ids };
+    w.events[w.events.length] = { k: 'p', s: r.i, n: r.ran - 1, ids, sigs };
     w.pend = [];
   }
 
@@ -1198,7 +1235,7 @@ const __traceKit = (() => {
     const OP = Object.prototype;
     const num = (v, k, c) => (v === v && v !== Infinity && v !== -Infinity ? v * k + c : v);
     function tweak(v) {
-      if (typeof v === 'string') return st.mk + v + st.mk;
+      if (typeof v === 'string') return st.numOnly ? v : st.mk + v + st.mk;
       if (typeof v === 'number') return num(v, st.k, st.c);
       if (typeof v === 'function') return wrapFn(v);
       if (v !== null && typeof v === 'object') return wrapObj(v);
@@ -1206,7 +1243,7 @@ const __traceKit = (() => {
     }
     function tweakResult(r) {
       let t;
-      if (typeof r === 'string') t = st.rk + r + st.rk;
+      if (typeof r === 'string') t = st.numOnly ? r : st.rk + r + st.rk;
       else if (typeof r === 'number') t = num(r, st.rkk, st.rkc);
       else t = tweak(r);
       if (record && st.results.length < 50 && (t === null || (typeof t !== 'object' && typeof t !== 'function'))) st.results.push(t);
@@ -1405,23 +1442,40 @@ const __traceKit = (() => {
     resetGlobals(st);
   }
 
-  // The names the jobs perturb ("{}" is the destructure run, "!storage" the empty-storage run and
-  // "!arrays" the array watch, not names).
+  // The names the jobs perturb ("{}" is the destructure run, "!storage" the empty-storage run,
+  // "!arrays" the array watch, "!numbers" and "!stored" items 10 and 11: none is a name).
   function perturbNames(jobs) {
     const names = [];
     let destr = false;
     let empty = false;
     let arrays = false;
+    let numbers = false;
+    let stored = false;
     for (let j = 0; j < jobs.length; j++) {
       const ps = jobs[j] && jobs[j].script && jobs[j].script.trace === true && Array.isArray(jobs[j].script.perturb) ? jobs[j].script.perturb : [];
       for (let k = 0; k < ps.length; k++) {
         if (ps[k] === '{}') destr = true;
         else if (ps[k] === '!storage') empty = true;
         else if (ps[k] === '!arrays') arrays = true;
+        else if (ps[k] === '!numbers') numbers = true;
+        else if (ps[k] === '!stored') stored = true;
         else if (typeof ps[k] === 'string' && (ps[k] === '*' || IDENT_RE.test(ps[k])) && names.indexOf(ps[k]) < 0) names.push(ps[k]);
       }
     }
-    return { names, destr, empty, arrays };
+    return { names, destr, empty, arrays, numbers, stored };
+  }
+
+  // Item 11: stored JSON text read back changed the way the changed run changes data (a string
+  // gets mk on both sides, a number becomes n * k + c); text that is not JSON is left as it is.
+  function storeTweaker(st) {
+    const deep = (v) => {
+      if (typeof v === 'string') return st.mk + v + st.mk;
+      if (typeof v === 'number') return v === v && v !== Infinity && v !== -Infinity ? v * st.k + st.c : v;
+      if (Array.isArray(v)) { const o = []; for (let i = 0; i < v.length; i++) o[i] = deep(v[i]); return o; }
+      if (v !== null && typeof v === 'object') { const o = {}; const ks = Object.keys(v); for (let i = 0; i < ks.length; i++) o[ks[i]] = deep(v[ks[i]]); return o; }
+      return v;
+    };
+    return (text) => { try { return R.stringify(deep(R.parse(text))); } catch (_) { return text; } };
   }
 
   // The silent runs after the real one: the changed run twice, then the destructure run (see
@@ -1433,9 +1487,12 @@ const __traceKit = (() => {
     resetGlobals(st);
     const pl = perturbNames(jobs);
     const lookOf = (ok, v) => (ok && typeof st.look === 'function' && st.look(v) ? v[2] : null);
-    if (pl.names.length || pl.destr) {
+    st.numOnly = pl.numbers;
+    if (pl.names.length || pl.destr || pl.stored) {
       st.mk = TILDE + rnd3() + TILDE; st.k = rint(11, 97); st.c = rint(101, 997);
       st.rk = LQ + rnd3() + RQ; st.rkk = rint(11, 97); st.rkc = rint(101, 997);
+    }
+    if (pl.names.length || pl.destr) {
       if (pl.names.length) {
         const srcOf = (pn) => perturbSource(tr.code, st.blank, pl.names, pn, null);
         steps.push({ key: 'out2', srcOf, pnF: makePerturber(st, true), after: (ok, v) => { st.perturbed = ok || st.threw; st.vars2 = lookOf(ok, v); } });
@@ -1447,6 +1504,14 @@ const __traceKit = (() => {
         });
       }
       if (pl.destr) steps.push({ key: 'outD', srcOf: (pn, dn) => perturbSource(tr.code, st.blank, [], pn, dn), dnF: makeDestructurer(st) });
+    }
+    if (pl.stored && typeof st.tweakStore === 'function') {
+      // The script as written, but every text it reads back from localStorage is changed (item 11).
+      steps.push({
+        key: 'outS', srcOf: (pn) => perturbSource(tr.code, st.blank, [], pn, null),
+        before: () => { st.tweakStore(storeTweaker(st)); },
+        after: (ok, v) => { st.tweakStore(null); st.storedRun = { threw: !ok, vars: lookOf(ok, v) }; },
+      });
     }
     if (pl.empty && typeof st.mute === 'function') {
       // The data as written, with nothing saved and nothing that saves (item 8).
@@ -1478,6 +1543,7 @@ const __traceKit = (() => {
     st.tail = typeof o.tail === 'string' ? o.tail : '';
     st.look = ok;
     st.mute = typeof o.mute === 'function' ? o.mute : null;
+    st.tweakStore = typeof o.tweakStore === 'function' ? o.tweakStore : null;
     const watchArrays = !!jobs && perturbNames(jobs).arrays;
     const steps = [{ real: true }];
     const res = { value: undefined, threw: false, err: undefined };

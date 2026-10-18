@@ -46,9 +46,29 @@ messages). The next deploy brings it level with this commit.
   check wants one and the same array printed twice with different output and a content-changing in-place call on it
   that RAN between the prints, so an alias or a function parameter passes, and a dead push, an empty `push()`, a push
   on another array, or a new array assigned to the variable fails. 3.8.11/19/23 t1 read printed numbers as numbers.
-  Edges: a print of the array via `JSON.stringify(a)` or `console.log(...a)` carries no identity and does not count;
-  the wrapped methods are visible to the script in the real run only (a detection cheat could tell that run apart);
-  arrays over 200 long count every in-place call as a change.
+  Edges: the wrapped methods are visible to the script in the real run only (a detection cheat could tell that run
+  apart); arrays over 200 long count every in-place call as a change.
+- **Batch 16, lens round 2 (2026-10-18, 932 cases).** Harness (EXECUTION TRACE items 9-11): 3.7.21's watch also notes
+  a copy made for a print (`[...a]`, `a.slice()`, `...a`, `Array.from`) as a print of `a`, and JSON text of an array
+  by its contents; `"!numbers"` changes only numbers in the changed run (3.8.11, so `.find((i) => i.name === "Mug")`
+  still finds); `"!stored"` re-runs with every stored text read back changed (`trace.stored`, prints' `outS`).
+  `lib/student-names.ts` reads every declarator of `const a = [..], b = [..]`. Check-local names now start with `$`
+  (a student's `c2` collided with a helper's `c2`). Fixed: 3.8.10 `restored.score++` accepted; 3.7.18 c1/c2 names, a
+  nested extra value, `{ ...changed, language }`, and "exactly ONE new key; it adds N"; 3.7.11 `a, b` in one
+  statement, `first.concat(second, third)`, and the order stated (`second.concat(first)` still fails: step 2 says
+  "on first"); 3.7.17 either spread order (its step names none); 3.7.21 snapshots and an array that is a property;
+  3.8.11 destructuring or `.find` for the item; 3.7.8 "only PART of items". Hollow passes closed: 3.8.19 restored and
+  its print must follow the stored text; 3.8.22 the print must come from what loadState read; 3.7.22 middle from
+  bumped and bigger spread from the object; 3.7.4 doubled is what `.map` returns, prices printed; 3.7.8 tail runs to
+  the end and comes from items; 3.7.17 framed and 3.7.18 changed by spread; 3.8.14 readSave called twice (text count);
+  3.8.7 the JSON text kept in a variable (regex).
+- **Not fixed, on purpose (lens round 2):** the untouched starter scores the "declared" regex on 3.7.4/8/11/18/21 (the
+  given declaration satisfies it; every lab still fails); `localStorage["k"] = ...` is not taught and not accepted in
+  3.8.18; a `saveState(key, state)` design is not recognised in 3.8.22; the strip under the editor shows only titles
+  (UI); 3.8.10 refuses `restored.name` as the second print (step 4 asks for a property of the original, player).
+  Also left: 3.8.23's `restored.length` print is not tied to the data (a length does not change under the changed
+  run); 3.7.21 accepts a JSON-text "before" print matched by contents, so a copy pushed and then given to the
+  variable passes when both prints use `JSON.stringify`; 3.8.14's two calls are counted in the text.
 
 # 2026-10-17: 3.6 labs accept the student's own names (committed locally, NOT pushed, NOT deployed)
 

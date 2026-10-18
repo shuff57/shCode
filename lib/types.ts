@@ -114,7 +114,9 @@ export interface Requirement {
    *  literal assigned to a name; "{}" adds a run that marks each key a
    *  destructuring declaration unpacks; "!storage" adds a run with localStorage
    *  empty and dropping writes (checks read it as trace.empty); "!arrays" watches the
-   *  in-place array methods in the real run (trace.arrays). The changed run's
+   *  in-place array methods in the real run (trace.arrays); "!numbers" changes
+   *  numbers only; "!stored" adds a run whose localStorage reads come back changed
+   *  (trace.stored, prints' outS). The changed run's
    *  variables are trace.vars2. */
   perturb?: string[];
   /** type: 'regex' only. The id of a `tests` requirement of the same lesson whose

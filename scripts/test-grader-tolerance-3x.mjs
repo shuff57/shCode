@@ -1450,7 +1450,8 @@ reject('3-6-13-lab-nested-mutation', 'own names, but the "deep" copy is a spread
   const id = '3-7-17-lab-spread-array';
   const AB = ['const first = [1, 2];', 'const second = [3, 4];'];
   rejectMsg(id, 'framed spreads both arrays: the message says why', 't1', /exactly two more values than first/, js(...AB, 'const combined = [...first, ...second];', 'const framed = [0, ...first, ...second, 99];', 'console.log(combined);', 'console.log(framed);', 'console.log(first);'));
-  rejectMsg(id, 'combined in the wrong order: the message says why', 't1', /every value of first, then every value of second/, js(...AB, 'const combined = [...second, ...first];', 'const framed = [0, ...first, 99];', 'console.log(combined);', 'console.log(framed);', 'console.log(first);'));
+  // (accepted since round 2, 2026-10-18: step 2 asks for every value of both arrays, in no order)
+  accept(id, 'combined spreads second first', js(...AB, 'const combined = [...second, ...first];', 'const framed = [0, ...first, 99];', 'console.log(combined);', 'console.log(framed);', 'console.log(first);'));
   reject(id, 'combined typed by hand, a spread thrown away', 't2', js(...AB, 'const unused = [...first, ...second];', 'const combined = [1, 2, 3, 4];', 'const framed = [0, ...first, 99];', 'console.log(combined);', 'console.log(framed);', 'console.log(first);'));
   reject(id, 'framed typed by hand', 't2', js(...AB, 'const combined = [...first, ...second];', 'const framed = [0, 1, 2, 99];', 'console.log(combined);', 'console.log(framed);', 'console.log(first);'));
   reject(id, 'no original printed', 't2', js(...AB, 'const combined = [...first, ...second];', 'const framed = [0, ...first, 99];', 'console.log(combined);', 'console.log(framed);'));
@@ -1663,6 +1664,78 @@ reject('3-6-13-lab-nested-mutation', 'own names, but the "deep" copy is a spread
   const RC = ['const records = [{ name: "Pen", price: 0.1 + 0.2 }, { name: "Pad", price: 5 }];', 'localStorage.setItem("records", JSON.stringify(records));', 'const restored = JSON.parse(localStorage.getItem("records"));'];
   accept('3-8-23-lab-adapt-to-list', 'a decimal field printed with toFixed(2)', js(...RC, 'console.log(restored.length);', 'console.log(restored[0].price.toFixed(2));'));
   reject('3-8-23-lab-adapt-to-list', 'the length printed wrong, a decimal rounded away', 't1', js(...RC, 'console.log(restored.length + 1);', 'console.log(Math.round(restored[0].price));'));
+}
+
+// ---- batch 16 (2026-10-18): round 2 of the three lenses. A: taught answers that were refused;
+// B: hollow answers that passed. "!stored" re-runs a script with every stored text it reads back
+// changed; "!numbers" changes only numbers (a .find by name keeps working); 3.7.21 counts a copy
+// made for the print ([...a], a.slice(), ...a) and JSON text of the array as a print of it.
+{
+  // A1 3.8.10: a number of restored changed in place after the parse
+  const PL = ['const player = { name: "Marisol", score: 40 };', 'const saved = JSON.stringify(player);', 'const restored = JSON.parse(saved);'];
+  accept('3-8-10-lab-round-trip-object', 'restored.score++ then printed', js(...PL, 'restored.score++;', 'console.log(restored.score);', 'console.log(player.name);'));
+  accept('3-8-10-lab-round-trip-object', 'restored.score += 1 then printed', js(...PL, 'restored.score += 1;', 'console.log("score: " + restored.score);', 'console.log(player.name);'));
+  reject('3-8-10-lab-round-trip-object', 'restored typed in with the bumped score', 't2', js('const player = { name: "Marisol", score: 40 };', 'const saved = JSON.stringify(player);', 'JSON.parse(saved);', 'const restored = { name: "Marisol", score: 41 };', 'console.log(restored.score);', 'console.log(player.name);'));
+  // A2 3.7.18: digits in the names; a nested extra value; extended spread from changed; ONE new key
+  const ST = 'const settings = { theme: "dark", fontSize: 14, wrap: true };';
+  const id18 = '3-7-18-lab-spread-object';
+  accept(id18, 'names c1 and c2', js(ST, 'const c1 = { ...settings, fontSize: 18 };', 'const c2 = { ...settings, language: "en" };', 'console.log(c1);', 'console.log(c2);', 'console.log(settings);'));
+  accept(id18, 'extended holds a nested object', js(ST, 'const changed = { ...settings, fontSize: 18 };', 'const extended = { ...settings, extra: { a: 1 } };', 'console.log(changed);', 'console.log(extended);', 'console.log(settings);'));
+  accept(id18, 'extended spreads changed', js(ST, 'const changed = { ...settings, fontSize: 18 };', 'const extended = { ...changed, language: "en" };', 'console.log(changed);', 'console.log(extended);', 'console.log(settings);'));
+  rejectMsg(id18, 'two new keys: the message says ONE', 't1', /exactly ONE new key that settings does not have; it adds 2/, js(ST, 'const changed = { ...settings, fontSize: 18 };', 'const extended = { ...settings, language: "en", tabs: 2 };', 'console.log(changed);', 'console.log(extended);', 'console.log(settings);'));
+  // A3 3.7.11: one-letter names in one statement; three lists; the order stated
+  const id11 = '3-7-11-lab-concat-two-lists';
+  accept(id11, 'names a and b in one statement', js('const a = [1, 2, 3], b = [4, 5, 6];', 'const both = a.concat(b);', 'console.log(both);', 'console.log(a);', 'console.log(b);'));
+  accept(id11, 'three lists in one concat', js('const first = [1, 2, 3];', 'const second = [4, 5, 6];', 'const third = [7, 8, 9];', 'const joined = first.concat(second, third);', 'console.log(joined);', 'console.log(first);', 'console.log(second);'));
+  rejectMsg(id11, 'second.concat(first): the message says the order', 't1', /joined starts with second's values/, js('const first = [1, 2, 3];', 'const second = [4, 5, 6];', 'const joined = second.concat(first);', 'console.log(joined);', 'console.log(first);', 'console.log(second);'));
+  // A4 3.7.21: snapshots of the same array; an array that is a property
+  const id21 = '3-7-21-lab-mutating-sort-drill';
+  accept(id21, 'a spread copy printed before and after', js('const nums = [1, 2, 3];', 'console.log("before:", [...nums]);', 'nums.push(4);', 'console.log("after:", [...nums]);', 'const d = nums.map((n) => n * 2);', 'console.log(d);'));
+  accept(id21, 'JSON.stringify of the array before and after', js('const nums = [1, 2, 3];', 'console.log(JSON.stringify(nums));', 'nums.push(4);', 'console.log(JSON.stringify(nums));', 'console.log(JSON.stringify(nums.map((n) => n * 2)));'));
+  accept(id21, 'console.log(...nums) before and after', js('const nums = [1, 2, 3];', 'console.log(...nums);', 'nums.unshift(0);', 'console.log(...nums);', 'console.log(...nums.slice(1));'));
+  accept(id21, 'the array is a property of an object', js('const data = { list: [3, 1, 2] };', 'console.log(data.list);', 'data.list.pop();', 'console.log(data.list);', 'console.log(data.list.map((n) => n * 2));'));
+  reject(id21, 'a copy of a copy: the printed snapshot is never changed in place', 't2', js('const nums = [1, 2, 3];', 'console.log([...nums]);', 'const other = [...nums, 4];', 'other.reverse();', 'console.log([...nums]);', 'console.log(other);'));
+  // A5 3.8.11: the second item reached by destructuring or .find
+  const GS = ['const gameState = { player: "M", items: [{ name: "Pen", price: 2 }, { name: "Mug", price: 5 }] };', 'const saved = JSON.stringify(gameState);', 'const restored = JSON.parse(saved);'];
+  accept('3-8-11-lab-round-trip-array', 'second item by array destructuring', js(...GS, 'const [, second] = restored.items;', 'console.log(second.price + 10);', 'console.log(second.name);'));
+  accept('3-8-11-lab-round-trip-array', 'second item found by name', js(...GS, 'const mug = restored.items.find((i) => i.name === "Mug");', 'console.log(mug.price + 10);', 'console.log(mug.name);'));
+  reject('3-8-11-lab-round-trip-array', 'the price typed in beside a .find', 't2', js(...GS, 'const mug = restored.items.find((i) => i.name === "Mug");', 'console.log(15);', 'console.log(mug.name);'));
+  // A6 3.7.8: a full copy is not a part
+  rejectMsg('3-7-8-lab-slice-sublist', 'slices of everything: the message says PART', 't1', /middle must take only PART of items/, js('const items = ["a", "b", "c", "d", "e"];', 'const middle = items.slice(0, 5);', 'const tail = items.slice(0);', 'console.log(middle);', 'console.log(tail);', 'console.log(items);'));
+  accept('3-7-8-lab-slice-sublist', 'slice(1, -1) for the middle', js('const items = ["a", "b", "c", "d", "e"];', 'const middle = items.slice(1, -1);', 'const tail = items.slice(2);', 'console.log(middle);', 'console.log(tail);', 'console.log(items);'));
+}
+{
+  // B1 3.8.19: restored must follow what was stored, and the print must follow restored
+  const id = '3-8-19-lab-load-restore';
+  reject(id, 'the parse result is thrown away, restored typed in', 't2', js('localStorage.setItem("state", JSON.stringify({ score: 90, level: 4 }));', 'const text = localStorage.getItem("state");', 'let restored = { score: 90, level: 4 };', 'if (text === null) { restored = { score: 0, level: 1 }; }', 'try { JSON.parse(text); } catch { restored = { score: 0, level: 1 }; }', 'console.log(restored.score);'));
+  reject(id, 'the saved value typed into the print', 't2', js('const defaults = { score: 0 };', 'localStorage.setItem("state", JSON.stringify({ score: 90, level: 4 }));', 'const text = localStorage.getItem("state");', 'let restored = defaults;', 'if (text !== null) { try { restored = JSON.parse(text); } catch (e) { restored = defaults; } }', 'console.log(90);'));
+  accept(id, 'a text property printed with a label', js('const defaults = { name: "new", level: 1 };', 'localStorage.setItem("state", JSON.stringify({ name: "Ana", level: 4 }));', 'const text = localStorage.getItem("state");', 'let restored = defaults;', 'if (text !== null) { try { restored = JSON.parse(text); } catch (e) { restored = defaults; } }', 'console.log("Welcome back, " + restored.name);'));
+  // B2 3.8.22: the print must follow what loadState read back
+  const D = ['const defaults = { score: 0, level: 1 };', 'function saveState(s) { localStorage.setItem("k", JSON.stringify(s)); }', 'function loadState() { const t = localStorage.getItem("k"); if (t === null) { return defaults; } try { return JSON.parse(t); } catch (e) { return defaults; } }', 'saveState({ score: 75, level: 5 });'];
+  reject('3-8-22-lab-capstone', 'the saved score typed into the print', 't2', js(...D, 'const restored = loadState();', 'console.log(75);'));
+  reject('3-8-22-lab-capstone', 'the defaults printed', 't2', js(...D, 'loadState();', 'console.log(defaults.score);'));
+  accept('3-8-22-lab-capstone', 'the level printed straight from loadState()', js(...D, 'console.log("level " + loadState().level);'));
+  // B3 3.7.22: middle sliced from bumped; bigger spread from the object
+  const PU = ['const prices = [];', 'prices.push(10); prices.push(20); prices.push(30); prices.push(40); prices.push(50);', 'const bumped = prices.map((p) => p + 5);'];
+  const OUT = ['console.log(bumped);', 'console.log(middle);', 'console.log(joined);', 'console.log(bigger);', 'console.log(settings);', 'console.log(prices);'];
+  reject('3-7-22-lab-capstone', 'middle sliced from prices', 't1', js(...PU, 'const middle = prices.slice(1, 4);', 'const joined = middle.concat([1, 2]);', 'const settings = { theme: "dark", fontSize: 14 };', 'const bigger = { ...settings, fontSize: 18 };', ...OUT));
+  reject('3-7-22-lab-capstone', 'bigger typed in, a spread thrown away', 't2', js(...PU, 'const middle = bumped.slice(1, 4);', 'const joined = middle.concat([1, 2]);', 'const settings = { theme: "dark", fontSize: 14 };', 'const unused = { ...settings, fontSize: 18 };', 'const bigger = { theme: "dark", fontSize: 18 };', ...OUT));
+  // B4 3.7.4: doubled is what .map gives back; prices printed
+  const PR = 'const prices = [10, 20, 30];';
+  reject('3-7-4-lab-map-non-mutating', 'a loop fills doubled, the map does nothing', 't2', js(PR, 'const doubled = [];', 'prices.map((p) => p);', 'for (const p of prices) { doubled.push(p * 2); }', 'console.log(doubled);', 'console.log(prices);'));
+  reject('3-7-4-lab-map-non-mutating', '.map used as forEach', 't2', js(PR, 'const doubled = [];', 'prices.map((p) => doubled.push(p * 2));', 'console.log(doubled);', 'console.log(prices);'));
+  reject('3-7-4-lab-map-non-mutating', 'prices never printed', 't2', js(PR, 'const doubled = prices.map((p) => p * 2);', 'console.log(doubled);'));
+  accept('3-7-4-lab-map-non-mutating', 'map chained with join into a print, both printed', js(PR, 'let doubled;', 'doubled = prices.map((p) => p * 3);', 'console.log(doubled.join(" "));', 'console.log(prices.join(" "));'));
+  // B5 3.7.8: tail is the end of items, taken from items
+  const IT = 'const items = ["a", "b", "c", "d", "e"];';
+  reject('3-7-8-lab-slice-sublist', 'tail does not run to the end', 't1', js(IT, 'const middle = items.slice(1, 3);', 'const tail = items.slice(1, 4);', 'console.log(middle);', 'console.log(tail);', 'console.log(items);'));
+  reject('3-7-8-lab-slice-sublist', 'tail sliced from middle', 't2', js(IT, 'const middle = items.slice(2, 5);', 'const tail = middle.slice(1);', 'console.log(middle);', 'console.log(tail);', 'console.log(items);'));
+  // B6 3.7.17 / 3.7.18: the spread itself
+  reject('3-7-17-lab-spread-array', 'framed built with concat', 't2', js('const first = [1, 2];', 'const second = [3, 4];', 'const combined = [...first, ...second];', 'const framed = [0].concat(first, [99]);', 'console.log(combined);', 'console.log(framed);', 'console.log(first);'));
+  reject('3-7-18-lab-spread-object', 'changed built with Object.assign', 't2', js('const settings = { theme: "dark", fontSize: 14, wrap: true };', 'const changed = Object.assign({}, settings, { fontSize: 18 });', 'const extended = { ...settings, language: "en" };', 'console.log(changed);', 'console.log(extended);', 'console.log(settings);'));
+  // B7 3.8.14 / 3.8.7
+  reject('3-8-14-lab-malformed-json', 'readSave called only once', 't1', js('function readSave(text) { try { return JSON.parse(text); } catch (e) { return { ok: false }; } }', 'console.log(readSave(\'{"a":1}\'));'));
+  reject('3-8-7-lab-stringify-spot-drops', 'the JSON text is never kept in a variable', 'r3', js('const counter = { count: 5, describe: function () { return "hi"; }, note: undefined };', 'console.log(JSON.stringify(counter));'));
 }
 
 try {
