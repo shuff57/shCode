@@ -24,6 +24,9 @@
       "instructions": "Write a second do...while loop with a condition that is already false before the loop starts (for example, a counter that starts at 10 and a condition like counter < 0). Confirm in your console output that the body still runs exactly once."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[counter starts at 1]\n  B --> C[/log counter/]\n  C --> D[add 1 to counter]\n  D --> E{counter is 5 or less}\n  E -- yes --> C\n  E -- no --> F([End])"
+  },
   "requirements": [
     {
       "id": "r1",

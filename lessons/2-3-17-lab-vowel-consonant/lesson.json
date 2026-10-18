@@ -24,6 +24,9 @@
       "instructions": "Write a switch on letter. Stack case labels for 'a', 'e', 'i', 'o', 'u' with no code between them, so all five fall into one block that prints Vowel. Add a default that prints Consonant. Use grouped cases, not ||."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[set letter]\n  B --> C{letter is a, e, i, o or u}\n  C -- yes --> D[/log Vowel/]\n  C -- no --> E[/log Consonant/]\n  D --> F([End])\n  E --> F"
+  },
   "requirements": [
     {
       "id": "r1",
