@@ -29,6 +29,9 @@
       "instructions": "After the inner loop closes, log line so each row of the grid prints on its own line. Change rows and cols to different values (still at least 5) and confirm the grid resizes without touching the loops themselves."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[row starts at 0]\n  B --> C{row is less than rows}\n  C -- yes --> D[line is empty, col starts at 0]\n  D --> E{col is less than cols}\n  E -- yes --> F[add a character to line, add 1 to col]\n  F --> E\n  E -- no --> G[/log line/]\n  G --> H[add 1 to row]\n  H --> C\n  C -- no --> I([End])"
+  },
   "requirements": [
     {
       "id": "r1",

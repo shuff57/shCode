@@ -34,6 +34,9 @@
       "instructions": "Call divide with a valid pair and with the bad value, and use console.log to print both results so you can see the guard fire."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[call divide with a and b]\n  B --> C{b is 0}\n  C -- yes --> D[/return Cannot divide by zero/]\n  C -- no --> E[/return a divided by b/]\n  D --> F([End])\n  E --> F"
+  },
   "requirements": [
     {
       "id": "r1",

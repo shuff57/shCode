@@ -24,6 +24,9 @@
       "instructions": "Write a while loop that keeps running as long as count is greater than 0. Inside the loop, log the current value of count, then decrease count by 1."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[set count to 10]\n  B --> C{count is greater than 0}\n  C -- yes --> D[/log count/]\n  D --> E[subtract 1 from count]\n  E --> C\n  C -- no --> F([End])"
+  },
   "requirements": [
     {
       "id": "r1",

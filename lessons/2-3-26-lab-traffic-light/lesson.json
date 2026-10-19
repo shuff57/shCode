@@ -24,6 +24,9 @@
       "instructions": "First create a variable called light set to \"green\", \"yellow\" or \"red\". Below the comment, write a switch on light with cases for 'green', 'yellow', and 'red', plus a default for anything else. Match the same messages as the original chain."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[set light]\n  B --> C{light is green}\n  C -- yes --> D[/log Go/]\n  C -- no --> E{light is yellow}\n  E -- yes --> F[/log Slow down/]\n  E -- no --> G{light is red}\n  G -- yes --> H[/log Stop/]\n  G -- no --> I[/log Broken light/]\n  D --> J([End])\n  F --> J\n  H --> J\n  I --> J"
+  },
   "requirements": [
     {
       "id": "r1",

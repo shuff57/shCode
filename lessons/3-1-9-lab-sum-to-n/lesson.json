@@ -31,6 +31,9 @@
       "instructions": "After the loop ends, return the running total. Then call sumToN with a few different values and log the results to verify. Expected: sumToN(5) is 15, sumToN(10) is 55, and sumToN(100) is 5050."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[total starts at 0, i starts at 1]\n  B --> C{i is n or less}\n  C -- yes --> D[add i to total, go to the next i]\n  D --> C\n  C -- no --> E[/return total/]\n  E --> F([End])"
+  },
   "requirements": [
     {
       "id": "r1",

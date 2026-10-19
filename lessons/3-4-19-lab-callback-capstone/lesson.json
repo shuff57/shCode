@@ -30,6 +30,9 @@
       "instructions": "Call the helper twice on your array, once with a one-line arrow testing one condition and once with an arrow testing a different condition. Log both counts."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[call countMatching with readings and a test]\n  B --> C[count starts at 0]\n  C --> D{more elements}\n  D -- yes --> E{the test passes for this element}\n  E -- yes --> F[add 1 to count]\n  E -- no --> G[go to the next element]\n  F --> G\n  G --> D\n  D -- no --> H[/return count and log it/]\n  H --> I([End])"
+  },
   "requirements": [
     {
       "id": "r1",

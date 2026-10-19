@@ -34,6 +34,9 @@
       "instructions": "Call doubled with a sample array and console.log both the result and the original array to show the original is untouched."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[call doubled, result is an empty array]\n  B --> C{more numbers}\n  C -- yes --> D[push the number times 2 onto result]\n  D --> C\n  C -- no --> E[/return result/]\n  E --> F[/log result and the original array/]\n  F --> G([End])"
+  },
   "requirements": [
     {
       "id": "r1",
