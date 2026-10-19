@@ -8,6 +8,10 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// The children run in a temp dir, where .npmrc's relative `--import` path does not
+// exist; they import no TypeScript, so they do not need the resolve hook.
+delete process.env.NODE_OPTIONS;
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const tmp = mkdtempSync(join(tmpdir(), 'stamp-tries-'));
 let failures = 0;
