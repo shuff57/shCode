@@ -51,6 +51,8 @@ delete globalThis.prompt;
 // self must be the real global here, not a stand-in object: the runner
 // installs its prompt() shim onto it, and the student's code has to find that
 // binding in the worker's own scope.
+// Bun gives a worker a global self; node's worker_threads does not.
+globalThis.self = globalThis;
 globalThis.postMessage = (v) => parentPort.postMessage(v);
 ${RUNNER_SOURCE}
 parentPort.on('message', (data) => self.onmessage({ data }));

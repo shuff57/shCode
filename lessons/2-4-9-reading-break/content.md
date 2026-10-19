@@ -21,6 +21,20 @@ console.log("After the loop.");
 
 The loop was written to count to 10. It got to 4 and stopped. The condition `i <= 10` never became false: `break` didn't wait for it.
 
+```flow readonly caption="Figure 2.4.9: the loop from the code above, with its own test (i is 10 or less) left out so the break path stands alone. Each round asks one question: is i 4? When it is, the break arrow leaves the loop at once. Nothing waits for the loop's own test to turn false."
+flowchart LR
+  A([Start]) --> B[i starts at 1]
+  B --> C{i is 4}
+  C -- no --> H[/log i/]
+  H --> I[add 1 to i]
+  I --> C
+  C -- yes --> D[/log Stopping at 4/]
+  D --> E[break: leave the loop]
+  E --> F[/log After the loop/]
+  F --> G([End])
+```
+
+
 **In a switch, `break` ends the `switch` block.** In a loop, `break` ends the **loop**. Same keyword, same idea of "stop right here," but a different "here" depending on what it's sitting inside. If you're inside a loop that's inside a `switch` case, `break` ends the innermost one: the loop, not the switch.
 
 `break` also makes a certain kind of loop possible: one with **no stopping condition of its own**, where the only way out is the `break`.

@@ -32,6 +32,19 @@ while (i < 5) {
 
 When `i` is `0`, the condition is true, `continue` fires, and `i` is still `0`. Nothing changed, so the next round does exactly the same thing: forever.
 
+```flow readonly caption="Figure 2.4.16: the loop that never stops. When i is even, continue sends the flow straight back to the test, and the box that adds 1 to i is never reached. i stays 0, so the same path runs again and again."
+flowchart LR
+  A([Start]) --> B[i starts at 0]
+  B --> C{i is less than 5}
+  C -- yes --> D{i is even}
+  D -- yes --> C
+  D -- no --> E[/log i/]
+  E --> F[add 1 to i]
+  F --> C
+  C -- no --> G([End])
+```
+
+
 **The fix is where you put the update, not whether you have one.** Move it *before* anything that could `continue` past it:
 
 ```js live plain
