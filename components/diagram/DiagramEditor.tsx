@@ -13,6 +13,7 @@ import {
   Background,
   BackgroundVariant,
   Controls,
+  ControlButton,
   MarkerType,
   applyEdgeChanges,
   applyNodeChanges,
@@ -380,7 +381,7 @@ function Canvas({
       setIsFull(active);
       if (!active) setDrawerOpen(false);
       // The canvas just changed size by a lot; refit once it has settled.
-      setTimeout(() => fitView({ padding: 0.2, duration: 200 }), 80);
+      setTimeout(() => fitView({ padding: 0.12, duration: 200, maxZoom: 1.6 }), 80);
     };
     document.addEventListener('fullscreenchange', onChangeFs);
     return () => document.removeEventListener('fullscreenchange', onChangeFs);
@@ -389,7 +390,7 @@ function Canvas({
   // The canvas just got narrower or wider; refit once it has settled.
   useEffect(() => {
     if (!isFull) return;
-    const t = setTimeout(() => fitView({ padding: 0.2, duration: 200 }), 80);
+    const t = setTimeout(() => fitView({ padding: 0.12, duration: 200, maxZoom: 1.6 }), 80);
     return () => clearTimeout(t);
   }, [drawerOpen, isFull, fitView]);
 
@@ -1139,12 +1140,27 @@ function Canvas({
           fitViewOptions={{ padding: 0.2, minZoom: fitMinZoom, maxZoom: 1 }}
           minZoom={0.25}
           maxZoom={2}
+          zoomOnScroll={!readOnly}
+          preventScrolling={!readOnly}
           deleteKeyCode={editNode || editEdge ? null : ['Backspace', 'Delete']}
           proOptions={{ hideAttribution: false }}
           defaultEdgeOptions={EDGE_BASE}
         >
           <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#3b3d4d" />
-          {!readOnly && <Controls showInteractive={false} />}
+          {/* A figure keeps zoom in/out/fit and gains a fullscreen button, so a
+              wide diagram can use the whole screen. The page keeps its own
+              scroll: wheel does not zoom a figure (pinch and Ctrl+wheel do). */}
+          <Controls showInteractive={false}>
+            {readOnly && (
+              <ControlButton
+                onClick={toggleFullscreen}
+                title={isFull ? 'Leave fullscreen (Esc)' : 'Fullscreen'}
+                aria-label={isFull ? 'Leave fullscreen' : 'Fullscreen'}
+              >
+                {isFull ? <Minimize /> : <Maximize />}
+              </ControlButton>
+            )}
+          </Controls>
         </ReactFlow>
       </div>
       {isFull && drawerOpen && drawerTabs && drawerTabs.length > 0 && (() => {
