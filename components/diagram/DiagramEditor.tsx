@@ -1150,7 +1150,14 @@ function Canvas({
           {/* A figure keeps zoom in/out/fit and gains a fullscreen button, so a
               wide diagram can use the whole screen. The page keeps its own
               scroll: wheel does not zoom a figure (pinch and Ctrl+wheel do). */}
-          <Controls showInteractive={false}>
+          <Controls showInteractive={false} showFitView={false}>
+            <ControlButton
+              onClick={() => fitView({ padding: 0.2, duration: 300 })}
+              title="Fit the diagram to the window"
+              aria-label="Fit to window"
+            >
+              <Focus />
+            </ControlButton>
             {readOnly && (
               <ControlButton
                 onClick={toggleFullscreen}
