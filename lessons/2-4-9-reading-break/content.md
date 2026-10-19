@@ -22,7 +22,7 @@ console.log("After the loop.");
 The loop was written to count to 10. It got to 4 and stopped. The condition `i <= 10` never became false: `break` didn't wait for it.
 
 ```flow readonly caption="Figure 2.4.9: the loop from the code above, with its own test (i is 10 or less) left out so the break path stands alone. Each round asks one question: is i 4? When it is, the break arrow leaves the loop at once. Nothing waits for the loop's own test to turn false."
-flowchart TD
+flowchart LR
   A([Start]) --> B[i starts at 1]
   B --> C{i is 4}
   C -- no --> H[/log i/]
