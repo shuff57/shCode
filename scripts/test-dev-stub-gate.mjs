@@ -77,7 +77,7 @@ async function boot(env) {
   // it is deleted, so "default boot" really is a no-NODE_ENV boot.
   const childEnv = { ...process.env, PORT: '0', ...env };
   if (!('NODE_ENV' in env)) delete childEnv.NODE_ENV;
-  const child = spawn('node', [path.join(root, 'server.js')], {
+  const child = spawn('node', ['--import', path.join(root, 'scripts/register-ts.mjs'), path.join(root, 'server.js')], {
     env: childEnv,
     stdio: ['ignore', 'pipe', 'pipe'],
     cwd: root,
