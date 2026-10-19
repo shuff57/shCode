@@ -32,6 +32,22 @@ Advanced
 
 `case 2` matched and printed `"Intermediate"`: that part is correct. Then execution fell through into `case 3` and printed `"Advanced"` too. It stopped there, because `case 3` *does* have its `break`. A learner at level 2 gets told they're Advanced: a wrong answer that no error message points you to. The fix is one word:
 
+```flow readonly caption="Figure 2.3.11: level is 2 and case 2 has no break. The arrow from Intermediate straight into Advanced is the fall-through. Case 3 does have its break, so the flow stops there."
+flowchart TD
+  A([Start]) --> B{level is 1}
+  B -- yes --> C[/log Beginner/]
+  B -- no --> D{level is 2}
+  D -- yes --> E[/log Intermediate/]
+  D -- no --> F{level is 3}
+  F -- yes --> G[/log Advanced/]
+  F -- no --> H[/log Unknown level/]
+  E --> G
+  C --> I([End])
+  G --> I
+  H --> I
+```
+
+
 ```js live plain
 let level = 2;
 

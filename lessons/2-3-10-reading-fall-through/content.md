@@ -26,6 +26,22 @@ switch (selection) {
 
 One customer, one dollar, three snacks and a refund. `case "A"` matched, and from there JavaScript ran every remaining line in the block, including `default`, which never even got asked whether it should.
 
+```flow readonly caption="Figure 2.3.10: selection is A and no case has a break. The diamonds are the case tests. Once case A matches, the flow drops down the arrows between the actions and runs every one below it without testing anything again."
+flowchart TD
+  A([Start]) --> B{selection is A}
+  B -- yes --> C[/log chips/]
+  B -- no --> D{selection is B}
+  D -- yes --> E[/log pretzels/]
+  D -- no --> F{selection is C}
+  F -- yes --> G[/log cookies/]
+  F -- no --> H[/log Unknown selection, refund/]
+  C --> E
+  E --> G
+  G --> H
+  H --> I([End])
+```
+
+
 **Try it:** Run it, then add `break;` after each `console.log` one at a time and watch the output shrink.
 
 The broken version didn't crash and didn't warn you. It ran, printed four lines, and looked like it worked. A missing `break` is a *logic* bug: the tell is always the same: you see output from cases you didn't expect. When a `switch` prints too much, look for the missing `break` **above** the surprising line, not at the surprising line itself.
