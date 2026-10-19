@@ -22,6 +22,21 @@ console.log(scores);
 
 Before you draw anything, predict the output. Then run it in your head line by line.
 
+### The same program in plain steps
+
+Each line of the code is one step. Read the **What it does** column to see which name or which array each step touches. The last two steps of the function are the ones your two diamonds are about.
+
+| # | Pseudocode | What it does |
+|---|---|---|
+| 1 | `SET scores TO the array [10, 20, 30]` | Makes one array and names it `scores`. |
+| 2 | `CALL process WITH scores` | Hands the function that same array. Inside, `nums` is a second name for it, so **two names, one array**. |
+| 3 | `SET item 0 OF nums TO 0` | **Mutation.** Writes into the one shared array. |
+| 4 | `SET nums TO a NEW array [9, 9]` | **Reassignment.** Points `nums` at a different array. `scores` is not touched. |
+| 5 | `RETURN to the caller` | `nums` and the array `[9, 9]` are gone. |
+| 6 | `OUTPUT scores` | Prints whatever array `scores` still names. |
+
+Steps 3 and 4 are the two writes. After each one, ask the same question: **did `scores` see this change?**
+
 ### What to draw
 
 | Shape | Use it for |
