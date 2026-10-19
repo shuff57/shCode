@@ -45,6 +45,16 @@ console.log("outside:", scores);
 
 `inside` shows the brand-new array; `outside` still shows the original three items, 1, 2 and 3. The parameter `arr` and the variable `scores` are two separate names that happened to start out pointing at the same array.
 
+```flow readonly caption="Figure 3.6.5: the code above, one step at a time. Inside the function the name arr moves to a new array, so inside prints the new one. The name scores never moves, and when the function ends arr disappears, so outside still prints 1, 2, 3."
+flowchart LR
+  A([Start]) --> B[scores names the array 1, 2, 3]
+  B --> C[call replace: arr names the same array]
+  C --> D[point arr at a new array 9, 9, 9]
+  D --> E[/log inside: the new array/]
+  E --> F[/log outside: scores, after the call/]
+  F --> G([End])
+```
+
 ## `const` locks the name, not the contents
 
 **What you'll learn:**

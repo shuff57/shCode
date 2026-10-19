@@ -340,5 +340,8 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[make user with a name and an age]\n  B --> C[call birthday: add 1 to the age on user]\n  C --> D[/log user/]\n  D --> E[call birthdaySafe: build a new older object]\n  E --> F[/log the new object and the original user/]\n  F --> G([End])"
   }
 }

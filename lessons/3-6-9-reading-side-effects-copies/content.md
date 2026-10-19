@@ -71,6 +71,16 @@ console.log("highest: " + top);
 console.log(scores);
 ```
 
+```flow readonly caption="Figure 3.6.9: getHighest with the copy. The sort happens on the copy, so the caller's scores array is never reordered. Remove the copy step and the sort reaches scores itself."
+flowchart LR
+  A([Start]) --> B[scores names the array 40, 90, 15, 70]
+  B --> C[call getHighest: copy is a new array made with spread]
+  C --> D[sort the copy, biggest first]
+  D --> E[return the first item of the copy]
+  E --> F[/log highest, then log scores: the original order/]
+  F --> G([End])
+```
+
 A copy made this way is **shallow**: the new array is genuinely new, but if its items are themselves objects, both arrays still point at those same inner objects. For a flat list of numbers or strings a shallow copy is all you need. When you need a copy that goes all the way down, `structuredClone(value)` does that.
 
 **Try it:** (`{ ...team }` copies an object the same way `[...scores]` copies an array; Reading 3.6.10 explains it.) Both copies start as copies of `team`. Push a score into each copy's nested `scores` array, then compare what `team` holds. Which copy reached back and changed the original?

@@ -180,5 +180,8 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[make quizScores: 10, 20, 30]\n  B --> C[call addOne with quizScores]\n  C --> D[start at position 0]\n  D --> E{more positions}\n  E -- yes --> F[write the item plus 1 into the same array]\n  F --> G[move to the next position]\n  G --> E\n  E -- no --> I[/log quizScores/]\n  I --> J([End])"
   }
 }
