@@ -36,6 +36,9 @@
       "instructions": "Call decideGrade() and then printAdvice() so the program's output matches what 2.1.42 printed before the refactor."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[set score, attendance and lateAssignments]\n  B --> C[/call decideGrade: log the recommendation/]\n  C --> D{printAdvice: low attendance or many late}\n  D -- yes --> E[/log the review warning/]\n  D -- no --> F([End])\n  E --> F"
+  },
   "requirements": [
     {
       "id": "r1",

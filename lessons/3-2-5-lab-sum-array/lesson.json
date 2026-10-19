@@ -28,6 +28,9 @@
       "instructions": "After the loop, use console.log to print the value of total."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[total starts at 0, i starts at 0]\n  B --> C{i is less than the array length}\n  C -- yes --> D[add the number at i to total, go to the next i]\n  D --> C\n  C -- no --> E[/log total/]\n  E --> F([End])"
+  },
   "requirements": [
     {
       "id": "r1",

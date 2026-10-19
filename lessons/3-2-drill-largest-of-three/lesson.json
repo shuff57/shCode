@@ -34,6 +34,9 @@
       "instructions": "Call largest with the biggest number first, in the middle and last. All three calls must give the same answer."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[biggest starts as a]\n  B --> C{b is bigger than biggest}\n  C -- yes --> D[biggest becomes b]\n  C -- no --> E{c is bigger than biggest}\n  D --> E\n  E -- yes --> F[biggest becomes c]\n  E -- no --> G[/return biggest/]\n  F --> G\n  G --> H([End])"
+  },
   "requirements": [
     {
       "id": "r1",

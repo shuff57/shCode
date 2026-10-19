@@ -33,6 +33,9 @@
       "instructions": "Create a variable called total. Use a nested loop (outer over rows, inner over cells) to add up every number in the grid, then console.log the total."
     }
   ],
+  "planChart": {
+    "mermaid": "flowchart TD\n  A([Start]) --> B[log grid row 1 col 0, then set it to 8]\n  B --> C[total starts at 0, row starts at 0]\n  C --> D{row is less than the number of rows}\n  D -- no --> I[/log total/]\n  I --> J([End])\n  D -- yes --> E[col starts at 0]\n  E --> F{col is less than the cells in this row}\n  F -- yes --> G[add the cell to total, go to the next col]\n  G --> F\n  F -- no --> K[this row is finished]\n  K --> H[go to the next row]\n  H --> D"
+  },
   "requirements": [
     {
       "id": "r1",
