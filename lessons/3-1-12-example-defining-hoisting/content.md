@@ -24,6 +24,16 @@ Run it, then walk through what actually happened, in order:
 4. It runs both `console.log()` statements.
 5. It returns to the line after the call. The program ends.
 
+```flow readonly caption="Figure 3.1.12: the five steps above. Reading the definition only stores it. Nothing in the body runs until the call jumps back into it, and then the flow returns to the line after the call."
+flowchart LR
+  A([Start]) --> B[read the definition of printWelcome: store it, do not run it]
+  B --> C[reach the call printWelcome]
+  C --> D[jump into the stored body]
+  D --> E[/log both welcome lines/]
+  E --> F[return to the line after the call]
+  F --> G([End])
+```
+
 Notice the name: `printWelcome`, not `print_welcome`. JavaScript convention is **camelCase** — first word lowercase, each later word capitalized, no underscores. The same rule you learned for variable names applies to function names too.
 
 ### The surprising case: calling before defining

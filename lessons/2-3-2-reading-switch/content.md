@@ -40,6 +40,18 @@ switch (grade) {
 }
 ```
 
+```flow readonly caption="Figure 2.3.2: the grade switch with grade set to B. Each diamond is a case test, checked in order. The first match runs its line, and its break is the arrow straight to the end. The default line runs only when every case has failed."
+flowchart TD
+  A([Start]) --> B{grade is A}
+  B -- yes --> C[/log Excellent/]
+  B -- no --> D{grade is B}
+  D -- yes --> E[/log Good/]
+  D -- no --> F[/default: log See me after class/]
+  C --> G([End])
+  E --> G
+  F --> G
+```
+
 ## default doesn't have to be written last
 
 `default` is checked only after every `case` has failed to match: that's true no matter *where* in the block it's written. Putting it in the middle of a `switch` is legal. It's also confusing to read, which is why the convention is to write it last, even though JavaScript doesn't require it.

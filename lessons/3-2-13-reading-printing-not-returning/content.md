@@ -28,6 +28,16 @@ const total = addAndPrint(2, 3);
 console.log("total is: " + total);
 ```
 
+```flow readonly caption="Figure 3.2.13: addAndPrint. The 5 is logged from inside the function, but no return hands it back, so the call produces undefined and that is what total holds."
+flowchart LR
+  A([Start]) --> B[call addAndPrint with 2 and 3]
+  B --> C[/log 5 from inside the function/]
+  C --> D[function ends with no return: the call gives undefined]
+  D --> E[total holds undefined]
+  E --> F[/log total is undefined/]
+  F --> G([End])
+```
+
 The function displayed its answer and then discarded it. A function that finishes without executing a `return` statement produces the value `undefined`. The function still ran; it simply handed nothing back.
 
 The fix is one word:

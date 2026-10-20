@@ -29,6 +29,16 @@ do {
 } while (attempts < 3);
 ```
 
+```flow readonly caption="Figure 2.4.5: the do...while loop above. The body comes first, then the test. The test sits at the bottom, so the body has already run once before it is ever asked."
+flowchart LR
+  A([Start]) --> B[attempts starts at 0]
+  B --> C[add 1 to attempts]
+  C --> D[/log Attempt and the number/]
+  D --> E{attempts is less than 3}
+  E -- no --> F([End])
+  E -- yes --> C
+```
+
 Because the check comes last, the body always runs **at least once**, even if the condition would have been false from the very start.
 
 Note the semicolon after the closing `while (...)`. A `do...while` is the one loop that ends with one; leaving it off is a common slip.

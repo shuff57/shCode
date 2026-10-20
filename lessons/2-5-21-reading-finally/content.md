@@ -29,6 +29,17 @@ try {
 }
 ```
 
+```flow readonly caption="Figure 2.5.21: try, catch and finally. An error sends the flow through catch, no error skips it, and both paths arrive at finally before the program goes on."
+flowchart TD
+  A([Start]) --> B[try: open the connection]
+  B --> C{did an error happen}
+  C -- yes --> D[/catch: log Handling and the error message/]
+  C -- no --> E[/log Work done/]
+  D --> F[/finally: log Closing the connection/]
+  E --> F
+  F --> G([End])
+```
+
 `catch` ran in one case and not the other. `"Closing the connection."` ran in **both**: that's what makes `finally` different from just writing a line after the whole `try...catch`. You could put the cleanup line after the block instead, and often that works fine. The difference shows up if the `catch` block itself doesn't fully handle everything: an error escaping `catch` skips whatever comes after the block, but still runs `finally`. Reach for `finally` when the cleanup absolutely must happen even if the error handling fails too.
 
 ---
