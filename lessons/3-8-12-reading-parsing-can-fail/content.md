@@ -40,7 +40,16 @@ console.log(loadSettings('{"theme":"dark","fontSize":18}'));
 console.log(loadSettings("corrupted!!"));
 ```
 
-Good data is used; bad data falls back to sensible defaults. The program keeps running either way, which is the whole point of handling an error rather than merely surviving it. A `catch` block that returns `undefined` and hopes for the best is not recovering — it is only postponing the crash.
+Good data is used; bad data falls back to sensible defaults. The program keeps running either way, which is the whole point of handling an error rather than merely surviving it.
+
+```flow readonly caption="Figure 3.8.12: loadSettings. If the text parses, the parsed settings come back. If JSON.parse throws, the catch hands back the defaults. Either way the program keeps running."
+flowchart TD
+  A([Start]) --> B{does JSON.parse throw}
+  B -- no --> C[return the parsed settings]
+  B -- yes --> D[catch: return the defaults]
+  C --> Z([End])
+  D --> Z
+``` A `catch` block that returns `undefined` and hopes for the best is not recovering — it is only postponing the crash.
 
 ---
 

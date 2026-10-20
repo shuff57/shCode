@@ -20,6 +20,24 @@ if (condition) {
 
 JavaScript checks each condition from top to bottom and stops at the **first** one that is true. Only that block runs: the rest are skipped.
 
+```flow readonly caption="Figure 2.1.3: the grade chain with score = 85. The conditions are asked from the top; the first yes runs its block and the arrow jumps to the end, so the lower questions are never asked."
+flowchart TD
+  A([Start]) --> B{score is 90 or more}
+  B -- yes --> G1[/log Grade A/]
+  B -- no --> C{score is 80 or more}
+  C -- yes --> G2[/log Grade B/]
+  C -- no --> D{score is 70 or more}
+  D -- yes --> G3[/log Grade C/]
+  D -- no --> E{score is 60 or more}
+  E -- yes --> G4[/log Grade D/]
+  E -- no --> G5[/log Grade F/]
+  G1 --> Z([End])
+  G2 --> Z
+  G3 --> Z
+  G4 --> Z
+  G5 --> Z
+```
+
 **Try it:** Change `score` to different values (95, 70, 55, 40) and re-run to see which branch fires each time.
 
 ```js live plain

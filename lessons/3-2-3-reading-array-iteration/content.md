@@ -60,7 +60,17 @@ for (let i = 0; i <= prices.length; i++) {
 }
 ```
 
-`4`, `9`, `6`, and then `undefined`. On the last round `i` is `3`, and `prices[3]` is one place past the end of the array (3.3.2), so it holds nothing. Nothing crashes, which is why this bug is easy to miss: the program just prints an extra line. If you ever see a stray `undefined` at the end of a loop's output, check the condition first. Change `<=` to `<` and run it again to see the extra line disappear. You met the same trap with the letters of a word in 2.2.19; arrays behave the same way. The next lab gives you a loop with this bug to fix.
+`4`, `9`, `6`, and then `undefined`. On the last round `i` is `3`, and `prices[3]` is one place past the end of the array (3.3.2), so it holds nothing. Nothing crashes, which is why this bug is easy to miss: the program just prints an extra line. If you ever see a stray `undefined` at the end of a loop's output, check the condition first. Change `<=` to `<` and run it again to see the extra line disappear.
+
+```flow readonly caption="Figure 3.2.3: the off-by-one with three prices. With i <= length the loop asks one more time at i = 3, and prices at 3 holds nothing, so it logs undefined."
+flowchart LR
+  A([Start]) --> B[i is 0]
+  B --> C{i is 3 or less}
+  C -- no --> Z([End])
+  C -- yes --> D[/log prices at i/]
+  D --> E[add 1 to i]
+  E --> C
+``` You met the same trap with the letters of a word in 2.2.19; arrays behave the same way. The next lab gives you a loop with this bug to fix.
 
 ---
 
