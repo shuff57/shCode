@@ -41,40 +41,40 @@
     {
       "id": "r2",
       "title": "case 'green' present",
-      "description": "case 'green' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
+      "description": "case 'green' is directly followed by a console.log call, or sets the message variable that is logged after the switch. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s*['\"]green['\"]\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*console\\.log",
+      "pattern": "(?=[\\s\\S]*console\\.log)case\\s*['\"]green['\"]\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*(?:console\\.log|[A-Za-z_$][\\w$]*\\s*=[^=])",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "case 'yellow' present",
-      "description": "case 'yellow' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
+      "description": "case 'yellow' is directly followed by a console.log call, or sets the message variable that is logged after the switch. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s*['\"]yellow['\"]\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*console\\.log",
+      "pattern": "(?=[\\s\\S]*console\\.log)case\\s*['\"]yellow['\"]\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*(?:console\\.log|[A-Za-z_$][\\w$]*\\s*=[^=])",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r4",
       "title": "case 'red' present",
-      "description": "case 'red' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
+      "description": "case 'red' is directly followed by a console.log call, or sets the message variable that is logged after the switch. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "case\\s*['\"]red['\"]\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*console\\.log",
+      "pattern": "(?=[\\s\\S]*console\\.log)case\\s*['\"]red['\"]\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*(?:console\\.log|[A-Za-z_$][\\w$]*\\s*=[^=])",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r5",
       "title": "default label present",
-      "description": "The default label is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
+      "description": "The default label is directly followed by a console.log call, or sets the message variable that is logged after the switch. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "default\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*console\\.log",
+      "pattern": "(?=[\\s\\S]*console\\.log)default\\s*:\\s*(?:\\{\\s*)?(?:(?:\\/\\/[^\\n]*\\n|\\/\\*[\\s\\S]*?\\*\\/)\\s*)*(?:console\\.log|[A-Za-z_$][\\w$]*\\s*=[^=])",
       "flags": "i",
       "points": 0
     },
