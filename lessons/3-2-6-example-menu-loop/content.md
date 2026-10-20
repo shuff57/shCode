@@ -16,6 +16,18 @@ for (let i = 0; i < menu.length; i++) {
 
 Now put an `if/else if/else` inside the loop. The loop handles the repetition; the conditional handles the decision. Each item gets its own response.
 
+```flow readonly caption="Figure 3.2.6: a loop with a chain inside. Each round picks up one item, the chain chooses what to print, then i goes up by one. When i reaches the length, the loop ends."
+flowchart LR
+  A([Start]) --> B[i is 0]
+  B --> C{i is less than menu length}
+  C -- no --> Z([End])
+  C -- yes --> D[choice is menu at i]
+  D --> E[if / else if chain checks choice]
+  E --> F[/log the matching message/]
+  F --> G[add 1 to i]
+  G --> C
+```
+
 ```js live plain
 let menu = ["start", "help", "quit"];
 

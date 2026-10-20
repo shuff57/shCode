@@ -17,6 +17,19 @@ if (outerCondition) {
 
 The inner `if` only runs at all when the outer condition is true. Nesting asks the first question, and only *then* decides whether to ask the second one at all. (There is also a way to write a single condition that checks two things at once, which is what `2.1.29 Reading: Logical Operators: && || !` is about. It solves a different problem: it asks both questions every time.)
 
+```flow readonly caption="Figure 2.1.15: the nested if. The second question (yearsActive) sits on the yes path of the first, so it is asked only for members."
+flowchart TD
+  A([Start]) --> B{isMember}
+  B -- yes --> C[/log Member confirmed/]
+  C --> D{yearsActive is 5 or more}
+  D -- yes --> E[/log Eligible/]
+  D -- no --> F[/log Not yet eligible/]
+  B -- no --> G[/log Not a member/]
+  E --> Z([End])
+  F --> Z
+  G --> Z
+```
+
 **Try it:** Change `isMember` to `false` and re-run. Notice the inner check never even runs: the outer `if` skipped its whole block.
 
 ```js live plain
