@@ -1,60 +1,110 @@
 {
   "id": "5-3-20a-chart-the-method-chain",
-  "title": "5.4.6 Chart the Code: A Method That Calls a Method",
-  "description": "Draw a method calling another method. Two double-rails, and flow that comes back from both.",
+  "title": "5.4.6 Plain English to Pseudocode: A Method That Calls a Method",
+  "description": "Turn five plain-English steps into pseudocode: one decision, two calls to other methods, and a step that runs either way.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
-  "preview": "diagram",
+  "preview": "console",
   "slos": [
     "SLO-2",
     "SLO-4"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([takeDamage(n) starts])\n  Z([back to the caller])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 6
-      }
-    ]
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([takeDamage amount starts]) --> B[health = health - amount]\n  B --> C{health <= 0}\n  C -- yes --> D[[this.die]]\n  C -- no --> E[[this.flashRed]]\n  D --> E\n  E --> F([back to the caller])",
+    "caption": "takeDamage: the die call sits on one branch, and both branches reach flashRed."
   },
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** The enemy is hit for some amount of damage.\n\n**2.** Take that amount off the enemy's health.\n\n**3.** If the health is now zero or less, the enemy dies.\n\n**4.** Either way, the enemy flashes red to show it was hit.\n\n**5.** Then control goes back to whoever hit it.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for the decision, and CALL for the two other methods (`die` and `flashRed`). The chart shows the shape.",
+      "hints": [
+        "A step that happens \"either way\" is not inside the IF. It comes after END IF.",
+        "Write a call as one line: `CALL die`. Do not write what die does."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Five numbered steps in a row",
+      "description": "Number every step 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n){4}[ \\t]*\\d+[.)][ \\t]*\\S",
+      "hint": "You need at least five lines that start with a number, one after another, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Subtract the damage from health first",
+      "description": "A step like `SET health TO health - amount`, before the decision.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:SET\\s+)?(?:this\\.)?health\\s+(?:TO|=)\\s+(?:this\\.)?health\\s*(?:-|minus)\\s*amount\\b[\\s\\S]*(?<!END\\s)\\bIF\\b",
+      "hint": "Write the change as SET health TO health - amount, and put it before the IF.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "One decision that asks if health is zero or less",
+      "description": "Exactly one IF, written against health and zero, closed with END IF.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?![\\s\\S]*(?<!END\\s)\\bIF\\b[\\s\\S]*(?<!END\\s)\\bIF\\b)[\\s\\S]*(?<!END\\s)\\bIF\\b[^\\n]*\\bhealth\\b[^\\n]*(?:<=?|≤|\\bzero\\b|\\b0\\b)[\\s\\S]*\\bEND\\s+IF\\b",
+      "hint": "Use one IF about health being 0 or less, and close it with END IF. If you have two IFs, join them into one.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "CALL die happens only inside the decision",
+      "description": "The CALL die line sits between IF and END IF.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?<!END\\s)\\bIF\\b(?:(?!\\bEND\\s+IF\\b)[\\s\\S])*\\bCALL\\s+die\\b",
+      "hint": "The enemy only dies when health is 0 or less, so CALL die goes between IF and END IF.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "CALL flashRed happens after END IF, either way",
+      "description": "The flash runs whether or not the enemy died, so it comes after END IF.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bEND\\s+IF\\b[\\s\\S]*\\bCALL\\s+flashRed\\b",
+      "hint": "Step 4 says \"either way\". A step that runs either way is not inside the decision: put CALL flashRed after END IF.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Two calls, and nothing from inside them",
+      "description": "One CALL line for die and one for flashRed. Do not write what those methods do.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?![\\s\\S]*\\b(?:sprite|score|remove)\\b)(?![\\s\\S]*\\bCALL\\b[\\s\\S]*\\bCALL\\b[\\s\\S]*\\bCALL\\b)[\\s\\S]*\\bCALL\\b[\\s\\S]*\\bCALL\\b",
+      "hint": "You need exactly two CALL lines. Removing the sprite and adding to the score belong inside die, not here.",
+      "points": 0
+    }
+  ],
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  },
-  "steps": [],
-  "requirements": []
+  }
 }
