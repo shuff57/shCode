@@ -62,7 +62,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\b(?:GO\\s*TO|GOTO|JUMP|REPEAT|LOOP\\s+BACK|START\\s+OVER|RESTART)\\b)[\\s\\S]*\\bSET\\s+[^\\n]*\\bmouse\\b",
+      "pattern": "^(?![\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*TO|GOTO|JUMP\\s+TO|LOOP\\s+BACK|START\\s+OVER)\\b)[\\s\\S]*\\bSET\\s+[^\\n]*\\bmouse\\b",
       "hint": "Delete the GO TO line. The sprite moves once per frame, then the frame goes on to the end.",
       "points": 0
     },

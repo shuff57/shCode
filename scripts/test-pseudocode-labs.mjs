@@ -96,6 +96,7 @@ const LABS = {
       ['a state change that jumps', ['r6'], lines('1. IF state is "title"', '2.   CALL drawTitle', '3.   IF space is pressed', '4.     SET state TO "play"', '5.     GO TO step 6', '6.   END IF', '7. ELSE IF state is "play"', '8.   CALL updateGame', '9.   IF playerDead', '10.    SET state TO "gameover"', '11.  END IF', '12. ELSE IF state is "gameover"', '13.  CALL drawGameOver', '14.  IF r is pressed', '15.    SET state TO "title"', '16.  END IF', '17. END IF')],
       ['gameover goes to the wrong state', ['r5'], lines('1. IF state is "title"', '2.   CALL drawTitle', '3.   IF space is pressed', '4.     SET state TO "play"', '5.   END IF', '6. ELSE IF state is "play"', '7.   CALL updateGame', '8.   IF playerDead', '9.     SET state TO "gameover"', '10.  END IF', '11. ELSE IF state is "gameover"', '12.  CALL drawGameOver', '13.  IF r is pressed', '14.    SET state TO "play"', '15.  END IF', '16. END IF')],
     ],
+    ok: [['spacebar, dies, = and a restart note', lines('1. IF state is "title"', '2.   CALL drawTitle', '3.   IF spacebar is pressed', "4.     SET state = 'play'", '5.   END IF', '6. ELSE IF state is "play"', '7.   CALL updateGame', '8.   IF the player dies', '9.     SET state TO "gameover"', '10.  END IF', '11. ELSE IF state is "gameover"', '12.  CALL drawGameOver', '13.  IF r is pressed (restart)', '14.    SET state TO "title"', '15.  END IF', '16. END IF')]],
     lower: lines('1. if state == "title"', '2.   call drawTitle', '3.   if space is pressed', '4.     set state to "play"', '5.   end if', '6. else if state == "play"', '7.   call updateGame', '8.   if the player is dead', '9.     set state to "gameover"', '10.  end if', '11. else if state == "gameover"', '12.  call drawGameOver', '13.  if r is pressed', '14.    set state to "title"', '15.  end if', '16. end if'),
   },
   '6-7-21a-chart-the-slingshot': {
@@ -113,9 +114,11 @@ const LABS = {
     starterRed: ['r1', 'r2', 'r3', 'r4'],
     muts: [
       ['fixed the ELSE but left the GO TO', ['r3'], lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.     GO TO step 4', '6.   END IF', '7. ELSE', '8.   CALL drawPauseScreen', '9.   IF p is pressed', '10.    SET state TO "play"', '11.  END IF', '12. END IF')],
+      ['ELSE hung on the wrong IF', ['r1'], lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.   ELSE', '6.     CALL drawPauseScreen', '7.     IF p is pressed', '8.       SET state TO "play"', '9.     END IF', '10.  END IF', '11. END IF')],
       ['paused but no way out', ['r4'], lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.   END IF', '6. ELSE', '7.   CALL drawPauseScreen', '8. END IF')],
       ['pause screen left floating', ['r2'], lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.   END IF', '6. ELSE', '7.   IF p is pressed', '8.     SET state TO "play"', '9.   END IF', '10. END IF', '11. CALL drawPauseScreen')],
     ],
+    ok: [['OTHERWISE instead of ELSE', lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.   END IF', '6. OTHERWISE', '7.   CALL drawPauseScreen', '8.   IF p is pressed', '9.     SET state TO "play"', '10.  END IF', '11. END IF')]],
     lower: lines('1. if state is "play"', '2.   call updateGame', '3.   if p is pressed', '4.     set state to "paused"', '5.   end if', '6. else', '7.   call drawPauseScreen', '8.   if p is pressed', '9.     set state to "play"', '10.  end if', '11. end if'),
   },
   '6-7-10a-fix-the-drag-chart': {

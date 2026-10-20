@@ -22,7 +22,7 @@
     {
       "id": "s1",
       "title": "Repair the half-finished pseudocode",
-      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** When the state is play: update the game, and if p was pressed, change the state to paused.\n\n**2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Then repair it, do not start over:\n\n- Give the play decision its own **ELSE** branch, for every frame that is not playing.\n- Move `CALL drawPauseScreen` into that branch so it runs only when paused.\n- Remove the **GO TO**. Setting a state is an ordinary step: the frame carries on to the end.\n- Inside the ELSE branch, add the way out: if p is pressed, SET state TO \"play\".\n\nWhen it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.",
+      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** When the state is play: update the game, and if p was pressed, change the state to paused.\n\n**2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Then repair it, do not start over:\n\n- Give the play decision its own **ELSE** branch, for every frame that is not playing. The ELSE comes after the inner `END IF` and lines up with `IF state is \"play\"`, and the last `END IF` closes the whole thing.\n- Move `CALL drawPauseScreen` into that branch so it runs only when paused.\n- Remove the **GO TO**. Setting a state is an ordinary step: the frame carries on to the end.\n- Inside the ELSE branch, add the way out: if p is pressed, SET state TO \"play\".\n\nRenumber the lines if you like: every line just needs a number. When it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.",
       "hints": [
         "A step that jumps back to itself is a hung game, written down. Delete the GO TO line.",
         "The ELSE branch runs on every frame that is not playing, so that is where drawPauseScreen belongs."
@@ -38,8 +38,8 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*\"?play\"?[\\s\\S]*\\bELSE\\b",
-      "hint": "Give the IF state is \"play\" an ELSE branch, for the frames when the game is not playing.",
+      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?[\\s\\S]*?\\bEND\\s*IF\\b[ \\t]*\\n(?:[ \\t]*\\d+[.)])?[ \\t]*(?:ELSE|OTHERWISE)\\b",
+      "hint": "Give the IF state is \"play\" an ELSE branch for the frames when the game is not playing. Put the ELSE after the END IF of the inner IF p, so it lines up with IF state is \"play\".",
       "points": 0
     },
     {
@@ -50,7 +50,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bELSE\\b[\\s\\S]*\\bCALL\\s+drawPauseScreen\\b[\\s\\S]*\\bEND\\s*IF\\b",
+      "pattern": "\\b(?:ELSE|OTHERWISE)\\b[\\s\\S]*\\bCALL\\s+drawPauseScreen\\b[\\s\\S]*\\bEND\\s*IF\\b",
       "hint": "Move CALL drawPauseScreen under the ELSE, so it floats nowhere and runs only on the paused frames.",
       "points": 0
     },
@@ -62,7 +62,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\b(?:GO\\s*TO|GOTO|JUMP|REPEAT|LOOP\\s+BACK|START\\s+OVER|RESTART)\\b)[\\s\\S]*\\bSET\\s+state\\s+TO\\s+\"?paused",
+      "pattern": "^(?![\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*TO|GOTO|JUMP\\s+TO|LOOP\\s+BACK|START\\s+OVER)\\b)[\\s\\S]*\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?paused",
       "hint": "Delete the GO TO line. Setting the state does its one job, then the frame goes on to the end.",
       "points": 0
     },
@@ -74,7 +74,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bELSE\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bp\\b[\\s\\S]*?\\bSET\\s+state\\s+TO\\s+\"?play\"?",
+      "pattern": "\\b(?:ELSE|OTHERWISE)\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bp\\b[\\s\\S]*?\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?play[\"\\']?",
       "hint": "In the ELSE branch add IF p is pressed, with SET state TO \"play\" inside it, so the player can leave pause.",
       "points": 0
     },
@@ -86,7 +86,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bp\\b[^\\n]*\\n(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bSET\\s+state\\s+TO\\s+\"?paused",
+      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bp\\b[^\\n]*\\n(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?paused",
       "hint": "SET state TO \"paused\" belongs inside IF p is pressed.",
       "points": 0
     },
@@ -98,7 +98,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*\"?play\"?[\\s\\S]*?\\bCALL\\s+updateGame\\b",
+      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?[\\s\\S]*?\\bCALL\\s+updateGame\\b",
       "hint": "The play branch should CALL updateGame.",
       "points": 0
     }

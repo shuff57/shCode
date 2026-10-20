@@ -12,9 +12,9 @@ The same plan is drawn as a flow chart above the editor. You do not draw it, you
 
 Someone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Then repair it, do not start over:
 
-- Give the play decision its own **ELSE** branch, for every frame that is not playing.
+- Give the play decision its own **ELSE** branch, for every frame that is not playing. The ELSE comes after the inner `END IF` and lines up with `IF state is "play"`, and the last `END IF` closes the whole thing.
 - Move `CALL drawPauseScreen` into that branch so it runs only when paused.
 - Remove the **GO TO**. Setting a state is an ordinary step: the frame carries on to the end.
 - Inside the ELSE branch, add the way out: if p is pressed, SET state TO "play".
 
-When it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.
+Renumber the lines if you like: every line just needs a number. When it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.

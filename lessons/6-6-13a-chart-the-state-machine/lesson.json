@@ -22,7 +22,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs.\n\n**2.** In the title state: draw the title screen, then if space was pressed, change the state to play.\n\n**3.** In the play state: update the game, then if the player is dead, change the state to gameover.\n\n**4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title.\n\n**5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing, CALL for the three drawing and updating methods, and SET for a state change. Number every line, including the indented ones and the END IF lines. Each keyword looks like this:\n\n- `IF state is \"title\"` ... `ELSE IF state is \"play\"` ... `END IF` (route by state)\n- `CALL drawTitle` (call another function)\n- `IF space is pressed` ... `END IF` (the check to leave the state)\n- `SET state TO \"play\"` (a state change)\n\nEvery state draws **first** and only then asks whether to leave. Afterwards, find the missing arrow: is there any way from play back to title without dying?",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs.\n\n**2.** In the title state: draw the title screen, then if space was pressed, change the state to play.\n\n**3.** In the play state: update the game, then if the player is dead, change the state to gameover.\n\n**4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title.\n\n**5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for the three drawing and updating methods, and SET for a state change. Number every line, including the indented ones and the END IF lines. Each keyword looks like this:\n\n- `IF state is \"title\"` ... `ELSE IF state is \"play\"` ... `END IF` (route by state)\n- `CALL drawTitle` (call another function)\n- `IF space is pressed` ... `END IF` (the check to leave the state)\n- `SET state TO \"play\"` (a state change)\n\nEvery state draws **first** and only then asks whether to leave. Afterwards, read your plan as a map: is there any way from play back to title without dying? There is not, and you found it by reading. That may be fine.",
       "hints": [
         "A state does its drawing first, then asks whether to leave. If you flip that, the frame where the player dies never draws.",
         "The three states are one chain: IF, then ELSE IF, then ELSE IF, then one END IF. Separate IFs would let the state change mid-frame."
@@ -50,7 +50,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bstate\\s*(?:is|==|===|=|equals)\\s*\"?title\"?[\\s\\S]*?\\b(?:ELSE\\s*IF|ELIF)\\b[^\\n]*\\bstate\\s*(?:is|==|===|=|equals)\\s*\"?play\"?[\\s\\S]*?\\b(?:ELSE\\s*IF|ELIF)\\b[^\\n]*\\bstate\\s*(?:is|==|===|=|equals)\\s*\"?gameover\"?",
+      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?title[\"\\']?[\\s\\S]*?\\b(?:ELSE\\s*IF|ELIF)\\b[^\\n]*\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?[\\s\\S]*?\\b(?:ELSE\\s*IF|ELIF)\\b[^\\n]*\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?gameover[\"\\']?",
       "hint": "Route with one chain: IF state is \"title\", then ELSE IF state is \"play\", then ELSE IF state is \"gameover\". Do not use three separate IFs.",
       "points": 0
     },
@@ -62,7 +62,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*\"?title\"?[\\s\\S]*?\\bCALL\\s+drawTitle\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bspace\\b[\\s\\S]*?\\bSET\\s+state\\s+TO\\s+\"?play\"?",
+      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?title[\"\\']?[\\s\\S]*?\\bCALL\\s+drawTitle\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bspace(?:bar)?\\b[\\s\\S]*?\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?play[\"\\']?",
       "hint": "In the title state: CALL drawTitle first, then IF space is pressed, then SET state TO \"play\" inside it.",
       "points": 0
     },
@@ -74,7 +74,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*\"?play\"?[\\s\\S]*?\\bCALL\\s+updateGame\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*dead[\\s\\S]*?\\bSET\\s+state\\s+TO\\s+\"?gameover\"?",
+      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?[\\s\\S]*?\\bCALL\\s+updateGame\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*(?:dead|dies|health|lives)[\\s\\S]*?\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?gameover[\"\\']?",
       "hint": "In the play state: CALL updateGame first, then IF the player is dead, then SET state TO \"gameover\" inside it.",
       "points": 0
     },
@@ -86,7 +86,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*\"?gameover\"?[\\s\\S]*?\\bCALL\\s+drawGameOver\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\br\\b[\\s\\S]*?\\bSET\\s+state\\s+TO\\s+\"?title\"?",
+      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?gameover[\"\\']?[\\s\\S]*?\\bCALL\\s+drawGameOver\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\br\\b[\\s\\S]*?\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?title[\"\\']?",
       "hint": "In the gameover state: CALL drawGameOver first, then IF r is pressed, then SET state TO \"title\" inside it.",
       "points": 0
     },
@@ -98,13 +98,13 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\b(?:GO\\s*TO|GOTO|JUMP|REPEAT|LOOP\\s+BACK|START\\s+OVER|RESTART)\\b)(?=(?:[\\s\\S]*\\bSET\\s+state\\s+TO\\b){3})[\\s\\S]*",
+      "pattern": "^(?![\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*TO|GOTO|JUMP\\s+TO|LOOP\\s+BACK|START\\s+OVER)\\b)(?=(?:[\\s\\S]*\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)){3})[\\s\\S]*",
       "hint": "Write three SET state TO lines, one per transition. Do not write GO TO or LOOP BACK: changing the state does not jump, the frame just ends.",
       "points": 0
     }
   ],
   "planChart": {
-    "mermaid": "flowchart LR\n  A([draw runs]) --> B{state is title}\n  B -- yes --> C[[drawTitle]]\n  C --> D{space pressed}\n  D -- yes --> E[state = play]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F{state is play}\n  F -- yes --> G[[updateGame]]\n  G --> H{player dead}\n  H -- yes --> I[state = gameover]\n  H -- no --> Z\n  I --> Z\n  F -- no --> J[[drawGameOver]]\n  J --> K{r pressed}\n  K -- yes --> L[state = title]\n  K -- no --> Z\n  L --> Z",
+    "mermaid": "flowchart LR\n  A([draw runs]) --> B{state is title}\n  B -- yes --> C[[drawTitle]]\n  C --> D{space pressed}\n  D -- yes --> E[state = play]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F{state is play}\n  F -- yes --> G[[updateGame]]\n  G --> H{player dead}\n  H -- yes --> I[state = gameover]\n  H -- no --> Z\n  I --> Z\n  F -- no --> M{state is gameover}\n  M -- yes --> J[[drawGameOver]]\n  J --> K{r pressed}\n  K -- yes --> L[state = title]\n  K -- no --> Z\n  L --> Z",
     "caption": "One frame of draw(): route by state, draw first, then check whether to leave. Every path reaches the end of the frame."
   }
 }

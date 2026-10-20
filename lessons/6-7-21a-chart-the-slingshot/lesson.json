@@ -98,7 +98,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?=(?:[\\s\\S]*(?<!\\bEND\\s*)\\bIF\\b){3})(?=(?:[\\s\\S]*\\bEND\\s*IF\\b){3})(?![\\s\\S]*\\b(?:GO\\s*TO|GOTO|JUMP|REPEAT|LOOP\\s+BACK|START\\s+OVER|RESTART)\\b)[\\s\\S]*",
+      "pattern": "^(?=(?:[\\s\\S]*(?<!\\bEND\\s*)\\bIF\\b){3})(?=(?:[\\s\\S]*\\bEND\\s*IF\\b){3})(?![\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*TO|GOTO|JUMP\\s+TO|LOOP\\s+BACK|START\\s+OVER)\\b)[\\s\\S]*",
       "hint": "Write three IF blocks, each closed with END IF. Do not write GO TO or LOOP BACK.",
       "points": 0
     }
