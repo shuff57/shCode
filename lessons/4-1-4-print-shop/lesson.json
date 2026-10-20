@@ -63,7 +63,7 @@
     {
       "id": "s11",
       "title": "README, comments, and style guide compliance",
-      "instructions": "Appendix A applies. The README says what the program does, how to run it, and, per Appendix D: what changed from your A4.1.0 chart and why."
+      "instructions": "Appendix A applies. The README says what the program does, how to run it, and, per Appendix D: what changed from your A4.1.0 plan and why."
     }
   ],
   "requirements": [

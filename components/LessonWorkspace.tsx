@@ -1238,7 +1238,13 @@ export default function LessonWorkspace({
                         aria-label="Program output"
                       >
                         {consoleOutput.length === 0 ? (
-                          <div className="console-empty">Click Run to see output.</div>
+                          <div className="console-empty">
+                            {runKey === 0
+                              ? 'Click Run to see output.'
+                              : lesson.requirements.length > 0
+                                ? 'Checked. Nothing was printed. Open the Quest panel to see which checks passed.'
+                                : 'Ran. Nothing was printed.'}
+                          </div>
                         ) : (
                           consoleOutput.map((log, i) => (
                             <div key={i} className={`log-entry log-${log.type}`}>
