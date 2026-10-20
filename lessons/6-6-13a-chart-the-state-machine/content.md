@@ -1,70 +1,24 @@
-## Chart the Code: The Three-State Machine
+## Plain English to Pseudocode: The Three-State Machine
 
-**What you'll practise:**
-- Drawing one frame of a state machine
-- Separating "what state am I in" from "should I change state"
-- Finding a transition nobody wrote
+Here is the plan in plain English:
 
-Of every chart in this course, this is the one that pays for itself most. A state machine written as a `switch` is a list; a state machine drawn is a **shape**, and you can see immediately which screens can reach which, including the ones that cannot be reached at all.
+**1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs.
 
-### The code
+**2.** In the title state: draw the title screen, then if space was pressed, change the state to play.
 
-```js
-let state = "title";
+**3.** In the play state: update the game, then if the player is dead, change the state to gameover.
 
-function draw() {
-  if (state === "title") {
-    drawTitle();
-    if (kb.presses("space")) { state = "play"; }
-  } else if (state === "play") {
-    updateGame();
-    if (playerDead) { state = "gameover"; }
-  } else if (state === "gameover") {
-    drawGameOver();
-    if (kb.presses("r")) { state = "title"; }
-  }
-}
-```
+**4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title.
 
-### What to draw
+**5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends.
 
-Chart **one frame**: one run of `draw()`, from the top to the end of the frame. The Start and End ovals are already placed and named for you.
+The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.
 
-| Shape | Use it for |
-|---|---|
-| **Decision** (diamond) | `state === "title"`, `state === "play"`, `state === "gameover"`, and each transition check |
-| **Function call** (double rail) | `drawTitle()`, `updateGame()`, `drawGameOver()` |
-| **Task** (rectangle) | Each `state = "..."` assignment |
+In `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for the three drawing and updating methods, and SET for a state change. Number every line, including the indented ones and the END IF lines. Each keyword looks like this:
 
-At least nine shapes and at least three diamonds.
+- `IF state is "title"` ... `ELSE IF state is "play"` ... `END IF` (route by state)
+- `CALL drawTitle` (call another function)
+- `IF space is pressed` ... `END IF` (the check to leave the state)
+- `SET state TO "play"` (a state change)
 
-### The distinction this chart exists to teach
-
-There are **two different kinds of diamond** on this chart and mixing them up is the whole difficulty:
-
-| Kind | Asks | Example |
-|---|---|---|
-| **Which state am I in?** | routing: where does this frame go | `state === "play"` |
-| **Should I change state?** | a transition: does the next frame go somewhere else | `playerDead` |
-
-Every state does its drawing *first*, and only then asks whether to leave. That order matters: if you flip it, the frame where the player dies never draws.
-
-Notice too that changing `state` does **not** jump anywhere. It sets a variable and the frame ends. The change only takes effect next frame, when the routing diamonds run again. On your chart, every path, including one that just changed the state: arrives at **end of frame**.
-
-That is the thing beginners get wrong in code and can see instantly in a picture.
-
-### Then find the missing arrow
-
-With your chart green, look at it as a map of screens. Draw yourself a quick note of which state can reach which:
-
-```
-   title ──space──▶ play ──dead──▶ gameover ──r──▶ title
-```
-
-Now ask: **is there any way to get from `play` back to `title` without dying?** There is not. This game has no quit, no pause, no way back to the menu except by losing.
-
-That may be fine. But you found it by looking, in about four seconds, and nobody reading the `switch` would have noticed.
-
-### Before you submit
-
-Press **Check my diagram**, then trace three frames by hand: one on the title screen with space held, one during play with the player alive, one on the game-over screen with nothing pressed. All three should reach **end of frame**. If any of them stops early, you have a missing arrow.
+Every state draws **first** and only then asks whether to leave. Afterwards, read your plan as a map: is there any way from play back to title without dying? There is not, and you found it by reading. That may be fine.

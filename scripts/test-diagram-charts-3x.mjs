@@ -1,8 +1,9 @@
-// The nine "Chart the Code" lessons of modules 3.4-3.8 were graded by generic structural rules
+// The "Chart the Code" lessons of modules 3.4-3.8 that still have students draw a chart were graded by generic structural rules
 // only: Start, a few boxes labelled "step 0", a diamond and End passed every one of them (found by
 // the advanced student lens, 2026-10-09). Each now carries a rules-only diagram.aiGrader (no model
 // call): the points come from shape KINDS and arrow TOPOLOGY, and the relevance gate caps a chart
 // whose words say nothing about the program below the pass line.
+// (3.7.5 and 3.7.16 are now Plain English to Pseudocode labs: see scripts/test-pseudocode-labs.mjs.)
 //
 // OFFLINE, always in CI. For every chart it proves:
 //   - the reference (lessons/<id>/solution/chart.mmd) earns every point;
@@ -391,51 +392,6 @@ const CASES = {
   I --> K
   J --> K
   K --> Z`,
-    },
-  },
-  '3-7-5-chart-map-trace': {
-    variant: `flowchart TD
-  A([Start])
-  B[withTax starts empty]
-  C{{loop over prices}}
-  D{any price left?}
-  E[add the taxed price to withTax]
-  F[/show withTax/]
-  Z([End])
-  A --> B
-  B --> C
-  C --> D
-  D -->|yes| E
-  E --> C
-  D -->|no| F
-  F --> Z`,
-    mutations: {
-      'yes and no arrows swapped': (t) => flip(t),
-      'print inside the loop, the loop never ends': (t) => swap(swap(t, '  D -->|no| F\n  F --> Z', '  D -->|no| F\n  F --> C\n  C --> Z'), '  E --> C\n', '  E --> C\n'),
-      'no arrow back': (t) => swap(t, '  E --> C\n', '  E --> F\n'),
-      'no hexagon': (t) => swap(t, '{{for each price in prices}}', '[for each price in prices]'),
-    },
-  },
-  '3-7-16-chart-spread-vs-rest': {
-    variant: `flowchart TD
-  A([Start])
-  B[sum starts at zero]
-  C{{loop over the numbers}}
-  D{any number left?}
-  E[add the number to sum]
-  F[/return the total/]
-  Z([End])
-  A --> B
-  B --> C
-  C --> D
-  D -->|yes| E
-  E --> C
-  D -->|no| F
-  F --> Z`,
-    mutations: {
-      'yes and no arrows swapped': (t) => flip(t),
-      'no arrow back': (t) => swap(t, '  E --> C\n', '  E --> F\n'),
-      'no hexagon': (t) => swap(t, '{{for i from 0 to numbers.length - 1}}', '[for i from 0 to numbers.length - 1]'),
     },
   },
   '3-8-17-chart-save-load-round-trip': {

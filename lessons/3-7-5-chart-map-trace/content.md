@@ -1,50 +1,36 @@
-## Chart the Code: `.map()`'s Callback Trace
+## Plain English to Pseudocode: `.map()`'s Callback Trace
 
 **What you'll practise:**
-- Reading a method call as a loop you did not write
-- Putting a decision inside a loop body, and rejoining the `no` path
-- Seeing where the collected result is built up
-- Getting the loop-back arrow landing on the right shape
+- Turning plain English into exact, numbered steps
+- Writing a loop out as `FOR EACH ... END FOR`
+- Reading a flow chart and matching each box to a step
 
-`.map()` is short to write and worth drawing once. The method walks the array, calls your callback once per element, and collects what each call returns. Drawing that walk makes the "same length" guarantee obvious.
+### The plan, in plain English
 
-### The code
+1. Start with an empty list called `withTax`.
+2. Go through the prices one at a time.
+3. For each price, multiply it by 1.08 and add the result to `withTax`.
+4. When there are no more prices, print `withTax`.
 
-```js
-const prices = [10, 20, 30];
-const withTax = prices.map((price) => price * 1.08);
+`.map()` does the walking for you in real code, so the loop is invisible there. In pseudocode you write it out.
 
-console.log(withTax);
-```
+The same plan is drawn as a flow chart above the editor. You do not draw it, you **read** it.
 
-### What to draw
+### What to write
 
-| Shape | Use it for |
+Open `README.md` and type directly into it, no comment marks needed. The first and last lines are already there. Write your steps **between** them and number every one.
+
+| Write this | Use it for |
 |---|---|
-| **Start / End** (oval) | One of each |
-| **Task** (rectangle) | Starting `withTax` as an empty result, and adding a taxed price to it |
-| **Loop setup** (hexagon: press **+ more shapes**) | The `for` header `.map()` runs for you: the next price, or "no more" |
-| **Decision** (diamond) | "Is there another price?" Ask it this way, so `yes` means keep going and `no` means done |
-| **Input / Output** (parallelogram) | The final `console.log` |
+| `SET withTax TO an empty list` | a plain step that changes something |
+| `FOR EACH price IN prices` ... `END FOR` | the loop, with the steps inside it indented |
+| `ADD price * 1.08 TO withTax` | one step inside the loop |
+| `OUTPUT withTax` | printing, once, after the loop |
 
-At least seven shapes, at least one diamond.
+### The line that catches people
 
-### The three arrows that decide whether this is right
-
-This chart has a decision inside a loop, so three arrows need to land exactly.
-
-1. **The `yes` arrow** goes to "apply the callback to the price, add the result to `withTax`".
-2. **After that task**, an arrow goes **back to the loop setup**, not on to the print. The next price has to be fetched and re-checked, and the hexagon is where that happens.
-3. **The `no` arrow** leaves the loop. Once there are no more prices, it goes to the print.
-
-The classic error is the second one. If the adding task goes straight to the print, the chart shows a program that handles one price and stops.
-
-### Where the result goes
-
-The `print` is **outside** the loop. On the chart, it hangs off the `no` arrow: the path taken once there are no more prices, not off anything in the loop body. And the collected array is built **inside** the loop, one entry per pass, which is why it always ends up the same length as the input.
+The print goes **after** `END FOR`. If you put it inside the loop, the program prints a growing list on every pass. And the adding step goes **inside** the loop, so there is one entry per price: that is why `withTax` always ends up the same length as `prices`.
 
 ### Before you submit
 
-Press **Check my diagram**, then trace it by hand with the real array: `10, 20, 30`. Follow your own arrows and count the callback calls. If you do not land on **three** results in `withTax`, the chart is wrong somewhere even if every check is green.
-
-That hand-trace is the actual test here. The checker cannot do it for you.
+Check that all six requirements are green, then: Trace it by hand with the real array `10, 20, 30`. Follow your own steps and count the callback calls. If you do not end with **three** results in `withTax`, the steps are wrong somewhere even if every check is green.

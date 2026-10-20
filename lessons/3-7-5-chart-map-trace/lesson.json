@@ -1,12 +1,12 @@
 {
   "id": "3-7-5-chart-map-trace",
-  "title": "3.7.5 Chart the Code: `.map()`'s Callback Trace",
-  "description": "Draw what .map() does to each element: an implicit loop, one callback call per item, and the collected results. Get the loop-back arrow right.",
+  "title": "3.7.5 Plain English to Pseudocode: `.map()`'s Callback Trace",
+  "description": "Turn five plain-English steps into pseudocode for what .map() does: a loop you did not write, one callback per item, and the collected results.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",
-  "preview": "diagram",
+  "preview": "console",
   "week": 9,
   "slos": [
     "SLO-2",
@@ -14,167 +14,9 @@
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-process",
-        "count": 2
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 7
-      },
-      {
-        "id": "min-shape",
-        "shape": "preparation",
-        "count": 1
-      }
-    ],
-    "aiGrader": {
-      "rubricTitle": "Map trace chart: structure check",
-      "model": "glm-5.3-flash:cloud",
-      "contextDocs": [],
-      "strict": true,
-      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
-      "rubric": [
-        {
-          "id": "hexagon",
-          "title": "The loop is drawn with the loop-setup hexagon",
-          "points": 5,
-          "description": "Scored by the editor (shape kind): a loop-setup (hexagon) shape on the Start-to-End path.",
-          "check": {
-            "steps": [
-              {
-                "op": "count",
-                "match": {
-                  "kind": "preparation"
-                },
-                "min": 1,
-                "fail": "A for-loop header has its own shape, the loop-setup hexagon from the shape palette. None of the shapes on your path is one.",
-                "pass": "A loop-setup hexagon is on the path."
-              }
-            ]
-          }
-        },
-        {
-          "id": "way-out",
-          "title": "The print is after the loop, off the way out",
-          "points": 5,
-          "description": "Scored by the editor (arrow order): the steps that repeat have an arrow leading back, and the arrow that leaves the repeat leads on to a step that runs once, before End.",
-          "check": {
-            "steps": [
-              {
-                "op": "loop-exit",
-                "loop": {
-                  "kind": "preparation"
-                },
-                "minAfter": 1,
-                "from": "any",
-                "orSetup": true,
-                "fail": "Two things must hold: the steps that run each time round must have an arrow leading back (to the hexagon, or to the diamond that asks whether there is another), and the arrow that leaves that repeat must lead to a step that runs once, after it, before End.",
-                "pass": "The way out of the loop leads on to the step after it."
-              }
-            ]
-          }
-        },
-        {
-          "id": "yes-no",
-          "title": "The \"another price?\" question sends yes to the callback and no to the print",
-          "points": 5,
-          "description": "Scored by the editor (arrow order): a decision whose yes exit goes to a task and whose no exit goes to the print or return, two different places.",
-          "check": {
-            "steps": [
-              {
-                "op": "branch",
-                "at": {
-                  "kind": "decision"
-                },
-                "orientation": "labelled",
-                "distinct": true,
-                "yes": {
-                  "kind": "process"
-                },
-                "no": {
-                  "kind": "io"
-                },
-                "fail": "The diamond has to split into two different results: its yes arrow goes to the task that does the work, its no arrow goes to the input/output step.",
-                "pass": "The decision splits into the task and the print."
-              }
-            ]
-          }
-        },
-        {
-          "id": "labels-on-topic",
-          "title": "The diamond and the output say what they do",
-          "points": 5,
-          "description": "Scored by the editor: the diamond asks about the next price and the output shape says what comes out.",
-          "check": {
-            "steps": [
-              {
-                "op": "label",
-                "match": {
-                  "kind": "decision",
-                  "re": "another|more|left|next|any|price|remain|item|list|done|end|still"
-                },
-                "min": 1,
-                "fail": "The diamond should ask whether there is another price.",
-                "pass": "The diamond asks about the next price."
-              },
-              {
-                "op": "label",
-                "match": {
-                  "kind": "io",
-                  "re": "print|show|display|log|output|return|result|total|sum|list|array|withtax"
-                },
-                "min": 1,
-                "fail": "The output step should say what it prints or returns.",
-                "pass": "The output step says what it prints or returns."
-              }
-            ]
-          }
-        }
-      ],
-      "gate": {
-        "anyOf": [
-          "price|prices|\\b10\\b|\\b20\\b|\\b30\\b|item",
-          "tax|withtax|callback|1\\.08|apply|add|collect|result",
-          "next|another|more|each|loop|\\bi\\b|list",
-          "print|show|log|output"
-        ],
-        "min": 3,
-        "capTo": 13,
-        "fail": "None of your shapes say what this program does. Label each shape in your own words."
-      }
-    }
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[withTax = empty list]\n  B --> C{{for each price in prices}}\n  C --> D{is there another price?}\n  D -- yes --> E[add price * 1.08 to withTax]\n  E --> C\n  D -- no --> F[/print withTax/]\n  F --> Z([End])",
+    "caption": "map as a loop: the yes branch adds one taxed price and goes back to the loop setup, and only the no branch reaches the print."
   },
   "grading": {
     "totalPoints": 0,
@@ -182,6 +24,89 @@
     "allowLateSubmit": true,
     "formative": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Start with an empty list called `withTax`.\n\n**2.** Go through the prices one at a time.\n\n**3.** For each price, multiply it by 1.08 and add the result to `withTax`.\n\n**4.** When there are no more prices, print `withTax`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. Each keyword looks like this:\n\n- `SET withTax TO an empty list` (a change)\n- `FOR EACH price IN prices` ... `END FOR` (the loop)\n- `ADD price * 1.08 TO withTax` (the step inside the loop)\n- `OUTPUT withTax` or `RETURN withTax` (the answer, after the loop)\n\nThe chart shows the shape.",
+      "hints": [
+        "The loop is `FOR EACH ... END FOR`, and the steps inside it are indented.",
+        "Whatever happens once the loop is over comes after END FOR, not inside it."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Five numbered steps in a row",
+      "description": "Number every step 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){4}[ \\t]*\\d+[.)][ \\t]*\\S",
+      "hint": "You need at least five lines that start with a number, one after another, each with a step written after it. Number END FOR and the indented line too.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Start withTax as an empty list, before the loop",
+      "description": "A step like `SET withTax TO an empty list`, before the `FOR EACH`.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bwithTax\\s+(?:TO|=)\\s+(?:the\\s+)?(?:an?\\s+)?(?:new\\s+)?(?:empty\\s+)?(?:list|array|\\[\\s*\\])[\\s\\S]*\\bFOR\\s+EACH\\b",
+      "hint": "Start with SET withTax TO an empty list, and put it before the FOR EACH.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "One loop over prices, opened with FOR EACH and closed with END FOR",
+      "description": "Exactly one `FOR EACH ... IN prices`, closed with `END FOR`.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?prices\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
+      "hint": "Use one FOR EACH price IN prices, and close it with one END FOR.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The taxed price is added inside the loop",
+      "description": "A step that adds `price * 1.08` to `withTax`, between `FOR EACH` and `END FOR`.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bFOR\\s+EACH\\s+(\\w+)\\b(?=\\s+(?:IN|OF)\\b)(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\b\\1\\b\\s*(?:\\*|times)\\s*1\\.08|1\\.08\\s*(?:\\*|times)\\s*\\b\\1\\b))(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\b(?:ADD|APPEND|PUSH)\\b[^\\n]*\\bwithTax\\b|\\bwithTax\\s+(?:TO|=)\\s+withTax\\s*\\+))",
+      "hint": "Between FOR EACH and END FOR, add price * 1.08 to withTax, using the same name you gave the loop. Each pass adds one entry.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "OUTPUT happens after END FOR",
+      "description": "Print `withTax` once the loop is over.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b[^\\n]*\\bwithTax\\b",
+      "hint": "Print or return withTax after END FOR, on the path taken once there are no more prices.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Nothing is printed inside the loop",
+      "description": "OUTPUT or RETURN comes after END FOR, not between FOR EACH and END FOR.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b)[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
+      "hint": "Something is printed or returned inside the loop. That would run once per price. Move it after END FOR.",
+      "points": 0
+    }
+  ]
 }
