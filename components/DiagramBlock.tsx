@@ -92,6 +92,7 @@ export default function DiagramBlock({
         onChange={readOnly ? undefined : onChange}
         readOnly={readOnly}
         height={frameHeight}
+        fitMinZoom={readOnly ? 0.4 : undefined}
         onReset={readOnly ? undefined : reset}
       />
       {caption ? (

@@ -229,5 +229,8 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[make student with a nested scores array]\n  B --> C[shallow: a spread copy of student, then push a number into its scores]\n  C --> D[/log shallow and student/]\n  D --> E[deep: a structuredClone of student, then push a different number into its scores]\n  E --> F[/log deep and student/]\n  F --> G([End])"
   }
 }
