@@ -1,52 +1,110 @@
 {
   "id": "6-6-19a-fix-the-pause-chart",
-  "title": "6.6.21 Fix the Broken Chart: the Pause State",
-  "description": "Someone half-wired a pause feature and the chart shows it. Find what the red checks are pointing at and repair it.",
+  "title": "6.6.21 Fix the Broken Pseudocode: the Pause State",
+  "description": "Repair half-finished pseudocode for a pause feature: give the not-playing frame its own branch, wire in the pause screen, stop a step jumping to itself, and add the way out.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
-  "preview": "diagram",
+  "preview": "console",
   "slos": [
     "SLO-3",
     "SLO-4"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([draw() runs]) --> B{state == \"play\"}\n  B -- yes --> C[[updateGame()]]\n  C --> D{p pressed}\n  D -- yes --> E[state = \"paused\"]\n  D -- no --> F([end of frame])\n  E --> E\n  G[[drawPauseScreen()]]",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Repair the half-finished pseudocode",
+      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** When the state is play: update the game, and if p was pressed, change the state to paused.\n\n**2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Then repair it, do not start over:\n\n- Give the play decision its own **ELSE** branch, for every frame that is not playing.\n- Move `CALL drawPauseScreen` into that branch so it runs only when paused.\n- Remove the **GO TO**. Setting a state is an ordinary step: the frame carries on to the end.\n- Inside the ELSE branch, add the way out: if p is pressed, SET state TO \"play\".\n\nWhen it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.",
+      "hints": [
+        "A step that jumps back to itself is a hung game, written down. Delete the GO TO line.",
+        "The ELSE branch runs on every frame that is not playing, so that is where drawPauseScreen belongs."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The play decision has an ELSE",
+      "description": "An ELSE branch for every frame that is not playing.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*\"?play\"?[\\s\\S]*\\bELSE\\b",
+      "hint": "Give the IF state is \"play\" an ELSE branch, for the frames when the game is not playing.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "drawPauseScreen is in the ELSE branch",
+      "description": "CALL drawPauseScreen after the ELSE, so it runs only when paused.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bELSE\\b[\\s\\S]*\\bCALL\\s+drawPauseScreen\\b[\\s\\S]*\\bEND\\s*IF\\b",
+      "hint": "Move CALL drawPauseScreen under the ELSE, so it floats nowhere and runs only on the paused frames.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "No step jumps back to itself",
+      "description": "No GO TO or loop back. A state change is an ordinary step.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?![\\s\\S]*\\b(?:GO\\s*TO|GOTO|JUMP|REPEAT|LOOP\\s+BACK|START\\s+OVER|RESTART)\\b)[\\s\\S]*\\bSET\\s+state\\s+TO\\s+\"?paused",
+      "hint": "Delete the GO TO line. Setting the state does its one job, then the frame goes on to the end.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "A way out of pause",
+      "description": "In the ELSE branch, IF p is pressed then SET state TO \"play\".",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bELSE\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bp\\b[\\s\\S]*?\\bSET\\s+state\\s+TO\\s+\"?play\"?",
+      "hint": "In the ELSE branch add IF p is pressed, with SET state TO \"play\" inside it, so the player can leave pause.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Pausing sits inside the p check",
+      "description": "SET state TO \"paused\" is inside an IF p is pressed.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bp\\b[^\\n]*\\n(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bSET\\s+state\\s+TO\\s+\"?paused",
+      "hint": "SET state TO \"paused\" belongs inside IF p is pressed.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Playing updates the game",
+      "description": "CALL updateGame in the play branch.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*\"?play\"?[\\s\\S]*?\\bCALL\\s+updateGame\\b",
+      "hint": "The play branch should CALL updateGame.",
+      "points": 0
+    }
+  ],
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([draw runs]) --> B{state is play}\n  B -- yes --> C[[updateGame]]\n  C --> D{p pressed}\n  D -- yes --> E[state = paused]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F[[drawPauseScreen]]\n  F --> G{p pressed}\n  G -- yes --> H[state = play]\n  G -- no --> Z\n  H --> Z",
+    "caption": "The finished pause feature. The not-playing branch draws the pause screen and has a way back to play."
+  }
 }

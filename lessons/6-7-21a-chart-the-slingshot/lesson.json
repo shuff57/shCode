@@ -1,60 +1,110 @@
 {
   "id": "6-7-21a-chart-the-slingshot",
-  "title": "6.8.12 Chart the Code: The Slingshot",
-  "description": "Chart the three-stage slingshot: aim, stretch, release. The stage nobody draws is the one where nothing is happening yet.",
+  "title": "6.8.12 Plain English to Pseudocode: The Slingshot",
+  "description": "Turn the plain-English rules of a slingshot into pseudocode: grab, stretch and release, guarded by one variable, with the force applied in exactly one frame.",
   "type": "lesson",
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.8 Joints",
-  "preview": "diagram",
+  "preview": "console",
   "slos": [
     "SLO-3",
     "SLO-4"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([draw() runs])\n  Z([end of frame])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 2
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 8
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Each frame, ask three questions in a row.\n\n**2.** Grab: if the mouse was just pressed while over the ball, the ball is now held.\n\n**3.** Stretch: if the ball is held and the mouse is still down, move the ball to the mouse and draw the band.\n\n**4.** Release: if the ball is held and the mouse was let go, work out the force, apply it to the ball, and the ball is no longer held.\n\n**5.** If nothing is being done to the ball (idle), all three answers are no and the frame just ends.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Write three separate IF blocks, one per question, each closed with END IF. Number every line, including the indented ones and the END IF lines. Each keyword looks like this:\n\n- `IF mouse presses AND ball is hovered` ... `END IF` (a question the frame asks)\n- `SET held TO true` (a change)\n- `CALL drawBand` (call another function)\n- `SET ball position TO the mouse` (a change)\n\nThe force is applied on exactly **one** frame of the whole throw. If you put `applyForce` on the stretch path, the ball would speed up every frame you hold it.",
+      "hints": [
+        "`held` guards both the stretch and the release. Without it, the release would fire whether or not anything had been picked up.",
+        "CALL applyForce goes in the release block only, once."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Ten or more numbered steps in a row",
+      "description": "Number every line 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){9}[ \\t]*\\d+[.)][ \\t]*\\S",
+      "hint": "You need at least ten lines that start with a number, one after another. Number the indented lines and the END IF lines too.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Grab: press on the ball sets held",
+      "description": "An IF about the mouse being pressed on the ball, with SET held TO true inside.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bpress(?:es|ed)?\\b[^\\n]*\\b(?:ball|hover\\w*|over)\\b(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bSET\\s+held\\s+TO\\s+true\\b",
+      "hint": "Grab: IF the mouse presses and the ball is hovered, then SET held TO true, then END IF.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Stretch: held and pressing moves the ball and draws the band",
+      "description": "An IF held AND pressing, with the ball moved to the mouse and CALL drawBand inside.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bheld\\b[^\\n]*\\bpressing\\b(?=(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bmouse\\b)(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bCALL\\s+drawBand\\b",
+      "hint": "Stretch: IF held AND mouse is pressing, then move the ball to the mouse and CALL drawBand, then END IF.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Release: held and released applies the force and clears held",
+      "description": "An IF held AND released, with CALL applyForce and SET held TO false inside.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bheld\\b[^\\n]*\\breleas(?:e|es|ed)\\b(?=(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bSET\\s+held\\s+TO\\s+false\\b)(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bCALL\\s+applyForce\\b",
+      "hint": "Release: IF held AND mouse is released, then CALL applyForce and SET held TO false, then END IF.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "applyForce is called once",
+      "description": "One CALL applyForce in the whole plan. A force every frame is the classic physics bug.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?![\\s\\S]*\\bapplyForce\\b[\\s\\S]*\\bapplyForce\\b)[\\s\\S]*\\bCALL\\s+applyForce\\b",
+      "hint": "Call applyForce exactly once, in the release block. Not on the stretch path.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Three questions, each closed",
+      "description": "Three IF blocks, each closed with END IF.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?=(?:[\\s\\S]*(?<!\\bEND\\s*)\\bIF\\b){3})(?=(?:[\\s\\S]*\\bEND\\s*IF\\b){3})(?![\\s\\S]*\\b(?:GO\\s*TO|GOTO|JUMP|REPEAT|LOOP\\s+BACK|START\\s+OVER|RESTART)\\b)[\\s\\S]*",
+      "hint": "Write three IF blocks, each closed with END IF. Do not write GO TO or LOOP BACK.",
+      "points": 0
+    }
+  ],
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([draw runs]) --> B{pressed on the ball}\n  B -- yes --> C[held = true]\n  C --> D{held and pressing}\n  B -- no --> D\n  D -- yes --> E[move ball to mouse]\n  E --> F[[drawBand]]\n  F --> G{held and released}\n  D -- no --> G\n  G -- yes --> H[work out the force]\n  H --> I[[applyForce]]\n  I --> J[held = false]\n  J --> Z([end of frame])\n  G -- no --> Z",
+    "caption": "One frame of draw(): three questions. The applyForce call sits on a path taken in exactly one frame of the throw."
+  }
 }
