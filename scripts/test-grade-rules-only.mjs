@@ -16,7 +16,7 @@ const ok = (c, m) => { if (c) console.log('  PASS ' + m); else { failures++; con
 
 mkdirSync(path.join(root, 'node_modules', '.pkg-load-cache'), { recursive: true });
 const out = mkdtempSync(path.join(root, 'node_modules', '.pkg-load-cache', 'shcode-rulesonly-'));
-const ID = '3-7-5-chart-map-trace';
+const ID = '3-8-17-chart-save-load-round-trip';
 try {
   execFileSync(process.execPath, [
     path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'), 'functions/api/grade-written.ts',
@@ -33,7 +33,7 @@ try {
     OLLAMA_API_KEY: 'unused', OLLAMA_HOST: 'http://127.0.0.1:9', GRADE_WRITTEN_DAILY_LIMIT: '30',
     ASSETS: { fetch: async (req) => {
       const p = new URL(typeof req === 'string' ? req : req.url).pathname;
-      return new Response(p.includes('lessons-manifest') ? JSON.stringify({ lessons: [{ id: ID, title: '3.7.5 Chart' }] }) : '{}', { headers: { 'Content-Type': 'application/json' } });
+      return new Response(p.includes('lessons-manifest') ? JSON.stringify({ lessons: [{ id: ID, title: '3.8.17 Chart' }] }) : '{}', { headers: { 'Content-Type': 'application/json' } });
     } },
     DB: { prepare() { const s = { bind: () => s, first: async () => ({ count: 0 }), run: async () => ({}), all: async () => ({ results: [] }) }; return s; } },
   };

@@ -47,6 +47,8 @@ const LABS = readdirSync(path.join(root, 'lessons')).filter((d) => {
   const p = path.join(root, 'lessons', d, 'lesson.json');
   if (!existsSync(p)) return false;
   const j = JSON.parse(readFileSync(p, 'utf8'));
+  // The Plain English to Pseudocode labs grade README.md, not script.js; scripts/test-pseudocode-labs.mjs covers them.
+  if ((j.requirements || []).length > 0 && j.requirements.every((r) => r.file === 'README.md')) return false;
   return /^3\.[4-8]\.\d+/.test(j.title || '') && j.preview === 'console' && (j.requirements || []).length > 0;
 });
 
