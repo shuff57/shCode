@@ -18,6 +18,24 @@ do {
 
 The `while` body ran **zero** times: it checked `100 < 10`, found it false, and never entered. The `do...while` body ran **exactly once**, then checked `100 < 10`, found it false, and stopped. That "at least once" is the entire difference between the two.
 
+```flow readonly caption="Figure 2.4.6a: the while loop with n at 100. The test comes first and is false, so the no arrow goes straight to the end. The body is never reached."
+flowchart LR
+  A([Start]) --> B[n starts at 100]
+  B --> C{n is less than 10}
+  C -- yes --> W[/log while body ran/]
+  W --> C
+  C -- no --> E([End])
+```
+
+```flow readonly caption="Figure 2.4.6b: the do...while loop with n at 100. The body comes first, so it runs once. Then the test is false and the no arrow leaves the loop."
+flowchart LR
+  A([Start]) --> B[n starts at 100]
+  B --> D[/log do...while body ran/]
+  D --> C{n is less than 10}
+  C -- no --> E([End])
+  C -- yes --> D
+```
+
 ## Step 2: The same question, a different starting value
 
 Here `x` starts at `0` and the condition is `x < 0`: false immediately, same as Step 1. Predict how many times `"ran"` prints before running.

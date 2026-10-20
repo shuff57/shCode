@@ -30,6 +30,17 @@ while (true) {
 
 Same `while (true)`, but now it says something completely different: *this loop ends when it finds what it's looking for, and not before.* The `%` operator gives the remainder of a division; `current % 7 === 0` is how you test whether `current` divides evenly by 7.
 
+```flow readonly caption="Figure 2.4.10: the search with while (true) and a break. Each round asks one question: does current divide evenly by 7? If not, add 1 and ask again. When it does, the break arrow leaves the loop."
+flowchart LR
+  A([Start]) --> B[current starts at 20]
+  B --> C{current divides evenly by 7}
+  C -- no --> D[add 1 to current]
+  D --> C
+  C -- yes --> E[/log Found and current/]
+  E --> F[break: leave the loop]
+  F --> G([End])
+```
+
 ## Step 3: Why this shape, and not a while with a real condition
 
 You could try to write a normal condition instead, but you'd have to know the stopping value before you started, and the whole point here is that you don't. `while (true)` plus a `break` near the top of the body is how you write "keep going until you find it" honestly, without inventing a fake limit.

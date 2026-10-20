@@ -19,6 +19,15 @@ console.log("The program keeps going.");
 
 Three things happen: the line after the error inside `try` is skipped, `catch` runs instead, and the program continues afterward. Without the `try...catch`, that last line would never print: the whole program would have stopped at `quantity`.
 
+```flow readonly caption="Figure 2.5.4: the first example. The error on the quantity line abandons the rest of try, so the third line never runs. catch runs instead, and the program carries on afterward."
+flowchart LR
+  A([Start]) --> B[/try: log Trying/]
+  B --> C[read quantity: it does not exist, so an error]
+  C --> D[/catch: log Something went wrong, but we recovered/]
+  D --> E[/log The program keeps going/]
+  E --> F([End])
+```
+
 The name in the parentheses after `catch`: `err` above: is yours to choose. It holds a value describing what went wrong; the next reading unpacks it.
 
 ## When Nothing Goes Wrong

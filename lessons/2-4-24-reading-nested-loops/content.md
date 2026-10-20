@@ -15,6 +15,20 @@ for (let row = 1; row <= 3; row++) {
 }
 ```
 
+```flow readonly caption="Figure 2.4.24: the 3 by 4 nested loop. The inner loop runs all the way through, from col 1 to col 4, before the outer loop adds 1 to row. That is 3 times 4, or 12, trips through the log step."
+flowchart TD
+  A([Start]) --> B[row starts at 1]
+  B --> C{row is 3 or less}
+  C -- no --> M([End])
+  C -- yes --> D[col starts at 1]
+  D --> E{col is 4 or less}
+  E -- no --> K[add 1 to row]
+  K --> C
+  E -- yes --> G[/log row and col/]
+  G --> H[add 1 to col]
+  H --> E
+```
+
 Read the order carefully: it's the thing beginners get wrong. The **inner loop runs all the way through for every single round of the outer loop.** The outer loop moves to `row 2` only after the inner loop has finished all four columns for `row 1`.
 
 That gives you a way to count the work: 3 rows × 4 columns = 12 lines of output. **Multiply, do not add.** A nested loop of `m` outer rounds and `n` inner rounds runs the inner body `m × n` times, not `m + n`.

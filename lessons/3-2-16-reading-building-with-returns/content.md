@@ -55,6 +55,16 @@ console.log(result);
 
 Read it from the inside out: `addTen(5)` is `15`, `double(15)` is `30`, `addTen(30)` is `40`. Two small functions, called three times (`addTen` is used twice), and not one line of the logic was duplicated.
 
+```flow readonly caption="Figure 3.2.16: the chain addTen(double(addTen(5))), read from the inside out. Each call returns a value, and that value is what the next call up receives."
+flowchart LR
+  A([Start]) --> B[inner call: addTen of 5 returns 15]
+  B --> C[next call: double of 15 returns 30]
+  C --> D[outer call: addTen of 30 returns 40]
+  D --> E[result holds 40]
+  E --> F[/log result/]
+  F --> G([End])
+```
+
 This only works because the functions return. A function that printed instead of returned would give `undefined` to the next call, and the chain would collapse into `NaN` or nonsense. Functions that return compose; functions that print do not.
 
 ---

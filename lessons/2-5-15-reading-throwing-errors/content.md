@@ -20,6 +20,17 @@ try {
 }
 ```
 
+```flow readonly caption="Figure 2.5.15: the age check. With age at -5 the test is true, so throw raises the error and the flow jumps to catch. With a valid age, throw and catch are both skipped."
+flowchart TD
+  A([Start]) --> B[age is -5]
+  B --> C{age is less than 0}
+  C -- yes --> D[throw an Error: Age cannot be negative]
+  D --> E[/catch: log Rejected and the message/]
+  E --> F([End])
+  C -- no --> G[/log Age accepted/]
+  G --> H([End])
+```
+
 The `throw` statement raises an error deliberately. Execution stops at that point and jumps to the nearest `catch`, exactly as it would for an error the engine raised on its own. `new Error("Age cannot be negative.")` builds the error value, and the text becomes `err.message`: the same property you already know how to read.
 
 ---
