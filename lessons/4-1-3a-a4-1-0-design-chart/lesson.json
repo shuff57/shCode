@@ -82,13 +82,13 @@
     {
       "id": "r5",
       "title": "Sorting, saving and loading are planned",
-      "description": "A different CALL for each: one that sorts, one that saves, one that loads.",
+      "description": "A different CALL for each: one that sorts, one that saves, one that loads, with that word in the name.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "^(?=[\\s\\S]*\\bCALL\\s+(?!\\w*(?:save|store|load|restore|read))\\w*(?:sort|rank)\\w*)(?=[\\s\\S]*\\bCALL\\s+(?!\\w*(?:sort|rank|load|restore|read))\\w*(?:save|store)\\w*)[\\s\\S]*\\bCALL\\s+(?!\\w*(?:sort|rank|save|store))\\w*(?:load|restore|read)\\w*",
-      "hint": "Plan three separate CALLs: one that sorts, one that saves and one that loads, each named for your own data.",
+      "hint": "Plan three separate CALLs. Put the word sort (or rank) in one name, save (or store) in another, and load (or restore) in the third. Keep the words apart: a name that holds two of them counts for neither.",
       "points": 0
     },
     {

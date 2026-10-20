@@ -23,7 +23,7 @@
       "title": "Turn the plain-English steps into pseudocode",
       "instructions": "Here is the plan in plain English:\n\n**1.** The enemy is hit for some amount of damage.\n\n**2.** Take that amount off the enemy's health.\n\n**3.** If the health is now zero or less, the enemy dies.\n\n**4.** Either way, the enemy flashes red to show it was hit.\n\n**5.** Then control goes back to whoever hit it.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for a decision, and CALL for another method. The two methods here are named `die` and `flashRed`. Number every line, including the indented one and END IF. Each keyword looks like this, in a different program:\n\n- `SET score TO score + 10` (a change)\n- `IF lives <= 0` ... `END IF` (a decision; indent what is inside it)\n- `CALL playSound` (call another method; `CALL this.playSound` is fine too)\n\nThe chart shows the shape.",
       "hints": [
-        "A step that happens \"either way\" is not inside the IF. It comes after END IF.",
+        "Ask which steps run only when the enemy died, and which run either way.",
         "Write a call as one line, like `CALL playSound`. Do not write what die does."
       ]
     }
@@ -86,7 +86,7 @@
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bEND\\s*IF\\b[\\s\\S]*\\bCALL\\s+(?:this\\.)?flashRed\\b",
-      "hint": "Step 4 says \"either way\". A step that runs either way is not inside the decision: put it after END IF.",
+      "hint": "Step 4 says \"either way\". Which side of the decision does a step that always runs belong on?",
       "points": 0
     },
     {

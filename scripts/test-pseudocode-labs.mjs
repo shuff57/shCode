@@ -135,6 +135,7 @@ const LABS = {
       ['velocity zeroed while still dragging', ['r2'], lines('1. IF mouse is pressing', '2.   IF sprite is under the mouse', '3.     SET sprite position TO the mouse', '4.     SET velocity TO zero', '5.   END IF', '6. ELSE', '7.   CALL idle', '8. END IF')],
       ['velocity box still floating', ['r1', 'r2'], lines('1. IF mouse is pressing', '2.   IF sprite is under the mouse', '3.     SET sprite position TO the mouse', '4.   END IF', '5. END IF', '6. SET velocity TO zero')],
     ],
+    ok: [['mouse is pressed instead of pressing', lines('1. IF mouse is pressed', '2.   IF sprite is under the mouse', '3.     SET sprite position TO the mouse', '4.   END IF', '5. ELSE', '6.   SET velocity TO zero', '7. END IF')]],
     lower: lines('1. if mouse is pressing', '2.   if the sprite is under the mouse', '3.     set sprite position to the mouse', '4.   end if', '5. else', '6.   set velocity to 0', '7. end if'),
   },
   '4-1-3a-a4-1-0-design-chart': {

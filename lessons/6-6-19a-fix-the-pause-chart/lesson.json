@@ -22,7 +22,7 @@
     {
       "id": "s1",
       "title": "Repair the half-finished pseudocode",
-      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** When the state is play: update the game, and if p was pressed, change the state to paused.\n\n**2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Read each red card against the plan above, then repair it. Do not start over. The call names are `updateGame` and `drawPauseScreen`. Renumber the lines if you like: every line just needs a number.\n\nWhen it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.",
+      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** When the state is play: update the game, and if p was pressed, change the state to paused.\n\n**2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Read each red card against the plan above, then repair it. Do not start over. The call names are `updateGame` and `drawPauseScreen`. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first.\n\nRenumber the lines if you like: every line just needs a number.\n\nWhen it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.",
       "hints": [
         "A step that jumps back to itself is a hung game, written down.",
         "Think about which frames the pause screen should run on."
@@ -87,7 +87,7 @@
       "stripComments": false,
       "flags": "i",
       "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bp\\b[^\\n]*\\n(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?paused",
-      "hint": "SET state TO \"paused\" belongs inside IF p is pressed.",
+      "hint": "Think about what has to happen before the state can change to paused.",
       "points": 0
     },
     {
