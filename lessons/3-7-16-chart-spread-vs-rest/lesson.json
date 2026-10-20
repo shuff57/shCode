@@ -15,7 +15,7 @@
   "points": 0,
   "contentFile": "content.md",
   "planChart": {
-    "mermaid": "flowchart LR\n  A([total numbers starts]) --> B[sum = 0]\n  B --> C{{for each number in numbers}}\n  C --> D{is there another number?}\n  D -- yes --> E[sum = sum + number]\n  E --> C\n  D -- no --> F[/return sum/]\n  F --> Z([back to the caller])",
+    "mermaid": "flowchart LR\n  A([total starts]) --> B[start the total at zero]\n  B --> C{{go through the numbers}}\n  C --> D{is there another number?}\n  D -- yes --> E[add the number to the total]\n  E --> C\n  D -- no --> F[/give back the total/]\n  F --> Z([back to the caller])",
     "caption": "the body of total: the yes branch adds one number and goes back to the loop setup, and only the no branch reaches the return."
   },
   "grading": {
@@ -28,7 +28,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Start the running total, `sum`, at 0.\n\n**2.** Go through the numbers one at a time.\n\n**3.** For each number, add it to `sum`.\n\n**4.** When there are no more numbers, give back `sum`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. Each keyword looks like this:\n\n- `SET sum TO 0` (start the total)\n- `FOR EACH number IN numbers` ... `END FOR` (the loop)\n- `SET sum TO sum + number` (the step inside the loop)\n- `RETURN sum` or `OUTPUT sum` (the answer, after the loop)\n\nBefore you submit, trace `total(5, 5)` and then `total(...scores)` with `scores` holding `[5, 5]`. The same steps give 10 both times: the rest parameter gathers the arguments into `numbers`, and the spread spreads them out to be gathered.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Start the running total, `sum`, at 0.\n\n**2.** Go through the numbers one at a time.\n\n**3.** For each number, add it to `sum`.\n\n**4.** When there are no more numbers, give back `sum`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` (start a value)\n- `FOR EACH enemy IN enemies` ... `END FOR` (the loop)\n- `SET lives TO lives - 1` (a step inside the loop)\n- `RETURN lives` or `OUTPUT lives` (the answer, after the loop)\n\nBefore you submit, trace `total(5, 5)` and then `total(...scores)` with `scores` holding `[5, 5]`. The same steps give 10 both times: the rest parameter gathers the arguments into `numbers`, and the spread spreads them out to be gathered.",
       "hints": [
         "The loop is `FOR EACH ... END FOR`, and the steps inside it are indented.",
         "Whatever happens once the loop is over comes after END FOR, not inside it."
@@ -50,56 +50,56 @@
     },
     {
       "id": "r2",
-      "title": "Start sum at 0, before the loop",
-      "description": "A step like `SET sum TO 0`, before the `FOR EACH`.",
+      "title": "The total starts at zero, before the loop",
+      "description": "sum starts at zero, before the loop begins.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bsum\\s+(?:TO|=|AT)\\s+(?:0|zero)\\b[\\s\\S]*\\bFOR\\s+EACH\\b",
-      "hint": "Start with SET sum TO 0, and put it before the FOR EACH.",
+      "hint": "Start the total at zero before the FOR EACH.",
       "points": 0
     },
     {
       "id": "r3",
-      "title": "One loop over numbers, opened with FOR EACH and closed with END FOR",
-      "description": "Exactly one `FOR EACH ... IN numbers`, closed with `END FOR`.",
+      "title": "One loop over numbers, closed",
+      "description": "Exactly one loop over numbers, closed with END FOR.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?numbers\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
-      "hint": "Use one FOR EACH number IN numbers, and close it with one END FOR.",
+      "hint": "Use one FOR EACH over numbers, and close it with one END FOR.",
       "points": 0
     },
     {
       "id": "r4",
-      "title": "Each number is added to sum inside the loop",
-      "description": "A step like `SET sum TO sum + number`, between `FOR EACH` and `END FOR`.",
+      "title": "Each number is added to the total, inside the loop",
+      "description": "Each pass adds the loop's number to sum.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bFOR\\s+EACH\\s+(\\w+)\\b(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\bsum\\s*(?:TO|=)\\s*\\(?\\s*sum\\s*(?:\\+|plus)\\s*\\b\\1\\b|\\bsum\\s*\\+=\\s*\\b\\1\\b|\\bADD\\s+\\b\\1\\b\\s+TO\\s+sum\\b|\\bsum\\s*(?:TO|=)\\s*\\(?\\s*\\b\\1\\b\\s*(?:\\+|plus)\\s*sum\\b))",
-      "hint": "Between FOR EACH and END FOR, add the loop's number to sum, for example SET sum TO sum + number. Use the same name you gave the loop.",
+      "hint": "Inside the loop, add the loop's number to sum, using the same name you gave the loop.",
       "points": 0
     },
     {
       "id": "r5",
-      "title": "RETURN sum happens after END FOR",
-      "description": "Give back `sum` once the loop is over.",
+      "title": "The total is given back after the loop",
+      "description": "sum is handed back once the loop is over.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b[^\\n]*\\bsum\\b",
-      "hint": "Give back sum (RETURN sum) after END FOR, once there are no more numbers.",
+      "hint": "Give sum back after END FOR, once there are no more numbers.",
       "points": 0
     },
     {
       "id": "r6",
-      "title": "Nothing is returned inside the loop",
-      "description": "RETURN or OUTPUT comes after END FOR, not between FOR EACH and END FOR.",
+      "title": "Nothing is given back inside the loop",
+      "description": "The answer comes after END FOR, not between FOR EACH and END FOR.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
