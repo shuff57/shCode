@@ -59,6 +59,7 @@ const LABS = {
     lower: lines('1. set withTax to a new empty array', '2. for each price in prices', '3.   push price * 1.08 to withTax', '4. end for', '5. print withTax'),
     ok: [
       ['RETURN instead of OUTPUT', lines('1. SET withTax TO an empty list', '2. FOR EACH price IN prices', '3.   ADD price * 1.08 TO withTax', '4. END FOR', '5. RETURN withTax')],
+      ['END FOR EACH as the closer', lines('1. SET withTax TO an empty list', '2. FOR EACH price IN prices', '3.   ADD price * 1.08 TO withTax', '4. END FOR EACH', '5. OUTPUT withTax')],
       ['ENDFOR in one word', lines('1. SET withTax TO an empty list', '2. FOR EACH price IN prices', '3.   ADD price * 1.08 TO withTax', '4. ENDFOR', '5. OUTPUT withTax')],
       ['SET withTax TO the array []', lines('1. SET withTax TO the array []', '2. FOR EACH price IN prices', '3.   ADD price * 1.08 TO withTax', '4. END FOR', '5. OUTPUT withTax')],
       ['SET withTax TO withTax + price * 1.08', lines('1. SET withTax TO an empty list', '2. FOR EACH price IN prices', '3.   SET withTax TO withTax + price * 1.08', '4. END FOR', '5. OUTPUT withTax')],

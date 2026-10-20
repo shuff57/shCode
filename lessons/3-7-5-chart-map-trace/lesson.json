@@ -28,7 +28,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Start with an empty list called `withTax`.\n\n**2.** Go through the prices one at a time.\n\n**3.** For each price, multiply it by 1.08 and add the result to `withTax`.\n\n**4.** When there are no more prices, print `withTax`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END line. Indent the line inside the loop. Each keyword looks like this:\n\n- `SET withTax TO an empty list` (a change)\n- `FOR EACH price IN prices` ... `END FOR` (the loop)\n- `ADD price * 1.08 TO withTax` (the step inside the loop)\n- `OUTPUT withTax` or `RETURN withTax` (the answer, after the loop)\n\nThe chart shows the shape.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Start with an empty list called `withTax`.\n\n**2.** Go through the prices one at a time.\n\n**3.** For each price, multiply it by 1.08 and add the result to `withTax`.\n\n**4.** When there are no more prices, print `withTax`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. Each keyword looks like this:\n\n- `SET withTax TO an empty list` (a change)\n- `FOR EACH price IN prices` ... `END FOR` (the loop)\n- `ADD price * 1.08 TO withTax` (the step inside the loop)\n- `OUTPUT withTax` or `RETURN withTax` (the answer, after the loop)\n\nThe chart shows the shape.",
       "hints": [
         "The loop is `FOR EACH ... END FOR`, and the steps inside it are indented.",
         "Whatever happens once the loop is over comes after END FOR, not inside it."
@@ -68,7 +68,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*\\bFOR\\s+EACH\\b[\\s\\S]*\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?prices\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
+      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?prices\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
       "hint": "Use one FOR EACH price IN prices, and close it with one END FOR.",
       "points": 0
     },
@@ -104,7 +104,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b)[\\s\\S]*\\bFOR\\s+EACH\\b",
+      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b)[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
       "hint": "Something is printed or returned inside the loop. That would run once per price. Move it after END FOR.",
       "points": 0
     }

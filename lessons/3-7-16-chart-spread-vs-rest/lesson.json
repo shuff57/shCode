@@ -28,7 +28,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Start the running total, `sum`, at 0.\n\n**2.** Go through the numbers one at a time.\n\n**3.** For each number, add it to `sum`.\n\n**4.** When there are no more numbers, give back `sum`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END line. Indent the line inside the loop. Each keyword looks like this:\n\n- `SET sum TO 0` (start the total)\n- `FOR EACH number IN numbers` ... `END FOR` (the loop)\n- `SET sum TO sum + number` (the step inside the loop)\n- `RETURN sum` or `OUTPUT sum` (the answer, after the loop)\n\nBefore you submit, trace `total(5, 5)` and then `total(...scores)` with `scores` holding `[5, 5]`. The same steps give 10 both times: the rest parameter gathers the arguments into `numbers`, and the spread spreads them out to be gathered.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Start the running total, `sum`, at 0.\n\n**2.** Go through the numbers one at a time.\n\n**3.** For each number, add it to `sum`.\n\n**4.** When there are no more numbers, give back `sum`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. Each keyword looks like this:\n\n- `SET sum TO 0` (start the total)\n- `FOR EACH number IN numbers` ... `END FOR` (the loop)\n- `SET sum TO sum + number` (the step inside the loop)\n- `RETURN sum` or `OUTPUT sum` (the answer, after the loop)\n\nBefore you submit, trace `total(5, 5)` and then `total(...scores)` with `scores` holding `[5, 5]`. The same steps give 10 both times: the rest parameter gathers the arguments into `numbers`, and the spread spreads them out to be gathered.",
       "hints": [
         "The loop is `FOR EACH ... END FOR`, and the steps inside it are indented.",
         "Whatever happens once the loop is over comes after END FOR, not inside it."
@@ -68,7 +68,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*\\bFOR\\s+EACH\\b[\\s\\S]*\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?numbers\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
+      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?numbers\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
       "hint": "Use one FOR EACH number IN numbers, and close it with one END FOR.",
       "points": 0
     },
@@ -104,7 +104,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b)[\\s\\S]*\\bFOR\\s+EACH\\b",
+      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b)[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
       "hint": "Something is returned inside the loop. That would end the method after the first number. Move it after END FOR.",
       "points": 0
     }
