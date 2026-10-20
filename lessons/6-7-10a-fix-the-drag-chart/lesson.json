@@ -33,13 +33,13 @@
     {
       "id": "r1",
       "title": "Pressing has an ELSE (the release path)",
-      "description": "An ELSE branch for every frame where the mouse is not pressing.",
+      "description": "An ELSE branch for every frame where the mouse is not pressing, lined up with that decision.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bmouse\\b[^\\n]*\\bpressing\\b[\\s\\S]*\\bELSE\\b",
-      "hint": "Give IF mouse is pressing an ELSE branch: the frames where the mouse is up.",
+      "pattern": "\\bmouse\\b[^\\n]*\\bpressing\\b(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bEND\\s*IF\\b(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bELSE\\b",
+      "hint": "Give IF mouse is pressing an ELSE branch: the frames where the mouse is up. The ELSE comes after the END IF of the inner IF, so it lines up with IF mouse is pressing.",
       "points": 0
     },
     {
@@ -62,7 +62,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*TO|GOTO|JUMP\\s+TO|LOOP\\s+BACK|START\\s+OVER)\\b)[\\s\\S]*\\bSET\\s+[^\\n]*\\bmouse\\b",
+      "pattern": "^(?![\\s\\S]*(?:(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*(?:BACK\\s*)?TO|GOTO|JUMP\\s+(?:BACK\\s+)?TO|LOOP\\s+BACK|START\\s+OVER)\\b|\\b(?:step|line)\\s+\\d+\\b))[\\s\\S]*\\bSET\\s+[^\\n]*\\bmouse\\b",
       "hint": "Delete the GO TO line. The sprite moves once per frame, then the frame goes on to the end.",
       "points": 0
     },

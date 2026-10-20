@@ -33,13 +33,13 @@
     {
       "id": "r1",
       "title": "The play decision has an ELSE",
-      "description": "An ELSE branch for every frame that is not playing.",
+      "description": "An ELSE branch for every frame that is not playing, lined up with the play decision.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?[\\s\\S]*?\\bEND\\s*IF\\b[ \\t]*\\n(?:[ \\t]*\\d+[.)])?[ \\t]*(?:ELSE|OTHERWISE)\\b",
-      "hint": "Give the IF state is \"play\" an ELSE branch for the frames when the game is not playing. Put the ELSE after the END IF of the inner IF p, so it lines up with IF state is \"play\".",
+      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bEND\\s*IF\\b(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\b(?:ELSE|OTHERWISE)\\b",
+      "hint": "Give the IF state is \"play\" an ELSE branch for the frames when the game is not playing. The ELSE comes after the END IF of the inner IF p, so it lines up with IF state is \"play\".",
       "points": 0
     },
     {
@@ -62,7 +62,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*TO|GOTO|JUMP\\s+TO|LOOP\\s+BACK|START\\s+OVER)\\b)[\\s\\S]*\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?paused",
+      "pattern": "^(?![\\s\\S]*(?:(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*(?:BACK\\s*)?TO|GOTO|JUMP\\s+(?:BACK\\s+)?TO|LOOP\\s+BACK|START\\s+OVER)\\b|\\b(?:step|line)\\s+\\d+\\b))[\\s\\S]*\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?paused",
       "hint": "Delete the GO TO line. Setting the state does its one job, then the frame goes on to the end.",
       "points": 0
     },
@@ -93,13 +93,13 @@
     {
       "id": "r6",
       "title": "Playing updates the game",
-      "description": "CALL updateGame in the play branch.",
+      "description": "CALL updateGame in the play branch, before the ELSE.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?[\\s\\S]*?\\bCALL\\s+updateGame\\b",
-      "hint": "The play branch should CALL updateGame.",
+      "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?(?:(?!\\b(?:ELSE|OTHERWISE)\\b)[\\s\\S])*?\\bCALL\\s+updateGame\\b",
+      "hint": "The play branch (before the ELSE) should CALL updateGame. A paused game must not update.",
       "points": 0
     }
   ],

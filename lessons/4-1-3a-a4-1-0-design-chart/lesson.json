@@ -33,14 +33,14 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "Ten or more numbered steps",
-      "description": "Number every line 1. 2. 3. and so on. A plan under ten steps has not been decided yet.",
+      "title": "Ten to nineteen numbered steps",
+      "description": "Number every line 1. 2. 3. and so on. A plan under ten steps has not been decided yet, and twenty or more is too big to hold in your head.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){9}[ \\t]*\\d+[.)][ \\t]*\\S",
-      "hint": "You need at least ten numbered lines, one after another. Number the indented ones and the END lines too. Keep it under twenty: collapse a run of steps into a function.",
+      "pattern": "^(?![\\s\\S]*(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){19}[ \\t]*\\d+[.)][ \\t]*\\S)[\\s\\S]*?(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){9}[ \\t]*\\d+[.)][ \\t]*\\S",
+      "hint": "You need between ten and nineteen lines that start with a number. Number the indented ones and the END lines too. If you pass twenty, collapse a run of steps into a function.",
       "points": 0
     },
     {
@@ -58,13 +58,13 @@
     {
       "id": "r3",
       "title": "A loop over your array",
-      "description": "FOR EACH item IN list ... END FOR.",
+      "description": "FOR EACH item IN list ... END FOR, with at least one step inside.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+[^\\n]+[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
-      "hint": "Walk your array with FOR EACH item IN list ... END FOR.",
+      "pattern": "\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+[^\\n]+\\n(?:[ \\t]*\\n)*[ \\t]*(?:\\d+[.)][ \\t]*)?(?!END\\b)\\S[^\\n]*\\n[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
+      "hint": "Walk your array with FOR EACH item IN list ... END FOR, and put at least one step inside it.",
       "points": 0
     },
     {
@@ -82,13 +82,13 @@
     {
       "id": "r5",
       "title": "Sorting, saving and loading are planned",
-      "description": "A CALL for each: something with sort, something with save, something with load.",
+      "description": "A different CALL for each: one that sorts, one that saves, one that loads.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?=[\\s\\S]*\\bCALL\\s+\\w*sort\\w*)(?=[\\s\\S]*\\bCALL\\s+\\w*save\\w*)[\\s\\S]*\\bCALL\\s+\\w*load\\w*",
-      "hint": "Plan a CALL for sorting, one for saving and one for loading, for example CALL sortByPriority, CALL saveQueue, CALL loadQueue.",
+      "pattern": "^(?=[\\s\\S]*\\bCALL\\s+(?!\\w*(?:save|store|load|restore|read))\\w*(?:sort|rank)\\w*)(?=[\\s\\S]*\\bCALL\\s+(?!\\w*(?:sort|rank|load|restore|read))\\w*(?:save|store)\\w*)[\\s\\S]*\\bCALL\\s+(?!\\w*(?:sort|rank|save|store))\\w*(?:load|restore|read)\\w*",
+      "hint": "Plan three separate CALLs: one for sorting, one for saving and one for loading, for example CALL sortByPriority, CALL saveQueue, CALL loadQueue.",
       "points": 0
     },
     {

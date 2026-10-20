@@ -107,6 +107,7 @@ const LABS = {
       ['held never set', ['r2'], lines('1. IF mouse presses AND ball is hovered', '2.   CALL playSound', '3. END IF', '4. IF held AND mouse is pressing', '5.   SET ball position TO the mouse', '6.   CALL drawBand', '7. END IF', '8. IF held AND mouse is released', '9.   CALL applyForce', '10.  SET held TO false', '11. END IF')],
       ['no band drawn', ['r3'], lines('1. IF mouse presses AND ball is hovered', '2.   SET held TO true', '3. END IF', '4. IF held AND mouse is pressing', '5.   SET ball position TO the mouse', '6.   CALL playSound', '7. END IF', '8. IF held AND mouse is released', '9.   CALL applyForce', '10.  SET held TO false', '11. END IF')],
     ],
+    ok: [['mouse is pressed / let go, MOVE the ball', lines('1. IF mouse presses AND ball is hovered', '2.   SET held TO true', '3. END IF', '4. IF held AND mouse is pressed', '5.   MOVE ball TO the mouse', '6.   CALL drawBand', '7. END IF', '8. IF held AND mouse is let go', '9.   CALL applyForce', '10.  SET held TO false', '11. END IF')]],
     lower: lines('1. if mouse presses and the ball is hovered', '2.   set held to true', '3. end if', '4. if held and mouse is pressing', '5.   set ball position to the mouse', '6.   call drawBand', '7. end if', '8. if held and mouse is released', '9.   set force to the pull times POWER', '10.  call applyForce', '11.  set held to false', '12. end if'),
   },
   '6-6-19a-fix-the-pause-chart': {
@@ -115,6 +116,9 @@ const LABS = {
     muts: [
       ['fixed the ELSE but left the GO TO', ['r3'], lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.     GO TO step 4', '6.   END IF', '7. ELSE', '8.   CALL drawPauseScreen', '9.   IF p is pressed', '10.    SET state TO "play"', '11.  END IF', '12. END IF')],
       ['ELSE hung on the wrong IF', ['r1'], lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.   ELSE', '6.     CALL drawPauseScreen', '7.     IF p is pressed', '8.       SET state TO "play"', '9.     END IF', '10.  END IF', '11. END IF')],
+      ['REPEAT step 4 as the jump', ['r3'], lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.     REPEAT step 4', '6.   END IF', '7. ELSE', '8.   CALL drawPauseScreen', '9.   IF p is pressed', '10.    SET state TO "play"', '11.  END IF', '12. END IF')],
+      ['ELSE after the outer END IF', ['r1'], lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.   END IF', '6. END IF', '7. ELSE', '8.   CALL drawPauseScreen', '9.   IF p is pressed', '10.    SET state TO "play"', '11.  END IF')],
+      ['updateGame only on the paused branch', ['r6'], lines('1. IF state is "play"', '2.   IF p is pressed', '3.     SET state TO "paused"', '4.   END IF', '5. ELSE', '6.   CALL updateGame', '7.   CALL drawPauseScreen', '8.   IF p is pressed', '9.     SET state TO "play"', '10.  END IF', '11. END IF')],
       ['paused but no way out', ['r4'], lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.   END IF', '6. ELSE', '7.   CALL drawPauseScreen', '8. END IF')],
       ['pause screen left floating', ['r2'], lines('1. IF state is "play"', '2.   CALL updateGame', '3.   IF p is pressed', '4.     SET state TO "paused"', '5.   END IF', '6. ELSE', '7.   IF p is pressed', '8.     SET state TO "play"', '9.   END IF', '10. END IF', '11. CALL drawPauseScreen')],
     ],
@@ -126,6 +130,8 @@ const LABS = {
     starterRed: ['r1', 'r2', 'r3'],
     muts: [
       ['fixed the release path but left the GO TO', ['r3'], lines('1. IF mouse is pressing', '2.   IF sprite is under the mouse', '3.     SET sprite position TO the mouse', '4.     GO TO step 3', '5.   END IF', '6. ELSE', '7.   SET velocity TO zero', '8. END IF')],
+      ['ELSE on the inner IF', ['r1'], lines('1. IF mouse is pressing', '2.   IF sprite is under the mouse', '3.     SET sprite position TO the mouse', '4.   ELSE', '5.     SET velocity TO zero', '6.   END IF', '7. END IF')],
+      ['REPEAT step 3 as the jump', ['r3'], lines('1. IF mouse is pressing', '2.   IF sprite is under the mouse', '3.     SET sprite position TO the mouse', '4.     REPEAT step 3', '5.   END IF', '6. ELSE', '7.   SET velocity TO zero', '8. END IF')],
       ['velocity zeroed while still dragging', ['r2'], lines('1. IF mouse is pressing', '2.   IF sprite is under the mouse', '3.     SET sprite position TO the mouse', '4.     SET velocity TO zero', '5.   END IF', '6. ELSE', '7.   CALL idle', '8. END IF')],
       ['velocity box still floating', ['r1', 'r2'], lines('1. IF mouse is pressing', '2.   IF sprite is under the mouse', '3.     SET sprite position TO the mouse', '4.   END IF', '5. END IF', '6. SET velocity TO zero')],
     ],
@@ -135,7 +141,10 @@ const LABS = {
     frame: (body) => lines('START', body, 'END'),
     noChart: true,
     muts: [
-      ['fewer than ten steps', ['r1'], lines('1. CALL loadQueue', '2. IF a saved queue was found', '3. ELSE', '4. END IF', '5. CALL sortByPriority', '6. FOR EACH order IN queue', '7. END FOR', '8. CALL saveQueue', '9. OUTPUT the verdict line')],
+      ['fewer than ten steps', ['r1', 'r2'], lines('1. CALL loadQueue', '2. IF a saved queue was found', '3. ELSE', '4. CALL sortByPriority', '5. FOR EACH order IN queue', '6.   CALL priceOf', '7. END FOR', '8. CALL saveQueue', '9. OUTPUT the verdict line')],
+      ['over nineteen steps', ['r1'], lines(...Array.from({ length: 20 }, (_, i) => `${i + 1}. CALL loadQueue`), '21. IF a saved queue was found', '22. ELSE', '23. END IF', '24. FOR EACH order IN queue', '25.   CALL sortByPriority', '26. END FOR', '27. CALL saveQueue', '28. OUTPUT the verdict line')],
+      ['an empty loop', ['r3'], lines('1. CALL loadQueue', '2. IF a saved queue was found', '3.   SET queue TO the saved queue', '4. ELSE', '5.   SET queue TO the starting list', '6. END IF', '7. CALL sortByPriority', '8. CALL priceOf', '9. FOR EACH order IN queue', '10. END FOR', '11. CALL saveQueue', '12. OUTPUT the verdict line')],
+      ['one CALL doing sort, save and load', ['r5'], lines('1. CALL loadQueue', '2. IF a saved queue was found', '3.   SET queue TO the saved queue', '4. ELSE', '5.   SET queue TO the starting list', '6. END IF', '7. CALL sortSaveLoad', '8. FOR EACH order IN queue', '9.   CALL priceOf', '10. END FOR', '11. OUTPUT the verdict line')],
       ['a decision with only one way out', ['r2'], lines('1. CALL loadQueue', '2. IF a saved queue was found', '3.   SET queue TO the saved queue', '4. END IF', '5. CALL sortByPriority', '6. FOR EACH order IN queue', '7.   CALL priceOf', '8.   CALL estimateHours', '9. END FOR', '10. CALL saveQueue', '11. OUTPUT the verdict line')],
       ['no loop', ['r3'], lines('1. CALL loadQueue', '2. IF a saved queue was found', '3.   SET queue TO the saved queue', '4. ELSE', '5.   SET queue TO the starting list', '6. END IF', '7. CALL sortByPriority', '8. CALL priceOf', '9. CALL estimateHours', '10. CALL saveQueue', '11. OUTPUT the verdict line')],
       ['no save planned', ['r5'], lines('1. CALL loadQueue', '2. IF a saved queue was found', '3.   SET queue TO the saved queue', '4. ELSE', '5.   SET queue TO the starting list', '6. END IF', '7. CALL sortByPriority', '8. FOR EACH order IN queue', '9.   CALL priceOf', '10. END FOR', '11. OUTPUT the verdict line')],

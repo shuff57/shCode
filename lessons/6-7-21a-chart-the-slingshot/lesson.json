@@ -57,24 +57,24 @@
     {
       "id": "r3",
       "title": "Stretch: held and pressing moves the ball and draws the band",
-      "description": "An IF held AND pressing, with the ball moved to the mouse and CALL drawBand inside.",
+      "description": "An IF held AND the mouse still down, with the ball moved to the mouse and CALL drawBand inside.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bheld\\b[^\\n]*\\bpressing\\b(?=(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bmouse\\b)(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bCALL\\s+drawBand\\b",
-      "hint": "Stretch: IF held AND mouse is pressing, then move the ball to the mouse and CALL drawBand, then END IF.",
+      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bheld\\b[^\\n]*\\b(?:pressing|pressed|down)\\b(?=(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\b(?:SET|MOVE)\\b[^\\n]*\\bmouse\\b)(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bCALL\\s+drawBand\\b",
+      "hint": "Stretch: IF held AND mouse is pressing, then move the ball to the mouse (SET ball position TO the mouse) and CALL drawBand, then END IF.",
       "points": 0
     },
     {
       "id": "r4",
       "title": "Release: held and released applies the force and clears held",
-      "description": "An IF held AND released, with CALL applyForce and SET held TO false inside.",
+      "description": "An IF held AND the mouse let go, with CALL applyForce and SET held TO false inside.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bheld\\b[^\\n]*\\breleas(?:e|es|ed)\\b(?=(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bSET\\s+held\\s+TO\\s+false\\b)(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bCALL\\s+applyForce\\b",
+      "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bheld\\b[^\\n]*(?:\\breleas(?:e|es|ed)\\b|\\blet\\s+go\\b|\\bup\\b)(?=(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bSET\\s+held\\s+TO\\s+false\\b)(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bCALL\\s+applyForce\\b",
       "hint": "Release: IF held AND mouse is released, then CALL applyForce and SET held TO false, then END IF.",
       "points": 0
     },
@@ -98,7 +98,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?=(?:[\\s\\S]*(?<!\\bEND\\s*)\\bIF\\b){3})(?=(?:[\\s\\S]*\\bEND\\s*IF\\b){3})(?![\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*TO|GOTO|JUMP\\s+TO|LOOP\\s+BACK|START\\s+OVER)\\b)[\\s\\S]*",
+      "pattern": "^(?=(?:[\\s\\S]*(?<!\\bEND\\s*)\\bIF\\b){3})(?=(?:[\\s\\S]*\\bEND\\s*IF\\b){3})(?![\\s\\S]*(?:(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*(?:BACK\\s*)?TO|GOTO|JUMP\\s+(?:BACK\\s+)?TO|LOOP\\s+BACK|START\\s+OVER)\\b|\\b(?:step|line)\\s+\\d+\\b))[\\s\\S]*",
       "hint": "Write three IF blocks, each closed with END IF. Do not write GO TO or LOOP BACK.",
       "points": 0
     }

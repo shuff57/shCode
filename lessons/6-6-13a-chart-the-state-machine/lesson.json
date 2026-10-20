@@ -98,13 +98,13 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*TO|GOTO|JUMP\\s+TO|LOOP\\s+BACK|START\\s+OVER)\\b)(?=(?:[\\s\\S]*\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)){3})[\\s\\S]*",
+      "pattern": "^(?![\\s\\S]*(?:(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*(?:BACK\\s*)?TO|GOTO|JUMP\\s+(?:BACK\\s+)?TO|LOOP\\s+BACK|START\\s+OVER)\\b|\\b(?:step|line)\\s+\\d+\\b))(?=(?:[\\s\\S]*\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)){3})[\\s\\S]*",
       "hint": "Write three SET state TO lines, one per transition. Do not write GO TO or LOOP BACK: changing the state does not jump, the frame just ends.",
       "points": 0
     }
   ],
   "planChart": {
-    "mermaid": "flowchart LR\n  A([draw runs]) --> B{state is title}\n  B -- yes --> C[[drawTitle]]\n  C --> D{space pressed}\n  D -- yes --> E[state = play]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F{state is play}\n  F -- yes --> G[[updateGame]]\n  G --> H{player dead}\n  H -- yes --> I[state = gameover]\n  H -- no --> Z\n  I --> Z\n  F -- no --> M{state is gameover}\n  M -- yes --> J[[drawGameOver]]\n  J --> K{r pressed}\n  K -- yes --> L[state = title]\n  K -- no --> Z\n  L --> Z",
+    "mermaid": "flowchart LR\n  A([draw runs]) --> B{state is title}\n  B -- yes --> C[[drawTitle]]\n  C --> D{space pressed}\n  D -- yes --> E[state = play]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F{state is play}\n  F -- yes --> G[[updateGame]]\n  G --> H{player dead}\n  H -- yes --> I[state = gameover]\n  H -- no --> Z\n  I --> Z\n  F -- no --> M{state is gameover}\n  M -- yes --> J[[drawGameOver]]\n  M -- no --> Z\n  J --> K{r pressed}\n  K -- yes --> L[state = title]\n  K -- no --> Z\n  L --> Z",
     "caption": "One frame of draw(): route by state, draw first, then check whether to leave. Every path reaches the end of the frame."
   }
 }
