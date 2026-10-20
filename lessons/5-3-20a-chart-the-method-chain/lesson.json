@@ -21,7 +21,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** The enemy is hit for some amount of damage.\n\n**2.** Take that amount off the enemy's health.\n\n**3.** If the health is now zero or less, the enemy dies.\n\n**4.** Either way, the enemy flashes red to show it was hit.\n\n**5.** Then control goes back to whoever hit it.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for the decision, and CALL for the two other methods (`die` and `flashRed`). The chart shows the shape.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** The enemy is hit for some amount of damage.\n\n**2.** Take that amount off the enemy's health.\n\n**3.** If the health is now zero or less, the enemy dies.\n\n**4.** Either way, the enemy flashes red to show it was hit.\n\n**5.** Then control goes back to whoever hit it.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for the decision, and CALL for the two other methods (`die` and `flashRed`). Each keyword looks like this:\n\n- `SET health TO health - amount` (a change)\n- `IF health <= 0` ... `END IF` (the decision; indent what is inside it)\n- `CALL die` (call another method; you may write `CALL this.die` as the chart does)\n\nNumber every line, including the indented one and END IF. The chart shows the shape.",
       "hints": [
         "A step that happens \"either way\" is not inside the IF. It comes after END IF.",
         "Write a call as one line: `CALL die`. Do not write what die does."
@@ -37,7 +37,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n){4}[ \\t]*\\d+[.)][ \\t]*\\S",
+      "pattern": "(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){4}[ \\t]*\\d+[.)][ \\t]*\\S",
       "hint": "You need at least five lines that start with a number, one after another, each with a step written after it.",
       "points": 0
     },
@@ -49,7 +49,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\b(?:SET\\s+)?(?:this\\.)?health\\s+(?:TO|=)\\s+(?:this\\.)?health\\s*(?:-|minus)\\s*amount\\b[\\s\\S]*(?<!END\\s)\\bIF\\b",
+      "pattern": "\\b(?:SET\\s+)?(?:this\\.)?health(?:(?:\\s+TO\\b|\\s*=)\\s*\\(?\\s*(?:this\\.)?health\\s*(?:-|minus)|\\s*-=)\\s*amount\\b[\\s\\S]*(?<!\\bEND\\s*)\\bIF\\b",
       "hint": "Write the change as SET health TO health - amount, and put it before the IF.",
       "points": 0
     },
@@ -61,8 +61,8 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*(?<!END\\s)\\bIF\\b[\\s\\S]*(?<!END\\s)\\bIF\\b)[\\s\\S]*(?<!END\\s)\\bIF\\b[^\\n]*\\bhealth\\b[^\\n]*(?:<=?|≤|\\bzero\\b|\\b0\\b)[\\s\\S]*\\bEND\\s+IF\\b",
-      "hint": "Use one IF about health being 0 or less, and close it with END IF. If you have two IFs, join them into one.",
+      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bIF\\b[\\s\\S]*(?<!\\bEND\\s*)\\bIF\\b)[\\s\\S]*(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bhealth\\b[^\\n]*(?:<=|≤|(?:\\b0|\\bzero)\\s+or\\s+(?:less|lower|below)|\\bat\\s+most\\s+(?:0|zero)|\\bnot\\s+above\\s+(?:0|zero))[\\s\\S]*\\bEND\\s*IF\\b",
+      "hint": "Use one IF that asks if health is zero or less (health <= 0), and close it with END IF. If you have two IFs, join them into one.",
       "points": 0
     },
     {
@@ -73,7 +73,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "(?<!END\\s)\\bIF\\b(?:(?!\\bEND\\s+IF\\b)[\\s\\S])*\\bCALL\\s+die\\b",
+      "pattern": "(?<!\\bEND\\s*)\\bIF\\b(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*\\bCALL\\s+(?:this\\.)?die\\b",
       "hint": "The enemy only dies when health is 0 or less, so CALL die goes between IF and END IF.",
       "points": 0
     },
@@ -85,20 +85,20 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bEND\\s+IF\\b[\\s\\S]*\\bCALL\\s+flashRed\\b",
+      "pattern": "\\bEND\\s*IF\\b[\\s\\S]*\\bCALL\\s+(?:this\\.)?flashRed\\b",
       "hint": "Step 4 says \"either way\". A step that runs either way is not inside the decision: put CALL flashRed after END IF.",
       "points": 0
     },
     {
       "id": "r6",
-      "title": "Two calls, and nothing from inside them",
-      "description": "One CALL line for die and one for flashRed. Do not write what those methods do.",
+      "title": "Exactly two calls",
+      "description": "One CALL line for die and one for flashRed.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\b(?:sprite|score|remove)\\b)(?![\\s\\S]*\\bCALL\\b[\\s\\S]*\\bCALL\\b[\\s\\S]*\\bCALL\\b)[\\s\\S]*\\bCALL\\b[\\s\\S]*\\bCALL\\b",
-      "hint": "You need exactly two CALL lines. Removing the sprite and adding to the score belong inside die, not here.",
+      "pattern": "^(?![\\s\\S]*\\bCALL\\b[\\s\\S]*\\bCALL\\b[\\s\\S]*\\bCALL\\b)[\\s\\S]*\\bCALL\\b[\\s\\S]*\\bCALL\\b",
+      "hint": "You need exactly two CALL lines, one for die and one for flashRed. What die does belongs inside die, not here.",
       "points": 0
     }
   ],

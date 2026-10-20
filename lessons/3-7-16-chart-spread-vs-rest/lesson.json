@@ -28,7 +28,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Start the running total, `sum`, at 0.\n\n**2.** Go through the numbers one at a time.\n\n**3.** For each number, add it to `sum`.\n\n**4.** When there are no more numbers, give back `sum`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, FOR EACH and END FOR for the loop, and OUTPUT or RETURN for the answer. The chart shows the shape.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Start the running total, `sum`, at 0.\n\n**2.** Go through the numbers one at a time.\n\n**3.** For each number, add it to `sum`.\n\n**4.** When there are no more numbers, give back `sum`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END line. Indent the line inside the loop. Each keyword looks like this:\n\n- `SET sum TO 0` (start the total)\n- `FOR EACH number IN numbers` ... `END FOR` (the loop)\n- `SET sum TO sum + number` (the step inside the loop)\n- `RETURN sum` or `OUTPUT sum` (the answer, after the loop)\n\nBefore you submit, trace `total(5, 5)` and then `total(...scores)` with `scores` holding `[5, 5]`. The same steps give 10 both times: the rest parameter gathers the arguments into `numbers`, and the spread spreads them out to be gathered.",
       "hints": [
         "The loop is `FOR EACH ... END FOR`, and the steps inside it are indented.",
         "Whatever happens once the loop is over comes after END FOR, not inside it."
@@ -44,8 +44,8 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n){4}[ \\t]*\\d+[.)][ \\t]*\\S",
-      "hint": "You need at least five lines that start with a number, one after another, each with a step written after it.",
+      "pattern": "(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){4}[ \\t]*\\d+[.)][ \\t]*\\S",
+      "hint": "You need at least five lines that start with a number, one after another, each with a step written after it. Number END FOR and the indented line too.",
       "points": 0
     },
     {
@@ -56,7 +56,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bsum\\s+(?:TO|=)\\s+0\\b[\\s\\S]*\\bFOR\\s+EACH\\b",
+      "pattern": "\\bsum\\s+(?:TO|=|AT)\\s+(?:0|zero)\\b[\\s\\S]*\\bFOR\\s+EACH\\b",
       "hint": "Start with SET sum TO 0, and put it before the FOR EACH.",
       "points": 0
     },
@@ -68,8 +68,8 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\bFOR\\s+EACH\\b[\\s\\S]*\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+IN\\s+numbers\\b[\\s\\S]*\\bEND\\s+FOR\\b",
-      "hint": "Use one FOR EACH number IN numbers, and close it with END FOR.",
+      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*\\bFOR\\s+EACH\\b[\\s\\S]*\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?numbers\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
+      "hint": "Use one FOR EACH number IN numbers, and close it with one END FOR.",
       "points": 0
     },
     {
@@ -80,8 +80,8 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s+FOR\\b)[\\s\\S])*?\\n(?=[^\\n]*\\bsum\\b)(?=[^\\n]*(?:\\bsum\\s*\\+|\\+\\s*sum\\b|\\bADD\\b))[^\\n]*",
-      "hint": "Between FOR EACH and END FOR, add the number to sum, for example SET sum TO sum + number.",
+      "pattern": "\\bFOR\\s+EACH\\s+(\\w+)\\b(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\bsum\\s*(?:TO|=)\\s*\\(?\\s*sum\\s*(?:\\+|plus)\\s*\\b\\1\\b|\\bsum\\s*\\+=\\s*\\b\\1\\b|\\bADD\\s+\\b\\1\\b\\s+TO\\s+sum\\b|\\bsum\\s*(?:TO|=)\\s*\\(?\\s*\\b\\1\\b\\s*(?:\\+|plus)\\s*sum\\b))",
+      "hint": "Between FOR EACH and END FOR, add the loop's number to sum, for example SET sum TO sum + number. Use the same name you gave the loop.",
       "points": 0
     },
     {
@@ -92,20 +92,20 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bEND\\s+FOR\\b[\\s\\S]*\\bRETURN\\b[^\\n]*\\bsum\\b",
-      "hint": "RETURN sum goes after END FOR, once there are no more numbers.",
+      "pattern": "\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b[^\\n]*\\bsum\\b",
+      "hint": "Give back sum (RETURN sum) after END FOR, once there are no more numbers.",
       "points": 0
     },
     {
       "id": "r6",
       "title": "Nothing is returned inside the loop",
-      "description": "The only `RETURN` is the one after the loop.",
+      "description": "RETURN or OUTPUT comes after END FOR, not between FOR EACH and END FOR.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s+FOR\\b)[\\s\\S])*\\bRETURN\\b)[\\s\\S]*\\bRETURN\\b",
-      "hint": "A RETURN inside the loop would end the method after the first number. Move it after END FOR.",
+      "pattern": "^(?![\\s\\S]*\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b)[\\s\\S]*\\bFOR\\s+EACH\\b",
+      "hint": "Something is returned inside the loop. That would end the method after the first number. Move it after END FOR.",
       "points": 0
     }
   ]
