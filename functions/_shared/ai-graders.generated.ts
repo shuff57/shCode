@@ -2518,324 +2518,6 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
-  "3-7-16-chart-spread-vs-rest": {
-    "lessonTitle": "3.7.16 Chart the Code: Spread vs. Rest, Side by Side",
-    "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
-    "rubric": [
-      {
-        "id": "hexagon",
-        "title": "The loop is drawn with the loop-setup hexagon",
-        "points": 5,
-        "description": "Scored by the editor (shape kind): a loop-setup (hexagon) shape on the Start-to-End path.",
-        "check": {
-          "steps": [
-            {
-              "op": "count",
-              "match": {
-                "kind": "preparation"
-              },
-              "min": 1,
-              "fail": "A for-loop header has its own shape, the loop-setup hexagon from the shape palette. None of the shapes on your path is one.",
-              "pass": "A loop-setup hexagon is on the path."
-            }
-          ]
-        }
-      },
-      {
-        "id": "way-out",
-        "title": "The return is after the loop, off the way out",
-        "points": 5,
-        "description": "Scored by the editor (arrow order): the steps that repeat have an arrow leading back, and the arrow that leaves the repeat leads on to a step that runs once, before End.",
-        "check": {
-          "steps": [
-            {
-              "op": "loop-exit",
-              "loop": {
-                "kind": "preparation"
-              },
-              "minAfter": 1,
-              "from": "any",
-              "orSetup": true,
-              "fail": "Two things must hold: the steps that run each time round must have an arrow leading back (to the hexagon, or to the diamond that asks whether there is another), and the arrow that leaves that repeat must lead to a step that runs once, after it, before End.",
-              "pass": "The way out of the loop leads on to the step after it."
-            }
-          ]
-        }
-      },
-      {
-        "id": "yes-no",
-        "title": "The \"another number?\" question sends yes to the add and no to the return",
-        "points": 5,
-        "description": "Scored by the editor (arrow order): a decision whose yes exit goes to a task and whose no exit goes to the print or return, two different places.",
-        "check": {
-          "steps": [
-            {
-              "op": "branch",
-              "at": {
-                "kind": "decision"
-              },
-              "orientation": "labelled",
-              "distinct": true,
-              "yes": {
-                "kind": "process"
-              },
-              "no": {
-                "kind": "io"
-              },
-              "fail": "The diamond has to split into two different results: its yes arrow goes to the task that does the work, its no arrow goes to the input/output step.",
-              "pass": "The decision splits into the task and the print."
-            }
-          ]
-        }
-      },
-      {
-        "id": "labels-on-topic",
-        "title": "The diamond and the output say what they do",
-        "points": 5,
-        "description": "Scored by the editor: the diamond asks about the next number and the output shape says what comes out.",
-        "check": {
-          "steps": [
-            {
-              "op": "label",
-              "match": {
-                "kind": "decision",
-                "re": "another|more|left|next|any|number|remain|item|list|done|end|still"
-              },
-              "min": 1,
-              "fail": "The diamond should ask whether there is another number.",
-              "pass": "The diamond asks about the next number."
-            },
-            {
-              "op": "label",
-              "match": {
-                "kind": "io",
-                "re": "print|show|display|log|output|return|result|total|sum|list|array|withtax"
-              },
-              "min": 1,
-              "fail": "The output step should say what it prints or returns.",
-              "pass": "The output step says what it prints or returns."
-            }
-          ]
-        }
-      }
-    ],
-    "model": "glm-5.3-flash:cloud",
-    "contextDocs": [],
-    "strict": true,
-    "gate": {
-      "anyOf": [
-        "sum|total|numbers|\\[i\\]|add",
-        "next|another|more|each|loop|\\bi\\b|index",
-        "\\b0\\b|zero|initial",
-        "return|print|show|log|output"
-      ],
-      "min": 3,
-      "capTo": 13,
-      "fail": "None of your shapes say what this program does. Label each shape in your own words."
-    },
-    "diagramRules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-process",
-        "count": 2
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 7
-      },
-      {
-        "id": "min-shape",
-        "shape": "preparation",
-        "count": 1
-      }
-    ]
-  },
-  "3-7-5-chart-map-trace": {
-    "lessonTitle": "3.7.5 Chart the Code: `.map()`'s Callback Trace",
-    "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
-    "rubric": [
-      {
-        "id": "hexagon",
-        "title": "The loop is drawn with the loop-setup hexagon",
-        "points": 5,
-        "description": "Scored by the editor (shape kind): a loop-setup (hexagon) shape on the Start-to-End path.",
-        "check": {
-          "steps": [
-            {
-              "op": "count",
-              "match": {
-                "kind": "preparation"
-              },
-              "min": 1,
-              "fail": "A for-loop header has its own shape, the loop-setup hexagon from the shape palette. None of the shapes on your path is one.",
-              "pass": "A loop-setup hexagon is on the path."
-            }
-          ]
-        }
-      },
-      {
-        "id": "way-out",
-        "title": "The print is after the loop, off the way out",
-        "points": 5,
-        "description": "Scored by the editor (arrow order): the steps that repeat have an arrow leading back, and the arrow that leaves the repeat leads on to a step that runs once, before End.",
-        "check": {
-          "steps": [
-            {
-              "op": "loop-exit",
-              "loop": {
-                "kind": "preparation"
-              },
-              "minAfter": 1,
-              "from": "any",
-              "orSetup": true,
-              "fail": "Two things must hold: the steps that run each time round must have an arrow leading back (to the hexagon, or to the diamond that asks whether there is another), and the arrow that leaves that repeat must lead to a step that runs once, after it, before End.",
-              "pass": "The way out of the loop leads on to the step after it."
-            }
-          ]
-        }
-      },
-      {
-        "id": "yes-no",
-        "title": "The \"another price?\" question sends yes to the callback and no to the print",
-        "points": 5,
-        "description": "Scored by the editor (arrow order): a decision whose yes exit goes to a task and whose no exit goes to the print or return, two different places.",
-        "check": {
-          "steps": [
-            {
-              "op": "branch",
-              "at": {
-                "kind": "decision"
-              },
-              "orientation": "labelled",
-              "distinct": true,
-              "yes": {
-                "kind": "process"
-              },
-              "no": {
-                "kind": "io"
-              },
-              "fail": "The diamond has to split into two different results: its yes arrow goes to the task that does the work, its no arrow goes to the input/output step.",
-              "pass": "The decision splits into the task and the print."
-            }
-          ]
-        }
-      },
-      {
-        "id": "labels-on-topic",
-        "title": "The diamond and the output say what they do",
-        "points": 5,
-        "description": "Scored by the editor: the diamond asks about the next price and the output shape says what comes out.",
-        "check": {
-          "steps": [
-            {
-              "op": "label",
-              "match": {
-                "kind": "decision",
-                "re": "another|more|left|next|any|price|remain|item|list|done|end|still"
-              },
-              "min": 1,
-              "fail": "The diamond should ask whether there is another price.",
-              "pass": "The diamond asks about the next price."
-            },
-            {
-              "op": "label",
-              "match": {
-                "kind": "io",
-                "re": "print|show|display|log|output|return|result|total|sum|list|array|withtax"
-              },
-              "min": 1,
-              "fail": "The output step should say what it prints or returns.",
-              "pass": "The output step says what it prints or returns."
-            }
-          ]
-        }
-      }
-    ],
-    "model": "glm-5.3-flash:cloud",
-    "contextDocs": [],
-    "strict": true,
-    "gate": {
-      "anyOf": [
-        "price|prices|\\b10\\b|\\b20\\b|\\b30\\b|item",
-        "tax|withtax|callback|1\\.08|apply|add|collect|result",
-        "next|another|more|each|loop|\\bi\\b|list",
-        "print|show|log|output"
-      ],
-      "min": 3,
-      "capTo": 13,
-      "fail": "None of your shapes say what this program does. Label each shape in your own words."
-    },
-    "diagramRules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-process",
-        "count": 2
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 7
-      },
-      {
-        "id": "min-shape",
-        "shape": "preparation",
-        "count": 1
-      }
-    ]
-  },
   "3-8-17-chart-save-load-round-trip": {
     "lessonTitle": "3.8.17 Chart the Code: Save/Load Round Trip End to End",
     "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
@@ -3172,6 +2854,34 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       "sprite"
     ]
   },
+  "5-2-14-a5-2-2-vel-vs-applyforce": {
+    "lessonTitle": "5.2.14 Vel vs applyForce",
+    "prompt": "Everything you need is in 5.2.8 (Reading: Forces vs Velocity) and 5.2.9 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.8, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.8 and 5.2.9)",
+    "rubric": [
+      {
+        "id": "q1-fight-explanation",
+        "title": "Q1: Explains why .vel fights the physics engine",
+        "description": "Student explains that setting .vel directly every frame overrides whatever the physics engine (gravity, applyForce, collisions) already computed for that sprite that frame, so the engine's own influence gets thrown away and re-imposed instead of blending with it. Accept any everyday phrasing of overriding, resetting, or cancelling out the physics engine's own effect; it doesn't need textbook precision.",
+        "points": 1
+      },
+      {
+        "id": "q2-applyforce-scenario",
+        "title": "Q2: Describes a real scenario where applyForce is the better tool",
+        "description": "Student names a concrete scenario (wind, thrust, a magnet, a continuous push layered on top of gravity, etc.) where applyForce is the better tool, and gives a reason: it respects mass and adds to existing motion instead of replacing it. Credit any concrete scenario with a reason attached, even loosely worded.",
+        "points": 1
+      },
+      {
+        "id": "writing-clarity",
+        "title": "Writing clarity",
+        "description": "Response is clearly organized and easy to follow. Deduct this point only for significant issues: incoherent structure, or writing that makes it difficult to assess the content. Do not deduct for length.",
+        "points": 1
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": [
+      "physics"
+    ]
+  },
   "5-3-32-a12-2-oop-writeup": {
     "lessonTitle": "5.4.19 Procedural vs OOP Writeup",
     "prompt": "Answer all four questions. Questions 1 and 4 come from the readings; questions 2 and 3 come from code you have written yourself. Your own everyday words throughout: do not copy definitions from the internet.\n\nQuestion 1: Definitions in your own words. What does procedural programming mean? What does object-oriented programming mean? (1.4.8 for procedural; 5.3.3, 5.4.14 and the side-by-side worked example in 5.4.15 for object-oriented)\n\nQuestion 2: A specific procedural example from your first-quarter code (Units 1 to 3, before moSHion). Name a specific assignment or program you wrote then that used a procedural approach, and describe it in one or two sentences. Name the assignment.\n\nQuestion 3: A specific moSHion OOP example. Name a specific place in your moSHion code: the A12.1 Collectible class, or an earlier class you wrote: where you used OOP. Describe how the class organised your code: what data and what behaviour did it group together? (5.3.7 and 5.4.1)\n\nQuestion 4: When OOP wins. Describe one situation, hypothetical is fine, where OOP is clearly the better choice than procedural code. Explain why, using at least one of these: readability, extensibility, or keeping data and behaviour together. (5.4.16 and 5.4.17)",
@@ -3238,33 +2948,5 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
-  },
-  "5-2-14-a5-2-2-vel-vs-applyforce": {
-    "lessonTitle": "5.2.14 Vel vs applyForce",
-    "prompt": "Everything you need is in 5.2.8 (Reading: Forces vs Velocity) and 5.2.9 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.8, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.8 and 5.2.9)",
-    "rubric": [
-      {
-        "id": "q1-fight-explanation",
-        "title": "Q1: Explains why .vel fights the physics engine",
-        "description": "Student explains that setting .vel directly every frame overrides whatever the physics engine (gravity, applyForce, collisions) already computed for that sprite that frame, so the engine's own influence gets thrown away and re-imposed instead of blending with it. Accept any everyday phrasing of overriding, resetting, or cancelling out the physics engine's own effect; it doesn't need textbook precision.",
-        "points": 1
-      },
-      {
-        "id": "q2-applyforce-scenario",
-        "title": "Q2: Describes a real scenario where applyForce is the better tool",
-        "description": "Student names a concrete scenario (wind, thrust, a magnet, a continuous push layered on top of gravity, etc.) where applyForce is the better tool, and gives a reason: it respects mass and adds to existing motion instead of replacing it. Credit any concrete scenario with a reason attached, even loosely worded.",
-        "points": 1
-      },
-      {
-        "id": "writing-clarity",
-        "title": "Writing clarity",
-        "description": "Response is clearly organized and easy to follow. Deduct this point only for significant issues: incoherent structure, or writing that makes it difficult to assess the content. Do not deduct for length.",
-        "points": 1
-      }
-    ],
-    "model": "glm-5.3-flash:cloud",
-    "contextDocs": [
-      "physics"
-    ]
   }
 };

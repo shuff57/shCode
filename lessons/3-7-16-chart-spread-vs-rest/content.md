@@ -1,52 +1,36 @@
-## Chart the Code: Spread vs. Rest, Side by Side
+## Plain English to Pseudocode: Spread vs. Rest, Side by Side
 
 **What you'll practise:**
-- Reading `...` in two places and telling which direction it points
-- Charting a loop that gathers a variable number of arguments
-- The same loop shape reused for a call that unpacks an array
+- Turning plain English into exact, numbered steps
+- Writing a loop out as `FOR EACH ... END FOR`
+- Reading a flow chart and matching each box to a step
 
-The three dots mean opposite things depending on where they sit. Inside a **definition**, `...numbers` gathers arguments into an array. At a **call**, `...values` unpacks an array into arguments. The code below shows both directions in one function.
+### The plan, in plain English
 
-### The code
+1. Start the running total, `sum`, at 0.
+2. Go through the numbers one at a time.
+3. For each number, add it to `sum`.
+4. When there are no more numbers, give back `sum`.
 
-```js
-function total(...numbers) {
-  let sum = 0;
-  for (let i = 0; i < numbers.length; i++) {
-    sum = sum + numbers[i];
-  }
-  return sum;
-}
+This is the **body of `total`**: the part that runs once the arguments have arrived. `total(5, 5)` and `total(...scores)` both end up here.
 
-const scores = [1, 2, 3];
-console.log(total(5, 5));
-console.log(total(...scores));
-```
+The same plan is drawn as a flow chart above the editor. You do not draw it, you **read** it.
 
-### What to draw
+### What to write
 
-Chart the **body of `total`** — the part that runs once the arguments have arrived. The two calls at the bottom are just different ways of supplying the same array, so they share one chart.
+Open `README.md` and type directly into it, no comment marks needed. The first and last lines are already there. Write your steps **between** them and number every one.
 
-| Shape | Use it for |
+| Write this | Use it for |
 |---|---|
-| **Start / End** (oval) | One of each |
-| **Task** (rectangle) | Starting `sum` at 0, and adding each number to it |
-| **Loop setup** (hexagon: press **+ more shapes**) | The `for` header: the next index, or "past the end" |
-| **Decision** (diamond) | "Is there another number?" Ask it this way, so `yes` means keep going and `no` means done |
-| **Input / Output** (parallelogram) | The `return sum` at the end |
-
-At least seven shapes, at least one diamond.
-
-### The arrows that matter
-
-1. **The `yes` arrow** from the diamond goes to "add `numbers[i]` to sum".
-2. **The `no` arrow** skips the adding and joins the path to the return, because once the array is exhausted the answer is ready.
-3. **The loop-back arrow** lands on the hexagon, not the diamond: the counter has to advance and be re-checked.
+| `SET sum TO 0` | a plain step that changes something |
+| `FOR EACH number IN numbers` ... `END FOR` | the loop, with the steps inside it indented |
+| `SET sum TO sum + number` | one step inside the loop |
+| `RETURN sum` | handing the answer back, once, after the loop |
 
 ### The point of the lesson
 
-The chart is the **same** whether the caller wrote `total(5, 5)` or `total(...scores)`. Spread at the call site changes only how the array reaches `numbers`; the gathering loop inside is identical either way. That is why the two directions share one picture: one is the doorway, the other is the room.
+Your steps are the **same** whether the caller wrote `total(5, 5)` or `total(...scores)`. Spread at the call site changes only how the array reaches `numbers`; the gathering loop inside is identical either way. One is the doorway, the other is the room. And the `RETURN` goes **after** `END FOR`: a return inside the loop would hand back the answer after the first number.
 
 ### Before you submit
 
-Press **Check my diagram**, then trace it by hand: `total(1, 2, 3)` should reach the return with `sum` equal to **6**. Follow your arrows and do the addition yourself. If you do not land on 6, fix the chart even if every check is green.
+Check that all six requirements are green, then: Trace `total(1, 2, 3)` by hand. It should reach `RETURN` with `sum` equal to **6**. Follow your own steps and do the addition yourself. If you do not land on 6, fix the steps even if every check is green.
