@@ -63,7 +63,7 @@
       "description": "It should say Savings: 40. Help: 2.4.13 (Skipping a Round with continue)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+savings\\s*=\\s*0\\s*;[\\s\\S]*?for\\s*\\([^)]*\\)\\s*\\{(?!(?:[\\s\\S]*?continue[\\s\\S]*?savings\\s*(?:\\+=|=\\s*savings\\s*\\+)))[\\s\\S]*?savings\\s*(?:\\+=\\s*[\\w$.]+|=\\s*savings\\s*\\+\\s*[\\w$.]+)[\\s\\S]*?continue\\s*;",
+      "pattern": "(?:(?:let|const)\\s+savings\\s*=\\s*0\\s*;[\\s\\S]*?for\\s*\\([^)]*\\)\\s*\\{(?!(?:[\\s\\S]*?continue[\\s\\S]*?savings\\s*(?:\\+=|=\\s*savings\\s*\\+)))[\\s\\S]*?savings\\s*(?:\\+=\\s*[\\w$.]+|=\\s*savings\\s*\\+\\s*[\\w$.]+)[\\s\\S]*?continue\\s*;)|(?:for\\s*\\([^)]*\\)\\s*\\{(?=(?:(?!continue|while\\s*\\()[\\s\\S])*?\\bsavings\\s*(?:\\+=|=\\s*savings\\s*\\+))(?=(?:(?!continue|while\\s*\\()[\\s\\S])*?!==?\\s*3))",
       "flags": "",
       "points": 0,
       "hint": "`continue` jumps straight to the next round, so anything written after it is skipped on the rounds that take it — and week 3 takes it. Put the line that has to happen every week above the `continue`, then press Run."
@@ -74,7 +74,7 @@
       "description": "The walking log never prints a line and the run is stopped. It should print Week 1, Week 3 and Week 5. Help: 2.4.16 (The continue Trap in a while Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\([\\s\\S]*?\\)\\s*\\{[\\s\\S]*?\\bi\\s*(?:\\+\\+|\\+=\\s*1|=\\s*i\\s*\\+\\s*1)\\s*;[\\s\\S]*?continue\\s*;",
+      "pattern": "(?:while\\s*\\([\\s\\S]*?\\)\\s*\\{[\\s\\S]*?\\bi\\s*(?:\\+\\+|\\+=\\s*1|=\\s*i\\s*\\+\\s*1)\\s*;[\\s\\S]*?continue\\s*;)|(?:while\\s*\\([^)]*\\)\\s*\\{\\s*(?:i\\s*(?:\\+\\+|\\+=\\s*1|=\\s*i\\s*\\+\\s*1)|\\+\\+\\s*i)\\s*;)",
       "flags": "",
       "points": 0,
       "hint": "In a while loop, `continue` jumps back to the condition — past the line that moves the counter. So the counter never changes and the loop asks the same question forever. Put the line that moves it above the `continue`, then press Run."
