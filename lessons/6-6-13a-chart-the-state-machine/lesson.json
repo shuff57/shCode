@@ -22,10 +22,10 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs.\n\n**2.** In the title state: draw the title screen, then if space was pressed, change the state to play.\n\n**3.** In the play state: update the game, then if the player is dead, change the state to gameover.\n\n**4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title.\n\n**5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for the three drawing and updating methods, and SET for a state change. Number every line, including the indented ones and the END IF lines. Each keyword looks like this:\n\n- `IF state is \"title\"` ... `ELSE IF state is \"play\"` ... `END IF` (route by state)\n- `CALL drawTitle` (call another function)\n- `IF space is pressed` ... `END IF` (the check to leave the state)\n- `SET state TO \"play\"` (a state change)\n\nEvery state draws **first** and only then asks whether to leave. Afterwards, read your plan as a map: is there any way from play back to title without dying? There is not, and you found it by reading. That may be fine.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs.\n\n**2.** In the title state: draw the title screen, then if space was pressed, change the state to play.\n\n**3.** In the play state: update the game, then if the player is dead, change the state to gameover.\n\n**4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title.\n\n**5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for drawing and updating, and SET for a state change. Name the three calls `drawTitle`, `updateGame` and `drawGameOver`. Number every line, including the indented ones and the END IF lines. Each keyword looks like this, in a different program:\n\n- `IF mode is \"menu\"` ... `ELSE IF mode is \"game\"` ... `END IF` (route by a value)\n- `CALL drawMenu` (call another function)\n- `IF enter is pressed` ... `END IF` (the check to leave)\n- `SET mode TO \"game\"` (a state change)\n\nEvery state draws **first** and only then asks whether to leave. Afterwards, read your plan as a map: is there any way from play back to title without dying? There is not, and you found it by reading. That may be fine.",
       "hints": [
         "A state does its drawing first, then asks whether to leave. If you flip that, the frame where the player dies never draws.",
-        "The three states are one chain: IF, then ELSE IF, then ELSE IF, then one END IF. Separate IFs would let the state change mid-frame."
+        "The three states are one chain, not three separate decisions: separate IFs would let the state change mid-frame."
       ]
     }
   ],
@@ -45,66 +45,66 @@
     {
       "id": "r2",
       "title": "One chain: title, then play, then gameover",
-      "description": "IF for title, ELSE IF for play, ELSE IF for gameover.",
+      "description": "The three states are tested in one chain.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?title[\"\\']?[\\s\\S]*?\\b(?:ELSE\\s*IF|ELIF)\\b[^\\n]*\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?[\\s\\S]*?\\b(?:ELSE\\s*IF|ELIF)\\b[^\\n]*\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?gameover[\"\\']?",
-      "hint": "Route with one chain: IF state is \"title\", then ELSE IF state is \"play\", then ELSE IF state is \"gameover\". Do not use three separate IFs.",
+      "hint": "Route with one chain: an IF for the title state, then ELSE IF for play, then ELSE IF for gameover. Do not use three separate IFs.",
       "points": 0
     },
     {
       "id": "r3",
-      "title": "Title: draw, then check space, then play",
-      "description": "CALL drawTitle, then IF space is pressed, then SET state TO \"play\".",
+      "title": "Title: draw, then check the key, then change state",
+      "description": "The title branch draws, then checks for space, then changes the state.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?title[\"\\']?[\\s\\S]*?\\bCALL\\s+drawTitle\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bspace(?:bar)?\\b[\\s\\S]*?\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?play[\"\\']?",
-      "hint": "In the title state: CALL drawTitle first, then IF space is pressed, then SET state TO \"play\" inside it.",
+      "hint": "In the title state, draw first, then check whether to leave, then change the state inside that check. Use the call name from the Steps.",
       "points": 0
     },
     {
       "id": "r4",
-      "title": "Play: update, then check dead, then gameover",
-      "description": "CALL updateGame, then IF the player is dead, then SET state TO \"gameover\".",
+      "title": "Play: update, then check for death, then change state",
+      "description": "The play branch updates the game, then checks if the player is dead, then changes the state.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?[\\s\\S]*?\\bCALL\\s+updateGame\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*(?:dead|dies|health|lives)[\\s\\S]*?\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?gameover[\"\\']?",
-      "hint": "In the play state: CALL updateGame first, then IF the player is dead, then SET state TO \"gameover\" inside it.",
+      "hint": "In the play state, update first, then check whether the player is dead, then change the state inside that check.",
       "points": 0
     },
     {
       "id": "r5",
-      "title": "Gameover: draw, then check r, then title",
-      "description": "CALL drawGameOver, then IF r is pressed, then SET state TO \"title\".",
+      "title": "Gameover: draw, then check the key, then change state",
+      "description": "The gameover branch draws, then checks for r, then changes the state.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?gameover[\"\\']?[\\s\\S]*?\\bCALL\\s+drawGameOver\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\br\\b[\\s\\S]*?\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?title[\"\\']?",
-      "hint": "In the gameover state: CALL drawGameOver first, then IF r is pressed, then SET state TO \"title\" inside it.",
+      "hint": "In the gameover state, draw first, then check whether to leave, then change the state inside that check.",
       "points": 0
     },
     {
       "id": "r6",
       "title": "Three state changes, and nothing jumps",
-      "description": "Three SET state lines, and no GO TO or loop back. A state change just sets a variable.",
+      "description": "One state change per transition, and no GO TO or loop back.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "^(?![\\s\\S]*(?:(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*(?:BACK\\s*)?TO|GOTO|JUMP\\s+(?:BACK\\s+)?TO|LOOP\\s+BACK|START\\s+OVER)\\b|\\b(?:step|line)\\s+\\d+\\b))(?=(?:[\\s\\S]*\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)){3})[\\s\\S]*",
-      "hint": "Write three SET state TO lines, one per transition. Do not write GO TO or LOOP BACK: changing the state does not jump, the frame just ends.",
+      "hint": "Write one state change for each of the three transitions. Do not write GO TO or LOOP BACK: changing the state does not jump, the frame just ends.",
       "points": 0
     }
   ],
   "planChart": {
-    "mermaid": "flowchart LR\n  A([draw runs]) --> B{state is title}\n  B -- yes --> C[[drawTitle]]\n  C --> D{space pressed}\n  D -- yes --> E[state = play]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F{state is play}\n  F -- yes --> G[[updateGame]]\n  G --> H{player dead}\n  H -- yes --> I[state = gameover]\n  H -- no --> Z\n  I --> Z\n  F -- no --> M{state is gameover}\n  M -- yes --> J[[drawGameOver]]\n  M -- no --> Z\n  J --> K{r pressed}\n  K -- yes --> L[state = title]\n  K -- no --> Z\n  L --> Z",
+    "mermaid": "flowchart LR\n  A([draw runs]) --> B{in the title state?}\n  B -- yes --> C[[draw the title screen]]\n  C --> D{space pressed?}\n  D -- yes --> E[switch to play]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F{in the play state?}\n  F -- yes --> G[[update the game]]\n  G --> H{player dead?}\n  H -- yes --> I[switch to gameover]\n  H -- no --> Z\n  I --> Z\n  F -- no --> M{in the gameover state?}\n  M -- yes --> J[[draw the game over screen]]\n  M -- no --> Z\n  J --> K{r pressed?}\n  K -- yes --> L[switch to title]\n  K -- no --> Z\n  L --> Z",
     "caption": "One frame of draw(): route by state, draw first, then check whether to leave. Every path reaches the end of the frame."
   }
 }

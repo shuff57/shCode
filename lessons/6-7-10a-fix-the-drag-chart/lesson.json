@@ -22,65 +22,65 @@
     {
       "id": "s1",
       "title": "Repair the half-finished pseudocode",
-      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** While the mouse is pressing: if the sprite is under the mouse, move the sprite to the mouse.\n\n**2.** When the mouse is not pressing (it was let go): set the sprite velocity to zero, so it does not fly off.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone charted picking the sprite up carefully, and stopped. Their pseudocode is already in `README.md`. **Press Run before changing anything**: three checks should be red. Then repair it, do not start over:\n\n- Give `IF mouse is pressing` an **ELSE**: the release path.\n- Move `SET velocity TO zero` into that ELSE. It belongs on exactly the frames where the mouse is up.\n- Remove the **GO TO**. Moving a sprite is one ordinary step per frame: the loop you are thinking of is `draw()` running again, outside this plan.\n\nWhen it is green, trace this: the player presses the mouse somewhere empty, then drags across the sprite while still holding. Does your plan pick it up mid-drag? Should it?",
+      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** While the mouse is pressing: if the sprite is under the mouse, move the sprite to the mouse.\n\n**2.** When the mouse is not pressing (it was let go): set the sprite velocity to zero, so it does not fly off.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone charted picking the sprite up carefully, and stopped. Their pseudocode is already in `README.md`. **Press Run before changing anything**: three checks should be red. Read each red card against the plan above, then repair it. Do not start over. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first.\n\nRenumber the lines if you like: every line just needs a number.\n\nWhen it is green, trace this: the player presses the mouse somewhere empty, then drags across the sprite while still holding. Does your plan pick it up mid-drag? Should it?",
       "hints": [
-        "A sprite dragged around has picked up speed. If you let go without zeroing it, it flies off, so the velocity reset belongs on the release path.",
-        "Delete the GO TO line. The loop that repeats is draw() itself, not a line in this plan."
+        "A sprite dragged around has picked up speed. What should happen to that speed when you let go?",
+        "The loop that repeats is draw() itself, not a line in this plan."
       ]
     }
   ],
   "requirements": [
     {
       "id": "r1",
-      "title": "Pressing has an ELSE (the release path)",
-      "description": "An ELSE branch for every frame where the mouse is not pressing, lined up with that decision.",
+      "title": "The frames where the mouse is up are handled",
+      "description": "The pressing decision has a branch for when the mouse is not pressing.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bmouse\\b[^\\n]*\\bpressing\\b(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bEND\\s*IF\\b(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bELSE\\b",
-      "hint": "Give IF mouse is pressing an ELSE branch: the frames where the mouse is up. The ELSE comes after the END IF of the inner IF, so it lines up with IF mouse is pressing.",
+      "pattern": "\\bmouse\\b[^\\n]*\\bpress(?:ing|ed)\\b(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bEND\\s*IF\\b(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bELSE\\b",
+      "hint": "The frames where the mouse is up need their own branch (ELSE). Check where it sits: the inner decision closes first, then the ELSE belongs to the pressing decision.",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "The velocity reset is in the ELSE",
-      "description": "SET velocity TO zero after the ELSE, so it runs only on release.",
+      "title": "The velocity reset happens on release only",
+      "description": "The velocity is zeroed only on the frames where the mouse is up.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bELSE\\b[\\s\\S]*\\bSET\\s+(?:the\\s+)?(?:sprite\\s+)?velocity\\s+TO\\s+(?:0|zero)\\b",
-      "hint": "Move SET velocity TO zero under the ELSE. A sprite still being dragged must not have its velocity zeroed.",
+      "hint": "A sprite still being dragged must not have its velocity zeroed. Which frames should do that?",
       "points": 0
     },
     {
       "id": "r3",
-      "title": "No step jumps back to itself",
-      "description": "No GO TO or loop back. Moving the sprite is one ordinary step.",
+      "title": "Every step moves forward",
+      "description": "No step sends you back to an earlier step. Moving the sprite is one ordinary step per frame.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "^(?![\\s\\S]*(?:(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*(?:BACK\\s*)?TO|GOTO|JUMP\\s+(?:BACK\\s+)?TO|LOOP\\s+BACK|START\\s+OVER)\\b|\\b(?:step|line)\\s+\\d+\\b))[\\s\\S]*\\bSET\\s+[^\\n]*\\bmouse\\b",
-      "hint": "Delete the GO TO line. The sprite moves once per frame, then the frame goes on to the end.",
+      "hint": "Look for a step that sends the flow back to itself: that is a hung game, written down.",
       "points": 0
     },
     {
       "id": "r4",
       "title": "Moving the sprite needs the sprite under the mouse",
-      "description": "SET the sprite to the mouse inside IF sprite is under the mouse.",
+      "description": "The sprite follows the mouse only inside the check for the sprite being under it.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\b(?:under|hover\\w*|touch\\w*|over)\\b[^\\n]*\\n(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bSET\\s+[^\\n]*\\bmouse\\b",
-      "hint": "Move the sprite to the mouse inside IF sprite is under the mouse.",
+      "hint": "The sprite should follow the mouse only when the check about the sprite and the mouse is true.",
       "points": 0
     }
   ],
   "planChart": {
-    "mermaid": "flowchart LR\n  A([draw runs]) --> B{mouse pressing}\n  B -- yes --> C{sprite under the mouse}\n  C -- yes --> D[move sprite to the mouse]\n  C -- no --> Z([end of frame])\n  D --> Z\n  B -- no --> E[set velocity to zero]\n  E --> Z",
+    "mermaid": "flowchart LR\n  A([draw runs]) --> B{mouse pressing?}\n  B -- yes --> C{sprite under the mouse?}\n  C -- yes --> D[move the sprite to the mouse]\n  C -- no --> Z([end of frame])\n  D --> Z\n  B -- no --> E[stop the sprite moving]\n  E --> Z",
     "caption": "The finished drag. Releasing has its own branch, and the velocity reset sits on it."
   }
 }

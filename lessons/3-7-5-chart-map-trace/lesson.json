@@ -15,7 +15,7 @@
   "points": 0,
   "contentFile": "content.md",
   "planChart": {
-    "mermaid": "flowchart LR\n  A([Start]) --> B[withTax = empty list]\n  B --> C{{for each price in prices}}\n  C --> D{is there another price?}\n  D -- yes --> E[add price * 1.08 to withTax]\n  E --> C\n  D -- no --> F[/print withTax/]\n  F --> Z([End])",
+    "mermaid": "flowchart LR\n  A([Start]) --> B[start an empty list]\n  B --> C{{go through the prices}}\n  C --> D{is there another price?}\n  D -- yes --> E[add the taxed price to the list]\n  E --> C\n  D -- no --> F[/show the list/]\n  F --> Z([End])",
     "caption": "map as a loop: the yes branch adds one taxed price and goes back to the loop setup, and only the no branch reaches the print."
   },
   "grading": {
@@ -28,7 +28,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Start with an empty list called `withTax`.\n\n**2.** Go through the prices one at a time.\n\n**3.** For each price, multiply it by 1.08 and add the result to `withTax`.\n\n**4.** When there are no more prices, print `withTax`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. Each keyword looks like this:\n\n- `SET withTax TO an empty list` (a change)\n- `FOR EACH price IN prices` ... `END FOR` (the loop)\n- `ADD price * 1.08 TO withTax` (the step inside the loop)\n- `OUTPUT withTax` or `RETURN withTax` (the answer, after the loop)\n\nThe chart shows the shape.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Start with an empty list called `withTax`.\n\n**2.** Go through the prices one at a time.\n\n**3.** For each price, multiply it by 1.08 and add the result to `withTax`.\n\n**4.** When there are no more prices, print `withTax`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. Each keyword looks like this, in a different program:\n\n- `SET greeting TO \"Hello\"` (a change)\n- `FOR EACH name IN names` ... `END FOR` (the loop)\n- `ADD name TO roster` (a step inside the loop)\n- `OUTPUT roster` or `RETURN roster` (the answer, after the loop)\n\nThe chart shows the shape.",
       "hints": [
         "The loop is `FOR EACH ... END FOR`, and the steps inside it are indented.",
         "Whatever happens once the loop is over comes after END FOR, not inside it."
@@ -50,56 +50,56 @@
     },
     {
       "id": "r2",
-      "title": "Start withTax as an empty list, before the loop",
-      "description": "A step like `SET withTax TO an empty list`, before the `FOR EACH`.",
+      "title": "The list starts empty, before the loop",
+      "description": "withTax is started as an empty list, before the loop begins.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bwithTax\\s+(?:TO|=)\\s+(?:the\\s+)?(?:an?\\s+)?(?:new\\s+)?(?:empty\\s+)?(?:list|array|\\[\\s*\\])[\\s\\S]*\\bFOR\\s+EACH\\b",
-      "hint": "Start with SET withTax TO an empty list, and put it before the FOR EACH.",
+      "hint": "Start the list before the loop, for example SET names TO an empty list, using your own name for it.",
       "points": 0
     },
     {
       "id": "r3",
-      "title": "One loop over prices, opened with FOR EACH and closed with END FOR",
-      "description": "Exactly one `FOR EACH ... IN prices`, closed with `END FOR`.",
+      "title": "One loop over prices, closed",
+      "description": "Exactly one loop over prices, closed with END FOR.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?prices\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
-      "hint": "Use one FOR EACH price IN prices, and close it with one END FOR.",
+      "hint": "Use one FOR EACH over prices, and close it with one END FOR.",
       "points": 0
     },
     {
       "id": "r4",
       "title": "The taxed price is added inside the loop",
-      "description": "A step that adds `price * 1.08` to `withTax`, between `FOR EACH` and `END FOR`.",
+      "description": "Each pass adds the taxed price to withTax.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bFOR\\s+EACH\\s+(\\w+)\\b(?=\\s+(?:IN|OF)\\b)(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\b\\1\\b\\s*(?:\\*|times)\\s*1\\.08|1\\.08\\s*(?:\\*|times)\\s*\\b\\1\\b))(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\b(?:ADD|APPEND|PUSH)\\b[^\\n]*\\bwithTax\\b|\\bwithTax\\s+(?:TO|=)\\s+withTax\\s*\\+))",
-      "hint": "Between FOR EACH and END FOR, add price * 1.08 to withTax, using the same name you gave the loop. Each pass adds one entry.",
+      "hint": "Inside the loop, add the taxed price to withTax, using the same name you gave the loop. Each pass adds one entry.",
       "points": 0
     },
     {
       "id": "r5",
-      "title": "OUTPUT happens after END FOR",
-      "description": "Print `withTax` once the loop is over.",
+      "title": "The answer comes after the loop",
+      "description": "withTax is shown once the loop is over.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b[^\\n]*\\bwithTax\\b",
-      "hint": "Print or return withTax after END FOR, on the path taken once there are no more prices.",
+      "hint": "Show or return withTax after END FOR, on the path taken once there are no more prices.",
       "points": 0
     },
     {
       "id": "r6",
-      "title": "Nothing is printed inside the loop",
-      "description": "OUTPUT or RETURN comes after END FOR, not between FOR EACH and END FOR.",
+      "title": "Nothing is shown inside the loop",
+      "description": "The answer comes after END FOR, not between FOR EACH and END FOR.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
