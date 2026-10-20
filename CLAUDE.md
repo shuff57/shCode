@@ -579,8 +579,10 @@ Mermaid is a projection of it, so authors never hand-write JSON.
 Eight shapes: `terminal`, `process`, `decision`, `io` (the starter set the
 palette shows), plus `subroutine`, `preparation`, `connector`, `comment`
 behind **+ more shapes**. The Mermaid each maps to, the ```flow fence for
-readings and slides, and the `preview: "diagram"` assignment format are in
-`.claude/skills/flowchart-diagrams/SKILL.md`.
+readings and slides, and the `preview: "diagram"` assignment format live in
+`lib/diagram-mermaid.ts` (the mapping) and `scripts/check-flow-figures.mjs` (what a
+```flow fence may contain). A read-only reading figure is ```` ```flow readonly caption="Figure N: ..." ````;
+a lab's collapsed plan chart is `planChart: {mermaid}` in `lesson.json`.
 
 Two of those are not ordinary flow nodes, and `lib/diagram-check.ts` collapses
 the graph before any rule runs: a `comment` is dropped entirely (otherwise it

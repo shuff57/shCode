@@ -33,11 +33,11 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "for loop present",
-      "description": "Code contains a for loop. Help: 2.2.9 (The for Loop)",
+      "title": "A loop is present",
+      "description": "Code contains a for loop or a while loop. Help: 2.2.9 (The for Loop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(",
+      "pattern": "(?:for|while)\\s*\\(",
       "flags": "i",
       "points": 0
     },
