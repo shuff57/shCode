@@ -23,7 +23,7 @@
     {
       "id": "s1",
       "title": "Write the plan for your whole program",
-      "instructions": "Plan the **whole program** before writing any of it. **No JavaScript is written today.** The build lessons stay closed until this plan is green.\n\nFrom the project checklist, your program has to:\n\n- store at least five objects of your own design in an array\n- write a function of your own with at least 3 parameters\n- write a function of your own that returns a computed value, used elsewhere in the program\n- sort the array\n- read the array with a loop\n- make a decision with a conditional based on your data\n- save and load your data\n- print one formatted verdict line combining at least two things you calculated\n\nIn `README.md`, write the **main program** as numbered pseudocode **between START and END**: the sequence that runs when the page loads. Number every line, including the indented ones and the END lines. Each keyword looks like this:\n\n- `CALL loadQueue` (one line for each function you plan to write)\n- `IF there is a saved queue` ... `ELSE` ... `END IF` (a decision, with both ways out)\n- `FOR EACH order IN queue` ... `END FOR` (walking your array)\n- `OUTPUT the verdict line` (the printed result)\n\nThree rules make it a design. **One CALL per planned function, both directions**: every function you intend to write is on the plan, and every CALL becomes a real function. **Stay under twenty steps**: if you cannot, collapse a run of steps into a function and name it. **Do not write the function bodies**: only the main program.\n\nWhen you hand in the finished project, the plan comes with it and one thing is compared: does the code match the plan? You may change your mind. What is not allowed is silently abandoning the plan: update it and say in your README what changed and why.",
+      "instructions": "Plan the **whole program** before writing any of it. **No JavaScript is written today.** The build lessons stay closed until this plan is green.\n\nFrom the project checklist, your program has to:\n\n- store at least five objects of your own design in an array\n- write a function of your own with at least 3 parameters\n- write a function of your own that returns a computed value, used elsewhere in the program\n- sort the array\n- read the array with a loop\n- make a decision with a conditional based on your data\n- save and load your data\n- print one formatted verdict line combining at least two things you calculated\n\nIn `README.md`, write the **main program** as numbered pseudocode **between START and END**: the sequence that runs when the page loads. Number every line, including the indented ones and the END lines. Each keyword looks like this:\n\n- `CALL loadRecipes` (one line for each function you plan to write)\n- `IF there is a saved recipe list` ... `ELSE` ... `END IF` (a decision, with both ways out)\n- `FOR EACH recipe IN recipes` ... `END FOR` (walking your array)\n- `OUTPUT the verdict line` (the printed result), written for your own program\n\nThree rules make it a design. **One CALL per planned function, both directions**: every function you intend to write is on the plan, and every CALL becomes a real function. **Stay under twenty steps**: if you cannot, collapse a run of steps into a function and name it. **Do not write the function bodies**: only the main program.\n\nWhen you hand in the finished project, the plan comes with it and one thing is compared: does the code match the plan? You may change your mind. What is not allowed is silently abandoning the plan: update it and say in your README what changed and why.",
       "hints": [
         "Every function you plan to write is one CALL line. Do not write what is inside it.",
         "A decision needs both ways out: an IF with an ELSE."
@@ -52,7 +52,7 @@
       "stripComments": false,
       "flags": "i",
       "pattern": "(?<!\\bEND\\s*)\\bIF\\b[\\s\\S]*\\bELSE\\b[\\s\\S]*\\bEND\\s*IF\\b",
-      "hint": "Add a decision, for example \"is there saved data?\": IF ... ELSE ... END IF. A decision with one exit is only half a decision.",
+      "hint": "Add a decision your program makes, for example \"is there saved data?\": IF ... ELSE ... END IF. A decision with one exit is only half a decision.",
       "points": 0
     },
     {
@@ -88,7 +88,7 @@
       "stripComments": false,
       "flags": "i",
       "pattern": "^(?=[\\s\\S]*\\bCALL\\s+(?!\\w*(?:save|store|load|restore|read))\\w*(?:sort|rank)\\w*)(?=[\\s\\S]*\\bCALL\\s+(?!\\w*(?:sort|rank|load|restore|read))\\w*(?:save|store)\\w*)[\\s\\S]*\\bCALL\\s+(?!\\w*(?:sort|rank|save|store))\\w*(?:load|restore|read)\\w*",
-      "hint": "Plan three separate CALLs: one for sorting, one for saving and one for loading, for example CALL sortByPriority, CALL saveQueue, CALL loadQueue.",
+      "hint": "Plan three separate CALLs: one that sorts, one that saves and one that loads, each named for your own data.",
       "points": 0
     },
     {

@@ -22,66 +22,66 @@
     {
       "id": "s1",
       "title": "Repair the half-finished pseudocode",
-      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** When the state is play: update the game, and if p was pressed, change the state to paused.\n\n**2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Then repair it, do not start over:\n\n- Give the play decision its own **ELSE** branch, for every frame that is not playing. The ELSE comes after the inner `END IF` and lines up with `IF state is \"play\"`, and the last `END IF` closes the whole thing.\n- Move `CALL drawPauseScreen` into that branch so it runs only when paused.\n- Remove the **GO TO**. Setting a state is an ordinary step: the frame carries on to the end.\n- Inside the ELSE branch, add the way out: if p is pressed, SET state TO \"play\".\n\nRenumber the lines if you like: every line just needs a number. When it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.",
+      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** When the state is play: update the game, and if p was pressed, change the state to paused.\n\n**2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Read each red card against the plan above, then repair it. Do not start over. The call names are `updateGame` and `drawPauseScreen`. Renumber the lines if you like: every line just needs a number.\n\nWhen it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.",
       "hints": [
-        "A step that jumps back to itself is a hung game, written down. Delete the GO TO line.",
-        "The ELSE branch runs on every frame that is not playing, so that is where drawPauseScreen belongs."
+        "A step that jumps back to itself is a hung game, written down.",
+        "Think about which frames the pause screen should run on."
       ]
     }
   ],
   "requirements": [
     {
       "id": "r1",
-      "title": "The play decision has an ELSE",
-      "description": "An ELSE branch for every frame that is not playing, lined up with the play decision.",
+      "title": "Every frame that is not playing is handled",
+      "description": "The play decision has a branch for the frames when the game is not playing.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\bstate\\s*(?:is|==|===|=|equals)\\s*[\"\\']?play[\"\\']?(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\bEND\\s*IF\\b(?:(?!\\bEND\\s*IF\\b)[\\s\\S])*?\\b(?:ELSE|OTHERWISE)\\b",
-      "hint": "Give the IF state is \"play\" an ELSE branch for the frames when the game is not playing. The ELSE comes after the END IF of the inner IF p, so it lines up with IF state is \"play\".",
+      "hint": "Frames that are not playing need their own branch. Check where it sits: it should line up with the play decision, after the inner END IF.",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "drawPauseScreen is in the ELSE branch",
-      "description": "CALL drawPauseScreen after the ELSE, so it runs only when paused.",
+      "title": "The pause screen is drawn only when paused",
+      "description": "The call to drawPauseScreen runs only on the paused frames.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\b(?:ELSE|OTHERWISE)\\b[\\s\\S]*\\bCALL\\s+drawPauseScreen\\b[\\s\\S]*\\bEND\\s*IF\\b",
-      "hint": "Move CALL drawPauseScreen under the ELSE, so it floats nowhere and runs only on the paused frames.",
+      "hint": "The pause screen should be drawn only on paused frames. Where does that put the call?",
       "points": 0
     },
     {
       "id": "r3",
-      "title": "No step jumps back to itself",
-      "description": "No GO TO or loop back. A state change is an ordinary step.",
+      "title": "Every step moves forward",
+      "description": "No step sends you back to an earlier step. A state change is an ordinary step.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "^(?![\\s\\S]*(?:(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?(?:GO\\s*(?:BACK\\s*)?TO|GOTO|JUMP\\s+(?:BACK\\s+)?TO|LOOP\\s+BACK|START\\s+OVER)\\b|\\b(?:step|line)\\s+\\d+\\b))[\\s\\S]*\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?paused",
-      "hint": "Delete the GO TO line. Setting the state does its one job, then the frame goes on to the end.",
+      "hint": "Look for a step that sends the flow back to itself: that is a hung game, written down.",
       "points": 0
     },
     {
       "id": "r4",
-      "title": "A way out of pause",
-      "description": "In the ELSE branch, IF p is pressed then SET state TO \"play\".",
+      "title": "The player can leave pause",
+      "description": "The paused branch checks for p and goes back to play.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
       "pattern": "\\b(?:ELSE|OTHERWISE)\\b[\\s\\S]*?(?<!\\bEND\\s*)\\bIF\\b[^\\n]*\\bp\\b[\\s\\S]*?\\bSET\\s+(?:the\\s+)?state\\s+(?:TO|=)\\s+[\"\\']?play[\"\\']?",
-      "hint": "In the ELSE branch add IF p is pressed, with SET state TO \"play\" inside it, so the player can leave pause.",
+      "hint": "A paused game needs a way back to playing. What should the paused frames check for?",
       "points": 0
     },
     {
       "id": "r5",
-      "title": "Pausing sits inside the p check",
-      "description": "SET state TO \"paused\" is inside an IF p is pressed.",
+      "title": "Pausing needs a key press",
+      "description": "The change to paused sits inside the check for p.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
@@ -93,7 +93,7 @@
     {
       "id": "r6",
       "title": "Playing updates the game",
-      "description": "CALL updateGame in the play branch, before the ELSE.",
+      "description": "The play branch updates the game, and the paused frames do not.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
@@ -104,7 +104,7 @@
     }
   ],
   "planChart": {
-    "mermaid": "flowchart LR\n  A([draw runs]) --> B{state is play}\n  B -- yes --> C[[updateGame]]\n  C --> D{p pressed}\n  D -- yes --> E[state = paused]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F[[drawPauseScreen]]\n  F --> G{p pressed}\n  G -- yes --> H[state = play]\n  G -- no --> Z\n  H --> Z",
+    "mermaid": "flowchart LR\n  A([draw runs]) --> B{is the game playing?}\n  B -- yes --> C[[update the game]]\n  C --> D{p pressed?}\n  D -- yes --> E[switch to paused]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F[[draw the pause screen]]\n  F --> G{p pressed?}\n  G -- yes --> H[switch to play]\n  G -- no --> Z\n  H --> Z",
     "caption": "The finished pause feature. The not-playing branch draws the pause screen and has a way back to play."
   }
 }
