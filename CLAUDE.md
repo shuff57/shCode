@@ -616,6 +616,18 @@ which is what gives `routeEdge` a side to route to. Back edges get no vote on
 either rank or column; before that fix, a loop's return arrow dragged its own
 body to the bottom of the canvas and the chart appeared to run upward.
 
+## AI check on a pseudocode lab (`aiCheck`)
+
+A plain-English-to-pseudocode lab can carry `aiCheck` in `lesson.json` (`lib/ai-check.ts`, 3.7.5 so far):
+a "Grade with AI" button above the editor sends the file to `POST /api/grade-written` and lays each
+criterion's verdict over the Quest card with the same id (only a clear `met` turns a card green). It is
+deliberately NOT `aiGrader`: that field makes a lesson a scored written part in the manifest, gradebook
+and attempt caps. `generate-ai-graders.mjs` collects `aiCheck` into the same server-side config, so the
+rubric and prompt are read by lesson id and the route's quota applies (shared with the tutor, 30 a day).
+The prompt and rubric text do ship to the browser (nothing redacts a formative lab); that is fine for a
+0-point practice check. Editing the file clears the AI's marks and the regex check owns the cards again.
+Submit records the cards as shown. Tests: `scripts/test-ai-check.mjs`.
+
 ## Ollama grader
 
 The essay grader at `POST /api/grade-written` calls `https://ollama.com/api/chat`

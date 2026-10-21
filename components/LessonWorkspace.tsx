@@ -9,6 +9,7 @@ import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
+import { applyAiVerdicts, reportFromRequirements, verdictsFromCriteria, type AiVerdicts } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import AiGradeResultPanel, { type AiGradeResultData } from './AiGradeResultPanel';
@@ -159,6 +160,14 @@ export default function LessonWorkspace({
   const [aiStage, setAiStage] = useState<string | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
   const [gradeReport, setGradeReport] = useState<GradeReportType | null>(null);
+  // "Grade with AI" on a plain-English-to-pseudocode lab (lesson.aiCheck, lib/ai-check.ts). The
+  // verdicts are laid over the Quest cards and kept only while the file still reads exactly as it
+  // did when it was graded: edit a word and the regex check owns the cards again.
+  const aiCheck = lesson.aiCheck;
+  const aiCheckFile = aiCheck?.file ?? 'README.md';
+  const [aiCheckBusy, setAiCheckBusy] = useState(false);
+  const [aiCheckNote, setAiCheckNote] = useState<{ kind: 'ok' | 'error'; text: string; hints?: string[] } | null>(null);
+  const aiVerdictsRef = useRef<{ verdicts: AiVerdicts; text: string } | null>(null);
   // Set true when an admin/teacher inserts the reference solution; pauses
   // localStorage autosave so their progress record stays clean. Cleared by
   // the Reset button (which also restores the starter).
@@ -684,8 +693,7 @@ export default function LessonWorkspace({
       lesson.grading?.passingScore || 0,
       context
     );
-    setRequirements(
-      lesson.requirements.map((r) => {
+    const merged = lesson.requirements.map((r) => {
         const result = report.results.find((d) => d.id === r.id);
         // A summative lesson's `pattern` is stripped from this copy
         // (lib/quiz-redact.ts), so the grader cannot check it and now fails
@@ -697,11 +705,54 @@ export default function LessonWorkspace({
         const patternCheck = !r.type || r.type === 'regex' || r.type === 'inFunction';
         if (patternCheck && !r.pattern) return { ...r };
         return { ...r, ...result };
-      })
-    );
+      });
+    const ai = aiVerdictsRef.current;
+    setRequirements(aiCheck && ai && ai.text === (files[aiCheckFile] ?? '') ? applyAiVerdicts(merged, ai.verdicts) : merged);
     setGradeReport(report);
     return report;
   }
+
+  // The AI's second opinion on the student's plain-English steps. The file goes to
+  // /api/grade-written, which reads the rubric by lesson id; each verdict then lands on the Quest
+  // card with the same id. Practice feedback only: nothing is scored or recorded here.
+  const runAiCheck = async () => {
+    if (!aiCheck || aiCheckBusy) return;
+    const text = files[aiCheckFile] ?? '';
+    setAiCheckBusy(true);
+    setAiCheckNote(null);
+    try {
+      const { status, data, network } = await streamGrade(
+        {
+          lessonId: lesson.id,
+          lessonTitle: lesson.title,
+          // The server reads the prompt and rubric by lessonId and ignores these.
+          prompt: '',
+          response: text,
+          rubric: aiCheck.rubric.map((r) => ({ id: r.id, title: r.title, points: r.points })),
+        },
+        () => {},
+      );
+      if (data === null || !data.ok) {
+        const kind = classifyGradeFailure(status, data, network);
+        setAiCheckNote({ kind: 'error', text: gradeFailureMessage({ kind, status, serverMessage: data?.error }) });
+        return;
+      }
+      const verdicts = verdictsFromCriteria(data.criteria ?? [], aiCheck.rubric.map((r) => r.id));
+      aiVerdictsRef.current = { verdicts, text };
+      setRequirements(applyAiVerdicts(useLessonStore.getState().requirements, verdicts));
+      const green = Object.values(verdicts).filter((v) => v.passed).length;
+      setAiCheckNote({
+        kind: 'ok',
+        text: `${data.summary ? data.summary + ' ' : ''}(${green} of ${aiCheck.rubric.length} green. Open Quest for the notes.)`.trim(),
+        hints: Array.isArray(data.hints) ? data.hints : [],
+      });
+    } catch (e) {
+      console.warn('[ai-check]', e);
+      setAiCheckNote({ kind: 'error', text: gradeFailureMessage({ kind: 'network' }) });
+    } finally {
+      setAiCheckBusy(false);
+    }
+  };
 
   const runClientGrade = useCallback(() => {
     const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals, testResults: testRunRef.current };
@@ -714,6 +765,18 @@ export default function LessonWorkspace({
     setGradeReport(report);
     return report;
   }, [lesson, files, latestModelDoc, latestRefusals]);
+
+  // The AI's marks describe the text it read. Change a word and they are stale: drop them and let
+  // the regex check own the cards again.
+  const aiCheckedText = files[aiCheckFile] ?? '';
+  useEffect(() => {
+    const ai = aiVerdictsRef.current;
+    if (!aiCheck || !ai || ai.text === aiCheckedText) return;
+    aiVerdictsRef.current = null;
+    setAiCheckNote(null);
+    runTests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aiCheck, aiCheckedText]);
 
   const handleCommit = async (message: string) => {
     try {
@@ -792,7 +855,8 @@ export default function LessonWorkspace({
       void runAiGrade();
       return;
     }
-    const report = runClientGrade();
+    // An aiCheck lab submits what the cards show, which may be the AI's verdicts.
+    const report = aiCheck ? reportFromRequirements(requirements) : runClientGrade();
     setGradeReport(report);
     setSubmitOpen(true);
   };
@@ -1053,6 +1117,42 @@ export default function LessonWorkspace({
       )}
       {lesson.planChart && (
         <LabPlanChart lessonId={lesson.id} mermaid={lesson.planChart.mermaid} caption={lesson.planChart.caption} />
+      )}
+      {aiCheck && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            flexWrap: 'wrap',
+            margin: '8px 0',
+            padding: '8px 12px',
+            border: '1px solid #44475a',
+            borderRadius: 6,
+          }}
+        >
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => void runAiCheck()}
+            disabled={aiCheckBusy || (files[aiCheckFile] ?? '').trim().length < 20}
+            title="Have the AI read your steps and mark the Quest cards green or red"
+          >
+            {aiCheckBusy ? 'Reading your steps…' : 'Grade with AI'}
+          </button>
+          <span style={{ fontSize: 14, color: '#8393c4', flex: '1 1 260px' }} role="status" aria-live="polite">
+            {aiCheckNote
+              ? aiCheckNote.text
+              : 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'}
+          </span>
+          {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
+            <ul style={{ flexBasis: '100%', margin: 0, paddingLeft: 20, fontSize: 14, color: '#8393c4' }}>
+              {aiCheckNote.hints.map((h, i) => (
+                <li key={i}>{h}</li>
+              ))}
+            </ul>
+          )}
+        </div>
       )}
       <div className="editor-card">
         <div className="editor-body">

@@ -28,7 +28,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Start with an empty list called `withTax`.\n\n**2.** Go through the prices one at a time.\n\n**3.** For each price, multiply it by 1.08 and add the result to `withTax`.\n\n**4.** When there are no more prices, print `withTax`.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: the loop is the hexagon and the diamond, and `FOR EACH` does both jobs, so the diamond has no line of its own.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. The loop is always `FOR EACH` here, even where earlier JavaScript used an index. Write multiplying with `*`. Each keyword looks like this, in a different program:\n\n- `SET greeting TO \"Hello\"` (a change)\n- `FOR EACH name IN names` ... `END FOR` (the loop)\n- `ADD name TO roster` (a step inside the loop)\n- `SET area TO width * height` (multiply with `*`)\n- `OUTPUT roster` or `RETURN roster` (the answer, after the loop)\n\nBefore you submit, trace `prices` holding `[10, 20, 30]` by hand: three passes, three entries added, and the answer shown once.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Start with an empty list called `withTax`.\n\n**2.** Go through the prices one at a time.\n\n**3.** For each price, multiply it by 1.08 and add the result to `withTax`.\n\n**4.** When there are no more prices, print `withTax`.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: the loop is the hexagon and the diamond, and `FOR EACH` does both jobs, so the diamond has no line of its own.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. The loop is always `FOR EACH` here, even where earlier JavaScript used an index. Write multiplying with `*`. Each keyword looks like this, in a different program:\n\n- `SET greeting TO \"Hello\"` (a change)\n- `FOR EACH name IN names` ... `END FOR` (the loop)\n- `ADD name TO roster` (a step inside the loop)\n- `SET area TO width * height` (multiply with `*`)\n- `OUTPUT roster` or `RETURN roster` (the answer, after the loop)\n\nPlain English is fine here. When you want a second opinion, press **Grade with AI** above the editor: it reads what your steps mean and marks the Quest cards green or red. Changing your text clears the AI's marks, and Run goes back to the quick pattern check.\n\nBefore you submit, trace `prices` holding `[10, 20, 30]` by hand: three passes, three entries added, and the answer shown once.",
       "hints": [
         "The loop is `FOR EACH ... END FOR`, and the steps inside it are indented.",
         "Whatever happens once the loop is over comes after END FOR, not inside it."
@@ -108,5 +108,48 @@
       "hint": "Either there is no FOR EACH loop yet, or a step inside it prints or returns. The answer is shown once, after the loop ends.",
       "points": 0
     }
-  ]
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md. The program they were describing: start with an empty list called withTax; go through the prices one at a time; for each price, multiply it by 1.08 and add the result to withTax; when there are no more prices, print withTax. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, ADD, OUTPUT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite, for example printing inside the repeating part for the last criterion.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The list starts empty, before the loop",
+        "description": "A list for the taxed prices (withTax, or the student's own name for it) is made empty ONCE, before the repeating part begins, and is not made empty again inside the repeating part.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One loop over prices, closed",
+        "description": "The steps go through the prices as ONE repeating part (FOR EACH, loop through, repeat for each price, or similar) and say where the repeating part ends (END FOR, END LOOP, 'when there are no more prices', or similar).",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The taxed price is added inside the loop",
+        "description": "Inside the repeating part, each price is multiplied by 1.08 (or has 8 percent added) and that result, not the untaxed price, is added to the new list.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The answer comes after the loop",
+        "description": "The finished list is printed, shown or returned once, after the repeating part has ended.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Nothing is shown inside the loop",
+        "description": "No step inside the repeating part prints, shows or returns the list. Showing it happens only after the loop. If the student never wrote a loop at all, mark this missing.",
+        "points": 1
+      }
+    ]
+  }
 }

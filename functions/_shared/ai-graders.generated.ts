@@ -2518,6 +2518,48 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "3-7-5-chart-map-trace": {
+    "lessonTitle": "3.7.5 Plain English to Pseudocode: What `.map()` Does for You",
+    "prompt": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md. The program they were describing: start with an empty list called withTax; go through the prices one at a time; for each price, multiply it by 1.08 and add the result to withTax; when there are no more prices, print withTax. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, ADD, OUTPUT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite, for example printing inside the repeating part for the last criterion.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The list starts empty, before the loop",
+        "description": "A list for the taxed prices (withTax, or the student's own name for it) is made empty ONCE, before the repeating part begins, and is not made empty again inside the repeating part.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One loop over prices, closed",
+        "description": "The steps go through the prices as ONE repeating part (FOR EACH, loop through, repeat for each price, or similar) and say where the repeating part ends (END FOR, END LOOP, 'when there are no more prices', or similar).",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The taxed price is added inside the loop",
+        "description": "Inside the repeating part, each price is multiplied by 1.08 (or has 8 percent added) and that result, not the untaxed price, is added to the new list.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The answer comes after the loop",
+        "description": "The finished list is printed, shown or returned once, after the repeating part has ended.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Nothing is shown inside the loop",
+        "description": "No step inside the repeating part prints, shows or returns the list. Showing it happens only after the loop. If the student never wrote a loop at all, mark this missing.",
+        "points": 1
+      }
+    ]
+  },
   "3-8-17-chart-save-load-round-trip": {
     "lessonTitle": "3.8.17 Chart the Code: Save/Load Round Trip End to End",
     "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",

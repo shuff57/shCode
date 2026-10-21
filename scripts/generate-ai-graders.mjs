@@ -59,7 +59,7 @@ for (const id of readdirSync(lessonsDir)) {
     continue;
   }
 
-  const graders = [lesson.aiGrader, lesson.diagram && lesson.diagram.aiGrader];
+  const graders = [lesson.aiGrader, lesson.diagram && lesson.diagram.aiGrader, lesson.aiCheck];
   for (const g of graders) {
     if (!g || !Array.isArray(g.rubric) || g.rubric.length === 0) continue;
 
@@ -72,6 +72,14 @@ for (const id of readdirSync(lessonsDir)) {
         `${id}: aiGrader has no "prompt". Add one -- the server no longer accepts a prompt from the client.`,
       );
       continue;
+    }
+    if (g === lesson.aiCheck) {
+      // aiCheck criteria ARE the lesson's requirement cards: the browser lays each verdict over the
+      // card with the same id, so an id that matches no requirement is a verdict nobody sees.
+      const reqIds = new Set((lesson.requirements || []).map((r) => r.id));
+      for (const r of g.rubric) {
+        if (!reqIds.has(r.id)) errors.push(`${id}: aiCheck rubric item ${r.id} matches no requirement id`);
+      }
     }
     for (const r of g.rubric) {
       if (!r.id) errors.push(`${id}: a rubric item has no id`);

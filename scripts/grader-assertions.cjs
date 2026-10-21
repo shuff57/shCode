@@ -49,7 +49,7 @@ for (const folder of fs.readdirSync(lessonsDir)) {
   const p = path.join(lessonsDir, folder, 'lesson.json');
   if (!fs.existsSync(p)) continue;
   const meta = JSON.parse(fs.readFileSync(p, 'utf8'));
-  for (const [kind, g] of [['aiGrader', meta.aiGrader], ['diagram.aiGrader', meta.diagram && meta.diagram.aiGrader]]) {
+  for (const [kind, g] of [['aiGrader', meta.aiGrader], ['diagram.aiGrader', meta.diagram && meta.diagram.aiGrader], ['aiCheck', meta.aiCheck]]) {
     if (g) rubrics.push({ folder, kind, rubric: g.rubric });
   }
 }

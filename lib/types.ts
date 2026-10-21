@@ -262,6 +262,10 @@ export interface Lesson {
   requirements: Requirement[];
   grading?: Grading;
   aiGrader?: AiGraderConfig;
+  /** A "Grade with AI" button above a plain-English-to-pseudocode lab's editor; the AI's verdicts
+   *  replace the Quest cards' red and green. Deliberately NOT `aiGrader`: that field makes a lesson a
+   *  scored written part everywhere (manifest, gradebook, attempt caps). See lib/ai-check.ts. */
+  aiCheck?: import('./ai-check').AiCheckConfig;
   /** Flowchart assignment. See lib/diagram-types.ts. */
   diagram?: DiagramConfig;
   /** Multiple-choice module quiz. Graded in the browser — see components/QuizView.tsx. */
