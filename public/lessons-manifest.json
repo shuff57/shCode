@@ -6112,7 +6112,7 @@
     },
     {
       "id": "3-7-5-chart-map-trace",
-      "title": "3.7.5 Plain English to Pseudocode: `.map()`'s Callback Trace",
+      "title": "3.7.5 Plain English to Pseudocode: What `.map()` Does for You",
       "unit": "3.7 Array Methods",
       "preview": "console",
       "type": "lesson",
