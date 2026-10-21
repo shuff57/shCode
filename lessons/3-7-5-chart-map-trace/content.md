@@ -1,4 +1,4 @@
-## Plain English to Pseudocode: `.map()`'s Callback Trace
+## Plain English to Pseudocode: What `.map()` Does for You
 
 **What you'll practise:**
 - Turning plain English into exact, numbered steps
@@ -33,4 +33,4 @@ The print goes **after** `END FOR`. If you put it inside the loop, the program p
 
 ### Before you submit
 
-Check that all six requirements are green, then: Trace it by hand with the real array `10, 20, 30`. Follow your own steps and count the callback calls. If you do not end with **three** results in `withTax`, the steps are wrong somewhere even if every check is green.
+Check that all six requirements are green, then: Trace it by hand with the real array `10, 20, 30`. Follow your own steps and count the passes through the loop. If you do not end with **three** results in `withTax`, the steps are wrong somewhere even if every check is green.
