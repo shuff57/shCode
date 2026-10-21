@@ -39,7 +39,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){19}[ \\t]*\\d+[.)][ \\t]*\\S)[\\s\\S]*?(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){9}[ \\t]*\\d+[.)][ \\t]*\\S",
+      "pattern": "^(?!(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*\\S){20})(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*\\S){10}",
       "hint": "You need between ten and nineteen lines that start with a number. Number the indented ones and the END lines too. If you pass twenty, collapse a run of steps into a function.",
       "points": 0
     },

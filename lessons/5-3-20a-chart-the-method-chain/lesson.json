@@ -31,14 +31,14 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "Five numbered steps in a row",
+      "title": "Five or more numbered steps",
       "description": "Number every step 1. 2. 3. and so on, with something written after each number.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){4}[ \\t]*\\d+[.)][ \\t]*\\S",
-      "hint": "You need at least five lines that start with a number, one after another, each with a step written after it.",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*\\S){5}",
+      "hint": "You need at least five lines that start with a number, each with a step written after it.",
       "points": 0
     },
     {

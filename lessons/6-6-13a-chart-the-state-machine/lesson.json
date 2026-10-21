@@ -32,13 +32,13 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "Twelve or more numbered steps in a row",
+      "title": "Twelve or more numbered steps",
       "description": "Number every line 1. 2. 3. and so on, with something written after each number.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "(?:[ \\t]*\\d+[.)][ \\t]*\\S[^\\n]*\\n(?:[ \\t]*\\n)*){11}[ \\t]*\\d+[.)][ \\t]*\\S",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*\\S){12}",
       "hint": "You need at least twelve lines that start with a number, one after another. Number the indented lines and the END IF lines too.",
       "points": 0
     },

@@ -260,6 +260,6 @@
     "allowLateSubmit": true
   },
   "planChart": {
-    "mermaid": "flowchart LR\n  A([Start]) --> B[make two lists]\n  B --> C[build a new list holding every item from both]\n  C --> D[build another new list with a loose item at each end around one copy]\n  D --> E[/log both new lists and one original/]\n  E --> F([End])"
+    "mermaid": "flowchart LR\n  A([Start]) --> B[make two lists]\n  B --> C[build a new list with spread holding every item from both]\n  C --> D[build another new list with spread, a loose item at each end around one copy]\n  D --> E[/log both new lists and one original/]\n  E --> F([End])"
   }
 }
