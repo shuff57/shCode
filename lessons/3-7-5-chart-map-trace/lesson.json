@@ -1,7 +1,7 @@
 {
   "id": "3-7-5-chart-map-trace",
-  "title": "3.7.5 Plain English to Pseudocode: `.map()`'s Callback Trace",
-  "description": "Turn five plain-English steps into pseudocode for what .map() does: a loop you did not write, one callback per item, and the collected results.",
+  "title": "3.7.5 Plain English to Pseudocode: What `.map()` Does for You",
+  "description": "Turn four plain-English steps into pseudocode for what .map() does: a loop you did not write, one result per item, collected in a new list.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -28,7 +28,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Start with an empty list called `withTax`.\n\n**2.** Go through the prices one at a time.\n\n**3.** For each price, multiply it by 1.08 and add the result to `withTax`.\n\n**4.** When there are no more prices, print `withTax`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. Each keyword looks like this, in a different program:\n\n- `SET greeting TO \"Hello\"` (a change)\n- `FOR EACH name IN names` ... `END FOR` (the loop)\n- `ADD name TO roster` (a step inside the loop)\n- `OUTPUT roster` or `RETURN roster` (the answer, after the loop)\n\nThe chart shows the shape.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Start with an empty list called `withTax`.\n\n**2.** Go through the prices one at a time.\n\n**3.** For each price, multiply it by 1.08 and add the result to `withTax`.\n\n**4.** When there are no more prices, print `withTax`.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: the loop is the hexagon and the diamond, and `FOR EACH` does both jobs, so the diamond has no line of its own.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. The loop is always `FOR EACH` here, even where earlier JavaScript used an index. Write multiplying with `*`. Each keyword looks like this, in a different program:\n\n- `SET greeting TO \"Hello\"` (a change)\n- `FOR EACH name IN names` ... `END FOR` (the loop)\n- `ADD name TO roster` (a step inside the loop)\n- `SET area TO width * height` (multiply with `*`)\n- `OUTPUT roster` or `RETURN roster` (the answer, after the loop)\n\nBefore you submit, trace `prices` holding `[10, 20, 30]` by hand: three passes, three entries added, and the answer shown once.",
       "hints": [
         "The loop is `FOR EACH ... END FOR`, and the steps inside it are indented.",
         "Whatever happens once the loop is over comes after END FOR, not inside it."
@@ -56,8 +56,8 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bwithTax\\s+(?:TO|=)\\s+(?:the\\s+)?(?:an?\\s+)?(?:new\\s+)?(?:empty\\s+)?(?:list|array|\\[\\s*\\])[\\s\\S]*\\bFOR\\s+EACH\\b",
-      "hint": "Start the list before the loop, for example SET names TO an empty list, using your own name for it.",
+      "pattern": "(?:\\bwithTax\\s*,?\\s*(?:(?:TO|=|AS|BE|IS|<-|:=|←))?\\s*(?:the\\s+)?(?:an?\\s+)?(?:new,?\\s+)?(?:empty\\s+)?(?:list|array|\\[\\s*\\])|(?:empty\\s+)?(?:list|array)\\s+(?:called|named)\\s+withTax\\b)[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
+      "hint": "Start the list before the loop, for example SET names TO an empty list, using your own name for it. It must come before FOR EACH, and END FOR EACH does not count as a loop start.",
       "points": 0
     },
     {
@@ -68,7 +68,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?prices\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
+      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?FOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?(?:(?:list|array)\\s+of\\s+)?(?:the\\s+)?prices\\b[\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?END\\s*FOR(?:\\s*EACH)?\\b",
       "hint": "Use one FOR EACH over prices, and close it with one END FOR.",
       "points": 0
     },
@@ -80,8 +80,8 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bFOR\\s+EACH\\s+(\\w+)\\b(?=\\s+(?:IN|OF)\\b)(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\b\\1\\b\\s*(?:\\*|times)\\s*1\\.08|1\\.08\\s*(?:\\*|times)\\s*\\b\\1\\b))(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\b(?:ADD|APPEND|PUSH)\\b[^\\n]*\\bwithTax\\b|\\bwithTax\\s+(?:TO|=)\\s+withTax\\s*\\+))",
-      "hint": "Inside the loop, add the taxed price to withTax, using the same name you gave the loop. Each pass adds one entry.",
+      "pattern": "\\bFOR\\s+EACH\\s+(\\w+)\\b(?=\\s+(?:IN|OF)\\b)(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:(?:\\b(?:ADD|APPEND|PUSH|PUT|INSERT)\\b[^\\n]*(?:(?:\\1\\s*(?:\\*|×|x|times|multiplied\\s+by)\\s*1\\.08(?!\\d)|(?:multiply|multiplying)\\s+(?:the\\s+)?\\1\\s+by\\s+1\\.08(?!\\d)|1\\.08\\s*(?:\\*|×|x|times)\\s*\\1\\b|\\1\\s*\\*\\s*\\(\\s*1\\s*\\+\\s*0?\\.08\\s*\\))[^\\n]*\\bwithTax\\b|\\bwithTax\\b[^\\n]*(?:\\1\\s*(?:\\*|×|x|times|multiplied\\s+by)\\s*1\\.08(?!\\d)|(?:multiply|multiplying)\\s+(?:the\\s+)?\\1\\s+by\\s+1\\.08(?!\\d)|1\\.08\\s*(?:\\*|×|x|times)\\s*\\1\\b|\\1\\s*\\*\\s*\\(\\s*1\\s*\\+\\s*0?\\.08\\s*\\)))|(?:\\1\\s*(?:\\*|×|x|times|multiplied\\s+by)\\s*1\\.08(?!\\d)|(?:multiply|multiplying)\\s+(?:the\\s+)?\\1\\s+by\\s+1\\.08(?!\\d)|1\\.08\\s*(?:\\*|×|x|times)\\s*\\1\\b|\\1\\s*\\*\\s*\\(\\s*1\\s*\\+\\s*0?\\.08\\s*\\))[^\\n]*\\b(?:ADD|APPEND|PUSH|PUT|INSERT)\\b[^\\n]*\\bwithTax\\b|\\bwithTax\\.(?:push|concat)\\b[^\\n]*(?:\\1\\s*(?:\\*|×|x|times|multiplied\\s+by)\\s*1\\.08(?!\\d)|(?:multiply|multiplying)\\s+(?:the\\s+)?\\1\\s+by\\s+1\\.08(?!\\d)|1\\.08\\s*(?:\\*|×|x|times)\\s*\\1\\b|\\1\\s*\\*\\s*\\(\\s*1\\s*\\+\\s*0?\\.08\\s*\\))|\\bwithTax\\s*(?:TO|=)\\s*withTax\\s*(?:\\+|\\.concat)[^\\n]*(?:\\1\\s*(?:\\*|×|x|times|multiplied\\s+by)\\s*1\\.08(?!\\d)|(?:multiply|multiplying)\\s+(?:the\\s+)?\\1\\s+by\\s+1\\.08(?!\\d)|1\\.08\\s*(?:\\*|×|x|times)\\s*\\1\\b|\\1\\s*\\*\\s*\\(\\s*1\\s*\\+\\s*0?\\.08\\s*\\))|\\bwithTax\\s*\\+=[^\\n]*(?:\\1\\s*(?:\\*|×|x|times|multiplied\\s+by)\\s*1\\.08(?!\\d)|(?:multiply|multiplying)\\s+(?:the\\s+)?\\1\\s+by\\s+1\\.08(?!\\d)|1\\.08\\s*(?:\\*|×|x|times)\\s*\\1\\b|\\1\\s*\\*\\s*\\(\\s*1\\s*\\+\\s*0?\\.08\\s*\\)))|(?:\\b(\\w+)\\s*(?:TO|=|<-|:=)\\s*[^\\n]*(?:\\1\\s*(?:\\*|×|x|times|multiplied\\s+by)\\s*1\\.08(?!\\d)|(?:multiply|multiplying)\\s+(?:the\\s+)?\\1\\s+by\\s+1\\.08(?!\\d)|1\\.08\\s*(?:\\*|×|x|times)\\s*\\1\\b|\\1\\s*\\*\\s*\\(\\s*1\\s*\\+\\s*0?\\.08\\s*\\))(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\b(?:ADD|APPEND|PUSH|PUT|INSERT)\\b[^\\n]*(?:\\b\\2\\b[^\\n]*\\bwithTax\\b|\\bwithTax\\b[^\\n]*\\b\\2\\b)|\\bwithTax\\.(?:push|concat)\\b[^\\n]*\\b\\2\\b|\\bwithTax\\s*(?:TO|=)\\s*withTax\\s*\\+[^\\n]*\\b\\2\\b))))",
+      "hint": "Inside the loop, multiply the price by 1.08 and add that result to withTax, using the same name you gave the loop. Each pass adds one entry.",
       "points": 0
     },
     {
@@ -92,7 +92,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b[^\\n]*\\bwithTax\\b",
+      "pattern": "\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\b(?:RETURNS?|OUTPUT|PRINT|LOG|DISPLAY|SHOW|WRITE|SAY|GIVE|SEND)\\b[^\\n]*\\bwithTax\\b",
       "hint": "Show or return withTax after END FOR, on the path taken once there are no more prices.",
       "points": 0
     },
@@ -104,8 +104,8 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b)[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
-      "hint": "Something is printed or returned inside the loop. That would run once per price. Move it after END FOR.",
+      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\n[ \\t]*(?:\\d+[.)][ \\t]*)?(?:RETURNS?|OUTPUT|PRINT|LOG|DISPLAY|SHOW|WRITE|SAY|GIVE|SEND)\\b)[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
+      "hint": "Either there is no FOR EACH loop yet, or a step inside it prints or returns. The answer is shown once, after END FOR.",
       "points": 0
     }
   ]

@@ -1,7 +1,7 @@
 {
   "id": "3-7-16-chart-spread-vs-rest",
   "title": "3.7.16 Plain English to Pseudocode: Spread vs. Rest, Side by Side",
-  "description": "Turn five plain-English steps into pseudocode for the body of total(...numbers): the same gathering loop whether the caller spreads an array or lists the numbers.",
+  "description": "Turn four plain-English steps into pseudocode for the body of total(...numbers): the same gathering loop whether the caller spreads an array or lists the numbers.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -28,7 +28,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Start the running total, `sum`, at 0.\n\n**2.** Go through the numbers one at a time.\n\n**3.** For each number, add it to `sum`.\n\n**4.** When there are no more numbers, give back `sum`.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the END at the bottom of the editor). Indent the line inside the loop. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` (start a value)\n- `FOR EACH enemy IN enemies` ... `END FOR` (the loop)\n- `SET lives TO lives - 1` (a step inside the loop)\n- `RETURN lives` or `OUTPUT lives` (the answer, after the loop)\n\nBefore you submit, trace `total(5, 5)` and then `total(...scores)` with `scores` holding `[5, 5]`. The same steps give 10 both times: the rest parameter gathers the arguments into `numbers`, and the spread spreads them out to be gathered.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Start the running total, `sum`, at 0.\n\n**2.** Go through the numbers one at a time.\n\n**3.** For each number, add it to `sum`.\n\n**4.** When there are no more numbers, give back `sum`.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: the loop is the hexagon and the diamond, and `FOR EACH` does both jobs, so the diamond has no line of its own.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Your four steps take **five** lines, because END FOR is a line too. Number every line, including the indented line and the END FOR line (not the last line of the editor). Indent the line inside the loop. The loop is always `FOR EACH` here, even where earlier JavaScript used an index. Call the running total `sum` or `total`. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` (start a value)\n- `FOR EACH enemy IN enemies` ... `END FOR` (the loop)\n- `SET lives TO lives - 1` (a step inside the loop)\n- `RETURN lives` or `OUTPUT lives` (the answer, after the loop)\n\nBefore you submit, trace `total(5, 5)` and then `total(...scores)` with `scores` holding `[5, 5]`. The same steps give 10 both times: the rest parameter gathers the arguments into `numbers`, and the spread spreads them out to be gathered.",
       "hints": [
         "The loop is `FOR EACH ... END FOR`, and the steps inside it are indented.",
         "Whatever happens once the loop is over comes after END FOR, not inside it."
@@ -51,13 +51,13 @@
     {
       "id": "r2",
       "title": "The total starts at zero, before the loop",
-      "description": "sum starts at zero, before the loop begins.",
+      "description": "sum (or total) starts at zero, before the loop begins.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bsum\\s+(?:TO|=|AT)\\s+(?:0|zero)\\b[\\s\\S]*\\bFOR\\s+EACH\\b",
-      "hint": "Start the total at zero before the FOR EACH.",
+      "pattern": "\\b(?:sum|total)\\s*,?\\s*(?:(?:TO|=|AS|BE|IS|<-|:=|←)|AT)\\s*(?:0|zero)\\b(?!\\.\\d)[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
+      "hint": "Start the sum at zero before the FOR EACH. A name like sum or total both work.",
       "points": 0
     },
     {
@@ -68,7 +68,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*\\bFOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?numbers\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b",
+      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?FOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?(?:(?:list|array)\\s+of\\s+)?(?:the\\s+)?numbers\\b[\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?END\\s*FOR(?:\\s*EACH)?\\b",
       "hint": "Use one FOR EACH over numbers, and close it with one END FOR.",
       "points": 0
     },
@@ -80,19 +80,19 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bFOR\\s+EACH\\s+(\\w+)\\b(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\bsum\\s*(?:TO|=)\\s*\\(?\\s*sum\\s*(?:\\+|plus)\\s*\\b\\1\\b|\\bsum\\s*\\+=\\s*\\b\\1\\b|\\bADD\\s+\\b\\1\\b\\s+TO\\s+sum\\b|\\bsum\\s*(?:TO|=)\\s*\\(?\\s*\\b\\1\\b\\s*(?:\\+|plus)\\s*sum\\b))",
-      "hint": "Inside the loop, add the loop's number to sum, using the same name you gave the loop.",
+      "pattern": "\\bFOR\\s+EACH\\s+(\\w+)\\b(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\b(?:sum|total)\\s*(?:TO|=|<-|:=)\\s*\\(?\\s*(?:sum|total)\\s*(?:\\+|plus)\\s*\\b\\1\\b(?![ \\t]*[*/\\-]\\s*[\\w(])|\\b(?:sum|total)\\s*\\+=\\s*\\b\\1\\b(?![ \\t]*[*/\\-]\\s*[\\w(])|\\bADD\\s+\\b\\1\\b\\s+TO\\s+(?:the\\s+)?(?:sum|total)\\b|\\bINCREASE\\s+(?:the\\s+)?(?:sum|total)\\s+BY\\s+\\b\\1\\b(?![ \\t]*[*/\\-]\\s*[\\w(])|\\b(?:sum|total)\\s*(?:TO|=|<-|:=)\\s*\\(?\\s*\\b\\1\\b\\s*(?:\\+|plus)\\s*(?:sum|total)\\b))",
+      "hint": "Inside the loop, add the loop's number to sum (or total), using the same name you gave the loop.",
       "points": 0
     },
     {
       "id": "r5",
       "title": "The total is given back after the loop",
-      "description": "sum is handed back once the loop is over.",
+      "description": "sum (or total) is handed back once the loop is over.",
       "type": "regex",
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b[^\\n]*\\bsum\\b",
+      "pattern": "\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\b(?:RETURNS?|OUTPUT|PRINT|LOG|DISPLAY|SHOW|WRITE|SAY|GIVE|SEND)\\b[^\\n]*\\b(?:sum|total)\\b(?![ \\t]*[-+*/]\\s*\\w)",
       "hint": "Give sum back after END FOR, once there are no more numbers.",
       "points": 0
     },
@@ -104,8 +104,8 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\b(?:RETURN|OUTPUT|PRINT|LOG|DISPLAY|SHOW|GIVE\\s+BACK)\\b)[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
-      "hint": "Something is returned inside the loop. That would end the method after the first number. Move it after END FOR.",
+      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\n[ \\t]*(?:\\d+[.)][ \\t]*)?(?:RETURNS?|OUTPUT|PRINT|LOG|DISPLAY|SHOW|WRITE|SAY|GIVE|SEND)\\b)[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
+      "hint": "Either there is no FOR EACH loop yet, or a step inside it returns. That would end the method after the first number. Give the answer back once, after END FOR.",
       "points": 0
     }
   ]
