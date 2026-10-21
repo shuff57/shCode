@@ -65,6 +65,11 @@ const LABS = {
       ['reversed ADD', ['r4'], lines('1. SET withTax TO an empty list', '2. FOR EACH price IN prices', '3.   ADD withTax TO price * 1.08', '4. END FOR', '5. OUTPUT withTax')],
       ['an early IF ... THEN OUTPUT in the loop', ['r6'], lines('1. SET withTax TO an empty list', '2. FOR EACH price IN prices', '3.   ADD price * 1.08 TO withTax', '4.   IF done THEN OUTPUT withTax', '5. END FOR', '6. OUTPUT withTax')],
       ['a dash-bulleted OUTPUT in the loop', ['r6'], lines('1. SET withTax TO an empty list', '2. FOR EACH price IN prices', '3.   ADD price * 1.08 TO withTax', '4.   - OUTPUT withTax', '5. END FOR', '6. OUTPUT withTax')],
+      ['ADD price * 1.08 + 5', ['r4'], lines('1. SET withTax TO an empty list', '2. FOR EACH price IN prices', '3.   ADD price * 1.08 + 5 TO withTax', '4. END FOR', '5. OUTPUT withTax')],
+      ['ADD 5 + price * 1.08', ['r4'], lines('1. SET withTax TO an empty list', '2. FOR EACH price IN prices', '3.   ADD 5 + price * 1.08 TO withTax', '4. END FOR', '5. OUTPUT withTax')],
+      ['ADD price * 1.08 * 0', ['r4'], lines('1. SET withTax TO an empty list', '2. FOR EACH price IN prices', '3.   ADD price * 1.08 * 0 TO withTax', '4. END FOR', '5. OUTPUT withTax')],
+      ['a list of prices is not an empty list', ['r2'], lines('1. SET withTax TO a list of prices', '2. FOR EACH price IN prices', '3.   ADD price * 1.08 TO withTax', '4. END FOR', '5. OUTPUT withTax')],
+      ['junk numbers, then the real program unnumbered', ['r3'], lines('1. a','2. b','3. c','4. d','5. e','SET withTax TO an empty list','FOR EACH price IN prices','  ADD price * 1.08 TO withTax','END FOR','OUTPUT withTax')],
     ],
     lower: lines('1. set withTax to a new empty array', '2. for each price in prices', '3.   push price * 1.08 to withTax', '4. end for', '5. print withTax'),
     ok: [
@@ -111,6 +116,7 @@ const LABS = {
       ['an early IF ... THEN RETURN in the loop', ['r6'], lines('1. SET sum TO 0', '2. FOR EACH number IN numbers', '3.   SET sum TO sum + number', '4.   IF sum > 5 THEN RETURN sum', '5. END FOR', '6. RETURN sum')],
       ['returns 1 + sum', ['r5'], lines('1. SET sum TO 0', '2. FOR EACH number IN numbers', '3.   SET sum TO sum + number', '4. END FOR', '5. RETURN 1 + sum')],
       ['sum + number + 100', ['r4'], lines('1. SET sum TO 0', '2. FOR EACH number IN numbers', '3.   SET sum TO sum + number + 100', '4. END FOR', '5. RETURN sum')],
+      ['junk numbers, then the real program unnumbered', ['r3'], lines('1. a','2. b','3. c','4. d','5. e','SET sum TO 0','FOR EACH number IN numbers','  SET sum TO sum + number','END FOR','RETURN sum')],
     ],
     lower: lines('1. set sum = 0', '2. for each n in numbers', '3.   add n to sum', '4. end for', '5. return sum'),
     ok: [

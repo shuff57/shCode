@@ -68,8 +68,8 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?FOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?(?:(?:list|array)\\s+of\\s+)?(?:the\\s+)?numbers\\b[\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+[.)][ \\t]*)?END\\s*FOR(?:\\s*EACH)?\\b",
-      "hint": "Use one FOR EACH over numbers, and close it with one END FOR.",
+      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*(?:^|\\n)[ \\t]*\\d+[.)][ \\t]*FOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?(?:(?:list|array)\\s+of\\s+)?(?:the\\s+)?numbers\\b[\\s\\S]*(?:^|\\n)[ \\t]*\\d+[.)][ \\t]*END\\s*FOR(?:\\s*EACH)?\\b",
+      "hint": "Use one FOR EACH over numbers, close it with one END FOR, and number both lines.",
       "points": 0
     },
     {
