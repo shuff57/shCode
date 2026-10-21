@@ -224,5 +224,8 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[make a list of at least five items]\n  B --> C[copy a middle range into a new list]\n  C --> D[copy from a position to the end into another new list]\n  D --> E[/log both copies and the original/]\n  E --> F([End])"
   }
 }

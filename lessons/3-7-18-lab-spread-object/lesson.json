@@ -277,5 +277,8 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[start from the settings object]\n  B --> C[copy it into a new object with one existing property changed]\n  C --> D[copy it again into a new object with a brand new property]\n  D --> E[/log both copies and the original/]\n  E --> F([End])"
   }
 }

@@ -56,7 +56,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\b(?:sum|total)\\s*,?\\s*(?:STARTS\\s+(?:AS|AT)|TO|=|AS|BE|IS|AT|<-|:=|←)\\s*(?:0|zero)(?:\\.0+)?\\b(?!\\.\\d)(?![ \\t]*[-+*/%]\\s*[\\w(]))[\\s\\S]*?\\b(?:sum|total)\\s*,?\\s*(?:STARTS\\s+(?:AS|AT)|TO|=|AS|BE|IS|AT|<-|:=|←)\\s*(?:0|zero)(?:\\.0+)?\\b(?!\\.\\d)(?![ \\t]*[-+*/%]\\s*[\\w(])[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
+      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?\\b(?:sum|total)\\)?\\s*,?\\s*(?:STARTS(?:\\s+(?:AS|AT|WITH))?|BEGINS(?:\\s+(?:AS|AT))?|EQUALS?(?:\\s+TO)?|TO|=|AS|BE|IS|AT|<-|:=|←)\\s*(?:0|zero)(?:\\.0+)?\\b(?!\\.\\d)(?![ \\t]*(?:[+*/%]\\s*[\\w(]|-\\s*[\\d(])))[\\s\\S]*?\\b(?:sum|total)\\)?\\s*,?\\s*(?:STARTS(?:\\s+(?:AS|AT|WITH))?|BEGINS(?:\\s+(?:AS|AT))?|EQUALS?(?:\\s+TO)?|TO|=|AS|BE|IS|AT|<-|:=|←)\\s*(?:0|zero)(?:\\.0+)?\\b(?!\\.\\d)(?![ \\t]*(?:[+*/%]\\s*[\\w(]|-\\s*[\\d(]))[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
       "hint": "Start the sum once, at zero, before the FOR EACH. Do not start it again inside the loop.",
       "points": 0
     },
@@ -68,7 +68,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*(?:^|\\n)[ \\t]*\\d+[.)][ \\t]*FOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?(?:(?:list|array)\\s+of\\s+)?(?:the\\s+)?numbers\\b[\\s\\S]*(?:^|\\n)[ \\t]*\\d+[.)][ \\t]*END\\s*FOR(?:\\s*EACH)?\\b",
+      "pattern": "^(?![\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\bEND\\s*FOR(?:\\s*EACH)?\\b)(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b)[\\s\\S]*(?:^|\\n)[ \\t]*\\d+[.)][ \\t]*FOR\\s+EACH\\s+\\w+\\s+(?:IN|OF)\\s+(?:the\\s+)?(?:(?:list|array)\\s+(?:of\\s+|called\\s+|named\\s+)?)?(?:the\\s+)?(?:\\.\\.\\.)?numbers\\b[\\s\\S]*(?:^|\\n)[ \\t]*\\d+[.)][ \\t]*END\\s*FOR(?:\\s*EACH)?\\b",
       "hint": "Use one FOR EACH over numbers, close it with one END FOR, and number both lines.",
       "points": 0
     },
@@ -80,7 +80,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?=[\\s\\S]*?\\b(sum|total)\\b\\s*,?\\s*(?:STARTS\\s+(?:AS|AT)|TO|=|AS|BE|IS|AT|<-|:=|←)\\s*(?:0|zero)\\b)[\\s\\S]*?(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b\\s+(\\w+)\\b(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\b\\1\\b\\s*(?:TO|=|<-|:=)\\s*\\(?\\s*\\1\\b\\s*(?:\\+|plus)\\s*\\b\\2\\b(?![ \\t]*[-+*/%]\\s*[\\w(])|\\b\\1\\b\\s*\\+=\\s*\\b\\2\\b(?![ \\t]*[-+*/%]\\s*[\\w(])|\\bADD\\s+(?:\\b\\2\\b|it)\\s+TO\\s+(?:the\\s+)?\\1\\b|\\bINCREASE\\s+(?:the\\s+)?\\1\\s+BY\\s+(?:\\b\\2\\b|it)\\b(?![ \\t]*[-+*/%]\\s*[\\w(])|\\b\\1\\b\\s*(?:TO|=|<-|:=)\\s*\\(?\\s*\\b\\2\\b\\s*(?:\\+|plus)\\s*\\1\\b))",
+      "pattern": "^(?=[\\s\\S]*?\\b(sum|total)\\b\\)?\\s*,?\\s*(?:STARTS(?:\\s+(?:AS|AT|WITH))?|BEGINS(?:\\s+(?:AS|AT))?|EQUALS?(?:\\s+TO)?|TO|=|AS|BE|IS|AT|<-|:=|←)\\s*(?:0|zero)\\b)[\\s\\S]*?(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b\\s+(\\w+)\\b(?=(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\b\\1\\b\\s*(?:TO|=|<-|:=)\\s*\\(?\\s*\\1\\b\\s*(?:\\+|plus)\\s*(?:the\\s+)?\\b\\2\\b(?![ \\t]*(?:[+*/%]\\s*[\\w(]|-\\s*[\\d(]))|\\b\\1\\b\\s*\\+=\\s*\\b\\2\\b(?![ \\t]*(?:[+*/%]\\s*[\\w(]|-\\s*[\\d(]))|\\bADD\\s+(?:(?:the|this|each|that|current)\\s+)*(?:\\b\\2\\b|it)\\s+TO\\s+(?:the\\s+)?\\1\\b|\\bINCREASE\\s+(?:the\\s+)?\\1\\s+BY\\s+(?:\\b\\2\\b|it)\\b(?![ \\t]*(?:[+*/%]\\s*[\\w(]|-\\s*[\\d(]))|\\b\\1\\b\\s*(?:TO|=|<-|:=)\\s*\\(?\\s*\\b\\2\\b\\s*(?:\\+|plus)\\s*\\1\\b))",
       "hint": "Inside the loop, add the loop's number to the same sum you started at zero, using the same name you gave the loop. Use one name for the sum all the way through.",
       "points": 0
     },
@@ -92,7 +92,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?=[\\s\\S]*?\\b(sum|total)\\b\\s*,?\\s*(?:STARTS\\s+(?:AS|AT)|TO|=|AS|BE|IS|AT|<-|:=|←)\\s*(?:0|zero)\\b)[\\s\\S]*?\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\b(?:RETURNS?|OUTPUT|PRINT|LOG|DISPLAY|SHOW|WRITE|SAY|GIVE|SEND|YIELD|HAND)\\b[^\\n]*(?<![-+*/%][ \\t])\\b\\1\\b(?![ \\t]*[-+*/%]\\s*[\\w(-])(?!\\.\\w)",
+      "pattern": "^(?=[\\s\\S]*?\\b(sum|total)\\b\\)?\\s*,?\\s*(?:STARTS(?:\\s+(?:AS|AT|WITH))?|BEGINS(?:\\s+(?:AS|AT))?|EQUALS?(?:\\s+TO)?|TO|=|AS|BE|IS|AT|<-|:=|←)\\s*(?:0|zero)\\b)[\\s\\S]*?\\bEND\\s*FOR(?:\\s*EACH)?\\b[\\s\\S]*\\b(?:RETURNS?|OUTPUT|PRINT|LOG|DISPLAY|SHOW|WRITE|SAY|GIVE|SEND|YIELD|HAND)\\b[^\\n]*(?<![-+*/%][ \\t]*)\\b\\1\\b(?![ \\t]*(?:[+*/%]\\s*[\\w(-]|-\\s*[\\d(]))(?!\\.\\w)",
       "hint": "Give back the same sum you added to, after END FOR, once there are no more numbers.",
       "points": 0
     },
@@ -104,7 +104,7 @@
       "file": "README.md",
       "stripComments": false,
       "flags": "i",
-      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:\\n[ \\t]*(?:\\d+[.)]?[ \\t]*)?(?:[-*]\\s*)?|\\b(?:THEN|AND|ELSE|DO)\\s+)(?:RETURNS?|OUTPUT|PRINT|LOG|DISPLAY|SHOW|WRITE|SAY|GIVE|SEND|YIELD|HAND)\\b)[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
+      "pattern": "^(?![\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b(?:(?!\\bEND\\s*FOR(?:\\s*EACH)?\\b)[\\s\\S])*?(?:(?:\\n[ \\t]*(?:\\d+[.)]?[ \\t]*)?(?:[-*>]\\s*)?|\\b(?:THEN|AND|ELSE|DO|NOW|NEXT|FINALLY|OTHERWISE)\\s+)(?:RETURNS?|OUTPUT|PRINT|LOG|DISPLAY|SHOW|WRITE|SAY|GIVE|SEND|YIELD|HAND)\\b|[,;:(]\\s*(?:RETURNS?|OUTPUT|PRINT|LOG|DISPLAY|SHOW|WRITE|SAY|GIVE|SEND|YIELD|HAND)\\b[^\\n]*\\b(?:sum|total)\\b))[\\s\\S]*(?<!\\bEND\\s*)\\bFOR\\s+EACH\\b",
       "hint": "Either there is no FOR EACH loop yet, or a step inside it returns. That would end the method after the first number. Give the answer back once, after END FOR.",
       "points": 0
     }

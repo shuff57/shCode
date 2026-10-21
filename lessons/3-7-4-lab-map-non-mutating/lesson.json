@@ -174,5 +174,8 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[make the list of prices]\n  B --> C[build a new list by changing every price with map]\n  C --> D[/log the new list/]\n  D --> E[/log the original list/]\n  E --> F([End])"
   }
 }

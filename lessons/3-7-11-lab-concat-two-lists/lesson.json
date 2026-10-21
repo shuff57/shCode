@@ -185,5 +185,8 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[make two lists]\n  B --> C[join the second onto the first into a new list with concat]\n  C --> D[/log the joined list/]\n  D --> E[/log both originals/]\n  E --> F([End])"
   }
 }

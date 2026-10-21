@@ -128,5 +128,8 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[make a list of at least three values]\n  B --> C[/log the list/]\n  C --> D[change the list in place with a mutating method]\n  D --> E[/log the list again/]\n  E --> F[make a new list with a non-mutating method]\n  F --> G[/log the new list and the original/]\n  G --> H([End])"
   }
 }
