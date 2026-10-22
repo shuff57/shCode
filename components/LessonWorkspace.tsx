@@ -292,6 +292,10 @@ export default function LessonWorkspace({
   }, [lesson]);
 
   const isConsoleMode = lesson.preview === 'console';
+  // A lesson whose graded file is prose/pseudocode (README.md), not a script the
+  // browser can run: a plain textarea and a Grade button instead of CodeMirror
+  // and Run. See lesson.json `editor`.
+  const isTextMode = lesson.editor === 'text';
 
   // Part two of a split assignment: drop the student's own chart into the
   // starter as pseudocode comments.
@@ -417,8 +421,10 @@ export default function LessonWorkspace({
     const b = reqBatcherRef.current;
     if (!b) return;
     // An untouched starter fails everything; that is not a student missing a requirement.
-    const starter = flattenFiles(lesson.files).find((f) => f.path === 'script.js');
-    if (starter && normalizeEol(files['script.js'] ?? '') === normalizeEol(starter.content || '')) return;
+    // A text lesson grades its own file, not script.js.
+    const starterPath = isTextMode ? aiCheckFile : 'script.js';
+    const starter = flattenFiles(lesson.files).find((f) => f.path === starterPath);
+    if (starter && normalizeEol(files[starterPath] ?? '') === normalizeEol(starter.content || '')) return;
     const outcomes = lesson.requirements
       .filter((r) => {
         // Same test runTests() uses for "not graded here" (a summative part's stripped pattern).
@@ -634,13 +640,22 @@ export default function LessonWorkspace({
   // lesson against the null doc it held at mount (moderate lens, 2026-09-04).
   const runTestsRef = useRef(runTests);
   useEffect(() => { runTestsRef.current = runTests; });
+  // Ctrl+Enter on a text lesson grades with the AI; assigned below, once the
+  // callback exists, without adding it to this once-registered effect.
+  const runAiCheckRef = useRef<() => void>(() => {});
 
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
-        if (isConsoleMode) {
+        if (useLessonStore.getState().lesson?.editor === 'text') {
+          // A text lesson has no program to run; Ctrl+Enter grades it. A lab with
+          // an aiCheck is graded by the AI; an older text lab falls back to the
+          // pattern check.
+          if (useLessonStore.getState().lesson?.aiCheck) void runAiCheckRef.current();
+          else runTestsRef.current();
+        } else if (isConsoleMode) {
           runCode();
         } else if (isReshapeMode) {
           // ReshapeStudio owns its own Ctrl+Enter handling, scoped to its
@@ -712,7 +727,7 @@ export default function LessonWorkspace({
     return report;
   }
 
-  // The AI's second opinion on the student's plain-English steps. The file goes to
+  // The AI grades a text lesson's steps -- this IS its Grade button. The file goes to
   // /api/grade-written, which reads the rubric by lesson id; each verdict then lands on the Quest
   // card with the same id. Practice feedback only: nothing is scored or recorded here.
   const runAiCheck = async () => {
@@ -737,6 +752,12 @@ export default function LessonWorkspace({
         setAiCheckNote({ kind: 'error', text: gradeFailureMessage({ kind, status, serverMessage: data?.error }) });
         return;
       }
+      // The verdicts describe `text`. If the student kept typing while the AI was
+      // reading, they belong to text that is no longer in the file.
+      if ((useLessonStore.getState().fileContents[aiCheckFile] ?? '') !== text) {
+        setAiCheckNote({ kind: 'ok', text: 'Your text changed while the AI was reading — press Grade again.' });
+        return;
+      }
       const verdicts = verdictsFromCriteria(data.criteria ?? [], aiCheck.rubric.map((r) => r.id));
       aiVerdictsRef.current = { verdicts, text };
       setRequirements(applyAiVerdicts(useLessonStore.getState().requirements, verdicts));
@@ -753,6 +774,7 @@ export default function LessonWorkspace({
       setAiCheckBusy(false);
     }
   };
+  runAiCheckRef.current = runAiCheck;
 
   const runClientGrade = useCallback(() => {
     const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals, testResults: testRunRef.current };
@@ -774,7 +796,14 @@ export default function LessonWorkspace({
     if (!aiCheck || !ai || ai.text === aiCheckedText) return;
     aiVerdictsRef.current = null;
     setAiCheckNote(null);
-    runTests();
+    if (isTextMode) {
+      // The AI is this lab's grader. Editing drops the marks and leaves the
+      // cards ungraded until the student presses Grade again.
+      setRequirements(lesson.requirements);
+      setGradeReport(null);
+    } else {
+      runTests();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aiCheck, aiCheckedText]);
 
@@ -1118,7 +1147,7 @@ export default function LessonWorkspace({
       {lesson.planChart && (
         <LabPlanChart lessonId={lesson.id} mermaid={lesson.planChart.mermaid} caption={lesson.planChart.caption} />
       )}
-      {aiCheck && (
+      {aiCheck && !isTextMode && (
         <div
           style={{
             display: 'flex',
@@ -1157,12 +1186,28 @@ export default function LessonWorkspace({
       <div className="editor-card">
         <div className="editor-body">
           <div className="run-toolbar">
-            {(isConsoleMode || isReshapeMode || isMoshionMode) && (
+            {(isTextMode || isConsoleMode || isReshapeMode || isMoshionMode) && (
               <>
                 {/* reSHape's own Run/Stop lives inside ReshapeStudio's Code
                     side (hidden entirely on its Build side) -- see that
                     component's own toolbar. */}
-                {!isReshapeMode && (
+                {isTextMode && (
+                  // The Grade button sits in the editor's own top row. With an
+                  // aiCheck it is the AI read of the steps; a text lesson with no
+                  // aiCheck has no AI to ask, so the pattern check is its grader.
+                  <button
+                    className="btn-run"
+                    onClick={() => {
+                      if (aiCheck) void runAiCheck();
+                      else trackRun(runTests());
+                    }}
+                    disabled={!!aiCheck && (aiCheckBusy || (files[aiCheckFile] ?? '').trim().length < 20)}
+                    title={aiCheck ? 'Have the AI read your steps and mark the Quest cards green or red' : undefined}
+                  >
+                    {aiCheck && aiCheckBusy ? 'Reading your steps…' : 'Grade'}
+                  </button>
+                )}
+                {!isReshapeMode && !isTextMode && (
                   isRunning && (isMoshionMode || isConsoleMode) ? (
                     <button
                       className="btn-run"
@@ -1194,11 +1239,16 @@ export default function LessonWorkspace({
                     gap: 5,
                   }}
                   onClick={() => {
-                    if (window.confirm('Reset your code to the starter? Unsaved work will be lost.')) {
+                    const what = isTextMode ? 'text' : 'code';
+                    if (window.confirm(`Reset your ${what} to the starter? Unsaved work will be lost.`)) {
                       resetLesson(lesson);
                       stopRun();
                       setSolutionLoaded(false);
-                      setResetMsg('Code reset to starter.');
+                      // Reset also discards any AI marks: the starter has not been graded.
+                      aiVerdictsRef.current = null;
+                      setAiCheckNote(null);
+                      if (isTextMode) setRequirements(lesson.requirements);
+                      setResetMsg(isTextMode ? 'Text reset to starter.' : 'Code reset to starter.');
                       setTimeout(() => setResetMsg(null), 2500);
                       if (isReshapeMode) setReshapeResetKey((k) => k + 1);
                     }
@@ -1291,8 +1341,32 @@ export default function LessonWorkspace({
               )}
             </div>
           </div>
+          {isTextMode && aiCheck && (
+            // The AI's read of the steps, directly under the Grade button and
+            // above the textarea it graded.
+            <div style={{ marginBottom: 8 }}>
+              <div role="status" aria-live="polite" style={{ fontSize: 14, color: '#8393c4' }}>
+                {aiCheckNote
+                  ? aiCheckNote.text
+                  : 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'}
+              </div>
+              {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
+                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: '#8393c4' }}>
+                  {aiCheckNote.hints.map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
           <div className="editor-preview-container" id="split">
-            {isReshapeMode ? (
+            {isTextMode ? (
+              // A text lesson has no output pane: the editor takes the whole
+              // width, and Grade is the only action.
+              <div className="pane" id="editorPane" style={{ flex: '1 1 100%' }}>
+                <CodeEditor plainText />
+              </div>
+            ) : isReshapeMode ? (
               // ReshapeStudio is self-contained (its own toolbar, its own
               // CodeEditor for the Code side, its own model tools for the
               // Build side) -- it replaces this whole split rather than

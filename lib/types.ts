@@ -262,10 +262,16 @@ export interface Lesson {
   requirements: Requirement[];
   grading?: Grading;
   aiGrader?: AiGraderConfig;
-  /** A "Grade with AI" button above a plain-English-to-pseudocode lab's editor; the AI's verdicts
-   *  replace the Quest cards' red and green. Deliberately NOT `aiGrader`: that field makes a lesson a
-   *  scored written part everywhere (manifest, gradebook, attempt caps). See lib/ai-check.ts. */
+  /** A Grade button above a plain-English-to-pseudocode lab's editor ("Grade with AI" on a code
+   *  lesson); the AI's verdicts replace the Quest cards' red and green. Deliberately NOT `aiGrader`:
+   *  that field makes a lesson a scored written part everywhere (manifest, gradebook, attempt caps).
+   *  See lib/ai-check.ts. */
   aiCheck?: import('./ai-check').AiCheckConfig;
+  /** What the workspace editor is. Absent or 'code' is the CodeMirror editor with Run; 'text' is a
+   *  plain textarea with a Grade button, for a lab whose graded file is prose or pseudocode
+   *  (README.md) rather than a script the browser can run. Presentation only -- the grader still
+   *  reads the same `requirements`/`aiCheck` files. */
+  editor?: 'code' | 'text';
   /** Flowchart assignment. See lib/diagram-types.ts. */
   diagram?: DiagramConfig;
   /** Multiple-choice module quiz. Graded in the browser — see components/QuizView.tsx. */

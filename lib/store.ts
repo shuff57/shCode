@@ -85,11 +85,15 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       files.map((f) => [f.path, normalizeEol(f.content || '')])
     );
 
-    // For JS-only preview modes (console, reshape, moshion), default to script.js
+    // For JS-only preview modes (console, reshape, moshion), default to script.js.
+    // A text lesson opens its graded file (README.md), even when the folder also
+    // holds an authored content.md.
     const jsPreviewModes = ['console', 'reshape', 'moshion'];
-    const defaultFile = jsPreviewModes.includes(lesson.preview || '')
-      ? (files.find((f) => f.path.endsWith('.js'))?.path || files[0]?.path)
-      : files[0]?.path;
+    const defaultFile = lesson.editor === 'text'
+      ? (lesson.aiCheck?.file || files.find((f) => f.path === 'README.md')?.path || files[0]?.path)
+      : jsPreviewModes.includes(lesson.preview || '')
+        ? (files.find((f) => f.path.endsWith('.js'))?.path || files[0]?.path)
+        : files[0]?.path;
 
     set({
       lesson,

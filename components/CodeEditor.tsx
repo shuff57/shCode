@@ -5,7 +5,7 @@ import { useLessonStore } from '../lib/store';
 import CodeMirrorPane from './CodeMirrorPane';
 import ImageLibrary from './ImageLibrary';
 
-export default function CodeEditor() {
+export default function CodeEditor({ plainText = false }: { plainText?: boolean }) {
   const [libraryOpen, setLibraryOpen] = useState(false);
   const currentFile = useLessonStore((s) => s.currentFile);
   const value = useLessonStore((s) => (currentFile ? s.fileContents[currentFile] : ''));
@@ -61,19 +61,22 @@ export default function CodeEditor() {
       <div className="editor-file-toolbar">
         <span className="editor-file-name">{currentFile}</span>
         {/* Inserts the public path at the cursor rather than copying it to
-            the clipboard — the whole point is getting it into the sketch. */}
-        <button
-          type="button"
-          onClick={() => setLibraryOpen(true)}
-          title="Your uploaded images"
-          style={{
-            marginLeft: 'auto', background: 'none', border: '1px solid #44475a',
-            color: '#f8f8f2', borderRadius: 4, padding: '2px 8px',
-            fontSize: 11, cursor: 'pointer',
-          }}
-        >
-          Images
-        </button>
+            the clipboard — the whole point is getting it into the sketch.
+            A text lesson has no CodeMirror to receive the insert event. */}
+        {!plainText && (
+          <button
+            type="button"
+            onClick={() => setLibraryOpen(true)}
+            title="Your uploaded images"
+            style={{
+              marginLeft: 'auto', background: 'none', border: '1px solid #44475a',
+              color: '#f8f8f2', borderRadius: 4, padding: '2px 8px',
+              fontSize: 11, cursor: 'pointer',
+            }}
+          >
+            Images
+          </button>
+        )}
       </div>
       {libraryOpen && (
         <ImageLibrary
@@ -85,15 +88,33 @@ export default function CodeEditor() {
         />
       )}
       <div id="editor" style={{ flex: 1, minHeight: 0 }}>
-        <CodeMirrorPane
-          value={value ?? ''}
-          onChange={(doc) => {
-            if (fileRef.current) {
-              updateFile(fileRef.current, doc);
-            }
-          }}
-          fileKey={currentFile}
-        />
+        {plainText ? (
+          <textarea
+            value={value ?? ''}
+            onChange={(e) => {
+              if (fileRef.current) updateFile(fileRef.current, e.target.value);
+            }}
+            spellCheck={false}
+            aria-label={`${currentFile} text`}
+            style={{
+              display: 'block', width: '100%', height: '100%', boxSizing: 'border-box',
+              resize: 'none', border: 0, outline: 'none',
+              padding: '14px 16px', background: 'var(--card)', color: 'var(--text)',
+              fontFamily: "'Consolas', 'Courier New', monospace",
+              fontSize: '0.95rem', lineHeight: 1.6, tabSize: 4,
+            }}
+          />
+        ) : (
+          <CodeMirrorPane
+            value={value ?? ''}
+            onChange={(doc) => {
+              if (fileRef.current) {
+                updateFile(fileRef.current, doc);
+              }
+            }}
+            fileKey={currentFile}
+          />
+        )}
       </div>
     </div>
   );
