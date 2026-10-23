@@ -7,6 +7,7 @@
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "console",
+  "editor": "text",
   "slos": [
     "SLO-2",
     "SLO-4"
@@ -21,7 +22,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** The enemy is hit for some amount of damage.\n\n**2.** Take that amount off the enemy's health.\n\n**3.** If the health is now zero or less, the enemy dies.\n\n**4.** Either way, the enemy flashes red to show it was hit.\n\n**5.** Then control goes back to whoever hit it.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for a decision, and CALL for another method. The two methods here are named `die` and `flashRed`. Number every line, including the indented one and END IF. Each keyword looks like this, in a different program:\n\n- `SET score TO score + 10` (a change)\n- `IF lives <= 0` ... `END IF` (a decision; indent what is inside it)\n- `CALL playSound` (call another method; `CALL this.playSound` is fine too)\n\nThe chart shows the shape.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** The enemy is hit for some amount of damage.\n\n**2.** Take that amount off the enemy's health.\n\n**3.** If the health is now zero or less, the enemy dies.\n\n**4.** Either way, the enemy flashes red to show it was hit.\n\n**5.** Then control goes back to whoever hit it.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for a decision, and CALL for another method. The two methods here are named `die` and `flashRed`. Number every line, including the indented one and END IF. Each keyword looks like this, in a different program:\n\n- `SET score TO score + 10` (a change)\n- `IF lives <= 0` ... `END IF` (a decision; indent what is inside it)\n- `CALL playSound` (call another method; `CALL this.playSound` is fine too)\n\nThe chart shows the shape.\n\nPlain English is fine here. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.",
       "hints": [
         "Ask which steps run only when the enemy died, and which run either way.",
         "Write a call as one line, like `CALL playSound`. Do not write what die does."
@@ -106,5 +107,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps for the lab \"5.4.6 Plain English to Pseudocode: A Method That Calls a Method\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** The enemy is hit for some amount of damage. **2.** Take that amount off the enemy's health. **3.** If the health is now zero or less, the enemy dies. **4.** Either way, the enemy flashes red to show it was hit. **5.** Then control goes back to whoever hit it. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for a decision, and CALL for another method. The two methods here are named `die` and `flashRed`. Number every line, including the indented one and END IF. Each keyword looks like this, in a different program: - `SET score TO score + 10` (a change) - `IF lives <= 0` ... `END IF` (a decision; indent what is inside it) - `CALL playSound` (call another method; `CALL this.playSound` is fine too) The chart shows the shape. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, IF, ELSE, CALL, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, capitalisation and numbering. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Five or more numbered steps",
+        "description": "Number every step 1. 2. 3. and so on, with something written after each number.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The damage comes off health first",
+        "description": "Health goes down by the damage, before the decision.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One decision about health being zero or less",
+        "description": "Exactly one IF, about health and zero, closed with END IF.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The enemy only dies inside the decision",
+        "description": "The call to die sits inside the decision.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The flash happens either way",
+        "description": "The flash runs whether or not the enemy died, so it sits outside the decision.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Exactly two calls",
+        "description": "One call for die and one for flashRed. Do not write what those methods do.",
+        "points": 1
+      }
+    ]
   }
 }

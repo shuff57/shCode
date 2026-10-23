@@ -98,5 +98,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.4.5 Lab: Rewrite a Declaration as an Expression\". The task they were given: Create a const and assign it an unnamed function expression: the `function` keyword with no name after it, followed by the parameter list and body. It should compute and return a value from its parameter. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Anonymous function assigned to a variable",
+        "description": "A const/let/var is assigned a function expression with no name after the function keyword. Help: 3.4.4 (Function Expressions)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Function called through the variable",
+        "description": "The assigned const is called inside a console.log. Help: 3.4.2 (A Function Is a Value)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "console.log present",
+        "description": "Code calls console.log. Help: 3.4.4 (Function Expressions)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The function uses its parameter",
+        "description": "The function expression has a parameter and its body uses it. Help: 3.4.4 (Function Expressions)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "the call prints a value",
+        "description": "At least one line is printed and it is not undefined. Help: 3.4.4 (Function Expressions)",
+        "points": 1
+      }
+    ]
   }
 }

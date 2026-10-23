@@ -79,5 +79,36 @@
     "passingScore": 0,
     "allowLateSubmit": true,
     "reviewCommitHistory": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.2.26 Variables and Types Check\". The task they were given: Use `let` or `const` to create a variable called `age` and set it to your age. Then create a second variable called `name` and set it to your name in quotes. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "req1",
+        "title": "Declare age variable",
+        "description": "Create a variable called age. Help: 1.2.3 (Every Value Has a Type)",
+        "points": 1
+      },
+      {
+        "id": "req2",
+        "title": "Declare name variable",
+        "description": "Create a variable called name. Help: 1.2.3 (Every Value Has a Type)",
+        "points": 1
+      },
+      {
+        "id": "req3",
+        "title": "Use typeof",
+        "description": "Use typeof to check a variable's type. Help: 1.2.3 (Every Value Has a Type)",
+        "points": 1
+      },
+      {
+        "id": "req4",
+        "title": "Use console.log",
+        "description": "Print a value to the console. Help: 1.2.3 (Every Value Has a Type)",
+        "points": 1
+      }
+    ]
   }
 }

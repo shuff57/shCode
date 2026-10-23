@@ -108,5 +108,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.1.3 Your First Statement\". The task they were given: Run the code below. Five messages appear in the console panel. This is your first time seeing a browser console print output. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "First statement present",
+        "description": "The first console.log statement is still present. Help: 1.1.2 (console.log & sequential execution)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Second statement present",
+        "description": "The second console.log statement is still present. Help: 1.1.2 (console.log & sequential execution)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Third statement present",
+        "description": "The third console.log statement is still present. Help: 1.1.2 (console.log & sequential execution)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Fourth statement is a console.log",
+        "description": "The fourth line is still a console.log call. Help: 1.1.2 (console.log & sequential execution)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Fifth statement is a console.log",
+        "description": "The fifth line is still a console.log call. Help: 1.1.2 (console.log & sequential execution)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Fourth statement changed",
+        "description": "The fourth statement no longer prints its original text. Help: 1.1.2 (console.log & sequential execution)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "Fifth statement changed",
+        "description": "The fifth statement no longer prints its original text. Help: 1.1.2 (console.log & sequential execution)",
+        "points": 1
+      }
+    ]
   }
 }

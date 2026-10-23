@@ -180,5 +180,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.5.5 Lab: Read and Update Object Fields\". The task they were given: Create a variable for it (the lesson calls it book; use any name that fits what you are building) and assign it an object literal with at least two properties, for example a title and a pages count. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "object literal created",
+        "description": "Declares an object with braces. Help: 3.5.4 (Reading and Changing Properties)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "property read with a dot and printed",
+        "description": "console.log prints a property of book read with dot notation, directly or through a variable that is then printed. A print inside a function nobody calls never runs. Help: 3.5.4 (Reading and Changing Properties)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "a field changed and a field added",
+        "description": "One dot assignment changes a property the object literal of book already had, and another dot assignment adds a property the literal did not have. Help: 3.5.4 (Reading and Changing Properties)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "whole object printed",
+        "description": "Calls console.log. Help: 3.5.4 (Reading and Changing Properties)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "book starts with two or more fields and ends with one more",
+        "description": "After the code runs, book is an object with at least three properties: the ones its literal was written with, plus at least one it did not have. Help: 3.5.3 (Example: An Object Literal)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "a field of book and the whole object are printed by code that runs",
+        "description": "A console.log that runs prints a field read from book (directly, or through a variable that is then printed), and another prints the whole object. Text typed in, a read thrown away, and a print that never runs do not count. Help: 3.5.4 (Reading and Changing Properties)",
+        "points": 1
+      }
+    ]
   }
 }

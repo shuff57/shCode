@@ -7,6 +7,7 @@
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.7 Advanced Input",
   "preview": "console",
+  "editor": "text",
   "slos": [
     "SLO-3",
     "SLO-4"
@@ -22,7 +23,7 @@
     {
       "id": "s1",
       "title": "Repair the half-finished pseudocode",
-      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** While the mouse is pressing: if the sprite is under the mouse, move the sprite to the mouse.\n\n**2.** When the mouse is not pressing (it was let go): set the sprite velocity to zero, so it does not fly off.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone charted picking the sprite up carefully, and stopped. Their pseudocode is already in `README.md`. **Press Run before changing anything**: three checks should be red. Read each red card against the plan above, then repair it. Do not start over. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first.\n\nRenumber the lines if you like: every line just needs a number.\n\nWhen it is green, trace this: the player presses the mouse somewhere empty, then drags across the sprite while still holding. Does your plan pick it up mid-drag? Should it?",
+      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** While the mouse is pressing: if the sprite is under the mouse, move the sprite to the mouse.\n\n**2.** When the mouse is not pressing (it was let go): set the sprite velocity to zero, so it does not fly off.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone charted picking the sprite up carefully, and stopped. Their pseudocode is already in `README.md`. **Press Run before changing anything**: three checks should be red. Read each red card against the plan above, then repair it. Do not start over. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first.\n\nRenumber the lines if you like: every line just needs a number.\n\nWhen it is green, trace this: the player presses the mouse somewhere empty, then drags across the sprite while still holding. Does your plan pick it up mid-drag? Should it?\n\nPlain English is fine here. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.",
       "hints": [
         "A sprite dragged around has picked up speed. What should happen to that speed when you let go?",
         "The loop that repeats is draw() itself, not a line in this plan."
@@ -82,5 +83,36 @@
   "planChart": {
     "mermaid": "flowchart LR\n  A([draw runs]) --> B{mouse pressing?}\n  B -- yes --> C{sprite under the mouse?}\n  C -- yes --> D[move the sprite to the mouse]\n  C -- no --> Z([end of frame])\n  D --> Z\n  B -- no --> E[stop the sprite moving]\n  E --> Z",
     "caption": "The finished drag. Releasing has its own branch, and the velocity reset sits on it."
+  },
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps for the lab \"6.7.11 Fix the Broken Pseudocode: Dragging a Sprite\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is what the finished feature should do, in plain English: **1.** While the mouse is pressing: if the sprite is under the mouse, move the sprite to the mouse. **2.** When the mouse is not pressing (it was let go): set the sprite velocity to zero, so it does not fly off. **3.** Every path ends at the end of the frame. No step may send you back to itself. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. Someone charted picking the sprite up carefully, and stopped. Their pseudocode is already in `README.md`. **Press Run before changing anything**: three checks should be red. Read each red card against the plan above, then repair it. Do not start over. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first. Renumber the lines if you like: every line just needs a number. When it is green, trace this: the player presses the mouse somewhere empty, then drags across the sprite while still holding. Does your plan pick it up mid-drag? Should it? Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, IF, ELSE, CALL, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, capitalisation and numbering. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The frames where the mouse is up are handled",
+        "description": "The pressing decision has a branch for when the mouse is not pressing.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The velocity reset happens on release only",
+        "description": "The velocity is zeroed only on the frames where the mouse is up.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Every step moves forward",
+        "description": "No step sends you back to an earlier step. Moving the sprite is one ordinary step per frame.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Moving the sprite needs the sprite under the mouse",
+        "description": "The sprite follows the mouse only inside the check for the sprite being under it.",
+        "points": 1
+      }
+    ]
   }
 }

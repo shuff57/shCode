@@ -290,5 +290,78 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.5.25 Lab: Objects Capstone — Build, Read, Destructure\". The task they were given: Create one array (the lesson calls it cart; use any name that fits) whose elements are objects. Give each object the same fields, for example a name, a price and a quantity. Include at least three records. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "array of records built",
+        "description": "An array holds object records: written in the brackets or pushed in one at a time. Help: 3.5.2 (Grouping Related Values)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "nested object present",
+        "description": "An object literal holds another object literal. Help: 3.5.9 (Objects Inside Objects and Arrays)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "one record's field read with a dot and printed",
+        "description": "console.log prints a field of one record picked by its number and read with a dot (cart[0].name), or a variable holding that read. A field printed by the loop in step 4 does not count for this step. Help: 3.5.4 (Reading and Changing Properties)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "spaced key read with brackets and printed",
+        "description": "console.log prints a value read with square brackets and a quoted key (cart[1][\"item code\"]), or a variable holding one. Help: 3.5.6 (Square Brackets and Computed Keys)",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "nested field read with a chain and printed",
+        "description": "console.log prints a nested field reached with two dots in a row (cart[0].details.color), or a variable holding one. Help: 3.5.10 (A Nested Object Access Chain)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "loop works out and prints each cost",
+        "description": "A loop over cart (for, while or forEach, on cart or counting to its length) prints each record's price times its quantity: multiplied right in the print, through a variable, through a helper function that returns the product, or from the two read into variables first. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "destructured names used",
+        "description": "Two or more fields are unpacked with a brace pattern, and each bare name is used inside console.log, or in a variable that is then printed. Help: 3.5.19 (Destructuring)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "Object.keys walked with a loop",
+        "description": "A loop goes over Object.keys(...) of one record (cart[0], or a variable holding a record), fetches each value with the key in square brackets, and prints it. Help: 3.5.6 (Square Brackets and Computed Keys)",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "output printed",
+        "description": "Calls console.log. Help: 3.5.2 (Grouping Related Values)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "cart holds three or more records, one with a nested object and one with a spaced key",
+        "description": "After the code runs, cart is an array of at least three objects, one record holds a nested object, one record has a key containing a space, and at least three records have a numeric price and quantity. Help: 3.5.23 (A Record-Shaped Object)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "each step's reads are printed by code that runs",
+        "description": "Code that runs prints: one record's field read with a dot, the spaced key's value, a nested field reached with a chain, each record's cost from a loop, the unpacked names, and every key and value of one record from a loop; at least eight lines, none undefined or NaN. Text typed in, and prints that never run, do not count. Help: 3.5.23 (A Record-Shaped Object)",
+        "points": 1
+      }
+    ]
   }
 }

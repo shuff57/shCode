@@ -180,5 +180,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.5.8 Lab: Dot vs. Bracket — When You're Forced to Bracket\". The task they were given: Create an object (the lesson calls it laptop; name it for what you are building) that has at least one property whose key contains a space, written in quotes, such as \"screen size\". You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "square bracket access used",
+        "description": "Reads a property with square brackets. Help: 3.5.6 (Square Brackets and Computed Keys)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "spaced key reached in brackets",
+        "description": "Reads laptop with square brackets and a quoted key that contains a space. Help: 3.5.6 (Square Brackets and Computed Keys)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Object.keys walked with a loop",
+        "description": "A loop goes over Object.keys(laptop), fetches each value with the key in square brackets, and prints it. A loop inside a function nobody calls never runs. Help: 3.5.6 (Square Brackets and Computed Keys)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "key name in a variable, read with brackets and printed",
+        "description": "A variable holds one key name as a string, and console.log prints the value read with that variable in square brackets (directly, or through a variable that is then printed). Help: 3.5.6 (Square Brackets and Computed Keys)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "laptop has a key with a space in it",
+        "description": "After the code runs, laptop is an object and one of its keys contains a space. Help: 3.5.6 (Square Brackets and Computed Keys)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "laptop's values are printed by reads that run",
+        "description": "Code that runs prints the spaced key's value read with brackets, the value read with the key held in a variable, and, from a loop, every key of laptop with its value. A printed undefined names the read that found nothing. Help: 3.5.6 (Square Brackets and Computed Keys)",
+        "points": 1
+      }
+    ]
   }
 }

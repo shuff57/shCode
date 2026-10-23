@@ -134,5 +134,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.4.19 Lab: Callback Capstone\". The task they were given: Define a function called countMatching that takes an array and a test function. It should walk the array with a for loop, call the test on each element, and return how many elements passed the test. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Helper defined",
+        "description": "A function is defined that accepts an array and a test function. Help: 3.4.11 (Passing a Function to a Function)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "for loop present",
+        "description": "Code contains a for loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Callback called inside the helper",
+        "description": "The test function parameter is called inside the helper. Help: 3.4.11 (Passing a Function to a Function)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "At least two inline arrows passed",
+        "description": "Two arrow functions appear in the file. Help: 3.4.6 (Arrow Functions)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "console.log present",
+        "description": "Code calls console.log. Help: 3.4.11 (Passing a Function to a Function)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Two calls, each with its own arrow",
+        "description": "countMatching is called twice, and each call has an arrow written inside its parentheses. Help: 3.4.12 (Example: Arrow Callback)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "countMatching counts the elements the test accepts",
+        "description": "countMatching([4, -2, 7, 0, -9, 3], n => n > 0) is 3, an array where nothing passes counts 0, and an empty array counts 0. Help: 3.4.12 (Example: Arrow Callback)",
+        "points": 1
+      }
+    ]
   }
 }

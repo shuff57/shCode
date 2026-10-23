@@ -7,6 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "4.1 Q1 Synthesis Project",
   "preview": "console",
+  "editor": "text",
   "slos": [
     "SLO-1",
     "SLO-3",
@@ -23,7 +24,7 @@
     {
       "id": "s1",
       "title": "Write the plan for your whole program",
-      "instructions": "Plan the **whole program** before writing any of it. **No JavaScript is written today.** The build lessons stay closed until this plan is green.\n\nFrom the project checklist, your program has to:\n\n- store at least five objects of your own design in an array\n- write a function of your own with at least 3 parameters\n- write a function of your own that returns a computed value, used elsewhere in the program\n- sort the array\n- read the array with a loop\n- make a decision with a conditional based on your data\n- save and load your data\n- print one formatted verdict line combining at least two things you calculated\n\nIn `README.md`, write the **main program** as numbered pseudocode **between START and END**: the sequence that runs when the page loads. Number every line, including the indented ones and the END lines. Each keyword looks like this:\n\n- `CALL loadRecipes` (one line for each function you plan to write)\n- `IF there is a saved recipe list` ... `ELSE` ... `END IF` (a decision, with both ways out)\n- `FOR EACH recipe IN recipes` ... `END FOR` (walking your array)\n- `OUTPUT the verdict line` (the printed result), written for your own program\n\nThree rules make it a design. **One CALL per planned function, both directions**: every function you intend to write is on the plan, and every CALL becomes a real function. **Stay under twenty steps**: if you cannot, collapse a run of steps into a function and name it. **Do not write the function bodies**: only the main program.\n\nWhen you hand in the finished project, the plan comes with it and one thing is compared: does the code match the plan? You may change your mind. What is not allowed is silently abandoning the plan: update it and say in your README what changed and why.",
+      "instructions": "Plan the **whole program** before writing any of it. **No JavaScript is written today.** The build lessons stay closed until this plan is green.\n\nFrom the project checklist, your program has to:\n\n- store at least five objects of your own design in an array\n- write a function of your own with at least 3 parameters\n- write a function of your own that returns a computed value, used elsewhere in the program\n- sort the array\n- read the array with a loop\n- make a decision with a conditional based on your data\n- save and load your data\n- print one formatted verdict line combining at least two things you calculated\n\nIn `README.md`, write the **main program** as numbered pseudocode **between START and END**: the sequence that runs when the page loads. Number every line, including the indented ones and the END lines. Each keyword looks like this:\n\n- `CALL loadRecipes` (one line for each function you plan to write)\n- `IF there is a saved recipe list` ... `ELSE` ... `END IF` (a decision, with both ways out)\n- `FOR EACH recipe IN recipes` ... `END FOR` (walking your array)\n- `OUTPUT the verdict line` (the printed result), written for your own program\n\nThree rules make it a design. **One CALL per planned function, both directions**: every function you intend to write is on the plan, and every CALL becomes a real function. **Stay under twenty steps**: if you cannot, collapse a run of steps into a function and name it. **Do not write the function bodies**: only the main program.\n\nWhen you hand in the finished project, the plan comes with it and one thing is compared: does the code match the plan? You may change your mind. What is not allowed is silently abandoning the plan: update it and say in your README what changed and why.\n\nPlain English is fine here. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.",
       "hints": [
         "Every function you plan to write is one CALL line. Do not write what is inside it.",
         "A decision needs both ways out: an IF with an ELSE."
@@ -104,5 +105,48 @@
       "points": 0
     }
   ],
-  "assignmentCode": "A4.1.0"
+  "assignmentCode": "A4.1.0",
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps for the lab \"4.1.5 Q1 Synthesis Design Plan\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Plan the **whole program** before writing any of it. **No JavaScript is written today.** The build lessons stay closed until this plan is green. From the project checklist, your program has to: - store at least five objects of your own design in an array - write a function of your own with at least 3 parameters - write a function of your own that returns a computed value, used elsewhere in the program - sort the array - read the array with a loop - make a decision with a conditional based on your data - save and load your data - print one formatted verdict line combining at least two things you calculated In `README.md`, write the **main program** as numbered pseudocode **between START and END**: the sequence that runs when the page loads. Number every line, including the indented ones and the END lines. Each keyword looks like this: - `CALL loadRecipes` (one line for each function you plan to write) - `IF there is a saved recipe list` ... `ELSE` ... `END IF` (a decision, with both ways out) - `FOR EACH recipe IN recipes` ... `END FOR` (walking your array) - `OUTPUT the verdict line` (the printed result), written for your own program Three rules make it a design. **One CALL per planned function, both directions**: every function you intend to write is on the plan, and every CALL becomes a real function. **Stay under twenty steps**: if you cannot, collapse a run of steps into a  Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, IF, ELSE, CALL, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, capitalisation and numbering. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Ten to nineteen numbered steps",
+        "description": "Number every line 1. 2. 3. and so on. A plan under ten steps has not been decided yet, and twenty or more is too big to hold in your head.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A decision with both ways out",
+        "description": "An IF closed with END IF, with an ELSE for the other way.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A loop over your array",
+        "description": "FOR EACH item IN list ... END FOR, with at least one step inside.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Functions planned as CALL lines",
+        "description": "At least three CALL lines: one per function you plan to write.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Sorting, saving and loading are planned",
+        "description": "A different CALL for each: one that sorts, one that saves, one that loads, with that word in the name.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "One verdict line is printed",
+        "description": "An OUTPUT (or PRINT) line for the formatted verdict.",
+        "points": 1
+      }
+    ]
+  }
 }

@@ -183,5 +183,48 @@
   },
   "planChart": {
     "mermaid": "flowchart LR\n  A([Start]) --> B[make quizScores: 10, 20, 30]\n  B --> C[call addOne with quizScores]\n  C --> D[start at position 0]\n  D --> E{more positions}\n  E -- yes --> F[write the item plus 1 into the same array]\n  F --> G[move to the next position]\n  G --> E\n  E -- no --> I[/log quizScores/]\n  I --> J([End])"
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.6.8 Lab: Fix a Function That Reassigns Instead of Mutating\". The task they were given: The starter is meant to add 1 to every score in the caller's array. Run it and notice the caller's array comes back unchanged. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "a loop visits each position",
+        "description": "Code loops over the array (for, while or forEach). Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "indexed write into the parameter",
+        "description": "Code assigns into the array parameter by index. Help: 3.3.3 (Changing an Item by Index)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "caller array logged",
+        "description": "Code calls console.log on the caller's array. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "parameter not reassigned",
+        "description": "The function writes into the array instead of pointing its parameter at a new one. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "addOne adds 1 to every score in the caller's array",
+        "description": "addOne([10, 20, 30]) changes that same array to [11, 21, 31], and any other array the same way. Help: 3.6.6 (Example: Reassigning a Parameter Doesn't Escape)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "addOne runs on the caller's array",
+        "description": "addOne is called with the caller's array (quizScores) where the program reaches it, and that array is printed after. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      }
+    ]
   }
 }

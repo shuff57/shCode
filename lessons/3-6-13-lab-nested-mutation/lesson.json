@@ -232,5 +232,54 @@
   },
   "planChart": {
     "mermaid": "flowchart LR\n  A([Start]) --> B[make student with a nested scores array]\n  B --> C[shallow: a spread copy of student, then push a number into its scores]\n  C --> D[/log shallow and student/]\n  D --> E[deep: a structuredClone of student, then push a different number into its scores]\n  E --> F[/log deep and student/]\n  F --> G([End])"
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.6.13 Lab: Nested-Structure Mutation\". The task they were given: Create an object (the lesson calls it student; name it for what you are building) that contains a nested array called scores (for example, scores: [90, 85]). Make a shallow copy called shallow with the object spread syntax: a new object with the same keys. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "outer object copied with spread",
+        "description": "Code copies an object with the spread syntax. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "nested array pushed into",
+        "description": "Code pushes a value into the nested array. Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "deep made with structuredClone",
+        "description": "Code makes deep by calling structuredClone. Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "objects logged",
+        "description": "Code calls console.log. Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "the shallow copy shares the nested array, the deep copy does not",
+        "description": "shallow.scores matches student.scores (they are the same array), deep.scores is different from it, and the output shows the arrays. Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the arrays are printed by code that runs",
+        "description": "Console.log calls that run print the arrays held by student, shallow and deep. Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "deep is what structuredClone(student) gave back",
+        "description": "A structuredClone call that runs is given student, and what it returns is the object deep ends up holding. Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      }
+    ]
   }
 }

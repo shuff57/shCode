@@ -428,5 +428,60 @@
   },
   "planChart": {
     "mermaid": "flowchart LR\n  A([Start]) --> B[build a list of at least five numbers with push]\n  B --> C[raise every number into a new list]\n  C --> D[copy a range of the new list]\n  D --> E[join the range with a second list]\n  E --> F[make an object and a copy with one property changed]\n  F --> G[/log the lists and both objects/]\n  G --> H([End])"
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.7.22 Lab: Array-Methods Capstone\". The task they were given: Create a variable (the lesson calls it prices; use any name that fits) and fill it with at least five numbers, using prices.push() as you build. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "prices built with .push()",
+        "description": "Declares prices as an array and adds to it with prices.push(). Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": ".map() used",
+        "description": "Calls .map() to transform the list. Help: 3.7.2 (Transforming a List with .map())",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": ".slice() used",
+        "description": "Calls .slice() to copy a range. Help: 3.7.6 (Taking Part of a List with .slice())",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Arrays joined",
+        "description": "Joins two arrays with .concat() or array spread. Help: 3.7.9 (Joining Lists with .concat())",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Object spread with override",
+        "description": "Builds an object copy with a property written after the spread. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "console.log present",
+        "description": "Calls console.log. Help: 3.7.2 (Transforming a List with .map())",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "prices holds five or more numbers, and bumped, middle and joined are made from it",
+        "description": "prices is an array of at least five numbers, bumped is a changed copy of it, middle a part of bumped, joined holds middle and more, and the output shows them. Help: 3.7.20 (Chaining .map() off a .push()-Built Array)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "every result is made from prices and printed by code that runs",
+        "description": "When prices holds other numbers, bumped, middle and joined change with it, and console.log calls that run print them, prices, and both objects. Help: 3.7.20 (Chaining .map() off a .push()-Built Array)",
+        "points": 1
+      }
+    ]
   }
 }

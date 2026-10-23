@@ -100,5 +100,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.3.28 Build a Four-Case Switch: Drink Sizes\". The task they were given: Create a variable called size set to one of 'S', 'M', 'L', 'XL'. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "switch statement present",
+        "description": "Code contains a switch statement. Help: 2.3.3 (switch Statements)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "case 'S' present",
+        "description": "case 'S' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "case 'M' present",
+        "description": "case 'M' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "case 'L' present",
+        "description": "case 'L' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "case 'XL' present",
+        "description": "case 'XL' is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "default label present",
+        "description": "The default label is directly followed by a console.log call. Help: 2.3.3 (switch Statements)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "four breaks, one per case",
+        "description": "Code contains four break statements, one for each of the S, M, L and XL cases. Help: 2.3.3 (switch Statements)",
+        "points": 1
+      }
+    ]
   }
 }

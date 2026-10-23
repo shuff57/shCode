@@ -131,5 +131,48 @@
   },
   "planChart": {
     "mermaid": "flowchart LR\n  A([Start]) --> B[make a list of at least three values]\n  B --> C[/log the list/]\n  C --> D[change the list in place with a mutating method]\n  D --> E[/log the list again/]\n  E --> F[make a new list with a non-mutating method]\n  F --> G[/log the new list and the original/]\n  G --> H([End])"
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.7.21 Lab: Mutating vs. Non-Mutating Methods Drill\". The task they were given: Create a variable that holds an array of at least three values. You will demonstrate two methods on it. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Array declared",
+        "description": "Makes an array in square brackets. Help: 3.7.19 (What Else Is Out There)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A mutating method is called",
+        "description": "Calls .push() (or another in-place method). Help: 3.7.19 (What Else Is Out There)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A non-mutating method is called",
+        "description": "Calls .map(), .slice() or .concat(), which return a new array. Help: 3.7.19 (What Else Is Out There)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "console.log present",
+        "description": "Calls console.log to show before and after. Help: 3.7.19 (What Else Is Out There)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "before and after are printed",
+        "description": "At least two different values are printed. Help: 3.7.19 (What Else Is Out There)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the array is printed before and after the in-place call, by code that runs",
+        "description": "At least three console.log calls that run print your data, and two prints of the array itself differ, before and after the method that changes it. Help: 3.7.19 (What Else Is Out There)",
+        "points": 1
+      }
+    ]
   }
 }

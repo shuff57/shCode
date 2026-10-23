@@ -173,5 +173,72 @@
     "passingScore": 0,
     "allowLateSubmit": true,
     "reviewCommitHistory": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"4.1.6 Q1 Synthesis Project\". The task they were given: A short pitch in README.md: what the program does. Written before any build time, so the rest of this list has something to serve. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "req1",
+        "title": "An array of your own",
+        "description": "An array you declared to hold your data. Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "req2",
+        "title": "Five objects stored",
+        "description": "At least five objects, each with your own properties. The checker cannot judge whether your object design is good; the teacher reads for that.",
+        "points": 1
+      },
+      {
+        "id": "req3",
+        "title": "A 3+ parameter function",
+        "description": "A function of your own with at least 3 parameters. Help: 3.2.2 (Parameters)",
+        "points": 1
+      },
+      {
+        "id": "req4",
+        "title": "A function that returns a value",
+        "description": "A function of your own that returns a computed value, used elsewhere in the program. A named function, an arrow, or a method all count. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "req5",
+        "title": "A sort",
+        "description": "A sort over your array — a built-in .sort() or a sort you wrote by hand. Help: 3.7.21 (Mutating vs. Non-Mutating Methods)",
+        "points": 1
+      },
+      {
+        "id": "req6",
+        "title": "Uses a loop",
+        "description": "A `for`, `while`, or `for...of` loop somewhere in the program (e.g. walking your array). Help: 2.2.9 (The for Loop)",
+        "points": 1
+      },
+      {
+        "id": "req7",
+        "title": "Uses a conditional",
+        "description": "An `if` statement or `switch` statement somewhere in the program. Help: 2.1.3 (If / Else if / Else)",
+        "points": 1
+      },
+      {
+        "id": "req8",
+        "title": "Saves and loads with localStorage + JSON",
+        "description": "Uses JSON.stringify/JSON.parse with localStorage. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "req9",
+        "title": "Prints a formatted verdict",
+        "description": "A console.log that prints one formatted line combining at least two things you calculated (joined with +, a template string, or comma-separated arguments). Help: 1.2.15 (Greeting with Backticks)",
+        "points": 1
+      },
+      {
+        "id": "req10",
+        "title": "Tests report PASS or FAIL",
+        "description": "A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests: three is on you, and the teacher reads for it. Help: 4.1.4 (Manual Testing: PASS / FAIL Checks)",
+        "points": 1
+      }
+    ]
   }
 }

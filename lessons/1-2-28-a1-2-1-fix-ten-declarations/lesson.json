@@ -139,5 +139,72 @@
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "assignmentCode": "A1.2.1"
+  "assignmentCode": "A1.2.1",
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.2.28 Fix Ten Declarations\". The task they were given: Several declarations are missing a keyword, a quote mark, or an equals sign. Repair them so the file runs. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "studentAge is a number",
+        "description": "studentAge is declared and holds a number, not text. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "firstName is a string",
+        "description": "firstName is declared and holds properly quoted text. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "isEnrolled is a real boolean",
+        "description": "isEnrolled holds a real boolean -- true, false, or a comparison that produces one -- not quoted text. Help: 1.2.17 (The boolean Type)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "gradeLevel is declared with a keyword",
+        "description": "gradeLevel uses let or const rather than being assigned with no keyword. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "maxStudents is a const",
+        "description": "The value that never changes is declared with const. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "unitPrice replaces the single-letter name",
+        "description": "The mystery name p has been renamed to unitPrice. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "itemCount replaces the second mystery name",
+        "description": "The mystery name q has been renamed to itemCount. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "favouriteColour is camelCase",
+        "description": "The snake_case or all-lowercase name has become camelCase. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "middleName is null, not the string \"null\"",
+        "description": "The deliberately-empty value uses the null keyword without quotes. Help: 1.2.19 (The null Value)",
+        "points": 1
+      },
+      {
+        "id": "r10",
+        "title": "finalScore is declared but left unassigned",
+        "description": "finalScore is declared with let and no value, so it holds undefined until set. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      }
+    ]
+  }
 }

@@ -93,5 +93,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.4.3 Match the Language to the Job\". The task they were given: Read the job. Log the name of the language designed for it, using console.log. Choose from: JavaScript, Python, C, SQL, Swift. Log one answer per step, in step order, one console.log each -- the first console.log is STEP 1. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A database question is SQL",
+        "description": "The first console.log answers STEP 1 -- the database question, with SQL. Help: 1.4.2 (Why There Are So Many Languages)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "An iPhone app is Swift",
+        "description": "The second console.log answers STEP 2 -- the iPhone app, with Swift. Help: 1.4.2 (Why There Are So Many Languages)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "An operating system is C",
+        "description": "The third console.log answers STEP 3 -- the operating system, with C. Help: 1.4.2 (Why There Are So Many Languages)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "An interactive web page is JavaScript",
+        "description": "The fourth console.log answers STEP 4 -- the interactive web page, with JavaScript. Help: 1.4.2 (Why There Are So Many Languages)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Data analysis is Python",
+        "description": "The fifth console.log answers STEP 5 -- the data analysis job, with Python. Help: 1.4.2 (Why There Are So Many Languages)",
+        "points": 1
+      }
+    ]
   }
 }

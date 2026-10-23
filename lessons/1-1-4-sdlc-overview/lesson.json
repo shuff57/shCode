@@ -135,5 +135,48 @@
     "passingScore": 0,
     "allowLateSubmit": true,
     "reviewCommitHistory": false
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.1.4 What a Program Is\". The task they were given: A **program** is a set of instructions that tells a computer what to do. **JavaScript** is the programming language you'll use this year. Let's write your first instruction. In `script.js`, under the Step 1 comment, type: ```js console.log(\"Hello, world!\"); ``` `console.log()` tells the computer to print whatever is inside the parentheses. Check the console panel below to see your output. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "req1",
+        "title": "Hello world",
+        "description": "Print \"Hello, world!\" using console.log. Help: 1.1.2 (console.log & sequential execution)",
+        "points": 1
+      },
+      {
+        "id": "req2",
+        "title": "Math expression",
+        "description": "Use console.log with a math expression. Help: 1.1.2 (console.log & sequential execution)",
+        "points": 1
+      },
+      {
+        "id": "req3",
+        "title": "String concatenation",
+        "description": "Join two strings with the + operator",
+        "points": 1
+      },
+      {
+        "id": "req4",
+        "title": "Boolean comparison",
+        "description": "Print a comparison that evaluates to true or false",
+        "points": 1
+      },
+      {
+        "id": "req5",
+        "title": "Your name",
+        "description": "Print your name to the console",
+        "points": 1
+      },
+      {
+        "id": "req6",
+        "title": "Your hobby",
+        "description": "Print your hobby, at least 6 console.log statements total",
+        "points": 1
+      }
+    ]
   }
 }

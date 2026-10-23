@@ -196,5 +196,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.2.15 Lab: an Early-Return Guard Clause\". The task they were given: Define a function called divide that takes two parameters, a and b. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "divide defined",
+        "description": "Code defines a function named divide. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "if statement present",
+        "description": "Code contains an if condition. Help: 2.1.3 (If / Else if / Else)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "return statement present",
+        "description": "Code contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "results are logged",
+        "description": "Code calls console.log. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "a guard if returns early",
+        "description": "Inside divide, an if returns right away for the bad input, and a second return follows for the good result. Help: 3.2.14 (`return` Ends the Function)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "no else needed",
+        "description": "divide does not use else: the early return already handled the bad case. Help: 3.2.14 (`return` Ends the Function)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "divide guards zero and divides otherwise",
+        "description": "divide(a, b) returns a message that mentions zero when b is 0 and a divided by b for every other b. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      }
+    ]
   }
 }

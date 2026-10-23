@@ -65,5 +65,30 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.4.33 Challenges: Stretch Problems\". The task they were given: Print a 6x6 hollow square using nested loops: a \"#\" on the border rows and border columns, and a space everywhere else inside. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "for loop present",
+        "description": "Code contains a for loop. Help: 2.4.2 (for vs while: Choosing a Loop)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "continue present",
+        "description": "Code contains a continue statement. Help: 2.4.13 (Skipping a Round with continue)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "multiple-of-3 and multiple-of-5 tests",
+        "description": "Uses % 3 and % 5.",
+        "points": 1
+      }
+    ]
   }
 }

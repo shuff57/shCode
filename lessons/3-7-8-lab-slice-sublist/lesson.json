@@ -227,5 +227,42 @@
   },
   "planChart": {
     "mermaid": "flowchart LR\n  A([Start]) --> B[make a list of at least five items]\n  B --> C[copy a middle range into a new list]\n  C --> D[copy from a position to the end into another new list]\n  D --> E[/log both copies and the original/]\n  E --> F([End])"
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.7.8 Lab: Extract a Sub-List with `.slice()`\". The task they were given: Create a variable (the lesson calls it items; use any name that fits your list) and assign it an array of at least five values. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Array declared",
+        "description": "Declares an array with square brackets. Help: 3.7.6 (Taking Part of a List with .slice())",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Two .slice() calls",
+        "description": "Calls .slice() at least twice. Help: 3.7.6 (Taking Part of a List with .slice())",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "console.log present",
+        "description": "Calls console.log. Help: 3.7.6 (Taking Part of a List with .slice())",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "items has five values and the slices and the original are printed",
+        "description": "items has at least five values, middle is a part of it, tail runs from a start to the end of items, and the output shows both slices. Help: 3.7.6 (Taking Part of a List with .slice())",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "middle and tail are sliced out of items and printed by code that runs",
+        "description": "When items holds other values, middle and tail change with it, and console.log calls that run print both slices. Help: 3.7.6 (Taking Part of a List with .slice())",
+        "points": 1
+      }
+    ]
   }
 }

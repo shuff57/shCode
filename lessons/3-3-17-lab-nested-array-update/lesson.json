@@ -160,5 +160,60 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.3.22 Lab: Read and Update a Nested Array\". The task they were given: The starter already creates the grid: let grid = [[1, 2], [3, 4]];. Leave that line exactly as it is. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "nested array literal present",
+        "description": "Code declares a nested array. Help: 3.3.20 (Lists Inside Lists)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "double-index access present",
+        "description": "Code reads or writes with two indexes. Help: 3.3.20 (Lists Inside Lists)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "nested for loops present",
+        "description": "A for loop sits inside another for loop (braces optional). Help: 3.3.20 (Lists Inside Lists)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "console.log present",
+        "description": "Code calls console.log. Help: 3.3.20 (Lists Inside Lists)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "a grid cell is updated",
+        "description": "Code changes one cell with a double index and an assignment, like grid[1][0] = 8 (writing a cell back to itself changes nothing). Help: 3.3.20 (Lists Inside Lists)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "a running total is logged",
+        "description": "Code adds numbers into a total with += (or total = total + ...) and then logs that total. Help: 3.3.20 (Lists Inside Lists)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "grid ends updated and total adds every cell",
+        "description": "After the code runs, grid is [[1, 2], [8, 4]] (only the cell grid[1][0] changed) and total equals the sum of every cell of the updated grid. Help: 3.3.20 (Lists Inside Lists)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the old cell value and the total are printed",
+        "description": "The output shows 3 (the cell's value before the update) and 15 (the total of the updated grid). Help: 3.3.20 (Lists Inside Lists)",
+        "points": 1
+      }
+    ]
   }
 }

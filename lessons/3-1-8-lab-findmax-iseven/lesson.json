@@ -225,5 +225,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.2.26 Lab: findMax & isEven\". The task they were given: Define a function called findMax that takes two parameters, a and b. Inside the function, compare a and b, then return whichever value is larger. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "findMax defined",
+        "description": "Code defines a function named findMax (exact spelling). Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "isEven defined",
+        "description": "Code defines a function named isEven (exact spelling). Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "return statement present",
+        "description": "Code contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "findMax compares its two values",
+        "description": "findMax compares a and b (with > or <, or Math.max) inside its body. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "isEven uses the remainder operator",
+        "description": "isEven uses % inside its body. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "findMax returns the larger value",
+        "description": "findMax(a, b) gives back whichever of the two numbers is larger, whichever order they come in. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "isEven is true for even numbers only",
+        "description": "isEven(n) returns true when n is even and false when it is odd, including 0 and negative numbers. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      }
+    ]
   }
 }

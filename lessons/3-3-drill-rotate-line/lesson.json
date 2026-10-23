@@ -176,5 +176,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.3.9 Lab: rotate(items)\". The task they were given: Inside rotate, remove the first item with items.shift() and keep it in a variable (3.3.7). The shell of the function is given: items is a parameter that holds the whole array. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "rotate is defined with one parameter",
+        "description": "Code defines a function named rotate with exactly one parameter. Help: 3.3.7 (Adding and Removing from the Front)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "rotate takes the first item off with shift",
+        "description": "rotate calls .shift() in its body. Help: 3.3.7 (Adding and Removing from the Front)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "rotate hands the array back with return",
+        "description": "rotate contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "rotate moves the first item to the back",
+        "description": "rotate(items) gives back the same items with the first one moved to the end, and every item still there. Help: 3.3.7 (Adding and Removing from the Front)",
+        "points": 1
+      }
+    ]
   }
 }

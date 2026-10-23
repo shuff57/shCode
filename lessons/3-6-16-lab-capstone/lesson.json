@@ -501,5 +501,102 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.6.16 Lab: Pass-by-Reference Capstone Practice\". The task they were given: Define a function (the lesson calls it addScore; use any name that fits) taking (scores, score) that returns a NEW array containing the old scores plus the new one, without changing the array it was given. Use spread to build the new array. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "addScore defined",
+        "description": "Code defines a function named addScore. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "new array built with spread",
+        "description": "addScore builds a new array using spread syntax. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "recordPlay defined",
+        "description": "Code defines a function named recordPlay. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "plays property updated",
+        "description": "recordPlay assigns to the plays property. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "copyBook defined with a deep copy",
+        "description": "Code defines copyBook and calls structuredClone. Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "structuredClone used",
+        "description": "Code calls structuredClone for a deep copy Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "results logged",
+        "description": "Code calls console.log. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "addScore returns a new array and leaves the original alone",
+        "description": "addScore([10, 20], 30) returns [10, 20, 30] and the array passed in is still [10, 20]. Help: 3.6.10 (Defensive Copying)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "recordPlay raises plays on the object it is given",
+        "description": "recordPlay({ title: \"x\", plays: 4 }) leaves that same object with plays 5. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "t3",
+        "title": "copyBook returns a deep copy",
+        "description": "Changing the nested array of copyBook(library) leaves library.books unchanged. Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      },
+      {
+        "id": "t4",
+        "title": "the callers' data is printed",
+        "description": "At least three lines of the caller's data are printed. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "addScore called",
+        "description": "addScore runs with your array variable, and the array or the new one it returns is printed after the call. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "recordPlay called",
+        "description": "recordPlay runs with your song object, and that object is printed after the call. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "r10",
+        "title": "copyBook called",
+        "description": "copyBook runs with your library object, and the library or the copy is printed after the call. Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      },
+      {
+        "id": "t5",
+        "title": "the callers' data is printed by code that runs",
+        "description": "Console.log calls that run print the scores, the song and the library. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      }
+    ]
   }
 }

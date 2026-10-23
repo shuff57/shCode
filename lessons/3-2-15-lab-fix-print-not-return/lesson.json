@@ -151,5 +151,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.2.18 Lab: Fix a Function That Prints Instead of Returning\". The task they were given: Run the starter. The function prints the area, but the variable that stores the call prints as undefined. That is the tell of a missing return. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "area defined",
+        "description": "Code defines a function named area. Help: 3.2.16 (Printing Is Not Returning)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "area returns its answer",
+        "description": "Inside area there is a return with a value, and area no longer prints with console.log. Help: 3.2.16 (Printing Is Not Returning)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "result used in arithmetic",
+        "description": "The value that area returns is used in arithmetic (for example doubled), proving a number came back. Help: 3.2.16 (Printing Is Not Returning)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "results are logged",
+        "description": "Code calls console.log. Help: 3.2.16 (Printing Is Not Returning)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "area hands back the number and prints nothing",
+        "description": "Called on its own, area(width, height) gives back width times height and prints nothing itself. Help: 3.2.16 (Printing Is Not Returning)",
+        "points": 1
+      }
+    ]
   }
 }

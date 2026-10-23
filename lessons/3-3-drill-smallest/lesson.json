@@ -162,5 +162,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.3.18 Lab: smallest(numbers)\". The task they were given: Write a function declaration called smallest that takes one parameter, numbers, an array with at least one number. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "smallest is defined with one parameter",
+        "description": "Code defines a function named smallest with exactly one parameter. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "the running answer starts from the first item",
+        "description": "smallest sets a variable to the array's first item, written as something[0]. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "smallest hands back a value with return",
+        "description": "smallest contains a return statement. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "smallest returns the smallest number in the array",
+        "description": "smallest(numbers) gives back the smallest number in the array, and the array is not changed. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      }
+    ]
   }
 }

@@ -163,5 +163,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.5.15 Lab: Add a Method to an Object\". The task they were given: Create a variable (the lesson calls it student; name it for what you are building) holding an object literal with at least one data property, such as a name. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "method defined on the object",
+        "description": "A property is assigned a function. Help: 3.5.13 (Methods)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "method called and its result printed",
+        "description": "A method you defined on student is called, such as student.greet(), inside a console.log that runs, or its result is stored in a variable that is then printed. Help: 3.5.13 (Methods)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "return used",
+        "description": "The method hands a value back. Help: 3.5.13 (Methods)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "result printed",
+        "description": "Calls console.log. Help: 3.5.13 (Methods)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "student is an object with a method",
+        "description": "After the code runs, student is an object and one of its properties is a function. Help: 3.5.13 (Methods)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "what the method returns is printed by code that runs",
+        "description": "A console.log that runs prints what a method of student returned, with no undefined and no blank line. A built-in such as toString, a call whose result is thrown away, and a print that never runs do not count. Help: 3.5.13 (Methods)",
+        "points": 1
+      }
+    ]
   }
 }

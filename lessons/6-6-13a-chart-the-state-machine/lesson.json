@@ -7,6 +7,7 @@
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "console",
+  "editor": "text",
   "slos": [
     "SLO-3",
     "SLO-4"
@@ -22,7 +23,7 @@
     {
       "id": "s1",
       "title": "Turn the plain-English steps into pseudocode",
-      "instructions": "Here is the plan in plain English:\n\n**1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs.\n\n**2.** In the title state: draw the title screen, then if space was pressed, change the state to play.\n\n**3.** In the play state: update the game, then if the player is dead, change the state to gameover.\n\n**4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title.\n\n**5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for drawing and updating, and SET for a state change. Name the three calls `drawTitle`, `updateGame` and `drawGameOver`. Number every line, including the indented ones and the END IF lines. Each keyword looks like this, in a different program:\n\n- `IF mode is \"menu\"` ... `ELSE IF mode is \"game\"` ... `END IF` (route by a value)\n- `CALL drawMenu` (call another function)\n- `IF enter is pressed` ... `END IF` (the check to leave)\n- `SET mode TO \"game\"` (a state change)\n\nEvery state draws **first** and only then asks whether to leave. Afterwards, read your plan as a map: is there any way from play back to title without dying? There is not, and you found it by reading. That may be fine.",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs.\n\n**2.** In the title state: draw the title screen, then if space was pressed, change the state to play.\n\n**3.** In the play state: update the game, then if the player is dead, change the state to gameover.\n\n**4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title.\n\n**5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for drawing and updating, and SET for a state change. Name the three calls `drawTitle`, `updateGame` and `drawGameOver`. Number every line, including the indented ones and the END IF lines. Each keyword looks like this, in a different program:\n\n- `IF mode is \"menu\"` ... `ELSE IF mode is \"game\"` ... `END IF` (route by a value)\n- `CALL drawMenu` (call another function)\n- `IF enter is pressed` ... `END IF` (the check to leave)\n- `SET mode TO \"game\"` (a state change)\n\nEvery state draws **first** and only then asks whether to leave. Afterwards, read your plan as a map: is there any way from play back to title without dying? There is not, and you found it by reading. That may be fine.\n\nPlain English is fine here. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.",
       "hints": [
         "A state does its drawing first, then asks whether to leave. If you flip that, the frame where the player dies never draws.",
         "The three states are one chain, not three separate decisions: separate IFs would let the state change mid-frame."
@@ -106,5 +107,48 @@
   "planChart": {
     "mermaid": "flowchart LR\n  A([draw runs]) --> B{in the title state?}\n  B -- yes --> C[[draw the title screen]]\n  C --> D{space pressed?}\n  D -- yes --> E[switch to play]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F{in the play state?}\n  F -- yes --> G[[update the game]]\n  G --> H{player dead?}\n  H -- yes --> I[switch to gameover]\n  H -- no --> Z\n  I --> Z\n  F -- no --> M{in the gameover state?}\n  M -- yes --> J[[draw the game over screen]]\n  M -- no --> Z\n  J --> K{r pressed?}\n  K -- yes --> L[switch to title]\n  K -- no --> Z\n  L --> Z",
     "caption": "One frame of draw(): route by state, draw first, then check whether to leave. Every path reaches the end of the frame."
+  },
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps for the lab \"6.6.14 Plain English to Pseudocode: The Three-State Machine\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs. **2.** In the title state: draw the title screen, then if space was pressed, change the state to play. **3.** In the play state: update the game, then if the player is dead, change the state to gameover. **4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title. **5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for drawing and updating, and SET for a state change. Name the three calls `drawTitle`, `updateGame` and `drawGameOver`. Number every line, including the indented ones and the END IF lines. Each keyword looks like this, in a different program: - `IF mode is \"menu\"` ... `ELSE IF mode is \"game\"` ... `END IF` (route by a value) - `CALL drawMenu` (call another function) - `IF enter is pressed` ... `END IF` (the check to leave) - `SET mode TO \"game\"` (a state change) Every state draws **first** and only Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, IF, ELSE, CALL, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, capitalisation and numbering. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Twelve or more numbered steps",
+        "description": "Number every line 1. 2. 3. and so on, with something written after each number.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "One chain: title, then play, then gameover",
+        "description": "The three states are tested in one chain.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Title: draw, then check the key, then change state",
+        "description": "The title branch draws, then checks for space, then changes the state.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Play: update, then check for death, then change state",
+        "description": "The play branch updates the game, then checks if the player is dead, then changes the state.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Gameover: draw, then check the key, then change state",
+        "description": "The gameover branch draws, then checks for r, then changes the state.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Three state changes, and nothing jumps",
+        "description": "One state change per transition, and no GO TO or loop back.",
+        "points": 1
+      }
+    ]
   }
 }

@@ -87,5 +87,42 @@
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "assignmentCode": "A2.2.1"
+  "assignmentCode": "A2.2.1",
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.2.17 For + While Loop Program (Part B)\". The task they were given: Use a for loop to count or step through a range of numbers, logging something on each pass, for example, counting how many multiples of a number appear in a range (`n % 3 === 0` is true when n is a multiple of 3: the remainder is 0). You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "for loop present",
+        "description": "Code contains a for loop. Help: 2.2.9 (The for Loop)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "while loop present",
+        "description": "Code contains a while loop. Help: 2.2.13 (The while Loop)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "console.log present",
+        "description": "Code calls console.log",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "for loop logs on each pass",
+        "description": "The for loop body contains a console.log.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "while loop builds a running total",
+        "description": "Inside the while loop a variable is added to itself (total = total + n or total += n).",
+        "points": 1
+      }
+    ]
+  }
 }

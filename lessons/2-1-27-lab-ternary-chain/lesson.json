@@ -66,5 +66,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.1.25 Chain Your Ternaries\". The task they were given: Create a variable called score and set it to a number from 0 to 100. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "90-or-above cutoff yields Excellent",
+        "description": "score >= 90 ? ... chooses Excellent. Help: 2.1.23 (Chaining Multiple ? Operators)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "70-or-above cutoff yields Good, else Needs work",
+        "description": "score >= 70 ? chooses Good, otherwise Needs work. Help: 2.1.23 (Chaining Multiple ? Operators)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "rating assigned by checking 90 before 70",
+        "description": "rating is assigned from a chain that checks the 90 cutoff before the 70 cutoff. Help: 2.1.23 (Chaining Multiple ? Operators)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "rating is logged",
+        "description": "console.log is called with the rating variable. Help: 2.1.23 (Chaining Multiple ? Operators)",
+        "points": 1
+      }
+    ]
   }
 }

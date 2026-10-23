@@ -78,5 +78,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.2.15 Greeting with Backticks\". The task they were given: Declare a variable called `myName` and set it to your name in quotes. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "myName is declared",
+        "description": "Declares a variable called myName. Help: 1.2.13 (Embedding Values with ${...})",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A backtick string embeds myName",
+        "description": "Uses a template literal containing ${myName}. Help: 1.2.13 (Embedding Values with ${...})",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A calculation is embedded",
+        "description": "Embeds an expression containing an operator, such as ${2024 + 1}. Help: 1.2.13 (Embedding Values with ${...})",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The single-quote version is logged too",
+        "description": "Logs a single-quoted string containing a literal ${ so the difference is visible. Help: 1.2.13 (Embedding Values with ${...})",
+        "points": 1
+      }
+    ]
   }
 }

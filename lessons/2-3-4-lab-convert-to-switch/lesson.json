@@ -70,5 +70,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.3.29 Convert an if-chain to switch\". The task they were given: Create a variable called day and assign it a day-of-week string, for example 'Monday'. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "switch statement present",
+        "description": "Code contains a switch statement",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "case label present",
+        "description": "A quoted case label is directly followed by a console.log call",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "default label present",
+        "description": "The default label is directly followed by a console.log call",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "at least two breaks, one per case",
+        "description": "Code contains at least two break statements, one after each case body.",
+        "points": 1
+      }
+    ]
   }
 }

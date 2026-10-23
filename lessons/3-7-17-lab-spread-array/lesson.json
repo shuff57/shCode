@@ -261,5 +261,48 @@
   },
   "planChart": {
     "mermaid": "flowchart LR\n  A([Start]) --> B[make two lists]\n  B --> C[build a new list with spread holding every item from both]\n  C --> D[build another new list with spread, a loose item at each end around one copy]\n  D --> E[/log both new lists and one original/]\n  E --> F([End])"
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.7.17 Lab: Build a New Array with Spread\". The task they were given: Create two arrays (the lesson calls them first and second; use any names that fit), each holding at least two values. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Spread used",
+        "description": "Uses array spread, written as ... inside an array literal. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Two spread arrays combined",
+        "description": "Spreads two arrays into one new array literal. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "console.log present",
+        "description": "Calls console.log. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Arrays declared",
+        "description": "Declares at least two arrays. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "both new arrays and an original are printed",
+        "description": "combined holds both arrays, framed is first with one loose value on each side, and the output shows both. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "combined and framed are spread from the originals and printed by code that runs",
+        "description": "When first and second hold other values, combined and framed change with them, and console.log calls that run print both new arrays and an original. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      }
+    ]
   }
 }

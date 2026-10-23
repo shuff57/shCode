@@ -96,5 +96,42 @@
   },
   "assignmentCode": "A1.5.1",
   "planFrom": "1-5-30-a1-5-1-flowchart-gate",
-  "planFromLabel": "1.5.30"
+  "planFromLabel": "1.5.30",
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.5.31 Implement Your Plan (Part 2)\". The task they were given: Before any code, write your chart out as pseudocode comments at the top of the file. One instruction per line, indented to show what is inside the decision. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r2",
+        "title": "pagesRequested is declared",
+        "description": "A descriptive variable holds how many pages were asked for. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "creditRemaining is declared",
+        "description": "A descriptive variable holds the credit left. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The decision compares the two",
+        "description": "An if statement compares pagesRequested against creditRemaining",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Both branches exist",
+        "description": "An else branch is present, matching the diamond's second exit",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Both branches print",
+        "description": "Two or more console.log calls, so each path reports an outcome. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      }
+    ]
+  }
 }

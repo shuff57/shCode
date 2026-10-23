@@ -89,5 +89,42 @@
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "assignmentCode": "A2.4.2"
+  "assignmentCode": "A2.4.2",
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.4.32 Print a Grid Pattern\". The task they were given: Declare a variable called rows and a variable called cols. Set each to a number of at least 5. Do not write the numbers directly into the loop headers: the loops must read them from these variables. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "rows variable declared",
+        "description": "A variable named rows is declared. Help: 2.4.24 (Nested Loops)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "cols variable declared",
+        "description": "A variable named cols is declared. Help: 2.4.24 (Nested Loops)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "outer loop reads rows",
+        "description": "An outer for loop (from 0) contains a nested inner for loop (from 0) whose bound is the cols variable, the outer's bound is the rows variable, and the row is logged after the inner loop closes (any consistent counter names accepted, e.g. i/j). Help: 2.4.24 (Nested Loops)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "inner loop reads cols",
+        "description": "The inner loop's condition compares its own counter against the cols variable, and the outer against rows, not hardcoded numbers (any consistent counter names accepted, e.g. i/j). Help: 2.4.24 (Nested Loops)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "console.log present",
+        "description": "Code calls console.log. Help: 2.4.24 (Nested Loops)",
+        "points": 1
+      }
+    ]
+  }
 }

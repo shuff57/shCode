@@ -343,5 +343,78 @@
   },
   "planChart": {
     "mermaid": "flowchart LR\n  A([Start]) --> B[make user with a name and an age]\n  B --> C[call birthday: add 1 to the age on user]\n  C --> D[/log user/]\n  D --> E[call birthdaySafe: build a new older object]\n  E --> F[/log the new object and the original user/]\n  F --> G([End])"
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.6.12 Lab: Object-Parameter Mutation\". The task they were given: Define a function (the lesson calls it birthday; name it for what you are building) that takes one object parameter and adds 1 to its age property. Do not reassign the parameter; change the property the object already has. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "birthday defined",
+        "description": "Code defines a function named birthday. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "property mutated",
+        "description": "Code assigns to a property on the parameter object. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "birthdaySafe defined",
+        "description": "Code defines a function named birthdaySafe. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "object spread used",
+        "description": "Code copies the object with spread syntax. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "results logged",
+        "description": "Code calls console.log. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "birthday raises the age on the object it is given",
+        "description": "birthday({ name: \"A\", age: 10 }) leaves that same object with age 11. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "birthdaySafe returns an older copy and leaves the original alone",
+        "description": "birthdaySafe({ name: \"A\", age: 10 }) returns { name: \"A\", age: 11 } and the object passed in still has age 10. Help: 3.6.9 (Side Effects and Copies)",
+        "points": 1
+      },
+      {
+        "id": "t3",
+        "title": "the caller's object is printed after the call",
+        "description": "user holds a name and an age, and the printed output shows both the name and the age user ends with. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "birthday called",
+        "description": "birthday runs with user (your object), and user is printed after the call. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "birthdaySafe called",
+        "description": "birthdaySafe runs with user, and the object it returns is printed after the call. Help: 3.6.10 (Defensive Copying: [...] and {...})",
+        "points": 1
+      },
+      {
+        "id": "t4",
+        "title": "the user object is printed by code that runs",
+        "description": "A console.log that runs prints the name or age of user, or the whole object. Help: 3.6.5 (Changing vs. Reassigning)",
+        "points": 1
+      }
+    ]
   }
 }

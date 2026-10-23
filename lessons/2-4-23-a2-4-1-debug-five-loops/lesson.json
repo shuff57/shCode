@@ -96,5 +96,42 @@
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "assignmentCode": "A2.4.1"
+  "assignmentCode": "A2.4.1",
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.4.23 Debug Five Loops\". The task they were given: The commented-out version of Program 1 never stops because n never changes. Write a fixed, runnable version below it that logs n from 1 to 5, then stops. Add a comment explaining what was wrong. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Program 1 fixed: update added",
+        "description": "A while (n <= 5) loop logs n and increments it inside its own body (n++, n += 1, or n = n + 1). Help: 2.4.20 (Infinite Loops: Three Causes)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Program 2 fixed: update moves the right way",
+        "description": "A for loop counts count down from 10 while it is greater than 0 (count--, count -= 1, or count = count - 1), logging count inside its own body. Help: 2.4.20 (Infinite Loops: Three Causes)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Program 3 fixed: inclusive comparison",
+        "description": "A for loop counts i from 1 to 5 inclusive, logging i inside its own body. Help: 2.4.20 (Infinite Loops: Three Causes)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Program 4 fixed: starts at 1",
+        "description": "A for loop counts k from 1 to 5 inclusive, logging k inside its own body (k++, k += 1, or k = k + 1). Help: 2.4.20 (Infinite Loops: Three Causes)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Program 5 fixed: do...while used",
+        "description": "A do...while loop logs something and its condition guarantees the body could otherwise be skipped (!greeted or greeted === false). Help: 2.4.5 (The do...while Loop)",
+        "points": 1
+      }
+    ]
+  }
 }

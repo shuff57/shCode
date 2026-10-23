@@ -125,5 +125,66 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.1.41 Challenges: Stretch Problems\". The task they were given: Create a variable called year. Write a condition that logs 'Leap year' when the year is divisible by 4 (`year % 4 === 0` is true when year divides evenly by 4: the remainder is 0) and (not divisible by 100, or divisible by 400), and 'Not a leap year' otherwise. You will need &&, ||, and !. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "checks divisibility by 4",
+        "description": "Challenge 1: tests year % 4",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "&& and || both used",
+        "description": "Challenge 1: the leap year check combines && and ||",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "logs both leap year messages",
+        "description": "Challenge 1: logs both \"Leap year\" and \"Not a leap year\"",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "playerOne and playerTwo declared",
+        "description": "Challenge 2: both playerOne and playerTwo exist",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "else if chain used",
+        "description": "Challenge 2: code contains an else if chain",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "logs a Tie result",
+        "description": "Challenge 2: logs \"Tie\" for the matching case",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "isMember and orderTotal declared",
+        "description": "Challenge 3: both isMember and orderTotal exist",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "nested if used",
+        "description": "Challenge 3: an if statement nested inside another if's block",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "both shipping thresholds used",
+        "description": "Challenge 3: uses both the $35 and $75 thresholds",
+        "points": 1
+      }
+    ]
   }
 }

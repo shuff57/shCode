@@ -146,5 +146,30 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.3.6 Lab: Fix the Off-by-One Loop\". The task they were given: Run the code. printPrices should print 5, 12 and 8 and nothing else. Find the extra line. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "printPrices is defined with one parameter",
+        "description": "Code defines a function named printPrices with exactly one parameter. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "the loop stops at the last item",
+        "description": "A for loop is still there, and its condition no longer lets the index reach the array's length (use < prices.length, not <=). Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "printPrices prints every price once and nothing else",
+        "description": "printPrices(prices) prints each price on its own line, in order, with no extra line at the end. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      }
+    ]
   }
 }

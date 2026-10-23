@@ -177,5 +177,42 @@
   },
   "planChart": {
     "mermaid": "flowchart LR\n  A([Start]) --> B[make the list of prices]\n  B --> C[build a new list by changing every price with map]\n  C --> D[/log the new list/]\n  D --> E[/log the original list/]\n  E --> F([End])"
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.7.4 Lab: Transform a List Without Mutating the Input\". The task they were given: The starter gives you an array of numbers (the lesson calls it prices; you may rename it): const prices = [10, 20, 30]; Leave its three numbers as they are. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Array declared",
+        "description": "Declares an array with square brackets. Help: 3.7.2 (Transforming a List with .map())",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": ".map() used",
+        "description": "Calls .map() to build a transformed array. Help: 3.7.2 (Transforming a List with .map())",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "console.log present",
+        "description": "Calls console.log. Help: 3.7.2 (Transforming a List with .map())",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "prices still holds its starting values and both arrays are printed",
+        "description": "prices is still [10, 20, 30], doubled holds three transformed numbers, and the output shows them. Help: 3.7.2 (Transforming a List with .map())",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "doubled is built from prices and printed by code that runs",
+        "description": "doubled is what prices.map(...) gives back, changes when prices does, and console.log calls that run print doubled and prices. Help: 3.7.2 (Transforming a List with .map())",
+        "points": 1
+      }
+    ]
   }
 }

@@ -90,5 +90,42 @@
     "passingScore": 0,
     "allowLateSubmit": true,
     "reviewCommitHistory": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.2.16 Operators and Expressions Check\". The task they were given: Create two number variables and add them together with +. Print the result with console.log. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "req1",
+        "title": "Use addition",
+        "description": "Use the + operator with numbers. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
+        "points": 1
+      },
+      {
+        "id": "req2",
+        "title": "Use multiplication",
+        "description": "Use the * operator. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
+        "points": 1
+      },
+      {
+        "id": "req3",
+        "title": "String concatenation",
+        "description": "Concatenate strings using +, either inline literals or two previously-declared string variables. Help: 1.2.12 (Strings and the Three Quotes)",
+        "points": 1
+      },
+      {
+        "id": "req4",
+        "title": "Comparison operator",
+        "description": "Use a comparison operator like ===, !==, <, >. Help: 1.2.3 (Every Value Has a Type)",
+        "points": 1
+      },
+      {
+        "id": "req5",
+        "title": "Log results",
+        "description": "Use console.log to display results. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
+        "points": 1
+      }
+    ]
   }
 }

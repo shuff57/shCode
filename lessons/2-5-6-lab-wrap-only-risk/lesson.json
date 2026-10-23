@@ -50,5 +50,24 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.5.6 Wrap Only What Can Fail\". The task they were given: The starter has a for loop that computes a total, wrapped inside one try block along with a risky console.log(label) line. Move the for loop and the let total = 0; declaration so they run before the try block, not inside it. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "for loop present",
+        "description": "The loop that computes the total is still in the file. Help: 2.2.9 (The for Loop)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "loop runs before try; total logged after catch",
+        "description": "The total is logged after the catch block, not inside the try. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      }
+    ]
   }
 }

@@ -7,6 +7,7 @@
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "console",
+  "editor": "text",
   "slos": [
     "SLO-3",
     "SLO-4"
@@ -22,7 +23,7 @@
     {
       "id": "s1",
       "title": "Repair the half-finished pseudocode",
-      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** When the state is play: update the game, and if p was pressed, change the state to paused.\n\n**2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Read each red card against the plan above, then repair it. Do not start over. The call names are `updateGame` and `drawPauseScreen`. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first.\n\nRenumber the lines if you like: every line just needs a number.\n\nWhen it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.",
+      "instructions": "Here is what the finished feature should do, in plain English:\n\n**1.** When the state is play: update the game, and if p was pressed, change the state to paused.\n\n**2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play.\n\n**3.** Every path ends at the end of the frame. No step may send you back to itself.\n\nThe same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps.\n\nSomeone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Read each red card against the plan above, then repair it. Do not start over. The call names are `updateGame` and `drawPauseScreen`. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first.\n\nRenumber the lines if you like: every line just needs a number.\n\nWhen it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.\n\nPlain English is fine here. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.",
       "hints": [
         "A step that jumps back to itself is a hung game, written down.",
         "Think about which frames the pause screen should run on."
@@ -106,5 +107,48 @@
   "planChart": {
     "mermaid": "flowchart LR\n  A([draw runs]) --> B{is the game playing?}\n  B -- yes --> C[[update the game]]\n  C --> D{p pressed?}\n  D -- yes --> E[switch to paused]\n  D -- no --> Z([end of frame])\n  E --> Z\n  B -- no --> F[[draw the pause screen]]\n  F --> G{p pressed?}\n  G -- yes --> H[switch to play]\n  G -- no --> Z\n  H --> Z",
     "caption": "The finished pause feature. The not-playing branch draws the pause screen and has a way back to play."
+  },
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps for the lab \"6.6.21 Fix the Broken Pseudocode: the Pause State\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is what the finished feature should do, in plain English: **1.** When the state is play: update the game, and if p was pressed, change the state to paused. **2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play. **3.** Every path ends at the end of the frame. No step may send you back to itself. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. Someone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Read each red card against the plan above, then repair it. Do not start over. The call names are `updateGame` and `drawPauseScreen`. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first. Renumber the lines if you like: every line just needs a number. When it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, IF, ELSE, CALL, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, capitalisation and numbering. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Every frame that is not playing is handled",
+        "description": "The play decision has a branch for the frames when the game is not playing.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The pause screen is drawn only when paused",
+        "description": "The call to drawPauseScreen runs only on the paused frames.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Every step moves forward",
+        "description": "No step sends you back to an earlier step. A state change is an ordinary step.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The player can leave pause",
+        "description": "The paused branch checks for p and goes back to play.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Pausing needs a key press",
+        "description": "The change to paused sits inside the check for p.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Playing updates the game",
+        "description": "The play branch updates the game, and the paused frames do not.",
+        "points": 1
+      }
+    ]
   }
 }

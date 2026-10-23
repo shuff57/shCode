@@ -187,5 +187,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.5.24 Lab: Parallel-Arrays-vs-Object Refactor\". The task they were given: The starter keeps three separate arrays, one per field, aligned by index: a name, a score and a group for each player. Read it and see how each field is fetched from a different array at the same index. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "array of object records built",
+        "description": "An array holds object records: written in the brackets, pushed in one at a time, or built first in variables and listed in the brackets. Help: 3.5.9 (Objects Inside Objects and Arrays)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "record fields read with a dot",
+        "description": "console.log prints a record's field read with a dot (players[i].name, a record variable then a dot, or a helper that returns text read off its record), or the fields are unpacked from one record with braces. Help: 3.5.9 (Objects Inside Objects and Arrays)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "loop over players prints each record",
+        "description": "A loop over the players array (for, for...of, while or forEach) prints something read from each record, itself or through a helper function it calls. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "output printed",
+        "description": "Calls console.log. Help: 3.5.9 (Objects Inside Objects and Arrays)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "players holds one record per player, with the same data",
+        "description": "After the code runs, players is the three records { name, score, group } for Marisol, Dev and Priya, in that order. Help: 3.5.23 (A Record-Shaped Object)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "the parallel arrays are gone",
+        "description": "No array of plain values is left, however it is made (a list in brackets, split, Array.of, new Set): the names, scores and groups live only in players. Help: 3.5.2 (Grouping Related Values)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the loop prints each player from the records",
+        "description": "A loop that runs prints every player's name, group and score read from players, one player per line. Typed-in text, and a loop that never runs, do not count. A printed undefined names the read that found nothing. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      }
+    ]
   }
 }

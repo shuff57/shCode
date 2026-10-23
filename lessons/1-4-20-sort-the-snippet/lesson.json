@@ -78,5 +78,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.4.20 Sort the Snippet\". The task they were given: Read the snippet in the comment. Log which paradigm it is, using console.log. Choose from: procedural, object-oriented, functional. Log one answer per step, in step order, one console.log each -- the first console.log is STEP 1. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Snippet A is procedural",
+        "description": "The first console.log answers STEP 1 -- Snippet A, with procedural. Help: 1.4.8 (Procedural Programming)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Snippet B is object-oriented",
+        "description": "The second console.log answers STEP 2 -- Snippet B, with object-oriented. Help: 1.4.15 (Object-Oriented Programming)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Snippet C is functional",
+        "description": "The third console.log answers STEP 3 -- Snippet C, with functional. Help: 1.4.18 (Functional Programming)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "JavaScript is multi-paradigm",
+        "description": "The fourth console.log answers STEP 4 -- the language itself, with multi-paradigm. Help: 1.4.19 (JavaScript Is Multi-Paradigm)",
+        "points": 1
+      }
+    ]
   }
 }

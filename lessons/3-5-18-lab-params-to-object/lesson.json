@@ -171,5 +171,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.5.18 Lab: Rewrite a Multi-Parameter Function to Take an Object\". The task they were given: Write a function (the lesson calls it describeBox; name it for what you are building) that takes three positional parameters (width, height and color) and returns a string built from them. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "function defined",
+        "description": "Defines a function. Help: 3.5.16 (Objects as Named Arguments)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "reads a property off the options object",
+        "description": "Uses options.property in the body. Help: 3.5.16 (Objects as Named Arguments)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "describeBox called with an object literal, and the result printed",
+        "description": "A call to describeBox passes an object literal in braces, and what it returns is printed: the call is inside console.log, or stored in a variable that is then printed. Help: 3.5.16 (Objects as Named Arguments)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "result printed",
+        "description": "Calls console.log. Help: 3.5.16 (Objects as Named Arguments)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "describeBox takes one options object and uses all three values",
+        "description": "describeBox takes one options object and the text it returns is built from all three values: changing the width, the height or the color changes the text. Help: 3.5.17 (Function Taking One Options Object)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "what describeBox returns is printed, with every key filled",
+        "description": "A console.log that runs prints what describeBox returned for an object literal, and no printed line says undefined (a key describeBox reads that the object does not have). A result thrown away, typed-in text, and a print that never runs do not count. Help: 3.5.16 (Objects as Named Arguments)",
+        "points": 1
+      }
+    ]
   }
 }

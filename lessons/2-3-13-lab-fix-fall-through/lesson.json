@@ -60,5 +60,30 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.3.13 Fix the Fall-Through Bug\". The task they were given: Run the code first and read the two lines it prints. Only one of them should print. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "switch statement present",
+        "description": "Code still contains a switch statement. Help: 2.3.9 (break and Fall-Through)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "break added after the apple case",
+        "description": "A break statement now appears between the apple case and the banana case. Help: 2.3.9 (break and Fall-Through)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "default label still present",
+        "description": "Code still contains a default label. Help: 2.3.9 (break and Fall-Through)",
+        "points": 1
+      }
+    ]
   }
 }

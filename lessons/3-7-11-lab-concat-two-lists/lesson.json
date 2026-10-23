@@ -188,5 +188,42 @@
   },
   "planChart": {
     "mermaid": "flowchart LR\n  A([Start]) --> B[make two lists]\n  B --> C[join the second onto the first into a new list with concat]\n  C --> D[/log the joined list/]\n  D --> E[/log both originals/]\n  E --> F([End])"
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.7.11 Lab: `.concat()` Two Lists\". The task they were given: Create two arrays (the lesson calls them first and second; use any names that fit), each holding at least three values. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Two arrays declared",
+        "description": "Declares at least two arrays with square brackets. Help: 3.7.9 (Joining Lists with .concat())",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": ".concat() used",
+        "description": "Calls .concat(). Help: 3.7.9 (Joining Lists with .concat())",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "console.log present",
+        "description": "Calls console.log. Help: 3.7.9 (Joining Lists with .concat())",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "joined is first followed by second, and it is printed",
+        "description": "joined holds first's values and then second's (more lists may follow), neither original was changed, and the output shows joined. Help: 3.7.9 (Joining Lists with .concat())",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "joined is built from both lists, and all three are printed by code that runs",
+        "description": "When first and second hold other values, joined changes with them, and console.log calls that run print joined and both originals. Help: 3.7.9 (Joining Lists with .concat())",
+        "points": 1
+      }
+    ]
   }
 }

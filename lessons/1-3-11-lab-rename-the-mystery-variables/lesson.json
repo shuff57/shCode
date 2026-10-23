@@ -103,5 +103,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.3.11 Rename the Mystery Variables\". The task they were given: The first snippet builds a grade sentence with a, b and c. Rename them to subjectName, finalGrade and gradeReport. Keep the output the same. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "subjectName replaces a",
+        "description": "Declares subjectName holding the subject text. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "finalGrade replaces b",
+        "description": "Declares finalGrade holding the number. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "gradeReport replaces c",
+        "description": "Declares gradeReport built from the other two. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "hoursWorked replaces n",
+        "description": "Declares hoursWorked holding the number of hours. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "hourlyRate replaces d",
+        "description": "Declares hourlyRate holding the rate. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "totalPay replaces p",
+        "description": "Declares totalPay as hoursWorked times hourlyRate. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "No single-letter variables left",
+        "description": "No declaration of a, b, c, n, d or p remains in the file. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
+        "points": 1
+      }
+    ]
   }
 }

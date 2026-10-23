@@ -237,5 +237,72 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.2.23 Lab: Compose Two Functions\". The task they were given: Define a function called triple that takes one parameter n and returns n multiplied by 3. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "triple defined",
+        "description": "Code defines a function named triple. Help: 3.2.20 (Building With Returned Values)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "addSeven defined",
+        "description": "Code defines a function named addSeven. Help: 3.2.20 (Building With Returned Values)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "returns a value",
+        "description": "Code contains a return statement. Help: 3.2.20 (Building With Returned Values)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "one call nested in another",
+        "description": "A call to one function is written as the argument of the other. Help: 3.2.20 (Building With Returned Values)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "results are logged",
+        "description": "Code calls console.log. Help: 3.2.20 (Building With Returned Values)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "triple multiplies",
+        "description": "triple multiplies: its body has a * (or adds the number to itself three times). Help: 3.2.20 (Building With Returned Values)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "addSeven adds",
+        "description": "addSeven adds: its body has a +. Help: 3.2.20 (Building With Returned Values)",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "both nesting orders",
+        "description": "Both orders are written: triple inside addSeven and addSeven inside triple. Help: 3.2.20 (Building With Returned Values)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "triple gives back 3 times n",
+        "description": "triple(n) returns n multiplied by 3 for any number. Help: 3.2.20 (Building With Returned Values)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "addSeven gives back n plus 7",
+        "description": "addSeven(n) returns n plus 7 for any number. Help: 3.2.20 (Building With Returned Values)",
+        "points": 1
+      }
+    ]
   }
 }

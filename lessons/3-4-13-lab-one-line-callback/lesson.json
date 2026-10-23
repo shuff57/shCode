@@ -103,5 +103,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.4.13 Lab: Write a One-Line Arrow Callback\". The task they were given: Define a function called transform with two parameters: a value and a function (in either order). Inside it, call the function you were handed on the value and return the result. The helper should not know what the function does. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Helper takes a function parameter",
+        "description": "A function is defined that calls one of its parameters as a function. Help: 3.4.11 (Passing a Function to a Function)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Inline arrow passed to transform",
+        "description": "transform is called with a one-line arrow: written inside its parentheses, or stored in a const and passed by name. Help: 3.4.11 (Passing a Function to a Function)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "console.log present",
+        "description": "Code calls console.log. Help: 3.4.11 (Passing a Function to a Function)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The result is printed",
+        "description": "console.log prints what transform returns: the call sits inside console.log, or its result is stored and that variable is printed. Help: 3.4.11 (Passing a Function to a Function)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "transform calls the function it is given and returns the result",
+        "description": "transform(2, n => n + 1) is 3 and transform(\"a\", s => s + \"b\") is \"ab\", with the value and the function given in either order. Help: 3.4.11 (Passing a Function)",
+        "points": 1
+      }
+    ]
   }
 }

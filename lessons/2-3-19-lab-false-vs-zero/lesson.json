@@ -80,5 +80,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.3.19 case false vs case 0: Predict, Then Run\". The task they were given: Create a variable called value. Write a switch on value with three cases in this order: case false, case 0, case '0' (the string). Each case should log which one matched, and end with a break. Add a default too. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "switch statement present",
+        "description": "Code contains a switch statement. Help: 2.3.18 (switch Compares Strictly)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "case false present",
+        "description": "case false is directly followed by a console.log call. Help: 2.3.18 (switch Compares Strictly)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "case 0 present",
+        "description": "case 0 is directly followed by a console.log call. Help: 2.3.18 (switch Compares Strictly)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "case '0' present",
+        "description": "case '0' is directly followed by a console.log call. Help: 2.3.18 (switch Compares Strictly)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "three breaks, one per case",
+        "description": "Code contains three break statements, one for each of case false, case 0 and case '0'. Help: 2.3.9 (break and Fall-Through)",
+        "points": 1
+      }
+    ]
   }
 }

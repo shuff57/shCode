@@ -210,5 +210,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.3.19 Lab: Write a Function That Returns a New Array\". The task they were given: Write a function declaration called doubled that takes an array parameter (the numbers to double). You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "function with an array parameter that is not mutated",
+        "description": "Code declares a function whose array parameter is never changed inside it (no push, pop, shift, unshift, splice, sort, reverse, fill or index assignment on it). Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "for loop present",
+        "description": "Code uses a for or for...of loop. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": ".push used",
+        "description": "Code calls .push(. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "function returns the new array",
+        "description": "A return inside the function hands back the new array. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "the new array differs from the input",
+        "description": "A pushed value is changed (arithmetic or a call) or only pushed when an if says so, so the result is not a plain copy. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "both arrays are logged",
+        "description": "console.log is called at least twice: once for the returned array and once for the original. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "doubled returns a new, doubled array and leaves the original alone",
+        "description": "doubled(numbers) returns a NEW array holding every number doubled, in the same order, and the array you pass in is not changed. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      }
+    ]
   }
 }

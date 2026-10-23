@@ -75,5 +75,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.5.9 What Runs, What Doesn't\". The task they were given: In a comment, predict which of these four lines will print: log \"A\", log an undeclared variable called boom, log \"B\", catch logs \"C\", and after the block, log \"D\". You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "logs A before the risky line",
+        "description": "Code logs \"A\" before reading boom. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "catch logs C",
+        "description": "The catch block logs \"C\". Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "D logged after the whole block",
+        "description": "\"D\" is logged after the catch block closes. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "logs B after the risky line",
+        "description": "console.log(\"B\") appears right after console.log(boom).",
+        "points": 1
+      }
+    ]
   }
 }

@@ -89,5 +89,42 @@
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "assignmentCode": "A2.5.1"
+  "assignmentCode": "A2.5.1",
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"2.5.26 Loop with try/catch\". The task they were given: Write a for loop with i from 1 to 3. Inside, set a variable raw to \"12\" when i is 1, \"abc\" when i is 2, and \"-4\" when i is 3 (three separate if statements). You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "for loop present",
+        "description": "Code loops over the three readings with a for loop. Help: 2.2.9 (The for Loop)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "try/catch inside the loop",
+        "description": "The loop body has a try block and a catch block. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "checks for NaN",
+        "description": "Code checks the converted value with Number.isNaN(...) or isNaN(...). Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "catch reports err.message",
+        "description": "The catch block logs a friendly message that includes err.message, not a generic string. Help: 2.5.12 (Reading the Error Object)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "throws an Error for the bad readings",
+        "description": "Two throw new Error statements: one for NaN, one for a reading that is 0 or less.",
+        "points": 1
+      }
+    ]
+  }
 }

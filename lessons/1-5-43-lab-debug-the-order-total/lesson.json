@@ -93,5 +93,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"1.5.43 Debug the Order Total\". The task they were given: Before changing anything, work out by hand what the correct total is for 3 notebooks at 4.00 with 10% off and 8% tax. Write it in a comment as your expected outcome. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "subtotal multiplies price by quantity",
+        "description": "The quantity is actually used, with multiplication. Help: 1.5.41 (Debugging with console.log)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The discount is subtracted",
+        "description": "The discounted amount is the subtotal minus the discount, not plus. Help: 1.5.41 (Debugging with console.log)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Tax is added to the discounted amount",
+        "description": "The final total adds tax rather than subtracting it. Help: 1.5.41 (Debugging with console.log)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "At least three labelled prints",
+        "description": "Three or more console.log calls whose text includes a label (string concatenation or a template literal both count). Help: 1.5.41 (Debugging with console.log)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "A PASS/FAIL check is present",
+        "description": "An if/else comparing the total against the expected value and printing PASS or FAIL. Help: 1.5.40 (Testing and Test Cases)",
+        "points": 1
+      }
+    ]
   }
 }

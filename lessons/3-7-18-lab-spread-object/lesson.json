@@ -280,5 +280,48 @@
   },
   "planChart": {
     "mermaid": "flowchart LR\n  A([Start]) --> B[start from the settings object]\n  B --> C[copy it with spread into a new object, one existing property changed after the spread]\n  C --> D[copy it with spread again, adding a brand new property]\n  D --> E[/log both copies and the original/]\n  E --> F([End])"
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.7.18 Lab: Build a New Object with Spread + Override\". The task they were given: The starter gives you an object with three properties (the lesson calls it settings; you may rename it): const settings = { theme: \"dark\", fontSize: 14, wrap: true }; Leave its keys and values as they are. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Object declared",
+        "description": "Declares an object with curly braces. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Object spread used",
+        "description": "Uses object spread, written as ... inside an object literal. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Override after the spread",
+        "description": "Writes a property after the spread so the override wins. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "console.log present",
+        "description": "Calls console.log. Help: 3.7.14 (Spreading into a New Array or Object)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "changed overrides one value of settings, extended adds one key, and settings is unchanged",
+        "description": "After the code runs, settings is still { theme: \"dark\", fontSize: 14, wrap: true }, changed overrides one of its values, extended adds one new key, and the output shows both copies. Help: 3.7.15 (Copying an Object with Changes)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "changed and extended are spread from settings and printed by code that runs",
+        "description": "When settings holds other values, the values changed and extended copy from it change too, and console.log calls that run print both copies and settings. Help: 3.7.15 (Copying an Object with Changes)",
+        "points": 1
+      }
+    ]
   }
 }

@@ -206,5 +206,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.5.12 Lab: Build a Small Nested-Object Structure\". The task they were given: Create a variable for it (the lesson calls it order; use any name that fits what you are building) and assign it an object literal. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "nested object built",
+        "description": "order holds another object: written inside its braces, assigned with a dot, or built first and placed in. Help: 3.5.9 (Objects Inside Objects and Arrays)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "array of objects built",
+        "description": "An array holds objects: written in the brackets, pushed in, or built first and listed. Help: 3.5.9 (Objects Inside Objects and Arrays)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "customer chain read",
+        "description": "console.log prints a field of the customer reached with a chain (order.customer.name), or a variable holding that read or holding order.customer. Help: 3.5.9 (Objects Inside Objects and Arrays)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "index then field read",
+        "description": "console.log prints a field read off one item: order.items[i].name, or the item held in a variable (a loop variable, a forEach parameter, or const item = order.items[i]) then a dot. Help: 3.5.9 (Objects Inside Objects and Arrays)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "loop prints each item",
+        "description": "A loop over the items (for, for...of, while or forEach, on order.items, a variable holding it, or counting to the number of items) prints a field read off each item, itself or through a helper function it calls. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "order holds a customer object and a list of items",
+        "description": "After the code runs, order.customer is an object with a name, and order.items is an array of at least two objects, each with a name and a price. Help: 3.5.9 (Objects Inside Objects and Arrays)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the customer name and every item are printed by reads that run",
+        "description": "Code that runs prints the customer name read from order, and a loop prints every item's name and price, one item per line. A printed undefined names the read that found nothing. Help: 3.5.9 (Objects Inside Objects and Arrays)",
+        "points": 1
+      }
+    ]
   }
 }

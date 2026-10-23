@@ -129,5 +129,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.4.17 Lab: Fix a Broken Arrow\". The task they were given: Run the starter. The line where the arrow is defined throws a syntax error before anything else runs. The message may not mention parentheses; the clue is that the error is on the line that defines the arrow. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Parameters wrapped in parentheses",
+        "description": "An arrow function is written with parentheses around its parameter list. Help: 3.4.8 (The Shorthand Rules)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Two parameters inside the parentheses",
+        "description": "The parenthesised parameter list holds two comma-separated parameters. Help: 3.4.8 (The Shorthand Rules)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The fixed code runs and prints",
+        "description": "Once the arrow parses, the console.log line runs and prints a result. Help: 3.4.8 (The Shorthand Rules)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "area is an arrow with two parameters",
+        "description": "area itself is a const holding an arrow with two parameters in parentheses. Help: 3.4.8 (The Shorthand Rules)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "area returns the product of its two arguments",
+        "description": "area(3, 4) is 12 and area(5, 6) is 30. Help: 3.4.8 (Shorthand Rules)",
+        "points": 1
+      }
+    ]
   }
 }

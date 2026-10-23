@@ -110,5 +110,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.4.16 Lab: Rewrite 3 Named Functions as Arrows\". The task they were given: Define three separate function declarations, each with a different job: for example one that returns a number, one that returns a true/false answer, and one that returns a string. Use the function name() {} form. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Three arrow functions",
+        "description": "At least three const variables are assigned arrow functions. Help: 3.4.8 (The Shorthand Rules)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Implicit return used",
+        "description": "Every arrow body is a bare expression: no arrow body starts with a brace. Help: 3.4.8 (The Shorthand Rules)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "console.log present",
+        "description": "Code calls console.log. Help: 3.4.8 (The Shorthand Rules)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Three named arrows, each called",
+        "description": "Three different const names each hold an arrow with at least one parameter, and each one is called. Help: 3.4.8 (The Shorthand Rules)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Three function declarations",
+        "description": "The three function declarations from step 1 are still in the file, beside the arrows that rewrite them. Help: 3.4.7 (The Same Function Three Ways)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "all three results are printed",
+        "description": "At least three values are printed. Help: 3.4.8 (Shorthand Rules)",
+        "points": 1
+      }
+    ]
   }
 }
