@@ -2330,6 +2330,42 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "3-5-22-lab-destructure-three": {
+    "lessonTitle": "3.5.22 Lab: Destructure 3 Fields From an Object",
+    "prompt": "The student wrote JavaScript for a lab. You cannot run it: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable names, template strings, arrow functions, semicolons, spacing and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "object destructuring used",
+        "description": "The code unpacks three or more properties of an object into variables using object destructuring (braces on the left of =).",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "describe destructures its parameter",
+        "description": "A function (called describe or named for what it builds) takes ONE object and unpacks two or more of its keys with braces right in the parameter list, e.g. function describe({ title, quantity }).",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "the three unpacked names are used in a printed sentence",
+        "description": "After the unpack, each of the three unpacked names is used by itself (no dot, no object name) in a console.log or in a variable that is then printed.",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "describe unpacks its parameter and uses the names",
+        "description": "describe returns a string built from the VALUES of at least two unpacked keys, so changing those values changes the text. Returning the key NAMES as text does not count.",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the unpacked names are printed by code that runs",
+        "description": "A console.log that actually runs prints a sentence using each of the three unpacked names; no printed line would say undefined. A print that never runs does not count.",
+        "points": 1
+      }
+    ]
+  },
   "3-6-7-chart-reassign-vs-mutate": {
     "lessonTitle": "3.6.7 Chart the Code: Reassignment vs. Mutation Trace",
     "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
@@ -2518,9 +2554,51 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "3-7-16-chart-spread-vs-rest": {
+    "lessonTitle": "3.7.16 Plain English to Pseudocode: Spread vs. Rest, Side by Side",
+    "prompt": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is the body of total(...numbers): start a running total called sum (or total) at 0; go through the numbers one at a time; for each number, add it to the total; when there are no more numbers, give back the total. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite, for example giving back the total inside the repeating part for the last criterion. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The total starts at zero, before the loop",
+        "description": "A running total (sum, total, or the student's own name for it) is set to 0 ONCE, before the repeating part begins, and is not set to 0 again inside the repeating part.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One loop over numbers, closed",
+        "description": "The steps go through the numbers as ONE repeating part (FOR EACH, loop through, repeat for each number, or similar) and say where the repeating part ends (END FOR, END LOOP, 'when there are no more numbers', or similar).",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Each number is added to the total, inside the loop",
+        "description": "Inside the repeating part, each number is added to the running total (total + number or similar), not just counted or replaced.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The total is given back after the loop",
+        "description": "The finished total is returned, given back or shown once, after the repeating part has ended.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Nothing is given back inside the loop",
+        "description": "No step inside the repeating part returns, gives back or shows the total. Giving it back happens only after the loop. If the student never wrote a loop at all, mark this missing.",
+        "points": 1
+      }
+    ]
+  },
   "3-7-5-chart-map-trace": {
     "lessonTitle": "3.7.5 Plain English to Pseudocode: What `.map()` Does for You",
-    "prompt": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md. The program they were describing: start with an empty list called withTax; go through the prices one at a time; for each price, multiply it by 1.08 and add the result to withTax; when there are no more prices, print withTax. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, ADD, OUTPUT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite, for example printing inside the repeating part for the last criterion.",
+    "prompt": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md. The program they were describing: start with an empty list called withTax; go through the prices one at a time; for each price, multiply it by 1.08 and add the result to withTax; when there are no more prices, print withTax. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, ADD, OUTPUT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite, for example printing inside the repeating part for the last criterion. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",
@@ -2556,6 +2634,132 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "r6",
         "title": "Nothing is shown inside the loop",
         "description": "No step inside the repeating part prints, shows or returns the list. Showing it happens only after the loop. If the student never wrote a loop at all, mark this missing.",
+        "points": 1
+      }
+    ]
+  },
+  "3-8-10-lab-round-trip-object": {
+    "lessonTitle": "3.8.10 Lab: Round-Trip an Object Through JSON",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.10 Lab: Round-Trip an Object Through JSON\". The task they were given: Create a variable (the lesson calls it player; use any name that fits) holding an object with at least two properties, one of them a number. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Object declared",
+        "description": "Declares an object with curly braces. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Saved with stringify",
+        "description": "Calls JSON.stringify to produce text. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Restored with parse",
+        "description": "Calls JSON.parse on the saved text. Help: 3.8.8 (JSON.parse — Text Back to Object)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Both logged",
+        "description": "Calls console.log to print the restored object. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "restored is a separate object rebuilt from the saved text",
+        "description": "saved is a string, and restored is a different object holding the same data as player. Help: 3.8.9 (A Round Trip)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "saved and restored come from player, and the prints come from restored and player",
+        "description": "When player holds other values, saved and restored change with it; a console.log that runs prints a number of restored plus one, and another prints one of player's properties. Help: 3.8.9 (A Round Trip)",
+        "points": 1
+      }
+    ]
+  },
+  "3-8-11-lab-round-trip-array": {
+    "lessonTitle": "3.8.11 Lab: Round-Trip an Array of Objects",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.11 Lab: Round-Trip an Array of Objects\". The task they were given: Create a variable (the lesson calls it gameState; use any name that fits) holding an object with a player name and an array called items of at least two item objects. Each item should have a name and a price. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Game-state object declared",
+        "description": "Declares an object with curly braces. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Saved with stringify",
+        "description": "Calls JSON.stringify to produce text. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Restored with parse",
+        "description": "Calls JSON.parse on the saved text. Help: 3.8.8 (JSON.parse — Text Back to Object)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Output printed",
+        "description": "Calls console.log. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "restored is rebuilt from the saved text and the second item is read",
+        "description": "saved is a string, restored holds the same data as gameState, and the second item's price plus ten and its name were printed. Help: 3.8.9 (A Round Trip)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "saved and restored come from gameState, and the second item is printed from restored",
+        "description": "When gameState holds other values, saved and restored change with it, and console.log calls that run print the second item's price plus ten and its name, read from restored. Help: 3.8.9 (A Round Trip)",
+        "points": 1
+      }
+    ]
+  },
+  "3-8-14-lab-malformed-json": {
+    "lessonTitle": "3.8.14 Lab: Handle a Malformed JSON String",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.14 Lab: Handle a Malformed JSON String\". The task they were given: Define a function (the lesson calls it readSave; any name works) that takes one parameter, a string. Inside it, attempt to parse the text with JSON.parse. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Function defined",
+        "description": "Defines a function. Help: 3.8.12 (Parsing Can Fail)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Parse attempted",
+        "description": "Calls JSON.parse. Help: 3.8.8 (JSON.parse — Text Back to Object)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "try block present",
+        "description": "Uses a try statement. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "catch block present",
+        "description": "Uses a catch clause. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Both paths logged",
+        "description": "Calls console.log. Help: 3.8.12 (Parsing Can Fail)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "readSave parses good text and falls back on bad text",
+        "description": "readSave('{\"a\":1}') returns { a: 1 } and readSave('{\"b\":[1,2]}') returns { b: [1, 2] }, and readSave(\"corrupted!!\") and readSave('{\"a\":') return a fallback object instead of throwing. Help: 3.8.13 (try/catch Around a Bad Parse)",
         "points": 1
       }
     ]
@@ -2720,6 +2924,240 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "min-nodes",
         "count": 10
+      }
+    ]
+  },
+  "3-8-18-lab-save-by-key": {
+    "lessonTitle": "3.8.18 Lab: Save a State Object by Key",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.18 Lab: Save a State Object by Key\". The task they were given: Create a variable (the lesson calls it state; use any name that fits) holding an object with at least two properties, for example a score and a level. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "State object declared",
+        "description": "Declares an object with curly braces. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Stored by key",
+        "description": "Calls localStorage.setItem. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Converted with stringify",
+        "description": "Calls JSON.stringify before storing. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Key read back",
+        "description": "Calls localStorage.getItem. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Stored text logged",
+        "description": "Calls console.log. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "the stored text is state turned into JSON and it is printed back",
+        "description": "The text printed from localStorage.getItem is the JSON text of state (written on one line or spread over several). Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "what getItem reads back is printed, by code that runs",
+        "description": "A console.log that runs prints what localStorage.getItem reads back, and that text changes when state does. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      }
+    ]
+  },
+  "3-8-19-lab-load-restore": {
+    "lessonTitle": "3.8.19 Lab: Load and Restore a Saved State",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.19 Lab: Load and Restore a Saved State\". The task they were given: Store an object under a key using JSON.stringify and localStorage.setItem, so there is something to load. Once your load code works, you may delete or comment out this save line and run again to watch the missing-key path: your checks go red while the line is gone, on purpose (nothing is saved, so nothing can be restored). Put the save line back before you submit. The checker also runs your code once with nothing saved, so the missing-key path is checked either way. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Read by key",
+        "description": "Calls localStorage.getItem. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Missing key checked",
+        "description": "Tests the read value against null. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Restored with parse",
+        "description": "Calls JSON.parse. Help: 3.8.8 (JSON.parse — Text Back to Object)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "try/catch guard",
+        "description": "Wraps the parse in try and catch. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Restored state logged",
+        "description": "Calls console.log. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "restored is a real object and one of its values is printed",
+        "description": "restored is an object, and the last line printed is one of its values. Help: 3.8.16 (The Whole Pattern)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "restored follows what was stored, and with nothing saved the code still finishes",
+        "description": "When the stored text changes, restored and the printed value change with it; with nothing saved under any key, the code does not stop with an error and restored is a default object. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      }
+    ]
+  },
+  "3-8-22-lab-capstone": {
+    "lessonTitle": "3.8.22 Lab: Saving-and-Loading Capstone",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.22 Lab: Saving-and-Loading Capstone\". The task they were given: Create a defaults object with at least two properties, then a state object describing a player with a score and a level. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Save function stores by key",
+        "description": "Calls localStorage.setItem. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "State converted with stringify",
+        "description": "Calls JSON.stringify. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Load reads the key",
+        "description": "Calls localStorage.getItem. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Missing key handled",
+        "description": "Tests the read value against null. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Parse guarded",
+        "description": "Wraps JSON.parse in try and catch. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Restored state logged",
+        "description": "Calls console.log. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "saveState and loadState round-trip a state, and a missing key gives an object",
+        "description": "After saveState({ score: 7, level: 2 }), loadState() returns { score: 7, level: 2 }; saving a second state replaces it; when the stored text changes, loadState() reads the new text; text that will not parse and a missing key both give your defaults object, not an error. Help: 3.8.16 (The Whole Pattern)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the printed value comes from what loadState read back",
+        "description": "A console.log that runs prints a value loadState() returned, and it changes when the stored text does. Help: 3.8.16 (The Whole Pattern)",
+        "points": 1
+      }
+    ]
+  },
+  "3-8-23-lab-adapt-to-list": {
+    "lessonTitle": "3.8.23 Lab: Adapt the Pattern to a List",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.23 Lab: Adapt the Pattern to a List\". The task they were given: Create a variable (the lesson calls it records; use any name that fits) holding an array of at least two objects. Each object should describe one thing with a name and a value. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r2",
+        "title": "List saved by key",
+        "description": "Calls localStorage.setItem. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Converted with stringify",
+        "description": "Calls JSON.stringify. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "List restored with parse",
+        "description": "Calls JSON.parse on the saved list. Help: 3.8.8 (JSON.parse — Text Back to Object)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Restored list logged",
+        "description": "Calls console.log. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "restored is a separate array rebuilt from storage",
+        "description": "restored is an array holding the same records as records, rebuilt from the text stored under a key, and the length and one record's field were printed. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "restored is parsed from what was stored, and a field is printed from it",
+        "description": "When records holds other values, restored changes with it, and a console.log that runs prints one record's field from restored. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      }
+    ]
+  },
+  "3-8-7-lab-stringify-spot-drops": {
+    "lessonTitle": "3.8.7 Lab: Stringify an Object and Spot What Got Dropped",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.7 Lab: Stringify an Object and Spot What Got Dropped\". The task they were given: Create a variable (the lesson calls it counter; use any name that fits) and assign it an object. Give it a number property, a function property (a method), and a third property whose value is undefined. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Object declared",
+        "description": "Declares an object with curly braces. Help: 3.8.6 (What Does Not Survive)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A function value in the object",
+        "description": "One property's value is a function. Help: 3.8.6 (What Does Not Survive)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "JSON text kept in a variable",
+        "description": "Keeps what JSON.stringify gives back in a variable. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Result logged",
+        "description": "Calls console.log on the stringified value. Help: 3.8.6 (What Does Not Survive)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "counter has a number, a method and an undefined value, and the JSON text is printed",
+        "description": "counter holds a number, a function and a property whose value is undefined, and the JSON text was printed. Help: 3.8.6 (What Does Not Survive)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the JSON text printed is made from counter by code that runs",
+        "description": "A console.log that runs prints the text JSON.stringify made from counter, and that text changes when counter does. Help: 3.8.6 (What Does Not Survive)",
+        "points": 1
       }
     ]
   },

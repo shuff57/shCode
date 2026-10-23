@@ -237,5 +237,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.11 Lab: Round-Trip an Array of Objects\". The task they were given: Create a variable (the lesson calls it gameState; use any name that fits) holding an object with a player name and an array called items of at least two item objects. Each item should have a name and a price. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Game-state object declared",
+        "description": "Declares an object with curly braces. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Saved with stringify",
+        "description": "Calls JSON.stringify to produce text. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Restored with parse",
+        "description": "Calls JSON.parse on the saved text. Help: 3.8.8 (JSON.parse — Text Back to Object)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Output printed",
+        "description": "Calls console.log. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "restored is rebuilt from the saved text and the second item is read",
+        "description": "saved is a string, restored holds the same data as gameState, and the second item's price plus ten and its name were printed. Help: 3.8.9 (A Round Trip)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "saved and restored come from gameState, and the second item is printed from restored",
+        "description": "When gameState holds other values, saved and restored change with it, and console.log calls that run print the second item's price plus ten and its name, read from restored. Help: 3.8.9 (A Round Trip)",
+        "points": 1
+      }
+    ]
   }
 }

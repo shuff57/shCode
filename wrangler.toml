@@ -40,6 +40,15 @@ bucket_name = "shcode-uploads"
 #
 #   AUTH_SECRET=local-dev-secret-$(openssl rand -hex 16)
 
+# Workers AI: the grader's FIRST choice in functions/api/grade-written.ts.
+# Declaring it here covers local `wrangler pages dev`; production reads the
+# binding from the Pages dashboard, so add it there too:
+#   Pages project -> Settings -> Functions -> Workers AI binding -> name "AI".
+# With the binding present the grader calls @cf/google/gemma-4-26b-a4b-it and
+# needs no API key; without it the route falls back to Ollama below.
+[ai]
+binding = "AI"
+
 # OLLAMA_API_KEY powers the AI essay grader in functions/api/grade-written.ts.
 # Create a key at https://ollama.com/settings/keys and store it as a secret:
 #
@@ -48,8 +57,9 @@ bucket_name = "shcode-uploads"
 # Optional: set OLLAMA_HOST if you ever want to point at something other than
 # https://ollama.com (e.g. a self-hosted proxy). Plain env var, not a secret.
 #
-# That is the WHOLE list: one grader, one key, one model. A self-hosted
-# classroom box (OLLAMA_LOCAL_*) and a second paid provider (OPENROUTER_*)
-# were both removed 2026-09-30 along with the Cloudflare Workers AI binding.
-# If you are reading an older revision of this file or of CLAUDE.md and it
-# describes a picker, that text is history, not configuration.
+# That is the WHOLE list: one grader, one target. Workers AI is the transport
+# whenever the `AI` binding above exists; Ollama is the fallback (and what the
+# dev server uses). A self-hosted classroom box (OLLAMA_LOCAL_*) and a second
+# paid provider (OPENROUTER_*) were both removed 2026-09-30 and have not come
+# back. If you are reading an older revision of this file or of CLAUDE.md and
+# it describes a picker, that text is history, not configuration.

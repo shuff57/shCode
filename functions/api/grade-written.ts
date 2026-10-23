@@ -1,31 +1,35 @@
-// POST /api/grade-written — proxies the AI essay grading call to an Ollama
-// server. Runs on Cloudflare Pages Functions, not in the static Next bundle,
-// so no API key ever reaches the browser.
+// POST /api/grade-written — grades a written answer or a plain-English lab
+// with an AI model. Runs on Cloudflare Pages Functions, not in the static Next
+// bundle, so no key ever reaches the browser.
 //
-// ONE target: Ollama cloud. The grader stopped being a menu. A self-hosted
-// classroom box and a second paid provider were both removed (see below), so
-// there is nothing to choose between and the picker never renders.
+// ONE target, two transports. The grader stopped being a menu: a self-hosted
+// classroom box and a second paid provider were removed, so there is nothing
+// to choose between and the picker never renders. Workers AI is the target
+// whenever this deploy has the `AI` binding; Ollama is the fallback.
 //
-// cloud OLLAMA_API_KEY + OLLAMA_HOST (default https://ollama.com)
-//      model: the lesson's aiGrader.model, else glm-5.3-flash:cloud
+// workers-ai  AI binding (`[ai]` in wrangler.toml and in the Pages dashboard)
+//             model: GRADE_WRITTEN_WORKERS_MODEL, else
+//             @cf/google/gemma-4-26b-a4b-it (a lesson's own @cf/ id wins)
+// ollama      OLLAMA_API_KEY + OLLAMA_HOST (default https://ollama.com)
+//             model: the lesson's aiGrader.model, else glm-5.3-flash:cloud
 //
-// The Cloudflare Workers AI binding was a target here until 2026-09-30 and was
-// removed as an experiment that did not work out. Two measured facts from
-// that experiment are kept because they hold for any future model swap:
-// Two measured facts from that experiment are kept because they hold for any
-// future model swap:
+// Workers AI was a target here until 2026-09-30, removed as an experiment, and
+// brought back 2026-10-22 as the first choice: it needs no key and the
+// platform's per-model rate limit (300 req/min for the model below) replaces a
+// vendor's daily quota. The measured facts from the first experiment still
+// hold and are why this model is the default:
 //
 // @cf/google/gemma-4-26b-a4b-it 20/20 correct 25/25 under a 25-way burst
 // @cf/zai-org/glm-5.3-flash 20/20 correct 20/25 -- five refused with
-// "3021: rate limiting",
-// i.e. the 20-rpm frontier cap
+// "3021: rate limiting", i.e. the 20-rpm frontier cap
 //
 // The max_tokens ceiling mattered too: at 1500 a reasoning model spent its
 // whole budget on the `reasoning` field and returned finish_reason:"length"
 // with content null -- indistinguishable from "cannot produce JSON" unless
-// you read finish_reason. 8000 was the measured ceiling.
+// you read finish_reason. Workers AI calls here send 4000 tokens with
+// enable_thinking:false for that reason.
 //
-// Set the cloud secret once per project:
+// Ollama secret, needed only for the fallback:
 //
 //   npx wrangler pages secret put OLLAMA_API_KEY --project-name shcode
 //
@@ -67,8 +71,20 @@ import { checkDiagram, allPassed } from '../../lib/diagram-check';
 import { splitRubric, scoreDiagram, mergeGrade, type DiagramScore } from '../../lib/diagram-score';
 import { capFor, kindFor, attemptsUsed, recordGraded, recordOutage, isStaff, effectiveCap, cleanArtifact } from '../_shared/attempts';
 
+/** The Workers AI binding (`env.AI`). Narrowed to the one method this route
+ *  uses, so the Function does not pin itself to a workers-types version. */
+interface WorkersAi {
+  run(model: string, inputs: Record<string, unknown>): Promise<unknown>;
+}
+
 interface Env {
   DB: D1Database;
+  // Workers AI first choice. When this binding exists the grader never calls
+  // Ollama; without it the route falls back as before, which is what the dev
+  // server and a deploy that has not added the binding do.
+  AI?: WorkersAi;
+  // Optional Workers AI model override. Default @cf/google/gemma-4-26b-a4b-it.
+  GRADE_WRITTEN_WORKERS_MODEL?: string;
   OLLAMA_API_KEY: string;
   // Optional override — defaults to https://ollama.com when unset.
   OLLAMA_HOST?: string;
@@ -100,6 +116,9 @@ const DEFAULT_GLOBAL_DAILY_LIMIT = 10000;
 const GLOBAL_BUCKET_IDENTITY = '\x00GLOBAL';
 const GRADE_WRITTEN_GLOBAL_BUCKET = 'grade-written:global';
 const DEFAULT_CLOUD_MODEL = 'glm-5.3-flash:cloud';
+// The Workers AI model the course measured: 20/20 on the classroom rubric and
+// 25/25 under a 25-way burst. Override per deploy with GRADE_WRITTEN_WORKERS_MODEL.
+const DEFAULT_WORKERS_MODEL = '@cf/google/gemma-4-26b-a4b-it';
 
 
 type Ctx = EventContext<Env, string, SessionData>;
@@ -121,22 +140,46 @@ type Ctx = EventContext<Env, string, SessionData>;
 // GET menu and the client's error branch still have a uniform object.
 interface GraderTarget {
   id: GraderId;
- label: string;
- description: string;
- host: string | null;
- model: string | null;
- apiKey: string | null;
- unavailableReason?: string;
+  label: string;
+  description: string;
+  /** Which transport. Workers AI runs in this Worker through the binding;
+   *  Ollama is an HTTP call to a hosted or self-hosted server. */
+  kind: 'workers-ai' | 'ollama';
+  host: string | null;
+  model: string | null;
+  apiKey: string | null;
+  unavailableReason?: string;
 }
 
 function resolveTargets(env: Env, lessonModel?: string): Record<GraderId, GraderTarget> {
-  const cloudKey = env.OLLAMA_API_KEY || null;
+  // Workers AI wins whenever the binding exists: no API key, billed to this
+  // Cloudflare account, and the platform's per-model rate limit instead of a
+  // vendor's daily quota. Ollama stays as the fallback so the dev server and a
+  // deploy that has not added the binding keep grading.
+  if (env.AI) {
+    const workersModel =
+      (env.GRADE_WRITTEN_WORKERS_MODEL || '').trim() ||
+      (lessonModel && lessonModel.startsWith('@cf/') ? lessonModel : DEFAULT_WORKERS_MODEL);
+    return {
+      cloud: {
+        id: 'cloud',
+        label: 'Cloud grader',
+        description: 'Cloudflare Workers AI, running on this deploy.',
+        kind: 'workers-ai',
+        host: null,
+        model: workersModel,
+        apiKey: null,
+      },
+    };
+  }
 
+  const cloudKey = env.OLLAMA_API_KEY || null;
   return {
     cloud: {
       id: 'cloud',
       label: 'Cloud grader',
       description: 'A hosted model. Works from anywhere, and usually answers faster.',
+      kind: 'ollama',
       host: (env.OLLAMA_HOST || 'https://ollama.com').replace(/\/+$/, ''),
       model: lessonModel || DEFAULT_CLOUD_MODEL,
       apiKey: cloudKey,
@@ -149,6 +192,8 @@ function resolveTargets(env: Env, lessonModel?: string): Record<GraderId, Grader
 function isAvailable(t: GraderTarget): boolean {
  if (t.unavailableReason) return false;
  if (!t.model) return false;
+ // Workers AI has no host: the binding is the transport.
+ if (t.kind === 'workers-ai') return true;
  return !!t.host;
 }
 
@@ -451,6 +496,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   if (wantsStream) {
     return streamGrade({
       target,
+      ai: env.AI,
       model,
       system,
       user,
@@ -470,10 +516,15 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
 
   let raw: string;
   try {
-    raw = await callOllamaChat(host, target.apiKey, model, system, user, controller.signal);
+    raw = target.kind === 'workers-ai'
+      ? await callWorkersAi(env.AI as WorkersAi, model, system, user)
+      : await callOllamaChat(host, target.apiKey, model, system, user, controller.signal);
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
-    if (/3021|rate limit|busy right now/i.test(msg)) {
+    // Workers AI's capacity errors are 3040/3046/rate limiting; the Ollama
+    // codes stay here for the fallback. A timed-out call is the same student
+    // experience as a busy one: try again.
+    if (/3021|3040|3046|429|rate limit|busy|capacity|overload|timed? ?out/i.test(msg)) {
       if (fail) await fail('The grader was busy.', 503);
       return json(
         {
@@ -560,6 +611,55 @@ async function callOllamaChat(
   }
   const data = (await res.json()) as { message?: { content?: string } };
   return data.message?.content || '';
+}
+
+// Workers AI, through the `AI` binding. The binding takes no AbortSignal, so a
+// wait is capped with a race; the surrounding route keeps its own 180s ceiling
+// for the Ollama path. `max_tokens` is deliberately generous and thinking is
+// switched off, the two lessons the earlier Workers AI experiment left: a
+// reasoning model spends a small budget on its `reasoning` field and answers
+// with no content at all. See the note at the top of this file.
+const WORKERS_TIMEOUT_MS = 60_000;
+
+async function callWorkersAi(
+  ai: WorkersAi,
+  model: string,
+  system: string,
+  user: string,
+): Promise<string> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const out = await Promise.race([
+    ai.run(model, {
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.2,
+      max_tokens: 4000,
+      chat_template_kwargs: { enable_thinking: false },
+    }),
+    new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new GraderError('Workers AI timed out.')), WORKERS_TIMEOUT_MS);
+    }),
+  ]).finally(() => {
+    if (timer !== undefined) clearTimeout(timer);
+  });
+
+  // The binding answers `{ response }` for text generation; some models use an
+  // OpenAI-shaped `choices`. A model can also return the JSON object itself, so
+  // stringify rather than hand a non-string to parseModelJson.
+  const text =
+    typeof out === 'string'
+      ? out
+      : out && typeof out === 'object'
+        ? ((out as { response?: unknown }).response ??
+           (out as { choices?: { message?: { content?: unknown } }[] }).choices?.[0]?.message?.content)
+        : null;
+  if (text === null || text === undefined || text === '') {
+    throw new GraderError('Workers AI returned no content.');
+  }
+  return typeof text === 'object' ? JSON.stringify(text) : String(text);
 }
 
 // What a student reads when the model call itself failed. The upstream text
@@ -690,6 +790,8 @@ async function readOllama(
 
 interface StreamArgs {
   target: GraderTarget;
+  /** Present when the deploy has the Workers AI binding. */
+  ai?: WorkersAi;
   model: string;
   system: string;
   user: string;
@@ -702,7 +804,7 @@ interface StreamArgs {
   fail?: (reason: string, status: number) => Promise<void>;
 }
 
-function streamGrade({ target, model, system, user, finish, record, fail }: StreamArgs): Response {
+function streamGrade({ target, ai, model, system, user, finish, record, fail }: StreamArgs): Response {
   const host = target.host as string;
   const apiKey = target.apiKey;
   const encoder = new TextEncoder();
@@ -722,11 +824,18 @@ function streamGrade({ target, model, system, user, finish, record, fail }: Stre
       try {
         stage('reading');
 
-        // One accumulation contract: readOllama returns the COMPLETE text and
-        // announces 'writing' as it grows; it never forwards a partial grade --
-        // see the note on GradeStage. One path rather than two is what keeps
-        // "is it the model or the plumbing?" answerable.
-        const raw = await readOllama(host, apiKey, model, system, user, stage, controllerAbort.signal);
+        // One accumulation contract: the model returns the COMPLETE text and
+        // only then is a grade shaped -- a partial verdict is never forwarded
+        // (see the note on GradeStage). The Ollama transport announces 'writing'
+        // as its stream grows; Workers AI's binding answers in one piece, so the
+        // stage line goes straight from reading to checking.
+        let raw: string;
+        if (target.kind === 'workers-ai') {
+          if (!ai) throw new GraderError('Workers AI is not available on this deploy.');
+          raw = await callWorkersAi(ai, model, system, user);
+        } else {
+          raw = await readOllama(host, apiKey, model, system, user, stage, controllerAbort.signal);
+        }
 
         stage('checking', raw.length);
 

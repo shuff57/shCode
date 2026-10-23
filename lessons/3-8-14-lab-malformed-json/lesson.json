@@ -142,5 +142,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.14 Lab: Handle a Malformed JSON String\". The task they were given: Define a function (the lesson calls it readSave; any name works) that takes one parameter, a string. Inside it, attempt to parse the text with JSON.parse. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Function defined",
+        "description": "Defines a function. Help: 3.8.12 (Parsing Can Fail)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Parse attempted",
+        "description": "Calls JSON.parse. Help: 3.8.8 (JSON.parse — Text Back to Object)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "try block present",
+        "description": "Uses a try statement. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "catch block present",
+        "description": "Uses a catch clause. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Both paths logged",
+        "description": "Calls console.log. Help: 3.8.12 (Parsing Can Fail)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "readSave parses good text and falls back on bad text",
+        "description": "readSave('{\"a\":1}') returns { a: 1 } and readSave('{\"b\":[1,2]}') returns { b: [1, 2] }, and readSave(\"corrupted!!\") and readSave('{\"a\":') return a fallback object instead of throwing. Help: 3.8.13 (try/catch Around a Bad Parse)",
+        "points": 1
+      }
+    ]
   }
 }

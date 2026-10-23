@@ -201,8 +201,9 @@ demanded it.
   filename. Every `/api/*` path (except `/api/auth/*`) is gated by the auth
   middleware at `functions/_middleware.ts`.
 - **DB** — Cloudflare D1 (SQLite). Bindings declared in `wrangler.toml`.
-- **AI grader** — Ollama cloud via `functions/api/grade-written.ts` (reads
-  `OLLAMA_API_KEY` secret).
+- **AI grader** — Cloudflare Workers AI through the `AI` binding when the
+  deploy has one, otherwise Ollama cloud; both in
+  `functions/api/grade-written.ts` (Ollama reads the `OLLAMA_API_KEY` secret).
 
 ## Role model
 
@@ -232,6 +233,7 @@ Cloudflare dashboard env vars pane (plain vars):
 | `AI_HELP_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/ai-help` across all students; default `5000`. The backstop that keeps one compromised account (or a signup burst — registration has no email verification yet) from exhausting the Ollama account's weekly allowance. |
 | `GRADE_WRITTEN_DAILY_LIMIT` | var (optional) | Per-student daily submission cap for `POST /api/grade-written`; default `30`. Teachers/admins are exempt. A runaway-cost stop, not a pedagogical one — the course allows unlimited retries, so raise it rather than let a student hit it. |
 | `GRADE_WRITTEN_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/grade-written`; default `10000`. Same backstop as `AI_HELP_GLOBAL_DAILY_LIMIT`, for the grader. |
+| `GRADE_WRITTEN_WORKERS_MODEL` | var (optional) | Workers AI model id for the grader; default `@cf/google/gemma-4-26b-a4b-it`. Only read when the `AI` binding exists. |
 
 ## D1 schema
 
@@ -365,25 +367,31 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   own tokens are never forwarded**: a half-arrived grade is meaningless, and a
   rubric verdict the model then revises would lie to the student about their
   score. Stage labels move; the grade appears once, whole.
-- The grader target is chosen by an enum, and there is now **one**: `cloud`,
-  Ollama, on `glm-5.3-flash:cloud`. The default is resolved **per request** by
-  `pickDefault()` walking `PREFERENCE` and taking the first available, so a deploy
-  with nothing configured keeps grading on `cloud` instead of 503ing.
-  `DEFAULT_GRADER` stays `'cloud'` as the last-resort constant for that reason.
+- The grader target is chosen by an enum, and there is **one**: `cloud`. Its
+  transport is resolved **per request** by `resolveTargets()`: **Workers AI**
+  when the deploy has the `AI` binding (model `@cf/google/gemma-4-26b-a4b-it`,
+  override `GRADE_WRITTEN_WORKERS_MODEL`), otherwise **Ollama** on
+  `glm-5.3-flash:cloud`. Either way the GET menu carries one entry, so
+  `hasGraderChoice()` never renders a picker. A lesson's own `@cf/` model id
+  wins on the Workers AI path; an Ollama model id is ignored there.
+  `DEFAULT_GRADER` stays `'cloud'` as the last-resort constant.
   Three targets were removed 2026-09-30 — the Workers AI binding, a
   self-hosted classroom box, and a class-gated second paid provider — all
-  tried, measured, dropped; the lessons below are why. Removing them needed no
-  migration, because a target the deploy has not configured was already reported
-  unavailable rather than hidden.
+  tried, measured, dropped; the lessons below are why. **The Workers AI binding
+  was brought back 2026-10-22** as the first choice: it needs no key and the
+  platform's per-model rate limit (300 req/min) replaces a vendor's daily quota.
+  Adding or removing the binding changes the transport without a migration.
 - **`max_tokens` on a reasoning model is load-bearing** — the lesson the
- removed Workers AI grader taught (2026-09-05; its `WORKERS_AI_MAX_TOKENS`
- ceiling was 8000). At 1500 a reasoning model spent its whole budget on its
- `reasoning` field, stopped with `finish_reason: "length"`, and returned
- `content: null` — which is indistinguishable from "this model cannot
- produce JSON" unless you read `finish_reason`. That mistake made a first
- benchmark run score two perfectly good models at 85% and 30%; both are
- 20/20. A null `content` was then reported by name rather than read as `''`.
-- Model choice was **measured, not assumed** (2026-09-05, on the removed
+ earlier Workers AI grader taught (2026-09-05). At 1500 a reasoning model spent
+ its whole budget on its `reasoning` field, stopped with
+ `finish_reason: "length"`, and returned `content: null` — which is
+ indistinguishable from "this model cannot produce JSON" unless you read
+ `finish_reason`. That mistake made a first benchmark run score two perfectly
+ good models at 85% and 30%; both are 20/20. A null `content` was then reported
+ by name rather than read as `''`. The Workers AI call sends
+ `max_tokens: 4000` and `chat_template_kwargs.enable_thinking: false` for that
+ reason.
+- Model choice was **measured, not assumed** (2026-09-05, on the earlier
  Workers AI path, against the repo's own rubrics via `buildPrompt` and
  `isPassingGrade`): `gemma-4-26b-a4b-it` and `glm-5.3-flash` both scored
  20/20 on a labelled set of strong / thin / off-topic / prompt-injection
@@ -392,7 +400,8 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
  limiting`, i.e. the 20-rpm frontier cap. Cost ran 75–81 neurons per grade,
  so ~130 grades/day inside the free 10,000. The burst cap is why that target
  pinned an ordinary text-generation model, and why no frontier model should
- ever be a classroom grader default.
+ ever be a classroom grader default. That same gemma is the Workers AI default
+ again now.
 - `GET /api/grade-written` still answers with the one configured target, and the
   client keeps the response shape. There is no picker: `hasGraderChoice()` in
   `components/GraderPicker.tsx` needs 2+ available targets and the menu now
@@ -628,12 +637,17 @@ The prompt and rubric text do ship to the browser (nothing redacts a formative l
 0-point practice check. Editing the file clears the AI's marks and the regex check owns the cards again.
 Submit records the cards as shown. Tests: `scripts/test-ai-check.mjs`.
 
-## Ollama grader
+## AI grader
 
-The essay grader at `POST /api/grade-written` calls `https://ollama.com/api/chat`
-with `Authorization: Bearer $OLLAMA_API_KEY`. Model comes from the lesson's
-`aiGrader.model` field (e.g. `glm-5.3-flash:cloud`). The key lives server-side
-only — never exposed to the client.
+`POST /api/grade-written` uses the Cloudflare Workers AI binding (`env.AI`,
+model `@cf/google/gemma-4-26b-a4b-it`, override
+`GRADE_WRITTEN_WORKERS_MODEL`) whenever the deploy has one. Without it the
+route falls back to Ollama's `https://ollama.com/api/chat` with
+`Authorization: Bearer $OLLAMA_API_KEY` and the lesson's `aiGrader.model`
+(e.g. `glm-5.3-flash:cloud`). Keys and bindings live server-side only — never
+exposed to the client. The binding is declared in `wrangler.toml`
+(`[ai] binding = "AI"`) and must also be added in the Pages dashboard for
+production: Settings → Functions → Workers AI binding → `AI`.
 
 ## Reference solutions
 

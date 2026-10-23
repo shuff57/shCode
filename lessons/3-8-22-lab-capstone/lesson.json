@@ -249,5 +249,60 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.22 Lab: Saving-and-Loading Capstone\". The task they were given: Create a defaults object with at least two properties, then a state object describing a player with a score and a level. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Save function stores by key",
+        "description": "Calls localStorage.setItem. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "State converted with stringify",
+        "description": "Calls JSON.stringify. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Load reads the key",
+        "description": "Calls localStorage.getItem. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Missing key handled",
+        "description": "Tests the read value against null. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Parse guarded",
+        "description": "Wraps JSON.parse in try and catch. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Restored state logged",
+        "description": "Calls console.log. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "saveState and loadState round-trip a state, and a missing key gives an object",
+        "description": "After saveState({ score: 7, level: 2 }), loadState() returns { score: 7, level: 2 }; saving a second state replaces it; when the stored text changes, loadState() reads the new text; text that will not parse and a missing key both give your defaults object, not an error. Help: 3.8.16 (The Whole Pattern)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the printed value comes from what loadState read back",
+        "description": "A console.log that runs prints a value loadState() returned, and it changes when the stored text does. Help: 3.8.16 (The Whole Pattern)",
+        "points": 1
+      }
+    ]
   }
 }

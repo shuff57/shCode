@@ -200,5 +200,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.19 Lab: Load and Restore a Saved State\". The task they were given: Store an object under a key using JSON.stringify and localStorage.setItem, so there is something to load. Once your load code works, you may delete or comment out this save line and run again to watch the missing-key path: your checks go red while the line is gone, on purpose (nothing is saved, so nothing can be restored). Put the save line back before you submit. The checker also runs your code once with nothing saved, so the missing-key path is checked either way. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Read by key",
+        "description": "Calls localStorage.getItem. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Missing key checked",
+        "description": "Tests the read value against null. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Restored with parse",
+        "description": "Calls JSON.parse. Help: 3.8.8 (JSON.parse — Text Back to Object)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "try/catch guard",
+        "description": "Wraps the parse in try and catch. Help: 2.5.4 (try...catch: Attempt and Recover)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Restored state logged",
+        "description": "Calls console.log. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "restored is a real object and one of its values is printed",
+        "description": "restored is an object, and the last line printed is one of its values. Help: 3.8.16 (The Whole Pattern)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "restored follows what was stored, and with nothing saved the code still finishes",
+        "description": "When the stored text changes, restored and the printed value change with it; with nothing saved under any key, the code does not stop with an error and restored is a default object. Help: 3.8.15 (Saving by Key)",
+        "points": 1
+      }
+    ]
   }
 }

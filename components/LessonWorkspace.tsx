@@ -722,7 +722,15 @@ export default function LessonWorkspace({
         return { ...r, ...result };
       });
     const ai = aiVerdictsRef.current;
-    setRequirements(aiCheck && ai && ai.text === (files[aiCheckFile] ?? '') ? applyAiVerdicts(merged, ai.verdicts) : merged);
+    // On an aiCheck lab Run is for running: the AI's Grade owns the cards, so with no fresh
+    // verdicts they stay ungraded rather than showing the pattern check's red and green.
+    setRequirements(
+      !aiCheck
+        ? merged
+        : ai && ai.text === (files[aiCheckFile] ?? '')
+          ? applyAiVerdicts(merged, ai.verdicts)
+          : lesson.requirements,
+    );
     setGradeReport(report);
     return report;
   }
@@ -796,14 +804,10 @@ export default function LessonWorkspace({
     if (!aiCheck || !ai || ai.text === aiCheckedText) return;
     aiVerdictsRef.current = null;
     setAiCheckNote(null);
-    if (isTextMode) {
-      // The AI is this lab's grader. Editing drops the marks and leaves the
-      // cards ungraded until the student presses Grade again.
-      setRequirements(lesson.requirements);
-      setGradeReport(null);
-    } else {
-      runTests();
-    }
+    // The AI is this lab's grader. Editing drops the marks and leaves the
+    // cards ungraded until the student presses Grade again.
+    setRequirements(lesson.requirements);
+    setGradeReport(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aiCheck, aiCheckedText]);
 
@@ -1147,42 +1151,6 @@ export default function LessonWorkspace({
       {lesson.planChart && (
         <LabPlanChart lessonId={lesson.id} mermaid={lesson.planChart.mermaid} caption={lesson.planChart.caption} />
       )}
-      {aiCheck && !isTextMode && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            flexWrap: 'wrap',
-            margin: '8px 0',
-            padding: '8px 12px',
-            border: '1px solid #44475a',
-            borderRadius: 6,
-          }}
-        >
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => void runAiCheck()}
-            disabled={aiCheckBusy || (files[aiCheckFile] ?? '').trim().length < 20}
-            title="Have the AI read your steps and mark the Quest cards green or red"
-          >
-            {aiCheckBusy ? 'Reading your steps…' : 'Grade with AI'}
-          </button>
-          <span style={{ fontSize: 14, color: '#8393c4', flex: '1 1 260px' }} role="status" aria-live="polite">
-            {aiCheckNote
-              ? aiCheckNote.text
-              : 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'}
-          </span>
-          {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
-            <ul style={{ flexBasis: '100%', margin: 0, paddingLeft: 20, fontSize: 14, color: '#8393c4' }}>
-              {aiCheckNote.hints.map((h, i) => (
-                <li key={i}>{h}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
       <div className="editor-card">
         <div className="editor-body">
           <div className="run-toolbar">
@@ -1225,6 +1193,17 @@ export default function LessonWorkspace({
                     </button>
                   )
                 )}
+                {aiCheck && !isTextMode && !isReshapeMode && (
+                  // Run shows what the code prints; Grade is the AI read that marks the Quest cards.
+                  <button
+                    className="btn-run"
+                    onClick={() => void runAiCheck()}
+                    disabled={aiCheckBusy || (files[aiCheckFile] ?? '').trim().length < 20}
+                    title="Have the AI read your code and mark the Quest cards green or red"
+                  >
+                    {aiCheckBusy ? 'Reading your code…' : 'Grade'}
+                  </button>
+                )}
                 <button
                   style={{
                     padding: '6px 14px',
@@ -1247,7 +1226,7 @@ export default function LessonWorkspace({
                       // Reset also discards any AI marks: the starter has not been graded.
                       aiVerdictsRef.current = null;
                       setAiCheckNote(null);
-                      if (isTextMode) setRequirements(lesson.requirements);
+                      if (isTextMode || aiCheck) setRequirements(lesson.requirements);
                       setResetMsg(isTextMode ? 'Text reset to starter.' : 'Code reset to starter.');
                       setTimeout(() => setResetMsg(null), 2500);
                       if (isReshapeMode) setReshapeResetKey((k) => k + 1);
@@ -1341,14 +1320,16 @@ export default function LessonWorkspace({
               )}
             </div>
           </div>
-          {isTextMode && aiCheck && (
+          {aiCheck && (
             // The AI's read of the steps, directly under the Grade button and
             // above the textarea it graded.
             <div style={{ marginBottom: 8 }}>
               <div role="status" aria-live="polite" style={{ fontSize: 14, color: '#8393c4' }}>
                 {aiCheckNote
                   ? aiCheckNote.text
-                  : 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'}
+                  : isTextMode
+                    ? 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'
+                    : 'Run shows what your code prints. Grade has the AI read it and mark the Quest cards, whatever shape you wrote it in.'}
               </div>
               {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
                 <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: '#8393c4' }}>

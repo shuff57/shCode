@@ -223,5 +223,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.8.10 Lab: Round-Trip an Object Through JSON\". The task they were given: Create a variable (the lesson calls it player; use any name that fits) holding an object with at least two properties, one of them a number. You cannot run their code: read it and judge what it WOULD do in a browser, where localStorage and JSON are available. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Object declared",
+        "description": "Declares an object with curly braces. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Saved with stringify",
+        "description": "Calls JSON.stringify to produce text. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Restored with parse",
+        "description": "Calls JSON.parse on the saved text. Help: 3.8.8 (JSON.parse — Text Back to Object)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Both logged",
+        "description": "Calls console.log to print the restored object. Help: 3.8.4 (JSON.stringify — Object to Text)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "restored is a separate object rebuilt from the saved text",
+        "description": "saved is a string, and restored is a different object holding the same data as player. Help: 3.8.9 (A Round Trip)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "saved and restored come from player, and the prints come from restored and player",
+        "description": "When player holds other values, saved and restored change with it; a console.log that runs prints a number of restored plus one, and another prints one of player's properties. Help: 3.8.9 (A Round Trip)",
+        "points": 1
+      }
+    ]
   }
 }
