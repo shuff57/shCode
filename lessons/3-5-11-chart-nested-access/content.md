@@ -1,13 +1,23 @@
-## Chart the Code: Tracing a Nested Access
+## Plain English to Pseudocode: Tracing a Nested Access
 
 **What you'll practise:**
-- Charting a loop whose body reads a nested field
-- Following a chain (`order.items[i].price`) as a single task
-- Putting the decision on a nested value outside the loop
+- Turning a loop whose body reads a nested field into numbered steps
+- Following a chain (`order.items[i].price`) as a single step
+- Putting the steps that run **once** after the loop
+- Giving each answer of a decision its own result
 
-An access chain is one reader, not three boxes. `order.items[i].price` takes one step at a time, but on a chart it is a single task shape.
+An access chain is one reader, not three steps. `order.items[i].price` takes one hop at a time, but in pseudocode it is a single line.
 
-### The code
+### The plan, in plain English
+
+1. Start the `total` at `0`.
+2. Go through each item in `order.items`, and add that item's `price` to the `total`.
+3. After the loop, read the customer's name, `order.customer.name`.
+4. Ask whether the customer is a VIP, `order.customer.vip`. If so, print the name and total with a VIP label. Otherwise, print the name and total.
+
+The same plan is drawn as a flow chart above the editor. You do not draw it, you **read** it.
+
+### The code it describes
 
 ```js
 const order = {
@@ -33,26 +43,22 @@ if (order.customer.vip) {
 }
 ```
 
-### What to draw
+### What to write
 
-| Shape | Use it for |
+Open `README.md` and type directly into it, no comment marks needed. The first and last lines are already there. Write your steps **between** them and number every one. Plain English is fine: the AI reads what your steps mean.
+
+| Write this | Use it for |
 |---|---|
-| **Start / End** (oval) | One of each. |
-| **Loop setup** (hexagon: press **+ more shapes**) | `i = 0 to order.items.length - 1` |
-| **Task** (rectangle) | `total = 0`, `total = total + order.items[i].price`, `name = order.customer.name` |
-| **Decision** (diamond) | `order.customer.vip` |
-| **Input / Output** (parallelogram) | The two prints: one for a VIP, one for everyone else |
+| `SET total TO 0` | starting the total |
+| `FOR EACH item IN order.items` ... `END FOR` | the loop, with its steps indented |
+| `IF order.customer.vip` ... `ELSE` ... `END IF` | the VIP question and its two answers |
 
-At least seven shapes, at least one diamond.
+### Three things that decide whether this is right
 
-### The three arrows that decide whether this is right
-
-1. **The loop body** runs the adding task, then goes **back to the hexagon**, not on to the decision.
-2. **After the loop**, the flow leaves the hexagon for the `name = ...` task — the decision is *outside* the loop.
-3. **Each diamond exit** leads to its own print, just as the code has one `console.log` in the `if` and one in the `else`. Both prints then lead on to End, so neither path dead-ends.
+1. **The loop body** adds the price and goes **back to the loop**, not on to the VIP question.
+2. **After the loop**, the flow reads the name. The VIP question is *outside* the loop, so it runs once.
+3. **Each answer** of the VIP question has its own print, just as the code has one `console.log` in the `if` and one in the `else`.
 
 ### Before you submit
 
-Press **Check my diagram**, then trace it by hand with the real data: prices `1.5` and `3`, and `vip` is `true`. Your chart should reach the VIP print with a total of **`4.5`**. If it does not, the chart is wrong somewhere even if every check is green.
-
-That hand-trace is the actual test here. The checker cannot do it for you.
+Press **Grade** above the editor. Before you submit, trace it by hand with the real data: prices `1.5` and `3`, and `vip` is `true`. Your steps should reach the VIP print with a total of `4.5`.

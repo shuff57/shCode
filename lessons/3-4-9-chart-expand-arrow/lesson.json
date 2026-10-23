@@ -1,164 +1,22 @@
 {
   "id": "3-4-9-chart-expand-arrow",
-  "title": "3.4.9 Chart the Code: A Function That Calls Its Parameter Twice",
-  "description": "Chart a function that calls another function twice: read the parameters, make the first call, make the second call on its result, and print.",
+  "title": "3.4.9 Plain English to Pseudocode: A Function That Calls Its Parameter Twice",
+  "description": "Turn four plain-English steps into pseudocode for applyTwice: read the operation and the value, make the first call, make the second call on its result, and print.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "week": 8,
   "slos": [
     "SLO-2"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 6
-      }
-    ],
-    "aiGrader": {
-      "rubricTitle": "Arrow expansion chart: structure check",
-      "model": "glm-5.3-flash:cloud",
-      "contextDocs": [],
-      "strict": true,
-      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
-      "rubric": [
-        {
-          "id": "three-steps",
-          "title": "Read, first call, second call, then the print",
-          "points": 5,
-          "description": "Scored by the editor (shape kind): at least four task, function-call or input/output shapes, for reading the parameters, the two calls and the print.",
-          "check": {
-            "steps": [
-              {
-                "op": "count",
-                "match": {
-                  "kind": [
-                    "process",
-                    "subroutine",
-                    "io"
-                  ]
-                },
-                "min": 4,
-                "fail": "The code does four things: it reads operation and value, calls operation once, calls it again on that result, and prints. Draw a shape for each.",
-                "pass": "There is a shape for each step."
-              }
-            ]
-          }
-        },
-        {
-          "id": "order",
-          "title": "The work comes first, then the print, then End",
-          "points": 6,
-          "description": "Scored by the editor (arrow order): tasks or function calls, then an input/output step, then End, on every route.",
-          "check": {
-            "steps": [
-              {
-                "op": "sequence",
-                "of": [
-                  {
-                    "kind": [
-                      "process",
-                      "subroutine"
-                    ]
-                  },
-                  {
-                    "kind": "io"
-                  },
-                  {
-                    "kind": "terminal"
-                  }
-                ],
-                "fail": "The print comes after the work, and it is the last step before End.",
-                "pass": "The tasks come first and the print is last."
-              }
-            ]
-          }
-        },
-        {
-          "id": "straight",
-          "title": "A straight line, no repeat",
-          "points": 5,
-          "description": "Scored by the editor (arrow order): no task or function call is part of a repeat.",
-          "check": {
-            "steps": [
-              {
-                "op": "not-in-cycle",
-                "match": {
-                  "kind": [
-                    "process",
-                    "subroutine"
-                  ]
-                },
-                "fail": "This code runs once from top to bottom, so no arrow should lead back to an earlier step. In your chart one does.",
-                "pass": "No arrow leads back."
-              }
-            ]
-          }
-        },
-        {
-          "id": "print-says",
-          "title": "The print says what it shows",
-          "points": 4,
-          "description": "Scored by the editor: the input/output shape is about the result.",
-          "check": {
-            "steps": [
-              {
-                "op": "label",
-                "match": {
-                  "kind": "io",
-                  "re": "print|show|display|log|output|result|answer|second|value"
-                },
-                "min": 1,
-                "fail": "Say in the print step what it shows: the result of the second call.",
-                "pass": "The print step says what it shows."
-              }
-            ]
-          }
-        }
-      ],
-      "gate": {
-        "anyOf": [
-          "operation|function|callback|apply",
-          "value|number|input|\\bn\\b",
-          "twice|again|second|first|once",
-          "print|show|display|log|output",
-          "result|return|double"
-        ],
-        "min": 3,
-        "capTo": 13,
-        "fail": "None of your shapes say what this program does. Label each shape in your own words."
-      }
-    }
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([applyTwice starts]) --> B[read operation and value]\n  B --> C[first = operation of value]\n  C --> D[second = operation of first]\n  D --> E[/print second/]\n  E --> Z([back to the caller])",
+    "caption": "applyTwice: a straight line, no diamond and no loop. The second call takes the answer of the first, and the print is last."
   },
   "grading": {
     "totalPoints": 0,
@@ -166,6 +24,132 @@
     "allowLateSubmit": true,
     "formative": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Read in `operation` and `value`.\n\n**2.** Call `operation` on `value`. Call the answer `first`.\n\n**3.** Call `operation` again, this time on `first`. Call that answer `second`.\n\n**4.** Print `second`.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: it is a straight line, so there is no diamond and nothing loops back. Each box is one step.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` (start a value)\n- `IF lives is 0` ... `END IF` (a check, with the steps inside it indented)\n- `FOR EACH life IN lives` ... `END FOR` (repeat for every item)\n- `PRINT lives` (show something)\n\nPlain English is fine here. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, trace it by hand: `operation` is `(n) => n * 2` and `value` is `5`. The first call gives `10`, the second gives `20`, and `20` is what prints. If your steps print before the second call, they are wrong even if Grade is green.",
+      "hints": [
+        "The second call uses the answer of the first call, not `value` again.",
+        "The print is the last step, after both calls."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Reads operation and value",
+      "description": "Read in both operation and value.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:read|reads|take|takes|get|gets|receive|receives|given|accept|accepts|input|inputs|parameters?|params?|arguments?|args?|load|know)\\b(?=[^\\n]*\\boperation\\b)(?=[^\\n]*\\bvalue\\b)",
+      "hint": "Start by reading in both the operation and the value.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "The first call",
+      "description": "Call operation on value and keep the answer.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:\\b(?:call|apply|run|use|perform|do|execute|invoke|pass|put|feed)\\w*\\b[^\\n]*\\boperation\\b[^\\n]*\\bvalue\\b|\\boperation\\s*(?:\\(|of\\b|on\\b)\\s*\\(?\\s*(?:the\\s+)?value\\b|\\bvalue\\b[^\\n]*\\b(?:through|into)\\b[^\\n]*\\boperation\\b)",
+      "hint": "Add a step that calls operation on value (name the answer first).",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The second call uses the first answer",
+      "description": "After the first call, call operation again on the first answer.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:(?:\\b(?:call|apply|run|use|perform|do|execute|invoke|pass|put|feed)\\w*\\b[^\\n]*\\boperation\\b[^\\n]*\\bvalue\\b|\\boperation\\s*(?:\\(|of\\b|on\\b)\\s*\\(?\\s*(?:the\\s+)?value\\b|\\bvalue\\b[^\\n]*\\b(?:through|into)\\b[^\\n]*\\boperation\\b)[\\s\\S]*(?:\\b(?:(?:call|apply|run|use|perform|do|execute|invoke|pass|put|feed)\\w*|again|second|twice)\\b[^\\n]*\\boperation\\b[^\\n]*\\b(?:first|that|result|answer|previous|output)\\b|\\boperation\\s*(?:\\(|of\\b|on\\b)\\s*\\(?\\s*(?:the\\s+)?(?:first|result|answer|previous|that)\\b|\\b(?:first|result|answer|previous)\\b[^\\n]*\\b(?:through|into)\\b[^\\n]*\\boperation\\b)|\\boperation\\s*\\(\\s*operation\\s*\\(\\s*(?:the\\s+)?value)",
+      "hint": "After the first call, add a step that calls operation again on first (not on value).",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "It prints the second answer",
+      "description": "Print the answer of the second call.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:print|show|display|say|output|write|log|return|tell|announce|report)\\w*\\b[^\\n]*\\b(?:second|result|answer|final|last|20|that|twice)\\b",
+      "hint": "Print the answer of the second call (second), not value or first.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "The print comes last",
+      "description": "The print is the last step, after both calls.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:print|show|display|say|output|write|log|return|tell|announce|report)\\w*\\b[^\\n]*(?:\\n(?![^\\n]*\\boperation\\b)[^\\n]*)*$",
+      "hint": "Move the print to the end, after both calls.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The function is: function applyTwice(operation, value) { return operation(operation(value)); } called as applyTwice((n) => n * 2, 5). The point is that operation(operation(value)) is TWO calls with the inner one finishing first: read operation and value, call operation on value (first), call operation again on that answer (second), then print second. There is no decision and no loop. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, ELSE, END IF, FOR EACH, END FOR, CALL, PRINT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite (for example the second call using value again instead of the first answer). Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Reads operation and value",
+        "description": "The steps take in both operation and value.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The first call",
+        "description": "A step calls operation on value and keeps the answer. A single step that nests both calls, such as operation(operation(value)), also counts for this one.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The second call uses the first answer",
+        "description": "AFTER the first call, a step calls operation again on the first call's answer. Calling it again on value, or only calling it once, is missing.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "It prints the second answer",
+        "description": "The step that prints shows the answer of the SECOND call, not value or the first answer.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The print comes last",
+        "description": "The print is the last step, after both calls. A print before the second call is missing.",
+        "points": 1
+      }
+    ]
+  }
 }

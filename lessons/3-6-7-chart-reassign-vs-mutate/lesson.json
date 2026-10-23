@@ -1,12 +1,13 @@
 {
   "id": "3-6-7-chart-reassign-vs-mutate",
-  "title": "3.6.7 Chart the Code: Reassignment vs. Mutation Trace",
-  "description": "Trace a function that mutates an array and then reassigns it, and chart which write the caller can see.",
+  "title": "3.6.7 Plain English to Pseudocode: Reassignment vs. Mutation Trace",
+  "description": "Turn plain-English steps into pseudocode for process(nums): one write mutates the shared array and the caller sees it, the other reassigns the local name and the caller does not.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.6 Functions: Pass by Value/Reference",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "week": 7,
   "slos": [
     "SLO-2",
@@ -14,196 +15,9 @@
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 2
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 7
-      },
-      {
-        "id": "min-shape",
-        "shape": "subroutine",
-        "count": 1
-      }
-    ],
-    "aiGrader": {
-      "rubricTitle": "Reassign vs mutate chart: structure check",
-      "model": "glm-5.3-flash:cloud",
-      "contextDocs": [],
-      "strict": true,
-      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
-      "rubric": [
-        {
-          "id": "call-shape",
-          "title": "The call is one function-call shape",
-          "points": 3,
-          "description": "Scored by the editor (shape kind): a double-rail function-call shape on the path.",
-          "check": {
-            "steps": [
-              {
-                "op": "count",
-                "match": {
-                  "kind": "subroutine"
-                },
-                "min": 1,
-                "fail": "A call to a function has its own shape, the double-rail rectangle from the shape palette.",
-                "pass": "A function-call shape is on the path."
-              }
-            ]
-          }
-        },
-        {
-          "id": "order",
-          "title": "Call, two decisions, then one print",
-          "points": 5,
-          "description": "Scored by the editor (arrow order): the call, then a decision, then another decision, then the print, on every route.",
-          "check": {
-            "steps": [
-              {
-                "op": "sequence",
-                "of": [
-                  {
-                    "kind": "subroutine"
-                  },
-                  {
-                    "kind": "decision"
-                  },
-                  {
-                    "kind": "decision"
-                  },
-                  {
-                    "kind": "io"
-                  },
-                  {
-                    "kind": "terminal"
-                  }
-                ],
-                "fail": "The order matters: the call comes first, then the question after the mutation, then the question after the reassignment, then the print once.",
-                "pass": "Call, two questions and the print are in order."
-              }
-            ]
-          }
-        },
-        {
-          "id": "different-exits",
-          "title": "Each question splits into two different results",
-          "points": 4,
-          "description": "Scored by the editor: a decision whose yes and no arrows lead to two different shapes, and a print.",
-          "check": {
-            "steps": [
-              {
-                "op": "branch",
-                "at": {
-                  "kind": "decision"
-                },
-                "distinct": true,
-                "fail": "Each diamond must have a yes and a no arrow that lead to two different places.",
-                "pass": "The decision has two different exits."
-              },
-              {
-                "op": "count",
-                "match": {
-                  "kind": "io"
-                },
-                "min": 1,
-                "fail": "The two paths rejoin before one print. Draw an input/output step for the print.",
-                "pass": "There is a print."
-              }
-            ]
-          }
-        },
-        {
-          "id": "questions-on-topic",
-          "title": "The questions ask whether the caller sees the change",
-          "points": 3,
-          "description": "Scored by the editor: at least two diamonds ask whether a write reached the caller.",
-          "check": {
-            "steps": [
-              {
-                "op": "label",
-                "match": {
-                  "kind": "decision",
-                  "re": "escape|caller|change|shared|local|see|mutat|reassign|original|same"
-                },
-                "min": 2,
-                "fail": "Both diamonds should ask whether that write reached the caller.",
-                "pass": "Both diamonds ask about the caller."
-              }
-            ]
-          }
-        },
-        {
-          "id": "right-trace",
-          "title": "The trace is right: the reassignment is charted and the print is not [9, 9]",
-          "points": 5,
-          "description": "Scored by the editor: a task that shows the new array, and a print that is not the reassigned array.",
-          "check": {
-            "steps": [
-              {
-                "op": "label",
-                "match": {
-                  "kind": "process",
-                  "re": "new array|\\[\\s*9|9\\W+9|reassign|local name|points? (at|to) a|brand"
-                },
-                "min": 1,
-                "fail": "Chart the reassignment as a task of its own: the function points its local name at a new array.",
-                "pass": "The reassignment is charted."
-              },
-              {
-                "op": "label",
-                "match": {
-                  "kind": "io",
-                  "re": "^(?!.*\\b9\\W+9\\b)"
-                },
-                "min": 1,
-                "fail": "The caller never sees the new array, so the print must not show [9, 9].",
-                "pass": "The print is not the reassigned array."
-              }
-            ]
-          }
-        }
-      ],
-      "gate": {
-        "anyOf": [
-          "nums|scores|array|\\[",
-          "mutat|reassign|escape|caller|shared|local|change",
-          "process|call|\\(",
-          "print|show|log|output"
-        ],
-        "min": 3,
-        "capTo": 13,
-        "fail": "None of your shapes say what this program does. Label each shape in your own words."
-      }
-    }
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([process starts]) --> B[nums item 0 = 0: change the shared array]\n  B --> E{did this write escape to the caller?}\n  E -- yes --> F[callers scores now starts with 0]\n  E -- no --> G\n  F --> G[nums = 9, 9: point the local name at a new array]\n  G --> H{did this write escape to the caller?}\n  H -- no --> I[callers scores unchanged]\n  H -- yes --> J[callers scores becomes 9, 9]\n  I --> K[/caller prints scores: 0, 20, 30/]\n  J --> K\n  K --> Z([back to the caller])",
+    "caption": "process: the first write changes the one shared array so the caller sees it; the second only moves the local name so the caller does not."
   },
   "grading": {
     "totalPoints": 0,
@@ -211,6 +25,132 @@
     "allowLateSubmit": true,
     "formative": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English. The caller has `scores = [10, 20, 30]` and calls `process(scores)`, so inside the function `nums` is a second name for the same array.\n\n**1.** Set item 0 of `nums` to 0.\n\n**2.** Ask: did the caller see that? Yes, because `nums` and `scores` are the same array, so `scores` now starts with 0.\n\n**3.** Point `nums` at a brand new array, `[9, 9]`.\n\n**4.** Ask: did the caller see that? No, only the local name moved, so `scores` is unchanged.\n\n**5.** Back in the caller, `scores` prints as `[0, 20, 30]`.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: the first diamond answers yes, the second answers no, and both paths meet at one print.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `SET item 1 OF list TO 5` (change one item in an array)\n- `SET list TO a NEW array` (point a name somewhere else)\n- `ASK did the caller see this? YES: ...` (a question and its answer)\n- `OUTPUT list` (show the result)\n\nPlain English is fine here. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, run the code in your head: the 0 survives in `scores`, and the `[9, 9]` never leaves the function.",
+      "hints": [
+        "Two writes, two questions: the first answer is yes (one shared array), the second is no (only the local name moved).",
+        "The last line should say what the caller prints, and it is not [9, 9]."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Mutation: item 0 is set to 0",
+      "description": "Write 0 into item 0 of the array.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:\\[\\s*0\\s*\\]|\\b(?:item|index|element|position|slot|spot)\\s*(?:number\\s*)?0\\b|\\bfirst\\s+(?:item|element|value|number|slot|spot|entry)\\b|\\bzeroth\\b)[^\\n]*(?:\\bTO|=|<-|:=|\\bBECOMES|\\bWITH|\\bAS)\\s*(?:the\\s+(?:value\\s+)?)?(?:0|zero)\\b(?!\\s*,\\s*\\d)|\\b(?:put|set|store|write|place)\\w*\\s+(?:a\\s+)?(?:0|zero)\\b[^\\n]*(?:\\bfirst\\b|\\[\\s*0\\s*\\]|\\bindex\\s*0|\\bitem\\s*0|\\bposition\\s*0)",
+      "hint": "Add a step that sets the first item (item 0) of nums to 0.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "The caller sees the mutation",
+      "description": "Say that the caller sees the change to item 0.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:^|\\n)(?![^\\n]*(?:\\bno\\b|\\b9\\b|(?:(?:\\bnot\\b|n't|\\bnever\\b)\\s+(?:\\w+\\s+){0,2}?(?:sees?|seen|visible|reach\\w*|escape\\w*|affect\\w*|chang\\w*|updat\\w*|notice\\w*|know\\w*)\\b|\\bunchanged\\b|\\bunaffected\\b|\\bnothing\\b)))(?=[^\\n]*\\b(?:caller|scores?|original|outside|calling\\s+code|main\\s+program|other\\s+code)\\b)[^\\n]*(?:\\b(?:sees?|seen|visible|reach\\w*|escape\\w*|affect\\w*|updated?|chang\\w*|shared?|same|yes)\\b|\\bnow\\s+(?:starts?|begins?|has|holds?|shows?|reads?|is)\\b|\\bstarts?\\s+with\\s+(?:0|zero)\\b)",
+      "hint": "After the mutation, say that the caller does see it, because nums and scores are the same array.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Reassignment: nums gets a new array",
+      "description": "Point nums at a new array.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:^|\\n)[^\\n]*(?:\\bnums\\b|\\bparameter\\b|\\blocal\\b|\\bname\\b|\\bargument\\b)[^\\n]*(?:\\[\\s*9\\s*,\\s*9\\s*\\]|\\b9\\s*,\\s*9\\b|\\b(?:new|another|different|fresh|second)\\s+(?:array|list)\\b|\\breassign\\w*|\\b(?:TO|=|<-)\\s*\\[)",
+      "hint": "Add a step that points nums at a brand new array, [9, 9].",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "The caller does not see the reassignment",
+      "description": "Say that the caller does not see the new array.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:^|\\n)(?=[^\\n]*(?:\\bnums\\b|\\bparameter\\b|\\blocal\\b|\\bname\\b|\\bargument\\b)[^\\n]*(?:\\[\\s*9\\s*,\\s*9\\s*\\]|\\b9\\s*,\\s*9\\b|\\b(?:new|another|different|fresh|second)\\s+(?:array|list)\\b|\\breassign\\w*|\\b(?:TO|=|<-)\\s*\\[))(?=[^\\n]*\\b(?:caller|scores?|original|outside|calling\\s+code|main\\s+program|other\\s+code)\\b)(?=[^\\n]*(?:\\bnot\\b|n't|\\bnever\\b|\\bno\\b|\\bunchanged\\b|\\bnothing\\b|\\bstill\\b|\\bstays?\\b|\\bremains?\\b|\\bunaffected\\b|\\bsame\\s+as\\s+before\\b))|(?:^|\\n)[^\\n]*(?:\\bnums\\b|\\bparameter\\b|\\blocal\\b|\\bname\\b|\\bargument\\b)[^\\n]*(?:\\[\\s*9\\s*,\\s*9\\s*\\]|\\b9\\s*,\\s*9\\b|\\b(?:new|another|different|fresh|second)\\s+(?:array|list)\\b|\\breassign\\w*|\\b(?:TO|=|<-)\\s*\\[)[^\\n]*[\\s\\S]*(?:^|\\n)(?=[^\\n]*\\b(?:caller|scores?|original|outside|calling\\s+code|main\\s+program|other\\s+code)\\b)(?=[^\\n]*(?:\\bnot\\b|n't|\\bnever\\b|\\bno\\b|\\bunchanged\\b|\\bnothing\\b|\\bstill\\b|\\bstays?\\b|\\bremains?\\b|\\bunaffected\\b|\\bsame\\s+as\\s+before\\b))[^\\n]*",
+      "hint": "After the reassignment, say that the caller does not see it: only the local name moved.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "The caller prints 0, 20, 30",
+      "description": "Say what the caller prints at the end: 0, 20, 30.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b0\\W+20\\W+30\\b",
+      "hint": "Finish with what the caller prints: 0, 20, 30, not 9, 9.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is process(nums): the caller has scores = [10, 20, 30] and calls process(scores). Inside, nums and scores name the same array. Step 1 sets item 0 of nums to 0 (a mutation of the shared array, so the caller sees it). Step 2 points nums at a brand new array [9, 9] (a reassignment of the local name only, so the caller does not see it). The caller then prints scores as 0, 20, 30. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, END IF, RETURN, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite, for example saying the caller sees the [9, 9] array for the reassignment criterion. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Mutation: item 0 is set to 0",
+        "description": "A step writes 0 into the first item (item 0) of nums, the shared array.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The caller sees the mutation",
+        "description": "The steps say the caller DOES see the change to item 0, because nums and scores are the same array. If they say the caller does not see it, or never say, mark this missing.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Reassignment: nums gets a new array",
+        "description": "A step points the local name nums at a brand new array ([9, 9]).",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The caller does not see the reassignment",
+        "description": "After the reassignment the steps say the caller does NOT see it (only the local name moved, scores is unchanged). If they say the caller sees the new array, or never say, mark this missing.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The caller prints 0, 20, 30",
+        "description": "The steps end with the caller printing scores as 0, 20, 30. [9, 9] or the original 10, 20, 30 is wrong; mark this missing.",
+        "points": 1
+      }
+    ]
+  }
 }

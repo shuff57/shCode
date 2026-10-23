@@ -1,12 +1,13 @@
 {
   "id": "3-5-21-chart-destructure-vs-access",
-  "title": "3.5.21 Chart the Code: Destructuring vs. Plain Access",
-  "description": "Chart a function whose body destructures its parameter, and see the unpack as its own task before the work that uses it.",
+  "title": "3.5.21 Plain English to Pseudocode: Destructuring vs. Plain Access",
+  "description": "Turn four plain-English steps into pseudocode for describeBox(): unpack width, height and color from options in one step, build the note, add \"(wide)\" only when width is greater than height, then give the note back.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "week": 8,
   "slos": [
     "SLO-3",
@@ -14,180 +15,9 @@
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 6
-      }
-    ],
-    "aiGrader": {
-      "rubricTitle": "Destructuring chart: structure check",
-      "model": "glm-5.3-flash:cloud",
-      "contextDocs": [],
-      "strict": true,
-      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
-      "rubric": [
-        {
-          "id": "unpack-first",
-          "title": "The unpack, then the note, then the decision",
-          "points": 6,
-          "description": "Scored by the editor (arrow order): the unpack task, then the task that builds the note, come before the decision on every route.",
-          "check": {
-            "steps": [
-              {
-                "op": "sequence",
-                "of": [
-                  {
-                    "kind": "process",
-                    "re": "^(?!.*options\\s*\\.)(?=.*(?:unpack|destructur|take|pull|extract|width\\s*,\\s*height|from\\s+options|=\\s*options))"
-                  },
-                  {
-                    "kind": "process",
-                    "re": "note|box|build|string|text|make|\\+"
-                  },
-                  {
-                    "kind": "decision"
-                  }
-                ],
-                "fail": "The unpack is its own task, drawn first: one box that takes width, height and color out of options (not a box that reads options.width). Then build the note in its own task, before the decision.",
-                "pass": "The unpack, then the note, then the decision."
-              },
-              {
-                "op": "count",
-                "match": {
-                  "kind": "process",
-                  "re": "^(?=.*options)(?:(?=.*width)(?!.*height)(?!.*color)|(?=.*height)(?!.*width)(?!.*color)|(?=.*color)(?!.*width)(?!.*height))"
-                },
-                "min": 0,
-                "max": 0,
-                "fail": "Take all three values out of options in one task. A separate box for each field is plain access, one value at a time.",
-                "pass": "No task reads a single field out of options."
-              }
-            ]
-          }
-        },
-        {
-          "id": "exits",
-          "title": "The wide path adds to the note",
-          "points": 6,
-          "description": "Scored by the editor: the decision has two different exits, and the yes exit goes to the task that adds to the note.",
-          "check": {
-            "steps": [
-              {
-                "op": "branch",
-                "at": {
-                  "kind": "decision"
-                },
-                "orientation": "labelled",
-                "distinct": true,
-                "yes": {
-                  "kind": "process",
-                  "re": "wide|note|add|append|\\+|plus|extend|attach"
-                },
-                "fail": "The yes arrow must lead to the task that appends to the note, and the no arrow to somewhere different.",
-                "pass": "The yes arrow goes to the task that adds to the note."
-              }
-            ]
-          }
-        },
-        {
-          "id": "one-print",
-          "title": "The print comes after the decision",
-          "points": 6,
-          "description": "Scored by the editor: an input/output step for the print, after the decision.",
-          "check": {
-            "steps": [
-              {
-                "op": "count",
-                "match": {
-                  "kind": "io"
-                },
-                "min": 1,
-                "fail": "Both paths finish at one print. Draw an input/output step for the print.",
-                "pass": "There is a print."
-              },
-              {
-                "op": "sequence",
-                "of": [
-                  {
-                    "kind": "decision"
-                  },
-                  {
-                    "kind": "io"
-                  },
-                  {
-                    "kind": "terminal"
-                  }
-                ],
-                "fail": "Both paths must meet at the print, and the print must come after the decision, before End.",
-                "pass": "Both paths meet at the print before End."
-              }
-            ]
-          }
-        },
-        {
-          "id": "wide-question",
-          "title": "The decision compares width and height",
-          "points": 6,
-          "description": "Scored by the editor: a diamond asks whether the width is greater than the height (or whether the box is wide).",
-          "check": {
-            "steps": [
-              {
-                "op": "label",
-                "match": {
-                  "kind": "decision",
-                  "re": "^(?!.*(?:\\b(?:not|isn'?t|never)\\b|or\\s+equal|>=|<=|\\u2265|\\u2264))(?=.*(?:width\\s*(?:is\\s+)?(?:the\\s+)?(?:>(?!=)|greater|larger|bigger|wider|more|exceeds?|over)|height\\s*(?:is\\s+)?(?:the\\s+)?(?:<(?!=)|less|smaller|shorter|narrower|under)|\\bwide\\b|\\bwider\\b))"
-                },
-                "min": 1,
-                "fail": "The diamond should ask whether the width is greater than the height, so that yes is the wide case (not \"or equal\", and not the negated question).",
-                "pass": "The diamond compares width and height."
-              }
-            ]
-          }
-        }
-      ],
-      "gate": {
-        "anyOf": [
-          "unpack|destructur|width|height|color|options",
-          "note|box|build",
-          "wide|greater|>|bigger",
-          "print|show|log|output|return"
-        ],
-        "min": 3,
-        "capTo": 13,
-        "fail": "None of your shapes say what this program does. Label each shape in your own words."
-      }
-    }
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([describeBox starts]) --> B[unpack width, height and color from options]\n  B --> C[build the note from color, width and height]\n  C --> D{is width greater than height?}\n  D -- yes --> E[add the word wide to the note]\n  D -- no --> F[/give back the note/]\n  E --> F\n  F --> Z([back to the caller])",
+    "caption": "describeBox: the unpack is one box of its own before the note is built, and the wide case only adds to the note before both paths give it back."
   },
   "grading": {
     "totalPoints": 0,
@@ -195,6 +25,132 @@
     "allowLateSubmit": true,
     "formative": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Take `width`, `height` and `color` out of `options` in one step.\n\n**2.** Build the note from the color, the width and the height.\n\n**3.** If the width is greater than the height, the box is wide.\n\n**4.** In that case, add `\" (wide)\"` to the end of the note.\n\n**5.** Either way, give the note back.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: the unpack is a box of its own at the start, and the diamond sits after the note is built.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` (start a value)\n- `IF lives is 0` ... `END IF` (a check, with the steps inside it indented)\n- `ADD 1 TO lives` (change a value)\n- `RETURN lives` (the answer)\n\nPlain English is fine here. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, trace it twice by hand: once with width 10 and height 4, and once with width 3 and height 8. Only the first should reach the step that adds the word wide.",
+      "hints": [
+        "Take all three values out of `options` in one line. Three lines that each read one field are the plain-access version of this program.",
+        "The check for wide comes after the note is built, and only the yes side adds to the note."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Unpacks all three values in one step",
+      "description": "Take width, height and color out of options in a single step.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:^|\\n)(?=[^\\n]*\\bwidth\\b)(?=[^\\n]*\\bheight\\b)(?=[^\\n]*\\bcolou?r\\b)[^\\n]*\\b(?:options|object|parameter|param|argument|input)\\b",
+      "hint": "Write one step that takes width, height and color out of options together, not one line per field.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "The note is built after the unpack",
+      "description": "Build the note after the values are out of options.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:options|object|parameter|param|argument|input)\\b[\\s\\S]*\\n(?=[^\\n]*\\bcolou?r\\b)(?=[^\\n]*\\b(?:note|build|make|create|string|text|join|combine|concat\\w*|put\\s+together|assemble|sentence|message|description|label)\\b)",
+      "hint": "Put the step that builds the note after the unpack step.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Asks whether width is greater than height",
+      "description": "Check whether the width is greater than the height.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:^|\\n)(?![^\\n]*(?:\\bnot\\b|n't|\\bor\\s+equal|>=|<=|\\u2265|\\u2264|\\bat\\s+(?:least|most)\\b))(?=[^\\n]*\\b(?:IF|CHECK|WHETHER|WHEN|IS|ASK|COMPARE|SEE|TEST|DECIDE)\\b)(?:(?=[^\\n]*\\bheight\\b)(?=[^\\n]*\\bwidth\\b)[^\\n]*(?:\\bwidth\\b\\s*(?:is\\s+|are\\s+)?(?:the\\s+)?(?:>|\\b(?:greater|larger|bigger|wider|more|longer|exceeds?|over|above)\\b)|\\bheight\\b\\s*(?:is\\s+|are\\s+)?(?:the\\s+)?(?:<|\\b(?:less|smaller|shorter|narrower|under|below|lower)\\b))|[^\\n]*\\bis\\s+(?:the\\s+)?(?:box\\s+)?wid(?:e|er)\\b)",
+      "hint": "Add a check that asks whether width is greater than height (not less than, and not equal).",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "The wide case adds to the note",
+      "description": "Inside the check, add \" (wide)\" to the note.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:IF|WHEN|WHENEVER|WHETHER|CHECK|ONLY)\\b[\\s\\S]*?(?:\\b(?:add|append|attach|extend|tack|concatenate|stick)\\w*\\b[^\\n]*\\bwide\\b|\\bwide\\b[^\\n]*\\b(?:to|onto|on|after)\\s+(?:the\\s+)?(?:end\\s+of\\s+)?(?:the\\s+)?(?:note|text|string|it|description|label|result)\\b|\\bnote\\b[^\\n]*(?:\\+|plus)[^\\n]*\\bwide\\b)",
+      "hint": "After the check, add a step that appends \" (wide)\" to the note.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "The note is given back after the check",
+      "description": "Give the note back after the decision, on both paths.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:IF|WHEN|WHENEVER|WHETHER|CHECK|ONLY)\\b[\\s\\S]*\\b(?:RETURNS?|OUTPUTS?|PRINTS?|LOG|DISPLAYS?|SHOWS?|GIVES?|SEND|HAND|ECHO|SAY|WRITE)\\b",
+      "hint": "Finish with a step that gives back the note, after the check.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is describeBox(options): take width, height and color out of options in one step; build the note from color, width and height; if width is greater than height, add \" (wide)\" to the note; give the note back. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, END IF, RETURN, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite, for example adding the wide text before the width test for the wide criterion. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Unpacks all three values in one step",
+        "description": "One step takes width, height and color out of options together. If each field is read in its own step (options.width, options.height, ...), or the unpack never happens, mark this missing.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The note is built after the unpack",
+        "description": "The step that builds the note (color, width and height joined into text) comes AFTER the unpack. If the note is built first, mark this missing.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Asks whether width is greater than height",
+        "description": "The steps ask whether the width is greater than the height (or equivalently whether the box is wide). A flipped comparison (width less than height), an \"or equal\" test, or no check at all is missing.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The wide case adds to the note",
+        "description": "When the width is greater than the height, a step adds \" (wide)\" (or the word wide) to the end of the note. If it is added before the check, or always, or never, mark this missing.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The note is given back after the check",
+        "description": "After the check, the steps give back (return or print) the note. If it is given back before the check, or never, mark this missing.",
+        "points": 1
+      }
+    ]
+  }
 }

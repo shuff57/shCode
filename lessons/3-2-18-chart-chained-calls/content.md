@@ -1,14 +1,24 @@
-## Chart the Code: Data Flow Through Chained Calls
+## Plain English to Pseudocode: Data Flow Through Chained Calls
 
 **What you'll practise:**
-- Drawing two calls on one path, in the order they run
+- Turning plain English into exact, numbered steps
+- Putting two nested calls in the order they run, inner first
 - Showing the value the inner call hands to the outer one
-- Charting a decision that tests the final result
-- Seeing why the nesting order changes the answer
+- Reading a flow chart and matching each box to a step
 
-When one call is written inside another, the inner one runs first and its value travels into the outer one. The chart makes that trip visible, which is the whole reason nested calls are easy to get wrong.
+### The plan, in plain English
 
-### The code
+When one call is written inside another, the inner one runs first and its value travels into the outer one. This program does exactly that:
+
+1. Call `double` with `5`. It hands back `10`.
+2. Call `addTen` with that `10`. It hands back `20`.
+3. Set `result` to the value `addTen` handed back.
+4. If `result` is over `25`, print `Big`.
+5. Otherwise, print `Small`.
+
+The same plan is drawn as a flow chart above the editor. You do not draw it, you **read** it.
+
+### The code it describes
 
 ```js
 function double(n) {
@@ -28,34 +38,25 @@ if (result > 25) {
 }
 ```
 
-### What to draw
+### What to write
 
-Use the canvas below. **Start** and **End** are already placed.
+Open `README.md` and type directly into it, no comment marks needed. The first and last lines are already there. Write your steps **between** them and number every one. Plain English is fine: the AI reads what your steps mean.
 
-| Shape | Use it for |
+| Write this | Use it for |
 |---|---|
-| **Start / End** (oval) | One of each |
-| **Function call** (double rail) | Two of them, one after the other: `double(5)` then `addTen(...)`. Press **+ more shapes** |
-| **Task** (rectangle) | Setting `result` to the final value |
-| **Decision** (diamond) | `result > 25` |
-| **Input / Output** (parallelogram) | The two prints |
+| `CALL double WITH 5` | running the inner call |
+| `SET result TO ...` | keeping the value `addTen` hands back |
+| `IF result > 25` ... `ELSE` ... `END IF` | the Big / Small check |
+| `PRINT "Big"` | showing something |
 
-At least seven shapes, at least one diamond.
+### The order the two calls have to be in
 
-### Read it inside out
+1. **First: `double(5)`.** It takes `5` and hands back `10`.
+2. **Second: `addTen`, on that `10`.** Nothing can be handed to `addTen` until `double` has returned.
+3. **Only then** is `result` set and tested. `result` does not exist until the outer call has returned.
 
-The inner call runs first. On the chart, `double(5)` is the **first** double-rail: it takes `5` and hands back `10`. That `10` is the argument to `addTen`, the **second** double-rail, which hands back `20`. Only then is `result` set, and the diamond tests it.
-
-Drawing the outer call first is the classic error. On your chart the order of the two double-rails has to match the order the calls actually run: inner then outer. Nothing can be handed to `addTen` until `double` has returned.
-
-### The arrows that decide whether this is right
-
-1. **One arrow leaves the first double-rail and enters the second.** That arrow *is* the chained value: the result of `double` becomes the argument of `addTen`.
-2. **The diamond comes after both calls**, not between them. `result` does not exist until the outer call has returned.
-3. **Both diamond exits rejoin** at the End. `Big` and `Small` are alternative prints, and after either one the program is done.
+Writing the outer call first is the classic error. On the chart the two double-rail boxes run left to right in the same order your steps do: inner, then outer.
 
 ### Before you submit
 
-Press **Check my diagram**, then trace it with `5`. Inner call: `double(5)` is `10`. Outer call: `addTen(10)` is `20`. The diamond asks `20 > 25`, which is false, so the path is `Small`. If your chart reaches `Big`, either the calls are in the wrong order or the diamond tests the wrong value.
-
-That hand-trace is the actual test here. The checker cannot do it for you.
+Press **Grade** above the editor, then trace your steps by hand with `5`. Inner call: `double(5)` is `10`. Outer call: `addTen(10)` is `20`. The check asks `20 > 25`, which is false, so the path is `Small`. If your steps reach `Big`, either the calls are in the wrong order or the check tests the wrong value.

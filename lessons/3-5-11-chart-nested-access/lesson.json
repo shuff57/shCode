@@ -1,12 +1,13 @@
 {
   "id": "3-5-11-chart-nested-access",
-  "title": "3.5.11 Chart the Code: Tracing a Nested Access",
-  "description": "Chart a loop that reads a nested field inside an array, then a decision on a nested value. Get the loop's arrows landing in the right place.",
+  "title": "3.5.11 Plain English to Pseudocode: Tracing a Nested Access",
+  "description": "Turn a loop that reads a nested price from each item into pseudocode, then read the customer's name and ask the VIP question once, after the loop.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "week": 8,
   "slos": [
     "SLO-3",
@@ -14,207 +15,9 @@
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 7
-      },
-      {
-        "id": "min-shape",
-        "shape": "preparation",
-        "count": 1
-      }
-    ],
-    "aiGrader": {
-      "rubricTitle": "Nested access chart: structure check",
-      "model": "glm-5.3-flash:cloud",
-      "contextDocs": [],
-      "strict": true,
-      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
-      "rubric": [
-        {
-          "id": "hexagon",
-          "title": "The loop is drawn with the loop-setup hexagon",
-          "points": 3,
-          "description": "Scored by the editor (shape kind).",
-          "check": {
-            "steps": [
-              {
-                "op": "count",
-                "match": {
-                  "kind": "preparation"
-                },
-                "min": 1,
-                "fail": "The for-loop header has its own shape, the loop-setup hexagon from the shape palette.",
-                "pass": "A loop-setup hexagon is on the path."
-              }
-            ]
-          }
-        },
-        {
-          "id": "adds-price",
-          "title": "A task inside the loop adds each price to the total",
-          "points": 6,
-          "description": "Scored by the editor (arrow order): the task that adds the price sits inside the repeat.",
-          "check": {
-            "steps": [
-              {
-                "op": "in-cycle",
-                "match": {
-                  "kind": "process",
-                  "re": "^(?!.*(?:=\\s*0(?![\\d.])|\\b(?:to|at)\\s+(?:0|zero)\\b))(?=.*(?:price|cost|amount|item))(?=.*(?:\\+|\\badd|\\bplus|\\bsum|\\btotal))"
-                },
-                "fail": "The loop body is the task that adds each item's price to the total, and it must lead back to the hexagon so it runs once per item.",
-                "pass": "The adding task runs once per item, inside the loop."
-              }
-            ]
-          }
-        },
-        {
-          "id": "after-loop",
-          "title": "The loop, then more steps after it",
-          "points": 6,
-          "description": "Scored by the editor (arrow order): the loop repeats, the arrow that leaves it leads on to the steps after it, and no arrow goes around the loop to the VIP test.",
-          "check": {
-            "steps": [
-              {
-                "op": "loop-exit",
-                "loop": {
-                  "kind": "preparation"
-                },
-                "minAfter": 2,
-                "from": "any",
-                "orSetup": true,
-                "fail": "The adding task must lead back to the hexagon, and the arrow that leaves the loop must lead on to the name task, the decision and the print (at least two more steps before End).",
-                "pass": "The way out of the loop leads on to the steps after it."
-              },
-              {
-                "op": "sequence",
-                "of": [
-                  {
-                    "kind": "preparation"
-                  },
-                  {
-                    "kind": "decision",
-                    "re": "^(?!.*(?:\\bmore\\b|\\bleft\\b|\\bnext\\b|\\banother\\b|\\bremaining\\b|\\blength\\b|\\bitems?\\b|\\bi\\s*<))(?=.*(?:vip|customer|member|special))"
-                  }
-                ],
-                "fail": "The loop must run before the VIP test on every route: no arrow may go around the hexagon straight to the steps after it.",
-                "pass": "Every route to the VIP test goes through the loop."
-              }
-            ]
-          }
-        },
-        {
-          "id": "decision-outside",
-          "title": "The VIP decision is outside the loop",
-          "points": 6,
-          "description": "Scored by the editor (arrow order): the decision that asks about the customer is not part of a repeat. A diamond that runs the loop (\"more items?\") may sit inside it.",
-          "check": {
-            "steps": [
-              {
-                "op": "not-in-cycle",
-                "match": {
-                  "kind": "decision",
-                  "re": "^(?!.*(?:\\bmore\\b|\\bleft\\b|\\bnext\\b|\\banother\\b|\\bremaining\\b|\\blength\\b|\\bitems?\\b|\\bi\\s*<))(?=.*(?:vip|customer|member|special))"
-                },
-                "fail": "The VIP test runs once, after the loop. In your chart an arrow leads back to the diamond that asks about the customer, so it runs on every pass (or no diamond asks about the customer at all).",
-                "pass": "The decision is outside the loop."
-              }
-            ]
-          }
-        },
-        {
-          "id": "vip-question",
-          "title": "The decision asks about the customer",
-          "points": 2,
-          "description": "Scored by the editor: a diamond asks about the customer (the vip flag).",
-          "check": {
-            "steps": [
-              {
-                "op": "label",
-                "match": {
-                  "kind": "decision",
-                  "re": "vip|customer|member|order"
-                },
-                "min": 1,
-                "fail": "The diamond should ask about the customer: is the order from a VIP.",
-                "pass": "The diamond asks about the customer."
-              }
-            ]
-          }
-        },
-        {
-          "id": "exits",
-          "title": "Each exit of the VIP decision has its own print",
-          "points": 6,
-          "description": "Scored by the editor (arrow order): the yes arrow of the VIP decision leads to the VIP print and the no arrow to a different print.",
-          "check": {
-            "steps": [
-              {
-                "op": "branch",
-                "at": {
-                  "kind": "decision"
-                },
-                "orientation": "labelled",
-                "distinct": true,
-                "yes": {
-                  "kind": "io",
-                  "re": "vip|member|special"
-                },
-                "no": {
-                  "kind": "io"
-                },
-                "fail": "Each exit of the diamond leads to its own print: the yes arrow to the VIP print (say VIP in it), the no arrow to the other print.",
-                "pass": "Each exit of the diamond has its own print."
-              }
-            ]
-          }
-        }
-      ],
-      "gate": {
-        "anyOf": [
-          "total|price|items|order",
-          "name|customer|vip",
-          "loop|each|every|next|\\bi\\b|length",
-          "print|show|log|output",
-          "yes|no|\\+|add"
-        ],
-        "min": 3,
-        "capTo": 13,
-        "fail": "None of your shapes say what this program does. Label each shape in your own words."
-      }
-    }
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([the order summary starts]) --> B[total = 0]\n  B --> C{{for each item in order.items}}\n  C --> D[total = total + the price of that item]\n  D --> C\n  C --> E[name = order.customer.name]\n  E --> F{is order.customer.vip true?}\n  F -- yes --> G[/print the name, VIP, and the total/]\n  F -- no --> H[/print the name and the total/]\n  G --> Z([the order summary ends])\n  H --> Z",
+    "caption": "the summary: the loop body adds one price and goes back to the loop, only the way out of the loop reaches the name and the VIP question."
   },
   "grading": {
     "totalPoints": 0,
@@ -222,6 +25,132 @@
     "allowLateSubmit": true,
     "formative": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Start the `total` at `0`.\n\n**2.** Go through each item in `order.items`, and add that item's `price` to the `total`.\n\n**3.** After the loop, read the customer's name, `order.customer.name`.\n\n**4.** Ask whether the customer is a VIP, `order.customer.vip`. If so, print the name and total with a VIP label. Otherwise, print the name and total.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: the hexagon is the loop, the adding step goes back to it, and the name and the VIP question sit after the way out of the loop.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` (start a value)\n- `IF lives is 0` ... `END IF` (a check, with the steps inside it indented)\n- `RETURN lives` (the answer)\n- `FOR EACH coin IN coins` ... `END FOR` (repeat for every item)\n\nPlain English is fine here. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, trace it by hand with the real data: prices `1.5` and `3`, and `vip` is `true`. Your steps should reach the VIP print with a total of `4.5`.",
+      "hints": [
+        "The adding step sits inside the loop. The name and the VIP question come after the loop, because they only need to run once.",
+        "The VIP question has two answers, and each answer gets its own print."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "The total starts at zero, before the loop",
+      "description": "Start the total at zero before the loop begins.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:\\b(?:total|sum|subtotal)\\b[^\\n]{0,30}?(?:\\bTO\\b|=|\\bAT\\b|\\bAS\\b|\\bIS\\b|\\bBE\\b|\\bOF\\b|\\bSTARTS\\b|\\bWITH\\b|<-|:=|:)\\s*(?:0|zero)\\b(?!\\.\\d)(?!\\s*[+\\-*/]\\s*\\w)|\\bzero\\s+out\\s+(?:the\\s+)?total\\b)[\\s\\S]*\\b(?:FOR\\s*EACH|FOREACH|FOR|LOOP|REPEAT|ITERATE|GO\\s+THROUGH|GOING\\s+THROUGH|WALK|LOOK\\s+AT\\s+EACH|WHILE|EVERY|EACH)\\b[^\\n]*?\\bitems?\\b",
+      "hint": "Start the total at 0 before the loop, not inside it.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Each price is added inside the loop",
+      "description": "Inside the loop over the items, add each item's price to the total.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:FOR\\s*EACH|FOREACH|FOR|LOOP|REPEAT|ITERATE|GO\\s+THROUGH|GOING\\s+THROUGH|WALK|LOOK\\s+AT\\s+EACH|WHILE|EVERY|EACH)\\b[^\\n]*?\\bitems?\\b(?:(?!(?:\\bEND[\\s-]*(?:FOR|LOOP|EACH|REPEAT|WHILE)\\b|\\bENDFOR\\b|\\bENDLOOP\\b|\\bafter\\s+(?:the\\s+)?(?:loop|last|all)\\b|\\bonce\\s+(?:the\\s+)?loop\\b|\\boutside\\s+(?:of\\s+)?(?:the\\s+)?loop\\b|\\bwhen\\s+(?:the\\s+)?loop\\b|\\bloop\\s+(?:is\\s+)?(?:done|finished|ends|over|complete)\\b))[\\s\\S])*?(?:\\b(?:ADD|PUT|INCREASE|INCREMENT|ADDS)\\b[^\\n]*\\bprice\\b[^\\n]*\\b(?:TO|ONTO|INTO|IN)\\b[^\\n]*\\btotal\\b|\\btotal\\b[^\\n]*?(?:\\+=|\\+|\\bplus\\b)[^\\n]*\\bprice\\b|\\bprice\\b[^\\n]*?(?:\\+|\\bplus\\b)[^\\n]*\\btotal\\b|\\b(?:INCREASE|RAISE|CHANGE|BUMP|GROW)\\s+(?:the\\s+)?total\\s+BY\\s+[^\\n]*\\bprice\\b)",
+      "hint": "Inside the loop over the items, add each item's price to the total.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The customer name is read after the loop",
+      "description": "After the loop, read the customer's name.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:\\bEND[\\s-]*(?:FOR|LOOP|EACH|REPEAT|WHILE)\\b|\\bENDFOR\\b|\\bENDLOOP\\b|\\bafter\\s+(?:the\\s+)?(?:loop|last|all)\\b|\\bonce\\s+(?:the\\s+)?loop\\b|\\boutside\\s+(?:of\\s+)?(?:the\\s+)?loop\\b|\\bwhen\\s+(?:the\\s+)?loop\\b|\\bloop\\s+(?:is\\s+)?(?:done|finished|ends|over|complete)\\b)[\\s\\S]*(?:\\bcustomer\\b[^\\n]*?\\bname\\b|\\bname\\b[^\\n]*?\\bcustomer\\b)",
+      "hint": "After the loop ends, read the customer's name (order.customer.name).",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "The VIP question is asked after the loop",
+      "description": "After the loop, ask whether the customer is a VIP.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:\\bEND[\\s-]*(?:FOR|LOOP|EACH|REPEAT|WHILE)\\b|\\bENDFOR\\b|\\bENDLOOP\\b|\\bafter\\s+(?:the\\s+)?(?:loop|last|all)\\b|\\bonce\\s+(?:the\\s+)?loop\\b|\\boutside\\s+(?:of\\s+)?(?:the\\s+)?loop\\b|\\bwhen\\s+(?:the\\s+)?loop\\b|\\bloop\\s+(?:is\\s+)?(?:done|finished|ends|over|complete)\\b)[\\s\\S]*\\b(?:IF|IS|WHEN|CHECK|WHETHER|DOES|ASK|SEE|CAN)\\b[^\\n]*?\\b(?:vip|member|special)\\b",
+      "hint": "After the loop, ask whether the customer is a VIP. It runs once, not on every pass.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Each answer has its own print",
+      "description": "A VIP gets one print and everyone else gets a different print.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:IF|IS|WHEN|CHECK|WHETHER|DOES|ASK|SEE|CAN)\\b[^\\n]*?\\b(?:vip|member|special)\\b[\\s\\S]*?\\b(?:PRINT|OUTPUT|SHOW|DISPLAY|LOG|SAY|WRITE|TELL|REPORT|ANNOUNCE)\\b[\\s\\S]*?\\b(?:ELSE|OTHERWISE|IF\\s+NOT|IS\\s+NOT|ISN'T|NOT\\s+A|NON[-\\s]?VIP|OTHER\\s+CUSTOMERS|EVERYONE\\s+ELSE)\\b[\\s\\S]*?\\b(?:PRINT|OUTPUT|SHOW|DISPLAY|LOG|SAY|WRITE|TELL|REPORT|ANNOUNCE)\\b",
+      "hint": "Print one line when the customer is a VIP and a different line in the other case.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given a four-step plain-English plan and rewrote it as numbered pseudocode in README.md, between a first line and a last line that were already there. The plan: start a total at 0; loop over each item in order.items adding each item's price to the total; AFTER the loop read the customer name (order.customer.name); AFTER the loop ask whether the customer is a VIP (order.customer.vip), print the name and total with a VIP label if so, and a different print otherwise. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, ELSE, END IF, FOR EACH, WRITE, PRINT, RETURN, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The total starts at zero, before the loop",
+        "description": "The steps start the total at 0 BEFORE the loop begins. If it is only set to 0 inside the loop, mark this missing.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Each price is added inside the loop",
+        "description": "Inside the loop over the items, the steps add each item's price to the total.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The customer name is read after the loop",
+        "description": "The steps read the customer's name AFTER the loop ends, not inside it.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The VIP question is asked after the loop",
+        "description": "The steps ask whether the customer is a VIP AFTER the loop ends, so it runs once. If the question is inside the loop, mark this missing.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Each answer has its own print",
+        "description": "The steps print one line when the customer is a VIP and a different line in the other case, so the VIP question has two different prints.",
+        "points": 1
+      }
+    ]
+  }
 }

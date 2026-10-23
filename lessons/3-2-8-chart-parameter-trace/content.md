@@ -1,14 +1,24 @@
-## Chart the Code: Tracing Parameter Values
+## Plain English to Pseudocode: Tracing Parameter Values
 
 **What you'll practise:**
-- Drawing a function call as one step with the double-rail shape
-- Showing where the value enters the parameter
-- Charting a decision that uses the same value after the call
-- Keeping the called function's body off the chart
+- Turning plain English into exact, numbered steps
+- Passing a value into a function as one step, without writing the function's body
+- Putting the call **before** the decision that uses the same value
+- Reading a flow chart and matching each box to a step
 
-This program passes a value into a function, which prints a result, and then decides what to do with the same value. The chart shows the flow through the call without drawing what happens inside the function.
+### The plan, in plain English
 
-### The code
+This program passes a value into a function, which prints a result, and then decides what to do with the same value:
+
+1. Set `base` to `100`.
+2. Call `showPriceWithTax` with `base`. Inside the call the value becomes `price`.
+3. After the call, check whether `base` is over `80`.
+4. If it is, print `Over budget`.
+5. Otherwise, print `Within budget`.
+
+The same plan is drawn as a flow chart above the editor. You do not draw it, you **read** it.
+
+### The code it describes
 
 ```js
 function showPriceWithTax(price) {
@@ -25,34 +35,21 @@ if (base > 80) {
 }
 ```
 
-### What to draw
+### What to write
 
-Use the canvas below. **Start** and **End** are already placed.
+Open `README.md` and type directly into it, no comment marks needed. The first and last lines are already there. Write your steps **between** them and number every one. Plain English is fine: the AI reads what your steps mean.
 
-| Shape | Use it for |
+| Write this | Use it for |
 |---|---|
-| **Start / End** (oval) | One of each |
-| **Function call** (double rail) | The call `showPriceWithTax(base)`: press **+ more shapes** to reveal it |
-| **Task** (rectangle) | Setting `base` |
-| **Decision** (diamond) | `base > 80` |
-| **Input / Output** (parallelogram) | The two prints (the call's own print happens inside the function, so it is not drawn) |
-
-At least seven shapes, at least one diamond.
+| `SET base TO 100` | starting the value |
+| `CALL showPriceWithTax WITH base` | the function call, one step |
+| `IF base is over 80` ... `ELSE` ... `END IF` | the decision |
+| `OUTPUT "Over budget"` | each print |
 
 ### Where the value goes
 
-The arrow into the double-rail carries `base` as the argument. Inside the call, that value becomes `price`, the parameter. You do not draw the body: **a double-rail is one step**, and the function's own lines belong to a different chart or to no chart at all.
-
-When the call finishes, the program carries on with the next line. `base` is unchanged, so the decision can still test it.
-
-### The arrows that decide whether this is right
-
-1. **Both diamond exits rejoin** at the End. `Over budget` and `Within budget` are the two prints, and after either one the program finishes.
-2. **The double-rail sits between "set base" and the diamond**, not off to the side. The program calls the function first and only then reaches the decision.
-3. **Nothing hangs off the double-rail** except the arrow that leads on to the decision. A function call is one step on the main path, not a branch.
+The argument is `base`. Inside the call, that value becomes `price`, the parameter. You do not write the body: **a call is one step**. When the call finishes, `base` is unchanged, so the decision can still test it. The check uses `base`, never `price`.
 
 ### Before you submit
 
-Press **Check my diagram**, then trace it by hand. With `base = 100`, the call runs, then `base > 80` is true, so follow the `yes` path to `Over budget`. Now change your mental `base` to `50` and trace again: the call still runs, but the answer flips to `Within budget`. If your chart sends both values the same way, the diamond is in the wrong place.
-
-That hand-trace is the actual test here. The checker cannot do it for you.
+Press **Grade** above the editor, then trace your steps by hand twice: once with `base` at 100, and once pretending it is 50. The call runs both times, but the answer flips from `Over budget` to `Within budget`. If your steps send both values the same way, the check is in the wrong place.
