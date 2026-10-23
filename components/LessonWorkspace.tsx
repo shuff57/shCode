@@ -168,6 +168,9 @@ export default function LessonWorkspace({
   const [aiCheckBusy, setAiCheckBusy] = useState(false);
   const [aiCheckNote, setAiCheckNote] = useState<{ kind: 'ok' | 'error'; text: string; hints?: string[] } | null>(null);
   const aiVerdictsRef = useRef<{ verdicts: AiVerdicts; text: string } | null>(null);
+  // The AI could not be reached for this exact text, so the pattern check marks the cards instead.
+  // Without it a grader outage would lock Submit for every student at once.
+  const aiFallbackRef = useRef<string | null>(null);
   // Set true when an admin/teacher inserts the reference solution; pauses
   // localStorage autosave so their progress record stays clean. Cleared by
   // the Reset button (which also restores the starter).
@@ -725,7 +728,7 @@ export default function LessonWorkspace({
     // On an aiCheck lab Run is for running: the AI's Grade owns the cards, so with no fresh
     // verdicts they stay ungraded rather than showing the pattern check's red and green.
     setRequirements(
-      !aiCheck
+      !aiCheck || aiFallbackRef.current === (files[aiCheckFile] ?? '')
         ? merged
         : ai && ai.text === (files[aiCheckFile] ?? '')
           ? applyAiVerdicts(merged, ai.verdicts)
@@ -738,6 +741,15 @@ export default function LessonWorkspace({
   // The AI grades a text lesson's steps -- this IS its Grade button. The file goes to
   // /api/grade-written, which reads the rubric by lesson id; each verdict then lands on the Quest
   // card with the same id. Practice feedback only: nothing is scored or recorded here.
+  // When the AI cannot answer, the lab's own pattern check (what Run used to do) marks the cards for
+  // this exact text, so a student is never stuck behind an outage. Editing clears it, like the AI's marks.
+  const fallBackToPatternCheck = (text: string, why: string) => {
+    aiFallbackRef.current = text;
+    setAiCheckNote({ kind: 'error', text: `${why} The pattern check marked your cards instead, so you can keep going.` });
+    if (isTextMode) trackRun(runTests());
+    else runCode();
+  };
+
   const runAiCheck = async () => {
     if (!aiCheck || aiCheckBusy) return;
     const text = files[aiCheckFile] ?? '';
@@ -757,7 +769,7 @@ export default function LessonWorkspace({
       );
       if (data === null || !data.ok) {
         const kind = classifyGradeFailure(status, data, network);
-        setAiCheckNote({ kind: 'error', text: gradeFailureMessage({ kind, status, serverMessage: data?.error }) });
+        fallBackToPatternCheck(text, gradeFailureMessage({ kind, status, serverMessage: data?.error }));
         return;
       }
       // The verdicts describe `text`. If the student kept typing while the AI was
@@ -777,7 +789,7 @@ export default function LessonWorkspace({
       });
     } catch (e) {
       console.warn('[ai-check]', e);
-      setAiCheckNote({ kind: 'error', text: gradeFailureMessage({ kind: 'network' }) });
+      fallBackToPatternCheck(text, gradeFailureMessage({ kind: 'network' }));
     } finally {
       setAiCheckBusy(false);
     }
@@ -801,8 +813,10 @@ export default function LessonWorkspace({
   const aiCheckedText = files[aiCheckFile] ?? '';
   useEffect(() => {
     const ai = aiVerdictsRef.current;
-    if (!aiCheck || !ai || ai.text === aiCheckedText) return;
+    const fb = aiFallbackRef.current;
+    if (!aiCheck || (!ai && fb === null) || ai?.text === aiCheckedText || fb === aiCheckedText) return;
     aiVerdictsRef.current = null;
+    aiFallbackRef.current = null;
     setAiCheckNote(null);
     // The AI is this lab's grader. Editing drops the marks and leaves the
     // cards ungraded until the student presses Grade again.
@@ -1225,6 +1239,7 @@ export default function LessonWorkspace({
                       setSolutionLoaded(false);
                       // Reset also discards any AI marks: the starter has not been graded.
                       aiVerdictsRef.current = null;
+                      aiFallbackRef.current = null;
                       setAiCheckNote(null);
                       if (isTextMode || aiCheck) setRequirements(lesson.requirements);
                       setResetMsg(isTextMode ? 'Text reset to starter.' : 'Code reset to starter.');
