@@ -1,4 +1,4 @@
-// POST /api/grade-written for a chart whose rubric is scored entirely by rules (the nine
+// POST /api/grade-written for a chart whose rubric is scored entirely by rules (the remaining
 // 3.4-3.8 "Chart the Code" lessons): the REAL Pages Function, the REAL generated grader config, and
 // an Ollama address nothing listens on, so a model call would fail the test. It proves the
 // server marks the chart from its drawing alone and the relevance gate still applies.
@@ -16,7 +16,7 @@ const ok = (c, m) => { if (c) console.log('  PASS ' + m); else { failures++; con
 
 mkdirSync(path.join(root, 'node_modules', '.pkg-load-cache'), { recursive: true });
 const out = mkdtempSync(path.join(root, 'node_modules', '.pkg-load-cache', 'shcode-rulesonly-'));
-const ID = '3-8-17-chart-save-load-round-trip';
+const ID = '3-6-7-chart-reassign-vs-mutate';
 try {
   execFileSync(process.execPath, [
     path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'), 'functions/api/grade-written.ts',
@@ -33,7 +33,7 @@ try {
     OLLAMA_API_KEY: 'unused', OLLAMA_HOST: 'http://127.0.0.1:9', GRADE_WRITTEN_DAILY_LIMIT: '30',
     ASSETS: { fetch: async (req) => {
       const p = new URL(typeof req === 'string' ? req : req.url).pathname;
-      return new Response(p.includes('lessons-manifest') ? JSON.stringify({ lessons: [{ id: ID, title: '3.8.17 Chart' }] }) : '{}', { headers: { 'Content-Type': 'application/json' } });
+      return new Response(p.includes('lessons-manifest') ? JSON.stringify({ lessons: [{ id: ID, title: '3.6.7 Chart' }] }) : '{}', { headers: { 'Content-Type': 'application/json' } });
     } },
     DB: { prepare() { const s = { bind: () => s, first: async () => ({ count: 0 }), run: async () => ({}), all: async () => ({ results: [] }) }; return s; } },
   };

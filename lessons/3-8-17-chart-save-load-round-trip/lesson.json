@@ -1,12 +1,13 @@
 {
   "id": "3-8-17-chart-save-load-round-trip",
-  "title": "3.8.17 Chart the Code: Save/Load Round Trip End to End",
-  "description": "Draw the whole save-and-load pattern: stringify to save, read the key, decide whether anything was stored, parse inside a try, and fall back to defaults. Get both decision exits right.",
+  "title": "3.8.17 Plain English to Pseudocode: Save/Load Round Trip",
+  "description": "Turn four plain-English steps into pseudocode for loadSettings(): read the key, check for nothing stored, then parse inside a try, with the defaults as the fallback on both exits.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "week": 10,
   "slos": [
     "SLO-2",
@@ -14,171 +15,9 @@
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 2
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 10
-      }
-    ],
-    "aiGrader": {
-      "rubricTitle": "Save/load chart: structure check",
-      "model": "glm-5.3-flash:cloud",
-      "contextDocs": [],
-      "strict": true,
-      "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
-      "rubric": [
-        {
-          "id": "order",
-          "title": "Read the key, check for nothing, then check the parse",
-          "points": 6,
-          "description": "Scored by the editor (arrow order): a task, then a decision, then a second decision, on every route.",
-          "check": {
-            "steps": [
-              {
-                "op": "sequence",
-                "of": [
-                  {
-                    "kind": "process"
-                  },
-                  {
-                    "kind": "decision",
-                    "re": "null|stor|nothing|missing|anything|empty|exist|found|saved|key|text|data"
-                  },
-                  {
-                    "kind": "decision",
-                    "re": "pars|succe|work|valid|json|catch|try|error|fail|read|ok|corrupt|bad"
-                  }
-                ],
-                "fail": "Load asks two questions in order: first \"is anything stored?\", then \"did the parse succeed?\". Put the missing-key question first, and the parse question after it.",
-                "pass": "The missing-key check comes before the parse check."
-              }
-            ]
-          }
-        },
-        {
-          "id": "missing-first",
-          "title": "Nothing stored leads to the defaults, not to the parse",
-          "points": 5,
-          "description": "Scored by the editor: one of the first decision's exits leads straight to a task (the defaults), the other to the second decision.",
-          "check": {
-            "steps": [
-              {
-                "op": "branch",
-                "at": {
-                  "kind": "decision"
-                },
-                "distinct": true,
-                "yes": {
-                  "kind": "process"
-                },
-                "no": {
-                  "kind": "decision"
-                },
-                "fail": "The first diamond has two different exits: one goes straight to a task that returns the defaults, the other goes on to the parse question.",
-                "pass": "One exit returns the defaults, the other goes on to the parse question."
-              }
-            ]
-          }
-        },
-        {
-          "id": "one-print",
-          "title": "Every path ends at the print",
-          "points": 4,
-          "description": "Scored by the editor: an input/output step for the print, after the decisions.",
-          "check": {
-            "steps": [
-              {
-                "op": "count",
-                "match": {
-                  "kind": "io"
-                },
-                "min": 1,
-                "fail": "All the paths finish at one print. Draw an input/output step for the print.",
-                "pass": "There is a print."
-              },
-              {
-                "op": "sequence",
-                "of": [
-                  {
-                    "kind": "decision"
-                  },
-                  {
-                    "kind": "io"
-                  },
-                  {
-                    "kind": "terminal"
-                  }
-                ],
-                "fail": "Every path must pass the decisions and then the print before End.",
-                "pass": "Every path passes the decisions, then the print, then End."
-              }
-            ]
-          }
-        },
-        {
-          "id": "print-says",
-          "title": "The print says what came back",
-          "points": 5,
-          "description": "Scored by the editor: the input/output shape is about the restored value.",
-          "check": {
-            "steps": [
-              {
-                "op": "label",
-                "match": {
-                  "kind": "io",
-                  "re": "restored|print|show|value|result|settings|log|output|object"
-                },
-                "min": 1,
-                "fail": "Say in the print step what it shows: the restored value.",
-                "pass": "The print step says what it shows."
-              }
-            ]
-          }
-        }
-      ],
-      "gate": {
-        "anyOf": [
-          "null|stored|missing|nothing|text|read|key",
-          "parse|succeed|catch|try|json",
-          "default|fallback|return",
-          "stringify|save|store|setitem",
-          "print|show|log|output|restored"
-        ],
-        "min": 3,
-        "capTo": 13,
-        "fail": "None of your shapes say what this program does. Label each shape in your own words."
-      }
-    }
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([loadSettings starts]) --> B[read the text stored under settings]\n  B --> C{is the text null?}\n  C -- yes --> D[/return the defaults/]\n  C -- no --> E{does the parse work?}\n  E -- yes --> F[/return the parsed settings/]\n  E -- no --> D\n  D --> Z([back to the caller])\n  F --> Z",
+    "caption": "loadSettings: the first diamond (nothing stored) skips the parse entirely, and both ways to fail end at the same defaults."
   },
   "grading": {
     "totalPoints": 0,
@@ -186,6 +25,132 @@
     "allowLateSubmit": true,
     "formative": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Read the text stored under the key `\"settings\"`.\n\n**2.** If nothing is stored (the text is `null`), give back the defaults.\n\n**3.** Otherwise, try to parse the text into an object and give it back.\n\n**4.** If the parse fails, give back the defaults instead.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: the first diamond is the missing-key check, the second is the parse, and both ways to fail end at the same defaults.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` (start a value)\n- `IF lives is 0` ... `END IF` (a check, with the steps inside it indented)\n- `RETURN lives` (the answer)\n- `TRY` ... `END TRY` (something that might fail)\n\nPlain English is fine here. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, trace it twice by hand: once with a saved key, and once on a first run where nothing is stored. The second trace must stop at the missing-key check.",
+      "hints": [
+        "The missing-key check comes first, and it gives back the defaults without ever reaching the parse.",
+        "The parse step needs its own way out for when it fails, and that way out also gives back the defaults."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Reads the stored text",
+      "description": "Read the text stored under the key.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:getItem|\\b(?:read|get|load|fetch|retrieve|look\\s*up|grab|stored|saved)\\b[^\\n]*\\b(?:settings|key|stored|saved|storage|localStorage|text)\\b)",
+      "hint": "Start by reading the text that is stored under the key.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Nothing stored is checked before the parse",
+      "description": "Ask whether anything is stored before the parse.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^[\\s\\S]*?\\b(?:IF|CHECK|WHETHER|WHEN|SEE|IS|ARE|HAS|HAVE|===?)\\b[^\\n]*\\b(?:null|nothing|no\\s+(?:saved|stored|data|text|value)|missing|empty|undefined|not\\s+(?:saved|stored|found)|(?:isn'?t|is\\s+not|wasn'?t)\\s+(?:saved|stored|there|found)|(?:doesn'?t|does\\s+not)\\s+exist|anything)\\b[^\\n]*\\n[\\s\\S]*\\bpars",
+      "hint": "Add a step that checks for nothing stored (null), and put it before the step that parses.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Nothing stored gives back the defaults",
+      "description": "When nothing is stored, give back the defaults without parsing.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:IF|CHECK|WHETHER|WHEN|SEE|IS|ARE|HAS|HAVE|===?)\\b[^\\n]*\\b(?:null|nothing|no\\s+(?:saved|stored|data|text|value)|missing|empty|undefined|not\\s+(?:saved|stored|found)|(?:isn'?t|is\\s+not|wasn'?t)\\s+(?:saved|stored|there|found)|(?:doesn'?t|does\\s+not)\\s+exist|anything)\\b(?:(?!pars)[\\s\\S])*?\\b(?:return|give|use|output|send|hand|answer)\\b[^\\n]*\\bdefaults?\\b",
+      "hint": "Right after the missing-key check, give back the defaults. Do this before any parse.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "The parse is guarded by a try",
+      "description": "The parse is wrapped in a TRY or has a way out for failing.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:\\b(?:try|catch|errors?|fail\\w*|throws?|invalid|corrupt\\w*|bad|unreadable|not\\s+valid)\\b(?:[^\\n]*\\n){0,3}?[^\\n]*\\bpars|\\bpars(?:[^\\n]*\\n){0,3}?[^\\n]*\\b(?:try|catch|errors?|fail\\w*|throws?|invalid|corrupt\\w*|bad|unreadable|not\\s+valid)\\b)",
+      "hint": "Put the parse inside a TRY, or say what happens when it fails.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "A failed parse gives back the defaults",
+      "description": "If the parse fails, give back the defaults.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bpars[\\s\\S]*?\\b(?:try|catch|errors?|fail\\w*|throws?|invalid|corrupt\\w*|bad|unreadable|not\\s+valid)\\b[\\s\\S]*?\\bdefaults?\\b",
+      "hint": "After the parse, say that when it fails the defaults come back.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is loadSettings(): read the text stored under the key \"settings\"; if nothing is stored (null), give back the defaults without parsing; otherwise try to parse the text and give the object back; if the parse fails, give back the defaults instead. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, END IF, TRY, CATCH, RETURN, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite, for example parsing before checking for nothing stored for the ordering criterion. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Reads the stored text",
+        "description": "The steps read the text stored under the key (getItem, read, load, or similar) before anything else is done with it.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Nothing stored is checked before the parse",
+        "description": "The steps ask whether anything is stored (null, nothing, missing) BEFORE they parse. If the parse comes first, or the check never happens, mark this missing.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Nothing stored gives back the defaults",
+        "description": "When nothing is stored the steps give back the defaults right away, without reaching the parse.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The parse is guarded by a try",
+        "description": "The parse is guarded: wrapped in a TRY (or CATCH / ON ERROR), or the steps say what happens if the parse fails.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "A failed parse gives back the defaults",
+        "description": "When the parse fails the steps give back the defaults. If the failure case is never mentioned, mark this missing.",
+        "points": 1
+      }
+    ]
+  }
 }

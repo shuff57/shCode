@@ -104,6 +104,23 @@ const LABS = {
       ['blank lines between steps', lines('1. SET withTax TO an empty list', '', '2. FOR EACH price IN prices', '', '3.   ADD price * 1.08 TO withTax', '', '4. END FOR', '', '5. OUTPUT withTax')],
     ],
   },
+  '3-8-17-chart-save-load-round-trip': {
+    frame: (body) => lines('loadSettings() starts', body, 'back to the caller'),
+    muts: [
+      ['parse before the null check', ['r3'], lines('1. SET text TO the value stored under "settings"', '2. TRY', '3.   RETURN the parsed text', '4. IF the parse fails', '5.   RETURN defaults', '6. END TRY', '7. IF text is null', '8.   RETURN defaults', '9. END IF')],
+      ['no null check at all', ['r3', 'r4'], lines('1. SET text TO the value stored under "settings"', '2. TRY', '3.   RETURN the parsed text', '4. IF the parse fails', '5.   RETURN defaults', '6. END TRY')],
+      ['null check without the defaults', ['r4'], lines('1. SET text TO the value stored under "settings"', '2. IF text is null', '3.   RETURN nothing', '4. END IF', '5. TRY', '6.   RETURN the parsed text', '7. IF the parse fails', '8.   RETURN defaults', '9. END TRY')],
+      ['parse with no try and no failure', ['r5', 'r6'], lines('1. SET text TO the value stored under "settings"', '2. IF text is null', '3.   RETURN defaults', '4. END IF', '5. RETURN the parsed text')],
+      ['failed parse never gives defaults', ['r6'], lines('1. SET text TO the value stored under "settings"', '2. IF text is null', '3.   RETURN defaults', '4. END IF', '5. TRY', '6.   RETURN the parsed text', '7. IF the parse fails', '8.   SHOW an error message', '9. END TRY')],
+      ['never reads the stored text', ['r2'], lines('1. SET up the settings object', '2. IF there is nothing saved', '3.   RETURN defaults', '4. END IF', '5. TRY', '6.   RETURN the parsed text', '7. IF the parse fails', '8.   RETURN defaults', '9. END TRY')],
+      ['not numbered', ['r1'], lines('SET text TO the value stored under "settings"', 'IF text is null', '  RETURN defaults', 'END IF', 'TRY', '  RETURN the parsed text', 'IF the parse fails', '  RETURN defaults', 'END TRY')],
+    ],
+    lower: lines('1. get the saved text for the key', '2. if nothing is stored', '3.   give back the defaults', '4. end if', '5. try to parse the text and give it back', '6. if it fails, give back the defaults'),
+    ok: [
+      ['getItem and catch', lines('1. SET text TO localStorage.getItem("settings")', '2. IF text === null', '3.   RETURN defaults', '4. END IF', '5. TRY RETURN JSON.parse(text)', '6. CATCH error', '7.   RETURN defaults')],
+      ['plain English', lines('1. Read the saved text for the key', '2. If there is no saved text, use the defaults', '3. Otherwise parse the text', '4. If the parse throws an error, use the defaults')],
+    ],
+  },
   '3-7-16-chart-spread-vs-rest': {
     frame: (body) => lines('total(...numbers) starts', body, 'back to the caller'),
     muts: [

@@ -6281,9 +6281,9 @@
     },
     {
       "id": "3-8-17-chart-save-load-round-trip",
-      "title": "3.8.17 Chart the Code: Save/Load Round Trip End to End",
+      "title": "3.8.17 Plain English to Pseudocode: Save/Load Round Trip",
       "unit": "3.8 Saving and Loading Data",
-      "preview": "diagram",
+      "preview": "console",
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 10,

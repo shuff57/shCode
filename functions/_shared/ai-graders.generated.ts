@@ -6935,165 +6935,44 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ]
   },
   "3-8-17-chart-save-load-round-trip": {
-    "lessonTitle": "3.8.17 Chart the Code: Save/Load Round Trip End to End",
-    "prompt": "This chart is scored entirely by rules from its shapes and arrows. No model reads it.",
+    "lessonTitle": "3.8.17 Plain English to Pseudocode: Save/Load Round Trip",
+    "prompt": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is loadSettings(): read the text stored under the key \"settings\"; if nothing is stored (null), give back the defaults without parsing; otherwise try to parse the text and give the object back; if the parse fails, give back the defaults instead. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, END IF, TRY, CATCH, RETURN, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite, for example parsing before checking for nothing stored for the ordering criterion. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
     "rubric": [
       {
-        "id": "order",
-        "title": "Read the key, check for nothing, then check the parse",
-        "points": 6,
-        "description": "Scored by the editor (arrow order): a task, then a decision, then a second decision, on every route.",
-        "check": {
-          "steps": [
-            {
-              "op": "sequence",
-              "of": [
-                {
-                  "kind": "process"
-                },
-                {
-                  "kind": "decision",
-                  "re": "null|stor|nothing|missing|anything|empty|exist|found|saved|key|text|data"
-                },
-                {
-                  "kind": "decision",
-                  "re": "pars|succe|work|valid|json|catch|try|error|fail|read|ok|corrupt|bad"
-                }
-              ],
-              "fail": "Load asks two questions in order: first \"is anything stored?\", then \"did the parse succeed?\". Put the missing-key question first, and the parse question after it.",
-              "pass": "The missing-key check comes before the parse check."
-            }
-          ]
-        }
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
       },
       {
-        "id": "missing-first",
-        "title": "Nothing stored leads to the defaults, not to the parse",
-        "points": 5,
-        "description": "Scored by the editor: one of the first decision's exits leads straight to a task (the defaults), the other to the second decision.",
-        "check": {
-          "steps": [
-            {
-              "op": "branch",
-              "at": {
-                "kind": "decision"
-              },
-              "distinct": true,
-              "yes": {
-                "kind": "process"
-              },
-              "no": {
-                "kind": "decision"
-              },
-              "fail": "The first diamond has two different exits: one goes straight to a task that returns the defaults, the other goes on to the parse question.",
-              "pass": "One exit returns the defaults, the other goes on to the parse question."
-            }
-          ]
-        }
+        "id": "r2",
+        "title": "Reads the stored text",
+        "description": "The steps read the text stored under the key (getItem, read, load, or similar) before anything else is done with it.",
+        "points": 1
       },
       {
-        "id": "one-print",
-        "title": "Every path ends at the print",
-        "points": 4,
-        "description": "Scored by the editor: an input/output step for the print, after the decisions.",
-        "check": {
-          "steps": [
-            {
-              "op": "count",
-              "match": {
-                "kind": "io"
-              },
-              "min": 1,
-              "fail": "All the paths finish at one print. Draw an input/output step for the print.",
-              "pass": "There is a print."
-            },
-            {
-              "op": "sequence",
-              "of": [
-                {
-                  "kind": "decision"
-                },
-                {
-                  "kind": "io"
-                },
-                {
-                  "kind": "terminal"
-                }
-              ],
-              "fail": "Every path must pass the decisions and then the print before End.",
-              "pass": "Every path passes the decisions, then the print, then End."
-            }
-          ]
-        }
+        "id": "r3",
+        "title": "Nothing stored is checked before the parse",
+        "description": "The steps ask whether anything is stored (null, nothing, missing) BEFORE they parse. If the parse comes first, or the check never happens, mark this missing.",
+        "points": 1
       },
       {
-        "id": "print-says",
-        "title": "The print says what came back",
-        "points": 5,
-        "description": "Scored by the editor: the input/output shape is about the restored value.",
-        "check": {
-          "steps": [
-            {
-              "op": "label",
-              "match": {
-                "kind": "io",
-                "re": "restored|print|show|value|result|settings|log|output|object"
-              },
-              "min": 1,
-              "fail": "Say in the print step what it shows: the restored value.",
-              "pass": "The print step says what it shows."
-            }
-          ]
-        }
-      }
-    ],
-    "model": "glm-5.3-flash:cloud",
-    "contextDocs": [],
-    "strict": true,
-    "gate": {
-      "anyOf": [
-        "null|stored|missing|nothing|text|read|key",
-        "parse|succeed|catch|try|json",
-        "default|fallback|return",
-        "stringify|save|store|setitem",
-        "print|show|log|output|restored"
-      ],
-      "min": 3,
-      "capTo": 13,
-      "fail": "None of your shapes say what this program does. Label each shape in your own words."
-    },
-    "diagramRules": [
-      {
-        "id": "one-start"
+        "id": "r4",
+        "title": "Nothing stored gives back the defaults",
+        "description": "When nothing is stored the steps give back the defaults right away, without reaching the parse.",
+        "points": 1
       },
       {
-        "id": "has-end"
+        "id": "r5",
+        "title": "The parse is guarded by a try",
+        "description": "The parse is guarded: wrapped in a TRY (or CATCH / ON ERROR), or the steps say what happens if the parse fails.",
+        "points": 1
       },
       {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 2
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 10
+        "id": "r6",
+        "title": "A failed parse gives back the defaults",
+        "description": "When the parse fails the steps give back the defaults. If the failure case is never mentioned, mark this missing.",
+        "points": 1
       }
     ]
   },

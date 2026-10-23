@@ -1,21 +1,26 @@
-## Chart the Code: Save/Load Round Trip End to End
+## Plain English to Pseudocode: Save/Load Round Trip
 
 **What you'll practise:**
-- Charting a save step and a load step as separate runs of the same program
-- Putting **two** decisions in the right order: is anything stored, and can it be read
-- Landing both "fall back to defaults" paths on the same print
-- Getting the `try...catch` on the parse drawn as a branch, not an ending
+- Turning plain English into exact, numbered steps
+- Putting **two** questions in the right order: is anything stored, and can it be read
+- Landing both "fall back to defaults" paths on the same answer
+- Reading a flow chart and matching each box to a step
 
-The whole module is one pattern in two halves. **Save** turns an object into text and stores it. **Load** reads the text, decides whether it is usable, and either restores the object or falls back to defaults. Both halves are short, and the load half has two decisions that are easy to put in the wrong order.
+### The plan, in plain English
 
-### The code
+Saving turns an object into text and stores it. This lab is the **load** half, `loadSettings()`:
+
+1. Read the text stored under the key `"settings"`.
+2. If nothing is stored, give back the defaults.
+3. Otherwise try to parse the text into an object, and give back the object.
+4. If the parse fails, give back the defaults instead.
+
+The same plan is drawn as a flow chart above the editor. You do not draw it, you **read** it.
+
+### The code it describes
 
 ```js
 const defaults = { theme: "light", fontSize: 14 };
-
-function saveSettings(settings) {
-  localStorage.setItem("settings", JSON.stringify(settings));
-}
 
 function loadSettings() {
   const text = localStorage.getItem("settings");
@@ -28,36 +33,26 @@ function loadSettings() {
     return defaults;
   }
 }
-
-console.log(loadSettings());
 ```
 
-### What to draw
+### What to write
 
-| Shape | Use it for |
+Open `README.md` and type directly into it, no comment marks needed. The first and last lines are already there. Write your steps **between** them and number every one. Plain English is fine: the AI reads what your steps mean.
+
+| Write this | Use it for |
 |---|---|
-| **Start / End** (oval) | One of each |
-| **Task** (rectangle) | Stringifying the state, storing it under the key, reading the key, and each `return` |
-| **Decision** (diamond) | "Is the text `null`?" (nothing stored) and "Did the parse succeed?" |
-| **Input / Output** (parallelogram) | The final print |
+| `SET text TO the stored value` | reading the key |
+| `IF text is null` ... `END IF` | the missing-key check |
+| `RETURN defaults` | falling back |
+| `TRY` ... `END TRY` | the parse that might fail |
 
-At least ten shapes, at least two diamonds.
+### The order the two questions have to be in
 
-### The order the two decisions have to be in
+1. **First: is anything stored?** If not, give back the defaults right away. You never reach the parse.
+2. **Second: does the parse succeed?** If it does, give back the object. If it fails, give back the defaults.
 
-1. **First decision: is the text `null`?** This is the missing-key check. Its `yes` path returns the defaults immediately — you never reach the parse.
-2. **Second decision: did the parse succeed?** This is the `try...catch`. Its `yes` path returns the parsed object; its `no` path returns the defaults.
-
-The first decision is the one students skip. If you jump straight to parsing, `JSON.parse(null)` does not throw — it quietly returns `null` — so the missing-data case slips through and the chart is wrong even though the two decision shapes are both there.
-
-### The arrows that matter
-
-- Every return box (the parsed object, and the defaults in both places) leads to the **same print** shape at the bottom.
-- Both **defaults** returns (`text === null` and the catch) land on that same print, because a defaults object is still a value the program prints.
-- The print is **outside** both decisions: the flow only reaches it once the restore has produced a value.
+The first question is the one students skip. `JSON.parse(null)` does not throw, it quietly returns `null`, so the missing-data case slips through even with a `try` in place.
 
 ### Before you submit
 
-Press **Check my diagram**, then trace it by hand twice: once with a saved key, and once on a first run where nothing is stored. The first trace should reach the parse and return the saved object; the second should stop at the missing-key check and return the defaults. If both traces reach the parse, the first decision is in the wrong place.
-
-That hand-trace is the actual test here. The checker cannot do it for you.
+Press **Grade** above the editor, then trace your steps by hand twice: once with a saved key, and once on a first run where nothing is stored. The first trace should reach the parse. The second should stop at the missing-key check and give back the defaults. If both reach the parse, the first question is in the wrong place.

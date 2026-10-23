@@ -3,7 +3,7 @@
 // the advanced student lens, 2026-10-09). Each now carries a rules-only diagram.aiGrader (no model
 // call): the points come from shape KINDS and arrow TOPOLOGY, and the relevance gate caps a chart
 // whose words say nothing about the program below the pass line.
-// (3.7.5 and 3.7.16 are now Plain English to Pseudocode labs: see scripts/test-pseudocode-labs.mjs.)
+// (3.7.5, 3.7.16 and 3.8.17 are now Plain English to Pseudocode labs: see scripts/test-pseudocode-labs.mjs.)
 //
 // OFFLINE, always in CI. For every chart it proves:
 //   - the reference (lessons/<id>/solution/chart.mmd) earns every point;
@@ -392,36 +392,6 @@ const CASES = {
   I --> K
   J --> K
   K --> Z`,
-    },
-  },
-  '3-8-17-chart-save-load-round-trip': {
-    variant: `flowchart TD
-  A([Start])
-  B[turn the settings into JSON text]
-  C[store the text under a key]
-  D[read the text stored at the key]
-  E{is anything stored?}
-  F[return the defaults]
-  G{does the parse work?}
-  H[return the parsed settings]
-  I[return the defaults]
-  J[/show what came back/]
-  Z([End])
-  A --> B
-  B --> C
-  C --> D
-  D --> E
-  E -->|no| F
-  E -->|yes| G
-  G -->|yes| H
-  G -->|no| I
-  F --> J
-  H --> J
-  I --> J
-  J --> Z`,
-    mutations: {
-      'parse question before the missing-key question': (t) => swap(swap(t, 'E{text === null?}', 'E{did the parse succeed?}'), 'G{did the parse succeed?}', 'G{text === null?}'),
-      'only one question': (t) => swap(swap(t, '  E -->|no| G\n  G -->|yes| H\n  G -->|no| I\n', '  E -->|no| H\n'), '  I --> J\n', ''),
     },
   },
 };
