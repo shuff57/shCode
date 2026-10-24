@@ -1,14 +1,14 @@
 ## Chapter 3 Group PA — Part 3 of 3: Demo
 
 **This is the writeup that goes with the live demo, and you are doing it together.**
-The chart and the build are done; now you write the report and run the program for the
+The plan and the build are done; now you write the report and run the program for the
 teacher. This part is worth **25%**.
 
 **You get three tries.** Each partner submits their own; submit, read the feedback on each criterion, improve and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
 
 ### Part 1: Who did what
 
-Name both partners. Then say who drove the keyboard for the chart (3.9.1), who drove it
+Name both partners. Then say who drove the keyboard for the plan (3.9.1), who drove it
 for the code (3.9.2), and one thing the partner who was not typing caught that the one
 typing had missed.
 
@@ -40,9 +40,9 @@ Chapter 1 opened with the four framework activities (1.1.6). They are:
 - **construction** — writing and building it
 - **deployment** — releasing it to the people who will use it
 
-Pick **ONE** of those four for each third of this period — the chart (3.9.1), the code
+Pick **ONE** of those four for each third of this period — the plan (3.9.1), the code
 (3.9.2), this writeup (3.9.3) — and name it. Then say in one sentence why the elaboration
-phase (the chart and the contracts) comes before the construction phase (the code) in the
+phase (the plan and the contracts) comes before the construction phase (the code) in the
 lifecycle, and how that helped your pair avoid a bug.
 
 ### Part 5: Chapter 3 checklist

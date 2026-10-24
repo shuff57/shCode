@@ -309,6 +309,7 @@ export default function LessonWorkspace({
   // nothing. The lines are parked in state instead, and the effect below
   // applies them once the files are actually there.
   const [planLines, setPlanLines] = useState<string[] | null>(null);
+  const [planKind, setPlanKind] = useState<'chart' | 'text'>('chart');
   const [planStale, setPlanStale] = useState(false);
   const planSeeded = useRef(false);
 
@@ -319,7 +320,7 @@ export default function LessonWorkspace({
     planSeeded.current = true;              // decided once, either way
     if (planLines.length === 0) return;
 
-    const marker = '// --- your chart from ' + (lesson.planFromLabel ?? lesson.planFrom) + ' ---';
+    const marker = '// --- your ' + (planKind === 'text' ? 'plan' : 'chart') + ' from ' + (lesson.planFromLabel ?? lesson.planFrom) + ' ---';
     const block = [marker, ...planLines].join('\n');
 
     // Only while script.js is still byte-for-byte the starter. Seeding over a
@@ -341,7 +342,7 @@ export default function LessonWorkspace({
     // lesson asks for the pseudocode. See lib/plan-seed.ts for why this is a
     // block match and not the single sentence it used to be.
     updateFile('script.js', seedPlan(current, block));
-  }, [planLines, files, lesson, updateFile]);
+  }, [planLines, planKind, files, lesson, updateFile]);
   const isReshapeMode = lesson.preview === 'reshape';
   const isMoshionMode = lesson.preview === 'moshion';
 
@@ -1158,7 +1159,7 @@ export default function LessonWorkspace({
         <PlanChartPanel
           planFrom={lesson.planFrom}
           planFromLabel={lesson.planFromLabel}
-          onScaffold={setPlanLines}
+          onScaffold={(lines, kind) => { setPlanKind(kind); setPlanLines(lines); }}
           stale={planStale}
         />
       )}

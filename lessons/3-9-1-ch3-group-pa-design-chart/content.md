@@ -1,15 +1,15 @@
-## Chapter 3 Group PA — Part 1 of 3: Design
+## Chapter 3 Group PA — Part 1 of 3: Design the Plan
 
 **This is the assessment for the whole chapter, and you are doing it in pairs.** Three
-thirds: design, build, demo. This is the design third, it is worth **25%**, and it comes
-first. Neither of you opens an editor until this chart is green.
+thirds: plan, build, demo. This is the planning third, it is worth **25%**, and it comes
+first. Neither of you opens an editor for Part 2 until this plan is done.
 
 **What you'll be assessed on here:**
 - Agreeing on the function list *before* either of you types — what goes in, what comes
   back (3.2.2)
-- Turning a word problem into a set of function contracts, then into a chart
-- Using the six shapes released through §3.1 — oval, rectangle, diamond, parallelogram,
-  the loop-setup hexagon (§2.2), and the **double-rail subroutine** (3.1.11)
+- Turning a word problem into a set of function contracts, then into pseudocode
+- A plan that **calls** your functions by name, walks the list with a loop, changes one
+  record and shows the effect, and loads at the start and saves at the end
 
 ### Step 1: pick one problem
 
@@ -68,10 +68,11 @@ Part 2 asks for it.
 
 ---
 
-### Step 2: write the contracts, on paper, together
+### Step 2: write the contracts, together
 
-Before any shape is drawn. One row per function, both of you, out loud. This is 3.2.2
-made to do work — a function's signature *is* its contract.
+Before any pseudocode. One row per function, both of you, out loud. This is 3.2.2
+made to do work — a function's signature *is* its contract. (The table is for Snack
+Shack; use your own function names if you picked another problem.)
 
 | Function | Takes in | Gives back |
 |---|---|---|
@@ -82,70 +83,69 @@ made to do work — a function's signature *is* its contract.
 | sellItem | | |
 | saveStock / loadStock | | |
 
-Then pseudocode, one function per block. The keywords from 2.2 and the conventions from
-3.1 still apply.
+### Step 3: write the pseudocode
+
+Now the plan: the short main section of your program, written as pseudocode. Type it
+into the answer box below, under your contracts. The keywords from 2.2 and the
+conventions from 3.1 still apply:
+
+- **One instruction per line.** A line doing two things gets split.
+- **Indent what sits inside something else.** The lines inside a loop or an IF are
+  indented; the lines after it are not.
+- **Call your functions by name**, handing each one what it needs. Do **not** write out
+  the inside of `totalValue` or `lowStock` — a call means "a function written somewhere
+  else does this, then we come back." Writing every job out inline is the most common way
+  to end up with a plan that has no functions in it.
+
+An example of the shape, for a different problem (a pizza club):
 
 ```
 START
-LOAD stock FROM storage          -- or use the seed list
-REPORT totalValue(stock)
-PUT receiptLines(stock) ON SCREEN
-PUT lowStock(stock, LEVEL) ON SCREEN
-SELL one of NAME
-SAVE stock
+SET members TO loadMembers()
+SET dues TO totalDues(members)
+REPORT dues
+SET late TO lateMembers(members, DAY_LIMIT)
+FOR EACH line IN memberLines(members)
+    PUT line ON SCREEN
+markPaid(members, NAME)
+REPORT the new dues for NAME
+saveMembers(members)
 END
 ```
 
-### Step 3: chart it
+Your plan needs all four of these:
 
-One screen, one keyboard, both of you looking at it. **Six shapes** (Appendix D §D.2):
-
-| Shape | Use it for |
-|---|---|
-| **Start / End** (oval) | One of each. |
-| **Task** (rectangle) | Getting the data ready, printing the report. **At least two.** |
-| **Decision** (diamond) | The comparison inside the loop or the select. Exactly two exits, **labeled**. |
-| **Parallelogram** | Input or output — the report and the loaded list. |
-| **Hexagon** | Loop setup: `{{i = 0 to list.length - 1}}`. The return arrow closes the loop. |
-| **Double-rail** `[[ ]]` | **A function call** — one per named function from your contract table, labeled with the function's name. |
-
-**The checker counts rectangles.** A parallelogram, a hexagon and a double-rail are all
-*not* rectangles — that is why "Uses at least two task rectangles" exists, and why the
-floor is low. Use each shape for what it means, never in place of a rectangle.
-
-**The double-rail is one shape, not three.** Do not draw the inside of `totalValue` on
-this chart — the double-rail means "a function defined somewhere else does this, then we
-come back." Drawing the body inline is the most common way to end up with a chart that
-has no functions in it.
-
-### What "green" means
-
-**Eleven checks run.** The two that stop a four-minute straight line: at least **two**
-task rectangles and at least **one** decision diamond. The checker also demands **ten
-shapes in total** — a straight line with one diamond does not clear it, and neither does
-a chart whose only shapes are the calls.
+1. **Named function calls** — at least four of your five jobs (build a record, total the
+   list, select a subset, one line per record, change one record), each called with the
+   list or values it needs and its answer kept or used.
+2. **A loop over the list** — `FOR EACH` or your own wording, with the work done on each
+   item indented under it.
+3. **The change-one-record call** — handed the list and a name, followed by a line that
+   reports or uses the changed list, so the effect shows.
+4. **Load at the start, save at the end** — the list comes back from storage before you
+   use it and goes back to storage when you are done.
 
 ### The part people get wrong
 
-**The loop return arrow goes to the hexagon, not to the diamond.** Same as 2.6.1. The
-hexagon is the loop header; the return arrow closes the loop by pointing back at it.
+**Calls, not insides.** If your plan has no function names in it, it has not shown any
+functions.
 
-**A double-rail has one arrow in and one arrow out.** The function ran and the flow
-came back. If your chart shows the double-rail branching, the branch belongs in the
-caller's logic, before or after the call.
+**Handing over the list.** `sellItem` changes the list it was handed. Your call has to
+give it the list and the name, and a later line has to use or report the result.
 
-**The hexagon counts as one shape for `min-nodes`, and so does the double-rail.** One
-shape, one meaning, one count.
+**The loop's indentation.** Whatever happens once per item goes under the loop. Whatever
+happens once after the loop does not.
+
+**Both ends of the round trip.** A load near the top and a save near the bottom. One
+without the other is half of it.
 
 ### Before you submit
 
-**You get three tries.** Each partner submits their own: submit, read the feedback on whether the chart answers your problem, redraw and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
+**You get three tries.** Each partner submits their own: submit, read the feedback on
+whether your plan covers your problem, rewrite it and submit again. Your best try counts.
+After your third try you can see how it is solved, once your teacher releases it.
 
-Press **Check my diagram**. Everything runs in your browser and tells you which shape is
-wrong. Fix anything red and press it again — there is no penalty for redrawing, exactly
-as in 3.1.12.
-
-Green means your drawing is a legal flowchart. Whether it solves *your* problem is for
-the two of you to read. Before you call it done, walk one record through it out loud —
-and then walk the *list*, because the loop is where this chapter's programs stop being
-straight lines.
+Exact wording does not matter, and neither does spelling. Before you call it done, walk
+one record through your plan out loud — and then walk the *list*, because the loop is
+where this chapter's programs stop being straight lines. Part 2 will open your saved
+plan beside your code, so write something you will want to read again.

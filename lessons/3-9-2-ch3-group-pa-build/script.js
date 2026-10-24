@@ -17,4 +17,4 @@
 
 // STEP 4: The main section.
 // Five to eight lines at the bottom that call each function in the
-// order your chart says, and print the results.
+// order your plan says, and print the results.

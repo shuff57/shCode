@@ -84,7 +84,7 @@ function copyItem(item) {
   return { ...item };
 }
 
-// STEP 4: The main section -- calls in the order the chart says.
+// STEP 4: The main section -- calls in the order the plan says.
 console.log("Total inventory value: $" + totalValue(stock).toFixed(2));
 console.log("Low stock (under " + reorderLevel + "):");
 console.log(receiptLines(lowStock(stock, reorderLevel)).join("\n"));

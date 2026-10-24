@@ -37,7 +37,7 @@ try {
     process.execPath,
     [
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/plan-seed.ts',
+      'lib/plan-seed.ts', 'lib/plan-text.ts', 'lib/diagram-pseudocode.ts',
       '--outDir', out,
       '--module', 'commonjs',
       '--target', 'es2022',
@@ -47,9 +47,10 @@ try {
   );
   writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
 
-  const { seedPlan, step1BlockEnd } = await import(
-    'file://' + path.join(out, 'plan-seed.js').replace(/\\/g, '/')
-  );
+  const load = (n) => import('file://' + path.join(out, n).replace(/\\/g, '/'));
+  const { seedPlan, step1BlockEnd } = await load('plan-seed.js');
+  const { isDiagramDraft, planTextToComments } = await load('plan-text.js');
+  const { toPseudocodeComments } = await load('diagram-pseudocode.js');
 
   // lib/store.ts normalises to LF before anything reads fileContents.
   const lf = (s) => s.replace(/\r\n?/g, '\n');
@@ -139,6 +140,48 @@ try {
       'console.log(typeof costPerSlice);\n\n// IF meetsTheLimit THEN report a good deal\n// ELSE report it is not',
     );
     check(re.test(withStep5), 'r8 PASSES once step 5 is written');
+  }
+
+  // A WRITTEN plan (3.9.1) and an OLD drawn-chart draft are told apart, and each
+  // seeds under STEP 1 of its own planFrom lesson.
+  console.log('\n--- written plan vs old chart draft ---');
+  const TEXT = [
+    'START',
+    'SET stock TO loadStock()',
+    '',
+    'FOR EACH line IN receiptLines(stock)',
+    '\tPUT line ON SCREEN',
+    '    // already a comment',
+    'saveStock(stock)',
+    'END',
+  ].join('\r\n');
+  const DOC = JSON.stringify({
+    nodes: [
+      { id: 'A', type: 'terminal', label: 'Start' },
+      { id: 'B', type: 'process', label: 'Add the numbers' },
+      { id: 'Z', type: 'terminal', label: 'End' },
+    ],
+    edges: [{ from: 'A', to: 'B' }, { from: 'B', to: 'Z' }],
+  });
+  check(isDiagramDraft(DOC), 'a saved DiagramDoc is recognised as a chart draft');
+  check(!isDiagramDraft(TEXT), 'written pseudocode is not mistaken for a chart');
+  check(!isDiagramDraft('{"hello": 1}') && !isDiagramDraft(''), 'other JSON and empty text are not chart drafts');
+  const lines = planTextToComments(TEXT);
+  check(lines.length === 7, 'blank lines are dropped, every other line becomes a comment', String(lines.length));
+  check(lines.every((l) => l.startsWith('// ')), 'every line is a // comment');
+  check(lines[0] === '// START' && lines[3] === '//     PUT line ON SCREEN',
+    'indentation is kept (tab becomes four spaces)', JSON.stringify(lines));
+  check(lines[4] === '//     already a comment', 'a line that was already a comment is not doubled', lines[4]);
+  const chartLines = toPseudocodeComments(JSON.parse(DOC));
+  check(chartLines.length > 0 && chartLines.some((l) => /Add the numbers/.test(l)),
+    'the old chart path still produces its comment lines', JSON.stringify(chartLines));
+  for (const lesson of planLessons) {
+    const starter = lf(readFileSync(path.join(root, 'lessons', lesson.dir, 'script.js'), 'utf8'));
+    const seeded = seedPlan(starter, ['// --- your plan from X ---', ...lines].join('\n'));
+    const at = seeded.indexOf('// --- your plan from X ---');
+    const step2At = seeded.search(/^\s*\/\/\s*STEP\s+2\b/m);
+    check(at !== -1 && at < step2At, `${lesson.dir}: the written plan sits above STEP 2`);
+    check(seeded.includes('//     PUT line ON SCREEN'), `${lesson.dir}: the indentation survives seeding`);
   }
 
   // The fallback still exists for a starter with no STEP 1.

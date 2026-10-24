@@ -1,7 +1,7 @@
 {
   "id": "3-9-2-ch3-group-pa-build",
   "title": "3.9.2 Group PA Part 2: Build It",
-  "description": "Turn the chart you just passed into five documented functions and a short main section. Eleven checks, all of them things Chapter 3 taught. Auto-graded: submit up to three times and your best counts. After your third try you can see how it is solved, once your teacher releases it.",
+  "description": "Turn the plan you just wrote into five documented functions and a short main section. Eleven checks, all of them things Chapter 3 taught. Auto-graded: submit up to three times and your best counts. After your third try you can see how it is solved, once your teacher releases it.",
   "type": "assignment",
   "estimateMins": 42,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Copy your contracts in as comments",
-      "instructions": "Your contract table from 3.9.1, one function per line as // comments: name, what goes in, what comes back. Do this before you write a single line of JavaScript. If a contract does not say what you meant on the chart, fix the wording now."
+      "instructions": "Your contract table from 3.9.1, one function per line as // comments: name, what goes in, what comes back. Do this before you write a single line of JavaScript. If a contract does not say what you meant in your plan, fix the wording now."
     },
     {
       "id": "s3",
@@ -95,12 +95,12 @@
     {
       "id": "s10",
       "title": "Write the main section",
-      "instructions": "Below the functions, five to eight lines that CALL each one in order and print the results: the total, the low-stock list, the receipt lines, one sale, one save and one load. The functions do the work; this section only arranges the calls. Copy the order from your chart."
+      "instructions": "Below the functions, five to eight lines that CALL each one in order and print the results: the total, the low-stock list, the receipt lines, one sale, one save and one load. The functions do the work; this section only arranges the calls. Copy the order from your plan."
     },
     {
       "id": "s11",
       "title": "Read it back to each other",
-      "instructions": "Swap the keyboard. The partner who did not type reads the program out loud, one function at a time, while the other checks it against the contract table. Every function on the chart should appear once. Fix what does not match, then run three sets of numbers through it -- you will need them for the demo writeup."
+      "instructions": "Swap the keyboard. The partner who did not type reads the program out loud, one function at a time, while the other checks it against the contract table. Every function in your plan should appear once. Fix what does not match, then run three sets of numbers through it -- you will need them for the demo writeup."
     }
   ],
   "requirements": [
@@ -119,7 +119,7 @@
     {
       "id": "r2",
       "title": "The problem is named in the header",
-      "description": "The Problem line says which of the four menu problems this is. Help: 3.9.1 (Group PA Part 1: Design the Chart)",
+      "description": "The Problem line says which of the four menu problems this is. Help: 3.9.1 (Group PA Part 1: Design the Plan)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\S\\n]*Problem:[^\\S\\n]*\\S+",

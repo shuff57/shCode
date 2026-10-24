@@ -19,14 +19,18 @@ import { fetchDraft } from '../lib/written-grader-store';
 import { toMermaid } from '../lib/diagram-mermaid';
 import { toPseudocodeComments } from '../lib/diagram-pseudocode';
 import type { DiagramDoc } from '../lib/diagram-types';
+import { isDiagramDraft, planTextToComments } from '../lib/plan-text';
 
 interface Props {
   /** Lesson id of the part that holds the chart. */
   planFrom: string;
   /** Human label for that lesson, e.g. "1.5.30". */
   planFromLabel?: string;
-  /** Called once, with the student's chart as pseudocode comment lines. */
-  onScaffold?: (lines: string[]) => void;
+  /**
+   * Called once, with the student's plan as pseudocode comment lines. `kind` is
+   * 'chart' for a drawn DiagramDoc draft and 'text' for written pseudocode.
+   */
+  onScaffold?: (lines: string[], kind: 'chart' | 'text') => void;
   /**
    * The chart was redrawn after the comments below it were written, so the two
    * no longer agree. The comments are not rewritten -- the student may have
@@ -47,6 +51,8 @@ function parseDoc(raw: string): DiagramDoc | null {
 
 export default function PlanChartPanel({ planFrom, planFromLabel, onScaffold, stale }: Props) {
   const [doc, setDoc] = useState<DiagramDoc | null>(null);
+  // A written plan (3.9.1 and later): plain text, shown as it was typed.
+  const [text, setText] = useState<string | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'missing'>('loading');
   // onScaffold seeds an editor, so it must fire once and never on a re-render.
   const scaffolded = useRef(false);
@@ -56,16 +62,28 @@ export default function PlanChartPanel({ planFrom, planFromLabel, onScaffold, st
     (async () => {
       const draft = await fetchDraft(planFrom);
       if (cancelled) return;
-      const parsed = draft?.response ? parseDoc(draft.response) : null;
-      if (!parsed) {
+      const raw = draft?.response ?? '';
+      // Old drafts are DiagramDocs and keep working exactly as before; anything
+      // else with words in it is a written plan.
+      const parsed = raw && isDiagramDraft(raw) ? parseDoc(raw) : null;
+      if (parsed) {
+        setDoc(parsed);
+        setState('ready');
+        if (!scaffolded.current && onScaffold) {
+          scaffolded.current = true;
+          onScaffold(toPseudocodeComments(parsed), 'chart');
+        }
+        return;
+      }
+      if (raw.trim() === '') {
         setState('missing');
         return;
       }
-      setDoc(parsed);
+      setText(raw.replace(/\r\n?/g, '\n'));
       setState('ready');
       if (!scaffolded.current && onScaffold) {
         scaffolded.current = true;
-        onScaffold(toPseudocodeComments(parsed));
+        onScaffold(planTextToComments(raw), 'text');
       }
     })();
     return () => {
@@ -82,14 +100,37 @@ export default function PlanChartPanel({ planFrom, planFromLabel, onScaffold, st
 
   // Signed out, or the chart was drawn on another device: say so plainly
   // rather than rendering an empty frame the student cannot explain.
-  if (state === 'missing' || !doc) {
+  if (state === 'missing' || (!doc && text === null)) {
     return (
       <div style={{ background: '#282a36', border: '1px solid #44475a', borderRadius: 6, padding: '10px 14px', marginBottom: 12, color: '#6272a4', fontSize: 13 }}>
-        Your chart from {label} could not be loaded. Open {label} in another tab
+        Your plan from {label} could not be loaded. Open {label} in another tab
         to see it while you work.
       </div>
     );
   }
+
+  if (text !== null && !doc) {
+    return (
+      <div style={{ marginBottom: 12 }}>
+        {stale && (
+          <div style={{ background: '#3a2f1a', border: '1px solid #ffb86c', borderRadius: 6, padding: '8px 12px', marginBottom: 8, color: '#ffb86c', fontSize: 13 }}>
+            You changed this plan after starting Part 2. The plan here is your
+            latest one; the pseudocode comments in the editor still describe the
+            earlier version. Update the comments to match before you compare them.
+          </div>
+        )}
+        <div style={{ background: '#282a36', border: '1px solid #44475a', borderRadius: 6, padding: '10px 14px' }}>
+          <div style={{ color: '#8393c4', fontSize: 13, marginBottom: 6 }}>Your plan from {label}</div>
+          <pre
+            data-testid="plan-text"
+            style={{ margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, color: '#f8f8f2', maxHeight: 320, overflow: 'auto' }}
+          >{text}</pre>
+        </div>
+      </div>
+    );
+  }
+
+  if (!doc) return null;
 
   return (
     <div style={{ marginBottom: 12 }}>

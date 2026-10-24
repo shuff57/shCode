@@ -1,18 +1,18 @@
-## Chapter 3 Individual PA — Part 4 of 5: Chart It
+## Chapter 3 Individual PA — Part 4 of 5: Plan It
 
-**This is the design part of the test, and you are doing it alone.** One problem, pick
-one of three, draw the flowchart, **10 points**, about **7 minutes**. You draw the chart
-in the editor below, press **Check my diagram** as many times as you like, and submit.
-The checker in your browser judges whether your drawing is a legal flowchart, and each
-time you submit the AI marks whether it answers the problem you picked.
+**This is the planning part of the test, and you are doing it alone.** One problem, pick
+one of three, write the plan in pseudocode, **10 points**, about **7 minutes**. You type
+the plan in the box below and submit. Each time you submit, the AI marks whether your
+plan answers the problem you picked.
 
-**You get three tries.** Submit, read the feedback, redraw and submit again. Your best try
+**Plan It is the plan, not the code.** This part is pseudocode: plain English arranged
+like code. **No JavaScript is needed**, and none is rewarded. Part 5 (3.10.5, right after
+this one) is where you write the real JavaScript for the same kind of problem, so a good
+plan here makes that part easier. The 10 points reward the structure of the plan, not
+the syntax.
+
+**You get three tries.** Submit, read the feedback, rewrite and submit again. Your best try
 counts. After your third try you can see how it is solved, once your teacher releases it.
-
-**Six shapes are legal on this chart** (Appendix D §D.2): oval, rectangle, diamond,
-parallelogram, the loop-setup hexagon (§2.2), and the **double-rail subroutine**
-(released at §3.1). The connector circle and the comment bracket are **not released** and
-must not appear.
 
 **Three problems. Pick one.** They are the same difficulty and the same shape. Check with
 the person next to you first -- adjacent tables should not pick the same one.
@@ -43,31 +43,42 @@ water needed, then compare it against what the can holds. Report whether one fil
 
 ---
 
-### Rules for your chart
+### The two rules of pseudocode
 
-- **Six shapes only:** oval, rectangle, diamond, parallelogram, hexagon, double-rail.
-- **The double-rail is a function call** — label it with the function's name. One arrow
-  in, one arrow out. **Draw at least two** (for example one that totals and one that
-  reports); a chart with only one loses points.
-- **The loop setup uses the hexagon** — your chart must include a loop.
-- **At least one decision diamond** — the comparison.
-- **At least two task rectangles** (the hexagon and the double-rail do not count).
-- **Both exits of every diamond labeled** (yes/no, true/false, etc.).
-- **No connectors, no comment shapes** — not released yet.
+- **One instruction per line.** A line doing two things gets split.
+- **Indent what sits inside something else.** The lines that repeat go under the loop
+  line; the lines for each outcome go under that outcome. Moving a line in or out
+  describes a different plan.
+
+### What your plan needs
+
+- **Named functions.** Chapter 3 is about functions, so the plan calls them by name.
+  **Call at least two** (for example one that totals and one that reports or decides),
+  and give each a name that says its job, like `totalCost` or `checkLimit`. You do not
+  write the inside of a function here; you only call it.
+- **A loop over the list.** One line that walks the list, with the lines that repeat
+  indented under it, including the step that adds each item or day to the running
+  total.
+- **One comparison, after the loop.** Compare the finished total against the limit
+  once, and report **every** outcome the problem names, each under the condition that
+  leads to it.
 
 ---
 
-### What "green" means here
+### What the 10 points are for
 
-Eleven structural checks run, the same ones the whole course uses. A legal chart clears
-them all -- but a chart with no function calls on it clears them too, and the lesson text
-cannot see that. Name your functions; the double-rail is the point of this chapter. A
-chart that draws the inside of every function inline passes all eleven checks (the rules
-judge legality, not decomposition) but will be graded down on the rubric -- the
-double-rail is the point of this chapter.
+| Points | What earns them |
+| ---: | --- |
+| 5 | At least two named functions, each called, each name saying its job, each on the path that produces the answer |
+| 5 | A loop that adds each item to the total, then one comparison after it that reports every outcome |
+
+Exact wording does not matter, and neither do spelling or neat layout. A plan that puts
+the comparison inside the loop, reverses an outcome, or reports words from a different
+problem does not solve the problem, even when it has all the right pieces.
 
 ### Before you submit
 
-Walk one set of real values through your chart out loud. Does the loop run the right
-number of times? Does the decision send the right values down each branch? Does each
-double-rail name a function that could really own that job?
+Walk one set of real values through your plan out loud. Does the loop run the right
+number of times? Does the total reach the comparison only once the whole list is added?
+Does each outcome get its own report? Does each function name say a job that could
+really own that line?
