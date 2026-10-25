@@ -11,8 +11,8 @@ get the cart
 get the spending limit
 set total to 0
 for each item in the cart
-    set line cost to lineCost of the item
-    set total to total plus line cost
+    set price to priceOf the item
+    set total to total plus price
     call receiptLine with the item
 if the total is over the limit
     report over the limit

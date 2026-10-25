@@ -13,11 +13,13 @@ first. Neither of you opens an editor for Part 2 until this plan is done.
 
 ### Step 1: pick one problem
 
-Four problems. Pick **one**. They are the same difficulty and the same shape: an array
-of record objects, and five functions over it — build one record, total the list, select
-a subset, transform it to one line per record, and change one record in place — then
-save and load the list. Check with the pair next to you first — two adjacent tables
-should not build the same one.
+Four problems. Pick **one**. They are built to the same measure: a list of records with
+the same three fields (a name, a count, and one more number), and the same five jobs plus
+save and load: build one record, total the list, select a subset, turn the list into one
+line per record, change one record in place. Each total multiplies
+the count by the other number; each subset test is one comparison; each change lowers a
+count by one and never below zero. Check with the pair next to you first: two adjacent
+tables should not build the same one.
 
 ---
 
@@ -25,44 +27,63 @@ should not build the same one.
 
 Your stock is an array of items, each `{ name, price, qty }`. Write and use:
 
-- `makeItem(name, price, qty)` — builds one item object and returns it
-- `totalValue(list)` — walks the list and returns the total dollar value
-- `lowStock(list, level)` — builds and returns a NEW array of items whose `qty` is
-  below `level`
-- `receiptLines(list)` — returns a NEW array with one line per item, `name xqty`
-- `sellItem(list, name)` — finds the item and lowers its `qty` by one, never below zero.
+- `makeItem(name, price, qty)` returns one item object
+- `totalValue(list)` returns the total dollar value (every `price` times its `qty`)
+- `lowStock(list, level)` returns a NEW array of the items whose `qty` is below `level`
+- `receiptLines(list)` returns a NEW array with one line per item, `name xqty`
+- `sellItem(list, name)` lowers that item's `qty` by one, never below zero.
   **This one changes the list it was handed.**
-- `saveStock(list)` and `loadStock()` — the whole list goes to localStorage as JSON
+- `saveStock(list)` and `loadStock()`: the whole list goes to localStorage as JSON
   under a key, and comes back.
 
 ---
 
 **2. Lap Times**
 
-You are logging a meet. Each runner is `{ name, laps, bestLap }`. Same five jobs: total
-every lap logged across the whole team; list the runners above a target time; one result
-line per runner (`name: 3 laps, best 42.1`); log one more lap for a named runner
-(mutates); save and reload.
+You are logging a meet. Each runner is `{ name, laps, lapSeconds }`. Write and use:
+
+- `makeRunner(name, laps, lapSeconds)` returns one runner object
+- `totalSeconds(list)` returns the seconds run by the whole team (every `laps` times its `lapSeconds`)
+- `slowRunners(list, target)` returns a NEW array of the runners whose `lapSeconds` is above `target`
+- `resultLines(list)` returns a NEW array with one line per runner, `name: 3 laps`
+- `dropLap(list, name)` takes one lap off that runner (the scanner counted it twice), never below zero.
+  **This one changes the list it was handed.**
+- `saveMeet(list)` and `loadMeet()`: the whole list goes to localStorage as JSON
+  under a key, and comes back.
 
 ---
 
 **3. Seed Tray**
 
-You are tracking a tray of varieties, each `{ variety, planted, sprouted }`. Total the
-seeds planted; list the varieties whose sprout rate is under a target percent; one label
-line per variety; record one more sprout for a named variety (mutates); save and reload.
+You are keeping a drawer of seed packets. Each variety is `{ variety, packets, seedsPerPacket }`. Write and use:
+
+- `makeVariety(variety, packets, seedsPerPacket)` returns one variety object
+- `totalSeeds(list)` returns the seeds on hand (every `packets` times its `seedsPerPacket`)
+- `lowPackets(list, level)` returns a NEW array of the varieties whose `packets` is below `level`
+- `labelLines(list)` returns a NEW array with one line per variety, `variety xpackets`
+- `sowPacket(list, variety)` lowers that variety's `packets` by one, never below zero.
+  **This one changes the list it was handed.**
+- `saveTray(list)` and `loadTray()`: the whole list goes to localStorage as JSON
+  under a key, and comes back.
 
 ---
 
 **4. Library Cart**
 
-A cart of titles, each `{ title, copies, dueInDays }`. Total the copies on the cart;
-list what is due back within a limit; one spine line per title; check out one copy of a
-named title (mutates — the copy count goes down, never below zero); save and reload.
+A cart of titles, each `{ title, copies, pages }`. Write and use:
+
+- `makeTitle(title, copies, pages)` returns one title object
+- `totalPages(list)` returns the pages on the cart (every `copies` times its `pages`)
+- `longTitles(list, limit)` returns a NEW array of the titles whose `pages` is above `limit`
+- `spineLines(list)` returns a NEW array with one line per title, `title xcopies`
+- `checkOut(list, title)` lowers that title's `copies` by one, never below zero.
+  **This one changes the list it was handed.**
+- `saveCart(list)` and `loadCart()`: the whole list goes to localStorage as JSON
+  under a key, and comes back.
 
 ---
 
-Whichever you pick, your program also needs one **string** of text — the shack's name,
+Whichever you pick, your program also needs one **string** of text: the shack's name,
 the meet name, the tray label, or the library branch. Pick one and write it down now;
 Part 2 asks for it.
 
@@ -111,6 +132,26 @@ markPaid(members, NAME)
 REPORT the new dues for NAME
 saveMembers(members)
 END
+```
+
+Here is the same plan drawn as a flowchart, so you can see the shape. It is read-only
+and it is for the pizza club, not for any of the four problems: yours has different
+functions, but the same four parts (named calls, a loop over the list, one change to a
+record, a load first and a save last).
+
+```flow readonly caption="Figure 3.9.1: the pizza club plan. Each call is a box with the function's name; the loop is the diamond that goes back until the lines run out."
+flowchart TD
+  A([Start]) --> B[set members to loadMembers]
+  B --> C[set dues to totalDues of members]
+  C --> D[/report dues/]
+  D --> E[set late to lateMembers of members and the day limit]
+  E --> F{is there another line in memberLines of members?}
+  F -- yes --> G[/put that line on screen/]
+  G --> F
+  F -- no --> H[markPaid of members and the name]
+  H --> I[/report the new dues for that name/]
+  I --> J[saveMembers of members]
+  J --> K([End])
 ```
 
 Your plan needs all four of these:

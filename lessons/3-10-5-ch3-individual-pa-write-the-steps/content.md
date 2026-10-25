@@ -18,20 +18,21 @@ must contain:
   problem's limit (budget, weekly goal or can size, below), camelCase names throughout, at least one `console.log` reporting the
   result, `typeof` for one value
 
-**Three problems. Pick one.** They are the same difficulty and the same shape. Adjacent
+**Three problems. Pick one.** They are the same difficulty and the same shape: an array of records with a name and
+one number, three functions, a limit, and a save/load round trip. Adjacent
 tables should not pick the same one.
 
 ---
 
 ### 1. Price Check
 
-Your cart is an array of items, each `{ name, price, qty }`. Write `totalCost` (returns
-the total over the whole cart), `receiptLine` (takes one item, returns its
-`"name xqty"` line), and `discountOne` (takes the cart, a name and a percent off, marks
-that item's `price` down on its own copy, and returns the copy without changing the
-original). Keep a `const` budget (pick a number) and print whether the total is over it.
-Print the receipt lines, the total, and the discounted copy. Save the cart to
-localStorage under a key and load it back.
+Your cart is an array of items, each `{ name, price }`. Write `totalCost` (returns the
+total of every price), `receiptLine` (takes one item, returns its `"name: $price"` line),
+and `markDown` (takes the cart, a name and an amount off, lowers that item's `price` by
+the amount on its own copy, and returns the copy without changing the original). Keep a
+`const` budget (pick a number) and print whether the total is over it. Print the receipt
+lines, the total, and the marked-down copy. Save the cart to localStorage under a key and
+load it back.
 
 ---
 
@@ -48,13 +49,13 @@ and the updated copy. Save the week under a key and load it back.
 
 ### 3. Watering Rota
 
-Your rota is an array of plants, each `{ name, ml, watered }`. Write `totalWater`
-(returns the total millilitres), `label` (takes one plant, returns its `"name — ml ml"`
-label), and `waterOne` (takes the rota and a name, marks that plant's `watered` as true
-on its own copy, and returns the copy without changing the original). Keep a `const`
-for the watering can's size in millilitres (pick a number) and print whether one fill
-is enough for the total. Print the labels, the total, and the watered copy. Save the
-rota under a key and load it back.
+Your rota is an array of plants, each `{ name, ml }`. Write `totalWater` (returns the
+total millilitres), `label` (takes one plant, returns its `"name: ml ml"` label), and
+`topUp` (takes the rota, a name and extra millilitres, adds them to that plant on its own
+copy, and returns the copy without changing the original). Keep a `const` for the
+watering can's size in millilitres (pick a number) and print whether one fill is enough
+for the total. Print the labels, the total, and the topped-up copy. Save the rota under a
+key and load it back.
 
 ---
 

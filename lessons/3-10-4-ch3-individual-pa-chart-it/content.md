@@ -14,32 +14,33 @@ the syntax.
 **You get three tries.** Submit, read the feedback, rewrite and submit again. Your best try
 counts. After your third try you can see how it is solved, once your teacher releases it.
 
-**Three problems. Pick one.** They are the same difficulty and the same shape. Check with
+**Three problems. Pick one.** They are the same difficulty and the same shape: a list of records with a name and one
+number, a total, then three outcomes. Check with
 the person next to you first -- adjacent tables should not pick the same one.
 
 ---
 
 ### 1. Price Check
 
-You know the price of one item and how many are in a cart. Walk the cart, building the
-total cost. If the total is over a spending limit, report **over**; if it is exactly the
-limit, report **at the limit**; otherwise report **under**.
+A cart is a list of items, each with a name and a price. Walk the cart, adding each price
+to the total cost. If the total is over a spending limit, report **over**; if it is exactly
+the limit, report **at the limit**; otherwise report **under**.
 
 ---
 
 ### 2. Reading Log
 
-You know how many minutes were read each night last week. Walk the week's list, adding
-each day's minutes to a total. If the total is over the weekly goal, report **beaten**;
+A week is a list of nights, each with a day and the minutes read. Walk the week, adding
+each night's minutes to a total. If the total is over the weekly goal, report **beaten**;
 if it lands exactly on the goal, report **on the nose**; otherwise report **short**.
 
 ---
 
 ### 3. Watering Rota
 
-You know how many plants need watering and how much water each takes. Work out the total
-water needed, then compare it against what the can holds. Report whether one fill is
-**enough**, **exactly enough**, or **not enough**.
+A rota is a list of plants, each with a name and the millilitres it takes. Walk the rota,
+adding each plant's water to a total, then compare it against what the can holds. Report
+whether one fill is **enough**, **exactly enough**, or **not enough**.
 
 ---
 
@@ -62,6 +63,28 @@ water needed, then compare it against what the can holds. Report whether one fil
 - **One comparison, after the loop.** Compare the finished total against the limit
   once, and report **every** outcome the problem names, each under the condition that
   leads to it.
+
+Here is the plan for a different problem, a bake sale (add up the cookies on each tray
+and compare the total with the order), drawn as a flowchart. It is read-only: it shows the
+shape your plan should have, not the answer to any of the three problems.
+
+```flow readonly caption="Figure 3.10.4: the bake sale plan. The total is built inside the loop; the comparison is only reached once the loop has run out of trays."
+flowchart TD
+  A([Start]) --> B[get the trays and the order size]
+  B --> C[set total to 0]
+  C --> D{is there another tray in the list?}
+  D -- yes --> E[set total to total plus trayCount of the tray]
+  E --> F[call trayLabel with the tray]
+  F --> D
+  D -- no --> G{is the total over the order size?}
+  G -- yes --> H[/report extra/]
+  G -- no --> I{is the total exactly the order size?}
+  I -- yes --> J[/report just right/]
+  I -- no --> K[/report need more/]
+  H --> L([End])
+  J --> L
+  K --> L
+```
 
 ---
 

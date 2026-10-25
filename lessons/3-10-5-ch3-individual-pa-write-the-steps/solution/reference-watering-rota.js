@@ -5,9 +5,9 @@
 
 // The rota as an array of record objects.
 const rota = [
-  { name: "Fern", ml: 120, watered: false },
-  { name: "Aloe", ml: 60, watered: false },
-  { name: "Basil", ml: 90, watered: false }
+  { name: "Fern", ml: 120 },
+  { name: "Aloe", ml: 60 },
+  { name: "Basil", ml: 90 }
 ];
 // The limit: the can holds 250 ml.
 const canMl = 250;
@@ -23,13 +23,13 @@ function totalWater(plants) {
 
 // One function: the label (map + arrow, 3.7.2 + 3.4.6).
 const label = (plant) => {
-  return plant.name + " — " + plant.ml + " ml";
+  return plant.name + ": " + plant.ml + " ml";
 };
 
 // One function: the non-mutating copy (spread, 3.7.15).
-function waterOne(plants, name) {
+function topUp(plants, name, extraMl) {
   return plants.map((plant) =>
-    plant.name === name ? { ...plant, watered: true } : plant
+    plant.name === name ? { ...plant, ml: plant.ml + extraMl } : plant
   );
 }
 
@@ -40,9 +40,9 @@ for (const plant of rota) {
 }
 console.log("Total water needed: " + totalWater(rota) + " ml");
 
-const after = waterOne(rota, "Fern");
-console.log("After watering Fern: " + after[0].name + " watered = " + after[0].watered);
-console.log("Original untouched: " + rota[0].watered);
+const after = topUp(rota, "Fern", 30);
+console.log("After topping up Fern: " + after[0].name + " needs " + after[0].ml + " ml");
+console.log("Original untouched: " + rota[0].ml + " ml");
 console.log(totalWater(rota) <= canMl ? "One fill is enough" : "One fill is not enough");
 
 // The round trip (3.8.15).
