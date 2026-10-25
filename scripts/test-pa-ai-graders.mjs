@@ -250,7 +250,7 @@ try {
       cal('equal-first order, terse lines', swap(swap(swap(swap(ref,
         'if the total is over the limit\n    report over the limit\notherwise if the total is exactly the limit\n    report at the limit',
         'if the total is exactly the limit\n    report at the limit\notherwise if the total is over the limit\n    report over the limit'),
-        'for each item in the cart', 'repeat for every item'), 'set price to', 'price is'), 'set total to total plus price', 'add it to total'), true);
+        'for each item in the cart', 'repeat for every item'), 'set price to', 'price is'), 'set total to addToTotal of the total and the price', 'add it to total'), true);
       cal('leftover phrasing, limit - total', swap(swap(ref, 'if the total is over the limit', 'if limit minus total is below zero'), 'otherwise if the total is exactly the limit', 'otherwise if limit minus total is zero'), true);
 
       // must not pass: the run is wrong
@@ -258,7 +258,7 @@ try {
       cal('no at-the-limit outcome', swap(ref, 'otherwise if the total is exactly the limit\n    report at the limit\n', ''), false);
       cal('outcomes reversed', swap(swap(ref, 'report over the limit', 'report TEMP'), 'report under the limit', 'report over the limit').replace('report TEMP', 'report under the limit'), false);
       cal('outcome words from a different problem', swap(swap(swap(ref, 'report over the limit', 'report beaten'), 'report at the limit', 'report on the nose'), 'report under the limit', 'report short'), false);
-      cal('no named functions, every job inline', swap(swap(ref, 'set price to priceOf the item', 'set price to the item price'), '    call receiptLine with the item\n', ''), false);
+      cal('no named functions, every job inline', swap(swap(ref, 'set price to priceOf the item', 'set price to the item price'), 'set total to addToTotal of the total and the price', 'set total to total plus price'), false);
       cal('junk-body skeleton behind two good function names', 'call readCart\nset total to 0\nfor each item\n    do stuff\n    x\ncall checkLimit\nif total is big\n    report over\notherwise\n    report under', false);
     }
 

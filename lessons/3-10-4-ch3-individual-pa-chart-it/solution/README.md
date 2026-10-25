@@ -12,8 +12,7 @@ get the spending limit
 set total to 0
 for each item in the cart
     set price to priceOf the item
-    set total to total plus price
-    call receiptLine with the item
+    set total to addToTotal of the total and the price
 if the total is over the limit
     report over the limit
 otherwise if the total is exactly the limit
