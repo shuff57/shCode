@@ -53,7 +53,52 @@
       "instructions": "**You get three tries.** Each partner submits their own: submit, read the feedback on whether your plan covers your problem, rewrite it and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.\n\nExact wording does not matter, and neither does spelling. Before you call it done, walk one record through your plan out loud — and then walk the *list*, because the loop is where this chapter's programs stop being straight lines. Part 2 will open your saved plan beside your code, so write something you will want to read again."
     }
   ],
-  "requirements": [],
+  "requirements": [
+    {
+      "id": "functions-as-calls",
+      "title": "The pair's functions are used as named calls",
+      "description": "At least four of the five jobs (build a record, total, select a subset, one line per record, change one record) appear as named calls, each handed what it needs, with its answer kept or used.",
+      "type": "regex",
+      "file": "README.md",
+      "pattern": "\\b[a-z]+[A-Z]\\w*\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "hint": "Call each function by name with the list or values it needs, for example \"set total to totalValue(stock)\". Do not write out the inside of a function."
+    },
+    {
+      "id": "loop-over-the-list",
+      "title": "The list is walked by a loop",
+      "description": "A loop (FOR EACH or your own words) walks the list or the lines made from it, its indented body does real work on each item, and the lines after it are not indented.",
+      "type": "regex",
+      "file": "README.md",
+      "pattern": "\\b(?:for\\s+each|repeat\\s+for|loop)\\b",
+      "flags": "i",
+      "points": 0,
+      "hint": "Indent what happens once per item under the loop line, and keep what happens once after the loop at the left edge."
+    },
+    {
+      "id": "change-one-record",
+      "title": "The function that changes a record is called on the list and its effect reported",
+      "description": "The plan calls the change-one-record function with the list and a name, and a later line reports or uses the changed list.",
+      "type": "regex",
+      "file": "README.md",
+      "pattern": "\\b(?:sellItem|dropLap|sowPacket|checkOut)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "hint": "Hand it the list and the name, then add a line that reports the new total or the new count so the effect shows."
+    },
+    {
+      "id": "save-and-load",
+      "title": "Loads and saves the list",
+      "description": "The plan loads the list near the start and saves it near the end, in a sensible order.",
+      "type": "regex",
+      "file": "README.md",
+      "pattern": "^(?=[\\s\\S]*\\bload\\w*)(?=[\\s\\S]*\\bsave\\w*)",
+      "flags": "i",
+      "points": 0,
+      "hint": "Put the load line before you use the list and the save line after the last change."
+    }
+  ],
   "assignmentCode": "A3.9.1",
   "aiGrader": {
     "summative": true,

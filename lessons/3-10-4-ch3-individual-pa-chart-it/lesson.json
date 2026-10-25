@@ -48,7 +48,30 @@
       "instructions": "Walk one set of real values through your plan out loud. Does the loop run the right number of times? Does the total reach the comparison only once the whole list is added? Does each outcome get its own report? Does each function name say a job that could really own that line?"
     }
   ],
-  "requirements": [],
+  "requirements": [
+    {
+      "id": "function-calls",
+      "title": "Named functions are called on the path to the answer (5 points)",
+      "description": "At least two named functions, each called in the plan, each name saying the job it does, and each feeding the answer.",
+      "type": "regex",
+      "file": "README.md",
+      "pattern": "\\b[a-z]+[A-Z]\\w*\\b|\\bcall\\s+\\w+",
+      "flags": "",
+      "points": 0,
+      "hint": "Write lines like \"set total to totalCost of the cart\" and \"call checkLimit with the total and the limit\". Call the function by name; do not write what is inside it."
+    },
+    {
+      "id": "loop-over-list",
+      "title": "Walks the list with a loop, then compares once and reports (5 points)",
+      "description": "A loop line over the list with the repeating lines indented under it and a step that adds each item to the total; then, after the loop, one comparison that reports every outcome the problem names.",
+      "type": "regex",
+      "file": "README.md",
+      "pattern": "\\b(?:for\\s+each|repeat\\s+for|loop)\\b",
+      "flags": "i",
+      "points": 0,
+      "hint": "Put the comparison after the loop, not indented under it, and give each outcome its own report under the condition that leads to it."
+    }
+  ],
   "assignmentCode": "A3.10.4",
   "aiGrader": {
     "summative": true,
