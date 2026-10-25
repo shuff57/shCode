@@ -7,7 +7,7 @@ import { useLessonStore, flattenFiles } from '../lib/store';
 import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
-import { recordSubmission, streamGrade } from '../lib/written-grader-store';
+import { recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import { applyAiVerdicts, reportFromRequirements, verdictsFromCriteria, type AiVerdicts } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
@@ -845,7 +845,8 @@ export default function LessonWorkspace({
     setAiError(null);
     setAiResult(null);
     try {
-      const code = useLessonStore.getState().fileContents['script.js'] || '';
+      // A plan written in a text lab is graded from its README.md, not from script.js.
+      const code = useLessonStore.getState().fileContents[isTextMode ? aiCheckFile : 'script.js'] || '';
       const { status, data, network } = await streamGrade(
         {
           lessonId: lesson.id,
@@ -897,6 +898,20 @@ export default function LessonWorkspace({
       setAiStage(null);
     }
   };
+
+  // The next part of a split assignment (3.9.2) reads the pair's plan back from the draft store,
+  // which a lab does not otherwise write to. Mirror the graded text there a moment after typing
+  // stops, and never the untouched starter.
+  const mirrorDraft = isTextMode && aiGraded && lessonProgress.authed;
+  const mirrorText = files[aiCheckFile] ?? '';
+  useEffect(() => {
+    if (!mirrorDraft) return;
+    const starter = flattenFiles(lesson.files).find((f) => f.path === aiCheckFile);
+    if (starter && normalizeEol(mirrorText) === normalizeEol(starter.content || '')) return;
+    const t = setTimeout(() => { void saveDraft(lesson.id, mirrorText); }, 1500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mirrorDraft, mirrorText, lesson.id]);
 
   const handleSubmit = () => {
     if (aiGraded) {
@@ -1174,7 +1189,7 @@ export default function LessonWorkspace({
                 {/* reSHape's own Run/Stop lives inside ReshapeStudio's Code
                     side (hidden entirely on its Build side) -- see that
                     component's own toolbar. */}
-                {isTextMode && (
+                {isTextMode && !aiGraded && (
                   // The Grade button sits in the editor's own top row. With an
                   // aiCheck it is the AI read of the steps; a text lesson with no
                   // aiCheck has no AI to ask, so the pattern check is its grader.

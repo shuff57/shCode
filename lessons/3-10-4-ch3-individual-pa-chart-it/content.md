@@ -2,7 +2,7 @@
 
 **This is the planning part of the test, and you are doing it alone.** One problem, pick
 one of three, write the plan in pseudocode, **10 points**, about **7 minutes**. You type
-the plan in the box below and submit. Each time you submit, the AI marks whether your
+the plan in the editor and submit. Each time you submit, the AI marks whether your
 plan answers the problem you picked.
 
 **Plan It is the plan, not the code.** This part is pseudocode: plain English arranged
@@ -64,27 +64,9 @@ whether one fill is **enough**, **exactly enough**, or **not enough**.
   once, and report **every** outcome the problem names, each under the condition that
   leads to it.
 
-Here is the plan for a different problem, a bake sale (add up the cookies on each tray
-and compare the total with the order), drawn as a flowchart. It is read-only: it shows the
-shape your plan should have, not the answer to any of the three problems.
-
-```flow readonly caption="Figure 3.10.4: the bake sale plan. The total is built inside the loop; the comparison is only reached once the loop has run out of trays."
-flowchart TD
-  A([Start]) --> B[get the trays and the order size]
-  B --> C[set total to 0]
-  C --> D{is there another tray in the list?}
-  D -- yes --> E[set total to total plus trayCount of the tray]
-  E --> F[call trayLabel with the tray]
-  F --> D
-  D -- no --> G{is the total over the order size?}
-  G -- yes --> H[/report extra/]
-  G -- no --> I{is the total exactly the order size?}
-  I -- yes --> J[/report just right/]
-  I -- no --> K[/report need more/]
-  H --> L([End])
-  J --> L
-  K --> L
-```
+Open the **Flow Chart** above the editor for the plan of a different problem, a bake sale
+(add up the cookies on each tray and compare the total with the order). It is read-only: it
+shows the shape your plan should have, not the answer to any of the three problems.
 
 ---
 

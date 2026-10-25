@@ -107,7 +107,7 @@ Shack; use your own function names if you picked another problem.)
 ### Step 3: write the pseudocode
 
 Now the plan: the short main section of your program, written as pseudocode. Type it
-into the answer box below, under your contracts. The keywords from 2.2 and the
+into the editor, under your contracts. The keywords from 2.2 and the
 conventions from 3.1 still apply:
 
 - **One instruction per line.** A line doing two things gets split.
@@ -134,25 +134,10 @@ saveMembers(members)
 END
 ```
 
-Here is the same plan drawn as a flowchart, so you can see the shape. It is read-only
-and it is for the pizza club, not for any of the four problems: yours has different
+Open the **Flow Chart** above the editor to see the same plan drawn as a flowchart. It is
+read-only and it is for the pizza club, not for any of the four problems: yours has different
 functions, but the same four parts (named calls, a loop over the list, one change to a
 record, a load first and a save last).
-
-```flow readonly caption="Figure 3.9.1: the pizza club plan. Each call is a box with the function's name; the loop is the diamond that goes back until the lines run out."
-flowchart TD
-  A([Start]) --> B[set members to loadMembers]
-  B --> C[set dues to totalDues of members]
-  C --> D[/report dues/]
-  D --> E[set late to lateMembers of members and the day limit]
-  E --> F{is there another line in memberLines of members?}
-  F -- yes --> G[/put that line on screen/]
-  G --> F
-  F -- no --> H[markPaid of members and the name]
-  H --> I[/report the new dues for that name/]
-  I --> J[saveMembers of members]
-  J --> K([End])
-```
 
 Your plan needs all four of these:
 

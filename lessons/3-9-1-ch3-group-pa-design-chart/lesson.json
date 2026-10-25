@@ -6,7 +6,7 @@
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.9 Chapter 3 Group Performance Assessment",
-  "preview": "assignment",
+  "preview": "console",
   "slos": [
     "SLO-1",
     "SLO-3",
@@ -17,9 +17,42 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "summative": true,
+    "maxSubmissions": 3
   },
-  "steps": [],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "About this part",
+      "instructions": "**This is the assessment for the whole chapter, and you are doing it in pairs.** Three thirds: plan, build, demo. This is the planning third, it is worth **25%**, and it comes first. Neither of you opens an editor for Part 2 until this plan is done.\n\n**What you'll be assessed on here:**\n- Agreeing on the function list *before* either of you types — what goes in, what comes back (3.2.2)\n- Turning a word problem into a set of function contracts, then into pseudocode\n- A plan that **calls** your functions by name, walks the list with a loop, changes one record and shows the effect, and loads at the start and saves at the end"
+    },
+    {
+      "id": "s2",
+      "title": "Step 1: pick one problem",
+      "instructions": "Four problems. Pick **one**. They are built to the same measure: a list of records with the same three fields (a name, a count, and one more number), and the same five jobs plus save and load: build one record, total the list, select a subset, turn the list into one line per record, change one record in place. Each total multiplies the count by the other number; each subset test is one comparison; each change lowers a count by one and never below zero. Check with the pair next to you first: two adjacent tables should not build the same one.\n\n---\n\n**1. Snack Shack**\n\nYour stock is an array of items, each `{ name, price, qty }`. Write and use:\n\n- `makeItem(name, price, qty)` returns one item object\n- `totalValue(list)` returns the total dollar value (every `price` times its `qty`)\n- `lowStock(list, level)` returns a NEW array of the items whose `qty` is below `level`\n- `receiptLines(list)` returns a NEW array with one line per item, `name xqty`\n- `sellItem(list, name)` lowers that item's `qty` by one, never below zero. **This one changes the list it was handed.**\n- `saveStock(list)` and `loadStock()`: the whole list goes to localStorage as JSON under a key, and comes back.\n\n---\n\n**2. Lap Times**\n\nYou are logging a meet. Each runner is `{ name, laps, lapSeconds }`. Write and use:\n\n- `makeRunner(name, laps, lapSeconds)` returns one runner object\n- `totalSeconds(list)` returns the seconds run by the whole team (every `laps` times its `lapSeconds`)\n- `slowRunners(list, target)` returns a NEW array of the runners whose `lapSeconds` is above `target`\n- `resultLines(list)` returns a NEW array with one line per runner, `name: 3 laps`\n- `dropLap(list, name)` takes one lap off that runner (the scanner counted it twice), never below zero. **This one changes the list it was handed.**\n- `saveMeet(list)` and `loadMeet()`: the whole list goes to localStorage as JSON under a key, and comes back.\n\n---\n\n**3. Seed Tray**\n\nYou are keeping a drawer of seed packets. Each variety is `{ variety, packets, seedsPerPacket }`. Write and use:\n\n- `makeVariety(variety, packets, seedsPerPacket)` returns one variety object\n- `totalSeeds(list)` returns the seeds on hand (every `packets` times its `seedsPerPacket`)\n- `lowPackets(list, level)` returns a NEW array of the varieties whose `packets` is below `level`\n- `labelLines(list)` returns a NEW array with one line per variety, `variety xpackets`\n- `sowPacket(list, variety)` lowers that variety's `packets` by one, never below zero. **This one changes the list it was handed.**\n- `saveTray(list)` and `loadTray()`: the whole list goes to localStorage as JSON under a key, and comes back.\n\n---\n\n**4. Library Cart**\n\nA cart of titles, each `{ title, copies, pages }`. Write and use:\n\n- `makeTitle(title, copies, pages)` returns one title object\n- `totalPages(list)` returns the pages on the cart (every `copies` times its `pages`)\n- `longTitles(list, limit)` returns a NEW array of the titles whose `pages` is above `limit`\n- `spineLines(list)` returns a NEW array with one line per title, `title xcopies`\n- `checkOut(list, title)` lowers that title's `copies` by one, never below zero. **This one changes the list it was handed.**\n- `saveCart(list)` and `loadCart()`: the whole list goes to localStorage as JSON under a key, and comes back.\n\n---\n\nWhichever you pick, your program also needs one **string** of text: the shack's name, the meet name, the tray label, or the library branch. Pick one and write it down now; Part 2 asks for it."
+    },
+    {
+      "id": "s3",
+      "title": "Step 2: write the contracts, together",
+      "instructions": "Before any pseudocode. One row per function, both of you, out loud. This is 3.2.2 made to do work — a function's signature *is* its contract. (The table is for Snack Shack; use your own function names if you picked another problem.)\n\n| Function | Takes in | Gives back |\n|---|---|---|\n| makeItem | | |\n| totalValue | | |\n| lowStock | | |\n| receiptLines | | |\n| sellItem | | |\n| saveStock / loadStock | | |"
+    },
+    {
+      "id": "s4",
+      "title": "Step 3: write the pseudocode",
+      "instructions": "Now the plan: the short main section of your program, written as pseudocode. Type it into the editor, under your contracts. The keywords from 2.2 and the conventions from 3.1 still apply:\n\n- **One instruction per line.** A line doing two things gets split.\n- **Indent what sits inside something else.** The lines inside a loop or an IF are indented; the lines after it are not.\n- **Call your functions by name**, handing each one what it needs. Do **not** write out the inside of `totalValue` or `lowStock` — a call means \"a function written somewhere else does this, then we come back.\" Writing every job out inline is the most common way to end up with a plan that has no functions in it.\n\nAn example of the shape, for a different problem (a pizza club):\n\n```\nSTART\nSET members TO loadMembers()\nSET dues TO totalDues(members)\nREPORT dues\nSET late TO lateMembers(members, DAY_LIMIT)\nFOR EACH line IN memberLines(members)\n    PUT line ON SCREEN\nmarkPaid(members, NAME)\nREPORT the new dues for NAME\nsaveMembers(members)\nEND\n```\n\nOpen the **Flow Chart** above the editor to see the same plan drawn as a flowchart. It is read-only and it is for the pizza club, not for any of the four problems: yours has different functions, but the same four parts (named calls, a loop over the list, one change to a record, a load first and a save last).\n\nYour plan needs all four of these:\n\n1. **Named function calls** — at least four of your five jobs (build a record, total the list, select a subset, one line per record, change one record), each called with the list or values it needs and its answer kept or used.\n2. **A loop over the list** — `FOR EACH` or your own wording, with the work done on each item indented under it.\n3. **The change-one-record call** — handed the list and a name, followed by a line that reports or uses the changed list, so the effect shows.\n4. **Load at the start, save at the end** — the list comes back from storage before you use it and goes back to storage when you are done."
+    },
+    {
+      "id": "s5",
+      "title": "The part people get wrong",
+      "instructions": "**Calls, not insides.** If your plan has no function names in it, it has not shown any functions.\n\n**Handing over the list.** `sellItem` changes the list it was handed. Your call has to give it the list and the name, and a later line has to use or report the result.\n\n**The loop's indentation.** Whatever happens once per item goes under the loop. Whatever happens once after the loop does not.\n\n**Both ends of the round trip.** A load near the top and a save near the bottom. One without the other is half of it."
+    },
+    {
+      "id": "s6",
+      "title": "Before you submit",
+      "instructions": "**You get three tries.** Each partner submits their own: submit, read the feedback on whether your plan covers your problem, rewrite it and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.\n\nExact wording does not matter, and neither does spelling. Before you call it done, walk one record through your plan out loud — and then walk the *list*, because the loop is where this chapter's programs stop being straight lines. Part 2 will open your saved plan beside your code, so write something you will want to read again."
+    }
+  ],
   "requirements": [],
   "assignmentCode": "A3.9.1",
   "aiGrader": {
@@ -57,5 +90,10 @@
         "points": 0
       }
     ]
+  },
+  "editor": "text",
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[set members to loadMembers]\n  B --> C[set dues to totalDues of members]\n  C --> D[/report dues/]\n  D --> E[set late to lateMembers of members and the day limit]\n  E --> F{is there another line in memberLines of members?}\n  F -- yes --> G[/put that line on screen/]\n  G --> F\n  F -- no --> H[markPaid of members and the name]\n  H --> I[/report the new dues for that name/]\n  I --> J[saveMembers of members]\n  J --> K([End])",
+    "caption": "The pizza club plan (not one of the four problems). Each call is a box with the function's name; the loop is the diamond that goes back until the lines run out."
   }
 }

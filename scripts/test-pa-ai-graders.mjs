@@ -213,10 +213,10 @@ try {
       fixtures.push({ id, name: 'chart whose label asks for credit', text: describe(INJECT), want: false });
     }
 
-    // ---- 3-9-1 is a written pseudocode plan too (Snack Shack reference in solution/answer.md)
+    // ---- 3-9-1 is a written pseudocode plan too (Snack Shack reference in solution/README.md)
     {
       const id = '3-9-1-ch3-group-pa-design-chart';
-      const ref = read(id + '/solution', 'answer.md').replace(/\r\n?/g, '\n').split('```')[1].trim();
+      const ref = read(id + '/solution', 'README.md').replace(/\r\n?/g, '\n').split('```')[1].trim();
       fixtures.push({ id, name: 'reference plan', text: ref, want: true });
       fixtures.push({ id, name: 'reference plan, different words and keywords', want: true,
         text: ref.replace('START\n', '').replace('END', '').replace('for each line in lines', 'FOR EACH line IN lines').replace('set stock to loadStock()', 'LOAD stock FROM storage with loadStock') });
@@ -234,12 +234,12 @@ try {
     }
 
     // ---- plan calibration (3-10-4 is a written pseudocode plan, not a drawn chart)
-    // Built from 3-10-4's own reference (solution/answer.md) so there is nothing to keep in
+    // Built from 3-10-4's own reference (solution/README.md) so there is nothing to keep in
     // step by hand. The first group must keep passing (a different but correct way of writing
     // the same run); the second must not (the structure or the words are wrong).
     {
       const id = '3-10-4-ch3-individual-pa-chart-it';
-      const ref = read(id + '/solution', 'answer.md').replace(/\r\n?/g, '\n').split('```')[1].trim();
+      const ref = read(id + '/solution', 'README.md').replace(/\r\n?/g, '\n').split('```')[1].trim();
       const swap = (text, a, b) => { if (!text.includes(a)) throw new Error('fixture anchor missing: ' + a); return text.replace(a, b); };
       const cal = (name, text, want) => fixtures.push({ id, name: 'calibration: ' + name, text, want });
       fixtures.push({ id, name: 'reference plan', text: ref, want: true });
