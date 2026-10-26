@@ -1,62 +1,175 @@
 {
   "id": "2-4-11-diagram-search-until-found",
-  "title": "2.4.11 Chart the Code: Search Until Found",
-  "description": "Draw a while (true) + break search as a flowchart. The loop has no condition of its own: the diamond inside the body is the only way out.",
+  "title": "2.4.11 Plain English to Pseudocode: Search Until Found",
+  "description": "Turn plain-English steps into pseudocode for a search that has no limit of its own: the question inside the loop is the only way out, and the early exit is its own step.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
-  "preview": "diagram",
-  "sourceRef": "designed: charts a while (true) + break search for book 2.4.3 (Definition 2.4.2's figure applied to Example 2.4.2)",
+  "preview": "console",
+  "editor": "text",
   "week": 6,
   "slos": [
     "SLO-2",
     "SLO-4"
   ],
+  "sourceRef": "designed: charts a while (true) + break search for book 2.4.3 (Definition 2.4.2's figure applied to Example 2.4.2)",
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "min-process",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      }
-    ]
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([the program starts]) --> B[set current to 20]\n  B --> C{is current a multiple of 7?}\n  C -- yes --> D[/print Found: current/]\n  D --> Z([the program ends])\n  C -- no --> E[add 1 to current]\n  E --> C",
+    "caption": "Search until found: the only diamond is the stopping rule. Yes prints and leaves the loop (the break); no adds 1 and goes back to the question."
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Set `current` to `20`.\n\n**2.** Repeat forever (there is no limit on this loop):\n\n**3.** Check whether `current` is a multiple of `7` (the remainder when you divide by 7 is 0).\n\n**4.** If it is, print `Found: ` followed by `current`, then **break**: leave the loop at once.\n\n**5.** If it is not, add `1` to `current` and go back to the check.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: there is no separate diamond guarding the loop. The only diamond is the stopping rule, it sits **inside** the loop, and its `yes` exit is the break.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` (start a value)\n- `REPEAT FOREVER` ... `END REPEAT` (a loop with no limit), `BREAK` (leave the loop)\n- `IF lives MOD 2 = 0` (a check; `MOD` gives the remainder)\n- `PRINT lives` (show something)\n\nPlain English is fine. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, trace it by hand from `20`: it should check 20, then 21, and print `Found: 21`. Then ask yourself what happens if the break is missing.",
+      "hints": [
+        "The break is its own step, written right after the print, inside the yes branch.",
+        "Without the break the loop never stops: nothing else in it can end it.",
+        "The add 1 belongs to the no branch: only add when the number was not found."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "current starts at 20",
+      "description": "Set current to 20 before the loop.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bcurrent\\b[^\\n]*?(?:\\bTO\\b|=|<-|:=|\\bIS\\b|\\bAS\\b|\\bAT\\b|\\bEQUALS?\\b)\\s*(?:the\\s+value\\s+)?(?:20|twenty)\\b",
+      "hint": "Start with a step that sets current to 20.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "A loop with no limit of its own",
+      "description": "The steps repeat (forever / until found) rather than checking a counter.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:REPEAT|FOREVER|LOOP|WHILE|KEEP|AGAIN|GO\\s+BACK|BACK\\s+TO|OVER\\s+AND\\s+OVER|ALWAYS|TRUE|UNTIL)\\b",
+      "hint": "Say that the check repeats, with no limit on how long.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The question: is current a multiple of 7?",
+      "description": "Check whether the remainder of current divided by 7 is 0.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:%|\\bmod(?:ulo)?\\b|remainder|divisib|multiple|divides|evenly|goes\\s+into)[^\\n]*\\b(?:7|seven)\\b",
+      "hint": "Add a check: is current divisible by 7 (current % 7 is 0)?",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Found is printed in the yes branch",
+      "description": "Found: and the number are printed after the check says yes.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:%|\\bmod(?:ulo)?\\b|remainder|divisib|multiple|divides|evenly|goes\\s+into)[^\\n]*\\b(?:7|seven)\\b[\\s\\S]*?\\b(?:print|show|display|say|output|write|log|report)\\w*\\b[^\\n]*\\bfound\\b",
+      "hint": "Print Found: and current under the yes answer.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "The early exit is its own step",
+      "description": "Right after the print, a step leaves the loop at once (break / stop / exit).",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:print|show|display|say|output|write|log|report)\\w*\\b[^\\n]*\\bfound\\b[\\s\\S]*?\\b(?:break|stop|exit|leave|quit|get\\s+out|end\\s+the\\s+loop|finish|halt)\\w*\\b",
+      "hint": "After printing Found, add a BREAK step that leaves the loop.",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "No means add 1 and try again",
+      "description": "When the check says no, current goes up by 1 and the check happens again.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:%|\\bmod(?:ulo)?\\b|remainder|divisib|multiple|divides|evenly|goes\\s+into)[^\\n]*\\b(?:7|seven)\\b[\\s\\S]*?(?:\\b(?:add|increase|increment|plus|raise|bump)\\w*\\b|\\+\\+|\\+\\s*1\\b|\\+=)[^\\n]*\\bcurrent\\b|(?:%|\\bmod(?:ulo)?\\b|remainder|divisib|multiple|divides|evenly|goes\\s+into)[^\\n]*\\b(?:7|seven)\\b[\\s\\S]*?\\bcurrent\\b[^\\n]*(?:\\b(?:add|increase|increment|plus|raise|bump)\\w*\\b|\\+\\+|\\+\\s*1\\b|\\+=)",
+      "hint": "Add 1 to current when it was not a multiple of 7.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let current = 20; while (true) { if (current % 7 === 0) { console.log(\"Found: \" + current); break; } current++; }. It prints Found: 21. The point is that the loop has no condition of its own: the only way out is the if inside the body. The yes branch prints Found and then BREAKS (leaves the loop). The no path adds 1 to current and goes round again. Without the break the loop would never end. Writing the add 1 inside an ELSE or after the END IF is equally fine, as long as it only matters when the number was not found. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, ELSE, END IF, FOR EACH, END FOR, CALL, PRINT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite (for example no break after printing Found (the loop would never stop), Found printed on every pass instead of only in the yes branch, or the add 1 missing so current never changes). Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "current starts at 20",
+        "description": "Set current to 20 before the loop.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A loop with no limit of its own",
+        "description": "The steps repeat (forever / until found) rather than checking a counter.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The question: is current a multiple of 7?",
+        "description": "Check whether the remainder of current divided by 7 is 0.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Found is printed in the yes branch",
+        "description": "Found: and the number are printed after the check says yes.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The early exit is its own step",
+        "description": "Right after the print, a step leaves the loop at once (break / stop / exit).",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "No means add 1 and try again",
+        "description": "When the check says no, current goes up by 1 and the check happens again.",
+        "points": 1
+      }
+    ]
+  }
 }

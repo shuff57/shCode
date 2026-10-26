@@ -110,7 +110,7 @@
     {
       "id": "r2",
       "title": "The problem is named in the header",
-      "description": "The Problem line says which of the four menu problems this is. Help: 2.6.1 (Group PA Part 1: Design the Chart)",
+      "description": "The Problem line says which of the four menu problems this is. Help: 2.6.1 (Group PA Part 1: Design the Plan)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\S\\n]*Problem:[^\\S\\n]*\\S+",
@@ -239,7 +239,7 @@
       {
         "id": "r2",
         "title": "The problem is named in the header",
-        "description": "The Problem line says which of the four menu problems this is. Help: 2.6.1 (Group PA Part 1: Design the Chart)",
+        "description": "The Problem line says which of the four menu problems this is. Help: 2.6.1 (Group PA Part 1: Design the Plan)",
         "points": 1
       },
       {

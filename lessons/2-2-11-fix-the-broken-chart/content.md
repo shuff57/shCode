@@ -1,48 +1,44 @@
-## Fix the Broken Chart
+## Fix the Broken Plan
 
 **What you'll practise:**
-- Reading the checker's output instead of guessing
-- Seeing how *one* mistake sets off *several* alarms
-- Repairing a chart rather than starting over
+- Reading the Quest cards to find the one idea that is missing
+- Seeing that a check needs both answers written
+- Repairing a plan instead of starting over
 
-Every chart you have drawn so far, you drew from scratch. This one arrives already drawn, and already wrong.
+### The broken plan
 
-### The chart
+Somebody planned a rollercoaster height rule: get the rider's height, and if it is at least 48 inches print `You may ride`, otherwise print `Too short`. Their plan arrives in `README.md` already written, and already wrong. The finished plan is drawn as a flow chart above the editor. You **read** it, you do not draw it.
 
-Somebody charted a rollercoaster height rule: get the rider's height, and if it is at least 48 inches, print "You may ride", otherwise print "Too short". The canvas below has their attempt on it.
+### The code it describes
 
-Press **Check my diagram** before you change anything. You should see **five** red checks.
+```js
+const height = 52;
 
-### Five red checks, one mistake
+if (height >= 48) {
+  console.log("You may ride");
+} else {
+  console.log("Too short");
+}
+```
 
-This is the part worth slowing down for. Five things are red, but there are not five mistakes: there is **one**, and it sets off five alarms:
+### One missing idea
 
-| Red check | What it is complaining about |
-|---|---|
-| `decision-two-exits` | The diamond has one arrow leaving it, not two |
-| `decision-labeled` | The arrow that *is* there carries no label at all |
-| `no-orphans` | The "Too short" rectangle is floating with no arrows at all |
-| `one-start` | Two shapes have nothing pointing at them, so a reader cannot tell where to begin |
-| `reaches-end` | It gave up. This check needs one clear starting point before it can follow the paths at all, so it waits for `one-start` to go green |
+Press **Grade** before you change anything. Some cards are red, but there is not a red card for every mistake: there is **one** missing idea, and it turns several cards red. The broken plan stops after the happy path (tall enough, you may ride). Nobody wrote the `ELSE`, so no rider can ever be told `Too short`.
 
-That last row is worth a second look. `reaches-end` is not reporting a fifth problem: it is reporting that it *cannot do its job yet*. Some checks depend on others, so a red near the bottom of the list sometimes clears itself the moment you fix something near the top.
-
-All five trace back to a single missing idea: **the `no` branch was never drawn.** The person got as far as the happy path: tall enough, you may ride, and stopped. The "Too short" box exists because they knew it was needed, but nothing connects it, so as far as the chart is concerned it is a second place to start reading.
-
-That last one surprises people. A floating shape is not just untidy: the checker cannot tell the difference between "a box I forgot to connect" and "a second beginning", because on the page they look identical.
+So the red cards point at one thing: **the other answer was never written.** Read the cards, find the single idea they share, and fix that.
 
 ### Your job
 
-Repair it. Do not delete everything and start over: fix what is there:
+Repair the plan; do not start over:
 
-1. Label the existing arrow out of the diamond, so a reader knows which answer it follows.
-2. Draw the missing arrow from the diamond to the "Too short" box, and label it.
-3. Make sure that branch goes somewhere afterwards. A branch that stops is still a broken branch.
-
-Press **Check my diagram** after each fix and watch the count come down. Notice that fixing the one missing branch turns off all five alarms at once.
+1. Add an `ELSE` line after `PRINT "You may ride"`.
+2. Under it, print `Too short`.
+3. Keep `END IF` after both answers.
 
 ### Why this lesson exists
 
-The next time you draw a chart from scratch and five things go red, your instinct will be that you have made five mistakes and the whole thing is ruined. Usually you have made one. Read the checks, find the single idea they all point at, and fix that.
+The next time you write a plan and several cards go red, your instinct will be that you made several mistakes. Usually you made one. Read the cards and find the idea they all point at.
 
-No points, no AI grader: get all nine checks green and you are done.
+### Before you submit
+
+Press **Grade**, then trace your steps by hand with `52` and with `40`. Each should print exactly one message.

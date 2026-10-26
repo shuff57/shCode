@@ -1,28 +1,35 @@
 ## Fix the Infinite Loop
 
 **What you'll practise:**
-- Recognizing an infinite loop *on the chart*, not just in code
-- Seeing that a missing `no` exit is the same idea as a missing stopping point
-- Drawing the exit that lets the reader, and the program: finally reach End
+- Recognising an infinite loop in a written plan
+- Seeing that a loop needs a way out that can be reached
+- Writing the loop's test and closing the loop
 
-### The chart
+### The broken plan
 
-Someone charted a countdown: `count` starts at 5, prints while it's above 0, and decreases each round. Press **Check my diagram** before you change anything.
+Someone planned a countdown: `count` starts at `5`, prints while it is above `0`, and goes down by `1` each round. Their plan arrives in `README.md` already written, and already wrong: its loop says `REPEAT FOREVER`. The finished plan is drawn as a flow chart above the editor. You **read** it, you do not draw it.
 
-You'll see the diamond has only one exit. That's not a drawing mistake to shrug off: it's the picture of exactly what an infinite loop is.
+### The code it describes
 
-### Why this is the same bug you read about
+```js
+let count = 5;
 
-`reaches-end` fails here for the same reason a real infinite loop never finishes: from Start, the arrows lead into the diamond, around the loop body, and back to the diamond again, and there is nowhere else to go. **An infinite loop is not a chart with a missing End oval. It's a chart with an End that nothing can get to.** The End oval could be sitting right there on the page, and it still wouldn't matter if no arrow reaches it.
+while (count > 0) {
+  console.log(count);
+  count = count - 1;
+}
+```
+
+### Why this is the bug you read about
+
+Press **Grade** before you change anything. The cards for starting at 5, printing and counting down are green, and the cards for the loop's test and for closing the loop are red. Counting down is not enough: nothing ever *asks* whether to stop, so the loop never leaves. On the chart, that is a diamond with only a `yes` exit. **An infinite loop is not a plan with a missing end line. It is a plan whose way out can never be reached.**
 
 ### Your job
 
-1. Add an End oval, if one isn't already placed.
-2. Draw the missing `no` exit from the diamond, and label it.
-3. Route that exit to End.
+1. Change `REPEAT FOREVER` into `WHILE count > 0`.
+2. Keep the print and the countdown step inside it, indented.
+3. Close the loop with `END WHILE`, so the plan can reach its end.
 
 ### Before you submit
 
-Press **Check my diagram** after each fix. Watch `decision-two-exits`, `decision-labeled`, and `reaches-end` clear once the missing branch exists.
-
-No points, no AI grader: get every check green and you're done.
+Press **Grade**, then trace the loop by hand: `count` is 5, 4, 3, 2, 1, printing each time, then 0 fails the test and the loop is over.

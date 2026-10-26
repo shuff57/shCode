@@ -355,7 +355,7 @@ check('guard: the four runtime-tested labs carry codes and no try cap; all three
     assert.equal(lessonGradeCategory({ title: m.title, preview: m.preview, scoreKind: m.scoreKind, assignmentCode: m.assignmentCode }), 'lab', id);
   }
   // Counted charts (decided 2026-10-07 after 38 real drafts were measured; 3.3.11 followed 2026-10-08): Lab category, pass at 80%.
-  for (const [id, code] of [['3-2-8-chart-parameter-trace', 'A3.2.2'], ['3-2-18-chart-chained-calls', 'A3.2.3'], ['3-3-11-chart-the-array-loop', 'A3.3.2'], ['3-1-7a-a3-1-0-flowchart-gate', 'A3.1.0'], ['1-5-30-a1-5-1-flowchart-gate', 'A1.5.1']]) {
+  for (const [id, code] of [['3-2-8-chart-parameter-trace', 'A3.2.2'], ['3-2-18-chart-chained-calls', 'A3.2.3'], ['3-3-11-chart-the-array-loop', 'A3.3.2'], ['3-1-7a-a3-1-0-flowchart-gate', 'A3.1.0'], ['1-5-30-a1-5-1-flowchart-gate', 'A1.5.1'], ['2-2-12-a5-2-flowchart-decision', 'A2.2.0']]) {
     const meta = read(id);
     assert.ok(!meta.grading?.formative, id);
     assert.equal(meta.grading?.completionCredit, true, id);

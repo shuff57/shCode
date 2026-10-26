@@ -1,14 +1,15 @@
-## Chapter 2 Group PA — Part 1 of 3: Design
+## Chapter 2 Group PA — Part 1 of 3: Design the Plan
 
 **This is the assessment for the whole chapter, and you are doing it in pairs.** Three
-thirds: design, build, demo. This is the design third, it is worth **25%**, and it comes
-first. Neither of you opens an editor until this chart is green.
+thirds: plan, build, demo. This is the planning third, it is worth **25%**, and it comes
+first. Neither of you opens an editor for Part 2 until this plan is done.
 
 **What you'll be assessed on here:**
 - Agreeing on what the program does *before* either of you types
-- Turning a word problem into pseudocode, then into a chart
-- Using the five shapes released through §2.2 — oval, rectangle, diamond, parallelogram,
-  and the **loop-setup hexagon** (§2.2)
+- Turning a word problem into a pseudocode plan: the inputs, a loop that walks them, the
+  skip or the stop the problem forces, a three-way classification, and a guard
+- Using the chapter's tools in plain language: loops (§2.2), `continue` and `break`
+  (§2.4), `switch` and `throw`
 
 ### Step 1: pick one problem
 
@@ -62,78 +63,102 @@ Whichever you pick, your program also needs one piece of **text** — the name o
 locker bank, the word being audited, the savings goal, or the coin system. Pick one
 and write it down now; Part 2 asks for it.
 
----
+### Step 2: write the plan, together
 
-### Step 2: pseudocode it, on paper, together
+One screen, one keyboard, both of you looking at it and talking it through out loud.
+Type your plan into the editor, under your problem name and your list of inputs. The
+keywords from 2.2 still apply (`START`, `INPUT`, `SET`, `IF`, `ELSE`, `END IF`, `PRINT`,
+`END`), and this chapter adds the loop and the jumps:
 
-Before anyone touches the canvas. Both of you, one sheet, out loud. Use the keywords
-from 2.2 and the flowchart conventions from 2.2.4 and 2.2.7.
+- **One instruction per line.** A line doing two things gets split.
+- **A loop is a loop line with its repeating steps indented under it.** Write the setup
+  on the loop line (`FOR i = 1 TO n`, `FOR EACH character IN word`, `WHILE amount > 0`,
+  or your own words). Everything that happens on each pass is indented under it. The
+  line that comes after the loop's last step is **not** indented: that is the way out.
+- **Skip and stop.** `CONTINUE` skips the rest of this pass; `BREAK` leaves the loop.
+  Put each one under the `IF` that triggers it.
+- **A `switch` is `SWITCH` with one `CASE` per outcome**, or a chain of `IF` / `ELSE IF`
+  lines that does the same job. Either is fine; every outcome needs its own report.
+- **A guard is an `IF` near the top** that checks the input that can be bad and
+  `THROW`s (or stops) before the loop starts.
+
+An example of the shape, for a different problem (a bus that fills up):
 
 ```
 START
-INPUT n
-INPUT name
-SET count TO 0
-FOR i = 1 TO n
-    IF rule(i) THEN
+INPUT capacity
+INPUT stops
+IF capacity < 1
+    THROW "the bus needs room for someone"
+END IF
+SET riders TO 0
+FOR EACH stop IN stops
+    IF nobody is waiting at stop
         CONTINUE
     END IF
-    FLIP state of i
-    IF i == 7 THEN
-        record state
+    SET riders TO riders + the number waiting at stop
+    IF riders >= capacity
+        BREAK
     END IF
 END FOR
-CLASSIFY state OF 7 WITH switch
-REPORT total
+IF riders >= capacity
+    PRINT "full"
+ELSE IF riders > 0
+    PRINT "part full"
+ELSE
+    PRINT "empty"
+END IF
+PRINT riders
 END
 ```
 
-### Step 3: chart it
+Open the **Flow Chart** above the editor to see the same plan drawn as a flowchart. It is
+read-only and it is for the bus, not for any of the four problems: yours has a different
+walk, a different skip or stop, and a different set of outcomes, but the same four parts.
 
-One screen, one keyboard, both of you looking at it. **Five shapes** (Appendix D §D.2):
+Your plan needs all four of these:
 
-| Shape | Use it for |
-|---|---|
-| **Start / End** (oval) | One of each. |
-| **Task** (rectangle) | Getting the numbers, working out the value, printing the result. **At least two.** |
-| **Decision** (diamond) | The comparison against the limit. Exactly two exits, **labeled**. |
-| **Parallelogram** | Input or output — the name and the final report. |
-| **Hexagon** | Loop setup: `{{i = 1 to n}}`. The return arrow closes the loop. |
+1. **A loop that walks the problem's input** — the lockers, the characters, the weeks, or
+   the coins — with the work for each pass indented under the loop line and the way out
+   after it.
+2. **The skip or the stop your problem forces** — the multiple-of-3 skip, the space skip,
+   the no-deposit week and the early stop, the drawer-empty stop — each under the
+   condition that triggers it.
+3. **A classification and a report after the loop** — every outcome your problem names
+   gets its own line of report (the state of locker 7, the three counts, the final
+   balance and its verdict, the count of each coin), all before `END`.
+4. **A guard against the bad input** — the check for `n < 1`, an empty word, or a negative
+   target or amount, near the start, with what happens when it fails.
 
-The toolbar also offers a parallelogram for input and output. The checker counts
-**rectangles** — a parallelogram or hexagon is not one. Use them for what they mean,
-never in place of a rectangle, or "Uses at least two task rectangles" goes red on a
-chart that looks finished.
+### What "done in four minutes" means
 
-### What "green in four minutes" means
-
-It means you drew a straight line and called it a design. **Eleven checks run**, and two of
-them exist specifically to stop that: your chart needs at least **two** task rectangles
-and at least **one** decision diamond. A chart that passes those and still took four
-minutes is missing the loop setup or the reporting step. The checker also demands eight shapes in total -- a straight line with one diamond does not clear it.
+It means you wrote a straight line and called it a plan. A plan with no loop, or a loop
+whose steps change nothing (`do stuff`), or a classification that never reports, solves
+no problem, however many lines it has. Read your own plan top to bottom the way the
+computer would.
 
 ### The part people get wrong
 
-**Both exits of the diamond have to arrive somewhere.** A locker that is *not* a multiple
-of 3 is still an answer, and the program has to say so. An arrow that leads nowhere is
-your chart claiming the program hangs.
+**The skip and the stop are different.** `CONTINUE` goes on to the *next* pass; `BREAK`
+leaves the loop for good. A plan that swaps them describes a different program.
 
-**The loop return arrow goes to the hexagon, not to the diamond.** The hexagon is the
-loop header; the return arrow closes the loop by pointing back to the hexagon. Drawing
-it back to the diamond is the most common mistake and makes the chart illegal.
+**Every outcome has to be reachable.** A locker that is *not* a multiple of 3 is still an
+answer, and the plan has to say so. If one of your three outcomes has no condition that
+leads to it, the plan cannot ever report it.
 
-**The hexagon counts as one shape for `min-nodes`, not two.** Do not draw the three
-parts of the `for` loop (init, condition, increment) as separate shapes — the hexagon
-is one shape that means "this is a loop header with its setup inside it."
+**The classification belongs after the loop, not inside it.** Whatever happens once per
+item is indented under the loop. Whatever happens once at the end is not.
+
+**The guard comes first.** If the check for a bad input sits after the loop, the loop has
+already run on it.
 
 ### Before you submit
 
-**You get three tries.** Each partner submits their own: submit, read the feedback on whether the chart answers your problem, redraw and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
+**You get three tries.** Each partner submits their own: submit, read the feedback on
+whether the plan answers your problem, rewrite it and submit again. Your best try counts.
+After your third try you can see how it is solved, once your teacher releases it.
 
-Press **Check my diagram**. Everything runs in your browser and tells you which shape is
-wrong. Fix anything red and press it again — there is no penalty for redrawing, exactly
-as in 2.2.7.
-
-Green means your drawing is a legal flowchart. Whether it solves *your* problem is for
-the two of you to read. Before you call it done, walk one set of real numbers through it
-out loud, and then a second set that comes out on the other side of the diamond.
+Exact wording does not matter, and neither does spelling. Before you call it done, walk
+one set of real numbers through the plan out loud, and then a second set that comes out
+by a different outcome. Part 2 will open your saved plan beside your code, so write
+something you will want to read again.

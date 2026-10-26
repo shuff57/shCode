@@ -1,11 +1,21 @@
-## Chart the Code: Search Until Found
+## Plain English to Pseudocode: Search Until Found
 
 **What you'll practise:**
-- Drawing a loop that has no stopping condition of its own
-- Placing `break` as the `yes` exit of a decision diamond, not as a separate shape
-- Seeing why the diamond has to sit *inside* the loop body, not in the loop header
+- Writing a loop that has no stopping condition of its own
+- Writing the early exit (break) as its own step in the yes branch
+- Turning plain English into exact, numbered steps
 
-### The code
+### The plan, in plain English
+
+1. Set `current` to `20`.
+2. Repeat forever:
+3. Is `current` a multiple of `7`?
+4. If yes, print `Found: ` and `current`, then **break** (leave the loop).
+5. If no, add `1` to `current` and go round again.
+
+The same plan is drawn as a flow chart above the editor. You do not draw it, you **read** it.
+
+### The code it describes
 
 ```js
 let current = 20;
@@ -19,25 +29,10 @@ while (true) {
 }
 ```
 
-### What to draw
+### The thing worth noticing
 
-There is no hexagon here: `while (true)` has no counter, no limit, nothing to collapse. The whole loop is one task, one decision, and a return arrow.
-
-| Shape | Use it for |
-|---|---|
-| **Start / End** (oval) | One of each. |
-| **Task** (rectangle) | `current = 20` (before the loop), and `current++` (inside it). |
-| **Decision** (diamond) | `current % 7 === 0` |
-| **Input / Output** (parallelogram) | The "Found" print. |
-
-### The trap
-
-`break` is not its own shape: it's what the `yes` exit of the diamond *does*. Route the `yes` arrow from `current % 7 === 0` straight to the print, and from there to End. Route the `no` arrow to `current++`, and from there back up to the diamond.
-
-Notice what's missing compared to every `for` loop chart you've drawn: there is no separate "check the limit" diamond guarding the whole loop. The only diamond *is* the stopping condition, and it lives inside the body, not in front of it.
+There is no limit on this loop: `while (true)` never stops by itself. The **only** way out is the `if` inside the body, and its yes branch ends with `break`. `break` is not a shape on the chart or a special place: it is the step the yes branch takes to leave. Leave it out and the loop runs forever.
 
 ### Before you submit
 
-Press **Check my diagram**. The checks confirm a legal flowchart: one Start, one End, nothing floating, the diamond has two labelled exits, every path reaches the End.
-
-No points, no AI grader. Redraw as often as you like.
+Press **Grade**, then trace your steps by hand from `20`: `Found: 21`.

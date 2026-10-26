@@ -1,62 +1,175 @@
 {
   "id": "2-4-7-diagram-do-while",
-  "title": "2.4.7 Chart the Code: do...while",
-  "description": "Draw a do...while loop as a flowchart and see why the diamond sits at the bottom instead of the top.",
+  "title": "2.4.7 Plain English to Pseudocode: do...while",
+  "description": "Turn plain-English steps into pseudocode for a do...while loop: the body runs first, and the question comes after it.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
-  "preview": "diagram",
-  "sourceRef": "book 2.4.2: Definition 2.4.1 do...while Loop (figure_def_2.4.1)",
+  "preview": "console",
+  "editor": "text",
   "week": 6,
   "slos": [
     "SLO-2",
     "SLO-4"
   ],
+  "sourceRef": "book 2.4.2: Definition 2.4.1 do...while Loop (figure_def_2.4.1)",
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "min-process",
-        "count": 2
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      }
-    ]
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([the program starts]) --> B[set attempts to 0]\n  B --> C[add 1 to attempts]\n  C --> D[/print Attempt and attempts/]\n  D --> E{is attempts less than 3?}\n  E -- yes --> C\n  E -- no --> Z([the program ends])",
+    "caption": "The do...while: the body (add 1, print) comes first and the diamond comes after it. Yes goes back to the body, no leaves the loop."
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Set `attempts` to `0`.\n\n**2.** Do this: add `1` to `attempts`, then print `Attempt ` followed by `attempts`.\n\n**3.** **After** the body has run, check whether `attempts` is less than `3`. If it is, go back to step 2 and do the body again. If it is not, the loop is over.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: the task boxes come first and the diamond sits **after** them. That position is the whole difference from a `while` loop, which asks its question first.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` (start a value)\n- `DO` ... `WHILE lives > 0` (do the steps, then ask the question; repeat while the answer is yes)\n- `PRINT lives` (show something)\n\nPlain English is fine. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, trace it by hand: it should print `Attempt 1`, `Attempt 2`, `Attempt 3`. Then pretend `attempts` started at `5`: a do...while still runs the body once.",
+      "hints": [
+        "The question line goes after the add and print lines, not before them.",
+        "The yes answer sends you back to the first step of the body (the add), not to the very start of the program.",
+        "Stopping: when attempts reaches 3, the question is no and the loop ends."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "attempts starts at 0",
+      "description": "Set attempts to 0 before the loop.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\battempts?\\b[^\\n]*?(?:\\bTO\\b|=|<-|:=|\\bIS\\b|\\bAS\\b|\\bAT\\b|\\bEQUALS?\\b)\\s*(?:the\\s+value\\s+)?(?:0|zero)\\b",
+      "hint": "Start with a step that sets attempts to 0.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "The body adds 1 to attempts",
+      "description": "One step inside the loop adds 1 to attempts.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:\\b(?:add|increase|increment|plus|raise|bump)\\w*\\b|\\+\\+|\\+\\s*1\\b|\\+=)[^\\n]*\\battempts?\\b|\\battempts?\\b[^\\n]*(?:\\b(?:add|increase|increment|plus|raise|bump)\\w*\\b|\\+\\+|\\+\\s*1\\b|\\+=)",
+      "hint": "Add a step that adds 1 to attempts.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The body prints Attempt and the number",
+      "description": "Another step inside the loop prints Attempt followed by attempts.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:print|show|display|say|output|write|log|report)\\w*\\b[^\\n]*\\battempt",
+      "hint": "Add a step that prints Attempt and the number.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "The question is: attempts less than 3",
+      "description": "The question compares attempts with 3 (less than 3 means go again).",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:<|>=?|\\b(?:less|below|under|fewer|smaller|lower|until|reaches|reached|equals?)\\b)[^\\d\\n]{0,25}\\b(?:3|three)\\b|\\b(?:3|three)\\b[^\\n]*(?:>|\\b(?:more|over|above)\\b)",
+      "hint": "Add a question: is attempts less than 3?",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "The question comes AFTER the body",
+      "description": "The question is written after the add and print steps, so the body runs before it is ever asked.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:\\b(?:add|increase|increment|plus|raise|bump)\\w*\\b|\\+\\+|\\+\\s*1\\b|\\+=)[\\s\\S]*?\\b(?:print|show|display|say|output|write|log|report)\\w*\\b[^\\n]*\\battempt[\\s\\S]*?(?:^|\\n)[\\s\\d.)\\-]*(?:(?:now|then|next)\\b[,\\s:]*)?(?:IF|WHILE|UNTIL|CHECK|WHETHER|TEST|ASK|IS|DOES|REPEAT)\\b",
+      "hint": "Move the question to after the add and print steps.",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "Yes goes back to the body",
+      "description": "When the answer is yes, the steps go back and repeat the body.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:go\\s+back|back\\s+(?:to|up)|repeat|again|return|loop|jump|go\\s+to\\s+step|DO|WHILE|UNTIL)\\b",
+      "hint": "Say that a yes sends you back to the first step of the body.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let attempts = 0; do { attempts++; console.log(\"Attempt \" + attempts); } while (attempts < 3). It prints Attempt 1, Attempt 2, Attempt 3. The point is that a do...while runs the body FIRST and asks its question (attempts < 3) AFTER the body, then goes back to the body if the answer is yes. A version that asks the question before the body is a while loop, not a do...while. 'DO ... WHILE attempts < 3' or 'repeat ... until attempts is 3' both express this correctly. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, ELSE, END IF, FOR EACH, END FOR, CALL, PRINT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite (for example the question written before the body (that is a while loop), no way back to the body when the answer is yes, or a different limit than 3). Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "attempts starts at 0",
+        "description": "Set attempts to 0 before the loop.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The body adds 1 to attempts",
+        "description": "One step inside the loop adds 1 to attempts.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The body prints Attempt and the number",
+        "description": "Another step inside the loop prints Attempt followed by attempts.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The question is: attempts less than 3",
+        "description": "The question compares attempts with 3 (less than 3 means go again).",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The question comes AFTER the body",
+        "description": "The question is written after the add and print steps, so the body runs before it is ever asked.",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "Yes goes back to the body",
+        "description": "When the answer is yes, the steps go back and repeat the body.",
+        "points": 1
+      }
+    ]
+  }
 }

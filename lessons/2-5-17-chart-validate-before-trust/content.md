@@ -1,11 +1,20 @@
-## Chart the Code: Validate Before You Trust
+## Plain English to Pseudocode: Validate Before You Trust
 
 **What you'll practise:**
-- Drawing two checks in a row, each one a diamond
-- Sending a failing check's `yes` branch to a `throw`, not to the next check
-- Only reaching the real work after both checks pass
+- Checking the input before doing any work with it
+- Ending a bad-input branch with a throw instead of carrying on
+- Reaching the real work only when every check passed
 
-### The code
+### The plan, in plain English
+
+1. Turn the typed text into a number called `quantity`.
+2. Check whether `quantity` is not a number. If so, throw an error.
+3. Check whether `quantity` is 0 or less. If so, throw an error.
+4. Only when both checks passed, print the order.
+
+The chart above the editor shows a different program with the same shape. You do not draw it, you **read** it.
+
+### The code it describes
 
 ```js
 const typed = "abc";
@@ -20,16 +29,10 @@ if (quantity <= 0) {
 console.log("Ordering " + quantity + " items.");
 ```
 
-### What to draw
+### The thing worth noticing
 
-| Shape | Use it for |
-|---|---|
-| **Start / End** (oval) | One of each. |
-| **Task** (rectangle) | Converting `typed` to `quantity`, each `throw`, and the final "Ordering..." print |
-| **Decision** (diamond) | "Is quantity NaN?" and, only on its `no` branch, "Is quantity <= 0?": two diamonds |
-
-Each diamond's `yes` branch goes to that check's error message. Each diamond's `no` branch is the only way to reach the *next* step: the second check only happens if the first one passed, and the real order only happens if both did.
+The checks come **first** and the work comes **last**. A bad value hits a `throw` and the program stops there, so the print is reached only when every check passed. Printing before the checks, or printing a message but not throwing, lets bad input through to the work.
 
 ### Before you submit
 
-Press **Check my diagram**. It needs at least two diamonds, each with two labelled exits, and every path, including both error paths: reaching the End.
+Press **Grade**, then trace your steps by hand with `"abc"`, `"0"` and `"3"`. Only `"3"` should reach the print.

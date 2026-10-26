@@ -100,9 +100,10 @@ exports.PA_PSEUDOCODE = ${JSON.stringify({
   'fx-written': 'SET total TO 0\nFOR each item IN cart\n  ADD item.price TO total\nRETURN total',
   'fx-quiz': 'IF the answer is a THEN ...',
 })};`);
-// 'fx-hybrid' IS lesson 3.2.8's real hybrid config (rubric with `check`, `gate`, rules), so the handler
-// tests below run against what ships, capped at CAP tries so "no try spent" is observable.
-const L328 = JSON.parse(readFileSync(join(root, 'lessons/3-2-8-chart-parameter-trace/lesson.json'), 'utf8'));
+// 'fx-hybrid' is a frozen copy of lesson 3.2.8's old drawn-chart grader (rubric with `check`, `gate`, rules),
+// taken from git before 3.2.8 became a pseudocode lab, so the handler's hybrid path stays covered after every
+// chart lesson is gone. Capped at CAP tries so "no try spent" is observable.
+const L328 = JSON.parse(readFileSync(join(root, 'scripts/fixtures/hybrid-chart-grader.json'), 'utf8'));
 writeFileSync(join(outDir, 'functions/_shared/ai-graders.generated.js'), `exports.AI_GRADERS = ${JSON.stringify({
   'fx-hybrid': {
     lessonTitle: L328.title, prompt: L328.diagram.aiGrader.prompt, model: 'fx-model', strict: true,
@@ -1608,9 +1609,10 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   eq(att.cleanArtifact({ doc: longLabel }, mer.describeDiagram(longLabel), DEFAULT_RULES), undefined, 'M1: a label over the length cap falls back to the text alone (the display copy would not describe what was graded)');
   // the model prompt never carries the artifact
   eq(sentBodies.some((b) => b.includes('Something completely different')), false, 'M1: the chart Y never reached the model');
-  // lesson rules reach the server: the baked config carries diagramRules for a flowchart lesson
-  const gen = readFileSync(join(root, 'functions/_shared/ai-graders.generated.ts'), 'utf8');
-  if (!/"diagramRules"/.test(gen)) fail('ai-graders.generated.ts carries no diagramRules (generate-ai-graders must bake lesson.diagram.rules)');
+  // lesson rules reach the server: the generator still bakes diagramRules (no shipped lesson is a drawn chart any more,
+  // so the generated file itself carries none)
+  const genSrc = readFileSync(join(root, 'scripts/generate-ai-graders.mjs'), 'utf8');
+  if (!/diagramRules/.test(genSrc)) fail('generate-ai-graders no longer bakes lesson.diagram.rules');
   else ok('the server-only grader config carries the diagram rules the checks are recomputed from');
   globalThis.fetch = realFetch;
 }
@@ -1631,7 +1633,7 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   const mer = require(join(outDir, 'lib/diagram-mermaid.js'));
   const att = require(join(outDir, 'functions/_shared/attempts.js'));
   const redact = require(join(outDir, 'lib/quiz-redact.js'));
-  const ref = readFileSync(join(root, 'lessons/3-2-8-chart-parameter-trace/solution/chart.mmd'), 'utf8');
+  const ref = readFileSync(join(root, 'scripts/fixtures/hybrid-chart-reference.mmd'), 'utf8');
   const good = mer.fromMermaid(ref);
   const goodText = mer.describeDiagram(good);
   // a legal chart with the required shape and nothing else right: a call, no decision after it, words that mean nothing
@@ -1723,12 +1725,12 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   // rules-only lesson (no wording items) never calls the model
   // (checked on the pure merge in diagram-assertions; here: nothing to do without a fixture)
 
-  // check and gate reach the server and never the browser
-  const gen = readFileSync(join(root, 'functions/_shared/ai-graders.generated.ts'), 'utf8');
-  for (const id of ['3-2-8-chart-parameter-trace', '3-2-18-chart-chained-calls', '3-3-11-chart-the-array-loop']) {
-    const lesson = JSON.parse(readFileSync(join(root, 'lessons', id, 'lesson.json'), 'utf8'));
-    const server = JSON.parse(gen.slice(gen.indexOf('= {') + 2, gen.lastIndexOf(';')))[id];
-    eq([server.rubric.filter((x) => x.check).length, server.gate?.anyOf?.length, server.gate?.capTo], [2, 5, 13], `${id}: the server-only config carries two rule items and the gate`);
+  // check and gate reach the server and never the browser. No shipped lesson is a drawn chart any more, so this runs
+  // against the frozen 3.2.8 config (scripts/fixtures/hybrid-chart-grader.json).
+  {
+    const id = 'fixture 3.2.8 hybrid chart';
+    const lesson = { id: 'fx-hybrid', type: 'assignment', ...JSON.parse(readFileSync(join(root, 'scripts/fixtures/hybrid-chart-grader.json'), 'utf8')) };
+    eq([lesson.diagram.aiGrader.rubric.filter((x) => x.check).length, lesson.diagram.aiGrader.gate?.anyOf?.length, lesson.diagram.aiGrader.gate?.capTo], [2, 5, 13], `${id}: the server-only config carries two rule items and the gate`);
     const client = JSON.stringify(redact.redactLessonForClient(lesson));
     const leaks = ['"check"', '"gate"', '"anyOf"', '"sequence"', '"loop-exit"', 'capTo', ...lesson.diagram.aiGrader.gate.anyOf.map((x) => JSON.stringify(x).slice(1, -1).slice(0, 40))].filter((x) => client.includes(x));
     eq(leaks, [], `${id}: nothing of check or gate is in the lesson the browser receives`);

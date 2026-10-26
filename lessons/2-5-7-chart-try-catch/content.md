@@ -1,13 +1,19 @@
-## Chart the Code: try/catch as a Flowchart
+## Plain English to Pseudocode: try/catch
 
 **What you'll practise:**
-- Seeing that "did it fail?" is an ordinary yes/no question, even though no `if` ever asks it
-- Drawing the point where `try` abandons its block and jumps to `catch`
-- Showing both paths landing back on the same next step
+- Seeing try/catch as a hidden "did it fail?" question
+- Knowing the catch runs only when the try fails
+- Noticing both paths continue with the same next step
 
-There is no "try shape" and no "catch shape". A flowchart has one way to ask a question: the diamond, so "did this line fail?" becomes a diamond, exactly like any other decision, even though nothing in the code literally writes that question.
+### The plan, in plain English
 
-### The code
+1. Try to print `quantity`.
+2. If that fails, catch it: print `Could not read quantity.`
+3. After the try/catch, either way, print `Done.`
+
+The same plan is drawn as a flow chart above the editor. You do not draw it, you **read** it.
+
+### The code it describes
 
 ```js
 try {
@@ -18,16 +24,10 @@ try {
 console.log("Done.");
 ```
 
-### What to draw
+### The thing worth noticing
 
-| Shape | Use it for |
-|---|---|
-| **Start / End** (oval) | One of each. |
-| **Task** (rectangle) | The risky line, the `catch` message, and the final "Done." |
-| **Decision** (diamond) | "Did the risky line fail?": exactly two arrows leave it |
-
-The `yes` arrow off the diamond goes to the `catch` message. The `no` arrow skips straight past it. **Both arrows land on the same next box**: "Done." runs either way, because the program continues normally once the `try...catch` statement finishes.
+There is no `if` anywhere, but `try` asks a hidden yes/no question: **did that line fail?** Yes runs the catch block, no skips it, and then both paths carry on with the same next line, because the program continues normally once the try/catch is over.
 
 ### Before you submit
 
-Press **Check my diagram**. It needs at least one diamond with two labelled exits, no floating shapes, and every path reaching the End, including both the `yes` and the `no` path off your diamond.
+Press **Grade**, then trace your steps by hand when the try fails and when it works. `Done.` prints both times; the catch message only when it failed.

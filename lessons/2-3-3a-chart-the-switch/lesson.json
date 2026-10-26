@@ -1,12 +1,13 @@
 {
   "id": "2-3-3a-chart-the-switch",
-  "title": "2.3.6 Chart the Code: a switch is a chain of diamonds",
-  "description": "Draw a three-case switch as a flowchart and see why `break` matters: without it, the arrows fall straight into the next case.",
+  "title": "2.3.6 Plain English to Pseudocode: a switch is a chain of questions",
+  "description": "Turn plain-English steps into pseudocode for a three-case switch: three questions in a row, a break after each case, and a last line that runs either way.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "week": 6,
   "slos": [
     "SLO-2",
@@ -15,44 +16,160 @@
   "sourceRef": "book 2.3.2: Definition 2.3.1, Concepts in Practice: Reading a switch (the grade example); book 2.3.3 break/fall-through",
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 3
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      }
-    ]
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([the program starts]) --> B[set grade to B]\n  B --> C{is grade A?}\n  C -- yes --> D[/print Excellent/]\n  C -- no --> E{is grade B?}\n  E -- yes --> F[/print Good/]\n  E -- no --> G{is grade C?}\n  G -- yes --> H[/print Passing/]\n  G -- no --> I[/print Not a grade I know/]\n  D --> J[/print Done/]\n  F --> J\n  H --> J\n  I --> J\n  J --> Z([the program ends])",
+    "caption": "The switch: three questions in a row. Each yes prints its message, then the break arrow jumps straight to Done. The last no is the default."
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Set `grade` to `B`.\n\n**2.** Check whether `grade` is `A`. If it is, print `Excellent` and **break** (leave the switch).\n\n**3.** Otherwise check whether `grade` is `B`. If it is, print `Good` and **break**.\n\n**4.** Otherwise check whether `grade` is `C`. If it is, print `Passing` and **break**.\n\n**5.** If none of them matched (the **default**), print `Not a grade I know`.\n\n**6.** After the switch, whichever way it went, print `Done`.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: a switch is three diamonds in a row, the `no` arrow of each one leads to the next question, and the **break** is the arrow that jumps from a case's print straight to Done instead of falling into the next case.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` (start a value)\n- `SWITCH lives` ... `CASE 3:` ... `BREAK` ... `DEFAULT:` ... `END SWITCH` (a switch; an `IF` / `ELSE IF` chain is fine too)\n- `PRINT lives` (show something)\n\nPlain English is fine. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, trace it by hand with `B`: it should print `Good` and then `Done`, and nothing else. Then take the break out of case A in your head: where would its arrow go?",
+      "hints": [
+        "Without a break, the arrow out of one case drops into the next case's print (fall-through). Write the break as its own step after each print.",
+        "The default is not a fourth question: it is where the last no arrow lands.",
+        "\"Done\" comes after the switch ends, so every case reaches it."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "grade starts as B",
+      "description": "Set grade to B before the switch.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bgrade\\b[^\\n]*?(?:\\bTO\\b|=|<-|:=|\\bIS\\b|\\bAS\\b|\\bAT\\b|\\bEQUALS?\\b)\\s*(?:the\\s+(?:value|letter)\\s+)?[\"'“]?B\\b",
+      "hint": "Start with a step that sets grade to B.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Three questions: A, then B, then C",
+      "description": "Each case is its own question, asked in order: is grade A, then B, then C.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:IF|CASE|WHEN|IS|EQUALS?|==+|=)\\s*[\"'“]?A\\b[\\s\\S]*?(?:IF|CASE|WHEN|IS|EQUALS?|==+|=)\\s*[\"'“]?B\\b[\\s\\S]*?(?:IF|CASE|WHEN|IS|EQUALS?|==+|=)\\s*[\"'“]?C\\b",
+      "hint": "Check grade against A, then B, then C, one question each.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Each case prints its own message",
+      "description": "A prints Excellent, B prints Good, C prints Passing.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:IF|CASE|WHEN|IS|EQUALS?|==+|=)\\s*[\"'“]?A\\b[\\s\\S]*?\\bexcellent\\b[\\s\\S]*?(?:IF|CASE|WHEN|IS|EQUALS?|==+|=)\\s*[\"'“]?B\\b[\\s\\S]*?\\bgood\\b[\\s\\S]*?(?:IF|CASE|WHEN|IS|EQUALS?|==+|=)\\s*[\"'“]?C\\b[\\s\\S]*?\\bpassing\\b",
+      "hint": "Put Excellent under A, Good under B and Passing under C.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Each case ends with a break",
+      "description": "After each case's print there is a break (or the cases are an ELSE IF chain), so the arrow leaves the switch instead of falling into the next case.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:(?:\\b(?:break|leave\\s+the\\s+switch|exit\\s+the\\s+switch|jump\\s+(?:straight\\s+)?to|skip\\s+the\\s+rest|go\\s+(?:straight\\s+)?to\\s+(?:done|the\\s+end))\\b[\\s\\S]*?){3})|(?:\\b(?:ELSE|OTHERWISE)\\s+IF\\b[\\s\\S]*?){2}",
+      "hint": "Add a BREAK step after each of the three prints.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "The default is the last no",
+      "description": "Not a grade I know is printed when none of the cases matched (default / else).",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:DEFAULT|ELSE|OTHERWISE|NONE|NO\\s+MATCH|ANYTHING\\s+ELSE|ANY\\s+OTHER|NOTHING\\s+MATCH)\\w*\\b[\\s\\S]*?\\b(?:print|show|display|say|output|write|log|report)\\w*\\b[^\\n]*\\bnot\\s+a\\s+grade\\b",
+      "hint": "Add a DEFAULT step that prints Not a grade I know.",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "Done runs after the switch, every time",
+      "description": "Done is printed once, after the switch has finished, not inside a case.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:END[\\s-]*SWITCH|END[\\s-]*IF|ENDIF|AFTER\\s+THE\\s+SWITCH|END\\s+OF\\s+THE\\s+SWITCH|SWITCH\\s+(?:ENDS|IS\\s+OVER|HAS\\s+FINISHED))\\b[\\s\\S]*\\b(?:print|show|display|say|output|write|log|report)\\w*\\b[^\\n]*\\bdone\\b",
+      "hint": "Move Done to after END SWITCH so every case reaches it.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let grade = \"B\"; switch (grade) { case \"A\": console.log(\"Excellent\"); break; case \"B\": console.log(\"Good\"); break; case \"C\": console.log(\"Passing\"); break; default: console.log(\"Not a grade I know\"); } console.log(\"Done\"). The point is that a switch is a chain of three questions (A, then B, then C), each case ends with a break so it does not fall into the next one, the default catches everything else, and Done is OUTSIDE the switch so every path reaches it. An IF / ELSE IF / ELSE chain with the same messages is an equally correct way to write the same idea (the ELSE branches then play the part of the breaks). Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, ELSE, END IF, FOR EACH, END FOR, CALL, PRINT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite (for example a case with no break after its print (so it would fall into the next case), the default message missing, or Done printed inside one case instead of after the switch). Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "grade starts as B",
+        "description": "Set grade to B before the switch.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Three questions: A, then B, then C",
+        "description": "Each case is its own question, asked in order: is grade A, then B, then C.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Each case prints its own message",
+        "description": "A prints Excellent, B prints Good, C prints Passing.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Each case ends with a break",
+        "description": "After each case's print there is a break (or the cases are an ELSE IF chain), so the arrow leaves the switch instead of falling into the next case.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The default is the last no",
+        "description": "Not a grade I know is printed when none of the cases matched (default / else).",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "Done runs after the switch, every time",
+        "description": "Done is printed once, after the switch has finished, not inside a case.",
+        "points": 1
+      }
+    ]
+  }
 }

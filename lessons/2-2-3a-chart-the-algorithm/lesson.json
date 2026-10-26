@@ -1,12 +1,13 @@
 {
   "id": "2-2-3a-chart-the-algorithm",
-  "title": "2.2.6 Chart the Code: Largest of Three",
-  "description": "You just wrote the largest-of-three algorithm as code. Now draw the same algorithm as a flowchart, without looking at the code.",
+  "title": "2.2.6 Plain English to Pseudocode: Largest of Three",
+  "description": "Turn the largest-of-three algorithm into pseudocode: two checks in a row, each one a question, with the no answer still carrying on to the next step.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "week": 6,
   "slos": [
     "SLO-4"
@@ -14,44 +15,141 @@
   "sourceRef": "designed: chart-from-code practice pairing with 2.2.5, per Appendix D diagram-native teaching",
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 2
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      }
-    ]
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([the program starts]) --> B[set largest to a]\n  B --> C{is b greater than largest?}\n  C -- yes --> D[set largest to b]\n  C -- no --> E{is c greater than largest?}\n  D --> E\n  E -- yes --> F[set largest to c]\n  E -- no --> G[/print largest/]\n  F --> G\n  G --> Z([the program ends])",
+    "caption": "Largest of three: two diamonds, each with a yes and a no exit. The no exit does not stop; it carries on to the next step."
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Set `largest` to `a`.\n\n**2.** Check whether `b` is greater than `largest`. If it is, set `largest` to `b`.\n\n**3.** Whether or not that happened, check whether `c` is greater than `largest`. If it is, set `largest` to `c`.\n\n**4.** After both checks, print `largest`.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: there are **two** diamonds, each with a labelled `yes` and `no` exit, and the `no` exit of the first one still carries on to the second.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `SET score TO 0` (start or change a value)\n- `IF score > best` ... `END IF` (a check, the steps inside indented; close every check)\n- `PRINT score` (show something)\n\nPlain English is fine. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, trace it three times by hand with (a, b, c) = (3, 9, 5), (3, 5, 9) and (9, 3, 5). Each should print `9`.",
+      "hints": [
+        "Compare against largest, not against a: largest is the winner so far.",
+        "The second check comes after END IF of the first, so it runs whichever way the first one went."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "largest starts as a",
+      "description": "Set largest to a before any check.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\blargest\\b[^\\n]*(?:\\bTO\\b|=|<-|:=|\\bIS\\b|\\bAS\\b|\\bAT\\b|\\bEQUALS?\\b|\\bBECOMES?\\b)\\s*(?:the\\s+(?:value\\s+of\\s+)?)?(?:a|first|the\\s+first)\\b",
+      "hint": "Start with a step that sets largest to a.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "First check: b against largest",
+      "description": "Check whether b is greater than largest and, if so, set largest to b.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:^|\\n)(?=[^\\n]*\\b(?:IF|CHECK|WHETHER|ASK|IS|DOES|COMPARE|TEST)\\b)(?=[^\\n]*\\b(?:b|second)\\b)(?=[^\\n]*\\blargest\\b)(?=[^\\n]*(?:>|<|\\bgreater\\b|\\bbigger\\b|\\blarger\\b|\\bmore\\b|\\bhigher\\b|\\bless\\b|\\bsmaller\\b|\\blower\\b|\\bthan\\b|\\bbeats?\\b|\\bexceeds?\\b|\\bover\\b|\\bcompare\\w*\\b))[\\s\\S]*?\\blargest\\b[^\\n]*(?:\\bTO\\b|=|<-|:=|\\bIS\\b|\\bAS\\b|\\bAT\\b|\\bEQUALS?\\b|\\bBECOMES?\\b)\\s*(?:the\\s+(?:value\\s+of\\s+)?)?(?:b|second)\\b",
+      "hint": "Add a check: is b greater than largest? If so, largest becomes b.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Second check: c against largest",
+      "description": "Check whether c is greater than largest (not than a) and, if so, set largest to c.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:^|\\n)(?=[^\\n]*\\b(?:IF|CHECK|WHETHER|ASK|IS|DOES|COMPARE|TEST)\\b)(?=[^\\n]*\\b(?:c|third)\\b)(?=[^\\n]*\\blargest\\b)(?=[^\\n]*(?:>|<|\\bgreater\\b|\\bbigger\\b|\\blarger\\b|\\bmore\\b|\\bhigher\\b|\\bless\\b|\\bsmaller\\b|\\blower\\b|\\bthan\\b|\\bbeats?\\b|\\bexceeds?\\b|\\bover\\b|\\bcompare\\w*\\b))[\\s\\S]*?\\blargest\\b[^\\n]*(?:\\bTO\\b|=|<-|:=|\\bIS\\b|\\bAS\\b|\\bAT\\b|\\bEQUALS?\\b|\\bBECOMES?\\b)\\s*(?:the\\s+(?:value\\s+of\\s+)?)?(?:c|third)\\b",
+      "hint": "Add a second check: is c greater than largest? If so, largest becomes c.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "The no answer carries on",
+      "description": "The first check is closed (END IF) before the second check begins, so the second one runs whichever way the first went.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "END[\\s-]*IF\\b[\\s\\S]*(?:^|\\n)(?=[^\\n]*\\b(?:IF|CHECK|WHETHER|ASK|IS|DOES|COMPARE|TEST)\\b)(?=[^\\n]*\\b(?:c|third)\\b)[^\\n]*",
+      "hint": "Close the first check with END IF, then start the second check.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Print after both checks",
+      "description": "largest is printed once, after the last check has finished.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "END[\\s-]*IF\\b(?![\\s\\S]*END[\\s-]*IF\\b)[\\s\\S]*\\b(?:print|show|display|say|output|write|log|report)\\w*\\b[^\\n]*\\blargest\\b",
+      "hint": "Print largest after the last END IF, so it runs whichever way the checks went.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let largest = a; if (b > largest) { largest = b; } if (c > largest) { largest = c; } console.log(\"Largest:\", largest). The point: two separate checks one after the other, each compared with largest (the winner so far, never with a); the second check is NOT inside the first and is NOT an else-if, so it runs even when the first answer was no; largest is printed once, after both checks. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, ELSE, END IF, FOR EACH, END FOR, CALL, PRINT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite (for example the second check nested inside the first or written as an else-if (so it is skipped when b won), c compared with a instead of largest, or the print inside a check). Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "largest starts as a",
+        "description": "Set largest to a before any check.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "First check: b against largest",
+        "description": "Check whether b is greater than largest and, if so, set largest to b.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Second check: c against largest",
+        "description": "a check that compares c with largest (not with a) and, if c is greater, sets largest to c. Judge only the comparison and the assignment here, not where the check sits or whether it is chained; that is another card.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The no answer carries on",
+        "description": "The first check is closed (END IF) before the second check begins, so the second one runs whichever way the first went.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Print after both checks",
+        "description": "largest is printed by a step that comes after the final END IF (outside every check), once. Judge this card only by where the print sits relative to the last END IF; ignore whether earlier checks were nested.",
+        "points": 1
+      }
+    ]
+  }
 }

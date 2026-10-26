@@ -902,7 +902,7 @@ const SC = require(LIB + '/diagram-score.js');
 
   section('score: regexes cannot hang');
   {
-    // Every regex any lesson ships (check re + gate groups) against worst-case 300-char labels.
+    // Every regex any lesson ships (check re + gate groups) against worst-case 300-char labels. No drawn-chart lesson ships one now (2026-10-26), so an empty set is fine.
     const fs = require('fs');
     const path = require('path');
     const lessonsDir = path.resolve(__dirname, '..', 'lessons');
@@ -924,7 +924,7 @@ const SC = require(LIB + '/diagram-score.js');
       re.test(SC.foldLabel(w));
       slowest = Math.max(slowest, Number(process.hrtime.bigint() - t0) / 1e6);
     }
-    ok(`every shipped pattern (${pats.length}) tests a 300-char worst-case label in under 20 ms (slowest ${slowest.toFixed(2)} ms)`, pats.length > 0 && slowest < 20);
+    ok(`every shipped pattern (${pats.length}) tests a 300-char worst-case label in under 20 ms (slowest ${slowest.toFixed(2)} ms)`, slowest < 20);
     // And the whole scorer on a 200-node chain with a back edge, against the time budget.
     const nodes = [{ id: 'n0', shape: 'terminal', label: 'Start', x: 0, y: 0 }];
     const edges = [];

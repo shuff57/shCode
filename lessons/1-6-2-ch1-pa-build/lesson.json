@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Copy your pseudocode in as comments",
-      "instructions": "Your chart from 1.6.1, written out one instruction per line as // comments, indented to show what sits inside the decision. Do this before you write a single line of JavaScript. If a line does not say what you meant on the chart, fix the wording now."
+      "instructions": "Your plan from 1.6.1, written out one instruction per line as // comments, indented to show what sits inside the decision. Do this before you write a single line of JavaScript. If a line does not say what you meant in the plan, fix the wording now."
     },
     {
       "id": "s3",
@@ -41,7 +41,7 @@
     {
       "id": "s5",
       "title": "Answer the diamond without an if",
-      "instructions": "Your chart's diamond is a comparison, and a comparison produces a boolean (1.2.18). Store it: const meetsTheLimit = yourValue <= yourLimit; That variable IS the diamond. Underneath it, write the two branches as pseudocode comments, one starting IF and one starting ELSE, both in capital letters -- what the program would say on the yes side, and on the no side. Chapter 2 turns those comments into an if statement; today they stay comments.",
+      "instructions": "Your plan's yes-or-no question is a comparison, and a comparison produces a boolean (1.2.18). Store it: const meetsTheLimit = yourValue <= yourLimit; That variable IS the question. Underneath it, write the two branches as pseudocode comments, one starting IF and one starting ELSE, both in capital letters -- what the program would say on the yes answer, and on the no side. Chapter 2 turns those comments into an if statement; today they stay comments.",
       "hints": [
         "Which way round the comparison goes depends on your problem -- read your chart, not the example",
         "The two branch comments are graded. IF and ELSE, in capitals, one comment line each"
@@ -74,7 +74,7 @@
     {
       "id": "r2",
       "title": "The problem is named in the header",
-      "description": "The Problem line says which of the four menu problems this is. Help: 1.6.1 (Group PA Part 1: Design the Chart)",
+      "description": "The Problem line says which of the four menu problems this is. Help: 1.6.1 (Group PA Part 1: Design the Plan)",
       "type": "regex",
       "file": "script.js",
       "pattern": "//[^\\S\\n]*Problem:[^\\S\\n]*\\S+",
@@ -130,7 +130,7 @@
     {
       "id": "r7",
       "title": "The diamond is stored as a boolean",
-      "description": "A comparison is assigned to a variable, which is what the chart's diamond becomes. Help: 1.2.2 (Declaring Variables with let and const)",
+      "description": "A comparison is assigned to a variable, which is what the plan's question becomes. Help: 1.2.2 (Declaring Variables with let and const)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*(?:<=|>=|===|!==|<|>)",
@@ -141,7 +141,7 @@
     {
       "id": "r8",
       "title": "Both branches written as pseudocode",
-      "description": "An IF comment line and an ELSE comment line, sitting below the stored comparison, say what happens on each side of the diamond. Help: 1.6.1 (Group PA Part 1: Design the Chart)",
+      "description": "An IF comment line and an ELSE comment line, sitting below the stored comparison, say what happens on each answer to the question. Help: 1.6.1 (Group PA Part 1: Design the Plan)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*(?:<=|>=|===|!==|<|>)[\\s\\S]*?//[^\\n]*\\bIF\\b[\\s\\S]*?//[^\\n]*\\bELSE\\b",
@@ -196,7 +196,7 @@
       {
         "id": "r2",
         "title": "The problem is named in the header",
-        "description": "The Problem line says which of the four menu problems this is. Help: 1.6.1 (Group PA Part 1: Design the Chart)",
+        "description": "The Problem line says which of the four menu problems this is. Help: 1.6.1 (Group PA Part 1: Design the Plan)",
         "points": 1
       },
       {
@@ -226,13 +226,13 @@
       {
         "id": "r7",
         "title": "The diamond is stored as a boolean",
-        "description": "A comparison is assigned to a variable, which is what the chart's diamond becomes. Help: 1.2.2 (Declaring Variables with let and const)",
+        "description": "A comparison is assigned to a variable, which is what the plan's question becomes. Help: 1.2.2 (Declaring Variables with let and const)",
         "points": 1
       },
       {
         "id": "r8",
         "title": "Both branches written as pseudocode",
-        "description": "An IF comment line and an ELSE comment line, sitting below the stored comparison, say what happens on each side of the diamond. Help: 1.6.1 (Group PA Part 1: Design the Chart)",
+        "description": "An IF comment line and an ELSE comment line, sitting below the stored comparison, say what happens on each answer to the question. Help: 1.6.1 (Group PA Part 1: Design the Plan)",
         "points": 1
       },
       {

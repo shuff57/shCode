@@ -1,11 +1,19 @@
-## Chart the Code: Nested Loops
+## Plain English to Pseudocode: Nested Loops
 
 **What you'll practise:**
-- Using two loop-setup hexagons, one for the outer loop and one for the inner
-- Routing the inner hexagon's return arrow before the outer one's
-- Seeing where the inner loop's whole cycle sits inside the outer loop's body
+- Putting one loop inside another
+- Seeing that the inner loop restarts for every outer round
+- Turning plain English into exact, numbered steps
 
-### The code
+### The plan, in plain English
+
+1. For each `row` from `1` to `3`:
+2. For each `col` from `1` to `4`, print `row` and `col`.
+3. When the `col` loop is done, move on to the next `row` and start the `col` loop again.
+
+The same plan is drawn as a flow chart above the editor. You do not draw it, you **read** it.
+
+### The code it describes
 
 ```js
 for (let row = 1; row <= 3; row++) {
@@ -15,30 +23,10 @@ for (let row = 1; row <= 3; row++) {
 }
 ```
 
-### What to draw
+### The thing worth noticing
 
-Two hexagons, one after the other: press **+ more shapes** if you don't already have it out.
-
-| Shape | Use it for |
-|---|---|
-| **Start / End** (oval) | One of each. |
-| **Loop setup** (hexagon) | Two of them: `row = 1 to 3`, and `col = 1 to 4` |
-| **Input / Output** (parallelogram) | The print inside the inner loop |
-
-### Where each return arrow goes
-
-This is the part that trips people up, so trace it before you draw: which hexagon does the print's return arrow go back to?
-
-The print happens inside the **inner** loop, so its return arrow goes back to the **inner** hexagon (`col = 1 to 4`), not the outer one. Only once the inner hexagon has cycled through all of `col`'s values does flow return to the **outer** hexagon (`row = 1 to 3`), which then either starts a fresh inner loop for the next `row`, or moves on to End.
-
-Picture it as two loops stacked, not two loops side by side: the whole inner hexagon-and-print cycle sits *inside* the outer loop's body, the same way the inner `for` sits inside the outer `for`'s braces in the code.
-
-### The trap
-
-If your print's return arrow goes straight to the outer hexagon instead of the inner one, your chart says the inner loop only ever runs once per row: which is a completely different (and much smaller) program than the one you're charting.
+The inner loop is a step **inside** the outer loop's body, so it restarts from `1` for every row, and the print goes back to the inner hexagon. Only when `col` has run through all four values does the flow return to the outer hexagon for the next `row`. Two loops side by side would be a different, much smaller program.
 
 ### Before you submit
 
-Press **Check my diagram**. The checks confirm a legal flowchart: one Start, one End, nothing floating, at least five shapes, every path reaching the End. They can't tell whether the return arrows land on the right hexagon, so trace `row 1` through both hexagons by hand and compare against the code's expected output before you call it done.
-
-No points, no AI grader. Redraw as often as you like.
+Press **Grade**, then trace `row 1` by hand: col 1, 2, 3, 4, and only then `row 2`. Twelve lines print in all.

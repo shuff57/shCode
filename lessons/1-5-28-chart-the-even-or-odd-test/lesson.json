@@ -1,55 +1,153 @@
 {
   "id": "1-5-28-chart-the-even-or-odd-test",
-  "title": "1.5.28 Chart the Even-or-Odd Test",
-  "description": "Five shapes: get a number, ask whether it is even, print one of two answers, rejoin. Your first chart, ungraded.",
+  "title": "1.5.28 Plain English to Pseudocode: Even or Odd",
+  "description": "Turn plain-English steps into pseudocode: get a number, ask whether it is even, print one of two answers, then end. Your first pseudocode practice, ungraded.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "slos": [
     "SLO-3"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      }
-    ]
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([the program starts]) --> B[get a number]\n  B --> C{is the number even?}\n  C -- yes --> D[/print even/]\n  C -- no --> E[/print odd/]\n  D --> Z([the program ends])\n  E --> Z",
+    "caption": "The even-or-odd test: one diamond with two labelled exits, and both exits reach the same end."
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn the plain-English steps into pseudocode",
+      "instructions": "Here is the plan in plain English:\n\n**1.** Get a number.\n\n**2.** Check whether the number is even.\n\n**3.** If it is, print `even`. Otherwise, print `odd`.\n\n**4.** Either way, the program then ends.\n\nThe same plan is drawn as a flow chart above the editor (open the Flow Chart bar). You do not draw it, you read it: the diamond is the question, both exits are labelled `yes` and `no`, and **both** exits reach the same end.\n\nIn `README.md`, type these as numbered pseudocode **between the first and last line**. Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `SET lives TO 3` or `GET lives` (start a value, or ask for one)\n- `IF lives is 0` ... `ELSE` ... `END IF` (a check with two answers, the steps inside indented)\n- `PRINT lives` (show something)\n\nPlain English is fine. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, trace it twice by hand: once with `4` and once with `7`. Each one should print exactly one word, and then the program should end.",
+      "hints": [
+        "The ELSE branch is the other answer to the same question, not a second question.",
+        "Close the check with END IF, so both answers meet again before the program ends."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Get a number first",
+      "description": "A step that gets (or sets) the number before it is checked.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:get|gets|input|ask|read|enter|prompt|pick|choose|receive|take|set|let|store)\\w*\\b[^\\n]*\\b(?:number|num|value|n|x)\\b",
+      "hint": "Start with a step that gets the number.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "The question is even",
+      "description": "Check whether the number is even.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:^|\\n)(?=[^\\n]*\\b(?:IF|CHECK|WHETHER|ASK|IS|DOES|TEST)\\b)(?=[^\\n]*(?:\\beven\\b|\\bMOD\\b|%\\s*2|\\bremainder\\b|\\bdivisible\\b|\\bdivides\\b|\\bdivided\\b))",
+      "hint": "Add a check: is the number even?",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Even is the yes answer",
+      "description": "even is printed when the number is even.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:IF|WHEN|THEN)\\b[\\s\\S]*?\\b(?:print|show|display|say|output|write|log|report)\\w*\\b[^\\n]*\\beven\\b[\\s\\S]*\\b(?:ELSE|OTHERWISE)\\b",
+      "hint": "Put the even message under the yes answer, before the ELSE.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Odd is the ELSE answer",
+      "description": "odd is printed in the other branch.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:ELSE|OTHERWISE)\\b[\\s\\S]*?\\b(?:print|show|display|say|output|write|log|report)\\w*\\b[^\\n]*\\bodd\\b",
+      "hint": "Put the odd message under ELSE.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Both answers rejoin",
+      "description": "The check is closed (END IF) so both branches reach the same end.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:END[\\s-]*IF|ENDIF)\\b",
+      "hint": "Close the check with END IF before the last line.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: get a number; if the number is even, print \"even\"; otherwise print \"odd\". Both branches then rejoin at the same end (the check is closed with END IF, nothing else is needed after it). The point is one question with two answers that meet again. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, ELSE, END IF, FOR EACH, END FOR, CALL, PRINT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite (for example the odd answer missing, the two messages under the wrong answers, or the check never closed (no END IF)). Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Get a number first",
+        "description": "A step that gets (or sets) the number before it is checked.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The question is even",
+        "description": "Check whether the number is even.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Even is the yes answer",
+        "description": "even is printed when the number is even.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Odd is the ELSE answer",
+        "description": "odd is printed in the other branch.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Both answers rejoin",
+        "description": "The check is closed (END IF) so both branches reach the same end.",
+        "points": 1
+      }
+    ]
+  }
 }

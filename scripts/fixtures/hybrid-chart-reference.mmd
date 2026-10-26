@@ -1,0 +1,15 @@
+flowchart TD
+  A([Start])
+  B[Set base to 100]
+  C[[showPriceWithTax of base]]
+  D{Is base over 80?}
+  F[/Print Over budget/]
+  G[/Print Within budget/]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D -- "yes" --> F
+  D -- "no" --> G
+  F --> Z
+  G --> Z

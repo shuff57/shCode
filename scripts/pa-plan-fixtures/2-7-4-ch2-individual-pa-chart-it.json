@@ -1,0 +1,62 @@
+{
+  "reference": [
+    {
+      "name": "Step Counter",
+      "text": "Problem: Step Counter\nSTART\nINPUT stepsGoal\nSET stepsSoFar TO 0\nFOR d = 1 TO 7\n    INPUT the steps for day d\n    SET stepsSoFar TO stepsSoFar + the steps for day d\nEND FOR\nSET remaining TO stepsGoal - stepsSoFar\nSWITCH\n    CASE remaining < 0\n        PRINT \"goal exceeded\"\n    CASE remaining == 0\n        PRINT \"goal met\"\n    CASE remaining > 0\n        PRINT \"not yet reached\"\nEND SWITCH\nEND"
+    },
+    {
+      "name": "Battery Life",
+      "text": "Problem: Battery Life\nSTART\nINPUT batteryPercent\nINPUT hoursPerCharge\nINPUT tripHours\nSET chargeLeft TO batteryPercent\nSET hoursRemaining TO 0\nSET percentPerHour TO 100 / hoursPerCharge\nWHILE chargeLeft > 0\n    SET chargeLeft TO chargeLeft - percentPerHour\n    SET hoursRemaining TO hoursRemaining + 1\nEND WHILE\nIF hoursRemaining > tripHours\n    PRINT \"the battery will last\"\nELSE IF hoursRemaining == tripHours\n    PRINT \"exactly enough\"\nELSE\n    PRINT \"the battery dies early\"\nEND IF\nEND"
+    },
+    {
+      "name": "Tip Calculator",
+      "text": "Problem: Tip Calculator\nSTART\nINPUT bill\nINPUT tipPercent\nINPUT people\nINPUT maxEach\nSET tip TO bill * tipPercent / 100\nSET tipPerPerson TO 0\nFOR EACH person IN the people\n    SET tipPerPerson TO tip / people\nEND FOR\nSWITCH\n    CASE tipPerPerson > maxEach\n        PRINT \"too high\"\n    CASE tipPerPerson == maxEach\n        PRINT \"tight\"\n    CASE tipPerPerson < maxEach\n        PRINT \"acceptable\"\nEND SWITCH\nEND"
+    },
+    {
+      "name": "Step Counter, plain words, total and compare with the goal",
+      "text": "Step counter\nget the daily goal\nthe running total of steps starts at 0\nrepeat for each of the walks today\n    add the steps from that walk to the running total\nonce all the walks are added, work out the steps remaining as the goal minus the total\nif the steps remaining is below 0\n    say the goal is exceeded\notherwise if the steps remaining is exactly 0\n    say the goal is met\notherwise\n    say the goal is not yet reached"
+    },
+    {
+      "name": "Battery Life, different keywords, hour by hour",
+      "text": "Battery Life\nREAD percent, hoursPerCharge, tripLength\nhours = 0\ncharge = percent\nLOOP WHILE charge > 0\n    charge -= 100 / hoursPerCharge\n    hours += 1\nENDLOOP\nIF hours < tripLength THEN SAY \"dies early\"\nIF hours = tripLength THEN SAY \"exactly enough\"\nIF hours > tripLength THEN SAY \"lasts\""
+    },
+    {
+      "name": "Tip Calculator, plain words, dealt out one person at a time",
+      "text": "Tip calculator\nget the bill, the tip percentage, the number of people and the most each person will pay\nwork out the whole tip from the bill and the percentage\nstart the tip per person at 0\nfor every person in the group\n    give that person an equal share, the whole tip divided by the number of people, as the tip per person\ncompare the tip per person with the most each person will pay\nif it is more than the most, report too high\nif it is exactly the most, report tight\nif it is less than the most, report acceptable"
+    }
+  ],
+  "mustNotPass": [
+    {
+      "name": "wrong plan: comparison inside the loop",
+      "text": "Problem: Step Counter\nSTART\nINPUT stepsGoal\nSET stepsSoFar TO 0\nFOR d = 1 TO 7\n    INPUT the steps for day d\n    SET stepsSoFar TO stepsSoFar + the steps for day d\n    IF stepsSoFar > stepsGoal\n        PRINT \"goal exceeded\"\n    ELSE IF stepsSoFar == stepsGoal\n        PRINT \"goal met\"\n    ELSE\n        PRINT \"not yet reached\"\n    END IF\nEND FOR\nEND"
+    },
+    {
+      "name": "wrong plan: Tip Calculator with the outcomes reversed",
+      "text": "Problem: Tip Calculator\nSTART\nINPUT bill\nINPUT tipPercent\nINPUT people\nINPUT maxEach\nSET tip TO bill * tipPercent / 100\nFOR EACH person IN the people\n    SET tipPerPerson TO tip / people\nEND FOR\nIF tipPerPerson > maxEach\n    PRINT \"acceptable\"\nELSE IF tipPerPerson == maxEach\n    PRINT \"tight\"\nELSE\n    PRINT \"too high\"\nEND IF\nEND"
+    },
+    {
+      "name": "wrong plan: Battery Life where the exactly-enough outcome cannot be reached",
+      "text": "Problem: Battery Life\nSTART\nINPUT batteryPercent\nINPUT hoursPerCharge\nINPUT tripHours\nSET chargeLeft TO batteryPercent\nSET hoursRemaining TO 0\nWHILE chargeLeft > 0\n    SET chargeLeft TO chargeLeft - 100 / hoursPerCharge\n    SET hoursRemaining TO hoursRemaining + 1\nEND WHILE\nIF hoursRemaining >= tripHours\n    PRINT \"the battery will last\"\nELSE\n    PRINT \"the battery dies early\"\nEND IF\nEND"
+    },
+    {
+      "name": "wrong plan: Step Counter that reports words from Battery Life",
+      "text": "Problem: Step Counter\nSTART\nINPUT stepsGoal\nSET stepsSoFar TO 0\nFOR d = 1 TO 7\n    INPUT the steps for day d\n    SET stepsSoFar TO stepsSoFar + the steps for day d\nEND FOR\nIF stepsSoFar > stepsGoal\n    PRINT \"the battery will last\"\nELSE IF stepsSoFar == stepsGoal\n    PRINT \"exactly enough\"\nELSE\n    PRINT \"the battery dies early\"\nEND IF\nEND"
+    },
+    {
+      "name": "wrong plan: loop body of junk steps",
+      "text": "Problem: Tip Calculator\nSTART\nINPUT bill\nINPUT tipPercent\nINPUT people\nINPUT maxEach\nFOR EACH person IN people\n    do stuff\n    think about the tip\nEND FOR\nPRINT the result\nEND"
+    },
+    {
+      "name": "wrong plan: right skeleton for the wrong numbers (compares the bill, not the tip per person)",
+      "text": "Problem: Tip Calculator\nSTART\nINPUT bill\nINPUT tipPercent\nINPUT people\nINPUT maxEach\nFOR EACH person IN people\n    SET total TO total + bill\nEND FOR\nIF total > 100\n    PRINT \"too high\"\nEND IF\nEND"
+    },
+    {
+      "name": "wrong plan: no loop and a single report",
+      "text": "Problem: Battery Life\nSTART\nINPUT batteryPercent\nINPUT hoursPerCharge\nINPUT tripHours\nSET hoursRemaining TO batteryPercent / 100 * hoursPerCharge\nPRINT hoursRemaining\nEND"
+    },
+    {
+      "name": "wrong plan: Battery Life with the comparison against the wrong limit and two outcomes only",
+      "text": "Problem: Battery Life\nSTART\nINPUT batteryPercent\nINPUT hoursPerCharge\nINPUT tripHours\nSET hoursRemaining TO 0\nSET chargeLeft TO batteryPercent\nWHILE chargeLeft > 0\n    SET chargeLeft TO chargeLeft - 10\n    SET hoursRemaining TO hoursRemaining + 1\nEND WHILE\nIF hoursRemaining > batteryPercent\n    PRINT \"lasts\"\nELSE\n    PRINT \"dies early\"\nEND IF\nEND"
+    }
+  ]
+}

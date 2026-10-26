@@ -1,12 +1,14 @@
 {
   "id": "2-2-12-a5-2-flowchart-decision",
-  "title": "2.2.7 Flowchart a Decision",
-  "description": "Draw the ticket-price algorithm as a flowchart. One start, one decision diamond with two labelled exits, one end. Green here unlocks 2.2.8 A2.2.1 (Part A).",
+  "title": "2.2.7 Write a Decision as Pseudocode",
+  "description": "Turn a written ticket-price algorithm into numbered pseudocode: get the age, one question with two answers, and print the price. Green here unlocks the 2.2.8 A2.2.1 (Part A) plan.",
   "type": "assignment",
+  "assignmentCode": "A2.2.0",
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "week": 6,
   "slos": [
     "SLO-4"
@@ -14,83 +16,143 @@
   "sourceRef": "designed: A2.2.0 flowchart gate per curriculum-plan.md §2.2 (0-pt structural gate; A2.2.1 stays locked until this is green); plan text describes charting the loop/hexagon counting problem for A2.2.1, but this lesson charts a decision instead: mismatch flagged in build report, kept as shipped 2026-08-15 pilot content",
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      }
-    ],
-    "aiGrader": {
-      "rubricTitle": "Ticket-price flowchart: AI-graded rubric",
-      "model": "glm-5.3-flash:cloud",
-      "contextDocs": [],
-      "prompt": "Draw a flowchart for this algorithm:\n\n1. Start.\n2. Get the customer's age.\n3. If the age is under 13, the ticket costs $8. Otherwise the ticket costs $14.\n4. Print the ticket price.\n5. End.\n\nUse an oval for Start and for End, a rectangle for each task, and a diamond for the decision. Label both arrows leaving the diamond so a reader knows which answer goes which way.",
-      "rubric": [
-        {
-          "id": "gets-age",
-          "title": "Gets the age before deciding",
-          "description": "A task or input shape that obtains the customer's age appears on the path between Start and the decision diamond. Credit any reasonable wording: 'get age', 'ask for age', 'input age', or even just 'age' labeled on an input step. If the diagram jumps straight from Start to the decision with no step that obtains the age, that is a real structural gap - the diamond has nothing to test - so do not credit it, but be generous about how the step itself is worded or drawn.",
-          "points": 0
-        },
-        {
-          "id": "correct-condition",
-          "title": "Diamond asks the right question",
-          "description": "The decision diamond tests the customer's age against 13, for example 'age < 13', 'under 13?', 'age less than 13'. Accept an equivalent inverted test such as 'age >= 13' as long as the branches below it are consistent with the direction of the test. Be generous about exact phrasing or how the number is presented. If the condition tests a different number entirely or a different quantity than age, that is testing the wrong thing rather than just being imprecise about the right thing, so do not credit it.",
-          "points": 0
-        },
-        {
-          "id": "both-prices",
-          "title": "Both prices appear on the correct branches",
-          "description": "One branch out of the diamond leads to $8 and the other to $14, and the branch labels match the condition. If the diamond asks 'age < 13', the yes branch must reach $8 and the no branch $14; if it asks 'age >= 13', the mapping is reversed. Be generous about how the branches are labeled - 'yes'/'no', 'true'/'false', or the literal condition text all count. But a missing price, both branches carrying the same price, or prices swapped relative to the condition mean the algorithm itself is wrong rather than just messily drawn, so do not credit those.",
-          "points": 0
-        },
-        {
-          "id": "rejoins-and-prints",
-          "title": "Both branches lead onward to the End",
-          "description": "Neither branch is a dead end: following either answer out of the diamond eventually reaches the End oval, whether the two paths rejoin at a shared 'print the price' step or each prints separately before ending. Any structure that gets both branches to the End counts - only withhold credit if a branch genuinely stops with nothing after it.",
-          "points": 0
-        },
-        {
-          "id": "shape-meaning",
-          "title": "Shapes are used for what they mean",
-          "description": "Ovals are used only for Start and End, the diamond is used only for the question, and rectangles (or input/output parallelograms) carry the actions. Small variation in exactly which action lands in which action-shaped box is fine. But if the question ends up drawn as a rectangle instead of a diamond, or an action is drawn as a diamond, the shapes are no longer carrying their meaning - which is the whole point of shape vocabulary - so do not credit that.",
-          "points": 0
-        }
-      ]
-    }
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([the program starts]) --> B[/get the swimmer's height/]\n  B --> C{is height at least 120?}\n  C -- yes --> D[set lane to deep end]\n  C -- no --> E[set lane to shallow end]\n  D --> F[/print lane/]\n  E --> F\n  F --> Z([the program ends])",
+    "caption": "A different decision to study (a swimming-pool lane), not your answer: get the value, ask one question, label both exits, and let both reach the print."
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "completionCredit": true
   },
-  "steps": [],
-  "requirements": [],
-  "assignmentCode": "A2.2.0"
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the ticket-price algorithm as pseudocode",
+      "instructions": "A movie theatre charges by age. Here is the algorithm in plain English:\n\n**1.** Start.\n\n**2.** Get the customer's age.\n\n**3.** If the age is under `13`, the ticket costs `$8`. Otherwise the ticket costs `$14`.\n\n**4.** Print the ticket price.\n\n**5.** End.\n\nThe chart above the editor (open the Flow Chart bar) shows a **different** decision, a swimming-pool lane, so you can see the shape of one: get the value, ask one question, both answers labelled, both reaching the print. It is not your answer. You design yours from the steps above.\n\nIn `README.md`, type your steps as numbered pseudocode **between the first and last line** (those two lines are Start and End). Number every line, including indented ones. Each keyword looks like this, in a different program:\n\n- `INPUT height` (get a value from the user)\n- `IF height is 120 or more` ... `ELSE` ... `END IF` (a check with two answers, the steps inside indented)\n- `SET lane TO \"deep\"` (start or change a value)\n- `PRINT lane` (show something)\n\nPlain English is fine. Press **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\nBefore you submit, trace it twice by hand: once with age `9` and once with age `30`. Each should print a price.\n\nGetting this green unlocks the 2.2.8 A2.2.1 (Part A) plan next: the same plan-before-you-write habit you will use for every graded project from here on.",
+      "hints": [
+        "Get the age first: you cannot test a value you have not got yet.",
+        "ELSE is the other answer to the same question. Set one price under the IF and the other under the ELSE.",
+        "Print the price after END IF so it prints whichever answer was taken."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Gets the age before deciding",
+      "description": "Get the customer's age (input, ask, read) before the check.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:input|get|ask|read|enter|prompt|receive|obtain|type)\\w*\\b[^\\n]*\\bage\\b[\\s\\S]*\\b(?:IF|CHECK|WHETHER)\\b",
+      "hint": "Add a step that gets the age before the IF.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "The question is about 13",
+      "description": "Check the age against 13 (under 13, or 13 or over).",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:^|\\n)(?=[^\\n]*\\b(?:IF|CHECK|WHETHER|ASK|IS|DOES)\\b)(?=[^\\n]*\\bage\\b)(?=[^\\n]*(?:<|>|\\b(?:under|below|less|fewer|younger|over|above|older|greater|more|least|at|than)\\b))(?=[^\\n]*\\b(?:13|thirteen)\\b)",
+      "hint": "Add a check that compares the age with 13.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Right price for each answer",
+      "description": "Under 13 costs $8 and 13 or over costs $14, on the matching branches.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:IF|CHECK|WHETHER|IS)\\b[^\\n]*(?:<(?!=)|\\b(?:under|below|less|fewer|younger)\\b)[^\\n]*\\n(?:(?!\\b(?:ELSE|OTHERWISE)\\b)[\\s\\S])*?\\b8\\b[\\s\\S]*?\\b(?:ELSE|OTHERWISE)\\b[\\s\\S]*?\\b14\\b|\\b(?:IF|CHECK|WHETHER|IS)\\b[^\\n]*(?:>|\\b(?:over|above|older|greater|more|least)\\b)[^\\n]*\\n(?:(?!\\b(?:ELSE|OTHERWISE)\\b)[\\s\\S])*?\\b14\\b[\\s\\S]*?\\b(?:ELSE|OTHERWISE)\\b[\\s\\S]*?\\b8\\b",
+      "hint": "Under 13 gets $8 and 13 or over gets $14. Check each price is on the right branch.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Both answers are written",
+      "description": "The decision has an ELSE (the other answer) and is closed with END IF.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:ELSE|OTHERWISE)\\b[\\s\\S]*\\b(?:END[\\s-]*IF|ENDIF)\\b",
+      "hint": "Write the other answer under ELSE and close the check with END IF.",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Prints the price",
+      "description": "The ticket price is printed.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:print|show|display|output|say|write|log|report)\\w*\\b[^\\n]*(?:price|cost|ticket|\\$|\\b8\\b|\\b14\\b)",
+      "hint": "Add a step that prints the ticket price.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The algorithm is: get the customer's age; if the age is under 13 the ticket price is $8, otherwise $14; print the ticket price. In JavaScript: const age = Number(prompt(\"Age?\")); let price; if (age < 13) { price = 8; } else { price = 14; } console.log(price). The point is one question about 13 with two answers carrying the right prices ($8 for under 13, $14 for 13 and over), with the age obtained before the question and the price printed. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, ELSE, END IF, FOR EACH, END FOR, CALL, PRINT, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite (for example no step that gets the age, the two prices swapped, or no step that prints the price). Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Gets the age before deciding",
+        "description": "Get the customer's age (input, ask, read) before the check.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The question is about 13",
+        "description": "Check the age against 13 (under 13, or 13 or over).",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Right price for each answer",
+        "description": "Under 13 costs $8 and 13 or over costs $14, on the matching branches.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Both answers are written",
+        "description": "The decision has an ELSE (the other answer) and is closed with END IF.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Prints the price",
+        "description": "The ticket price is printed.",
+        "points": 1
+      }
+    ]
+  }
 }

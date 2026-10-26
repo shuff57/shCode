@@ -1,0 +1,66 @@
+{
+  "reference": [
+    {
+      "name": "Locker Sweep (keywords)",
+      "text": "Problem: Locker Sweep\nSTART\nINPUT n\nINPUT bankName\nIF n < 1\n    THROW \"n must be at least 1\"\nEND IF\nSET openCount TO 0\nFOR i = 1 TO n\n    IF i is a multiple of 3\n        CONTINUE\n    END IF\n    FLIP the state of locker i\n    IF locker i is now open\n        SET openCount TO openCount + 1\n    ELSE\n        SET openCount TO openCount - 1\n    END IF\nEND FOR\nSWITCH the state of locker 7\n    CASE open\n        SET verdict TO \"open\"\n    CASE closed\n        SET verdict TO \"closed\"\n    CASE never touched\n        SET verdict TO \"never touched\"\nEND SWITCH\nPRINT bankName\nPRINT verdict\nPRINT openCount\nEND"
+    },
+    {
+      "name": "Word Audit",
+      "text": "Problem: Word Audit\nSTART\nINPUT word\nIF word is an empty string\n    THROW \"nothing to audit\"\nEND IF\nSET vowels TO 0\nSET digits TO 0\nSET others TO 0\nFOR EACH character IN word\n    IF character is a space\n        CONTINUE\n    END IF\n    SWITCH the kind of character\n        CASE vowel\n            SET vowels TO vowels + 1\n        CASE digit\n            SET digits TO digits + 1\n        CASE anything else\n            SET others TO others + 1\n    END SWITCH\nEND FOR\nPRINT word\nPRINT vowels\nPRINT digits\nPRINT others\nEND"
+    },
+    {
+      "name": "Savings Run",
+      "text": "Problem: Savings Run\nSTART\nINPUT deposit\nINPUT target\nINPUT weeks\nIF target < 0\n    THROW \"target cannot be negative\"\nEND IF\nSET balance TO 0\nSET hitWeek TO 0\nFOR week = 1 TO weeks\n    IF week is a multiple of 4\n        CONTINUE\n    END IF\n    SET balance TO balance + deposit\n    IF balance >= target\n        SET hitWeek TO week\n        BREAK\n    END IF\nEND FOR\nSWITCH\n    CASE hitWeek is 0\n        SET result TO \"missed the target\"\n    CASE hitWeek is weeks\n        SET result TO \"hit on the last week\"\n    CASE hitWeek is less than weeks\n        SET result TO \"hit early\"\nEND SWITCH\nPRINT result\nPRINT balance\nEND"
+    },
+    {
+      "name": "Coin Drawer",
+      "text": "Problem: Coin Drawer\nSTART\nINPUT amount\nINPUT the supply of quarters, dimes, nickels and pennies\nIF amount < 0\n    THROW \"amount cannot be negative\"\nEND IF\nSET the count of each coin TO 0\nWHILE amount > 0\n    IF the drawer has no coins left\n        BREAK\n    END IF\n    SET coin TO the largest coin that is no more than amount and still in the drawer\n    SWITCH coin\n        CASE quarter\n            PRINT \"quarter\"\n        CASE dime\n            PRINT \"dime\"\n        CASE nickel\n            PRINT \"nickel\"\n        CASE penny\n            PRINT \"penny\"\n    END SWITCH\n    SUBTRACT the value of coin FROM amount\n    ADD 1 TO the count of coin\n    TAKE one coin out of the drawer\nEND WHILE\nPRINT the count of quarters\nPRINT the count of dimes\nPRINT the count of nickels\nPRINT the count of pennies\nEND"
+    },
+    {
+      "name": "Locker Sweep, plain words, chain of IFs",
+      "text": "Locker Sweep\nget n, the number of lockers, and the name of the bank\nif n is less than 1\n    stop with an error saying n is bad\nall lockers start closed, and the open count starts at 0\nrepeat for every locker number from 1 up to n\n    if the number is a multiple of 3\n        skip this locker and go on to the next one\n    flip the locker (closed becomes open, open becomes closed)\n    if it is open now, add 1 to the open count, otherwise take 1 off\nafter the walk, look at locker 7\nif locker 7 is open\n    the verdict is open\notherwise if locker 7 is closed\n    the verdict is closed\notherwise\n    the verdict is never touched\nshow the bank name, the verdict and the open count"
+    },
+    {
+      "name": "Coin Drawer, plain words, different keywords",
+      "text": "Coin Drawer\nread the amount and how many of each coin are in the drawer\nif the amount is below zero, throw an error and stop\nset all four coin counts to zero\nloop while there is still money left to give\n    if the drawer is completely empty, leave the loop\n    pick the biggest coin that fits in what is left and is still in the drawer\n    depending on which coin it is (quarter, dime, nickel or penny), say its name out loud\n    take its value off the amount, add one to its count, remove it from the drawer\nafter the loop, show how many quarters, dimes, nickels and pennies went out"
+    },
+    {
+      "name": "Savings Run, chain of IFs, WHILE loop",
+      "text": "Savings Run\nINPUT deposit, target, weeks\nIF target < 0 THEN throw an error\nSET balance = 0\nSET week = 0\nSET hit = false\nWHILE week < weeks\n    SET week = week + 1\n    IF week is a multiple of 4: CONTINUE\n    balance = balance + deposit\n    IF balance >= target\n        hit = true\n        BREAK\nEND WHILE\nIF hit is false\n    PRINT \"missed\"\nELSE IF week == weeks\n    PRINT \"hit on the last week\"\nELSE\n    PRINT \"hit early\"\nPRINT balance"
+    }
+  ],
+  "mustNotPass": [
+    {
+      "name": "wrong plan: skip and flip reversed, classification inside the loop, no guard",
+      "text": "Problem: Locker Sweep\nSTART\nINPUT n\nFOR i = 1 TO n\n    IF i is a multiple of 3\n        FLIP the state of locker i\n    ELSE\n        CONTINUE\n    END IF\n    IF locker 7 is open\n        PRINT \"closed\"\n    ELSE\n        PRINT \"open\"\n    END IF\nEND FOR\nEND"
+    },
+    {
+      "name": "wrong plan: Savings Run with CONTINUE and BREAK swapped, no guard",
+      "text": "Problem: Savings Run\nSTART\nINPUT deposit\nINPUT target\nSET balance TO 0\nFOR week = 1 TO 52\n    IF week is a multiple of 4\n        BREAK\n    END IF\n    SET balance TO balance + deposit\n    IF balance >= target\n        CONTINUE\n    END IF\nEND FOR\nPRINT balance\nEND"
+    },
+    {
+      "name": "wrong plan: Word Audit that skips digits so digit is unreachable, spaces are counted and nothing is reported",
+      "text": "Problem: Word Audit\nSTART\nINPUT word\nSET vowels TO 0\nSET others TO 0\nFOR EACH character IN word\n    IF character is a digit\n        CONTINUE\n    END IF\n    IF character is a vowel\n        SET vowels TO vowels + 1\n    ELSE\n        SET others TO others + 1\n    END IF\nEND FOR\nEND"
+    },
+    {
+      "name": "wrong plan: Coin Drawer with words from Savings Run",
+      "text": "Problem: Coin Drawer\nSTART\nINPUT deposit\nINPUT target\nSET balance TO 0\nFOR week = 1 TO 10\n    SET balance TO balance + deposit\nEND FOR\nPRINT \"you saved\" balance\nEND"
+    },
+    {
+      "name": "wrong plan: body of junk steps",
+      "text": "Problem: Coin Drawer\nSTART\nINPUT amount\nWHILE amount > 0\n    do stuff\n    handle the coins\n    do more stuff\nEND WHILE\nPRINT the result\nEND"
+    },
+    {
+      "name": "wrong plan: right skeleton, wrong numbers (multiple of 5, locker 3, no guard)",
+      "text": "Problem: Locker Sweep\nSTART\nINPUT n\nFOR i = 1 TO n\n    IF i is a multiple of 5\n        CONTINUE\n    END IF\n    FLIP the state of locker i\nEND FOR\nSWITCH the state of locker 3\n    CASE open\n        PRINT \"open\"\n    CASE closed\n        PRINT \"closed\"\nEND SWITCH\nEND"
+    },
+    {
+      "name": "wrong plan: no loop at all, one line for everything",
+      "text": "Problem: Savings Run\nSTART\nINPUT deposit\nINPUT target\nwork out how many weeks of deposits it takes to reach the target\nPRINT the answer\nEND"
+    },
+    {
+      "name": "wrong plan: Word Audit with vowel and digit counts swapped and the skip ending the loop",
+      "text": "Problem: Word Audit\nSTART\nINPUT word\nSET vowels TO 0\nSET digits TO 0\nSET others TO 0\nFOR EACH character IN word\n    IF character is a space\n        BREAK\n    END IF\n    IF character is a vowel\n        SET digits TO digits + 1\n    ELSE IF character is a digit\n        SET vowels TO vowels + 1\n    ELSE\n        SET others TO others + 1\n    END IF\nEND FOR\nPRINT vowels\nEND"
+    }
+  ]
+}

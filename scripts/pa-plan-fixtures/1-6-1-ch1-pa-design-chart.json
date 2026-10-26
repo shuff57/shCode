@@ -1,0 +1,70 @@
+{
+  "reference": [
+    {
+      "name": "Slice Economics",
+      "text": "Problem: Slice Economics\nPartners: Ana and Ben\n\nPLAN\nSTART\nINPUT pizzeria name\nINPUT pizza price\nINPUT number of slices\nSET cost per slice TO pizza price / number of slices\nIF cost per slice <= 2.00 THEN\n    PRINT pizzeria name and \"is a good deal\"\nELSE\n    PRINT pizzeria name and \"costs more than $2.00 a slice\"\nEND IF\nEND"
+    },
+    {
+      "name": "Split the Check",
+      "text": "Problem: Split the Check\nPartners: Cy and Dee\n\nPLAN\nSTART\nINPUT restaurant name\nINPUT bill total\nINPUT tip percentage\nINPUT number of people\nSET total with tip TO bill total + bill total * tip percentage / 100\nSET cost per person TO total with tip / number of people\nIF cost per person <= 15.00 THEN\n    PRINT restaurant name and \"everyone is within what they said they would spend\"\nELSE\n    PRINT restaurant name and \"each person is over the $15.00 they agreed to\"\nEND IF\nEND"
+    },
+    {
+      "name": "Grade Forecast",
+      "text": "Problem: Grade Forecast\nPartners: Eli and Fay\n\nPLAN\nSTART\nINPUT student name\nINPUT homework percentage\nINPUT labs percentage\nINPUT test percentage\nSET weighted average TO homework * 0.30 + labs * 0.30 + test * 0.40\nIF weighted average >= 70 THEN\n    PRINT student name and \"is on track to pass\"\nELSE\n    PRINT student name and \"is below the passing mark\"\nEND IF\nEND"
+    },
+    {
+      "name": "Fuel Stop",
+      "text": "Problem: Fuel Stop\nPartners: Gus and Hal\n\nPLAN\nSTART\nINPUT car name\nINPUT miles per gallon\nINPUT gallons the tank holds\nSET distance on a full tank TO miles per gallon * gallons\nIF distance on a full tank >= 275 THEN\n    PRINT car name and \"can make the trip without a gas stop\"\nELSE\n    PRINT car name and \"will need a gas stop\"\nEND IF\nEND"
+    },
+    {
+      "name": "different words and keywords (Slice Economics, lowercase, ask/otherwise/say)",
+      "text": "Problem: Slice Economics\nPartners: Ivy and Jo\n\nPLAN\nstart\nask for the name of the pizza place\nask for the price of the pizza\nask for how many slices it has\nwork out the cost per slice: the price divided by the slices\nif the cost per slice is $2.00 or less\n    say that the place is a good deal\notherwise\n    say that it costs too much per slice\nend"
+    },
+    {
+      "name": "different words and keywords (Fuel Stop, reversed question, branches swapped to match)",
+      "text": "Problem: Fuel Stop\nPartners: Kai and Lu\n\nPLAN\nBEGIN\nGET car name\nGET miles per gallon\nGET tank size in gallons\nSET miles on one tank = miles per gallon times tank size\nIF miles on one tank < 275 THEN\n    OUTPUT the car needs a gas stop\nELSE\n    OUTPUT no gas stop is needed\nEND IF\nSTOP"
+    },
+    {
+      "name": "terse Split the Check, tip as a decimal",
+      "text": "Problem: Split the Check\nPartners: Mo and Ned\n\nSTART\nINPUT place\nINPUT bill\nINPUT tip percent\nINPUT people\nSET each TO bill * (1 + tip percent / 100) / people\nIF each <= 15 THEN\n    PRINT \"Everyone is fine at \" each\nELSE\n    PRINT \"Over $15.00 each\"\nEND IF\nEND"
+    }
+  ],
+  "mustNotPass": [
+    {
+      "name": "outcomes reversed (Slice Economics)",
+      "text": "Problem: Slice Economics\nPartners: Ana and Ben\n\nSTART\nINPUT pizzeria name\nINPUT pizza price\nINPUT number of slices\nSET cost per slice TO pizza price / number of slices\nIF cost per slice <= 2.00 THEN\n    PRINT \"costs more than $2.00 a slice\"\nELSE\n    PRINT \"is a good deal\"\nEND IF\nEND"
+    },
+    {
+      "name": "wrong operation: price times slices (Slice Economics)",
+      "text": "Problem: Slice Economics\nPartners: Ana and Ben\n\nSTART\nINPUT pizzeria name\nINPUT pizza price\nINPUT number of slices\nSET cost per slice TO pizza price * number of slices\nIF cost per slice <= 2.00 THEN\n    PRINT \"good deal\"\nELSE\n    PRINT \"too expensive\"\nEND IF\nEND"
+    },
+    {
+      "name": "tip never added (Split the Check)",
+      "text": "Problem: Split the Check\nPartners: Cy and Dee\n\nSTART\nINPUT restaurant name\nINPUT bill total\nINPUT tip percentage\nINPUT number of people\nSET cost per person TO bill total / number of people\nIF cost per person <= 15.00 THEN\n    PRINT \"everyone is within budget\"\nELSE\n    PRINT \"each person is over $15.00\"\nEND IF\nEND"
+    },
+    {
+      "name": "one branch only: no ELSE report (Grade Forecast)",
+      "text": "Problem: Grade Forecast\nPartners: Eli and Fay\n\nSTART\nINPUT student name\nINPUT homework percentage\nINPUT labs percentage\nINPUT test percentage\nSET weighted average TO homework * 0.30 + labs * 0.30 + test * 0.40\nIF weighted average >= 70 THEN\n    PRINT \"on track to pass\"\nEND IF\nEND"
+    },
+    {
+      "name": "report before the decision, same words on both sides (Fuel Stop)",
+      "text": "Problem: Fuel Stop\nPartners: Gus and Hal\n\nSTART\nINPUT car name\nINPUT miles per gallon\nINPUT gallons\nPRINT \"checking the trip\"\nSET distance TO miles per gallon * gallons\nIF distance >= 275 THEN\n    PRINT \"result ready\"\nELSE\n    PRINT \"result ready\"\nEND IF\nEND"
+    },
+    {
+      "name": "correct skeleton, limit from a different problem (Grade Forecast with 275)",
+      "text": "Problem: Grade Forecast\nPartners: Eli and Fay\n\nSTART\nINPUT student name\nINPUT homework percentage\nINPUT labs percentage\nINPUT test percentage\nSET weighted average TO homework * 0.30 + labs * 0.30 + test * 0.40\nIF weighted average >= 275 THEN\n    PRINT \"on track to pass\"\nELSE\n    PRINT \"below the passing mark\"\nEND IF\nEND"
+    },
+    {
+      "name": "words from a different problem: Fuel Stop outcomes on a Slice Economics plan",
+      "text": "Problem: Slice Economics\nPartners: Ana and Ben\n\nSTART\nINPUT pizzeria name\nINPUT pizza price\nINPUT number of slices\nSET cost per slice TO pizza price / number of slices\nIF cost per slice <= 2.00 THEN\n    PRINT \"no gas stop is needed\"\nELSE\n    PRINT \"the car will need a gas stop\"\nEND IF\nEND"
+    },
+    {
+      "name": "body of junk steps behind a good skeleton",
+      "text": "Problem: Fuel Stop\nPartners: Gus and Hal\n\nSTART\nINPUT x\nINPUT y\nSET z TO do stuff\nIF it is big THEN\n    PRINT yes\nELSE\n    PRINT no\nEND IF\nEND"
+    },
+    {
+      "name": "weights dropped: plain average of three marks (Grade Forecast)",
+      "text": "Problem: Grade Forecast\nPartners: Eli and Fay\n\nSTART\nINPUT student name\nINPUT homework percentage\nINPUT labs percentage\nINPUT test percentage\nSET weighted average TO homework + labs\nIF weighted average >= 70 THEN\n    PRINT \"on track to pass\"\nELSE\n    PRINT \"below the passing mark\"\nEND IF\nEND"
+    }
+  ]
+}

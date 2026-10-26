@@ -1,13 +1,11 @@
-## Flowchart a Decision
+## Write a Decision as Pseudocode
 
 **What you'll practise:**
-- Turning a written algorithm into a flowchart
-- Using the diamond for a question and rectangles for actions
-- Labelling both exits of a decision so a reader can follow either answer
+- Turning a written algorithm into exact, numbered steps
+- Writing one question with two answers (IF / ELSE)
+- Getting a value before you test it
 
-You have already turned code into a flowchart once, in 2.2.6. This time you draw one straight from a written algorithm: no code to read first, just the steps below.
-
-### The algorithm
+### The algorithm, in plain English
 
 A movie theatre charges by age:
 
@@ -17,21 +15,27 @@ A movie theatre charges by age:
 4. Print the ticket price.
 5. End.
 
-### What to draw
+You have already turned code into a plan once, in 2.2.6. This time you write the steps straight from a written algorithm: no code to read first. The chart above the editor shows a different decision (a pool lane) for you to study; it is not the answer.
 
-Use the canvas below. The **Start** and **End** ovals are already placed: everything between them is yours.
+### The code it describes
 
-| Shape | Use it for |
-|---|---|
-| **Start / End** (oval) | The beginning and the finish. One of each. |
-| **Task** (rectangle) | Something the program *does*: get the age, set the price, print. |
-| **Decision** (diamond) | A yes/no question. Exactly two arrows leave it. |
-| **Input / Output** (parallelogram) | Optional. Use it if you want to show reading input or printing output as its own shape. |
+```js
+const age = Number(prompt("Age?"));
+let price;
 
-**How to build it:** click a shape in the toolbar to drop it on the canvas, then type its text in the bar underneath. To draw an arrow, drag from one of the small circles on a shape's edge to a circle on the next shape. Click any arrow to give it a label: the two arrows out of your diamond need `yes` and `no`.
+if (age < 13) {
+  price = 8;
+} else {
+  price = 14;
+}
+
+console.log(price);
+```
+
+### The thing worth noticing
+
+You must get the age **before** you ask the question, and the question has exactly two answers: the `IF` branch and the `ELSE` branch each set one price, and the print comes after both so it runs either way.
 
 ### Before you submit
 
-Press **Check my diagram** first. That runs the structure checks: one Start, one End, no floating shapes, two labelled exits on every diamond, and tells you exactly which shape is wrong. Fix anything red, then press **Submit for grading**. Some of the points come from the AI grader, which looks at whether your logic actually charges the right price to the right customer.
-
-You can revise and resubmit as many times as you want. Getting this green unlocks 2.2.8 A2.2.1 (Part A) next: the same chart-before-you-write habit you will use for every graded project from here on.
+Press **Grade**, then trace your steps by hand with age `9` and age `30`. Each should print a price. You can revise and resubmit as many times as you want. Getting this green unlocks the 2.2.8 A2.2.1 (Part A) plan next.

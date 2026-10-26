@@ -1,33 +1,35 @@
-## Chart this
+## Plain English to Pseudocode: Even or Odd
 
-> Get a number. If it is even, print "even". Otherwise print "odd".
+**What you'll practise:**
+- Turning plain English into exact, numbered steps
+- Writing a question with two answers (even and odd)
+- Seeing both answers join back together before the end
 
-Five shapes will do it. Drag them onto the canvas and connect them.
+### The plan, in plain English
 
-| # | Shape | What goes in it |
-|---|---|---|
-| 1 | **Oval** | Start |
-| 2 | **Rectangle** | get the number |
-| 3 | **Diamond** | is the number even?: two exits, **yes** and **no** |
-| 4 | **Rectangle**, twice | print "even" on the yes path, print "odd" on the no path |
-| 5 | **Oval** | End, with both branches joining back together before it |
+1. Get a number.
+2. Check whether the number is even.
+3. If it is, print `even`. Otherwise, print `odd`.
+4. Either way, the program then ends.
 
-### The detail worth checking
+The same plan is drawn as a flow chart above the editor. You do not draw it, you **read** it.
 
-**The branches rejoining.** A flowchart whose paths never meet again has two endings, and that almost always means a step was forgotten. Both of your print boxes should have an arrow leading onward to the same End.
+### The code it describes
 
-Draw it first, then look: can you follow an arrow from Start to End through *either* answer without lifting your finger?
+```js
+let number = Number(prompt("Enter a number"));
 
-### The other thing to try
+if (number % 2 === 0) {
+  console.log("even");
+} else {
+  console.log("odd");
+}
+```
 
-When your chart is green, **break it on purpose** and read what turns red:
+### The thing worth noticing
 
-- Delete one of the two arrows leaving the diamond.
-- Remove the label from the `no` arrow.
-- Drag a shape loose so nothing connects to it.
+**The branches rejoin.** A plan whose paths never meet again has two endings, and that almost always means a step was forgotten. In your pseudocode the `END IF` is where the two answers come back together: both print lines lead to the same end.
 
-Put each one back afterwards. Meeting every failure message once, on a chart nobody is grading, is much better than meeting it for the first time on a graded chart later in this course.
+### Before you submit
 
-### How this is checked
-
-The structural checks run in your browser and tell you what is wrong. Nothing is graded and there is no limit on redraws. The checks look at *shape*: one start, every arrow labelled, nothing floating, decisions with two labelled exits, everything reaching the end. They cannot tell whether your labels describe the right task; only you can.
+Press **Grade**, then trace your steps by hand with `4` and with `7`. Each prints exactly one word. Nothing here is graded and you can retry as often as you like.
