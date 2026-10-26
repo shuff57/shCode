@@ -3278,6 +3278,42 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "3-1-21-chart-built-grade-advisor": {
+    "lessonTitle": "3.1.14 Write Up What You Built",
+    "prompt": "The student was given a task and wrote numbered pseudocode in README.md, between a first line and a last line that were already there. The student refactored a grade advisor into two functions, decideGrade and printAdvice, and is writing up the MAIN program only: set up score, attendance and lateAssignments, CALL decideGrade, CALL printAdvice. The point is that the main program no longer contains any decision, because the branching moved inside the two functions. A write-up that puts an IF or ELSE (the grade chain or the attendance warning) in the main program has drawn the inside of a function and is missing the last criterion. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, CALL, PRINT, IF, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The three values are set up",
+        "description": "score, attendance and lateAssignments are set up in the main program.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "It calls decideGrade",
+        "description": "decideGrade is called as a single step (a call, not its body written out).",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "It calls printAdvice",
+        "description": "printAdvice is called as a single step (a call, not its body written out).",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "No decision is left in the main program",
+        "description": "The main program has no IF, ELSE or other decision. A decision written out in the main program is missing.",
+        "points": 1
+      }
+    ]
+  },
   "3-1-7-a7-2-pass-by-reference-writeup": {
     "lessonTitle": "3.6.15 Writeup: Pass by Value vs Reference",
     "prompt": "Everything you need is in 3.6.2 (Pass by Value vs Reference), 3.6.9 (Side Effects and Copies) and 3.6.10 (Defensive Copying): go back and reread them if you get stuck. One or two sentences per answer is plenty, in your own everyday words.\n\n1. What does \"pass by value\" mean, and which kinds of values does JavaScript pass this way? (3.6.2)\n\n2. What does \"pass by reference\" mean, and which kinds of values does JavaScript pass this way? (3.6.2)\n\n3. Give one short example of each. You may describe the code in words rather than writing it. (3.6.2)\n\n4. Why does this matter? Describe one bug that could happen if a programmer forgets the difference. (3.6.9 and 3.6.10)",
@@ -3309,6 +3345,42 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
+  },
+  "3-1-7a-a3-1-0-flowchart-gate": {
+    "lessonTitle": "3.1.12 Plan Before You Refactor",
+    "prompt": "The student was given a task and wrote numbered pseudocode in README.md, between a first line and a last line that were already there. The program being planned is a grade advisor: it has three values (score, attendance, lateAssignments), prints a recommended letter grade from the score, and prints a review warning when attendance is low or late work is high. The student should list at least two functions (a name and a one-line job each) and write the main program as steps that set up the three values and CALL each function by name. A step that writes out the inside of a function (the else-if chain, the warning test) instead of calling it does not count as a call. The function that decides the grade and the function that handles the warning must be two different functions. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, CALL, PRINT, IF, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The three values are set up",
+        "description": "score, attendance and lateAssignments are set up in the main program, before the function calls.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Two functions are named",
+        "description": "A FUNCTIONS list (or similar) names at least two functions and says in a few words what each one does.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "One function decides the grade",
+        "description": "The main program CALLS a function whose job is to work out the recommended letter grade. Writing the grade tests out inline instead of calling is missing.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "One function gives the advice",
+        "description": "The main program CALLS a second, different function whose job is the attendance and late-work warning. Writing the warning test out inline instead of calling is missing.",
+        "points": 1
+      }
+    ]
   },
   "3-1-8-lab-findmax-iseven": {
     "lessonTitle": "3.2.26 Lab: findMax & isEven",

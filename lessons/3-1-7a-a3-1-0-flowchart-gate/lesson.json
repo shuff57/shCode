@@ -1,12 +1,13 @@
 {
   "id": "3-1-7a-a3-1-0-flowchart-gate",
-  "title": "3.1.12 Chart Before You Refactor",
-  "description": "Redraw your grade-advisor plan with each function as one double-rail shape. The gate for A3.1.1: chart first, refactor second.",
+  "title": "3.1.12 Plan Before You Refactor",
+  "description": "Plan the grade-advisor refactor in pseudocode before you touch the code: name the two functions, say what each one does, and write the main program as calls to them. The gate for 3.1.13: plan first, refactor second.",
   "type": "assignment",
-  "estimateMins": 25,
+  "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "slos": [
     "SLO-2",
     "SLO-3",
@@ -14,49 +15,125 @@
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 7
-      }
-    ]
+  "assignmentCode": "A3.1.0",
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[set size and toppings]\n  B --> C[[call priceOrder]]\n  C --> D[[call printReceipt]]\n  D --> Z([End])",
+    "caption": "A different program, a pizza order: the double-rail boxes are function calls, each one step. The main program only sets up values and calls; what is inside priceOrder and printReceipt is not drawn."
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "completionCredit": true
   },
-  "steps": [],
-  "requirements": [],
-  "assignmentCode": "A3.1.0"
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Plan the refactor in pseudocode",
+      "instructions": "**The program.** Your grade advisor from 2.1.42 reads a `score`, an `attendance` percent and a count of `lateAssignments`, prints a recommended letter grade, and prints a warning when attendance is low or late work is high. Right now it is one long run of statements.\n\n**The job.** You are about to break it into at least two named functions. Decide which two **here, in a plan, before you open the editor in 3.1.13.**\n\nIn `README.md`:\n\n- Under **FUNCTIONS**, write one line for each function you plan: its name, a dash, and what it does. Give each name that says its job, like `decideGrade`.\n- Between the first and last line, write the **main program** as numbered pseudocode: set up the three values, then **call** each function by name.\n\nOpen the **Flow Chart** bar above the editor to see the same kind of plan for a different program, a pizza order. It is read-only: you read it, you do not draw it.\n\n**The rule that makes this a plan.** Every function in your FUNCTIONS list must be called in the main program, and every function the main program calls must be in the list. One to one, both directions. If you change your mind while coding 3.1.13, come back and change the plan.\n\nPress **Grade** above the editor: the AI reads what your steps mean and marks each Quest card green or red.",
+      "hints": [
+        "A call is one step: `3. CALL decideGrade`. Do not write what is inside the function here.",
+        "Two or three named functions is right. A function is worth naming when you can name what it does: decideGrade, printAdvice."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "The three values are set up",
+      "description": "The plan sets up score, attendance and lateAssignments.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?=[\\s\\S]*\\bscore\\b)(?=[\\s\\S]*\\battendance\\b)(?=[\\s\\S]*\\blateAssignments\\b)",
+      "hint": "Add a step that sets up score, attendance and lateAssignments before anything else.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Two functions are named",
+      "description": "Under FUNCTIONS, write two lines: a function name, a dash, and what it does.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:^|\\n)[ \\t]*[-*\\u2022][ \\t]*[A-Za-z]\\w*[ \\t]*(?:\\u2014|\\u2013|-|:|=)[ \\t]*[A-Za-z][\\s\\S]*(?:^|\\n)[ \\t]*[-*\\u2022][ \\t]*[A-Za-z]\\w*[ \\t]*(?:\\u2014|\\u2013|-|:|=)[ \\t]*[A-Za-z]",
+      "hint": "Under FUNCTIONS write two lines like \"- decideGrade - picks the letter\".",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "One function decides the grade",
+      "description": "The plan calls a function that works out the recommended letter grade.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:CALL|RUN|USE|DO|PERFORM|INVOKE|TRIGGER|START|HAND)\\b[^\\n]*(?:grade|decid|recommend|letter)\\w*",
+      "hint": "Add a step that calls the function which decides the letter grade.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "One function gives the advice",
+      "description": "The plan calls a different function that handles the attendance and late-work warning.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:CALL|RUN|USE|DO|PERFORM|INVOKE|TRIGGER|START|HAND)\\b[^\\n]*(?:advice|advis|warn|review|attend|late)\\w*",
+      "hint": "Add a step that calls the function which checks attendance and late work.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given a task and wrote numbered pseudocode in README.md, between a first line and a last line that were already there. The program being planned is a grade advisor: it has three values (score, attendance, lateAssignments), prints a recommended letter grade from the score, and prints a review warning when attendance is low or late work is high. The student should list at least two functions (a name and a one-line job each) and write the main program as steps that set up the three values and CALL each function by name. A step that writes out the inside of a function (the else-if chain, the warning test) instead of calling it does not count as a call. The function that decides the grade and the function that handles the warning must be two different functions. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, CALL, PRINT, IF, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The three values are set up",
+        "description": "score, attendance and lateAssignments are set up in the main program, before the function calls.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Two functions are named",
+        "description": "A FUNCTIONS list (or similar) names at least two functions and says in a few words what each one does.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "One function decides the grade",
+        "description": "The main program CALLS a function whose job is to work out the recommended letter grade. Writing the grade tests out inline instead of calling is missing.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "One function gives the advice",
+        "description": "The main program CALLS a second, different function whose job is the attendance and late-work warning. Writing the warning test out inline instead of calling is missing.",
+        "points": 1
+      }
+    ]
+  }
 }

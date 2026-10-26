@@ -1,38 +1,20 @@
-## Chart What You Built
+## Write Up What You Built
 
 **What you'll practise:**
-- Drawing a program you already wrote, not one you're planning
-- Using the double-rail shape correctly for a real function call
-- Seeing your chart get *shorter* once the decisions moved inside the functions
+- Writing down a program you already wrote, not one you are planning
+- Calling a function in one step instead of writing out its inside
+- Seeing the main program get *shorter* once the decisions moved inside the functions
 
-3.1.12 had you chart the grade-advisor **before** you refactored it — a plan. This is the other half: chart it **after**, from the code you actually wrote in 3.1.13.
+3.1.12 had you plan the grade advisor **before** the refactor. This is the other half: write it down **after**, from the code you wrote in 3.1.13.
 
-### The chart is shorter now, and that's the point
+### The main program is shorter now, and that is the point
 
-Before the refactor, your plan needed a decision diamond for the score chain and another for the attendance check — that's why 3.1.12 required at least one decision and at least seven shapes.
+Before the refactor the program needed a decision for the score chain and another for the attendance check. Now that `decideGrade()` and `printAdvice()` exist, the *main* program does not branch at all. It runs three things in order: set up the three values, call `decideGrade()`, call `printAdvice()`.
 
-Now that `decideGrade()` and `printAdvice()` exist, the *main* program doesn't branch at all anymore. It just runs three things in order: set up the three variables, call `decideGrade()`, call `printAdvice()`. The branching didn't disappear — it moved *inside* the two functions, which is exactly what 3.1.11's reading warned you not to draw:
-
-> **Do not draw the function's body hanging off the double-rail.** The body is not part of this chart.
-
-So this chart should have **no decision diamonds** in it at all. If you find yourself reaching for one, you're drawing what's inside `decideGrade()` or `printAdvice()` — stop, and collapse it back into the double-rail.
-
-### What to draw
-
-| Shape | Use it for |
-|---|---|
-| **Start / End** (oval) | One of each. |
-| **Input / Output** (parallelogram) | Setting `score`, `attendance`, `lateAssignments`. |
-| **Function call** (double rail) | `decideGrade()` and `printAdvice()` — press **+ more shapes** to find it. |
-
-That's the whole chart: five shapes, no diamond, one straight line from Start to End.
+So your write-up has **no IF or ELSE line**. If you reach for one, you are writing what is inside `decideGrade()` or `printAdvice()`: stop, and collapse it back into a call.
 
 ### Check it against the code
 
-Hold this chart next to `3-1-19-lab-refactor-grade-advisor`'s script. Every `[[ ]]` on the chart should be a real function call in the code, and both functions you wrote should appear as a `[[ ]]` here — the same one-to-one rule 3.1.12 asked you to follow, now checked in the other direction.
+Hold this next to your 3.1.13 script. Every function the code calls should be a CALL line here, and the other way round: the same one-to-one rule 3.1.12 asked for, now checked from the other side.
 
-### Before you submit
-
-Press **Check my diagram**. These checks run: one start, one end, every shape labeled, nothing orphaned, the chart reaches End, no shape points back at itself, and at least five shapes total.
-
-A green check does not confirm you used the double-rail shape for both function calls specifically — that's a look-at-it check, not a count-it one. If your chart is green but has fewer than two double-rail shapes, you drew something else instead. Go back and fix it before you call this done.
+The Flow Chart bar above the editor shows the same shape for a different program. It is read-only.

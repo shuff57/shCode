@@ -1,12 +1,13 @@
 {
   "id": "3-1-21-chart-built-grade-advisor",
-  "title": "3.1.14 Chart What You Built",
-  "description": "Draw the grade-advisor program you just refactored, using the double-rail shape for decideGrade() and printAdvice(). The after-chart to 3.1.12's before-chart.",
+  "title": "3.1.14 Write Up What You Built",
+  "description": "Write the grade-advisor program you just refactored as pseudocode: set up the three values, call decideGrade(), call printAdvice(), and notice the main program has no decision left in it.",
   "type": "assignment",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "week": 7,
   "slos": [
     "SLO-2",
@@ -15,38 +16,124 @@
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      },
-      {
-        "id": "min-nodes",
-        "count": 5
-      }
-    ]
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[set temperature and wind]\n  B --> C[[call pickCoat]]\n  C --> D[[call printTip]]\n  D --> Z([End])",
+    "caption": "A different program, a coat picker: its main program is a straight line with no diamond, because the choosing moved inside pickCoat. Yours should look the same shape."
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "completionCredit": true
   },
-  "steps": [],
-  "requirements": []
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write up the refactored program",
+      "instructions": "3.1.12 had you plan the grade advisor **before** the refactor. This is the other half: write down what you **built**, from the code you actually wrote in 3.1.13.\n\nThe main program no longer branches. It runs three things in order: set up `score`, `attendance` and `lateAssignments`, call `decideGrade()`, call `printAdvice()`. The branching did not disappear, it moved **inside** the two functions, and what is inside a function is not part of this write-up.\n\nIn `README.md`, between the first and last line, write those steps as numbered pseudocode. **There should be no `IF` or `ELSE` line at all.** If you want one, you are writing what is inside `decideGrade` or `printAdvice`: stop and collapse it back into a call.\n\nOpen the **Flow Chart** bar above the editor to see the same shape for a different program, a coat picker. It is read-only.\n\nPress **Grade** above the editor: the AI reads what your steps mean and marks each Quest card.",
+      "hints": [
+        "A call is one step: `3. CALL printAdvice`.",
+        "Check it against your 3.1.13 script: every function the code calls should be a CALL line here, and the other way round."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Numbered steps",
+      "description": "Number your steps 1. 2. 3. and so on, with something written after each number.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:(?:\\d+\\s*[.):]|step\\s*\\d+\\s*[:.)]?)[ \\t]*)\\S){4}",
+      "hint": "Write at least four lines that start with a number, each with a step written after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "The three values are set up",
+      "description": "The main program sets up score, attendance and lateAssignments.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?=[\\s\\S]*\\bscore\\b)(?=[\\s\\S]*\\battendance\\b)(?=[\\s\\S]*\\blateAssignments\\b)",
+      "hint": "Add a step that sets up score, attendance and lateAssignments.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "It calls decideGrade",
+      "description": "The main program calls decideGrade.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:CALL|RUN|USE|DO|PERFORM|INVOKE|TRIGGER|START|HAND)\\b[^\\n]*\\bdecideGrade\\b",
+      "hint": "Add a step that calls decideGrade.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "It calls printAdvice",
+      "description": "The main program calls printAdvice.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:CALL|RUN|USE|DO|PERFORM|INVOKE|TRIGGER|START|HAND)\\b[^\\n]*\\bprintAdvice\\b",
+      "hint": "Add a step that calls printAdvice.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "No decision is left in the main program",
+      "description": "The branching moved inside the functions, so no IF or ELSE line is left in the main program.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?![\\s\\S]*(?:^|\\n)[ \\t]*(?:\\d+\\s*[.):]\\s*)?(?:IF|ELSE|OTHERWISE)\\b)(?=[\\s\\S]*\\bdecideGrade\\b)",
+      "hint": "Take the IF or ELSE line out: the decisions live inside decideGrade and printAdvice now.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your steps",
+    "prompt": "The student was given a task and wrote numbered pseudocode in README.md, between a first line and a last line that were already there. The student refactored a grade advisor into two functions, decideGrade and printAdvice, and is writing up the MAIN program only: set up score, attendance and lateAssignments, CALL decideGrade, CALL printAdvice. The point is that the main program no longer contains any decision, because the branching moved inside the two functions. A write-up that puts an IF or ELSE (the grade chain or the attendance warning) in the main program has drawn the inside of a function and is missing the last criterion. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, CALL, PRINT, IF, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Numbered steps",
+        "description": "The student numbered their steps (1. 2. 3. or similar), at least four of them.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The three values are set up",
+        "description": "score, attendance and lateAssignments are set up in the main program.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "It calls decideGrade",
+        "description": "decideGrade is called as a single step (a call, not its body written out).",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "It calls printAdvice",
+        "description": "printAdvice is called as a single step (a call, not its body written out).",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "No decision is left in the main program",
+        "description": "The main program has no IF, ELSE or other decision. A decision written out in the main program is missing.",
+        "points": 1
+      }
+    ]
+  }
 }

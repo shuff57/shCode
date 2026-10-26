@@ -4253,9 +4253,9 @@
     },
     {
       "id": "3-1-21-chart-built-grade-advisor",
-      "title": "3.1.14 Chart What You Built",
+      "title": "3.1.14 Write Up What You Built",
       "unit": "3.1 Functions: Definition and Calls",
-      "preview": "diagram",
+      "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7,
@@ -4344,9 +4344,9 @@
     },
     {
       "id": "3-1-7a-a3-1-0-flowchart-gate",
-      "title": "3.1.12 Chart Before You Refactor",
+      "title": "3.1.12 Plan Before You Refactor",
       "unit": "3.1 Functions: Definition and Calls",
-      "preview": "diagram",
+      "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,

@@ -355,7 +355,7 @@ check('guard: the four runtime-tested labs carry codes and no try cap; all three
     assert.equal(lessonGradeCategory({ title: m.title, preview: m.preview, scoreKind: m.scoreKind, assignmentCode: m.assignmentCode }), 'lab', id);
   }
   // Counted charts (decided 2026-10-07 after 38 real drafts were measured; 3.3.11 followed 2026-10-08): Lab category, pass at 80%.
-  for (const [id, code] of [['3-2-8-chart-parameter-trace', 'A3.2.2'], ['3-2-18-chart-chained-calls', 'A3.2.3'], ['3-3-11-chart-the-array-loop', 'A3.3.2']]) {
+  for (const [id, code] of [['3-2-8-chart-parameter-trace', 'A3.2.2'], ['3-2-18-chart-chained-calls', 'A3.2.3'], ['3-3-11-chart-the-array-loop', 'A3.3.2'], ['3-1-7a-a3-1-0-flowchart-gate', 'A3.1.0']]) {
     const meta = read(id);
     assert.ok(!meta.grading?.formative, id);
     assert.equal(meta.grading?.completionCredit, true, id);
@@ -364,6 +364,12 @@ check('guard: the four runtime-tested labs carry codes and no try cap; all three
     assert.ok(!meta.diagram?.maxSubmissions && !meta.maxSubmissions, `${id} stays unlimited tries`);
     const m = manifest.get(id);
     assert.equal(lessonGradeCategory({ title: m.title, preview: m.preview, scoreKind: m.scoreKind, assignmentCode: m.assignmentCode }), 'lab', id);
+  }
+  // 3.1.14 was an uncoded, ungraded drawn chart and is an uncoded, ungraded pseudocode lab: its swap must not start counting.
+  {
+    const m = manifest.get('3-1-21-chart-built-grade-advisor');
+    assert.equal(m.assignmentCode, null);
+    assert.equal(lessonGradeCategory({ title: m.title, preview: m.preview, scoreKind: m.scoreKind, assignmentCode: m.assignmentCode }), null);
   }
   const taken = new Set([...manifest.values()].map((l) => l.assignmentCode).filter(Boolean));
 });

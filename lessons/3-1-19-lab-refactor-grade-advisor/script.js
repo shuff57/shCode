@@ -1,6 +1,6 @@
 // 3.1.13 Refactor the Grade Advisor
 //
-// This is the program from 2.1.42, unchanged. Your chart from 3.1.12 planned
+// This is the program from 2.1.42, unchanged. Your plan from 3.1.12 planned
 // two functions -- decideGrade and printAdvice. Build the code to match it.
 
 const score = 88;
