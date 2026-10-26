@@ -143,5 +143,54 @@
     "passingScore": 30,
     "allowLateSubmit": true,
     "reviewCommitHistory": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.4.21 Lab: Parameters, Return Values, and Arrow Syntax\". The task they were given: Write a function with a parameter and a return value, a second function of your own, and an arrow function, then call them and print the results. The lesson names the first function greet. You cannot run their code: read it and judge what it WOULD do in a browser. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "req1",
+        "title": "greet function",
+        "description": "Declare a function called greet. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "req2",
+        "title": "Return value",
+        "description": "Return a value: a return statement, or an arrow whose body is one expression",
+        "points": 1
+      },
+      {
+        "id": "req3",
+        "title": "Arrow function",
+        "description": "Write an arrow function. Help: 3.4.6 (Arrow Functions)",
+        "points": 1
+      },
+      {
+        "id": "req4",
+        "title": "Call greet",
+        "description": "Call the greet function. Help: 3.1.11 (The Function-Call Shape)",
+        "points": 1
+      },
+      {
+        "id": "req5",
+        "title": "Multiple functions",
+        "description": "Define at least 2 functions. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "greet returns a greeting with the name",
+        "description": "greet(\"Ava\") returns a greeting that contains Ava, and the same works for another name. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "req6",
+        "title": "Results printed",
+        "description": "Print what your functions return with console.log. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      }
+    ]
   }
 }

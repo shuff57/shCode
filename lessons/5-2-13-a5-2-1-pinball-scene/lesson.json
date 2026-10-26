@@ -97,5 +97,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.13 Pinball Scene\". The task they were given: Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Turn on gravity",
+        "description": "world.gravity.y is set to a non-zero value. Help: 5.2.2 (Gravity)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Add at least three static obstacles",
+        "description": "At least three 'static' sprites exist in the scene. Help: 5.2.6 (Bounciness and Friction)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Make the ball genuinely bouncy",
+        "description": "The ball's bounciness is set above 0.8. Help: 5.2.6 (Bounciness and Friction)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Add a reset key",
+        "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.6 (Bounciness and Friction)",
+        "points": 1
+      }
+    ]
   }
 }

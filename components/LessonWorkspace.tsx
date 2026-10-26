@@ -9,7 +9,7 @@ import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
-import { applyAiVerdicts, reportFromRequirements, verdictsFromCriteria, type AiVerdicts } from '../lib/ai-check';
+import { aiCheckText, applyAiVerdicts, reportFromRequirements, verdictsFromCriteria, type AiVerdicts } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import AiGradeResultPanel, { type AiGradeResultData } from './AiGradeResultPanel';
@@ -165,6 +165,8 @@ export default function LessonWorkspace({
   // did when it was graded: edit a word and the regex check owns the cards again.
   const aiCheck = lesson.aiCheck;
   const aiCheckFile = aiCheck?.file ?? 'README.md';
+  // What the AI reads: the checked file, plus any other file the lab's cards are about.
+  const aiText = (f: Record<string, string>) => (aiCheck ? aiCheckText(aiCheck, f) : '');
   const [aiCheckBusy, setAiCheckBusy] = useState(false);
   const [aiCheckNote, setAiCheckNote] = useState<{ kind: 'ok' | 'error'; text: string; hints?: string[] } | null>(null);
   const aiVerdictsRef = useRef<{ verdicts: AiVerdicts; text: string } | null>(null);
@@ -729,9 +731,9 @@ export default function LessonWorkspace({
     // On an aiCheck lab Run is for running: the AI's Grade owns the cards, so with no fresh
     // verdicts they stay ungraded rather than showing the pattern check's red and green.
     setRequirements(
-      !aiCheck || aiFallbackRef.current === (files[aiCheckFile] ?? '')
+      !aiCheck || aiFallbackRef.current === aiText(files)
         ? merged
-        : ai && ai.text === (files[aiCheckFile] ?? '')
+        : ai && ai.text === aiText(files)
           ? applyAiVerdicts(merged, ai.verdicts)
           : lesson.requirements,
     );
@@ -753,7 +755,7 @@ export default function LessonWorkspace({
 
   const runAiCheck = async () => {
     if (!aiCheck || aiCheckBusy) return;
-    const text = files[aiCheckFile] ?? '';
+    const text = aiText(files);
     setAiCheckBusy(true);
     setAiCheckNote(null);
     try {
@@ -775,7 +777,7 @@ export default function LessonWorkspace({
       }
       // The verdicts describe `text`. If the student kept typing while the AI was
       // reading, they belong to text that is no longer in the file.
-      if ((useLessonStore.getState().fileContents[aiCheckFile] ?? '') !== text) {
+      if (aiText(useLessonStore.getState().fileContents) !== text) {
         setAiCheckNote({ kind: 'ok', text: 'Your text changed while the AI was reading — press Grade again.' });
         return;
       }
@@ -811,7 +813,7 @@ export default function LessonWorkspace({
 
   // The AI's marks describe the text it read. Change a word and they are stale: drop them and let
   // the regex check own the cards again.
-  const aiCheckedText = files[aiCheckFile] ?? '';
+  const aiCheckedText = aiText(files);
   useEffect(() => {
     const ai = aiVerdictsRef.current;
     const fb = aiFallbackRef.current;
@@ -919,7 +921,7 @@ export default function LessonWorkspace({
       return;
     }
     // An aiCheck lab submits what the cards show, which may be the AI's verdicts.
-    const report = aiCheck ? reportFromRequirements(requirements) : runClientGrade();
+    const report = aiCheck ? reportFromRequirements(requirements, lesson?.grading?.passingScore ?? 0) : runClientGrade();
     setGradeReport(report);
     setSubmitOpen(true);
   };

@@ -16,6 +16,9 @@ import type { Requirement } from './types';
 export interface AiCheckConfig {
   /** The file the student writes in. Defaults to README.md. */
   file?: string;
+  /** Other files the same check reads (a lab graded on its script and its README). They are sent after
+   *  `file`, each under a "----- name -----" line, and the prompt says so. */
+  alsoFiles?: string[];
   /** Heading for the AI's own notes. */
   rubricTitle?: string;
   /** The grading brief. Read on the server from the generated config, not from the browser. */
@@ -35,6 +38,13 @@ export interface AiVerdict {
 }
 
 export type AiVerdicts = Record<string, AiVerdict>;
+
+/** The text the AI reads, and the text the cards' AI marks belong to: the main file, then any others. */
+export function aiCheckText(config: Pick<AiCheckConfig, 'file' | 'alsoFiles'>, files: Record<string, string>): string {
+  const main = files[config.file ?? 'README.md'] ?? '';
+  const more = (config.alsoFiles ?? []).map((f) => `\n\n----- ${f} -----\n${files[f] ?? ''}`);
+  return main + more.join('');
+}
 
 /** Only a clear "met" turns a card green. "partial" and "missing" stay red, with the AI's note. */
 export function verdictsFromCriteria(criteria: AiCheckCriterion[], knownIds: string[]): AiVerdicts {
@@ -61,21 +71,32 @@ export function applyAiVerdicts(reqs: Requirement[], verdicts: AiVerdicts | null
   });
 }
 
-/** What Submit records for an aiCheck lab: the cards as the student sees them. */
-export function reportFromRequirements(reqs: Requirement[]): GradeReport {
-  const results = reqs.map((r) => ({
-    id: r.id,
-    title: r.title,
-    status: (r.status === 'passed' ? 'passed' : 'failed') as 'passed' | 'failed',
-    messages: r.messages ?? [],
-    pointsEarned: 0,
-    pointsPossible: 0,
-  }));
+/**
+ * What Submit records for an aiCheck lab: the cards as the student sees them. A card carries
+ * the points the regex check gave it, so a scored lab keeps its score when the AI's verdicts
+ * replace the pattern check's; a lab whose cards are worth nothing is "passed" when every card
+ * is green, as before.
+ */
+export function reportFromRequirements(reqs: Requirement[], passingScore = 0): GradeReport {
+  const results = reqs.map((r) => {
+    const status = (r.status === 'passed' ? 'passed' : 'failed') as 'passed' | 'failed';
+    const possible = r.points ?? 0;
+    return {
+      id: r.id,
+      title: r.title,
+      status,
+      messages: r.messages ?? [],
+      pointsEarned: status === 'passed' ? possible : 0,
+      pointsPossible: possible,
+    };
+  });
+  const totalScore = results.reduce((sum, r) => sum + r.pointsEarned, 0);
+  const totalPossible = results.reduce((sum, r) => sum + r.pointsPossible, 0);
   return {
     results,
-    totalScore: 0,
-    totalPossible: 0,
-    passed: results.length > 0 && results.every((r) => r.status === 'passed'),
-    passingScore: 0,
+    totalScore,
+    totalPossible,
+    passed: totalPossible > 0 ? totalScore >= passingScore : results.length > 0 && results.every((r) => r.status === 'passed'),
+    passingScore,
   };
 }

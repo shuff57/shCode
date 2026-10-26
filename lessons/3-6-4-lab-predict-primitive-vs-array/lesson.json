@@ -250,5 +250,66 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.6.4 Lab: Predict Output — Primitive vs. Array Argument\". The task they were given: Write one function that reassigns a number parameter and one that mutates an array parameter, then log the caller's variables to prove which change escaped. You cannot run their code: read it and judge what it WOULD do in a browser. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "changeNum defined",
+        "description": "Code defines a function named changeNum. Help: 3.6.2 (Pass by Value vs Reference)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "changeArr defined",
+        "description": "Code defines a function named changeArr. Help: 3.6.2 (Pass by Value vs Reference)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": ".push used",
+        "description": "Code calls .push on the array parameter. Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "caller variables logged",
+        "description": "Code calls console.log. Help: 3.6.2 (Pass by Value vs Reference)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "changeArr adds to the array it is given, and both caller variables are printed",
+        "description": "changeArr([1, 2]) leaves that same array as [1, 2, <one more item>], and at least two lines are printed. Help: 3.6.3 (Example: Mutating an Array Parameter)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "changeNum reassigns its parameter",
+        "description": "changeNum assigns a different number to its own parameter. Help: 3.6.2 (Pass by Value vs Reference)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "changeNum called",
+        "description": "changeNum runs with your number variable, and that variable is printed after the call. Help: 3.6.2 (Pass by Value vs Reference)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "changeArr called",
+        "description": "changeArr runs with your array variable, and that array is printed after the call. Help: 3.6.3 (Example: Mutating an Array Parameter)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the number and the array are printed by code that runs",
+        "description": "A console.log that runs prints data from the number or the array. Typed text does not count. Help: 3.6.3 (Example: Mutating an Array Parameter)",
+        "points": 1
+      }
+    ]
   }
 }

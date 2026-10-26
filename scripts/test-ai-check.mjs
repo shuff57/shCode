@@ -44,6 +44,16 @@ check(rep.passed === false && rep.results.length === 3 && rep.totalPossible === 
 const allGreen = applyAiVerdicts(reqs, Object.fromEntries(reqs.map((r) => [r.id, { passed: true, feedback: '' }])));
 check(reportFromRequirements(allGreen).passed === true, 'report: all green is passed');
 check(reportFromRequirements([]).passed === false, 'report: no cards is not passed');
+// a scored lab keeps its points when the AI's verdicts replace the pattern check's
+const scored = [
+  { id: 'a', title: 'a', description: '', status: 'passed', points: 10 },
+  { id: 'b', title: 'b', description: '', status: 'failed', points: 5 },
+  { id: 'c', title: 'c', description: '', status: 'passed', points: 15 },
+];
+const sr = reportFromRequirements(scored, 20);
+check(sr.totalScore === 25 && sr.totalPossible === 30, 'report: green cards earn their points');
+check(sr.passed === true && sr.passingScore === 20, 'report: a scored lab passes on its passing score, not on every card');
+check(reportFromRequirements(scored, 28).passed === false, 'report: below the passing score is not passed');
 
 // wiring of every lesson that carries aiCheck
 const gen = readFileSync(path.join(root, 'functions/_shared/ai-graders.generated.ts'), 'utf8');

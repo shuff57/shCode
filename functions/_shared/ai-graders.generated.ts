@@ -680,6 +680,72 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "1-3-19-a1-3-1-document-a-messy-program": {
+    "lessonTitle": "1.3.19 Document a Messy Program",
+    "prompt": "The student worked on the lab \"1.3.19 Document a Messy Program\". The task they were given: a twelve-line program with no comments, no spacing and terrible names. Fix it to the class style guide (descriptive camelCase names, const for a value that never changes, spaces around operators, at least four explanatory comments) and write a short README.md that answers three prompts. You are given TWO files in one message: script.js first, then a line reading ----- README.md ----- followed by the README. Criteria about names, operators and comments are about script.js; the README criteria are about the README. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "taxRate is declared with const",
+        "description": "The rate that never changes is declared with const, not let. Help: 1.3.2 (camelCase and const)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "bookTitle holds the title",
+        "description": "Declares bookTitle with quoted text. Help: 1.3.6 (Human-Readable Names)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "unitPrice and quantity are named",
+        "description": "Declares both unitPrice and quantity. Help: 1.3.6 (Human-Readable Names)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "subtotal is computed from them",
+        "description": "subtotal is unitPrice times quantity. Help: 1.3.6 (Human-Readable Names)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "orderTotal uses the tax rate",
+        "description": "orderTotal is computed from subtotal and taxRate. Help: 1.3.6 (Human-Readable Names)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "No single-letter variables remain",
+        "description": "No declaration of a one-letter variable is left in the file. Help: 1.3.6 (Human-Readable Names)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "Operators are spaced",
+        "description": "No cramped arithmetic like a*b remains: every operator has a space on each side. Help: 1.3.3 (Code Layout)",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "At least four explanatory comments",
+        "description": "Four or more comments explaining the code, written as // or /* */. Help: 1.3.4 (Comments: // and /* */)",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "README answers all three prompts",
+        "description": "Each of the three headings has a real answer under it -- a sentence or a bullet, not an empty heading. Help: 1.3.18 (What a README Is For)",
+        "points": 1
+      },
+      {
+        "id": "r10",
+        "title": "README mentions the tax rate",
+        "description": "README tells the reader about the tax rate they may need to change. Help: 1.3.6 (Human-Readable Names)",
+        "points": 1
+      }
+    ]
+  },
   "1-4-12-name-the-structure": {
     "lessonTitle": "1.4.12 Name the Structure",
     "prompt": "The student wrote JavaScript for the lab \"1.4.12 Name the Structure\". The task they were given: Read the description. Log which structure it needs, using console.log. Choose from: sequence, selection, repetition. Log one answer per step, in step order, one console.log each -- the first console.log is STEP 1. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
@@ -3128,6 +3194,54 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "3-1-10-functions": {
+    "lessonTitle": "3.4.21 Lab: Parameters, Return Values, and Arrow Syntax",
+    "prompt": "The student wrote JavaScript for the lab \"3.4.21 Lab: Parameters, Return Values, and Arrow Syntax\". The task they were given: Write a function with a parameter and a return value, a second function of your own, and an arrow function, then call them and print the results. The lesson names the first function greet. You cannot run their code: read it and judge what it WOULD do in a browser. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "req1",
+        "title": "greet function",
+        "description": "Declare a function called greet. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "req2",
+        "title": "Return value",
+        "description": "Return a value: a return statement, or an arrow whose body is one expression",
+        "points": 1
+      },
+      {
+        "id": "req3",
+        "title": "Arrow function",
+        "description": "Write an arrow function. Help: 3.4.6 (Arrow Functions)",
+        "points": 1
+      },
+      {
+        "id": "req4",
+        "title": "Call greet",
+        "description": "Call the greet function. Help: 3.1.11 (The Function-Call Shape)",
+        "points": 1
+      },
+      {
+        "id": "req5",
+        "title": "Multiple functions",
+        "description": "Define at least 2 functions. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "greet returns a greeting with the name",
+        "description": "greet(\"Ava\") returns a greeting that contains Ava, and the same works for another name. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "req6",
+        "title": "Results printed",
+        "description": "Print what your functions return with console.log. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      }
+    ]
+  },
   "3-1-13-lab-syntax-naming": {
     "lessonTitle": "3.1.5 Lab: Fix the Syntax and the Name",
     "prompt": "The student wrote JavaScript for the lab \"3.1.5 Lab: Fix the Syntax and the Name\". The task they were given: The starter's function header is missing something every function header needs. Add it. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
@@ -3796,6 +3910,54 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "t2",
         "title": "the total is printed",
         "description": "The output shows the total, 84. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
+        "points": 1
+      }
+    ]
+  },
+  "3-2-7-arrays": {
+    "lessonTitle": "3.3.24 Arrays",
+    "prompt": "The student wrote JavaScript for the lab \"3.3.24 Arrays\". The task they were given: Work with lists of values: create an array, add with push, remove with pop, loop through it, search it with a comparison, and write countFruit(fruits, name) and longFruits(fruits, minLength). You cannot run their code: read it and judge what it WOULD do in a browser. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "req1",
+        "title": "Create array",
+        "description": "Declare an array using square brackets. Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "req2",
+        "title": "Use push",
+        "description": "Add elements using .push(). Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "req3",
+        "title": "Use pop",
+        "description": "Remove an element using .pop(). Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "req4",
+        "title": "Iterate with a for loop",
+        "description": "Loop through the array with a for loop that has something in its body. Help: 3.3.5 (Looping Over Arrays)",
+        "points": 1
+      },
+      {
+        "id": "req5",
+        "title": "Search with a comparison",
+        "description": "Inside a loop, compare each item to the one you want with === (or use includes / indexOf) and act on it. Help: 3.3.5 (Looping Over Arrays)",
+        "points": 1
+      },
+      {
+        "id": "req6",
+        "title": "countFruit returns how many times a name appears",
+        "description": "countFruit(fruits, name) returns the number of items in the array that are exactly name, and 0 when there are none. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      },
+      {
+        "id": "req7",
+        "title": "longFruits returns a new array of the long names",
+        "description": "longFruits(fruits, minLength) returns a new array with only the items whose length is minLength or more, in order, and does not change the array it was given. Help: 3.3.15 (Arrays and Functions)",
         "points": 1
       }
     ]
@@ -5402,6 +5564,66 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "3-6-4-lab-predict-primitive-vs-array": {
+    "lessonTitle": "3.6.4 Lab: Predict Output — Primitive vs. Array Argument",
+    "prompt": "The student wrote JavaScript for the lab \"3.6.4 Lab: Predict Output — Primitive vs. Array Argument\". The task they were given: Write one function that reassigns a number parameter and one that mutates an array parameter, then log the caller's variables to prove which change escaped. You cannot run their code: read it and judge what it WOULD do in a browser. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "changeNum defined",
+        "description": "Code defines a function named changeNum. Help: 3.6.2 (Pass by Value vs Reference)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "changeArr defined",
+        "description": "Code defines a function named changeArr. Help: 3.6.2 (Pass by Value vs Reference)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": ".push used",
+        "description": "Code calls .push on the array parameter. Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "caller variables logged",
+        "description": "Code calls console.log. Help: 3.6.2 (Pass by Value vs Reference)",
+        "points": 1
+      },
+      {
+        "id": "t1",
+        "title": "changeArr adds to the array it is given, and both caller variables are printed",
+        "description": "changeArr([1, 2]) leaves that same array as [1, 2, <one more item>], and at least two lines are printed. Help: 3.6.3 (Example: Mutating an Array Parameter)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "changeNum reassigns its parameter",
+        "description": "changeNum assigns a different number to its own parameter. Help: 3.6.2 (Pass by Value vs Reference)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "changeNum called",
+        "description": "changeNum runs with your number variable, and that variable is printed after the call. Help: 3.6.2 (Pass by Value vs Reference)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "changeArr called",
+        "description": "changeArr runs with your array variable, and that array is printed after the call. Help: 3.6.3 (Example: Mutating an Array Parameter)",
+        "points": 1
+      },
+      {
+        "id": "t2",
+        "title": "the number and the array are printed by code that runs",
+        "description": "A console.log that runs prints data from the number or the array. Typed text does not count. Help: 3.6.3 (Example: Mutating an Array Parameter)",
+        "points": 1
+      }
+    ]
+  },
   "3-6-7-chart-reassign-vs-mutate": {
     "lessonTitle": "3.6.7 Plain English to Pseudocode: Reassignment vs. Mutation Trace",
     "prompt": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is process(nums): the caller has scores = [10, 20, 30] and calls process(scores). Inside, nums and scores name the same array. Step 1 sets item 0 of nums to 0 (a mutation of the shared array, so the caller sees it). Step 2 points nums at a brand new array [9, 9] (a reassignment of the local name only, so the caller does not see it). The caller then prints scores as 0, 20, 30. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, IF, END IF, RETURN, or a mix of both are all fine, and so are different names, different capitalisation, and different ways to number the lines. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite, for example saying the caller sees the [9, 9] array for the reassignment criterion. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
@@ -6498,6 +6720,36 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "contextDocs": [
       "overview",
       "sprite"
+    ]
+  },
+  "5-2-13-a5-2-1-pinball-scene": {
+    "lessonTitle": "5.2.13 Pinball Scene",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.13 Pinball Scene\". The task they were given: Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Turn on gravity",
+        "description": "world.gravity.y is set to a non-zero value. Help: 5.2.2 (Gravity)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Add at least three static obstacles",
+        "description": "At least three 'static' sprites exist in the scene. Help: 5.2.6 (Bounciness and Friction)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Make the ball genuinely bouncy",
+        "description": "The ball's bounciness is set above 0.8. Help: 5.2.6 (Bounciness and Friction)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Add a reset key",
+        "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.6 (Bounciness and Friction)",
+        "points": 1
+      }
     ]
   },
   "5-2-14-a5-2-2-vel-vs-applyforce": {

@@ -297,5 +297,54 @@
     "passingScore": 55,
     "allowLateSubmit": true,
     "reviewCommitHistory": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the lab \"3.3.24 Arrays\". The task they were given: Work with lists of values: create an array, add with push, remove with pop, loop through it, search it with a comparison, and write countFruit(fruits, name) and longFruits(fruits, minLength). You cannot run their code: read it and judge what it WOULD do in a browser. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "req1",
+        "title": "Create array",
+        "description": "Declare an array using square brackets. Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "req2",
+        "title": "Use push",
+        "description": "Add elements using .push(). Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "req3",
+        "title": "Use pop",
+        "description": "Remove an element using .pop(). Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "req4",
+        "title": "Iterate with a for loop",
+        "description": "Loop through the array with a for loop that has something in its body. Help: 3.3.5 (Looping Over Arrays)",
+        "points": 1
+      },
+      {
+        "id": "req5",
+        "title": "Search with a comparison",
+        "description": "Inside a loop, compare each item to the one you want with === (or use includes / indexOf) and act on it. Help: 3.3.5 (Looping Over Arrays)",
+        "points": 1
+      },
+      {
+        "id": "req6",
+        "title": "countFruit returns how many times a name appears",
+        "description": "countFruit(fruits, name) returns the number of items in the array that are exactly name, and 0 when there are none. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      },
+      {
+        "id": "req7",
+        "title": "longFruits returns a new array of the long names",
+        "description": "longFruits(fruits, minLength) returns a new array with only the items whose length is minLength or more, in order, and does not change the array it was given. Help: 3.3.15 (Arrays and Functions)",
+        "points": 1
+      }
+    ]
   }
 }
