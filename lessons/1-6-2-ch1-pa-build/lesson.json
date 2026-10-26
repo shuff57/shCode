@@ -181,5 +181,72 @@
   },
   "assignmentCode": "A1.6.2",
   "planFrom": "1-6-1-ch1-pa-design-chart",
-  "planFromLabel": "1.6.1"
+  "planFromLabel": "1.6.1",
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the group performance-assessment part \"1.6.2 Group PA Part 2: Build It\". The task they were given: Turn the flowchart you passed in Part 1 into a documented, straight-line program: a header naming both partners and the problem, a const limit, a string and a number variable, a value computed from the inputs, the chart's decision stored as a boolean, both branches written as IF and ELSE comment lines, a template-literal report and a typeof report. You cannot run their code: read it and judge what it WOULD do in a browser. The header is in comments at the top of script.js, so for the header criteria read the comments. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Both partners named in the header",
+        "description": "The Partners line at the top of script.js has names on it. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The problem is named in the header",
+        "description": "The Problem line says which of the four menu problems this is. Help: 1.6.1 (Group PA Part 1: Design the Chart)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The limit is a const",
+        "description": "The number that never changes is declared with const, not let. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A string variable is declared",
+        "description": "One variable holds text -- the name or label your problem talks about. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "A number variable is declared",
+        "description": "At least one variable holds a number typed straight in. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The value is computed from the inputs",
+        "description": "A variable is assigned from arithmetic on other variables, not typed in by hand. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "The diamond is stored as a boolean",
+        "description": "A comparison is assigned to a variable, which is what the chart's diamond becomes. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "Both branches written as pseudocode",
+        "description": "An IF comment line and an ELSE comment line, sitting below the stored comparison, say what happens on each side of the diamond. Help: 1.6.1 (Group PA Part 1: Design the Chart)",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "A template literal reports the result",
+        "description": "At least one console.log uses backticks with ${} inside. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r10",
+        "title": "typeof is reported for one value",
+        "description": "The program prints the type of at least one of its values. Help: 1.2.23 (The typeof Operator)",
+        "points": 1
+      }
+    ]
+  }
 }

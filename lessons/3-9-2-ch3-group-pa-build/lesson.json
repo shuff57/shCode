@@ -245,5 +245,78 @@
   },
   "assignmentCode": "A3.9.2",
   "planFrom": "3-9-1-ch3-group-pa-design-chart",
-  "planFromLabel": "3.9.1"
+  "planFromLabel": "3.9.1",
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote JavaScript for the group performance-assessment part \"3.9.2 Group PA Part 2: Build It\". The task they were given: Turn the plan you wrote in Part 1 into five documented functions and a short main section: a header naming both partners and the problem, a const level, a declared function that returns a value, an array of record objects, a loop that walks the list, push to build a new list, map with an arrow function, spread to copy a record, and localStorage with JSON saved and loaded. You cannot run their code: read it and judge what it WOULD do in a browser. The header is in comments at the top of script.js, so for the header criteria read the comments. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Both partners named in the header",
+        "description": "The Partners line at the top of script.js has names on it",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The problem is named in the header",
+        "description": "The Problem line says which of the four menu problems this is. Help: 3.9.1 (Group PA Part 1: Design the Plan)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The level is a const",
+        "description": "The threshold that never changes is declared with const, not let. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A named function is declared",
+        "description": "At least one function is declared with the function keyword, the way 3.1.2 teaches",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "A function returns a value",
+        "description": "At least one function hands a value back with return, rather than printing it. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The data is an array of record objects",
+        "description": "The seed data is an array whose elements are object literals (or makeItem calls) with the same properties. Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "A loop walks the list",
+        "description": "A for or for...of loop is present, the way 3.3.5 teaches",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "push builds a new list",
+        "description": "A new array is built up with the push method. Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "map() is called with an arrow function",
+        "description": "The map method is given an arrow function as its callback. Help: 3.4.6 (Arrow Functions)",
+        "points": 1
+      },
+      {
+        "id": "r10",
+        "title": "Spread copies a record",
+        "description": "A new object or array is built from an old one with the spread operator, the way 3.7.14 teaches",
+        "points": 1
+      },
+      {
+        "id": "r11",
+        "title": "Data is saved and loaded",
+        "description": "localStorage is used with JSON in both directions, the way 3.8.15 teaches",
+        "points": 1
+      }
+    ]
+  }
 }

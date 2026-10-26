@@ -1,6 +1,6 @@
 // Program: Is this pizza worth it?
 // Problem: Slice Economics
-// Partners: Reference answer (one worked example of the four)
+// Partners: Alex Chen, Jamie Rivera
 // Date: 2026-09-01
 
 // PLAN (pseudocode, from the chart in 1.6.1):

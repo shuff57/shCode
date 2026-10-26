@@ -1183,6 +1183,72 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "1-6-2-ch1-pa-build": {
+    "lessonTitle": "1.6.2 Group PA Part 2: Build It",
+    "prompt": "The student wrote JavaScript for the group performance-assessment part \"1.6.2 Group PA Part 2: Build It\". The task they were given: Turn the flowchart you passed in Part 1 into a documented, straight-line program: a header naming both partners and the problem, a const limit, a string and a number variable, a value computed from the inputs, the chart's decision stored as a boolean, both branches written as IF and ELSE comment lines, a template-literal report and a typeof report. You cannot run their code: read it and judge what it WOULD do in a browser. The header is in comments at the top of script.js, so for the header criteria read the comments. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Both partners named in the header",
+        "description": "The Partners line at the top of script.js has names on it. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The problem is named in the header",
+        "description": "The Problem line says which of the four menu problems this is. Help: 1.6.1 (Group PA Part 1: Design the Chart)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The limit is a const",
+        "description": "The number that never changes is declared with const, not let. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A string variable is declared",
+        "description": "One variable holds text -- the name or label your problem talks about. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "A number variable is declared",
+        "description": "At least one variable holds a number typed straight in. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The value is computed from the inputs",
+        "description": "A variable is assigned from arithmetic on other variables, not typed in by hand. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "The diamond is stored as a boolean",
+        "description": "A comparison is assigned to a variable, which is what the chart's diamond becomes. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "Both branches written as pseudocode",
+        "description": "An IF comment line and an ELSE comment line, sitting below the stored comparison, say what happens on each side of the diamond. Help: 1.6.1 (Group PA Part 1: Design the Chart)",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "A template literal reports the result",
+        "description": "At least one console.log uses backticks with ${} inside. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r10",
+        "title": "typeof is reported for one value",
+        "description": "The program prints the type of at least one of its values. Help: 1.2.23 (The typeof Operator)",
+        "points": 1
+      }
+    ]
+  },
   "1-6-3-ch1-pa-demo": {
     "lessonTitle": "1.6.3 Group PA Part 3: Demo It",
     "prompt": "Both partners write this together and both submit the same answer. Everything asked for is something you did in the last hour or read earlier in Chapter 1; go back and reread if you get stuck. Your own everyday words throughout.\n\nPart 1 -- Who did what. Name both partners. Then say who drove the keyboard for the chart (1.6.1), who drove it for the code (1.6.2), and one thing the partner who was not typing caught that the one typing had missed.\n\nPart 2 -- Three test cases. A table or three rows, each with the numbers you put in, what you expected to come out, and what actually came out. At least one of your three has to land on the other side of the comparison from the other two -- a test set that only ever proves one answer has not tested the decision (1.5.40). Worked example, if you are on Slice Economics: a $16.00 pizza cut into 8 slices is $2.00 a slice, which is at the limit and counts as a good deal; a $20.00 pizza cut into 8 is $2.50 a slice, which is not. Those two land on opposite sides, which is what is being asked for. Three pizzas that all come out under $2.00 is what does not count, however different the numbers look.\n\nPart 3 -- One thing you logged. Name one console.log you added while building that was there to check your work rather than to report the answer: what you printed, what it showed you, and what you changed because of it (1.5.41). If nothing was wrong, say what the print confirmed and how you would have known if it had been.\n\nPart 4 -- Lifecycle. Chapter 1 opened with the four framework activities (1.1.6). They are:\n  - inception -- the planning: deciding the goals and the overall scope\n  - elaboration -- working out the requirements and designing the thing\n  - construction -- writing and building it\n  - deployment -- releasing it to the people who will use it\nPick ONE of those four for each third of this period -- the chart (1.6.1), the code (1.6.2), this writeup -- and name it. Then say in one sentence why the chart came before the code rather than after.\n\nPart 5 -- Paradigm and types. Two questions; answer both.\n(a) Which paradigm is your program written in? Chapter 1 taught four. Pick ONE:\n  - procedural -- a sequence of instructions carried out in order, with the data sitting in variables that the statements reach into from outside (1.4.8)\n  - structured -- built only out of sequence, selection and repetition, with no jumping to an arbitrary line (1.4.9)\n  - object-oriented -- data and the code that works on that data bundled together into objects (1.4.15)\n  - functional -- built out of functions that take values in and hand values back, rather than changing things as they go (1.4.18)\nName the one your program is, then say in one sentence how you can TELL by looking at your own code. Point at something actually in your script.js, not at the definition.\n(b) Your program produced two values that do not have the same type. typeof prints a type name for you (1.2.23), and the types Chapter 1 taught are number, string, boolean, undefined and null (1.2.27). Name the type of your computed value -- the cost per slice, the cost per person, the weighted average, or the tank range. Then name the type of your comparison -- the variable that stores the diamond (1.2.18). Then say in one sentence why those two are not the same type.\n\nPart 6 -- The branch you did not write. Copy in the two pseudocode comment lines from your code, and say in one sentence what would have to be true before those comments could become real JavaScript.",
@@ -2994,6 +3060,72 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       },
       {
         "id": "no-self-loop"
+      }
+    ]
+  },
+  "2-6-2-ch2-group-pa-build": {
+    "lessonTitle": "2.6.2 Group PA Part 2: Build It",
+    "prompt": "The student wrote JavaScript for the group performance-assessment part \"2.6.2 Group PA Part 2: Build It\". The task they were given: Turn the flowchart you passed in Part 1 into a documented, loop-driven program: a header naming both partners and the problem, a const limit, a string and a number variable, a for or while loop with continue and break (Coin Drawer uses two breaks), a switch that classifies the outcome, and a throw that guards bad input before the loop runs. You cannot run their code: read it and judge what it WOULD do in a browser. The header is in comments at the top of script.js, so for the header criteria read the comments. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Both partners named in the header",
+        "description": "The Partners line at the top of script.js has names on it. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The problem is named in the header",
+        "description": "The Problem line says which of the four menu problems this is. Help: 2.6.1 (Group PA Part 1: Design the Chart)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The limit is a const",
+        "description": "The number that never changes is declared with const, not let. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A string variable is declared",
+        "description": "One variable holds text -- the name or label your problem talks about. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "A number variable is declared",
+        "description": "At least one variable holds a number typed straight in. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The loop uses a for or while",
+        "description": "A for or while loop is present and walks the input range. Help: 2.2.13 (The while Loop)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "The loop has its continue (Coin Drawer: its break)",
+        "description": "A continue statement appears inside the loop. Coin Drawer has no skip rule, so there the loop needs its break instead: a break inside an if, for when the drawer is empty. Help: 2.4.13 (Skipping a Round with continue)",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "A break AND a continue (Coin Drawer: two breaks)",
+        "description": "A continue statement and a break statement both appear in the program. The break may be the one that ends a switch case. Coin Drawer: the loop break (inside an if) and the switch-case break both appear.",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "A switch classifies the outcome",
+        "description": "A switch with at least two case groups (each ending in a break) and a default. Grouped cases count as one group.",
+        "points": 1
+      },
+      {
+        "id": "r10",
+        "title": "The bad input is guarded with throw",
+        "description": "A throw statement guards the bad input before the loop runs. Help: 2.5.1 (Handling Errors with try/catch)",
+        "points": 1
       }
     ]
   },
@@ -6514,6 +6646,78 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
     "strict": true
+  },
+  "3-9-2-ch3-group-pa-build": {
+    "lessonTitle": "3.9.2 Group PA Part 2: Build It",
+    "prompt": "The student wrote JavaScript for the group performance-assessment part \"3.9.2 Group PA Part 2: Build It\". The task they were given: Turn the plan you wrote in Part 1 into five documented functions and a short main section: a header naming both partners and the problem, a const level, a declared function that returns a value, an array of record objects, a loop that walks the list, push to build a new list, map with an arrow function, spread to copy a record, and localStorage with JSON saved and loaded. You cannot run their code: read it and judge what it WOULD do in a browser. The header is in comments at the top of script.js, so for the header criteria read the comments. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Both partners named in the header",
+        "description": "The Partners line at the top of script.js has names on it",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The problem is named in the header",
+        "description": "The Problem line says which of the four menu problems this is. Help: 3.9.1 (Group PA Part 1: Design the Plan)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The level is a const",
+        "description": "The threshold that never changes is declared with const, not let. Help: 1.2.2 (Declaring Variables with let and const)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A named function is declared",
+        "description": "At least one function is declared with the function keyword, the way 3.1.2 teaches",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "A function returns a value",
+        "description": "At least one function hands a value back with return, rather than printing it. Help: 3.2.11 (Getting a Value Back with `return`)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The data is an array of record objects",
+        "description": "The seed data is an array whose elements are object literals (or makeItem calls) with the same properties. Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "A loop walks the list",
+        "description": "A for or for...of loop is present, the way 3.3.5 teaches",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "push builds a new list",
+        "description": "A new array is built up with the push method. Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "map() is called with an arrow function",
+        "description": "The map method is given an arrow function as its callback. Help: 3.4.6 (Arrow Functions)",
+        "points": 1
+      },
+      {
+        "id": "r10",
+        "title": "Spread copies a record",
+        "description": "A new object or array is built from an old one with the spread operator, the way 3.7.14 teaches",
+        "points": 1
+      },
+      {
+        "id": "r11",
+        "title": "Data is saved and loaded",
+        "description": "localStorage is used with JSON in both directions, the way 3.8.15 teaches",
+        "points": 1
+      }
+    ]
   },
   "3-9-3-ch3-group-pa-demo": {
     "lessonTitle": "3.9.3 Group PA Part 3: Demo It",
