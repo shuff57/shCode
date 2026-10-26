@@ -11,6 +11,7 @@ import {
   signSession,
 } from '../../_shared/auth';
 import { checkRateLimit, rateLimitExceeded } from '../../_shared/rateLimit';
+import { TERMS_VERSION } from '../../_shared/terms';
 
 interface Env {
   DB: D1Database;
@@ -26,6 +27,8 @@ interface Body {
   password: string;
   firstName?: string;
   lastName?: string;
+  confirmedAge13?: boolean;
+  acceptedTerms?: boolean;
 }
 
 const MAX_NAME_LEN = 100;
@@ -57,6 +60,15 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   if (!email) return json({ error: 'Email required' }, 400);
   if (password.length < 8) return json({ error: 'Password must be at least 8 characters' }, 400);
 
+  // Terms of Service / Privacy Policy: self-signup requires the person to
+  // confirm they are 13+ and accept the terms (the sign-in dialog checks too).
+  if (body.confirmedAge13 !== true) {
+    return json({ error: 'You must be at least 13 years old to create an account' }, 400);
+  }
+  if (body.acceptedTerms !== true) {
+    return json({ error: 'You must agree to the Terms of Service and Privacy Policy' }, 400);
+  }
+
   // Optional, independently. Empty/omitted stores NULL — every display site
   // falls back to email in that case.
   const firstName = cleanName(body.firstName);
@@ -80,9 +92,9 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
     ? 'teacher'
     : 'student';
   await env.DB.prepare(
-    'INSERT INTO students (email, password_hash, created_at, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)',
+    'INSERT INTO students (email, password_hash, created_at, role, first_name, last_name, terms_accepted_at, terms_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
   )
-    .bind(email, passwordHash, Date.now(), role, firstName, lastName)
+    .bind(email, passwordHash, Date.now(), role, firstName, lastName, Date.now(), TERMS_VERSION)
     .run();
 
   const token = await signSession(email, role, env.AUTH_SECRET);

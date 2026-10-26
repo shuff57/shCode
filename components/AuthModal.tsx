@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { login, signup, AuthError, CurrentUser } from '../lib/auth';
+import { login, signup, acceptTerms, AuthError, CurrentUser } from '../lib/auth';
 
 interface Props {
   isOpen: boolean;
@@ -10,11 +10,15 @@ interface Props {
 }
 
 export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [mode, setMode] = useState<'login' | 'signup' | 'terms'>('login');
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmedAge13, setConfirmedAge13] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  // Set after a login that reported needsTerms, until the student accepts.
+  const [pendingUser, setPendingUser] = useState<CurrentUser | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -32,6 +36,9 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
       setFirstName('');
       setLastName('');
       setPassword('');
+      setConfirmedAge13(false);
+      setAcceptedTerms(false);
+      setPendingUser(null);
       setError(null);
       setMode('login');
     }
@@ -43,9 +50,31 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
     setError(null);
     setLoading(true);
     try {
+      if (mode === 'terms') {
+        if (!confirmedAge13 || !acceptedTerms) {
+          setError('Please tick both boxes to continue.');
+          return;
+        }
+        await acceptTerms();
+        if (pendingUser) onAuthenticated({ ...pendingUser, needsTerms: false });
+        onClose();
+        return;
+      }
+      if (mode === 'signup' && (!confirmedAge13 || !acceptedTerms)) {
+        setError('Please tick both boxes to create your account.');
+        return;
+      }
       const user = mode === 'login'
         ? await login(email.trim(), password)
-        : await signup(email.trim(), password, firstName.trim(), lastName.trim());
+        : await signup(email.trim(), password, firstName.trim(), lastName.trim(), { confirmedAge13, acceptedTerms });
+      if (mode === 'login' && user.needsTerms) {
+        // Older account with no acceptance record: ask once before continuing.
+        setPendingUser(user);
+        setConfirmedAge13(false);
+        setAcceptedTerms(false);
+        setMode('terms');
+        return;
+      }
       onAuthenticated(user);
       onClose();
     } catch (err) {
@@ -66,13 +95,17 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
       }}
     >
       <form onSubmit={submit} className="auth-form">
-        <h3 style={{ marginTop: 0 }}>{mode === 'login' ? 'Sign in' : 'Create account'}</h3>
+        <h3 style={{ marginTop: 0 }}>{mode === 'login' ? 'Sign in' : mode === 'terms' ? 'One more step' : 'Create account'}</h3>
         <p style={{ color: '#888', fontSize: 13, marginTop: 0 }}>
           {mode === 'login'
             ? 'Sign in to save your work and pick up on any device.'
-            : 'Pick any email + password. This is just to identify your commits.'}
+            : mode === 'terms'
+              ? 'We now have Terms of Service and a Privacy Policy. Please confirm both once to keep using your account.'
+              : 'Pick any email + password. This is just to identify your commits.'}
         </p>
 
+        {mode !== 'terms' && (
+          <>
         <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>Email</label>
         <input
           ref={emailRef}
@@ -92,6 +125,8 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
             fontSize: 14,
           }}
         />
+          </>
+        )}
 
         {mode === 'signup' && (
           <>
@@ -139,6 +174,8 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
           </>
         )}
 
+        {mode !== 'terms' && (
+          <>
         <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>
           Password {mode === 'signup' && <span style={{ color: '#6272a4' }}>(≥ 8 chars)</span>}
         </label>
@@ -160,6 +197,36 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
             fontSize: 14,
           }}
         />
+          </>
+        )}
+
+        {(mode === 'signup' || mode === 'terms') && (
+          <div style={{ display: 'grid', gap: 8, marginBottom: 12, fontSize: 13 }}>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+              <input
+                type="checkbox"
+                checked={confirmedAge13}
+                onChange={(e) => setConfirmedAge13(e.target.checked)}
+                style={{ marginTop: 3 }}
+              />
+              <span>I am at least 13 years old.</span>
+            </label>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                style={{ marginTop: 3 }}
+              />
+              <span>
+                I have read and agree to the{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#8be9fd' }}>Terms of Service</a>
+                {' '}and{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8be9fd' }}>Privacy Policy</a>.
+              </span>
+            </label>
+          </div>
+        )}
 
         {error && (
           <div style={{
@@ -178,13 +245,14 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
           <button
             type="submit"
             className="btn-primary"
-            disabled={loading || !email.trim() || password.length < 1}
+            disabled={loading || (mode === 'terms' ? !confirmedAge13 || !acceptedTerms : !email.trim() || password.length < 1)}
           >
-            {loading ? '...' : mode === 'login' ? 'Sign in' : 'Create account'}
+            {loading ? '...' : mode === 'login' ? 'Sign in' : mode === 'terms' ? 'Continue' : 'Create account'}
           </button>
           <button type="button" className="btn-secondary" onClick={onClose}>
             Cancel
           </button>
+          {mode !== 'terms' && (
           <button
             type="button"
             onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); }}
@@ -200,6 +268,7 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
           >
             {mode === 'login' ? 'Need an account? Sign up' : 'Already have one? Sign in'}
           </button>
+          )}
         </div>
       </form>
       <style>{`

@@ -1,4 +1,5 @@
 import LessonSearchFilter from '../components/LessonSearchFilter';
+import LegalLinks from '../components/LegalLinks';
 import { loadLessons } from '../lib/lessons';
 import { listUnits } from '../lib/curriculum';
 import type { Lesson } from '../lib/types';
@@ -85,6 +86,7 @@ export default async function HomePage() {
 
       <footer className="flex items-center justify-between w-2/3 mx-auto mt-8 pt-4 border-t border-border text-sm opacity-70">
         <span>© {new Date().getFullYear()} shCode</span>
+        <LegalLinks />
         <span>LHD™</span>
       </footer>
     </div>

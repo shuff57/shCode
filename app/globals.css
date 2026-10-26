@@ -1984,3 +1984,16 @@ details.console > summary::-webkit-details-marker { display: none; }
   }
   body:has(.shd-tabstrip) { padding-bottom: 110px; }
 }
+
+/* Terms / Privacy / Contact pages and the links to them */
+.legal-links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.9rem; }
+.legal-links a { color: inherit; text-decoration: underline; opacity: 0.85; }
+.legal-links a:hover { opacity: 1; }
+.legal-page { max-width: 760px; margin: 0 auto; padding: 8px 4px 48px; line-height: 1.7; }
+.legal-page h1 { font-size: 1.9rem; margin: 16px 0 4px; }
+.legal-page h2 { font-size: 1.25rem; margin: 28px 0 8px; }
+.legal-page p, .legal-page ul { margin: 0 0 12px; }
+.legal-page ul { padding-left: 22px; list-style: disc; }
+.legal-page a { color: var(--brand); text-decoration: underline; }
+.legal-page .legal-updated { opacity: 0.7; font-size: 0.9rem; margin-bottom: 20px; }
+.legal-page .legal-links { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }
