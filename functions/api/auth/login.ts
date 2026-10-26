@@ -58,10 +58,16 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   }
 
   const row = await env.DB.prepare(
-    'SELECT password_hash, role, first_name, last_name FROM students WHERE email = ?',
+    'SELECT password_hash, role, first_name, last_name, terms_accepted_at FROM students WHERE email = ?',
   )
     .bind(email)
-    .first<{ password_hash: string; role: string; first_name: string | null; last_name: string | null }>();
+    .first<{
+      password_hash: string;
+      role: string;
+      first_name: string | null;
+      last_name: string | null;
+      terms_accepted_at: number | null;
+    }>();
   if (!row) {
     await recordFailedLogin(env.DB, email, now);
     return json({ error: 'Invalid email or password' }, 401);
@@ -81,7 +87,10 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
     row.role === 'admin' || row.role === 'teacher' ? row.role : 'student';
   const token = await signSession(email, role, env.AUTH_SECRET);
   const secure = new URL(request.url).protocol === 'https:';
-  return json({ email, role, firstName: row.first_name, lastName: row.last_name }, 200, {
+  // Accounts made before the signup checkboxes have no acceptance record; the
+  // sign-in dialog asks them once (POST /api/accept-terms).
+  const needsTerms = row.terms_accepted_at == null;
+  return json({ email, role, firstName: row.first_name, lastName: row.last_name, needsTerms }, 200, {
     'Set-Cookie': buildSessionCookie(token, SESSION_TTL_SECONDS, secure),
   });
 };

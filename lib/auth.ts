@@ -13,6 +13,8 @@ export interface CurrentUser {
   role: Role;
   firstName: string | null;
   lastName: string | null;
+  /** True when login found no terms-acceptance record (older account). */
+  needsTerms?: boolean;
 }
 
 /** "First Last", trimmed, handling either half being null. Null if both are unset. */
@@ -80,6 +82,7 @@ interface AuthResponse {
   role?: string;
   firstName?: string | null;
   lastName?: string | null;
+  needsTerms?: boolean;
   error?: string;
 }
 
@@ -99,6 +102,7 @@ async function postAuth(path: string, body: unknown): Promise<CurrentUser> {
     role: parseRole(data.role),
     firstName: data.firstName ?? null,
     lastName: data.lastName ?? null,
+    needsTerms: data.needsTerms === true,
   };
   return cache;
 }
@@ -108,8 +112,32 @@ export function signup(
   password: string,
   firstName?: string,
   lastName?: string,
+  consent: { confirmedAge13: boolean; acceptedTerms: boolean } = { confirmedAge13: false, acceptedTerms: false },
 ): Promise<CurrentUser> {
-  return postAuth('/api/auth/signup', { email, password, firstName, lastName });
+  return postAuth('/api/auth/signup', {
+    email,
+    password,
+    firstName,
+    lastName,
+    confirmedAge13: consent.confirmedAge13,
+    acceptedTerms: consent.acceptedTerms,
+  });
+}
+
+/** Record that the signed-in student is 13+ and accepts the Terms and Privacy Policy. */
+export async function acceptTerms(): Promise<void> {
+  const res = await fetch('/api/accept-terms', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ confirmedAge13: true, acceptedTerms: true }),
+  });
+  if (!res.ok) {
+    let message = `${res.status}`;
+    try { message = ((await res.json()) as { error?: string }).error || message; } catch { /* empty body */ }
+    throw new AuthError(res.status, message);
+  }
+  if (cache) cache = { ...cache, needsTerms: false };
 }
 
 export function login(email: string, password: string): Promise<CurrentUser> {
