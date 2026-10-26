@@ -1,7 +1,7 @@
 {
   "id": "1-5-31-a1-5-1-implement-your-plan",
   "title": "1.5.31 Implement Your Plan (Part 2)",
-  "description": "Turn the chart you just passed into working JavaScript, and confirm the code matches the plan. Auto-graded.",
+  "description": "Turn the plan you just wrote into working JavaScript, and confirm the code matches the plan. Auto-graded.",
   "type": "assignment",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -14,7 +14,7 @@
     {
       "id": "s1",
       "title": "Write the plan down first",
-      "instructions": "Before any code, write your chart out as pseudocode comments at the top of the file. One instruction per line, indented to show what is inside the decision."
+      "instructions": "Before any code, write your plan out as pseudocode comments at the top of the file. One instruction per line, indented to show what is inside the decision."
     },
     {
       "id": "s2",
@@ -24,7 +24,7 @@
     {
       "id": "s3",
       "title": "Write the decision",
-      "instructions": "Your chart's diamond becomes an if/else here. You have not been taught this as code yet - Chapter 2 does that properly - so here is the exact shape to copy and fill in:\n\nif (SOMETHING IS TRUE) {\n  console.log(\"what happens on the yes branch\");\n} else {\n  console.log(\"what happens on the no branch\");\n}\n\nReplace the condition with your comparison, and put a message in each branch. Both branches must print something.",
+      "instructions": "Your plan's IF becomes an if/else here. You have not been taught this as code yet - Chapter 2 does that properly - so here is the exact shape to copy and fill in:\n\nif (SOMETHING IS TRUE) {\n  console.log(\"what happens on the yes branch\");\n} else {\n  console.log(\"what happens on the no branch\");\n}\n\nReplace the condition with your comparison, and put a message in each branch. Both branches must print something.",
       "hints": [
         "The condition goes in the round brackets: pagesRequested <= creditRemaining",
         "Each branch needs its own console.log",
@@ -34,7 +34,7 @@
     {
       "id": "s4",
       "title": "Confirm the code matches the plan",
-      "instructions": "Read your pseudocode comments and your code side by side. Every shape on your chart should appear once in the code, in the same order. Then change the values so the other branch runs, and check that it does."
+      "instructions": "Read your pseudocode comments and your code side by side. Every step of your plan should appear once in the code, in the same order. Then change the values so the other branch runs, and check that it does."
     }
   ],
   "requirements": [
@@ -100,7 +100,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote JavaScript for the lab \"1.5.31 Implement Your Plan (Part 2)\". The task they were given: Before any code, write your chart out as pseudocode comments at the top of the file. One instruction per line, indented to show what is inside the decision. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote JavaScript for the lab \"1.5.31 Implement Your Plan (Part 2)\". The task they were given: Before any code, write your plan out as pseudocode comments at the top of the file. One instruction per line, indented to show what is inside the decision. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r2",

@@ -287,6 +287,8 @@ export interface Lesson {
    *  ```flow fence. Shows what to do, not this lab's answer. */
   planChart?: { mermaid: string; caption?: string };
   planFrom?: string;
+  /** A text-plan lab that a later part reads with `planFrom`: its README.md is mirrored to the draft store (components/LessonWorkspace.tsx). */
+  savesPlan?: boolean;
   /** Display label for `planFrom`, e.g. "1.5.30". */
   planFromLabel?: string;
   /** Max quiz/written score for this lesson (quiz question count, or written

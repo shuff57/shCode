@@ -1,57 +1,139 @@
 {
   "id": "1-5-30-a1-5-1-flowchart-gate",
-  "title": "1.5.30 Your First Flowchart (Part 1)",
-  "description": "Chart the printer-credit rule using only the three shapes the book teaches. The first and gentlest run of the flowchart gate: nothing is graded, and you can redraw as often as you like.",
+  "title": "1.5.30 Plan It in Pseudocode (Part 1)",
+  "description": "Plan the printer-credit rule in pseudocode with the keywords from the reading: take in the pages, ask the question, charge only the pages over 20, and report both answers. The plan comes before the code in 1.5.31.",
   "type": "assignment",
-  "estimateMins": 25,
+  "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
-  "preview": "diagram",
+  "preview": "console",
+  "editor": "text",
   "slos": [
     "SLO-1",
     "SLO-4"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "diagram": {
-    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
-    "rules": [
-      {
-        "id": "one-start"
-      },
-      {
-        "id": "has-end"
-      },
-      {
-        "id": "all-labeled"
-      },
-      {
-        "id": "no-orphans"
-      },
-      {
-        "id": "min-decisions",
-        "count": 1
-      },
-      {
-        "id": "decision-two-exits"
-      },
-      {
-        "id": "decision-labeled"
-      },
-      {
-        "id": "reaches-end"
-      },
-      {
-        "id": "no-self-loop"
-      }
-    ]
+  "assignmentCode": "A1.5.1",
+  "savesPlan": true,
+  "planChart": {
+    "mermaid": "flowchart LR\n  A([Start]) --> B[/get the age/]\n  B --> C{is the age under 13?}\n  C -- yes --> D[/report the child price: 8/]\n  C -- no --> E[/report the adult price: 12/]\n  D --> Z([End])\n  E --> Z",
+    "caption": "A different rule, a movie ticket: the diamond is the question, both exits are labelled, and the \"no\" branch still reports something. Your plan has the same four parts for the printer rule."
   },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "completionCredit": true
   },
-  "steps": [],
-  "requirements": [],
-  "assignmentCode": "A1.5.1"
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the plan in pseudocode",
+      "instructions": "**The problem.** The school printer gives every student **20 free pages a week**. After that, printing costs **10 cents a page** for each page over the 20. Plan a program that takes the number of pages a student printed this week and reports what they owe.\n\n**Write the algorithm in `README.md`**, between `START` and `END`, using the keywords from the reading:\n\n```\nSTART\nINPUT ...\nIF ... THEN\n    ...\nELSE\n    ...\nEND IF\nEND\n```\n\nOne instruction per line, and indent what sits inside the decision. Open the **Flow Chart** bar above the editor to see the same kind of plan for a different rule, a movie ticket. It is read-only: you read it, you do not draw it.\n\nPress **Grade** above the editor: the AI reads what your plan means and marks each Quest card green or red. Changing your text clears its marks, so press Grade again when you have finished editing.\n\n**Check it by hand before you submit.** Walk 12 pages through your plan, then 25 pages. 12 pages should owe nothing, and 25 pages should owe for 5 pages, not 25. Nothing is graded harshly here: you can rewrite as often as you like, and Part 2 (1.5.31) will show this plan beside your code.",
+      "hints": [
+        "The ELSE branch still has to do something: \"owes nothing\" is a real answer that has to be reported.",
+        "Only the pages over 20 are charged. 25 pages is 5 pages of charge, not 25."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The page count comes in",
+      "description": "The plan takes in the number of pages the student printed.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:INPUT|READ|GET|ASK|ENTER|TAKE|RECEIVE)\\b[^\\n]*\\bpages?\\b",
+      "hint": "Add a step near the top that takes in the number of pages printed.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "The question is about 20 pages",
+      "description": "The plan asks whether the pages printed are over the 20 free pages.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bIF\\b[^\\n]*\\b20\\b",
+      "hint": "Add an IF line that compares the pages printed with 20.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Only the pages over 20 are charged",
+      "description": "The charge is for the pages over 20 (pages minus 20), not for every page.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:-\\s*20\\b|\\b20\\b[^\\n]*\\b(?:subtract|minus|take\\s+away|less|over|above)\\b|\\b(?:subtract|minus|take\\s+away)\\b[^\\n]*\\b20\\b|\\b(?:over|above|beyond)\\b[^\\n]*\\b20\\b[^\\n]*\\b(?:pages?)\\b|\\bextra\\s+pages?\\b)",
+      "hint": "Work out the pages over 20 first (pages minus 20), then charge for those.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Each extra page costs 10 cents",
+      "description": "The charge is 10 cents (0.10) for each of those pages.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:\\b0?\\.10?\\b|\\b10\\s*(?:cents?|\\u00a2|c\\b)|\\$\\s*0?\\.1\\b|\\bdime\\b|\\bten\\s+cents\\b)",
+      "hint": "Say what each extra page costs: 10 cents, written as 0.10 or 10 cents.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Both answers are reported",
+      "description": "The ELSE branch reports too: a student under the limit owes nothing, and that is printed.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\bELSE\\b[\\s\\S]*\\b(?:PRINT|OUTPUT|DISPLAY|REPORT|SHOW|SAY|TELL|WRITE|OWE)\\w*\\b|\\bELSE\\b[\\s\\S]*\\b(?:nothing|zero|free|no\\s+charge|0)\\b",
+      "hint": "Under ELSE, report that the student owes nothing. Do not leave that branch empty.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your plan",
+    "prompt": "The student wrote pseudocode in README.md, between a first line and a last line that were already there. The problem: the school printer gives every student 20 free pages a week; after that each page over 20 costs 10 cents. The plan should take in the number of pages printed, ask whether it is over 20, charge 10 cents for ONLY the pages over 20 (pages minus 20, not every page), and report what is owed in BOTH cases (a student at or under 20 owes nothing, and that is reported, not left as an empty branch). Plain English, keywords such as START, INPUT, IF, THEN, ELSE, END IF, SET, PRINT, or a mix of both are all fine, and so are different names, capitalisation and layout. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The page count comes in",
+        "description": "The plan takes in the number of pages the student printed.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The question is about 20 pages",
+        "description": "The plan asks whether the pages printed are over the 20 free pages.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Only the pages over 20 are charged",
+        "description": "The charge is for the pages over 20 (pages minus 20), not for every page.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Each extra page costs 10 cents",
+        "description": "The charge is 10 cents (0.10) for each of those pages.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Both answers are reported",
+        "description": "The ELSE branch reports too: a student under the limit owes nothing, and that is printed.",
+        "points": 1
+      }
+    ]
+  }
 }

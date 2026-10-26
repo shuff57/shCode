@@ -950,9 +950,45 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "1-5-30-a1-5-1-flowchart-gate": {
+    "lessonTitle": "1.5.30 Plan It in Pseudocode (Part 1)",
+    "prompt": "The student wrote pseudocode in README.md, between a first line and a last line that were already there. The problem: the school printer gives every student 20 free pages a week; after that each page over 20 costs 10 cents. The plan should take in the number of pages printed, ask whether it is over 20, charge 10 cents for ONLY the pages over 20 (pages minus 20, not every page), and report what is owed in BOTH cases (a student at or under 20 owes nothing, and that is reported, not left as an empty branch). Plain English, keywords such as START, INPUT, IF, THEN, ELSE, END IF, SET, PRINT, or a mix of both are all fine, and so are different names, capitalisation and layout. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The page count comes in",
+        "description": "The plan takes in the number of pages the student printed.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The question is about 20 pages",
+        "description": "The plan asks whether the pages printed are over the 20 free pages.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Only the pages over 20 are charged",
+        "description": "The charge is for the pages over 20 (pages minus 20), not for every page.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Each extra page costs 10 cents",
+        "description": "The charge is 10 cents (0.10) for each of those pages.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Both answers are reported",
+        "description": "The ELSE branch reports too: a student under the limit owes nothing, and that is printed.",
+        "points": 1
+      }
+    ]
+  },
   "1-5-31-a1-5-1-implement-your-plan": {
     "lessonTitle": "1.5.31 Implement Your Plan (Part 2)",
-    "prompt": "The student wrote JavaScript for the lab \"1.5.31 Implement Your Plan (Part 2)\". The task they were given: Before any code, write your chart out as pseudocode comments at the top of the file. One instruction per line, indented to show what is inside the decision. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote JavaScript for the lab \"1.5.31 Implement Your Plan (Part 2)\". The task they were given: Before any code, write your plan out as pseudocode comments at the top of the file. One instruction per line, indented to show what is inside the decision. You cannot run their code: read it and judge what it WOULD do. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r2",

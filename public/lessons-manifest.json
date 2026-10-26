@@ -1562,9 +1562,9 @@
     },
     {
       "id": "1-5-30-a1-5-1-flowchart-gate",
-      "title": "1.5.30 Your First Flowchart (Part 1)",
+      "title": "1.5.30 Plan It in Pseudocode (Part 1)",
       "unit": "1.5 Program Design Tools and Environments",
-      "preview": "diagram",
+      "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,

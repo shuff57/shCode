@@ -904,7 +904,7 @@ export default function LessonWorkspace({
   // The next part of a split assignment (3.9.2) reads the pair's plan back from the draft store,
   // which a lab does not otherwise write to. Mirror the graded text there a moment after typing
   // stops, and never the untouched starter.
-  const mirrorDraft = isTextMode && aiGraded && lessonProgress.authed;
+  const mirrorDraft = isTextMode && (aiGraded || (!!aiCheck && !!lesson.savesPlan)) && lessonProgress.authed;
   const mirrorText = files[aiCheckFile] ?? '';
   useEffect(() => {
     if (!mirrorDraft) return;

@@ -26,7 +26,7 @@ When your chart is green, **break it on purpose** and read what turns red:
 - Remove the label from the `no` arrow.
 - Drag a shape loose so nothing connects to it.
 
-Put each one back afterwards. Meeting every failure message once, on a chart nobody is grading, is much better than meeting it for the first time on the graded chart in 1.5.30.
+Put each one back afterwards. Meeting every failure message once, on a chart nobody is grading, is much better than meeting it for the first time on a graded chart later in this course.
 
 ### How this is checked
 
