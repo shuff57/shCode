@@ -1,3 +1,5 @@
+> **Note, 2026-10-26:** every drawn-flowchart lab, gate and PA design part in this plan has since become a typed pseudocode plan (ids, assignment codes and credit unchanged). Read "chart", "draw" and "Check my diagram" below as written plans; the module docs under `curriculum/modules/` describe what ships.
+
 # CSCI 4 — Introduction to Programming Concepts and Methodologies
 ## Curriculum Plan: JavaScript + moSHion + JSCAD 3D Modeling
 ### Chico USD / Butte College Dual Enrollment | High School Juniors

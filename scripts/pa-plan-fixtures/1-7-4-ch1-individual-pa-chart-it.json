@@ -1,66 +1,90 @@
 {
-  "reference": [
-    {
-      "name": "Backpack Check",
-      "text": "Problem: Backpack Check\nSTART\nINPUT number of textbooks\nINPUT weight of one textbook\nINPUT student weight\nSET backpack weight TO number of textbooks * weight of one textbook\nSET guideline TO student weight / 10\nIF backpack weight <= guideline THEN\n    PRINT \"The backpack is a safe weight\"\nELSE\n    PRINT \"The backpack is over the guideline\"\nEND IF\nEND"
-    },
-    {
-      "name": "Screen Time",
-      "text": "Problem: Screen Time\nSTART\nINPUT minutes on day 1\nINPUT minutes on day 2\nINPUT minutes on day 3\nINPUT minutes on day 4\nINPUT minutes on day 5\nINPUT minutes on day 6\nINPUT minutes on day 7\nSET total minutes TO day 1 + day 2 + day 3 + day 4 + day 5 + day 6 + day 7\nSET daily average TO total minutes / 7\nIF daily average <= 120 THEN\n    PRINT \"Within the 120-minute daily limit\"\nELSE\n    PRINT \"Averaging over the daily limit\"\nEND IF\nEND"
-    },
-    {
-      "name": "Print Job",
-      "text": "Problem: Print Job\nSTART\nINPUT number of pages\nSET job cost TO number of pages * 0.08\nIF job cost <= 5.00 THEN\n    PRINT \"The job can be printed\"\nELSE\n    PRINT \"Not enough left in the account\"\nEND IF\nEND"
-    },
-    {
-      "name": "different words and keywords (Backpack Check, lowercase, otherwise)",
-      "text": "Problem: Backpack Check\nstart\nget how many textbooks\nget what one textbook weighs\nget the student's weight\nset pack weight to books times the weight of one\nset the limit to the student's weight divided by 10\nif the pack weight is at most the limit\n    report that the pack is fine\notherwise\n    report that the pack is too heavy\nend"
-    },
-    {
-      "name": "different words and keywords (Print Job, reversed question, branches swapped to match; cents against 500)",
-      "text": "Problem: Print Job\nBEGIN\nREAD pages\nCOMPUTE cost in cents = pages * 8\nIF cost in cents > 500 THEN\n    OUTPUT the account does not have enough\nELSE\n    OUTPUT the job can print\nEND IF\nSTOP"
-    },
-    {
-      "name": "terse Screen Time with the average inside one line",
-      "text": "Problem: Screen Time\nSTART\nINPUT d1, d2, d3, d4, d5, d6, d7\nSET avg TO (d1 + d2 + d3 + d4 + d5 + d6 + d7) / 7\nIF avg > 120 THEN\n    PRINT \"over the limit\"\nELSE\n    PRINT \"within the limit\"\nEND IF\nEND"
-    }
-  ],
-  "mustNotPass": [
-    {
-      "name": "outcomes reversed (Print Job)",
-      "text": "Problem: Print Job\nSTART\nINPUT number of pages\nSET job cost TO number of pages * 0.08\nIF job cost <= 5.00 THEN\n    PRINT \"Not enough left in the account\"\nELSE\n    PRINT \"The job can be printed\"\nEND IF\nEND"
-    },
-    {
-      "name": "total compared instead of the average (Screen Time)",
-      "text": "Problem: Screen Time\nSTART\nINPUT minutes on day 1\nINPUT minutes on day 2\nINPUT minutes on day 3\nINPUT minutes on day 4\nINPUT minutes on day 5\nINPUT minutes on day 6\nINPUT minutes on day 7\nSET total minutes TO day 1 + day 2 + day 3 + day 4 + day 5 + day 6 + day 7\nIF total minutes <= 120 THEN\n    PRINT \"Within the daily limit\"\nELSE\n    PRINT \"Over the daily limit\"\nEND IF\nEND"
-    },
-    {
-      "name": "mixed units: cents against dollars (Print Job)",
-      "text": "Problem: Print Job\nSTART\nINPUT number of pages\nSET job cost TO number of pages * 8\nIF job cost <= 5.00 THEN\n    PRINT \"The job can be printed\"\nELSE\n    PRINT \"Not enough left in the account\"\nEND IF\nEND"
-    },
-    {
-      "name": "one branch only (Backpack Check)",
-      "text": "Problem: Backpack Check\nSTART\nINPUT number of textbooks\nINPUT weight of one textbook\nINPUT student weight\nSET backpack weight TO number of textbooks * weight of one textbook\nSET guideline TO student weight / 10\nIF backpack weight <= guideline THEN\n    PRINT \"The backpack is a safe weight\"\nEND IF\nEND"
-    },
-    {
-      "name": "guideline is the whole weight, not a tenth (Backpack Check)",
-      "text": "Problem: Backpack Check\nSTART\nINPUT number of textbooks\nINPUT weight of one textbook\nINPUT student weight\nSET backpack weight TO number of textbooks * weight of one textbook\nIF backpack weight <= student weight THEN\n    PRINT \"safe\"\nELSE\n    PRINT \"too heavy\"\nEND IF\nEND"
-    },
-    {
-      "name": "report before the decision, same on both sides (Print Job)",
-      "text": "Problem: Print Job\nSTART\nINPUT number of pages\nPRINT \"the job is checked\"\nSET job cost TO number of pages * 0.08\nIF job cost <= 5.00 THEN\n    PRINT \"done\"\nELSE\n    PRINT \"done\"\nEND IF\nEND"
-    },
-    {
-      "name": "words from a different problem: Screen Time words on a Print Job plan",
-      "text": "Problem: Print Job\nSTART\nINPUT number of pages\nSET job cost TO number of pages * 0.08\nIF job cost <= 5.00 THEN\n    PRINT \"Within the 120-minute daily limit\"\nELSE\n    PRINT \"Averaging over the daily limit\"\nEND IF\nEND"
-    },
-    {
-      "name": "body of junk steps behind a good skeleton",
-      "text": "Problem: Screen Time\nSTART\nINPUT x\nSET y TO do stuff\nIF it is a lot THEN\n    PRINT yes\nELSE\n    PRINT no\nEND IF\nEND"
-    },
-    {
-      "name": "comparison with no work-out step and no inputs",
-      "text": "Problem: Print Job\nSTART\nIF the job is too expensive THEN\n    PRINT \"no\"\nELSE\n    PRINT \"yes\"\nEND IF\nEND"
-    }
-  ]
+ "reference": [
+  {
+   "name": "Backpack Check",
+   "text": "Problem: Backpack Check\nSTART\nINPUT number of textbooks\nINPUT weight of one textbook\nINPUT student weight\nSET backpack weight TO number of textbooks * weight of one textbook\nSET guideline TO student weight / 10\nIF backpack weight <= guideline THEN\n    PRINT \"The backpack is a safe weight\"\nELSE\n    PRINT \"The backpack is over the guideline\"\nEND IF\nEND"
+  },
+  {
+   "name": "Screen Time",
+   "text": "Problem: Screen Time\nSTART\nINPUT minutes on day 1\nINPUT minutes on day 2\nINPUT minutes on day 3\nINPUT minutes on day 4\nINPUT minutes on day 5\nINPUT minutes on day 6\nINPUT minutes on day 7\nSET total minutes TO day 1 + day 2 + day 3 + day 4 + day 5 + day 6 + day 7\nSET daily average TO total minutes / 7\nIF daily average <= 120 THEN\n    PRINT \"Within the 120-minute daily limit\"\nELSE\n    PRINT \"Averaging over the daily limit\"\nEND IF\nEND"
+  },
+  {
+   "name": "Print Job",
+   "text": "Problem: Print Job\nSTART\nINPUT number of pages\nSET job cost TO number of pages * 0.08\nIF job cost <= 5.00 THEN\n    PRINT \"The job can be printed\"\nELSE\n    PRINT \"Not enough left in the account\"\nEND IF\nEND"
+  },
+  {
+   "name": "different words and keywords (Backpack Check, lowercase, otherwise)",
+   "text": "Problem: Backpack Check\nstart\nget how many textbooks\nget what one textbook weighs\nget the student's weight\nset pack weight to books times the weight of one\nset the limit to the student's weight divided by 10\nif the pack weight is at most the limit\n    report that the pack is fine\notherwise\n    report that the pack is too heavy\nend"
+  },
+  {
+   "name": "different words and keywords (Print Job, reversed question, branches swapped to match; cents against 500)",
+   "text": "Problem: Print Job\nBEGIN\nREAD pages\nCOMPUTE cost in cents = pages * 8\nIF cost in cents > 500 THEN\n    OUTPUT the account does not have enough\nELSE\n    OUTPUT the job can print\nEND IF\nSTOP"
+  },
+  {
+   "name": "terse Screen Time with the average inside one line",
+   "text": "Problem: Screen Time\nSTART\nINPUT d1, d2, d3, d4, d5, d6, d7\nSET avg TO (d1 + d2 + d3 + d4 + d5 + d6 + d7) / 7\nIF avg > 120 THEN\n    PRINT \"over the limit\"\nELSE\n    PRINT \"within the limit\"\nEND IF\nEND"
+  },
+  {
+   "name": "five-line outline (Backpack Check)",
+   "text": "Problem: Backpack Check\n\nGET: number of textbooks, weight of one textbook, my weight\n\nWORK OUT: backpack weight = textbooks * weight of one\n\nASK: is the backpack weight at most my weight divided by 10?\n\nYES: report that the backpack is safe to carry\n\nNO: report that the backpack is too heavy"
+  },
+  {
+   "name": "outline as plain sentences (Screen Time)",
+   "text": "I take in the minutes for each of the seven days. Then I add them up and divide by 7 to get the daily average. Then I ask whether the average is more than 120 minutes. If it is, I tell the student they are over the limit; if it is not, I tell them they are within it."
+  },
+  {
+   "name": "outline (Print Job)",
+   "text": "GET: pages\nWORK OUT: cost = pages * 0.08\nASK: is cost over 5.00?\nYES: report not enough money in the account\nNO: report the job can be printed"
+  }
+ ],
+ "mustNotPass": [
+  {
+   "name": "outcomes reversed (Print Job)",
+   "text": "Problem: Print Job\nSTART\nINPUT number of pages\nSET job cost TO number of pages * 0.08\nIF job cost <= 5.00 THEN\n    PRINT \"Not enough left in the account\"\nELSE\n    PRINT \"The job can be printed\"\nEND IF\nEND"
+  },
+  {
+   "name": "total compared instead of the average (Screen Time)",
+   "text": "Problem: Screen Time\nSTART\nINPUT minutes on day 1\nINPUT minutes on day 2\nINPUT minutes on day 3\nINPUT minutes on day 4\nINPUT minutes on day 5\nINPUT minutes on day 6\nINPUT minutes on day 7\nSET total minutes TO day 1 + day 2 + day 3 + day 4 + day 5 + day 6 + day 7\nIF total minutes <= 120 THEN\n    PRINT \"Within the daily limit\"\nELSE\n    PRINT \"Over the daily limit\"\nEND IF\nEND"
+  },
+  {
+   "name": "mixed units: cents against dollars (Print Job)",
+   "text": "Problem: Print Job\nSTART\nINPUT number of pages\nSET job cost TO number of pages * 8\nIF job cost <= 5.00 THEN\n    PRINT \"The job can be printed\"\nELSE\n    PRINT \"Not enough left in the account\"\nEND IF\nEND"
+  },
+  {
+   "name": "one branch only (Backpack Check)",
+   "text": "Problem: Backpack Check\nSTART\nINPUT number of textbooks\nINPUT weight of one textbook\nINPUT student weight\nSET backpack weight TO number of textbooks * weight of one textbook\nSET guideline TO student weight / 10\nIF backpack weight <= guideline THEN\n    PRINT \"The backpack is a safe weight\"\nEND IF\nEND"
+  },
+  {
+   "name": "guideline is the whole weight, not a tenth (Backpack Check)",
+   "text": "Problem: Backpack Check\nSTART\nINPUT number of textbooks\nINPUT weight of one textbook\nINPUT student weight\nSET backpack weight TO number of textbooks * weight of one textbook\nIF backpack weight <= student weight THEN\n    PRINT \"safe\"\nELSE\n    PRINT \"too heavy\"\nEND IF\nEND"
+  },
+  {
+   "name": "report before the decision, same on both sides (Print Job)",
+   "text": "Problem: Print Job\nSTART\nINPUT number of pages\nPRINT \"the job is checked\"\nSET job cost TO number of pages * 0.08\nIF job cost <= 5.00 THEN\n    PRINT \"done\"\nELSE\n    PRINT \"done\"\nEND IF\nEND"
+  },
+  {
+   "name": "words from a different problem: Screen Time words on a Print Job plan",
+   "text": "Problem: Print Job\nSTART\nINPUT number of pages\nSET job cost TO number of pages * 0.08\nIF job cost <= 5.00 THEN\n    PRINT \"Within the 120-minute daily limit\"\nELSE\n    PRINT \"Averaging over the daily limit\"\nEND IF\nEND"
+  },
+  {
+   "name": "body of junk steps behind a good skeleton",
+   "text": "Problem: Screen Time\nSTART\nINPUT x\nSET y TO do stuff\nIF it is a lot THEN\n    PRINT yes\nELSE\n    PRINT no\nEND IF\nEND"
+  },
+  {
+   "name": "comparison with no work-out step and no inputs",
+   "text": "Problem: Print Job\nSTART\nIF the job is too expensive THEN\n    PRINT \"no\"\nELSE\n    PRINT \"yes\"\nEND IF\nEND"
+  },
+  {
+   "name": "outline with the labels empty",
+   "text": "Problem: Print Job\n\nGET:\n\nWORK OUT:\n\nASK:\n\nYES:\n\nNO:"
+  },
+  {
+   "name": "outline, Screen Time compares the total with 120",
+   "text": "GET: minutes for seven days\nWORK OUT: total = all seven days added\nASK: is the total at most 120?\nYES: report within the limit\nNO: report over the limit"
+  },
+  {
+   "name": "outline, both sides report the same thing",
+   "text": "GET: pages\nWORK OUT: cost = pages * 0.08\nASK: is cost at most 5.00?\nYES: report the job is done\nNO: report the job is done"
+  }
+ ]
 }

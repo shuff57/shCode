@@ -14,7 +14,7 @@ In practice most programmers reach for **pseudocode by default**, and draw a **f
 
 Which is the honest description of when a flowchart earns its cost: not for every program, but for the one branch you keep getting wrong.
 
-> **This course is stricter than that.** From here on, every graded build artifact opens with a flowchart, and the in-app coding lesson stays locked until the chart passes the structural checks. That is a teaching decision, not industry practice: the point is to build the design-before-code habit while the programs are small enough for it to be quick. 1.5.29 covers the rule in full.
+> **This course is stricter than that.** From here on, every graded build opens with a plan written in pseudocode before the code. That is a teaching decision, not industry practice: the point is to build the design-before-code habit while the programs are small enough for it to be quick. 1.5.29 covers the rule in full.
 
 **What you'll learn from it:**
 - Pseudocode is faster to write and edit, and scales to long programs.

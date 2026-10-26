@@ -1,6 +1,11 @@
 Problem:
 
-PLAN
-START
+GET:
 
-END
+WORK OUT:
+
+ASK:
+
+YES:
+
+NO:

@@ -1,19 +1,21 @@
-# Reference answer — Part 4: Plan It
+# Reference answer — Part 4: Outline It
 
-Pseudocode plan for Print Job. A student who picked Backpack Check or Screen Time instead
-is marked against THAT problem — see lesson.json → aiGrader.prompt. This is one acceptable
-shape, not the only one: different keywords and phrasing score the same as long as the plan
-takes in what the problem names, has a line that says how the one value is worked out, asks
-the comparison against the problem's own limit, and reports something different on each side.
+Outline for Print Job. A student who picked Backpack Check or Screen Time instead is marked
+against THAT problem — see lesson.json → aiGrader.prompt. This is one acceptable shape, not the
+only one: any wording, with or without the labels, scores the same as long as the outline takes
+in what the problem names, says how the one value is worked out, asks the question against the
+problem's own limit, and reports something different on each side.
 
 ```
-START
-INPUT number of pages
-SET job cost TO number of pages * 0.08
-IF job cost <= 5.00 THEN
-    PRINT "The job can be printed"
-ELSE
-    PRINT "Not enough left in the account"
-END IF
-END
+Problem: Print Job
+
+GET: the number of pages
+
+WORK OUT: job cost = number of pages * 0.08
+
+ASK: is the job cost at most 5.00?
+
+YES: report that the job can be printed
+
+NO: report that there is not enough left in the account
 ```

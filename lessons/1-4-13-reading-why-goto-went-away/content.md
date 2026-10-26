@@ -6,7 +6,7 @@ Early languages let a program jump to any line at any time, with an instruction 
 
 Structured programming was the argument that giving up that freedom made programs *possible to reason about*. It was controversial at the time and it is not controversial now: the freedom is rarely missed.
 
-This is the first example in this course of a restriction being a feature, and it will not be the last. The class flowchart convention in §1.5 is the same trade in a different costume: fewer things you are allowed to draw, in exchange for charts anyone can read.
+This is the first example in this course of a restriction being a feature, and it will not be the last. The class plan convention in §1.5 is the same trade in a different costume: fewer things you are allowed to write, in exchange for plans anyone can read.
 
 **What you'll learn from it:**
 - `goto` let a program jump to any line from any line.

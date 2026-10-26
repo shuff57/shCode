@@ -1,7 +1,7 @@
 {
   "id": "1-5-29-reading-the-flowchart-convention",
-  "title": "1.5.29 Reading: The Class Flowchart Convention",
-  "description": "The rule for the rest of the course: every graded build opens with a flowchart, and the flowchart goes first. What gets checked, what does not, and how big a chart should be.",
+  "title": "1.5.29 Reading: The Class Plan Convention",
+  "description": "The rule for the rest of the course: every graded build opens with a plan, and the plan goes first. What a plan looks like, what the checks can and cannot see, and how big a plan should get.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
