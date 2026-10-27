@@ -67,8 +67,10 @@ for (const d of dirs) {
 
   // the solution, for the "don't hand over the answer" check
   const solPath = path.join(root, 'lessons', d, 'solution.js');
-  const solLines = fs.existsSync(solPath)
-    ? fs.readFileSync(solPath, 'utf8').split('\n').map(norm).filter((l) => l.length > 12)
+  const solDirPath = path.join(root, 'lessons', d, 'solution', 'script.js');
+  const solFile = fs.existsSync(solPath) ? solPath : solDirPath;
+  const solLines = fs.existsSync(solFile)
+    ? fs.readFileSync(solFile, 'utf8').split('\n').map(norm).filter((l) => l.length > 12)
     : [];
 
   for (const s of lesson.steps) {

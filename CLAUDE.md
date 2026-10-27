@@ -665,6 +665,25 @@ directory form exists because A1.3.1 (`1-3-19`) grades `README.md` as well as
 `script.js`, so a script-only reference scored 8/10 and Submit could never be
 demonstrated.
 
+**Per-problem variants (the Chapter 3 group PA).** A lesson can carry one answer
+per problem the assignment offers, as `solution/variants/<problem>/<same paths>`
+(`snack-shack`, `lap-times`, `seed-tray`, `library-cart`). It is still the
+directory form — the root files are the default answer, and a variant is just
+another file under `solution/`, so `/api/lesson-solution` returns it keyed
+`variants/<problem>/...` with no server code involved. `lib/solution-variants.ts`
+groups the flat map and strips the prefix; `components/SolutionPanel.tsx` shows
+the picker and inserts only the selected group's files. `check-starters.mjs`
+grades every variant against the lesson's requirements (the reference must score
+full), and `test-pa-ai-graders.mjs` feeds them to the live grader. Three lessons
+use this: 3.9.1 (plans), 3.9.2 (builds; its root answer moved from `solution.js`
+to `solution/script.js`), and 3.9.3 (reflect answers). **A file under `solution/` is exactly
+what the panel inserts**, so it holds the answer and nothing else — no markdown
+title, no fence, no teaching notes. The AI grader reads an inserted "here is one
+example answer" as not the student's own work and marks it 0/4; that is how 3.9.3's
+first draft failed the live run. 3.9.3's after-tries reveal in `pa-pseudocode/`
+still wraps the same answer in that teaching text, and `test-pa-ai-graders.mjs`
+asserts the reveal contains the panel answer verbatim.
+
 **Adding a new exclusion is the dangerous part.** `lib/lessons.ts` and
 `scripts/generate-lesson-starters.mjs` both walk the lesson tree *recursively*
 and ship what they find to students. A `solution/` directory is kept out of

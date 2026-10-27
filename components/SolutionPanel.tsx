@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Eye } from 'lucide-react';
 import { getCurrentUser } from '../lib/auth';
+import { groupSolutionFiles } from '../lib/solution-variants';
 
 interface SolutionPanelProps {
   lessonId: string;
@@ -22,6 +23,9 @@ export default function SolutionPanel({ lessonId, onInsert, readOnly }: Solution
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<Record<string, string> | null>(null);
+  // Which problem's answer the picker is showing. Null until the teacher picks
+  // one, so the first group (the default answer) shows.
+  const [selected, setSelected] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -29,6 +33,14 @@ export default function SolutionPanel({ lessonId, onInsert, readOnly }: Solution
       setAllowed(u?.role === 'admin' || u?.role === 'teacher');
     });
   }, []);
+
+  // The workspace reuses this component when the student moves to another
+  // lesson; without this, the previous lesson's answer would still be on screen.
+  useEffect(() => {
+    setFiles(null);
+    setSelected(null);
+    setError(null);
+  }, [lessonId]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -76,13 +88,18 @@ export default function SolutionPanel({ lessonId, onInsert, readOnly }: Solution
     }
   };
 
+  const groups = groupSolutionFiles(files);
+  const active = groups.find((g) => g.id === selected) ?? groups[0] ?? null;
+  const hasVariants = groups.length > 1;
+  const paths = active ? Object.keys(active.files).sort() : [];
+
   const handleInsert = () => {
-    if (!files || !onInsert) return;
-    onInsert(files);
+    if (!active || !onInsert) return;
+    // `active.files` already has the `variants/<problem>/` prefix stripped, so
+    // the editor receives script.js, not variants/lap-times/script.js.
+    onInsert(active.files);
     setOpen(false);
   };
-
-  const paths = files ? Object.keys(files).sort() : [];
 
   if (!allowed) return null;
 
@@ -112,7 +129,13 @@ export default function SolutionPanel({ lessonId, onInsert, readOnly }: Solution
       >
         <div className="solution-dialog-content">
           <div className="solution-dialog-header">
-            <h3>{readOnly ? 'Answer key' : 'Reference solution'}</h3>
+            <h3>
+              {readOnly
+                ? 'Answer key'
+                : hasVariants && active
+                  ? `Reference solution — ${active.label}`
+                  : 'Reference solution'}
+            </h3>
             <span className="solution-dialog-badge">admin / teacher only</span>
           </div>
           <p className="solution-dialog-desc">
@@ -128,6 +151,42 @@ export default function SolutionPanel({ lessonId, onInsert, readOnly }: Solution
               </>
             )}
           </p>
+          {hasVariants && active && (
+            // One answer per menu problem. The label names the problem, so a
+            // teacher can find the pair's own choice rather than reading four
+            // near-identical files to guess which is which.
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                margin: '2px 0 10px',
+                fontSize: 13,
+                color: '#f8f8f2',
+              }}
+            >
+              <span>Problem</span>
+              <select
+                aria-label="Which problem's reference answer"
+                value={active.id}
+                onChange={(e) => setSelected(e.target.value)}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: 6,
+                  border: '1px solid #44475a',
+                  background: '#282a36',
+                  color: '#f8f8f2',
+                  fontSize: 13,
+                }}
+              >
+                {groups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           {loading && <div className="solution-dialog-status">Loading…</div>}
           {error && <div className="solution-dialog-status error">{error}</div>}
           {paths.map((p) => (
@@ -148,7 +207,7 @@ export default function SolutionPanel({ lessonId, onInsert, readOnly }: Solution
                 className="solution-dialog-code"
                 aria-label={`Reference solution — ${p}`}
               >
-                {files![p]}
+                {active ? active.files[p] : ''}
               </pre>
             </div>
           ))}

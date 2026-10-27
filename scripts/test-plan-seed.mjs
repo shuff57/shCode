@@ -1,12 +1,12 @@
 // Every `planFrom` lesson must seed the student's imported chart UNDER its
 // STEP 1 comment, not at the end of the file.
 //
-// Why this is a gate and not a comment: 1.6.2's r8 requires an IF/ELSE comment
-// pair after the stored comparison, because that pair is step 5's work. The
-// seeded chart is itself pseudocode containing `// IF` and `// ELSE`
-// (lib/diagram-pseudocode.ts). Seed it at the BOTTOM of the file and it lands
-// after the comparison and satisfies r8 on its own -- a green check for work
-// the student never did. That is exactly what shipped: the seeding anchor was
+// Why this is a gate and not a comment: 1.6.2's `branches-as-pseudocode`
+// requirement needs an IF/ELSE comment pair after the stored comparison,
+// because that pair is step 5's work. The seeded chart is itself pseudocode
+// containing `// IF` and `// ELSE` (lib/diagram-pseudocode.ts). Seed it at the
+// BOTTOM of the file and it lands after the comparison and satisfies the
+// requirement on its own -- a green check for work the student never did. That is exactly what shipped: the seeding anchor was
 // a sentence from 1.5.31's starter that 1.6.2's starter does not contain.
 //
 // Nothing about that coupling is visible from either file, so it is measured
@@ -102,16 +102,16 @@ try {
       step2At === -1 ? 'no STEP 2 to compare against' : 'seeded below the remaining steps');
 
     check(!seeded.trimEnd().endsWith('// END'), 'the chart is not appended at end of file',
-      'landed at the bottom, which is the shape that hollowed out r8');
+      'landed at the bottom, which is the shape that hollowed out branches-as-pseudocode');
   }
 
   // The coupling itself, on the lesson that has the check.
-  console.log('\n--- 1-6-2-ch1-pa-build: seeding must not satisfy r8 by itself ---');
+  console.log('\n--- 1-6-2-ch1-pa-build: seeding must not satisfy branches-as-pseudocode by itself ---');
   const build = JSON.parse(
     readFileSync(path.join(root, 'lessons', '1-6-2-ch1-pa-build', 'lesson.json'), 'utf8'),
   );
-  const r8 = build.requirements.find((r) => r.id === 'r8');
-  check(Boolean(r8), 'r8 exists');
+  const r8 = build.requirements.find((r) => r.id === 'branches-as-pseudocode');
+  check(Boolean(r8), 'the branches-as-pseudocode requirement exists');
   if (r8) {
     const re = new RegExp(r8.pattern, r8.flags || '');
     const starter = lf(
@@ -132,14 +132,14 @@ try {
     ].join('\n');
     const withoutStep5 = seeded.replace(/^\s*\/\/ STEP 7/m, work + '\n\n// STEP 7');
     check(withoutStep5 !== seeded, 'the fixture actually injected the student work');
-    check(!re.test(withoutStep5), 'r8 FAILS when step 5 is skipped',
-      'the seeded pseudocode satisfied r8 on its own');
+    check(!re.test(withoutStep5), 'branches-as-pseudocode FAILS when step 5 is skipped',
+      'the seeded pseudocode satisfied it on its own');
 
     const withStep5 = withoutStep5.replace(
       'console.log(typeof costPerSlice);',
       'console.log(typeof costPerSlice);\n\n// IF meetsTheLimit THEN report a good deal\n// ELSE report it is not',
     );
-    check(re.test(withStep5), 'r8 PASSES once step 5 is written');
+    check(re.test(withStep5), 'branches-as-pseudocode PASSES once step 5 is written');
   }
 
   // A WRITTEN plan (3.9.1) and an OLD drawn-chart draft are told apart, and each

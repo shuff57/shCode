@@ -2,6 +2,12 @@
 //
 //   1. The reference answer scores FULL marks.
 //   2. The shipped starter does NOT score full marks.
+//   3. Every alternative problem's answer scores FULL marks too.
+//
+// (3) exists because a group PA offers four problems and the Solution panel can
+// show any of them (solution/variants/<problem>/). The root answer is the one
+// (1) has always checked; without this, a variant could be wrong and nothing
+// would say so until a teacher inserted it in front of a class.
 //
 // (2) is the one worth having. A starter that already passes everything means
 // the lesson grades nothing: the student clicks Submit on untouched code, sees
@@ -23,7 +29,6 @@
 // Run: node scripts/check-starters.mjs   (also part of `npm test`)
 import { execFileSync } from 'child_process';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
-import { tmpdir } from 'os';
 import path from 'path';
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
@@ -72,7 +77,7 @@ let failures = 0;
 try {
   execFileSync(process.execPath, [
     path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-    'lib/run-tests-node.ts', '--outDir', out, '--module', 'commonjs',
+    'lib/run-tests-node.ts', 'lib/solution-variants.ts', '--outDir', out, '--module', 'commonjs',
     '--target', 'es2022', '--skipLibCheck',
   ], { cwd: root, stdio: 'inherit' });
   writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
@@ -81,11 +86,16 @@ try {
   // not" is measured on them too. For a lesson with none it is plain grade().
   const { gradeWithTests } = createRequire(import.meta.url)(
     path.join(out, 'run-tests-node.js').replace(/\\/g, '/'));
+  // Same grouping the Solution panel uses, so the check and the menu cannot
+  // disagree about what counts as a variant or which files belong to it.
+  const { groupSolutionFiles } = createRequire(import.meta.url)(
+    path.join(out, 'solution-variants.js').replace(/\\/g, '/'));
 
   const passed = async (reqs, files) =>
     (await gradeWithTests(reqs, files, 0)).results.filter((r) => r.status === 'passed').length;
 
   let checked = 0;
+  let variantsChecked = 0;
   const noReference = [];
   const noStarter = [];
 
@@ -100,6 +110,23 @@ try {
 
     const ref = referenceFiles(id);
     if (!ref) { noReference.push(id); continue; }
+
+    // Every alternative problem's answer must score full marks as well. This
+    // runs before the starter pairing because a variant has no starter of its
+    // own -- the student's file is the starter, whichever problem they picked.
+    for (const group of groupSolutionFiles(ref)) {
+      if (group.id === 'default') continue;
+      variantsChecked++;
+      const score = await passed(reqs, group.files);
+      if (score !== reqs.length) {
+        failures++;
+        const failing = (await gradeWithTests(reqs, group.files, 0)).results
+          .filter((r) => r.status === 'failed').map((r) => r.id).join(', ');
+        console.error(`FAIL ${id} (${group.label})\n     its variant answer scores ${score}/${reqs.length}`
+          + ` — its own answer fails: ${failing}`);
+      }
+    }
+
     const starter = starterFiles(id, Object.keys(ref));
     if (!starter) { noStarter.push(id); continue; }
     checked++;
@@ -121,7 +148,7 @@ try {
     }
   }
 
-  console.log(`\n[check-starters] ${checked} graded lesson(s) checked`);
+  console.log(`\n[check-starters] ${checked} graded lesson(s) checked, ${variantsChecked} alternative answer(s)`);
   if (noReference.length) {
     console.log(`  ${noReference.length} with requirements but no reference answer:`);
     for (const id of noReference) console.log(`    ${id}`);

@@ -1,3 +1,59 @@
+# 2026-10-27: Group PA Build parts scored, 3.9.1 uncapped + chart tabs (DEPLOYED, 99632677); per-problem reference answers added; NEXT: swap the grader model
+
+**Live on production (deployment `99632677`, branch cs-3d, HEAD `64f663c9`, tree clean):**
+- 1.6.2, 2.6.2, 3.9.2 are scored `aiGrader` parts: 8 one-point criteria, 70% pass, 3 tries, "Grade (N left)". Regex cards stay
+  as the fallback with the same ids. 3.9.3 is "Reflect" (4 criteria, rich Markdown editor). 3.9.1 and 3.9.3 pass at
+  "at least half met or partly met" (user's choice).
+- **3.9.1 has NO try limit** (user request). `UNCAPPED` in `scripts/check-pa-attempts.mjs` names it; `test-pa-ai-graders.mjs`
+  marks it `uncapped: true`. An uncapped part has no solution reveal and **must not have a `pa-pseudocode/<id>.md`**:
+  `generate-pa-pseudocode` refuses one and the deploy fails. Its reference is `lessons/3-9-1-*/solution/README.md`
+  (teacher Solution panel only). The old file was moved to the session scratchpad, not deleted from history (git-ignored).
+- 3.9.1 `planChart` has `variants` (Worked example, Snack Shack, Lap Times, Seed Tray, Library Cart); tabs in
+  `components/LabPlanChart.tsx`; `check-flow-figures.mjs` checks every variant. Checked in a real browser (dev server).
+- Every AI call (tutor, hints, grader, checker) uses the Workers AI binding when present (`lib/workers-ai.ts`); Ollama is
+  only the fallback. **Not verified:** that the production Pages project actually has the `AI` binding (dashboard:
+  Settings > Functions > Workers AI binding). Press Grade once as a student to prove it.
+
+**Open request 1: gemma-4-26b-a4b-it is too inconsistent on pseudocode parts.** User wants a bigger model and will supply
+real student responses. Candidates listed from `npx wrangler ai models list --json` (CLOUDFLARE_ACCOUNT_ID=bd9289625d5d3d62591c36e5ebe49055):
+gpt-oss-120b, nemotron-3-120b-a12b, glm-5.3-flash, deepseek-v4.1-flash-1017, qwen3.8-27b, kimi-k2.6, glm-5.3,
+deepseek-v4-pro-0813, llama-3.3-70b-instruct-fp8-fast. Plan: run the PA fixtures per model, add messy student variants and the
+user's responses (ask them for the part, which problem, and what it SHOULD score), then a ~25-request burst per top model
+(a frontier model once hit a 20 rpm cap at 25 simultaneous submits; gemma took all 25). Reasoning models need generous
+`max_tokens` and thinking off where allowed, or `content: null` reads as failure. Switch via `GRADE_WRITTEN_WORKERS_MODEL`
+or `DEFAULT_WORKERS_MODEL` in `lib/workers-ai.ts` only after the user picks. Nothing has been changed yet.
+- Live test: `WORKERS_PROXY=http://localhost:8799 node scripts/test-pa-ai-graders.mjs --live --filter=<id>`. The proxy is a
+  throwaway worker in the scratchpad `aiproxy/` (worker.js + wrangler.toml); start it with
+  `CLOUDFLARE_ACCOUNT_ID=... npx wrangler dev --remote --port 8799`. Check the model name the proxy forwards before comparing models.
+
+**Done (2026-10-27, after the deploy above): example solutions for all four scenarios** (Snack Shack,
+Lap Times, Seed Tray, Library Cart) for 3.9.1/3.9.2/3.9.3, selectable in the teacher Solution panel.
+3.9.2's `solution.js` became `solution/script.js` (the directory form); the root answer of each lesson is
+Snack Shack and `solution/variants/<problem>/` holds the other three. `lib/solution-variants.ts` groups the
+flat `/api/lesson-solution` map and strips the `variants/<problem>/` prefix; `components/SolutionPanel.tsx`
+shows a Problem picker when there is more than one group and inserts only the selected group;
+`scripts/test-solution-variants.mjs` (in `npm test`) pins the grouping; `check-starters.mjs` grades every
+variant against the lesson's requirements; `test-pa-ai-graders.mjs` feeds them to the live grader.
+**The rule the live run taught, and the reason it is in CLAUDE.md too: a file under `solution/` is exactly
+what the panel inserts, so it must be the answer and nothing else.** The first draft of 3.9.3 carried the
+reveal's teaching wrapper ("Here is one full answer…", "What makes this a full answer") and the grader
+called it "an example answer" and scored 0/4 on every criterion; 3.9.1's plans carried a heading and a
+fence. Both were fixed by stripping the files to the answer body. 3.9.3's `pa-pseudocode/` reveal keeps the
+wrapper, and the test now asserts the reveal contains the panel answer verbatim (it used to assert
+byte-equality, which forced the wrapper into the insert). Live results after the fix, on
+`@cf/google/gemma-4-26b-a4b-it` through the Workers AI proxy: 3.9.1 five plans pass, 3.9.2 four builds
+score 8/8, 3.9.3 four answers score 4/4; every gaming fixture still fails.
+A lesson with both `solution.js` and `solution/` fails the build; `scripts/test-lesson-solution-parity.mjs`
+and `check-solution-leak.mjs` read these files too.
+
+**Traps that cost time this session**
+- `pkill -f "wrangler dev --remote"` in the same command as other work kills the shell (exit 144). Run it alone, or kill the pid.
+- Deploy: stop the dev server first, `rm -rf .next`, `TRIES_STAMP_ALLOW_OLD=1 npm run deploy`, then `git checkout next-env.d.ts`.
+- Running generators/checks can rewrite an unrelated lesson (`3-8-14-lab-malformed-json` hint changed once); revert it, do not commit it.
+- Rubric descriptions must differ from regex-card descriptions (leak check); prompts must not contain their own lesson number.
+- `stash@{0}` belongs to another session; do not pop it.
+- Not run since these changes: the full `npm test`.
+
 # 2026-10-17 (later): 3.7 and 3.8 labs: student names, hollow-answer traces, taught forms accepted (DEPLOYED 2026-10-18, two lens rounds)
 
 From the three student-lens reviews of 3.7/3.8. **Already live, partly:** another session ran `npm run deploy` from
