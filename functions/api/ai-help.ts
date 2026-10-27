@@ -1,4 +1,5 @@
-// POST /api/ai-help — streams Socratic tutoring from Ollama. Two modes, one
+// POST /api/ai-help — streams Socratic tutoring from Cloudflare Workers AI (the `AI` binding; Ollama only
+// when a deploy or dev server has no binding). Two modes, one
 // endpoint, because everything around the prompt is shared:
 //
 //   'code'    (default) moSHion JavaScript. Prompt built from the student's
@@ -20,12 +21,17 @@
 
 import { findRelevantDocs, type RelevantDoc } from '../../lib/moshion-docs';
 import { chatStream } from '../../lib/ollama';
+import { DEFAULT_WORKERS_MODEL, workersChatStream, type WorkersAi } from '../../lib/workers-ai';
 import { findPII } from '../../lib/pii-check';
 import { resolveUnitForLesson, type UnitResolver } from '../_shared/lessonUnit';
 
 interface Env {
   DB: D1Database;
-  OLLAMA_API_KEY: string;
+  // Workers AI, the transport whenever the binding exists (same as the grader).
+  AI?: WorkersAi;
+  // Optional Workers AI model override, shared with the grader. Default gemma-4-26b-a4b-it.
+  GRADE_WRITTEN_WORKERS_MODEL?: string;
+  OLLAMA_API_KEY?: string;
   OLLAMA_HOST?: string;
   ASSETS?: Fetcher;
   // Optional: override the per-student per-unit daily request quota. Default 10.
@@ -390,9 +396,9 @@ export function trimLongCodeBlocks(input: ReadableStream<Uint8Array>, maxLines: 
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
   const { request, env, data } = context;
 
-  if (!env.OLLAMA_API_KEY) {
+  if (!env.AI && !env.OLLAMA_API_KEY) {
     return json(
-      { error: 'Server is missing OLLAMA_API_KEY. Ask your teacher to configure it.' },
+      { error: 'AI help is not configured on this server. Ask your teacher to add the Workers AI binding.' },
       503,
     );
   }
@@ -525,16 +531,24 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
 
   let raw: ReadableStream<Uint8Array>;
   try {
-    raw = await chatStream({
-      model: 'glm-5.3-flash:cloud',
-      host: env.OLLAMA_HOST,
-      apiKey: env.OLLAMA_API_KEY,
-      temperature: 0.3,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-    });
+    const messages = [
+      { role: 'system' as const, content: system },
+      { role: 'user' as const, content: user },
+    ];
+    raw = env.AI
+      ? await workersChatStream({
+          ai: env.AI,
+          model: (env.GRADE_WRITTEN_WORKERS_MODEL || '').trim() || DEFAULT_WORKERS_MODEL,
+          messages,
+          temperature: 0.3,
+        })
+      : await chatStream({
+          model: 'glm-5.3-flash:cloud',
+          host: env.OLLAMA_HOST,
+          apiKey: env.OLLAMA_API_KEY,
+          temperature: 0.3,
+          messages,
+        });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error('ai-help upstream failure:', msg);

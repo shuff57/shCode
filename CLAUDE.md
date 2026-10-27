@@ -201,9 +201,10 @@ demanded it.
   filename. Every `/api/*` path (except `/api/auth/*`) is gated by the auth
   middleware at `functions/_middleware.ts`.
 - **DB** — Cloudflare D1 (SQLite). Bindings declared in `wrangler.toml`.
-- **AI grader** — Cloudflare Workers AI through the `AI` binding when the
-  deploy has one, otherwise Ollama cloud; both in
-  `functions/api/grade-written.ts` (Ollama reads the `OLLAMA_API_KEY` secret).
+- **AI** — every AI call goes through Cloudflare Workers AI (the `AI` binding): the grader and the
+  Check button in `functions/api/grade-written.ts`, the tutor and flowchart hints in
+  `functions/api/ai-help.ts` (streamed by `lib/workers-ai.ts`). Ollama cloud (`OLLAMA_API_KEY`) is
+  only the fallback for a dev server or a deploy with no binding.
 
 ## Role model
 
@@ -225,7 +226,7 @@ Cloudflare dashboard env vars pane (plain vars):
 | Name | Kind | Purpose |
 | --- | --- | --- |
 | `AUTH_SECRET` | secret | HS256 signing key for session JWTs |
-| `OLLAMA_API_KEY` | secret | Bearer token for `https://ollama.com/api/chat` |
+| `OLLAMA_API_KEY` | secret | Fallback only: bearer token for `https://ollama.com/api/chat`, used when the deploy has no `AI` binding |
 | `OLLAMA_HOST` | var (optional) | Override Ollama endpoint (defaults to `https://ollama.com`) |
 | `ADMIN_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='admin'` |
 | `TEACHER_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='teacher'` |
@@ -233,7 +234,7 @@ Cloudflare dashboard env vars pane (plain vars):
 | `AI_HELP_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/ai-help` across all students; default `5000`. The backstop that keeps one compromised account (or a signup burst — registration has no email verification yet) from exhausting the Ollama account's weekly allowance. |
 | `GRADE_WRITTEN_DAILY_LIMIT` | var (optional) | Per-student daily submission cap for `POST /api/grade-written`; default `30`. Teachers/admins are exempt. A runaway-cost stop, not a pedagogical one — the course allows unlimited retries, so raise it rather than let a student hit it. |
 | `GRADE_WRITTEN_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/grade-written`; default `10000`. Same backstop as `AI_HELP_GLOBAL_DAILY_LIMIT`, for the grader. |
-| `GRADE_WRITTEN_WORKERS_MODEL` | var (optional) | Workers AI model id for the grader; default `@cf/google/gemma-4-26b-a4b-it`. Only read when the `AI` binding exists. |
+| `GRADE_WRITTEN_WORKERS_MODEL` | var (optional) | Workers AI model id for every AI call (grader, Check, tutor); default `@cf/google/gemma-4-26b-a4b-it`. Only read when the `AI` binding exists. |
 
 ## D1 schema
 
@@ -347,7 +348,7 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   there is no diagram-specific table.
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
-- `POST /api/ai-help` streams `text/plain`, trims code blocks to <=3 lines, and
+- `POST /api/ai-help` streams `text/plain` from Workers AI (`lib/workers-ai.ts`), trims code blocks to <=3 lines, and
   is quota'd per student **per unit** per UTC day (`AI_HELP_DAILY_LIMIT`). The
   unit in the bucket key is resolved SERVER-SIDE from
   `public/lessons-manifest.json` (`functions/_shared/lessonUnit.ts`); the

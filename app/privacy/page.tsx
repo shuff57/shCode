@@ -62,8 +62,7 @@ export default function PrivacyPage() {
 
       <h2>Who else handles it</h2>
       <ul>
-        <li><strong>Cloudflare:</strong> hosting, the database, file storage and security logs.</li>
-        <li><strong>Ollama:</strong> the AI provider that writes AI help hints.</li>
+        <li><strong>Cloudflare:</strong> hosting, the database, file storage, security logs, and the AI (Workers AI) that writes help hints and gives feedback on written answers.</li>
       </ul>
       <p>
         These providers process data only to provide their service to us. We may also disclose information if the law

@@ -69,6 +69,7 @@ import { sanitizeDiagramDoc } from '../../lib/diagram-artifact';
 import { describeDiagram } from '../../lib/diagram-mermaid';
 import { checkDiagram, allPassed } from '../../lib/diagram-check';
 import { splitRubric, scoreDiagram, mergeGrade, type DiagramScore } from '../../lib/diagram-score';
+import { DEFAULT_WORKERS_MODEL } from '../../lib/workers-ai';
 import { capFor, kindFor, attemptsUsed, recordGraded, recordOutage, isStaff, effectiveCap, cleanArtifact } from '../_shared/attempts';
 
 /** The Workers AI binding (`env.AI`). Narrowed to the one method this route
@@ -118,7 +119,7 @@ const GRADE_WRITTEN_GLOBAL_BUCKET = 'grade-written:global';
 const DEFAULT_CLOUD_MODEL = 'glm-5.3-flash:cloud';
 // The Workers AI model the course measured: 20/20 on the classroom rubric and
 // 25/25 under a 25-way burst. Override per deploy with GRADE_WRITTEN_WORKERS_MODEL.
-const DEFAULT_WORKERS_MODEL = '@cf/google/gemma-4-26b-a4b-it';
+// DEFAULT_WORKERS_MODEL comes from lib/workers-ai.ts, shared with the tutor.
 
 
 type Ctx = EventContext<Env, string, SessionData>;
