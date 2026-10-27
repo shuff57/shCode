@@ -626,6 +626,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
                 ? 'No tries left'
                 : maxSubmissions !== null && attemptsKnown
                 ? `Grade (${Math.max(0, maxSubmissions - attempts)} left)`
+                : typeof config.maxSubmissions === 'number'
+                ? 'Grade'
                 : result
                 ? 'Re-submit for feedback'
                 : 'Submit for feedback'}
