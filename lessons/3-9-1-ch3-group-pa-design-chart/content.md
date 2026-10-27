@@ -167,9 +167,8 @@ without the other is half of it.
 
 ### Before you submit
 
-**You get three tries.** Each partner submits their own: submit, read the feedback on
+**Try as many times as you like.** Each partner submits their own: submit, read the feedback on
 whether your plan covers your problem, rewrite it and submit again. Your best try counts.
-After your third try you can see how it is solved, once your teacher releases it.
 
 Exact wording does not matter, and neither does spelling. Before you call it done, walk
 one record through your plan out loud — and then walk the *list*, because the loop is

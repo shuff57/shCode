@@ -33,6 +33,8 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 const LESSONS = path.join(ROOT, 'lessons');
 const PSEUDO = path.join(ROOT, 'pa-pseudocode');
 const WANT = 3;
+// Parts the teacher chose to leave uncapped. They need no maxSubmissions and no solution reveal.
+const UNCAPPED = new Set(['3-9-1-ch3-group-pa-design-chart']);
 const listOnly = process.argv.includes('--list');
 // The pseudocode is git-ignored (the repo is public; see pa-pseudocode/README.md), so a
 // fresh clone has none. Without this flag a missing file is reported but does not fail:
@@ -76,7 +78,8 @@ for (const id of fs.readdirSync(LESSONS).sort()) {
 
   const gaps = [];
   const caps = capOf(lesson);
-  if (caps.length === 0) gaps.push('no maxSubmissions');
+  if (UNCAPPED.has(id)) { if (caps.length) gaps.push('is meant to be uncapped but still sets maxSubmissions'); }
+  else if (caps.length === 0) gaps.push('no maxSubmissions');
   else {
     if (!caps.some((c) => c.value === WANT)) gaps.push(`maxSubmissions is ${caps.map((c) => c.value).join('/')}, want ${WANT}`);
     const reads = readsFor(lesson);

@@ -51,7 +51,7 @@ const PARTS = {
   '3-10-4-ch3-individual-pa-chart-it': { cap: 'aiGrader', points: 10, kind: 'plan' },
   '1-6-1-ch1-pa-design-chart': { cap: 'aiGrader', points: 0, kind: 'plan' },
   '2-6-1-ch2-group-pa-design-chart': { cap: 'aiGrader', points: 0, kind: 'plan' },
-  '3-9-1-ch3-group-pa-design-chart': { cap: 'aiGrader', points: 0, kind: 'plan' },
+  '3-9-1-ch3-group-pa-design-chart': { cap: 'aiGrader', points: 0, kind: 'plan', uncapped: true },
   '1-7-3-ch1-individual-pa-find-and-fix': { cap: 'grading', points: 20, kind: 'fix' },
   '2-7-3-ch2-individual-pa-find-and-fix': { cap: 'grading', points: 20, kind: 'fix' },
   '3-10-3-ch3-individual-pa-find-and-fix': { cap: 'grading', points: 20, kind: 'fix' },
@@ -101,7 +101,8 @@ try {
       check(/never|do not write the fix|not write the correct/i.test(g.prompt) || meta.kind === 'chart', `${id}: the brief does not keep the repair out of the feedback`);
     }
     const authored = meta.cap === 'diagram' ? lesson.diagram : meta.cap === 'grading' ? lesson.grading : lesson.aiGrader;
-    check(authored && authored.maxSubmissions === 3, `${id}: maxSubmissions 3 is not on ${meta.cap}, where its renderer reads it`);
+    if (meta.uncapped) check(authored && authored.maxSubmissions === undefined, `${id}: is meant to be uncapped but sets maxSubmissions`);
+    else check(authored && authored.maxSubmissions === 3, `${id}: maxSubmissions 3 is not on ${meta.cap}, where its renderer reads it`);
     const src = meta.kind === 'chart' ? lesson.diagram.aiGrader : lesson.aiGrader;
     check(src && src.summative === true && src.revisable === true, `${id}: the AI block must be summative + revisable`);
 

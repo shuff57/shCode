@@ -18,8 +18,7 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true,
-    "summative": true,
-    "maxSubmissions": 3
+    "summative": true
   },
   "steps": [
     {
@@ -50,7 +49,7 @@
     {
       "id": "s6",
       "title": "Before you submit",
-      "instructions": "**You get three tries.** Each partner submits their own: submit, read the feedback on whether your plan covers your problem, rewrite it and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.\n\nExact wording does not matter, and neither does spelling. Before you call it done, walk one record through your plan out loud — and then walk the *list*, because the loop is where this chapter's programs stop being straight lines. Part 2 will open your saved plan beside your code, so write something you will want to read again."
+      "instructions": "**Try as many times as you like.** Each partner submits their own: submit, read the feedback on whether your plan covers your problem, rewrite it and submit again. Your best try counts.\n\nExact wording does not matter, and neither does spelling. Before you call it done, walk one record through your plan out loud — and then walk the *list*, because the loop is where this chapter's programs stop being straight lines. Part 2 will open your saved plan beside your code, so write something you will want to read again."
     }
   ],
   "requirements": [
@@ -104,7 +103,6 @@
     "summative": true,
     "revisable": true,
     "strict": true,
-    "maxSubmissions": 3,
     "rubricTitle": "Chapter 3 Group PA, Part 1: Design the Plan",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
