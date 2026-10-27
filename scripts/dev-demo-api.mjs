@@ -22,6 +22,7 @@ import { onRequestGet as stateIndexGet } from '../functions/api/lesson-state/ind
 import { onRequestPost as statePost, onRequestDelete as stateDelete } from '../functions/api/lesson-state/[lessonId].ts';
 import { onRequestGet as submissionsGet, onRequestPost as submissionsPost } from '../functions/api/lesson-submissions/index.ts';
 import { onRequestGet as gradeGet, onRequestPost as gradePost } from '../functions/api/grade-written.ts';
+import { onRequestPost as aiHelpPost } from '../functions/api/ai-help.ts';
 import { onRequestGet as attemptRevealGet } from '../functions/api/attempt-reveal.ts';
 import { onRequestGet as quizRevealGet } from '../functions/api/quiz-reveal.ts';
 import { onRequestGet as myGradebookGet } from '../functions/api/my-gradebook.ts';
@@ -183,8 +184,28 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
         try { return new Response(fs.readFileSync(file), { headers: { 'Content-Type': 'application/json' } }); } catch { return new Response('not found', { status: 404 }); }
       },
     },
-    OLLAMA_API_KEY: 'demo',
-    get OLLAMA_HOST() { return `http://127.0.0.1:${fakePort}`; },
+    // A fake Workers AI binding, so the dev server takes the same path production does (the grader, the Check
+    // button and the tutor all go through env.AI). Grading prompts are answered by the fake model above; the
+    // tutor gets a canned streamed hint. No Ollama key or host is set, so a fallback would be a visible error.
+    AI: {
+      async run(model, inputs) {
+        const grading = !inputs.stream;
+        if (grading) {
+          const r = await fetch(`http://127.0.0.1:${fakePort}/api/chat`, { method: 'POST', body: JSON.stringify({ model, messages: inputs.messages }) });
+          const frame = JSON.parse((await r.text()).trim().split('\n')[0]);
+          return { response: frame.message.content };
+        }
+        const enc = new TextEncoder();
+        const pieces = ['Demo tutor (Workers AI): ', 'read the line that the error points at, ', 'then say in your own words what you expected it to do.'];
+        return new ReadableStream({
+          start(c) {
+            for (const t of pieces) c.enqueue(enc.encode('data: ' + JSON.stringify({ response: t }) + '\n\n'));
+            c.enqueue(enc.encode('data: [DONE]\n\n'));
+            c.close();
+          },
+        });
+      },
+    },
     GRADE_WRITTEN_DAILY_LIMIT: '1000',
   };
 
@@ -233,6 +254,7 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   server.post('/api/lesson-submissions', json, route(submissionsPost));
   server.get('/api/grade-written', route(gradeGet));
   server.post('/api/grade-written', json, route(gradePost));
+  server.post('/api/ai-help', json, route(aiHelpPost));
   server.get('/api/attempt-reveal', route(attemptRevealGet));
   server.get('/api/quiz-reveal', route(quizRevealGet));
   server.get('/api/my-gradebook', route(myGradebookGet));
