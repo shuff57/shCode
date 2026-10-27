@@ -1181,7 +1181,7 @@ export default function LessonWorkspace({
         />
       )}
       {lesson.planChart && (
-        <LabPlanChart lessonId={lesson.id} mermaid={lesson.planChart.mermaid} caption={lesson.planChart.caption} />
+        <LabPlanChart lessonId={lesson.id} mermaid={lesson.planChart.mermaid} caption={lesson.planChart.caption} variants={lesson.planChart.variants} />
       )}
       <div className="editor-card">
         <div className="editor-body">

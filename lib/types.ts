@@ -285,7 +285,12 @@ export interface Lesson {
   /** An authored flowchart of the plan, shown collapsed-or-open above the
    *  editor of a lab (components/LabPlanChart.tsx). Mermaid, same subset as a
    *  ```flow fence. Shows what to do, not this lab's answer. */
-  planChart?: { mermaid: string; caption?: string };
+  planChart?: {
+    mermaid: string;
+    caption?: string;
+    /** Extra charts the student can switch between (the first is shown first). `mermaid` stays the default. */
+    variants?: { id: string; label: string; mermaid: string; caption?: string }[];
+  };
   planFrom?: string;
   /** A text-plan lab that a later part reads with `planFrom`: its README.md is mirrored to the draft store (components/LessonWorkspace.tsx). */
   savesPlan?: boolean;

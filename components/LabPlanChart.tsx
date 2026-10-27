@@ -18,12 +18,16 @@ interface Props {
   lessonId: string;
   mermaid: string;
   caption?: string;
+  /** Other charts to switch between (e.g. one per problem). When absent, `mermaid` is the only chart. */
+  variants?: { id: string; label: string; mermaid: string; caption?: string }[];
 }
 
 const KEY = 'shCode:lab-plan-chart-open:';
 
-export default function LabPlanChart({ lessonId, mermaid, caption }: Props) {
+export default function LabPlanChart({ lessonId, mermaid, caption, variants }: Props) {
   const [open, setOpen] = useState(false);
+  const [picked, setPicked] = useState(variants?.[0]?.id ?? '');
+  const shown = variants?.find((v) => v.id === picked) ?? variants?.[0] ?? { id: 'only', label: '', mermaid, caption };
 
   // Read the remembered choice after mount so server and client markup match.
   useEffect(() => {
@@ -52,13 +56,43 @@ export default function LabPlanChart({ lessonId, mermaid, caption }: Props) {
       <summary style={{ cursor: 'pointer', color: '#8be9fd', fontSize: 14, fontWeight: 600 }}>
         Flow Chart
       </summary>
+      {open && variants && variants.length > 1 ? (
+        <div role="tablist" aria-label="Choose a flow chart" style={{ display: 'flex', flexWrap: 'wrap', gap: 6, margin: '10px 0 4px' }}>
+          {variants.map((v) => {
+            const on = v.id === shown.id;
+            return (
+              <button
+                key={v.id}
+                type="button"
+                role="tab"
+                aria-selected={on}
+                onClick={() => setPicked(v.id)}
+                style={{
+                  padding: '4px 12px',
+                  minHeight: 30,
+                  borderRadius: 6,
+                  border: `1px solid ${on ? '#bd93f9' : '#44475a'}`,
+                  background: on ? '#bd93f9' : '#282a36',
+                  color: on ? '#282a36' : '#f8f8f2',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {v.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
       {open ? (
         <DiagramBlock
-          source={mermaid}
-          blockId={`lab-plan-${lessonId}`}
+          key={shown.id}
+          source={shown.mermaid}
+          blockId={`lab-plan-${lessonId}-${shown.id}`}
           lessonId={lessonId}
           readOnly
-          caption={caption}
+          caption={shown.caption}
         />
       ) : null}
     </details>
