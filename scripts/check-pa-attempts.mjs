@@ -93,8 +93,10 @@ for (const id of fs.readdirSync(LESSONS).sort()) {
   // Part 1 quizzes (concepts and traces) have no solution to write as pseudocode: after the
   // last try the server releases the answers and explanations itself (quiz-reveal).
   const isQuiz = !!(lesson.quiz && typeof lesson.quiz === 'object');
-  if (!isQuiz) needPseudo++;
-  const pseudoGap = isQuiz ? null : !fs.existsSync(pseudo)
+  // An uncapped part never reveals a solution, so it carries no pseudocode file (the generator refuses one).
+  const noReveal = isQuiz || UNCAPPED.has(id);
+  if (!noReveal) needPseudo++;
+  const pseudoGap = noReveal ? null : !fs.existsSync(pseudo)
     ? 'no pa-pseudocode/<id>.md'
     : fs.readFileSync(pseudo, 'utf8').trim().length < 40 ? 'pa-pseudocode/<id>.md is empty' : null;
   if (pseudoGap) (requirePseudocode ? gaps : warnings).push(...(requirePseudocode ? [pseudoGap] : [`${id}: ${pseudoGap}`]));
