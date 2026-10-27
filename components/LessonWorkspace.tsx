@@ -1204,7 +1204,19 @@ export default function LessonWorkspace({
                     disabled={!!aiCheck && (aiCheckBusy || (files[aiCheckFile] ?? '').trim().length < 20)}
                     title={aiCheck ? 'Have the AI read your steps and mark the Quest cards green or red' : undefined}
                   >
-                    {aiCheck && aiCheckBusy ? 'Reading your steps…' : 'Grade'}
+                    {aiCheck && aiCheckBusy ? 'Reading your steps…' : 'Check'}
+                  </button>
+                )}
+                {aiGraded && (
+                  // A scored part: Grade is the same counted AI read as Submit, so it
+                  // spends one of the part's tries and stops when they are gone.
+                  <button
+                    className="btn-run"
+                    onClick={() => void runAiGrade()}
+                    disabled={aiGrading || cap.unknown || cap.reached || (files[isTextMode ? aiCheckFile : 'script.js'] ?? '').trim().length < 20}
+                    title={cap.left !== null ? `Counts as one of your ${cap.max} tries (${cap.left} left)` : 'Have the AI grade your plan'}
+                  >
+                    {aiGrading ? 'Grading…' : cap.reached ? 'No tries left' : cap.left !== null ? `Grade (${cap.left} left)` : 'Grade'}
                   </button>
                 )}
                 {!isReshapeMode && !isTextMode && (
@@ -1226,14 +1238,14 @@ export default function LessonWorkspace({
                   )
                 )}
                 {aiCheck && !isTextMode && !isReshapeMode && (
-                  // Run shows what the code prints; Grade is the AI read that marks the Quest cards.
+                  // Run shows what the code prints; Check is the AI read that marks the Quest cards.
                   <button
                     className="btn-run"
                     onClick={() => void runAiCheck()}
                     disabled={aiCheckBusy || (files[aiCheckFile] ?? '').trim().length < 20}
                     title="Have the AI read your code and mark the Quest cards green or red"
                   >
-                    {aiCheckBusy ? 'Reading your code…' : 'Grade'}
+                    {aiCheckBusy ? 'Reading your code…' : 'Check'}
                   </button>
                 )}
                 <button

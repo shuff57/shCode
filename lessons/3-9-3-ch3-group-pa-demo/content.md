@@ -1,68 +1,58 @@
-## Chapter 3 Group PA — Part 3 of 3: Demo
+## Chapter 3 Group PA — Part 3 of 3: Reflect
 
-**This is the writeup that goes with the live demo, and you are doing it together.**
-The plan and the build are done; now you write the report and run the program for the
-teacher. This part is worth **25%**.
+**A short write-up, done together.** The plan and the build are finished; this is where you say what
+happened. It is worth **25%**, and short answers are fine.
 
-**You get three tries.** Each partner submits their own; submit, read the feedback on each criterion, improve and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
+**You get three tries.** Each partner submits their own: grade, read the feedback on each item,
+improve and grade again. Your best try counts. After your third try you can see how it is solved,
+once your teacher releases it.
 
-### Part 1: Who did what
+### 1. Who did what
 
-Name both partners. Then say who drove the keyboard for the plan (3.9.1), who drove it
-for the code (3.9.2), and one thing the partner who was not typing caught that the one
-typing had missed.
+Name both partners. Say who drove the keyboard for the plan (3.9.1), who drove it for the code
+(3.9.2), and one thing the partner who was not typing caught.
 
-### Part 2: Three test cases
+### 2. Three test cases
 
-A table or three rows, each with the numbers you put in, what you expected to come out,
-and what actually came out. At least one of your three has to land on the other side of
-the comparison from the other two -- a test set that only ever proves one answer has not
-tested the decision.
+A test case is one run of your program where you **know the right answer before you run it**.
+Write three, in a table with these columns:
 
-Worked example, if you are on **Snack Shack**: with a reorder level of 5, Pretzel (qty
-3) is low stock and Popcorn (qty 12) is not. Those two land on opposite sides of the
-comparison, which is what is being asked for. Three items that all come out low is what
-does **not** count, however different the numbers look.
+| What you put in | What you expected | What you got |
+| --- | --- | --- |
+| the items or numbers you gave it | the answer you worked out by hand first | what your program printed |
 
-### Part 3: One thing you logged
+Your program makes one yes-or-no decision: the **subset function** (`lowStock`, `slowRunners`,
+`lowPackets` or `longTitles`) keeps an item or leaves it out. A good set of tests checks **both**
+answers, so **at least one case must be kept and at least one must be left out**. Three cases that
+all come out the same way prove only half of the decision.
 
-Name one `console.log` you added while building that was there to check your work rather
-than to report the answer: what you printed, what it showed you, and what you changed
-because of it. If nothing was wrong, say what the print confirmed and how you would have
-known if it had been.
+| Your problem | Kept (counts) | Left out (does not count) |
+| --- | --- | --- |
+| Snack Shack, level 5 | Pretzel, qty 3: low stock | Popcorn, qty 12: not low |
+| Lap Times, target 60 | a runner at 75 seconds a lap: slow | a runner at 55: not slow |
+| Seed Tray, level 5 | a variety with 2 packets: low | a variety with 9: not low |
+| Library Cart, limit 300 | a title of 420 pages: long | a title of 180: not long |
 
-### Part 4: Lifecycle
+Then one line: **did "what you got" match "what you expected" every time?** If not, say what you
+changed.
 
-Chapter 1 opened with the four framework activities (1.1.6). They are:
+### 3. One thing you logged
 
-- **inception** — the planning: deciding the goals and the overall scope
-- **elaboration** — working out the requirements and designing the thing
-- **construction** — writing and building it
-- **deployment** — releasing it to the people who will use it
+Name one `console.log` you added to check your work, not to report the answer: what it printed,
+what it showed you, and what you changed. If nothing was wrong, say what it confirmed.
 
-Pick **ONE** of those four for each third of this period — the plan (3.9.1), the code
-(3.9.2), this writeup (3.9.3) — and name it. Then say in one sentence why the elaboration
-phase (the plan and the contracts) comes before the construction phase (the code) in the
-lifecycle, and how that helped your pair avoid a bug.
+### 4. Three sections in your code
 
-### Part 5: Chapter 3 checklist
+Pick any **three** of the eight Chapter 3 sections. For each, name the function where it shows up
+and quote one line of your own code from it.
 
-Name the specific **function** where each of these first appeared in your program, and
-quote one line of your own code from it (not just the section number):
-
-- the function definition and its call (3.1)
-- the parameter list and the return value (3.2)
-- the loop over the array (3.3)
-- the arrow function (3.4)
-- the record object and how you read its properties (3.5)
-- the mutation the caller can see (3.6)
-- the `map()` call (3.7)
-- the save and the load (3.8)
-
-If you didn't use one, say so.
-
-### Part 6: Extension — the mutating function's return value (optional)
-
-Optional: if you finished early, you were asked what your mutating function returns, and what
-happens if the caller ignores the return value. Say what you answered, and why the
-change is already visible to the caller even though nothing comes back (3.6.2).
+| Section | What to look for |
+| --- | --- |
+| 3.1 | a function and its call |
+| 3.2 | parameters and a return value |
+| 3.3 | the loop over the array |
+| 3.4 | the arrow function |
+| 3.5 | a record object and its properties |
+| 3.6 | the change the caller can see |
+| 3.7 | `map()` |
+| 3.8 | the save and the load |

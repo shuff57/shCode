@@ -1,7 +1,7 @@
 ## Chapter 3 Group PA — Part 1 of 3: Design the Plan
 
 **This is the assessment for the whole chapter, and you are doing it in pairs.** Three
-thirds: plan, build, demo. This is the planning third, it is worth **25%**, and it comes
+thirds: plan, build, reflect. This is the planning third, it is worth **25%**, and it comes
 first. Neither of you opens an editor for Part 2 until this plan is done.
 
 **What you'll be assessed on here:**

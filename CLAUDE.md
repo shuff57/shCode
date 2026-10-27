@@ -628,7 +628,7 @@ body to the bottom of the canvas and the chart appeared to run upward.
 ## AI check on a pseudocode lab (`aiCheck`)
 
 A plain-English-to-pseudocode lab can carry `aiCheck` in `lesson.json` (`lib/ai-check.ts`, 3.7.5 so far):
-a "Grade with AI" button above the editor sends the file to `POST /api/grade-written` and lays each
+a "Check" button above the editor sends the file to `POST /api/grade-written` and lays each
 criterion's verdict over the Quest card with the same id (only a clear `met` turns a card green). It is
 deliberately NOT `aiGrader`: that field makes a lesson a scored written part in the manifest, gradebook
 and attempt caps. `generate-ai-graders.mjs` collects `aiCheck` into the same server-side config, so the

@@ -120,6 +120,7 @@ function redactAiGrader(cfg: AiGraderConfig): AiGraderConfig {
   }
   if (typeof cfg.maxSubmissions === 'number') out.maxSubmissions = cfg.maxSubmissions;
   if (cfg.input) out.input = cfg.input;
+  if (cfg.formatting) out.formatting = true;
   return out;
 }
 

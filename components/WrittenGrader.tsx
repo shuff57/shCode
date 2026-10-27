@@ -22,6 +22,13 @@ import SolutionPanel from './SolutionPanel';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import { useRepairLoop } from '../lib/use-attempt-cap';
 import CodeMirrorPane from './CodeMirrorPane';
+import dynamic from 'next/dynamic';
+
+// The editor engine is a few hundred kB; only the parts that set `formatting` download it.
+const RichAnswerEditor = dynamic(() => import('./RichAnswerEditor'), {
+  ssr: false,
+  loading: () => <div style={{ minHeight: 260, background: '#282a36', border: '1px solid #44475a', borderRadius: 8 }} />,
+});
 
 interface AiRubricItem {
   id: string;
@@ -39,6 +46,8 @@ interface AiGraderConfig {
   maxSubmissions?: number;
   /** 'code' draws the JavaScript editor in place of the prose textarea. See lib/types.ts. */
   input?: 'text' | 'code';
+  /** Markdown toolbar, Preview and text size on the prose textarea. See lib/types.ts. */
+  formatting?: boolean;
   rubricTitle?: string;
   model?: string;
   contextDocs?: string[];
@@ -171,6 +180,21 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     typeof config.maxSubmissions === 'number' && !bypassesLessonLock(progress.role) ? config.maxSubmissions : null;
   // The JavaScript editor in place of the prose textarea. Presentation only.
   const codeInput = config.input === 'code';
+  // A word-processor style editor for the prose answer (config.formatting). It hands back plain
+  // Markdown, so the grader and the draft store still deal in text.
+  const formatting = config.formatting === true && !codeInput;
+  const [textSize, setTextSize] = useState(15);
+  useEffect(() => {
+    try {
+      const v = Number(localStorage.getItem('shcode:writtenTextSize'));
+      if (v >= 12 && v <= 22) setTextSize(v);
+    } catch { /* storage can be blocked; the default size is fine */ }
+  }, []);
+  const changeSize = (delta: number) => {
+    const next = Math.min(22, Math.max(12, textSize + delta));
+    setTextSize(next);
+    try { localStorage.setItem('shcode:writtenTextSize', String(next)); } catch { /* ignore */ }
+  };
   // Submitted-before is answered by the SERVER, not by this browser. Seeding it
   // from the localStorage cache alone -- which is all this did until 2026-09-02
   // -- meant clearing site data, switching browser, or picking up a second
@@ -520,6 +544,20 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           <CodeMirrorPane value={response} onChange={setResponse} fileKey={lessonId} language="javascript" />
         </div>
       ) : (
+        formatting ? (
+          <>
+            <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', marginBottom: 6 }}>
+              <button type="button" title="Smaller text" aria-label="Smaller text" onClick={() => changeSize(-1)} disabled={textSize <= 12} style={{ padding: '2px 10px', borderRadius: 6, border: '1px solid #44475a', background: '#282a36', color: '#f8f8f2', fontSize: 12, fontWeight: 600, opacity: textSize <= 12 ? 0.5 : 1 }}>A−</button>
+              <button type="button" title="Larger text" aria-label="Larger text" onClick={() => changeSize(1)} disabled={textSize >= 22} style={{ padding: '2px 10px', borderRadius: 6, border: '1px solid #44475a', background: '#282a36', color: '#f8f8f2', fontSize: 16, fontWeight: 600, opacity: textSize >= 22 ? 0.5 : 1 }}>A+</button>
+            </div>
+            <RichAnswerEditor
+              value={response}
+              onChange={setResponse}
+              textSize={textSize}
+              placeholder="Write your response here. Use the toolbar for headings, lists and tables."
+            />
+          </>
+        ) : (
         <textarea
           value={response}
           onChange={(e) => setResponse(e.target.value)}
@@ -544,12 +582,13 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
             border: '1px solid #44475a',
             borderRadius: 6,
             padding: 12,
-            fontSize: 14,
+            fontSize: formatting ? textSize : 14,
             fontFamily: 'system-ui, sans-serif',
             lineHeight: 1.5,
             resize: 'vertical',
           }}
         />
+        )
       )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
@@ -585,6 +624,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
                 : 'Submit my answer'
               : capReached
                 ? 'No tries left'
+                : maxSubmissions !== null && attemptsKnown
+                ? `Grade (${Math.max(0, maxSubmissions - attempts)} left)`
                 : result
                 ? 'Re-submit for feedback'
                 : 'Submit for feedback'}

@@ -120,6 +120,10 @@ export default function AiAnswer({ text, streaming, placeholder, style }: Props)
           padding: 2px 10px;
           color: #6272a4;
         }
+        .ai-help-response table { border-collapse: collapse; margin: 6px 0 10px; }
+        .ai-help-response th,
+        .ai-help-response td { border: 1px solid #44475a; padding: 4px 10px; text-align: left; }
+        .ai-help-response th { color: #bd93f9; font-weight: 600; }
         .ai-help-response a { color: #8be9fd; text-decoration: underline; }
       `}</style>
     </>

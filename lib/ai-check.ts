@@ -1,5 +1,5 @@
 // The Grade button on a plain-English-to-pseudocode lab (lesson.json `aiCheck`). A lab that keeps
-// the code editor labels it "Grade with AI"; a text-editor lab (editor: "text") labels it "Grade".
+// the code editor labels it "Check"; a text-editor lab (editor: "text") labels it "Check".
 //
 // The regex requirements stay the way a Run grades a lab. This is the second opinion for the
 // labs where students write plain English, which is too varied for a pattern to judge: the

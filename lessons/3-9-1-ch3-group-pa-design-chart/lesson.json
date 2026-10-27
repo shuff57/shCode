@@ -25,7 +25,7 @@
     {
       "id": "s1",
       "title": "About this part",
-      "instructions": "**This is the assessment for the whole chapter, and you are doing it in pairs.** Three thirds: plan, build, demo. This is the planning third, it is worth **25%**, and it comes first. Neither of you opens an editor for Part 2 until this plan is done.\n\n**What you'll be assessed on here:**\n- Agreeing on the function list *before* either of you types — what goes in, what comes back (3.2.2)\n- Turning a word problem into a set of function contracts, then into pseudocode\n- A plan that **calls** your functions by name, walks the list with a loop, changes one record and shows the effect, and loads at the start and saves at the end"
+      "instructions": "**This is the assessment for the whole chapter, and you are doing it in pairs.** Three thirds: plan, build, reflect. This is the planning third, it is worth **25%**, and it comes first. Neither of you opens an editor for Part 2 until this plan is done.\n\n**What you'll be assessed on here:**\n- Agreeing on the function list *before* either of you types — what goes in, what comes back (3.2.2)\n- Turning a word problem into a set of function contracts, then into pseudocode\n- A plan that **calls** your functions by name, walks the list with a loop, changes one record and shows the effect, and loads at the start and saves at the end"
     },
     {
       "id": "s2",

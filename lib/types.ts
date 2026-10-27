@@ -433,6 +433,10 @@ export interface AiGraderConfig {
    * grader never sees it -- it takes only `lessonId` and `response`.
    */
   input?: 'text' | 'code';
+  /** With the prose textarea: a small toolbar (heading, bold, italic, bullets, numbers, table, text size)
+   *  that types Markdown for the student, and a Preview switch. The grader still gets the plain text.
+   *  Presentation only; passes through redaction like `input`. */
+  formatting?: boolean;
   rubricTitle?: string;
   model?: string;
   contextDocs?: string[];

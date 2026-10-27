@@ -6509,20 +6509,20 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.9.2",
-      "maxScore": null,
+      "maxScore": 8,
       "maxSubmissions": 3,
-      "scoreKind": null
+      "scoreKind": "written"
     },
     {
       "id": "3-9-3-ch3-group-pa-demo",
-      "title": "3.9.3 Group PA Part 3: Demo It",
+      "title": "3.9.3 Group PA Part 3: Reflect",
       "unit": "3.9 Chapter 3 Group Performance Assessment",
       "preview": "assignment",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.9.3",
-      "maxScore": 6,
+      "maxScore": 4,
       "maxSubmissions": 3,
       "scoreKind": null
     },
