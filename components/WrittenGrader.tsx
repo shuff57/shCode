@@ -847,9 +847,15 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
                 Continue to next lesson →
               </button>
               <p style={{ margin: '8px 0 0', color: '#888', fontSize: 12 }}>
-                {capReached
-                  ? "You've passed. All your tries are used, so this is your final score. Move on whenever you're ready."
-                  : "You've passed — keep revising to push your score higher if you want, or move on whenever you're ready."}
+                {/* A zero-point rubric (3.9.1, 3.9.3) has no score to raise, so
+                    "keep revising to push your score higher" is an invitation to
+                    resubmit the same plan. Students did: one class submitted 25
+                    times after passing. Say plainly that pass/fail is all there is. */}
+                {result.totalPossible === 0
+                  ? "You've passed — this part is marked pass or fail, so there is no score to raise. Move on whenever you're ready."
+                  : capReached
+                    ? "You've passed. All your tries are used, so this is your final score. Move on whenever you're ready."
+                    : "You've passed — keep revising to push your score higher if you want, or move on whenever you're ready."}
               </p>
             </div>
           )}

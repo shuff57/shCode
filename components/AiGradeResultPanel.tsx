@@ -7,6 +7,7 @@
 // written parts draw the same shape inline in their own components.
 
 import { Circle, CircleCheck, CircleX, Lightbulb, Sparkles } from 'lucide-react';
+import { isPassingGrade } from '../lib/grade-pass';
 
 export interface AiCriterion {
   id: string;
@@ -82,7 +83,16 @@ export default function AiGradeResultPanel({ title, titles, result, grading, sta
             <p style={{ marginTop: 10, color: '#f8f8f2', fontSize: 14 }}>
               This try: {result.totalEarned} of {result.totalPossible}.
             </p>
-          ) : null}
+          ) : (
+            // A zero-point rubric has no score to raise. Saying nothing here left
+            // students submitting the same plan over and over -- one class sent 25
+            // identical tries after already passing. Say plainly what the result means.
+            <p style={{ marginTop: 10, color: isPassingGrade(result) ? '#50fa7b' : '#ffb86c', fontSize: 14 }}>
+              {isPassingGrade(result)
+                ? "You've passed — this part is marked pass or fail, so there is no score to raise. Move on whenever you're ready."
+                : 'Not passing yet — use the feedback above, then submit again.'}
+            </p>
+          )}
           {result.hints?.length > 0 ? (
             <div style={{ marginTop: 14, padding: 12, background: '#282a36', borderRadius: 6, border: '1px solid #ffb86c55' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: '#ffb86c', fontWeight: 600 }}>
