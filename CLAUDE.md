@@ -650,6 +650,29 @@ exposed to the client. The binding is declared in `wrangler.toml`
 (`[ai] binding = "AI"`) and must also be added in the Pages dashboard for
 production: Settings → Functions → Workers AI binding → `AI`.
 
+### Deterministic plan grader (3.9.1)
+
+`lib/plan-check.ts` grades the Chapter 3 plan from the text alone. It parses the
+main sequence (calls in both `name(args)` and `name of the list` forms, indented
+loops and numbered `go back to #N`, report lines, load/save order), treats a
+contract line as a description rather than a call, and applies four structural
+rules. Pass is **2 of 4 criteria fully met** — a partly-met criterion does not
+count (decided 2026-10-28; it gives 13/16 on the 16 real plans, the same rate
+the AI grader produced). It exists because the AI changed verdicts on identical
+plans; the measurements and the rejected alternatives (temperature, model
+swaps, majority-of-3, binary verdicts, graduated help) are in `HANDOFF.md`.
+
+It is **advisory** today: `components/PlanCheckPanel.tsx` renders it beside the
+AI grade in the teacher's submission queue, computed from the stored response,
+while the AI result remains the recorded grade. `scripts/test-plan-check.mjs`
+(in `npm test`) pins the parser against the references, the variants, the
+starter, CRLF, prose-that-is-not-a-call, and the `go back to #N` loop.
+
+`scripts/grade-harness.mjs` is the live comparison tool: any AI part, Workers AI
+(proxy or REST) or OpenRouter, `--runs`, `--majority N`, `--binary`,
+`--source fixtures|d1|file`. It is **not** in `npm test` because it spends model
+credits.
+
 ## Reference solutions
 
 Two authoring forms, both admin/teacher-only, both served by

@@ -9,6 +9,7 @@ import { criteriaScore } from '../lib/grade-pass';
 import { errorText } from '../lib/http-error';
 import { diagramFrameHeight } from '../lib/diagram-types';
 import SubmissionBoundary from './SubmissionBoundary';
+import PlanCheckPanel from './PlanCheckPanel';
 import { useFeedback } from './FeedbackProvider';
 
 // Only pulled in when a flowchart submission is actually on screen — a class
@@ -553,6 +554,11 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                           : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
               </div>
             </div>
+
+            {/* Advisory only, and only for the Chapter 3 plan part: the rules
+                grade the same text deterministically, so a teacher can see where
+                they disagree with the AI before this becomes the recorded grade. */}
+            <PlanCheckPanel lessonId={sub.lesson_id} response={sub.response} />
 
             {failed && (
               <div

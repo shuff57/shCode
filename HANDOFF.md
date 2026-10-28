@@ -1,3 +1,46 @@
+# 2026-10-28: grader consistency measured; deterministic plan grader built (advisory)
+
+**The problem.** 3.9.1's AI grade is unstable on identical work. On prod (106+ submissions, 10 students):
+16 groups of identical plans, **6 changed criterion verdicts between runs**; one student submitted an
+unchanged plan 25 times in one class period. Two UI bugs made the retries worse and are fixed (commit
+`b429f388`): the passed-message told students to "keep revising to push your score higher" on a
+zero-point part, and `AiGradeResultPanel` showed no pass line at all.
+
+**Measured and rejected.**
+- **Temperature 0**: no better than 0.2 (12/64 vs 10/64 cells).
+- **Model swaps**, same 17 plans x 5 runs (Workers AI and OpenRouter): gemma-4-26b 12/68 cells;
+  gemma-4-31b 11/68; qwen3.8-27b 11/64; claude-haiku-5.5 22/68; **gpt-5.4-mini 45/68 and 4-6
+  pass/fail flips**; glm-5.3-flash 19/64. Bigger models are WORSE at this task. GLM/DeepSeek/Nemotron
+  return 4007 unless `reasoning_effort` is sent (mandatory in their catalog entries) — that was not a
+  billing problem.
+- **Majority-of-3** (three parallel calls, majority verdict): 26b 9/64, 1 pass/fail flip, 9.2 s;
+  31b **5/64, 0 flips, 8.9 s**. The strongest AI option; not adopted.
+- **Binary verdicts** (met/missing, no partial): 26b 1/64 cells but the pass rate collapses 13/16 -> 7/16
+  and one flip remains; 31b 6/64, 2 flips. It changes the standard, not just the noise. Rejected.
+- **Graduated help** (help level inside the grading prompt): shifts verdicts on 4/17 plans. Dropped.
+
+**Built.**
+- `lib/plan-check.ts` — deterministic grader for the 3.9.1 plan: parses main section vs contracts,
+  calls (paren and `name of list` forms), loops (indented and `go back to #N`), reports, load/save
+  order; four criteria met/partial/missing; **pass = 2 of 4 fully met** (13/16 on the real plans, the
+  same rate the AI produced). References and all three variants score 4/4; the starter 0/4;
+  `scripts/test-plan-check.mjs` (in `npm test`) pins it, including CRLF and prose-vs-call cases.
+- `components/PlanCheckPanel.tsx` — advisory panel in the teacher's submission queue, computed from
+  the stored response, shown beside the AI grade. Screenshot-verified in the dev demo with a seeded row.
+- `scripts/grade-harness.mjs` — live comparison tool (Workers AI proxy/REST or OpenRouter, `--runs`,
+  `--majority N`, `--binary`, `--source fixtures|d1|file`). Not in `npm test`; it spends credits.
+
+**Decision.** The AI grade stays the recorded grade for 3.9.1 for now; the deterministic check runs
+alongside it for teachers. After real submissions show the two agree as expected, cut over and extend
+the pattern by task type: builds -> run the student's code; reflections -> checklist + AI voice +
+teacher review for ambiguous cases. Do not add another model to the sweep; the model is not the lever.
+
+**Open.** The advisory is teacher-queue only; students still see the AI criteria. The module's
+`PLAN_LESSONS` names only 3.9.1 — the Chapter 1/2 design parts carry different rubrics, so teaching
+them this shape needs their own rules. Plan 1 (the old reference document) and plan 4 are cases where
+the deterministic grader is arguably right and the AI wrong; plans 7 and 11 are the reverse under the
+2-of-4 bar. Those four are the ones to label if the cut-over needs more evidence.
+
 # 2026-10-27: Group PA Build parts scored, 3.9.1 uncapped + chart tabs (DEPLOYED, 99632677); per-problem reference answers added; NEXT: swap the grader model
 
 **Live on production (deployment `99632677`, branch cs-3d, HEAD `64f663c9`, tree clean):**
@@ -14,17 +57,11 @@
   only the fallback. **Not verified:** that the production Pages project actually has the `AI` binding (dashboard:
   Settings > Functions > Workers AI binding). Press Grade once as a student to prove it.
 
-**Open request 1: gemma-4-26b-a4b-it is too inconsistent on pseudocode parts.** User wants a bigger model and will supply
-real student responses. Candidates listed from `npx wrangler ai models list --json` (CLOUDFLARE_ACCOUNT_ID=bd9289625d5d3d62591c36e5ebe49055):
-gpt-oss-120b, nemotron-3-120b-a12b, glm-5.3-flash, deepseek-v4.1-flash-1017, qwen3.8-27b, kimi-k2.6, glm-5.3,
-deepseek-v4-pro-0813, llama-3.3-70b-instruct-fp8-fast. Plan: run the PA fixtures per model, add messy student variants and the
-user's responses (ask them for the part, which problem, and what it SHOULD score), then a ~25-request burst per top model
-(a frontier model once hit a 20 rpm cap at 25 simultaneous submits; gemma took all 25). Reasoning models need generous
-`max_tokens` and thinking off where allowed, or `content: null` reads as failure. Switch via `GRADE_WRITTEN_WORKERS_MODEL`
-or `DEFAULT_WORKERS_MODEL` in `lib/workers-ai.ts` only after the user picks. Nothing has been changed yet.
-- Live test: `WORKERS_PROXY=http://localhost:8799 node scripts/test-pa-ai-graders.mjs --live --filter=<id>`. The proxy is a
-  throwaway worker in the scratchpad `aiproxy/` (worker.js + wrangler.toml); start it with
-  `CLOUDFLARE_ACCOUNT_ID=... npx wrangler dev --remote --port 8799`. Check the model name the proxy forwards before comparing models.
+**Open request 1 (closed 2026-10-28).** The model sweep found no better grader — bigger models were
+worse on 3.9.1, and majority-of-3 was measured too. The record and the deterministic plan grader are in
+the 2026-10-28 section above; the production model is unchanged (`gemma-4-26b`). The old live test
+(`test-pa-ai-graders --live --filter=`) and the throwaway `aiproxy/` are superseded by
+`scripts/grade-harness.mjs`.
 
 **Done (2026-10-27, after the deploy above): example solutions for all four scenarios** (Snack Shack,
 Lap Times, Seed Tray, Library Cart) for 3.9.1/3.9.2/3.9.3, selectable in the teacher Solution panel.
