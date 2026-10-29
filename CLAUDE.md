@@ -657,7 +657,7 @@ main sequence (calls in both `name(args)` and `name of the list` forms, indented
 loops and numbered `go back to #N`, report lines, load/save order), treats a
 contract line as a description rather than a call, and applies structural rules.
 There are two bars over one parser: `checkPlan()`'s four criteria, which pass at
-**2 of 4 fully met**, and `checkPlanGaps()`'s eight blanks, which pass at **6 of
+**2 of 4 fully met**, and `checkPlanGaps()`'s eight jobs, which pass at **6 of
 8** (below). A partly-met criterion does not count (decided 2026-10-28; the
 four-criteria bar gives 13/16 on the 16 real plans, the same rate the AI grader
 produced). It exists because the AI changed verdicts on identical plans; the
@@ -678,13 +678,13 @@ plan that is probably right. Twenty realistic mutations of the reference —
 shouting, snake_case, abbreviations, synonyms, typos, no parentheses,
 log/show/print — all score full; `scripts/test-plan-check.mjs` pins five of them.
 
-**The editor strip is the same eight blanks** (`lib/plan-requirements.ts`). The
+**The editor strip is the same eight jobs** (`lib/plan-requirements.ts`). The
 lesson's authored `requirements` are four coarse plan-level regexes that cannot
-name a blank, and a text lesson runs no requirement check while the student
-types — so the strip read `0/4` beside feedback about eight blanks and never
+name a job, and a text lesson runs no requirement check while the student
+types — so the strip read `0/4` beside feedback about eight jobs and never
 moved. `LessonWorkspace` now builds the cards from the same `checkPlanGaps()`
-call, recomputed on every edit: one card per blank, met = green, partial or
-missing = red "Not yet" with the parser's reason, and the two required blanks
+call, recomputed on every edit: one card per job, met = green, partial or
+missing = red "Not yet" with the parser's reason, and the two required jobs
 say so. `planGradeReport()` builds the matching report on the same pass rule (six
 of eight AND the change and its report). The authored `requirements` stay in
 `lesson.json` because `check-starters` grades the reference and the starter
@@ -695,34 +695,36 @@ AI grade in the teacher's submission queue, computed from the stored response,
 while the AI result remains the recorded grade. `scripts/test-plan-check.mjs`
 and `scripts/test-plan-gaps.mjs` (both in `npm test`) pin the parser against the
 references, the variants, the starter, CRLF, prose-that-is-not-a-call, the
-`go back to #N` loop, a JavaScript-shaped plan, and every single blank.
+`go back to #N` loop, a JavaScript-shaped plan, and every single repair.
 
-**3.9.1 is the skeleton, and its unit of marking is the blank** (2026-10-28). The
-lesson hands the pair the shape of the plan — START/END, the order of the steps,
-the `if`/`otherwise`, the `FOR EACH` line — with **eight blanks**, each a line of
-underscores. **Step 1 offers four problems, so there are four starters**
-(`lesson.json`'s `starterVariants`: Snack Shack, Lap Times, Seed Tray, Library
-Cart — the same seventeen lines and eight blanks, worded in that problem's names;
-the first is the shipped `README.md`). `components/StarterPicker.tsx`, above the
-editor, writes the chosen starter over the graded file and remembers the pick in
+**3.9.1 is a find-and-fix, and its unit of marking is the job** (2026-10-29).
+The plan is already written — START/END, the order of the steps, the
+`if`/`otherwise`, the `FOR EACH` line — and **four lines in it are wrong**: the
+line that should load the list calls the save instead; the subset call is not
+handed the level; the change call is not handed the record's name; the report
+that should show the change sits above it. **Step 1 offers four problems, so
+there are four starters** (`lesson.json`'s `starterVariants`: Snack Shack, Lap
+Times, Seed Tray, Library Cart — the same seventeen lines and the same four
+mistakes, worded in that problem's names; the first is the shipped
+`README.md`). `components/StarterPicker.tsx`, above the editor, writes the
+chosen starter over the graded file and remembers the pick in
 `shCode:starter:<lessonId>`, which is what makes Reset restore the pair's own
 starter instead of the first problem's (`lib/starter-variants.ts`; only WHICH
 starter is read from storage, the text still comes from the bundle). Choosing
 over typed work confirms first. Each starter is its problem's reference answer
-with the eight answers taken out — `test-plan-gaps.mjs` fills it back and asserts
-byte equality, so a starter cannot drift from the answer it belongs to. The pair fills each with the one call that belongs there, so
-`checkPlanGaps()` returns eight criteria, one per blank, and passes at
-**six of eight** (`GAP_PASS` — 75%, the nearest whole-blank count to the 70% the
-course asks for). A pair may therefore leave two blanks; three fails. Both
-graders share `parsePlan()` and the loop / change / storage analyses, so they
-cannot disagree about the same words.
+with the four mistakes planted — `test-plan-gaps.mjs` replays the same four
+edits and asserts byte equality, so a starter cannot drift from the answer it
+belongs to. `checkPlanGaps()` returns eight criteria, one per job, and passes at
+**six of eight** (`GAP_PASS` — 75%, the nearest whole-job count to the 70% the
+course asks for). Each repair turns exactly one card green; a pair may therefore
+leave two jobs, three fails. Both graders share `parsePlan()` and the loop /
+change / storage analyses, so they cannot disagree about the same words.
 
-**Two blanks are required, and the pass rule knows it.** Blanks 6 and 7 — the
+**Two jobs are required, and the pass rule knows it.** Jobs 6 and 7 — the
 change to one record and the report that shows it — are `required` in both
 layers (`PLAN_GAPS` marks them; the rubric items carry `required: true`). Six of
-eight is the tolerance for wording, but a pair could miss both crux blanks,
-score exactly six, and pass a plan with no sale in it — while the lesson's own
-Step 5 calls blank 6 "the one that matters". `lib/grade-pass.ts`'s
+eight is the tolerance for wording, but a pair could fix only the load and the
+subset, score exactly six, and pass a plan with no sale in it. `lib/grade-pass.ts`'s
 `isPassingGrade` refuses a result whose required criterion is not fully `met`
 (partial is not met: it is work that does not do the job), `shapeResult` carries
 the flag into the stored grade, and `isPassingSubmission` re-checks it on saved
@@ -731,30 +733,30 @@ existed answers exactly as it did. Adding `required` to a rubric item is the
 general way to say "this is the mark, not a share of it".
 
 Four rules the first live run forced, each with a test:
-- **A line of underscores is not a step.** `report ______` has not reported, and
-  a blank loop body is not work. Without this the untouched skeleton scored 1/8.
+- **A line of underscores is not a step.** A pair can still empty a line;
+  `report ______` has not reported, and a blank loop body is not work.
 - **The change's report must come after the loop as well as after the change.**
   A `put` inside the loop prints once per item, not the effect of one change.
 - **The total must be worked out before it is reported.** The reference plan
   calls `totalValue` again inside its report line; that later call must not fill
-  the earlier blank.
+  the earlier job.
 - **A JavaScript plan's round trip is `JSON.parse`/`localStorage.getItem` and
   `setItem`.** Those are deliberately not the pair's named functions, so without
   this a correct JS-shaped plan lost both ends of the round trip.
 
-**The AI grades the same eight blanks against a stated expected answer.** The
-rubric items are the gaps, each carrying the expected line and "close enough
-counts"; the prompt says the shape was given, so nothing outside the blanks is
-marked down, and gates on the plan being about one of the four problems.
-Measured on 16 hand-built fillings (reference, renamed functions, a terse plan, a
-JavaScript plan, shouting, blanks left empty, a read-only change call, an
-un-reported change, an off-topic plan, an inline-only plan): **1 of 64 criterion
-cells changed verdict across repeated runs**, against ~11 of 64 under the old
-four-criteria rubric. The one disagreement that matters is the off-topic plan —
-the rules score it 6/8 and would pass it, the prompt's gate fails it, so the
-recorded grade is the AI's. `scripts/grade-harness.mjs --source file` now grades
-labelled fixtures (a `label` keeps a text that appears only once; a corpus dump
-still keeps only repeated texts).
+**The AI grades the same eight jobs against a stated expected answer.** The
+rubric items are the jobs, each carrying the expected line and "close enough
+counts"; the prompt states the four planted mistakes, says the shape was given
+so nothing outside them is marked down, accepts any repair that does the job,
+and gates on the plan being about one of the four problems. The same tolerance
+rules were measured under the blanks on 16 hand-built plans (reference, renamed
+functions, a terse plan, a JavaScript plan, shouting, jobs left empty, a
+read-only change call, an un-reported change, an off-topic plan, an inline-only
+plan): **1 of 64 criterion cells changed verdict across repeated runs**, against
+~11 of 64 under the old four-criteria rubric. The find-and-fix prompt keeps
+those rules; `scripts/grade-harness.mjs --source file` re-measures it on labelled
+fixtures (a `label` keeps a text that appears only once; a corpus dump still
+keeps only repeated texts).
 
 **The text is formatted before it is read** (`lib/plan-format.ts`). One plan wears
 many shapes: numbered steps, a two-column table, a loop closed by `END FOR` or

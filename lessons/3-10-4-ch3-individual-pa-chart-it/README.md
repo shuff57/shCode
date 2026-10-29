@@ -1,6 +1,0 @@
-Problem:
-
-PLAN
-START
-
-END

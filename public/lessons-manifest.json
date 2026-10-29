@@ -4396,7 +4396,7 @@
     },
     {
       "id": "3-10-2-ch3-individual-pa-own-words",
-      "title": "3.10.2 Individual PA Part 2: In Your Own Words",
+      "title": "3.10.4 Individual PA Part 4: Reflect",
       "unit": "3.10 Chapter 3 Individual Performance Assessment",
       "preview": "assignment",
       "type": "assignment",
@@ -4409,7 +4409,7 @@
     },
     {
       "id": "3-10-3-ch3-individual-pa-find-and-fix",
-      "title": "3.10.3 Individual PA Part 3: Find and Fix",
+      "title": "3.10.2 Individual PA Part 2: Find and Fix",
       "unit": "3.10 Chapter 3 Individual Performance Assessment",
       "preview": "console",
       "type": "assignment",
@@ -4421,28 +4421,15 @@
       "scoreKind": "written"
     },
     {
-      "id": "3-10-4-ch3-individual-pa-chart-it",
-      "title": "3.10.4 Individual PA Part 4: Plan It",
-      "unit": "3.10 Chapter 3 Individual Performance Assessment",
-      "preview": "console",
-      "type": "assignment",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null,
-      "assignmentCode": "A3.10.4",
-      "maxScore": 10,
-      "maxSubmissions": 3,
-      "scoreKind": "written"
-    },
-    {
       "id": "3-10-5-ch3-individual-pa-write-the-steps",
-      "title": "3.10.5 Individual PA Part 5: Write the Steps",
+      "title": "3.10.3 Individual PA Part 3: Write the Steps",
       "unit": "3.10 Chapter 3 Individual Performance Assessment",
       "preview": "assignment",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.10.5",
-      "maxScore": 20,
+      "maxScore": 30,
       "maxSubmissions": 3,
       "scoreKind": "written"
     },
@@ -6489,7 +6476,7 @@
     },
     {
       "id": "3-9-1-ch3-group-pa-design-chart",
-      "title": "3.9.1 Group PA Part 1: Design the Plan",
+      "title": "3.9.1 Group PA Part 1: Find and Fix the Plan",
       "unit": "3.9 Chapter 3 Group Performance Assessment",
       "preview": "console",
       "type": "assignment",

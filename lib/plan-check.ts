@@ -12,10 +12,11 @@
 // TWO BARS, ONE PARSER.
 //   checkPlan()      -- the four criteria. At least half FULLY met passes. This
 //                       is the grader for a plan written from nothing.
-//   checkPlanGaps()  -- 3.9.1's skeleton: eight blanks in a plan whose shape is
-//                       given, one gap per blank, six of the eight needed. The
-//                       shape is the lesson's, so the marks are about which
-//                       function goes in which blank and what it is handed.
+//   checkPlanGaps()  -- 3.9.1's find-and-fix: a complete plan with four mistakes
+//                       planted in it, one mark per job the plan has to do, six
+//                       of the eight needed. The shape is the lesson's, so the
+//                       marks are about which call does each job and what it is
+//                       handed.
 // Both read the same parse, so a plan cannot be credited by one and not the
 // other for the same words.
 //
@@ -670,10 +671,11 @@ export function checkPlan(text: string): PlanCheck {
 }
 
 // ------------------------------------------------------------------- the gaps
-// 3.9.1 hands the student the shape of the plan and eight blanks. The shape is
-// not what is graded -- the loop, the if/otherwise and the order are given --
-// so each blank gets its own mark: is there a call here, does it do that job,
-// was it handed what it needs. Six of the eight pass. Decided 2026-10-28.
+// 3.9.1 hands the pair a complete plan with four mistakes planted in it. The
+// shape is not what is graded -- the loop, the if/otherwise and the order are
+// given -- so each of the eight jobs gets its own mark: is there a call here,
+// does it do that job, was it handed what it needs. Six of the eight pass.
+// Decided 2026-10-28; the part became a find-and-fix on 2026-10-29.
 
 /** How many of the eight gaps must be right. 70% of 8 is 5.6; six is that bar. */
 export const GAP_PASS = 6;
@@ -681,25 +683,25 @@ export const GAP_PASS = 6;
 interface GapSpec {
   id: string;
   title: string;
-  /** What belongs in the blank, in the course's words. Used by the feedback. */
+  /** What the job needs, in the course's words. Used by the feedback. */
   wants: string;
   /**
-   * A blank the plan cannot pass without, whatever the others score.
+   * A job the plan cannot pass without, whatever the others score.
    *
    * The bar is six of eight because wording varies and "close enough" counts.
-   * But blanks 6 and 7 are the change to one record and the report of it -- the
-   * lesson's own Step 5 calls blank 6 "the one that matters" and blank 7 "the
-   * proof". Missing both costs exactly two gaps, which six of eight allows, so
-   * without this flag a pair could pass having skipped the point of the plan.
+   * But jobs 6 and 7 are the change to one record and the report of it -- the
+   * lesson's own Step 5 calls the change "the one that matters" and the report
+   * "the proof". Missing both costs exactly two gaps, which six of eight allows,
+   * so without this flag a pair could pass having skipped the point of the plan.
    * A higher bar would punish the other six instead; the flag names the two.
    */
   required?: boolean;
 }
 
 /**
- * The eight blanks of the Snack Shack skeleton, top to bottom. The wording of
- * each `wants` is the lesson's own question for that blank, so feedback and
- * instructions say the same thing.
+ * The eight jobs of the Snack Shack plan, top to bottom. The wording of each
+ * `wants` is the lesson's own question for that job, so feedback and the Quest
+ * panel say the same thing.
  */
 export const PLAN_GAPS: GapSpec[] = [
   { id: 'gap-1-load', title: 'The list comes back from storage', wants: 'where does the list come from, before anything uses it?' },

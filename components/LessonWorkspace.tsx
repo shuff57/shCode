@@ -303,13 +303,13 @@ export default function LessonWorkspace({
   // browser can run: a plain textarea and a Grade button instead of CodeMirror
   // and Run. See lesson.json `editor`.
   const isTextMode = lesson.editor === 'text';
-  // 3.9.1: the strip is the eight blanks. Its authored `requirements` are four
-  // coarse plan-level regexes that cannot name a blank, and a text lesson runs
+  // 3.9.1: the strip is the plan's eight jobs. Its authored `requirements` are
+  // four coarse plan-level regexes that cannot name a job, and a text lesson runs
   // no check on typing, so those cards never moved. See lib/plan-requirements.ts.
   const planStrip = isTextMode && isPlanLesson(lesson.id);
 
   // Recomputed as the plan is typed, so the strip and the grade describe the
-  // same eight lines. Cheap: the parser reads the whole plan in well under a
+  // same eight jobs. Cheap: the parser reads the whole plan in well under a
   // millisecond (scripts/test-plan-check.mjs measures it).
   const planStripText = files[aiCheckFile] ?? '';
   useEffect(() => {
@@ -723,7 +723,7 @@ export default function LessonWorkspace({
   // reads `latestModelDoc`, which ReshapeStudio keeps current independent of
   // the (debounced, <=300ms) script.js text sync.
   function runTests() {
-    // A plan lesson is graded by the blank check, not by its authored regexes:
+    // A plan lesson is graded by the plan check, not by its authored regexes:
     // Ctrl+Enter and the Grade fallback must not put the four old cards back.
     if (planStrip) {
       const text = files[aiCheckFile] ?? '';

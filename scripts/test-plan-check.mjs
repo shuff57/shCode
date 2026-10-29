@@ -5,7 +5,7 @@
 // This grader must be boringly repeatable, and it must be right on the forms
 // the course actually teaches:
 //   - reference answers and every variant score full;
-//   - the untouched starter scores nothing;
+//   - the untouched starter does not pass the lesson's own grader;
 //   - a contract line is not a call, and a loop inside a function description
 //     is not a loop in the main plan;
 //   - the no-parentheses form a real student wrote ("totalvalue of stock")
@@ -17,7 +17,7 @@
 import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { checkPlan } from '../lib/plan-check.ts';
+import { checkPlan, checkPlanGaps } from '../lib/plan-check.ts';
 import { formatPlan } from '../lib/plan-format.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -40,13 +40,16 @@ for (const f of [
   check(r.criteria.every((c) => c.verdict === 'met'), `${f}: every criterion met`);
   check(r.passed, `${f}: passes`);
 }
-// The starter is the plan's shape with eight blanks in it: the loop line is
-// given, so it earns a partial, and nothing is finished. An unfilled blank must
-// never read as work, so no criterion may come back fully met.
+// The starter is a complete plan with four mistakes planted in it (see
+// scripts/test-plan-gaps.mjs for the eight-job bar, which is 3.9.1's). The
+// four-criteria bar below is the grader for a plan written from nothing, and it
+// is kept honest here in the way it can be: the starter must not pass the
+// lesson's own grader, and the two planted faults it still has -- the change
+// call without a name and the load that calls the save -- must show here too.
 const starter = checkPlan(read(`${lesson}/README.md`));
-check(!starter.passed, 'starter: does not pass');
-check(starter.criteria.every((c) => c.verdict !== 'met'), 'starter: nothing fully credited');
-check(verdict(starter, 'loop-over-the-list') === 'partial', 'starter: the given loop line is partial until its body is filled');
+check(!checkPlanGaps(read(`${lesson}/README.md`)).passed, 'starter: does not pass the lesson\'s own grader');
+check(verdict(starter, 'change-one-record') === 'partial', 'starter: the change call without a name is partial');
+check(verdict(starter, 'save-and-load') === 'partial', 'starter: a load that calls the save is not a load');
 
 // --- determinism ----------------------------------------------------------
 const sample = read(`${lesson}/solution/README.md`);

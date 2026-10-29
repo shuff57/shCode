@@ -6,9 +6,9 @@
 // let a teacher see, on real work, where the AI and the rules disagree -- and
 // to have the deterministic one ready to cut over.
 //
-// 3.9.1 hands the pair a plan with its shape given and eight blanks in it, so
-// this shows one mark per blank: which function the student put there, and
-// whether it was handed what it needs.
+// 3.9.1 hands the pair a plan with four mistakes planted in it, so this shows
+// one mark per job the plan has to do: whether the line does that job, and
+// whether the call is handed what it needs.
 //
 // Computed from the stored response, so it works on every historical row with
 // no server change or migration.
@@ -22,7 +22,7 @@ export default function PlanCheckPanel({ lessonId, response }: { lessonId: strin
   if (!PLAN_LESSONS.includes(lessonId)) return null;
   const result = checkPlanGaps(response);
   const met = result.criteria.filter((c) => c.verdict === 'met').length;
-  // Two blanks are required, so a plan can be over the count and still fail.
+  // Two jobs are required, so a plan can be over the count and still fail.
   const requiredMet = (id: string) => result.criteria.find((c) => c.id === id)?.verdict === 'met';
   const requiredMissed = PLAN_GAPS.some((g) => g.required && !requiredMet(g.id));
   return (
@@ -39,9 +39,9 @@ export default function PlanCheckPanel({ lessonId, response }: { lessonId: strin
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-        <strong style={{ color: '#8be9fd', fontSize: '0.85rem' }}>Blank check</strong>
+        <strong style={{ color: '#8be9fd', fontSize: '0.85rem' }}>Plan check</strong>
         <span style={{ color: '#8393c4', fontSize: '0.78rem' }}>
-          {met} of {result.criteria.length} gaps right{result.blanks ? ` · ${result.blanks} still empty` : ''} &middot;{' '}
+          {met} of {result.criteria.length} jobs right{result.blanks ? ` · ${result.blanks} line${result.blanks === 1 ? '' : 's'} still empty` : ''} &middot;{' '}
           {result.passed
             ? `would pass (${GAP_PASS} needed)`
             : requiredMissed

@@ -1,11 +1,11 @@
 // Lessons that offer a choice of problem ship one starter per problem.
 //
-// 3.9.1 gives the pair the shape of the plan and leaves eight blanks; the shape
-// is worded per problem ("set meet to ______" vs "set stock to ______"), so a
-// Lap Times pair should open the editor onto the Lap Times skeleton, not the
-// Snack Shack one. Picking a problem writes that text over the graded file and
-// remembers the pick here, which is what lets Reset put back the pair's own
-// starter instead of the first problem's.
+// 3.9.1 gives the pair a complete plan with four mistakes planted in it; the
+// plan is worded per problem ("set meet to saveMeet()" vs "set stock to
+// saveStock()"), so a Lap Times pair should open the editor onto the Lap Times
+// starter, not the Snack Shack one. Picking a problem writes that text over the
+// graded file and remembers the pick here, which is what lets Reset put back the
+// pair's own starter instead of the first problem's.
 //
 // The memory is localStorage and best effort: a private window forgets the
 // pick, and the file it already holds is still correct.

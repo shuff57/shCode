@@ -1,3 +1,35 @@
+# 2026-10-29: 3.9.1 is a find-and-fix; 3.10 is four parts (both before they are sat)
+
+Content and schema changes only: the plan parser, the `required` flag, the picker and the
+derived strip all stay.
+
+**3.9.1 (Group PA Part 1) — the plan is given, four lines are wrong.** The eight-blank
+skeleton shipped on 10-28 was replaced the next day. Each of the four starters is its
+problem's reference plan with the same four mistakes planted in the same four lines: the
+load calls the save, the subset call is missing the level, the change call is missing the
+name, and the report sits above the change. The parser was not changed: `checkPlanGaps`
+already measures the eight jobs, and an untouched starter lands at 4/8 with the two crux
+jobs missing, so it cannot pass. `GAP_PASS`, the required gate and the AI rubric's eight
+items are unchanged; only the prompt, the rubric descriptions and the lesson text now
+describe a repair. `test-plan-gaps.mjs` replays the four edits from the reference and
+asserts byte equality, so a starter cannot drift from its answer.
+
+**3.10 (Individual PA) — four parts, ids kept, titles renumbered.** The Plan It part
+(`3-10-4`) is deleted; a plan item is no part of the individual paper now that the group
+paper repairs rather than writes one. In title order: 3.10.1 Concepts and Traces (quiz,
+40), 3.10.2 Find and Fix (`3-10-3`, 20), 3.10.3 Write the Steps (`3-10-5`, 30), 3.10.4
+Reflect (`3-10-2`, 10). The old 10-point "In Your Own Words" concept questions became the
+individual reflection (three test cases, one log, three sections), and the plan's 10
+points moved into the write. The **ids did not move** because they key D1 progress; order
+comes from the title number (`lib/lesson-title-order.ts`), the mechanism 1.1 already
+uses. `test-pa-ai-graders.mjs` lost the 3-10-4 entry and its live calibration block;
+3.9.1's rubric total is 8 in that table (it had been left at 0).
+
+**Traps hit.** A real browser holding an old draft keeps the old eight-blank text and
+reads `0/8`; Reset loads the remembered problem's *new* starter. The 3.10 module doc's
+five-part tables and D1/D2 wording all needed rewriting. The build loses one lesson path
+(722 → 721) and the PA count goes 24 → 23.
+
 # 2026-10-28: grader consistency measured; deterministic plan grader built (advisory)
 
 **The problem.** 3.9.1's AI grade is unstable on identical work. On prod (106+ submissions, 10 students):

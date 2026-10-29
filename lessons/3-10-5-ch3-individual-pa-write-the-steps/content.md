@@ -1,7 +1,7 @@
-## Chapter 3 Individual PA — Part 5 of 5: Write the Steps
+## Chapter 3 Individual PA — Part 3 of 4: Write the Steps
 
 **This is the coding part of the test, and you are doing it alone.** One problem, pick
-one of three, write the JavaScript. **20 points**, about **12 minutes**. No Run button.
+one of three, write the JavaScript. **30 points**, about **19 minutes**. No Run button.
 
 **You get three tries.** Submit, read the feedback on each criterion, fix the code and submit again. Your best try counts. After your third try you can see how it is solved, once your teacher releases it.
 

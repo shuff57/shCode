@@ -1,4 +1,4 @@
-## Chapter 3 Individual PA — Part 3 of 5: Find and Fix
+## Chapter 3 Individual PA — Part 2 of 4: Find and Fix
 
 **This is the debugging part of the test, and you are doing it alone.** One file, four
 bugs in it, **20 points total**, about **11 minutes**. You run the program, read what
@@ -39,7 +39,7 @@ skill the part exists to assess.
 
 ### Before you submit
 
-- **Run it.** Every fix you make should be checked by running, and Part 3 is the one
+- **Run it.** Every fix you make should be checked by running, and Part 2 is the one
   part of this paper where running is allowed.
 - Four fixes, four comments: **syntax**, **runtime**, **logic**, in the words above.
 - Your teacher marks the fix in the code — naming the bug is part of the fix, not an

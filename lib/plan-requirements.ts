@@ -1,16 +1,16 @@
-// 3.9.1's editor strip: the eight blanks, as requirement cards.
+// 3.9.1's editor strip: the eight jobs in the plan, as requirement cards.
 //
 // WHY NOT THE LESSON'S OWN `requirements`. Those four cards were written before
-// the part became a skeleton, and they describe the whole plan ("at least four
-// of the five jobs appear as named calls"). They cannot say "this blank holds
-// the change call", so the strip read 0/4 next to feedback about eight blanks,
-// and — worse — it never moved: a text lesson runs no requirement check on
-// typing, so the four cards sat grey for the whole part.
+// the part became a find-and-fix, and they describe the whole plan ("at least
+// four of the five jobs appear as named calls"). They cannot say "this line is
+// the change", so the strip read 0/4 next to feedback about eight jobs, and —
+// worse — it never moved: a text lesson runs no requirement check on typing, so
+// the four cards sat grey for the whole part.
 //
-// The gap grader already answers the question the strip is asking, and it is
-// the same parser the teacher's blank check and the AI rubric describe. So the
+// The plan checker already answers the question the strip is asking, and it is
+// the same parser the teacher's plan check and the AI rubric describe. So the
 // strip is computed from the text instead of from the authored cards, and a
-// student sees the same eight lines before submitting that they are graded on
+// student sees the same eight jobs before submitting that they are graded on
 // after. The authored `requirements` stay in lesson.json: `check-starters`
 // grades the reference and the starter against them, and they are the coarse
 // "is this a plan at all" check the lesson was built with.
@@ -19,10 +19,10 @@ import type { Requirement } from './types';
 import type { GradeReport } from './grader';
 import { checkPlanGaps, PLAN_GAPS, PLAN_LESSONS } from './plan-check';
 
-/** Is this a lesson whose strip is the blanks rather than its authored cards? */
+/** Is this a lesson whose strip is the plan's jobs rather than its authored cards? */
 export const isPlanLesson = (lessonId: string): boolean => PLAN_LESSONS.includes(lessonId);
 
-/** The eight blanks as strip cards. A partial is NOT yet: it does not do the job. */
+/** The eight jobs as strip cards. A partial is NOT yet: it does not do the job. */
 export function planRequirements(text: string): Requirement[] {
   const { criteria } = checkPlanGaps(text);
   return criteria.map((c) => {
@@ -31,7 +31,7 @@ export function planRequirements(text: string): Requirement[] {
     return {
       id: c.id,
       // The requirement card has no field for it, and a student should see which
-      // two blanks cannot be left, so the title says so.
+      // two jobs cannot be left, so the title says so.
       title: required ? `${c.title} (required)` : c.title,
       description: spec?.wants ?? '',
       status: c.verdict === 'met' ? 'passed' : 'failed',
@@ -48,7 +48,7 @@ export function planRequirements(text: string): Requirement[] {
 /**
  * A GradeReport built from the same cards, for the call sites that want one.
  *
- * `passed` is the real verdict — six of eight AND the two required blanks — not
+ * `passed` is the real verdict — six of eight AND the two required jobs — not
  * "every card green", so the strip's own count and the part's bar can differ
  * without lying: a plan at seven of eight with the change missing is not a pass.
  */
