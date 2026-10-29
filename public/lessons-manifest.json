@@ -6496,9 +6496,9 @@
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null,
       "assignmentCode": "A3.9.1",
-      "maxScore": 4,
+      "maxScore": 8,
       "maxSubmissions": null,
-      "scoreKind": null
+      "scoreKind": "written"
     },
     {
       "id": "3-9-2-ch3-group-pa-build",
