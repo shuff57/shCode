@@ -15,6 +15,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { checkPlanGaps, GAP_PASS, PLAN_GAPS } from '../lib/plan-check.ts';
 import { isUntouchedStarter } from '../lib/starter-variants.ts';
+import { planGradeReport, planRequirements } from '../lib/plan-requirements.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const lesson = 'lessons/3-9-1-ch3-group-pa-design-chart';
@@ -295,6 +296,34 @@ check(isUntouchedStarter(asLesson, starter), 'the shipped starter counts as unto
 check(isUntouchedStarter(asLesson, variants[1].text), 'another problem\'s starter counts as untouched');
 check(isUntouchedStarter(asLesson, '  \n'), 'an empty file counts as untouched');
 check(!isUntouchedStarter(asLesson, starter.replace('set stock to __________', 'set stock to loadStock()')), 'a filled-in blank is work, not a starter');
+
+// --- the editor strip is the same eight blanks ----------------------------
+// The strip a student reads before submitting and the grade they get after
+// must describe the same eight lines. One red card per blank left or wrong.
+const strip = planRequirements(starter);
+check(strip.length === 8, 'the strip shows eight cards, not the authored four');
+check(strip.map((r) => r.id).join(',') === PLAN_GAPS.map((g) => g.id).join(','), 'the cards are the gaps, in the order the student sees them');
+check(
+  strip.every((r, i) => r.title === PLAN_GAPS[i].title + (PLAN_GAPS[i].required ? ' (required)' : '')),
+  'each card carries its blank\'s title, and the two required ones say so',
+);
+check(
+  strip.filter((r) => r.title.endsWith('(required)')).length === 2,
+  'exactly the change and its report are marked required',
+);
+check(strip.every((r) => r.description === PLAN_GAPS.find((g) => g.id === r.id).wants), 'each card asks the lesson\'s own question for its blank');
+check(strip.every((r) => r.status === 'failed'), 'the untouched starter is eight red cards, not eight grey ones');
+check(planRequirements(reference).every((r) => r.status === 'passed'), 'the reference is eight green cards');
+const partialStrip = planRequirements(fill(ANSWERS.map((a, i) => (i === 5 ? 'sellItem(stock)' : a))));
+check(partialStrip.find((r) => r.id === 'gap-6-change').status === 'failed', 'a partial blank is a red card: it does not do the job');
+check(partialStrip.find((r) => r.id === 'gap-6-change').messages.length === 2, 'a red required card carries the reason and the note that it cannot be left');
+check(strip.find((r) => r.id === 'gap-1-load').messages.length === 1, 'a red ordinary card carries the reason only');
+check(planRequirements(reference).find((r) => r.id === 'gap-6-change').messages.length === 0, 'a green card carries no complaint');
+
+// The report built for the strip passes on the same rule as the grader.
+const stripReport = planGradeReport(fill(ANSWERS.map((a, i) => (i === 5 || i === 6 ? BLANK : a))));
+check(stripReport.totalScore === 6 && stripReport.totalPossible === 8, 'the strip report counts eight blanks');
+check(stripReport.passed === false, 'the strip report carries the required gate, not just the count');
 
 // --- the spec and the checks agree ----------------------------------------
 check(PLAN_GAPS.length === 8, 'the gap spec lists eight blanks');

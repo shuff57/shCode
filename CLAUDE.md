@@ -678,6 +678,18 @@ plan that is probably right. Twenty realistic mutations of the reference —
 shouting, snake_case, abbreviations, synonyms, typos, no parentheses,
 log/show/print — all score full; `scripts/test-plan-check.mjs` pins five of them.
 
+**The editor strip is the same eight blanks** (`lib/plan-requirements.ts`). The
+lesson's authored `requirements` are four coarse plan-level regexes that cannot
+name a blank, and a text lesson runs no requirement check while the student
+types — so the strip read `0/4` beside feedback about eight blanks and never
+moved. `LessonWorkspace` now builds the cards from the same `checkPlanGaps()`
+call, recomputed on every edit: one card per blank, met = green, partial or
+missing = red "Not yet" with the parser's reason, and the two required blanks
+say so. `planGradeReport()` builds the matching report on the same pass rule (six
+of eight AND the change and its report). The authored `requirements` stay in
+`lesson.json` because `check-starters` grades the reference and the starter
+against them.
+
 It is **advisory** today: `components/PlanCheckPanel.tsx` renders it beside the
 AI grade in the teacher's submission queue, computed from the stored response,
 while the AI result remains the recorded grade. `scripts/test-plan-check.mjs`

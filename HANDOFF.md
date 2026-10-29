@@ -346,10 +346,19 @@ the teacher's blank check says the same. Live check, gemma-4-26b, 2 runs: refere
 blank pass; no change + no report fails; a change handed only the list (partial) fails; 0/40 cells
 flipped. `test-grade-pass.mjs` and `test-plan-gaps.mjs` (now 102 checks) pin it.
 
-**Open on this, and each is the teacher's call:**
-1. **The `requirements` cards are still the old four** regexes, so the editor strip reads 0/4 while the
-   feedback talks about eight blanks. They are a coarse checklist, the rubric is the graded artefact —
-   but the mismatch is visible.
+**The editor strip is the eight blanks now.** The four authored `requirements` could not name a blank,
+and a text lesson runs no requirement check on typing, so the strip read 0/4 for the whole part and
+never moved — next to feedback that talks about eight blanks. `lib/plan-requirements.ts` builds the
+cards from the same `checkPlanGaps()` call the panel uses, and `LessonWorkspace` recomputes them on
+every edit: met is green, a partial or missing blank is a red "Not yet" with the parser's reason, and
+the two required blanks are marked. `planGradeReport()` carries the same verdict (six of eight AND the
+change and its report), so the count and the bar can differ without lying. The authored requirements
+stay in `lesson.json` for `check-starters`. `test-plan-gaps.mjs` is now 113 checks and pins the strip
+(one card per blank, in the student's order, red on the untouched starter, green on the reference,
+partial is red, the report carries the required gate).
+
+**Open on this:**
+1. Nothing blocking. 3.9.1's strip, starters, grader and rubric now agree with each other.
 3. **Nothing here is deployed.** Committed on `cs-3d` as `6848538c` (plus the four-starter work, if
    committed separately); production is still at `65e0531e`. A deploy also ships the two commits queued
    behind it. Note that a student who opened 3.9.1 on production before the deploy keeps a saved draft of

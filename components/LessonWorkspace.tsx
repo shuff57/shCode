@@ -45,6 +45,7 @@ import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
 import LabPlanChart from './LabPlanChart';
 import StarterPicker from './StarterPicker';
+import { isPlanLesson, planGradeReport, planRequirements } from '../lib/plan-requirements';
 import KeyboardShortcutModal from './KeyboardShortcutModal';
 import { RotateCcw, Send } from 'lucide-react';
 
@@ -302,6 +303,20 @@ export default function LessonWorkspace({
   // browser can run: a plain textarea and a Grade button instead of CodeMirror
   // and Run. See lesson.json `editor`.
   const isTextMode = lesson.editor === 'text';
+  // 3.9.1: the strip is the eight blanks. Its authored `requirements` are four
+  // coarse plan-level regexes that cannot name a blank, and a text lesson runs
+  // no check on typing, so those cards never moved. See lib/plan-requirements.ts.
+  const planStrip = isTextMode && isPlanLesson(lesson.id);
+
+  // Recomputed as the plan is typed, so the strip and the grade describe the
+  // same eight lines. Cheap: the parser reads the whole plan in well under a
+  // millisecond (scripts/test-plan-check.mjs measures it).
+  const planStripText = files[aiCheckFile] ?? '';
+  useEffect(() => {
+    if (!planStrip) return;
+    setRequirements(planRequirements(planStripText));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [planStrip, planStripText]);
 
   // Part two of a split assignment: drop the student's own chart into the
   // starter as pseudocode comments.
@@ -708,6 +723,13 @@ export default function LessonWorkspace({
   // reads `latestModelDoc`, which ReshapeStudio keeps current independent of
   // the (debounced, <=300ms) script.js text sync.
   function runTests() {
+    // A plan lesson is graded by the blank check, not by its authored regexes:
+    // Ctrl+Enter and the Grade fallback must not put the four old cards back.
+    if (planStrip) {
+      const text = files[aiCheckFile] ?? '';
+      setRequirements(planRequirements(text));
+      return planGradeReport(text);
+    }
     const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals, testResults: testRunRef.current };
     const report = grade(
       lesson.requirements,
@@ -1275,7 +1297,10 @@ export default function LessonWorkspace({
                       aiVerdictsRef.current = null;
                       aiFallbackRef.current = null;
                       setAiCheckNote(null);
-                      if (isTextMode || aiCheck) setRequirements(lesson.requirements);
+                      // A plan lesson's strip recomputes from the restored text in
+                      // the effect above; setting the authored cards here would flash
+                      // the old four onto it.
+                      if (!planStrip && (isTextMode || aiCheck)) setRequirements(lesson.requirements);
                       setResetMsg(isTextMode ? 'Text reset to starter.' : 'Code reset to starter.');
                       setTimeout(() => setResetMsg(null), 2500);
                       if (isReshapeMode) setReshapeResetKey((k) => k + 1);
