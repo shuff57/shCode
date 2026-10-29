@@ -20,6 +20,7 @@ import {
   rememberedStarter,
   rememberStarter,
   starterFile,
+  STARTER_REQUESTED,
 } from '../lib/starter-variants';
 
 export default function StarterPicker({ lesson }: { lesson: Lesson }) {
@@ -42,11 +43,29 @@ export default function StarterPicker({ lesson }: { lesson: Lesson }) {
     return () => clearTimeout(t);
   }, [note]);
 
+  // A Flow Chart tab asks for its problem's starter: same confirm, same load as a
+  // click here. `handled` tells the chart whether this lesson owns that problem.
+  useEffect(() => {
+    const onRequest = (e: Event) => {
+      const d = (e as CustomEvent<{ lessonId: string; id: string; handled?: boolean }>).detail;
+      if (d?.lessonId !== lesson.id || !variants.some((v) => v.id === d.id)) return;
+      d.handled = true;
+      choose(d.id);
+    };
+    window.addEventListener(STARTER_REQUESTED, onRequest);
+    return () => window.removeEventListener(STARTER_REQUESTED, onRequest);
+  });
+
   if (variants.length < 2) return null;
 
   function choose(id: string) {
     const v = variants.find((x) => x.id === id);
-    if (!v || v.id === picked) return;
+    if (!v) return;
+    // Already the starter on screen: nothing to load, but the chart still follows.
+    if (v.id === picked) {
+      rememberStarter(lesson.id, v.id);
+      return;
+    }
     const file = starterFile(v);
     const text = files[file] ?? '';
     if (

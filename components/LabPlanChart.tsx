@@ -13,7 +13,7 @@
 
 import { useEffect, useState } from 'react';
 import DiagramBlock from './DiagramBlock';
-import { STARTER_PICKED, starterKey } from '../lib/starter-variants';
+import { STARTER_PICKED, STARTER_REQUESTED, starterKey } from '../lib/starter-variants';
 
 interface Props {
   lessonId: string;
@@ -54,6 +54,15 @@ export default function LabPlanChart({ lessonId, mermaid, caption, variants }: P
     return () => window.removeEventListener(STARTER_PICKED, onPick);
   }, [lessonId, variants]);
 
+  // A tab for one of the lesson's problems loads that problem's starter too (the
+  // picker confirms before it replaces typed work, and the chart follows once it
+  // has). A tab no picker owns, like the worked example, just shows its chart.
+  function pick(id: string) {
+    const detail = { lessonId, id, handled: false };
+    window.dispatchEvent(new CustomEvent(STARTER_REQUESTED, { detail }));
+    if (!detail.handled) setPicked(id);
+  }
+
   function toggle(next: boolean) {
     setOpen(next);
     try {
@@ -84,7 +93,7 @@ export default function LabPlanChart({ lessonId, mermaid, caption, variants }: P
                 type="button"
                 role="tab"
                 aria-selected={on}
-                onClick={() => setPicked(v.id)}
+                onClick={() => pick(v.id)}
                 style={{
                   padding: '4px 12px',
                   minHeight: 30,

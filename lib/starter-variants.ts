@@ -17,6 +17,10 @@ export type { StarterVariant };
 /** Fired on `window` when a problem is picked; detail is `{ lessonId, id }`. */
 export const STARTER_PICKED = 'shcode:starter-picked';
 
+/** Fired on `window` by the Flow Chart tabs to ask for a problem's starter. detail is
+ *  `{ lessonId, id, handled }`; StarterPicker sets `handled` when `id` is one of its problems. */
+export const STARTER_REQUESTED = 'shcode:starter-requested';
+
 export const starterKey = (lessonId: string) => `shCode:starter:${lessonId}`;
 const key = starterKey;
 
