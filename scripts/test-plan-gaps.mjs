@@ -82,19 +82,35 @@ const names = [
   'gap-1-load', 'gap-2-total', 'gap-3-subset', 'gap-4-lines',
   'gap-5-loop-body', 'gap-6-change', 'gap-7-report', 'gap-8-save',
 ];
+// Blanks 6 and 7 are required: the change to one record is what the lesson
+// calls the point of the plan, and the report is the proof. Six of eight is the
+// tolerance for wording, not permission to skip the sale.
+const CRUX = new Set(['gap-6-change', 'gap-7-report']);
 for (let i = 0; i < 8; i++) {
   const r = checkPlanGaps(missingBlank(i + 1));
   const wrong = r.criteria.filter((c) => c.verdict !== 'met').map((c) => c.id);
   check(wrong.length === 1 && wrong[0] === names[i], `blank ${i + 1} missing costs only ${names[i]} (got ${wrong.join(', ') || 'none'})`);
   check(met(r) === 7, `blank ${i + 1} missing still leaves 7 of 8`);
-  check(r.passed, `blank ${i + 1} missing still passes`);
+  if (CRUX.has(names[i])) {
+    check(!r.passed, `blank ${i + 1} is required: seven of eight is not a pass without it`);
+  } else {
+    check(r.passed, `blank ${i + 1} missing still passes`);
+  }
 }
 
 // The two-crux case: no change call and no report. That is one decision made
-// twice, and it fails.
+// twice, and it fails -- at six of eight, which used to be a pass.
 const noChange = checkPlanGaps(fill(ANSWERS.map((a, i) => (i === 5 ? BLANK : i === 6 ? BLANK : a))));
 check(met(noChange) === 6, 'both crux blanks left costs exactly two gaps');
 check(verdict(noChange, 'gap-7-report') === 'missing', 'an empty report after an empty change is missing');
+check(!noChange.passed, 'six of eight without the change and its report is a fail');
+
+// A half-filled change is not a sale either: handed only the list, it cannot
+// know which record to change.
+const halfChange = checkPlanGaps(fill(ANSWERS.map((a, i) => (i === 5 ? 'sellItem(stock)' : a))));
+check(verdict(halfChange, 'gap-6-change') === 'partial', 'a change call handed only the list is partial');
+check(!halfChange.passed, 'a partial change call does not pass the part');
+check(PLAN_GAPS.filter((g) => g.required).map((g) => g.id).join(',') === 'gap-6-change,gap-7-report', 'the spec marks exactly the change and its report as required');
 
 // The bar, stated plainly. Six of eight is 75%, the nearest whole-blank count
 // to the 70% the course asks for, and it means a pair may leave two blanks.

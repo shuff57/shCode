@@ -65,6 +65,26 @@ try {
   check('7/10 passes', isPassingGrade({ totalEarned: 7, totalPossible: 10, criteria: [] }), true);
   check('6/10 fails', isPassingGrade({ totalEarned: 6, totalPossible: 10, criteria: [] }), false);
 
+  // --- a criterion the part cannot pass without (`required: true`) ---
+  // 3.9.1 passes at six of eight blanks, and two of those blanks are the point
+  // of the plan. Missing both costs exactly two gaps, so the points rule alone
+  // lets a plan pass with no change and no report in it.
+  const req = (verdict) => ({ id: 'crux', verdict, required: true });
+  check('required met does not block 7/10',
+    isPassingGrade({ totalEarned: 7, totalPossible: 10, criteria: [req('met')] }), true);
+  check('required missing sinks a 9/10',
+    isPassingGrade({ totalEarned: 9, totalPossible: 10, criteria: [req('missing')] }), false);
+  check('required partial is not met, so it sinks a 9/10',
+    isPassingGrade({ totalEarned: 9, totalPossible: 10, criteria: [req('partial')] }), false);
+  check('a missing criterion that is NOT required leaves 7/10 passing',
+    isPassingGrade({ totalEarned: 7, totalPossible: 10, criteria: [{ id: 'x', verdict: 'missing' }] }), true);
+  check('required sinks a pass/fail rubric too',
+    pf2('met', 'met', 'met', 'missing'), false);
+  function pf2(...vs) {
+    const criteria = vs.map((v, i) => ({ verdict: v, ...(i === 3 ? { required: true } : {}) }));
+    return isPassingGrade({ totalEarned: 0, totalPossible: 0, criteria });
+  }
+
   // --- stored rows ---
   // The regression itself: a real failing submission on a points:0 rubric.
   check('stored 0/0 row with 1 of 5 met is NOT passing',
@@ -80,9 +100,18 @@ try {
   check('empty criteria array is null', isPassingSubmission(0, 0, '{"criteria":[]}'), null);
   check('scored rubric with null score is null', isPassingSubmission(null, 10, null), null);
 
-  // Point-scored stored rows ignore grade_json entirely.
+  // Point-scored stored rows answer from the score unless the grade carries a
+  // required criterion, which the score cannot express.
   check('stored 8/10 row is passing', isPassingSubmission(8, 10, null), true);
   check('stored 3/10 row is not passing', isPassingSubmission(3, 10, null), false);
+  check('stored 9/10 row with a missed required criterion is NOT passing',
+    isPassingSubmission(9, 10, JSON.stringify({ criteria: [req('missing')] })), false);
+  check('stored 9/10 row with its required criterion met is passing',
+    isPassingSubmission(9, 10, JSON.stringify({ criteria: [req('met')] })), true);
+  check('stored 9/10 row from before the flag existed still passes',
+    isPassingSubmission(9, 10, JSON.stringify({ criteria: [{ id: 'x', verdict: 'missing' }] })), true);
+  check('stored 4/10 row with a required flag still fails on the score',
+    isPassingSubmission(4, 10, JSON.stringify({ criteria: [req('met')] })), false);
 } finally {
   rmSync(out, { recursive: true, force: true });
 }

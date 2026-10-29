@@ -17,6 +17,12 @@ export interface RubricItem {
    * request body, never in the client's rubric.
    */
   check?: RubricCheck;
+  /**
+   * The part cannot pass without this criterion, whatever the rest scores.
+   * Authored on a rubric item; honoured by lib/grade-pass.ts and carried into
+   * the stored grade so the teacher side asks the same question.
+   */
+  required?: boolean;
 }
 
 export interface GradeRequest {
@@ -84,6 +90,8 @@ interface CriterionResult {
   feedback: string;
   /** Hybrid flowchart parts: who scored this criterion. Absent on every other grader. */
   source?: 'rules' | 'ai';
+  /** A criterion the part cannot pass without. Stored so a saved grade keeps its own rule. */
+  required?: boolean;
 }
 
 export interface GradeResponse {
@@ -281,6 +289,7 @@ export function shapeResult(parsed: any, rubric: RubricItem[]): GradeResponse {
       max: r.points,
       verdict,
       feedback: String(match?.feedback || '').slice(0, 400),
+      ...(r.required ? { required: true } : {}),
     };
   });
   const totalEarned = criteria.reduce((s, c) => s + c.earned, 0);

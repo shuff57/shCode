@@ -18,6 +18,23 @@
 interface PassCriterion {
   verdict: 'met' | 'partial' | 'missing';
   source?: string;
+  /**
+   * A criterion the part cannot pass without, whatever the rest of the paper
+   * scores. Authored as `required: true` on the rubric item and carried through
+   * `shapeResult` into the stored grade, so it survives into the teacher side.
+   *
+   * WHY A FLAG AND NOT MORE POINTS. 3.9.1's plan is graded on eight blanks and
+   * passes at six, which is the right tolerance for "close enough" wording. But
+   * two of the blanks -- the change to one record and the report of it -- are
+   * what the lesson calls the point of the plan; a pair can miss both and still
+   * reach six of eight. Weighting them would either leave that case passing or
+   * make the other six worth almost nothing. `required` says the one thing the
+   * point rule cannot: this is not a share of the mark, it is the mark.
+   *
+   * Only `met` satisfies it. A `partial` is, by the rubric's own wording, work
+   * that does not do the job.
+   */
+  required?: boolean;
 }
 
 /**
@@ -39,6 +56,7 @@ export interface PassInput {
 
 /** Pass/fail for a live grade result. */
 export function isPassingGrade(r: PassInput): boolean {
+  if (missedRequired(r.criteria)) return false;
   if (r.totalPossible === 0) {
     if (!r.criteria || r.criteria.length === 0) return false;
     const ok = r.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length;
@@ -54,6 +72,14 @@ export function isPassingGrade(r: PassInput): boolean {
  * grade_json that will not parse — so callers can tell "not passing" apart
  * from "no verdict available" instead of defaulting a broken row to fine.
  */
+/** Does the paper miss a criterion it cannot pass without? */
+function missedRequired(criteria: ReadonlyArray<PassCriterion> | null | undefined): boolean {
+  return (
+    Array.isArray(criteria) &&
+    criteria.some((c) => c && c.required === true && c.verdict !== 'met')
+  );
+}
+
 export function isPassingSubmission(
   score: number | null,
   possible: number | null,
@@ -61,7 +87,25 @@ export function isPassingSubmission(
 ): boolean | null {
   if (possible !== null && possible > 0) {
     if (score === null) return null;
-    return score / possible >= (gradeJson && gradeJson.includes('"source":"rules"') ? HYBRID_PASS_FRACTION : 0.7);
+    if (score / possible < (gradeJson && gradeJson.includes('"source":"rules"') ? HYBRID_PASS_FRACTION : 0.7)) {
+      return false;
+    }
+    // Over the bar, but a required criterion can still sink it. Only asked when
+    // the stored grade actually carries the flag -- every row written before it
+    // existed answers exactly as it did, and a row whose grade_json is missing
+    // or unreadable keeps its points verdict rather than being re-litigated.
+    if (gradeJson && /"required"\s*:\s*true/.test(gradeJson)) {
+      let criteria: unknown;
+      try {
+        criteria = (JSON.parse(gradeJson) as { criteria?: unknown })?.criteria;
+      } catch {
+        criteria = undefined;
+      }
+      if (Array.isArray(criteria) && criteria.length > 0) {
+        return isPassingGrade({ totalEarned: score, totalPossible: possible, criteria: criteria as PassCriterion[] });
+      }
+    }
+    return true;
   }
   if (!gradeJson) return null;
   let parsed: unknown;

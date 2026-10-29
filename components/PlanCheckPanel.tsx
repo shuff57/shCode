@@ -13,7 +13,7 @@
 // Computed from the stored response, so it works on every historical row with
 // no server change or migration.
 
-import { checkPlanGaps, GAP_PASS, PLAN_LESSONS } from '../lib/plan-check';
+import { checkPlanGaps, GAP_PASS, PLAN_GAPS, PLAN_LESSONS } from '../lib/plan-check';
 
 const COLOR: Record<string, string> = { met: '#50fa7b', partial: '#f1fa8c', missing: '#ff5555' };
 const LABEL: Record<string, string> = { met: 'met', partial: 'partly', missing: 'missing' };
@@ -22,6 +22,9 @@ export default function PlanCheckPanel({ lessonId, response }: { lessonId: strin
   if (!PLAN_LESSONS.includes(lessonId)) return null;
   const result = checkPlanGaps(response);
   const met = result.criteria.filter((c) => c.verdict === 'met').length;
+  // Two blanks are required, so a plan can be over the count and still fail.
+  const requiredMet = (id: string) => result.criteria.find((c) => c.id === id)?.verdict === 'met';
+  const requiredMissed = PLAN_GAPS.some((g) => g.required && !requiredMet(g.id));
   return (
     <section
       aria-label="Deterministic plan check"
@@ -38,7 +41,13 @@ export default function PlanCheckPanel({ lessonId, response }: { lessonId: strin
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
         <strong style={{ color: '#8be9fd', fontSize: '0.85rem' }}>Blank check</strong>
         <span style={{ color: '#8393c4', fontSize: '0.78rem' }}>
-          {met} of {result.criteria.length} gaps right{result.blanks ? ` · ${result.blanks} still empty` : ''} &middot; {result.passed ? 'would pass' : 'would not pass'} ({GAP_PASS} needed) &middot; advisory, not the recorded grade
+          {met} of {result.criteria.length} gaps right{result.blanks ? ` · ${result.blanks} still empty` : ''} &middot;{' '}
+          {result.passed
+            ? `would pass (${GAP_PASS} needed)`
+            : requiredMissed
+              ? 'would not pass — the change and its report both have to be right'
+              : `would not pass (${GAP_PASS} needed)`}{' '}
+          &middot; advisory, not the recorded grade
         </span>
       </div>
       {result.criteria.map((c) => (
@@ -47,6 +56,9 @@ export default function PlanCheckPanel({ lessonId, response }: { lessonId: strin
             {LABEL[c.verdict]}
           </span>
           <span style={{ color: '#f8f8f2' }}>{c.title}</span>
+          {PLAN_GAPS.find((g) => g.id === c.id)?.required ? (
+            <span style={{ color: '#bd93f9', marginLeft: 8, fontSize: '0.74rem' }}>required</span>
+          ) : null}
           <div style={{ color: '#a8b1d8', marginLeft: 52 }}>{c.feedback}</div>
         </div>
       ))}

@@ -84,6 +84,9 @@ for (const id of readdirSync(lessonsDir)) {
     for (const r of g.rubric) {
       if (!r.id) errors.push(`${id}: a rubric item has no id`);
       if (typeof r.points !== 'number') errors.push(`${id}: rubric item ${r.id} has non-numeric points`);
+      if (r.required !== undefined && typeof r.required !== 'boolean') {
+        errors.push(`${id}: rubric item ${r.id} has a non-boolean required -- say true or leave it out`);
+      }
     }
     // Hybrid charts (diagram.aiGrader): `check` on a rubric item and `gate` on the grader are
     // marked by lib/diagram-score.ts on the server. Validate them here so a typo is a build

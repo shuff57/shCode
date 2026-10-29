@@ -15,6 +15,8 @@ export interface AiCriterion {
   max: number;
   verdict: 'met' | 'partial' | 'missing';
   feedback: string;
+  /** The part cannot pass without this criterion (lib/grade-pass.ts). */
+  required?: boolean;
 }
 
 export interface AiGradeResultData {
@@ -34,6 +36,10 @@ interface Props {
   stage: string | null;
   error: string | null;
 }
+
+/** Does this result miss a criterion the part cannot pass without? */
+const requiredMissed = (r: AiGradeResultData) =>
+  r.criteria.some((c) => c.required && c.verdict !== 'met');
 
 export default function AiGradeResultPanel({ title, titles, result, grading, stage, error }: Props) {
   if (!grading && !result && !error) return null;
@@ -80,9 +86,24 @@ export default function AiGradeResultPanel({ title, titles, result, grading, sta
             })}
           </div>
           {result.totalPossible > 0 ? (
-            <p style={{ marginTop: 10, color: '#f8f8f2', fontSize: 14 }}>
-              This try: {result.totalEarned} of {result.totalPossible}.
-            </p>
+            <>
+              <p style={{ marginTop: 10, color: '#f8f8f2', fontSize: 14 }}>
+                This try: {result.totalEarned} of {result.totalPossible}.
+              </p>
+              {requiredMissed(result) && (
+                // A scored part normally says nothing about passing, but one with a
+                // required criterion can be over the points bar and still fail. Say
+                // which line is holding it, or the score reads as good enough.
+                <p role="status" style={{ marginTop: 6, color: '#ffb86c', fontSize: 14 }}>
+                  Not passing yet — this part cannot pass unless{' '}
+                  {result.criteria
+                    .filter((c) => c.required && c.verdict !== 'met')
+                    .map((c) => titles[c.id] || c.id)
+                    .join(' and ')}{' '}
+                  {result.criteria.filter((c) => c.required && c.verdict !== 'met').length === 1 ? 'is' : 'are'} fully right.
+                </p>
+              )}
+            </>
           ) : (
             // A zero-point rubric has no score to raise. Saying nothing here left
             // students submitting the same plan over and over -- one class sent 25

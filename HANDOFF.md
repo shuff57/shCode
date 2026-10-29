@@ -332,10 +332,22 @@ asserts byte equality, and scores every starter 0/8 untouched and 8/8 filled. Th
 items now name all four problems' calls instead of Snack Shack's, and the prompt says the fixed lines
 are worded for the problem the pair picked.
 
+**The two crux blanks are `required`, so six of eight is no longer enough without them.** Missing the
+change (blank 6) and its report (blank 7) costs exactly two gaps — six of eight, which passed. The
+lesson's own Step 5 calls blank 6 "the one that matters" and blank 7 "the proof", so the bar was letting
+a plan through with no sale in it. Rather than raise `GAP_PASS` (which would punish the other six blanks
+for a tolerance that is right for wording), a rubric item can now be `required`: `PLAN_GAPS` marks the
+two, `lesson.json`'s items carry `required: true`, and `lib/grade-pass.ts` refuses a result whose
+required criterion is not fully `met` — a partial does not satisfy it. `shapeResult` carries the flag
+into the stored grade and `isPassingSubmission` re-checks it on saved rows, only where the flag is
+present, so old rows answer as they always did. The student's result panel says which line is holding
+the part ("Not passing yet — this part cannot pass unless The change is reported is fully right"), and
+the teacher's blank check says the same. Live check, gemma-4-26b, 2 runs: reference and one-ordinary-
+blank pass; no change + no report fails; a change handed only the list (partial) fails; 0/40 cells
+flipped. `test-grade-pass.mjs` and `test-plan-gaps.mjs` (now 102 checks) pin it.
+
 **Open on this, and each is the teacher's call:**
-1. **Six of eight lets a pair leave two blanks** (say the total and the lines) and still pass. Three
-   fails. Move `GAP_PASS` to 7 for "all but one" if that allowance is too loose.
-2. **The `requirements` cards are still the old four** regexes, so the editor strip reads 0/4 while the
+1. **The `requirements` cards are still the old four** regexes, so the editor strip reads 0/4 while the
    feedback talks about eight blanks. They are a coarse checklist, the rubric is the graded artefact —
    but the mismatch is visible.
 3. **Nothing here is deployed.** Committed on `cs-3d` as `6848538c` (plus the four-starter work, if

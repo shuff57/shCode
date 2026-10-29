@@ -683,6 +683,17 @@ interface GapSpec {
   title: string;
   /** What belongs in the blank, in the course's words. Used by the feedback. */
   wants: string;
+  /**
+   * A blank the plan cannot pass without, whatever the others score.
+   *
+   * The bar is six of eight because wording varies and "close enough" counts.
+   * But blanks 6 and 7 are the change to one record and the report of it -- the
+   * lesson's own Step 5 calls blank 6 "the one that matters" and blank 7 "the
+   * proof". Missing both costs exactly two gaps, which six of eight allows, so
+   * without this flag a pair could pass having skipped the point of the plan.
+   * A higher bar would punish the other six instead; the flag names the two.
+   */
+  required?: boolean;
 }
 
 /**
@@ -696,8 +707,8 @@ export const PLAN_GAPS: GapSpec[] = [
   { id: 'gap-3-subset', title: 'The low-stock list comes from a call', wants: 'what gives you the low-stock list? It needs the list and the level.' },
   { id: 'gap-4-lines', title: 'The lines come from a call', wants: 'what turns the list into one line per record?' },
   { id: 'gap-5-loop-body', title: 'The loop does something with each line', wants: 'the loop is walking lines, so what happens once per line?' },
-  { id: 'gap-6-change', title: 'One record is changed by a call', wants: 'which function changes one record? Hand it the list and a name.' },
-  { id: 'gap-7-report', title: 'The change is reported', wants: 'the record has changed. What do you report so the change shows?' },
+  { id: 'gap-6-change', title: 'One record is changed by a call', wants: 'which function changes one record? Hand it the list and a name.', required: true },
+  { id: 'gap-7-report', title: 'The change is reported', wants: 'the record has changed. What do you report so the change shows?', required: true },
   { id: 'gap-8-save', title: 'The list is saved', wants: 'what happens to the list when you are done?' },
 ];
 
@@ -787,7 +798,12 @@ export function checkPlanGaps(text: string): PlanCheck {
   const metCount = criteria.filter((c) => c.verdict === 'met').length;
   const partials = criteria.filter((c) => c.verdict === 'partial').length;
   const totalEarned = criteria.reduce((s, c) => s + (c.verdict === 'met' ? 1 : c.verdict === 'partial' ? 0.5 : 0), 0);
-  const passed = metCount >= GAP_PASS;
+  // Six of eight, and the two blanks the lesson calls the point of the plan.
+  const missedRequired = criteria.filter((c) => {
+    const spec = PLAN_GAPS.find((g) => g.id === c.id);
+    return spec?.required && c.verdict !== 'met';
+  });
+  const passed = metCount >= GAP_PASS && missedRequired.length === 0;
   const next = criteria.find((c) => c.verdict !== 'met');
   return {
     ok: true,
@@ -800,7 +816,10 @@ export function checkPlanGaps(text: string): PlanCheck {
     passed,
     summary: `${metCount} of ${criteria.length} gaps right${partials ? `, ${partials} nearly` : ''} (${GAP_PASS} needed to pass).`
       + (blanks ? ` ${blankWord(blanks)} still empty.` : '')
-      + (next ? ` Next: ${next.title.toLowerCase()}.` : ''),
+      + (next ? ` Next: ${next.title.toLowerCase()}.` : '')
+      + (metCount >= GAP_PASS && missedRequired.length
+        ? ' Even at that count the plan cannot pass: the change to one record and the report of it both have to be right.'
+        : ''),
   };
 }
 

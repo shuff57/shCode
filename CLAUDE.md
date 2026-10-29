@@ -705,6 +705,19 @@ course asks for). A pair may therefore leave two blanks; three fails. Both
 graders share `parsePlan()` and the loop / change / storage analyses, so they
 cannot disagree about the same words.
 
+**Two blanks are required, and the pass rule knows it.** Blanks 6 and 7 — the
+change to one record and the report that shows it — are `required` in both
+layers (`PLAN_GAPS` marks them; the rubric items carry `required: true`). Six of
+eight is the tolerance for wording, but a pair could miss both crux blanks,
+score exactly six, and pass a plan with no sale in it — while the lesson's own
+Step 5 calls blank 6 "the one that matters". `lib/grade-pass.ts`'s
+`isPassingGrade` refuses a result whose required criterion is not fully `met`
+(partial is not met: it is work that does not do the job), `shapeResult` carries
+the flag into the stored grade, and `isPassingSubmission` re-checks it on saved
+rows — only where `grade_json` carries the flag, so every row written before it
+existed answers exactly as it did. Adding `required` to a rubric item is the
+general way to say "this is the mark, not a share of it".
+
 Four rules the first live run forced, each with a test:
 - **A line of underscores is not a step.** `report ______` has not reported, and
   a blank loop body is not work. Without this the untouched skeleton scored 1/8.

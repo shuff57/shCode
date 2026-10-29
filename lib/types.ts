@@ -460,7 +460,14 @@ export interface AiGraderConfig {
   model?: string;
   contextDocs?: string[];
   prompt?: string;              // the prompt students responded to (for the grader context)
-  rubric: Array<{ id: string; title: string; description?: string; points: number }>;
+  rubric: Array<{
+    id: string;
+    title: string;
+    description?: string;
+    points: number;
+    /** The part cannot pass without this criterion (lib/grade-pass.ts). */
+    required?: boolean;
+  }>;
 }
 
 // ---- Student State (localStorage) ----
