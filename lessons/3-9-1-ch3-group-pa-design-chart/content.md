@@ -104,19 +104,33 @@ Shack; use your own function names if you picked another problem.)
 | sellItem | | |
 | saveStock / loadStock | | |
 
-### Step 3: write the pseudocode
+### Step 3: fill in the eight blanks
 
-Now the plan: the short main section of your program, written as pseudocode. Type it
-into the editor, under your contracts. The keywords from 2.2 and the
-conventions from 3.1 still apply:
+The editor already has the **shape of the plan**: the `if` / `otherwise`, the order of the
+calls, the loop line, START and END. What it does not have is **which function does each
+job, and what each one is handed**. That is the whole of what you decide here, and it is
+the 3.2.2 thinking the rest of the chapter runs on.
 
-- **One instruction per line.** A line doing two things gets split.
-- **Indent what sits inside something else.** The lines inside a loop or an IF are
-  indented; the lines after it are not.
-- **Call your functions by name**, handing each one what it needs. Do **not** write out
-  the inside of `totalValue` or `lowStock` — a call means "a function written somewhere
-  else does this, then we come back." Writing every job out inline is the most common way
-  to end up with a plan that has no functions in it.
+Eight lines of underscores are the blanks. Replace each one with the single line that
+belongs there, top to bottom:
+
+1. `set stock to ______` — where does the list come from, before anything uses it?
+2. `set total to ______` — what gives you the total? Hand it the list.
+3. `set low to ______` — what gives you the low-stock list? It needs the list **and** the
+   level.
+4. `set lines to ______` — what turns the list into one line per record?
+5. the indented line under the loop — the loop is walking `lines`, so what happens **once
+   per line**?
+6. the line after the loop — which function changes one record? Hand it the list **and** a
+   name (the reference plan sells `"Popcorn"`).
+7. `report ______` — the record has changed. What do you report so the change shows?
+8. the last line before `END` — what happens to the list when you are done?
+
+Use the names you wrote in your contracts table. Everything from 2.2 and 3.1 still holds:
+one instruction per line, and what sits inside something else is indented.
+
+A line of underscores is a **placeholder, not a step**. A plan with one still in it is not
+finished, and the check says so.
 
 An example of the shape, for a different problem (a pizza club):
 
@@ -134,41 +148,37 @@ saveMembers(members)
 END
 ```
 
-Open the **Flow Chart** above the editor to see the same plan drawn as a flowchart. It is
-read-only and it is for the pizza club, not for any of the four problems: yours has different
-functions, but the same four parts (named calls, a loop over the list, one change to a
-record, a load first and a save last).
+Open the **Flow Chart** above the editor and compare. It is a different problem's plan
+with different function names — the shape is the same one in front of you, so use it to
+see how a blank should read, not what to type.
 
-Your plan needs all four of these:
-
-1. **Named function calls** — at least four of your five jobs (build a record, total the
-   list, select a subset, one line per record, change one record), each called with the
-   list or values it needs and its answer kept or used.
-2. **A loop over the list** — `FOR EACH` or your own wording, with the work done on each
-   item indented under it.
-3. **The change-one-record call** — handed the list and a name, followed by a line that
-   reports or uses the changed list, so the effect shows.
-4. **Load at the start, save at the end** — the list comes back from storage before you
-   use it and goes back to storage when you are done.
+The shape is given so that the blanks are the whole of what you decide together. If you
+think the order is wrong, that belongs in your Part 3 reflection, not in the file.
 
 ### The part people get wrong
 
-**Calls, not insides.** If your plan has no function names in it, it has not shown any
-functions.
+**Blank 6 is the one that matters.** The function that changes a record changes the list it
+was handed. Your call has to give it the list **and** the name. A blank filled with a
+function that only reads the list has not simulated a sale.
 
-**Handing over the list.** `sellItem` changes the list it was handed. Your call has to
-give it the list and the name, and a later line has to use or report the result.
+**Blank 7 is the proof.** Calling the function is not enough: a line after it has to report
+or use the changed list, or the change is invisible.
 
-**The loop's indentation.** Whatever happens once per item goes under the loop. Whatever
-happens once after the loop does not.
+**Blank 5 is inside the loop; blank 6 is not.** Once per line, then once after. That
+indentation is the difference between walking the list and changing one record.
 
-**Both ends of the round trip.** A load near the top and a save near the bottom. One
-without the other is half of it.
+**Blanks 1 and 8 are the round trip.** The list comes back from storage before you use it,
+and it goes back when you are done. One without the other is half of it.
+
+**The name has to match the job.** `totalValue` does not sell anything and `receiptLines`
+does not save. Each blank wants the function whose contract does that work.
 
 ### Before you submit
 
-**Try as many times as you like.** Each partner submits their own: submit, read the feedback on
-whether your plan covers your problem, rewrite it and submit again. Your best try counts.
+**Try as many times as you like.** Each partner submits their own: submit, read the
+feedback on which parts of the plan are not doing their job, fill the gaps again, submit
+again. Your best try counts. A line of underscores left in is an empty answer, not a plan
+that avoids the subject.
 
 Exact wording does not matter, and neither does spelling. Before you call it done, walk
 one record through your plan out loud — and then walk the *list*, because the loop is

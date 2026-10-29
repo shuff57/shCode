@@ -655,18 +655,94 @@ production: Settings → Functions → Workers AI binding → `AI`.
 `lib/plan-check.ts` grades the Chapter 3 plan from the text alone. It parses the
 main sequence (calls in both `name(args)` and `name of the list` forms, indented
 loops and numbered `go back to #N`, report lines, load/save order), treats a
-contract line as a description rather than a call, and applies four structural
-rules. Pass is **2 of 4 criteria fully met** — a partly-met criterion does not
-count (decided 2026-10-28; it gives 13/16 on the 16 real plans, the same rate
-the AI grader produced). It exists because the AI changed verdicts on identical
-plans; the measurements and the rejected alternatives (temperature, model
-swaps, majority-of-3, binary verdicts, graduated help) are in `HANDOFF.md`.
+contract line as a description rather than a call, and applies structural rules.
+There are two bars over one parser: `checkPlan()`'s four criteria, which pass at
+**2 of 4 fully met**, and `checkPlanGaps()`'s eight blanks, which pass at **6 of
+8** (below). A partly-met criterion does not count (decided 2026-10-28; the
+four-criteria bar gives 13/16 on the 16 real plans, the same rate the AI grader
+produced). It exists because the AI changed verdicts on identical plans; the
+measurements and the rejected alternatives (temperature, model swaps,
+majority-of-3, binary verdicts, graduated help) are in `HANDOFF.md`.
+
+**Spelling is not what is graded.** A call is classified by what its name and its
+contract say — `sellItem`, `takeOne`, `sellItm` and a contract that says "lowers
+that item's qty by one" are the same call — rather than by matching one fixed
+spelling. Case, spacing and camel/snake do not matter, and a word one slip of the
+fingers away still counts (`reprot`, `whlie`, `recieptLines`); the distance is
+optimal-string-alignment, so a swapped pair costs one edit while `report` and
+`repeat` stay two apart, and nothing shorter than five letters is fuzzed, so
+"look" never becomes "loop". When a plan does call its own functions by name but
+one call cannot be placed, the change criterion answers "could not tell which
+call changes one record … needs a look" and stays partial instead of failing a
+plan that is probably right. Twenty realistic mutations of the reference —
+shouting, snake_case, abbreviations, synonyms, typos, no parentheses,
+log/show/print — all score full; `scripts/test-plan-check.mjs` pins five of them.
 
 It is **advisory** today: `components/PlanCheckPanel.tsx` renders it beside the
 AI grade in the teacher's submission queue, computed from the stored response,
 while the AI result remains the recorded grade. `scripts/test-plan-check.mjs`
-(in `npm test`) pins the parser against the references, the variants, the
-starter, CRLF, prose-that-is-not-a-call, and the `go back to #N` loop.
+and `scripts/test-plan-gaps.mjs` (both in `npm test`) pin the parser against the
+references, the variants, the starter, CRLF, prose-that-is-not-a-call, the
+`go back to #N` loop, a JavaScript-shaped plan, and every single blank.
+
+**3.9.1 is the skeleton, and its unit of marking is the blank** (2026-10-28). The
+lesson hands the pair the shape of the plan — START/END, the order of the steps,
+the `if`/`otherwise`, the `FOR EACH` line — with **eight blanks**, each a line of
+underscores. The pair fills each with the one call that belongs there, so
+`checkPlanGaps()` returns eight criteria, one per blank, and passes at
+**six of eight** (`GAP_PASS` — 75%, the nearest whole-blank count to the 70% the
+course asks for). A pair may therefore leave two blanks; three fails. Both
+graders share `parsePlan()` and the loop / change / storage analyses, so they
+cannot disagree about the same words.
+
+Four rules the first live run forced, each with a test:
+- **A line of underscores is not a step.** `report ______` has not reported, and
+  a blank loop body is not work. Without this the untouched skeleton scored 1/8.
+- **The change's report must come after the loop as well as after the change.**
+  A `put` inside the loop prints once per item, not the effect of one change.
+- **The total must be worked out before it is reported.** The reference plan
+  calls `totalValue` again inside its report line; that later call must not fill
+  the earlier blank.
+- **A JavaScript plan's round trip is `JSON.parse`/`localStorage.getItem` and
+  `setItem`.** Those are deliberately not the pair's named functions, so without
+  this a correct JS-shaped plan lost both ends of the round trip.
+
+**The AI grades the same eight blanks against a stated expected answer.** The
+rubric items are the gaps, each carrying the expected line and "close enough
+counts"; the prompt says the shape was given, so nothing outside the blanks is
+marked down, and gates on the plan being about one of the four problems.
+Measured on 16 hand-built fillings (reference, renamed functions, a terse plan, a
+JavaScript plan, shouting, blanks left empty, a read-only change call, an
+un-reported change, an off-topic plan, an inline-only plan): **1 of 64 criterion
+cells changed verdict across repeated runs**, against ~11 of 64 under the old
+four-criteria rubric. The one disagreement that matters is the off-topic plan —
+the rules score it 6/8 and would pass it, the prompt's gate fails it, so the
+recorded grade is the AI's. `scripts/grade-harness.mjs --source file` now grades
+labelled fixtures (a `label` keeps a text that appears only once; a corpus dump
+still keeps only repeated texts).
+
+**The text is formatted before it is read** (`lib/plan-format.ts`). One plan wears
+many shapes: numbered steps, a two-column table, a loop closed by `END FOR` or
+`NEXT` or `UNTIL`, the body on the loop's own line, or no indentation at all.
+`formatPlan(text)` normalises all of them into the shape the grader reads — step
+numbers and table pipes off, tabs as four spaces, and every block (a delimited
+loop, a written-out function) indented under its head. It only moves indentation
+and strips scaffolding: it never adds, drops, splits or reorders a step, so the
+grader cannot be shown a plan the student did not write. `raw` keeps each line as
+typed, `notes` says what was moved in plain words, and `canonical` is the plan as
+read — the advisory panel shows both under "How this plan was read". Formatting
+is idempotent, and the guard test asserts it.
+
+**Only the main sequence is the plan.** The rubric says "the body of a function
+is NOT written out inside the plan", so a `function name(...) { ... }` block
+written between START and END is a definition: its calls are not the plan's
+calls and its loop is not the plan's loop (the feedback names the line and says
+so). JavaScript builtins and keywords — `let(`, `push(`, `setItem(`, `log(`,
+`console.log` — are never counted as named functions, though `log …` and
+`console.log(…)` DO count as a report of the changed record. All three rules
+came out of the 2026-10-28 measurement: on the real corpus plan #11 was credited
+with ten named calls where it makes two, and plans that wrote their functions
+out were credited for a main sequence they never wrote.
 
 `scripts/grade-harness.mjs` is the live comparison tool: any AI part, Workers AI
 (proxy or REST) or OpenRouter, `--runs`, `--majority N`, `--binary`,

@@ -18,6 +18,7 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { checkPlan } from '../lib/plan-check.ts';
+import { formatPlan } from '../lib/plan-format.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const lesson = 'lessons/3-9-1-ch3-group-pa-design-chart';
@@ -39,9 +40,13 @@ for (const f of [
   check(r.criteria.every((c) => c.verdict === 'met'), `${f}: every criterion met`);
   check(r.passed, `${f}: passes`);
 }
+// The starter is the plan's shape with eight blanks in it: the loop line is
+// given, so it earns a partial, and nothing is finished. An unfilled blank must
+// never read as work, so no criterion may come back fully met.
 const starter = checkPlan(read(`${lesson}/README.md`));
 check(!starter.passed, 'starter: does not pass');
-check(starter.criteria.every((c) => c.verdict === 'missing'), 'starter: nothing credited');
+check(starter.criteria.every((c) => c.verdict !== 'met'), 'starter: nothing fully credited');
+check(verdict(starter, 'loop-over-the-list') === 'partial', 'starter: the given loop line is partial until its body is filled');
 
 // --- determinism ----------------------------------------------------------
 const sample = read(`${lesson}/solution/README.md`);
@@ -63,19 +68,29 @@ saveStock(stock)
 END`;
 const c1 = checkPlan(contractOnly);
 check(verdict(c1, 'loop-over-the-list') === 'missing', 'a loop only in a contract does not count as the plan loop');
-check(verdict(c1, 'functions-as-calls') === 'partial', 'four calls with the contract names count');
+check(verdict(c1, 'functions-as-calls') === 'met', 'four named calls count, and loadStock() needs nothing to be handed');
 check(verdict(c1, 'change-one-record') === 'met', 'change call with two arguments and a later report');
 check(/inside a function description/.test(c1.criteria.find((c) => c.id === 'loop-over-the-list').feedback), 'feedback says where the loop is');
 
 // --- the change call present but nothing reports the effect ---------------
-const noReport = contractOnly.replace('report totalValue(stock)\n', '').replace('saveStock(stock)', 'saveStock(stock)');
+const noReport = contractOnly.replace('report totalValue(stock)\n', '');
 const c2 = checkPlan(noReport);
 check(verdict(c2, 'change-one-record') === 'partial', 'change call without a later report is partial');
-check(/no later line reports/i.test(c2.criteria.find((c) => c.id === 'change-one-record').feedback), 'feedback asks for the report');
-// The pass rule is "at least half FULLY met"; c2 has one fully-met criterion
-// (save/load) and must not pass on the strength of its partials.
-check(c2.criteria.filter((c) => c.verdict === 'met').length === 1, 'this plan has exactly one fully-met criterion');
-check(!c2.passed, 'one fully-met criterion is not enough to pass');
+
+// The pass rule is "at least half FULLY met"; partials do not count. This plan
+// has one fully-met criterion (save/load) and three partials and must not pass.
+const oneMet = `
+START
+set stock to loadStock()
+report stock
+for each line in stock
+report done
+sellItem(stock)
+saveStock(stock)
+END`;
+const c2b = checkPlan(oneMet);
+check(c2b.criteria.filter((c) => c.verdict === 'met').length === 1, 'this plan has exactly one fully-met criterion');
+check(!c2b.passed, 'one fully-met criterion is not enough to pass');
 
 // --- the no-parentheses form a real student used --------------------------
 const ofForm = `
@@ -147,6 +162,203 @@ const c5 = checkPlan(prose);
 check(verdict(c5, 'functions-as-calls') === 'missing', 'prose descriptions are not calls');
 check(verdict(c5, 'loop-over-the-list') === 'missing', 'no loop in prose');
 check(!c5.passed, 'the prose plan does not pass');
+
+// --- a JavaScript-shaped plan: bodies are not the plan ---------------------
+// Real plan #11's shape. The student wrote the function bodies out inside
+// START..END and then called them. The bodies must not become the plan's
+// calls (`let(`, `push(`, `setItem(`), and the loop inside receiptLines is
+// not the main plan's loop, but the calls in the main sequence are.
+const jsShaped = `
+Problem: Snack Shack
+CONTRACTS
+-
+PLAN
+START
+let stock = [
+{name: "berries", price: 14, qty: 10}
+]
+function [[makeItem]](name, price, qty) {
+let item = makeItem(name, price, qty)
+return item
+}
+function [[receiptLines]](list) {
+let lines = []
+for (let i = 0; i < list.length; i++) {
+lines.push(list[i].name + " " + list[i].qty)
+}
+localStorage.setItem("lines", lines)
+return lines
+}
+set stock to loadStock()
+set total to totalValue of stock
+report total
+set lines to receiptLines of stock
+put those lines on screen
+sellItem of stock and "Popcorn"
+log the new total and quantity
+saveStock of stock
+END`;
+const j1 = checkPlan(jsShaped);
+const fnFeedback = j1.criteria.find((c) => c.id === 'functions-as-calls').feedback;
+check(verdict(j1, 'functions-as-calls') === 'met', 'the main-sequence calls are credited');
+check(!/\blet\b|\bpush\b|\bsetItem\b|\breturn\b/i.test(fnFeedback), 'JS builtins and keywords are not counted as named functions');
+check(/sellitem/i.test(fnFeedback) && /totalvalue/i.test(fnFeedback), 'the real calls are the ones named');
+check(verdict(j1, 'loop-over-the-list') === 'missing', 'a loop inside a written-out function is not the plan loop');
+check(/inside a function description/.test(j1.criteria.find((c) => c.id === 'loop-over-the-list').feedback), 'feedback says the loop is in a function');
+check(verdict(j1, 'change-one-record') === 'met', '"log the new total" counts as reporting the change');
+check(j1.passed, 'the JavaScript-shaped plan passes on its main sequence');
+
+// A plan whose only parentheses are JS plumbing has no function calls at all.
+const onlyBuiltins = `
+START
+let stock = []
+stock.push("berries")
+localStorage.setItem("list", stock)
+console.log(stock)
+END`;
+const j2 = checkPlan(onlyBuiltins);
+check(verdict(j2, 'functions-as-calls') === 'missing', 'push/setItem/console.log are not named functions');
+check(!j2.passed, 'a plan of JS plumbing does not pass');
+
+// --- the student's own spelling: the grader reads the job, not the name -----
+// A correct plan is not wrong because a name is worded differently, abbreviated,
+// shouting, or misspelt. These four cases are the ways a plan actually varies.
+const synonyms = `
+Problem: Snack Shack
+CONTRACTS
+- addUp(list) adds up price times quantity
+- underLevel(list, level) returns a new array of items below the level
+- linesFor(list) gives one line per item
+- takeOne(list, name) lowers that item's qty by one
+- storeStock(list) saves the list
+- readStock(list) reads the list back
+PLAN
+START
+set stock to readStock()
+set total to addUp(stock)
+report total
+set lines to linesFor(stock)
+for each line in lines
+    put the line on screen
+takeOne(stock, "Popcorn")
+report the new total
+storeStock(stock)
+END`;
+const s1 = checkPlan(synonyms);
+check(s1.criteria.every((c) => c.verdict === 'met'), 'a plan renamed to synonyms is fully credited');
+check(s1.passed, 'the synonym plan passes');
+
+// Shouting, snake_case, abbreviations and a slipped key, all at once.
+const misspelt = read(`${lesson}/solution/README.md`)
+  .replace(/totalValue/g, 'TOTALVALU')
+  .replace(/lowStock/g, 'LOWSTOK')
+  .replace(/receiptLines/g, 'RECIEPTLINES')
+  .replace(/sellItem/g, 'SELLITM')
+  .replace(/saveStock/g, 'SAVESTOCK')
+  .replace(/loadStock/g, 'LOADSTOCK')
+  .replace(/report/g, 'REPROT');
+const s2 = checkPlan(misspelt);
+check(s2.criteria.every((c) => c.verdict === 'met'), 'misspelt, shouting names are still credited in full');
+check(s2.passed, 'the misspelt plan passes');
+
+// Four calls whose names say nothing: the rubric's own "partial".
+const namelessPlan = `
+START
+set a to helperOne(stock)
+set b to helperTwo(stock)
+set c to helperThree(stock)
+set d to helperFour(stock)
+END`;
+const s3 = checkPlan(namelessPlan);
+check(verdict(s3, 'functions-as-calls') === 'partial', 'four calls with names that say nothing are partial');
+check(/names do not say what they do/.test(s3.criteria.find((c) => c.id === 'functions-as-calls').feedback), 'feedback asks for a name that says what the function does');
+check(!s3.passed, 'a plan of undecipherable names does not pass');
+
+// A call the grader cannot place in an otherwise sound plan is a "look at this",
+// not a failure: the name may be one it does not know.
+const unplaceable = `
+START
+set stock to loadStock()
+set total to totalValue(stock)
+report total
+for each line in receiptLines of stock
+    put the line on screen
+set x to wobble(stock, "Popcorn")
+saveStock(stock)
+END`;
+const s4 = checkPlan(unplaceable);
+check(verdict(s4, 'change-one-record') === 'partial', 'an unplaceable call is partial, not missing');
+check(/needs a look/.test(s4.criteria.find((c) => c.id === 'change-one-record').feedback), 'feedback says the call needs a look');
+
+// --- the same plan, structured differently --------------------------------
+// Structure is what this grader reads, so these are the cases that matter most:
+// each is the reference plan with one structural habit changed, and each is
+// functionally the same plan.
+const body = `set stock to loadStock()
+set total to totalValue(stock)
+report the total
+set lines to receiptLines(stock)
+LOOP
+BODY
+sellItem(stock, "Popcorn")
+report the new total and quantity
+saveStock(stock)
+END`;
+const structural = [
+  ['the loop closed by END FOR', body.replace('LOOP', 'FOR EACH line IN lines\n    put the line on screen\nEND FOR').replace('\nBODY', '')],
+  ['the body not indented, closed by NEXT', body.replace('LOOP', 'for each line in lines\nput the line on screen\nNEXT').replace('\nBODY', '')],
+  ['the body on the loop line', body.replace('LOOP', 'for each line in lines, put the line on screen').replace('\nBODY', '')],
+  ['numbered steps, loop by "repeat steps"', `1. set stock to loadStock()
+2. set total to totalValue(stock)
+3. report the total
+4. set lines to receiptLines(stock)
+5. for each line in lines, put the line on screen
+6. repeat steps 5 for every line
+7. sellItem(stock, "Popcorn")
+8. report the new total and quantity
+9. saveStock(stock)`],
+  ['a two-column table', `| 1 | set stock to loadStock() |
+| 2 | set total to totalValue(stock) |
+| 3 | report the total |
+| 4 | set lines to receiptLines(stock) |
+| 5 | for each line in lines: put the line on screen |
+| 6 | sellItem(stock, "Popcorn") |
+| 7 | report the new total and quantity |
+| 8 | saveStock(stock) |`],
+  ['no START/END at all', body.replace('LOOP', 'for each line in lines\n    put the line on screen').replace('\nBODY', '')],
+  ['the loop over the records', body.replace('LOOP', 'for each item in stock\n    put item.name and item.qty on screen').replace('\nBODY', '').replace('set lines to receiptLines(stock)\n', '')],
+  ['the change before the loop', `START
+set stock to loadStock()
+sellItem(stock, "Popcorn")
+report the new total and quantity
+set lines to receiptLines(stock)
+for each line in lines
+    put the line on screen
+saveStock(stock)
+END`],
+];
+for (const [name, text] of structural) {
+  const r = checkPlan(text);
+  check(r.criteria.every((c) => c.verdict === 'met'), `structure: ${name} — every criterion met`);
+  check(r.passed, `structure: ${name} — passes`);
+}
+
+// --- the formatter --------------------------------------------------------
+const delimited = formatPlan(`START
+set stock to loadStock()
+FOR EACH line IN receiptLines(stock)
+put the line on screen
+END FOR
+saveStock(stock)
+END`);
+check(/Line 3 starts a loop/.test(delimited.notes.join(' ')), 'the formatter says what it re-indented');
+check(/\n {4}put the line on screen/.test(delimited.canonical), 'the loop body is indented in the read-back');
+check(
+  formatPlan(delimited.canonical).canonical === delimited.canonical,
+  'formatting is idempotent: formatting the read-back changes nothing',
+);
+check(formatPlan(read(`${lesson}/solution/README.md`)).notes.length === 0, 'a tidy plan needs noting');
+check(/^set stock to loadStock\(\)$/m.test(formatPlan('1. set stock to loadStock()').canonical), 'a step number is scaffold, not content');
 
 console.log(`\n[test-plan-check] ${n - failures}/${n} checks held`);
 if (failures) process.exit(1);

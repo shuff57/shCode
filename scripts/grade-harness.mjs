@@ -124,10 +124,22 @@ function fileTexts() {
   if (!p) { console.error('--source file needs --file <json>'); process.exit(2); }
   const rows = JSON.parse(readFileSync(p, 'utf8'));
   const seen = new Map();
-  for (const r of rows) { const k = lf(typeof r === 'string' ? r : r.response); if (k) seen.set(k, (seen.get(k) ?? 0) + 1); }
-  // Only texts submitted more than once: those measure repeatability, and they
+  for (const r of rows) {
+    const k = lf(typeof r === 'string' ? r : r.response);
+    if (!k) continue;
+    const prev = seen.get(k);
+    seen.set(k, {
+      n: (prev?.n ?? 0) + 1,
+      label: prev?.label ?? (typeof r === 'string' ? null : r.label ?? null),
+    });
+  }
+  // A hand-built fixture carries a `label` and is graded even when it appears
+  // once -- these are the cases with a known right answer. A corpus dump keeps
+  // only texts submitted more than once: those measure repeatability, and they
   // are the same set the comparison runs used.
-  return [...seen].filter(([, n]) => n > 1).map(([text, n], i) => ({ name: `real #${i + 1} (${n})`, text, want: null }));
+  return [...seen.entries()]
+    .filter(([, v]) => v.n > 1 || v.label)
+    .map(([text, v], i) => ({ name: v.label ?? `real #${i + 1} (${v.n})`, text, want: null }));
 }
 
 const texts = source === 'd1' ? d1Texts() : source === 'file' ? fileTexts() : fixtureTexts();

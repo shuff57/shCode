@@ -25,6 +25,12 @@ zero-point part, and `AiGradeResultPanel` showed no pass line at all.
   order; four criteria met/partial/missing; **pass = 2 of 4 fully met** (13/16 on the real plans, the
   same rate the AI produced). References and all three variants score 4/4; the starter 0/4;
   `scripts/test-plan-check.mjs` (in `npm test`) pins it, including CRLF and prose-vs-call cases.
+  **Corrected the same day** against the real corpus: a `function name(...) { ... }` block written
+  inside START..END is a definition, not main-sequence work (its calls are not the plan's calls, its
+  loop is not the plan's loop), and JavaScript builtins and keywords (`let(`, `push(`, `setItem(`,
+  `log(`) are never named functions — while `log …` / `console.log(…)` DO count as reporting the
+  changed record. Before that, plan #11 was credited with ten named functions where it makes two, and
+  #4 was credited for a main sequence it never wrote.
 - `components/PlanCheckPanel.tsx` — advisory panel in the teacher's submission queue, computed from
   the stored response, shown beside the AI grade. Screenshot-verified in the dev demo with a seeded row.
 - `scripts/grade-harness.mjs` — live comparison tool (Workers AI proxy/REST or OpenRouter, `--runs`,
@@ -35,11 +41,72 @@ alongside it for teachers. After real submissions show the two agree as expected
 the pattern by task type: builds -> run the student's code; reflections -> checklist + AI voice +
 teacher review for ambiguous cases. Do not add another model to the sweep; the model is not the lever.
 
+**Re-measured after the parser fixes (same 16 plans x 3 runs, gemma-4-26b).** The AI changed a criterion
+on **5/16 plans, 11/64 cells**, with one pass/fail flip on a single unchanged plan; the rules changed
+none (byte-identical output, 0.14 ms per plan against 11.9 s). Pass rate 14/16 AI (any of three runs)
+against 13/16 rules, and the two now agree on pass/fail for **15/16**. Two of the four labelled cases
+moved: #4 (functions written out, nothing calling them) is now a fail for both, and #11 (a complete
+main sequence under written-out bodies, effect reported with `log`) now passes for both. The remaining
+disagreement is #7: the student sells an item and never reports the effect, saves before loading and
+has no loop in the main sequence — the rules fail it, the AI passes it on 2 of 3 runs.
+
+**Robust to the student's own spelling (same day, later).** The question that
+prompted it: deterministic grading only works if it survives misspellings,
+capitals and near-miss names. It now does. A call is classified by JOB, from its
+name and from the student's own contract for it — `sellItem` / `takeOne` /
+`sellItm` all read as the change call, `readStock` / `restore` / `loadStock` as
+the load — instead of being matched against a fixed list. Names, keywords and
+report words are matched case- and spacing-insensitively, and a word one slip
+away counts (optimal-string-alignment distance, so a transposition is one edit,
+`report` and `repeat` stay two apart, and nothing under five letters is fuzzed).
+Four calls with names that say nothing are partial, in the rubric's own words;
+a call that cannot be placed in an otherwise sound plan says "could not tell
+which call changes one record … needs a look" and stays partial rather than
+failing work that is probably right. Evidence: 20 mutations of the reference
+answer — shouting, snake_case, abbreviations, synonyms, one- and two-letter
+typos, no parentheses, `log`/`show`/`print`/`put … on screen`, misspelt `reprot`
+— all score 4/4 and pass, and the 16 real plans grade exactly as before
+(13/16 passing, 15/16 agreeing with the AI). `test-plan-check.mjs` went 36 → 45
+checks. Remaining exposure: a word the grader cannot place at all, and label
+prefixes (`6.if yes`, `Y: put …`) which still stop a line being read.
+
+**Structure, not just spelling (same day, later).** The harder half of the same
+question: students structure the same plan differently. Fifteen structural
+variants of the reference were measured; five were marked wrong, and every one
+was a bug rather than a judgement call.
+- `END FOR` was read as the END of the plan, cutting a correct plan off at its
+  first loop and costing it three criteria. `isPlanEnd` now excludes `END FOR` /
+  `END IF` / `END WHILE` / `END LOOP` / `END REPEAT`.
+- A step number in front of a line (`3. report the total`) stopped the line being
+  read as a report, and a two-column table (`| 5 | for each line … |`) stopped it
+  being read as a loop. Both are now scaffolding: `unframe()` takes the number and
+  keeps the longest table cell, and `raw` still holds the line as typed.
+- A zero-argument `loadStock()` counted as "not handed anything", so a plan with
+  four named calls read as three. A load or a save needs nothing, and a contract
+  that declares no parameters says so; both now count toward the four.
+- A body on the loop's own line (`for each line in lines, put it on screen`) and a
+  body closed by a word instead of by indentation (`END FOR`, `NEXT`, `UNTIL`) are
+  now bodies. A body with no indentation AND no closer stays partial — that is
+  the rubric's own rule ("the indentation makes it unclear what is inside it").
+
+**The autoformatter** (`lib/plan-format.ts`, new) is the fix for the class rather
+than the cases. `formatPlan()` normalises the text into the one shape the grader
+reads (scaffolding off, blocks indented under their heads) and returns `notes`
+(what moved, in plain words) and `canonical` (the plan as read). It never adds,
+drops, splits or reorders a step — only indentation moves and scaffolding comes
+off — so the grader can never be shown a plan the student did not write. The
+advisory panel shows both under "How this plan was read", so a teacher can check
+the reading instead of trusting it. Formatting is idempotent; the test asserts it.
+After the change: all 15 structural variants and all 20 spelling mutations score
+4/4, the 16 real plans grade exactly as before (13/16, 15/16 agreeing with the AI),
+and `test-plan-check.mjs` is 65 checks.
+
 **Open.** The advisory is teacher-queue only; students still see the AI criteria. The module's
 `PLAN_LESSONS` names only 3.9.1 — the Chapter 1/2 design parts carry different rubrics, so teaching
-them this shape needs their own rules. Plan 1 (the old reference document) and plan 4 are cases where
-the deterministic grader is arguably right and the AI wrong; plans 7 and 11 are the reverse under the
-2-of-4 bar. Those four are the ones to label if the cut-over needs more evidence.
+them this shape needs their own rules. Known parser limits: a loop written as a bare abbreviation
+("#11's `FR`") or as a labelled question is not recognised as a loop, and a label prefix (`6.if yes`,
+`Y: put …`) stops a line being read as a report; both are wording, and the rubric says wording must
+not be marked down — teach them if the labelled plans recur.
 
 # 2026-10-27: Group PA Build parts scored, 3.9.1 uncapped + chart tabs (DEPLOYED, 99632677); per-problem reference answers added; NEXT: swap the grader model
 
@@ -222,6 +289,45 @@ charts 139).
   `git checkout` every chart it touched except the one you meant. `npm test` also dirties `.gauntlet/occt-checks.json`
   (revert it) and breaks a running dev server's `.next`: stop the server first.
 
+**3.9.1 becomes a skeleton, and the AI grades eight blanks against stated answers (same day, evening).**
+The lesson now hands the pair the shape of the plan with **eight blanks** in it; the pair fills each
+blank with the one call that belongs there. `checkPlanGaps()` in `lib/plan-check.ts` marks one gap per
+blank and passes at **6 of 8** (`GAP_PASS`, 75%); `scripts/test-plan-gaps.mjs` (55 checks, in `npm test`)
+pins it. Four rules came out of the first live run and each has a test: a line of underscores is not a
+step (`report ______` has not reported; the untouched skeleton scored 1/8 without this); the change's
+report must come after the loop as well as after the change (a `put` inside the loop is per-item print);
+the total must be worked out before it is reported (the reference calls `totalValue` again in its report
+line); and a JavaScript plan's round trip is `JSON.parse`/`getItem` and `setItem`, which are deliberately
+not the pair's named functions.
+
+The AI rubric is now those same eight gaps, each carrying the expected line and "close enough counts",
+and the prompt says the shape was given so nothing outside the blanks is marked down. **Measured on 16
+hand-built fillings, 3-5 runs each: 1 of 64 criterion cells changed verdict**, against ~11 of 64 under
+the old four-criteria rubric. The one disagreement that matters is the off-topic plan (the pizza club
+plan): the rules score it 6/8 and would pass it, while the prompt's explicit gate fails it — so the
+recorded grade must stay the AI's until the rules learn that check.
+
+Lesson edits, all in `lessons/3-9-1-ch3-group-pa-design-chart/`: the starter is the skeleton; steps 3, 5
+and 6 rewritten around the blanks; `content.md` matched (it is not rendered on this route — `preview:
+console` with no `diagram` or `quiz` sends the page to `LessonWorkspace`, which renders `steps`) but it
+is read by `check-lesson-citations` / `check-prompt-pointers`, so it must not drift; the `functions-as-calls`
+hint no longer spells out the answer; the flow chart's four per-problem variants are **removed**, because
+with the skeleton they were the answer key (only the pizza-club worked example is left).
+
+**Open on this, and each is the teacher's call:**
+1. **The skeleton is Snack Shack's**, but Step 1 still offers four problems. Either the lesson becomes
+   Snack Shack for everyone (losing the adjacent-tables-should-differ rule), or the starter carries four
+   skeletons and the pair deletes three. Left as drafted.
+2. **Six of eight lets a pair leave two blanks** (say the total and the lines) and still pass. Three
+   fails. Move `GAP_PASS` to 7 for "all but one" if that allowance is too loose.
+3. **The `requirements` cards are still the old four** regexes, so the editor strip reads 0/4 while the
+   feedback talks about eight blanks. They are a coarse checklist, the rubric is the graded artefact —
+   but the mismatch is visible.
+4. Nothing is committed: `lib/plan-check.ts`, `components/PlanCheckPanel.tsx`,
+   `scripts/test-plan-check.mjs`, `scripts/test-plan-gaps.mjs` (new), `scripts/grade-harness.mjs`,
+   `CLAUDE.md`, `HANDOFF.md`, `package.json` and the three lesson files are all in the working tree.
+
+---
 # Handoff — 2026-10-15 · module 3.5 reviewed and live; editor pages fixed; three owner decisions open
 
 Live on shcode.pages.dev from `cs-3d` at `be4528e2` (pushed). Migrations are all applied (`npm run d1:status` says
