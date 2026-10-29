@@ -13,6 +13,7 @@
 
 import { useEffect, useState } from 'react';
 import DiagramBlock from './DiagramBlock';
+import { STARTER_PICKED, starterKey } from '../lib/starter-variants';
 
 interface Props {
   lessonId: string;
@@ -35,6 +36,23 @@ export default function LabPlanChart({ lessonId, mermaid, caption, variants }: P
       if (localStorage.getItem(KEY + lessonId) === '1') setOpen(true);
     } catch { /* private mode: stay closed */ }
   }, [lessonId]);
+
+  // The chart follows the lesson's problem picker (StarterPicker): the remembered
+  // pick on arrival, and every pick after that. A pick that names no chart here
+  // (a lesson whose charts are not per problem) changes nothing.
+  useEffect(() => {
+    const has = (id: string | null | undefined) => !!id && !!variants?.some((v) => v.id === id);
+    try {
+      const r = localStorage.getItem(starterKey(lessonId));
+      if (has(r)) setPicked(r as string);
+    } catch { /* private mode: the chart keeps its default */ }
+    const onPick = (e: Event) => {
+      const d = (e as CustomEvent<{ lessonId: string; id: string }>).detail;
+      if (d?.lessonId === lessonId && has(d.id)) setPicked(d.id);
+    };
+    window.addEventListener(STARTER_PICKED, onPick);
+    return () => window.removeEventListener(STARTER_PICKED, onPick);
+  }, [lessonId, variants]);
 
   function toggle(next: boolean) {
     setOpen(next);
