@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
+import { loadModuleGroups, validateGroups, type LessonGroup } from './lesson-groups';
 
 /**
  * Hierarchy:
@@ -154,6 +155,8 @@ export async function getModule(moduleId: string): Promise<{
   html: string;
   lessons: LessonInModule[];
   artifacts: ModuleArtifact[];
+  /** The module's lesson layer, or null when it has none authored yet. */
+  groups: LessonGroup[] | null;
 } | null> {
   const modules = await listModules();
   const summary = modules.find((m) => m.id === moduleId);
@@ -163,6 +166,18 @@ export async function getModule(moduleId: string): Promise<{
   const { body } = parseFrontmatter(src);
   const html = await renderMarkdown(body);
   const lessons = await listLessonsInModule(moduleId, summary.category);
+
+  // The lesson layer (curriculum/groups/<id>.json). A module without the file
+  // renders exactly as before, so this can be adopted one module at a time.
+  // A group file that disagrees with the folder tree is a build error rather
+  // than a screen quietly falling outside every lesson.
+  const groups = await loadModuleGroups(moduleId);
+  if (groups) {
+    const problems = validateGroups(groups, lessons.map((l) => l.id));
+    if (problems.length) {
+      throw new Error(`curriculum/groups/${moduleId}.json:\n  ${problems.join('\n  ')}`);
+    }
+  }
 
   // Collect any module-level artifacts in assignments/{moduleId}_* for legacy support
   const artifacts: ModuleArtifact[] = [];
@@ -181,6 +196,6 @@ export async function getModule(moduleId: string): Promise<{
     }
   } catch { /* no assignments dir */ }
 
-  return { summary, html, lessons, artifacts };
+  return { summary, html, lessons, artifacts, groups };
 }
 

@@ -1,3 +1,38 @@
+# 2026-10-29 (later): lesson layer added, piloted on 5.1
+
+**What exists now.** `curriculum/groups/<moduleId>.json` groups a module's screens
+into lessons (title, objective, ordered screens). `lib/lesson-groups.ts` loads and
+validates them; `getModule()` returns `groups` and **throws** if a group file
+disagrees with the folder tree; `scripts/check-lesson-groups.mjs` runs the same
+validator in `prebuild` and `npm test`. The module page shows a heading per group
+(`ModuleLessonsList`), each screen shows a banner (`LessonGroupBanner`).
+**Progress is still per screen** — the layer is presentation only, so it cannot
+orphan D1 completions the way a renumber does.
+
+Only 5.1 is grouped (6 lessons over 24 screens). Every other module renders
+exactly as before; adopting one module at a time is the intended path.
+`curriculum/groups/README.md` holds the schema rules and the check policy.
+
+**Check policy, decided here and worth not re-litigating.** A lesson needs a
+closing check only when its last screen is a reading or a video. 5.1 ends every
+lesson in a lab, example or challenge, so it gets **no new checks**. The
+reading-heavy modules do: 1.2, 1.5, 3.2, 6.5, 6.7.
+
+**Trap found while mapping.** A group file must key screens by lesson FOLDER id,
+not the numbered title — `5.1.24` lives in the folder `moshion-gravity`. And
+module order is the number on the TITLE, never readdir order; the first version of
+the checker sorted by folder name and reported a false "out of order".
+
+**Do not insert a check screen mid-module.** Lesson numbering keys D1 progress;
+a renumber orphans every completion it passes. A new check goes at the end of a
+module, or ships with a migration.
+
+**Also recorded:** `CODEHS-MAP.md` maps all 35 modules to their closest CodeHS
+lesson, and `CODEHS-INSPIRATION.md` holds the structural findings. Two facts there
+are not obvious from the tree: 5.4's screens live in `5-3-*` folders, 6.2's in
+`6-1-*` and 6.8's in `6-7-*` (folder prefixes are frozen, the `unit` field is
+authoritative — `CLAUDE.md` mentioned 5.3/5.4 but not 6.2/6.8).
+
 # 2026-10-29: 3.9.1 is a find-and-fix; 3.10 is four parts (both before they are sat)
 
 Content and schema changes only: the plan parser, the `required` flag, the picker and the

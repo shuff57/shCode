@@ -1,6 +1,8 @@
 'use client';
 
+import { Fragment } from 'react';
 import Link from 'next/link';
+import type { LessonGroup } from '../lib/lesson-groups';
 import { badgeForLesson } from '../lib/lesson-badges';
 import { bypassesLessonLock, useLessonState } from '../lib/progress';
 import { lessonHref } from '../lib/lesson-href';
@@ -35,12 +37,19 @@ export default function ModuleLessonsList({
   lessons,
   moduleId,
   unitId,
+  groups,
 }: {
   lessons: LessonItem[];
   /** Dotted module id, e.g. "1.1". Omit and lessons can only show their own overrides. */
   moduleId?: string | null;
   /** lesson.json `category`, e.g. "Unit 1: JavaScript Fundamentals". */
   unitId?: string | null;
+  /**
+   * The module's lesson layer (curriculum/groups/<id>.json). Presentational
+   * only: it adds a heading before each lesson's first screen. Locking, due
+   * dates and "done" stay per screen, so a group never changes what counts.
+   */
+  groups?: LessonGroup[] | null;
 }) {
   const progress = useLessonState();
   const due = useDueDates();
@@ -84,6 +93,16 @@ export default function ModuleLessonsList({
   const moduleDue = moduleId
     ? resolveModuleSummary(due, moduleId, lessons.map((l) => l.id), unitId)
     : null;
+
+  // A heading goes above the group's first screen that is actually in this
+  // list — a screen filtered out by the module's category must not swallow it.
+  const groupHeadings = new Map<string, { group: LessonGroup; index: number }>();
+  if (groups) {
+    groups.forEach((g, i) => {
+      const first = g.screens.find((s) => lessons.some((l) => l.id === s));
+      if (first) groupHeadings.set(first, { group: g, index: i + 1 });
+    });
+  }
 
   return (
     <>
@@ -251,8 +270,48 @@ export default function ModuleLessonsList({
           </>
         );
 
+        const heading = groupHeadings.get(l.id);
+        const minutes = heading
+          ? heading.group.screens.reduce(
+              (sum, s) => sum + (lessons.find((x) => x.id === s)?.estimateMins ?? 0),
+              0,
+            )
+          : 0;
+
         return (
-          <li key={l.id} style={{ marginBottom: 8 }}>
+          <Fragment key={l.id}>
+          {heading && (
+            <li
+              style={{
+                listStyle: 'none',
+                margin: idx === 0 ? '0 0 10px' : '22px 0 10px',
+                padding: '0 4px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: '#bd93f9',
+                  }}
+                >
+                  Lesson {heading.index} of {groups?.length}
+                </span>
+                <span style={{ fontWeight: 650, fontSize: 15 }}>{heading.group.title}</span>
+                <span style={{ fontSize: 12, color: '#8393c4' }}>
+                  {heading.group.screens.length} screens
+                  {minutes > 0 ? ` · ~${minutes} min` : ''}
+                </span>
+              </div>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8393c4', lineHeight: 1.45 }}>
+                {heading.group.objective}
+              </p>
+            </li>
+          )}
+          <li style={{ marginBottom: 8 }}>
             {locked ? (
               <div
                 className="mod-row bg-card border-border border rounded block"
@@ -271,6 +330,7 @@ export default function ModuleLessonsList({
               </Link>
             )}
           </li>
+          </Fragment>
         );
       })}
     </ol>
