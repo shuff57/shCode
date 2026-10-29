@@ -101,7 +101,7 @@ export default function DiagramHintPanel({ lessonId, lessonTitle, unit, task, do
       const limitHdr = res.headers.get('X-RateLimit-Limit');
       const remainingHdr = res.headers.get('X-RateLimit-Remaining');
       if (limitHdr && remainingHdr) {
-        setQuota({ limit: parseInt(limitHdr, 10), remaining: parseInt(remainingHdr, 10) });
+        setQuota(res.headers.get('X-RateLimit-Unlimited') ? null : { limit: parseInt(limitHdr, 10), remaining: parseInt(remainingHdr, 10) });
       }
 
       if (!res.ok || !res.body) {
@@ -300,7 +300,7 @@ export default function DiagramHintPanel({ lessonId, lessonTitle, unit, task, do
                 textAlign: 'right',
               }}
             >
-              {quota.remaining} of {quota.limit} AI helps left today
+              {quota.remaining} of {quota.limit} CODY helps left today
               {unit ? ` (${unit})` : ''}
             </div>
           ) : null}

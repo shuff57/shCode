@@ -73,7 +73,7 @@ check(
 
 for (const [i, [id, label, rel]] of PROBLEMS.entries()) {
   const v = variants[i];
-  const ref = read(rel).split('\n');
+  const ref = planOf(read(rel));
   const starterPlan = planOf(v.text);
 
   check(v.id === id && v.label === label, `${id}: the starter is labelled and keyed for its problem`);
@@ -98,7 +98,7 @@ for (const [i, [id, label, rel]] of PROBLEMS.entries()) {
 // calls each have a single repair, and the report/change pair has two
 // independent ones: restoring the order fixes the report, and adding the name
 // fixes the change.
-const snack = read(PROBLEMS[0][2]).split('\n');
+const snack = planOf(read(PROBLEMS[0][2]));
 const snackStarter = planOf(variants[0].text);
 
 const withLine = (lines, index, text) => lines.map((l, i) => (i === index ? text : l));

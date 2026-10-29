@@ -230,7 +230,7 @@ Cloudflare dashboard env vars pane (plain vars):
 | `OLLAMA_HOST` | var (optional) | Override Ollama endpoint (defaults to `https://ollama.com`) |
 | `ADMIN_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='admin'` |
 | `TEACHER_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='teacher'` |
-| `AI_HELP_DAILY_LIMIT` | var (optional) | Per-student per-unit daily quota for `POST /api/ai-help`; default `10`. The unit in the key is resolved server-side from the build-time catalog — a request-supplied unit string never shapes a bucket (LEF-17). Teachers/admins are exempt. |
+| `AI_HELP_DAILY_LIMIT` | var (optional) | Per-student per-unit daily quota for `POST /api/ai-help` (the tutor, named CODY in the UI) on the **Ollama fallback only**; default `10`. With the `AI` binding a signed-in student is unlimited (only the global ceiling applies). The unit in the key is resolved server-side from the build-time catalog — a request-supplied unit string never shapes a bucket (LEF-17). Teachers/admins are exempt. |
 | `AI_HELP_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/ai-help` across all students; default `5000`. The backstop that keeps one compromised account (or a signup burst — registration has no email verification yet) from exhausting the Ollama account's weekly allowance. |
 | `GRADE_WRITTEN_DAILY_LIMIT` | var (optional) | Per-student daily submission cap for `POST /api/grade-written`; default `30`. Teachers/admins are exempt. A runaway-cost stop, not a pedagogical one — the course allows unlimited retries, so raise it rather than let a student hit it. |
 | `GRADE_WRITTEN_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/grade-written`; default `10000`. Same backstop as `AI_HELP_GLOBAL_DAILY_LIMIT`, for the grader. |
@@ -348,6 +348,7 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   there is no diagram-specific table.
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
+- **CODY** (Code. Optimizer. Development. Yielder.) is the student-facing name of the `/api/ai-help` tutor. On Workers AI (the `AI` binding) students have no per-student cap and get `X-RateLimit-Unlimited: 1`; the UI hides the "helps left" line. The per-student per-unit quota below applies only on the Ollama fallback. The global ceiling counts both.
 - `POST /api/ai-help` streams `text/plain` from Workers AI (`lib/workers-ai.ts`), trims code blocks to <=3 lines, and
   is quota'd per student **per unit** per UTC day (`AI_HELP_DAILY_LIMIT`). The
   unit in the bucket key is resolved SERVER-SIDE from

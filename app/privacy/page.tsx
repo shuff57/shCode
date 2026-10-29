@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           has the link can open it, so do not upload anything personal.
         </li>
         <li>
-          <strong>AI help:</strong> when you ask for help, your question and the relevant lesson or code are sent to an AI
+          <strong>AI help (CODY):</strong> when you ask for help, your question and the relevant lesson or code are sent to an AI
           provider to write a hint. Questions that appear to contain personal details such as an email address, phone number
           or card number are blocked before anything is sent. We keep only a count of how many help requests each student
           makes per day, not the questions or the answers.

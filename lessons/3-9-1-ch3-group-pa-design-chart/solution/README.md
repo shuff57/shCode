@@ -1,3 +1,16 @@
+Problem: Snack Shack
+Partners:
+
+CONTRACTS (one row per function: name, takes in, gives back)
+- makeItem(name, price, qty) gives back one item
+- totalValue(list) gives back price times qty added up for the whole list
+- lowStock(list, level) gives back a NEW list of the items with qty below the level
+- receiptLines(list) gives back one line per item
+- sellItem(list, name) lowers that item's qty by one, never below zero, and changes the list it was handed
+- saveStock(list) saves the list to storage
+- loadStock() gives the saved list back
+
+PLAN
 START
 set stock to loadStock()
 set shop name and reorder level

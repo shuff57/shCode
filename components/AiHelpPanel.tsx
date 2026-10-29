@@ -87,7 +87,7 @@ export default function AiHelpPanel({ lesson }: Props) {
       const limitHdr = res.headers.get('X-RateLimit-Limit');
       const remainingHdr = res.headers.get('X-RateLimit-Remaining');
       if (limitHdr && remainingHdr) {
-        setQuota({ limit: parseInt(limitHdr, 10), remaining: parseInt(remainingHdr, 10) });
+        setQuota(res.headers.get('X-RateLimit-Unlimited') ? null : { limit: parseInt(limitHdr, 10), remaining: parseInt(remainingHdr, 10) });
       }
 
       if (!res.ok || !res.body) {
@@ -185,7 +185,7 @@ export default function AiHelpPanel({ lesson }: Props) {
         </div>
       ) : (
         <div style={{ color: '#6272a4', fontSize: 12.5, fontStyle: 'italic' }}>
-          No runtime errors yet. Ask anything below — the AI sees your current code and the moSHion docs.
+          No runtime errors yet. Ask CODY anything below — it sees your current code and the moSHion docs.
         </div>
       )}
 
@@ -273,7 +273,7 @@ export default function AiHelpPanel({ lesson }: Props) {
             textAlign: 'right',
           }}
         >
-          {quota.remaining} of {quota.limit} AI helps left today
+          {quota.remaining} of {quota.limit} CODY helps left today
           {lesson.unit ? ` (${lesson.unit})` : ''}
         </div>
       ) : null}

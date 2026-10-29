@@ -1055,7 +1055,7 @@ export default function LessonWorkspace({
         tabs={[
           {
             key: 'help',
-            label: 'Help',
+            label: 'CODY',
             color: '#ffb86c',
             content: <AiHelpPanel lesson={lesson} />,
           },
