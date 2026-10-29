@@ -688,7 +688,17 @@ references, the variants, the starter, CRLF, prose-that-is-not-a-call, the
 **3.9.1 is the skeleton, and its unit of marking is the blank** (2026-10-28). The
 lesson hands the pair the shape of the plan — START/END, the order of the steps,
 the `if`/`otherwise`, the `FOR EACH` line — with **eight blanks**, each a line of
-underscores. The pair fills each with the one call that belongs there, so
+underscores. **Step 1 offers four problems, so there are four starters**
+(`lesson.json`'s `starterVariants`: Snack Shack, Lap Times, Seed Tray, Library
+Cart — the same seventeen lines and eight blanks, worded in that problem's names;
+the first is the shipped `README.md`). `components/StarterPicker.tsx`, above the
+editor, writes the chosen starter over the graded file and remembers the pick in
+`shCode:starter:<lessonId>`, which is what makes Reset restore the pair's own
+starter instead of the first problem's (`lib/starter-variants.ts`; only WHICH
+starter is read from storage, the text still comes from the bundle). Choosing
+over typed work confirms first. Each starter is its problem's reference answer
+with the eight answers taken out — `test-plan-gaps.mjs` fills it back and asserts
+byte equality, so a starter cannot drift from the answer it belongs to. The pair fills each with the one call that belongs there, so
 `checkPlanGaps()` returns eight criteria, one per blank, and passes at
 **six of eight** (`GAP_PASS` — 75%, the nearest whole-blank count to the 70% the
 course asks for). A pair may therefore leave two blanks; three fails. Both

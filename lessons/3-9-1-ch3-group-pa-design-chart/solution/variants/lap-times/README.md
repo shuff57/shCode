@@ -1,6 +1,6 @@
 START
-set meet name and target lap seconds
 set meet to loadMeet()
+set meet name and target lap seconds
 set seconds to totalSeconds(meet)
 report the meet name and the seconds
 set slow to slowRunners(meet, target)

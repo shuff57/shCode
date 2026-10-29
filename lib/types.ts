@@ -239,6 +239,15 @@ export interface Grading {
   expectsRuntimeError?: boolean;
 }
 
+/** One problem's starter, for a lesson whose shape is given and whose problem
+ *  the pair chooses. `file` defaults to README.md. */
+export interface StarterVariant {
+  id: string;
+  label: string;
+  file?: string;
+  text: string;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -272,6 +281,11 @@ export interface Lesson {
    *  (README.md) rather than a script the browser can run. Presentation only -- the grader still
    *  reads the same `requirements`/`aiCheck` files. */
   editor?: 'code' | 'text';
+  /** A lesson that offers a choice of problem ships one starter per problem
+   *  (3.9.1's four). Picking one seeds its file with that text and is
+   *  remembered, so Reset restores the pair's own starter rather than the first
+   *  problem's. See lib/starter-variants.ts. */
+  starterVariants?: StarterVariant[];
   /** Flowchart assignment. See lib/diagram-types.ts. */
   diagram?: DiagramConfig;
   /** Multiple-choice module quiz. Graded in the browser — see components/QuizView.tsx. */

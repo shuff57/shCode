@@ -1,6 +1,6 @@
 START
-set branch name and page limit
 set cart to loadCart()
+set branch name and page limit
 set pages to totalPages(cart)
 report the branch name and the pages
 set long to longTitles(cart, limit)

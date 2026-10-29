@@ -14,6 +14,7 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { checkPlanGaps, GAP_PASS, PLAN_GAPS } from '../lib/plan-check.ts';
+import { isUntouchedStarter } from '../lib/starter-variants.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const lesson = 'lessons/3-9-1-ch3-group-pa-design-chart';
@@ -228,6 +229,56 @@ check(
   JSON.stringify(checkPlanGaps(reference)) === JSON.stringify(checkPlanGaps(reference.replace(/\n/g, '\r\n'))),
   'CRLF does not change the result',
 );
+
+// --- one starter per problem ----------------------------------------------
+// Step 1 offers four problems, so the editor offers four skeletons: the same
+// eight blanks, worded in that problem's own names. Each starter must be its
+// problem's reference answer with the eight answers taken out -- fill it back
+// and you get the reference, byte for byte.
+const lessonJson = JSON.parse(read(`${lesson}/lesson.json`));
+const variants = lessonJson.starterVariants ?? [];
+const solutions = {
+  'snack-shack': `${lesson}/solution/README.md`,
+  'lap-times': `${lesson}/solution/variants/lap-times/README.md`,
+  'seed-tray': `${lesson}/solution/variants/seed-tray/README.md`,
+  'library-cart': `${lesson}/solution/variants/library-cart/README.md`,
+};
+// 0-based, inside START..END: load, total, subset, lines, loop body, change,
+// report, save.
+const ANSWER_LINES = [1, 3, 5, 10, 12, 13, 14, 15];
+
+check(variants.length === 4, 'four starters, one per problem');
+check(
+  variants.map((v) => v.id).join(',') === 'snack-shack,lap-times,seed-tray,library-cart',
+  'the starters are the lesson\'s four problems, in its order'
+);
+check(variants[0]?.text.trim() === starter, 'the first starter is the shipped README, so a pair who never picks still gets a starter');
+
+for (const v of variants) {
+  const sol = read(solutions[v.id]).split('\n');
+  const plan = v.text.split('\nPLAN\n')[1].trimEnd().split('\n');
+  check(sol.length === 17, `${v.id}: the reference is the 17-line plan`);
+  check(plan.length === 17 && plan[0] === 'START' && plan[16] === 'END', `${v.id}: the starter has the same 17 lines`);
+  check((v.text.match(/_{3,}/g) ?? []).length === 8, `${v.id}: eight blanks`);
+  const filled = plan.map((l, i) => (ANSWER_LINES.includes(i) ? sol[i] : l)).join('\n');
+  check(filled === sol.join('\n'), `${v.id}: filled with its own answers, the starter is the reference`);
+
+  const blank = checkPlanGaps(v.text);
+  check(blank.blanks === 8, `${v.id}: untouched, the starter is eight blanks`);
+  check(met(blank) === 0, `${v.id}: untouched, nothing is credited`);
+  check(!blank.passed, `${v.id}: untouched, the starter does not pass`);
+  const done = checkPlanGaps(filled);
+  check(met(done) === 8, `${v.id}: filled in, every gap is right`);
+  check(done.passed, `${v.id}: filled in, the plan passes`);
+}
+
+// The picker overwrites only a file that still holds a starter. Anything typed
+// must be confirmed first, so "is this untouched?" has to be able to say no.
+const asLesson = { id: 'probe', starterVariants: variants };
+check(isUntouchedStarter(asLesson, starter), 'the shipped starter counts as untouched');
+check(isUntouchedStarter(asLesson, variants[1].text), 'another problem\'s starter counts as untouched');
+check(isUntouchedStarter(asLesson, '  \n'), 'an empty file counts as untouched');
+check(!isUntouchedStarter(asLesson, starter.replace('set stock to __________', 'set stock to loadStock()')), 'a filled-in blank is work, not a starter');
 
 // --- the spec and the checks agree ----------------------------------------
 check(PLAN_GAPS.length === 8, 'the gap spec lists eight blanks');

@@ -44,6 +44,7 @@ import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
 import LabPlanChart from './LabPlanChart';
+import StarterPicker from './StarterPicker';
 import KeyboardShortcutModal from './KeyboardShortcutModal';
 import { RotateCcw, Send } from 'lucide-react';
 
@@ -1182,6 +1183,9 @@ export default function LessonWorkspace({
       )}
       {lesson.planChart && (
         <LabPlanChart lessonId={lesson.id} mermaid={lesson.planChart.mermaid} caption={lesson.planChart.caption} variants={lesson.planChart.variants} />
+      )}
+      {lesson.starterVariants && lesson.starterVariants.length > 1 && (
+        <StarterPicker lesson={lesson} />
       )}
       <div className="editor-card">
         <div className="editor-body">

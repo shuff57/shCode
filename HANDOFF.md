@@ -314,18 +314,35 @@ is read by `check-lesson-citations` / `check-prompt-pointers`, so it must not dr
 hint no longer spells out the answer; the flow chart's four per-problem variants are **removed**, because
 with the skeleton they were the answer key (only the pizza-club worked example is left).
 
+**One starter per problem, and a picker that loads it (same day, later).** Step 1 offers four problems,
+so the editor now offers four skeletons: `lesson.json`'s `starterVariants` holds Snack Shack, Lap Times,
+Seed Tray and Library Cart, each the same seventeen lines with the same eight blanks and the shape
+worded in that problem's names. `components/StarterPicker.tsx` sits above the editor, writes the chosen
+starter over the graded file, and remembers the pick in `shCode:starter:<lessonId>`; Reset therefore
+restores the pair's own skeleton rather than the first problem's (`lib/starter-variants.ts`,
+`lib/store.ts` resetLesson — the remembered pick names WHICH starter, the text still comes from the
+bundle, so a Reset never hands back an edited draft). Choosing another problem over typed work confirms
+first, in plain words about what is lost.
+
+The four starters are **derived from the four reference answers**, not written twice: each solution is
+the 17-line plan, the starter is that plan with lines 2, 4, 6, 11, 13, 14, 15 and 16 blanked. The three
+per-problem solutions had their setup line and load line in the opposite order from the skeleton; they
+now match it. `test-plan-gaps.mjs` (98 checks) fills each starter back from its own reference and
+asserts byte equality, and scores every starter 0/8 untouched and 8/8 filled. The AI rubric's eight
+items now name all four problems' calls instead of Snack Shack's, and the prompt says the fixed lines
+are worded for the problem the pair picked.
+
 **Open on this, and each is the teacher's call:**
-1. **The skeleton is Snack Shack's**, but Step 1 still offers four problems. Either the lesson becomes
-   Snack Shack for everyone (losing the adjacent-tables-should-differ rule), or the starter carries four
-   skeletons and the pair deletes three. Left as drafted.
-2. **Six of eight lets a pair leave two blanks** (say the total and the lines) and still pass. Three
+1. **Six of eight lets a pair leave two blanks** (say the total and the lines) and still pass. Three
    fails. Move `GAP_PASS` to 7 for "all but one" if that allowance is too loose.
-3. **The `requirements` cards are still the old four** regexes, so the editor strip reads 0/4 while the
+2. **The `requirements` cards are still the old four** regexes, so the editor strip reads 0/4 while the
    feedback talks about eight blanks. They are a coarse checklist, the rubric is the graded artefact —
    but the mismatch is visible.
-4. Nothing is committed: `lib/plan-check.ts`, `components/PlanCheckPanel.tsx`,
-   `scripts/test-plan-check.mjs`, `scripts/test-plan-gaps.mjs` (new), `scripts/grade-harness.mjs`,
-   `CLAUDE.md`, `HANDOFF.md`, `package.json` and the three lesson files are all in the working tree.
+3. **Nothing here is deployed.** Committed on `cs-3d` as `6848538c` (plus the four-starter work, if
+   committed separately); production is still at `65e0531e`. A deploy also ships the two commits queued
+   behind it. Note that a student who opened 3.9.1 on production before the deploy keeps a saved draft of
+   the old, blank-less README — the picker will still load a starter over it (it confirms first,
+   because that draft is not any starter), but nothing moves it automatically.
 
 ---
 # Handoff — 2026-10-15 · module 3.5 reviewed and live; editor pages fixed; three owner decisions open

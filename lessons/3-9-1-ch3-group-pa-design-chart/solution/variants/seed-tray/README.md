@@ -1,6 +1,6 @@
 START
-set tray label and level
 set tray to loadTray()
+set tray label and level
 set seeds to totalSeeds(tray)
 report the tray label and the seeds
 set low to lowPackets(tray, level)

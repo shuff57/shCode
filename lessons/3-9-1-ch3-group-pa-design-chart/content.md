@@ -21,6 +21,10 @@ the count by the other number; each subset test is one comparison; each change l
 count by one and never below zero. Check with the pair next to you first: two adjacent
 tables should not build the same one.
 
+**Then say which one you picked in the box labelled "Your problem" above the editor.** That
+loads the plan written in that problem's names, so the skeleton you fill in is yours, not
+another table's.
+
 ---
 
 **1. Snack Shack**
@@ -112,7 +116,8 @@ job, and what each one is handed**. That is the whole of what you decide here, a
 the 3.2.2 thinking the rest of the chapter runs on.
 
 Eight lines of underscores are the blanks. Replace each one with the single line that
-belongs there, top to bottom:
+belongs there, top to bottom. (The wording below is Snack Shack's; your skeleton reads in
+your problem's names — the blanks are in the same eight places.)
 
 1. `set stock to ______` — where does the list come from, before anything uses it?
 2. `set total to ______` — what gives you the total? Hand it the list.

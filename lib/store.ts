@@ -13,6 +13,7 @@ import {
   clearProgress,
 } from './version-control';
 import { listCommits, createCommit as apiCreateCommit } from './commits-api';
+import { rememberedStarter, starterFile } from './starter-variants';
 
 interface UIState {
   sidebarOpen: boolean;
@@ -142,6 +143,11 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     const fileContents = Object.fromEntries(
       files.map((f) => [f.path, normalizeEol(f.content || '')])
     );
+    // A lesson that offers a choice of problem restores the pair's own
+    // starter. Only WHICH starter is read from storage -- the text still comes
+    // from the bundle, so a Reset never hands back an edited draft.
+    const picked = rememberedStarter(lesson);
+    if (picked) fileContents[starterFile(picked)] = normalizeEol(picked.text);
     const jsPreviewModes = ['console', 'reshape', 'moshion'];
     const defaultFile = jsPreviewModes.includes(lesson.preview || '')
       ? (files.find((f) => f.path.endsWith('.js'))?.path || files[0]?.path)
