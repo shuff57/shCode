@@ -67,7 +67,8 @@ export function gradeFailureMessage({ kind, serverMessage, keepsTries }: GradeFa
     case 'rate-limit':
     case 'busy': {
       const base = calm(serverMessage) ?? 'The grader is busy right now. Wait a moment and try again.';
-      return tail ? `${base} ${tail}${keepsTries === true ? ' Try again in a minute.' : ''}` : base;
+      // A daily cap does not lift in a minute; only a busy grader does.
+      return tail ? `${base} ${tail}${keepsTries === true && kind === 'busy' ? ' Try again in a minute.' : ''}` : base;
     }
     case 'offline': {
       const base = calm(serverMessage) ?? 'The grader is not available on this site right now.';

@@ -409,7 +409,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
         {
           ok: false,
           error:
-            'Grading is very busy today. The whole-school allowance resets at midnight UTC — your answer is safe, try again tomorrow or ask your teacher.',
+            'Grading is very busy today. The whole-school allowance resets at midnight UTC — your answer is safe, try again tomorrow or tell your teacher.',
           rateLimited: true,
           limit: globalDailyLimit,
           remaining: 0,
@@ -430,7 +430,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
         {
           error:
             `You've submitted ${dailyLimit} written responses for grading today, which is the daily maximum. `
-            + `The counter resets at midnight UTC — ask your teacher if you need more today.`,
+            + `The counter resets at midnight UTC (late afternoon here) — tell your teacher if you need more today.`,
           rateLimited: true,
           limit: dailyLimit,
           remaining: 0,
