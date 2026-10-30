@@ -1,4 +1,4 @@
-// 5.1.21 Sprite Playground (reference solution).
+// 5.1.22 Sprite Playground (reference solution).
 // Canvas + WASD player + frameCount-driven mover + on-screen text.
 
 let player, mover;
@@ -26,7 +26,7 @@ function draw() {
   mover.x = 80 + Math.sin(frameCount * 0.05) * 60;
 
   // Label.
-  fill(255);
+  fill('white');
   textSize(14);
   text('WASD to move the blue sprite', 12, 24);
 }

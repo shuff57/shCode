@@ -1,6 +1,6 @@
 ## Gravity
 
-**Read before `5.2.3 Lab: Tune Gravity`.**
+**Read before `5.2.4 Lab: Tune Gravity`.**
 
 **What you'll learn from it:**
 

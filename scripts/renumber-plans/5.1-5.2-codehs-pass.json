@@ -1,0 +1,142 @@
+{
+  "_comment": "5.1 reorder + 5.2 gets Falling Block, 2026-10-29. Key-names reading moves before the keyboard worked example; text() reading added before the playground; Falling Block moves from 5.1.24 to 5.2.3 (after Reading: Gravity). Folders never change. See scripts/renumber-module.mjs.",
+  "modules": {
+    "5.1": [
+      {
+        "folder": "5-1-1-slides"
+      },
+      {
+        "folder": "5-1-2-video-intro"
+      },
+      {
+        "folder": "5-1-3-reading-canvas-sprite"
+      },
+      {
+        "folder": "5-1-4-example-minimum-sprite"
+      },
+      {
+        "folder": "5-1-5-reading-canvas"
+      },
+      {
+        "folder": "5-1-6-reading-sprite"
+      },
+      {
+        "folder": "5-1-7-lab-one-sprite"
+      },
+      {
+        "folder": "5-1-8-reading-sprite-variable"
+      },
+      {
+        "folder": "5-1-9-reading-background"
+      },
+      {
+        "folder": "5-1-10-reading-sprite-props"
+      },
+      {
+        "folder": "5-1-11-moshion-intro"
+      },
+      {
+        "folder": "5-1-12-video-frame-loop"
+      },
+      {
+        "folder": "5-1-13-reading-input"
+      },
+      {
+        "folder": "5-1-19-reading-wasd"
+      },
+      {
+        "folder": "5-1-14-example-keyboard"
+      },
+      {
+        "folder": "5-1-15-reading-velocity"
+      },
+      {
+        "folder": "5-1-16-reading-movement-pattern"
+      },
+      {
+        "folder": "5-1-17-reading-else-to-zero"
+      },
+      {
+        "folder": "5-1-18-lab-else-to-zero"
+      },
+      {
+        "folder": "5-1-20-moshion-move-keys"
+      },
+      {
+        "folder": "5-1-24-reading-text-labels",
+        "new": true,
+        "type": "reading",
+        "notes": "text(), fill(), textSize() taught before the playground asks for them"
+      },
+      {
+        "folder": "5-1-21-a10-1-sprite-playground"
+      },
+      {
+        "folder": "5-1-22-a10-2-frame-loop"
+      },
+      {
+        "folder": "5-1-23-challenges"
+      }
+    ],
+    "5.2": [
+      {
+        "folder": "5-2-1-slides"
+      },
+      {
+        "folder": "5-2-2-reading-gravity"
+      },
+      {
+        "folder": "moshion-gravity"
+      },
+      {
+        "folder": "5-2-3-lab-tune-gravity"
+      },
+      {
+        "folder": "5-2-4-reading-ground-check"
+      },
+      {
+        "folder": "5-2-5-lab-add-a-jump"
+      },
+      {
+        "folder": "5-2-6-reading-bounciness-friction"
+      },
+      {
+        "folder": "moshion-bounce"
+      },
+      {
+        "folder": "5-2-8-reading-forces-vs-velocity"
+      },
+      {
+        "folder": "5-2-9-lab-wind-zone"
+      },
+      {
+        "folder": "5-2-10-reading-delete"
+      },
+      {
+        "folder": "5-2-11-lab-reaching-the-goal"
+      },
+      {
+        "folder": "5-2-12-example-finished-scene"
+      },
+      {
+        "folder": "5-2-13-a5-2-1-pinball-scene"
+      },
+      {
+        "folder": "5-2-14-a5-2-2-vel-vs-applyforce"
+      },
+      {
+        "folder": "5-2-15-challenges"
+      }
+    ]
+  },
+  "alsoRewrite": [
+    "curriculum/modules/*.md",
+    "curriculum-plan.md",
+    "curriculum/BOOK-TO-MODULE.md",
+    "scripts/apply-criterion-pointers-*.mjs",
+    "scripts/test-grader-tolerance.mjs",
+    "scripts/test-runtime-labs.mjs",
+    "scripts/test-diagram-chart-lessons.mjs",
+    "scripts/verify-a11y-keyboard-chart.py"
+  ]
+}

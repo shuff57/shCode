@@ -1,4 +1,4 @@
-// 5.2.7 Bouncy Ball (reference solution).
+// 5.2.8 Bouncy Ball (reference solution).
 //
 // A closed box with one ball loose inside it. Every wall is static, so the
 // physics engine never moves them -- the ball is the only thing with a say.

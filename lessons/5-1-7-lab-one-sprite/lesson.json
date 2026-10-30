@@ -1,7 +1,7 @@
 {
   "id": "5-1-7-lab-one-sprite",
-  "title": "5.1.7 Lab: Drop one sprite, change its color",
-  "description": "Practice from 5.1.6: create a canvas, drop a single sprite at the centre, and set its color. Three steps, no movement yet.",
+  "title": "5.1.7 Exploration: Move, resize and recolor a sprite",
+  "description": "Change one number at a time in a sketch that already works, predict what will move, rerun, and check. Practice from 5.1.5 and 5.1.6. No new code to write.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -14,62 +14,65 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Make a canvas",
-      "instructions": "Inside `setup()`, call `new Canvas(...)` with a width and height of your choice (anything from 300 to 600 works).",
-      "hints": [
-        "Open the moSHion docs drawer on the right and find the Canvas section."
-      ]
+      "title": "Run it first",
+      "instructions": "Click Run. You should see a tomato-colored square in the middle of a dark 360 by 360 canvas. Every line here is one you met in 5.1.5 and 5.1.6, and all of it already works.",
+      "hints": []
     },
     {
       "id": "s2",
-      "title": "Create one sprite at the centre",
-      "instructions": "Still inside `setup()`, call `new Sprite(x, y, w, h)` to place a sprite roughly in the middle of your canvas.",
+      "title": "Move it",
+      "instructions": "Predict first: if you change `180, 180` to `60, 60` in `new Sprite(...)`, where will the square go? Make the change and Run to check. The first two numbers are the sprite's center, `x` then `y`, and `y` gets bigger as you go down.",
       "hints": [
-        "Check the Sprite section of the moSHion docs drawer for what the four arguments mean."
+        "5.1.6 says x and y point to the center of the sprite, not its corner."
       ]
     },
     {
       "id": "s3",
-      "title": "Set the sprite's color",
-      "instructions": "Store the sprite in a variable, then assign a CSS color string to its `.color` property: try `'tomato'`, `'deepskyblue'`, or any color you like.",
+      "title": "Resize it",
+      "instructions": "Predict first: what will change if you replace the last two numbers, `60, 60`, with `140, 30`? Make the change and Run to check. Which of the two numbers is the width and which is the height?",
       "hints": [
-        "Look up sprite properties in the moSHion docs drawer."
+        "The four numbers inside `new Sprite(...)` are x, y, width, height, in that order."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Recolor it",
+      "instructions": "Change `'tomato'` to a color of your own, such as `'gold'` or `'deepskyblue'`, and Run.",
+      "hints": [
+        "A color goes inside quotes, the same way it did in 5.1.6."
       ]
     }
   ],
   "requirements": [
     {
       "id": "r1",
-      "title": "Create a canvas",
-      "description": "Call new Canvas(...) inside setup() to open a drawing area. Help: 5.1.5 (Canvas: new Canvas(w, h))",
-      "type": "inFunction",
-      "function": "setup",
+      "title": "Moved the sprite",
+      "description": "Change the first two numbers in new Sprite(...) so the sprite sits somewhere other than the center. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+      "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Canvas\\s*\\(",
+      "pattern": "new\\s+Sprite\\s*\\(\\s*(?!180\\s*,\\s*180\\s*,)\\d+\\s*,\\s*\\d+\\s*,",
       "flags": "",
       "points": 0,
       "status": "pending"
     },
     {
       "id": "r2",
-      "title": "Create a sprite",
-      "description": "Call new Sprite(...) inside setup() to put a rectangle on the canvas. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
-      "type": "inFunction",
-      "function": "setup",
+      "title": "Resized the sprite",
+      "description": "Change the last two numbers in new Sprite(...) so the sprite is not 60 by 60. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+      "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Sprite\\s*\\(",
+      "pattern": "new\\s+Sprite\\s*\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*(?!60\\s*,\\s*60\\s*\\))\\d+\\s*,\\s*\\d+\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"
     },
     {
       "id": "r3",
-      "title": "Set the sprite's color",
-      "description": "Assign a color string to the sprite's .color property. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
-      "type": "inFunction",
-      "function": "setup",
+      "title": "Recolored the sprite",
+      "description": "Give the sprite a color other than tomato. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+      "type": "regex",
       "file": "script.js",
-      "pattern": "\\.color\\s*=",
+      "pattern": "\\.color\\s*=\\s*['\\\"](?!tomato['\\\"])",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -97,27 +97,29 @@ The student should be able to read the STEP comment and know **what** to do, the
 |--------------------------|--------------------------------|------------------------------------|
 | `s1` Create a canvas     | `// STEP 1: Create a canvas …` | `r1` `new Canvas(`                 |
 | `s2` Create sprites      | `// STEP 2: Create N sprites …` | `r2` `new Sprite(` (×N)            |
-| `s3` Wire input          | `// STEP 3: Read WASD and …`   | `r3`, `r4` `kb.pressing(…)` checks |
+| `s3` Wire input          | `// STEP 3: Read the keys and …`   | `r3`, `r4` `kb.pressing(…)` checks |
 | …                        | …                              | …                                  |
 
 Not every step needs a requirement (some are prose-only guidance), and not every requirement needs a step (e.g. "clear the background" may be implicit), but the happy path is 1:1.
 
-## 4. WASD, not arrow keys
+## 4. Key names: WASD or arrows, taught before asked
 
-Every moSHion lab that uses keyboard input should use **WASD**, not arrow keys. Arrow keys scroll the browser iframe on some platforms and break the lesson UX. Enforce this in both `steps[].instructions` hints and the requirement regex:
+Either key set is acceptable (`'a' 'd' 'w' 's'` or `'left' 'right' 'up' 'down'`). What is not acceptable is asking for one the course has not taught. 5.1.13 teaches `kb.pressing`, and 5.1.14 (Reading: Key names) teaches both sets explicitly; any lab before 5.1.14 must not name a key a student has not seen. After it, a lab may use either.
+
+A requirement must accept both sets, so a student who picks arrows is not failed:
 
 ```json
-"pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]"
+"pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d|left|right)['\"]"
 ```
 
-Not `['"](?:left|right)['"]`.
+Say "click the canvas before you press a key" in the lesson. This replaces an earlier WASD-only rule whose reason (arrow keys scroll the iframe) was tested once, in Chromium with the sketch focused, and did not reproduce; it is untested on other platforms. If a platform is found where it does scroll, restore the rule rather than working around it per lab.
 
 ## 5. Don'ts
 
 - **Do not include commented-out solution code in `script.js`.** STEP comments describe the task in plain English (see §3). Lines like `//   stars = new Group();` are answer keys, not scaffolds.
 - **Do not ship a working solution.** Empty function bodies; the student writes them.
 - **Do not include a `// BUILD THIS:` prose block** at the top of `script.js`. The header comment is one line (`// <numbering> <title>: <one-line tagline>` per `moshion-lesson-conventions.md` §4.2); longer task framing belongs in `steps[].instructions` and the matching `// STEP N:` comments inside the function bodies.
-- **Do not use arrow keys**: WASD only. See §4.
+- **Do not name a key set the course has not taught yet.** See §4.
 - **Do not auto-grade velocity magnitudes** (e.g. `vel.x = 4`). Students should be free to pick any value in a reasonable range; the grader checks *that* velocity is set, not *what* it's set to.
 - **Do not include `authored_by_email` or other DB-side fields in the starter.** Those belong to the commit pipeline, not the lesson.
 

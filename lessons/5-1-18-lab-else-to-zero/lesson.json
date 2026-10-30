@@ -1,6 +1,6 @@
 {
   "id": "5-1-18-lab-else-to-zero",
-  "title": "5.1.18 Lab: Delete the else, watch drift",
+  "title": "5.1.19 Lab: Delete the else, watch drift",
   "description": "Start from a working WASD movement pattern, delete the two else lines, observe drift, then restore them.",
   "type": "lesson",
   "estimateMins": 5,
@@ -49,7 +49,7 @@
     {
       "id": "r1",
       "title": "Restore else player.vel.x = 0",
-      "description": "The draw() function must contain an else branch that sets player.vel.x to 0, so the sprite stops horizontally when no key is held. Help: 5.1.17 (The else-to-zero rule)",
+      "description": "The draw() function must contain an else branch that sets player.vel.x to 0, so the sprite stops horizontally when no key is held. Help: 5.1.18 (The else-to-zero rule)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -61,7 +61,7 @@
     {
       "id": "r2",
       "title": "Restore else player.vel.y = 0",
-      "description": "The draw() function must contain an else branch that sets player.vel.y to 0, so the sprite stops vertically when no key is held. Help: 5.1.17 (The else-to-zero rule)",
+      "description": "The draw() function must contain an else branch that sets player.vel.y to 0, so the sprite stops vertically when no key is held. Help: 5.1.18 (The else-to-zero rule)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

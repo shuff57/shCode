@@ -1,15 +1,15 @@
 {
   "id": "moshion-gravity",
-  "title": "5.1.24 Falling Block: Example",
-  "description": "A dynamic block falls under gravity and lands on a static floor. Read the example, then experiment.",
+  "title": "5.2.3 Worked Example: Falling Block",
+  "description": "A dynamic block falls under gravity and lands on a static floor. Read the example, then experiment. Follows 5.2.2 (Reading: Gravity).",
   "type": "example",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.1 Hello Sprite and Movement",
+  "unit": "5.2 Physics Feel",
   "preview": "moshion",
-  "week": 10,
+  "week": 15,
   "slos": [
-    "SLO-1"
+    "SLO-3"
   ],
   "steps": [
     {
@@ -25,7 +25,7 @@
       "title": "Turn gravity off",
       "instructions": "Change `world.gravity.y = 10` to `world.gravity.y = 0`. The block floats.",
       "hints": [
-        "Gravity units are roughly pixels per second²."
+        "Gravity units are roughly pixels per second\u00b2."
       ]
     },
     {

@@ -1,6 +1,6 @@
 ## Frame loop: `setup()` and `draw()`
 
-**Read before `5.1.5 Reading: Canvas`.** About 3 minutes.
+**Read before `5.1.4 Worked Example: Minimum Sprite Program`.** About 3 minutes.
 
 By the end of this reading you should be able to answer:
 

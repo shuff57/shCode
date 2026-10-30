@@ -56,5 +56,5 @@ the end of a module, or with a migration that moves the ids.
 ## Not yet done
 
 - Only 5.1 is grouped. The rest of the modules have no file.
-- No per-lesson "2 of 6 done" counter — the banner shows the objective and the
-  screen count only.
+- No per-lesson "2 of 6 done" counter. The headings on the module page show the
+  objective and screen count only; screens themselves show nothing.

@@ -1,7 +1,7 @@
 {
   "id": "5-1-21-a10-1-sprite-playground",
-  "title": "5.1.21 Sprite Playground",
-  "description": "Build a sprite playground combining canvas, WASD-controlled sprite, auto-motion, and on-screen text. Auto-graded.",
+  "title": "5.1.22 Sprite Playground",
+  "description": "Build a sprite playground combining canvas, a keyboard-controlled sprite (WASD or arrow keys), auto-motion, and on-screen text. Auto-graded.",
   "type": "assignment",
   "estimateMins": 45,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -15,29 +15,31 @@
     {
       "id": "s1",
       "title": "Create a canvas and two sprites",
-      "instructions": "Make a canvas (any size between 300×300 and 800×600) and two sprites: one `player` (controllable) and one `mover` (moves on its own).",
+      "instructions": "Make a canvas (any size between 300\u00d7300 and 800\u00d7600) and two sprites: one `player` (controllable) and one `mover` (moves on its own).",
       "hints": []
     },
     {
       "id": "s2",
-      "title": "Wire WASD movement to the player",
-      "instructions": "Use `kb.pressing('a')` / `'d'` / `'w'` / `'s'` to set the player's velocity. Include an else branch that resets velocity to 0 when no key is held.",
+      "title": "Wire keyboard movement to the player",
+      "instructions": "Use `kb.pressing(...)` with `'a'` / `'d'` / `'w'` / `'s'` (or `'left'` / `'right'` / `'up'` / `'down'`) to set the player's velocity. Include an else branch that resets velocity to 0 when no key is held.",
       "hints": [
-        "Don't use arrow keys in this lab: they also scroll the browser iframe."
+        "Pick one set of keys and use it for all four directions. 5.1.14 lists both sets, and 5.1.18 explains the else branch."
       ]
     },
     {
       "id": "s3",
       "title": "Animate the mover sprite",
       "instructions": "Drive the `mover` sprite with `frameCount` so it moves on its own. Pick any pattern: oscillate, orbit, or spin.",
-      "hints": []
+      "hints": [
+        "Worked Example 3 in 5.1.15 shows oscillating, circling and spinning with `frameCount`."
+      ]
     },
     {
       "id": "s4",
       "title": "Add an on-screen text label",
-      "instructions": "Display a message on the canvas using `text()` and `textSize()`. Your choice of message.",
+      "instructions": "Display a message on the canvas using `fill()`, `textSize()` and `text()`. Your choice of message.",
       "hints": [
-        "Set `fill(255)` before `text(...)` so it's visible on dark backgrounds."
+        "5.1.21 shows all three. Call `fill('white')` before `text(...)` so the words show up on a dark background."
       ]
     },
     {
@@ -61,7 +63,7 @@
     {
       "id": "r2",
       "title": "Create at least 2 sprites",
-      "description": "Two sprites exist in the sketch. Help: 5.1.16 (Movement pattern (if / else if / else))",
+      "description": "Two sprites exist in the sketch. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\([\\s\\S]*?new\\s+Sprite\\s*\\(",
@@ -70,36 +72,36 @@
     },
     {
       "id": "r3",
-      "title": "Horizontal WASD input",
-      "description": "A or D keys move the player horizontally each frame. Help: 5.1.19 (WASD-not-arrows)",
+      "title": "Horizontal keyboard input",
+      "description": "The left or right key (`'a'`, `'d'`, `'left'` or `'right'`) moves the player horizontally each frame. Help: 5.1.14 (Key names: WASD and the arrow keys)",
       "type": "inFunction",
       "function": [
         "draw",
         "update"
       ],
       "file": "script.js",
-      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\\\"](?:a|d|left|right)['\\\"]",
       "flags": "",
       "points": 0
     },
     {
       "id": "r4",
-      "title": "Vertical WASD input",
-      "description": "W or S keys move the player vertically each frame. Help: 5.1.19 (WASD-not-arrows)",
+      "title": "Vertical keyboard input",
+      "description": "The up or down key (`'w'`, `'s'`, `'up'` or `'down'`) moves the player vertically each frame. Help: 5.1.14 (Key names: WASD and the arrow keys)",
       "type": "inFunction",
       "function": [
         "draw",
         "update"
       ],
       "file": "script.js",
-      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:w|s)['\"]",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\\\"](?:w|s|up|down)['\\\"]",
       "flags": "",
       "points": 0
     },
     {
       "id": "r5",
       "title": "Velocity resets to zero",
-      "description": "The player stops when no movement key is held. Help: 5.1.17 (The else-to-zero rule)",
+      "description": "The player stops when no movement key is held. Help: 5.1.18 (The else-to-zero rule)",
       "type": "inFunction",
       "function": [
         "draw",
@@ -113,7 +115,7 @@
     {
       "id": "r6",
       "title": "Automatic motion for the mover",
-      "description": "The mover sprite animates without keyboard input. Help: 5.1.16 (Movement pattern (if / else if / else))",
+      "description": "The mover sprite animates without keyboard input. Help: 5.1.15 (Worked Example: Keyboard Movement)",
       "type": "inFunction",
       "function": [
         "draw",
@@ -127,7 +129,7 @@
     {
       "id": "r7",
       "title": "On-screen text label",
-      "description": "A text label is drawn on the canvas.",
+      "description": "A text label is drawn on the canvas. Help: 5.1.21 (Words on the canvas: text())",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -138,7 +140,7 @@
     {
       "id": "r8",
       "title": "Clear the background each frame",
-      "description": "Previous frames don't stack up.",
+      "description": "Previous frames don't stack up. Help: 5.1.9 (background(color) wipe rule)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

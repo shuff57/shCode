@@ -1,10 +1,10 @@
-# 5.1.14 Worked Examples
+# 5.1.15 Worked Examples
 
-Teacher-led walkthroughs for Module 5.1. Students can reference these after class when building 5.1.21 Sprite Playground.
+Teacher-led walkthroughs for Module 5.1. Students can reference these after class when building 5.1.22 Sprite Playground.
 
 All three examples are designed to be typed (not pasted) into the moSHion in-app editor so the code sinks in line-by-line.
 
-**Elsewhere in Module 5.1:** 5.1.22 Frame Loop Writeup · 5.1.23 Challenges
+**Elsewhere in Module 5.1:** 5.1.23 Frame Loop Writeup · 5.1.24 Challenges
 
 ---
 

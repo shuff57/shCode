@@ -165,13 +165,20 @@ Sprites* — with an objective each:
 | 6 Build it and prove it | 4 | ~110 | worked example |
 
 The layer is presentational: a heading above each group on the module page, and a
-banner on each screen saying which lesson it belongs to. Progress, the sequential
+nothing on the individual screens (a per-screen banner was tried and removed). Progress, the sequential
 lock, due dates and "X of Y" are still per screen, unchanged.
 
 **No new check screens in 5.1.** Five of its six lessons already end in a lab, an
 example or a challenge; a quiz there would be busywork. The rule recorded in
 `curriculum/groups/README.md`: a lesson needs a check when its last screen is a
 reading or a video — which points at 1.2, 1.5, 3.2, 6.5 and 6.7, not at 5.1.
+
+**Content pass on 5.1 (same day).** Reordered and rewritten so nothing is asked before
+it is taught: 5.1.7 became an exploration, 5.1.14 is a new key-names reading
+(WASD and arrows), 5.1.21 is a new `text()` reading, 5.1.20 lost its `update()`,
+gravity and dynamic-sprite steps, and Falling Block moved to 5.2.3. The lesson table
+above shows the earlier six-lesson split; the current groups are in
+`curriculum/groups/5.1.json` (4, 6, 2, 5, 3 and 4 screens).
 
 Next module to group: 5.2, against GD 3.5 (*The Physics of Sprites*), which is a
 Notes → Exploration ×4 → reflection loop in four clean lessons.

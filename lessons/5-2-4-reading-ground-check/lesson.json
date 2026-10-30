@@ -1,7 +1,7 @@
 {
   "id": "5-2-4-reading-ground-check",
-  "title": "5.2.4 Reading: Ground-Gated Actions",
-  "description": "colliding() and edge-triggered kb.presses vs level-triggered kb.pressing. Read before 5.2.5 Lab: Add a Jump.",
+  "title": "5.2.5 Reading: Ground-Gated Actions",
+  "description": "colliding() and edge-triggered kb.presses vs level-triggered kb.pressing. Read before 5.2.6 Lab: Add a Jump.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",

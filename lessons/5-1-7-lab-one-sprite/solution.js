@@ -1,11 +1,8 @@
-// 5.1.7 Lab: Drop one sprite, change its color (reference solution).
-
-let player;
+// 5.1.7 Exploration: move, resize and recolor a sprite (one possible answer).
 
 function setup() {
   new Canvas(360, 360);
-  player = new Sprite(180, 180, 50, 50);
-  player.color = 'tomato';
+  new Sprite(60, 60, 140, 30).color = 'gold';
 }
 
 function draw() {

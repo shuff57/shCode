@@ -50,7 +50,7 @@
     {
       "id": "r1",
       "title": "Static geometry exists",
-      "description": "Create at least one sprite with collider 'static'. Help: 5.2.6 (Bounciness and Friction)",
+      "description": "Create at least one sprite with collider 'static'. Help: 5.2.7 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "WASD horizontal input",
-      "description": "Use kb.pressing with 'a' or 'd' inside draw(). Help: 5.1.14 (Keyboard Movement)",
+      "description": "Use kb.pressing with 'a' or 'd' inside draw(). Help: 5.1.15 (Keyboard Movement)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

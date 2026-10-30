@@ -2,10 +2,8 @@ import LessonWorkspace from '../../../components/LessonWorkspace';
 import ContentLessonView from '../../../components/ContentLessonView';
 import LessonProgressFooter from '../../../components/LessonProgressFooter';
 import LessonAccessGate from '../../../components/LessonAccessGate';
-import LessonGroupBanner from '../../../components/LessonGroupBanner';
 import { getLesson, loadLessons } from '../../../lib/lessons';
 import { getModule } from '../../../lib/curriculum';
-import { groupOf } from '../../../lib/lesson-groups';
 import { rendersAsContent } from '../../../lib/lesson-view';
 import { redactLessonForClient } from '../../../lib/quiz-redact';
 
@@ -41,10 +39,6 @@ export default async function LessonPage({
     />
   ) : null;
 
-  // Where this screen sits in the module's lesson layer. Null for every module
-  // that has not been grouped yet, so this renders nothing there.
-  const inLesson = mod ? groupOf(mod.groups, lesson.id) : null;
-
   const siblingIds = mod ? mod.lessons.map((l) => l.id) : [];
   // The last point at which the answer key can be taken out. Both views below
   // are 'use client', so whatever is handed to them is serialised into the
@@ -56,15 +50,6 @@ export default async function LessonPage({
 
   return (
     <>
-      {inLesson && moduleId && (
-        <LessonGroupBanner
-          moduleId={moduleId}
-          group={inLesson.group}
-          index={inLesson.index}
-          total={inLesson.total}
-          screenCount={inLesson.group.screens.length}
-        />
-      )}
       <LessonAccessGate
         currentLessonId={lesson.id}
         siblings={siblingIds}

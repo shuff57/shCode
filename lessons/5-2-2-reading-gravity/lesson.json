@@ -1,7 +1,7 @@
 {
   "id": "5-2-2-reading-gravity",
   "title": "5.2.2 Reading: Gravity",
-  "description": "world.gravity.y and dynamic vs static sprites. Read before 5.2.3 Lab: Tune Gravity.",
+  "description": "world.gravity.y and dynamic vs static sprites. Read before 5.2.4 Lab: Tune Gravity.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",

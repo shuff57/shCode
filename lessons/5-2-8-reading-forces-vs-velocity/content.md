@@ -1,6 +1,6 @@
 ## Forces vs Velocity
 
-**Read before `5.2.9 Lab: Wind Zone`.**
+**Read before `5.2.10 Lab: Wind Zone`.**
 
 **What you'll learn from it:**
 

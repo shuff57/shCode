@@ -96,17 +96,3 @@ export async function loadModuleGroups(moduleId: string): Promise<LessonGroup[] 
   }
   return parsed.lessons ?? [];
 }
-
-/** Which group a screen belongs to, 1-based, for "Lesson 2 of 6" labels. */
-export function groupOf(
-  groups: LessonGroup[] | null,
-  screenId: string,
-): { group: LessonGroup; index: number; total: number } | null {
-  if (!groups) return null;
-  for (let i = 0; i < groups.length; i++) {
-    if (groups[i].screens.includes(screenId)) {
-      return { group: groups[i], index: i + 1, total: groups.length };
-    }
-  }
-  return null;
-}

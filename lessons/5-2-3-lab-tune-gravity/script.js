@@ -1,4 +1,4 @@
-// 5.2.3 Lab: Tune Gravity: try several values and see how each one feels.
+// 5.2.4 Lab: Tune Gravity: try several values and see how each one feels.
 
 let player, ground, goal;
 

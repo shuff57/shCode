@@ -1,6 +1,6 @@
 {
   "id": "5-2-14-a5-2-2-vel-vs-applyforce",
-  "title": "5.2.14 Vel vs applyForce",
+  "title": "5.2.15 Vel vs applyForce",
   "description": "Why setting .vel every frame fights the physics engine, and when applyForce is the better tool. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 20,
@@ -20,7 +20,7 @@
     "contextDocs": [
       "physics"
     ],
-    "prompt": "Everything you need is in 5.2.8 (Reading: Forces vs Velocity) and 5.2.9 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.8, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.8 and 5.2.9)",
+    "prompt": "Everything you need is in 5.2.9 (Reading: Forces vs Velocity) and 5.2.10 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.9, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.9 and 5.2.10)",
     "rubric": [
       {
         "id": "q1-fight-explanation",

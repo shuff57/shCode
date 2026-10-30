@@ -1,6 +1,6 @@
 ## `kb.pressing(key)`: is the key held right now?
 
-**Read before `5.1.15 Reading: Velocity`.** About 3 minutes.
+**Read before `5.1.14 Reading: Key names: WASD and the arrow keys`.** About 3 minutes.
 
 By the end of this reading you should be able to answer:
 

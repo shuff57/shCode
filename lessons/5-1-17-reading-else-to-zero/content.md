@@ -1,6 +1,6 @@
 ## The else-to-zero Rule
 
-Read before `5.1.18 Lab: Delete the else, watch drift`. About 5 minutes.
+Read before `5.1.19 Lab: Delete the else, watch drift`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

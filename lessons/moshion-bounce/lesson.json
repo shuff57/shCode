@@ -1,6 +1,6 @@
 {
   "id": "moshion-bounce",
-  "title": "5.2.7 Bouncy Ball",
+  "title": "5.2.8 Bouncy Ball",
   "description": "Learn how bounciness and friction change how sprites feel.",
   "type": "lesson",
   "estimateMins": 25,
@@ -47,7 +47,7 @@
     {
       "id": "r1",
       "title": "Create multiple static walls",
-      "description": "At least two 'static' sprites. Help: 5.2.6 (Bounciness and Friction)",
+      "description": "At least two 'static' sprites. Help: 5.2.7 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\([^)]*['\"]static['\"][\\s\\S]*new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
@@ -69,7 +69,7 @@
     {
       "id": "r3",
       "title": "Set bounciness",
-      "description": "Assign to .bounciness. Help: 5.2.6 (Bounciness and Friction)",
+      "description": "Assign to .bounciness. Help: 5.2.7 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.bounciness\\s*=",
@@ -80,7 +80,7 @@
     {
       "id": "r4",
       "title": "Set friction",
-      "description": "Assign to .friction. Help: 5.2.6 (Bounciness and Friction)",
+      "description": "Assign to .friction. Help: 5.2.7 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.friction\\s*=",

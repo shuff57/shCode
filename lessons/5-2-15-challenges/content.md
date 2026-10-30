@@ -21,7 +21,7 @@ Keep the manual, per-goal style from this module's lessons: two separate goal va
 
 **Hints:**
 - A counter variable that starts at `0` and increments each time a goal is deleted works well.
-- Check the counter (`=== 2`) before printing the final message, and guard it the same single-fire way you guarded the first goal in 5.2.11.
+- Check the counter (`=== 2`) before printing the final message, and guard it the same single-fire way you guarded the first goal in 5.2.12.
 - Give the counter a "used up" state (like bumping it past 2) so the message can't print twice either.
 
 ---

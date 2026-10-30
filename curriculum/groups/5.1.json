@@ -38,9 +38,10 @@
     {
       "id": "input-and-velocity",
       "title": "Keyboard input and velocity",
-      "objective": "Students will be able to read a key with kb.pressing(), turn that reading into a velocity, and predict where the sprite goes next frame.",
+      "objective": "Students will be able to read a key with kb.pressing() using either WASD or arrow-key names, turn that reading into a velocity, and predict where the sprite goes next frame.",
       "screens": [
         "5-1-13-reading-input",
+        "5-1-19-reading-wasd",
         "5-1-14-example-keyboard",
         "5-1-15-reading-velocity",
         "5-1-16-reading-movement-pattern"
@@ -49,23 +50,22 @@
     {
       "id": "else-to-zero",
       "title": "The else-to-zero rule",
-      "objective": "Students will be able to explain why a sprite keeps drifting when the else branch is missing, and write the full if / else if / else pattern that stops it.",
+      "objective": "Students will be able to explain why a sprite keeps drifting when the else branch is missing, and build four-direction keyboard movement that stops when no key is held.",
       "screens": [
         "5-1-17-reading-else-to-zero",
         "5-1-18-lab-else-to-zero",
-        "5-1-19-reading-wasd",
         "5-1-20-moshion-move-keys"
       ]
     },
     {
       "id": "build-and-prove",
       "title": "Build it and prove it",
-      "objective": "Students will be able to build the sprite playground and the second auto-moving sprite, write the frame-loop explanation, and take on the stretch challenges.",
+      "objective": "Students will be able to put words on the canvas with text(), build the sprite playground and its second auto-moving sprite, write the frame-loop explanation, and take on the stretch challenges.",
       "screens": [
+        "5-1-24-reading-text-labels",
         "5-1-21-a10-1-sprite-playground",
         "5-1-22-a10-2-frame-loop",
-        "5-1-23-challenges",
-        "moshion-gravity"
+        "5-1-23-challenges"
       ]
     }
   ]
