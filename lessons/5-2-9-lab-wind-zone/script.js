@@ -1,6 +1,6 @@
 // 5.2.14 Lab: Wind Zone: push the player with applyForce inside a zone.
 
-let player, ground;
+let player, ground, leftWall, rightWall;
 
 function setup() {
   new Canvas(400, 400);
@@ -13,6 +13,11 @@ function setup() {
   ground = new Sprite(200, 380, 400, 20, 'static');
   ground.color = 'gray';
   ground.friction = 0.5;
+
+  leftWall = new Sprite(6, 200, 12, 400, 'static');
+  leftWall.color = 'sienna';
+  rightWall = new Sprite(394, 200, 12, 400, 'static');
+  rightWall.color = 'sienna';
 }
 
 function draw() {

@@ -1,7 +1,7 @@
 {
   "id": "5-4-flappy-6-lab-score-a-gap",
   "title": "5.4.7 Lab: Score a gap",
-  "description": "A pipe the bird has flown past is worth a point, once. The starter has no score. Give every pipe a flag that remembers it has been counted, the same idea as 5.3.7 with a different trigger.",
+  "description": "A pipe the bird has flown past is worth a point, once. The starter shows a score that never moves. Give every pipe a flag that remembers it has been counted, the same idea as 5.3.7 with a different trigger.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",

@@ -20,9 +20,6 @@ function setup() {
 
 function draw() {
   background('#222');
-  fill('white');
-  textSize(14);
-  text('arrow keys steer', 20, 28);
 
   if (kb.presses('up') && dy === 0) { dx = 0; dy = -1; }
   if (kb.presses('down') && dy === 0) { dx = 0; dy = 1; }
@@ -39,6 +36,13 @@ function draw() {
       head.y = cellToPixel(head.row);
     }
   }
+}
 
+// drawTop() runs after the sprites are drawn, so the block can never cover
+// its words (the same trick as the Flappy labs, from 5.4.5).
+function drawTop() {
+  fill('white');
+  textSize(14);
+  text('arrow keys steer', 20, 28);
   if (!playing) text('Game over', 150, 200);
 }

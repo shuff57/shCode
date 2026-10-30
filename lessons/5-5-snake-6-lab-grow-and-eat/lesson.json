@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Move by adding a head and removing a tail",
-      "instructions": "The starter has five functions. Every one except `step()` is finished; the comment above each says what it does, and `step()` is the move from 5.5.4's `draw()`, now in a function of its own. Your work is all in `step()`. Replace its last two lines with the trick from 5.5.5: put a new head at the front of `segments` with `unshift`, then `pop` the tail and delete it. Run it: the whole three-cell snake should slide forward.",
+      "instructions": "Besides `setup()`, `draw()` and `drawTop()`, the starter has five functions. Every one except `step()` is finished; the comment above each says what it does. `step()` does the job 5.5.4 did on each beat inside `draw()` (work out the next cell, stop at a wall), now in a function of its own; for now its last two lines delete the head and build a new one on the next cell, so the rest of the body is left behind. The words on screen are drawn in `drawTop()`, as in the Flappy labs, so the snake can never cover the score. Your work is all in `step()`. Replace its last two lines with the trick from 5.5.5: put a new head at the front of `segments` with `unshift`, then `pop` the tail and delete it. Run it: the whole three-cell snake should slide forward.",
       "hints": [
         "`segments.unshift(makeSegment(col, row));`",
         "`const tail = segments.pop();` then `tail.delete();`"
@@ -68,7 +68,7 @@
       "description": "Reaching the food adds a point and makes a new piece. Help: 5.5.5 (Reading: A body that grows)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)[\\s\\S]{0,80}?food\\s*=\\s*makeFood\\s*\\(\\s*\\)|food\\s*=\\s*makeFood\\s*\\(\\s*\\)[\\s\\S]{0,80}?(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)",
+      "pattern": "(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)[\\s\\S]{0,80}?(?:food\\s*=\\s*makeFood\\s*\\(\\s*\\)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makeFood\\s*\\(\\s*\\)[\\s\\S]{0,60}?\\bfood\\s*=\\s*\\1\\b)|(?:food\\s*=\\s*makeFood\\s*\\(\\s*\\)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makeFood\\s*\\(\\s*\\)[\\s\\S]{0,60}?\\bfood\\s*=\\s*\\2\\b)[\\s\\S]{0,80}?(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -76,10 +76,10 @@
     {
       "id": "r4",
       "title": "Eating keeps the tail, so the snake grows",
-      "description": "The tail is removed only on a step that does not eat (in the else, or after the eating branch has returned). Help: 5.5.5 (Reading: A body that grows)",
+      "description": "The tail is removed only on a step that does not eat: the eating test compares the new head's cell with the food's cell, and the tail comes off in the else (or after the eating branch has returned). Help: 5.5.5 (Reading: A body that grows)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^)]*\\bfood\\b[^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*\\}\\s*else\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(|if\\s*\\([^)]*\\bfood\\b[^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?\\breturn\\b(?:[^{}]|\\{[^{}]*\\})*\\}[\\s\\S]*?segments\\.(?:pop|splice)\\s*\\(|if\\s*\\([^)]*(?:\\bfood\\.\\w+\\s*!==?|!==?\\s*food\\.\\w+)[^)]*\\)\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(|(?:const|let)\\s+(\\w+)\\s*=[^;\\n]*\\bfood\\b[^;\\n]*[;\\n][\\s\\S]{0,300}?if\\s*\\(\\s*\\1\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*\\}\\s*else\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(|(?:const|let)\\s+(\\w+)\\s*=[^;\\n]*\\bfood\\b[^;\\n]*[;\\n][\\s\\S]{0,400}?if\\s*\\(\\s*(?:!\\s*\\2|\\2\\s*===?\\s*false)\\s*\\)\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(",
+      "pattern": "if\\s*\\((?=[^{};]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))(?:[^()]|\\([^()]*\\))*\\)\\s*\\{(?:(?!segments\\.(?:pop|splice)\\s*\\()(?:[^{}]|\\{[^{}]*\\}))*\\}\\s*else\\s*(?:\\{[^{}]*?|[^{};]*?)segments\\.(?:pop|splice)\\s*\\(|if\\s*\\((?=[^{};]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))(?:[^()]|\\([^()]*\\))*\\)\\s*\\{(?:(?!segments\\.(?:pop|splice)\\s*\\()(?:[^{}]|\\{[^{}]*\\}))*?\\breturn\\b(?:[^{}]|\\{[^{}]*\\})*\\}[\\s\\S]*?segments\\.(?:pop|splice)\\s*\\(|if\\s*\\((?=[^{};]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))(?=[^{};]*(?:!==?|!\\s*\\())(?:[^()]|\\([^()]*\\))*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)segments\\.(?:pop|splice)\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=(?=[^;]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))[^;]*;[\\s\\S]{0,300}?if\\s*\\(\\s*\\1\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{(?:(?!segments\\.(?:pop|splice)\\s*\\()(?:[^{}]|\\{[^{}]*\\}))*\\}\\s*else\\s*(?:\\{[^{}]*?|[^{};]*?)segments\\.(?:pop|splice)\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=(?=[^;]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))[^;]*;[\\s\\S]{0,400}?if\\s*\\(\\s*(?:!\\s*\\2|\\2\\s*===?\\s*false)\\s*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)segments\\.(?:pop|splice)\\s*\\(|(?<![\\w.$])(\\w+)\\s*=\\s*false\\b[\\s\\S]{0,300}?if\\s*\\((?=[^{};]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))(?:[^()]|\\([^()]*\\))*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)(?<![\\w.$])\\3\\s*=\\s*true\\b[\\s\\S]{0,300}?if\\s*\\(\\s*(?:\\3\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{(?:(?!segments\\.(?:pop|splice)\\s*\\()(?:[^{}]|\\{[^{}]*\\}))*\\}\\s*else\\s*|(?:!\\s*\\3|\\3\\s*===?\\s*false)\\s*\\)\\s*)(?:\\{[^{}]*?|[^{};]*?)segments\\.(?:pop|splice)\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

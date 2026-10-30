@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Roll a die",
-      "instructions": "Inside the same block, set `roll` to a random whole number from 1 to 6. The number shows in the top corner. Watch a dozen rolls and check that you see a 6 and never a 0 or a 7.",
+      "instructions": "Inside the same block, set `roll` to a random whole number from 1 to 6. The number shows in the top corner. Watch a dozen rolls and check that you see a 6 and never a 0 or a 7. For the first second the corner reads `roll: 0`: no roll has happened yet, so that is the starting value from `let roll = 0;` at the top. Count from the first change.",
       "hints": [
         "`random` gives decimals, and `floor` cuts them off. Wrap one in the other.",
         "The top number is never reached, so for 1 to 6 write `floor(random(1, 7))`. `floor(random(6)) + 1` also works."

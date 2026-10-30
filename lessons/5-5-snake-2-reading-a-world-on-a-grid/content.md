@@ -48,6 +48,16 @@ Change the 8 and the whole game speeds up or slows down. A smaller number is a f
 const col = floor(random(20));
 ```
 
+**Words go on top, as in Flappy.** The snake's cells are sprites, and moSHion draws the sprites after `draw()` has finished, so a score written in `draw()` would disappear under the snake whenever it crosses the top of the grid. The Snake labs write their words in `drawTop()`, the function from 5.4.5 that runs after the sprites are drawn:
+
+```js
+function drawTop() {
+  fill('white');
+  textSize(22);
+  text('score: ' + score, 20, 32);
+}
+```
+
 ---
 
 ## Short glossary (quick reference)

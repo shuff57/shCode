@@ -9,6 +9,6 @@ Make the pipes faster, or the gap narrower, as the score grows. The rule reads t
 A restart wipes the score, which is right. Keep a second variable that is *not* reset when R is pressed, update it when the score beats it, and show it beside the current score in `drawTop()`.
 
 **Challenge 3 — a wobbling gap (hard).**
-Give each pipe a little sideways wobble of its own, using `random` for how fast it wobbles. The top and the bottom half must stay in step, or the gap stops being a gap.
+Give each pipe a little up-and-down wobble of its own, using `random` for how fast it wobbles: for example, a small `vel.y` from `random`, turned the other way on a beat. The top and the bottom half must move together, by the same amount, or the gap stops being a gap: a top half drifting down while the bottom half drifts up closes it.
 
 Whatever you pick, the game must still be playable from a fresh start: press R and everything that belongs to a round goes back.

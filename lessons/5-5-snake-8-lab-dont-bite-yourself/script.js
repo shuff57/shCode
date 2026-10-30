@@ -73,9 +73,6 @@ function setup() {
 
 function draw() {
   background('#222');
-  fill('white');
-  textSize(22);
-  text('score: ' + score, 20, 32);
 
   if (kb.presses('up') && dy === 0) { dx = 0; dy = -1; }
   if (kb.presses('down') && dy === 0) { dx = 0; dy = 1; }
@@ -84,11 +81,20 @@ function draw() {
 
   if (playing && frameCount % 8 === 0) step();
 
+  if (kb.presses('r')) startRound();
+}
+
+// drawTop() runs after the sprites are drawn, so the snake can never cover
+// its words (the same trick as the Flappy labs, from 5.4.5).
+function drawTop() {
+  fill('white');
+  textSize(22);
+  text('score: ' + score, 20, 32);
+
   if (!playing) {
     textSize(28);
     text('Game over', 130, 190);
     textSize(14);
     text('press R to play again', 130, 215);
   }
-  if (kb.presses('r')) startRound();
 }

@@ -20,9 +20,6 @@ function setup() {
 
 function draw() {
   background('#222');
-  fill('white');
-  textSize(14);
-  text('arrow keys steer', 20, 28);
 
   // STEP 1: when an arrow key is pressed, set dx and dy (up is dx = 0, dy = -1).
   // STEP 2: only allow up/down when dy === 0, and left/right when dx === 0.
@@ -36,6 +33,13 @@ function draw() {
     head.x = cellToPixel(head.col);
     head.y = cellToPixel(head.row);
   }
+}
 
+// drawTop() runs after the sprites are drawn, so the block can never cover
+// its words (the same trick as the Flappy labs, from 5.4.5).
+function drawTop() {
+  fill('white');
+  textSize(14);
+  text('arrow keys steer', 20, 28);
   if (!playing) text('Game over', 150, 200);
 }

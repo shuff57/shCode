@@ -55,10 +55,10 @@
     {
       "id": "r2",
       "title": "A point is added only when contact starts",
-      "description": "The score goes up when the ball is touching now and was not touching a frame ago. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "The score goes up when the ball is touching now and was not touching a frame ago: the `score += 1` sits inside that `if`. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*(?:[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?\\s*&&\\s*(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false)|(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false)\\s*&&\\s*[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?)\\s*\\)\\s*\\{?[\\s\\S]{0,80}?score\\s*(?:\\+=|\\+\\+|=\\s*score\\s*\\+)|if\\s*\\(\\s*(?:[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?|(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false))\\s*\\)\\s*\\{?\\s*if\\s*\\(\\s*(?:(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false)|[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?)\\s*\\)\\s*\\{?[\\s\\S]{0,80}?score\\s*(?:\\+=|\\+\\+|=\\s*score\\s*\\+)",
+      "pattern": "if\\s*\\(\\s*(?:[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?\\s*&&\\s*(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false)|(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false)\\s*&&\\s*[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?)\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]*?)score\\s*(?:\\+=|\\+\\+|=\\s*score\\s*\\+)|if\\s*\\(\\s*(?:[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?|(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false))\\s*\\)\\s*\\{?\\s*if\\s*\\(\\s*(?:(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false)|[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?)\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]*?)score\\s*(?:\\+=|\\+\\+|=\\s*score\\s*\\+)",
       "flags": "",
       "points": 0,
       "status": "pending"

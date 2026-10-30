@@ -1,7 +1,7 @@
 {
   "id": "moshion-gravity",
   "title": "5.2.7 Worked Example: Falling Block",
-  "description": "A dynamic block falls under gravity and lands on a static floor. Read the example, then experiment. Follows 5.2.6 (Reading: Gravity).",
+  "description": "A dynamic block falls under gravity and lands on the static ground. Read the example, then experiment. Follows 5.2.6 (Reading: Gravity).",
   "type": "example",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Run it",
-      "instructions": "Click Run. The block falls and the floor catches it.",
+      "instructions": "Click Run. The block falls and the ground catches it.",
       "hints": [
         "Static sprites don't move; they push back on dynamic ones."
       ]
@@ -25,13 +25,13 @@
       "title": "Turn gravity off",
       "instructions": "Change `world.gravity.y = 10` to `world.gravity.y = 0`. The block floats.",
       "hints": [
-        "Gravity units are roughly pixels per second\u00b2."
+        "Gravity units are roughly pixels per second²."
       ]
     },
     {
       "id": "s3",
-      "title": "Make the floor dynamic",
-      "instructions": "Remove the `'static'` argument from the ground sprite. Both pieces fall now: that's why the floor is static.",
+      "title": "Make the ground dynamic",
+      "instructions": "Remove the `'static'` argument from the ground sprite. Both pieces fall now: that's why the ground is static.",
       "hints": [
         "new Sprite(x, y, w, h) defaults to dynamic. Add 'static' to anchor it."
       ]
@@ -44,5 +44,23 @@
         "Give them different x positions so they don't spawn on top of each other."
       ]
     }
-  ]
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "You changed the gravity",
+      "description": "Change `world.gravity.y` to a different number and run it, as step 2 says. Help: 5.2.6 (Reading: Gravity)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*(?!10\\s*;)[-\\d(]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
 }

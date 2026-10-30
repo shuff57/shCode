@@ -22,12 +22,24 @@
     },
     {
       "id": "s2",
-      "title": "Describe what you noticed",
-      "instructions": "For each value, describe in a sentence what it felt like: did the player fall, float, or drift upward? Fast or slow?",
+      "title": "Note what you noticed",
+      "instructions": "For each value, write one sentence as a `//` comment at the bottom of the code: did the player fall, float, or drift upward? Fast or slow?",
       "hints": []
     }
   ],
-  "requirements": [],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Gravity changed from the starting value",
+      "description": "Try a gravity value other than 10 in `world.gravity.y`. Help: 5.2.6 (Reading: Gravity)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*(?!10\\s*;)[-\\d(]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,

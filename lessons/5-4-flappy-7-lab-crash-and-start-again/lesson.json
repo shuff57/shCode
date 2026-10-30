@@ -76,10 +76,10 @@
     {
       "id": "r4",
       "title": "The crash freezes the world",
-      "description": "Gravity goes to 0 and the pipes' speed goes to 0, so nothing keeps moving. Help: 5.4.5 (Reading: A world that scrolls)",
+      "description": "Gravity goes to 0 and the pipes stop too (their vel.x goes to 0), so nothing keeps moving. The bird's own vel.x line from the starter does not count: it is the pipes that must stop. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*world\\.gravity\\.y\\s*=\\s*0(?![\\d.]))(?=[\\s\\S]*\\.vel\\.x\\s*=\\s*0(?![\\d.]))",
+      "pattern": "^(?=[\\s\\S]*world\\.gravity\\.y\\s*=\\s*0(?![\\d.]))(?=[\\s\\S]*(?:(?<!bird)\\.vel\\.x\\s*=\\s*0(?![\\d.])|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?(?<![\\w$.])(?!bird\\b)[\\w$]+(?:\\[[^\\]]*\\])?(?:\\.mate)?\\.x\\s*(?:-=|=\\s*[\\w$.\\[\\]]+\\.x\\s*-)))",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -90,7 +90,7 @@
       "description": "The play code, including the new pipes on the beat, sits inside if (playing), so nothing new happens after a crash. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?frameCount\\s*%|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\}\\s*else\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?frameCount\\s*%|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{?[^{}]{0,300}?\\breturn\\b[^{}]{0,20}\\}?[\\s\\S]*?frameCount\\s*%",
+      "pattern": "\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?frameCount\\s*%|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\}\\s*else\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?frameCount\\s*%|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{?[^{}]{0,300}?\\breturn\\b[^{}]{0,20}\\}?[\\s\\S]*?frameCount\\s*%|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*&&[^{};]*frameCount\\s*%|\\bif\\s*\\([^{};]*frameCount\\s*%[^{};]*&&\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"
