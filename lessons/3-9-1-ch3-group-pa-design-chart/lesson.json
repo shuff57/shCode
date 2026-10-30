@@ -192,6 +192,30 @@
         "label": "Worked example",
         "mermaid": "flowchart LR\n  A([Start]) --> B[set members to loadMembers]\n  B --> C[set dues to totalDues of members]\n  C --> D[/report dues/]\n  D --> E[set late to lateMembers of members and the day limit]\n  E --> F{is there another line in memberLines of members?}\n  F -- yes --> G[/put that line on screen/]\n  G --> F\n  F -- no --> H[markPaid of members and the name]\n  H --> I[/report the new dues for that name/]\n  I --> J[saveMembers of members]\n  J --> K([End])",
         "caption": "The pizza club plan (not one of the four problems). Each call is a box with the function's name; the loop is the diamond that goes back until the lines run out."
+      },
+      {
+        "id": "snack-shack",
+        "label": "Snack Shack",
+        "mermaid": "flowchart LR\n  A([Start]) --> B[set stock to loadStock]\n  B --> C[set total to totalValue of stock]\n  C --> D[/report the shop name and the total/]\n  D --> E[set low to lowStock of stock and reorder level]\n  E --> F{low has anything in it?}\n  F -- yes --> G[/report the low-stock list/]\n  F -- no --> H[/report that everything is stocked/]\n  G --> I[set lines to receiptLines of stock]\n  H --> I\n  I --> J{is there another line in receiptLines of stock?}\n  J -- yes --> K[/put the line on the screen/]\n  K --> J\n  J -- no --> L[sellItem of stock and Popcorn]\n  L --> M[/report the new total, totalValue of stock, and the new quantity of Popcorn/]\n  M --> N[saveStock of stock]\n  N --> O([End])",
+        "caption": "Snack Shack: the finished plan, one call per box. The diamond walks receiptLines until the lines run out, then the change is made and the list is saved."
+      },
+      {
+        "id": "lap-times",
+        "label": "Lap Times",
+        "mermaid": "flowchart LR\n  A([Start]) --> B[set meet to loadMeet]\n  B --> C[set seconds to totalSeconds of meet]\n  C --> D[/report the meet name and the seconds/]\n  D --> E[set slow to slowRunners of meet and target]\n  E --> F{slow has anything in it?}\n  F -- yes --> G[/report the slow runners/]\n  F -- no --> H[/report that nobody is slow/]\n  G --> I[set lines to resultLines of meet]\n  H --> I\n  I --> J{is there another line in resultLines of meet?}\n  J -- yes --> K[/put the line on the screen/]\n  K --> J\n  J -- no --> L[dropLap of meet and Ana]\n  L --> M[/report totalSeconds of meet and the laps Ana now has/]\n  M --> N[saveMeet of meet]\n  N --> O([End])",
+        "caption": "Lap Times: the finished plan, one call per box. The diamond walks resultLines until the lines run out, then the change is made and the list is saved."
+      },
+      {
+        "id": "seed-tray",
+        "label": "Seed Tray",
+        "mermaid": "flowchart LR\n  A([Start]) --> B[set tray to loadTray]\n  B --> C[set seeds to totalSeeds of tray]\n  C --> D[/report the tray label and the seeds/]\n  D --> E[set low to lowPackets of tray and level]\n  E --> F{low has anything in it?}\n  F -- yes --> G[/report the low-packet varieties/]\n  F -- no --> H[/report that every variety is stocked/]\n  G --> I[set labels to labelLines of tray]\n  H --> I\n  I --> J{is there another line in labelLines of tray?}\n  J -- yes --> K[/put the label on the screen/]\n  K --> J\n  J -- no --> L[sowPacket of tray and Basil]\n  L --> M[/report totalSeeds of tray and the packets Basil now has/]\n  M --> N[saveTray of tray]\n  N --> O([End])",
+        "caption": "Seed Tray: the finished plan, one call per box. The diamond walks labelLines until the lines run out, then the change is made and the list is saved."
+      },
+      {
+        "id": "library-cart",
+        "label": "Library Cart",
+        "mermaid": "flowchart LR\n  A([Start]) --> B[set cart to loadCart]\n  B --> C[set pages to totalPages of cart]\n  C --> D[/report the branch name and the pages/]\n  D --> E[set long to longTitles of cart and limit]\n  E --> F{long has anything in it?}\n  F -- yes --> G[/report the long titles/]\n  F -- no --> H[/report that nothing is long/]\n  G --> I[set spines to spineLines of cart]\n  H --> I\n  I --> J{is there another line in spineLines of cart?}\n  J -- yes --> K[/put the spine on the screen/]\n  K --> J\n  J -- no --> L[checkOut of cart and Dune]\n  L --> M[/report totalPages of cart and the copies Dune now has/]\n  M --> N[saveCart of cart]\n  N --> O([End])",
+        "caption": "Library Cart: the finished plan, one call per box. The diamond walks spineLines until the lines run out, then the change is made and the list is saved."
       }
     ]
   }

@@ -1,3 +1,16 @@
+Problem: Library Cart
+Partners:
+
+CONTRACTS (one row per function: name, takes in, gives back)
+- makeTitle(title, copies, pages) gives back one title
+- totalPages(cart) gives back copies times pages added up for the whole list
+- longTitles(cart, limit) gives back a NEW list of the titles whose pages is above the limit
+- spineLines(cart) gives back one line per title
+- checkOut(cart, title) lowers that title's copies by one, never below zero, and changes the list it was handed
+- saveCart(cart) saves the list to storage
+- loadCart() gives the saved list back
+
+PLAN
 START
 set cart to loadCart()
 set branch name and page limit

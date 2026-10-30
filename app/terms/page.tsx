@@ -20,7 +20,7 @@ export default function TermsPage() {
       <h2>What the Service is</h2>
       <p>
         shCode is a browser-based set of coding lessons for JavaScript and moSHion 3D modelling. It includes a code
-        editor, automatic checking of your work, a saved history of your versions, and optional AI help. It is free to
+        editor, automatic checking of your work, a saved history of your versions, and optional AI help from CODY. It is free to
         use, is in public beta, and changes over time.
       </p>
 
@@ -42,7 +42,7 @@ export default function TermsPage() {
       <h2>Grading and AI help</h2>
       <p>
         The automatic checker and the AI help can be wrong. Your teacher decides your grade and how AI help may be used
-        in your class. AI help has daily limits, and its answers are hints, not a replacement for your own work.
+        in your class. CODY may have daily limits, and its answers are hints, not a replacement for your own work.
       </p>
 
       <h2>Acceptable use</h2>

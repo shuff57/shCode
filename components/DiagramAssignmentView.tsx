@@ -38,6 +38,7 @@ const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   loading: () => <EditorPlaceholder height={570} />,
 });
 import { bestOfScore, bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
+import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
@@ -415,6 +416,7 @@ export default function DiagramAssignmentView({
       ) : null}
 
       <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} />
+      <GradeQuotaNote />
 
       <DiagramEditor
         value={doc}

@@ -136,3 +136,15 @@ not a quiet addition to this one.
 `saveTexture(name, dataUrl)` stores art a student drew, in that student's own
 browser storage. It never touches this directory, is never committed, and
 carries no license claim by this project.
+
+## 6. Original art in `assets/` and `textures/`
+
+`textures/runner.png`, `textures/runnerJump.png`, `assets/ground_tile.png` and
+`assets/grass_tile.png` (all under `public/moshion/`) are original work, drawn
+pixel by pixel from `scripts/make-moshion-runner-sheet.py` and
+`scripts/make-moshion-ground-tiles.py` (both deterministic, neither reads a
+source image), and are MIT like section 1. They sit in the `textures/` catalog
+beside the Kenney crops but are not covered by section 5;
+`make-moshion-textures.py` lists them separately as `ORIGINAL`. The `*Walk`,
+`*Fly`, `*Swim` and `*Crawl` strips are Kenney tiles placed side by side, still
+exact crops with nothing redrawn.

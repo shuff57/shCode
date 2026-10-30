@@ -14,7 +14,15 @@ import type { Lesson, StarterVariant } from './types';
 
 export type { StarterVariant };
 
-const key = (lessonId: string) => `shCode:starter:${lessonId}`;
+/** Fired on `window` when a problem is picked; detail is `{ lessonId, id }`. */
+export const STARTER_PICKED = 'shcode:starter-picked';
+
+/** Fired on `window` by the Flow Chart tabs to ask for a problem's starter. detail is
+ *  `{ lessonId, id, handled }`; StarterPicker sets `handled` when `id` is one of its problems. */
+export const STARTER_REQUESTED = 'shcode:starter-requested';
+
+export const starterKey = (lessonId: string) => `shCode:starter:${lessonId}`;
+const key = starterKey;
 
 /** The file a starter seeds. README.md is the graded file of a text lesson. */
 export const starterFile = (variant: StarterVariant) => variant.file ?? 'README.md';
@@ -38,6 +46,9 @@ export function rememberStarter(lessonId: string, id: string): void {
   } catch {
     /* not remembered */
   }
+  // The lesson's Flow Chart follows the pick (components/LabPlanChart.tsx), and
+  // it works even where storage is blocked, so tell it directly as well.
+  window.dispatchEvent(new CustomEvent(STARTER_PICKED, { detail: { lessonId, id } }));
 }
 
 /** Whether `text` is one of this lesson's starters, i.e. nothing typed yet.

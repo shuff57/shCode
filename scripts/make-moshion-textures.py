@@ -95,6 +95,37 @@ CATALOG = {
 }
 
 
+# Animations built from consecutive Kenney tiles: name -> (tile indices, hold).
+# Each output is a horizontal strip of exact 21x21 crops, the same strip
+# addAni()/saveTexture() slice, so `sprite.texture = 'batFly'` just moves.
+# Colour variants of the astronaut sit 30 tiles (one sheet row) apart.
+WALK = [26, 28, 27, 28]            # step, neutral, other step, neutral
+ANIMATED = {
+    "creatures": {
+        "batFly": ([441, 442, 443, 442], 6),
+        "beeFly": ([354, 355, 356, 355], 5),
+        "fishSwim": ([350, 351, 352, 351], 8),
+        "ladybugWalk": ([475, 476, 477, 476], 8),
+        "snailCrawl": ([414, 415, 416, 415], 14),
+    },
+    "characters": {
+        "playerWalk": ([i + 0 for i in WALK], 8),
+        "playerBlueWalk": ([i + 30 for i in WALK], 8),
+        "playerPinkWalk": ([i + 60 for i in WALK], 8),
+        "playerYellowWalk": ([i + 90 for i in WALK], 8),
+        "playerBeigeWalk": ([i + 120 for i in WALK], 8),
+    },
+}
+
+# Original art (NOT Kenney): drawn by make-moshion-runner-sheet.py into this directory.
+# name -> (group, frames, hold, frame size in px). The PNGs must already exist; the checker
+# verifies each is `frames` tiles wide.
+ORIGINAL = {
+    "runner": ("characters", 6, 4, 24),
+    "runnerJump": ("characters", 1, 4, 24),
+}
+
+
 def main():
     sheet = Image.open(SHEET).convert("RGBA")
     if sheet.size != (TILE * GRID, TILE * GRID):
@@ -117,6 +148,26 @@ def main():
             tile.save(path, optimize=True)
             written.append((group, name, index))
 
+    anim_meta = {}
+    for group, anims in ANIMATED.items():
+        for name, (indices, hold) in anims.items():
+            strip = Image.new("RGBA", (TILE * len(indices), TILE), (0, 0, 0, 0))
+            for k, index in enumerate(indices):
+                col, row = index % GRID, index // GRID
+                t = sheet.crop((col * TILE, row * TILE, (col + 1) * TILE, (row + 1) * TILE))
+                if not t.getbbox():
+                    raise SystemExit(f"tile {index} ({name}) is empty -- wrong index?")
+                strip.paste(t, (k * TILE, 0))
+            strip.save(os.path.join(OUT, f"{name}.png"), optimize=True)
+            written.append((group, name, indices[0]))
+            anim_meta[name] = (len(indices), hold, TILE)
+    for name, (group, frames, hold, size) in ORIGINAL.items():
+        path = os.path.join(OUT, f"{name}.png")
+        if not os.path.exists(path):
+            raise SystemExit(f"{name}.png missing -- run scripts/make-moshion-runner-sheet.py first")
+        written.append((group, name, -1))
+        anim_meta[name] = (frames, hold, size)
+
     with open(LICENSE, "r", encoding="utf-8") as fh:
         license_text = fh.read()
     with open(os.path.join(OUT, "LICENSE.txt"), "w", encoding="utf-8", newline="\n") as fh:
@@ -137,10 +188,17 @@ def main():
         "source": "Kenney -- Platformer Art: Pixel Redux (CC0 1.0)",
         "base": "/moshion/textures/",
         "groups": {
-            group: sorted(tiles) for group, tiles in CATALOG.items()
+            group: sorted(
+                list(CATALOG.get(group, {})) + list(ANIMATED.get(group, {}))
+                + [n for n, (g, _, _, _) in ORIGINAL.items() if g == group]
+            )
+            for group in CATALOG
         },
         "textures": {
-            name: {"file": f"{name}.png", "w": TILE, "h": TILE, "group": group}
+            name: dict(
+                {"file": f"{name}.png", "w": anim_meta.get(name, (1, 0, TILE))[2] * anim_meta.get(name, (1, 0, TILE))[0], "h": anim_meta.get(name, (1, 0, TILE))[2], "group": group},
+                **({"frames": anim_meta[name][0], "frameDelay": anim_meta[name][1]} if anim_meta.get(name, (1,))[0] > 1 else {}),
+            )
             for group, name, _ in written
         },
     }
@@ -155,7 +213,7 @@ def main():
             "window.MOSHION_TEXTURES = " + blob + ";\n"
         )
 
-    print(f"wrote {len(written)} textures to public/moshion/textures/")
+    print(f"wrote {len(written)} textures to textures/")
     for group in CATALOG:
         names = [n for g, n, _ in written if g == group]
         print(f"  {group:12} {len(names):2}  {' '.join(names)}")

@@ -100,5 +100,5 @@ function draw() {
 ## If you finish all three
 
 - Combine: a tall, parallaxing level with a mirroring player and a smooth `lerp` follow on both axes: that's a real platformer camera.
-- Read the moSHion `Camera` docs section. There may be a built-in `camera.follow(sprite)` that does much of this for you. How does yours compare?
+- Read the moSHion `Camera` docs section. moSHion has no built-in `camera.follow(sprite)`: the `camera.x = player.x` you wrote, with a `lerp` for smoothing, IS the technique. Some engines wrap it in a single call; here you built it yourself. What would you name your own `follow` helper, and what would it take as inputs?
 - Show a classmate your favorite stretch and explain why you tuned the lerp factor the way you did.

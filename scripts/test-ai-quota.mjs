@@ -423,6 +423,24 @@ try {
     );
     ok(!perIdentity.some(([k]) => k.includes('\x00GLOBAL')), 'no per-identity row touched the reserved identity');
   }
+
+  // -- unlimited on Workers AI -------------------------------------------------
+  {
+    console.log('\n--- a student is uncapped when the call goes through Workers AI ---');
+    const db = makeDB();
+    const env = { ...makeEnv(db, { dailyLimit: 3 }), AI: { run: async () => ({ response: 'A hint.' }) } };
+    let refused = 0;
+    let last = null;
+    for (let i = 0; i < 25; i++) {
+      last = await ask(env);
+      if (last.status !== 200) refused++;
+    }
+    ok(refused === 0, `25 requests past a cap of 3 all got through on Workers AI, ${refused} refused`);
+    ok(last.headers.get('X-RateLimit-Unlimited') === '1', 'the response says the student is uncapped');
+    const perIdentity = [...db.rows.entries()].filter(([k]) => k.startsWith('kid@example.test\u0000'));
+    ok(perIdentity.length === 0, 'no per-student counter row is written');
+    ok(countFor(db, '\x00GLOBAL', 'ai-help:global', DAY) === 25, 'the deploy-wide counter still counts every request');
+  }
 } finally {
   rmSync(out, { recursive: true, force: true });
 }

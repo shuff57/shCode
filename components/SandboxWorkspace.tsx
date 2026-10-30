@@ -465,7 +465,7 @@ export default function SandboxWorkspace() {
       : []),
     {
       key: 'help',
-      label: 'Help',
+      label: 'CODY',
       color: '#ffb86c',
       content: <AiHelpPanel lesson={lesson} />,
     },
