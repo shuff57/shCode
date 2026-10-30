@@ -51,7 +51,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "kb\\.presses\\s*\\([^)]*\\)\\s*&&[\\s\\S]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*&&[\\s\\S]*?kb\\.presses\\s*\\(",
+      "pattern": "kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?kb\\.presses\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=[^;{}]*?\\.colliding\\s*\\([^;{}]*;[\\s\\S]{0,200}?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\b\\1\\b|\\b\\1\\b[^{};]*?&&\\s*\\(?\\s*kb\\.presses\\s*\\()",
       "flags": "",
       "points": 0,
       "status": "pending"

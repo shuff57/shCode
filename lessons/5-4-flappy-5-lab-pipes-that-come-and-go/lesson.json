@@ -46,7 +46,7 @@
       "description": "A remainder test on the frame count builds a pair at a steady rate. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "frameCount\\s*%\\s*\\w+\\s*===?\\s*0",
+      "pattern": "frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -57,7 +57,7 @@
       "description": "The pair is built and pushed inside the beat's if, so a pair arrives once per beat, not every frame. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\((?=[^{};]*frameCount\\s*%\\s*\\w+\\s*===?\\s*0)[^{};]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]*?)(?:pipes\\.push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makePipe\\s*\\(\\s*\\)\\s*;?\\s*pipes\\.push\\s*\\(\\s*\\1\\s*\\))",
+      "pattern": "\\bif\\s*\\((?=[^{};]*frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0)[^{};]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)(?:pipes\\.push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makePipe\\s*\\(\\s*\\)\\s*;?\\s*pipes\\.push\\s*\\(\\s*\\1\\s*\\))",
       "flags": "",
       "points": 0,
       "status": "pending"

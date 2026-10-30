@@ -60,7 +60,7 @@
       "description": "The score goes up and the pipe is flagged in the same step. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)[\\s\\S]{0,60}?\\w+(?:\\[\\w+\\])?\\.passed\\s*=\\s*true|\\w+(?:\\[\\w+\\])?\\.passed\\s*=\\s*true[\\s\\S]{0,60}?(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)",
+      "pattern": "\\bif\\s*\\((?=[^{};]*\\.passed\\b)[^{};]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)(?:(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)[^{}]{0,60}?\\w+(?:\\[\\w+\\])?\\.passed\\s*=\\s*true|\\w+(?:\\[\\w+\\])?\\.passed\\s*=\\s*true[^{}]{0,60}?(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score))",
       "flags": "",
       "points": 0,
       "status": "pending"

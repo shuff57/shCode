@@ -22,8 +22,8 @@
     },
     {
       "id": "s2",
-      "title": "Turn gravity off",
-      "instructions": "Change `world.gravity.y = 10` to `world.gravity.y = 0`. The block floats.",
+      "title": "Turn gravity off, then up",
+      "instructions": "Change `world.gravity.y = 10` to `world.gravity.y = 0` and Run. The block floats. Then change it to `world.gravity.y = 20` and Run again. The block falls faster. Leave it at 20 for the next steps.",
       "hints": [
         "Gravity units are roughly pixels per second²."
       ]
@@ -31,7 +31,7 @@
     {
       "id": "s3",
       "title": "Make the ground dynamic",
-      "instructions": "Remove the `'static'` argument from the ground sprite. Both pieces fall now: that's why the ground is static.",
+      "instructions": "With gravity still on, remove the `'static'` argument from the ground sprite. Both pieces fall now: that's why the ground is static.",
       "hints": [
         "new Sprite(x, y, w, h) defaults to dynamic. Add 'static' to anchor it."
       ]
@@ -49,7 +49,7 @@
     {
       "id": "r1",
       "title": "You changed the gravity",
-      "description": "Change `world.gravity.y` to a different number and run it, as step 2 says. Help: 5.2.6 (Reading: Gravity)",
+      "description": "End with `world.gravity.y` set to a number other than 10 (step 2 uses 20). Help: 5.2.6 (Reading: Gravity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "world\\.gravity\\.y\\s*=\\s*(?!10\\s*;)[-\\d(]",
