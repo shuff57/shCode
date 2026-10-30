@@ -70,9 +70,10 @@ prefix is not always the unit (5.4 lives in `5-3-*`, 6.2 in `6-1-*`, 6.8 in `6-7
 | shCode | Screens | Closest CodeHS | Fit | What to compare |
 | --- | ---: | --- | --- | --- |
 | 5.1 Hello Sprite and Movement | 24 | GD 3.2 *Program Structure* (*Bounce Bounce Revolution*, *The Elevator*, *The Propeller*); GD 3.3 *Understanding the Canvas* (*Create a Canvas*, *Refreshing the Canvas*, *Shelving Boxes*); GD 3.4 *Your First Sprites* (*Sprite Face*, *Shapeshifter*, *Downhill Delights*, *Block Mario*) | **Exact** | Three of their lessons (20 activities) = our one module (24 screens). This is the row to run the lesson-layer experiment on: their three natural lesson boundaries are already the objective boundaries ours lacks. |
-| 5.2 Physics Feel | 15 | GD 3.5 *The Physics of Sprites* — *Physics Engines and Gravity*, *Collisions*, *Physical Properties*, *Motion*, each followed by an *Exploration:* exercise, closing on *Sprite Physics Reflection* | **Exact** | Their loop is Notes → Exploration ×4 → reflection. Ours is 15 screens. Compare whether our students get the same four hands-on probes. |
-| 5.3 Classes and Instances | 15 | VGD 14.1–14.5 *Objects*; CSA 3.3 *Anatomy of a Class*, 3.4 *Constructors* | Close | Nothing in GD (the game course) covers classes at all — they instantiate sprites without explaining them, which is exactly the "deliberate reveal" our 5.3 was built for. Confirm ours does the reveal and theirs never does. |
-| 5.4 Writing Your Own Classes | 21 | CSA 3.3–3.8; VGD 14.5 *Object Constructors* | Close | CSA has constructors, `this`, scope/access, class vs instance methods across six lessons. Ours covers methods, `this.sprite`, composition, arrays of instances. Compare `static`/class variables — do we have them? |
+| 5.2 Physics Feel | 16 | GD 3.5 *The Physics of Sprites* — *Physics Engines and Gravity*, *Collisions*, *Physical Properties*, *Motion*, each followed by an *Exploration:* exercise, closing on *Sprite Physics Reflection* | **Exact** | Their loop is Notes → Exploration ×4 → reflection. Ours is 16 screens. Compare whether our students get the same four hands-on probes. |
+| 5.3 Classes and Instances | 16 | VGD 14.1–14.5 *Objects*; CSA 3.3 *Anatomy of a Class*, 3.4 *Constructors* | Close | Nothing in GD (the game course) covers classes at all — they instantiate sprites without explaining them, which is exactly the "deliberate reveal" our 5.3 was built for. Confirm ours does the reveal and theirs never does. |
+| 5.4 Writing Your Own Classes | 22 | CSA 3.3–3.8; VGD 14.5 *Object Constructors* | Close | CSA has constructors, `this`, scope/access, class vs instance methods across six lessons. Ours covers methods, `this.sprite`, composition, arrays of instances, and the procedural-vs-object comparison. |
+| 5.5 Inside a Class | 20 | CSA 3.8 *Scope and Access*, and the class-variable lesson that closes the range the 5.4 row cites | Close | **Added 2026-10-29; not in the first audit.** Closes the `static`/class-variable question this table used to ask of 5.4: scope *inside* a class (3.2.24 taught local-vs-global only), access, `player.hit(enemy)`, `static spawned`, and a wave-spawner build. Unit 5 had no quiz at all before it. |
 
 ## Unit 6 — Physics and game systems
 
@@ -92,6 +93,16 @@ prefix is not always the unit (5.4 lives in `5-3-*`, 6.2 in `6-1-*`, 6.8 in `6-7
 | shCode | Screens | Closest CodeHS | Fit | What to compare |
 | --- | ---: | --- | --- | --- |
 | 7.1 Arcade Cabinet | 2 | GD 6.7.5 *Project - Final Level Design*; GD 6.8 *Level #2 Intro → Planning → Creating Level #2 → Playtesting and Feedback → Jumper Reflection*; VGD 17.1 *Project Prep and Development* | Partial | Their capstone close is a five-step ritual repeated on every project. Ours is 2 screens. See Pattern 4 in `CODEHS-INSPIRATION.md`. |
+
+### Unit 8 — not audited
+
+**8.1 Solid Shapes** (11 screens, 9 of them labs) is the course's last module and has **no row
+above**, by the brief that scoped this map ("Unit 8 (3D) is out of scope"). If a row is wanted,
+the fit is **None**: none of the five courses goes past a 2D canvas, and nothing in them teaches
+parametric solid modelling, a build history or an exported mesh. CodeHS's nearest neighbour is
+its separate three.js course, which was not among the six pulled.
+
+Nothing comes after 8.1.
 
 ---
 
