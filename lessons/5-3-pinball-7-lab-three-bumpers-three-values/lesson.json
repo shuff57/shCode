@@ -26,16 +26,17 @@
       "title": "Loop instead of naming one",
       "instructions": "Replace the single `bumpers[0]` check with a loop over every bumper in the array. Inside the loop, apply the same edge check you wrote in 5.3.7, but on the bumper's own `wasTouching`.",
       "hints": [
-        "`for (const b of bumpers) { ... }` visits each bumper in turn; the loop shape is the one from 3.3.5.",
+        "`for (const b of bumpers) { ... }` visits each bumper in turn; the loop shape is the one from 3.3.5. A counting loop, `for (let i = 0; i < bumpers.length; i++)`, works too: then the bumper is `bumpers[i]`.",
         "Inside the loop the check reads `touching && !b.wasTouching`."
       ]
     },
     {
       "id": "s3",
       "title": "Score the bumper's own worth",
-      "instructions": "Add the bumper's `worth` to the score instead of always adding 1, so the middle bumper is worth 5 and the bottom one 10. Run it: one hit on the bottom bumper should move the score by 10.",
+      "instructions": "Add the bumper's `worth` to the score instead of always adding 1, so the middle bumper is worth 5 and the bottom one 10. Run it and watch one drop: the ball rolls over all three bumpers, top to bottom, so the score should read 1, then 6, then 16. Press R and the next drop adds another 16.",
       "hints": [
-        "`score += b.worth;` — the number lives on the bumper, so the loop does not need to know it."
+        "`score += b.worth;` — the number lives on the bumper, so the loop does not need to know it.",
+        "If one drop adds much more than 16, a bumper's `wasTouching` is not being updated every frame."
       ]
     }
   ],
@@ -46,7 +47,7 @@
       "description": "One loop visits every bumper in the array instead of naming one. Help: 3.3.5 (Reading: Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:const|let)\\s+\\w+\\s+of\\s+bumpers\\s*\\)",
+      "pattern": "for\\s*\\(\\s*(?:const|let|var)\\s+\\w+\\s+of\\s+bumpers\\s*\\)|for\\s*\\([^;]*;\\s*\\w+\\s*<=?\\s*bumpers\\.length|bumpers\\.forEach\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -57,7 +58,7 @@
       "description": "The bumper's own `wasTouching` is updated on every frame, so every bumper can be hit once per contact. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\.wasTouching\\s*=\\s*\\w+\\s*;",
+      "pattern": "\\w+(?:\\[\\s*\\w+\\s*\\])?\\.wasTouching\\s*=\\s*(?!false\\b|true\\b)\\w+",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -68,7 +69,7 @@
       "description": "Different bumpers are worth different amounts, because the score uses each bumper's own `worth`. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "score\\s*\\+=\\s*\\w+\\.worth",
+      "pattern": "score\\s*(?:\\+=|=\\s*score\\s*\\+)\\s*\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth",
       "flags": "",
       "points": 0,
       "status": "pending"

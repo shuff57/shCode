@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 - What is the difference between "touching" and "just touched"?
 - How do you remember what happened on the previous frame?
 
-`colliding()` answers a question about **this frame**: are these two sprites touching *right now*? While the ball rests against the gold block, the answer is yes on every single frame.
+`colliding()` answers a question about **this frame**: are these two sprites touching *right now*? While the ball rests on the gold, the answer is yes on every single frame.
 
 ```js
 function draw() {
@@ -59,7 +59,7 @@ function setup() {
 
   ball = new Sprite(200, 40, 24);
   ball.color = 'deepskyblue';
-  ball.bounciness = 0.2;
+  ball.bounciness = 0;
 
   score = 0;
 }
@@ -82,9 +82,13 @@ function draw() {
 }
 ```
 
-**What you'll see:** the ball drops, lands on the gold bar, and the score reads **1** — not 600. Press R and it becomes 2. The ball resting on the bar for a thousand frames still counts once.
+**What you'll see:** the ball drops, lands on the gold bar, and the score reads **1** — not hundreds. Press R and it becomes 2, then 3, then 4. The ball resting on the bar for a thousand frames still counts once.
 
-**Try this:** delete the line `wasTouching = touching;` and run it again. The score now climbs once and stops, because `wasTouching` stays `false` forever — a different wrong answer from the same three lines. Both mistakes are worth seeing once: the first counts too often, the second never resets.
+This ball has `bounciness` 0, so it lands and stays. A ball that bounces touches the bar, leaves it, and touches it again, and every one of those touches starts a new contact, so each one counts. That is correct: a bounce really is a second hit. 5.3.6 shows it.
+
+**Try this:** delete the line `wasTouching = touching;` and run it again. The score races again, about sixty points a second while the ball sits on the bar, exactly like the version with no memory. Nothing ever changes `wasTouching`, so it stays `false`, `!wasTouching` is always `true`, and the test is just `touching`. A memory that is never updated remembers nothing.
+
+Then try the other way to get it wrong: move the update *inside* the `if`, by changing the `if` line to `if (touching && !wasTouching) { score += 1; wasTouching = touching; }` (with the separate `wasTouching = touching;` line still deleted). Now the first landing counts, and pressing R never adds another point: `wasTouching` becomes `true` on the first touch and nothing sets it back to `false`. That is why the update goes on its own line, outside the `if`, where it runs every frame.
 
 ---
 

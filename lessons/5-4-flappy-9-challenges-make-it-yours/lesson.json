@@ -1,7 +1,7 @@
 {
   "id": "5-4-flappy-9-challenges-make-it-yours",
   "title": "5.4.11 Challenges: Make it yours",
-  "description": "The game is complete. Change one rule of your own: a narrower gap, pipes that speed up with the score, or a best score that survives a crash. Pick one, or invent one.",
+  "description": "The game is complete. Change one rule of your own: a narrower gap, pipes that speed up with the score, a best score that survives a crash, or a wobbling gap. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Pick a rule and change it",
-      "instructions": "Choose one of the three challenges on the page above, or invent a rule of your own. Start from your finished 5.4.8.",
+      "instructions": "Choose one of the three challenges on the page above. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from your finished 5.4.8.",
       "hints": [
         "Whatever you pick, press R afterwards and check the game still starts cleanly."
       ]
@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Name what you changed",
-      "instructions": "Write one sentence in the notes under the editor saying what your rule is and what would happen if you removed it.",
+      "instructions": "At the top of `script.js`, write one sentence as a `//` comment saying what your rule is and what would happen if you removed it.",
       "hints": [
         "A rule is something the game decides. 'The gap shrinks every five points' is a rule; 'I changed a colour' is not."
       ]
@@ -33,33 +33,11 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "The game gets harder as the score grows",
-      "description": "Something read in makePipe or the loop depends on the score. Help: 5.4.7 (Lab: Score a gap)",
+      "title": "Your rule is in the code",
+      "description": "One of the three challenges is there: something depends on the score (harder as you go, or a best score), or the pipes use random for more than the gap height. Help: 5.4.7 (Lab: Score a gap) and 5.4.6 (Lab: Pipes that come and go)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:score\\s*[*/%<>]|[*/%<>]\\s*score|min\\s*\\(|max\\s*\\()",
-      "flags": "",
-      "points": 0,
-      "status": "pending"
-    },
-    {
-      "id": "r2",
-      "title": "The best score survives a crash",
-      "description": "A second number is kept across rounds and updated when the score beats it. Help: 5.3.10 (Lab: Lose, and start again)",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "if\\s*\\(\\s*score\\s*>\\s*\\w+\\s*\\)",
-      "flags": "",
-      "points": 0,
-      "status": "pending"
-    },
-    {
-      "id": "r3",
-      "title": "Something about the pipes is random",
-      "description": "The pipes use random for more than the gap height. Help: 5.4.6 (Lab: Pipes that come and go)",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "random\\s*\\([^)]*\\)[\\s\\S]{0,200}?random\\s*\\(",
+      "pattern": "score\\s*[*/%<>]|[*/%<>]\\s*score\\b|\\bmin\\s*\\(|\\bmax\\s*\\(|random\\s*\\([\\s\\S]*?random\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

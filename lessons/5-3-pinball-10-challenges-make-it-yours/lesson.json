@@ -1,7 +1,7 @@
 {
   "id": "5-3-pinball-10-challenges-make-it-yours",
   "title": "5.3.12 Challenges: Make it yours",
-  "description": "The game is complete. Change one rule of your own: a second goal worth more, a bumper that slides, or a best score that survives a restart. Pick one, or invent one.",
+  "description": "The game is complete. Change one rule of your own: a second goal worth more, a bumper that slides, or a best score that survives a restart. Pick one, combine them, or invent one.",
   "type": "lesson",
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Pick a rule and change it",
-      "instructions": "Choose one of the three challenges on the page above, or invent a rule of your own. Read the whole challenge before you start typing: each one asks you to change something the game already does, not to add a new screen.",
+      "instructions": "Choose one of the three challenges on the page above, or more than one, or invent a rule of your own. Read the whole challenge before you start typing: each one asks you to change something the game already does, not to add a new screen.",
       "hints": [
         "Whatever you pick, press R afterwards and check the game still starts cleanly."
       ]
@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Name what you changed",
-      "instructions": "Write one sentence in the notes under the editor saying what your rule is and what would happen if you removed it. If you cannot say what would break, the rule may not be doing anything yet.",
+      "instructions": "Write one sentence as a `//` comment at the very top of your code saying what your rule is and what would happen if you removed it. If you cannot say what would break, the rule may not be doing anything yet.",
       "hints": [
         "A rule is something the game decides. 'The second goal is worth 5' is a rule; 'I added a sprite' is not."
       ]
@@ -33,33 +33,11 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "A second goal is on the table",
-      "description": "Either choice one or your own: more than one thing can be scored. Help: 5.3.8 (Lab: Three bumpers, three values)",
+      "title": "Your game has a rule of your own",
+      "description": "Any one challenge counts, or a rule you invented: a second thing that scores, something on the table that moves, a best score kept across restarts, or a score worth something other than 1. Help: 5.3.8 (Lab: Three bumpers, three values)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:goal2\\s*=\\s*new\\s+Sprite|goals\\s*\\.\\s*push)",
-      "flags": "",
-      "points": 0,
-      "status": "pending"
-    },
-    {
-      "id": "r2",
-      "title": "Something on the table moves",
-      "description": "A sprite is given a velocity of its own, so the table is not entirely still. Help: 5.2.13 (Reading: Forces vs Velocity)",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "\\.vel\\.[xy]\\s*=\\s*-?[1-9]",
-      "flags": "",
-      "points": 0,
-      "status": "pending"
-    },
-    {
-      "id": "r3",
-      "title": "The best score survives a restart",
-      "description": "A second number is kept across rounds and updated when the score beats it. Help: 5.3.9 (Reading: The state of the game)",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "if\\s*\\(\\s*score\\s*>\\s*\\w+\\s*\\)",
+      "pattern": "\\.colliding\\s*\\(\\s*(?!goal\\s*\\))[\\w.\\[\\]]+\\s*\\)|\\b\\w+\\.x\\s*(?:\\+=|-=)|\\b(\\w+)\\.x\\s*=\\s*\\1\\.x\\s*[+-]|\\.vel\\.[xy]\\s*=\\s*-?(?:[1-9]|0?\\.\\d*[1-9])|if\\s*\\(\\s*score\\s*>=?\\s*\\w+|if\\s*\\(\\s*\\w+\\s*<=?\\s*score\\b|\\bmax\\s*\\([^)]*\\bscore\\b|score\\s*\\+=\\s*(?!1\\b)[\\w.]+|score\\s*=\\s*score\\s*\\+\\s*(?!1\\b)[\\w.]+|\\bframeCount\\b",
       "flags": "",
       "points": 0,
       "status": "pending"

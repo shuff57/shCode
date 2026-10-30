@@ -17,7 +17,7 @@
       "title": "Notice the bird got past",
       "instructions": "In `draw()`, loop over the pipes. A pipe has been passed when its `x` is less than the bird's `x`. Show the score on screen, starting at 0.",
       "hints": [
-        "`for (const p of pipes) { ... }` visits each pipe; the pipes are already built, with a `passed` property that starts `false`.",
+        "`for (const p of pipes) { ... }` visits each pipe; the pipes are already built, with a `passed` property that starts `false`. The index loop from 5.4.6 works too, with `pipes[i]` in place of `p`.",
         "`if (p.x < bird.x && !p.passed) { ... }`"
       ]
     },
@@ -35,10 +35,10 @@
     {
       "id": "r1",
       "title": "Every pipe is checked",
-      "description": "A loop looks at each pipe in the array. Help: 5.3.8 (Lab: Three bumpers, three values)",
+      "description": "A loop looks at each pipe in the array (a for...of loop or an index loop). Help: 5.3.8 (Lab: Three bumpers, three values)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:const|let)\\s+\\w+\\s+of\\s+pipes\\s*\\)",
+      "pattern": "for\\s*\\([^)]*\\bpipes\\b[^)]*\\)[\\s\\S]{0,300}?bird\\.x",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -49,7 +49,7 @@
       "description": "The pipe's x is compared with the bird's x and the pipe's own flag. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\.x\\s*<\\s*bird\\.x\\s*&&\\s*!\\s*\\w+\\.passed",
+      "pattern": "(?:\\w+(?:\\[\\w+\\])?\\.x\\s*<=?\\s*bird\\.x|bird\\.x\\s*>=?\\s*\\w+(?:\\[\\w+\\])?\\.x)\\s*\\)?\\s*(?:&&|\\{\\s*if\\s*\\()\\s*(?:!\\s*\\w+(?:\\[\\w+\\])?\\.passed\\b|\\w+(?:\\[\\w+\\])?\\.passed\\s*===?\\s*false\\b)|(?:!\\s*\\w+(?:\\[\\w+\\])?\\.passed\\b|\\w+(?:\\[\\w+\\])?\\.passed\\s*===?\\s*false\\b)\\s*\\)?\\s*(?:&&|\\{\\s*if\\s*\\()\\s*(?:\\w+(?:\\[\\w+\\])?\\.x\\s*<=?\\s*bird\\.x|bird\\.x\\s*>=?\\s*\\w+(?:\\[\\w+\\])?\\.x)",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -60,7 +60,7 @@
       "description": "The score goes up and the pipe is flagged in the same step. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "score\\s*\\+=\\s*1[\\s\\S]{0,60}?\\w+\\.passed\\s*=\\s*true",
+      "pattern": "(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)[\\s\\S]{0,60}?\\w+(?:\\[\\w+\\])?\\.passed\\s*=\\s*true|\\w+(?:\\[\\w+\\])?\\.passed\\s*=\\s*true[\\s\\S]{0,60}?(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -1,7 +1,7 @@
 {
   "id": "5-2-13-a5-2-1-pinball-scene",
   "title": "5.2.18 Pinball Scene",
-  "description": "Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. Auto-graded.",
+  "description": "Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. Run plays it; the Check button has the AI mark the Quest cards.",
   "type": "assignment",
   "estimateMins": 45,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -40,7 +40,7 @@
     {
       "id": "s4",
       "title": "Add a reset key",
-      "instructions": "When a key is pressed, move the ball back to a starting position near the top of the canvas.",
+      "instructions": "When a key is pressed, move the ball back to a starting position near the top of the canvas. Then press Check, next to Run: the AI reads your code and marks the four Quest cards. Run plays the scene but does not mark the cards on this lab.",
       "hints": [
         "Search the moSHion docs drawer for kb.presses."
       ]

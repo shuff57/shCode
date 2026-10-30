@@ -1,4 +1,4 @@
-// 5.2.16 Lab: Reaching the Goal: a single-fire win check with delete().
+// 5.2.17 Lab: Reaching the Goal: a single-fire win check with delete().
 
 let player, ground, goal;
 
@@ -27,19 +27,21 @@ function draw() {
   else                        player.vel.x = 0;
 
   if (kb.presses(' ') && player.colliding(ground)) {
-    player.vel.y = -8;
+    player.vel.y = -7;
   }
 
   if (player.y < 200) {
     player.applyForce(0, -3);
   }
 
-  // STEP 1: Check whether the player has reached the goal, but only while
-  //         `goal` still exists (guard the whole block with if (goal) so
-  //         it can only fire once). Compute the distance between the
-  //         player and the goal (dx, dy, then the Pythagorean distance with Math.sqrt,
-  //         or use player.distanceTo(goal)).
-  //         When that distance is small enough, log a win message, call
-  //         goal.delete(), and set `goal` to null so the check can never
-  //         run again.
+  // STEP 1: Add if (goal) { } here. Steps 2 and 3 go inside its braces,
+  //         so the check only runs while the goal still exists.
+
+  // STEP 2: Inside it, work out the distance from the player to the goal:
+  //         dx = player.x - goal.x, dy = player.y - goal.y, then the
+  //         square root of dx * dx + dy * dy (as in 5.2.16).
+
+  // STEP 3: Still inside it, when the distance is less than 25, log a win
+  //         message, call goal.delete(), and set goal to null so the check
+  //         can never run again.
 }

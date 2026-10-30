@@ -7600,25 +7600,25 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "parts",
         "title": "Four or more parts of the game are named",
-        "description": "The student names at least four separate parts of Snake in their own words, such as the snake's cells, the food, steering, the beat that moves it, scoring, losing, and restarting. Credit any plausible list of four or more, however loosely worded. A part is something the game has or does; a list that only restates the rules in one lump is partial.",
+        "description": "The student names about four parts of Snake in their own words, such as the snake's cells, the food, steering, the beat that moves it, scoring, losing and restarting. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
         "points": 0
       },
       {
         "id": "remember",
         "title": "Says what the game must remember between frames",
-        "description": "The student names at least two things the game has to remember from one frame to the next, for example where every cell of the snake is, which way it is heading, where the food is, the score, and whether the round is still playing. Any two sensible items earn full credit.",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example where every cell of the snake is, which way it is heading, where the food is, the score, or whether the round is still being played. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
         "points": 0
       },
       {
         "id": "first",
         "title": "Picks a first thing to build and gives a reason",
-        "description": "The student says which part they would build first and gives any reason at all (it is the base the rest sits on, it is the easiest to test, nothing else works without it). Be generous: a short plausible reason is enough.",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
         "points": 0
       },
       {
         "id": "unsure",
         "title": "Names one part they are unsure how to build",
-        "description": "The student names one part they do not yet know how to do, such as growing the body or making the snake not bite itself, and says in a few words what is hard about it. Any honest, specific answer counts; 'nothing' or a blank is the only miss.",
+        "description": "The student names a part they do not yet know how to do, such as growing the body or making the snake not bite itself, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
         "points": 0
       }
     ],
@@ -7632,25 +7632,25 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "played",
         "title": "Says how many rounds they played and how it went",
-        "description": "The student says they played the finished game at least three times, or gives some concrete detail from their rounds (a score, a way they lost, how long the snake got). Credit any answer that shows they actually played. Only an answer with no sign of play is a miss.",
+        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how long the snake got). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
         "points": 0
       },
       {
         "id": "bug",
         "title": "Names one thing that surprised or broke",
-        "description": "The student names one thing that did not work as they expected, a bug or a rough moment, and describes it concretely enough that another person could look for it (what they did, what happened). If they found nothing, a specific thing they checked and found fine is acceptable as partial.",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
         "points": 0
       },
       {
         "id": "cause",
         "title": "Says which part of the code that touches",
-        "description": "The student connects what they saw to a part of the game or its code, such as the beat, the tail removal, the isBody search or the food placement, even loosely. Any plausible link counts; they do not have to be right about the cause.",
+        "description": "The student connects what they saw to some part of the game or its code, such as the beat, the tail removal, the isBody search or the food placement, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
         "points": 0
       },
       {
         "id": "change",
         "title": "Names one rule they would change and what it would do",
-        "description": "The student names one rule or number they would change (the speed, the grid size, wrapping at the walls, a bonus food) and says what the change would do to the game. Any specific change with an effect is full credit.",
+        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
         "points": 0
       }
     ],

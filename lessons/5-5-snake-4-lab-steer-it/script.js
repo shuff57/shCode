@@ -30,10 +30,11 @@ function draw() {
   if (playing && frameCount % 8 === 0) {
     head.col += dx;
     head.row += dy;
+    // STEP 3: if the new column or row is off the grid (below 0, or 20 or
+    //   more), set playing to false. Otherwise (else), move the block on
+    //   screen with the two lines below, so a dead block stays on its last cell.
     head.x = cellToPixel(head.col);
     head.y = cellToPixel(head.row);
-    // STEP 3: if the column or row is off the grid (below 0, or 20 or more),
-    //   set playing to false and keep the block on its last cell.
   }
 
   if (!playing) text('Game over', 150, 200);

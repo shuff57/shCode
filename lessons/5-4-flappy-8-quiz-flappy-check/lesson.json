@@ -37,7 +37,7 @@
       {
         "id": "q2-presses",
         "source": "5.4.2",
-        "question": "The bird hovers in place while the space bar is held. Which line was used?",
+        "question": "While the space bar is held, the bird climbs at one steady speed; let go and it falls. Which line was used?",
         "options": [
           "`kb.presses(' ')`",
           "`kb.pressing(' ')`",

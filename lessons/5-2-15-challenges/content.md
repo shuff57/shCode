@@ -1,6 +1,6 @@
 ## Challenge 1: Second Goal (medium)
 
-Add a second goal sprite somewhere harder to reach: above the wind zone is a good spot. Track how many goals have been collected. Only print `"All goals collected!"` once BOTH goals are gone, not after the first one.
+The starter is the one-goal scene from 5.2.17, so press Run first and touch the goal once. Then add a second goal sprite somewhere harder to reach: above the wind zone is a good spot. Track how many goals have been collected. Only print `"All goals collected!"` once BOTH goals are gone, not after the first one.
 
 **How it should work:**
 
@@ -17,11 +17,11 @@ let collected = 0;
 //   console.log('All goals collected!');
 ```
 
-Keep the manual, per-goal style from this module's lessons: two separate goal variables (or a small counter), not an array of goal objects. That refactor is coming later, in §5.4: don't do it here.
+Keep the manual, per-goal style from this module's lessons: two separate goal variables (or a small counter). Don't try to put the goals in a list of objects here; that comes later in the course, once you have classes.
 
 **Hints:**
 - A counter variable that starts at `0` and increments each time a goal is deleted works well.
-- Check the counter (`=== 2`) before printing the final message, and guard it the same single-fire way you guarded the first goal in 5.2.16.
+- Check the counter (`=== 2`) before printing the final message, and guard it the same single-fire way you guarded the first goal in 5.2.17.
 - Give the counter a "used up" state (like bumping it past 2) so the message can't print twice either.
 
 ---

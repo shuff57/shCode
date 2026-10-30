@@ -31,12 +31,12 @@ bird.vel.y -= 4;      // the bird leaves at 4 faster than before
 
 If the bird is falling hard, `-= 4` only slows the fall. `= -4` always gives the same flap, which is what a player's thumb expects.
 
-**Why `presses`.** 5.2.9 told the difference between a key being held and a key just going down. A held key with `kb.pressing` would reset the speed on every frame, so the bird would hover in place. `kb.presses` fires once when the key goes down, so one tap is one flap.
+**Why `presses`.** 5.2.9 told the difference between a key being held and a key just going down. A held key with `kb.pressing` would reset the speed on every frame, so the bird would climb at one steady speed for as long as the key is held and never fall. `kb.presses` fires once when the key goes down, so one tap is one flap.
 
 | | Fires | Flappy feel |
 | --- | --- | --- |
 | `kb.presses(' ')` | once, when the key goes down | one tap, one flap |
-| `kb.pressing(' ')` | every frame the key is held | the bird floats and cannot fall |
+| `kb.pressing(' ')` | every frame the key is held | the bird climbs steadily and cannot fall |
 
 **Two numbers tune the whole game.** The size of the gravity and the size of the flap together set how it feels. Raise gravity and the bird drops quickly, so a flap has to be bigger to keep up. Change one without the other and the game is either floaty or impossible.
 

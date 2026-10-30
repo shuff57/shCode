@@ -10,7 +10,7 @@
 
 **Try it:**
 
-```js live
+```js live console
 let ball, floor;
 
 function setup() {
@@ -32,7 +32,7 @@ function draw() {
 }
 ```
 
-Run it and watch `ball.y` climb every second as the ball falls. Then change `world.gravity.y = 10` to `world.gravity.y = 0` and rerun: the ball just floats. Try `-5` next: it drifts upward instead.
+Run it and read the console under the canvas: once a second it prints `ball.y`. The number grows while the ball falls (a bigger `y` is further down), then stops changing once the ball lands on the floor. Then change `world.gravity.y = 10` to `world.gravity.y = 0` and rerun: the ball just floats. Try `-5` next: it drifts upward instead.
 
 ---
 

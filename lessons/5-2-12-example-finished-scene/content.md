@@ -1,8 +1,10 @@
+**Read before `5.2.17 Lab: Reaching the Goal`.**
+
 **Goal:** See every concept from this module combined into one scene: gravity, a ground-gated jump, bounciness and friction, a wind zone, walls, and a single-fire win condition.
 
 ## Step 1: Run the finished scene
 
-```js live
+```js live console
 let player, ground, goal, leftWall, rightWall;
 
 function setup() {
@@ -32,7 +34,7 @@ function draw() {
   else                           player.vel.x = 0;
 
   if (kb.presses(' ') && player.colliding(ground)) {
-    player.vel.y = -8;
+    player.vel.y = -7;
   }
 
   if (player.y < 200) {
@@ -52,14 +54,26 @@ function draw() {
 }
 ```
 
-Move with the arrow keys, jump near the ground, drift upward through the wind zone above `y = 200`, bounce a little on landing, and touch the gold goal to win once.
+Move with the arrow keys, jump near the ground, drift upward through the wind zone above `y = 200`, bounce a little on landing, and touch the gold goal to win once. The console under the canvas prints `You win!` the moment you touch it.
 
-## Step 2: Trace the two guarded patterns
+## Step 2: How close is "touching the goal"?
+
+The goal has `collider = 'none'`, so nothing bumps into it. The scene asks a question instead: how far apart are the centres of the player and the goal?
+
+```js
+const dx = player.x - goal.x;              // how far apart, left to right
+const dy = player.y - goal.y;              // how far apart, up and down
+const dist = Math.sqrt(dx * dx + dy * dy); // the straight-line distance
+```
+
+This is the distance formula you met in 3.1.7 Worked Example: Refactoring calcDistance. There it was written `((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5`; `Math.sqrt(...)` and `** 0.5` are the same square root. `if (dist < 25)` then reads "close enough": the two centres are less than 25 pixels apart. A bigger number makes the goal easier to reach, a smaller one makes it harder.
+
+## Step 3: Trace the two guarded patterns
 
 Two lines in `draw()` are doing more work than they look like:
 
 ```js
-if (kb.presses(' ') && player.colliding(ground)) { player.vel.y = -8; }
+if (kb.presses(' ') && player.colliding(ground)) { player.vel.y = -7; }
 if (goal) { /* ... */ }
 ```
 

@@ -17,7 +17,7 @@
       "title": "Flap once per tap",
       "instructions": "In `draw()`, when the space bar is pressed, set the bird's vertical speed to a negative number so it goes up. Run it and tap: each tap should send the bird up in one arc.",
       "hints": [
-        "`kb.presses(' ')` is true on the frame the key goes down.",
+        "`kb.presses(' ')` is true on the frame the key goes down. `kb.presses('space')`, the key name from 5.1.13, works the same way.",
         "`bird.vel.y = -4;` sets the speed. Negative is up."
       ]
     },
@@ -38,7 +38,7 @@
       "description": "A press of the space bar sets the bird's upward speed. Help: 5.4.2 (Reading: Gravity and the flap)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "kb\\.presses\\s*\\(\\s*' '\\s*\\)[\\s\\S]{0,80}?bird\\.vel\\.y\\s*=\\s*-\\s*\\d",
+      "pattern": "kb\\.presses\\s*\\(\\s*(['\"])(?: |space)\\1\\s*\\)[\\s\\S]{0,80}?bird\\.vel\\.y\\s*=\\s*-\\s*\\d",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -60,7 +60,7 @@
       "description": "Leaving the top or bottom puts the position back. Help: 5.4.3 (Worked Example: The bird that flaps)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "bird\\.y\\s*(?:>|<)\\s*\\d+[\\s\\S]{0,120}?bird\\.y\\s*=\\s*\\d+",
+      "pattern": "bird\\.(?:pos\\.)?y\\s*(?:>=?|<=?)\\s*(?:\\d+|height)[\\s\\S]{0,120}?bird\\.(?:pos\\.)?y\\s*=\\s*(?:\\d+|height\\s*\\/\\s*2)",
       "flags": "",
       "points": 0,
       "status": "pending"

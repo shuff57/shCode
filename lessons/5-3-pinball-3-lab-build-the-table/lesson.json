@@ -32,17 +32,18 @@
     {
       "id": "s3",
       "title": "A ball worth watching",
-      "instructions": "Build the ball: a sprite with no width and height given falls as a circle. Give it a colour and a `bounciness` above 0.5, or it will thud and stop.",
+      "instructions": "Build the ball: a sprite with no width and height given falls as a circle. Start it at (70, 60), where the R key in the starter puts it back. Give it a colour and a `bounciness` above 0.5, or it will thud and stop.",
       "hints": [
-        "`ball.bounciness = 0.9;` — 5.2.11 explains what the number means."
+        "`ball = new Sprite(70, 60, 24);` then `ball.bounciness = 0.75;` — 5.2.11 explains what the number means."
       ]
     },
     {
       "id": "s4",
       "title": "Put a goal on the table",
-      "instructions": "Add a gold block with the same body type as the obstacles, somewhere the ball could reach. Nothing happens when they touch yet; the next lesson is about counting the touch.",
+      "instructions": "Add a gold block with the same body type as the obstacles and store it in `goal` (the starter already declares it). Put it where the ball really goes: run the sketch, watch the ball's path, and place the gold on it. Nothing happens when they touch yet; the next lesson is about counting the touch.",
       "hints": [
-        "It is one more `new Sprite(..., 'static')` with `color = 'gold'`."
+        "It is one more `new Sprite(..., 'static')`, stored as `goal = ...`, with `goal.color = 'gold';`.",
+        "If the ball never touches the gold, move the gold onto the ball's path. 5.3.3 Step 2 puts a gold bar at the low end of a tilted bumper, tilted the same way, so the ball rolls straight onto it."
       ]
     }
   ],
@@ -50,10 +51,10 @@
     {
       "id": "r1",
       "title": "Gravity is on",
-      "description": "`setup()` turns gravity on so the ball falls. Help: 5.2.6 (Reading: Gravity)",
+      "description": "`setup()` turns gravity on (a number other than 0) so the ball falls. Help: 5.2.6 (Reading: Gravity)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "world\\.gravity\\.y\\s*=",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*-?(?:[1-9]|0?\\.\\d*[1-9])",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -64,7 +65,7 @@
       "description": "Three or more sprites are built with the static body type, so they do not fall. Help: 5.2.6 (Reading: Gravity)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "'static'[\\s\\S]*'static'[\\s\\S]*'static'",
+      "pattern": "['\"]static['\"][\\s\\S]*['\"]static['\"][\\s\\S]*['\"]static['\"]",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -86,7 +87,7 @@
       "description": "A static sprite is stored as the goal, in a colour the player can see. Help: 5.3.3 (Worked Example: The table and the goal)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "goal\\s*=\\s*new\\s+Sprite\\s*\\([^)]*'static'",
+      "pattern": "goal\\s*=\\s*new\\s+Sprite\\s*\\([^)]*['\"]static['\"]|goal\\.collider\\s*=\\s*['\"]static['\"]",
       "flags": "",
       "points": 0,
       "status": "pending"

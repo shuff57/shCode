@@ -64,6 +64,8 @@ function draw() {
     // STEP 2: in the same place, freeze the world (gravity, bird, every pipe).
   }
 
-  // STEP 3: when R is pressed, put back everything a round owns, including
-  //   the pipes. Then draw 'Game over' while the flag is false.
+  // STEP 3: wrap the play code above (from the flap down to here) in
+  //   if (playing) { ... }, and draw 'Game over' in its else.
+  // STEP 4: after that if/else, when R is pressed, put back everything a
+  //   round owns, including the pipes.
 }

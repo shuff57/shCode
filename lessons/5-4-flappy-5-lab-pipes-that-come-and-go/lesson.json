@@ -46,7 +46,7 @@
       "description": "A remainder test on the frame count builds a pair at a steady rate. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "frameCount\\s*%\\s*\\d+\\s*===?\\s*0",
+      "pattern": "frameCount\\s*%\\s*\\w+\\s*===?\\s*0",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -54,10 +54,10 @@
     {
       "id": "r2",
       "title": "Every pair goes into the array",
-      "description": "The new pipe is pushed so the game can find it again. Help: 5.4.5 (Reading: A world that scrolls)",
+      "description": "The pair built on the beat is pushed into the array so the game can find it again. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "pipes\\.push\\s*\\(\\s*makePipe\\s*\\(\\s*\\)\\s*\\)",
+      "pattern": "frameCount\\s*%\\s*\\w+\\s*===?\\s*0\\s*\\)\\s*\\{?[\\s\\S]{0,120}?pipes\\.push\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

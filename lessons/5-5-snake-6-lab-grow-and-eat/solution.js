@@ -3,10 +3,17 @@
 const CELL = 20;
 let segments, food, dx, dy, score, playing;
 
+// New since 5.5.4: the snake is an array, segments, with the head at
+// segments[0]. Every function below is finished except step(), and step()
+// is where all of your work goes.
+
+// Turns a column or row number into the pixel at the middle of that cell.
 function cellToPixel(n) {
   return n * CELL + CELL / 2;
 }
 
+// Builds one green cell of the body at (col, row) and gives it back.
+// The sprite remembers its own cell in .col and .row.
 function makeSegment(col, row) {
   const s = new Sprite(cellToPixel(col), cellToPixel(row), CELL - 2, CELL - 2, 'static');
   s.color = 'limegreen';
@@ -15,6 +22,7 @@ function makeSegment(col, row) {
   return s;
 }
 
+// Builds one red food cell at a random spot and gives it back.
 function makeFood() {
   const col = floor(random(20));
   const row = floor(random(20));
@@ -25,13 +33,15 @@ function makeFood() {
   return f;
 }
 
+// One move of the snake, run on the beat. This is the move from 5.5.4's
+// draw(), now in a function of its own: work out the next cell, stop at a wall.
 function step() {
   const head = segments[0];
   const col = head.col + dx;
   const row = head.row + dy;
   if (col < 0 || col >= 20 || row < 0 || row >= 20) {
     playing = false;
-    return;
+    return;   // return ends step() here: nothing below it runs
   }
 
   segments.unshift(makeSegment(col, row));
@@ -45,6 +55,8 @@ function step() {
   }
 }
 
+// Clears the old snake and food, then builds a three-cell snake, new food,
+// and a fresh direction, score and flag. setup() and the R key both use it.
 function startRound() {
   for (const s of segments) s.delete();
   if (food) food.delete();

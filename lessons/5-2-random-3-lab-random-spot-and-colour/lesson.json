@@ -72,7 +72,7 @@
       "hint": "The top of random(1, 7) is never reached, so floor of it is 1 to 6.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "floor\\s*\\(\\s*random\\s*\\(\\s*1\\s*,\\s*7\\s*\\)\\s*\\)|floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\)\\s*\\+\\s*1|1\\s*\\+\\s*floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\)|floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\+\\s*1\\s*\\)|floor\\s*\\(\\s*Math\\.random\\s*\\(\\s*\\)\\s*\\*\\s*6\\s*\\)\\s*\\+\\s*1",
+      "pattern": "floor\\s*\\(\\s*random\\s*\\(\\s*1\\s*,\\s*(?:7|6\\s*\\+\\s*1)\\s*\\)\\s*\\)|floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\)\\s*\\+\\s*1|1\\s*\\+\\s*floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\)|floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\+\\s*1\\s*\\)|floor\\s*\\(\\s*Math\\.random\\s*\\(\\s*\\)\\s*\\*\\s*6\\s*\\)\\s*\\+\\s*1",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -84,7 +84,7 @@
       "hint": "floor(random(colors.length)) is a whole number from 0 to 4.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:floor|round|int|trunc)\\s*\\(\\s*(?:Math\\.)?random\\s*\\(\\s*(?:\\)\\s*\\*\\s*)?[A-Za-z_]\\w*\\.length|random\\s*\\(\\s*[A-Za-z_]\\w*\\s*\\)",
+      "pattern": "(?:floor|round|int|trunc)\\s*\\(\\s*(?:Math\\.)?random\\s*\\(\\s*(?:\\)\\s*\\*\\s*|0\\s*,\\s*)?[A-Za-z_]\\w*\\.length|random\\s*\\(\\s*[A-Za-z_]\\w*\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"

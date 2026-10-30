@@ -66,10 +66,11 @@ function setup() {
 
   goal = new Sprite(200, 250, 200, 20, 'static');
   goal.color = 'gold';
+  goal.rotation = 10;    // tilted, so the ball rolls off the end
 
   ball = new Sprite(200, 40, 24);
   ball.color = 'deepskyblue';
-  ball.bounciness = 0.2;
+  ball.bounciness = 0;
 
   score = 0;
   playing = true;
@@ -109,9 +110,9 @@ function draw() {
 }
 ```
 
-**What you'll see:** the ball drops, touches the gold bar once (score 1), and keeps falling. Once it passes the bottom the words "Game over" replace the play area. Press R and a fresh round starts at score 0.
+**What you'll see:** the ball drops onto the gold bar (score 1), rolls down it and off the end, and falls past the bottom of the canvas. About three seconds in, the words "Game over" replace the play area, with the final score under them. Press R and a fresh round starts at score 0.
 
-**Try this:** remove `ball.vel.y = 0;` from the restart and press R a few times. Eventually the ball reappears already travelling fast, overshoots the bar, and the round ends almost at once. Nothing in the code says "carry the old speed over" — the old speed was simply never cleared.
+**Try this:** remove `ball.vel.y = 0;` from the restart. Let a round end, wait a second or two on the Game over screen, then press R. The ball reappears at the top already falling fast — it still has the speed it built up falling off the table — so it slams onto the bar within a few frames and the round ends in about half the usual time. Wait longer before pressing R and it comes back faster still. Nothing in the code says "carry the old speed over" — the old speed was simply never cleared.
 
 ---
 

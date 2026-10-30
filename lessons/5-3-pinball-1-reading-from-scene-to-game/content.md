@@ -29,16 +29,23 @@ function setup() {
   new Canvas(400, 400);
   world.gravity.y = 10;
 
-  bumper = new Sprite(200, 160, 140, 16, 'static');
-  bumper.color = 'sienna';
-  bumper.rotation = -12;
+  // two walls keep the ball on the table
+  const leftWall = new Sprite(5, 200, 10, 400, 'static');
+  leftWall.color = 'gray';
+  const rightWall = new Sprite(395, 200, 10, 400, 'static');
+  rightWall.color = 'gray';
 
-  floor = new Sprite(200, 385, 400, 20, 'static');
+  bumper = new Sprite(140, 115, 200, 14, 'static');
+  bumper.color = 'sienna';
+  bumper.rotation = 14;
+
+  // the floor stops short of the left wall: that gap is the drain
+  floor = new Sprite(250, 385, 280, 20, 'static');
   floor.color = 'gray';
 
-  ball = new Sprite(200, 40, 24);
+  ball = new Sprite(70, 60, 24);
   ball.color = 'deepskyblue';
-  ball.bounciness = 0.9;
+  ball.bounciness = 0.75;
 }
 
 function draw() {
@@ -48,15 +55,15 @@ function draw() {
   text('press R to drop the ball again', 20, 28);
 
   if (kb.presses('r')) {
-    ball.x = 200;
-    ball.y = 40;
+    ball.x = 70;
+    ball.y = 60;
     ball.vel.x = 0;
     ball.vel.y = 0;
   }
 }
 ```
 
-**What you'll see:** the ball falls, hits the bumper, and rolls down to the floor. Press R and it starts again. That is the whole scene from 5.2.18 — and there is still no goal, no score, no way to lose, and no reason to press R except to watch it fall again.
+**What you'll see:** the ball drops onto the bumper and rolls down it, flies off the end into the right wall, bounces across the floor, and falls out through the gap at the bottom left. That gap is the **drain**. Press R and it starts again. This is the same kind of scene you built in 5.2.18, with two walls and a drain added — and there is still no goal, no score, nothing happens when the ball drains, and no reason to press R except to watch it fall again.
 
 **Try this:** let the ball settle, then look at what is missing. If you wanted to tell a friend how well you just did, what number would you show them? That number does not exist yet. 5.3.3 adds it.
 
@@ -69,3 +76,4 @@ function draw() {
 | **scene** | sprites plus physics: something to look at that obeys the rules |
 | **game** | a scene with a goal, a score, a way to lose and a way to start again |
 | **round** | one attempt, from starting the ball to losing it |
+| **drain** | the gap at the bottom of the table; a ball that falls through it has left the table |

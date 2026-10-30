@@ -18,7 +18,7 @@ function setup() {
 
   ball = new Sprite(200, 40, 24);
   ball.color = 'deepskyblue';
-  ball.bounciness = 0.2;
+  ball.bounciness = 0;
 
   score = 0;
 }
@@ -39,7 +39,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** the ball lands and the score races — several hundred within a second — and it keeps going while the ball sits on the bar. The number is not measuring "hits". It is measuring **frames spent touching**, which is a different quantity that no one asked for.
+**What you'll see:** the ball lands and the score races — about sixty more every second the ball sits there — and it never stops, because the ball never leaves the bar. The number is not measuring "hits". It is measuring **frames spent touching**, which is a different quantity that no one asked for.
 
 The tell is the speed. A correct score changes once per hit. A number that flies is counting time.
 
@@ -57,7 +57,7 @@ function setup() {
 
   ball = new Sprite(200, 40, 24);
   ball.color = 'deepskyblue';
-  ball.bounciness = 0.2;
+  ball.bounciness = 0;
 
   score = 0;
   wasTouching = false;
@@ -79,7 +79,9 @@ function draw() {
 }
 ```
 
-**What you'll see:** one point per landing. Press R three times and the score reads 3.
+**What you'll see:** one point per landing. The first landing makes the score 1; press R three times, letting the ball land each time, and it reads 4.
+
+**Try this:** change `ball.bounciness = 0;` to `ball.bounciness = 0.2;` and run Step 2 again. Now each drop adds **3**, not 1: the ball lands, bounces up off the bar, lands again, bounces once more, and only then settles. Each of those is a separate touch, so each one counts. The score is still counting events, not frames — a bounce is a real second hit.
 
 ## Step 3: The same shape, for a different thing
 

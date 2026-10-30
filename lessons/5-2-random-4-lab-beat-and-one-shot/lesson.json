@@ -60,7 +60,7 @@
       "hint": "Inside the if, write on = !on; so it flips each beat.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "frameCount\\s*%\\s*\\d+\\s*\\)?\\s*===?\\s*0\\s*\\)\\s*\\{?[\\s\\S]{0,160}?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false)",
+      "pattern": "frameCount\\s*%\\s*\\d+\\s*\\)?\\s*===?\\s*0\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false)|\\{\\s*if\\s*\\([^)]*\\)\\s*\\{?[^{}]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false)|[^{};]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false))",
       "flags": "",
       "points": 0,
       "status": "pending"

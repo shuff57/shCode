@@ -1,7 +1,7 @@
 {
   "id": "5-2-11-lab-reaching-the-goal",
-  "title": "5.2.16 Lab: Reaching the Goal",
-  "description": "A single-fire win check with delete(). Auto-graded.",
+  "title": "5.2.17 Lab: Reaching the Goal",
+  "description": "Use the finished scene's distance check to win once with delete(). Auto-graded.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -14,10 +14,28 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Detect the goal, once",
-      "instructions": "Guard the whole check with if (goal), so it can only run while the goal still exists. Compute the distance between the player and the goal (the Pythagorean distance: Math.sqrt(dx * dx + dy * dy), or player.distanceTo(goal) from the Sprite docs), and when it's small enough, delete the goal and set the goal variable to null so the check can never fire again.",
+      "title": "Guard the check",
+      "instructions": "At the bottom of draw(), add `if (goal) { }`. The next two steps go inside its braces, so the check only runs while the goal still exists.",
       "hints": [
-        "Search the moSHion docs drawer for sprite.delete()."
+        "5.2.16 Worked Example: The Finished Scene wraps its whole win check in `if (goal) { ... }`. Yours has the same shape."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Measure the distance",
+      "instructions": "Inside `if (goal)`, work out how far the player is from the goal: `dx` is the gap left to right (`player.x - goal.x`), `dy` is the gap up and down, and the distance is the square root of `dx * dx + dy * dy`. Keep it in a variable such as `dist`.",
+      "hints": [
+        "This is the distance formula from 3.1.7 Worked Example: Refactoring calcDistance. `Math.sqrt(...)` and `** 0.5` both take the square root.",
+        "Three lines, as in 5.2.16: `const dx = player.x - goal.x;`, then the same for `dy`, then `const dist = Math.sqrt(dx * dx + dy * dy);`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Win once",
+      "instructions": "Still inside `if (goal)`, when the distance is less than 25, log a win message, call `goal.delete()`, then set `goal` to `null`. Run it and walk into the gold block: the message prints once and the goal is gone for good.",
+      "hints": [
+        "5.2.15 Reading: Cleanup and Delete deletes a sprite and then sets its variable to `null`, so the guard is false from then on.",
+        "`if (dist < 25) { ... }` holds the three lines: the `console.log`, `goal.delete();` and `goal = null;`."
       ]
     }
   ],
@@ -25,11 +43,11 @@
     {
       "id": "r1",
       "title": "Guard the check on the goal still existing",
-      "description": "The win check is wrapped in if (goal) so it stops running once the goal is gone. Help: 5.2.15 (Cleanup and Delete)",
+      "description": "The win check is wrapped in if (goal) so it stops running once the goal is gone. Help: 5.2.16 (Worked Example: The Finished Scene)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*\\(?\\s*goal\\s*\\)?\\s*\\)",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*goal\\s*\\)?\\s*(?:\\)|&&|!==?\\s*null\\b)",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -37,11 +55,11 @@
     {
       "id": "r2",
       "title": "Compute the distance to the goal",
-      "description": "The distance between player and goal is computed: Math.sqrt(dx * dx + dy * dy), Math.hypot(dx, dy), dist(...), or player.distanceTo(goal). Help: 5.2.15 (Cleanup and Delete)",
+      "description": "The distance between player and goal is computed: Math.sqrt(dx * dx + dy * dy), ** 0.5, Math.hypot(dx, dy), dist(...), or player.distanceTo(goal). Help: 5.2.16 (Worked Example: The Finished Scene)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "Math\\.(?:sqrt|hypot)\\s*\\(|\\bdist\\s*\\(|\\.distanceTo\\s*\\(",
+      "pattern": "Math\\.(?:sqrt|hypot)\\s*\\(|\\*\\*\\s*0?\\.5\\b|\\bdist\\s*\\(|\\.distanceTo\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -49,7 +67,7 @@
     {
       "id": "r3",
       "title": "Delete the goal on arrival",
-      "description": "When the player reaches the goal, goal.delete() is called. Help: 5.2.15 (Cleanup and Delete)",
+      "description": "When the player reaches the goal, goal.delete() is called. Help: 5.2.15 (Reading: Cleanup and Delete)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -61,7 +79,7 @@
     {
       "id": "r4",
       "title": "Clear the goal variable",
-      "description": "After deleting, goal is set to null so the win check can never fire twice. Help: 5.2.15 (Cleanup and Delete)",
+      "description": "After deleting, goal is set to null so the win check can never fire twice. Help: 5.2.15 (Reading: Cleanup and Delete)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

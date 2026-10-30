@@ -38,4 +38,4 @@ function draw() {
 
 1. Change `world.gravity.y = 20` to `40` and tap. The same flap now barely holds the bird up.
 2. Set the flap to `-8`. The bird now shoots nearly to the top of the screen on every tap.
-3. Replace `kb.presses` with `kb.pressing` and hold the bar. The bird freezes in a hover, because the speed is reset on every frame.
+3. Replace `kb.presses` with `kb.pressing` and hold the bar. The bird climbs at one steady speed and never falls, because the speed is reset to -4 on every frame. Keep holding and it leaves the top, comes back to the middle, and climbs again. Let go and it falls.

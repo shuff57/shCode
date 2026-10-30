@@ -49,7 +49,7 @@ while (isBody(col, row)) {
 
 One helper, two jobs. If you had written the loop twice, a later fix would have to be made twice too.
 
-**A small simplification.** The test counts the tail's cell as body even though the tail is about to move away. Real Snake lets you follow your own tail. That is a challenge for the end of the module.
+**A small simplification.** The test counts the tail's cell as body even though the tail is about to move away. Real Snake lets you follow your own tail. This version is a little stricter, which only ends a few rounds one step early, and it keeps the search to one simple loop.
 
 ---
 

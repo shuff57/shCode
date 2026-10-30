@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Move by adding a head and removing a tail",
-      "instructions": "In `step()`, replace the last two lines with the trick from 5.5.5: put a new head at the front of `segments` with `unshift`, then `pop` the tail and delete it. Run it: the whole three-cell snake should slide forward.",
+      "instructions": "The starter has five functions. Every one except `step()` is finished; the comment above each says what it does, and `step()` is the move from 5.5.4's `draw()`, now in a function of its own. Your work is all in `step()`. Replace its last two lines with the trick from 5.5.5: put a new head at the front of `segments` with `unshift`, then `pop` the tail and delete it. Run it: the whole three-cell snake should slide forward.",
       "hints": [
         "`segments.unshift(makeSegment(col, row));`",
         "`const tail = segments.pop();` then `tail.delete();`"
@@ -57,7 +57,7 @@
       "description": "The last cell leaves the array and the screen. Help: 5.5.5 (Reading: A body that grows)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "segments\\.pop\\s*\\(\\s*\\)[\\s\\S]{0,80}?\\.delete\\s*\\(\\s*\\)",
+      "pattern": "segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1)[\\s\\S]{0,80}?\\.delete\\s*\\(\\s*\\)|\\.delete\\s*\\(\\s*\\)[\\s\\S]{0,80}?segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1)",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -68,7 +68,18 @@
       "description": "Reaching the food adds a point and makes a new piece. Help: 5.5.5 (Reading: A body that grows)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "score\\s*\\+=\\s*1[\\s\\S]{0,80}?food\\s*=\\s*makeFood\\s*\\(\\s*\\)",
+      "pattern": "(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)[\\s\\S]{0,80}?food\\s*=\\s*makeFood\\s*\\(\\s*\\)|food\\s*=\\s*makeFood\\s*\\(\\s*\\)[\\s\\S]{0,80}?(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "Eating keeps the tail, so the snake grows",
+      "description": "The tail is removed only on a step that does not eat (in the else, or after the eating branch has returned). Help: 5.5.5 (Reading: A body that grows)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\([^)]*\\bfood\\b[^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*\\}\\s*else\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(|if\\s*\\([^)]*\\bfood\\b[^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?\\breturn\\b(?:[^{}]|\\{[^{}]*\\})*\\}[\\s\\S]*?segments\\.(?:pop|splice)\\s*\\(|if\\s*\\([^)]*(?:\\bfood\\.\\w+\\s*!==?|!==?\\s*food\\.\\w+)[^)]*\\)\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -30,7 +30,7 @@ function draw() {
 }
 ```
 
-Run it. Gravity still pulls the player down, but the constant upward force slows the fall instead of stopping it: the player drifts down more gently than gravity alone would allow. Now replace that line with `player.vel.y = -3` and rerun: the player's vertical speed gets overridden every single frame instead, fighting gravity outright.
+Run it. Gravity still pulls the player down, but the constant upward force slows the fall instead of stopping it: the player drifts down more gently than gravity alone would allow. Now replace that line with `player.vel.y = -3` and rerun: the player rises at a steady speed straight off the top of the canvas and never comes back. Setting `.vel` every frame throws away whatever gravity did since the last frame, so gravity never gets a say.
 
 ---
 

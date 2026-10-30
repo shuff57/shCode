@@ -1,37 +1,47 @@
 // 5.3.12 Challenges: Make it yours (reference: all three).
+// My rules: a second goal worth 5, a bumper that slides, and a best score
+// that survives R. Without the best score, every restart would forget it.
 
-let ball, bumper, floor, goal, goal2, score, best, wasTouching, playing;
+let ball, bumper, floor, goal, goal2, slider, score, best, wasTouching, playing;
 let wasTouching2 = false;
+let slideStep = 2;
 
 function setup() {
   new Canvas(400, 400);
   world.gravity.y = 10;
 
-  bumper = new Sprite(200, 160, 140, 16, 'static');
+  // two walls keep the ball on the table
+  const leftWall = new Sprite(5, 200, 10, 400, 'static');
+  leftWall.color = 'gray';
+  const rightWall = new Sprite(395, 200, 10, 400, 'static');
+  rightWall.color = 'gray';
+
+  bumper = new Sprite(140, 115, 200, 14, 'static');
   bumper.color = 'sienna';
-  bumper.rotation = -12;
+  bumper.rotation = 14;
 
-  // Challenge 2: a bumper that slides, so it is dynamic rather than static.
-  const slider = new Sprite(200, 300, 60, 12);
-  slider.color = 'purple';
-  slider.bounciness = 0.2;
-  slider.vel.x = 3;
-
-  floor = new Sprite(200, 385, 400, 20, 'static');
+  // the floor stops short of the left wall: that gap is the drain
+  floor = new Sprite(250, 385, 280, 20, 'static');
   floor.color = 'gray';
 
-  goal = new Sprite(330, 250, 60, 60, 'static');
+  goal = new Sprite(286, 151, 100, 14, 'static');
   goal.color = 'gold';
+  goal.rotation = 14;
   goal.worth = 1;
 
-  // Challenge 1: a second goal, worth more.
-  goal2 = new Sprite(70, 250, 50, 50, 'static');
+  // Challenge 1: a second goal, worth more, on the ball's way to the drain.
+  goal2 = new Sprite(330, 250, 40, 40, 'static');
   goal2.color = 'orange';
   goal2.worth = 5;
 
-  ball = new Sprite(200, 40, 24);
+  // Challenge 2: a bumper that slides. It stays static, so gravity leaves it
+  // alone, and draw() moves it a little every frame.
+  slider = new Sprite(200, 230, 60, 12, 'static');
+  slider.color = 'purple';
+
+  ball = new Sprite(70, 60, 24);
   ball.color = 'deepskyblue';
-  ball.bounciness = 0.9;
+  ball.bounciness = 0.75;
 
   score = 0;
   best = 0;
@@ -50,6 +60,9 @@ function draw() {
     text('score: ' + score, 20, 60);
     textSize(14);
     text('best: ' + best, 20, 84);
+
+    slider.x += slideStep;
+    if (slider.x > 330 || slider.x < 70) slideStep = -slideStep;
 
     const touching = ball.colliding(goal);
     if (touching && !wasTouching) score += goal.worth;
@@ -77,8 +90,8 @@ function draw() {
     score = 0;
     wasTouching = false;
     wasTouching2 = false;
-    ball.x = 200;
-    ball.y = 40;
+    ball.x = 70;
+    ball.y = 60;
     ball.vel.x = 0;
     ball.vel.y = 0;
   }

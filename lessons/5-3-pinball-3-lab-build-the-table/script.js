@@ -11,8 +11,9 @@ function setup() {
   //   Give each one a name, like bumper, so the code can reach it later.
 
   // STEP 3: build a ball that falls, and make it genuinely bouncy.
+  //   Start it at (70, 60): that is where the R key below puts it back.
 
-  // STEP 4: build a gold goal block somewhere the ball could reach.
+  // STEP 4: build a gold goal block somewhere the ball really goes.
 
   score = 0;
 }
@@ -26,8 +27,8 @@ function draw() {
   text('score: ' + score, 20, 60);
 
   if (kb.presses('r')) {
-    ball.x = 200;
-    ball.y = 40;
+    ball.x = 70;
+    ball.y = 60;
     ball.vel.x = 0;
     ball.vel.y = 0;
   }

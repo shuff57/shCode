@@ -1,7 +1,7 @@
 {
   "id": "5-3-pinball-6-lab-score-one-point-per-touch",
   "title": "5.3.7 Lab: Score one point per touch",
-  "description": "The starter scores on every frame the ball touches the goal, so the number races. Fix it with a remembered last frame, so one landing is worth one point.",
+  "description": "The starter scores on every frame the ball touches the goal, so one roll across the gold is worth 33 points. Fix it with a remembered last frame, so one touch is worth one point.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Ask once per frame, not per test",
-      "instructions": "Run the starter and push the ball into the gold block: the score races. In `draw()`, check the touch **once**, into a variable, so the rest of the frame can look at the same answer.",
+      "instructions": "Run the starter and watch the ball roll across the gold bar: the score jumps by 33 for one crossing, one point for every frame the ball was touching. In `draw()`, check the touch **once**, into a variable, so the rest of the frame can look at the same answer.",
       "hints": [
         "`const touching = ball.colliding(goal);` — after this line, `touching` holds this frame's answer.",
         "Reread 5.3.5 (Reading: A collision is not an event) if the difference between this frame and last frame is not clear yet."
@@ -33,9 +33,10 @@
     {
       "id": "s3",
       "title": "Prove it",
-      "instructions": "Press R three times and let the ball land each time. The score should read exactly 3, no matter how long the ball rests on the block.",
+      "instructions": "Run it and let the ball finish its drop: the score reads 1. Press R three times, letting the ball cross the gold each time, and it should read exactly 4: one point per crossing, never 33.",
       "hints": [
-        "If it reads 1 and stops, the remembered variable is never updated."
+        "If it still jumps by dozens, the memory is never updated: check that `wasTouching = touching;` is in `draw()`.",
+        "If it reads 1 and stays there however often you press R, the update is inside the `if`, so it only ever stores `true`. Move it onto its own line after the `if`."
       ]
     }
   ],
@@ -46,7 +47,7 @@
       "description": "This frame's collision answer is stored in a variable, so the same answer is used for the test and the memory. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:const|let)\\s+\\w+\\s*=\\s*ball\\.colliding\\s*\\(\\s*goal\\s*\\)",
+      "pattern": "(?:const|let|var)\\s+\\w+\\s*=\\s*(?:ball\\.colliding\\s*\\(\\s*goal|goal\\.colliding\\s*\\(\\s*ball)\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -57,7 +58,7 @@
       "description": "The score goes up when the ball is touching now and was not touching a frame ago. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^)]*&&\\s*!\\s*\\w+\\s*\\)\\s*\\{[\\s\\S]{0,80}?score\\s*(?:\\+=|\\+\\+)",
+      "pattern": "if\\s*\\(\\s*(?:[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?\\s*&&\\s*(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false)|(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false)\\s*&&\\s*[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?)\\s*\\)\\s*\\{?[\\s\\S]{0,80}?score\\s*(?:\\+=|\\+\\+|=\\s*score\\s*\\+)|if\\s*\\(\\s*(?:[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?|(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false))\\s*\\)\\s*\\{?\\s*if\\s*\\(\\s*(?:(?:!\\s*[\\w.]+|[\\w.]+\\s*===?\\s*false)|[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?)\\s*\\)\\s*\\{?[\\s\\S]{0,80}?score\\s*(?:\\+=|\\+\\+|=\\s*score\\s*\\+)",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -65,10 +66,10 @@
     {
       "id": "r3",
       "title": "The memory is updated every frame",
-      "description": "Last frame's answer is replaced with this frame's answer on every frame, so the next touch is recognised. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "The variable that remembers last frame is given this frame's answer on every frame, so the next touch is recognised. Any name works. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\b(\\w*[Tt]ouching\\w*)\\s*=\\s*\\w+\\s*;",
+      "pattern": "(?:const|let|var)\\s+(\\w+)\\s*=\\s*(?:ball\\.colliding\\s*\\(\\s*goal|goal\\.colliding\\s*\\(\\s*ball)\\s*\\)[\\s\\S]*?!\\s*(\\w+)[\\s\\S]*?\\b\\2\\s*=\\s*\\1\\b(?!\\s*[=(.])|(?:const|let|var)\\s+(\\w+)\\s*=\\s*(?:ball\\.colliding\\s*\\(\\s*goal|goal\\.colliding\\s*\\(\\s*ball)\\s*\\)[\\s\\S]*?\\b(\\w+)\\s*===?\\s*false[\\s\\S]*?\\b\\4\\s*=\\s*\\3\\b(?!\\s*[=(.])",
       "flags": "",
       "points": 0,
       "status": "pending"

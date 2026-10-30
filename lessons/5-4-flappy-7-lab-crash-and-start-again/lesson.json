@@ -1,7 +1,7 @@
 {
   "id": "5-4-flappy-7-lab-crash-and-start-again",
   "title": "5.4.8 Lab: Crash, and start again",
-  "description": "Touching a pipe ends the round. Reuse the playing flag from 5.3.9, freeze the world when it ends, and make the restart clear the pipes as well as the bird and the score.",
+  "description": "Touching a pipe ends the round. Reuse the playing flag from 5.3.9: freeze the world when it ends, run the game only while the flag is true, and make the restart clear the pipes as well as the bird and the score.",
   "type": "lesson",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Touching a pipe ends the round",
-      "instructions": "Add a `playing` flag that starts `true`. When the bird is colliding with either half of a pipe, set it to `false`. Inside your pipe loop, test `bird.colliding(p)` and `bird.colliding(p.mate)`.",
+      "instructions": "Add a `playing` flag that starts `true`. Inside your pipe loop, test `bird.colliding(p)` and `bird.colliding(p.mate)`; when either one is true, set `playing` to `false`.",
       "hints": [
         "`let playing` goes next to `score`, and `playing = true;` goes in `setup()`.",
         "Both halves matter: the gap is between them, so a bird that hits only the bottom half must also lose."
@@ -24,18 +24,28 @@
     {
       "id": "s2",
       "title": "Freeze the world",
-      "instructions": "When the round ends, stop the bird and the pipes: set `world.gravity.y = 0`, `bird.vel.y = 0`, and every pipe's `vel.x` and its mate's to 0. Draw 'Game over' with the score.",
+      "instructions": "At the moment of the crash, inside the same `if` that sets the flag, stop everything that moves: set `world.gravity.y = 0`, `bird.vel.y = 0`, and every pipe's `vel.x` and its mate's `vel.x` to 0.",
       "hints": [
-        "Do it once, at the moment of the crash, inside the same `if` that sets the flag.",
+        "A second loop inside that `if` reaches every pipe: `for (const q of pipes) { q.vel.x = 0; q.mate.vel.x = 0; }`.",
         "The pipes stop because their speed becomes 0; the bird stops because gravity is off."
       ]
     },
     {
       "id": "s3",
+      "title": "Play only while playing",
+      "instructions": "Freezing stops what is already on the screen, but the code that makes new things still runs every frame: new pipes keep arriving on the beat, the space bar still flaps, and the score can still go up. Wrap the play code in `draw()` (the flap, the edge check, the new pipes on the beat, and both pipe loops) in `if (playing) { ... }`, the same shape as 5.3.10. In its `else`, draw 'Game over'. Run it and crash: no new pipe should appear and the score should stay where it was.",
+      "hints": [
+        "`if (playing) { ...all of the play code... } else { text('Game over', 130, 190); }`",
+        "Leave the score text above the `if`, so the score still shows after a crash."
+      ]
+    },
+    {
+      "id": "s4",
       "title": "Put back everything a round owns",
       "instructions": "When R is pressed, put the world back for a fresh round: delete every pipe and empty the array, reset the bird's position and speed, turn gravity back on, zero the score, and set `playing = true`.",
       "hints": [
         "Empty the array only after deleting each sprite: loop with `for (const p of pipes) { p.mate.delete(); p.delete(); }` and then `pipes = [];`.",
+        "Put the R check after the whole `if (playing) { ... } else { ... }`, not inside it, or it can never run once the round is over.",
         "Forget the pipes and the old ones are still sliding in the next round."
       ]
     }
@@ -47,7 +57,7 @@
       "description": "A variable that starts true is the game's state. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\b\\w+\\s*=\\s*true\\s*;",
+      "pattern": "(?<![\\w.$])\\w+\\s*=\\s*true\\b",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -58,8 +68,41 @@
       "description": "A collision with the bird sets the flag false. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "bird\\.colliding\\s*\\([\\s\\S]{0,160}?\\w+\\s*=\\s*false",
+      "pattern": "(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,160}?(?<![\\w.$])\\w+\\s*=\\s*false\\b",
       "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "The crash freezes the world",
+      "description": "Gravity goes to 0 and the pipes' speed goes to 0, so nothing keeps moving. Help: 5.4.5 (Reading: A world that scrolls)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*world\\.gravity\\.y\\s*=\\s*0(?![\\d.]))(?=[\\s\\S]*\\.vel\\.x\\s*=\\s*0(?![\\d.]))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "The game runs only while the flag is true",
+      "description": "The play code, including the new pipes on the beat, sits inside if (playing), so nothing new happens after a crash. Help: 5.3.9 (Reading: The state of the game)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\(\\s*\\w+\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{[\\s\\S]*?frameCount\\s*%|\\bif\\s*\\(\\s*(?:!\\s*\\w+|\\w+\\s*===?\\s*false)\\s*\\)[\\s\\S]{0,300}?\\breturn\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r6",
+      "title": "Game over shows when the round ends",
+      "description": "While the flag is false, the screen says Game over. Help: 5.3.9 (Reading: The state of the game)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:\\}\\s*else\\s*\\{?|if\\s*\\(\\s*(?:!\\s*\\w+|\\w+\\s*===?\\s*false)\\s*\\)\\s*\\{?)[\\s\\S]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over",
+      "flags": "i",
       "points": 0,
       "status": "pending"
     },
@@ -69,7 +112,7 @@
       "description": "Pressing R empties the array so the next round starts clean. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "kb\\.presses\\s*\\(\\s*'r'\\s*\\)[\\s\\S]{0,400}?(?:pipes\\s*=\\s*\\[\\s*\\]|pipes\\.length\\s*=\\s*0)",
+      "pattern": "kb\\.presses\\s*\\(\\s*['\"][rR]['\"]\\s*\\)[\\s\\S]{0,400}?(?:pipes\\s*=\\s*\\[\\s*\\]|pipes\\.length\\s*=\\s*0|pipes\\.splice\\s*\\(\\s*0\\s*[,)])|^(?=[\\s\\S]*kb\\.presses\\s*\\(\\s*['\"][rR]['\"]\\s*\\)\\s*\\)\\s*\\{?\\s*(\\w+)\\s*\\(\\s*\\))(?=[\\s\\S]*function\\s+\\1\\s*\\([^)]*\\)\\s*\\{[\\s\\S]{0,400}?(?:pipes\\s*=\\s*\\[\\s*\\]|pipes\\.length\\s*=\\s*0|pipes\\.splice\\s*\\(\\s*0\\s*[,)]))",
       "flags": "",
       "points": 0,
       "status": "pending"

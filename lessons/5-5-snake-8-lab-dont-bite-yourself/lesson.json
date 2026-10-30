@@ -44,10 +44,10 @@
     {
       "id": "r1",
       "title": "isBody searches the segments",
-      "description": "A loop goes through every segment and returns true when one matches. Help: 5.5.7 (Reading: Searching the array)",
+      "description": "A loop (for...of, or an index loop) goes through every segment and returns true when one matches. Help: 5.5.7 (Reading: Searching the array)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:const|let)\\s+\\w+\\s+of\\s+segments\\s*\\)[\\s\\S]{0,160}?return\\s+true",
+      "pattern": "for\\s*\\([^)]*\\bsegments\\b[^)]*\\)[\\s\\S]{0,200}?return\\s+true",
       "flags": "",
       "points": 0,
       "status": "pending"

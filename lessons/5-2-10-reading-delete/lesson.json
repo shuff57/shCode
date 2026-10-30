@@ -1,7 +1,7 @@
 {
   "id": "5-2-10-reading-delete",
   "title": "5.2.15 Reading: Cleanup and Delete",
-  "description": "delete() vs .visible. Read before 5.2.16 Lab: Reaching the Goal.",
+  "description": "delete() vs .visible. Read before 5.2.16 Worked Example: The Finished Scene.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",

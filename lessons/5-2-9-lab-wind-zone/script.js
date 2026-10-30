@@ -23,7 +23,7 @@ function draw() {
   else                        player.vel.x = 0;
 
   if (kb.presses(' ') && player.colliding(ground)) {
-    player.vel.y = -8;
+    player.vel.y = -7;
   }
 
   // STEP 1: Add a wind zone above y = 200. When the player's y position

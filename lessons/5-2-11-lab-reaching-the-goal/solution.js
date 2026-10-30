@@ -1,4 +1,4 @@
-// 5.2.16 Lab: Reaching the Goal: a single-fire win check with delete().
+// 5.2.17 Lab: Reaching the Goal: a single-fire win check with delete().
 
 let player, ground, goal;
 
@@ -27,7 +27,7 @@ function draw() {
   else                        player.vel.x = 0;
 
   if (kb.presses(' ') && player.colliding(ground)) {
-    player.vel.y = -8;
+    player.vel.y = -7;
   }
 
   if (player.y < 200) {

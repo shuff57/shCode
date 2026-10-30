@@ -10,7 +10,7 @@
 
 **Try it:**
 
-```js live
+```js live console
 let player, ground;
 
 function setup() {
@@ -36,7 +36,7 @@ function draw() {
 }
 ```
 
-Run it. `touching` prints every frame the player rests on the ground. Now hold the space bar down: `space pressed once` prints only on the very first frame of the press, not the whole time you hold it.
+Run it and read the console under the canvas. `touching` prints every frame the player rests on the ground. Now hold the space bar down: `space pressed once` prints only on the very first frame of the press, not the whole time you hold it.
 
 ---
 
