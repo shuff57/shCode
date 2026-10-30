@@ -7435,6 +7435,36 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       "sprite"
     ]
   },
+  "5-5-19-assignment-where-state-lives": {
+    "lessonTitle": "5.5.19 Your Turn: Where the state lives",
+    "prompt": "The student was asked, for a wave-spawner program, to say where each of three numbers should live — a local variable in a method, a property on `this`, or a class variable declared with `static` — and to give one sentence of reasoning for each. The three numbers: (1) the list of enemies still on the field, (2) one enemy's health, (3) how many enemies have ever been built. The right answers, in the course's terms: the list is a property of the scene (or a plain array at file scope, which is the same idea in this program) because it must outlive a frame and hold several objects; health is a property on `this` because each enemy needs its own copy; the all-time count is a class variable (`static`) because it belongs to the class rather than to any one enemy. Judge each criterion ONLY by whether the idea is present, however the student words it. Do not require the words 'local', 'property' or 'static' — 'belongs to the class', 'each one has its own', 'survives the call' and similar phrases are the same ideas. A student who places a number in a defensible but different place (for example, calling the enemy list a file-scope variable) is right enough for 'met', as long as the reason holds. Mark a criterion 'missing' only when the answer is absent or the reasoning is the opposite of the idea. Write each note for THIS student's own words: in a not-met note, name the exact phrase that causes the problem (quote at most a few words), say in plain words what it claims now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the answer for them. In a met note, say in one short phrase what in their answer satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Three answers, each with a reason",
+        "description": "All three numbers are answered, and each answer carries a reason rather than a bare label.",
+        "points": 0
+      },
+      {
+        "id": "r2",
+        "title": "The list of live enemies is placed and justified",
+        "description": "The list is placed somewhere it can outlive a frame and hold several objects, with a reason.",
+        "points": 0
+      },
+      {
+        "id": "r3",
+        "title": "One enemy's health is placed and justified",
+        "description": "Health is given to each enemy individually, with a reason that says so.",
+        "points": 0
+      },
+      {
+        "id": "r4",
+        "title": "The count of enemies ever built is placed and justified",
+        "description": "The all-time count is placed on the class rather than on an instance, with a reason.",
+        "points": 0
+      }
+    ]
+  },
   "6-6-13a-chart-the-state-machine": {
     "lessonTitle": "6.6.14 Plain English to Pseudocode: The Three-State Machine",
     "prompt": "The student was given plain-English steps for the lab \"6.6.14 Plain English to Pseudocode: The Three-State Machine\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs. **2.** In the title state: draw the title screen, then if space was pressed, change the state to play. **3.** In the play state: update the game, then if the player is dead, change the state to gameover. **4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title. **5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for drawing and updating, and SET for a state change. Name the three calls `drawTitle`, `updateGame` and `drawGameOver`. Number every line, including the indented ones and the END IF lines. Each keyword looks like this, in a different program: - `IF mode is \"menu\"` ... `ELSE IF mode is \"game\"` ... `END IF` (route by a value) - `CALL drawMenu` (call another function) - `IF enter is pressed` ... `END IF` (the check to leave) - `SET mode TO \"game\"` (a state change) Every state draws **first** and only Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, IF, ELSE, CALL, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, capitalisation and numbering. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",

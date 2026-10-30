@@ -1,0 +1,81 @@
+{
+  "id": "5-5-4-lab-locals-are-private",
+  "title": "5.5.4 Lab: Share one number between two methods",
+  "description": "`add()` declares its own `let step = 3`; `undo()` types the 3 again. A local in one method is invisible to the next, so the two numbers can drift. Put the step on `this` in the constructor and both methods use it.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Inside a Class",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Store the step on this",
+      "instructions": "In the constructor, store the number 3 on `this.step`. This makes it a property, so every method of the class can read it.",
+      "hints": [
+        "It is one line, next to `this.points = 0;`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Use it in add()",
+      "instructions": "Change `add()` so it adds `this.step` instead of its own local. Delete the `let step = 3;` line once nothing reads it.",
+      "hints": [
+        "`this.points += this.step;` reads the stored value instead of a local made for this call."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Use it in undo()",
+      "instructions": "Change `undo()` so it subtracts `this.step` too. Run it: press A three times, then U once, and the count should come back by exactly the same amount it went up.",
+      "hints": [
+        "Same line as `add()`, with `-=`."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The step is stored on this",
+      "description": "The constructor stores the step as a property, so both methods can read the same number. Help: 5.5.1 (Reading: Three places a variable can live)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "this\\.step\\s*=",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "add() uses this.step",
+      "description": "`add()` adds the stored step rather than a local of its own. Help: 5.5.1 (Reading: Three places a variable can live)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "add\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?this\\.points\\s*(?:\\+=|=\\s*this\\.points\\s*\\+)\\s*this\\.step",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "undo() uses the same this.step",
+      "description": "`undo()` subtracts the stored step, so the two methods cannot drift apart. Help: 5.5.1 (Reading: Three places a variable can live)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "undo\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?this\\.points\\s*(?:-=|=\\s*this\\.points\\s*-)\\s*this\\.step",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

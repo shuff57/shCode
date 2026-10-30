@@ -1,0 +1,63 @@
+{
+  "id": "5-5-9-lab-isalive",
+  "title": "5.5.9 Lab: Give the class its own isAlive()",
+  "description": "The scene asks `hp > 0` twice, by hand. Write `isAlive()` on the class and ask it instead, so the question 'is this enemy still up?' has exactly one answer in one place. What you see on screen does not change.",
+  "type": "lesson",
+  "estimateMins": 6,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Inside a Class",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write isAlive()",
+      "instructions": "Add an `isAlive()` method to the class. It takes no arguments and returns `true` while `this.hp` is above 0, `false` once it is not.",
+      "hints": [
+        "It is a one-line method: `return` followed by a comparison on `this.hp`.",
+        "5.5.6 (Worked Example: The number anyone can set) has the same method written out."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Ask the class, not the number",
+      "instructions": "In `draw()`, replace both `e.hp > 0` checks with `e.isAlive()`. Run it and press Space six times: nothing about what you see should change. That is the point — the rule has moved, not the behaviour.",
+      "hints": [
+        "There are two of them: the one inside the `text(...)` line and the one on the next line that sets the colour."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "isAlive() returns whether this.hp is above 0",
+      "description": "The class has an `isAlive()` method that returns a comparison on `this.hp`. Help: 5.5.6 (Worked Example: The number anyone can set)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "isAlive\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?return\\s+this\\.hp\\s*>\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "draw() asks isAlive() instead of comparing hp",
+      "description": "The scene calls `e.isAlive()` rather than comparing `e.hp` itself. Help: 5.5.6 (Worked Example: The number anyone can set)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+draw\\s*\\([\\s\\S]*?\\.isAlive\\s*\\(\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

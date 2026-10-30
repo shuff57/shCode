@@ -1,0 +1,55 @@
+{
+  "id": "5-5-12-lab-write-hit",
+  "title": "5.5.12 Lab: Write hit(other)",
+  "description": "The enemy already knows how to take a hit; the player is missing its half of the exchange. Write `hit(other)` so the receiver's power is applied to the object passed in.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Inside a Class",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the player's half",
+      "instructions": "Inside `Player`, write a `hit(other)` method. It takes one argument — another object — and asks that object to take damage. The amount is the player's own `this.power`. Press Space: the enemy's health should fall by 2 each time.",
+      "hints": [
+        "Reread 5.5.11 (Worked Example: player.hit(enemy)). The method body is the one line `other.takeHit(this.power);`.",
+        "`other` is the name of the parameter in your own method. Whatever you called it, use that name before the dot."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "hit(other) asks the argument to take the hit",
+      "description": "The method calls `takeHit` on the object it was handed, not on `this`. Help: 5.5.11 (Worked Example: player.hit(enemy))",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "hit\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{[\\s\\S]*?\\1\\s*\\.\\s*takeHit\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The damage is the player's own power",
+      "description": "The amount passed along comes from `this.power`, so one player can hit harder than another. Help: 5.5.11 (Worked Example: player.hit(enemy))",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "hit\\s*\\(\\s*\\w+\\s*\\)\\s*\\{[\\s\\S]*?takeHit\\s*\\([^)]*this\\.power",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

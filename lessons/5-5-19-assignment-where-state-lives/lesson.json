@@ -1,0 +1,115 @@
+{
+  "id": "5-5-19-assignment-where-state-lives",
+  "title": "5.5.19 Your Turn: Where the state lives",
+  "description": "Three numbers from the wave spawner, and for each one: a local, a property on this, or a class variable — plus one sentence on why. Formative, AI-checked, no points.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Inside a Class",
+  "preview": "console",
+  "editor": "text",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Answer all three, with a reason",
+      "instructions": "In `README.md`, answer all three questions. For each number, name the place it belongs — a **local** in a method, a **property on `this`**, or a **class variable** (`static`) — and give one sentence saying why that place and not the other two.\n\n1. The list of enemies still on the field.\n2. One enemy's health.\n3. How many enemies have ever been built.\n\nA reason that names the failure is worth more than a label: \"if it were a local, it would start again at zero on every call\" says more than \"it is a property\".\n\nPress **Grade** above the editor when you are done: the AI reads what your answers mean and marks each card. Changing your text clears its marks, so press Grade again after editing.",
+      "hints": [
+        "Think about who needs to read the number, and how long it has to stay true. Those two questions decide the place.",
+        "Reread 5.5.1 (Reading: Three places a variable can live) and 5.5.14 (Reading: One value shared by every instance) if you are unsure about the third place."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Three answers, each with a reason",
+      "description": "Answer all three questions, and say why for each one. Numbered or bulleted answers are both fine.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "^(?:[\\s\\S]*?(?:^|\\n)[ \\t]*(?:\\d+\\s*[.):]|[-*][ \\t]|#{1,3}[ \\t])[ \\t]*\\S){3}",
+      "hint": "You need at least three answers, one per number, each with a sentence after it.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "The list of live enemies is placed and justified",
+      "description": "Says where the list lives and why — it has to outlive one frame, and it holds several objects.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "enemies[\\s\\S]{0,200}?(?:property|\\bthis\\b|class variable|static|local|array)",
+      "hint": "Say where the array itself lives, and what would go wrong if it were a local inside an enemy.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "One enemy's health is placed and justified",
+      "description": "Says where health lives and why — each enemy needs its own copy.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "\\b(?:hp|health)\\b[\\s\\S]{0,200}?(?:property|\\bthis\\b|class variable|static|local|each|own)",
+      "hint": "Ask what would happen to the other enemies if health were shared by the class.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The count of enemies ever built is placed and justified",
+      "description": "Says where the all-time count lives and why — it belongs to the class, not to any one enemy.",
+      "type": "regex",
+      "file": "README.md",
+      "stripComments": false,
+      "flags": "i",
+      "pattern": "(?:static|class variable|[Bb]y the class|every enemy|all enemies)[\\s\\S]{0,200}?(?:count|ever|spawned|built|\\d)|(?:count|ever|spawned|built)[\\s\\S]{0,200}?(?:static|class variable)",
+      "hint": "Two enemies cannot each hold 'how many enemies have ever been built' and both be right.",
+      "points": 0
+    }
+  ],
+  "aiCheck": {
+    "file": "README.md",
+    "rubricTitle": "What the AI read in your answers",
+    "prompt": "The student was asked, for a wave-spawner program, to say where each of three numbers should live — a local variable in a method, a property on `this`, or a class variable declared with `static` — and to give one sentence of reasoning for each. The three numbers: (1) the list of enemies still on the field, (2) one enemy's health, (3) how many enemies have ever been built. The right answers, in the course's terms: the list is a property of the scene (or a plain array at file scope, which is the same idea in this program) because it must outlive a frame and hold several objects; health is a property on `this` because each enemy needs its own copy; the all-time count is a class variable (`static`) because it belongs to the class rather than to any one enemy. Judge each criterion ONLY by whether the idea is present, however the student words it. Do not require the words 'local', 'property' or 'static' — 'belongs to the class', 'each one has its own', 'survives the call' and similar phrases are the same ideas. A student who places a number in a defensible but different place (for example, calling the enemy list a file-scope variable) is right enough for 'met', as long as the reason holds. Mark a criterion 'missing' only when the answer is absent or the reasoning is the opposite of the idea. Write each note for THIS student's own words: in a not-met note, name the exact phrase that causes the problem (quote at most a few words), say in plain words what it claims now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the answer for them. In a met note, say in one short phrase what in their answer satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Three answers, each with a reason",
+        "description": "All three numbers are answered, and each answer carries a reason rather than a bare label.",
+        "points": 0
+      },
+      {
+        "id": "r2",
+        "title": "The list of live enemies is placed and justified",
+        "description": "The list is placed somewhere it can outlive a frame and hold several objects, with a reason.",
+        "points": 0
+      },
+      {
+        "id": "r3",
+        "title": "One enemy's health is placed and justified",
+        "description": "Health is given to each enemy individually, with a reason that says so.",
+        "points": 0
+      },
+      {
+        "id": "r4",
+        "title": "The count of enemies ever built is placed and justified",
+        "description": "The all-time count is placed on the class rather than on an instance, with a reason.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

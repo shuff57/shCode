@@ -1,0 +1,127 @@
+{
+  "id": "5-5-7-quiz-scope-and-access",
+  "title": "5.5.7 Check: Scope and access",
+  "description": "Six multiple-choice questions on where a variable lives, why a local cannot be shared between methods, and what a method that owns a rule buys you. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Inside a Class",
+  "preview": "quiz",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-what-survives",
+        "source": "5.5.1",
+        "question": "A method declares `let step = 1;`, uses it, and returns. Which of these is still there afterwards?",
+        "options": [
+          "`step`, because it was declared with `let`",
+          "`step`, but only inside the class body",
+          "Nothing declared inside the method; only properties set on `this` survive",
+          "`step`, if the method was called more than once"
+        ],
+        "answer": 2,
+        "explanation": "A local is created fresh for each call and disappears when the call ends. A property such as `this.count` is stored on the object, so it is still there on the next frame.",
+        "sourceIds": [
+          "5-5-1-reading-three-places"
+        ]
+      },
+      {
+        "id": "q2-other-method",
+        "source": "5.5.1",
+        "question": "What happens when this runs?",
+        "code": "class Score {\n  constructor() {\n    this.points = 0;\n  }\n\n  add() {\n    let step = 3;\n    this.points += step;\n  }\n\n  undo() {\n    this.points -= step;\n  }\n}\n\nconst s = new Score();\ns.add();\ns.undo();",
+        "options": [
+          "`points` ends at 0, because the two methods cancel out",
+          "`points` ends at -3, because `step` starts as `undefined`",
+          "A `ReferenceError` when `undo()` runs, because `step` is local to `add()`",
+          "A `ReferenceError` on the `s.add()` line, because `step` is declared after it"
+        ],
+        "answer": 2,
+        "explanation": "`step` is declared inside `add()`, so it belongs to that call only. By the time `undo()` runs, there is no `step` anywhere it can see, and JavaScript throws `ReferenceError: step is not defined`.",
+        "sourceIds": [
+          "5-5-1-reading-three-places"
+        ]
+      },
+      {
+        "id": "q3-parameter-is-local",
+        "source": "5.5.1",
+        "question": "A method changes its parameter inside its body. What does the caller see?",
+        "code": "class Counter {\n  constructor() {\n    this.n = 0;\n  }\n\n  addBy(n) {\n    n = n + 100;\n    this.n += n;\n  }\n}\n\nlet amount = 1;\nconst c = new Counter();\nc.addBy(amount);\nconsole.log(amount);",
+        "options": [
+          "`101`, because `n` and `amount` are the same variable",
+          "`1`, because `n` is a local filled from `amount`, and changing it changes only the local",
+          "`undefined`, because parameters do not exist after the call",
+          "A `ReferenceError`, because `n` was reassigned"
+        ],
+        "answer": 1,
+        "explanation": "The parameter `n` is a local. It receives the *value* of `amount`, so `n = n + 100` changes the copy inside the method. `amount` outside is untouched and still prints `1`.",
+        "sourceIds": [
+          "5-5-1-reading-three-places"
+        ]
+      },
+      {
+        "id": "q4-two-locals",
+        "source": "5.5.4",
+        "question": "Two methods each declare `let step = 3;`. What is true?",
+        "options": [
+          "They are the same variable, so changing one changes the other",
+          "They are two separate locals with the same name, so changing one leaves the other alone",
+          "The second declaration is an error, because `step` is already taken",
+          "Both are the same as `this.step`"
+        ],
+        "answer": 1,
+        "explanation": "Each method's `step` is created for its own call. Same name, different variables — which is exactly why the number has to live on `this` if both methods must agree about it.",
+        "sourceIds": [
+          "5-5-4-lab-locals-are-private"
+        ]
+      },
+      {
+        "id": "q5-why-a-method",
+        "source": "5.5.5",
+        "question": "Why write `e.takeHit(4)` instead of `e.hp = e.hp - 4` in `draw()`?",
+        "options": [
+          "The method runs faster than the subtraction",
+          "A method is required before an object can be created",
+          "The class keeps the rule — how much a hit is worth, and that health never goes below zero — in one place",
+          "Only a method can change a property on `this`"
+        ],
+        "answer": 2,
+        "explanation": "Both lines change the number. The method is worth it because the rule about that number lives with the data: every scene calls `takeHit` and gets the floor and the death check for free, instead of re-writing them in each scene.",
+        "sourceIds": [
+          "5-5-5-reading-object-owns-its-rule"
+        ]
+      },
+      {
+        "id": "q6-negative-health",
+        "source": "5.5.6",
+        "question": "In the worked example, which version can leave `hp` at `-2`?",
+        "options": [
+          "The version where `draw()` does `e.hp = e.hp - 4`",
+          "The version where the class has `takeHit(n)` and an `if` that lifts `hp` back to 0",
+          "Both versions, because JavaScript does not stop negative numbers",
+          "Neither, because `hp` is a property and properties cannot go below 0"
+        ],
+        "answer": 0,
+        "explanation": "The scene version subtracts and never checks, so 10, 6, 2, -2. The class version subtracts and then brings the value back up to 0, so the lowest anyone can observe is 0.",
+        "sourceIds": [
+          "5-5-6-example-hp-from-outside"
+        ]
+      }
+    ]
+  }
+}

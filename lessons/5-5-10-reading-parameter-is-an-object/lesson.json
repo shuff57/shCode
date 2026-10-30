@@ -1,0 +1,21 @@
+{
+  "id": "5-5-10-reading-parameter-is-an-object",
+  "title": "5.5.10 Reading: A parameter that is another object",
+  "description": "In `a.distanceTo(b)` the method has two instances in play: `this` is the receiver, `other` is the parameter. Shows where that symmetry ends — `player.hit(enemy)` and `enemy.hit(player)` mean opposite things.",
+  "type": "lesson",
+  "estimateMins": 6,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Inside a Class",
+  "preview": "reading",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

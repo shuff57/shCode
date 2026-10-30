@@ -1,0 +1,68 @@
+{
+  "moduleId": "5.5",
+  "source": "Not a book section. The seams follow CodeHS AP CSA (Cortado) Unit 3 lessons 3.8 Scope and Access and 3.9 Class Variables, and reuse the object model the course already teaches in 5.3/5.4. Structure only: no CodeHS text, problems or code is copied.",
+  "lessons": [
+    {
+      "id": "where-a-variable-lives",
+      "title": "Where a variable lives",
+      "objective": "Students will be able to say which of a method's variables is a local, which is a property, and which survives until the next frame.",
+      "screens": [
+        "5-5-1-reading-three-places",
+        "5-5-2-example-counter-that-resets",
+        "5-5-3-lab-move-counter-to-this",
+        "5-5-4-lab-locals-are-private"
+      ]
+    },
+    {
+      "id": "who-owns-the-rule",
+      "title": "Who owns the rule",
+      "objective": "Students will be able to move a rule out of the scene and into the class that owns the data, and say what a method buys them that a direct property write does not.",
+      "screens": [
+        "5-5-5-reading-object-owns-its-rule",
+        "5-5-6-example-hp-from-outside",
+        "5-5-7-quiz-scope-and-access",
+        "5-5-8-lab-takehit-floor",
+        "5-5-9-lab-isalive"
+      ]
+    },
+    {
+      "id": "objects-that-meet",
+      "title": "Objects that meet",
+      "objective": "Students will be able to write a method whose parameter is another instance, and keep a collection of instances clean as they die.",
+      "screens": [
+        "5-5-10-reading-parameter-is-an-object",
+        "5-5-11-example-player-hits-enemy",
+        "5-5-12-lab-write-hit",
+        "5-5-13-lab-reap-the-dead"
+      ]
+    },
+    {
+      "id": "shared-state",
+      "title": "One value for the whole class",
+      "objective": "Students will be able to declare a class variable with `static`, count every instance ever built, and say why one counter cannot belong to one enemy.",
+      "screens": [
+        "5-5-14-reading-static",
+        "5-5-15-example-spawn-counter",
+        "5-5-16-lab-count-spawns"
+      ]
+    },
+    {
+      "id": "the-wave-spawner",
+      "title": "The wave spawner",
+      "objective": "Students will be able to assemble a class, an array and a timer into a spawner that creates and removes instances while the sketch runs, and say where each piece of its state lives.",
+      "screens": [
+        "5-5-17-example-wave-spawner",
+        "5-5-18-lab-wave-spawner",
+        "5-5-19-assignment-where-state-lives"
+      ]
+    },
+    {
+      "id": "unit-check",
+      "title": "Unit 5 check",
+      "objective": "Students will be able to answer, from across 5.3 to 5.5, what a class is, what a constructor does, what this means, where a variable lives and what a class variable is.",
+      "screens": [
+        "5-5-20-quiz-unit-5-objects"
+      ]
+    }
+  ]
+}
