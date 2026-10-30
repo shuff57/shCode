@@ -69,7 +69,7 @@
       "description": "Different bumpers are worth different amounts, because the score uses each bumper's own `worth`. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.wasTouching\\b[^{};]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)score\\s*(?:\\+=|=\\s*score\\s*\\+)\\s*\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth",
+      "pattern": "\\.wasTouching\\b[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)score\\s*(?:\\+=|=\\s*score\\s*\\+)\\s*\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth",
       "flags": "",
       "points": 0,
       "status": "pending"

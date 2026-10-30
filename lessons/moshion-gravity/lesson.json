@@ -52,7 +52,7 @@
       "description": "End with `world.gravity.y` set to a number other than 10 (step 2 uses 20). Help: 5.2.6 (Reading: Gravity)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "world\\.gravity\\.y\\s*=\\s*(?!10\\s*;)[-\\d(]",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*(?!\\(?\\s*10(?:\\.0*)?\\s*\\)?\\s*(?:;|\\r?\\n|$))[-\\d(.]",
       "flags": "",
       "points": 0,
       "status": "pending"
