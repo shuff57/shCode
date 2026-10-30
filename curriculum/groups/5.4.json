@@ -1,0 +1,56 @@
+{
+  "moduleId": "5.4",
+  "source": "Seams follow CodeHS AP CSA (Cortado) Unit 1 lessons 1.12-1.14 and Unit 3 lessons 3.3-3.9 (objects, anatomy of a class, constructors, methods, this). Structure only: no CodeHS text, problems or code is copied.",
+  "lessons": [
+    {
+      "id": "writing-a-method",
+      "title": "Writing a method",
+      "objective": "Students will be able to write a method that takes no arguments, one that takes an argument and one that returns a value, and explain what this refers to inside a method.",
+      "screens": [
+        "5-3-16-reading-methods-intro",
+        "5-3-15-video-this-keyword",
+        "5-3-17-lab-method-no-params",
+        "5-3-18-lab-method-with-params",
+        "5-3-19-lab-method-returns"
+      ]
+    },
+    {
+      "id": "methods-working-together",
+      "title": "Methods that work together",
+      "objective": "Students will be able to call one method from another with this, move and remove a wrapped sprite from inside a method, and read a complete Enemy class that uses all of it.",
+      "screens": [
+        "5-3-20-lab-method-calls-method",
+        "5-3-20a-chart-the-method-chain",
+        "5-3-21-reading-composition",
+        "5-3-22-lab-mutate-sprite-prop",
+        "5-3-23-lab-cleanup",
+        "5-3-24-example-enemy-class"
+      ]
+    },
+    {
+      "id": "many-instances",
+      "title": "Many instances",
+      "objective": "Students will be able to build several instances of one class, keep them in an array, call a method on each one with a loop, and say what changes when a fourth enemy arrives in a procedural design and in an object design.",
+      "screens": [
+        "5-3-25-lab-three-vars",
+        "5-3-26-lab-array-of-instances",
+        "5-3-27-lab-loop-instances",
+        "5-3-28-reading-parallel-vs-classes",
+        "5-3-29-example-proc-vs-oop",
+        "5-3-29a-read-the-two-designs"
+      ]
+    },
+    {
+      "id": "choosing-oop",
+      "title": "Choosing OOP",
+      "objective": "Students will be able to decide whether a class is the right tool with a three-question checklist, write a Collectible class and build five of them, compare procedural and object-oriented versions in writing, and name encapsulation, inheritance and polymorphism.",
+      "screens": [
+        "5-3-30-reading-when-oop",
+        "5-3-31-a12-1-collectible",
+        "5-3-32-a12-2-oop-writeup",
+        "5-3-33-reading-oop-vocab",
+        "5-3-34-challenges"
+      ]
+    }
+  ]
+}

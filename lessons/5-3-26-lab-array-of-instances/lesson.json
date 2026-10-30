@@ -1,6 +1,6 @@
 {
   "id": "5-3-26-lab-array-of-instances",
-  "title": "5.4.12 Lab: An array of Enemies",
+  "title": "5.4.13 Lab: An array of Enemies",
   "description": "Store five Enemy instances in a single array by pushing new Enemy(...) calls into `enemies`: practice managing many instances without separate named variables.",
   "type": "lesson",
   "estimateMins": 8,

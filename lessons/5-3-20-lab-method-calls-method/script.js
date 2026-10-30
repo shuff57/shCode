@@ -1,4 +1,4 @@
-// 5.4.5 Lab: A method calling this.otherMethod().
+// 5.4.6 Lab: A method calling this.otherMethod().
 
 class Counter {
   constructor() {

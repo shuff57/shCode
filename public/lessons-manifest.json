@@ -7178,8 +7178,8 @@
     },
     {
       "id": "5-3-15-video-this-keyword",
-      "title": "5.3.17 Video: The this keyword",
-      "unit": "5.3 Classes and Objects via moSHion",
+      "title": "5.4.2 Video: The this keyword",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "video",
       "type": "lesson",
       "category": "Unit 2: moSHion: Applied Game Development",
@@ -7204,7 +7204,7 @@
     },
     {
       "id": "5-3-17-lab-method-no-params",
-      "title": "5.4.2 Lab: Method with no params",
+      "title": "5.4.3 Lab: Method with no params",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
@@ -7217,7 +7217,7 @@
     },
     {
       "id": "5-3-18-lab-method-with-params",
-      "title": "5.4.3 Lab: Method with parameters",
+      "title": "5.4.4 Lab: Method with parameters",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
@@ -7230,7 +7230,7 @@
     },
     {
       "id": "5-3-19-lab-method-returns",
-      "title": "5.4.4 Lab: Method that returns a value",
+      "title": "5.4.5 Lab: Method that returns a value",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
@@ -7256,7 +7256,7 @@
     },
     {
       "id": "5-3-20-lab-method-calls-method",
-      "title": "5.4.5 Lab: A method calling this.otherMethod()",
+      "title": "5.4.6 Lab: A method calling this.otherMethod()",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
@@ -7269,7 +7269,7 @@
     },
     {
       "id": "5-3-20a-chart-the-method-chain",
-      "title": "5.4.6 Plain English to Pseudocode: A Method That Calls a Method",
+      "title": "5.4.7 Plain English to Pseudocode: A Method That Calls a Method",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "console",
       "type": "lesson",
@@ -7282,7 +7282,7 @@
     },
     {
       "id": "5-3-21-reading-composition",
-      "title": "5.4.7 Reading: Why this.sprite, not extends Sprite",
+      "title": "5.4.8 Reading: Why this.sprite, not extends Sprite",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
@@ -7295,7 +7295,7 @@
     },
     {
       "id": "5-3-22-lab-mutate-sprite-prop",
-      "title": "5.4.8 Lab: Mutate this.sprite.x from a method",
+      "title": "5.4.9 Lab: Mutate this.sprite.x from a method",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
@@ -7308,7 +7308,7 @@
     },
     {
       "id": "5-3-23-lab-cleanup",
-      "title": "5.4.9 Lab: Cleanup with this.sprite.delete()",
+      "title": "5.4.10 Lab: Cleanup with this.sprite.delete()",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
@@ -7321,7 +7321,7 @@
     },
     {
       "id": "5-3-24-example-enemy-class",
-      "title": "5.4.10 Worked Example: Write an Enemy class (integration)",
+      "title": "5.4.11 Worked Example: Write an Enemy class (integration)",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "example",
       "type": "lesson",
@@ -7334,7 +7334,7 @@
     },
     {
       "id": "5-3-25-lab-three-vars",
-      "title": "5.4.11 Lab: Three Enemies in three variables",
+      "title": "5.4.12 Lab: Three Enemies in three variables",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
@@ -7347,7 +7347,7 @@
     },
     {
       "id": "5-3-26-lab-array-of-instances",
-      "title": "5.4.12 Lab: An array of Enemies",
+      "title": "5.4.13 Lab: An array of Enemies",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
@@ -7360,7 +7360,7 @@
     },
     {
       "id": "5-3-27-lab-loop-instances",
-      "title": "5.4.13 Lab: Loop over an array of instances",
+      "title": "5.4.14 Lab: Loop over an array of instances",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
@@ -7373,7 +7373,7 @@
     },
     {
       "id": "5-3-28-reading-parallel-vs-classes",
-      "title": "5.4.14 Reading: Parallel Arrays vs Classes",
+      "title": "5.4.15 Reading: Parallel Arrays vs Classes",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
@@ -7386,7 +7386,7 @@
     },
     {
       "id": "5-3-29-example-proc-vs-oop",
-      "title": "5.4.15 Worked Example: Procedural vs OOP side-by-side",
+      "title": "5.4.16 Worked Example: Procedural vs OOP side-by-side",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "example",
       "type": "lesson",
@@ -7399,7 +7399,7 @@
     },
     {
       "id": "5-3-29a-read-the-two-designs",
-      "title": "5.4.16 Read the Charts: Three Variables or Three Objects",
+      "title": "5.4.17 Read the Charts: Three Variables or Three Objects",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
@@ -7425,7 +7425,7 @@
     },
     {
       "id": "5-3-30-reading-when-oop",
-      "title": "5.4.17 Reading: When to reach for OOP (3-question checklist)",
+      "title": "5.4.18 Reading: When to reach for OOP (3-question checklist)",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
@@ -7438,7 +7438,7 @@
     },
     {
       "id": "5-3-31-a12-1-collectible",
-      "title": "5.4.18 Collectible Class",
+      "title": "5.4.19 Collectible Class",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "assignment",
@@ -7451,7 +7451,7 @@
     },
     {
       "id": "5-3-32-a12-2-oop-writeup",
-      "title": "5.4.19 Procedural vs OOP Writeup",
+      "title": "5.4.20 Procedural vs OOP Writeup",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "assignment",
       "type": "assignment",
@@ -7464,7 +7464,7 @@
     },
     {
       "id": "5-3-33-reading-oop-vocab",
-      "title": "5.4.20 Reading: Encapsulation, inheritance, polymorphism (vocabulary only)",
+      "title": "5.4.21 Reading: Encapsulation, inheritance, polymorphism (vocabulary only)",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
@@ -7477,7 +7477,7 @@
     },
     {
       "id": "5-3-34-challenges",
-      "title": "5.4.21 Challenges",
+      "title": "5.4.22 Challenges",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "challenge",

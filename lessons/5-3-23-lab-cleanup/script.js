@@ -1,4 +1,4 @@
-// 5.4.9 Lab: Cleanup with this.sprite.delete().
+// 5.4.10 Lab: Cleanup with this.sprite.delete().
 
 class Bubble {
   constructor(x, y) {

@@ -1,6 +1,6 @@
 {
   "id": "5-3-22-lab-mutate-sprite-prop",
-  "title": "5.4.8 Lab: Mutate this.sprite.x from a method",
+  "title": "5.4.9 Lab: Mutate this.sprite.x from a method",
   "description": "Write `Mover.moveRight(dx)` which adds `dx` to `this.sprite.x`, reaching through composition to move the wrapped sprite.",
   "type": "lesson",
   "estimateMins": 8,
@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "moveRight(dx) mutates this.sprite.x",
-      "description": "Write a `moveRight(dx)` method that adds `dx` to `this.sprite.x` using `+=`. Help: 5.4.7 (Why this.sprite, not extends Sprite)",
+      "description": "Write a `moveRight(dx)` method that adds `dx` to `this.sprite.x` using `+=`. Help: 5.4.8 (Why this.sprite, not extends Sprite)",
       "type": "regex",
       "file": "script.js",
       "pattern": "moveRight[\\s\\S]*?this\\.sprite\\.x\\s*(?:\\+=|=\\s*this\\.sprite\\.x\\s*\\+)",

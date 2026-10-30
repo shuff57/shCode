@@ -16,7 +16,7 @@ OOP textbooks and college courses all invoke three vocabulary words. You will he
 
 ### Encapsulation
 
-In the `Counter` class you wrote in labs 5.4.2–e, the count `n` lived inside the class. Outside code only ever touched it through methods like `tick()`, `addBy()`, and `isHigh()`. Outside code never reached in and said `c.n = 999`. That "keep data inside, expose it through methods" discipline is **encapsulation**. The class is a closed box: you push the right button and it does the right thing; you don't need to know the wiring.
+In the `Counter` class you wrote in labs 5.4.3–e, the count `n` lived inside the class. Outside code only ever touched it through methods like `tick()`, `addBy()`, and `isHigh()`. Outside code never reached in and said `c.n = 999`. That "keep data inside, expose it through methods" discipline is **encapsulation**. The class is a closed box: you push the right button and it does the right thing; you don't need to know the wiring.
 
 Encapsulation matters because it limits how many places in a program can break a piece of state. If `n` is only ever changed through `tick()` and `addBy()`, there are exactly two places to look when something goes wrong.
 

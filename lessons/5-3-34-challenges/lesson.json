@@ -1,6 +1,6 @@
 {
   "id": "5-3-34-challenges",
-  "title": "5.4.21 Challenges",
+  "title": "5.4.22 Challenges",
   "description": "Pick one (or more) OOP stretch challenges: extend your Enemy class, write a Player class, or try subclassing with `extends`. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
@@ -80,7 +80,7 @@
     {
       "id": "r4",
       "title": "Use one OOP feature",
-      "description": "Your class uses at least one of: `this.<property>`, `extends`, or `super(`. Help: 5.4.20 (Encapsulation, inheritance, polymorphism)",
+      "description": "Your class uses at least one of: `this.<property>`, `extends`, or `super(`. Help: 5.4.21 (Encapsulation, inheritance, polymorphism)",
       "type": "regex",
       "file": "script.js",
       "pattern": "this\\.\\w+|extends\\s+\\w+|super\\s*\\(",

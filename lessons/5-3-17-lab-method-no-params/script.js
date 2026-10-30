@@ -1,4 +1,4 @@
-// 5.4.2 Lab: Method with no params.
+// 5.4.3 Lab: Method with no params.
 
 class Counter {
   constructor() {

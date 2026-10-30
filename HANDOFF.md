@@ -1,20 +1,85 @@
-# 2026-10-29 (latest): 5.3 object-teaching pass, step 1 of 3
+# 2026-10-29 (latest): teaching moSHion objects, using CodeHS AP CSA as the pattern
 
-Plan (CodeHS AP CSA Unit 3 as the pattern for teaching moSHion objects): (A) group 5.3/5.4 into
-8 lessons, (B) two new 5.3 screens, (C) a new 5.5 "Classes That Work Together" of ~18 screens
-(5 lessons: designing a class, state inside an instance, instances that meet, build, two checks).
-**Only B is done**, uncommitted: `5-3-35-example-class-anatomy` (5.3.6, class name / constructor /
-parameters / properties) and `5-3-36-lab-write-constructor` (5.3.16, class shell given, student
-writes the constructor body and builds two instances; starter fails all 5 requirements, reference
-passes all 5). Renumbered through `scripts/renumber-plans/5.3-class-anatomy-constructor.json`; no
-folder moved, so no D1 migration. 5.3 now has 17 screens; 5.4 numbers are unchanged. Build and
-`npm test` exit 0. The 10 `check-help-pointer-titles` mismatches are pre-existing, none in 5.3.
-Traps: the constructor lab must stay AFTER `this` is taught (5.3.12-13) because it asks for
-`this.x = x`; the constructor reading (5.3.5) still precedes `this`, which was already so. When A
-is written, 5.3.5 moves into lesson 1 with the anatomy example (an example needs "parameter" from
-5.3.5), so lesson 1 is slides, video, class/instance, `new`, constructor reading, anatomy (6).
-Also in this pass: `lab-assignment-conventions.md` §4 is now "either key set, taught before asked".
-I read only titles of CSA's lessons, not bodies; 5.4 bodies are unread, so the 5.5 outline is a draft.
+**Branch `codehs-inspiration`** (cut from `cs-3d`). Start here, then read `CODEHS-INSPIRATION.md`
+(why CodeHS, six-course measurements) and `CODEHS-MAP.md` (per-module map, fit levels).
+
+## State of the tree
+
+Committed: `f6ba94ff` (5.1/5.2 content pass, key names taught before asked) and `1a0d2b14`
+(5.3 class-anatomy example + fill-in-the-constructor lab).
+
+**Uncommitted, 62 files, build and `npm test` exit 0:** step A below. `.gauntlet/occt-checks.json`
+is also modified, but only by the test run; leave it out of commits.
+
+## The plan for objects (three steps)
+
+- **B, done and committed.** Two new 5.3 screens: `5-3-35-example-class-anatomy` (5.3.6: class name,
+  constructor, parameters, properties) and `5-3-36-lab-write-constructor` (5.3.16: class shell given,
+  student writes the constructor body and builds two instances). No lab before 5.4.11 made a student
+  write a constructor; this is the first.
+- **A, done, uncommitted.** `curriculum/groups/5.3.json` (3 lessons / 16 screens) and `5.4.json`
+  (4 lessons / 22 screens). The this-keyword video moved from the end of 5.3 to 5.4.2 through
+  `scripts/renumber-plans/5.3-5.4-video-to-methods.json`: it teaches `this` inside methods, which 5.4.1
+  introduces, so anywhere earlier in 5.3 would ask before teaching. Folders never moved, so no D1
+  migration. Its `videoUrl` is still empty (it shows the teacher-recorded fallback text): record or
+  link it.
+- **C, NOT started: a new module 5.5.** User decisions: it must be at similar density to its
+  neighbours (5.1 = 24 screens, 5.2 = 16, 5.3 = 16, 5.4 = 22), and it **includes a scope-and-access
+  lesson**. Draft outline, about 22 screens, to be checked against the 5.4 screen BODIES first
+  (I read only their titles and descriptions):
+  1. Designing a class (5): reading on nouns and verbs, example designing an `Enemy`, plain-English-to-
+     pseudocode, lab writing a `Coin`, lab adding two methods.
+  2. State inside an instance (4): reading, example `Enemy` with health and `takeHit()`, two labs.
+  3. Instances that meet (4): reading, example `player.hit(enemy)`, lab, lab removing dead instances.
+  4. Scope and access (about 4, from CSA 3.8): not yet outlined; moSHion has no use for it today,
+     so teach it through the classes already built and keep it short.
+  5. Build (3): wave-spawner walkthrough, moSHion enemy-wave lab, written design notes.
+  6. Check (2): one on class/instance/constructor/`this`, one on methods/state/instances.
+  5.5 is a free number (modules go 5.4 straight to 6.1), and a module at the end of a unit shifts no
+  existing ids. Create it with a `curriculum/modules/5.5_*.md`, a group file, and the lessons.
+
+## Traps (each cost real thought)
+
+- **Taught before asked** (memory `feedback_lesson-voice-taught-before-asked`). Every term in a step,
+  hint or requirement must come from an EARLIER screen in module order. The constructor lab stays after
+  `this` is taught (5.3.12-13) because it asks for `this.x = x`. The constructor reading (5.3.5) still
+  comes before `this`, which was already the order.
+- **Lesson ends.** The group README's rule: a lesson needs a closing check only when its last screen is
+  a reading or a video. All current 5.1/5.3/5.4 lessons end on a lab, example, chart, assignment or
+  challenge, so none needed one.
+- **Renumbering.** Use `scripts/renumber-module.mjs --plan <plan> [--dry-run]`. It rewrites titles and
+  citations but not folders. It always ends with "no Numbered Lesson List table" for 5.1/5.3 (their docs
+  have no table); that is harmless, fix the module doc prose by hand. To move a lesson ACROSS modules,
+  first retitle it with a number inside the destination module and set its `unit`, then run the plan.
+  A new lesson's own text is not rewritten, so write its citations in the FINAL numbering.
+- **Do not trust a pointer's number alone.** After a renumber the "Read before X" line in the screen
+  before an insertion points at the wrong screen; fix it by hand (5.3.5 was).
+- **Generated files** (`functions/_shared/ai-graders.generated.ts`, `module-docs.generated.ts`,
+  `public/lesson-requirements.json`, `public/lessons-manifest.json`) are rewritten by `npm run build`.
+  Commit them with the content that caused them.
+- **Pointer mismatches.** `check-help-pointer-titles` reports 10, all pre-existing and none in 5.1-5.4
+  (1.4.14, 2.5.24, 3.4.19 x4, 6.3.10, 6.6.24 x2, 6.7.28). Not caused by this branch.
+- **Pacing.** The 5.4 module doc estimates about 4 h 45 min while the 5.3/5.4 note says about 1.75
+  contact hours. "Choosing OOP" (5.4 lesson 4) is about 127 min because it holds both graded assignments
+  (Collectible 45, writeup 40) and screen order is fixed by number. Teacher decision pending.
+- **Process.** Stop the dev server (kill by pid, `rm -rf .next`) before `npm run build` or `npm test`.
+  Dev server: `DEV_ROLE=teacher npm run dev`, port 3002. Browser: `playwright-cli`, named sessions, close
+  throwaway ones, never close `mom`.
+
+## Other open items
+
+- Add moSHion terms (`text(`, `update(`, `world.gravity`, `'static'`/`'dynamic'`, `frameCount`) to the
+  `scripts/check-concept-order.mjs` catalog; today it only checks console labs, so it would not have
+  caught the 5.1 defects.
+- Group the remaining 32 modules one at a time (objectives are hand-written; user reviews each).
+- Closing checks for reading-heavy modules (1.2, 1.5, 3.2, 6.5, 6.7).
+- A standard project close-out for 7.1 (two screens today).
+- The arrow-keys-scroll claim was tested once, in Chromium, and did not reproduce; untested elsewhere.
+  `lab-assignment-conventions.md` §4 now allows either key set and says to restore WASD-only if a
+  platform scrolls.
+- 5.2.4 Lab: Tune Gravity partly overlaps the Falling Block example (5.2.3); intended example-then-lab.
+- I read only titles of CSA's lessons, not bodies. Re-fetch `https://codehs.com/course/apcsacortado/explore`
+  (public, no login) if a closer comparison is wanted.
 
 # 2026-10-29 (later): lesson layer added, piloted on 5.1
 

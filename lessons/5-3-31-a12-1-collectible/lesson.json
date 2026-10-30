@@ -1,6 +1,6 @@
 {
   "id": "5-3-31-a12-1-collectible",
-  "title": "5.4.18 Collectible Class",
+  "title": "5.4.19 Collectible Class",
   "description": "Write a Collectible class, instantiate at least 5, and detect overlap with the player. SLO-2 lab: the class is the point. Auto-graded.",
   "type": "assignment",
   "estimateMins": 45,
@@ -18,7 +18,7 @@
       "title": "Define the Collectible class",
       "instructions": "Write `class Collectible { }` with a `constructor(x, y, value, color)`. Store the data on `this` and create `this.sprite = new Sprite(...)`.",
       "hints": [
-        "Re-read 5.4.10 Worked Example: the `Enemy` constructor follows the same `this.x = x` / `this.sprite = new Sprite(...)` pattern."
+        "Re-read 5.4.11 Worked Example: the `Enemy` constructor follows the same `this.x = x` / `this.sprite = new Sprite(...)` pattern."
       ]
     },
     {
@@ -51,7 +51,7 @@
     {
       "id": "r1",
       "title": "Constructor stores state on the object",
-      "description": "The constructor body assigns at least one argument onto this: the class shell is provided, so this checks the part the student writes. Help: 5.4.17 (When to reach for OOP)",
+      "description": "The constructor body assigns at least one argument onto this: the class shell is provided, so this checks the part the student writes. Help: 5.4.18 (When to reach for OOP)",
       "type": "regex",
       "file": "script.js",
       "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?this\\.\\w+\\s*=",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "collect() method does work",
-      "description": "A collect() method whose body returns something AND deletes the sprite (via this.sprite.delete() or sprite.remove()). Help: 5.4.17 (When to reach for OOP)",
+      "description": "A collect() method whose body returns something AND deletes the sprite (via this.sprite.delete() or sprite.remove()). Help: 5.4.18 (When to reach for OOP)",
       "type": "regex",
       "file": "script.js",
       "pattern": "collect\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?(this\\.sprite\\.delete|\\.remove)[\\s\\S]*?return\\b|collect\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?return[\\s\\S]*?(this\\.sprite\\.delete|\\.remove)",
@@ -81,7 +81,7 @@
     {
       "id": "r4",
       "title": "At least one instance",
-      "description": "At least one Collectible is instantiated. Help: 5.4.17 (When to reach for OOP)",
+      "description": "At least one Collectible is instantiated. Help: 5.4.18 (When to reach for OOP)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Collectible\\s*\\(",

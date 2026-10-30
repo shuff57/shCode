@@ -55,6 +55,6 @@ the end of a module, or with a migration that moves the ids.
 
 ## Not yet done
 
-- Only 5.1 is grouped. The rest of the modules have no file.
+- Only 5.1, 5.3 and 5.4 are grouped (5.3/5.4 use CodeHS AP CSA's object lessons as the pattern). The rest of the modules have no file.
 - No per-lesson "2 of 6 done" counter. The headings on the module page show the
   objective and screen count only; screens themselves show nothing.
