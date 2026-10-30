@@ -13,7 +13,9 @@ lesson(s), and what an auditor should compare. Built 2026-10-29 from the public
 | **Partial** | Overlaps one activity or one paragraph; neither course owns it. |
 | **None** | No counterpart anywhere in the five courses checked. |
 
-Courses checked: `gamedesign` (Introduction to Game Design, JSGameLib),
+Courses checked: `gamedesign` (Introduction to Game Design, **p5play** — not JSGameLib;
+`/course/jsgamelib/explore` is a 404, and the course syllabus is titled "Intro to Game Design
+with p5play"),
 `videogamedesign` (Video Game Design in JavaScript), `introjs_corgi`
 (Introduction to CS in JavaScript), `apcsp_js` (AP CSP in JavaScript),
 `apcsacortado` (AP CSA). Unit 8 (3D) is out of scope per the brief.
