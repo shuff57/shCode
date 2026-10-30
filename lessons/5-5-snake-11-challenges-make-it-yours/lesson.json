@@ -38,7 +38,7 @@
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bbeat\\s*(?:-=|--|=\\s*(?:Math\\.)?max\\s*\\(|=\\s*beat\\s*-)|--\\s*beat\\b|if\\s*\\(\\s*(?:score\\s*>=?\\s*best|best\\s*<=?\\s*score)\\s*\\)|\\bbest\\s*=\\s*(?:Math\\.)?max\\s*\\(|\\bturnX\\s*=",
-      "flags": "",
+      "flags": "i",
       "points": 0,
       "status": "pending"
     }

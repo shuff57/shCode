@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Build a pair on a timer",
-      "instructions": "The function `makePipe()` is given: it builds one pair and returns the top pipe. In `draw()`, call it every 90 frames and put the result in the `pipes` array. Run it: pipes should keep arriving from the right.",
+      "instructions": "The function `makePipe()` is given: it builds one pair and returns the top pipe. In `draw()`, call it every 90 frames and put the result in the `pipes` array. Run it: pipes should keep arriving from the right. The bird can touch a pipe and nothing happens yet; 5.4.8 makes that end the round.",
       "hints": [
         "`frameCount % 90 === 0` is true once every 90 frames.",
         "`pipes.push(makePipe());`"
@@ -33,9 +33,9 @@
     {
       "id": "s3",
       "title": "Show how many are alive",
-      "instructions": "Draw `pipes.length` on the screen. It should rise to two or three and then hold there. If it keeps climbing, pipes are not being removed.",
+      "instructions": "Draw `pipes.length` on the screen, inside `drawTop()` at the bottom of the starter, so no pipe can cover it. It should rise to two or three and then hold there. If it keeps climbing, pipes are not being removed.",
       "hints": [
-        "`text('pipes: ' + pipes.length, 20, 50);`"
+        "`text('pipes: ' + pipes.length, 20, 50);` goes inside `drawTop()`, under the 'tap space to flap' line."
       ]
     }
   ],
@@ -68,7 +68,7 @@
       "description": "The sprite is deleted and also taken out of the array. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.delete\\s*\\(\\s*\\)[\\s\\S]{0,120}?pipes\\.splice\\s*\\(",
+      "pattern": "\\.delete\\s*\\(\\s*\\)[\\s\\S]{0,120}?pipes\\.splice\\s*\\(|pipes\\.splice\\s*\\([\\s\\S]{0,120}?\\.delete\\s*\\(\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"

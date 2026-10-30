@@ -26,13 +26,14 @@
       "instructions": "Build at least three obstacle sprites. They must not fall, so give each one the body type that ignores gravity. Store at least one in a named variable, so you can ask about it later.",
       "hints": [
         "`new Sprite(x, y, w, h, 'static')` is a body type, not a fifth size — 5.2.6.",
-        "`.rotation` tilts an obstacle so the ball leaves at an angle."
+        "`.rotation` tilts an obstacle so the ball leaves at an angle.",
+        "Do not name one `floor`: that would hide the `floor()` function from 5.2.1, as 5.3.2 explains. `ground` works."
       ]
     },
     {
       "id": "s3",
       "title": "A ball worth watching",
-      "instructions": "Build the ball: a sprite with no width and height given falls as a circle. Start it at (70, 60), where the R key in the starter puts it back. Give it a colour and a `bounciness` above 0.5, or it will thud and stop.",
+      "instructions": "Build the ball: give `new Sprite` the position and then **one** size number instead of a width and a height, and you get a circle that many pixels across (5.3.2 shows it). Start it at (70, 60), where the R key in the starter puts it back. Give it a colour and a `bounciness` above 0.5, or it will thud and stop.",
       "hints": [
         "`ball = new Sprite(70, 60, 24);` then `ball.bounciness = 0.75;` — 5.2.11 explains what the number means."
       ]

@@ -11,7 +11,7 @@
 **Try it:**
 
 ```js live
-let ball, floor;
+let ball, ground;
 
 function setup() {
   new Canvas(360, 300);
@@ -21,8 +21,8 @@ function setup() {
   ball.color = 'deepskyblue';
   ball.bounciness = 0.8;
 
-  floor = new Sprite(180, 280, 360, 20, 'static');
-  floor.color = 'gray';
+  ground = new Sprite(180, 280, 360, 20, 'static');
+  ground.color = 'gray';
 }
 
 function draw() {

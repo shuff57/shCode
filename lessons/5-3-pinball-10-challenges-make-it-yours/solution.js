@@ -2,7 +2,7 @@
 // My rules: a second goal worth 5, a bumper that slides, and a best score
 // that survives R. Without the best score, every restart would forget it.
 
-let ball, bumper, floor, goal, goal2, slider, score, best, wasTouching, playing;
+let ball, bumper, ground, goal, goal2, slider, score, best, wasTouching, playing;
 let wasTouching2 = false;
 let slideStep = 2;
 
@@ -20,9 +20,9 @@ function setup() {
   bumper.color = 'sienna';
   bumper.rotation = 14;
 
-  // the floor stops short of the left wall: that gap is the drain
-  floor = new Sprite(250, 385, 280, 20, 'static');
-  floor.color = 'gray';
+  // the ground stops short of the left wall: that gap is the drain
+  ground = new Sprite(250, 385, 280, 20, 'static');
+  ground.color = 'gray';
 
   goal = new Sprite(286, 151, 100, 14, 'static');
   goal.color = 'gold';
@@ -34,9 +34,10 @@ function setup() {
   goal2.color = 'orange';
   goal2.worth = 5;
 
-  // Challenge 2: a bumper that slides. It stays static, so gravity leaves it
-  // alone, and draw() moves it a little every frame.
-  slider = new Sprite(200, 230, 60, 12, 'static');
+  // Challenge 2: a bumper that slides, across the arc the ball makes on its way
+  // back to the left. It stays static, so gravity leaves it alone, and draw()
+  // moves it a little every frame.
+  slider = new Sprite(160, 250, 60, 12, 'static');
   slider.color = 'purple';
 
   ball = new Sprite(70, 60, 24);
@@ -57,12 +58,12 @@ function draw() {
     textSize(14);
     text('press R to drop the ball', 20, 28);
     textSize(22);
-    text('score: ' + score, 20, 60);
+    text('score: ' + score, 250, 60);
     textSize(14);
-    text('best: ' + best, 20, 84);
+    text('best: ' + best, 250, 84);
 
     slider.x += slideStep;
-    if (slider.x > 330 || slider.x < 70) slideStep = -slideStep;
+    if (slider.x > 190 || slider.x < 130) slideStep = -slideStep;
 
     const touching = ball.colliding(goal);
     if (touching && !wasTouching) score += goal.worth;

@@ -193,7 +193,7 @@ function draw() {
 
 ### What `frameCount` does
 
-`frameCount` is a built-in counter that starts at 0 and increments by 1 every frame. At 60 fps, after 1 second it's 60. After 10 seconds it's 600.
+`frameCount` is a built-in counter that is `1` on the first frame and goes up by 1 every frame after. At 60 fps, after 1 second it's 60. After 10 seconds it's 600.
 
 ### What the math does
 

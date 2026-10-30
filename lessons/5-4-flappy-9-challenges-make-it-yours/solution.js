@@ -60,11 +60,11 @@ function startRound() {
 
 function draw() {
   background('#222');
-  fill('white');
-  textSize(22);
-  text('score: ' + score, 20, 36);
-  textSize(14);
-  text('best: ' + best, 20, 56);
+
+  // The bird's x never changes: the pipes do the moving. Holding it here every
+  // frame means a pipe that bumps the bird cannot shove it off the screen.
+  bird.x = 100;
+  bird.vel.x = 0;
 
   if (playing) {
     if (kb.presses(' ')) bird.vel.y = -4;
@@ -88,10 +88,21 @@ function draw() {
       }
       if (bird.colliding(p) || bird.colliding(p.mate)) endRound();
     }
-  } else {
-    textSize(28);
-    text('Game over', 130, 190);
   }
 
   if (kb.presses('r')) startRound();
+}
+
+// drawTop() runs after the sprites are drawn, so its text is never hidden behind a pipe.
+function drawTop() {
+  fill('white');
+  textSize(22);
+  text('score: ' + score, 20, 36);
+  textSize(14);
+  text('best: ' + best, 20, 56);
+
+  if (!playing) {
+    textSize(28);
+    text('Game over', 130, 190);
+  }
 }

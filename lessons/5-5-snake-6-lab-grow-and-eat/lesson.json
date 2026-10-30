@@ -79,7 +79,7 @@
       "description": "The tail is removed only on a step that does not eat (in the else, or after the eating branch has returned). Help: 5.5.5 (Reading: A body that grows)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^)]*\\bfood\\b[^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*\\}\\s*else\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(|if\\s*\\([^)]*\\bfood\\b[^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?\\breturn\\b(?:[^{}]|\\{[^{}]*\\})*\\}[\\s\\S]*?segments\\.(?:pop|splice)\\s*\\(|if\\s*\\([^)]*(?:\\bfood\\.\\w+\\s*!==?|!==?\\s*food\\.\\w+)[^)]*\\)\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(",
+      "pattern": "if\\s*\\([^)]*\\bfood\\b[^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*\\}\\s*else\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(|if\\s*\\([^)]*\\bfood\\b[^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?\\breturn\\b(?:[^{}]|\\{[^{}]*\\})*\\}[\\s\\S]*?segments\\.(?:pop|splice)\\s*\\(|if\\s*\\([^)]*(?:\\bfood\\.\\w+\\s*!==?|!==?\\s*food\\.\\w+)[^)]*\\)\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(|(?:const|let)\\s+(\\w+)\\s*=[^;\\n]*\\bfood\\b[^;\\n]*[;\\n][\\s\\S]{0,300}?if\\s*\\(\\s*\\1\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*\\}\\s*else\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(|(?:const|let)\\s+(\\w+)\\s*=[^;\\n]*\\bfood\\b[^;\\n]*[;\\n][\\s\\S]{0,400}?if\\s*\\(\\s*(?:!\\s*\\2|\\2\\s*===?\\s*false)\\s*\\)\\s*\\{?[^{}]*?segments\\.(?:pop|splice)\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

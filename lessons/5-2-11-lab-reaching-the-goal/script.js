@@ -1,6 +1,7 @@
 // 5.2.17 Lab: Reaching the Goal: a single-fire win check with delete().
+// Move with a and d, jump with the space bar while standing on the ground.
 
-let player, ground, goal;
+let player, ground, goal, leftWall, rightWall;
 
 function setup() {
   new Canvas(400, 400);
@@ -8,7 +9,7 @@ function setup() {
 
   player = new Sprite(200, 60, 40, 40);
   player.color = 'deepskyblue';
-  player.bounciness = 0.6;
+  player.bounciness = 0.2;
 
   ground = new Sprite(200, 380, 400, 20, 'static');
   ground.color = 'gray';
@@ -17,6 +18,11 @@ function setup() {
   goal = new Sprite(360, 340, 24, 24);
   goal.collider = 'none';
   goal.color = 'gold';
+
+  leftWall = new Sprite(6, 200, 12, 400, 'static');
+  leftWall.color = 'sienna';
+  rightWall = new Sprite(394, 200, 12, 400, 'static');
+  rightWall.color = 'sienna';
 }
 
 function draw() {

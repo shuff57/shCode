@@ -1,6 +1,6 @@
 // 5.3.8 Lab: Three bumpers, three values.
 
-let ball, floor, score;
+let ball, ground, score;
 let bumpers = [];
 
 function setup() {
@@ -31,8 +31,8 @@ function setup() {
 
   bumpers.push(b1, b2, b3);
 
-  floor = new Sprite(220, 405, 440, 20, 'static');
-  floor.color = 'gray';
+  ground = new Sprite(220, 405, 440, 20, 'static');
+  ground.color = 'gray';
 
   // a heavy ball: bounciness 0 makes it roll instead of bounce,
   // so it touches each bumper once on the way down
@@ -49,7 +49,7 @@ function draw() {
   textSize(14);
   text('press R to drop the ball', 20, 26);
   textSize(22);
-  text('score: ' + score, 20, 58);
+  text('score: ' + score, 280, 58);
 
   // STEP 1: only bumpers[0] counts, and it counts on every frame it is
   //   touched. Loop over every bumper instead, and let each one remember

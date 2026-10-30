@@ -25,7 +25,7 @@
       "title": "End the round",
       "instructions": "In `draw()`, when the ball has fallen past the bottom of the canvas, set the flag to `false`. Nothing visible happens yet — the next step is what uses the flag.",
       "hints": [
-        "`ball.y > 400` is true once the ball is below a 400-tall canvas. On this table the ball gets there by falling through the drain, the gap in the floor at the bottom left.",
+        "`ball.y > 400` is true once the ball is below a 400-tall canvas. On this table the ball gets there by falling through the drain, the gap in the ground at the bottom left.",
         "Do not delete the ball; it has to be there when the round restarts."
       ]
     },
@@ -69,6 +69,17 @@
       "type": "regex",
       "file": "script.js",
       "pattern": "kb\\.presses\\s*\\(\\s*['\"][rR]['\"]\\s*\\)[\\s\\S]{0,240}?score\\s*=\\s*0|function\\s+(\\w+)\\s*\\([^)]*\\)\\s*\\{[^}]*?score\\s*=\\s*0[\\s\\S]*?kb\\.presses\\s*\\(\\s*['\"][rR]['\"]\\s*\\)[\\s\\S]{0,120}?\\b\\1\\s*\\(|kb\\.presses\\s*\\(\\s*['\"][rR]['\"]\\s*\\)[\\s\\S]{0,120}?\\b(\\w+)\\s*\\(\\s*\\)[\\s\\S]*?function\\s+\\2\\s*\\([^)]*\\)\\s*\\{[^}]*?score\\s*=\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "The game reads the flag",
+      "description": "The flag set by the losing test is asked somewhere, so it changes what happens: `if (playing) { ... } else { ... }` shows Game over once the round has ended. Any name works, and so does a flag that starts false, like `gameOver`. Help: 5.3.9 (Reading: The state of the game)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:ball\\.y\\s*>=?\\s*(?:\\d+|height)|(?:\\d+|height)\\s*<=?\\s*ball\\.y)[\\s\\S]{0,80}?(?<![\\w.])(\\w+)\\s*=\\s*(?:true|false)\\b[\\s\\S]*?(?:\\bif\\s*\\(\\s*!?\\s*\\1\\s*(?:===?\\s*(?:true|false)\\s*)?\\)|\\b\\1\\s*(?:\\?|&&|\\|\\|)|(?:&&|\\|\\|)\\s*!?\\s*\\1\\b)|(?:\\bif\\s*\\(\\s*!?\\s*|(?:&&|\\|\\|)\\s*!?\\s*)(\\w+)\\s*(?:===?\\s*(?:true|false)\\s*)?(?:\\)|&&|\\|\\||\\?)[\\s\\S]*?(?:ball\\.y\\s*>=?\\s*(?:\\d+|height)|(?:\\d+|height)\\s*<=?\\s*ball\\.y)[\\s\\S]{0,80}?(?<![\\w.])\\2\\s*=\\s*(?:true|false)\\b",
       "flags": "",
       "points": 0,
       "status": "pending"

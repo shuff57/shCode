@@ -30,10 +30,11 @@ function makePipe() {
 
 function draw() {
   background('#222');
-  fill('white');
-  textSize(14);
-  text('tap space to flap', 20, 28);
-  text('pipes: ' + pipes.length, 20, 50);
+
+  // The bird's x never changes: the pipes do the moving. Holding it here every
+  // frame means a pipe that bumps the bird cannot shove it off the screen.
+  bird.x = 100;
+  bird.vel.x = 0;
 
   if (kb.presses(' ')) {
     bird.vel.y = -4;
@@ -54,4 +55,12 @@ function draw() {
       pipes.splice(i, 1);
     }
   }
+}
+
+// drawTop() runs after the sprites are drawn, so its text is never hidden behind a pipe.
+function drawTop() {
+  fill('white');
+  textSize(14);
+  text('tap space to flap', 20, 28);
+  text('pipes: ' + pipes.length, 20, 50);
 }

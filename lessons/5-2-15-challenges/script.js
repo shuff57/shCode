@@ -1,8 +1,9 @@
 // 5.2.20 Challenges: Optional Stretch: a second goal and a two-goal finish.
 // This is the one-goal scene from 5.2.17. Run it first: touch the gold goal
 // and the console prints the win line once.
+// Move with a and d, jump with the space bar while standing on the ground.
 
-let player, ground, goal;
+let player, ground, goal, leftWall, rightWall;
 
 function setup() {
   new Canvas(400, 400);
@@ -10,7 +11,7 @@ function setup() {
 
   player = new Sprite(200, 60, 40, 40);
   player.color = 'deepskyblue';
-  player.bounciness = 0.6;
+  player.bounciness = 0.2;
 
   ground = new Sprite(200, 380, 400, 20, 'static');
   ground.color = 'gray';
@@ -20,8 +21,15 @@ function setup() {
   goal.collider = 'none';
   goal.color = 'gold';
 
-  // STEP 2: add a second goal sprite somewhere harder to reach. Above the
-  //         wind zone (y less than 200) is a good spot.
+  leftWall = new Sprite(6, 200, 12, 400, 'static');
+  leftWall.color = 'sienna';
+  rightWall = new Sprite(394, 200, 12, 400, 'static');
+  rightWall.color = 'sienna';
+
+  // STEP 2: add a second goal sprite somewhere harder to reach. Up in the
+  //         wind zone (y less than 200), which only a jump reaches, is a
+  //         good spot: x = 360, y = 120 can be reached by jumping from
+  //         where the first goal sits.
 }
 
 function draw() {

@@ -14,8 +14,8 @@ function setup() {
   bumperMid.color = 'sienna';
   bumperMid.rotation = 20;
 
-  const floor = new Sprite(200, 380, 400, 20, 'static');
-  floor.color = 'gray';
+  const ground = new Sprite(200, 380, 400, 20, 'static');
+  ground.color = 'gray';
 
   ball = new Sprite(200, 40, 24);
   ball.color = 'deepskyblue';

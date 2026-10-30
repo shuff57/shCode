@@ -31,9 +31,11 @@ function makePipe() {
 
 function draw() {
   background('#222');
-  fill('white');
-  textSize(22);
-  text('score: ' + score, 20, 36);
+
+  // The bird's x never changes: the pipes do the moving. Holding it here every
+  // frame means a pipe that bumps the bird cannot shove it off the screen.
+  bird.x = 100;
+  bird.vel.x = 0;
 
   if (kb.presses(' ')) {
     bird.vel.y = -4;
@@ -65,7 +67,17 @@ function draw() {
   }
 
   // STEP 3: wrap the play code above (from the flap down to here) in
-  //   if (playing) { ... }, and draw 'Game over' in its else.
-  // STEP 4: after that if/else, when R is pressed, put back everything a
+  //   if (playing) { ... }.
+  // STEP 4: after that if, when R is pressed, put back everything a
   //   round owns, including the pipes.
+}
+
+// drawTop() runs after the sprites are drawn, so its text is never hidden behind a pipe.
+function drawTop() {
+  fill('white');
+  textSize(22);
+  text('score: ' + score, 20, 36);
+
+  // STEP 3: when the round is over (!playing), draw 'Game over' here, where
+  //   no pipe can cover it.
 }

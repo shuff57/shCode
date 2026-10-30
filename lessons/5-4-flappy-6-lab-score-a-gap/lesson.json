@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Notice the bird got past",
-      "instructions": "In `draw()`, loop over the pipes. A pipe has been passed when its `x` is less than the bird's `x`. Show the score on screen, starting at 0.",
+      "instructions": "In `draw()`, loop over the pipes. A pipe has been passed when its `x` is less than the bird's `x`. The score is already on screen, starting at 0: `drawTop()` at the bottom of the starter shows it on top of the pipes.",
       "hints": [
         "`for (const p of pipes) { ... }` visits each pipe; the pipes are already built, with a `passed` property that starts `false`. The index loop from 5.4.6 works too, with `pipes[i]` in place of `p`.",
         "`if (p.x < bird.x && !p.passed) { ... }`"

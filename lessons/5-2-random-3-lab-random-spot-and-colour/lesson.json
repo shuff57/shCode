@@ -44,11 +44,11 @@
     {
       "id": "r1",
       "title": "The coin gets a random x",
-      "description": "The x position comes from random(...). Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "The x position comes from random(...), straight on the line or through a variable first. Help: 5.2.1 (Reading: Random numbers and timers)",
       "hint": "Set coin.x to random(30, 370).",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.x\\s*=\\s*random\\s*\\(|new\\s+Sprite\\s*\\(\\s*random\\s*\\(",
+      "pattern": "\\.x\\s*=\\s*[^;\\n]*\\brandom\\s*\\(|\\b(\\w+)\\s*=\\s*[^;\\n]*\\brandom\\s*\\([^;\\n]*[;\\n][\\s\\S]*?\\.x\\s*=\\s*\\1\\b|new\\s+Sprite\\s*\\(\\s*random\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -56,11 +56,11 @@
     {
       "id": "r2",
       "title": "The coin gets a random y",
-      "description": "The y position comes from random(...). Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "The y position comes from random(...), straight on the line or through a variable first. Help: 5.2.1 (Reading: Random numbers and timers)",
       "hint": "Set coin.y to random(30, 270).",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.y\\s*=\\s*random\\s*\\(|new\\s+Sprite\\s*\\([^;]*?\\)\\s*,\\s*random\\s*\\(",
+      "pattern": "\\.y\\s*=\\s*[^;\\n]*\\brandom\\s*\\(|\\b(\\w+)\\s*=\\s*[^;\\n]*\\brandom\\s*\\([^;\\n]*[;\\n][\\s\\S]*?\\.y\\s*=\\s*\\1\\b|new\\s+Sprite\\s*\\([^;]*?\\)\\s*,\\s*random\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

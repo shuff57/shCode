@@ -7301,25 +7301,25 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "r1",
         "title": "Turn on gravity",
-        "description": "world.gravity.y is set to a non-zero value. Help: 5.2.6 (Gravity)",
+        "description": "world.gravity.y is set to a non-zero value. Help: 5.2.6 (Reading: Gravity)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "Add at least three static obstacles",
-        "description": "At least three 'static' sprites exist in the scene. Help: 5.2.11 (Bounciness and Friction)",
+        "description": "At least three 'static' sprites exist in the scene. Help: 5.2.6 (Reading: Gravity)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "Make the ball genuinely bouncy",
-        "description": "The ball's bounciness is set above 0.8. Help: 5.2.11 (Bounciness and Friction)",
+        "description": "The ball's bounciness is set to 0.8 or more. Help: 5.2.11 (Reading: Bounciness and Friction)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "Add a reset key",
-        "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.11 (Bounciness and Friction)",
+        "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.9 (Reading: Ground-Gated Actions)",
         "points": 1
       }
     ]

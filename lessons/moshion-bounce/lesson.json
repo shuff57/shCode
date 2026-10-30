@@ -68,11 +68,11 @@
     },
     {
       "id": "r3",
-      "title": "Set bounciness",
-      "description": "Assign to .bounciness. Help: 5.2.11 (Bounciness and Friction)",
+      "title": "Make it bouncy",
+      "description": "The ball's .bounciness is set near the top of the 0 to 1 range: 0.5 or more. Help: 5.2.11 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.bounciness\\s*=",
+      "pattern": "\\.bounciness\\s*=\\s*(?:1(?:\\.\\d+)?\\b|0?\\.[5-9])",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -8,7 +8,7 @@ function setup() {
 
   player = new Sprite(200, 60, 40, 40);
   player.color = 'deepskyblue';
-  player.bounciness = 0.6;
+  player.bounciness = 0.2;
 
   ground = new Sprite(200, 380, 400, 20, 'static');
   ground.color = 'gray';

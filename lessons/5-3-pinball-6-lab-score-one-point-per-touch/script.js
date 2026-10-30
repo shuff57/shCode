@@ -1,6 +1,6 @@
 // 5.3.7 Lab: Score one point per touch.
 
-let ball, bumper, floor, goal, score;
+let ball, bumper, ground, goal, score;
 
 function setup() {
   new Canvas(400, 400);
@@ -16,9 +16,9 @@ function setup() {
   bumper.color = 'sienna';
   bumper.rotation = 14;
 
-  // the floor stops short of the left wall: that gap is the drain
-  floor = new Sprite(250, 385, 280, 20, 'static');
-  floor.color = 'gray';
+  // the ground stops short of the left wall: that gap is the drain
+  ground = new Sprite(250, 385, 280, 20, 'static');
+  ground.color = 'gray';
 
   goal = new Sprite(286, 151, 100, 14, 'static');
   goal.color = 'gold';
@@ -37,7 +37,7 @@ function draw() {
   textSize(14);
   text('press R to drop the ball', 20, 28);
   textSize(22);
-  text('score: ' + score, 20, 60);
+  text('score: ' + score, 250, 60);
 
   // STEP 1: this adds a point on every frame the ball touches the goal, so the
   //   score races. Check the touch into a variable first, then compare it with

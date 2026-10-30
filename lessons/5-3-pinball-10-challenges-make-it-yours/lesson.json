@@ -37,7 +37,7 @@
       "description": "Any one challenge counts, or a rule you invented: a second thing that scores, something on the table that moves, a best score kept across restarts, or a score worth something other than 1. Help: 5.3.8 (Lab: Three bumpers, three values)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.colliding\\s*\\(\\s*(?!goal\\s*\\))[\\w.\\[\\]]+\\s*\\)|\\b\\w+\\.x\\s*(?:\\+=|-=)|\\b(\\w+)\\.x\\s*=\\s*\\1\\.x\\s*[+-]|\\.vel\\.[xy]\\s*=\\s*-?(?:[1-9]|0?\\.\\d*[1-9])|if\\s*\\(\\s*score\\s*>=?\\s*\\w+|if\\s*\\(\\s*\\w+\\s*<=?\\s*score\\b|\\bmax\\s*\\([^)]*\\bscore\\b|score\\s*\\+=\\s*(?!1\\b)[\\w.]+|score\\s*=\\s*score\\s*\\+\\s*(?!1\\b)[\\w.]+|\\bframeCount\\b",
+      "pattern": "\\.colliding\\s*\\(\\s*(?!goal\\s*\\))[\\w.\\[\\]]+\\s*\\)|\\b\\w+\\.[xy]\\s*(?:\\+=|-=|\\+\\+|--)|(?:\\+\\+|--)\\s*\\w+\\.[xy]\\b|\\b(\\w+)\\.x\\s*=\\s*\\1\\.x\\s*[+-]|\\.vel\\.[xy]\\s*=\\s*-?(?:[1-9]|0?\\.\\d*[1-9])|if\\s*\\(\\s*score\\s*>=?\\s*\\w+|if\\s*\\(\\s*\\w+\\s*<=?\\s*score\\b|\\bmax\\s*\\([^)]*\\bscore\\b|score\\s*\\+=\\s*(?!1\\b)[\\w.]+|score\\s*=\\s*score\\s*\\+\\s*(?!1\\b)[\\w.]+|\\bframeCount\\b",
       "flags": "",
       "points": 0,
       "status": "pending"

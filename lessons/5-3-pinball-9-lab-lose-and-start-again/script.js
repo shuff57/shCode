@@ -1,6 +1,6 @@
 // 5.3.10 Lab: Lose, and start again.
 
-let ball, bumper, floor, goal, score, wasTouching;
+let ball, bumper, ground, goal, score, wasTouching;
 
 function setup() {
   new Canvas(400, 400);
@@ -16,9 +16,9 @@ function setup() {
   bumper.color = 'sienna';
   bumper.rotation = 14;
 
-  // the floor stops short of the left wall: that gap is the drain
-  floor = new Sprite(250, 385, 280, 20, 'static');
-  floor.color = 'gray';
+  // the ground stops short of the left wall: that gap is the drain
+  ground = new Sprite(250, 385, 280, 20, 'static');
+  ground.color = 'gray';
 
   goal = new Sprite(286, 151, 100, 14, 'static');
   goal.color = 'gold';
@@ -38,7 +38,7 @@ function draw() {
   textSize(14);
   text('press R to drop the ball', 20, 28);
   textSize(22);
-  text('score: ' + score, 20, 60);
+  text('score: ' + score, 250, 60);
 
   const touching = ball.colliding(goal);
   if (touching && !wasTouching) score += 1;

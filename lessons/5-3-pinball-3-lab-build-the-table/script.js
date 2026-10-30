@@ -24,7 +24,7 @@ function draw() {
   textSize(14);
   text('press R to drop the ball', 20, 28);
   textSize(22);
-  text('score: ' + score, 20, 60);
+  text('score: ' + score, 250, 60);
 
   if (kb.presses('r')) {
     ball.x = 70;

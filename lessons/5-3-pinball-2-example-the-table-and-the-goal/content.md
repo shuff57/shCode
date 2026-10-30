@@ -6,10 +6,10 @@
 
 ## Step 1: The table, with bumpers you can name
 
-The table from 5.3.2. The bumper and the floor are held in variables, so the code can ask about them later. The two walls are never asked about, so they stay inside `setup()`.
+The table from 5.3.2. The bumper and the ground are held in variables, so the code can ask about them later. The two walls are never asked about, so they stay inside `setup()`.
 
 ```js live
-let ball, bumper, floor, goal;
+let ball, bumper, ground, goal;
 
 function setup() {
   new Canvas(400, 400);
@@ -25,9 +25,9 @@ function setup() {
   bumper.color = 'sienna';
   bumper.rotation = 14;
 
-  // the floor stops short of the left wall: that gap is the drain
-  floor = new Sprite(250, 385, 280, 20, 'static');
-  floor.color = 'gray';
+  // the ground stops short of the left wall: that gap is the drain
+  ground = new Sprite(250, 385, 280, 20, 'static');
+  ground.color = 'gray';
 
   ball = new Sprite(70, 60, 24);
   ball.color = 'deepskyblue';
@@ -43,14 +43,14 @@ function draw() {
 }
 ```
 
-**What you'll see:** exactly the scene from 5.3.2. Nothing new is visible — `bumper` and `floor` are the same sprites, now held in variables so the code can reach them.
+**What you'll see:** exactly the scene from 5.3.2. Nothing new is visible — `bumper` and `ground` are the same sprites, now held in variables so the code can reach them.
 
 ## Step 2: A target on the ball's path
 
 A goal is just another static sprite, in a place the ball can reach. This one is a gold bar at the low end of the bumper, tilted the same way, so the ball rolls straight onto it.
 
 ```js live
-let ball, bumper, floor, goal, score;
+let ball, bumper, ground, goal, score;
 
 function setup() {
   new Canvas(400, 400);
@@ -66,9 +66,9 @@ function setup() {
   bumper.color = 'sienna';
   bumper.rotation = 14;
 
-  // the floor stops short of the left wall: that gap is the drain
-  floor = new Sprite(250, 385, 280, 20, 'static');
-  floor.color = 'gray';
+  // the ground stops short of the left wall: that gap is the drain
+  ground = new Sprite(250, 385, 280, 20, 'static');
+  ground.color = 'gray';
 
   goal = new Sprite(286, 151, 100, 14, 'static');
   goal.color = 'gold';
@@ -90,12 +90,12 @@ function draw() {
 }
 ```
 
-**What you'll see:** a gold bar at the end of the bumper. The ball rolls down the bumper, straight across the gold, into the right wall, and on to the floor and the drain. Nothing happens when the ball crosses the gold, because nothing is looking yet.
+**What you'll see:** a gold bar at the end of the bumper. The ball rolls down the bumper, straight across the gold, into the right wall, and on to the ground and the drain. Nothing happens when the ball crosses the gold, because nothing is looking yet.
 
 ## Step 3: Count the touch
 
 ```js live
-let ball, bumper, floor, goal, score;
+let ball, bumper, ground, goal, score;
 
 function setup() {
   new Canvas(400, 400);
@@ -111,9 +111,9 @@ function setup() {
   bumper.color = 'sienna';
   bumper.rotation = 14;
 
-  // the floor stops short of the left wall: that gap is the drain
-  floor = new Sprite(250, 385, 280, 20, 'static');
-  floor.color = 'gray';
+  // the ground stops short of the left wall: that gap is the drain
+  ground = new Sprite(250, 385, 280, 20, 'static');
+  ground.color = 'gray';
 
   goal = new Sprite(286, 151, 100, 14, 'static');
   goal.color = 'gold';
@@ -132,7 +132,7 @@ function draw() {
   textSize(14);
   text('press R to drop the ball', 20, 28);
   textSize(22);
-  text('score: ' + score, 20, 60);
+  text('score: ' + score, 250, 60);
 
   if (ball.colliding(goal)) {
     score += 1;

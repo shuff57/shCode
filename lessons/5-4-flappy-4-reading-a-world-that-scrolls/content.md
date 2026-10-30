@@ -17,6 +17,13 @@ pipe.vel.x = -2;
 
 A `'kinematic'` sprite moves under its own speed, ignores gravity, and still collides with the bird. A `'static'` one would never move at all.
 
+A moving pipe that bumps the bird would shove it sideways, so the labs hold the bird in place with two lines at the top of `draw()`:
+
+```js
+bird.x = 100;     // the bird's x never changes
+bird.vel.x = 0;   // and nothing gives it a sideways speed
+```
+
 **New pipes on a timer.** `frameCount` counts frames since the game started, as 5.2.1 showed. The remainder operator `%` turns it into a repeating beat:
 
 ```js
@@ -47,6 +54,16 @@ for (let i = pipes.length - 1; i >= 0; i--) {
 
 **Two things have to go.** Deleting the sprite takes it off the screen. Splicing takes it out of the array. Do only the first and the array keeps pointing at a sprite that no longer exists.
 
+**Text goes on top.** moSHion draws the sprites after `draw()` has finished, so words that `text()` writes in `draw()` end up underneath any pipe that slides over them. A function named `drawTop()` runs after the sprites are drawn. The labs from here on keep their words in it, so a pipe can never hide the score:
+
+```js
+function drawTop() {
+  fill('white');
+  textSize(22);
+  text('score: ' + score, 20, 36);
+}
+```
+
 ---
 
 ## Short glossary (quick reference)
@@ -57,3 +74,4 @@ for (let i = pipes.length - 1; i >= 0; i--) {
 | **frameCount** | how many frames have run since the game began |
 | **%** | the remainder after dividing; `frameCount % 90` repeats 0 to 89 |
 | **splice(i, 1)** | removes one item from an array at position `i` |
+| **drawTop()** | runs after the sprites are drawn, so its text sits on top of them |

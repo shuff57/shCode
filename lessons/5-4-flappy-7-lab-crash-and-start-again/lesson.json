@@ -33,10 +33,10 @@
     {
       "id": "s3",
       "title": "Play only while playing",
-      "instructions": "Freezing stops what is already on the screen, but the code that makes new things still runs every frame: new pipes keep arriving on the beat, the space bar still flaps, and the score can still go up. Wrap the play code in `draw()` (the flap, the edge check, the new pipes on the beat, and both pipe loops) in `if (playing) { ... }`, the same shape as 5.3.10. In its `else`, draw 'Game over'. Run it and crash: no new pipe should appear and the score should stay where it was.",
+      "instructions": "Freezing stops what is already on the screen, but the code that makes new things still runs every frame: new pipes keep arriving on the beat, the space bar still flaps, and the score can still go up. Wrap the play code in `draw()` (the flap, the edge check, the new pipes on the beat, and both pipe loops) in `if (playing) { ... }`, the same shape as 5.3.10. Then draw 'Game over' in `drawTop()`, the function at the bottom of the starter that already shows the score: it runs after the pipes are drawn, so a frozen pipe cannot cover the words. Run it and crash: no new pipe should appear and the score should stay where it was.",
       "hints": [
-        "`if (playing) { ...all of the play code... } else { text('Game over', 130, 190); }`",
-        "Leave the score text above the `if`, so the score still shows after a crash."
+        "`if (playing) { ...all of the play code... }` in `draw()`.",
+        "In `drawTop()`: `if (!playing) { text('Game over', 130, 190); }`. The `!` reads as \"not\", as in `!wasTouching` from 5.3.7. An `else` after `if (playing)` in `draw()` works too, but there a pipe can sit on top of the words."
       ]
     },
     {
@@ -45,7 +45,7 @@
       "instructions": "When R is pressed, put the world back for a fresh round: delete every pipe and empty the array, reset the bird's position and speed, turn gravity back on, zero the score, and set `playing = true`.",
       "hints": [
         "Empty the array only after deleting each sprite: loop with `for (const p of pipes) { p.mate.delete(); p.delete(); }` and then `pipes = [];`.",
-        "Put the R check after the whole `if (playing) { ... } else { ... }`, not inside it, or it can never run once the round is over.",
+        "Put the R check after the whole `if (playing) { ... }`, not inside it, or it can never run once the round is over.",
         "Forget the pipes and the old ones are still sliding in the next round."
       ]
     }
@@ -65,10 +65,10 @@
     {
       "id": "r2",
       "title": "Touching a pipe ends the round",
-      "description": "A collision with the bird sets the flag false. Help: 5.3.9 (Reading: The state of the game)",
+      "description": "A collision with the bird flips the flag (playing = false, or a game-over flag = true). Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,160}?(?<![\\w.$])\\w+\\s*=\\s*false\\b",
+      "pattern": "(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,160}?(?<![\\w.$])\\w+\\s*=\\s*(?:false|true)\\b",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -90,7 +90,7 @@
       "description": "The play code, including the new pipes on the beat, sits inside if (playing), so nothing new happens after a crash. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\(\\s*\\w+\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{[\\s\\S]*?frameCount\\s*%|\\bif\\s*\\(\\s*(?:!\\s*\\w+|\\w+\\s*===?\\s*false)\\s*\\)[\\s\\S]{0,300}?\\breturn\\b",
+      "pattern": "\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?frameCount\\s*%|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\}\\s*else\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?frameCount\\s*%|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{?[^{}]{0,300}?\\breturn\\b[^{}]{0,20}\\}?[\\s\\S]*?frameCount\\s*%",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -101,7 +101,7 @@
       "description": "While the flag is false, the screen says Game over. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:\\}\\s*else\\s*\\{?|if\\s*\\(\\s*(?:!\\s*\\w+|\\w+\\s*===?\\s*false)\\s*\\)\\s*\\{?)[\\s\\S]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over",
+      "pattern": "(?:\\}\\s*else\\s*\\{?|if\\s*\\(\\s*(?:!\\s*\\w+|\\w+\\s*===?\\s*false)\\s*\\)\\s*\\{?)[\\s\\S]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over|^(?=[\\s\\S]*(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,160}?(?<![\\w.$])(\\w+)\\s*=\\s*true\\b)(?=[\\s\\S]*if\\s*\\(\\s*\\1\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{?[^{}]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over)",
       "flags": "i",
       "points": 0,
       "status": "pending"

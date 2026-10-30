@@ -11,7 +11,7 @@
 **Try it:**
 
 ```js live console
-let ball, floor;
+let ball, ground;
 
 function setup() {
   new Canvas(360, 300);
@@ -20,8 +20,8 @@ function setup() {
   ball = new Sprite(180, 60, 30, 30);
   ball.color = 'deepskyblue';
 
-  floor = new Sprite(180, 280, 360, 20, 'static');
-  floor.color = 'gray';
+  ground = new Sprite(180, 280, 360, 20, 'static');
+  ground.color = 'gray';
 }
 
 function draw() {
@@ -32,7 +32,7 @@ function draw() {
 }
 ```
 
-Run it and read the console under the canvas: once a second it prints `ball.y`. The number grows while the ball falls (a bigger `y` is further down), then stops changing once the ball lands on the floor. Then change `world.gravity.y = 10` to `world.gravity.y = 0` and rerun: the ball just floats. Try `-5` next: it drifts upward instead.
+Run it and read the console under the canvas: once a second it prints `ball.y`. The number grows while the ball falls (a bigger `y` is further down), then stops changing once the ball lands on the ground. Then change `world.gravity.y = 10` to `world.gravity.y = 0` and rerun: the ball just floats. Try `-5` next: it drifts upward instead.
 
 ---
 

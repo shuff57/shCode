@@ -1,6 +1,6 @@
 ## Challenge 1: Second Goal (medium)
 
-The starter is the one-goal scene from 5.2.17, so press Run first and touch the goal once. Then add a second goal sprite somewhere harder to reach: above the wind zone is a good spot. Track how many goals have been collected. Only print `"All goals collected!"` once BOTH goals are gone, not after the first one.
+The starter is the one-goal scene from 5.2.17, so press Run first and touch the goal once. Then add a second goal sprite somewhere harder to reach: up in the wind zone (`y` less than `200`), which the player only gets to by jumping, is a good spot. Put it straight above the first goal, for example at `x = 360`, `y = 120`, and jump from where the first goal was. Track how many goals have been collected. Only print `"All goals collected!"` once BOTH goals are gone, not after the first one.
 
 **How it should work:**
 

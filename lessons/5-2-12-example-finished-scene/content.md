@@ -12,7 +12,7 @@ function setup() {
   world.gravity.y = 10;
   player = new Sprite(200, 60, 40, 40);
   player.color = 'deepskyblue';
-  player.bounciness = 0.6;
+  player.bounciness = 0.2;
 
   ground = new Sprite(200, 380, 400, 20, 'static');
   ground.friction = 0.5;
@@ -29,9 +29,9 @@ function setup() {
 
 function draw() {
   background('#222');
-  if (kb.pressing('left'))       player.vel.x = -4;
-  else if (kb.pressing('right')) player.vel.x = 4;
-  else                           player.vel.x = 0;
+  if (kb.pressing('a'))       player.vel.x = -4;
+  else if (kb.pressing('d'))  player.vel.x = 4;
+  else                        player.vel.x = 0;
 
   if (kb.presses(' ') && player.colliding(ground)) {
     player.vel.y = -7;
@@ -54,7 +54,7 @@ function draw() {
 }
 ```
 
-Move with the arrow keys, jump near the ground, drift upward through the wind zone above `y = 200`, bounce a little on landing, and touch the gold goal to win once. The console under the canvas prints `You win!` the moment you touch it.
+Move with `a` and `d` (the same keys as every lab in this module), jump with the space bar while standing on the ground, drift upward through the wind zone above `y = 200`, bounce a little on landing, and touch the gold goal to win once. The console under the canvas prints `You win!` the moment you touch it.
 
 ## Step 2: How close is "touching the goal"?
 

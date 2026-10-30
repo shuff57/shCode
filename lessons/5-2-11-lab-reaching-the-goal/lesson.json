@@ -32,7 +32,7 @@
     {
       "id": "s3",
       "title": "Win once",
-      "instructions": "Still inside `if (goal)`, when the distance is less than 25, log a win message, call `goal.delete()`, then set `goal` to `null`. Run it and walk into the gold block: the message prints once and the goal is gone for good.",
+      "instructions": "Still inside `if (goal)`, when the distance is less than 25, log a win message, call `goal.delete()`, then set `goal` to `null`. Run it, move with `a` and `d` (jump with the space bar) and walk into the gold block: the message prints once and the goal is gone for good.",
       "hints": [
         "5.2.15 Reading: Cleanup and Delete deletes a sprite and then sets its variable to `null`, so the guard is false from then on.",
         "`if (dist < 25) { ... }` holds the three lines: the `console.log`, `goal.delete();` and `goal = null;`."
@@ -54,12 +54,12 @@
     },
     {
       "id": "r2",
-      "title": "Compute the distance to the goal",
-      "description": "The distance between player and goal is computed: Math.sqrt(dx * dx + dy * dy), ** 0.5, Math.hypot(dx, dy), dist(...), or player.distanceTo(goal). Help: 5.2.16 (Worked Example: The Finished Scene)",
+      "title": "Compute the distance and test it",
+      "description": "The distance between player and goal is worked out from their positions (Math.sqrt(dx * dx + dy * dy), ** 0.5, Math.hypot(dx, dy), dist(...), or player.distanceTo(goal)) and is what the if tests: dist < 25. Help: 5.2.16 (Worked Example: The Finished Scene)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "Math\\.(?:sqrt|hypot)\\s*\\(|\\*\\*\\s*0?\\.5\\b|\\bdist\\s*\\(|\\.distanceTo\\s*\\(",
+      "pattern": "(?:Math\\.(?:sqrt|hypot)|\\bdist|\\.distanceTo)\\s*\\([^;{}]*[A-Za-z_][^;{}]*\\)\\s*<=?\\s*[\\w.]|\\d\\s*>=?\\s*(?:Math\\.(?:sqrt|hypot)|\\bdist|[\\w.]*\\.distanceTo)\\s*\\([^;{}]*[A-Za-z_][^;{}]*\\)|\\)\\s*\\*\\*\\s*0?\\.5\\s*<=?\\s*[\\w.]|\\b(\\w+)\\s*=\\s*(?:Math\\.(?:sqrt|hypot)\\s*\\(|dist\\s*\\(|[\\w.]*\\.distanceTo\\s*\\(|\\()[^;\\n]*[A-Za-z_][^;\\n]*[;\\n][\\s\\S]{0,300}?(?:\\b\\1\\s*<=?\\s*[\\w.]|\\d\\s*>=?\\s*\\1\\b)",
       "flags": "",
       "points": 0,
       "status": "pending"

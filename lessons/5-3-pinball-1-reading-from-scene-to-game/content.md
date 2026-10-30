@@ -23,7 +23,7 @@ This module adds them one at a time, and every one of them is built with things 
 **Try it:**
 
 ```js live
-let ball, bumper, floor;
+let ball, bumper, ground;
 
 function setup() {
   new Canvas(400, 400);
@@ -39,9 +39,9 @@ function setup() {
   bumper.color = 'sienna';
   bumper.rotation = 14;
 
-  // the floor stops short of the left wall: that gap is the drain
-  floor = new Sprite(250, 385, 280, 20, 'static');
-  floor.color = 'gray';
+  // the ground stops short of the left wall: that gap is the drain
+  ground = new Sprite(250, 385, 280, 20, 'static');
+  ground.color = 'gray';
 
   ball = new Sprite(70, 60, 24);
   ball.color = 'deepskyblue';
@@ -63,9 +63,11 @@ function draw() {
 }
 ```
 
-**What you'll see:** the ball drops onto the bumper and rolls down it, flies off the end into the right wall, bounces across the floor, and falls out through the gap at the bottom left. That gap is the **drain**. Press R and it starts again. This is the same kind of scene you built in 5.2.18, with two walls and a drain added — and there is still no goal, no score, nothing happens when the ball drains, and no reason to press R except to watch it fall again.
+**What you'll see:** the ball drops onto the bumper and rolls down it, flies off the end into the right wall, bounces across the ground, and falls out through the gap at the bottom left. That gap is the **drain**. Press R and it starts again. This is the same kind of scene you built in 5.2.18, with two walls and a drain added — and there is still no goal, no score, nothing happens when the ball drains, and no reason to press R except to watch it fall again.
 
-**Try this:** let the ball settle, then look at what is missing. If you wanted to tell a friend how well you just did, what number would you show them? That number does not exist yet. 5.3.3 adds it.
+**Two things in that code to notice.** `new Sprite(70, 60, 24)` has **one** size number instead of a width and a height. One number makes a circle that many pixels across, so this ball is a circle 24 pixels wide, the same kind of ball you made in 5.2.12 Bouncy Ball. And the gray strip along the bottom is called `ground`, not `floor`: `floor()` is the rounding function from 5.2.1 (Reading: Random numbers and timers), and a variable named `floor` would hide it, so `floor(random(1, 7))` would stop working.
+
+**Try this:** watch one drop all the way to the drain, then look at what is missing. If you wanted to tell a friend how well you just did, what number would you show them? That number does not exist yet. 5.3.3 adds it.
 
 ---
 
