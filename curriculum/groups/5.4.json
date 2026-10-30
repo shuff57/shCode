@@ -41,13 +41,27 @@
       ]
     },
     {
-      "id": "choosing-oop",
-      "title": "Choosing OOP",
-      "objective": "Students will be able to decide whether a class is the right tool with a three-question checklist, write a Collectible class and build five of them, compare procedural and object-oriented versions in writing, and name encapsulation, inheritance and polymorphism.",
+      "id": "when-to-reach-for-oop",
+      "title": "When to reach for OOP",
+      "objective": "Students will be able to decide whether a class is the right tool with a three-question checklist, then write a Collectible class and build five of them.",
       "screens": [
         "5-3-30-reading-when-oop",
-        "5-3-31-a12-1-collectible",
-        "5-3-32-a12-2-oop-writeup",
+        "5-3-31-a12-1-collectible"
+      ]
+    },
+    {
+      "id": "defend-the-choice",
+      "title": "Defend the choice",
+      "objective": "Students will be able to compare a procedural and an object-oriented version of the same feature in writing, and say what changes when a fourth enemy arrives.",
+      "screens": [
+        "5-3-32-a12-2-oop-writeup"
+      ]
+    },
+    {
+      "id": "name-the-pillars",
+      "title": "Name the pillars",
+      "objective": "Students will be able to name encapsulation, inheritance and polymorphism, and extend their own class in a challenge.",
+      "screens": [
         "5-3-33-reading-oop-vocab",
         "5-3-34-challenges"
       ]

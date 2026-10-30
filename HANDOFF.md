@@ -89,10 +89,16 @@ the AI check on 5.5.19 has not had a live model run — `test-ai-check` only che
 - Group the remaining 31 modules one at a time (objectives are hand-written; user reviews each).
 - Closing checks for reading-heavy modules (1.2, 1.5, 3.2, 6.5, 6.7).
 - A standard project close-out for 7.1 (two screens today).
-- **Pacing conflict, still unresolved.** The 5.4 module doc estimates about 4 h 45 min while
-  the 5.3/5.4 note says about 1.75 contact hours. "Choosing OOP" (5.4 lesson 4) is about 127 min
-  because it holds both graded assignments. 5.5 adds about 3 hours on top. Teacher decision
-  pending — nothing in 5.5 depends on the answer.
+- **Pacing: the worst block is gone, the conflict is not.** 5.4's lesson 4 ("Choosing OOP",
+  127 min, both graded parts in one lesson) was split three ways on 2026-10-29 — *When to reach
+  for OOP* (51), *Defend the choice* (40), *Name the pillars* (36) — leaving 5.4 at **6 lessons
+  over 22 screens**, longest 63 min. The split is a `curriculum/groups/5.4.json` edit only:
+  no screen moved, no renumber, no migration, and the module still estimates ~4 h 45 min,
+  which still disagrees with the 5.3/5.4 note's ~1.75 contact hours. 5.5 adds about 3 hours on
+  top. Teacher decision on the prose estimate is pending — nothing depends on the answer.
+- A one-screen lesson is legal (`lib/lesson-groups.ts` caps at 8 and sets no floor), but it was
+  the first one in the course: `ModuleLessonsList` said "1 screens" until it was fixed to
+  pluralise.
 - 10 pre-existing `check-help-pointer-titles` mismatches (1.4.10, 2.5.6, 3.4.12 x4, 5.1.10,
   6.6.24 x2, 6.8.7). None in 5.1–5.5.
 - 5.2.4 Lab: Tune Gravity partly overlaps the Falling Block example (5.2.3); intended

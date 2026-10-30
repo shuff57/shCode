@@ -302,7 +302,7 @@ export default function ModuleLessonsList({
                 </span>
                 <span style={{ fontWeight: 650, fontSize: 15 }}>{heading.group.title}</span>
                 <span style={{ fontSize: 12, color: '#8393c4' }}>
-                  {heading.group.screens.length} screens
+                  {heading.group.screens.length} screen{heading.group.screens.length === 1 ? '' : 's'}
                   {minutes > 0 ? ` · ~${minutes} min` : ''}
                 </span>
               </div>
