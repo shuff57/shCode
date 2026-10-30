@@ -58,6 +58,17 @@ export interface ModuleSummary {
   environment?: string;
   category?: string;     // category lesson.json must match to appear in this module
   slug: string;          // e.g. "2.1_moshion-foundations"
+  /**
+   * Keep this module out of the COURSE LIST (home page and its search), while
+   * still building its pages and letting a direct link work.
+   *
+   * Deliberately not `status`: that field says how finished a module's DOC is,
+   * and 23 of the 40 modules say `draft` — all of Unit 1 among them — so
+   * filtering on it would hide most of the course. `hidden` says exactly one
+   * thing: do not advertise this module yet. 8.1 Solid Shapes is the first user
+   * (the 3D track is paused).
+   */
+  hidden?: boolean;
 }
 
 export interface LessonInModule {
@@ -101,6 +112,7 @@ export async function listModules(): Promise<ModuleSummary[]> {
       environment: data.environment,
       category: data.category,
       slug: f.replace(/\.md$/, ''),
+      hidden: data.hidden === true,
     });
   }
   modules.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
