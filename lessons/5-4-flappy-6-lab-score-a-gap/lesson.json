@@ -1,7 +1,7 @@
 {
   "id": "5-4-flappy-6-lab-score-a-gap",
-  "title": "5.4.6 Lab: Score a gap",
-  "description": "A pipe the bird has flown past is worth a point, once. The starter has no score. Give every pipe a flag that remembers it has been counted, the same idea as 5.3.6 with a different trigger.",
+  "title": "5.4.7 Lab: Score a gap",
+  "description": "A pipe the bird has flown past is worth a point, once. The starter has no score. Give every pipe a flag that remembers it has been counted, the same idea as 5.3.7 with a different trigger.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Count each pipe once",
-      "instructions": "Inside that test, add one to the score and set `p.passed = true`. Without the flag, the test is true on every frame after the bird passes, and the score races like the ball did in 5.3.4.",
+      "instructions": "Inside that test, add one to the score and set `p.passed = true`. Without the flag, the test is true on every frame after the bird passes, and the score races like the ball did in 5.3.5.",
       "hints": [
         "`score += 1;` then `p.passed = true;`",
         "Run it: the score should rise by exactly one as each pipe slides behind the bird."
@@ -35,7 +35,7 @@
     {
       "id": "r1",
       "title": "Every pipe is checked",
-      "description": "A loop looks at each pipe in the array. Help: 5.3.7 (Lab: Three bumpers, three values)",
+      "description": "A loop looks at each pipe in the array. Help: 5.3.8 (Lab: Three bumpers, three values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\(\\s*(?:const|let)\\s+\\w+\\s+of\\s+pipes\\s*\\)",
@@ -46,7 +46,7 @@
     {
       "id": "r2",
       "title": "A pipe is passed when it is behind the bird",
-      "description": "The pipe's x is compared with the bird's x and the pipe's own flag. Help: 5.3.4 (Reading: A collision is not an event)",
+      "description": "The pipe's x is compared with the bird's x and the pipe's own flag. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\.x\\s*<\\s*bird\\.x\\s*&&\\s*!\\s*\\w+\\.passed",
@@ -57,7 +57,7 @@
     {
       "id": "r3",
       "title": "Each pipe is counted once",
-      "description": "The score goes up and the pipe is flagged in the same step. Help: 5.3.4 (Reading: A collision is not an event)",
+      "description": "The score goes up and the pipe is flagged in the same step. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "score\\s*\\+=\\s*1[\\s\\S]{0,60}?\\w+\\.passed\\s*=\\s*true",

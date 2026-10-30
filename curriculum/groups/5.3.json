@@ -4,9 +4,10 @@
   "lessons": [
     {
       "id": "from-scene-to-game",
-      "title": "From scene to game",
-      "objective": "Students will be able to name the four things that turn a physics scene into a game, and build a table with a goal on it.",
+      "title": "Plan, and from scene to game",
+      "objective": "Students will be able to plan a game as parts and remembered values, name the four things that turn a physics scene into a game, and build a table with a goal on it.",
       "screens": [
+        "5-3-pinball-plan-sketch-the-game",
         "5-3-pinball-1-reading-from-scene-to-game",
         "5-3-pinball-2-example-the-table-and-the-goal",
         "5-3-pinball-3-lab-build-the-table"
@@ -34,9 +35,10 @@
     },
     {
       "id": "make-it-yours",
-      "title": "Make it yours",
-      "objective": "Students will be able to extend their own game with a new rule of their own design.",
+      "title": "Playtest, and make it yours",
+      "objective": "Students will be able to playtest their own game, link what they saw to their code, and extend it with a rule of their own.",
       "screens": [
+        "5-3-pinball-playtest-and-reflect",
         "5-3-pinball-10-challenges-make-it-yours"
       ]
     }

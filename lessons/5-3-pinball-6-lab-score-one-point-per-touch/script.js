@@ -1,4 +1,4 @@
-// 5.3.6 Lab: Score one point per touch.
+// 5.3.7 Lab: Score one point per touch.
 
 let ball, bumper, floor, goal, score;
 

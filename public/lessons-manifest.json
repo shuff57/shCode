@@ -7594,7 +7594,7 @@
     },
     {
       "id": "5-3-pinball-1-reading-from-scene-to-game",
-      "title": "5.3.1 Reading: From scene to game",
+      "title": "5.3.2 Reading: From scene to game",
       "unit": "5.3 Project: Pinball",
       "preview": "reading",
       "type": "lesson",
@@ -7607,7 +7607,7 @@
     },
     {
       "id": "5-3-pinball-10-challenges-make-it-yours",
-      "title": "5.3.10 Challenges: Make it yours",
+      "title": "5.3.12 Challenges: Make it yours",
       "unit": "5.3 Project: Pinball",
       "preview": "moshion",
       "type": "lesson",
@@ -7620,7 +7620,7 @@
     },
     {
       "id": "5-3-pinball-2-example-the-table-and-the-goal",
-      "title": "5.3.2 Worked Example: The table and the goal",
+      "title": "5.3.3 Worked Example: The table and the goal",
       "unit": "5.3 Project: Pinball",
       "preview": "example",
       "type": "lesson",
@@ -7633,7 +7633,7 @@
     },
     {
       "id": "5-3-pinball-3-lab-build-the-table",
-      "title": "5.3.3 Lab: Build the table",
+      "title": "5.3.4 Lab: Build the table",
       "unit": "5.3 Project: Pinball",
       "preview": "moshion",
       "type": "lesson",
@@ -7646,7 +7646,7 @@
     },
     {
       "id": "5-3-pinball-4-reading-a-collision-is-not-an-event",
-      "title": "5.3.4 Reading: A collision is not an event",
+      "title": "5.3.5 Reading: A collision is not an event",
       "unit": "5.3 Project: Pinball",
       "preview": "reading",
       "type": "lesson",
@@ -7659,7 +7659,7 @@
     },
     {
       "id": "5-3-pinball-5-example-the-score-that-climbs",
-      "title": "5.3.5 Worked Example: The score that climbs by itself",
+      "title": "5.3.6 Worked Example: The score that climbs by itself",
       "unit": "5.3 Project: Pinball",
       "preview": "example",
       "type": "lesson",
@@ -7672,7 +7672,7 @@
     },
     {
       "id": "5-3-pinball-6-lab-score-one-point-per-touch",
-      "title": "5.3.6 Lab: Score one point per touch",
+      "title": "5.3.7 Lab: Score one point per touch",
       "unit": "5.3 Project: Pinball",
       "preview": "moshion",
       "type": "lesson",
@@ -7685,7 +7685,7 @@
     },
     {
       "id": "5-3-pinball-7-lab-three-bumpers-three-values",
-      "title": "5.3.7 Lab: Three bumpers, three values",
+      "title": "5.3.8 Lab: Three bumpers, three values",
       "unit": "5.3 Project: Pinball",
       "preview": "moshion",
       "type": "lesson",
@@ -7698,7 +7698,7 @@
     },
     {
       "id": "5-3-pinball-8-reading-the-state-of-the-game",
-      "title": "5.3.8 Reading: The state of the game",
+      "title": "5.3.9 Reading: The state of the game",
       "unit": "5.3 Project: Pinball",
       "preview": "reading",
       "type": "lesson",
@@ -7711,7 +7711,7 @@
     },
     {
       "id": "5-3-pinball-9-lab-lose-and-start-again",
-      "title": "5.3.9 Lab: Lose, and start again",
+      "title": "5.3.10 Lab: Lose, and start again",
       "unit": "5.3 Project: Pinball",
       "preview": "moshion",
       "type": "lesson",
@@ -7723,8 +7723,34 @@
       "scoreKind": null
     },
     {
+      "id": "5-3-pinball-plan-sketch-the-game",
+      "title": "5.3.1 Plan: Sketch your pinball game",
+      "unit": "5.3 Project: Pinball",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-3-pinball-playtest-and-reflect",
+      "title": "5.3.11 Playtest and reflect: Pinball",
+      "unit": "5.3 Project: Pinball",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "5-4-flappy-1-reading-gravity-and-the-flap",
-      "title": "5.4.1 Reading: Gravity and the flap",
+      "title": "5.4.2 Reading: Gravity and the flap",
       "unit": "5.4 Project: Flappy",
       "preview": "reading",
       "type": "lesson",
@@ -7737,7 +7763,7 @@
     },
     {
       "id": "5-4-flappy-2-example-the-bird-that-flaps",
-      "title": "5.4.2 Worked Example: The bird that flaps",
+      "title": "5.4.3 Worked Example: The bird that flaps",
       "unit": "5.4 Project: Flappy",
       "preview": "example",
       "type": "lesson",
@@ -7750,7 +7776,7 @@
     },
     {
       "id": "5-4-flappy-3-lab-make-it-flap",
-      "title": "5.4.3 Lab: Make it flap",
+      "title": "5.4.4 Lab: Make it flap",
       "unit": "5.4 Project: Flappy",
       "preview": "moshion",
       "type": "lesson",
@@ -7763,7 +7789,7 @@
     },
     {
       "id": "5-4-flappy-4-reading-a-world-that-scrolls",
-      "title": "5.4.4 Reading: A world that scrolls",
+      "title": "5.4.5 Reading: A world that scrolls",
       "unit": "5.4 Project: Flappy",
       "preview": "reading",
       "type": "lesson",
@@ -7776,7 +7802,7 @@
     },
     {
       "id": "5-4-flappy-5-lab-pipes-that-come-and-go",
-      "title": "5.4.5 Lab: Pipes that come and go",
+      "title": "5.4.6 Lab: Pipes that come and go",
       "unit": "5.4 Project: Flappy",
       "preview": "moshion",
       "type": "lesson",
@@ -7789,7 +7815,7 @@
     },
     {
       "id": "5-4-flappy-6-lab-score-a-gap",
-      "title": "5.4.6 Lab: Score a gap",
+      "title": "5.4.7 Lab: Score a gap",
       "unit": "5.4 Project: Flappy",
       "preview": "moshion",
       "type": "lesson",
@@ -7802,7 +7828,7 @@
     },
     {
       "id": "5-4-flappy-7-lab-crash-and-start-again",
-      "title": "5.4.7 Lab: Crash, and start again",
+      "title": "5.4.8 Lab: Crash, and start again",
       "unit": "5.4 Project: Flappy",
       "preview": "moshion",
       "type": "lesson",
@@ -7815,7 +7841,7 @@
     },
     {
       "id": "5-4-flappy-8-quiz-flappy-check",
-      "title": "5.4.8 Check: the flapping game",
+      "title": "5.4.10 Check: the flapping game",
       "unit": "5.4 Project: Flappy",
       "preview": "quiz",
       "type": "assignment",
@@ -7828,7 +7854,7 @@
     },
     {
       "id": "5-4-flappy-9-challenges-make-it-yours",
-      "title": "5.4.9 Challenges: Make it yours",
+      "title": "5.4.11 Challenges: Make it yours",
       "unit": "5.4 Project: Flappy",
       "preview": "moshion",
       "type": "lesson",
@@ -7836,6 +7862,32 @@
       "week": 11,
       "assignmentCode": null,
       "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-4-flappy-plan-sketch-the-game",
+      "title": "5.4.1 Plan: Sketch your Flappy game",
+      "unit": "5.4 Project: Flappy",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-4-flappy-playtest-and-reflect",
+      "title": "5.4.9 Playtest and reflect: Flappy",
+      "unit": "5.4 Project: Flappy",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": 4,
       "maxSubmissions": null,
       "scoreKind": null
     },

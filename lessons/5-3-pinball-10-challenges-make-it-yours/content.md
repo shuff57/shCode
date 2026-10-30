@@ -3,7 +3,7 @@
 Your game is complete: a table, a goal, a score that counts events, an end, and a restart. Now change one rule of your own choosing. Pick any of these, or invent one.
 
 **Challenge 1 — a second goal (easy).**
-Add a second goal worth more than the first. Give each goal its own value, the same way the bumpers in 5.3.7 each had a `worth`.
+Add a second goal worth more than the first. Give each goal its own value, the same way the bumpers in 5.3.8 each had a `worth`.
 
 **Challenge 2 — a bumper that moves (medium).**
 Make one bumper slide left and right. A static sprite does not move, so this one must be dynamic — give it a low `bounciness` and set its velocity, and it will keep going until something stops it.

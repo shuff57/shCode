@@ -1,4 +1,4 @@
-// 5.4.3 Lab: Make it flap.
+// 5.4.4 Lab: Make it flap.
 
 let bird;
 

@@ -1,6 +1,6 @@
 {
   "id": "5-3-pinball-7-lab-three-bumpers-three-values",
-  "title": "5.3.7 Lab: Three bumpers, three values",
+  "title": "5.3.8 Lab: Three bumpers, three values",
   "description": "Three bumpers, worth 1, 5 and 10. The starter scores only the first, on every frame. Loop over all of them and let each bumper remember its own last frame, so every bumper scores once per hit and for its own value.",
   "type": "lesson",
   "estimateMins": 10,
@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Loop instead of naming one",
-      "instructions": "Replace the single `bumpers[0]` check with a loop over every bumper in the array. Inside the loop, apply the same edge check you wrote in 5.3.6, but on the bumper's own `wasTouching`.",
+      "instructions": "Replace the single `bumpers[0]` check with a loop over every bumper in the array. Inside the loop, apply the same edge check you wrote in 5.3.7, but on the bumper's own `wasTouching`.",
       "hints": [
         "`for (const b of bumpers) { ... }` visits each bumper in turn; the loop shape is the one from 3.3.5.",
         "Inside the loop the check reads `touching && !b.wasTouching`."
@@ -54,7 +54,7 @@
     {
       "id": "r2",
       "title": "Each bumper remembers its own last frame",
-      "description": "The bumper's own `wasTouching` is updated on every frame, so every bumper can be hit once per contact. Help: 5.3.4 (Reading: A collision is not an event)",
+      "description": "The bumper's own `wasTouching` is updated on every frame, so every bumper can be hit once per contact. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\.wasTouching\\s*=\\s*\\w+\\s*;",
@@ -65,7 +65,7 @@
     {
       "id": "r3",
       "title": "The score adds the bumper's own worth",
-      "description": "Different bumpers are worth different amounts, because the score uses each bumper's own `worth`. Help: 5.3.4 (Reading: A collision is not an event)",
+      "description": "Different bumpers are worth different amounts, because the score uses each bumper's own `worth`. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "score\\s*\\+=\\s*\\w+\\.worth",
