@@ -1,0 +1,73 @@
+{
+  "id": "5-5-snake-11-challenges-make-it-yours",
+  "title": "5.5.11 Challenges: Make it yours",
+  "description": "The game is complete. Change one rule of your own: a snake that speeds up as it eats, a best score that survives a loss, or a fix for the quick double-turn. Pick one, or invent one.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a rule and change it",
+      "instructions": "Choose one of the three challenges on the page above, or invent a rule of your own. Start from the game in the editor.",
+      "hints": [
+        "Whatever you pick, press R afterwards and check the game still starts cleanly."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Name what you changed",
+      "instructions": "Write one sentence in the notes under the editor saying what your rule is and what would happen if you removed it.",
+      "hints": [
+        "A rule is something the game decides. 'The snake speeds up with each food' is a rule; 'I changed a colour' is not."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The snake speeds up as it eats",
+      "description": "The beat is a variable that gets shorter. Help: 5.5.2 (Reading: A world on a grid)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "beat\\s*(?:-=|=\\s*(?:max|Math\\.max))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The best score survives a loss",
+      "description": "A second number is kept across rounds and updated when the score beats it. Help: 5.3.9 (Lab: Lose, and start again)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(\\s*score\\s*>\\s*best\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A turn waits for the next step",
+      "description": "The key stores the turn, and the step applies it. Help: 5.5.4 (Lab: Steer it)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "turnX\\s*=",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

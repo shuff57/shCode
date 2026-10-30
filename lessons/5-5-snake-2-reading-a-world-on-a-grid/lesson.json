@@ -1,0 +1,20 @@
+{
+  "id": "5-5-snake-2-reading-a-world-on-a-grid",
+  "title": "5.5.2 Reading: A world on a grid",
+  "description": "Snake lives on a grid of cells, not on free pixels. Shows how a column and a row become a pixel position, and how the game moves one cell every few frames.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "reading",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

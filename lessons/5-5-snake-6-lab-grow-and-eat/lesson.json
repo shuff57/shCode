@@ -1,0 +1,82 @@
+{
+  "id": "5-5-snake-6-lab-grow-and-eat",
+  "title": "5.5.6 Lab: Grow and eat",
+  "description": "The snake is a three-cell body that moves as one cell, and the food does nothing. Move it by adding a head and removing the tail, then let eating keep the tail and add a point.",
+  "type": "lesson",
+  "estimateMins": 14,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Move by adding a head and removing a tail",
+      "instructions": "In `step()`, replace the last two lines with the trick from 5.5.5: put a new head at the front of `segments` with `unshift`, then `pop` the tail and delete it. Run it: the whole three-cell snake should slide forward.",
+      "hints": [
+        "`segments.unshift(makeSegment(col, row));`",
+        "`const tail = segments.pop();` then `tail.delete();`"
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Eating keeps the tail",
+      "instructions": "If the new head's cell is the food's cell (`col === food.col && row === food.row`), add 1 to `score`, delete the food, make a new one, and skip the tail removal. Otherwise remove the tail as before.",
+      "hints": [
+        "It is an `if`/`else`: the `if` branch scores and replaces the food, the `else` branch pops the tail.",
+        "`food.delete();` then `food = makeFood();`"
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Watch it grow",
+      "instructions": "Eat three pieces of food. The snake should be six cells long and the score should read 3. If the score rises but the snake does not grow, the tail is still being removed on the eating step.",
+      "hints": [
+        "The tail removal belongs only in the `else`."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A new head goes on the front",
+      "description": "The snake moves by adding a cell to the front of the array. Help: 5.5.5 (Reading: A body that grows)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "segments\\.unshift\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The tail is removed and deleted",
+      "description": "The last cell leaves the array and the screen. Help: 5.5.5 (Reading: A body that grows)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "segments\\.pop\\s*\\(\\s*\\)[\\s\\S]{0,80}?\\.delete\\s*\\(\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Eating scores and replaces the food",
+      "description": "Reaching the food adds a point and makes a new piece. Help: 5.5.5 (Reading: A body that grows)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "score\\s*\\+=\\s*1[\\s\\S]{0,80}?food\\s*=\\s*makeFood\\s*\\(\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

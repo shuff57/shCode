@@ -7465,6 +7465,70 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "5-5-snake-1-plan-break-snake-into-parts": {
+    "lessonTitle": "5.5.1 Plan: Break Snake into parts",
+    "prompt": "Everything you need is on this page and in 5.4.7 (Lab: Crash, and start again): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build Snake. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names at least four separate parts of Snake in their own words, such as the snake's cells, the food, steering, the beat that moves it, scoring, losing, and restarting. Credit any plausible list of four or more, however loosely worded. A part is something the game has or does; a list that only restates the rules in one lump is partial.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between frames",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example where every cell of the snake is, which way it is heading, where the food is, the score, and whether the round is still playing. Any two sensible items earn full credit.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all (it is the base the rest sits on, it is the easiest to test, nothing else works without it). Be generous: a short plausible reason is enough.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names one part they do not yet know how to do, such as growing the body or making the snake not bite itself, and says in a few words what is hard about it. Any honest, specific answer counts; 'nothing' or a blank is the only miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-5-snake-9-playtest-and-reflect": {
+    "lessonTitle": "5.5.9 Playtest and reflect: Snake",
+    "prompt": "Everything you need is in 5.5.1 (Plan: Break Snake into parts) and 5.5.8 (Lab: Don't bite yourself): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Snake at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many rounds they played and how it went",
+        "description": "The student says they played the finished game at least three times, or gives some concrete detail from their rounds (a score, a way they lost, how long the snake got). Credit any answer that shows they actually played. Only an answer with no sign of play is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names one thing that did not work as they expected, a bug or a rough moment, and describes it concretely enough that another person could look for it (what they did, what happened). If they found nothing, a specific thing they checked and found fine is acceptable as partial.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which part of the code that touches",
+        "description": "The student connects what they saw to a part of the game or its code, such as the beat, the tail removal, the isBody search or the food placement, even loosely. Any plausible link counts; they do not have to be right about the cause.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule or number they would change (the speed, the grid size, wrapping at the walls, a bonus food) and says what the change would do to the game. Any specific change with an effect is full credit.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
   "6-6-13a-chart-the-state-machine": {
     "lessonTitle": "6.6.14 Plain English to Pseudocode: The Three-State Machine",
     "prompt": "The student was given plain-English steps for the lab \"6.6.14 Plain English to Pseudocode: The Three-State Machine\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs. **2.** In the title state: draw the title screen, then if space was pressed, change the state to play. **3.** In the play state: update the game, then if the player is dead, change the state to gameover. **4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title. **5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for drawing and updating, and SET for a state change. Name the three calls `drawTitle`, `updateGame` and `drawGameOver`. Number every line, including the indented ones and the END IF lines. Each keyword looks like this, in a different program: - `IF mode is \"menu\"` ... `ELSE IF mode is \"game\"` ... `END IF` (route by a value) - `CALL drawMenu` (call another function) - `IF enter is pressed` ... `END IF` (the check to leave) - `SET mode TO \"game\"` (a state change) Every state draws **first** and only Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, IF, ELSE, CALL, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, capitalisation and numbering. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",

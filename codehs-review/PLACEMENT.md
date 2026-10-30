@@ -23,7 +23,7 @@ the written plan, the pseudocode step and the playtest/reflection close.
 | | 5.2 Physics Feel | built | GD 3.5 | none |
 | | 5.3 Project: Pinball | built | GD Mini Golf | add: written plan, playtest + reflection close |
 | | 5.4 Project: Flappy | built | VGD Helicopter | add: pseudocode before the pipe loop; **random** and **timers** are inside it, not taught on their own |
-| | 5.5 Project: Snake | to build | VGD 12.1 | an array that grows and is searched; **grid sense** |
+| | 5.5 Project: Snake | **built 2026-10-30** (11 screens, first build with the AI-graded plan and playtest) | VGD 12.1 | an array that grows and is searched; **grid sense** |
 | | (candidate) a **projectile/cannon** build | undecided | GD Projectiles | needs `Group`, which today waits until 6.1 |
 | | (candidate) Breakout | undecided | VGD 11.1 | grid of sprites without groups |
 | **6 OOP (use)** | 5.6 Classes and Instances | built | CSA 1.12-1.14 | keep whole; `this` stays early |
@@ -54,8 +54,8 @@ the written plan, the pseudocode step and the playtest/reflection close.
    build in the functional block for now.
 2. **One grids module**: tile maps and 2D arrays, placed in the systems block after 6.1. moSHion has no tile-map
    support (`MOSHION-GAPS.md`), so the module needs a small library addition or a helper taught in the lesson.
-3. **Random numbers and timers get a dedicated lesson before Unit 5** (not only inside 5.4). 5.4's inline use stays;
-   the lesson comes first so 5.4 can point back to it.
+3. **Random numbers and timers get a dedicated lesson, placed as the first lesson of 5.2** (owner's choice, same day), so
+   it precedes the builds that use it (5.3-5.5). 5.4's inline use stays and can point back to it. Not yet written.
 4. **The five-step close (written plan, build, playtest, reflect) is adopted on every build module and is
    AI-graded like the PAs.** Each build module (5.3, 5.4, 5.5, the OOP games) gets plan/playtest/reflect screens
    with an `aiGrader` rubric. Lazy-grading rules apply (`feedback_pseudocode-grading-lax`): accept any phrasing

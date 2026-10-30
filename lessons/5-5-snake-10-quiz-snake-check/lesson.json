@@ -1,0 +1,124 @@
+{
+  "id": "5-5-snake-10-quiz-snake-check",
+  "title": "5.5.10 Check: the Snake game",
+  "description": "Six multiple-choice questions on the grid, the beat, steering without turning back, moving and growing with unshift and pop, and searching the snake. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "quiz",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-cell",
+        "source": "5.5.2",
+        "question": "A cell is 20 pixels wide. Which pixel x puts the centre of a sprite in the middle of column 3?",
+        "options": [
+          "60",
+          "70",
+          "80",
+          "3"
+        ],
+        "answer": 1,
+        "explanation": "Column 3 starts at 3 * 20 = 60, and the centre is half a cell further, so 70. A sprite's x is its centre.",
+        "sourceIds": [
+          "5-5-snake-2-reading-a-world-on-a-grid"
+        ]
+      },
+      {
+        "id": "q2-beat",
+        "source": "5.5.2",
+        "question": "What does changing `frameCount % 8` to `frameCount % 4` do to the snake?",
+        "options": [
+          "It moves twice as often, so it is faster",
+          "It moves half as often, so it is slower",
+          "It moves two cells per step",
+          "Nothing"
+        ],
+        "answer": 0,
+        "explanation": "The step runs on every 4th frame instead of every 8th, so there are twice as many steps a second.",
+        "sourceIds": [
+          "5-5-snake-2-reading-a-world-on-a-grid"
+        ]
+      },
+      {
+        "id": "q3-noreverse",
+        "source": "5.5.4",
+        "question": "Why do the up and down keys only work when `dy === 0`?",
+        "options": [
+          "To stop the snake from turning back into itself",
+          "To make the snake faster",
+          "Because up and down are the same key",
+          "To keep the score from rising"
+        ],
+        "answer": 0,
+        "explanation": "If the snake is moving down, `dy` is 1, so up is refused. Without the test, one key press sends the snake straight into its own neck.",
+        "sourceIds": [
+          "5-5-snake-4-lab-steer-it"
+        ]
+      },
+      {
+        "id": "q4-move",
+        "source": "5.5.5",
+        "question": "How does the whole snake move one step?",
+        "options": [
+          "Every cell is moved one place forward",
+          "A new head is added at the front and the tail is removed",
+          "The head is deleted and rebuilt",
+          "The canvas scrolls backwards"
+        ],
+        "answer": 1,
+        "explanation": "The middle cells never move. A cell appears in front and one disappears at the back, which looks like sliding.",
+        "sourceIds": [
+          "5-5-snake-5-reading-a-body-that-grows"
+        ]
+      },
+      {
+        "id": "q5-grow",
+        "source": "5.5.5",
+        "question": "What makes the snake one cell longer when it eats?",
+        "options": [
+          "An extra `push` at the back",
+          "The tail is not removed on that step",
+          "The head is made twice as big",
+          "The beat gets shorter"
+        ],
+        "answer": 1,
+        "explanation": "A head was added and nothing was taken from the tail, so the array has one more item.",
+        "sourceIds": [
+          "5-5-snake-5-reading-a-body-that-grows"
+        ]
+      },
+      {
+        "id": "q6-return",
+        "source": "5.5.7",
+        "question": "In `isBody`, why does `return false` sit after the loop and not inside it?",
+        "options": [
+          "Inside the loop it would end the function after checking only the first segment",
+          "Because `return false` is not allowed in a loop",
+          "So the loop runs once",
+          "It makes no difference"
+        ],
+        "answer": 0,
+        "explanation": "A return inside the loop would answer after the first segment. After the loop, it only runs when no segment matched.",
+        "sourceIds": [
+          "5-5-snake-7-reading-searching-the-array"
+        ]
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

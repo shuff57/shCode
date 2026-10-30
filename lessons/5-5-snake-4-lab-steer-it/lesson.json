@@ -1,0 +1,83 @@
+{
+  "id": "5-5-snake-4-lab-steer-it",
+  "title": "5.5.4 Lab: Steer it",
+  "description": "The block only walks right and walks off the edge. Add the four arrow keys with two direction variables, forbid turning back on yourself, and end the round at a wall.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn with the arrow keys",
+      "instructions": "The block moves by `dx` and `dy` each step, but nothing changes them. In `draw()`, set `dx` and `dy` when an arrow key is pressed: up is `dx = 0; dy = -1`, and so on for down, left and right.",
+      "hints": [
+        "`kb.presses('up')` is true on the frame the key goes down.",
+        "Four `if` lines, one per key. Each sets both `dx` and `dy` so the block never moves diagonally."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "No turning back",
+      "instructions": "Pressing the opposite key while moving would send the snake straight back into itself. Allow up and down only when `dy === 0`, and left and right only when `dx === 0`.",
+      "hints": [
+        "Add `&& dy === 0` to the up and down tests, and `&& dx === 0` to left and right.",
+        "Run it and press left while moving right. Nothing should happen."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Stop at the wall",
+      "instructions": "After the step, if the new column or row is off the grid (below 0, or 20 or more), set `playing` to `false` and do not move. Show 'Game over' when `playing` is false.",
+      "hints": [
+        "`head.col < 0 || head.col >= 20 || head.row < 0 || head.row >= 20`",
+        "Put the pixel update in the `else`, so a dead block stays on the last cell it reached."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Each arrow key sets the direction",
+      "description": "Pressing a key changes dx and dy together. Help: 5.5.2 (Reading: A world on a grid)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\.presses\\s*\\(\\s*'up'\\s*\\)[\\s\\S]{0,80}?dy\\s*=\\s*-1",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "A turn straight back is refused",
+      "description": "The opposite direction is only allowed when the block is not already moving that way. Help: 5.5.2 (Reading: A world on a grid)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "dy\\s*===\\s*0[\\s\\S]{0,200}?dx\\s*===\\s*0|dx\\s*===\\s*0[\\s\\S]{0,200}?dy\\s*===\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Leaving the grid ends the round",
+      "description": "A column or row off the grid sets the flag false. Help: 5.4.7 (Lab: Crash, and start again)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:col|row)\\s*(?:<\\s*0|>=\\s*20)[\\s\\S]{0,160}?playing\\s*=\\s*false",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

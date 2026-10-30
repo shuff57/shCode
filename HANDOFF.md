@@ -1,9 +1,9 @@
-# 2026-10-30 (latest): 5.3 Pinball and 5.4 Flappy are built; the CodeHS review is written up
+# 2026-10-30 (latest): 5.3 Pinball, 5.4 Flappy and 5.5 Snake are built; the CodeHS review is written up
 
 **Branch `codehs-inspiration`.** Built since the section below: `5.3 Project: Pinball` (10 screens,
 `6805ddf9`) and `5.4 Project: Flappy` (9 screens, `656d9dd2`), both in their own folder prefixes
 (`5-3-pinball-*`, `5-4-flappy-*`) because `5-3-*` and `5-5-*` still key what is now 5.6 and 5.8.
-**5.5 Snake is the next build** (an array that grows and is searched; no classes, no groups).
+**5.5 Snake is built** (11 screens in `5-5-snake-*`; an array that grows and is searched; no classes, no groups). It is the **first build with the five-step close**: `5.5.1` is an AI-graded written plan and `5.5.9` an AI-graded playtest-and-reflect. **5.3 and 5.4 do not have them yet** (decided 2026-10-30; retrofit is next). Also owed: the random-numbers-and-timers lesson as the first lesson of 5.2.
 
 **The CodeHS review is in `codehs-review/`**: per-course lesson-by-lesson dispositions
 (`gamedesign`, `videogamedesign`, `apcsp_js`, `apcsacortado`), `csa-3.3-3.9.md`, `PLACEMENT.md`
