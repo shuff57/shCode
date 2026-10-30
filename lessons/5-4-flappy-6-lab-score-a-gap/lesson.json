@@ -1,0 +1,74 @@
+{
+  "id": "5-4-flappy-6-lab-score-a-gap",
+  "title": "5.4.6 Lab: Score a gap",
+  "description": "A pipe the bird has flown past is worth a point, once. The starter has no score. Give every pipe a flag that remembers it has been counted, the same idea as 5.3.6 with a different trigger.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.4 Project: Flappy",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Notice the bird got past",
+      "instructions": "In `draw()`, loop over the pipes. A pipe has been passed when its `x` is less than the bird's `x`. Show the score on screen, starting at 0.",
+      "hints": [
+        "`for (const p of pipes) { ... }` visits each pipe; the pipes are already built, with a `passed` property that starts `false`.",
+        "`if (p.x < bird.x && !p.passed) { ... }`"
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Count each pipe once",
+      "instructions": "Inside that test, add one to the score and set `p.passed = true`. Without the flag, the test is true on every frame after the bird passes, and the score races like the ball did in 5.3.4.",
+      "hints": [
+        "`score += 1;` then `p.passed = true;`",
+        "Run it: the score should rise by exactly one as each pipe slides behind the bird."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Every pipe is checked",
+      "description": "A loop looks at each pipe in the array. Help: 5.3.7 (Lab: Three bumpers, three values)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(\\s*(?:const|let)\\s+\\w+\\s+of\\s+pipes\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "A pipe is passed when it is behind the bird",
+      "description": "The pipe's x is compared with the bird's x and the pipe's own flag. Help: 5.3.4 (Reading: A collision is not an event)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\.x\\s*<\\s*bird\\.x\\s*&&\\s*!\\s*\\w+\\.passed",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Each pipe is counted once",
+      "description": "The score goes up and the pipe is flagged in the same step. Help: 5.3.4 (Reading: A collision is not an event)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "score\\s*\\+=\\s*1[\\s\\S]{0,60}?\\w+\\.passed\\s*=\\s*true",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

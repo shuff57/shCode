@@ -1,0 +1,43 @@
+{
+  "moduleId": "5.4",
+  "source": "Not a book section. The module shape (build the mechanic, then the obstacles, then the score, then the end, then a check) follows CodeHS's project modules in Introduction to Game Design, with the array rollout taken from AP CSP's lists module. Structure only: no CodeHS text, problems or code is copied.",
+  "lessons": [
+    {
+      "id": "the-flap",
+      "title": "The flap",
+      "objective": "Students will be able to make a sprite fall under gravity and rise by one sudden change of speed on a key tap.",
+      "screens": [
+        "5-4-flappy-1-reading-gravity-and-the-flap",
+        "5-4-flappy-2-example-the-bird-that-flaps",
+        "5-4-flappy-3-lab-make-it-flap"
+      ]
+    },
+    {
+      "id": "a-world-that-scrolls",
+      "title": "A world that scrolls",
+      "objective": "Students will be able to build obstacles on a timer, keep them in an array, and delete the ones that have left.",
+      "screens": [
+        "5-4-flappy-4-reading-a-world-that-scrolls",
+        "5-4-flappy-5-lab-pipes-that-come-and-go"
+      ]
+    },
+    {
+      "id": "score-and-crash",
+      "title": "Score and crash",
+      "objective": "Students will be able to count each obstacle once, end the round on a crash, and put back everything a round owns.",
+      "screens": [
+        "5-4-flappy-6-lab-score-a-gap",
+        "5-4-flappy-7-lab-crash-and-start-again"
+      ]
+    },
+    {
+      "id": "check-and-extend",
+      "title": "Check and make it yours",
+      "objective": "Students will be able to check their understanding of the flapping game and extend it with a rule of their own.",
+      "screens": [
+        "5-4-flappy-8-quiz-flappy-check",
+        "5-4-flappy-9-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

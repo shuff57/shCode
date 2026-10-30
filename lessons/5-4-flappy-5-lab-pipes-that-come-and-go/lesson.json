@@ -1,0 +1,82 @@
+{
+  "id": "5-4-flappy-5-lab-pipes-that-come-and-go",
+  "title": "5.4.5 Lab: Pipes that come and go",
+  "description": "The starter builds one pair of pipes and leaves it. Build a new pair on a timer, keep them in an array, and delete the ones that have left the screen.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.4 Project: Flappy",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build a pair on a timer",
+      "instructions": "The function `makePipe()` is given: it builds one pair and returns the top pipe. In `draw()`, call it every 90 frames and put the result in the `pipes` array. Run it: pipes should keep arriving from the right.",
+      "hints": [
+        "`frameCount % 90 === 0` is true once every 90 frames.",
+        "`pipes.push(makePipe());`"
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Delete the pipes that have gone",
+      "instructions": "Loop over `pipes` from the end to the start. When a pipe's `x` is less than -30, delete its `mate` and the pipe itself, and splice it out of the array.",
+      "hints": [
+        "`for (let i = pipes.length - 1; i >= 0; i--) { ... }` is the backwards loop from 5.4.4.",
+        "Three lines inside: `pipes[i].mate.delete();`, `pipes[i].delete();`, `pipes.splice(i, 1);`"
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Show how many are alive",
+      "instructions": "Draw `pipes.length` on the screen. It should rise to two or three and then hold there. If it keeps climbing, pipes are not being removed.",
+      "hints": [
+        "`text('pipes: ' + pipes.length, 20, 50);`"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A pair is built on a repeating beat",
+      "description": "A remainder test on the frame count builds a pair at a steady rate. Help: 5.4.4 (Reading: A world that scrolls)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "frameCount\\s*%\\s*\\d+\\s*===?\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Every pair goes into the array",
+      "description": "The new pipe is pushed so the game can find it again. Help: 5.4.4 (Reading: A world that scrolls)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "pipes\\.push\\s*\\(\\s*makePipe\\s*\\(\\s*\\)\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Pipes that have left are deleted and spliced out",
+      "description": "The sprite is deleted and also taken out of the array. Help: 5.4.4 (Reading: A world that scrolls)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.delete\\s*\\(\\s*\\)[\\s\\S]{0,120}?pipes\\.splice\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

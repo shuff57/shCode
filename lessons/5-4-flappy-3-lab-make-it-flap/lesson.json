@@ -1,0 +1,74 @@
+{
+  "id": "5-4-flappy-3-lab-make-it-flap",
+  "title": "5.4.3 Lab: Make it flap",
+  "description": "The bird falls and nothing lifts it. Add a flap on the space bar that sets the bird's speed, then keep the bird from leaving the screen.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.4 Project: Flappy",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Flap once per tap",
+      "instructions": "In `draw()`, when the space bar is pressed, set the bird's vertical speed to a negative number so it goes up. Run it and tap: each tap should send the bird up in one arc.",
+      "hints": [
+        "`kb.presses(' ')` is true on the frame the key goes down.",
+        "`bird.vel.y = -4;` sets the speed. Negative is up."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Keep it on the screen",
+      "instructions": "When the bird goes below the bottom of the canvas (`bird.y > 400`) or above the top (`bird.y < 0`), put it back in the middle with no speed. This is a stand-in for losing, which comes in 5.4.7.",
+      "hints": [
+        "Two things have to go back: the position `bird.y = 200;` and the speed `bird.vel.y = 0;`.",
+        "Leave out the speed and the bird comes back already falling fast."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The space bar flaps the bird",
+      "description": "A press of the space bar sets the bird's upward speed. Help: 5.4.1 (Reading: Gravity and the flap)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\.presses\\s*\\(\\s*' '\\s*\\)[\\s\\S]{0,80}?bird\\.vel\\.y\\s*=\\s*-\\s*\\d",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The flap sets the speed rather than adding",
+      "description": "The line uses = so every flap is the same size. Help: 5.4.1 (Reading: Gravity and the flap)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "bird\\.vel\\.y\\s*=\\s*-",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "The bird is put back when it leaves the screen",
+      "description": "Leaving the top or bottom puts the position back. Help: 5.4.2 (Worked Example: The bird that flaps)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "bird\\.y\\s*(?:>|<)\\s*\\d+[\\s\\S]{0,120}?bird\\.y\\s*=\\s*\\d+",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
