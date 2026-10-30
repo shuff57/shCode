@@ -7,10 +7,12 @@ lessons), and *Video Game Design in JavaScript* (20517 — background only; see 
 
 Structure only. No CodeHS text, problems or code is copied.
 
-> **Correction to `CODEHS-MAP.md`.** There is no JSGameLib course: `codehs.com/course/jsgamelib/explore`
-> is a 404. The game-design course is **p5play** — its syllabus is titled "Intro to Game Design with
-> p5play", and its lesson vocabulary is p5play's (canvas, sprites, physics, groups, tiles, sprite
-> sheets). `CODEHS-MAP.md` calls it JSGameLib throughout; that is wrong.
+> **Library name, verified 2026-10-30 in a logged-in session.** The game-design course's code is
+> **p5play** (`new Canvas`, `new Sprite`, `.diameter`, `setup`/`draw`; the syllabus is titled "Intro
+> to Game Design with p5play"). Some lesson prose still says **JSGameLib** (probably an earlier name for the same library; not
+> confirmed): lesson 3.1's description and its activity 3.1.5 ("JSGameLib Documentation") both do. There is no
+> separate JSGameLib *course* (`codehs.com/course/jsgamelib/explore` is a 404). So there is one
+> game-design course, and it is described as both. Read `CODEHS-MAP.md`'s "JSGameLib" as that course.
 
 ---
 
@@ -163,7 +165,7 @@ of grid-world programming with no shCode equivalent).
 - **5.3 Pinball already fits the layout**: it is our GD 4.1, opens from the physics scene, and
   injects the state flag and the score mid-project rather than front-loading them. No change.
 - **5.4 and 5.5 should follow the injection rule**, not the "teach arrays then build" rule.
-- **`CODEHS-MAP.md` needs the JSGameLib → p5play correction** and its unit-5 rows re-checked.
+- **`CODEHS-MAP.md`:** note that CodeHS's lesson prose still says JSGameLib for the p5play code; its unit-5 rows are re-checked against the logged-in project reads in `codehs-review/`.
 - **Unit 7's ordering is an open question**: keep `this` at 5.6 (our way, forced by JavaScript) and
   static after scope/access (our way), or adopt CSA's static-before-scope swap.
 - **Unit 6 has no modules yet** beyond 5.6, and the chapter-level repartition (5.x functional /

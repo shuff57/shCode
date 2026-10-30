@@ -1,4 +1,34 @@
-# 2026-10-29 (latest): module 5.5 is built; the 5.3/5.4 grouping is committed
+# 2026-10-30 (latest): 5.3 Pinball and 5.4 Flappy are built; the CodeHS review is written up
+
+**Branch `codehs-inspiration`.** Built since the section below: `5.3 Project: Pinball` (10 screens,
+`6805ddf9`) and `5.4 Project: Flappy` (9 screens, `656d9dd2`), both in their own folder prefixes
+(`5-3-pinball-*`, `5-4-flappy-*`) because `5-3-*` and `5-5-*` still key what is now 5.6 and 5.8.
+**5.5 Snake is the next build** (an array that grows and is searched; no classes, no groups).
+
+**The CodeHS review is in `codehs-review/`**: per-course lesson-by-lesson dispositions
+(`gamedesign`, `videogamedesign`, `apcsp_js`, `apcsacortado`), `csa-3.3-3.9.md`, `PLACEMENT.md`
+(proposed module rows plus **12 open decisions for the owner**, none decided) and
+`MOSHION-GAPS.md` (library gaps against the planned modules). `PROGRESS.md` has the log and
+what was and was not verified. Read `PLACEMENT.md` first.
+
+**Not started: the unit-level repartition** (unit 5 functional / unit 6 OOP use / unit 7 writing
+classes / then concepts). It renumbers about 166 lessons by title and citation only (no folder
+moves, no D1 migration). Recommended after unit 5 content exists, in one commit.
+
+**moSHion findings that block planned work** (details and evidence in `MOSHION-GAPS.md`): the copy
+vendored in `public/moshion/` is 223 lines behind the repo and lacks `coin.wav`, `music.wav` and the
+tile textures; there is no tile map, no sensor, no `camera.follow`; `this.speed` on a class that
+extends Sprite collides with a built-in accessor. Lesson `6.4.19` hints at a `camera.follow` that
+does not exist.
+
+**Traps this session cost a cycle each:** `pkill -f <name>` can match and kill your own shell
+(exit 144), so kill by pid; a background command ending with `&` keeps running after the tool
+reports "completed", so run long jobs as the foreground command of a background call and verify
+a `.done` marker; only one process may drive the logged-in `codehs` playwright session.
+
+---
+
+# 2026-10-29: module 5.5 (now 5.8) is built; the 5.3/5.4 grouping is committed
 
 **Branch `codehs-inspiration`** (cut from `cs-3d`). Read `CODEHS-INSPIRATION.md`
 (why CodeHS, six-course measurements) and `CODEHS-MAP.md` (per-module map, fit levels).
@@ -24,7 +54,7 @@ That is where the remaining work is:
 
 ### Decided 2026-10-29: a game-build block, and OOP moves behind it — **DONE**
 
-The renumber is committed (`53bc896e`). 5.3–5.5 are free and 5.6–5.8 hold the OOP block.
+The renumber is committed (`53bc896e`). 5.3 and 5.4 are now built, 5.5 is free, and 5.6–5.8 hold the OOP block.
 
 **The shape, settled with the owner:** the games are the spine, and the two blocks differ only in
 how you build them. 2–3 games per block, one per module, and 2–3 classes written across the OOP
@@ -43,8 +73,8 @@ block.
   without one. Either 6.x’s builds start reusing them, or the OOP block stays a self-contained
   unit — undecided, and it does not block 5.3.
 
-- grouped so far: 5.1, 5.6, 5.7, 5.8. **Ungrouped: 5.2, 6.1–6.8, 7.1** (about 120 screens), and
-  5.3–5.5 do not exist yet — they are the three game builds.
+- grouped so far: 5.1, 5.3, 5.4, 5.6, 5.7, 5.8. **Ungrouped: 5.2, 6.1–6.8, 7.1** (about 120 screens).
+  5.3 and 5.4 are built; 5.5 (Snake) is not.
 - the book's chapter 6 also lists **6.9 Timing and Async** and **6.10 Sound and Texture**;
   neither exists in the app.
 - **chapter 7 is two screens** (`7.1.1` Arcade Cabinet, `7.1.2` Q2 Reflection). If the course is
@@ -52,9 +82,9 @@ block.
   close (Pattern 4 in `CODEHS-INSPIRATION.md`) is the model for filling it.
 - tiles and spritesheets are CodeHS ideas with no shCode counterpart (see `CODEHS-MAP.md`).
 
-## What 5.5 is, and what the check changed
+## What 5.8 (built as 5.5) is, and what the check changed
 
-`5.5 Inside a Class` — 20 screens, six lessons, after 5.4 and before 6.1. **Not a book
+`5.8 Inside a Class` (built as 5.5, renumbered) — 20 screens, six lessons, after 5.4 and before 6.1. **Not a book
 section**: Unit 5 ended on 5.4's challenges with no internal check.
 
 The draft in the previous section of this file was a general "design a class" module.

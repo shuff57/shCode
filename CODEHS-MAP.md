@@ -13,7 +13,7 @@ lesson(s), and what an auditor should compare. Built 2026-10-29 from the public
 | **Partial** | Overlaps one activity or one paragraph; neither course owns it. |
 | **None** | No counterpart anywhere in the five courses checked. |
 
-Courses checked: `gamedesign` (Introduction to Game Design, **p5play** — not JSGameLib;
+Courses checked: `gamedesign` (Introduction to Game Design: the code is **p5play**, and some lesson prose still calls it JSGameLib;
 `/course/jsgamelib/explore` is a 404, and the course syllabus is titled "Intro to Game Design
 with p5play"),
 `videogamedesign` (Video Game Design in JavaScript), `introjs_corgi`
