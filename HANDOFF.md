@@ -22,35 +22,29 @@ decision.
 **What "in scope" means for the tree:** modules 5.1–5.5 and 6.1–6.8, plus chapter 7's capstone.
 That is where the remaining work is:
 
-### Decided 2026-10-29: a game-build block, and OOP moves behind it
+### Decided 2026-10-29: a game-build block, and OOP moves behind it — **DONE**
 
-The next structural change, not started. CodeHS's game-design course teaches the library by
-building games (Mini Golf, Projectiles/cannon, Jumper — 7, 8 and 8 lessons), and that is the
-model. Our own slate, not a copy:
+The renumber is committed (`53bc896e`). 5.3–5.5 are free and 5.6–5.8 hold the OOP block.
 
-| | |
-| --- | --- |
-| 5.1, 5.2 | unchanged (sprites, physics) |
-| **5.3, 5.4, 5.5** | **three game builds, functions and arrays only** — our own games (snake / pinball / flappy-style were the examples given) |
-| **5.6, 5.7, 5.8** | the OOP block, moved up from 5.3/5.4/5.5 |
-| 6.1–6.8, 7.1 | unchanged |
+**The shape, settled with the owner:** the games are the spine, and the two blocks differ only in
+how you build them. 2–3 games per block, one per module, and 2–3 classes written across the OOP
+block.
 
-**Why this is safe:** no chapter 6 script defines a class, so the OOP block is a detour only
-5.3–5.5 need; moving it costs nothing downstream. And no game can use collisions or groups
-before 6.1–6.2 teach them, so the builds must lean on what 5.2 actually gives — `colliding()`,
-edge-triggered input, `delete()`, a win check, and the pinball scene at 5.2.14.
+| Block | Modules | Games | How it is built |
+| --- | --- | --- | --- |
+| Functional game dev | **5.3, 5.4, 5.5** | Pinball first, then a Flappy-style and Snake (2–3 in all) | functions, arrays, sprite variables — no classes |
+| Class-oriented game design | **5.6, 5.7, 5.8** | **new games, not rebuilds** | your own classes: 2–3 of them across the block |
 
-**The trap in the move:** `scripts/renumber-module.mjs` REFUSES a cross-module move whose
-folder still carries the old module's number ("title number 5.3.1 is not in module 5.6, but the
-plan puts it there"). So the OOP shift is not one plan run — the titles and the `unit` field are
-rewritten to 5.6/5.7/5.8 first, and the citations follow in the same bespoke sweep. That sweep
-touches about 97 lesson files plus twenty docs, and a careless one is how 140 citations rotted
-before; run `check-lesson-citations`, `check-prompt-pointers`, `check-help-pointer-titles` and
-`check-lesson-numbers` after it, and commit it on its own.
+**Constraints that shaped it:**
+- Nothing before 6.1/6.2 teaches `new Group()`, so every game in 5.3–5.5 uses individual sprites
+  and `colliding()`. Pinball, Flappy and Snake all fit; nothing may use groups.
+- 5.2.14 already builds a pinball scene, so 5.3 starts from something the student has made.
+- **Unit 6 still defines no class.** After 5.6–5.8 students write classes and then go 106 screens
+  without one. Either 6.x’s builds start reusing them, or the OOP block stays a self-contained
+  unit — undecided, and it does not block 5.3.
 
-**Still to settle:** which three games, and in what order.
-
-- grouped so far: 5.1, 5.3, 5.4, 5.5. **Ungrouped: 5.2, 6.1–6.8, 7.1** (about 120 screens).
+- grouped so far: 5.1, 5.6, 5.7, 5.8. **Ungrouped: 5.2, 6.1–6.8, 7.1** (about 120 screens), and
+  5.3–5.5 do not exist yet — they are the three game builds.
 - the book's chapter 6 also lists **6.9 Timing and Async** and **6.10 Sound and Texture**;
   neither exists in the app.
 - **chapter 7 is two screens** (`7.1.1` Arcade Cabinet, `7.1.2` Q2 Reflection). If the course is
