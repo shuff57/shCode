@@ -121,6 +121,27 @@ import {
   type GraderOption,
 } from './grade-written-core';
 
+export interface GradeQuota {
+  limit: number;
+  used: number;
+  remaining: number;
+}
+
+/** Fired on `window` once a grade call has finished (any outcome), so the quota note re-reads. */
+export const GRADE_FINISHED = 'shcode:grade-finished';
+
+/** What the signed-in student has left today; null for staff, or when it cannot be read. */
+export async function fetchGradeQuota(): Promise<GradeQuota | null> {
+  try {
+    const res = await fetch('/api/grade-written', { credentials: 'same-origin' });
+    if (!res.ok) return null;
+    const q = ((await res.json()) as { quota?: GradeQuota | null })?.quota;
+    return q && typeof q.limit === 'number' && typeof q.used === 'number' ? q : null;
+  } catch {
+    return null;
+  }
+}
+
 export interface StreamGradeResult {
   ok: boolean;
   status: number;
@@ -131,6 +152,17 @@ export interface StreamGradeResult {
 }
 
 export async function streamGrade(
+  body: unknown,
+  onStage: (stage: GradeStage, chars?: number) => void,
+): Promise<StreamGradeResult> {
+  try {
+    return await streamGradeInner(body, onStage);
+  } finally {
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event(GRADE_FINISHED));
+  }
+}
+
+async function streamGradeInner(
   body: unknown,
   onStage: (stage: GradeStage, chars?: number) => void,
 ): Promise<StreamGradeResult> {

@@ -11,6 +11,7 @@ import { recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import { aiCheckText, applyAiVerdicts, reportFromRequirements, verdictsFromCriteria, type AiVerdicts } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
+import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import AiGradeResultPanel, { type AiGradeResultData } from './AiGradeResultPanel';
 import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
@@ -1195,6 +1196,7 @@ export default function LessonWorkspace({
         </div>
       )}
       {capped ? <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} /> : null}
+      <GradeQuotaNote />
       {lesson.planFrom && (
         <PlanChartPanel
           planFrom={lesson.planFrom}

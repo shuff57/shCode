@@ -106,7 +106,7 @@ interface Env {
 // Deliberately ONE bucket across both graders. The cap is a runaway-cost stop,
 // and a student who could reset it by flipping the dropdown would not be capped.
 const RATE_BUCKET = 'grade-written';
-const DEFAULT_DAILY_LIMIT = 30;
+const DEFAULT_DAILY_LIMIT = 100;
 const DEFAULT_GLOBAL_DAILY_LIMIT = 10000;
 
 // The deploy-wide counter's reserved (identity, bucket) pair — the backstop
@@ -230,11 +230,31 @@ function toOption(t: GraderTarget): GraderOption {
 // dropdown. Kept because the client reads this shape, not because there is a
 // choice left to make.
 export const onRequestGet: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
-  const { env } = context;
+  const { env, data } = context;
   const targets = resolveTargets(env);
+  // What the signed-in student has left today, so the editor can say so instead of
+  // the first sign of a cap being a refusal. Staff are exempt and get `null`; a
+  // database error also gives `null` (the note simply does not show).
+  let quota: { limit: number; used: number; remaining: number } | null = null;
+  if (data?.role === 'student') {
+    try {
+      const limit = Math.max(1, parseInt(env.GRADE_WRITTEN_DAILY_LIMIT || '', 10) || DEFAULT_DAILY_LIMIT);
+      const day = new Date().toISOString().slice(0, 10);
+      const row = await env.DB.prepare(
+        'SELECT count FROM ai_help_usage WHERE student_email = ? AND unit = ? AND day = ?',
+      )
+        .bind(data.email, RATE_BUCKET, day)
+        .first<{ count: number }>();
+      const used = row?.count ?? 0;
+      quota = { limit, used, remaining: Math.max(0, limit - used) };
+    } catch {
+      quota = null;
+    }
+  }
   return json({
     graders: PREFERENCE.map((id) => toOption(targets[id])),
     fallback: pickDefault(targets),
+    quota,
   });
 };
 

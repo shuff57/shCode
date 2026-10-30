@@ -19,6 +19,7 @@ import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import GraderPicker, { hasGraderChoice, useGraderChoice } from './GraderPicker';
 import SolutionPanel from './SolutionPanel';
+import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import { useRepairLoop } from '../lib/use-attempt-cap';
 import CodeMirrorPane from './CodeMirrorPane';
@@ -534,6 +535,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         />
       </div>
       <AttemptBanner max={maxSubmissions} used={attempts} loading={!loaded} />
+      <GradeQuotaNote />
       {codeInput ? (
         // CodeMirrorPane fills its parent (height: 100%), so the parent needs a
         // height of its own. No Run button, lint or autocomplete, on purpose:
