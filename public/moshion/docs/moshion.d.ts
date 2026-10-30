@@ -14,6 +14,8 @@ declare class Ani {
   name: string;
   frameCount: number;
   frameDelay: number;
+  /** Optional per-frame holds (game frames), one per frame; null = uniform frameDelay. */
+  frameDelays: number[] | null;
   frame: number;
   spriteSheet: HTMLImageElement;
 }
@@ -75,18 +77,27 @@ declare class Sprite {
   // debug: draws the collider outline (not the art) in lime.
   debug: boolean;
   ani: Ani | null;
-  image: string | HTMLImageElement | null;
+  /** Still art: an emoji / short text ('🧍'), an image URL, or a ready <img> / <canvas>.
+   *  null or '' goes back to the colored shape. Art that fails to load falls
+   *  back to the colored shape rather than vanishing. */
+  image: string | HTMLImageElement | HTMLCanvasElement | ImageBitmap | null;
+
   /**
    * Named art from the texture catalog, e.g. `sprite.texture = 'coin'`.
    *
    * Reads back as the NAME that was set, not the image. Setting it clears
    * `.image` and `.ani`, and setting either of those clears this. An
-   * unknown name warns and leaves the sprite as it was.
+   * unknown name warns and leaves the sprite as it was. Drawn with image
+   * smoothing off, so pixel art stays crisp when scaled.
    *
    * Names come from `textureNames()`: the built-in catalog plus anything
    * `saveTexture()` has stored. A saved name wins over a built-in one.
    */
   texture: string | null;
+  /** A picture that repeats at its natural size inside the sprite's shape
+   *  (anchored top-left) instead of stretching. For ground, walls and
+   *  platforms. Any `image` / `texture` / `ani` draws instead. null clears it. */
+  pattern: string | HTMLImageElement | HTMLCanvasElement | ImageBitmap | null;
 
   addAni(name: string, sheetUrl: string, frameCount: number): Ani;
   changeAni(name: string): void;
@@ -237,6 +248,12 @@ declare class Sprite {
 
 declare class Group extends Array<Sprite> {
   Sprite: typeof Sprite;
+  /** Catalog texture name for every member, current and future. */
+  texture: string | null;
+  /** Repeating picture for every member, current and future. */
+  pattern: string | HTMLImageElement | HTMLCanvasElement | ImageBitmap | null;
+  /** Art for every member, current and future (`new group.Sprite()`). */
+  image: string | HTMLImageElement | HTMLCanvasElement | ImageBitmap | null;
 
   newSprite(x: number, y: number, w?: number, h?: number): Sprite;
   push(...sprites: Sprite[]): number;
@@ -396,6 +413,27 @@ interface World {
   physicsUpdate(step?: number): void;
   /** Restitution velocity threshold, px/frame. */
   bounceThreshold: number;
+  /**
+   * Ray-cast the world for all fixtures in the path of the ray.
+   * @param x1 - Start X (pixels) or {x, y} object
+   * @param y1 - Start Y (pixels) or {x, y} object for end point
+   * @param x2 - End X (pixels)
+   * @param y2 - End Y (pixels)
+   * @param callback - Called for each fixture hit. Receives (sprite, point, normal, fraction).
+   *   Return `fraction` (0..1) to clip ray at hit and continue (finds closest).
+   *   Return `0` to stop at first hit (finds any).
+   *   Return `1` to continue without clipping (finds all).
+   *   Return `-1` to filter this fixture and continue.
+   *   `point` and `normal` are in world pixels; `fraction` is 0..1 along the ray.
+   *   `sprite` is the hit Sprite, or null if the fixture has no sprite userData.
+   */
+  rayCast(
+    x1: number | { x: number; y: number },
+    y1: number | { x: number; y: number },
+    x2: number,
+    y2: number,
+    callback: (sprite: Sprite | null, point: Vec2, normal: Vec2, fraction: number) => number
+  ): void;
 }
 
 // ---- input ---------------------------------------------------------------
@@ -445,28 +483,6 @@ interface Kb {
   /** Alias of released() — true on the frame the key comes back up. */
   releases(key: string): boolean;
 }
-
-// ---- sketch lifecycle --------------------------------------------------------
-
-/**
- * The four hooks the engine calls. A sketch defines the ones it needs as
- * plain global functions; the engine auto-boots as soon as it sees setup().
- */
-
-/** Runs once, before the first frame. Must call `new Canvas(w, h)`. */
-declare function setup(): void;
-/** Runs each frame BEFORE the physics step, so a sprite moved here is moved
-  * before this frame's collisions are resolved. */
-declare function update(step: number): void;
-/** Runs each frame after physics, BEFORE sprites are rendered. Anything drawn
-  * here is painted underneath every sprite — draw backgrounds and world
-  * decoration here, and put a HUD in drawTop(). */
-declare function draw(): void;
-/** Runs each frame AFTER sprites are rendered, in screen space (the camera is
-  * off for its duration and restored afterwards). This is where a HUD goes:
-  * `text('SCORE ' + score, 14, 20)` lands 14px from the canvas's left edge and
-  * on top of the world, instead of behind whatever sprite is there. */
-declare function drawTop(): void;
 
 // `mouse` is the pointer, not strictly a mouse: a single touch drives exactly
 // these same properties, so a sketch written against mouse.x / mouse.presses()
@@ -546,6 +562,27 @@ declare const height: number;
 declare const mouseX: number;
 declare const mouseY: number;
 
+// ---- sketch lifecycle ----------------------------------------------------
+
+// The four hooks the engine calls. A sketch defines the ones it needs as
+// plain global functions; the engine auto-boots as soon as it sees setup().
+
+/** Runs once, before the first frame. Must call `new Canvas(w, h)`. */
+declare function setup(): void;
+/** Runs each frame BEFORE the physics step, so a sprite moved here is moved
+  * before this frame's collisions are resolved. `step` is the frame's
+  * duration in seconds, capped at 0.05. */
+declare function update(step: number): void;
+/** Runs each frame after physics, BEFORE sprites are rendered. Anything drawn
+  * here is painted underneath every sprite — draw backgrounds and world
+  * decoration here, and put a HUD in drawTop(). */
+declare function draw(): void;
+/** Runs each frame AFTER sprites are rendered, in screen space (the camera is
+  * off for its duration and restored afterwards). This is where a HUD goes:
+  * `text('SCORE ' + score, 14, 20)` lands 14px from the canvas's left edge and
+  * on top of the world, instead of behind whatever sprite is there. */
+declare function drawTop(): void;
+
 declare function background(color: string): void;
 declare function text(str: string, x: number, y: number, size?: number, color?: string): void;
 declare function fill(c: string | number): void;
@@ -572,12 +609,13 @@ declare function hasTexture(name: string): boolean;
  *
  * Pass `{ frames: n }` and `dataUrl` is read as a horizontal strip of n
  * equal frames — `sprite.texture = name` then animates it, no addAni needed.
- * `frameDelay` is game frames per animation frame (default 4).
+ * `frameDelay` is game frames per animation frame (default 4); `delays` holds
+ * each frame for its own number of game frames.
  */
 declare function saveTexture(
   name: string,
   dataUrl: string,
-  anim?: { frames: number; frameDelay?: number }
+  anim?: { frames: number; frameDelay?: number; delays?: number[] }
 ): void;
 /** Forget a saved texture. Built-ins cannot be deleted. */
 declare function deleteTexture(name: string): void;
