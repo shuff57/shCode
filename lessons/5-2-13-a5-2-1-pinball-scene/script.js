@@ -1,4 +1,4 @@
-// 5.2.14 A5.2.1 Pinball Scene: gravity, obstacles, a bouncy ball, a reset key.
+// 5.2.18 A5.2.1 Pinball Scene: gravity, obstacles, a bouncy ball, a reset key.
 
 let ball;
 

@@ -17,11 +17,11 @@ pipe.vel.x = -2;
 
 A `'kinematic'` sprite moves under its own speed, ignores gravity, and still collides with the bird. A `'static'` one would never move at all.
 
-**New pipes on a timer.** `frameCount` counts frames since the game started. The remainder operator `%` turns it into a repeating beat:
+**New pipes on a timer.** `frameCount` counts frames since the game started, as 5.2.1 showed. The remainder operator `%` turns it into a repeating beat:
 
 ```js
 if (frameCount % 90 === 0) {
-  // runs on frame 0, 90, 180, 270 ... about every 1.5 seconds
+  // runs on frame 90, 180, 270 ... about every 1.5 seconds
 }
 ```
 

@@ -7,7 +7,7 @@ By the end of this reading you should be able to answer:
 - What is the difference between a scene and a game?
 - What four things does this module add to the scene you already built?
 
-In 5.2.14 you built a scene: gravity, static obstacles, a bouncy ball, and a key that puts the ball back at the top. Run it and it looks like pinball. Nothing is at stake, though — the ball falls, bounces, and nothing counts.
+In 5.2.18 you built a scene: gravity, static obstacles, a bouncy ball, and a key that puts the ball back at the top. Run it and it looks like pinball. Nothing is at stake, though — the ball falls, bounces, and nothing counts.
 
 A game adds four things on top of a scene:
 
@@ -56,7 +56,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** the ball falls, hits the bumper, and rolls down to the floor. Press R and it starts again. That is the whole scene from 5.2.14 — and there is still no goal, no score, no way to lose, and no reason to press R except to watch it fall again.
+**What you'll see:** the ball falls, hits the bumper, and rolls down to the floor. Press R and it starts again. That is the whole scene from 5.2.18 — and there is still no goal, no score, no way to lose, and no reason to press R except to watch it fall again.
 
 **Try this:** let the ball settle, then look at what is missing. If you wanted to tell a friend how well you just did, what number would you show them? That number does not exist yet. 5.3.3 adds it.
 

@@ -18,7 +18,7 @@ function draw() {
 }
 ```
 
-You have met this before, with keys. 5.2.5 drew the distinction:
+You have met this before, with keys. 5.2.9 drew the distinction:
 
 | | Fires | |
 | --- | --- | --- |

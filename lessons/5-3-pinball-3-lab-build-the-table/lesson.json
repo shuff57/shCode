@@ -17,7 +17,7 @@
       "title": "Turn gravity on",
       "instructions": "In `setup()`, turn gravity on so the ball falls. Run it once you have a ball and you should see it drop.",
       "hints": [
-        "Reread 5.2.2 (Reading: Gravity). The line starts with `world.gravity`."
+        "Reread 5.2.6 (Reading: Gravity). The line starts with `world.gravity`."
       ]
     },
     {
@@ -25,7 +25,7 @@
       "title": "Three things to bounce off",
       "instructions": "Build at least three obstacle sprites. They must not fall, so give each one the body type that ignores gravity. Store at least one in a named variable, so you can ask about it later.",
       "hints": [
-        "`new Sprite(x, y, w, h, 'static')` is a body type, not a fifth size — 5.2.2.",
+        "`new Sprite(x, y, w, h, 'static')` is a body type, not a fifth size — 5.2.6.",
         "`.rotation` tilts an obstacle so the ball leaves at an angle."
       ]
     },
@@ -34,7 +34,7 @@
       "title": "A ball worth watching",
       "instructions": "Build the ball: a sprite with no width and height given falls as a circle. Give it a colour and a `bounciness` above 0.5, or it will thud and stop.",
       "hints": [
-        "`ball.bounciness = 0.9;` — 5.2.7 explains what the number means."
+        "`ball.bounciness = 0.9;` — 5.2.11 explains what the number means."
       ]
     },
     {
@@ -50,7 +50,7 @@
     {
       "id": "r1",
       "title": "Gravity is on",
-      "description": "`setup()` turns gravity on so the ball falls. Help: 5.2.2 (Reading: Gravity)",
+      "description": "`setup()` turns gravity on so the ball falls. Help: 5.2.6 (Reading: Gravity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "world\\.gravity\\.y\\s*=",
@@ -61,7 +61,7 @@
     {
       "id": "r2",
       "title": "At least three obstacles stay put",
-      "description": "Three or more sprites are built with the static body type, so they do not fall. Help: 5.2.2 (Reading: Gravity)",
+      "description": "Three or more sprites are built with the static body type, so they do not fall. Help: 5.2.6 (Reading: Gravity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "'static'[\\s\\S]*'static'[\\s\\S]*'static'",
@@ -72,7 +72,7 @@
     {
       "id": "r3",
       "title": "The ball is genuinely bouncy",
-      "description": "The ball's `bounciness` is set above 0.5, so it keeps most of its speed. Help: 5.2.7 (Reading: Bounciness and Friction)",
+      "description": "The ball's `bounciness` is set above 0.5, so it keeps most of its speed. Help: 5.2.11 (Reading: Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "bounciness\\s*=\\s*(?:0\\.[5-9]|[1-9])",

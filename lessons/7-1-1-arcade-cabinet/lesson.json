@@ -123,7 +123,7 @@
     {
       "id": "req5",
       "title": "Motion tuned on purpose",
-      "description": "gravity, friction, bounciness, drag, a velocity you set yourself, or applyForce. Help: 5.2.9 (Forces vs Velocity)",
+      "description": "gravity, friction, bounciness, drag, a velocity you set yourself, or applyForce. Help: 5.2.13 (Forces vs Velocity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "world\\s*\\.\\s*gravity|\\.\\s*(friction|bounciness|drag|rotationDrag|rotationSpeed)\\s*=|\\.\\s*vel\\s*(\\.\\s*[xy])?\\s*[-+*/]?=(?!=)|\\.\\s*speed\\s*=|\\.\\s*applyForce\\s*\\(",

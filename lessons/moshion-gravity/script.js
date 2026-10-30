@@ -1,4 +1,4 @@
-// 5.2.3 Worked Example: Falling Block: gravity + static sprites.
+// 5.2.7 Worked Example: Falling Block: gravity + static sprites.
 
 let block, ground;
 

@@ -1,0 +1,110 @@
+{
+  "id": "5-2-random-3-lab-random-spot-and-colour",
+  "title": "5.2.3 Lab: A random spot and colour",
+  "description": "Once a second, move a coin to a random place, roll a whole-number die, and give the coin a random colour from a list.",
+  "type": "lesson",
+  "estimateMins": 9,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "A random spot",
+      "instructions": "`draw()` already has a block that runs once a second: `if (frameCount % 60 === 0) { ... }`. Inside it, set `coin.x` to a random number from 30 to 370 and `coin.y` to a random number from 30 to 270. Run it and wait: once a second the coin should jump to a new place, always fully on the canvas.",
+      "hints": [
+        "`random(min, max)` gives a number from `min` up to `max`. Decimals are fine for a position.",
+        "`coin.x = random(30, 370);` is one of the two lines. The other one is for `coin.y`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Roll a die",
+      "instructions": "Inside the same block, set `roll` to a random whole number from 1 to 6. The number shows in the top corner. Watch a dozen rolls and check that you see a 6 and never a 0 or a 7.",
+      "hints": [
+        "`random` gives decimals, and `floor` cuts them off. Wrap one in the other.",
+        "The top number is never reached, so for 1 to 6 write `floor(random(1, 7))`. `floor(random(6)) + 1` also works."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "A random colour",
+      "instructions": "Inside the same block, pick a random position in the `colors` list: a whole number from 0 up to the last position. Then set `coin.color` to the colour at that position. Use the list's `.length` so the line keeps working if a colour is added.",
+      "hints": [
+        "`colors.length` is how many colours there are. Five colours means the positions are 0 to 4.",
+        "`const pick = floor(random(colors.length));` gives the position, and `colors[pick]` reads the colour there."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The coin gets a random x",
+      "description": "The x position comes from random(...). Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "Set coin.x to random(30, 370).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.x\\s*=\\s*random\\s*\\(|new\\s+Sprite\\s*\\(\\s*random\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The coin gets a random y",
+      "description": "The y position comes from random(...). Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "Set coin.y to random(30, 270).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.y\\s*=\\s*random\\s*\\(|new\\s+Sprite\\s*\\([^;]*?\\)\\s*,\\s*random\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "The die is a whole number from 1 to 6",
+      "description": "random is wrapped in floor and shifted so the answers run 1 to 6. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "The top of random(1, 7) is never reached, so floor of it is 1 to 6.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "floor\\s*\\(\\s*random\\s*\\(\\s*1\\s*,\\s*7\\s*\\)\\s*\\)|floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\)\\s*\\+\\s*1|1\\s*\\+\\s*floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\)|floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\+\\s*1\\s*\\)|floor\\s*\\(\\s*Math\\.random\\s*\\(\\s*\\)\\s*\\*\\s*6\\s*\\)\\s*\\+\\s*1",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "A random position in the colors list",
+      "description": "A whole number from 0 to the list's last position is chosen at random, using the list's length. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "floor(random(colors.length)) is a whole number from 0 to 4.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:floor|round|int|trunc)\\s*\\(\\s*(?:Math\\.)?random\\s*\\(\\s*(?:\\)\\s*\\*\\s*)?[A-Za-z_]\\w*\\.length|random\\s*\\(\\s*[A-Za-z_]\\w*\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "The coin takes the chosen colour",
+      "description": "coin.color is set from the colors list. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "colors[pick] reads the colour at that position. Assign it to coin.color.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.color\\s*=\\s*[A-Za-z_]\\w*\\s*\\[|\\.color\\s*=\\s*random\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

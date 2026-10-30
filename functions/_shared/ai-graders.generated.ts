@@ -7295,38 +7295,38 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ]
   },
   "5-2-13-a5-2-1-pinball-scene": {
-    "lessonTitle": "5.2.14 Pinball Scene",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.14 Pinball Scene\". The task they were given: Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "lessonTitle": "5.2.18 Pinball Scene",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.18 Pinball Scene\". The task they were given: Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",
         "title": "Turn on gravity",
-        "description": "world.gravity.y is set to a non-zero value. Help: 5.2.2 (Gravity)",
+        "description": "world.gravity.y is set to a non-zero value. Help: 5.2.6 (Gravity)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "Add at least three static obstacles",
-        "description": "At least three 'static' sprites exist in the scene. Help: 5.2.7 (Bounciness and Friction)",
+        "description": "At least three 'static' sprites exist in the scene. Help: 5.2.11 (Bounciness and Friction)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "Make the ball genuinely bouncy",
-        "description": "The ball's bounciness is set above 0.8. Help: 5.2.7 (Bounciness and Friction)",
+        "description": "The ball's bounciness is set above 0.8. Help: 5.2.11 (Bounciness and Friction)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "Add a reset key",
-        "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.7 (Bounciness and Friction)",
+        "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.11 (Bounciness and Friction)",
         "points": 1
       }
     ]
   },
   "5-2-14-a5-2-2-vel-vs-applyforce": {
-    "lessonTitle": "5.2.15 Vel vs applyForce",
-    "prompt": "Everything you need is in 5.2.9 (Reading: Forces vs Velocity) and 5.2.10 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.9, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.9 and 5.2.10)",
+    "lessonTitle": "5.2.19 Vel vs applyForce",
+    "prompt": "Everything you need is in 5.2.13 (Reading: Forces vs Velocity) and 5.2.14 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.13, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.13 and 5.2.14)",
     "rubric": [
       {
         "id": "q1-fight-explanation",
@@ -7437,7 +7437,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "5-3-pinball-plan-sketch-the-game": {
     "lessonTitle": "5.3.1 Plan: Sketch your pinball game",
-    "prompt": "Everything you need is on this page and in 5.2.14 (Pinball Scene): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to turn your pinball scene into a pinball game. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one moment to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "prompt": "Everything you need is on this page and in 5.2.18 (Pinball Scene): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to turn your pinball scene into a pinball game. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one moment to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
     "rubric": [
       {
         "id": "parts",

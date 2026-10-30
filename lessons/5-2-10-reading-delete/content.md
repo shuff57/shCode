@@ -1,6 +1,6 @@
 ## Cleanup and Delete
 
-**Read before `5.2.12 Lab: Reaching the Goal`.**
+**Read before `5.2.16 Lab: Reaching the Goal`.**
 
 **What you'll learn from it:**
 

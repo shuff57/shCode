@@ -45,7 +45,7 @@
     {
       "id": "r2",
       "title": "Something on the table moves",
-      "description": "A sprite is given a velocity of its own, so the table is not entirely still. Help: 5.2.9 (Reading: Forces vs Velocity)",
+      "description": "A sprite is given a velocity of its own, so the table is not entirely still. Help: 5.2.13 (Reading: Forces vs Velocity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.vel\\.[xy]\\s*=\\s*-?[1-9]",

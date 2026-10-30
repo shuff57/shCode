@@ -6,7 +6,7 @@
 
 ## Step 1: The table, with bumpers you can name
 
-Same table as 5.2.14. The only change is that the obstacles have names, so the code can ask about them.
+Same table as 5.2.18. The only change is that the obstacles have names, so the code can ask about them.
 
 ```js live
 let ball, bumper, floor, goal;

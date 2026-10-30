@@ -1,0 +1,110 @@
+{
+  "id": "5-2-random-4-lab-beat-and-one-shot",
+  "title": "5.2.4 Lab: A beat and a one-shot",
+  "description": "Blink a lamp every 30 frames, show a message once at frame 300, and repair a halfway check that sits inside another condition and never runs.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "A beat: blink the lamp",
+      "instructions": "In `draw()`, every 30 frames flip the variable `on` between true and false. The code below already colours the lamp gold when `on` is true and gray when it is false, so the lamp should blink twice a second once your line works.",
+      "hints": [
+        "The remainder operator makes a beat: `frameCount % 30 === 0` is true on every 30th frame.",
+        "Inside that `if`, `on = !on;` flips a true/false variable."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A one-shot: Time is up",
+      "instructions": "When `frameCount` reaches 300 (five seconds), set `message` to `'Time is up!'` and log it with `console.log`. Watch the counter: the words should appear at 300 and the console line should print once, not over and over.",
+      "hints": [
+        "`frameCount === 300` is true on exactly one frame, so a one-shot needs no extra switch.",
+        "Put both lines inside the `if`: `message = 'Time is up!';` and the `console.log(...)`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Repair the check that never runs",
+      "instructions": "The 'Almost!' check at the bottom should print on frame 70, but it is wrapped inside `if (on)`. On frame 70 the lamp is off, so the check is never looked at. Change the code so the timer test is not inside another condition, and 'Almost!' appears in the console once.",
+      "hints": [
+        "Count it out: the lamp flips at frames 30, 60, 90. At frame 70 `on` is false, so `if (on)` skips everything inside it.",
+        "Move `if (frameCount === 70) { ... }` out so it stands on its own in `draw()`, not inside `if (on)`."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A repeating beat",
+      "description": "The code tests frameCount % N === 0 to act every N frames. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "frameCount % 30 === 0 is true on every 30th frame.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "frameCount\\s*%\\s*\\d+\\s*\\)?\\s*===?\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The beat flips the lamp",
+      "description": "Inside the beat, on is changed: flipped with ! or set to true or false. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "Inside the if, write on = !on; so it flips each beat.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "frameCount\\s*%\\s*\\d+\\s*\\)?\\s*===?\\s*0\\s*\\)\\s*\\{?[\\s\\S]{0,160}?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A one-shot at frame 300",
+      "description": "The code tests frameCount === 300, which is true on one frame only. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "Use === so it is true on one frame: frameCount === 300.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "frameCount\\s*===?\\s*(?:300(?!\\d)|5\\s*\\*\\s*60)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "The one-shot sets the message",
+      "description": "When frame 300 arrives, message is set to the words. Help: 5.2.2 (Worked Example: Sparkles on a beat)",
+      "hint": "Inside the frameCount === 300 block, assign message = 'Time is up!'.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "frameCount\\s*===?\\s*(?:300|5\\s*\\*\\s*60)\\s*\\)\\s*\\{?[\\s\\S]{0,200}?\\bmessage\\s*=\\s*\\S",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "The frame 70 check is not inside another condition",
+      "description": "The frameCount === 70 test stands on its own, not wrapped in if (on) or joined to it with &&. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "A timer test hidden inside an if is only looked at when that if is true. Move it outside.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*(?:if\\s*\\(\\s*on\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{[^}]*frameCount\\s*===?\\s*70|\\bon\\s*&&\\s*frameCount\\s*===?\\s*70|frameCount\\s*===?\\s*70\\s*&&\\s*on\\b))[\\s\\S]*frameCount\\s*===?\\s*70",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

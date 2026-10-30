@@ -1,4 +1,4 @@
-// 5.2.8 Bouncy Ball: build a closed box and drop a ball in it.
+// 5.2.12 Bouncy Ball: build a closed box and drop a ball in it.
 
 let ball;
 

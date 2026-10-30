@@ -50,7 +50,7 @@
     {
       "id": "r1",
       "title": "Static geometry exists",
-      "description": "Create at least one sprite with collider 'static'. Help: 5.2.7 (Bounciness and Friction)",
+      "description": "Create at least one sprite with collider 'static'. Help: 5.2.11 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
@@ -82,7 +82,7 @@
     {
       "id": "r4",
       "title": "Gravity enabled",
-      "description": "Assign a positive value to world.gravity.y. Help: 5.2.2 (Gravity)",
+      "description": "Assign a positive value to world.gravity.y. Help: 5.2.6 (Gravity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "world\\.gravity\\.y\\s*=\\s*[1-9]",

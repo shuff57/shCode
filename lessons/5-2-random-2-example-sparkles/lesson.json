@@ -1,0 +1,22 @@
+{
+  "id": "5-2-random-2-example-sparkles",
+  "title": "5.2.2 Worked Example: Sparkles on a beat",
+  "description": "A square appears at a random spot, in a random colour, every 30 frames, and a message arrives once at frame 300. Change the numbers and watch the beat and the moment move.",
+  "type": "lesson",
+  "estimateMins": 7,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "example",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

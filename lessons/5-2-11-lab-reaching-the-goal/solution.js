@@ -1,4 +1,4 @@
-// 5.2.12 Lab: Reaching the Goal: a single-fire win check with delete().
+// 5.2.16 Lab: Reaching the Goal: a single-fire win check with delete().
 
 let player, ground, goal;
 

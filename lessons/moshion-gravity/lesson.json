@@ -1,7 +1,7 @@
 {
   "id": "moshion-gravity",
-  "title": "5.2.3 Worked Example: Falling Block",
-  "description": "A dynamic block falls under gravity and lands on a static floor. Read the example, then experiment. Follows 5.2.2 (Reading: Gravity).",
+  "title": "5.2.7 Worked Example: Falling Block",
+  "description": "A dynamic block falls under gravity and lands on a static floor. Read the example, then experiment. Follows 5.2.6 (Reading: Gravity).",
   "type": "example",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",

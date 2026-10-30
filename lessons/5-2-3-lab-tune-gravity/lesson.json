@@ -1,6 +1,6 @@
 {
   "id": "5-2-3-lab-tune-gravity",
-  "title": "5.2.4 Lab: Tune Gravity",
+  "title": "5.2.8 Lab: Tune Gravity",
   "description": "Try different world.gravity.y values on the same scene and describe how each one feels. Non-graded: discuss with a partner.",
   "type": "lesson",
   "estimateMins": 15,
