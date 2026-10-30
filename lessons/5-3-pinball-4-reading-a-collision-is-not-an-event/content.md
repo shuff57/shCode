@@ -1,6 +1,6 @@
 ## A collision is not an event
 
-**Read before `5.3.5 Worked Example: The score that climbs by itself`.** About 6 minutes.
+**Read before `5.3.6 Worked Example: The score that climbs by itself`.** About 6 minutes.
 
 By the end of this reading you should be able to answer:
 

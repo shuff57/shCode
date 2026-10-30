@@ -1,4 +1,4 @@
-// 5.3.3 Lab: Build the table.
+// 5.3.4 Lab: Build the table.
 
 let ball, goal, score;
 

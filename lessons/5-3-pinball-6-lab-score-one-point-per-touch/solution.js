@@ -1,4 +1,4 @@
-// 5.3.6 Lab: Score one point per touch (reference solution).
+// 5.3.7 Lab: Score one point per touch (reference solution).
 
 let ball, bumper, floor, goal, score, wasTouching;
 

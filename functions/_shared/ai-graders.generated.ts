@@ -7435,6 +7435,134 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       "sprite"
     ]
   },
+  "5-3-pinball-plan-sketch-the-game": {
+    "lessonTitle": "5.3.1 Plan: Sketch your pinball game",
+    "prompt": "Everything you need is on this page and in 5.2.14 (Pinball Scene): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to turn your pinball scene into a pinball game. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one moment to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of pinball in their own words, such as the ball, the bumpers, a goal, the score, a way to lose and a way to start again. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between moments",
+        "description": "The student names at least two things the game has to remember from one moment to the next, for example the score, whether the round is still being played, where the ball is, or whether the ball was touching a bumper a moment ago. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as counting a hit only once or ending the round, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-3-pinball-playtest-and-reflect": {
+    "lessonTitle": "5.3.11 Playtest and reflect: Pinball",
+    "prompt": "Everything you need is in 5.3.1 (Plan: Sketch your pinball game) and 5.3.10 (Lab: Lose, and start again): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished pinball game at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many rounds they played and how it went",
+        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how it felt). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as the score, the memory of the last moment, the state flag or the restart, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-4-flappy-plan-sketch-the-game": {
+    "lessonTitle": "5.4.1 Plan: Sketch your Flappy game",
+    "prompt": "Everything you need is on this page and in 5.3.10 (Lab: Lose, and start again): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build a flapping-bird game. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one moment to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of the flapping game in their own words, such as the bird, gravity, the flap, the pipes, the gaps, the score, losing and restarting. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between moments",
+        "description": "The student names at least two things the game has to remember from one moment to the next, for example the bird's speed, where the pipes are, the score, or whether the round is still being played. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as making pipes keep appearing or removing the ones that have left, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-4-flappy-playtest-and-reflect": {
+    "lessonTitle": "5.4.9 Playtest and reflect: Flappy",
+    "prompt": "Everything you need is in 5.4.1 (Plan: Sketch your Flappy game) and 5.4.8 (Lab: Crash, and start again): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished flapping game at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many rounds they played and how it went",
+        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how it felt). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as the flap, the timer that builds pipes, the deleting of old pipes, the score or the restart, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
   "5-5-19-assignment-where-state-lives": {
     "lessonTitle": "5.8.19 Your Turn: Where the state lives",
     "prompt": "The student was asked, for a wave-spawner program, to say where each of three numbers should live — a local variable in a method, a property on `this`, or a class variable declared with `static` — and to give one sentence of reasoning for each. The three numbers: (1) the list of enemies still on the field, (2) one enemy's health, (3) how many enemies have ever been built. The right answers, in the course's terms: the list is a property of the scene (or a plain array at file scope, which is the same idea in this program) because it must outlive a frame and hold several objects; health is a property on `this` because each enemy needs its own copy; the all-time count is a class variable (`static`) because it belongs to the class rather than to any one enemy. Judge each criterion ONLY by whether the idea is present, however the student words it. Do not require the words 'local', 'property' or 'static' — 'belongs to the class', 'each one has its own', 'survives the call' and similar phrases are the same ideas. A student who places a number in a defensible but different place (for example, calling the enemy list a file-scope variable) is right enough for 'met', as long as the reason holds. Mark a criterion 'missing' only when the answer is absent or the reasoning is the opposite of the idea. Write each note for THIS student's own words: in a not-met note, name the exact phrase that causes the problem (quote at most a few words), say in plain words what it claims now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the answer for them. In a met note, say in one short phrase what in their answer satisfied it. Do not use generic praise.",
@@ -7467,7 +7595,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "5-5-snake-1-plan-break-snake-into-parts": {
     "lessonTitle": "5.5.1 Plan: Break Snake into parts",
-    "prompt": "Everything you need is on this page and in 5.4.7 (Lab: Crash, and start again): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build Snake. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "prompt": "Everything you need is on this page and in 5.4.8 (Lab: Crash, and start again): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build Snake. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
     "rubric": [
       {
         "id": "parts",

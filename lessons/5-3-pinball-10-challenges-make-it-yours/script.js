@@ -1,4 +1,4 @@
-// 5.3.10 Challenges: Make it yours.
+// 5.3.12 Challenges: Make it yours.
 // A finished game. Pick a challenge from the page above and change it.
 
 let ball, bumper, floor, goal, score, wasTouching, playing;

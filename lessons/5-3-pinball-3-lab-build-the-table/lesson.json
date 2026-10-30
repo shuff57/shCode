@@ -1,6 +1,6 @@
 {
   "id": "5-3-pinball-3-lab-build-the-table",
-  "title": "5.3.3 Lab: Build the table",
+  "title": "5.3.4 Lab: Build the table",
   "description": "Build the pinball table from scratch: gravity, three static obstacles, a bouncy ball and a gold goal block. The score is drawn but does not change yet — counting is the next lesson.",
   "type": "lesson",
   "estimateMins": 10,
@@ -83,7 +83,7 @@
     {
       "id": "r4",
       "title": "A goal is on the table",
-      "description": "A static sprite is stored as the goal, in a colour the player can see. Help: 5.3.2 (Worked Example: The table and the goal)",
+      "description": "A static sprite is stored as the goal, in a colour the player can see. Help: 5.3.3 (Worked Example: The table and the goal)",
       "type": "regex",
       "file": "script.js",
       "pattern": "goal\\s*=\\s*new\\s+Sprite\\s*\\([^)]*'static'",

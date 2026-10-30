@@ -1,7 +1,7 @@
 {
   "id": "5-4-flappy-7-lab-crash-and-start-again",
-  "title": "5.4.7 Lab: Crash, and start again",
-  "description": "Touching a pipe ends the round. Reuse the playing flag from 5.3.8, freeze the world when it ends, and make the restart clear the pipes as well as the bird and the score.",
+  "title": "5.4.8 Lab: Crash, and start again",
+  "description": "Touching a pipe ends the round. Reuse the playing flag from 5.3.9, freeze the world when it ends, and make the restart clear the pipes as well as the bird and the score.",
   "type": "lesson",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "A flag says whether the game is being played",
-      "description": "A variable that starts true is the game's state. Help: 5.3.8 (Reading: The state of the game)",
+      "description": "A variable that starts true is the game's state. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\b\\w+\\s*=\\s*true\\s*;",
@@ -55,7 +55,7 @@
     {
       "id": "r2",
       "title": "Touching a pipe ends the round",
-      "description": "A collision with the bird sets the flag false. Help: 5.3.8 (Reading: The state of the game)",
+      "description": "A collision with the bird sets the flag false. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
       "pattern": "bird\\.colliding\\s*\\([\\s\\S]{0,160}?\\w+\\s*=\\s*false",
@@ -66,7 +66,7 @@
     {
       "id": "r3",
       "title": "The restart clears the pipes",
-      "description": "Pressing R empties the array so the next round starts clean. Help: 5.4.4 (Reading: A world that scrolls)",
+      "description": "Pressing R empties the array so the next round starts clean. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
       "pattern": "kb\\.presses\\s*\\(\\s*'r'\\s*\\)[\\s\\S]{0,400}?(?:pipes\\s*=\\s*\\[\\s*\\]|pipes\\.length\\s*=\\s*0)",

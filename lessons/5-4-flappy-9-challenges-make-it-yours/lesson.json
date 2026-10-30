@@ -1,6 +1,6 @@
 {
   "id": "5-4-flappy-9-challenges-make-it-yours",
-  "title": "5.4.9 Challenges: Make it yours",
+  "title": "5.4.11 Challenges: Make it yours",
   "description": "The game is complete. Change one rule of your own: a narrower gap, pipes that speed up with the score, or a best score that survives a crash. Pick one, or invent one.",
   "type": "lesson",
   "estimateMins": 25,
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Pick a rule and change it",
-      "instructions": "Choose one of the three challenges on the page above, or invent a rule of your own. Start from your finished 5.4.7.",
+      "instructions": "Choose one of the three challenges on the page above, or invent a rule of your own. Start from your finished 5.4.8.",
       "hints": [
         "Whatever you pick, press R afterwards and check the game still starts cleanly."
       ]
@@ -34,7 +34,7 @@
     {
       "id": "r1",
       "title": "The game gets harder as the score grows",
-      "description": "Something read in makePipe or the loop depends on the score. Help: 5.4.6 (Lab: Score a gap)",
+      "description": "Something read in makePipe or the loop depends on the score. Help: 5.4.7 (Lab: Score a gap)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:score\\s*[*/%<>]|[*/%<>]\\s*score|min\\s*\\(|max\\s*\\()",
@@ -45,7 +45,7 @@
     {
       "id": "r2",
       "title": "The best score survives a crash",
-      "description": "A second number is kept across rounds and updated when the score beats it. Help: 5.3.9 (Lab: Lose, and start again)",
+      "description": "A second number is kept across rounds and updated when the score beats it. Help: 5.3.10 (Lab: Lose, and start again)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\(\\s*score\\s*>\\s*\\w+\\s*\\)",
@@ -56,7 +56,7 @@
     {
       "id": "r3",
       "title": "Something about the pipes is random",
-      "description": "The pipes use random for more than the gap height. Help: 5.4.5 (Lab: Pipes that come and go)",
+      "description": "The pipes use random for more than the gap height. Help: 5.4.6 (Lab: Pipes that come and go)",
       "type": "regex",
       "file": "script.js",
       "pattern": "random\\s*\\([^)]*\\)[\\s\\S]{0,200}?random\\s*\\(",

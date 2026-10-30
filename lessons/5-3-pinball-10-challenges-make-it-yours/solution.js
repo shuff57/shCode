@@ -1,4 +1,4 @@
-// 5.3.10 Challenges: Make it yours (reference: all three).
+// 5.3.12 Challenges: Make it yours (reference: all three).
 
 let ball, bumper, floor, goal, goal2, score, best, wasTouching, playing;
 let wasTouching2 = false;

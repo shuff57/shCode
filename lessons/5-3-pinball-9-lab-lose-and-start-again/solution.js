@@ -1,4 +1,4 @@
-// 5.3.9 Lab: Lose, and start again (reference solution).
+// 5.3.10 Lab: Lose, and start again (reference solution).
 
 let ball, bumper, floor, goal, score, wasTouching, playing;
 

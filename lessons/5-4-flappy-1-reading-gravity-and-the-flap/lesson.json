@@ -1,6 +1,6 @@
 {
   "id": "5-4-flappy-1-reading-gravity-and-the-flap",
-  "title": "5.4.1 Reading: Gravity and the flap",
+  "title": "5.4.2 Reading: Gravity and the flap",
   "description": "A flapping bird is gravity that never stops plus one sudden change to the bird's speed. Shows why the flap sets the speed rather than pushing, and why the key must be an edge.",
   "type": "lesson",
   "estimateMins": 6,

@@ -1,6 +1,6 @@
 ## From scene to game
 
-**Read before `5.3.2 Worked Example: The table and the goal`.** About 5 minutes.
+**Read before `5.3.3 Worked Example: The table and the goal`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -58,7 +58,7 @@ function draw() {
 
 **What you'll see:** the ball falls, hits the bumper, and rolls down to the floor. Press R and it starts again. That is the whole scene from 5.2.14 — and there is still no goal, no score, no way to lose, and no reason to press R except to watch it fall again.
 
-**Try this:** let the ball settle, then look at what is missing. If you wanted to tell a friend how well you just did, what number would you show them? That number does not exist yet. 5.3.2 adds it.
+**Try this:** let the ball settle, then look at what is missing. If you wanted to tell a friend how well you just did, what number would you show them? That number does not exist yet. 5.3.3 adds it.
 
 ---
 

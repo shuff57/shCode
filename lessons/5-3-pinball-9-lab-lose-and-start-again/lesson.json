@@ -1,6 +1,6 @@
 {
   "id": "5-3-pinball-9-lab-lose-and-start-again",
-  "title": "5.3.9 Lab: Lose, and start again",
+  "title": "5.3.10 Lab: Lose, and start again",
   "description": "Give the game an end: a flag for playing or over, a losing condition when the ball falls past the bottom, and a restart that puts the score back as well as the ball.",
   "type": "lesson",
   "estimateMins": 10,
@@ -43,7 +43,7 @@
     {
       "id": "r1",
       "title": "A flag says whether the game is being played",
-      "description": "A variable created once and starting true is the game's state. Help: 5.3.8 (Reading: The state of the game)",
+      "description": "A variable created once and starting true is the game's state. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\b\\w+\\s*=\\s*true\\s*;",
@@ -54,7 +54,7 @@
     {
       "id": "r2",
       "title": "The ball falling past the bottom ends the round",
-      "description": "Losing is a position test: when the ball's y is past the bottom of the canvas, the round ends. Help: 5.3.8 (Reading: The state of the game)",
+      "description": "Losing is a position test: when the ball's y is past the bottom of the canvas, the round ends. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
       "pattern": "ball\\.y\\s*>\\s*\\d+[\\s\\S]{0,80}?\\w+\\s*=\\s*false",
@@ -65,7 +65,7 @@
     {
       "id": "r3",
       "title": "A restart puts the score back",
-      "description": "Pressing R starts a fresh round, so the score returns to 0 along with the ball. Help: 5.3.8 (Reading: The state of the game)",
+      "description": "Pressing R starts a fresh round, so the score returns to 0 along with the ball. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
       "pattern": "kb\\.presses\\s*\\(\\s*'r'\\s*\\)[\\s\\S]{0,240}?score\\s*=\\s*0",

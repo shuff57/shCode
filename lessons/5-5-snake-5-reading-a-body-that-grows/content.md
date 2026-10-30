@@ -38,7 +38,7 @@ if (col === food.col && row === food.row) {
 }
 ```
 
-**Two places to clean up.** As with the pipes in 5.4.4, a cell lives in two places: the screen and the array. `pop` takes it out of the array; `delete()` takes it off the screen. Do only the first and the snake looks longer than it is.
+**Two places to clean up.** As with the pipes in 5.4.5, a cell lives in two places: the screen and the array. `pop` takes it out of the array; `delete()` takes it off the screen. Do only the first and the snake looks longer than it is.
 
 **New food.** When the food is eaten, delete the old food sprite and build a new one on a random cell with `makeFood()`.
 

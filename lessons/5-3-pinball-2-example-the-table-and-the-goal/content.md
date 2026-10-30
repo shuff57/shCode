@@ -1,6 +1,6 @@
 ## The table and the goal
 
-**Read after `5.3.1 Reading: From scene to game`.**
+**Read after `5.3.2 Reading: From scene to game`.**
 
 **Goal:** give the scene a target and a number that goes up when the ball reaches it.
 
@@ -36,7 +36,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** exactly the scene from 5.3.1. Nothing new is visible — `bumper` and `floor` are the same sprites, now held in variables so the code can reach them.
+**What you'll see:** exactly the scene from 5.3.2. Nothing new is visible — `bumper` and `floor` are the same sprites, now held in variables so the code can reach them.
 
 ## Step 2: A target at the bottom
 
@@ -121,7 +121,7 @@ function draw() {
 
 **What you'll see:** push the ball into the gold block and the score does not go up by one. It climbs so fast the number is unreadable, and it keeps climbing for as long as the ball rests against the block.
 
-That is not a mistake in your typing — it is the whole subject of the next lesson. `colliding()` answers a question about *this frame*, and `draw()` runs sixty times a second. Leave the number counting for now; 5.3.4 explains it and 5.3.6 fixes it.
+That is not a mistake in your typing — it is the whole subject of the next lesson. `colliding()` answers a question about *this frame*, and `draw()` runs sixty times a second. Leave the number counting for now; 5.3.5 explains it and 5.3.7 fixes it.
 
 ## Key takeaways
 

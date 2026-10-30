@@ -1,4 +1,4 @@
-// 5.3.7 Lab: Three bumpers, three values.
+// 5.3.8 Lab: Three bumpers, three values.
 
 let ball, floor, score;
 let bumpers = [];

@@ -1,4 +1,4 @@
-// 5.4.7 Lab: Crash, and start again (reference solution).
+// 5.4.8 Lab: Crash, and start again (reference solution).
 
 let bird, pipes, score, playing;
 
