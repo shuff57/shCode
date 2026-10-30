@@ -7,7 +7,7 @@
 
 **The CodeHS review is in `codehs-review/`**: per-course lesson-by-lesson dispositions
 (`gamedesign`, `videogamedesign`, `apcsp_js`, `apcsacortado`), `csa-3.3-3.9.md`, `PLACEMENT.md`
-(proposed module rows plus **12 open decisions for the owner**, none decided) and
+(proposed module rows; **4 decisions made 2026-10-30** (groups stay at 6.1; one grids module; a random+timers lesson before Unit 5; the five-step build close, AI-graded) and **8 still open**) and
 `MOSHION-GAPS.md` (library gaps against the planned modules). `PROGRESS.md` has the log and
 what was and was not verified. Read `PLACEMENT.md` first.
 

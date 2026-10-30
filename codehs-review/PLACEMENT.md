@@ -48,17 +48,23 @@ the written plan, the pseudocode step and the playtest/reflection close.
 6. Small named **setup functions** in a growing project (their solutions decompose the scene).
 7. A **runner-style harness** per class in the class unit.
 
-## Open decisions for the owner
+## Decided by the owner, 2026-10-30
 
-1. **Groups in the functional block.** CodeHS puts groups inside the second project. Ours waits for
-   6.1, so no functional game may use them. Pull groups forward, or keep functional games to
-   individual sprites and arrays?
-2. **Tiles / grids module** (GD tiles + CSA 2D arrays + VGD Tic Tac Toe). Build one?
-3. **Random numbers and timers.** Dedicated lesson before Unit 5, or keep teaching them inside the
-   first game that needs them (5.4 does today)?
+1. **Groups stay at 6.1.** Functional games (5.3-5.5) use individual sprites and arrays; no cannon/projectile
+   build in the functional block for now.
+2. **One grids module**: tile maps and 2D arrays, placed in the systems block after 6.1. moSHion has no tile-map
+   support (`MOSHION-GAPS.md`), so the module needs a small library addition or a helper taught in the lesson.
+3. **Random numbers and timers get a dedicated lesson before Unit 5** (not only inside 5.4). 5.4's inline use stays;
+   the lesson comes first so 5.4 can point back to it.
+4. **The five-step close (written plan, build, playtest, reflect) is adopted on every build module and is
+   AI-graded like the PAs.** Each build module (5.3, 5.4, 5.5, the OOP games) gets plan/playtest/reflect screens
+   with an `aiGrader` rubric. Lazy-grading rules apply (`feedback_pseudocode-grading-lax`): accept any phrasing
+   of a correct idea.
+
+## Still open
+
 4. **Console user input.** Wanted at all, or keyboard-only from 5.1?
 5. **Sound.** New lesson inside a build, or a standalone module?
-6. **The five-step close** (plan, build, playtest, reflect) on every build module; graded or not?
 7. **Breakout and a projectile build** as extra functional games, or hold at Pinball, Flappy, Snake?
 8. **Inheritance.** CSA does not teach it, so it cannot settle the question. A name-only reading at
    the end of the class unit, or nothing?
