@@ -1,85 +1,105 @@
-# 2026-10-29 (latest): teaching moSHion objects, using CodeHS AP CSA as the pattern
+# 2026-10-29 (latest): module 5.5 is built; the 5.3/5.4 grouping is committed
 
-**Branch `codehs-inspiration`** (cut from `cs-3d`). Start here, then read `CODEHS-INSPIRATION.md`
+**Branch `codehs-inspiration`** (cut from `cs-3d`). Read `CODEHS-INSPIRATION.md`
 (why CodeHS, six-course measurements) and `CODEHS-MAP.md` (per-module map, fit levels).
 
 ## State of the tree
 
-Committed: `f6ba94ff` (5.1/5.2 content pass, key names taught before asked) and `1a0d2b14`
-(5.3 class-anatomy example + fill-in-the-constructor lab).
+Committed: `f6ba94ff` (5.1/5.2 content pass), `1a0d2b14` (5.3 class-anatomy example +
+fill-in-the-constructor lab), `3594e0ff` (5.3/5.4 lesson grouping + the this-keyword video
+moved to 5.4.2), `82e46363` (**module 5.5**).
 
-**Uncommitted, 62 files, build and `npm test` exit 0:** step A below. `.gauntlet/occt-checks.json`
-is also modified, but only by the test run; leave it out of commits.
+All three steps of the object plan are done. `.gauntlet/occt-checks.json` shows as modified
+only after a test run; leave it out of commits.
 
-## The plan for objects (three steps)
+## What 5.5 is, and what the check changed
 
-- **B, done and committed.** Two new 5.3 screens: `5-3-35-example-class-anatomy` (5.3.6: class name,
-  constructor, parameters, properties) and `5-3-36-lab-write-constructor` (5.3.16: class shell given,
-  student writes the constructor body and builds two instances). No lab before 5.4.11 made a student
-  write a constructor; this is the first.
-- **A, done, uncommitted.** `curriculum/groups/5.3.json` (3 lessons / 16 screens) and `5.4.json`
-  (4 lessons / 22 screens). The this-keyword video moved from the end of 5.3 to 5.4.2 through
-  `scripts/renumber-plans/5.3-5.4-video-to-methods.json`: it teaches `this` inside methods, which 5.4.1
-  introduces, so anywhere earlier in 5.3 would ask before teaching. Folders never moved, so no D1
-  migration. Its `videoUrl` is still empty (it shows the teacher-recorded fallback text): record or
-  link it.
-- **C, NOT started: a new module 5.5.** User decisions: it must be at similar density to its
-  neighbours (5.1 = 24 screens, 5.2 = 16, 5.3 = 16, 5.4 = 22), and it **includes a scope-and-access
-  lesson**. Draft outline, about 22 screens, to be checked against the 5.4 screen BODIES first
-  (I read only their titles and descriptions):
-  1. Designing a class (5): reading on nouns and verbs, example designing an `Enemy`, plain-English-to-
-     pseudocode, lab writing a `Coin`, lab adding two methods.
-  2. State inside an instance (4): reading, example `Enemy` with health and `takeHit()`, two labs.
-  3. Instances that meet (4): reading, example `player.hit(enemy)`, lab, lab removing dead instances.
-  4. Scope and access (about 4, from CSA 3.8): not yet outlined; moSHion has no use for it today,
-     so teach it through the classes already built and keep it short.
-  5. Build (3): wave-spawner walkthrough, moSHion enemy-wave lab, written design notes.
-  6. Check (2): one on class/instance/constructor/`this`, one on methods/state/instances.
-  5.5 is a free number (modules go 5.4 straight to 6.1), and a module at the end of a unit shifts no
-  existing ids. Create it with a `curriculum/modules/5.5_*.md`, a group file, and the lessons.
+`5.5 Inside a Class` — 20 screens, six lessons, after 5.4 and before 6.1. **Not a book
+section**: Unit 5 ended on 5.4's challenges with no internal check.
+
+The draft in the previous section of this file was a general "design a class" module.
+Reading the 5.4 screen *bodies* killed half of it — 5.4.11 already writes an Enemy class,
+5.4.19 already has students write a class from scratch with five instances and remove
+collected items from an array, 5.4.7 is the plain-English-to-pseudocode screen. The table
+of what was cut is in `curriculum/modules/5.5_inside-a-class.md`.
+
+What shipped instead, because nothing earlier teaches it:
+- **scope inside a class** — 3.2.24/25 teach local-vs-global *in functions*; the third
+  place (`this`) and one method's local being invisible to the next are new.
+- **access** — 5.4.21 names encapsulation as vocabulary only; 5.5.5–5.5.9 make it concrete
+  (`takeHit` with a floor at zero, `isAlive`).
+- **your own object taking your own object** — 5.4.1's `distanceTo(other)` shows the syntax
+  in passing; `player.hit(enemy)` and the direction it implies are new.
+- **`static`** — never taught. The reading opens by separating it from moSHion's
+  `new Sprite(..., 'static')` **body type** (5.2). That collision is the trap to keep saying.
+- **the wave spawner** build, and a written "where does each piece of state live" answer.
+- **two checks**, because the unit had none: one gating scope/access, one closing 5.3–5.5.
 
 ## Traps (each cost real thought)
 
-- **Taught before asked** (memory `feedback_lesson-voice-taught-before-asked`). Every term in a step,
-  hint or requirement must come from an EARLIER screen in module order. The constructor lab stays after
-  `this` is taught (5.3.12-13) because it asks for `this.x = x`. The constructor reading (5.3.5) still
-  comes before `this`, which was already the order.
-- **Lesson ends.** The group README's rule: a lesson needs a closing check only when its last screen is
-  a reading or a video. All current 5.1/5.3/5.4 lessons end on a lab, example, chart, assignment or
-  challenge, so none needed one.
-- **Renumbering.** Use `scripts/renumber-module.mjs --plan <plan> [--dry-run]`. It rewrites titles and
-  citations but not folders. It always ends with "no Numbered Lesson List table" for 5.1/5.3 (their docs
-  have no table); that is harmless, fix the module doc prose by hand. To move a lesson ACROSS modules,
-  first retitle it with a number inside the destination module and set its `unit`, then run the plan.
-  A new lesson's own text is not rewritten, so write its citations in the FINAL numbering.
-- **Do not trust a pointer's number alone.** After a renumber the "Read before X" line in the screen
-  before an insertion points at the wrong screen; fix it by hand (5.3.5 was).
-- **Generated files** (`functions/_shared/ai-graders.generated.ts`, `module-docs.generated.ts`,
-  `public/lesson-requirements.json`, `public/lessons-manifest.json`) are rewritten by `npm run build`.
-  Commit them with the content that caused them.
-- **Pointer mismatches.** `check-help-pointer-titles` reports 10, all pre-existing and none in 5.1-5.4
-  (1.4.14, 2.5.24, 3.4.19 x4, 6.3.10, 6.6.24 x2, 6.7.28). Not caused by this branch.
-- **Pacing.** The 5.4 module doc estimates about 4 h 45 min while the 5.3/5.4 note says about 1.75
-  contact hours. "Choosing OOP" (5.4 lesson 4) is about 127 min because it holds both graded assignments
-  (Collectible 45, writeup 40) and screen order is fixed by number. Teacher decision pending.
-- **Process.** Stop the dev server (kill by pid, `rm -rf .next`) before `npm run build` or `npm test`.
-  Dev server: `DEV_ROLE=teacher npm run dev`, port 3002. Browser: `playwright-cli`, named sessions, close
-  throwaway ones, never close `mom`.
+- **Taught before asked** (memory `feedback_lesson-voice-taught-before-asked`). Every term in a
+  step, hint or requirement must come from an EARLIER screen in module order. Verify with
+  `grep` before assuming: `frameCount` is taught in 5.1.14, `'static'` body type in 5.2, `.filter`
+  in **3.7.19** (not 3.7.18, which is a spread lab).
+- **`Help: N.N.N (Title)` must reproduce the other lesson's title.** `check-help-pointer-titles`
+  normalises case and punctuation but not *meaning*; the pointer must point at the lesson that
+  actually teaches the thing. It found two wrong pointers in 5.5.13 (fixed).
+- **A quiz's `source` and `sourceIds` must agree in count and in meaning.**
+  `check-lesson-numbers` reports both mismatches; `node scripts/pin-quiz-sources.mjs` re-pins
+  `source` to the folder ids. Also: `test-quiz` rejects two options that differ only by case
+  (`enemy.spawned` vs `Enemy.spawned`) — it was a real failure in 5.5.20.
+- **A lesson with `requirements` but no reference warns in `check-starters`.** Give it a
+  `solution/` file. The reference must score FULL and the starter must not; that is the whole
+  invariant, and it caught a too-narrow regex in 5.5.19.
+- **The starter/reference bundles go stale.** After adding lessons, `check-solution-leak` fails
+  with "not in solutions.generated.ts". Run `node scripts/generate-solutions.mjs` and
+  `node scripts/generate-lesson-starters.mjs`.
+- **Generated files** (`ai-graders.generated.ts`, `module-docs.generated.ts`,
+  `public/lessons-manifest.json`, `public/lesson-requirements.json`) are rewritten by the
+  generators. Commit them with the content that caused them.
+- **Lesson ends.** The group README's rule: a lesson needs a closing check only when its last
+  screen is a reading or a video. 5.5's lessons end in labs or examples, so its two quizzes are
+  a deliberate gate and a unit close, not per-lesson closers.
+- **Renumbering.** `scripts/renumber-module.mjs --plan <plan> [--dry-run]` rewrites titles and
+  citations but not folders. To move a lesson ACROSS modules, first retitle it with a number
+  inside the destination module and set its `unit`, then run the plan. A new lesson's own text
+  is not rewritten, so write its citations in the FINAL numbering.
+- **`pkill -f "next dev"` kills the shell (exit 144)** — hit again this session. Kill the pid
+  from `ss -lptn 'sport = :3002'`.
+- **Process.** Stop the dev server before `npm run build` or `npm test`. Dev server:
+  `DEV_ROLE=teacher npm run dev`, port 3002. Browser: `playwright-cli`, named sessions, close
+  throwaway ones, never close `mom`. A student-role dev server shows the lesson-lock gate;
+  use `DEV_ROLE=teacher` to read a new module's content.
+
+## Verified, and not
+
+Checked as a teacher in a browser: the module page lists 20 lessons, 5.5.15's `static spawned`
+runs and the HUD reads it, 5.5.18's starter runs with "Still needed (4)", 5.5.20's quiz serves
+and says "6 of 8".
+**Not walked as a student** (the lock gate blocks it until earlier lessons are completed), and
+the AI check on 5.5.19 has not had a live model run — `test-ai-check` only checks the shape.
 
 ## Other open items
 
-- Add moSHion terms (`text(`, `update(`, `world.gravity`, `'static'`/`'dynamic'`, `frameCount`) to the
-  `scripts/check-concept-order.mjs` catalog; today it only checks console labs, so it would not have
-  caught the 5.1 defects.
-- Group the remaining 32 modules one at a time (objectives are hand-written; user reviews each).
+- `5-3-15-video-this-keyword` (5.4.2) still has an empty `videoUrl`; it shows the
+  teacher-recorded fallback text. Record or link it.
+- Add moSHion terms (`text(`, `update(`, `world.gravity`, `'static'`/`'dynamic'`, `frameCount`)
+  to the `scripts/check-concept-order.mjs` catalog; today it only checks console labs, so it
+  would not have caught the 5.1 defects and cannot check 5.5's labs either.
+- Group the remaining 31 modules one at a time (objectives are hand-written; user reviews each).
 - Closing checks for reading-heavy modules (1.2, 1.5, 3.2, 6.5, 6.7).
 - A standard project close-out for 7.1 (two screens today).
-- The arrow-keys-scroll claim was tested once, in Chromium, and did not reproduce; untested elsewhere.
-  `lab-assignment-conventions.md` §4 now allows either key set and says to restore WASD-only if a
-  platform scrolls.
-- 5.2.4 Lab: Tune Gravity partly overlaps the Falling Block example (5.2.3); intended example-then-lab.
-- I read only titles of CSA's lessons, not bodies. Re-fetch `https://codehs.com/course/apcsacortado/explore`
-  (public, no login) if a closer comparison is wanted.
+- **Pacing conflict, still unresolved.** The 5.4 module doc estimates about 4 h 45 min while
+  the 5.3/5.4 note says about 1.75 contact hours. "Choosing OOP" (5.4 lesson 4) is about 127 min
+  because it holds both graded assignments. 5.5 adds about 3 hours on top. Teacher decision
+  pending — nothing in 5.5 depends on the answer.
+- 10 pre-existing `check-help-pointer-titles` mismatches (1.4.10, 2.5.6, 3.4.12 x4, 5.1.10,
+  6.6.24 x2, 6.8.7). None in 5.1–5.5.
+- 5.2.4 Lab: Tune Gravity partly overlaps the Falling Block example (5.2.3); intended
+  example-then-lab.
+- I read only titles of CodeHS's other courses, not bodies. Re-fetch
+  `https://codehs.com/course/apcsacortado/explore` (public, no login) if a closer comparison is
+  wanted.
 
 # 2026-10-29 (later): lesson layer added, piloted on 5.1
 
