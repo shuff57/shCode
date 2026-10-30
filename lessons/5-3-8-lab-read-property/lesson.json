@@ -1,11 +1,11 @@
 {
   "id": "5-3-8-lab-read-property",
-  "title": "5.3.9 Lab: Read a property",
+  "title": "5.6.9 Lab: Read a property",
   "description": "Read `b.color` and `b.size` off a Box instance and print them to the on-canvas console using `console.log`. First practice with dot-notation reads.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.3 Classes and Objects via moSHion",
+  "unit": "5.6 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "Read b.color and b.size with console.log",
-      "description": "Call console.log with b.color and with b.size inside draw() (labels are fine, e.g. console.log('color:', b.color)). Help: 5.3.3 (Class and instance)",
+      "description": "Call console.log with b.color and with b.size inside draw() (labels are fine, e.g. console.log('color:', b.color)). Help: 5.6.3 (Class and instance)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

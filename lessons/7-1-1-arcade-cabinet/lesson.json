@@ -83,7 +83,7 @@
     {
       "id": "req1",
       "title": "A class of your own",
-      "description": "A class you declared yourself: any name, any purpose, capitalised like every class you have written since 5.4. The checker cannot tell whether you made two of them; the teacher reads for that. Help: 5.3.3 (Class and instance)",
+      "description": "A class you declared yourself: any name, any purpose, capitalised like every class you have written since 5.4. The checker cannot tell whether you made two of them; the teacher reads for that. Help: 5.6.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bclass\\s+[A-Z][\\w$]*\\s*(?:extends\\s+[\\w$.]+\\s*)?\\{",

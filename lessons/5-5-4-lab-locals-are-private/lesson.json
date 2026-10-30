@@ -1,11 +1,11 @@
 {
   "id": "5-5-4-lab-locals-are-private",
-  "title": "5.5.4 Lab: Share one number between two methods",
+  "title": "5.8.4 Lab: Share one number between two methods",
   "description": "`add()` declares its own `let step = 3`; `undo()` types the 3 again. A local in one method is invisible to the next, so the two numbers can drift. Put the step on `this` in the constructor and both methods use it.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.5 Inside a Class",
+  "unit": "5.8 Inside a Class",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -42,7 +42,7 @@
     {
       "id": "r1",
       "title": "The step is stored on this",
-      "description": "The constructor stores the step as a property, so both methods can read the same number. Help: 5.5.1 (Reading: Three places a variable can live)",
+      "description": "The constructor stores the step as a property, so both methods can read the same number. Help: 5.8.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
       "pattern": "this\\.step\\s*=",
@@ -53,7 +53,7 @@
     {
       "id": "r2",
       "title": "add() uses this.step",
-      "description": "`add()` adds the stored step rather than a local of its own. Help: 5.5.1 (Reading: Three places a variable can live)",
+      "description": "`add()` adds the stored step rather than a local of its own. Help: 5.8.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
       "pattern": "add\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?this\\.points\\s*(?:\\+=|=\\s*this\\.points\\s*\\+)\\s*this\\.step",
@@ -64,7 +64,7 @@
     {
       "id": "r3",
       "title": "undo() uses the same this.step",
-      "description": "`undo()` subtracts the stored step, so the two methods cannot drift apart. Help: 5.5.1 (Reading: Three places a variable can live)",
+      "description": "`undo()` subtracts the stored step, so the two methods cannot drift apart. Help: 5.8.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
       "pattern": "undo\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?this\\.points\\s*(?:-=|=\\s*this\\.points\\s*-)\\s*this\\.step",

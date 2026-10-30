@@ -1,4 +1,4 @@
-// 5.3.9 Lab: Read a property (reference solution).
+// 5.6.9 Lab: Read a property (reference solution).
 
 class Box {
   constructor() {

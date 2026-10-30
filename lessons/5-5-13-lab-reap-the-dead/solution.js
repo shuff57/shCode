@@ -1,4 +1,4 @@
-// 5.5.13 Lab: Reap the dead with filter (reference solution).
+// 5.8.13 Lab: Reap the dead with filter (reference solution).
 
 class Enemy {
   constructor(x, y) {

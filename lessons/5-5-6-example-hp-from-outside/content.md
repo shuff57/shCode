@@ -1,6 +1,6 @@
 ## The number anyone can set
 
-**Read after `5.5.5 Reading: Who may change a property`.**
+**Read after `5.8.5 Reading: Who may change a property`.**
 
 **Goal:** watch the same enemy class fail and then hold its rule, with the arithmetic moving from the scene into the class.
 

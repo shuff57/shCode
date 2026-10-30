@@ -1,10 +1,10 @@
 {
   "id": "5-3-29-example-proc-vs-oop",
-  "title": "5.4.16 Worked Example: Procedural vs OOP side-by-side",
+  "title": "5.7.16 Worked Example: Procedural vs OOP side-by-side",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Writing Your Own Classes",
+  "unit": "5.7 Writing Your Own Classes",
   "preview": "example",
   "week": 12,
   "slos": [

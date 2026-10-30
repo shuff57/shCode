@@ -1,4 +1,4 @@
-// 5.5.12 Lab: Write hit(other) (reference solution).
+// 5.8.12 Lab: Write hit(other) (reference solution).
 
 class Enemy {
   constructor(x, y) {

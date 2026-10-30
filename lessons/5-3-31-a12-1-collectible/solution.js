@@ -1,4 +1,4 @@
-// 5.4.19 Collectible Class: reference solution.
+// 5.7.19 Collectible Class: reference solution.
 // Hidden from students; only loaded for admin/teacher via /api/lesson-solution.
 
 class Collectible {

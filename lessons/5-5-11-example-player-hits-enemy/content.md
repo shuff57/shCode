@@ -1,6 +1,6 @@
 ## player.hit(enemy)
 
-**Read after `5.5.10 Reading: A parameter that is another object`.**
+**Read after `5.8.10 Reading: A parameter that is another object`.**
 
 **Goal:** move a decision from the scene into an object, by letting the player act on the enemy it is given.
 
@@ -47,7 +47,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** press Space and the enemy's number falls to 0, then it greys out. It works. The cost is the same as in 5.5.6: `draw()` is where a hit gets decided, so a second scene would have to decide it again.
+**What you'll see:** press Space and the enemy's number falls to 0, then it greys out. It works. The cost is the same as in 5.8.6: `draw()` is where a hit gets decided, so a second scene would have to decide it again.
 
 ## Step 2: The player decides
 

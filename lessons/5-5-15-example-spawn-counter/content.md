@@ -1,6 +1,6 @@
 ## Enemy.spawned
 
-**Read after `5.5.14 Reading: One value shared by every instance`.**
+**Read after `5.8.14 Reading: One value shared by every instance`.**
 
 **Goal:** one counter that no single enemy owns, written from inside the constructor and read from the scene.
 

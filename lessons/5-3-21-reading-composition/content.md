@@ -1,6 +1,6 @@
 ## Why `this.sprite`, not `extends Sprite`
 
-**Read before `5.4.9 Lab: Mutate this.sprite.x from a method`.** About 4 minutes.
+**Read before `5.7.9 Lab: Mutate this.sprite.x from a method`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 

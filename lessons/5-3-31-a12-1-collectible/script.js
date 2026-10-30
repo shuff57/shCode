@@ -1,4 +1,4 @@
-// 5.4.19 Collectible Class: write the class, instantiate 5+, catch them.
+// 5.7.19 Collectible Class: write the class, instantiate 5+, catch them.
 
 class Collectible {
   constructor(x, y, value, color) {

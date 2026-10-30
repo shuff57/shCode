@@ -1,6 +1,6 @@
 ## A parameter that is another object
 
-**Read before `5.5.11 Worked Example: player.hit(enemy)`.** About 5 minutes.
+**Read before `5.8.11 Worked Example: player.hit(enemy)`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 - Why is `player.hit(enemy)` not the same as `enemy.hit(player)`?
 - What does a method need to know about the object handed to it?
 
-5.4.1 (Reading: Methods) showed you `distanceTo(other)` as a way to see what a method declaration looks like. You read past the interesting part: `other` is a **whole second object**, of the same class, handed in as an argument.
+5.7.1 (Reading: Methods) showed you `distanceTo(other)` as a way to see what a method declaration looks like. You read past the interesting part: `other` is a **whole second object**, of the same class, handed in as an argument.
 
 ```js
 a.distanceTo(b);

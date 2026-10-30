@@ -1,6 +1,6 @@
 ## One value shared by every instance
 
-**Read before `5.5.15 Worked Example: Enemy.spawned`.** About 5 minutes.
+**Read before `5.8.15 Worked Example: Enemy.spawned`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

@@ -1,4 +1,4 @@
-// 5.4.14 Lab: Loop over an array of instances (reference solution).
+// 5.7.14 Lab: Loop over an array of instances (reference solution).
 
 class Enemy {
   constructor(x, y, hp) {

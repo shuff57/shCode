@@ -1,4 +1,4 @@
-// 5.3.16 Your Turn: Fill in a Constructor.
+// 5.6.16 Your Turn: Fill in a Constructor.
 
 class Message {
   constructor(x, y, words) {

@@ -1,11 +1,11 @@
 {
   "id": "5-3-13-lab-build-sprite",
-  "title": "5.3.14 Your Turn: Build a Sprite",
-  "description": "Low-stakes autograded practice. Instantiate the Sprite class twice (rectangle form and circle form), set properties on each instance, and give one sprite a stroke. Bridges the 5.3.7 / 5.3.13 worked examples and the 5.4.11 Enemy class worked example.",
+  "title": "5.6.14 Your Turn: Build a Sprite",
+  "description": "Low-stakes autograded practice. Instantiate the Sprite class twice (rectangle form and circle form), set properties on each instance, and give one sprite a stroke. Bridges the 5.6.7 / 5.6.13 worked examples and the 5.7.11 Enemy class worked example.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.3 Classes and Objects via moSHion",
+  "unit": "5.6 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Create the canvas",
-      "instructions": "In `setup()`, create a canvas. `Canvas` is a class, and `new Canvas(...)` stamps out an instance: the same constructor-call pattern you saw in 5.3.7.",
+      "instructions": "In `setup()`, create a canvas. `Canvas` is a class, and `new Canvas(...)` stamps out an instance: the same constructor-call pattern you saw in 5.6.7.",
       "hints": [
         "Open the moSHion docs drawer on the right and find the Canvas section."
       ]
@@ -81,7 +81,7 @@
     {
       "id": "r4",
       "title": "Property set on an instance",
-      "description": "At least one `.color` assignment on a sprite instance. Help: 5.3.3 (Class and instance)",
+      "description": "At least one `.color` assignment on a sprite instance. Help: 5.6.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.color\\s*=",

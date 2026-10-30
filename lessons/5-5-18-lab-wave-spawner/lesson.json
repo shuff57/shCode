@@ -1,11 +1,11 @@
 {
   "id": "5-5-18-lab-wave-spawner",
-  "title": "5.5.18 Lab: Build a wave",
+  "title": "5.8.18 Lab: Build a wave",
   "description": "Build the spawner yourself: a frameCount timer that sends three enemies only when the field is clear, a hit that goes to the first one, and a filter that reaps the dead. Uses every idea in the module.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.5 Inside a Class",
+  "unit": "5.8 Inside a Class",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -19,7 +19,7 @@
       "title": "Send a wave when the field is clear",
       "instructions": "In `draw()`, send three enemies together — one at `x = 90`, one at `x = 260`, one at `x = 430`, all at `y = 100` — but only when there are none left, and only on a timer rather than every frame. Run it: three arrive, nothing new appears until all three are gone, then three more.",
       "hints": [
-        "Both conditions go in one `if`: `enemies.length === 0` for the empty field, and `frameCount % 90 === 0` for the timer. Reread 5.5.17 (Worked Example: The wave spawner).",
+        "Both conditions go in one `if`: `enemies.length === 0` for the empty field, and `frameCount % 90 === 0` for the timer. Reread 5.8.17 (Worked Example: The wave spawner).",
         "`frameCount === 90` would be true for one frame only. The `%` makes it come back."
       ]
     },
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "A wave only arrives on a timer",
-      "description": "The spawn check uses `frameCount` and a modulo, so it is true once every N frames rather than every frame. Help: 5.5.17 (Worked Example: The wave spawner)",
+      "description": "The spawn check uses `frameCount` and a modulo, so it is true once every N frames rather than every frame. Help: 5.8.17 (Worked Example: The wave spawner)",
       "type": "regex",
       "file": "script.js",
       "pattern": "frameCount\\s*%\\s*\\d+\\s*===\\s*0",
@@ -55,7 +55,7 @@
     {
       "id": "r2",
       "title": "A wave only arrives when the field is clear",
-      "description": "The spawn check also asks whether the list is empty, so a new group waits for the last one to be cleared. Help: 5.5.17 (Worked Example: The wave spawner)",
+      "description": "The spawn check also asks whether the list is empty, so a new group waits for the last one to be cleared. Help: 5.8.17 (Worked Example: The wave spawner)",
       "type": "regex",
       "file": "script.js",
       "pattern": "enemies\\.length\\s*===\\s*0",
@@ -66,7 +66,7 @@
     {
       "id": "r3",
       "title": "New enemies are pushed onto the list",
-      "description": "Each arriving enemy is a new instance put into the `enemies` array. Help: 5.4.13 (Lab: An array of Enemies)",
+      "description": "Each arriving enemy is a new instance put into the `enemies` array. Help: 5.7.13 (Lab: An array of Enemies)",
       "type": "regex",
       "file": "script.js",
       "pattern": "enemies\\.push\\s*\\(\\s*new\\s+Enemy\\s*\\(",
@@ -77,7 +77,7 @@
     {
       "id": "r4",
       "title": "The dead are filtered out",
-      "description": "The list is rebuilt from the living with `filter`, and stored back into `enemies`. Help: 5.5.13 (Lab: Reap the dead with filter)",
+      "description": "The list is rebuilt from the living with `filter`, and stored back into `enemies`. Help: 5.8.13 (Lab: Reap the dead with filter)",
       "type": "regex",
       "file": "script.js",
       "pattern": "enemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,80}?(?:isAlive\\s*\\(\\s*\\)|hp\\s*>\\s*0)",

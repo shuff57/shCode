@@ -1,4 +1,4 @@
-// 5.3.14 Your Turn: Build a Sprite.
+// 5.6.14 Your Turn: Build a Sprite.
 
 function setup() {
   // STEP 1: create a canvas with new Canvas(...)

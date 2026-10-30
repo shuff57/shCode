@@ -1,11 +1,11 @@
 {
   "id": "5-3-36-lab-write-constructor",
-  "title": "5.3.16 Your Turn: Fill in a Constructor",
-  "description": "Low-stakes autograded practice. The class shell is given; you write the constructor body that stores three arguments on this, then build two instances with different values. Follows 5.3.15 (Worked Example: Sprite Showcase) and comes before the Enemy class in 5.4.11.",
+  "title": "5.6.16 Your Turn: Fill in a Constructor",
+  "description": "Low-stakes autograded practice. The class shell is given; you write the constructor body that stores three arguments on this, then build two instances with different values. Follows 5.6.15 (Worked Example: Sprite Showcase) and comes before the Enemy class in 5.7.11.",
   "type": "lesson",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.3 Classes and Objects via moSHion",
+  "unit": "5.6 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -18,7 +18,7 @@
       "title": "Store x",
       "instructions": "The `Message` class is already written, but its constructor body is empty, so nothing is stored. Inside the constructor, store the `x` argument on this instance as a property named `x`. Nothing will appear on the canvas yet; that is expected.",
       "hints": [
-        "Reread 5.3.5 (Reading: constructor and its parameters). The line that stores an argument starts with `this.` and the property name.",
+        "Reread 5.6.5 (Reading: constructor and its parameters). The line that stores an argument starts with `this.` and the property name.",
         "The property name goes after the dot and the argument goes on the right of the equals sign."
       ]
     },
@@ -43,7 +43,7 @@
       "title": "Build two messages",
       "instructions": "In `setup()`, build two `Message` instances with `new`, and store them in `first` and `second`. Give each one different values so the two words appear in different places. Run it: both words should now show on the canvas.",
       "hints": [
-        "Reread 5.3.6 (Worked Example: The parts of a class). Arguments go in the same order as the constructor's parameters: x, then y, then words.",
+        "Reread 5.6.6 (Worked Example: The parts of a class). Arguments go in the same order as the constructor's parameters: x, then y, then words.",
         "The words go in quotes, like `'hello'`."
       ]
     }
@@ -52,7 +52,7 @@
     {
       "id": "r1",
       "title": "Constructor stores x",
-      "description": "The constructor stores the x argument on this as a property named x. Help: 5.3.5 (Reading: constructor and its parameters)",
+      "description": "The constructor stores the x argument on this as a property named x. Help: 5.6.5 (Reading: constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "this\\.x\\s*=\\s*x\\b",
@@ -62,7 +62,7 @@
     {
       "id": "r2",
       "title": "Constructor stores y",
-      "description": "The constructor stores the y argument on this as a property named y. Help: 5.3.5 (Reading: constructor and its parameters)",
+      "description": "The constructor stores the y argument on this as a property named y. Help: 5.6.5 (Reading: constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "this\\.y\\s*=\\s*y\\b",
@@ -72,7 +72,7 @@
     {
       "id": "r3",
       "title": "Constructor stores words",
-      "description": "The constructor stores the words argument on this as a property named words. Help: 5.3.5 (Reading: constructor and its parameters)",
+      "description": "The constructor stores the words argument on this as a property named words. Help: 5.6.5 (Reading: constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "this\\.words\\s*=\\s*words\\b",
@@ -82,7 +82,7 @@
     {
       "id": "r4",
       "title": "Two instances built",
-      "description": "Builds at least two Message instances with new. Help: 5.3.6 (Worked Example: The parts of a class)",
+      "description": "Builds at least two Message instances with new. Help: 5.6.6 (Worked Example: The parts of a class)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Message\\s*\\([^)]+\\)[\\s\\S]*new\\s+Message\\s*\\([^)]+\\)",
@@ -92,7 +92,7 @@
     {
       "id": "r5",
       "title": "The two instances differ",
-      "description": "The two new Message calls are not given identical arguments. Help: 5.3.4 (Reading: The new operator)",
+      "description": "The two new Message calls are not given identical arguments. Help: 5.6.4 (Reading: The new operator)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Message\\s*\\(([^)]*)\\)[\\s\\S]*new\\s+Message\\s*\\((?!\\1\\))[^)]*\\)",

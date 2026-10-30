@@ -1,4 +1,4 @@
-// 5.4.5 Lab: Method that returns a value.
+// 5.7.5 Lab: Method that returns a value.
 
 class Counter {
   constructor() {

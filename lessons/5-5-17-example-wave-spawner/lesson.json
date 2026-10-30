@@ -1,11 +1,11 @@
 {
   "id": "5-5-17-example-wave-spawner",
-  "title": "5.5.17 Worked Example: The wave spawner",
+  "title": "5.8.17 Worked Example: The wave spawner",
   "description": "Assembles the module: a frameCount timer spawns enemies, the array is reaped with filter, and a wave only arrives once the field is clear. Closes with a table of which job belongs to the class, the array, and the scene.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.5 Inside a Class",
+  "unit": "5.8 Inside a Class",
   "preview": "example",
   "week": 12,
   "slos": [

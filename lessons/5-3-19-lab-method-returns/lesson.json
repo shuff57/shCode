@@ -1,11 +1,11 @@
 {
   "id": "5-3-19-lab-method-returns",
-  "title": "5.4.5 Lab: Method that returns a value",
+  "title": "5.7.5 Lab: Method that returns a value",
   "description": "Add `Counter.isHigh()` which returns `true` when `this.n > 10`. The driver uses the return value to color the display red.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Writing Your Own Classes",
+  "unit": "5.7 Writing Your Own Classes",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "isHigh() compares this.n to 10",
-      "description": "Write an `isHigh()` method inside `Counter` whose body compares `this.n` to `10` (e.g. `return this.n > 10`). The driver paints the number red when it returns truthy. Help: 5.4.1 (Methods: functions that live on a class)",
+      "description": "Write an `isHigh()` method inside `Counter` whose body compares `this.n` to `10` (e.g. `return this.n > 10`). The driver paints the number red when it returns truthy. Help: 5.7.1 (Methods: functions that live on a class)",
       "type": "regex",
       "file": "script.js",
       "pattern": "isHigh\\s*\\([^)]*\\)\\s*\\{(?=[\\s\\S]*?\\breturn\\b)(?=[\\s\\S]*?(?:this\\.n\\s*>\\s*10|10\\s*<\\s*this\\.n))",

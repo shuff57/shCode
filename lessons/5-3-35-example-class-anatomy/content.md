@@ -70,4 +70,4 @@ The first number still goes into `x` and the second into `y`, so the word moves 
 - Code outside the class builds instances with `new` and reads their properties with a dot.
 - A class can also hold functions that act on its data. You will write those in 5.4.
 
-Next: 5.3.7 Worked Example: You've been using classes.
+Next: 5.6.7 Worked Example: You've been using classes.

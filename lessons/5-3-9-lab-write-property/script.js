@@ -1,4 +1,4 @@
-// 5.3.10 Lab: Write a property.
+// 5.6.10 Lab: Write a property.
 
 class Box {
   constructor() {

@@ -1,6 +1,6 @@
 ## The counter that resets
 
-**Read after `5.5.1 Reading: Three places a variable can live`.**
+**Read after `5.8.1 Reading: Three places a variable can live`.**
 
 **Goal:** see exactly what a local costs you when the value has to survive the call.
 
@@ -84,7 +84,7 @@ function draw() {
 
 ## Step 3: Notice where the local was still fine
 
-Delete the line `this.n = n;` from the first version and the local does nothing at all — no error, no effect. That is the honest test: **a local is for work you finish inside one call.** `let dx` and `let dy` in `distanceTo` (5.4.1) are exactly that — worked out, used, thrown away. Anything that must be true on the next frame cannot live in a local.
+Delete the line `this.n = n;` from the first version and the local does nothing at all — no error, no effect. That is the honest test: **a local is for work you finish inside one call.** `let dx` and `let dy` in `distanceTo` (5.7.1) are exactly that — worked out, used, thrown away. Anything that must be true on the next frame cannot live in a local.
 
 ## Key takeaways
 

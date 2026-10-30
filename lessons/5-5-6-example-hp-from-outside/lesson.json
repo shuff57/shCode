@@ -1,11 +1,11 @@
 {
   "id": "5-5-6-example-hp-from-outside",
-  "title": "5.5.6 Worked Example: The number anyone can set",
+  "title": "5.8.6 Worked Example: The number anyone can set",
   "description": "The same Enemy twice: once with draw() doing the subtraction and the death check, once with takeHit(n) and isAlive() inside the class. Ends by trying to break the class from outside, to show what encapsulation does and does not promise in JavaScript.",
   "type": "lesson",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.5 Inside a Class",
+  "unit": "5.8 Inside a Class",
   "preview": "example",
   "week": 12,
   "slos": [

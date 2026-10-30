@@ -217,7 +217,7 @@ Example:
 
 - **New title:** `2.3.5 Groups Sandbox`
 - **Convention violations to fix:**
-  - Title prefix `5.3.1 …` → `2.3.5 …`
+  - Title prefix `5.6.1 …` → `2.3.5 …`
   - `unit: "5.3 Groups & Overlaps"` → `"2.3 Collections and Physics Applications"`
   - `category: "Unit 5: moSHion: Game Physics"` → `"Unit 2: moSHion: Applied Game Development"`
   - `week: 15` → `13`

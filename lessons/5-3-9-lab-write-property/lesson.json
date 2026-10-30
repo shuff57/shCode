@@ -1,11 +1,11 @@
 {
   "id": "5-3-9-lab-write-property",
-  "title": "5.3.10 Lab: Write a property",
+  "title": "5.6.10 Lab: Write a property",
   "description": "Mutate `b.color` on a space-bar press to practice assigning a new value to an instance property. First practice with dot-notation writes.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.3 Classes and Objects via moSHion",
+  "unit": "5.6 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "Assign to b.color",
-      "description": "Write `b.color = ...` inside `draw()` to change the box's color property. Help: 5.3.3 (Class and instance)",
+      "description": "Write `b.color = ...` inside `draw()` to change the box's color property. Help: 5.6.3 (Class and instance)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

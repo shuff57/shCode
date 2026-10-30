@@ -1,4 +1,4 @@
-// 5.5.8 Lab: takeHit with a floor at zero (reference solution).
+// 5.8.8 Lab: takeHit with a floor at zero (reference solution).
 
 class Enemy {
   constructor(x, y) {

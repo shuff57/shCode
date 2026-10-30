@@ -1,6 +1,6 @@
 ## The wave spawner
 
-**Read after `5.5.16 Lab: Count your spawns`.**
+**Read after `5.8.16 Lab: Count your spawns`.**
 
 **Goal:** assemble the whole module — a class that holds its own rules, a list of instances, and a spawner that makes new ones while the sketch runs.
 

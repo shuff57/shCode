@@ -19,7 +19,7 @@ Courses checked: `gamedesign` (Introduction to Game Design, JSGameLib),
 `apcsacortado` (AP CSA). Unit 8 (3D) is out of scope per the brief.
 
 Screens = `lesson.json` count by the `unit` field, which is authoritative — the folder
-prefix is not always the unit (5.4 lives in `5-3-*`, 6.2 in `6-1-*`, 6.8 in `6-7-*`).
+prefix is not always the unit (5.7 lives in `5-3-*`, 6.2 in `6-1-*`, 6.8 in `6-7-*`).
 
 ---
 
@@ -30,7 +30,7 @@ prefix is not always the unit (5.4 lives in `5-3-*`, 6.2 in `6-1-*`, 6.8 in `6-7
 | 1.1 Software Lifecycle | 22 | AP CSP 1.16 *Debugging Strategies*; VGD 1.6 *Top Down Design and Decomposition in Karel* | Partial | CodeHS teaches decomposition and debugging but **never names a lifecycle model**. Our SDLC, four phases, four Ps and the prescriptive-limit screens have no counterpart — decide whether that is our advantage or over-teaching for a first unit. |
 | 1.2 Variables and Data Types | 31 | VGD 2.2 *Variables*; GD 2.3 *Variables* (incl. *Live Coding: Variables* video) | Close | Theirs is one lesson of variables; ours is 31 screens through seven primitives, `null`/`undefined`, BigInt, `typeof`. Check whether our depth is load-bearing for later modules or just thorough. |
 | 1.3 Documentation and Coding Conventions | 21 | VGD 1.7 *Commenting Your Code*; CSA 1.8 *Documentation with Comments* | Close | CodeHS has commenting only. Naming, reuse-vs-create, team vocabulary are ours. |
-| 1.4 Programming Paradigms and Languages | 23 | AP CSP 3.1 *What is Code*, 3.2 *Uses of Programs*; CSA 1.1 *Introduction to Algorithms, Programming, and Compilers* | Partial | No paradigm taxonomy in CodeHS. Ours is the only place students meet procedural vs OOP vs declarative before 5.4. |
+| 1.4 Programming Paradigms and Languages | 23 | AP CSP 3.1 *What is Code*, 3.2 *Uses of Programs*; CSA 1.1 *Introduction to Algorithms, Programming, and Compilers* | Partial | No paradigm taxonomy in CodeHS. Ours is the only place students meet procedural vs OOP vs declarative before 5.7. |
 | 1.5 Program Design Tools and Environments | 45 | GD 2.1 *How to Think Like a Programmer* (Problem Decomposition ×2, Algorithms ×2); GD 2.6.6 *Development with Pseudocode*; CSA 1.7 *API and Libraries* | Partial | They plan in prose and pseudocode; we plan in flowcharts. Their pseudocode-before-build rhythm is worth comparing screen for screen. |
 | 1.6 / 1.7 Chapter 1 PAs | 3 + 5 | AP CSP 2.1 *Practice PT: Pair-Programming Paint!*; VGD 4.1 *Graphics Challenges* | Partial | Their checkpoint is a small artifact; ours is a plan + writeup pair. Different assessment species — not a gap. |
 
@@ -53,7 +53,7 @@ prefix is not always the unit (5.4 lives in `5-3-*`, 6.2 in `6-1-*`, 6.8 in `6-7
 | 3.2 Parameters and Return Values | 29 | same four VGD lessons; CSA 3.6 *Methods: Passing and Returning References* | Close | Default parameters (VGD 7.3) — do we teach them? |
 | 3.3 Arrays | 24 | VGD 13.1–13.4 *Intro to Arrays / Adding & Removing / Iterating / Array Iteration with Graphics*; AP CSP 7.1–7.7 | Close | AP CSP splits into seven lessons including *Finding an Element* and *Removing an Element*; ours is one module. Compare coverage per operation. |
 | 3.4 Function Expressions and Arrow Functions | 22 | — | **None** | Not in any course. Justified for JS (callbacks, array methods) but check whether 3.7 depends on it, because CodeHS teaches array methods without arrow syntax. |
-| 3.5 Objects and Properties | 26 | VGD 14.1–14.5 *Intro to Objects / Graphic Objects / Object Methods / Iterating / Object Constructors*; CSA 3.3–3.8 | Close | CSA teaches objects in **Unit 1** and classes in Unit 3; we defer both to 3.5 and 5.3. Their ordering is the argument against ours — worth reading before defending it. |
+| 3.5 Objects and Properties | 26 | VGD 14.1–14.5 *Intro to Objects / Graphic Objects / Object Methods / Iterating / Object Constructors*; CSA 3.3–3.8 | Close | CSA teaches objects in **Unit 1** and classes in Unit 3; we defer both to 3.5 and 5.6. Their ordering is the argument against ours — worth reading before defending it. |
 | 3.6 Pass by Value/Reference | 17 | CSA 3.6 *Methods: Passing and Returning References of an Object* | Close | Java semantics vs JS. Only place any of the five courses touches the idea. |
 | 3.7 Array Methods | 23 | VGD 13.5 *Array Methods* | **Exact** | Title-for-title match. Compare which methods each covers (`map`/`filter`/`forEach`/`reduce`?). |
 | 3.8 Saving and Loading Data | 24 | — | **None** | No `localStorage`, no persistence anywhere in the five courses. Ours is the differentiator that makes 6.5 possible. |
@@ -71,9 +71,9 @@ prefix is not always the unit (5.4 lives in `5-3-*`, 6.2 in `6-1-*`, 6.8 in `6-7
 | --- | ---: | --- | --- | --- |
 | 5.1 Hello Sprite and Movement | 24 | GD 3.2 *Program Structure* (*Bounce Bounce Revolution*, *The Elevator*, *The Propeller*); GD 3.3 *Understanding the Canvas* (*Create a Canvas*, *Refreshing the Canvas*, *Shelving Boxes*); GD 3.4 *Your First Sprites* (*Sprite Face*, *Shapeshifter*, *Downhill Delights*, *Block Mario*) | **Exact** | Three of their lessons (20 activities) = our one module (24 screens). This is the row to run the lesson-layer experiment on: their three natural lesson boundaries are already the objective boundaries ours lacks. |
 | 5.2 Physics Feel | 16 | GD 3.5 *The Physics of Sprites* — *Physics Engines and Gravity*, *Collisions*, *Physical Properties*, *Motion*, each followed by an *Exploration:* exercise, closing on *Sprite Physics Reflection* | **Exact** | Their loop is Notes → Exploration ×4 → reflection. Ours is 16 screens. Compare whether our students get the same four hands-on probes. |
-| 5.3 Classes and Instances | 16 | VGD 14.1–14.5 *Objects*; CSA 3.3 *Anatomy of a Class*, 3.4 *Constructors* | Close | Nothing in GD (the game course) covers classes at all — they instantiate sprites without explaining them, which is exactly the "deliberate reveal" our 5.3 was built for. Confirm ours does the reveal and theirs never does. |
-| 5.4 Writing Your Own Classes | 22 | CSA 3.3–3.8; VGD 14.5 *Object Constructors* | Close | CSA has constructors, `this`, scope/access, class vs instance methods across six lessons. Ours covers methods, `this.sprite`, composition, arrays of instances, and the procedural-vs-object comparison. |
-| 5.5 Inside a Class | 20 | CSA 3.8 *Scope and Access*, and the class-variable lesson that closes the range the 5.4 row cites | Close | **Added 2026-10-29; not in the first audit.** Closes the `static`/class-variable question this table used to ask of 5.4: scope *inside* a class (3.2.24 taught local-vs-global only), access, `player.hit(enemy)`, `static spawned`, and a wave-spawner build. Unit 5 had no quiz at all before it. |
+| 5.6 Classes and Instances | 16 | VGD 14.1–14.5 *Objects*; CSA 3.3 *Anatomy of a Class*, 3.4 *Constructors* | Close | Nothing in GD (the game course) covers classes at all — they instantiate sprites without explaining them, which is exactly the "deliberate reveal" our 5.6 was built for. Confirm ours does the reveal and theirs never does. |
+| 5.7 Writing Your Own Classes | 22 | CSA 3.3–3.8; VGD 14.5 *Object Constructors* | Close | CSA has constructors, `this`, scope/access, class vs instance methods across six lessons. Ours covers methods, `this.sprite`, composition, arrays of instances, and the procedural-vs-object comparison. |
+| 5.8 Inside a Class | 20 | CSA 3.8 *Scope and Access*, and the class-variable lesson that closes the range the 5.4 row cites | Close | **Added 2026-10-29; not in the first audit.** Closes the `static`/class-variable question this table used to ask of 5.7: scope *inside* a class (3.2.24 taught local-vs-global only), access, `player.hit(enemy)`, `static spawned`, and a wave-spawner build. Unit 5 had no quiz at all before it. |
 
 ## Unit 6 — Physics and game systems
 

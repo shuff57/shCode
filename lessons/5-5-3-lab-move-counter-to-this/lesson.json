@@ -1,11 +1,11 @@
 {
   "id": "5-5-3-lab-move-counter-to-this",
-  "title": "5.5.3 Lab: Move the counter onto this",
+  "title": "5.8.3 Lab: Move the counter onto this",
   "description": "The starter's tick() changes a local, so the number on screen stays at 1. Make the change land on `this.n` so it survives the call.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.5 Inside a Class",
+  "unit": "5.8 Inside a Class",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -18,7 +18,7 @@
       "title": "Change this.n, not a local",
       "instructions": "Run it and press **Space** a few times: the number stays at 1, because `tick()` makes a fresh local every call. Rewrite the body of `tick()` so the change lands on `this.n`. Run it again and press Space: the count should now climb 1, 2, 3, 4.",
       "hints": [
-        "Reread 5.5.1 (Reading: Three places a variable can live) if the difference between `n` and `this.n` is not clear yet.",
+        "Reread 5.8.1 (Reading: Three places a variable can live) if the difference between `n` and `this.n` is not clear yet.",
         "`this.n += 1` reads the value that is still there from last time, adds one, and puts it back."
       ]
     }
@@ -27,7 +27,7 @@
     {
       "id": "r1",
       "title": "tick() adds 1 to this.n",
-      "description": "Inside `tick()`, the change lands on `this.n` (for example `this.n += 1`), so the value survives the call. Help: 5.5.1 (Reading: Three places a variable can live)",
+      "description": "Inside `tick()`, the change lands on `this.n` (for example `this.n += 1`), so the value survives the call. Help: 5.8.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
       "pattern": "tick\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?this\\.n\\s*(?:\\+=|\\+\\+|=\\s*this\\.n\\s*\\+\\s*1)",

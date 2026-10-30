@@ -1,4 +1,4 @@
-// 5.5.3 Lab: Move the counter onto this (reference solution).
+// 5.8.3 Lab: Move the counter onto this (reference solution).
 
 class Counter {
   constructor() {
