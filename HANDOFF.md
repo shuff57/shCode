@@ -12,6 +12,24 @@ moved to 5.4.2), `82e46363` (**module 5.5**).
 All three steps of the object plan are done. `.gauntlet/occt-checks.json` shows as modified
 only after a test run; leave it out of commits.
 
+## Scope, decided 2026-10-29: moSHion and 2D game design only
+
+**Chapters 8–13 are paused.** The 3D track (JSCAD in the book's outline; reSHape Script on the
+B-rep kernel in the app) is not being built out. `8.1 Solid Shapes` exists and ships — 11 screens,
+`status: draft`, quarter 3 — but nothing follows it, and no one should start 8.2 without a new
+decision.
+
+**What "in scope" means for the tree:** modules 5.1–5.5 and 6.1–6.8, plus chapter 7's capstone.
+That is where the remaining work is:
+
+- grouped so far: 5.1, 5.3, 5.4, 5.5. **Ungrouped: 5.2, 6.1–6.8, 7.1** (about 120 screens).
+- the book's chapter 6 also lists **6.9 Timing and Async** and **6.10 Sound and Texture**;
+  neither exists in the app.
+- **chapter 7 is two screens** (`7.1.1` Arcade Cabinet, `7.1.2` Q2 Reflection). If the course is
+  now "moSHion and 2D game design", this is the design surface, and CodeHS's five-beat project
+  close (Pattern 4 in `CODEHS-INSPIRATION.md`) is the model for filling it.
+- tiles and spritesheets are CodeHS ideas with no shCode counterpart (see `CODEHS-MAP.md`).
+
 ## What 5.5 is, and what the check changed
 
 `5.5 Inside a Class` — 20 screens, six lessons, after 5.4 and before 6.1. **Not a book
