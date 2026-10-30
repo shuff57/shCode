@@ -7266,8 +7266,8 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "contextDocs": []
   },
   "5-1-22-a10-2-frame-loop": {
-    "lessonTitle": "5.1.22 Frame Loop Writeup",
-    "prompt": "Answer all three. Everything you need is in 5.1.3 (Frame loop), 5.1.15 (Velocity) and the 5.1.12 video: go back and reread or rewatch if you get stuck. A few sentences each is plenty, in your own everyday words.\n\nQuestion 1, In your own words, what is the difference between setup() and draw() in a moSHion sketch? When does each one run? (5.1.3, the worked example in 5.1.4, and the 5.1.12 video)\n\nQuestion 2: moSHion runs at about 60 frames per second. If you set player.vel.x = 4, how many pixels does the sprite move in one second? Show your math. How far in 5 seconds? If your canvas is 400 pixels wide, roughly how long until the sprite crosses the whole canvas? (5.1.15)\n\nQuestion 3: Why do you think the engine gives us vel (velocity) instead of making us set pos.x ourselves every frame? Give one reason. (5.1.15)",
+    "lessonTitle": "5.1.23 Frame Loop Writeup",
+    "prompt": "Answer all three. Everything you need is in 5.1.3 (Frame loop), 5.1.16 (Velocity) and the 5.1.12 video: go back and reread or rewatch if you get stuck. A few sentences each is plenty, in your own everyday words.\n\nQuestion 1, In your own words, what is the difference between setup() and draw() in a moSHion sketch? When does each one run? (5.1.3, the worked example in 5.1.4, and the 5.1.12 video)\n\nQuestion 2: moSHion runs at about 60 frames per second. If you set player.vel.x = 4, how many pixels does the sprite move in one second? Show your math. How far in 5 seconds? If your canvas is 400 pixels wide, roughly how long until the sprite crosses the whole canvas? (5.1.16)\n\nQuestion 3: Why do you think the engine gives us vel (velocity) instead of making us set pos.x ourselves every frame? Give one reason. (5.1.16)",
     "rubric": [
       {
         "id": "q1-setup-vs-draw",
@@ -7295,8 +7295,8 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ]
   },
   "5-2-13-a5-2-1-pinball-scene": {
-    "lessonTitle": "5.2.13 Pinball Scene",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.13 Pinball Scene\". The task they were given: Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "lessonTitle": "5.2.14 Pinball Scene",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.14 Pinball Scene\". The task they were given: Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",
@@ -7307,26 +7307,26 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "r2",
         "title": "Add at least three static obstacles",
-        "description": "At least three 'static' sprites exist in the scene. Help: 5.2.6 (Bounciness and Friction)",
+        "description": "At least three 'static' sprites exist in the scene. Help: 5.2.7 (Bounciness and Friction)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "Make the ball genuinely bouncy",
-        "description": "The ball's bounciness is set above 0.8. Help: 5.2.6 (Bounciness and Friction)",
+        "description": "The ball's bounciness is set above 0.8. Help: 5.2.7 (Bounciness and Friction)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "Add a reset key",
-        "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.6 (Bounciness and Friction)",
+        "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.7 (Bounciness and Friction)",
         "points": 1
       }
     ]
   },
   "5-2-14-a5-2-2-vel-vs-applyforce": {
-    "lessonTitle": "5.2.14 Vel vs applyForce",
-    "prompt": "Everything you need is in 5.2.8 (Reading: Forces vs Velocity) and 5.2.9 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.8, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.8 and 5.2.9)",
+    "lessonTitle": "5.2.15 Vel vs applyForce",
+    "prompt": "Everything you need is in 5.2.9 (Reading: Forces vs Velocity) and 5.2.10 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.9, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.9 and 5.2.10)",
     "rubric": [
       {
         "id": "q1-fight-explanation",
@@ -7396,7 +7396,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "5-3-32-a12-2-oop-writeup": {
     "lessonTitle": "5.4.19 Procedural vs OOP Writeup",
-    "prompt": "Answer all four questions. Questions 1 and 4 come from the readings; questions 2 and 3 come from code you have written yourself. Your own everyday words throughout: do not copy definitions from the internet.\n\nQuestion 1: Definitions in your own words. What does procedural programming mean? What does object-oriented programming mean? (1.4.8 for procedural; 5.3.3, 5.4.14 and the side-by-side worked example in 5.4.15 for object-oriented)\n\nQuestion 2: A specific procedural example from your first-quarter code (Units 1 to 3, before moSHion). Name a specific assignment or program you wrote then that used a procedural approach, and describe it in one or two sentences. Name the assignment.\n\nQuestion 3: A specific moSHion OOP example. Name a specific place in your moSHion code: the A12.1 Collectible class, or an earlier class you wrote: where you used OOP. Describe how the class organised your code: what data and what behaviour did it group together? (5.3.7 and 5.4.1)\n\nQuestion 4: When OOP wins. Describe one situation, hypothetical is fine, where OOP is clearly the better choice than procedural code. Explain why, using at least one of these: readability, extensibility, or keeping data and behaviour together. (5.4.16 and 5.4.17)",
+    "prompt": "Answer all four questions. Questions 1 and 4 come from the readings; questions 2 and 3 come from code you have written yourself. Your own everyday words throughout: do not copy definitions from the internet.\n\nQuestion 1: Definitions in your own words. What does procedural programming mean? What does object-oriented programming mean? (1.4.8 for procedural; 5.3.3, 5.4.14 and the side-by-side worked example in 5.4.15 for object-oriented)\n\nQuestion 2: A specific procedural example from your first-quarter code (Units 1 to 3, before moSHion). Name a specific assignment or program you wrote then that used a procedural approach, and describe it in one or two sentences. Name the assignment.\n\nQuestion 3: A specific moSHion OOP example. Name a specific place in your moSHion code: the A12.1 Collectible class, or an earlier class you wrote: where you used OOP. Describe how the class organised your code: what data and what behaviour did it group together? (5.3.8 and 5.4.1)\n\nQuestion 4: When OOP wins. Describe one situation, hypothetical is fine, where OOP is clearly the better choice than procedural code. Explain why, using at least one of these: readability, extensibility, or keeping data and behaviour together. (5.4.16 and 5.4.17)",
     "rubric": [
       {
         "id": "q1-definitions",

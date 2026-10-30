@@ -1,4 +1,4 @@
-// 5.3.9 Lab: Write a property (reference solution).
+// 5.3.10 Lab: Write a property (reference solution).
 
 class Box {
   constructor() {

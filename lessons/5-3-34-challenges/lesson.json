@@ -26,7 +26,7 @@
       "title": "Instantiate the class",
       "instructions": "Build an instance with `new ClassName(...)` and store it in a variable.",
       "hints": [
-        "5.3.6 Worked Example shows `new Sprite(...)`: the same pattern applies to your own class."
+        "5.3.7 Worked Example shows `new Sprite(...)`: the same pattern applies to your own class."
       ]
     },
     {

@@ -1,6 +1,6 @@
 {
   "id": "5-3-10-lab-two-instances",
-  "title": "5.3.10 Lab: Two sprites, two property values",
+  "title": "5.3.11 Lab: Two sprites, two property values",
   "description": "Instantiate b1 and b2 from the same class with different colors, then mutate only b1 to confirm each instance's state is independent.",
   "type": "lesson",
   "estimateMins": 8,

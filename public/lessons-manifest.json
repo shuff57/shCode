@@ -6671,7 +6671,7 @@
     },
     {
       "id": "5-1-14-example-keyboard",
-      "title": "5.1.14 Worked Example: Keyboard Movement",
+      "title": "5.1.15 Worked Example: Keyboard Movement",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "example",
       "type": "lesson",
@@ -6684,7 +6684,7 @@
     },
     {
       "id": "5-1-15-reading-velocity",
-      "title": "5.1.15 Reading: Velocity: vel.x and vel.y",
+      "title": "5.1.16 Reading: Velocity: vel.x and vel.y",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
@@ -6697,7 +6697,7 @@
     },
     {
       "id": "5-1-16-reading-movement-pattern",
-      "title": "5.1.16 Reading: Movement pattern (if / else if / else)",
+      "title": "5.1.17 Reading: Movement pattern (if / else if / else)",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
@@ -6710,7 +6710,7 @@
     },
     {
       "id": "5-1-17-reading-else-to-zero",
-      "title": "5.1.17 Reading: The else-to-zero rule",
+      "title": "5.1.18 Reading: The else-to-zero rule",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
@@ -6723,7 +6723,7 @@
     },
     {
       "id": "5-1-18-lab-else-to-zero",
-      "title": "5.1.18 Lab: Delete the else, watch drift",
+      "title": "5.1.19 Lab: Delete the else, watch drift",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "lesson",
@@ -6736,7 +6736,7 @@
     },
     {
       "id": "5-1-19-reading-wasd",
-      "title": "5.1.19 Reading: WASD-not-arrows",
+      "title": "5.1.14 Reading: Key names: WASD and the arrow keys",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
@@ -6775,7 +6775,7 @@
     },
     {
       "id": "5-1-21-a10-1-sprite-playground",
-      "title": "5.1.21 Sprite Playground",
+      "title": "5.1.22 Sprite Playground",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "assignment",
@@ -6788,7 +6788,7 @@
     },
     {
       "id": "5-1-22-a10-2-frame-loop",
-      "title": "5.1.22 Frame Loop Writeup",
+      "title": "5.1.23 Frame Loop Writeup",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "assignment",
       "type": "assignment",
@@ -6801,10 +6801,23 @@
     },
     {
       "id": "5-1-23-challenges",
-      "title": "5.1.23 Challenges",
+      "title": "5.1.24 Challenges",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "challenge",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 10,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-1-24-reading-text-labels",
+      "title": "5.1.21 Reading: Words on the canvas: text()",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10,
       "assignmentCode": null,
@@ -6866,7 +6879,7 @@
     },
     {
       "id": "5-1-7-lab-one-sprite",
-      "title": "5.1.7 Lab: Drop one sprite, change its color",
+      "title": "5.1.7 Exploration: Move, resize and recolor a sprite",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "lesson",
@@ -6918,7 +6931,7 @@
     },
     {
       "id": "5-2-10-reading-delete",
-      "title": "5.2.10 Reading: Cleanup and Delete",
+      "title": "5.2.11 Reading: Cleanup and Delete",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -6931,7 +6944,7 @@
     },
     {
       "id": "5-2-11-lab-reaching-the-goal",
-      "title": "5.2.11 Lab: Reaching the Goal",
+      "title": "5.2.12 Lab: Reaching the Goal",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -6944,7 +6957,7 @@
     },
     {
       "id": "5-2-12-example-finished-scene",
-      "title": "5.2.12 Worked Example: The Finished Scene",
+      "title": "5.2.13 Worked Example: The Finished Scene",
       "unit": "5.2 Physics Feel",
       "preview": "example",
       "type": "lesson",
@@ -6957,7 +6970,7 @@
     },
     {
       "id": "5-2-13-a5-2-1-pinball-scene",
-      "title": "5.2.13 Pinball Scene",
+      "title": "5.2.14 Pinball Scene",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "assignment",
@@ -6970,7 +6983,7 @@
     },
     {
       "id": "5-2-14-a5-2-2-vel-vs-applyforce",
-      "title": "5.2.14 Vel vs applyForce",
+      "title": "5.2.15 Vel vs applyForce",
       "unit": "5.2 Physics Feel",
       "preview": "assignment",
       "type": "assignment",
@@ -6983,7 +6996,7 @@
     },
     {
       "id": "5-2-15-challenges",
-      "title": "5.2.15 Challenges: Optional Stretch",
+      "title": "5.2.16 Challenges: Optional Stretch",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "challenge",
@@ -7009,7 +7022,7 @@
     },
     {
       "id": "5-2-3-lab-tune-gravity",
-      "title": "5.2.3 Lab: Tune Gravity",
+      "title": "5.2.4 Lab: Tune Gravity",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -7022,7 +7035,7 @@
     },
     {
       "id": "5-2-4-reading-ground-check",
-      "title": "5.2.4 Reading: Ground-Gated Actions",
+      "title": "5.2.5 Reading: Ground-Gated Actions",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -7035,7 +7048,7 @@
     },
     {
       "id": "5-2-5-lab-add-a-jump",
-      "title": "5.2.5 Lab: Add a Jump",
+      "title": "5.2.6 Lab: Add a Jump",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -7048,7 +7061,7 @@
     },
     {
       "id": "5-2-6-reading-bounciness-friction",
-      "title": "5.2.6 Reading: Bounciness and Friction",
+      "title": "5.2.7 Reading: Bounciness and Friction",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -7061,7 +7074,7 @@
     },
     {
       "id": "5-2-8-reading-forces-vs-velocity",
-      "title": "5.2.8 Reading: Forces vs Velocity",
+      "title": "5.2.9 Reading: Forces vs Velocity",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -7074,7 +7087,7 @@
     },
     {
       "id": "5-2-9-lab-wind-zone",
-      "title": "5.2.9 Lab: Wind Zone",
+      "title": "5.2.10 Lab: Wind Zone",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -7100,7 +7113,7 @@
     },
     {
       "id": "5-3-10-lab-two-instances",
-      "title": "5.3.10 Lab: Two sprites, two property values",
+      "title": "5.3.11 Lab: Two sprites, two property values",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "moshion",
       "type": "lesson",
@@ -7113,7 +7126,7 @@
     },
     {
       "id": "5-3-11-reading-this-noun",
-      "title": "5.3.11 Reading: this is a noun",
+      "title": "5.3.12 Reading: this is a noun",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
@@ -7126,7 +7139,7 @@
     },
     {
       "id": "5-3-12-example-this-pronoun",
-      "title": "5.3.12 Worked Example: this is a pronoun",
+      "title": "5.3.13 Worked Example: this is a pronoun",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "example",
       "type": "lesson",
@@ -7139,7 +7152,7 @@
     },
     {
       "id": "5-3-13-lab-build-sprite",
-      "title": "5.3.13 Your Turn: Build a Sprite",
+      "title": "5.3.14 Your Turn: Build a Sprite",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "moshion",
       "type": "lesson",
@@ -7152,7 +7165,7 @@
     },
     {
       "id": "5-3-14-moshion-sprite-showcase",
-      "title": "5.3.14 Worked Example: Sprite Showcase",
+      "title": "5.3.15 Worked Example: Sprite Showcase",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "example",
       "type": "lesson",
@@ -7165,7 +7178,7 @@
     },
     {
       "id": "5-3-15-video-this-keyword",
-      "title": "5.3.15 Video: The this keyword",
+      "title": "5.3.17 Video: The this keyword",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "video",
       "type": "lesson",
@@ -7476,6 +7489,32 @@
       "scoreKind": null
     },
     {
+      "id": "5-3-35-example-class-anatomy",
+      "title": "5.3.6 Worked Example: The parts of a class",
+      "unit": "5.3 Classes and Objects via moSHion",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 12,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-3-36-lab-write-constructor",
+      "title": "5.3.16 Your Turn: Fill in a Constructor",
+      "unit": "5.3 Classes and Objects via moSHion",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 12,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "5-3-4-reading-new-operator",
       "title": "5.3.4 Reading: The new operator",
       "unit": "5.3 Classes and Objects via moSHion",
@@ -7503,7 +7542,7 @@
     },
     {
       "id": "5-3-6-example-devtools-reveal",
-      "title": "5.3.6 Worked Example: You've been using classes",
+      "title": "5.3.7 Worked Example: You've been using classes",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "example",
       "type": "lesson",
@@ -7516,7 +7555,7 @@
     },
     {
       "id": "5-3-7-reading-properties",
-      "title": "5.3.7 Reading: Properties: data on this",
+      "title": "5.3.8 Reading: Properties: data on this",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
@@ -7529,7 +7568,7 @@
     },
     {
       "id": "5-3-8-lab-read-property",
-      "title": "5.3.8 Lab: Read a property",
+      "title": "5.3.9 Lab: Read a property",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "moshion",
       "type": "lesson",
@@ -7542,7 +7581,7 @@
     },
     {
       "id": "5-3-9-lab-write-property",
-      "title": "5.3.9 Lab: Write a property",
+      "title": "5.3.10 Lab: Write a property",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "moshion",
       "type": "lesson",
@@ -9375,7 +9414,7 @@
     },
     {
       "id": "moshion-bounce",
-      "title": "5.2.7 Bouncy Ball",
+      "title": "5.2.8 Bouncy Ball",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -9388,12 +9427,12 @@
     },
     {
       "id": "moshion-gravity",
-      "title": "5.1.24 Falling Block: Example",
-      "unit": "5.1 Hello Sprite and Movement",
+      "title": "5.2.3 Worked Example: Falling Block",
+      "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "example",
       "category": "Unit 2: moSHion: Applied Game Development",
-      "week": 10,
+      "week": 15,
       "assignmentCode": null,
       "maxScore": null,
       "maxSubmissions": null,

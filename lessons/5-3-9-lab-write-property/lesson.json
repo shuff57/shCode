@@ -1,6 +1,6 @@
 {
   "id": "5-3-9-lab-write-property",
-  "title": "5.3.9 Lab: Write a property",
+  "title": "5.3.10 Lab: Write a property",
   "description": "Mutate `b.color` on a space-bar press to practice assigning a new value to an instance property. First practice with dot-notation writes.",
   "type": "lesson",
   "estimateMins": 5,
@@ -38,7 +38,7 @@
     {
       "id": "r2",
       "title": "Detect a key press",
-      "description": "Use `kb.presses(...)` inside `draw()` to respond to keyboard input. Help: 5.1.14 (Keyboard Movement)",
+      "description": "Use `kb.presses(...)` inside `draw()` to respond to keyboard input. Help: 5.1.15 (Keyboard Movement)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

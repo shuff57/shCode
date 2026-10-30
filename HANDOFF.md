@@ -1,3 +1,21 @@
+# 2026-10-29 (latest): 5.3 object-teaching pass, step 1 of 3
+
+Plan (CodeHS AP CSA Unit 3 as the pattern for teaching moSHion objects): (A) group 5.3/5.4 into
+8 lessons, (B) two new 5.3 screens, (C) a new 5.5 "Classes That Work Together" of ~18 screens
+(5 lessons: designing a class, state inside an instance, instances that meet, build, two checks).
+**Only B is done**, uncommitted: `5-3-35-example-class-anatomy` (5.3.6, class name / constructor /
+parameters / properties) and `5-3-36-lab-write-constructor` (5.3.16, class shell given, student
+writes the constructor body and builds two instances; starter fails all 5 requirements, reference
+passes all 5). Renumbered through `scripts/renumber-plans/5.3-class-anatomy-constructor.json`; no
+folder moved, so no D1 migration. 5.3 now has 17 screens; 5.4 numbers are unchanged. Build and
+`npm test` exit 0. The 10 `check-help-pointer-titles` mismatches are pre-existing, none in 5.3.
+Traps: the constructor lab must stay AFTER `this` is taught (5.3.12-13) because it asks for
+`this.x = x`; the constructor reading (5.3.5) still precedes `this`, which was already so. When A
+is written, 5.3.5 moves into lesson 1 with the anatomy example (an example needs "parameter" from
+5.3.5), so lesson 1 is slides, video, class/instance, `new`, constructor reading, anatomy (6).
+Also in this pass: `lab-assignment-conventions.md` §4 is now "either key set, taught before asked".
+I read only titles of CSA's lessons, not bodies; 5.4 bodies are unread, so the 5.5 outline is a draft.
+
 # 2026-10-29 (later): lesson layer added, piloted on 5.1
 
 **What exists now.** `curriculum/groups/<moduleId>.json` groups a module's screens
@@ -5,7 +23,8 @@ into lessons (title, objective, ordered screens). `lib/lesson-groups.ts` loads a
 validates them; `getModule()` returns `groups` and **throws** if a group file
 disagrees with the folder tree; `scripts/check-lesson-groups.mjs` runs the same
 validator in `prebuild` and `npm test`. The module page shows a heading per group
-(`ModuleLessonsList`), each screen shows a banner (`LessonGroupBanner`).
+(`ModuleLessonsList`). Individual screens deliberately show nothing: a per-screen
+banner was built, reviewed and removed on request.
 **Progress is still per screen** — the layer is presentation only, so it cannot
 orphan D1 completions the way a renumber does.
 
@@ -26,6 +45,33 @@ the checker sorted by folder name and reported a false "out of order".
 **Do not insert a check screen mid-module.** Lesson numbering keys D1 progress;
 a renumber orphans every completion it passes. A new check goes at the end of a
 module, or ships with a migration.
+
+**5.1 content pass (same day), driven by one rule: never ask a student for anything
+not taught on an EARLIER screen** (saved as a memory; assume zero prior knowledge).
+Audit found: 5.1.20 asked for `update()`, `world.gravity` and `'dynamic'`, never taught
+in 5.1; 5.1.7 told students to "store the sprite in a variable" while its own starter
+said to chain `.color`, and the variable reading comes after it; the playground asked
+for `text()` that no screen explains; several "Read before" pointers were stale or
+pointed backwards. Done: 5.1.7 is now an exploration (change a number, predict, rerun);
+5.1.14 is a key-names reading (WASD and arrows, taught one after the other, demo uses
+only `kb.pressing` and `.color`); 5.1.20 rewritten in `draw()` with either key set;
+5.1.21 is a new `text()` reading; playground pointers and requirements fixed and
+accept either key set; Falling Block moved 5.1.24 -> 5.2.3 (it follows Reading:
+Gravity). **No D1 migration:** `scripts/renumber-module.mjs` renumbers TITLES and
+never renames folders, and folder names are the ids D1 keys on. Plan:
+`scripts/renumber-plans/5.1-5.2-codehs-pass.json`. The tool's last step (rebuild the
+module doc table) fails on 5.1 (no table) and 5.2 (6 columns, not 5), so both module
+docs were fixed by hand. Falling Block moving modules means a class with a MODULE due
+date on 5.1 sees it inherit 5.2's date instead.
+**Arrow keys:** the "arrows scroll the iframe" rule (lab-assignment-conventions.md §4)
+was tested once in Chromium: with the sketch focused, ArrowDown did not scroll the
+page. Not tested elsewhere. The lessons now only say "click the canvas first". The
+convention doc still says WASD-only and now disagrees with 5.1.
+**Follow-up, not done:** `scripts/check-concept-order.mjs` enforces the taught-before-
+asked rule for console labs but its catalog has no moSHion features (`text(`,
+`update(`, `world.gravity`, `'static'`); adding them would have caught all of the above.
+Pre-existing, unrelated: 6.3.10 cites 5.1.10 as "...rotation, scale" but the title says
+"layer".
 
 **Also recorded:** `CODEHS-MAP.md` maps all 35 modules to their closest CodeHS
 lesson, and `CODEHS-INSPIRATION.md` holds the structural findings. Two facts there
