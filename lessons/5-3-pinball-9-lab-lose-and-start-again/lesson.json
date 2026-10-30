@@ -1,0 +1,82 @@
+{
+  "id": "5-3-pinball-9-lab-lose-and-start-again",
+  "title": "5.3.9 Lab: Lose, and start again",
+  "description": "Give the game an end: a flag for playing or over, a losing condition when the ball falls past the bottom, and a restart that puts the score back as well as the ball.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.3 Project: Pinball",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Give the game a state",
+      "instructions": "Add a flag variable that says whether the game is being played, starting at `true`. Put it next to `score` so it is created once, not every frame.",
+      "hints": [
+        "`let playing = true;` — declared outside `draw()` so it survives between frames, like `wasTouching`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "End the round",
+      "instructions": "In `draw()`, when the ball has fallen past the bottom of the canvas, set the flag to `false`. Nothing visible happens yet — the next step is what uses the flag.",
+      "hints": [
+        "`ball.y > 400` is true once the ball is below a 400-tall canvas.",
+        "Do not delete the ball; it has to be there when the round restarts."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Show the end, then start again",
+      "instructions": "When the flag is false, draw 'Game over' and the final score instead of the play area. When R is pressed, set the flag back to `true` **and** put the score back to 0.",
+      "hints": [
+        "One `if (playing) { ... } else { ... }` at the top of `draw()` is enough.",
+        "Restarting means everything the first frame had: position, velocity, score, and the flag."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A flag says whether the game is being played",
+      "description": "A variable created once and starting true is the game's state. Help: 5.3.8 (Reading: The state of the game)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b\\w+\\s*=\\s*true\\s*;",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The ball falling past the bottom ends the round",
+      "description": "Losing is a position test: when the ball's y is past the bottom of the canvas, the round ends. Help: 5.3.8 (Reading: The state of the game)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "ball\\.y\\s*>\\s*\\d+[\\s\\S]{0,80}?\\w+\\s*=\\s*false",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A restart puts the score back",
+      "description": "Pressing R starts a fresh round, so the score returns to 0 along with the ball. Help: 5.3.8 (Reading: The state of the game)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\.presses\\s*\\(\\s*'r'\\s*\\)[\\s\\S]{0,240}?score\\s*=\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

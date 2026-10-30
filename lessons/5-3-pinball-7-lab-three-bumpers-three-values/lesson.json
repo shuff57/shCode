@@ -1,0 +1,82 @@
+{
+  "id": "5-3-pinball-7-lab-three-bumpers-three-values",
+  "title": "5.3.7 Lab: Three bumpers, three values",
+  "description": "Three bumpers, worth 1, 5 and 10. The starter scores only the first, on every frame. Loop over all of them and let each bumper remember its own last frame, so every bumper scores once per hit and for its own value.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.3 Project: Pinball",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Give every bumper its own memory",
+      "instructions": "A sprite is an object, so you can store your own values on it — the starter already stores `worth`. In `setup()`, give each bumper a `wasTouching` of `false`, so each one can remember its own last frame.",
+      "hints": [
+        "It is the same three lines for each bumper: `b1.wasTouching = false;` and so on.",
+        "Why one per bumper rather than one shared variable? Because two bumpers can be touched in different frames, and one shared memory would mix them up."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Loop instead of naming one",
+      "instructions": "Replace the single `bumpers[0]` check with a loop over every bumper in the array. Inside the loop, apply the same edge check you wrote in 5.3.6, but on the bumper's own `wasTouching`.",
+      "hints": [
+        "`for (const b of bumpers) { ... }` visits each bumper in turn; the loop shape is the one from 3.3.5.",
+        "Inside the loop the check reads `touching && !b.wasTouching`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Score the bumper's own worth",
+      "instructions": "Add the bumper's `worth` to the score instead of always adding 1, so the middle bumper is worth 5 and the bottom one 10. Run it: one hit on the bottom bumper should move the score by 10.",
+      "hints": [
+        "`score += b.worth;` — the number lives on the bumper, so the loop does not need to know it."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Every bumper is checked in a loop",
+      "description": "One loop visits every bumper in the array instead of naming one. Help: 3.3.5 (Reading: Looping Over Arrays (for / for…of))",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(\\s*(?:const|let)\\s+\\w+\\s+of\\s+bumpers\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Each bumper remembers its own last frame",
+      "description": "The bumper's own `wasTouching` is updated on every frame, so every bumper can be hit once per contact. Help: 5.3.4 (Reading: A collision is not an event)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\.wasTouching\\s*=\\s*\\w+\\s*;",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "The score adds the bumper's own worth",
+      "description": "Different bumpers are worth different amounts, because the score uses each bumper's own `worth`. Help: 5.3.4 (Reading: A collision is not an event)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "score\\s*\\+=\\s*\\w+\\.worth",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

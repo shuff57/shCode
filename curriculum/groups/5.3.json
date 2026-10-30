@@ -1,0 +1,44 @@
+{
+  "moduleId": "5.3",
+  "source": "Not a book section. The four-part shape of a game (goal, score, loss, restart) follows CodeHS's project modules in Introduction to Game Design, where each project is built in setup/mechanics/challenge steps. Structure only: no CodeHS text, problems or code is copied.",
+  "lessons": [
+    {
+      "id": "from-scene-to-game",
+      "title": "From scene to game",
+      "objective": "Students will be able to name the four things that turn a physics scene into a game, and build a table with a goal on it.",
+      "screens": [
+        "5-3-pinball-1-reading-from-scene-to-game",
+        "5-3-pinball-2-example-the-table-and-the-goal",
+        "5-3-pinball-3-lab-build-the-table"
+      ]
+    },
+    {
+      "id": "scoring-an-event",
+      "title": "Scoring an event",
+      "objective": "Students will be able to explain why a collision fires every frame, and score a hit exactly once by remembering the frame before.",
+      "screens": [
+        "5-3-pinball-4-reading-a-collision-is-not-an-event",
+        "5-3-pinball-5-example-the-score-that-climbs",
+        "5-3-pinball-6-lab-score-one-point-per-touch",
+        "5-3-pinball-7-lab-three-bumpers-three-values"
+      ]
+    },
+    {
+      "id": "losing-and-restarting",
+      "title": "Losing and restarting",
+      "objective": "Students will be able to hold a game's state in a variable and use it to end and restart a game.",
+      "screens": [
+        "5-3-pinball-8-reading-the-state-of-the-game",
+        "5-3-pinball-9-lab-lose-and-start-again"
+      ]
+    },
+    {
+      "id": "make-it-yours",
+      "title": "Make it yours",
+      "objective": "Students will be able to extend their own game with a new rule of their own design.",
+      "screens": [
+        "5-3-pinball-10-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

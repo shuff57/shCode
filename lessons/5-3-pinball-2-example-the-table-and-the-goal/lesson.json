@@ -1,0 +1,22 @@
+{
+  "id": "5-3-pinball-2-example-the-table-and-the-goal",
+  "title": "5.3.2 Worked Example: The table and the goal",
+  "description": "Names the table's sprites, adds a gold goal block, then shows the score that climbs by itself when the ball rests against it — deliberately, because 5.3.4 explains why.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.3 Project: Pinball",
+  "preview": "example",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
