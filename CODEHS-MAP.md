@@ -94,15 +94,31 @@ prefix is not always the unit (5.4 lives in `5-3-*`, 6.2 in `6-1-*`, 6.8 in `6-7
 | --- | ---: | --- | --- | --- |
 | 7.1 Arcade Cabinet | 2 | GD 6.7.5 *Project - Final Level Design*; GD 6.8 *Level #2 Intro → Planning → Creating Level #2 → Playtesting and Feedback → Jumper Reflection*; VGD 17.1 *Project Prep and Development* | Partial | Their capstone close is a five-step ritual repeated on every project. Ours is 2 screens. See Pattern 4 in `CODEHS-INSPIRATION.md`. |
 
-### Unit 8 — not audited
+### Unit 8 and after — planned, not audited
 
-**8.1 Solid Shapes** (11 screens, 9 of them labs) is the course's last module and has **no row
-above**, by the brief that scoped this map ("Unit 8 (3D) is out of scope"). If a row is wanted,
-the fit is **None**: none of the five courses goes past a 2D canvas, and nothing in them teaches
-parametric solid modelling, a build history or an exported mesh. CodeHS's nearest neighbour is
-its separate three.js course, which was not among the six pulled.
+The book's spine runs to **thirteen chapters** (`bookSHelf/projects/Introduction to Programming
+Concepts and Methodologies/outline.md`); this map stops at 7 because everything after it is
+either unbuilt or out of scope. Only the first section of chapter 8 exists in the app:
 
-Nothing comes after 8.1.
+| Book chapter | Sections | In the app? |
+| --- | --- | --- |
+| 8 JSCAD Foundations | 8.1 Libraries and JSCAD Introduction · 8.2 2D Shapes and Transforms · 8.3 Boolean Operations in 2D · 8.4 Parameters and `getParameterDefinitions` · 8.5 Arrays in JSCAD / Loops | **only 8.1**, as 11 screens on the B-rep kernel (`status: draft`, quarter 3) |
+| 9 3D Modeling | 9.1 First Extrusion · 9.2 3D Primitives and Transforms · 9.3 Error Handling and Debugging · 9.4 Testing Principles | no |
+| 10 Synthesis — Fits-My-Stuff (Q3) | 10.1 | no |
+| 11 Advanced Modeling | 11.1 Hulls and Advanced Extrusions · 11.2 Measurements and Printability · 11.3 Sorting and Searching on Geometry | no |
+| 12 Production Pipeline | 12.1 Multi-File Projects and File I/O · 12.2 Colors, Text, and Export Formats | no |
+| 13 Synthesis — Mechanism (Q4) | 13.1 Capstone Design Phase · 13.2 Capstone Build and Iterate · 13.3 Presentations and Reflection | no |
+
+Fit would be **None** for all of it: none of the five CodeHS courses goes past a 2D canvas, and
+none teaches parametric solid modelling, a build history or an exported mesh. CodeHS's nearest
+neighbour is its separate three.js course, which was not among the six pulled.
+
+**The trap waiting there:** the book's chapters 8–13 are written against **JSCAD**
+(`getParameterDefinitions`, `union`/`subtract`, JSCAD's own error handling), and JSCAD is retired
+in shCode — 8.1 was re-pointed at the B-rep kernel and reSHape Script. Building 8.2–9.4 from the
+outline as written would rebuild the dependency the course is trying to leave.
+
+Also unbuilt from the book's chapter 6: **6.9 Timing and Async** and **6.10 Sound and Texture**.
 
 ---
 
