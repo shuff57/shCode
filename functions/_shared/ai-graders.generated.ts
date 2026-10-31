@@ -7332,19 +7332,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "q1-fight-explanation",
         "title": "Q1: Explains why .vel fights the physics engine",
         "description": "Student explains that setting .vel directly every frame overrides whatever the physics engine (gravity, applyForce, collisions) already computed for that sprite that frame, so the engine's own influence gets thrown away and re-imposed instead of blending with it. Accept any everyday phrasing of overriding, resetting, or cancelling out the physics engine's own effect; it doesn't need textbook precision. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the part labelled with this question: if anything anywhere in it touches this question, even indirectly, give full credit. If the response as a whole is about sprite movement, .vel, applyForce, forces or the physics engine at all, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "q2-applyforce-scenario",
         "title": "Q2: Describes a real scenario where applyForce is the better tool",
         "description": "Student names a concrete scenario (wind, thrust, a magnet, a continuous push layered on top of gravity, etc.) where applyForce is the better tool, and gives a reason: it respects mass and adds to existing motion instead of replacing it. Credit any situation at all, even loosely worded; a reason, even a vague one, is welcome but not required. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the part labelled with this question: if anything anywhere in it touches this question, even indirectly, give full credit. If the response as a whole is about sprite movement, .vel, applyForce, forces or the physics engine at all, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "writing-clarity",
         "title": "Writing clarity",
         "description": "Response is clearly organized and easy to follow. Deduct this point only for significant issues: incoherent structure, or writing that makes it difficult to assess the content. Do not deduct for length.",
-        "points": 1
+        "points": 0
       }
     ],
     "model": "glm-5.3-flash:cloud",
