@@ -1,0 +1,141 @@
+{
+  "id": "6-9-grids-13-quiz-grids-and-tile-maps",
+  "title": "6.9.13 Check: Grids and tile maps",
+  "description": "Seven multiple-choice questions on rows and columns, pixels and cells, the offset, bounds and level.delete(). Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.9 Grids and Tile Maps",
+  "preview": "quiz",
+  "week": 16,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-letter",
+        "source": "6.9.2",
+        "question": "`map` is an array of strings, one string per row. What does `map[2][5]` give you?",
+        "options": [
+          "The whole of row 2",
+          "The pixel position of that tile",
+          "The letter in row 2, column 5",
+          "The letter in column 2, row 5"
+        ],
+        "answer": 2,
+        "explanation": "The first index picks the row (a string), the second picks a letter in that row. Read it left to right: row, then column.",
+        "sourceIds": [
+          "6-9-grids-2-reading-a-map-is-rows-of-text"
+        ]
+      },
+      {
+        "id": "q2-data",
+        "source": "6.9.9",
+        "question": "A lit cell must go dark when it is clicked. What do you change?",
+        "options": [
+          "The colour of the rectangle that is on screen",
+          "The value in the grid; the next draw shows it",
+          "Nothing yet; the screen has to be cleared first",
+          "The size of `CELL`"
+        ],
+        "answer": 1,
+        "explanation": "The grid is the truth and the screen is a picture drawn from it every frame. Change the data and the picture follows.",
+        "sourceIds": [
+          "6-9-grids-9-reading-a-grid-is-data"
+        ]
+      },
+      {
+        "id": "q3-forward",
+        "source": "6.9.5",
+        "question": "`TILE` is 40. Which pixel x is the centre of column 3?",
+        "options": [
+          "120",
+          "140",
+          "160",
+          "3"
+        ],
+        "answer": 1,
+        "explanation": "Column 3 starts at 3 * 40 = 120, and the centre is half a tile further: 120 + 20 = 140.",
+        "sourceIds": [
+          "6-9-grids-5-reading-reading-a-map-as-data"
+        ]
+      },
+      {
+        "id": "q4-back",
+        "source": "6.9.5",
+        "question": "`TILE` is 40 and the mouse is at x = 150. Which column is it over, and how do you get it?",
+        "options": [
+          "Column 4, from `round(150 / 40)`",
+          "Column 3.75, from `150 / 40`",
+          "Column 150, since x is already a column",
+          "Column 3, from `floor(150 / 40)`"
+        ],
+        "answer": 3,
+        "explanation": "150 / 40 is 3.75. `floor` cuts off the 0.75 and leaves 3, the column the pixel is inside. `round` would say 4, which is the next tile.",
+        "sourceIds": [
+          "6-9-grids-5-reading-reading-a-map-as-data"
+        ]
+      },
+      {
+        "id": "q5-offset",
+        "source": "6.9.11",
+        "question": "The wall starts `TOP` = 60 pixels down and each brick is `BH` = 20 tall. A click lands at y = 100. Which row is that?",
+        "options": [
+          "Row 2",
+          "Row 5",
+          "Row 1",
+          "Row 4"
+        ],
+        "answer": 0,
+        "explanation": "Take the 60 off first: 100 - 60 = 40, and 40 / 20 = 2. Dividing 100 by 20 without taking `TOP` off gives 5, which is row 5 of a wall that starts at the top.",
+        "sourceIds": [
+          "6-9-grids-11-lab-a-wall-of-bricks"
+        ]
+      },
+      {
+        "id": "q6-bounds",
+        "source": "6.9.10",
+        "question": "The grid has 8 rows (0 to 7) and a words strip under it. A click lands in the strip, so `floor(y / CELL)` is 8. What happens if the code goes straight to `grid[r][c] = ...`?",
+        "options": [
+          "Nothing happens: JavaScript skips a row that is not there and carries on",
+          "The last row, row 7, is flipped instead",
+          "`grid[8]` is `undefined`, so reading a cell from it stops the sketch",
+          "The grid quietly grows a ninth row to fit the click"
+        ],
+        "answer": 2,
+        "explanation": "There is no row 8, so `grid[8]` is `undefined` and `undefined` has no cells. That is why every click is checked against the size of the grid first.",
+        "sourceIds": [
+          "6-9-grids-10-lab-light-the-grid"
+        ]
+      },
+      {
+        "id": "q7-delete",
+        "source": "6.9.8",
+        "question": "Why does `loadLevel(n)` call `level.delete()` before it builds the next level with `Tiles`?",
+        "options": [
+          "It puts the player back on the P of the old level",
+          "It adds up the score once for every coin left",
+          "`Tiles` would refuse to build a second level while the first still exists",
+          "The old walls and coins would stay on screen and keep blocking"
+        ],
+        "answer": 3,
+        "explanation": "`Tiles` only adds sprites. The old level is still there until you delete it, so level 2 would be built on top of level 1.",
+        "sourceIds": [
+          "6-9-grids-8-lab-the-next-level"
+        ]
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

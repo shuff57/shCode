@@ -1,0 +1,106 @@
+{
+  "id": "6-9-grids-4-lab-build-the-maze",
+  "title": "6.9.4 Lab: Build the maze",
+  "description": "The screen is empty: three Groups, a map and a player, but no level. Set the defaults on walls, coins and the goal, then build the whole maze from rows of text with Tiles. You can then walk it, and the corner counts the coins left (5).",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.9 Grids and Tile Maps",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Walls that never move",
+      "instructions": "The starter made `walls = new Group()`. A Group's defaults are copied onto every sprite made through it, so you set them once here instead of on each tile. Set two: its `collider` is `'static'` (it never moves when you bump it) and its `color` is `'dimgray'`.",
+      "hints": [
+        "`walls.collider = 'static';`",
+        "`walls.color = 'dimgray';` Two lines, one for each default."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Coins and the goal",
+      "instructions": "Set the defaults for `coins` (`collider` `'none'`, `diameter` 14, `color` `'gold'`) and for `goals` (`collider` `'none'`, `color` `'limegreen'`). `'none'` is what lets the player walk through them. `diameter` 14 makes a coin a small circle instead of a full tile.",
+      "hints": [
+        "The same shape as the walls: `coins.collider = 'none';`, `coins.diameter = 14;`, `coins.color = 'gold';`.",
+        "`goals.collider = 'none';` and `goals.color = 'limegreen';`. Both Groups were already made for you."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Build the level",
+      "instructions": "Make `level = new Tiles(map, 20, 20, TILE, TILE, legend)`, where the legend is an object written in place of that last word: `'#'` builds `walls`, `'c'` builds `coins`, `'G'` builds `goals`. The two numbers after `map` are the centre of the first tile, which is half a tile in, so 20. Run it: the corner reads `coins left: 5` and you can walk the maze with the arrow keys. The `P` in the map is an empty cell for now; the player starts at a fixed spot.",
+      "hints": [
+        "The legend is `{ '#': walls, 'c': coins, 'G': goals }`. A letter on the left, a Group on the right, commas between.",
+        "If the level is in the wrong place or its edge is cut off, check the two numbers after `map`: they are the centre of the first tile, `TILE / 2` or 20, not 0."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Walls are static",
+      "description": "Walls never move: their collider is static. Help: 6.9.2 (Reading: A map is rows of text)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bwalls\\.collider\\s*=\\s*(?:['\"]static['\"]|STATIC\\b|STA\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Coins let you walk through",
+      "description": "Coins do not block the player: their collider is none. Help: 6.9.2 (Reading: A map is rows of text)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bcoins\\.collider\\s*=\\s*['\"]none['\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "The goal lets you walk through",
+      "description": "The goal is its own Group and does not block the player either. Help: 6.9.3 (Worked Example: A level from text)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bgoals\\.collider\\s*=\\s*['\"]none['\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "The level is built from the map with Tiles",
+      "description": "new Tiles(map, ...) with a legend: # builds walls, c builds coins, G builds goals. Help: 6.9.2 (Reading: A map is rows of text)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*\\bnew\\s+Tiles\\s*\\()(?=[\\s\\S]*['\"]#['\"]\\s*:\\s*walls\\b)(?=[\\s\\S]*['\"]c['\"]\\s*:\\s*coins\\b)(?=[\\s\\S]*['\"]G['\"]\\s*:\\s*goals\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "The first tile is centred half a tile in",
+      "description": "x and y are the CENTRE of the top-left tile, so they are half a tile, not 0. Help: 6.9.3 (Worked Example: A level from text)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Tiles\\s*\\(\\s*[\\w$.\\[\\]]+\\s*,\\s*(?:20|TILE\\s*\\/\\s*2|0?\\.5\\s*\\*\\s*TILE|TILE\\s*\\*\\s*0?\\.5)\\s*,\\s*(?:20|TILE\\s*\\/\\s*2|0?\\.5\\s*\\*\\s*TILE|TILE\\s*\\*\\s*0?\\.5)\\s*,",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

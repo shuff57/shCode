@@ -1,0 +1,132 @@
+{
+  "id": "6-9-grids-10-lab-light-the-grid",
+  "title": "6.9.10 Lab: Light the grid",
+  "description": "An 8 by 8 grid of lights kept as data. The starter has the canvas, the draw loop and the words, and every function you need is there but empty. Build the grid, draw it from the data, flip a cell on a click, and count the lit cells.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.9 Grids and Tile Maps",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build the grid",
+      "instructions": "The grid is `grid[r][c]`: `true` when that cell is lit. `COLS` (8), `ROWS` (8) and `CELL` (50) are at the top of the starter, and `setup()` already calls `makeGrid()` and keeps what it gives back in `grid`. Besides `setup()`, `draw()` and `drawTop()`, the starter has four functions, and each is empty or gives back a stand-in until you write it: `makeGrid()` gives back an empty list, `drawGrid()` and `clickCell()` do nothing, and `countLit()` gives back 0. Right now the screen is blank and the words say `lit: 0 of 64`.\n\nStart with `makeGrid()`. It makes `g` for you. Make `ROWS` rows: for each one make an empty array called `row`, push `COLS` values of `false` into it (every light starts off), then push the finished row onto `g`. The whole row goes onto `g` as one item, as in 6.9.9. Nothing shows yet; the next step draws it.",
+      "hints": [
+        "Two loops, one inside the other: the outer makes a row, the inner fills it. `row.push(false);`",
+        "`g.push(row);` goes after the inner loop, inside the outer one."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Draw it from the data",
+      "instructions": "In `drawGrid()`, visit every cell with two loops (use `grid.length` and `grid[r].length` as the limits). Before each cell, set `fill`: `'gold'` for a lit cell and `'#334'` for an off cell, chosen by what `grid[r][c]` holds. Then draw the cell with `rect(c * CELL, r * CELL, CELL, CELL)`. A `rect`'s x and y is its top-left corner, so the cell in column `c` starts at `c * CELL`. Run it: an 8 by 8 board of dark squares appears with thin black lines between them. Nothing is lit yet, because every cell is `false`.",
+      "hints": [
+        "`fill(grid[r][c] ? 'gold' : '#334');` or an `if`/`else` that calls `fill` in each branch.",
+        "Row `r` goes with y, column `c` goes with x: `rect(c * CELL, r * CELL, CELL, CELL);`"
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "A click flips a cell",
+      "instructions": "`draw()` already calls `clickCell(mouse.x, mouse.y)` on every click. In `clickCell(x, y)`, turn the pixels into a column and a row: `c` is `floor(x / CELL)` and `r` is `floor(y / CELL)`. Then, IF that row and column are on the grid, flip the cell: `grid[r][c] = !grid[r][c];`. The canvas is 440 tall, but the grid is only 400 of it. The strip under the grid is where the words live, and a click there gives row 8, which does not exist: `grid[8]` is `undefined`, and reading a cell of it stops the sketch. So check `r >= 0 && r < ROWS && c >= 0 && c < COLS` first, with the row tests ahead of anything that reads `grid[r]`. Run it: click a few squares to light them, click one again to turn it off, and click in the strip under the grid to check that nothing happens and nothing breaks.",
+      "hints": [
+        "The test and the flip go together: `if (r >= 0 && r < ROWS && c >= 0 && c < COLS) { ... }`",
+        "The flip is one line, and `!` turns `true` into `false` and `false` into `true`."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Count the lit cells",
+      "instructions": "In `countLit()`, `n` starts at 0 and is given back at the end for you. Between those, use two loops over the grid and add 1 to `n` for every cell that is `true`. The words under the grid should now count as you click: light three squares and they read `lit: 3 of 64`, turn one off and they read 2.",
+      "hints": [
+        "Same two loops as `drawGrid()`, with `if (grid[r][c]) n += 1;` inside.",
+        "A `true` cell is enough for an `if` on its own; there is no need to compare it with anything."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The grid is built with two loops",
+      "description": "A row is made for each of ROWS, filled with COLS false values, and pushed onto g. Help: 6.9.9 (Reading: A grid is data)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "makeGrid",
+      "pattern": "^(?=[\\s\\S]*\\bfor\\b[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*\\.push\\s*\\(\\s*(?:false|0)\\s*\\))(?=[\\s\\S]*\\.push\\s*\\(\\s*(?!false\\b|true\\b|\\d)[A-Za-z_$][\\w$]*\\s*\\))|^(?=[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*\\.fill\\s*\\(\\s*(?:false|0)\\s*\\))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The picture is drawn from the grid",
+      "description": "Two loops visit every cell; the colour comes from grid[r][c]; each cell is a rect. Help: 6.9.9 (Reading: A grid is data)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "drawGrid",
+      "pattern": "^(?=[\\s\\S]*\\bfor\\b[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*(?:\\bgrid\\s*\\[\\s*[\\w$]+\\s*\\]\\s*\\[\\s*[\\w$]+\\s*\\]|\\bfor\\s*\\(\\s*(?:const|let)\\s+[\\w$]+\\s+of\\s+grid\\b))(?=[\\s\\S]*\\b(?:rect|square)\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A click becomes a row and a column with floor",
+      "description": "floor(x / CELL) is the column and floor(y / CELL) is the row. Help: 6.9.9 (Reading: A grid is data)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "clickCell",
+      "pattern": "^(?=[\\s\\S]*(?:\\bfloor|Math\\.floor|Math\\.trunc)\\s*\\([^;]*\\/\\s*(?:CELL|50)\\b[\\s\\S]*(?:\\bfloor|Math\\.floor|Math\\.trunc)\\s*\\([^;]*\\/\\s*(?:CELL|50)\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "A click outside the grid does nothing",
+      "description": "The row and column are checked against the size of the grid before the cell is read. Help: 6.9.9 (Reading: A grid is data)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "clickCell",
+      "pattern": "<=?\\s*(?:ROWS|COLS|grid\\.length|grid\\s*\\[\\s*[\\w$0]+\\s*\\]\\.length|[78])\\b|>=?\\s*(?:ROWS|COLS|grid\\.length|grid\\s*\\[\\s*[\\w$0]+\\s*\\]\\.length|[78])\\b|!==?\\s*undefined|\\?\\.\\[",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "The click flips the cell",
+      "description": "A lit cell goes dark and a dark cell lights: the new value is worked out from the old one. Help: 6.9.9 (Reading: A grid is data)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "clickCell",
+      "pattern": "\\bgrid\\s*\\[[^\\]]+\\]\\s*\\)?\\s*\\[[^\\]]+\\]\\s*\\)?\\s*=\\s*[^;]*\\bgrid\\s*\\)?\\s*\\[|^(?=[\\s\\S]*\\]\\s*=\\s*true\\b)(?=[\\s\\S]*\\]\\s*=\\s*false\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r6",
+      "title": "countLit counts the lit cells",
+      "description": "Two loops, and a count that goes up only for a lit cell. Help: 6.9.9 (Reading: A grid is data)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "countLit",
+      "pattern": "^(?=[\\s\\S]*\\bfor\\b[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*(?:\\bif\\s*\\([^)]*\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]|\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*\\?|\\+=\\s*grid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]))|\\.filter\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

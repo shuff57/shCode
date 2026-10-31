@@ -1,0 +1,123 @@
+{
+  "id": "6-9-grids-11-lab-a-wall-of-bricks",
+  "title": "6.9.11 Lab: A wall of bricks",
+  "description": "A wall of 40 bricks kept as an array of arrays of 1s and 0s. The drawing, the mouse and the words are done. Build the wall with two loops, find the brick under a pixel (the wall starts 60 pixels down), and count the bricks left.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.9 Grids and Tile Maps",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build the wall",
+      "instructions": "The wall is `bricks[r][c]`: `1` for a brick and `0` for a gap. The starter keeps the sizes at the top (`BRICK_COLS` 8, `BRICK_ROWS` 5, each brick `BW` 50 wide and `BH` 20 tall) and the wall starts `TOP` (60) pixels down, leaving room above it for words. Besides `setup()`, `draw()` and `drawTop()`, the starter has `startGame()` (which builds the wall and sets `score` to 0), `drawBricks()` (finished: it draws a coloured `rect` for every 1 and nothing for a 0) and three functions that are empty or give back a stand-in: `makeBricks()` gives back an empty list, `hitAt(x, y)` gives back `false`, and `bricksLeft()` gives back 0. Right now the screen shows no wall and the words say `bricks left: 0`.\n\nStart with `makeBricks()`. It makes `b` for you. Make `BRICK_ROWS` rows: for each one make an empty array called `row`, push `BRICK_COLS` ones into it, then push the finished row onto `b`. Run it: a wall of five coloured rows of eight bricks appears, but the words still say 0 until step 3.",
+      "hints": [
+        "Two loops again, like `makeGrid()` in 6.9.10, but each cell is a `1` instead of `false`: `row.push(1);`",
+        "`b.push(row);` goes after the inner loop and inside the outer one."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Which brick is at this pixel?",
+      "instructions": "`draw()` calls `hitAt(mouse.x, mouse.y)` on every click, and `hitAt` should take out the brick that is there. In `hitAt(x, y)`, the column is `floor(x / BW)`. The wall starts `TOP` pixels down, so take that off first: the row is `floor((y - TOP) / BH)`. Then, IF that row and column are inside the wall AND the cell is `1`, set it to `0`, add 10 to `score`, and `return true`. If the test fails the function falls through to the `return false` already below your lines. A click above the wall gives a negative row, and a click under it gives a row that is too big; either one reads `bricks[r]` as `undefined` and stops the sketch, so put the row and column tests before `bricks[r][c] === 1` in the same `if`, joined with `&&`. Run it: click a brick and it disappears and the score is 10. Click the empty space where it was, the space above the wall and the space under it: nothing happens and nothing breaks.",
+      "hints": [
+        "The test reads `r >= 0 && r < BRICK_ROWS && c >= 0 && c < BRICK_COLS && bricks[r][c] === 1`.",
+        "Three lines go inside the `if`: set the cell to 0, add 10 to `score`, and `return true;`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Bricks left",
+      "instructions": "In `bricksLeft()`, `n` starts at 0 and is given back at the end for you. Between those, use two loops over the wall and add 1 to `n` for every cell that is `1`. The words at the top now read `bricks left: 40` and go down as you click. Clear every brick and the screen says Cleared!. Press R and the wall comes back whole.",
+      "hints": [
+        "The same two loops as `drawBricks()`, with `if (bricks[r][c] === 1) n += 1;` inside.",
+        "This is the function a Breakout ball will call later through `hitAt(ball.x, ball.y)`, so keep its name."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The wall is built with two loops",
+      "description": "A row is made for each of BRICK_ROWS and filled with BRICK_COLS ones, then pushed onto b. Help: 6.9.10 (Lab: Light the grid)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "makeBricks",
+      "pattern": "^(?=[\\s\\S]*\\bfor\\b[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*\\.push\\s*\\(\\s*(?:1|true)\\s*\\))(?=[\\s\\S]*\\.push\\s*\\(\\s*(?!1\\b|true\\b|false\\b|0\\b)[A-Za-z_$][\\w$]*\\s*\\))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "A hit pixel becomes a row and a column",
+      "description": "Divide by the brick size with floor. The wall starts TOP pixels down, so take TOP off y first. Help: 6.9.9 (Reading: A grid is data)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "hitAt",
+      "pattern": "^(?=[\\s\\S]*(?:\\bfloor|Math\\.floor|Math\\.trunc)\\s*\\([^;]*\\/\\s*(?:BW|50)\\b)(?=[\\s\\S]*(?:(?:\\bfloor|Math\\.floor|Math\\.trunc)\\s*\\([^;]*(?:\\bTOP\\b|\\b60\\b)[^;]*\\/\\s*(?:BH|20)\\b|(?:\\bfloor|Math\\.floor|Math\\.trunc)\\s*\\([^;]*\\/\\s*(?:BH|20)\\b[^;]*\\)\\s*-\\s*(?:TOP\\s*\\/\\s*BH|3)\\b))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A hit outside the wall does nothing",
+      "description": "The row and column are checked, above AND below, before the cell is read. Help: 6.9.9 (Reading: A grid is data)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "hitAt",
+      "pattern": "^(?=[\\s\\S]*(?:>=?\\s*0\\b|<\\s*0\\b|\\b0\\s*<=?|\\b0\\s*>))(?=[\\s\\S]*(?:<=?\\s*(?:BRICK_ROWS|BRICK_COLS|bricks\\.length|bricks\\s*\\[\\s*[\\w$0]+\\s*\\]\\.length|[58])\\b|>=?\\s*(?:BRICK_ROWS|BRICK_COLS|bricks\\.length|bricks\\s*\\[\\s*[\\w$0]+\\s*\\]\\.length|[58])\\b))|!==?\\s*undefined|\\?\\.\\[",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "A hit removes the brick",
+      "description": "The cell goes from 1 to 0. Help: 6.9.9 (Reading: A grid is data)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "hitAt",
+      "pattern": "\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*(?:=\\s*0\\b|-=\\s*1\\b|--)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "A hit scores and says true",
+      "description": "score goes up, and hitAt gives back true when it removed a brick. Help: 6.9.9 (Reading: A grid is data)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "hitAt",
+      "pattern": "^(?=[\\s\\S]*(?:\\bscore\\s*(?:\\+=\\s*[1-9]|\\+\\+|=\\s*score\\s*\\+)|\\+\\+\\s*score\\b))(?=[\\s\\S]*\\breturn\\s+true\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r6",
+      "title": "bricksLeft counts the bricks",
+      "description": "Two loops, counting only the cells that hold a brick. Help: 6.9.10 (Lab: Light the grid)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "bricksLeft",
+      "pattern": "^(?=[\\s\\S]*\\bfor\\b[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*(?:\\bif\\s*\\([^)]*\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]|\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*\\?|\\+=\\s*bricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]))|\\.filter\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

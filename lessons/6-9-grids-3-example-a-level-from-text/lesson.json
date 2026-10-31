@@ -1,0 +1,23 @@
+{
+  "id": "6-9-grids-3-example-a-level-from-text",
+  "title": "6.9.3 Worked Example: A level from text",
+  "description": "A small level built from six rows of text. Change a letter, the legend or the tile size and watch what each one controls.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.9 Grids and Tile Maps",
+  "preview": "example",
+  "week": 16,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
