@@ -49,7 +49,7 @@
       "description": "The pipe's x is compared with the bird's x and the pipe's own flag. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:\\w+(?:\\[\\w+\\])?\\.x\\s*<=?\\s*bird\\.x|bird\\.x\\s*>=?\\s*\\w+(?:\\[\\w+\\])?\\.x)\\s*\\)?\\s*(?:&&|\\{\\s*if\\s*\\()\\s*(?:!\\s*\\w+(?:\\[\\w+\\])?\\.passed\\b|\\w+(?:\\[\\w+\\])?\\.passed\\s*===?\\s*false\\b)|(?:!\\s*\\w+(?:\\[\\w+\\])?\\.passed\\b|\\w+(?:\\[\\w+\\])?\\.passed\\s*===?\\s*false\\b)\\s*\\)?\\s*(?:&&|\\{\\s*if\\s*\\()\\s*(?:\\w+(?:\\[\\w+\\])?\\.x\\s*<=?\\s*bird\\.x|bird\\.x\\s*>=?\\s*\\w+(?:\\[\\w+\\])?\\.x)",
+      "pattern": "(?:\\w+(?:\\[\\w+\\])?\\.x\\s*<=?\\s*bird\\.x|bird\\.x\\s*>=?\\s*\\w+(?:\\[\\w+\\])?\\.x)(?:\\s*\\)){0,3}\\s*(?:&&|\\{\\s*if\\s*\\()\\s*(?:\\(\\s*){0,3}(?:!\\s*(?:\\(\\s*)?\\w+(?:\\s*\\))?(?:\\[\\w+\\])?\\.passed\\b|\\w+(?:\\[\\w+\\])?\\.passed\\s*===?\\s*false\\b)|(?:!\\s*(?:\\(\\s*)?\\w+(?:\\s*\\))?(?:\\[\\w+\\])?\\.passed\\b|\\w+(?:\\[\\w+\\])?\\.passed\\s*===?\\s*false\\b)(?:\\s*\\)){0,3}\\s*(?:&&|\\{\\s*if\\s*\\()\\s*(?:\\(\\s*){0,3}(?:\\w+(?:\\[\\w+\\])?\\.x\\s*<=?\\s*bird\\.x|bird\\.x\\s*>=?\\s*\\w+(?:\\[\\w+\\])?\\.x)",
       "flags": "",
       "points": 0,
       "status": "pending"

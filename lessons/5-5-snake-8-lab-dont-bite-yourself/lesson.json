@@ -69,7 +69,7 @@
       "description": "A while loop repeats the pick while the cell is part of the body. Help: 5.5.7 (Reading: Searching the array)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(\\s*isBody\\s*\\(",
+      "pattern": "while\\s*\\(\\s*(?:\\(\\s*){0,3}isBody\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

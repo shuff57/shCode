@@ -60,7 +60,7 @@
       "hint": "Inside the if, write on = !on; so it flips each beat.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "frameCount\\s*%\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*===?\\s*0\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false)|\\{\\s*if\\s*\\([^)]*\\)\\s*\\{?[^{}]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false)|[^{};]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false))",
+      "pattern": "frameCount\\s*%\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*===?\\s*0\\s*\\)(?:\\s*\\)){0,3}\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false)|\\{\\s*if\\s*\\([^)]*\\)(?:\\s*\\)){0,3}\\s*\\{?[^{}]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false)|[^{};]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false))",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -84,7 +84,7 @@
       "hint": "Inside the frameCount === 300 block, assign message = 'Time is up!'.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "frameCount\\s*===?\\s*(?:300(?!\\d)|5\\s*\\*\\s*60)\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]*?)\\bmessage\\s*=\\s*\\S|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:300(?!\\d)|5\\s*\\*\\s*60)\\s*[;\\n][\\s\\S]*?frameCount\\s*===?\\s*\\1\\b\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]*?)\\bmessage\\s*=\\s*\\S",
+      "pattern": "frameCount\\s*===?\\s*(?:300(?!\\d)|5\\s*\\*\\s*60)\\s*\\)(?:\\s*\\)){0,3}\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]*?)\\bmessage\\s*=\\s*\\S|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:300(?!\\d)|5\\s*\\*\\s*60)\\s*[;\\n][\\s\\S]*?frameCount\\s*===?\\s*\\1\\b\\s*\\)(?:\\s*\\)){0,3}\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]*?)\\bmessage\\s*=\\s*\\S",
       "flags": "",
       "points": 0,
       "status": "pending"

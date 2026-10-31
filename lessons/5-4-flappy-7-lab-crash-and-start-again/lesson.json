@@ -90,7 +90,7 @@
       "description": "The play code, including the new pipes on the beat, sits inside if (playing), so nothing new happens after a crash. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?frameCount\\s*%|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\}\\s*else\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?frameCount\\s*%|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{?[^{}]{0,300}?\\breturn\\b[^{}]{0,20}\\}?[\\s\\S]*?frameCount\\s*%|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*&&[^{};]*frameCount\\s*%|\\bif\\s*\\([^{};]*frameCount\\s*%[^{};]*&&\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)",
+      "pattern": "\\bif\\s*\\(\\s*(?:\\(\\s*){0,3}(?!true\\b|false\\b)(?:!\\s*(?:\\(\\s*){0,3}\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)(?:\\s*\\)){0,3}\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?frameCount\\s*%|\\bif\\s*\\(\\s*(?:\\(\\s*){0,3}(?!true\\b|false\\b)(?:!\\s*(?:\\(\\s*){0,3}\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)(?:\\s*\\)){0,3}\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\}\\s*else\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?frameCount\\s*%|\\bif\\s*\\(\\s*(?:\\(\\s*){0,3}(?!true\\b|false\\b)(?:!\\s*(?:\\(\\s*){0,3}\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)(?:\\s*\\)){0,3}\\s*\\)\\s*\\{?[^{}]{0,300}?\\breturn\\b[^{}]{0,20}\\}?[\\s\\S]*?frameCount\\s*%|\\bif\\s*\\(\\s*(?:\\(\\s*){0,3}(?!true\\b|false\\b)(?:!\\s*(?:\\(\\s*){0,3}\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)(?:\\s*\\)){0,3}\\s*&&[^{};]{0,200}frameCount\\s*%|\\bif\\s*\\([^{};]{0,200}frameCount\\s*%[^{};]{0,200}&&\\s*(?:\\(\\s*){0,3}(?!true\\b|false\\b)(?:!\\s*(?:\\(\\s*){0,3}\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)(?:\\s*\\)){0,3}\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -101,7 +101,7 @@
       "description": "While the flag is false, the screen says Game over. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:\\}\\s*else\\s*\\{?|if\\s*\\(\\s*(?:!\\s*\\w+|\\w+\\s*===?\\s*false)\\s*\\)\\s*\\{?)[\\s\\S]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over|^(?=[\\s\\S]*(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,160}?(?<![\\w.$])(\\w+)\\s*=\\s*true\\b)(?=[\\s\\S]*if\\s*\\(\\s*\\1\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{?[^{}]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over)",
+      "pattern": "(?:\\}\\s*else\\s*\\{?|if\\s*\\(\\s*(?:\\(\\s*){0,3}(?:!\\s*(?:\\(\\s*){0,3}\\w+|\\w+\\s*===?\\s*false)(?:\\s*\\)){0,3}\\s*\\)\\s*\\{?)[\\s\\S]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over|^(?=[\\s\\S]*(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,160}?(?<![\\w.$])(\\w+)\\s*=\\s*true\\b)(?=[\\s\\S]*if\\s*\\(\\s*(?:\\(\\s*){0,3}\\1\\s*(?:===?\\s*true\\s*)?(?:\\s*\\)){0,3}\\s*\\)\\s*\\{?[^{}]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over)",
       "flags": "i",
       "points": 0,
       "status": "pending"
