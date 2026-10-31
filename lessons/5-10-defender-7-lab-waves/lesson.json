@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "A round starts at wave 0",
-      "instructions": "`spawnOnBeat()` is gone: enemies now come in waves. The top of the screen says `wave: undefined` because nothing sets the wave yet. In `startRound()`, set `wave` to 0 and `wavePause` to 60, so every round, the first one and every one after R, starts with a one-second pause before wave 1. Run it: the top should read `wave: 0`.",
+      "instructions": "`spawnOnBeat()` is gone: enemies now come in waves. The top of the screen says `wave: undefined`, running into `base:` beside it, because nothing sets the wave yet. In `startRound()`, set `wave` to 0 and `wavePause` to 60, so every round, the first one and every one after R, starts with a one-second pause before wave 1. Run it: the top should read `wave: 0`.",
       "hints": [
         "`wave = 0;` and `wavePause = 60;`, beside the other lines that put a round back.",
         "`startRound()` is called by `setup()` and by the R key, so one place covers both."
@@ -33,7 +33,7 @@
     {
       "id": "s3",
       "title": "Build a wave",
-      "instructions": "In `spawnWave()`, add 1 to `wave` and set `fallSpeed` to `0.5 + wave * 0.25`, so each wave falls a little faster. Then loop `wave + 2` times. On loop number `i` the enemy is tough (3 hp) when `i % 3 === 2` and has 1 hp otherwise; build it with `spawnEnemy(40 + floor(random(8)) * 45, -20 - i * 50, hp)`, which stacks the wave in a column above the top. Play to wave 3, then press R in the middle of a wave: the field should empty, `wave:` should read 0, and wave 1 should come again after the pause.",
+      "instructions": "In `spawnWave()`, add 1 to `wave` and set `fallSpeed` to `0.5 + wave * 0.25`, so each wave falls a little faster. Then loop `wave + 2` times. On loop number `i` the enemy is tough (3 hp) when `i % 3 === 2` and has 1 hp otherwise; build it with `spawnEnemy(40 + floor(random(8)) * 45, -20 - i * 50, hp)`, which stacks the wave above the top in a staggered line, each at a random spot across the screen. Play to wave 3, then press R in the middle of a wave: the field should empty, `wave:` should read 0, and wave 1 should come again after the pause.",
       "hints": [
         "`const hp = i % 3 === 2 ? 3 : 1;` makes every third enemy a tough one.",
         "`-20 - i * 50` puts each enemy 50 pixels above the one before it, so they come down one after another."
@@ -44,11 +44,11 @@
     {
       "id": "r1",
       "title": "Every round starts at wave 0 with a pause",
-      "description": "startRound sets wave to 0 and gives wavePause a number of frames. Help: 5.10.6 (Worked Example: Waves with a pause)",
+      "description": "startRound sets wave to 0 and gives wavePause a number of frames (a number, or a named constant). Help: 5.10.6 (Worked Example: Waves with a pause)",
       "type": "inFunction",
       "function": "startRound",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*\\bwave\\s*=\\s*\\(?\\s*0\\b)(?=[\\s\\S]*\\bwavePause\\s*=\\s*\\(?\\s*\\d+)",
+      "pattern": "^(?=[\\s\\S]*\\bwave\\s*=\\s*\\(?\\s*0\\b)(?=[\\s\\S]*\\bwavePause\\s*=\\s*\\(?\\s*(?:\\d|(?!(?:wavePause|undefined|null|false|NaN)\\b)[A-Za-z_$][\\w$]*))",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -56,11 +56,14 @@
     {
       "id": "r2",
       "title": "The pause counts down only on a clear field",
-      "description": "nextWave checks whether any enemies are left, and counts wavePause down by 1. Help: 5.10.6 (Worked Example: Waves with a pause)",
+      "description": "nextWave checks whether any enemies are left, and counts wavePause down by 1 (or, as in 5.8.18, starts a wave only when the field is clear on a frameCount beat). Help: 5.10.6 (Worked Example: Waves with a pause)",
       "type": "inFunction",
-      "function": "nextWave",
+      "function": [
+        "nextWave",
+        "draw"
+      ],
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*(?:enemies\\.length\\s*\\)?\\s*(?:>\\s*\\(?\\s*0|!==?\\s*\\(?\\s*0|>=\\s*\\(?\\s*1|===?\\s*\\(?\\s*0|<\\s*\\(?\\s*1)|!\\s*\\(?\\s*enemies\\.length\\b|if\\s*\\(\\s*\\(?\\s*enemies\\.length\\s*\\)?\\s*\\)))(?=[\\s\\S]*(?:\\bwavePause\\s*(?:-=\\s*\\(?\\s*1\\b|--)|--\\s*wavePause\\b|\\bwavePause\\s*=\\s*\\(?\\s*wavePause\\s*-\\s*\\(?\\s*1\\b))",
+      "pattern": "^(?=[\\s\\S]*(?:enemies\\.length\\s*\\)?\\s*(?:>\\s*\\(?\\s*0|!==?\\s*\\(?\\s*0|>=\\s*\\(?\\s*1|===?\\s*\\(?\\s*0|<\\s*\\(?\\s*1)|!\\s*\\(?\\s*enemies\\.length\\b|if\\s*\\(\\s*\\(?\\s*enemies\\.length\\s*\\)?\\s*\\)))(?=[\\s\\S]*(?:\\bwavePause\\s*(?:-=\\s*\\(?\\s*1\\b|--)|--\\s*wavePause\\b|\\bwavePause\\s*=\\s*\\(?\\s*wavePause\\s*-\\s*\\(?\\s*1\\b))|\\bif\\s*\\((?=[^{};]{0,200}(?:\\benemies\\s*\\.\\s*length\\s*(?:\\)\\s*)?(?:===?\\s*\\(?\\s*0\\b|<\\s*\\(?\\s*1\\b|<=\\s*\\(?\\s*0\\b)|!\\s*\\(?\\s*enemies\\s*\\.\\s*length\\b|\\b0\\s*===?\\s*enemies\\s*\\.\\s*length\\b))(?=[^{};]{0,200}\\bframeCount\\s*\\)?\\s*%)[^{};]{0,200}\\)\\s*\\{?[^{}]{0,200}?\\bspawnWave\\s*\\(\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -68,11 +71,14 @@
     {
       "id": "r3",
       "title": "At 0 the next wave comes and the pause starts again",
-      "description": "When wavePause reaches 0, nextWave calls spawnWave() and sets wavePause back to a number above 0. Help: 5.10.6 (Worked Example: Waves with a pause)",
+      "description": "When wavePause reaches 0, nextWave calls spawnWave() and sets wavePause back to a number above 0 (or a named constant). Help: 5.10.6 (Worked Example: Waves with a pause)",
       "type": "inFunction",
-      "function": "nextWave",
+      "function": [
+        "nextWave",
+        "draw"
+      ],
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*wavePause\\s*\\)?\\s*(?:<=\\s*\\(?\\s*0|===?\\s*\\(?\\s*0|<\\s*\\(?\\s*1))[\\s\\S]*?if\\s*\\([^{]*\\)\\s*\\{(?=[^}]*spawnWave\\s*\\(\\s*\\))(?=[^}]*\\bwavePause\\s*=\\s*\\(?\\s*[1-9])",
+      "pattern": "^(?=[\\s\\S]*wavePause\\s*\\)?\\s*(?:<=\\s*\\(?\\s*0|===?\\s*\\(?\\s*0|<\\s*\\(?\\s*1))[\\s\\S]*?if\\s*\\([^{]*\\)\\s*\\{(?=[^}]*spawnWave\\s*\\(\\s*\\))(?=[^}]*\\bwavePause\\s*=\\s*\\(?\\s*(?:[1-9]|(?!(?:wavePause|undefined|null|false|NaN)\\b)[A-Za-z_$][\\w$]*))|\\bif\\s*\\((?=[^{};]{0,200}(?:\\benemies\\s*\\.\\s*length\\s*(?:\\)\\s*)?(?:===?\\s*\\(?\\s*0\\b|<\\s*\\(?\\s*1\\b|<=\\s*\\(?\\s*0\\b)|!\\s*\\(?\\s*enemies\\s*\\.\\s*length\\b|\\b0\\s*===?\\s*enemies\\s*\\.\\s*length\\b))(?=[^{};]{0,200}\\bframeCount\\s*\\)?\\s*%)[^{};]{0,200}\\)\\s*\\{?[^{}]{0,200}?\\bspawnWave\\s*\\(\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"

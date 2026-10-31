@@ -26,7 +26,7 @@
         "options": [
           "In `enemyHp`, at the enemy's index",
           "On its own Enemy object, as `this.hp`",
-          "In the sprite's text",
+          "In the sprite's text, which `takeHit()` reads back as a number",
           "In `Enemy.spawned`"
         ],
         "answer": 1,
@@ -40,10 +40,10 @@
         "source": "5.11.3 and 5.11.5",
         "question": "Why does `hitEnemies()` no longer splice anything?",
         "options": [
-          "`splice` is not allowed inside a class",
-          "`for...of` loops cannot splice",
+          "`splice` is not allowed on an array of objects, only on numbers and sprites",
+          "A `for...of` loop has no index to splice with, so the finished objects stay in both arrays until the next round starts",
           "Objects only change their state there; `clearFinished()` removes the finished ones once, at the end of the frame",
-          "Bullets can never hit twice"
+          "Bullets can never hit twice, because `hits()` deletes the shot's sprite the moment it overlaps"
         ],
         "answer": 2,
         "explanation": "A hit calls `spend()` and `takeHit(1)`, and nothing leaves a list until `clearFinished()` runs at the end of the frame: finished in one place.",
@@ -57,7 +57,7 @@
         "source": "5.11.3",
         "question": "What does `enemies = enemies.filter((e) => e.isAlive());` NOT do by itself?",
         "options": [
-          "Keep the alive enemies",
+          "Keep the enemies that are still alive in the list",
           "Delete the finished enemies' sprites",
           "Make a new array",
           "Call `isAlive()` on each enemy"
@@ -73,9 +73,9 @@
         "source": "5.11.5",
         "question": "In `b.hits(e)`, what is `e`?",
         "options": [
-          "A number",
-          "The bullet's own sprite",
-          "A class",
+          "A number: the index of the enemy in `enemies`",
+          "The bullet's own sprite, which `hits()` compares with the enemy",
+          "The Enemy class itself, so `hits()` can test every enemy at once",
           "Another object, an Enemy, handed to the bullet's method"
         ],
         "answer": 3,
@@ -90,9 +90,9 @@
         "question": "Why is `spawned` declared `static`?",
         "options": [
           "It is a fact about all enemies, so it belongs to the class (`Enemy.spawned`), not to one enemy",
-          "So it can never change",
-          "So the game runs faster",
-          "Because it is a number"
+          "So it can never change once the first enemy has been built",
+          "So each enemy keeps its own count of how many enemies were built before it",
+          "Because a number kept on a class must be `static`, or the constructor will not run"
         ],
         "answer": 0,
         "explanation": "One counter for every enemy built lives on the class. Each new enemy adds 1 to it in the constructor, and `startRound()` sets it back to 0.",

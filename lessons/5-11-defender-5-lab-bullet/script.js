@@ -130,7 +130,7 @@ function spawnEnemy(x, y, hp) {
   enemies.push(new Enemy(x, y, hp, fallSpeed));
 }
 
-// One wave: two more enemies than the wave number, in a column above the top,
+// One wave: two more enemies than the wave number, in a staggered line above the top,
 // every third one tough. Each wave falls a little faster.
 function spawnWave() {
   wave += 1;

@@ -36,7 +36,7 @@ function spawnEnemy(x, y, hp) {
 
 - `collider = 'none'` makes it a pass-through sprite, like the goal in 5.2.17 and the drone in Part A, so shots and enemies never shove each other.
 - `hp > 1 ? 'orange' : 'crimson'` is the conditional operator (`test ? this : that`): orange when the enemy has more than 1 hp, crimson when it does not.
-- `e.text = String(hp)` writes the hp on the enemy, the same way 5.8.8 put a number on a sprite.
+- `String(hp)` turns the number into text (`3` becomes `'3'`), and `e.text = ...` writes that text on the enemy, the same way 5.8.8 put a number on a sprite.
 - Then **three pushes**, one per array: the sprite, its hp, and its worth (10 points per hp).
 
 **The index is the only glue.** After three calls, the arrays look like this:

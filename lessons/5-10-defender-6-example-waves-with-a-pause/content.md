@@ -58,14 +58,14 @@ function drawTop() {
 }
 ```
 
-**What you'll see:** `pause` counts down from 60, then wave 1 arrives: three enemies in a column, one above the other. While any of them is still on the field, `pause` stays where it is and nothing new arrives. When the last one has fallen out, `pause` counts down from 90, and wave 2 brings four.
+**What you'll see:** `pause` counts down from 60, then wave 1 arrives: three enemies in a staggered line, each at a random spot across the screen. While any of them is still on the field, `pause` stays where it is and nothing new arrives. When the last one has fallen out, `pause` counts down from 90, and wave 2 brings four.
 
 **How it works.**
 
 - `nextWave()` runs every frame. Its first line returns straight away while `enemies.length` is more than 0, so the countdown below it only runs on a clear field.
 - `wavePause` is Part A's cooldown wearing a different name: take 1 off every frame, and act when it reaches 0. Acting means building the wave and starting the countdown again, at 90.
-- `spawnWave()` adds 1 to `wave` first, so the loop makes `wave + 2` enemies: 3, then 4, then 5. `-20 - i * 50` puts each one 50 pixels above the one before it, which is what makes the column.
-- `40 + floor(random(8)) * 45` picks one of eight columns across the canvas, so enemies never sit half off the edge.
+- `spawnWave()` adds 1 to `wave` first, so the loop makes `wave + 2` enemies: 3, then 4, then 5. `-20 - i * 50` puts each one 50 pixels above the one before it, which is what staggers the line.
+- `40 + floor(random(8)) * 45` picks one of eight lanes across the canvas, so enemies never sit half off the edge.
 
 **Try this:**
 

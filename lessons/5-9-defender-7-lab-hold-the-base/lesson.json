@@ -34,7 +34,7 @@
       "title": "Game over, and R",
       "instructions": "In `drawTop()`, when the round is over (`!playing`), write 'Game over' and 'press R to play again' in the middle of the screen. `drawTop()` runs after the sprites, so the drone can never cover the words. Then, in `draw()`, after the whole `if (playing) { ... }`, start a new round when R is pressed. Let the drone land three times, press R, and check: the base is back to 3, the score is 0, and no old shots are left.",
       "hints": [
-        "`if (!playing) { text('Game over', 122, 190); }` inside `drawTop()`, with the second line under it.",
+        "`if (!playing) { textSize(30); text('Game over', 122, 190); }` inside `drawTop()`, with the second line under it in a smaller size: `textSize(14); text('press R to play again', 128, 216);`.",
         "`if (kb.presses('r')) startRound();` goes after the `if (playing) { ... }` block, not inside it, or it can never run once the round is over."
       ]
     }
@@ -55,7 +55,7 @@
     {
       "id": "r2",
       "title": "Reaching the base costs 1",
-      "description": "When the drone reaches the base, baseHp goes down by 1. Help: 5.9.2 (Reading: A ship, and a timer you start yourself)",
+      "description": "When the drone reaches the base, baseHp goes down by 1, inside the if that sees the landing (the way score goes up by 1 inside the if that sees a hit). Help: 5.9.6 (Lab: Hit the drone)",
       "type": "inFunction",
       "function": [
         "moveDrone",
@@ -93,11 +93,10 @@
     {
       "id": "r5",
       "title": "R starts a new round",
-      "description": "In draw(), outside if (playing), pressing R calls startRound(), so it works after Game over too. Help: 5.4.8 (Lab: Crash, and start again)",
-      "type": "inFunction",
-      "function": "draw",
+      "description": "In draw(), outside if (playing), pressing R calls startRound() (directly, or through a function of your own that calls it), so it works after Game over too. Help: 5.4.8 (Lab: Crash, and start again)",
+      "type": "regex",
       "file": "script.js",
-      "pattern": "^(?![\\s\\S]*?if\\s*\\(\\s*(?:\\(\\s*)?playing\\s*(?:\\)\\s*)?(?:===?\\s*true\\s*)?\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\))[\\s\\S]*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\)[\\s\\S]{0,80}?startRound\\s*\\(\\s*\\)",
+      "pattern": "^(?![\\s\\S]*?if\\s*\\(\\s*(?:\\(\\s*)?playing\\s*(?:\\)\\s*)?(?:===?\\s*true\\s*)?\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\))(?:[\\s\\S]*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\)[\\s\\S]{0,80}?startRound\\s*\\(\\s*\\)|(?=[\\s\\S]*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\)[^;{}]{0,80}?\\)\\s*\\{?\\s*([A-Za-z_$][\\w$]*)\\s*\\(\\s*\\))[\\s\\S]*?\\bfunction\\s+\\1\\s*\\([^)]*\\)\\s*\\{[^{}]{0,300}?\\bstartRound\\s*\\(\\s*\\))",
       "flags": "",
       "points": 0,
       "status": "pending"

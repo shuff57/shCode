@@ -55,9 +55,9 @@
         "source": "5.10.4",
         "question": "Why does the inner loop `break` right after a shot hits?",
         "options": [
-          "To end the round",
-          "To stop every loop in `draw()`",
-          "To save the score",
+          "To end the round once every enemy has been shot",
+          "To stop every loop in `draw()` at once, so no other shot or enemy moves until the next frame",
+          "To save the score before the enemy's index is spliced out of the arrays",
           "That shot has been spliced out, so `bullets[i]` is now a different shot or `undefined`"
         ],
         "answer": 3,
@@ -72,9 +72,9 @@
         "question": "Why does `nextWave()` start with `if (enemies.length > 0) return;`?",
         "options": [
           "The pause only counts while the field is clear, so waves cannot pile up",
-          "To stop shots",
-          "To reset the score",
-          "It makes enemies fall faster"
+          "To stop the ship firing while there are still enemies left on the field",
+          "To reset the score to 0 each time a new wave arrives",
+          "It makes every enemy that is still on the field fall a little faster on each frame"
         ],
         "answer": 0,
         "explanation": "Returning while any enemy is left means the pause only counts down on a clear field, so a new wave never lands on top of the last one.",
@@ -87,10 +87,10 @@
         "source": "5.10.8",
         "question": "The landing code splices `enemies` and `enemyWorth` but not `enemyHp`. What do you see?",
         "options": [
-          "Nothing changes",
-          "The round ends",
+          "Nothing changes, because `enemyHp` is only read when a shot hits",
+          "The game stops with a TypeError the first time an enemy lands",
           "Later enemies read the wrong hp: their labels and the shots they need disagree",
-          "Enemies stop falling"
+          "Enemies stop falling after the first landing, and the field slowly fills up with them"
         ],
         "answer": 2,
         "explanation": "After a landing `enemyHp` is one item longer than the other two, so later enemies read a neighbour's hp: a crimson 1 can take three shots and an orange 3 die in one.",
@@ -103,10 +103,10 @@
         "source": "5.10.1 and 5.10.8",
         "question": "You want each enemy to have a shield value too. In this Part B code, what has to change?",
         "options": [
-          "One line in `spawnEnemy`",
-          "A new array, a push in `spawnEnemy`, a splice in both removal places, a line in `startRound`, and the line that uses it",
-          "Only `startRound`",
-          "Nothing: sprites can hold it"
+          "One line in `spawnEnemy`, which pushes the shield onto `enemyHp` beside the hp",
+          "A new array, its push, a splice in both removal places, a reset in `startRound`, and the line that reads it",
+          "Only `startRound`, which sets every enemy's shield back at the start of a round",
+          "A new array and a push in `spawnEnemy`; the splices already there take care of every array, whatever its name"
         ],
         "answer": 1,
         "explanation": "A fact kept in its own parallel array needs the array, a push, a splice in every place an enemy is removed, a reset in startRound, and the code that reads it.",

@@ -34,10 +34,11 @@
     {
       "id": "s3",
       "title": "The scene asks",
-      "instructions": "In `draw()`, replace `nextWave();` with `if (spawner.ready(enemies.length)) enemies = spawner.makeWave();`. In `startRound()`, replace the three wave lines with `spawner = new Spawner();`. Then delete what the spawner now does: the `let wave, wavePause, fallSpeed;` line, `spawnEnemy()`, `spawnWave()` and `nextWave()`. The HUD in `drawTop()` reads `spawner.wave`.",
+      "instructions": "In `draw()`, replace `nextWave();` with `if (spawner.ready(enemies.length)) enemies = spawner.makeWave();`. In `startRound()`, replace the three wave lines with `spawner = new Spawner();`. Then delete what the spawner now does: the `let wave, wavePause, fallSpeed;` line, `spawnEnemy()`, `spawnWave()` and `nextWave()`. Last, change the HUD line in `drawTop()` from `wave` to `spawner.wave`: the old `wave` is gone, and the game would stop with `wave is not defined`.",
       "hints": [
         "A wave only arrives on a clear field, so putting the new array in `enemies` loses nothing.",
-        "Search for `wavePause` and `nextWave`: when neither is found, the old wave code is gone."
+        "Search for `wavePause` and `nextWave`: when neither is found, the old wave code is gone.",
+        "Search for `'wave: '` as well: that line in `drawTop()` must read `text('wave: ' + spawner.wave, 165, 26);`."
       ]
     },
     {
@@ -109,10 +110,11 @@
     {
       "id": "r6",
       "title": "The old wave globals are gone",
-      "description": "wavePause, spawnWave() and nextWave() are deleted: the Spawner class does their jobs now. Help: 5.11.1 (Reading: Count the cost)",
+      "description": "wavePause, spawnWave() and nextWave() are deleted, and the HUD in drawTop() reads spawner.wave instead of the old wave: the Spawner class does their jobs now. Help: 5.11.1 (Reading: Count the cost)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?![\\s\\S]*\\b(?:wavePause|spawnWave|nextWave)\\b)[\\s\\S]*\\bclass\\s+Spawner\\b",
+      "pattern": "^(?![\\s\\S]*\\b(?:wavePause|spawnWave|nextWave)\\b)(?![\\s\\S]*?\\bfunction\\s+drawTop\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?:function|class)\\b|\\b(?:const|let|var)\\s+wave\\b)[\\s\\S])*?(?<!\\.\\s*)\\bwave\\b)[\\s\\S]*\\bclass\\s+Spawner\\b",
+      "ignoreStrings": true,
       "flags": "",
       "points": 0,
       "status": "pending"

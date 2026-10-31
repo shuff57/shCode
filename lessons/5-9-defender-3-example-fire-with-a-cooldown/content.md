@@ -2,7 +2,7 @@
 
 **Read before `5.9.4 Lab: Fly and fire`.** About 8 minutes.
 
-Hold Space. The ship fires, but only when `cooldown` has counted down to 0, and every shot sets it back to `COOLDOWN`. The two numbers at the top show the countdown and how many shots have gone.
+Click the canvas first, so the sketch hears your keys, then hold Space. The ship fires, but only when `cooldown` has counted down to 0, and every shot sets it back to `COOLDOWN`. The two numbers at the top show the countdown and how many shots have gone.
 
 ```js live
 // Hold Space. The cooldown decides how far apart the shots are.
@@ -49,7 +49,7 @@ function drawTop() {
 }
 ```
 
-**What you'll see:** while Space is held, a shot leaves every 12 frames, five a second, evenly spaced. Between two shots `cooldown` runs 12, 11, 10 ... down to 0. Let go and it stays at 0, so the next press fires at once.
+**What you'll see:** while Space is held, a shot leaves every 12 frames, five a second, evenly spaced. Between two shots the number at the top runs 12, 11, 10 ... down to 1, then starts again at 12: on the frame it reaches 0 a shot goes and it is set back to 12 before the top is drawn. Let go and it settles at 0, so the next press fires at once.
 
 **Try this:**
 

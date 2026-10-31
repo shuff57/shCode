@@ -66,7 +66,7 @@ function spawnEnemy(x, y, hp) {
   enemyWorth.push(hp * 10);
 }
 
-// One wave: two more enemies than the wave number, in a column above the top,
+// One wave: two more enemies than the wave number, in a staggered line above the top,
 // every third one tough. Each wave falls a little faster.
 function spawnWave() {
   // STEP 3: add 1 to wave and set fallSpeed to 0.5 + wave * 0.25. Then loop

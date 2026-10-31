@@ -19,7 +19,7 @@
       "instructions": "Run the game. Let ONE enemy of wave 1 land on the base, then shoot the other two. Now watch wave 2. Its first enemy, the lowest, is crimson and says 1, but it takes three shots, and the first shot makes its label go UP to 2. The orange 3 dies in one shot. Nothing crashes.",
       "hints": [
         "The bug needs a landing first. If you shoot all of wave 1, wave 2 behaves.",
-        "Wave 2's first enemy is the one at the bottom of the column, the first to come down."
+        "Wave 2's first enemy is the lowest one in its staggered line, the first to come down."
       ]
     },
     {
@@ -52,14 +52,15 @@
     {
       "id": "r1",
       "title": "A landed enemy leaves all three arrays",
-      "description": "The landing in moveEnemies (or a removeEnemy helper it calls) splices enemies, enemyHp and enemyWorth. Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
+      "description": "The landing in moveEnemies splices enemies, enemyHp and enemyWorth at the same index j, together (or calls a removeEnemy helper that does). Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
       "type": "inFunction",
       "function": [
         "moveEnemies",
         "removeEnemy"
       ],
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*\\benemies\\.splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\.splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\.splice\\s*\\()",
+      "pattern": "(?:^|\\{)(?=[^{}]*?\\benemies\\s*\\.\\s*splice\\s*\\(\\s*([\\w$]+)\\s*,\\s*1\\s*\\))(?=[^{}]*?\\benemyHp\\s*\\.\\s*splice\\s*\\(\\s*\\1\\s*,\\s*1\\s*\\))(?=[^{}]*?\\benemyWorth\\s*\\.\\s*splice\\s*\\(\\s*\\1\\s*,\\s*1\\s*\\))|\\{(?=[^{}]*?(?:\\bbaseHp\\s*(?:-=\\s*\\(?\\s*1\\b|--|=\\s*\\(?\\s*baseHp\\s*-\\s*\\(?\\s*1\\b)|--\\s*baseHp\\b))(?=[^{}]*?\\bremoveEnemy\\s*\\()(?=[\\s\\S]*\\benemies\\s*\\.\\s*splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\s*\\.\\s*splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\s*\\.\\s*splice\\s*\\()",
+      "ignoreStrings": true,
       "flags": "",
       "points": 0,
       "status": "pending"

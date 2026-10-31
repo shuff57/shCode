@@ -91,14 +91,14 @@
     {
       "id": "r5",
       "title": "A landed enemy leaves the screen and all three arrays",
-      "description": "The landed sprite is deleted and index j is spliced out of enemies, enemyHp and enemyWorth, in moveEnemies or in a removeEnemy helper it calls. Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
+      "description": "Inside the landing if, next to baseHp going down, the sprite is deleted and index j is spliced out of enemies, enemyHp and enemyWorth (or a removeEnemy helper that does it is called there). Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
       "type": "inFunction",
       "function": [
         "moveEnemies",
         "removeEnemy"
       ],
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*\\.(?:delete|remove)\\s*\\(\\s*\\))(?=[\\s\\S]*\\benemies\\.splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\.splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\.splice\\s*\\()",
+      "pattern": "\\{(?=[^{}]*?(?:\\bbaseHp\\s*(?:-=\\s*\\(?\\s*1\\b|--|=\\s*\\(?\\s*baseHp\\s*-\\s*\\(?\\s*1\\b)|--\\s*baseHp\\b))(?=[^{}]*?\\.(?:delete|remove)\\s*\\(\\s*\\))(?=[^{}]*?\\benemies\\s*\\.\\s*splice\\s*\\(\\s*([\\w$]+)\\s*,\\s*1\\s*\\))(?=[^{}]*?\\benemyHp\\s*\\.\\s*splice\\s*\\(\\s*\\1\\s*,\\s*1\\s*\\))(?=[^{}]*?\\benemyWorth\\s*\\.\\s*splice\\s*\\(\\s*\\1\\s*,\\s*1\\s*\\))|\\{(?=[^{}]*?(?:\\bbaseHp\\s*(?:-=\\s*\\(?\\s*1\\b|--|=\\s*\\(?\\s*baseHp\\s*-\\s*\\(?\\s*1\\b)|--\\s*baseHp\\b))(?=[^{}]*?\\bremoveEnemy\\s*\\()(?=[\\s\\S]*\\.(?:delete|remove)\\s*\\(\\s*\\))(?=[\\s\\S]*\\benemies\\s*\\.\\s*splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\s*\\.\\s*splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\s*\\.\\s*splice\\s*\\()",
       "flags": "",
       "points": 0,
       "status": "pending"

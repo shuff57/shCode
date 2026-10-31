@@ -40,9 +40,9 @@
         "question": "What do `if (ship.x < 20) ship.x = 20;` and its partner do?",
         "options": [
           "They keep the ship on the canvas",
-          "They slow the ship down",
-          "They stop the ship firing",
-          "They end the round"
+          "They slow the ship down near the edges",
+          "They stop the ship firing near a side",
+          "They end the round at an edge"
         ],
         "answer": 0,
         "explanation": "Whenever the ship goes past 20 or 380 it is put back on that line, so it can never leave the screen.",
@@ -55,9 +55,9 @@
         "source": "5.9.3",
         "question": "A beat (`frameCount % 12 === 0`) and a cooldown both give a 12-frame gap. What can only the cooldown do?",
         "options": [
-          "Run faster",
-          "Count backwards past 0",
-          "Run while the round is over",
+          "Run more than once in a single frame",
+          "Count backwards past 0 and keep going below it",
+          "Keep running while the round is over and nothing moves",
           "Start counting when something happens, such as a shot"
         ],
         "answer": 3,
@@ -71,10 +71,10 @@
         "source": "5.9.4",
         "question": "Why does `moveBullets()` loop from the end of `bullets` to the start?",
         "options": [
-          "It is faster",
+          "Counting down is faster than counting up",
           "A splice moves every later shot down one place, and going backwards none is skipped",
-          "Shots fly upwards",
-          "The newest shot must move first"
+          "Shots fly upwards, so the array has to be read from the top end",
+          "The newest shot must move first, or it would catch up with the one ahead"
         ],
         "answer": 1,
         "explanation": "Counting upwards, the shot that slides into the gap after a splice would be skipped; counting downwards, the shots still to visit never move.",
@@ -87,10 +87,10 @@
         "source": "5.9.5",
         "question": "`overlaps()` is true on every frame a shot touches the drone. Why does one shot score only 1?",
         "options": [
-          "`overlaps()` only fires once",
-          "The drone has collider 'none'",
+          "`overlaps()` is not true again until the shot has stopped touching",
+          "The drone has collider 'none', so a shot passes through it in one frame",
           "The shot is deleted and spliced out on the frame it hits",
-          "The score is capped"
+          "The score can only go up by 1 on any one frame"
         ],
         "answer": 2,
         "explanation": "The shot is gone before the next frame, so there is no second frame on which it can overlap the drone.",
@@ -103,10 +103,10 @@
         "source": "5.9.7",
         "question": "When `baseHp` reaches 0 the code sets `playing = false` and nothing else. Why does everything stop moving?",
         "options": [
-          "The base deletes every sprite",
+          "The base deletes every sprite on the canvas when its hp runs out",
           "Every line that moves something is inside `if (playing)`",
-          "`playing` sets gravity to 0",
-          "`drawTop()` stops drawing"
+          "`playing = false` sets the world's gravity to 0",
+          "`drawTop()` stops drawing, and the sprites freeze with it"
         ],
         "answer": 1,
         "explanation": "Nothing in this game moves by itself, so once `playing` is false, `draw()` skips every line that moves the ship, the shots and the drone.",

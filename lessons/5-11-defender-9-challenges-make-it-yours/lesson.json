@@ -38,7 +38,7 @@
       "description": "One of the three challenges is there: a best score kept across rounds, a boss on every fifth wave (this.wave % 5 === 0), or a Ship class that owns this.cooldown. Help: 5.11.6 (Lab: A Spawner for the waves)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bbest\\s*=\\s*(?:\\(\\s*)?(?:Math\\s*\\.\\s*)?max\\s*\\(|\\bbest\\s*=\\s*\\(?\\s*score\\b|if\\s*\\(\\s*(?:\\(\\s*){0,2}(?:score(?:\\s*\\))?\\s*>=?\\s*(?:\\(\\s*)?best|best(?:\\s*\\))?\\s*<=?\\s*(?:\\(\\s*)?score)\\b|\\bwave\\s*\\)?\\s*%\\s*\\(?\\s*[\\w$]+\\s*\\)?\\s*===?\\s*\\(?\\s*0(?![\\w.])|\\bclass\\s+Ship\\b[\\s\\S]*?\\bthis\\s*\\.\\s*cooldown\\b",
+      "pattern": "\\bbest\\s*=\\s*(?:\\(\\s*)?(?:Math\\s*\\.\\s*)?max\\s*\\(|\\bbest\\s*=\\s*\\(?\\s*score\\b|if\\s*\\(\\s*(?:\\(\\s*){0,2}(?:score(?:\\s*\\))?\\s*>=?\\s*(?:\\(\\s*)?best|best(?:\\s*\\))?\\s*<=?\\s*(?:\\(\\s*)?score)\\b|\\bwave\\s*\\)?\\s*%\\s*\\(?\\s*[\\w$]+\\s*\\)?\\s*===?\\s*\\(?\\s*0(?![\\w.])|\\bclass\\s+Ship\\b[\\s\\S]*?\\bthis\\s*\\.\\s*cooldown\\b|\\b0\\s*===?\\s*\\(?\\s*(?:this\\s*\\.\\s*)?wave\\s*\\)?\\s*%\\s*\\(?\\s*[\\w$]+\\s*\\)?|!\\s*\\(\\s*(?:this\\s*\\.\\s*)?wave\\s*\\)?\\s*%\\s*\\(?\\s*[\\w$]+\\s*\\)?\\)|\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*(?:this\\s*\\.\\s*)?wave\\s*\\)?\\s*%\\s*\\(?\\s*[\\w$]+\\s*\\)?\\s*;?[\\s\\S]{0,300}?(?:\\b\\1\\s*\\)?\\s*===?\\s*\\(?\\s*0(?![\\w.])|\\b0\\s*===?\\s*\\(?\\s*\\1\\b|!\\s*\\(?\\s*\\1\\b)",
       "flags": "",
       "points": 0,
       "status": "pending"
