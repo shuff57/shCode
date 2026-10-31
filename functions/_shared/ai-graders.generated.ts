@@ -7331,13 +7331,13 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "q1-fight-explanation",
         "title": "Q1: Explains why .vel fights the physics engine",
-        "description": "Student explains that setting .vel directly every frame overrides whatever the physics engine (gravity, applyForce, collisions) already computed for that sprite that frame, so the engine's own influence gets thrown away and re-imposed instead of blending with it. Accept any everyday phrasing of overriding, resetting, or cancelling out the physics engine's own effect; it doesn't need textbook precision.",
+        "description": "Student explains that setting .vel directly every frame overrides whatever the physics engine (gravity, applyForce, collisions) already computed for that sprite that frame, so the engine's own influence gets thrown away and re-imposed instead of blending with it. Accept any everyday phrasing of overriding, resetting, or cancelling out the physics engine's own effect; it doesn't need textbook precision. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the part labelled with this question: if anything anywhere in it touches this question, even indirectly, give full credit. If the response as a whole is about sprite movement, .vel, applyForce, forces or the physics engine at all, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 1
       },
       {
         "id": "q2-applyforce-scenario",
         "title": "Q2: Describes a real scenario where applyForce is the better tool",
-        "description": "Student names a concrete scenario (wind, thrust, a magnet, a continuous push layered on top of gravity, etc.) where applyForce is the better tool, and gives a reason: it respects mass and adds to existing motion instead of replacing it. Credit any concrete scenario with a reason attached, even loosely worded.",
+        "description": "Student names a concrete scenario (wind, thrust, a magnet, a continuous push layered on top of gravity, etc.) where applyForce is the better tool, and gives a reason: it respects mass and adds to existing motion instead of replacing it. Credit any situation at all, even loosely worded; a reason, even a vague one, is welcome but not required. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the part labelled with this question: if anything anywhere in it touches this question, even indirectly, give full credit. If the response as a whole is about sprite movement, .vel, applyForce, forces or the physics engine at all, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 1
       },
       {
@@ -7442,25 +7442,25 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "parts",
         "title": "Four or more parts of the game are named",
-        "description": "The student names about four parts of pinball in their own words, such as the ball, the bumpers, a goal, the score, a way to lose and a way to start again. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names about four parts of pinball in their own words, such as the ball, the bumpers, a goal, the score, a way to lose and a way to start again. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about pinball at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "remember",
         "title": "Says what the game must remember between moments",
-        "description": "The student names at least two things the game has to remember from one moment to the next, for example the score, whether the round is still being played, where the ball is, or whether the ball was touching a bumper a moment ago. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names at least two things the game has to remember from one moment to the next, for example the score, whether the round is still being played, where the ball is, or whether the ball was touching a bumper a moment ago. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about pinball at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "first",
         "title": "Picks a first thing to build and gives a reason",
-        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about pinball at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "unsure",
         "title": "Names one part they are unsure how to build",
-        "description": "The student names a part they do not yet know how to do, such as counting a hit only once or ending the round, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names a part they do not yet know how to do, such as counting a hit only once or ending the round, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about pinball at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       }
     ],
@@ -7474,25 +7474,25 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "played",
         "title": "Says how many rounds they played and how it went",
-        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how it felt). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how it felt). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their pinball game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "bug",
         "title": "Names one thing that surprised or broke",
-        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their pinball game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "cause",
         "title": "Says which part of the code that touches",
-        "description": "The student connects what they saw to some part of the game or its code, such as the score, the memory of the last moment, the state flag or the restart, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student connects what they saw to some part of the game or its code, such as the score, the memory of the last moment, the state flag or the restart, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their pinball game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "change",
         "title": "Names one rule they would change and what it would do",
-        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their pinball game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       }
     ],
@@ -7506,25 +7506,25 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "parts",
         "title": "Four or more parts of the game are named",
-        "description": "The student names about four parts of the flapping game in their own words, such as the bird, gravity, the flap, the pipes, the gaps, the score, losing and restarting. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names about four parts of the flapping game in their own words, such as the bird, gravity, the flap, the pipes, the gaps, the score, losing and restarting. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about the flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "remember",
         "title": "Says what the game must remember between moments",
-        "description": "The student names at least two things the game has to remember from one moment to the next, for example the bird's speed, where the pipes are, the score, or whether the round is still being played. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names at least two things the game has to remember from one moment to the next, for example the bird's speed, where the pipes are, the score, or whether the round is still being played. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about the flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "first",
         "title": "Picks a first thing to build and gives a reason",
-        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about the flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "unsure",
         "title": "Names one part they are unsure how to build",
-        "description": "The student names a part they do not yet know how to do, such as making pipes keep appearing or removing the ones that have left, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names a part they do not yet know how to do, such as making pipes keep appearing or removing the ones that have left, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about the flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       }
     ],
@@ -7538,25 +7538,25 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "played",
         "title": "Says how many rounds they played and how it went",
-        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how it felt). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how it felt). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "bug",
         "title": "Names one thing that surprised or broke",
-        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "cause",
         "title": "Says which part of the code that touches",
-        "description": "The student connects what they saw to some part of the game or its code, such as the flap, the timer that builds pipes, the deleting of old pipes, the score or the restart, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student connects what they saw to some part of the game or its code, such as the flap, the timer that builds pipes, the deleting of old pipes, the score or the restart, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "change",
         "title": "Names one rule they would change and what it would do",
-        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       }
     ],
@@ -7600,25 +7600,25 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "parts",
         "title": "Four or more parts of the game are named",
-        "description": "The student names about four parts of Snake in their own words, such as the snake's cells, the food, steering, the beat that moves it, scoring, losing and restarting. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names about four parts of Snake in their own words, such as the snake's cells, the food, steering, the beat that moves it, scoring, losing and restarting. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Snake at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "remember",
         "title": "Says what the game must remember between frames",
-        "description": "The student names at least two things the game has to remember from one frame to the next, for example where every cell of the snake is, which way it is heading, where the food is, the score, or whether the round is still being played. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example where every cell of the snake is, which way it is heading, where the food is, the score, or whether the round is still being played. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Snake at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "first",
         "title": "Picks a first thing to build and gives a reason",
-        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Snake at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "unsure",
         "title": "Names one part they are unsure how to build",
-        "description": "The student names a part they do not yet know how to do, such as growing the body or making the snake not bite itself, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names a part they do not yet know how to do, such as growing the body or making the snake not bite itself, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Snake at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       }
     ],
@@ -7632,25 +7632,25 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "played",
         "title": "Says how many rounds they played and how it went",
-        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how long the snake got). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how long the snake got). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "bug",
         "title": "Names one thing that surprised or broke",
-        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "cause",
         "title": "Says which part of the code that touches",
-        "description": "The student connects what they saw to some part of the game or its code, such as the beat, the tail removal, the isBody search or the food placement, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student connects what they saw to some part of the game or its code, such as the beat, the tail removal, the isBody search or the food placement, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {
         "id": "change",
         "title": "Names one rule they would change and what it would do",
-        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Only a blank answer or one completely unrelated to the question is a miss.",
+        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       }
     ],
