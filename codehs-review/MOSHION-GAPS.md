@@ -96,3 +96,31 @@ PLACEMENT row names are used for the module column. "Yes" means the symbol exist
 - **p5play features CodeHS uses that I could not confirm from memory:** `Tiles` argument order, `sprite.addAni` multi-argument forms, `sprite.mouse`, `sprite.addSensor` naming. Mark all as "recalled, not verified": check against the CodeHS lesson text on the logged-in session (already read for GD modules 4-6 in `gamedesign.md`), not from here.
 - **Whether any lesson in modules 5.6-5.8, 6.2, 6.6-6.8 or 7.1 calls something absent.** I grepped the whole `5-*`, `6-*`, `7-*` lesson trees for the symbols in section 2 only. Full check: run every `script.js` and `solution.js` through the existing corpus harness in the moSHion repo (`tests/harness.mjs`) against the vendored engine after the re-sync.
 - **Lesson numbering.** Lesson folders use the old numbers (`5-5-*` is the static/scope module); the table above uses PLACEMENT's "today's ids" and does not claim a folder-to-module mapping.
+
+## 5. Status after fix (2026-10-31)
+
+moSHion commit `3b77bf6` (repo branch `gaps-fix`, not yet pushed or merged) is vendored into `public/moshion/`;
+`public/moshion/VENDORED.md` is the pin (commit, what was copied, what shCode keeps as its own and why).
+Section 1's drift was already closed by `df183a7d` (2026-10-30); this sync adds the fixes below. All additive:
+the moSHion suite went from 199 to 253 checks, all passing (`tests/gaps.spec.mjs` is the new 54), and
+shCode's gate is unchanged at 424/424 corpus, 94/94 semantic.
+
+| Gap | Now |
+| --- | --- |
+| Large tile worlds (O(n^2) overlaps) | Fixed. `_updateOverlaps` uses an exact sort-and-sweep broadphase; `render` culls sprites wholly off screen. Engine work per frame, headless Chromium, N static tiles + 10 balls: 310 sprites 13.95 -> 1.47 ms, 610 42.85 -> 3.25 ms, 1210 160 -> 5.4 ms, 2410 (never reached frame 30) -> 10.2 ms. Re-measure with `bun tests/tiles-perf.bench.mjs` in the moSHion repo, ideally on a Chromebook. |
+| Tile maps / `Tiles` | Added: `new Tiles(map, x, y, w, h, legend)`, legend `{ '#': walls }` maps a character to a Group. p5play's `group.tile` form is not supported. |
+| World edges | Added: `new Walls(thickness = 50)`, four static walls just outside the canvas; also `walls.top/bottom/left/right`. |
+| `square()` ignores `fill()` | Fixed: `square(x, y, s, r)` is `rect(x, y, s, s, r)`. Labs 5.6.9-5.6.11 now show the coloured squares their text promises (they drew black before). |
+| Timers | Added: `every(frames, fn)` and `after(frames, fn)`, each with `stop()`; frame-counted, run after `update()`. |
+| Ground sensor | Added: `sprite.addSensor(ox, oy, w, h)` returns a `Sensor` with `overlaps()` / `overlapping()` / `remove()`; a detect-only fixture, false against walls and ceilings. |
+| `overlaps()` is a query; names not to reuse | Documented in `docs/moshion.d.ts` and the moSHion docs site (`colliding vs overlapping`, `Custom properties`). |
+| Deferred | `camera.zoom` / `follow`, polygon colliders, animation controls (`ani.play/stop/looping`, multi-row sheets). |
+
+Item 4 of section 4 is closed: every `script.js`, `solution.js` and `solution/*.js` under `lessons/5-*`, `6-*`, `7-*`
+(135 files) ran in real Chromium through the moSHion repo's `tests/harness.mjs` on the old and the new engine. The
+results are identical, nothing calls a global the engine lacks, and the 12 that error are graded scaffolds by design
+(11 have an empty `setup()` with no `new Canvas`; `5-3-19` calls the `isHigh()` the student writes). Only idle
+frames ran, so code behind a key press was not exercised.
+
+Not done here: `lib/moshion-docs.ts` (the in-app docs) does not yet teach the new names, and HANDOFF.md's top
+section still calls the vendored copy 223 lines behind.
