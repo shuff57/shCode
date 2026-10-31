@@ -1,0 +1,126 @@
+{
+  "id": "5-11-defender-4-lab-enemy-takes-over",
+  "title": "5.11.4 Lab: Enemy takes over",
+  "description": "The game is Part B's, with a new Enemy class nothing uses yet. Finish the class, swap the three parallel arrays for one array of Enemy objects, and remove finished enemies in one place. The game must play exactly as before.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.11 Project: Defender, Part C",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Finish Enemy",
+      "instructions": "The `Enemy` class at the top keeps its own `hp`, `worth` and `speed`, and already has `move()`, `reachedBase()` and `remove()`. Write its three empty methods. `takeHit(n)` takes `n` off `this.hp`, puts it back to 0 if it went below, and shows the new hp on the sprite with `this.sprite.text = String(this.hp);`, as in 5.8.8 (Lab: takeHit with a floor at zero). `isAlive()` returns whether `this.hp` is above 0, as in 5.8.9 (Lab: Give the class its own isAlive()). `land()` sets `this.hp` to 0: an enemy that reaches the base is used up. Nothing calls them yet, so the game still runs as Part B.",
+      "hints": [
+        "`this.hp -= n;` then `if (this.hp < 0) this.hp = 0;`",
+        "`isAlive()` is one line: `return this.hp > 0;`"
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "One array",
+      "instructions": "`spawnEnemy(x, y, hp)` pushes into three arrays. Make it one line: `enemies.push(new Enemy(x, y, hp, fallSpeed));`. The enemy now carries its own hp, worth and speed, so delete `enemyHp` and `enemyWorth` everywhere they appear: the `let` line, `spawnEnemy()`, both removal copies, `hitEnemies()` and `startRound()`. The game will not play properly again until step 4 is done.",
+      "hints": [
+        "Search the file for `enemyHp` (Ctrl+F) and change every line it finds; then do the same for `enemyWorth`.",
+        "In 5.11.1 (Reading: Count the cost) there were 13 such lines. When the search finds none, this step is done."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Ask the enemy",
+      "instructions": "Now the scene asks the enemy instead of reaching into arrays. In `moveEnemies()`, each enemy moves itself with `e.move()`, and one that reaches the base costs 1 and is used up: `if (e.isAlive() && e.reachedBase()) { baseHp -= 1; e.land(); }`. Nothing is deleted or spliced there any more. In `hitEnemies()`, keep the shot's half of a hit (its `delete()`, its `splice` and the `break`) and replace the enemy's half with `e.takeHit(1);` and, when that leaves it not alive, `score += e.worth;`. The overlap test names the enemy's sprite, `bullets[i].overlaps(e.sprite)`, and asks `e.isAlive()` first: a finished enemy stays in the list until the end of the frame, and a second shot must not score it twice.",
+      "hints": [
+        "`for (const e of enemies)` reads every enemy without an index, the way `startRound()` already does. An index loop with `enemies[j]` works too.",
+        "`if (e.isAlive() && bullets[i].overlaps(e.sprite)) { ... }`"
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Finished in one place",
+      "instructions": "Write `function clearEnemies()` with the two-part reap from 5.11.3 (Worked Example: Finished in one place): first `remove()` every enemy that is not alive, then `enemies = enemies.filter((e) => e.isAlive());`. Call it last inside `if (playing)` in `draw()`. In `startRound()` the enemies are objects now, so their loop calls `e.remove()` instead of `e.delete()`. Then play to wave 3: the game should feel exactly as it did in Part B.",
+      "hints": [
+        "Screen first, then the list. Filter first and the finished enemies are gone from the list before anything can remove their sprites.",
+        "`for (const e of enemies) { if (!e.isAlive()) e.remove(); }`"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "takeHit lowers hp, never below 0",
+      "description": "takeHit(n) takes n off this.hp, then brings this.hp back to 0 if it went below (an if, or Math.max). Help: 5.8.8 (Lab: takeHit with a floor at zero)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\btakeHit\\s*\\(\\s*([\\w$]+)\\s*\\)\\s*\\{(?=(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.hp\\s*(?:-=\\s*\\(?\\s*\\1\\b|=(?!=)[^;{}]*?this\\.hp\\s*-\\s*\\(?\\s*\\1\\b)|\\b(?:let|const|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*this\\.hp\\s*-\\s*\\(?\\s*\\1\\b(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\bthis\\.hp\\s*=(?!=)[^;{}]*?\\b\\2\\b))(?=(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:(?:this\\.hp\\b[^;{}=]*?[<>]|[<>]=?\\s*\\(?\\s*this\\.hp\\b|!\\s*\\(?\\s*this\\.isAlive\\b|this\\.isAlive\\s*\\(\\s*\\)\\s*\\)?\\s*===?\\s*false)(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.hp\\s*=\\s*\\(?\\s*0(?![\\w.])|this\\.hp\\s*=(?!=)[^;{}?]*\\?\\s*(?:\\(?\\s*0\\s*\\)?\\s*:|[^;{}:]*:\\s*\\(?\\s*0(?![\\w.]))|this\\.hp\\s*=(?!=)[^;{}]*?\\b(?:max|constrain)\\s*\\(\\s*(?:0\\s*,|[^;]*?,\\s*\\(?\\s*0\\s*\\)?\\s*[,)])))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "isAlive answers from hp",
+      "description": "isAlive() returns true while this.hp is above 0 and false at 0. Help: 5.8.9 (Lab: Give the class its own isAlive())",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bisAlive\\s*\\(\\s*\\)\\s*\\{(?=[^}]*?\\breturn\\b)[^}]*?(?:this\\.hp\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*(?:<|!==?)\\s*\\(?\\s*this\\.hp\\b|\\b1\\s*<=\\s*\\(?\\s*this\\.hp\\b|!\\s*\\(\\s*this\\.hp\\s*(?:<=\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|===?\\s*\\(?\\s*0(?![\\w.]))|this\\.hp\\s*(?:<=\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|===?\\s*\\(?\\s*0(?![\\w.]))[^;{}]*?(?:\\)\\s*\\{?\\s*return\\s+false\\b|\\?\\s*false\\b))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "land() uses the enemy up",
+      "description": "land() sets this.hp to 0, so the enemy is finished and the reap takes it away. Help: 5.11.1 (Reading: Count the cost)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bland\\s*\\(\\s*\\)\\s*\\{[^}]*?(?:this\\.hp\\s*=\\s*\\(?\\s*0(?![\\w.])|this\\.hp\\s*-=\\s*this\\.hp\\b|this\\.takeHit\\s*\\(\\s*this\\.hp\\s*\\))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "One array of Enemy objects; enemyHp and enemyWorth are gone",
+      "description": "Enemies are made with new Enemy(...) and kept in the one enemies array; no line names enemyHp or enemyWorth any more (setup, spawnEnemy, moveEnemies, hitEnemies and startRound all included). Help: 5.11.1 (Reading: Count the cost)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*\\benemy(?:Hp|Worth)\\b)[\\s\\S]*\\bnew\\s+Enemy\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "The scene asks the enemy",
+      "description": "The game calls the enemy's own methods: .takeHit( for a hit, .reachedBase() and .land() for a landing. Help: 5.11.1 (Reading: Count the cost)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*\\.\\s*takeHit\\s*\\()(?=[\\s\\S]*\\.\\s*land\\s*\\(\\s*\\))(?=[\\s\\S]*\\.\\s*reachedBase\\s*\\(\\s*\\))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r6",
+      "title": "Finished enemies leave the screen and the list",
+      "description": "Once a frame, every finished enemy is removed from the screen (remove()) and then dropped from the list (enemies = enemies.filter(...)), in that order. Help: 5.11.3 (Worked Example: Finished in one place)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*(?:\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,80}?(?:isAlive\\s*\\(\\s*\\)|\\.\\s*hp\\s*>)|\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,80}?(?:isAlive\\s*\\(\\s*\\)|\\.\\s*hp\\s*>)[\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b))(?=[\\s\\S]*(?:for\\s*\\(\\s*(?:const|let|var)\\s+([\\w$]+)\\s+of\\s+enemies\\s*\\)\\s*\\{?[^{}]{0,120}?if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*\\2\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))|\\benemies\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([\\w$]+)\\s*\\)?\\s*(?:=>)?\\s*\\{?[^{}]{0,120}?if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*\\3\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))|if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*enemies\\s*\\[\\s*[\\w$]+\\s*\\]\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))))|if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{(?=[^}]*?\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)))(?=[^}]*?\\benemies\\s*\\.\\s*splice\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

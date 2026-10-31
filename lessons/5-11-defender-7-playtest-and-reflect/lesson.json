@@ -1,0 +1,56 @@
+{
+  "id": "5-11-defender-7-playtest-and-reflect",
+  "title": "5.11.7 Playtest and reflect: Defender",
+  "description": "Play your finished Defender at least three times and lose in three different ways, find one surprise, link it to a class or function, and compare one change with Part B. AI-graded with hints.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.11 Project: Defender, Part C",
+  "preview": "assignment",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "aiGrader": {
+    "rubricTitle": "Playtest Defender: AI-graded rubric",
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": [],
+    "prompt": "Everything you need is in 5.9.1 (Plan: Break Defender into parts) and 5.11.6 (Lab: A Spawner for the waves): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Defender at least three times, and lose in three different ways: let a wave through on purpose, get overrun in a late wave, and press R in the middle of a wave. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which class or function do you think that comes from?\n\n4. What is one change that is easier, or harder, in Part C than it was in Part B, and why?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many rounds they played and how it went",
+        "description": "The student says they played, or gives any detail of a round (a score, the wave they reached, a way they lost, what pressing R did). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which class or function that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as Bullet, Enemy, Spawner, the hit loop, clearFinished or startRound, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "compare",
+        "title": "Compares one change in Part C with Part B",
+        "description": "The student names one change and says anything about whether it is easier or harder with classes than it was in Part B, for example giving every enemy a new property, the 5.10.8 bug, or the restart. Any comparison, in either direction, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

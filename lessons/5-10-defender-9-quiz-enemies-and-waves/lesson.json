@@ -1,0 +1,125 @@
+{
+  "id": "5-10-defender-9-quiz-enemies-and-waves",
+  "title": "5.10.9 Check: Enemies and waves",
+  "description": "Six multiple-choice questions on parallel arrays, the nested hit loop and its break, waves that wait for a clear field, and what one more enemy fact costs. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.10 Project: Defender, Part B",
+  "preview": "quiz",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-index",
+        "source": "5.10.1",
+        "question": "`enemies[2]`, `enemyHp[2]` and `enemyWorth[2]`: what do they have in common?",
+        "options": [
+          "They are the same number",
+          "They describe the same enemy",
+          "They were made on the same frame",
+          "Nothing"
+        ],
+        "answer": 1,
+        "explanation": "In parallel arrays the index is the glue: index 2 in all three arrays is one enemy's sprite, hp and worth.",
+        "sourceIds": [
+          "5-10-defender-1-reading-many-enemies-parallel-arrays"
+        ]
+      },
+      {
+        "id": "q2-tests",
+        "source": "5.10.4",
+        "question": "5 shots and 4 enemies are alive. At most how many overlap tests does `hitEnemies()` make this frame?",
+        "options": [
+          "9",
+          "5",
+          "20",
+          "4"
+        ],
+        "answer": 2,
+        "explanation": "The outer loop takes each of the 5 shots and the inner loop tries it on each of the 4 enemies, so 5 times 4 is 20; a break after a hit can only make it fewer.",
+        "sourceIds": [
+          "5-10-defender-4-reading-every-shot-against-every-enemy"
+        ]
+      },
+      {
+        "id": "q3-break",
+        "source": "5.10.4",
+        "question": "Why does the inner loop `break` right after a shot hits?",
+        "options": [
+          "To end the round",
+          "To stop every loop in `draw()`",
+          "To save the score",
+          "That shot has been spliced out, so `bullets[i]` is now a different shot or `undefined`"
+        ],
+        "answer": 3,
+        "explanation": "The shot at index i is gone, so reading `bullets[i]` again would test another shot twice or ask `undefined` for `.overlaps`; break leaves only the inner loop.",
+        "sourceIds": [
+          "5-10-defender-4-reading-every-shot-against-every-enemy"
+        ]
+      },
+      {
+        "id": "q4-clear",
+        "source": "5.10.6",
+        "question": "Why does `nextWave()` start with `if (enemies.length > 0) return;`?",
+        "options": [
+          "The pause only counts while the field is clear, so waves cannot pile up",
+          "To stop shots",
+          "To reset the score",
+          "It makes enemies fall faster"
+        ],
+        "answer": 0,
+        "explanation": "Returning while any enemy is left means the pause only counts down on a clear field, so a new wave never lands on top of the last one.",
+        "sourceIds": [
+          "5-10-defender-6-example-waves-with-a-pause"
+        ]
+      },
+      {
+        "id": "q5-drift",
+        "source": "5.10.8",
+        "question": "The landing code splices `enemies` and `enemyWorth` but not `enemyHp`. What do you see?",
+        "options": [
+          "Nothing changes",
+          "The round ends",
+          "Later enemies read the wrong hp: their labels and the shots they need disagree",
+          "Enemies stop falling"
+        ],
+        "answer": 2,
+        "explanation": "After a landing `enemyHp` is one item longer than the other two, so later enemies read a neighbour's hp: a crimson 1 can take three shots and an orange 3 die in one.",
+        "sourceIds": [
+          "5-10-defender-8-debugging-the-enemy-that-would-not-die"
+        ]
+      },
+      {
+        "id": "q6-cost",
+        "source": "5.10.1 and 5.10.8",
+        "question": "You want each enemy to have a shield value too. In this Part B code, what has to change?",
+        "options": [
+          "One line in `spawnEnemy`",
+          "A new array, a push in `spawnEnemy`, a splice in both removal places, a line in `startRound`, and the line that uses it",
+          "Only `startRound`",
+          "Nothing: sprites can hold it"
+        ],
+        "answer": 1,
+        "explanation": "A fact kept in its own parallel array needs the array, a push, a splice in every place an enemy is removed, a reset in startRound, and the code that reads it.",
+        "sourceIds": [
+          "5-10-defender-1-reading-many-enemies-parallel-arrays",
+          "5-10-defender-8-debugging-the-enemy-that-would-not-die"
+        ]
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "5-10-defender-3-plan-the-hit-loop",
+  "title": "5.10.3 Plan: The hit loop in plain words",
+  "description": "Before any code: say in plain words how every shot meets every enemy, what a hit does to the shot and to the enemy, and which lists change. AI-graded with hints.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.10 Project: Defender, Part B",
+  "preview": "assignment",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "aiGrader": {
+    "rubricTitle": "Plan the hit loop: AI-graded rubric",
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": [],
+    "prompt": "Everything you need is on this page, in 2.4.26 (Plain English to Pseudocode: Nested Loops) and in 5.9.6 (Lab: Hit the drone): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYour Defender has many enemies now, and shots still fly straight through them. Before you write any code, plan the check that runs once every frame, in plain words or pseudocode.\n\n1. Which two lists does the check go through, and how does every shot get tested against every enemy?\n\n2. A shot hits an enemy. What happens to the shot?\n\n3. What happens to the enemy it hit? What if that hit leaves it with no hp?\n\n4. When an enemy is shot down, which lists have to change?",
+    "rubric": [
+      {
+        "id": "pairs",
+        "title": "Names the two lists and has every shot meet every enemy",
+        "description": "The student says the check goes through the shots and the enemies so that every shot is tested against every enemy, for example a loop inside a loop, 'for each shot, check each enemy', or any gesture at going through both lists; naming only one list, or saying it loosely, still earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "shot",
+        "title": "Says what happens to a shot that hits",
+        "description": "The student says the shot that hits goes away, from the screen, from the list, or both, in any words such as 'delete it', 'remove it' or 'it disappears'. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "enemy",
+        "title": "Says what happens to the enemy that was hit",
+        "description": "The student says the enemy loses hp (or a life, or a hit), or that with none left it is gone or scores points; any one part of that earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "arrays",
+        "title": "Says which lists change when an enemy is shot down",
+        "description": "The student names the lists that change when an enemy is shot down, ideally all three (the sprites, the hp and the worth); naming one of them, or saying 'the enemy lists' or 'all of them', also earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

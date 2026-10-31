@@ -1,0 +1,122 @@
+{
+  "id": "5-9-defender-4-lab-fly-and-fire",
+  "title": "5.9.4 Lab: Fly and fire",
+  "description": "The ship slides off the canvas and Space does nothing. Keep the ship on the canvas with two ifs, fire on a cooldown, and delete the shots that leave the top.",
+  "type": "lesson",
+  "estimateMins": 18,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.9 Project: Defender, Part A",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Keep the ship on the canvas",
+      "instructions": "Hold left for a while: the ship slides off the canvas. In `moveShip()`, after the two lines that move it, add two ifs that put it back: when `ship.x` is less than 20, set it to 20; when it is more than 380, set it to 380. The ship is 36 pixels wide and `x` is its centre, so 20 keeps all of it on the screen.",
+      "hints": [
+        "`if (ship.x < 20) ship.x = 20;`",
+        "The second if is the same shape, with `>` and 380."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Fire on a cooldown",
+      "instructions": "In `fire()`, first count `cooldown` down: take 1 off it while it is above 0. Then, when Space is held **and** `cooldown` is 0, build a shot: a 6 by 14 sprite at `(ship.x, ship.y - 18)` with `collider = 'none'` (so it passes through things, as in 5.2.17) and the colour `'yellow'`. Push it onto `bullets`, then set `cooldown` to 12 so the next shot has to wait 12 frames. Hold Space: the shots should come about five a second, evenly spaced.",
+      "hints": [
+        "`if (cooldown > 0) cooldown -= 1;` is the countdown, from 5.9.2.",
+        "`if (kb.pressing('space') && cooldown === 0) { ... }` is the test, from 5.9.3. The sprite, the push and `cooldown = 12;` all go inside its braces."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Shots that leave are deleted",
+      "instructions": "Every shot climbs 8 pixels a frame and never stops. In the loop in `moveBullets()`, a shot whose `y` is less than -20 has left the top: delete it and splice it out of `bullets`, as Flappy did with its pipes in 5.4.6. The loop runs from the end of the array to the start because a splice moves every later shot down one place; going backwards, none is skipped. Hold Space and watch 'shots alive' at the top: it should stay at 4 or fewer. If it keeps climbing, shots are not being removed.",
+      "hints": [
+        "`bullets[i].delete();` takes the shot off the screen and `bullets.splice(i, 1);` takes it out of the array. You need both.",
+        "Both lines go inside `if (bullets[i].y < -20) { ... }`."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The ship stays on the canvas",
+      "description": "Two ifs in moveShip() put the ship back when it passes either side: x no smaller than 20 and no bigger than 380. Help: 5.9.2 (Reading: A ship, and a timer you start yourself)",
+      "type": "inFunction",
+      "function": [
+        "moveShip",
+        "draw"
+      ],
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*?(?:ship\\.x\\s*(?:\\)\\s*)?<=?\\s*(?:-\\s*)?\\w|(?<![\\w$.])\\w+\\s*>=?\\s*(?:\\(\\s*)?ship\\.x\\b)[\\s\\S]{0,80}?ship\\.x\\s*(?:=(?!=)|[-+]=))(?=[\\s\\S]*?(?:ship\\.x\\s*(?:\\)\\s*)?>=?\\s*(?:-\\s*)?\\w|(?<![\\w$.])\\w+\\s*<=?\\s*(?:\\(\\s*)?ship\\.x\\b)[\\s\\S]{0,80}?ship\\.x\\s*(?:=(?!=)|[-+]=))|constrain\\s*\\(\\s*ship\\.x|^(?=[\\s\\S]*\\bmax\\s*\\()(?=[\\s\\S]*\\bmin\\s*\\()[\\s\\S]*?ship\\.x\\s*=(?!=)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The cooldown counts down",
+      "description": "fire() takes 1 off cooldown on every frame it is above 0. Help: 5.9.2 (Reading: A ship, and a timer you start yourself)",
+      "type": "inFunction",
+      "function": [
+        "fire",
+        "draw"
+      ],
+      "file": "script.js",
+      "pattern": "\\bcooldown\\s*(?:-=\\s*1\\b|--)|--\\s*cooldown\\b|\\bcooldown\\s*=(?!=)[^;]{0,120}?\\bcooldown\\s*-\\s*1\\b|\\bcooldown\\s*=(?!=)\\s*(?:Math\\.)?max\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A shot is made only when Space is held and the cooldown is 0",
+      "description": "The shot is pushed onto bullets inside an if that asks both: Space is held, and cooldown is 0. Help: 5.9.3 (Worked Example: Fire with a cooldown)",
+      "type": "inFunction",
+      "function": [
+        "fire",
+        "draw"
+      ],
+      "file": "script.js",
+      "pattern": "if\\s*\\((?=[^{};]{0,200}(?:kb\\s*\\.\\s*(?:pressing|presses|holding)\\s*\\(\\s*['\"\\x60](?:[Ss]pace(?:bar)?|SPACE(?:BAR)?| )['\"\\x60]\\s*\\)|kb\\s*\\.\\s*space\\b))(?=[^{};]{0,200}(?:\\bcooldown\\s*(?:\\)\\s*)?(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b)|!\\s*(?:\\(\\s*)?cooldown\\b|\\b0\\s*(?:===?|>=)\\s*(?:\\(\\s*)?cooldown\\b|\\b1\\s*>\\s*(?:\\(\\s*)?cooldown\\b))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)bullets\\s*\\.\\s*push\\s*\\(|if\\s*\\((?=[^{};]{0,200}(?:kb\\s*\\.\\s*(?:pressing|presses|holding)\\s*\\(\\s*['\"\\x60](?:[Ss]pace(?:bar)?|SPACE(?:BAR)?| )['\"\\x60]\\s*\\)|kb\\s*\\.\\s*space\\b))[^{};]{0,200}\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?if\\s*\\((?=[^{};]{0,200}(?:\\bcooldown\\s*(?:\\)\\s*)?(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b)|!\\s*(?:\\(\\s*)?cooldown\\b|\\b0\\s*(?:===?|>=)\\s*(?:\\(\\s*)?cooldown\\b|\\b1\\s*>\\s*(?:\\(\\s*)?cooldown\\b))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)bullets\\s*\\.\\s*push\\s*\\(|if\\s*\\((?=[^{};]{0,200}(?:\\bcooldown\\s*(?:\\)\\s*)?(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b)|!\\s*(?:\\(\\s*)?cooldown\\b|\\b0\\s*(?:===?|>=)\\s*(?:\\(\\s*)?cooldown\\b|\\b1\\s*>\\s*(?:\\(\\s*)?cooldown\\b))[^{};]{0,200}\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?if\\s*\\((?=[^{};]{0,200}(?:kb\\s*\\.\\s*(?:pressing|presses|holding)\\s*\\(\\s*['\"\\x60](?:[Ss]pace(?:bar)?|SPACE(?:BAR)?| )['\"\\x60]\\s*\\)|kb\\s*\\.\\s*space\\b))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)bullets\\s*\\.\\s*push\\s*\\(|if\\s*\\(\\s*(?:\\(\\s*)?cooldown\\s*(?:\\)\\s*)?(?:>\\s*0|>=\\s*1|!==?\\s*0)\\s*\\)\\s*(?:\\{[^{}]{0,200}\\}|[^{};]{0,200};)\\s*else\\s*(?:\\{\\s*)?if\\s*\\((?=[^{};]{0,200}(?:kb\\s*\\.\\s*(?:pressing|presses|holding)\\s*\\(\\s*['\"\\x60](?:[Ss]pace(?:bar)?|SPACE(?:BAR)?| )['\"\\x60]\\s*\\)|kb\\s*\\.\\s*space\\b))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)bullets\\s*\\.\\s*push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}(?:kb\\s*\\.\\s*(?:pressing|presses|holding)\\s*\\(\\s*['\"\\x60](?:[Ss]pace(?:bar)?|SPACE(?:BAR)?| )['\"\\x60]\\s*\\)|kb\\s*\\.\\s*space\\b))(?=[^;]{0,200}(?:\\bcooldown\\s*(?:\\)\\s*)?(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b)|!\\s*(?:\\(\\s*)?cooldown\\b|\\b0\\s*(?:===?|>=)\\s*(?:\\(\\s*)?cooldown\\b|\\b1\\s*>\\s*(?:\\(\\s*)?cooldown\\b))[^;]{0,200}?[;\\n][\\s\\S]{0,300}?if\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\1\\b)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)bullets\\s*\\.\\s*push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}(?:kb\\s*\\.\\s*(?:pressing|presses|holding)\\s*\\(\\s*['\"\\x60](?:[Ss]pace(?:bar)?|SPACE(?:BAR)?| )['\"\\x60]\\s*\\)|kb\\s*\\.\\s*space\\b))[^;]{0,200}?[;\\n][\\s\\S]{0,300}?if\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\2\\b)(?=[^{};]{0,200}(?:\\bcooldown\\s*(?:\\)\\s*)?(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b)|!\\s*(?:\\(\\s*)?cooldown\\b|\\b0\\s*(?:===?|>=)\\s*(?:\\(\\s*)?cooldown\\b|\\b1\\s*>\\s*(?:\\(\\s*)?cooldown\\b))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)bullets\\s*\\.\\s*push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}(?:\\bcooldown\\s*(?:\\)\\s*)?(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b)|!\\s*(?:\\(\\s*)?cooldown\\b|\\b0\\s*(?:===?|>=)\\s*(?:\\(\\s*)?cooldown\\b|\\b1\\s*>\\s*(?:\\(\\s*)?cooldown\\b))[^;]{0,200}?[;\\n][\\s\\S]{0,300}?if\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\3\\b)(?=[^{};]{0,200}(?:kb\\s*\\.\\s*(?:pressing|presses|holding)\\s*\\(\\s*['\"\\x60](?:[Ss]pace(?:bar)?|SPACE(?:BAR)?| )['\"\\x60]\\s*\\)|kb\\s*\\.\\s*space\\b))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)bullets\\s*\\.\\s*push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}(?:kb\\s*\\.\\s*(?:pressing|presses|holding)\\s*\\(\\s*['\"\\x60](?:[Ss]pace(?:bar)?|SPACE(?:BAR)?| )['\"\\x60]\\s*\\)|kb\\s*\\.\\s*space\\b))[^;]{0,200}?[;\\n][\\s\\S]{0,300}?(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}(?:\\bcooldown\\s*(?:\\)\\s*)?(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b)|!\\s*(?:\\(\\s*)?cooldown\\b|\\b0\\s*(?:===?|>=)\\s*(?:\\(\\s*)?cooldown\\b|\\b1\\s*>\\s*(?:\\(\\s*)?cooldown\\b))[^;]{0,200}?[;\\n][\\s\\S]{0,300}?if\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\4\\b)(?=[^{};]{0,200}(?<![\\w$.])\\5\\b)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)bullets\\s*\\.\\s*push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}(?:\\bcooldown\\s*(?:\\)\\s*)?(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b)|!\\s*(?:\\(\\s*)?cooldown\\b|\\b0\\s*(?:===?|>=)\\s*(?:\\(\\s*)?cooldown\\b|\\b1\\s*>\\s*(?:\\(\\s*)?cooldown\\b))[^;]{0,200}?[;\\n][\\s\\S]{0,300}?(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}(?:kb\\s*\\.\\s*(?:pressing|presses|holding)\\s*\\(\\s*['\"\\x60](?:[Ss]pace(?:bar)?|SPACE(?:BAR)?| )['\"\\x60]\\s*\\)|kb\\s*\\.\\s*space\\b))[^;]{0,200}?[;\\n][\\s\\S]{0,300}?if\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\6\\b)(?=[^{};]{0,200}(?<![\\w$.])\\7\\b)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)bullets\\s*\\.\\s*push\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "Firing sets the cooldown again",
+      "description": "Next to the push, cooldown is set back to 12 (any number above 0), so the next shot has to wait. Help: 5.9.3 (Worked Example: Fire with a cooldown)",
+      "type": "inFunction",
+      "function": [
+        "fire",
+        "draw"
+      ],
+      "file": "script.js",
+      "pattern": "bullets\\s*\\.\\s*push\\s*\\([\\s\\S]{0,200}?\\bcooldown\\s*(?:=(?!=)\\s*(?:\\(\\s*)?(?!(?:cooldown|0|false|null|undefined)\\b|(?:Math\\.)?max\\s*\\()(?:[1-9]|[A-Za-z_$])|\\+=\\s*(?:\\(\\s*)?(?:[1-9]|[A-Za-z_$]))|\\bcooldown\\s*(?:=(?!=)\\s*(?:\\(\\s*)?(?!(?:cooldown|0|false|null|undefined)\\b|(?:Math\\.)?max\\s*\\()(?:[1-9]|[A-Za-z_$])|\\+=\\s*(?:\\(\\s*)?(?:[1-9]|[A-Za-z_$]))[^;]{0,200};[\\s\\S]{0,200}?bullets\\s*\\.\\s*push\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "Shots that leave the top are deleted and spliced out",
+      "description": "Inside an if that asks whether a shot's y is above the top, the shot is deleted from the screen and spliced out of bullets. Help: 5.4.6 (Lab: Pipes that come and go)",
+      "type": "inFunction",
+      "function": "moveBullets",
+      "file": "script.js",
+      "pattern": "if\\s*\\((?=[^{};]{0,200}(?:\\.y\\s*(?:\\)\\s*)?<=?\\s*(?:\\(\\s*)?(?:-\\s*)?\\w|(?<![\\w$.])\\w+\\s*(?:\\)\\s*)?>=?\\s*(?:\\(\\s*)?[\\w$]+(?:\\s*\\[\\s*\\w+\\s*\\])?\\s*\\.y\\b))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\.(?:delete|remove)\\s*\\(\\s*\\)[^{}]{0,300}?bullets\\s*\\.\\s*splice\\s*\\(|bullets\\s*\\.\\s*splice\\s*\\([^{}]{0,300}?\\.(?:delete|remove)\\s*\\(\\s*\\))|bullets\\s*\\.\\s*splice\\s*\\([^;{}]{0,80}\\)\\s*\\[\\s*0\\s*\\]\\s*\\.(?:delete|remove)\\s*\\(\\s*\\))|(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}(?:\\.y\\s*(?:\\)\\s*)?<=?\\s*(?:\\(\\s*)?(?:-\\s*)?\\w|(?<![\\w$.])\\w+\\s*(?:\\)\\s*)?>=?\\s*(?:\\(\\s*)?[\\w$]+(?:\\s*\\[\\s*\\w+\\s*\\])?\\s*\\.y\\b))[^;]{0,200}?[;\\n][\\s\\S]{0,300}?if\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\1\\b)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\.(?:delete|remove)\\s*\\(\\s*\\)[^{}]{0,300}?bullets\\s*\\.\\s*splice\\s*\\(|bullets\\s*\\.\\s*splice\\s*\\([^{}]{0,300}?\\.(?:delete|remove)\\s*\\(\\s*\\))|bullets\\s*\\.\\s*splice\\s*\\([^;{}]{0,80}\\)\\s*\\[\\s*0\\s*\\]\\s*\\.(?:delete|remove)\\s*\\(\\s*\\))|^(?=[\\s\\S]*?if\\s*\\((?=[^{};]{0,200}(?:\\.y\\s*(?:\\)\\s*)?<=?\\s*(?:\\(\\s*)?(?:-\\s*)?\\w|(?<![\\w$.])\\w+\\s*(?:\\)\\s*)?>=?\\s*(?:\\(\\s*)?[\\w$]+(?:\\s*\\[\\s*\\w+\\s*\\])?\\s*\\.y\\b))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)\\.(?:delete|remove)\\s*\\(\\s*\\))(?=[\\s\\S]*\\bbullets\\s*=\\s*bullets\\s*\\.\\s*filter\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

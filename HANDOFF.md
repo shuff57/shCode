@@ -16,8 +16,7 @@ classes / then concepts). It renumbers about 166 lessons by title and citation o
 moves, no D1 migration). Recommended after unit 5 content exists, in one commit.
 
 **moSHion findings that block planned work** (details and evidence in `MOSHION-GAPS.md`): the copy
-vendored in `public/moshion/` is 223 lines behind the repo and lacks `coin.wav`, `music.wav` and the
-tile textures; there is no tile map, no sensor, no `camera.follow`; `this.speed` on a class that
+vendored in `public/moshion/` was re-synced to moSHion 3b77bf6 (branch `gaps-fix`, not yet merged or pushed; see `public/moshion/VENDORED.md`), which added `Tiles`, `Walls`, `every`/`after` and `addSensor`; there is still no `camera.follow`; `this.speed` on a class that
 extends Sprite collides with a built-in accessor. Lesson `6.4.19` hints at a `camera.follow` that
 does not exist.
 

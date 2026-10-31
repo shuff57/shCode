@@ -7294,6 +7294,102 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       "sprite"
     ]
   },
+  "5-10-defender-3-plan-the-hit-loop": {
+    "lessonTitle": "5.10.3 Plan: The hit loop in plain words",
+    "prompt": "Everything you need is on this page, in 2.4.26 (Plain English to Pseudocode: Nested Loops) and in 5.9.6 (Lab: Hit the drone): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYour Defender has many enemies now, and shots still fly straight through them. Before you write any code, plan the check that runs once every frame, in plain words or pseudocode.\n\n1. Which two lists does the check go through, and how does every shot get tested against every enemy?\n\n2. A shot hits an enemy. What happens to the shot?\n\n3. What happens to the enemy it hit? What if that hit leaves it with no hp?\n\n4. When an enemy is shot down, which lists have to change?",
+    "rubric": [
+      {
+        "id": "pairs",
+        "title": "Names the two lists and has every shot meet every enemy",
+        "description": "The student says the check goes through the shots and the enemies so that every shot is tested against every enemy, for example a loop inside a loop, 'for each shot, check each enemy', or any gesture at going through both lists; naming only one list, or saying it loosely, still earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "shot",
+        "title": "Says what happens to a shot that hits",
+        "description": "The student says the shot that hits goes away, from the screen, from the list, or both, in any words such as 'delete it', 'remove it' or 'it disappears'. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "enemy",
+        "title": "Says what happens to the enemy that was hit",
+        "description": "The student says the enemy loses hp (or a life, or a hit), or that with none left it is gone or scores points; any one part of that earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "arrays",
+        "title": "Says which lists change when an enemy is shot down",
+        "description": "The student names the lists that change when an enemy is shot down, ideally all three (the sprites, the hp and the worth); naming one of them, or saying 'the enemy lists' or 'all of them', also earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-11-defender-2-plan-draw-the-classes-first": {
+    "lessonTitle": "5.11.2 Plan: Draw the classes first",
+    "prompt": "Everything you need is on this page and in 5.11.1 (Reading: Count the cost): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to rebuild Defender with three classes: Bullet, Enemy and Spawner. Before you move any code, plan them.\n\n1. For at least two of the three classes, name one thing each one remembers.\n\n2. For at least two of them, name one thing each one can do or answer.\n\n3. Name one job that leaves draw() or a Part B function and moves into a class.\n\n4. Which class answers \"no\" to the checklist's first question, \"more than one of this thing?\", and why might it still be a class?",
+    "rubric": [
+      {
+        "id": "remember",
+        "title": "Names something two of the classes remember",
+        "description": "The student names, for at least two of Bullet, Enemy and Spawner, something each one remembers, such as a shot's sprite or whether it is used up, an enemy's hp, worth or speed, or the spawner's wave number or pause. Any property, in any words, earns full credit, and one class is enough if the answer clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "does",
+        "title": "Names something two of the classes can do or answer",
+        "description": "The student names, for at least two of the classes, something each can do or answer, such as a shot moving or saying whether it hit an enemy, an enemy taking a hit or saying whether it is alive, or the spawner building a wave. Any method or action, in any words, earns full credit, and one class is enough if the answer clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "moves",
+        "title": "Names one job that moves into a class",
+        "description": "The student names one job that used to sit in draw() or a Part B function and now belongs to a class, for example what a hit does, an enemy landing, removing finished enemies, or the pause before the next wave. Any job they connect to a class earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "checklist",
+        "title": "Names the class that fails the first checklist question, or why one might still be a class",
+        "description": "The student says which class fails the checklist's first question (the Spawner, because there is only one), or gives any reason one might still be a class, such as its facts changing together or a restart being one line. Either half on its own earns full credit, and so does a different class with a reason. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-11-defender-7-playtest-and-reflect": {
+    "lessonTitle": "5.11.7 Playtest and reflect: Defender",
+    "prompt": "Everything you need is in 5.9.1 (Plan: Break Defender into parts) and 5.11.6 (Lab: A Spawner for the waves): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Defender at least three times, and lose in three different ways: let a wave through on purpose, get overrun in a late wave, and press R in the middle of a wave. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which class or function do you think that comes from?\n\n4. What is one change that is easier, or harder, in Part C than it was in Part B, and why?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many rounds they played and how it went",
+        "description": "The student says they played, or gives any detail of a round (a score, the wave they reached, a way they lost, what pressing R did). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which class or function that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as Bullet, Enemy, Spawner, the hit loop, clearFinished or startRound, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "compare",
+        "title": "Compares one change in Part C with Part B",
+        "description": "The student names one change and says anything about whether it is easier or harder with classes than it was in Part B, for example giving every enemy a new property, the 5.10.8 bug, or the restart. Any comparison, in either direction, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
   "5-2-13-a5-2-1-pinball-scene": {
     "lessonTitle": "5.2.18 Pinball Scene",
     "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.18 Pinball Scene\". The task they were given: Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
@@ -7651,6 +7747,38 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "change",
         "title": "Names one rule they would change and what it would do",
         "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-9-defender-1-plan-break-defender-into-parts": {
+    "lessonTitle": "5.9.1 Plan: Break Defender into parts",
+    "prompt": "Everything you need is on this page and in 5.5.1 (Plan: Break Snake into parts): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build Defender. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of Defender in their own words, such as the ship, the shots, the enemies, the base, the score, the waves, game over and restarting. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between frames",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example where the shots are, each enemy's hp, the score, the base's hp, the cooldown, or whether the round is still being played. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as firing at a steady rate, telling when a shot hits, or bringing the enemies in waves, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       }
     ],

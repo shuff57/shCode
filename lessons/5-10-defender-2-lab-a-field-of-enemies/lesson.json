@@ -1,0 +1,112 @@
+{
+  "id": "5-10-defender-2-lab-a-field-of-enemies",
+  "title": "5.10.2 Lab: A field of enemies",
+  "description": "The drone is gone and enemies arrive on a beat, but nothing builds or moves them. Write spawnEnemy with one push per array, and the loop that makes enemies fall, land and leave all three arrays.",
+  "type": "lesson",
+  "estimateMins": 18,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.10 Project: Defender, Part B",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build an enemy",
+      "instructions": "Part A's drone is gone. `spawnOnBeat()` is finished and already called in `draw()`: every 60 frames it asks `spawnEnemy(x, y, hp)` for one enemy, and about one in four is a tough one with 3 hp. Shots fly straight through enemies for now; 5.10.5 makes them hit. Fill in `spawnEnemy`: build a 30 by 30 sprite at `(x, y)` with collider `'none'`, colour it `'orange'` when `hp` is more than 1 and `'crimson'` when it is not, write `String(hp)` on it with `.text`, then push the sprite onto `enemies`, `hp` onto `enemyHp` and `hp * 10` onto `enemyWorth`. Nothing shows yet when you run it: each enemy is built just above the top, and nothing moves it.",
+      "hints": [
+        "`e.color = hp > 1 ? 'orange' : 'crimson';` picks the colour in one line, as 5.10.1 showed.",
+        "Three pushes, one per array, so index j is the same enemy in all three: `enemies.push(e);`, then the same for `enemyHp` and `enemyWorth`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Fall and land",
+      "instructions": "In `moveEnemies()`, loop over `enemies` from the end to the start, as `moveBullets()` does. Move each enemy down by `fallSpeed`. An enemy whose `y` is more than `BASE_Y` has reached the base: take 1 from `baseHp`, delete its sprite, and splice index `j` out of all three arrays. The line under your loop already ends the round when `baseHp` reaches 0. If you would rather write the four removal lines once, put them in `function removeEnemy(j)` and call it; the check reads that function too.",
+      "hints": [
+        "`enemies[j].y += fallSpeed;` moves one enemy by hand, the way the drone fell in Part A.",
+        "Four lines remove enemy `j`: `enemies[j].delete();`, then `splice(j, 1)` on each of the three arrays."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Watch",
+      "instructions": "Run it and do not shoot. Tough enemies are orange and say 3; the rest are crimson and say 1. Let three land: `base:` counts down to 0, the round ends and everything stops. Press R: only the ship and the base are left, and new enemies start to arrive. An enemy that stays stuck on the base after it lands was spliced but not deleted.",
+      "hints": [
+        "The round ends because every line that moves something is inside `if (playing)` in `draw()`."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "spawnEnemy builds a pass-through sprite",
+      "description": "spawnEnemy makes a new sprite and sets its collider to 'none', so shots and enemies pass through each other. Help: 5.2.17 (Lab: Reaching the Goal)",
+      "type": "inFunction",
+      "function": "spawnEnemy",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*new\\s+Sprite\\s*\\()(?=[\\s\\S]*\\.collider\\s*=\\s*['\"`]none['\"`])",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "One push per array",
+      "description": "spawnEnemy pushes onto enemies, enemyHp and enemyWorth, so index j is the same enemy in all three. Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
+      "type": "inFunction",
+      "function": "spawnEnemy",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*\\benemies\\.push\\s*\\()(?=[\\s\\S]*\\benemyHp\\.push\\s*\\()(?=[\\s\\S]*\\benemyWorth\\.push\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Enemies fall",
+      "description": "moveEnemies moves each enemy down by adding to its y. Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
+      "type": "inFunction",
+      "function": "moveEnemies",
+      "file": "script.js",
+      "pattern": "\\.y\\s*(?:\\+=|=\\s*[^;]*\\+)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "A landing costs the base 1",
+      "description": "Inside an if that tests an enemy's y against BASE_Y, baseHp goes down by 1. Help: 5.9.7 (Lab: Hold the base, and start again)",
+      "type": "inFunction",
+      "function": "moveEnemies",
+      "file": "script.js",
+      "pattern": "(?:if\\s*\\((?=[^{;]{0,200}?(?:\\.y\\s*\\)?\\s*>=?\\s*\\(?\\s*(?:BASE_Y|\\d+)|\\b(?:BASE_Y|\\d+)\\s*\\)?\\s*<=?\\s*\\(?\\s*[\\w$.\\[\\]]+\\.y\\b))[^{;]{0,200}\\)\\s*\\{?|(?:const|let|var)\\s+(\\w+)\\s*=[^;\\n]{0,200}?(?:\\.y\\s*\\)?\\s*>=?\\s*\\(?\\s*(?:BASE_Y|\\d+)|\\b(?:BASE_Y|\\d+)\\s*\\)?\\s*<=?\\s*\\(?\\s*[\\w$.\\[\\]]+\\.y\\b)[\\s\\S]{0,300}?if\\s*\\(\\s*\\(?\\s*\\1\\s*\\)?\\s*\\)\\s*\\{?)[^}]{0,600}?(?:\\bbaseHp\\s*(?:-=\\s*\\(?\\s*1\\b|--)|--\\s*baseHp\\b|\\bbaseHp\\s*=\\s*\\(?\\s*baseHp\\s*-\\s*\\(?\\s*1\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "A landed enemy leaves the screen and all three arrays",
+      "description": "The landed sprite is deleted and index j is spliced out of enemies, enemyHp and enemyWorth, in moveEnemies or in a removeEnemy helper it calls. Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
+      "type": "inFunction",
+      "function": [
+        "moveEnemies",
+        "removeEnemy"
+      ],
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*\\.(?:delete|remove)\\s*\\(\\s*\\))(?=[\\s\\S]*\\benemies\\.splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\.splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\.splice\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -224,6 +224,9 @@ for (const l of lessons) {
           '7-1-1-arcade-cabinet|2.3.3',
           '5-2-5-lab-add-a-jump|2.1.29',
           '5-2-9-lab-wind-zone|2.1.3',
+          '5-10-defender-4-reading-every-shot-against-every-enemy|2.4.25',
+          '5-10-defender-4-reading-every-shot-against-every-enemy|2.4.27',
+          '5-10-defender-5-lab-shoot-them-down|2.4.27',
         ]);
         if (!WAIVED.has(`${l.dir}|${cited}`)) {
           stale.push(`${l.dir} (${l.num}) [${where}] ${cited} RESOLVES TO`

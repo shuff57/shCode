@@ -1,0 +1,52 @@
+{
+  "id": "5-11-defender-9-challenges-make-it-yours",
+  "title": "5.11.9 Challenges: Make it yours",
+  "description": "The game is complete. Change one rule of your own: a best score that survives a restart, a boss every fifth wave, or a Ship class that owns its own cooldown. Pick one; add an idea of your own on top if you like.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.11 Project: Defender, Part C",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a rule and change it",
+      "instructions": "Choose one of the three challenges on the page above. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from the game in the editor.",
+      "hints": [
+        "Whatever you pick, press R afterwards and check the game still starts cleanly."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Name what you changed",
+      "instructions": "At the top of `script.js`, write one sentence as a `//` comment saying what your rule is and what would happen if you removed it.",
+      "hints": [
+        "A rule is something the game decides. 'A boss comes every fifth wave' is a rule; 'I changed a colour' is not."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Your rule is in the code",
+      "description": "One of the three challenges is there: a best score kept across rounds, a boss on every fifth wave (this.wave % 5 === 0), or a Ship class that owns this.cooldown. Help: 5.11.6 (Lab: A Spawner for the waves)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bbest\\s*=\\s*(?:\\(\\s*)?(?:Math\\s*\\.\\s*)?max\\s*\\(|\\bbest\\s*=\\s*\\(?\\s*score\\b|if\\s*\\(\\s*(?:\\(\\s*){0,2}(?:score(?:\\s*\\))?\\s*>=?\\s*(?:\\(\\s*)?best|best(?:\\s*\\))?\\s*<=?\\s*(?:\\(\\s*)?score)\\b|\\bwave\\s*\\)?\\s*%\\s*\\(?\\s*[\\w$]+\\s*\\)?\\s*===?\\s*\\(?\\s*0(?![\\w.])|\\bclass\\s+Ship\\b[\\s\\S]*?\\bthis\\s*\\.\\s*cooldown\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

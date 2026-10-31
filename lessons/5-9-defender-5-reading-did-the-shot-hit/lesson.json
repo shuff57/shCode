@@ -1,0 +1,20 @@
+{
+  "id": "5-9-defender-5-reading-did-the-shot-hit",
+  "title": "5.9.5 Reading: Did the shot hit?",
+  "description": "overlaps() asks whether two sprites touch this frame, whatever their collider. Why colliding() cannot see a shot, why the shot must leave on the frame it hits, and how the drone goes back to the top.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.9 Project: Defender, Part A",
+  "preview": "reading",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
