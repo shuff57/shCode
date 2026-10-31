@@ -1,12 +1,13 @@
 {
   "id": "5-2-1-slides",
   "title": "5.2.5 Slides: Physics Feel",
-  "description": "Gravity, ground-gated actions, bounciness and friction, forces, and cleanup slides. Placeholder until the deck is rebuilt from bookSHelf.",
+  "description": "Module 5.2 opener: dynamic and static sprites, gravity, the ground-gated jump, bounciness and friction, reaching a goal, and the Pinball Scene you will build.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
   "preview": "slides",
+  "slidesUrl": "/slides/5.2_physics_feel.paper.html",
   "week": 15,
   "slos": [
     "SLO-3"

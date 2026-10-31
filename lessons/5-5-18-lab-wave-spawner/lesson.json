@@ -47,7 +47,7 @@
       "description": "The spawn check uses `frameCount` and a modulo, so it is true once every N frames rather than every frame. Help: 5.8.17 (Worked Example: The wave spawner)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "frameCount\\s*%\\s*\\d+\\s*===\\s*0",
+      "pattern": "frameCount\\s*%\\s*\\(?\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*\\)?\\s*===?\\s*0(?![\\w.])|(?<![\\w.])0\\s*===?\\s*\\(?\\s*frameCount\\s*%",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -58,7 +58,7 @@
       "description": "The spawn check also asks whether the list is empty, so a new group waits for the last one to be cleared. Help: 5.8.17 (Worked Example: The wave spawner)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "enemies\\.length\\s*===\\s*0",
+      "pattern": "enemies\\.length\\s*\\)?\\s*(?:===?\\s*0(?![\\w.])|<\\s*1(?![\\w.])|<=\\s*0(?![\\w.]))|(?<![\\w.])0\\s*===?\\s*\\(?\\s*enemies\\.length\\b|!\\s*\\(?\\s*enemies\\.length\\b",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -69,7 +69,7 @@
       "description": "Each arriving enemy is a new instance put into the `enemies` array. Help: 5.7.13 (Lab: An array of Enemies)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "enemies\\.push\\s*\\(\\s*new\\s+Enemy\\s*\\(",
+      "pattern": "enemies\\.push\\s*\\(\\s*new\\s+Enemy\\s*\\(|enemies\\s*=\\s*\\[[^\\]]*?new\\s+Enemy\\s*\\(|\\bnew\\s+Enemy\\s*\\([^;]*;[\\s\\S]{0,200}?enemies\\.push\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -80,7 +80,7 @@
       "description": "The list is rebuilt from the living with `filter`, and stored back into `enemies`. Help: 5.8.13 (Lab: Reap the dead with filter)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "enemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,80}?(?:isAlive\\s*\\(\\s*\\)|hp\\s*>\\s*0)",
+      "pattern": "enemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|(?<![\\w.])0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)",
       "flags": "",
       "points": 0,
       "status": "pending"
