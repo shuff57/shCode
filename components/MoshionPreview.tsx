@@ -44,7 +44,9 @@ const MoshionPreview = forwardRef<HTMLIFrameElement, Props>(function MoshionPrev
       // See ReshapePreview for the reasoning: allow-same-origin is deliberately
       // absent so student code cannot reach /api/* with the session cookie.
       // Saves therefore go through the parent -- see lib/moshion-storage.ts.
-      sandbox="allow-scripts allow-downloads"
+      // allow-modals lets a student's prompt()/alert() work (a game-mode pick);
+      // it adds no access to the parent's origin, cookies or API.
+      sandbox="allow-scripts allow-downloads allow-modals"
       allow="autoplay; fullscreen; gamepad; clipboard-write"
       src={src}
     />

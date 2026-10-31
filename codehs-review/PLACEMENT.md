@@ -61,6 +61,16 @@ the written plan, the pseudocode step and the playtest/reflection close.
    with an `aiGrader` rubric. Lazy-grading rules apply (`feedback_pseudocode-grading-lax`): accept any phrasing
    of a correct idea.
 
+## Decided by the owner, 2026-10-31
+
+5. **Console user input.** Not a module. A game-mode pick is taught as a key-press title screen
+   (`kb.presses('1')` / `'2'`), and `allow-modals` is also on the sketch iframe so a student's own
+   `prompt()` works (it was silently blocked before).
+7. **Breakout** is added in Chapter 6, after the grids module (bricks are a grid). Not in the functional block.
+8. **Inheritance** is one module in Chapter 7, after classes and groups are solid, taught through enemy types.
+9. **Scope first, static later.**
+11. **Pacing: option B** (`PACING.md`): `week` fields and module-doc `weeks:` set to the B column; 5.2 moves to week 11.
+
 ## Still open
 
 4. **Console user input.** Wanted at all, or keyboard-only from 5.1?

@@ -6,6 +6,7 @@
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
+  "week": 10,
   "preview": "slides",
   "slos": [
     "SLO-3"
