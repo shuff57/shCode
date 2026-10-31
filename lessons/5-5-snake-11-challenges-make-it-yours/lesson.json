@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Pick a rule and change it",
-      "instructions": "Choose one of the three challenges on the page above. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from the game in the editor.",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from the game in the editor.\n\n**Challenge 1: a faster snake (easy).** The starter keeps the beat in `const BEAT = 8;` and steps on `frameCount % BEAT`. A `const` can never change, so turn it into `let beat = 8;` and use `frameCount % beat`. Make `beat` smaller every time the snake eats, with a floor so the game never becomes impossible.\n\n**Challenge 2: your best score (medium).** A restart wipes the score, which is right. Keep a second variable called `best` that is *not* reset when R is pressed, update it when the score beats it, and show it beside the current score in `drawTop()`.\n\n**Challenge 3: the quick double-turn (hard).** Move right, then press up and left very quickly, both within one step: the snake runs back into itself, because the second key was tested against a direction that had only just changed. Store each turn in `turnX` and `turnY`, and apply it at the start of the next step.",
       "hints": [
         "Whatever you pick, press R afterwards and check the game still starts cleanly."
       ]

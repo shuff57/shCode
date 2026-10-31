@@ -52,7 +52,7 @@
     {
       "id": "r1",
       "title": "Sounds are loaded once, in setup()",
-      "description": "setup() loads a sound into a variable with loadSound('/moshion/assets/coin.wav') (or music.wav), so it has downloaded before the game needs it. Any variable name and any quotes; the path must name one of the two files. Help: the section 'A sound is an object you load' on this page.",
+      "description": "setup() loads a sound into a variable with loadSound and the path '/moshion/assets/coin.wav' (or music.wav), so it is ready before the game needs it. Any variable name works. Help: step 1 of this lab.",
       "hint": "Check the path letter by letter: '/moshion/assets/coin.wav'. And load it in setup(), not in draw() or a constructor.",
       "type": "regex",
       "file": "script.js",
