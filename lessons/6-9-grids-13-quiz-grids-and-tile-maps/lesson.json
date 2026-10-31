@@ -102,15 +102,15 @@
       {
         "id": "q6-bounds",
         "source": "6.9.10",
-        "question": "The grid has 8 rows (0 to 7) and a words strip under it. A click lands in the strip, so `floor(y / CELL)` is 8. What happens if the code goes straight to `grid[r][c] = ...`?",
+        "question": "The grid has 8 rows (0 to 7) and a words strip above it. A click lands in the strip, so `floor((y - TOP) / CELL)` is -1. What happens if the code goes straight to `grid[r][c] = ...`?",
         "options": [
-          "Nothing happens: JavaScript skips a row that is not there and carries on",
-          "The last row, row 7, is flipped instead",
-          "`grid[8]` is `undefined`, so reading a cell from it stops the sketch",
-          "The grid quietly grows a ninth row to fit the click"
+          "`grid[-1]` is skipped, so nothing happens and the sketch carries on",
+          "`grid[-1]` counts from the end, so row 7 is flipped instead",
+          "`grid[-1]` is `undefined`, so reading a cell from it stops the sketch",
+          "`grid[-1]` makes the grid grow a new row at the front"
         ],
         "answer": 2,
-        "explanation": "There is no row 8, so `grid[8]` is `undefined` and `undefined` has no cells. That is why every click is checked against the size of the grid first.",
+        "explanation": "There is no row -1, so `grid[-1]` is `undefined` and `undefined` has no cells. That is why every click is checked against the size of the grid first.",
         "sourceIds": [
           "6-9-grids-10-lab-light-the-grid"
         ]

@@ -36,7 +36,7 @@ function setup() {
 
   level = new Tiles(map, TILE / 2, TILE / 2, TILE, TILE, { '#': walls, 'c': coins, 'G': goals });
 
-  player = new Sprite(0, 0, 26, 26);   // findStart decides where it really stands
+  player = new Sprite(220, 60, 26, 26);   // a fixed spot for now; findStart decides where it really stands
   player.color = 'deepskyblue';
   player.rotationLock = true;
   // STEP 2: ask findStart(map) for the start and move the player there:
@@ -75,5 +75,5 @@ function drawTop() {
   fill('white');
   textSize(16);
   text('coins left: ' + coins.length, 12, 24);
-  text('standing on: [' + tileAt(player.x, player.y) + ']', 12, 392);
+  text('standing on: [' + tileAt(player.x, player.y) + ']', 12, 48);
 }

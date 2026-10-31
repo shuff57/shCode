@@ -45,7 +45,7 @@ Decide what to hand back when the letter is missing: the lab returns the centre 
 
 **Where pixels and cells meet.** These two conversions are the only place the two meet. The lab calls the pair `findStart` (cells to pixels) and `tileAt` (pixels to a cell). Every game that mixes a map with sprites needs exactly these two.
 
-**The mouse can be anywhere.** If the mouse is off the map, the row can be -1 or 10, and there is no `map[-1]`. A row that does not exist is `undefined`, and reading a letter from `undefined` stops the sketch with an error. Check that the row and column exist first:
+**A row or column can fall off the map.** A pixel in a canvas bigger than the map, or a tile one step past an edge, gives a row of -1 or 10, and there is no `map[-1]`. A row that does not exist is `undefined`, and reading a letter from `undefined` stops the sketch with an error. Check that the row and column exist first:
 
 ```js
 if (r >= 0 && r < map.length && c >= 0 && c < map[r].length) {
@@ -59,7 +59,7 @@ if (r >= 0 && r < map.length && c >= 0 && c < map[r].length) {
 
 **A game with several levels keeps a list of maps.** `levels[0]` is a whole map, `levels[1][3][2]` is one letter of the second level, and `levels.length` is how many levels there are. The last lab of the maze uses exactly this.
 
-Try the live block. It scans for the `P` and shows its pixel position; move the mouse over the maze and the bottom line says which letter is under it. Move the mouse off the canvas and the line goes away instead of crashing.
+Try the live block. It scans for the `P` and shows its pixel position; move the mouse over the maze and the bottom line says which letter is under it.
 
 ```js live
 // Scan the map for the letter P, then show which tile is under the mouse.
@@ -78,7 +78,7 @@ const map = [
   '##########',
 ];
 
-let walls, hero, startX, startY;
+let walls, coins, hero, startX, startY;
 
 function setup() {
   new Canvas(400, 400);
@@ -86,7 +86,11 @@ function setup() {
   walls = new Group();
   walls.collider = 'static';
   walls.color = 'dimgray';
-  new Tiles(map, TILE / 2, TILE / 2, TILE, TILE, { '#': walls });
+  coins = new Group();
+  coins.collider = 'none';
+  coins.diameter = 14;
+  coins.color = 'gold';
+  new Tiles(map, TILE / 2, TILE / 2, TILE, TILE, { '#': walls, 'c': coins });
 
   // Forward: look at every letter. When it is the P, turn its row and column into pixels.
   for (let r = 0; r < map.length; r++) {
@@ -108,7 +112,7 @@ function drawTop() {
   fill('white');
   textSize(16);
   text('P was found at ' + startX + ', ' + startY, 12, 24);
-  // The mouse can be anywhere, so check the row and column exist before reading them.
+  // Check the row and column exist before reading them.
   if (r >= 0 && r < map.length && c >= 0 && c < map[r].length) {
     text('row ' + r + ', column ' + c + ' holds [' + map[r][c] + ']', 12, 392);
   }
@@ -121,7 +125,7 @@ function drawTop() {
 
 1. Change `'P'` in the scan to `'G'`. The blue square jumps to the goal, because the scan found a different letter.
 2. Change `floor(mouse.x / TILE)` to `round(mouse.x / TILE)`. The row and column are now wrong for the right half of each tile.
-3. Delete `r >= 0 && ` from the test and move the mouse above the maze. The sketch stops with an error.
+3. Change `new Canvas(400, 400)` to `new Canvas(400, 440)` and delete `r < map.length && ` from the test. Press Run and move the mouse into the empty strip under the maze. The row is 10, `map[10]` is `undefined`, and the sketch stops with an error. Put it back.
 
 ---
 

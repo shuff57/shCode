@@ -22,8 +22,8 @@ function setup() {
   world.gravity.y = 0;   // seen from above: nothing falls
 
   walls = new Group();
-  // STEP 1: make a Group called walls. Its collider is static (it never
-  //   moves), and its color is slategray.
+  // STEP 1: set two defaults on walls: its collider is 'static' (it never
+  //   moves) and its color is 'dimgray'.
 
   coins = new Group();
   goals = new Group();

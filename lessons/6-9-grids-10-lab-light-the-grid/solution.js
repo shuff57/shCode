@@ -3,11 +3,12 @@
 const COLS = 8;
 const ROWS = 8;
 const CELL = 50;      // each cell is 50 by 50 pixels
+const TOP = 40;       // the grid starts 40 pixels down; the words live in the strip above it
 
 let grid;             // grid[r][c] is true when that cell is lit
 
 function setup() {
-  new Canvas(400, 440);   // 400 by 400 for the grid, a strip underneath for words
+  new Canvas(400, 440);   // a 40 pixel strip for words on top, then 400 by 400 for the grid
   grid = makeGrid();
 }
 
@@ -35,7 +36,7 @@ function drawGrid() {
   for (let r = 0; r < grid.length; r++) {
     for (let c = 0; c < grid[r].length; c++) {
       fill(grid[r][c] ? 'gold' : '#334');
-      rect(c * CELL, r * CELL, CELL, CELL);
+      rect(c * CELL, TOP + r * CELL, CELL, CELL);
     }
   }
 }
@@ -43,7 +44,7 @@ function drawGrid() {
 // A click is a pixel. Turn it into a row and a column, and flip that cell if it is on the grid.
 function clickCell(x, y) {
   const c = floor(x / CELL);
-  const r = floor(y / CELL);
+  const r = floor((y - TOP) / CELL);
   if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
     grid[r][c] = !grid[r][c];
   }
@@ -63,5 +64,5 @@ function countLit() {
 function drawTop() {
   fill('white');
   textSize(16);
-  text('lit: ' + countLit() + ' of ' + (ROWS * COLS), 12, 428);
+  text('lit: ' + countLit() + ' of ' + (ROWS * COLS), 12, 24);
 }

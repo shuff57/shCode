@@ -81,5 +81,5 @@ function drawTop() {
   fill('white');
   textSize(16);
   text('coins left: ' + coins.length, 12, 24);
-  text('standing on: [' + tileAt(player.x, player.y) + ']', 12, 392);
+  text('standing on: [' + tileAt(player.x, player.y) + ']', 12, 48);
 }

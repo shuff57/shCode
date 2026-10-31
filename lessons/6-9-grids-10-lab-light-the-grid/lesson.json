@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Build the grid",
-      "instructions": "The grid is `grid[r][c]`: `true` when that cell is lit. `COLS` (8), `ROWS` (8) and `CELL` (50) are at the top of the starter, and `setup()` already calls `makeGrid()` and keeps what it gives back in `grid`. Besides `setup()`, `draw()` and `drawTop()`, the starter has four functions, and each is empty or gives back a stand-in until you write it: `makeGrid()` gives back an empty list, `drawGrid()` and `clickCell()` do nothing, and `countLit()` gives back 0. Right now the screen is blank and the words say `lit: 0 of 64`.\n\nStart with `makeGrid()`. It makes `g` for you. Make `ROWS` rows: for each one make an empty array called `row`, push `COLS` values of `false` into it (every light starts off), then push the finished row onto `g`. The whole row goes onto `g` as one item, as in 6.9.9. Nothing shows yet; the next step draws it.",
+      "instructions": "The grid is `grid[r][c]`: `true` when that cell is lit. `COLS` (8), `ROWS` (8), `CELL` (50) and `TOP` (40, how far down the grid starts, because the words live in the strip above it) are at the top of the starter, and `setup()` already calls `makeGrid()` and keeps what it gives back in `grid`. Besides `setup()`, `draw()` and `drawTop()`, the starter has four functions, and each is empty or gives back a stand-in until you write it: `makeGrid()` gives back an empty list, `drawGrid()` and `clickCell()` do nothing, and `countLit()` gives back 0. Right now the screen is blank and the words say `lit: 0 of 64`.\n\nStart with `makeGrid()`. It makes `g` for you. Make `ROWS` rows: for each one make an empty array called `row`, push `COLS` values of `false` into it (every light starts off), then push the finished row onto `g`. The whole row goes onto `g` as one item, as in 6.9.9. Nothing shows yet; the next step draws it.",
       "hints": [
         "Two loops, one inside the other: the outer makes a row, the inner fills it. `row.push(false);`",
         "`g.push(row);` goes after the inner loop, inside the outer one."
@@ -25,16 +25,16 @@
     {
       "id": "s2",
       "title": "Draw it from the data",
-      "instructions": "In `drawGrid()`, visit every cell with two loops (use `grid.length` and `grid[r].length` as the limits). Before each cell, set `fill`: `'gold'` for a lit cell and `'#334'` for an off cell, chosen by what `grid[r][c]` holds. Then draw the cell with `rect(c * CELL, r * CELL, CELL, CELL)`. A `rect`'s x and y is its top-left corner, so the cell in column `c` starts at `c * CELL`. Run it: an 8 by 8 board of dark squares appears with thin black lines between them. Nothing is lit yet, because every cell is `false`.",
+      "instructions": "In `drawGrid()`, visit every cell with two loops (use `grid.length` and `grid[r].length` as the limits). Before each cell, set `fill`: `'gold'` for a lit cell and `'#334'` for an off cell, chosen by what `grid[r][c]` holds. Then draw the cell with `rect(c * CELL, TOP + r * CELL, CELL, CELL)`. A `rect`'s x and y is its top-left corner, so the cell in column `c` starts at `c * CELL`, and the row starts `TOP` lower, as in 6.9.9. One difference from 6.9.9: its live grid held 1s and 0s and asked `=== 1`, but this grid holds `true` and `false`. Test the cell on its own, because `true === 1` is `false` and a cell tested that way would never light. Run it: an 8 by 8 board of dark squares appears under the words, with thin black lines between them. Nothing is lit yet, because every cell is `false`.",
       "hints": [
         "`fill(grid[r][c] ? 'gold' : '#334');` or an `if`/`else` that calls `fill` in each branch.",
-        "Row `r` goes with y, column `c` goes with x: `rect(c * CELL, r * CELL, CELL, CELL);`"
+        "Row `r` goes with y, column `c` goes with x: `rect(c * CELL, TOP + r * CELL, CELL, CELL);`"
       ]
     },
     {
       "id": "s3",
       "title": "A click flips a cell",
-      "instructions": "`draw()` already calls `clickCell(mouse.x, mouse.y)` on every click. In `clickCell(x, y)`, turn the pixels into a column and a row: `c` is `floor(x / CELL)` and `r` is `floor(y / CELL)`. Then, IF that row and column are on the grid, flip the cell: `grid[r][c] = !grid[r][c];`. The canvas is 440 tall, but the grid is only 400 of it. The strip under the grid is where the words live, and a click there gives row 8, which does not exist: `grid[8]` is `undefined`, and reading a cell of it stops the sketch. So check `r >= 0 && r < ROWS && c >= 0 && c < COLS` first, with the row tests ahead of anything that reads `grid[r]`. Run it: click a few squares to light them, click one again to turn it off, and click in the strip under the grid to check that nothing happens and nothing breaks.",
+      "instructions": "`draw()` already calls `clickCell(mouse.x, mouse.y)` on every click. In `clickCell(x, y)`, turn the pixels into a column and a row: `c` is `floor(x / CELL)` and `r` is `floor((y - TOP) / CELL)` (take `TOP` off first, as in 6.9.9). Then, IF that row and column are on the grid, flip the cell: `grid[r][c] = !grid[r][c];`. The canvas is 440 tall, but the grid is only 400 of it. The strip above the grid is where the words live, and a click there gives row -1, which does not exist: `grid[-1]` is `undefined`, and reading a cell of it stops the sketch. So check `r >= 0 && r < ROWS && c >= 0 && c < COLS` first, with the row tests ahead of anything that reads `grid[r]`. Run it: click a few squares to light them, click one again to turn it off, and click in the strip above the grid to check that nothing happens and nothing breaks.",
       "hints": [
         "The test and the flip go together: `if (r >= 0 && r < ROWS && c >= 0 && c < COLS) { ... }`",
         "The flip is one line, and `!` turns `true` into `false` and `false` into `true`."
@@ -60,18 +60,20 @@
       "function": "makeGrid",
       "pattern": "^(?=[\\s\\S]*\\bfor\\b[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*\\.push\\s*\\(\\s*(?:false|0)\\s*\\))(?=[\\s\\S]*\\.push\\s*\\(\\s*(?!false\\b|true\\b|\\d)[A-Za-z_$][\\w$]*\\s*\\))|^(?=[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*\\.fill\\s*\\(\\s*(?:false|0)\\s*\\))",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
     {
       "id": "r2",
       "title": "The picture is drawn from the grid",
-      "description": "Two loops visit every cell; the colour comes from grid[r][c]; each cell is a rect. Help: 6.9.9 (Reading: A grid is data)",
+      "description": "Two loops visit every cell; the colour comes from grid[r][c] on its own (the cells are true and false, so not === 1); each cell is a rect. Help: 6.9.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "drawGrid",
-      "pattern": "^(?=[\\s\\S]*\\bfor\\b[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*(?:\\bgrid\\s*\\[\\s*[\\w$]+\\s*\\]\\s*\\[\\s*[\\w$]+\\s*\\]|\\bfor\\s*\\(\\s*(?:const|let)\\s+[\\w$]+\\s+of\\s+grid\\b))(?=[\\s\\S]*\\b(?:rect|square)\\s*\\()",
+      "pattern": "^(?![\\s\\S]*\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*[!=]==\\s*[01]\\b)(?=[\\s\\S]*\\bfor\\b[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*(?:\\bgrid\\s*\\[\\s*[\\w$]+\\s*\\]\\s*\\[\\s*[\\w$]+\\s*\\]|\\bfor\\s*\\(\\s*(?:const|let)\\s+[\\w$]+\\s+of\\s+grid\\b))(?=[\\s\\S]*\\b(?:rect|square)\\s*\\()",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
@@ -84,18 +86,20 @@
       "function": "clickCell",
       "pattern": "^(?=[\\s\\S]*(?:\\bfloor|Math\\.floor|Math\\.trunc)\\s*\\([^;]*\\/\\s*(?:CELL|50)\\b[\\s\\S]*(?:\\bfloor|Math\\.floor|Math\\.trunc)\\s*\\([^;]*\\/\\s*(?:CELL|50)\\b)",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
     {
       "id": "r4",
       "title": "A click outside the grid does nothing",
-      "description": "The row and column are checked against the size of the grid before the cell is read. Help: 6.9.9 (Reading: A grid is data)",
+      "description": "The row and column are checked against the size of the grid before the cell is read, so a click in the strip above the grid does nothing. Help: 6.9.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "clickCell",
-      "pattern": "<=?\\s*(?:ROWS|COLS|grid\\.length|grid\\s*\\[\\s*[\\w$0]+\\s*\\]\\.length|[78])\\b|>=?\\s*(?:ROWS|COLS|grid\\.length|grid\\s*\\[\\s*[\\w$0]+\\s*\\]\\.length|[78])\\b|!==?\\s*undefined|\\?\\.\\[",
+      "pattern": "^(?:(?!\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[)[\\s\\S])*?(?:<=?|>=?)\\s*(?:ROWS|COLS|grid\\.length|grid\\s*\\[\\s*[\\w$0]+\\s*\\]\\.length|[78])\\b|\\?\\.\\[|^(?:(?!\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[)[\\s\\S])*?\\bgrid\\s*\\[[^\\]]+\\]\\s*(?:===?|!==?)\\s*undefined\\b|^(?:(?!\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[)[\\s\\S])*?!\\s*grid\\s*\\[[^\\]]+\\]\\s*[)|&]|\\bgrid\\s*\\[[^\\]]+\\]\\s*&&\\s*grid\\s*\\[|!==?\\s*undefined\\s*\\)?\\s*(?:&&|\\)\\s*return)",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
@@ -106,8 +110,9 @@
       "type": "inFunction",
       "file": "script.js",
       "function": "clickCell",
-      "pattern": "\\bgrid\\s*\\[[^\\]]+\\]\\s*\\)?\\s*\\[[^\\]]+\\]\\s*\\)?\\s*=\\s*[^;]*\\bgrid\\s*\\)?\\s*\\[|^(?=[\\s\\S]*\\]\\s*=\\s*true\\b)(?=[\\s\\S]*\\]\\s*=\\s*false\\b)",
+      "pattern": "\\bgrid\\s*\\[[^\\]]+\\]\\s*\\)?\\s*\\[[^\\]]+\\]\\s*\\)?\\s*=\\s*(?:[^;]*?[!?]|[^;]*?\\bgrid\\s*\\)?\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*[!=]==?|\\(?\\s*\\d+\\s*-\\s*grid)|^(?=[\\s\\S]*\\]\\s*=\\s*true\\b)(?=[\\s\\S]*\\]\\s*=\\s*false\\b)",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
@@ -118,8 +123,9 @@
       "type": "inFunction",
       "file": "script.js",
       "function": "countLit",
-      "pattern": "^(?=[\\s\\S]*\\bfor\\b[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*(?:\\bif\\s*\\([^)]*\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]|\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*\\?|\\+=\\s*grid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]))|\\.filter\\s*\\(",
+      "pattern": "^(?=[\\s\\S]*\\bfor\\b[\\s\\S]*\\bfor\\b)(?=[\\s\\S]*(?:\\bn\\s*(?:\\+\\+|\\+=|=\\s*n\\s*\\+)|\\+\\+\\s*n\\b))(?=[\\s\\S]*(?:\\bif\\s*\\([^)]*\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]|\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*\\?|\\+=\\s*\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]|\\bfor\\s*\\(\\s*(?:const|let|var)\\s+([\\w$]+)\\s+of\\s+grid\\b[\\s\\S]*?\\bfor\\s*\\(\\s*(?:const|let|var)\\s+([\\w$]+)\\s+of\\s+\\1\\b[\\s\\S]*?(?:\\bif\\s*\\(\\s*!?\\s*\\2\\b|\\b\\2\\s*\\?|\\+=\\s*\\2\\b)|\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*\\bgrid\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*;[\\s\\S]*?(?:\\bif\\s*\\(\\s*!?\\s*\\3\\b|\\b\\3\\s*\\?|\\+=\\s*\\3\\b)))|\\.filter\\s*\\(",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     }

@@ -23,7 +23,7 @@ const map = [
 
 `#` is a wall and `c` is a coin. A space is an empty floor tile. You can read the level straight off the screen, and you can change it by changing a letter.
 
-**Reading the map.** A map is an array (3.3.20), so `map[2]` is the third row, a whole string. A string is read by position like the words in 2.2.19, so `map[2][5]` is **row 2, column 5**: the letter in that row at that place. Row first, then column, counting from 0. `map.length` is the number of rows and `map[0].length` is the number of letters in a row.
+**Reading the map.** A map is an array (3.3.2), so `map[2]` is the third row, a whole string. A string is read by position like the words in 2.2.19, so `map[2][5]` is **row 2, column 5**: the letter in that row at that place. Row first, then column, counting from 0. `map.length` is the number of rows and `map[0].length` is the number of letters in a row.
 
 **Every row must be the same length.** If one row is a letter short, that row has a hole at its end and nothing warns you. When a level looks wrong, count the letters.
 

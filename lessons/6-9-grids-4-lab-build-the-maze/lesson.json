@@ -67,7 +67,7 @@
     {
       "id": "r3",
       "title": "The goal lets you walk through",
-      "description": "The goal is its own Group and does not block the player either. Help: 6.9.3 (Worked Example: A level from text)",
+      "description": "The goal is its own Group and does not block the player either. Help: 6.9.2 (Reading: A map is rows of text)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bgoals\\.collider\\s*=\\s*['\"]none['\"]",
@@ -92,7 +92,7 @@
       "description": "x and y are the CENTRE of the top-left tile, so they are half a tile, not 0. Help: 6.9.3 (Worked Example: A level from text)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Tiles\\s*\\(\\s*[\\w$.\\[\\]]+\\s*,\\s*(?:20|TILE\\s*\\/\\s*2|0?\\.5\\s*\\*\\s*TILE|TILE\\s*\\*\\s*0?\\.5)\\s*,\\s*(?:20|TILE\\s*\\/\\s*2|0?\\.5\\s*\\*\\s*TILE|TILE\\s*\\*\\s*0?\\.5)\\s*,",
+      "pattern": "new\\s+Tiles\\s*\\(\\s*[\\w$.\\[\\]]+\\s*,\\s*\\(?\\s*(?:20|TILE\\s*\\/\\s*2|0?\\.5\\s*\\*\\s*TILE|TILE\\s*\\*\\s*0?\\.5)\\s*\\)?\\s*,\\s*\\(?\\s*(?:20|TILE\\s*\\/\\s*2|0?\\.5\\s*\\*\\s*TILE|TILE\\s*\\*\\s*0?\\.5)\\s*\\)?\\s*,",
       "flags": "",
       "points": 0,
       "status": "pending"

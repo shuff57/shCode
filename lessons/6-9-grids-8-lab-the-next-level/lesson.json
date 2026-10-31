@@ -42,6 +42,7 @@
       "file": "script.js",
       "pattern": "\\blevel\\s*\\??\\.\\s*(?:delete|remove|deleteAll)\\s*\\(|^(?=[\\s\\S]*\\bwalls\\s*\\.\\s*(?:deleteAll|delete)\\s*\\()(?=[\\s\\S]*\\bcoins\\s*\\.\\s*(?:deleteAll|delete)\\s*\\()(?=[\\s\\S]*\\bgoals\\s*\\.\\s*(?:deleteAll|delete)\\s*\\()",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
@@ -54,6 +55,7 @@
       "file": "script.js",
       "pattern": "^(?=[\\s\\S]*\\bnew\\s+Tiles\\s*\\()(?=[\\s\\S]*\\blevels\\s*\\[\\s*[A-Za-z_$])",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
@@ -66,30 +68,33 @@
       "file": "script.js",
       "pattern": "^(?=[\\s\\S]*\\bfindStart\\s*\\()(?=[\\s\\S]*\\bplayer\\.(?:x|pos(?:ition)?)\\b)",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
     {
       "id": "r4",
       "title": "Reaching the goal moves to the next level",
-      "description": "levelNum goes up by 1 and loadLevel builds that level. Help: 6.9.7 (Lab: Coins and the goal)",
+      "description": "The goal test (no coins left AND the player on the goal) comes first, then levelNum goes up by 1 and loadLevel builds that level. Help: 6.9.7 (Lab: Coins and the goal)",
       "type": "inFunction",
       "function": "checkGoal",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*(?:\\blevelNum\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\+\\+\\s*levelNum\\b|\\blevelNum\\s*=\\s*levelNum\\s*\\+\\s*1\\b))(?=[\\s\\S]*\\bloadLevel\\s*\\()",
+      "pattern": "^(?=[\\s\\S]*\\bcoins\\.length\\b[\\s\\S]*?(?:\\blevelNum\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\+\\+\\s*levelNum\\b|\\blevelNum\\s*=\\s*levelNum\\s*\\+\\s*1\\b))(?=[\\s\\S]*\\b(?:player\\.overlaps\\s*\\(\\s*goals|goals\\.overlaps\\s*\\(\\s*player)\\b[\\s\\S]*?(?:\\blevelNum\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\+\\+\\s*levelNum\\b|\\blevelNum\\s*=\\s*levelNum\\s*\\+\\s*1\\b))(?=[\\s\\S]*\\bloadLevel\\s*\\()",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
     {
       "id": "r5",
       "title": "The last level ends the game",
-      "description": "After the final level, won becomes true instead of loading another. Help: 6.9.7 (Lab: Coins and the goal)",
+      "description": "After the final level, won becomes true instead of loading another. Help: 6.9.5 (Reading: Reading a map as data), where levels.length is how many levels there are",
       "type": "inFunction",
       "function": "checkGoal",
       "file": "script.js",
       "pattern": "^(?=[\\s\\S]*(?:\\blevelNum\\b[^;{}]*\\blevels\\.length\\b|\\blevels\\.length\\b[^;{}]*\\blevelNum\\b|\\blevelNum\\s*(?:===?|>=|>|<)\\s*\\d))(?=[\\s\\S]*\\bwon\\s*=\\s*true\\b)",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     }

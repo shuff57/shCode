@@ -29,9 +29,9 @@ const levels = [
   ],
   [
     '##########',
-    '#P#c     #',
+    '# #c     #',
     '# # ### ##',
-    '#   #c#  #',
+    '#P  #c#  #',
     '### # ## #',
     '#c  #  # #',
     '# ###c ###',
@@ -134,7 +134,7 @@ function drawTop() {
   fill('white');
   textSize(16);
   text('coins left: ' + coins.length, 12, 24);
-  text('level ' + (levelNum + 1) + ' of ' + levels.length, 150, 24);
+  text('level ' + Math.min(levelNum + 1, levels.length) + ' of ' + levels.length, 150, 24);
   text('score: ' + score, 300, 24);
   if (player.overlaps(goals) && coins.length > 0) {
     text('Grab every coin first!', 100, 392);
