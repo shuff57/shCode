@@ -38,7 +38,7 @@
       "description": "A press of the space bar sets the bird's upward speed. Help: 5.4.2 (Reading: Gravity and the flap)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "kb\\.presses\\s*\\(\\s*(['\"])(?: |space)\\1\\s*\\)[^{};]{0,200}?\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)bird\\.vel\\.y\\s*=\\s*(?:-\\s*[\\w.(]|[A-Za-z_$][\\w$]*\\s*[;\\n}])",
+      "pattern": "kb\\.presses\\s*\\(\\s*(['\"])(?: |space)\\1\\s*\\)[^{};]{0,200}?\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]{0,200}?)bird\\.vel\\.y\\s*=\\s*(?:-\\s*[\\w.(]|[A-Za-z_$][\\w$]*\\s*[;\\n}])",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -60,7 +60,7 @@
       "description": "Leaving the top or bottom puts the position back. Help: 5.4.3 (Worked Example: The bird that flaps)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "bird\\.(?:pos\\.)?y\\s*(?:>=?|<=?)\\s*(?:\\d+|height)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)bird\\.(?:pos\\.)?y\\s*=\\s*(?:\\d+|height\\s*\\/\\s*2|[A-Za-z_$][\\w$]*\\s*[;\\n}])",
+      "pattern": "bird\\.(?:pos\\.)?y\\s*(?:>=?|<=?)\\s*(?:\\d+|height)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]{0,200}?)bird\\.(?:pos\\.)?y\\s*=\\s*(?:\\d+|height\\s*\\/\\s*2|[A-Za-z_$][\\w$]*\\s*[;\\n}])",
       "flags": "",
       "points": 0,
       "status": "pending"

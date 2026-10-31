@@ -69,7 +69,7 @@
       "description": "The variable that remembers last frame is given this frame's answer on every frame, so the next touch is recognised. Any name works. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:const|let|var)\\s+(\\w+)\\s*=\\s*(?:ball\\.colliding\\s*\\(\\s*goal|goal\\.colliding\\s*\\(\\s*ball)\\s*\\)[\\s\\S]*?!\\s*(?:\\(\\s*)?(\\w+)[\\s\\S]*?\\b\\2\\s*=\\s*\\1\\b(?!\\s*[=(.])|(?:const|let|var)\\s+(\\w+)\\s*=\\s*(?:ball\\.colliding\\s*\\(\\s*goal|goal\\.colliding\\s*\\(\\s*ball)\\s*\\)[\\s\\S]*?\\b(\\w+)\\s*===?\\s*false[\\s\\S]*?\\b\\4\\s*=\\s*\\3\\b(?!\\s*[=(.])",
+      "pattern": "(?:const|let|var)\\s+(\\w+)\\s*=\\s*(?:ball\\.colliding\\s*\\(\\s*goal|goal\\.colliding\\s*\\(\\s*ball)\\s*\\)[\\s\\S]{0,800}?(?:!\\s*(?:\\(\\s*)?|\\b(?=\\w+\\s*\\)?\\s*===?\\s*false\\b))(\\w+)[\\s\\S]{0,800}?(?:(?=\\b\\2\\s*=\\s*(?:\\(\\s*)?\\1\\b(?!\\s*[=(.]))(?<!\\bif\\s*\\([^{}]{0,200}\\)\\s*\\{[^{}]{0,300}\\bscore\\b[^{}]{0,300})\\b\\2|\\b\\2\\s*=(?!=)(?:[^{}]{0,300}\\}|[^{};]{0,300};)\\s*else\\b\\s*(?:if\\s*\\([^{};]{0,200}\\)\\s*)?(?:\\{[^{}]{0,300}?|[^{};]{0,300}?)\\b\\2\\s*=(?!=))",
       "flags": "",
       "points": 0,
       "status": "pending"

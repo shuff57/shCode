@@ -47,7 +47,7 @@
       "description": "One loop visits every bumper in the array instead of naming one. Help: 3.3.5 (Reading: Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:const|let|var)\\s+\\w+\\s+of\\s+bumpers\\s*\\)|for\\s*\\([^;]*;\\s*\\w+\\s*<=?\\s*bumpers\\.length|bumpers\\.forEach\\s*\\(",
+      "pattern": "for\\s*\\(\\s*(?:const|let|var)\\s+\\w+\\s+of\\s+bumpers\\s*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;])|for\\s*\\([^;]*;\\s*\\w+\\s*<=?\\s*bumpers\\.length[^{}]{0,40}?\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)])|bumpers\\.forEach\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

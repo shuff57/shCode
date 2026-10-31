@@ -68,7 +68,7 @@
       "description": "A collision with the bird flips the flag (playing = false, or a game-over flag = true). Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,160}?(?<![\\w.$])\\w+\\s*=\\s*(?:false|true)\\b",
+      "pattern": "(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,320}?(?<![\\w.$])\\w+\\s*=\\s*(?:false|true)\\b",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -112,7 +112,7 @@
       "description": "Pressing R empties the array so the next round starts clean. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "kb\\.presses\\s*\\(\\s*['\"][rR]['\"]\\s*\\)[\\s\\S]{0,400}?(?:pipes\\s*=\\s*\\[\\s*\\]|pipes\\.length\\s*=\\s*0|pipes\\.splice\\s*\\(\\s*0\\s*[,)])|^(?=[\\s\\S]*kb\\.presses\\s*\\(\\s*['\"][rR]['\"]\\s*\\)\\s*\\)\\s*\\{?\\s*(\\w+)\\s*\\(\\s*\\))(?=[\\s\\S]*function\\s+\\1\\s*\\([^)]*\\)\\s*\\{[\\s\\S]{0,400}?(?:pipes\\s*=\\s*\\[\\s*\\]|pipes\\.length\\s*=\\s*0|pipes\\.splice\\s*\\(\\s*0\\s*[,)]))",
+      "pattern": "kb\\.presses\\s*\\(\\s*['\"][rR]['\"]\\s*\\)[\\s\\S]{0,400}?(?:pipes\\s*=\\s*\\[\\s*\\]|pipes\\.length\\s*=\\s*0|pipes\\.splice\\s*\\(\\s*0\\s*[,)]|for\\s*\\(\\s*(?:let|var)\\s+(\\w+)\\s*=\\s*pipes\\.length\\s*-\\s*1\\s*;[^;{}]*;[^{}]*?\\)\\s*\\{(?:(?!\\bif\\b)[^{}])*?pipes\\.splice\\s*\\(\\s*\\1\\s*,|while\\s*\\(\\s*(?:\\(\\s*){0,3}pipes\\.length\\s*(?:\\)\\s*)?(?:(?:>|!==?)\\s*0\\s*)?(?:\\)\\s*){1,4}\\{?(?:(?!\\bif\\b)[^{}])*?pipes\\.(?:pop|shift|splice)\\s*\\()|^(?=[\\s\\S]*kb\\.presses\\s*\\(\\s*['\"][rR]['\"]\\s*\\)\\s*\\)\\s*\\{?\\s*(\\w+)\\s*\\(\\s*\\))(?=[\\s\\S]*function\\s+\\2\\s*\\([^)]*\\)\\s*\\{[\\s\\S]{0,400}?(?:pipes\\s*=\\s*\\[\\s*\\]|pipes\\.length\\s*=\\s*0|pipes\\.splice\\s*\\(\\s*0\\s*[,)]|for\\s*\\(\\s*(?:let|var)\\s+(\\w+)\\s*=\\s*pipes\\.length\\s*-\\s*1\\s*;[^;{}]*;[^{}]*?\\)\\s*\\{(?:(?!\\bif\\b)[^{}])*?pipes\\.splice\\s*\\(\\s*\\3\\s*,|while\\s*\\(\\s*(?:\\(\\s*){0,3}pipes\\.length\\s*(?:\\)\\s*)?(?:(?:>|!==?)\\s*0\\s*)?(?:\\)\\s*){1,4}\\{?(?:(?!\\bif\\b)[^{}])*?pipes\\.(?:pop|shift|splice)\\s*\\())",
       "flags": "",
       "points": 0,
       "status": "pending"

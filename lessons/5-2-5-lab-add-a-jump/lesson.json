@@ -51,7 +51,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "(?:\\b(?:if|while)\\s*\\(|(?:const|let|var)\\s+\\w+\\s*=)[^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?kb\\.presses\\s*\\()|(?:(?:const|let|var)\\s+)?(\\w+)\\s*=[^;{}]*?\\.colliding\\s*\\([^;{}]*;[\\s\\S]{0,200}?\\b(?:if|while)\\s*\\([^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\b\\1\\b|\\b\\1\\b[^{};]*?&&\\s*\\(?\\s*kb\\.presses\\s*\\()",
+      "pattern": "\\b(?:if|while)\\s*\\([^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?kb\\.presses\\s*\\()(?=[^{};]*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)]))|(?:const|let|var)\\s+\\w+\\s*=[^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?kb\\.presses\\s*\\()|(?:(?:const|let|var)\\s+)?(\\w+)\\s*=[^;{}]*?\\.colliding\\s*\\([^;{}]*;[\\s\\S]{0,200}?\\b(?:if|while)\\s*\\([^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\b\\1\\b|\\b\\1\\b[^{};]*?&&\\s*\\(?\\s*kb\\.presses\\s*\\()",
       "flags": "",
       "points": 0,
       "status": "pending"

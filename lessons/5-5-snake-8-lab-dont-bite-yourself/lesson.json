@@ -47,7 +47,7 @@
       "description": "A loop (for...of, or an index loop) goes through every segment and returns true when one matches. Help: 5.5.7 (Reading: Searching the array)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\([^)]*\\bsegments\\b[^)]*\\)[\\s\\S]{0,200}?return\\s+true|for\\s*\\([^)]*\\bsegments\\b[^)]*\\)[\\s\\S]{0,200}?(?<![\\w.$])(\\w+)\\s*=\\s*true\\b[\\s\\S]{0,200}?return\\s+\\1\\b",
+      "pattern": "for\\s*\\([^)]*\\bsegments\\b[^)]*\\)[\\s\\S]{0,200}?\\bif\\s*\\([^{};]*\\)[^;]{0,120}?return\\s+true|for\\s*\\([^)]*\\bsegments\\b[^)]*\\)[\\s\\S]{0,200}?\\bif\\s*\\([^{};]*\\)[^;]{0,120}?(?<![\\w.$])(\\w+)\\s*=\\s*true\\b[\\s\\S]{0,200}?return\\s+\\1\\b",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -69,7 +69,7 @@
       "description": "A while loop repeats the pick while the cell is part of the body. Help: 5.5.7 (Reading: Searching the array)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(\\s*(?:\\(\\s*){0,3}isBody\\s*\\(",
+      "pattern": "while\\s*\\(\\s*(?:\\(\\s*){0,3}isBody\\s*\\([^)]*\\)[^{]*?(?:\\{[^}]*?|[^{;]*?)(?<![\\w$.=!<>])\\w+\\s*=(?!=)",
       "flags": "",
       "points": 0,
       "status": "pending"

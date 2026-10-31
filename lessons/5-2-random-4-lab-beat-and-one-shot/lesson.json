@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "A beat: blink the lamp",
-      "instructions": "In `draw()`, every 30 frames flip the variable `on` between true and false. The code below already colours the lamp gold when `on` is true and gray when it is false, so the lamp should blink twice a second once your line works.",
+      "instructions": "In `draw()`, every 30 frames flip the variable `on` between true and false: on each beat, write `on = !on;` once (`!` turns true into false and false into true). The code below already colours the lamp gold when `on` is true and gray when it is false, so the lamp should blink twice a second once your line works.",
       "hints": [
         "The remainder operator makes a beat: `frameCount % 30 === 0` is true on every 30th frame.",
         "Inside that `if`, `on = !on;` flips a true/false variable."
@@ -60,7 +60,7 @@
       "hint": "Inside the if, write on = !on; so it flips each beat.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "frameCount\\s*%\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*===?\\s*0\\s*\\)(?:\\s*\\)){0,3}\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false)|\\{\\s*if\\s*\\([^)]*\\)(?:\\s*\\)){0,3}\\s*\\{?[^{}]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false)|[^{};]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false))",
+      "pattern": "frameCount\\s*%\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*===?\\s*0\\s*\\)(?:\\s*\\)){0,3}\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false|on\\s*\\)?\\s*\\?)|\\{\\s*if\\s*\\([^)]*\\)(?:\\s*\\)){0,3}\\s*\\{?[^{}]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false|on\\s*\\)?\\s*\\?)|[^{};]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false|on\\s*\\)?\\s*\\?))",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -96,7 +96,7 @@
       "hint": "A timer test hidden inside an if is only looked at when that if is true. Move it outside.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?![\\s\\S]*(?:if\\s*\\(\\s*on\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{[^}]*frameCount\\s*===?\\s*70|\\bon\\s*&&\\s*frameCount\\s*===?\\s*70|frameCount\\s*===?\\s*70\\s*&&\\s*on\\b))[\\s\\S]*frameCount\\s*===?\\s*70",
+      "pattern": "^(?![\\s\\S]*(?:if\\s*\\(\\s*(?:\\(\\s*){0,3}on\\s*(?:===?\\s*true\\s*)?(?:\\)\\s*){1,4}\\{[^}]*frameCount\\s*===?\\s*70|\\bon\\s*\\)?\\s*&&\\s*\\(?\\s*frameCount\\s*===?\\s*70|frameCount\\s*===?\\s*70\\s*\\)?\\s*&&\\s*\\(?\\s*on\\b))[\\s\\S]*frameCount\\s*===?\\s*70",
       "flags": "",
       "points": 0,
       "status": "pending"

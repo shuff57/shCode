@@ -57,7 +57,7 @@
       "description": "The pair is built and pushed inside the beat's if, so a pair arrives once per beat, not every frame. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\((?=[^{};]*frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0)[^{};]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)(?:pipes\\.push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makePipe\\s*\\(\\s*\\)\\s*;?\\s*pipes\\.push\\s*\\(\\s*\\1\\s*\\))",
+      "pattern": "\\bif\\s*\\((?=[^{};]*frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0)[^{};]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)(?:pipes\\.push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makePipe\\s*\\(\\s*\\)\\s*;?\\s*pipes\\.push\\s*\\(\\s*\\1\\s*\\))|(?:const|let|var)\\s+(\\w+)\\s*=\\s*\\(?\\s*frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0[^;{}]*;?[\\s\\S]{0,300}?\\bif\\s*\\((?=[^{};]{0,200}(?<![\\w$.])(?<!!\\s*(?:\\(\\s*){0,3})\\2\\b(?!\\s*(?:===?\\s*false|!==?)))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]{0,200}?)(?:pipes\\.push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makePipe\\s*\\(\\s*\\)\\s*;?\\s*pipes\\.push\\s*\\(\\s*\\3\\s*\\))",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -68,7 +68,7 @@
       "description": "Inside an if that tests a pipe's x (off the left edge), the sprite is deleted and also taken out of the array. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\((?=[^{};]*(?:\\.x\\b[^{};]*<|>[^{};]*\\.x\\b))[^{};]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|)(?:\\.delete\\s*\\(\\s*\\)[^{}]{0,120}?pipes\\.splice\\s*\\(|pipes\\.splice\\s*\\([^{}]{0,120}?\\.delete\\s*\\(\\s*\\))",
+      "pattern": "\\bif\\s*\\((?=[^{};]*(?:\\.x\\b[^{};]*<|>[^{};]*\\.x\\b))[^{};]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|)(?:\\.delete\\s*\\(\\s*\\)[^{}]{0,120}?pipes\\.splice\\s*\\(|pipes\\.splice\\s*\\([^{}]{0,120}?\\.delete\\s*\\(\\s*\\))|(?:const|let|var)\\s+(\\w+)\\s*=\\s*[^;{}]*?(?:\\.x\\b[^;{}]*<|>[^;{}]*\\.x\\b)[^;{}]*;?[\\s\\S]{0,300}?\\bif\\s*\\((?=[^{};]{0,200}(?<![\\w$.])(?<!!\\s*(?:\\(\\s*){0,3})\\1\\b(?!\\s*(?:===?\\s*false|!==?)))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|)(?:\\.delete\\s*\\(\\s*\\)[^{}]{0,120}?pipes\\.splice\\s*\\(|pipes\\.splice\\s*\\([^{}]{0,120}?\\.delete\\s*\\(\\s*\\))",
       "flags": "",
       "points": 0,
       "status": "pending"

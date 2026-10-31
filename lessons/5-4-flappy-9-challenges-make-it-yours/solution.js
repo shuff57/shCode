@@ -29,8 +29,9 @@ function makePipe() {
   bottom.vel.x = -speed;
   top.mate = bottom;
   top.passed = false;
-  top.wobble = random(0.5, 2);   // random again: how fast this pipe's gap bobs
-  top.phase = random(0, 6);
+  top.wobble = random(0.3, 0.7);   // random again: how fast this pipe's gap bobs
+  top.vel.y = top.wobble;          // both halves move by the same amount,
+  bottom.vel.y = top.wobble;       // so the gap keeps its size
   return top;
 }
 
@@ -42,6 +43,8 @@ function endRound() {
   for (const q of pipes) {
     q.vel.x = 0;
     q.mate.vel.x = 0;
+    q.vel.y = 0;
+    q.mate.vel.y = 0;
   }
 }
 
@@ -85,6 +88,10 @@ function draw() {
       if (p.x < bird.x && !p.passed) {
         score += 1;
         p.passed = true;
+      }
+      if (frameCount % 30 === 0) {   // on a beat, turn the wobble the other way
+        p.vel.y = -p.vel.y;
+        p.mate.vel.y = p.vel.y;
       }
       if (bird.colliding(p) || bird.colliding(p.mate)) endRound();
     }

@@ -77,7 +77,7 @@ if (kb.presses(' ') && player.colliding(ground)) { player.vel.y = -7; }
 if (goal) { /* ... */ }
 ```
 
-The jump line combines an edge-triggered key check with a ground check: without `player.colliding(ground)`, holding space would relaunch the player every frame it's held, even mid-air. The goal check wraps the whole win branch in `if (goal)`: once `goal.delete()` runs and `goal` is set to `null`, that condition is false forever after, so the win message can only ever print once. Both are the same shape: a condition that guards a side effect so it happens exactly once, not every frame it stays true.
+The jump line combines an edge-triggered key check with a ground check: without `player.colliding(ground)`, pressing space again and again mid-air would relaunch the player each time, so it could climb as high as it liked. The goal check wraps the whole win branch in `if (goal)`: once `goal.delete()` runs and `goal` is set to `null`, that condition is false forever after, so the win message can only ever print once. Both are the same shape: a condition that guards a side effect so it happens exactly once, not every frame it stays true.
 
 ## Key takeaways
 

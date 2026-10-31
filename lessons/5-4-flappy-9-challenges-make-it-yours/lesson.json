@@ -34,10 +34,10 @@
     {
       "id": "r1",
       "title": "Your rule is in the code",
-      "description": "One of the three challenges is there: something depends on the score (harder as you go, or a best score), or the pipes use random for more than the gap height. Help: 5.4.7 (Lab: Score a gap) and 5.4.6 (Lab: Pipes that come and go)",
+      "description": "One of the three challenges is there: something depends on the score (harder as you go, or a best score), or a wobble made with random moves the pipes up and down. Help: 5.4.7 (Lab: Score a gap) and 5.4.6 (Lab: Pipes that come and go)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "score\\s*[*/%<>]|[*/%<>]\\s*score\\b|\\bmin\\s*\\(|\\bmax\\s*\\(|random\\s*\\([\\s\\S]*?random\\s*\\(|(?<![\\w$.])(?!score\\b)[A-Za-z_$][\\w$]*(?:\\.[\\w$]+)*\\s*=(?!=)[^;\\n]*\\bscore\\b",
+      "pattern": "score\\s*[*/%<>]|[*/%<>]\\s*score\\b|\\bmin\\s*\\(|\\bmax\\s*\\(|(?<![\\w$])([A-Za-z_$][\\w$]*)\\s*=\\s*\\(?\\s*random\\s*\\([\\s\\S]*?(?<!bird)\\.(?:vel\\.)?y\\s*[+-]?=(?!=)[^;\\n]*?(?<![\\w$])\\1\\b|(?<!bird)\\.(?:vel\\.)?y\\s*[+-]?=(?!=)[^;\\n]*?\\brandom\\s*\\(|(?<![\\w$.])(?!score\\b)[A-Za-z_$][\\w$]*(?:\\.[\\w$]+)*\\s*=(?!=)[^;\\n]*\\bscore\\b",
       "flags": "",
       "points": 0,
       "status": "pending"

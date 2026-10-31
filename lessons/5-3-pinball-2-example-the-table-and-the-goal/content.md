@@ -144,7 +144,7 @@ function draw() {
 
 **What you'll see:** the ball crosses the gold bar once, and the score does not go up by one. It shoots up to **33** in about half a second while the ball rolls across the gold, then stops when the ball leaves it. Press R and the next drop adds another 33. One crossing, thirty-three points.
 
-That is not a mistake in your typing — it is the whole subject of the next lesson. `colliding()` answers a question about *this frame*, and `draw()` runs sixty times a second. The ball touched the gold for 33 frames, so the score counted 33. Leave the number counting for now; 5.3.5 explains it and 5.3.7 fixes it.
+That is not a mistake in your typing — it is the whole subject of the reading two lessons on, after the lab where you build this table. `colliding()` answers a question about *this frame*, and `draw()` runs sixty times a second. The ball touched the gold for 33 frames, so the score counted 33. Leave the number counting for now; 5.3.5 explains it and 5.3.7 fixes it.
 
 ## Key takeaways
 
