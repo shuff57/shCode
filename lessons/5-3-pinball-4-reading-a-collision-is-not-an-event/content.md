@@ -18,7 +18,7 @@ function draw() {
 }
 ```
 
-You have met this before, with keys. 5.2.9 drew the distinction:
+You have met this before, with keys. 5.2.9 drew the distinction, and it has two names. **Level-triggered** means true on every frame the thing is still going on, like a key that is held down. **Edge-triggered** means true only on the one frame it starts, like the moment the key goes down.
 
 | | Fires | |
 | --- | --- | --- |
@@ -44,6 +44,8 @@ function draw() {
 ```
 
 Read `touching && !wasTouching` as: **touching now, and not touching a moment ago.** That is the moment contact starts, and it happens exactly once per hit.
+
+**One catch: `colliding()` gives a number, not `true` or `false`.** It is 0 while the sprites are apart, and a count above 0 while they touch. An `if` treats 0 as false and any other number as true, so `touching && !wasTouching` works. But after the first frame the memory holds 0, not `false`, so `wasTouching === false` is never true and a score written that way never goes up. Test the memory with `!wasTouching`.
 
 **Try it:**
 
@@ -88,7 +90,7 @@ This ball has `bounciness` 0, so it lands and stays. A ball that bounces touches
 
 **Try this:** delete the line `wasTouching = touching;` and run it again. The score races again, about sixty points a second while the ball sits on the bar, exactly like the version with no memory. Nothing ever changes `wasTouching`, so it stays `false`, `!wasTouching` is always `true`, and the test is just `touching`. A memory that is never updated remembers nothing.
 
-Then try the other way to get it wrong: move the update *inside* the `if`, by changing the `if` line to `if (touching && !wasTouching) { score += 1; wasTouching = touching; }` (with the separate `wasTouching = touching;` line still deleted). Now the first landing counts, and pressing R never adds another point: `wasTouching` becomes `true` on the first touch and nothing sets it back to `false`. That is why the update goes on its own line, outside the `if`, where it runs every frame.
+Then try the other way to get it wrong: move the update *inside* the `if`, by changing the `if` line to `if (touching && !wasTouching) { score += 1; wasTouching = touching; }` (with the separate `wasTouching = touching;` line still deleted). Now the first landing counts, and pressing R never adds another point: `wasTouching` takes the first touch's number, which counts as true, and nothing sets it back to 0. That is why the update goes on its own line, outside the `if`, where it runs every frame.
 
 ---
 

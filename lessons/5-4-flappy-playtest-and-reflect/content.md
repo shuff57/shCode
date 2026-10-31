@@ -2,7 +2,7 @@
 
 A playtest is playing your own game on purpose, to find out what it does, not to win. Programmers do it after every build, because code that passes the labs can still feel wrong.
 
-**How to play on purpose.** Play your finished game at least three rounds, and lose in a different way each time: into a pipe, off the screen, and by flying a long way. Watch for anything that looks odd: pipes that bunch up, a score that counts twice, a flap that feels too strong, something left over after a restart.
+**How to play on purpose.** Play your finished game at least three rounds, and lose in a different way each time: into a top pipe, into a bottom pipe, and after flying a long way. Try flying off the top or the bottom too: in your game that does not lose, it puts the bird back in the middle. Watch for anything that looks odd: pipes that bunch up, a score that counts twice, a flap that feels too strong, something left over after a restart.
 
 **Then think backwards.** When something looks odd, ask which part of the game could cause it: the flap, the timer that builds pipes, the deleting of old ones, the score, the restart. Naming the part is the first step of fixing it, even when you are not sure.
 

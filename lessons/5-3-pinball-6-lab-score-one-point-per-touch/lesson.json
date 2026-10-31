@@ -36,7 +36,7 @@
       "instructions": "Run it and let the ball finish its drop: the score reads 1. Press R three times, letting the ball cross the gold each time, and it should read exactly 4: one point per crossing, never 33.",
       "hints": [
         "If it still jumps by dozens, the memory is never updated: check that `wasTouching = touching;` is in `draw()`.",
-        "If it reads 1 and stays there however often you press R, the update is inside the `if`, so it only ever stores `true`. Move it onto its own line after the `if`."
+        "If it reads 1 and stays there however often you press R, the update is inside the `if`, so the memory is only ever set on a touch and never goes back to 0. Move it onto its own line after the `if`."
       ]
     }
   ],
@@ -55,10 +55,10 @@
     {
       "id": "r2",
       "title": "A point is added only when contact starts",
-      "description": "The score goes up when the ball is touching now and was not touching a frame ago: the `score += 1` sits inside that `if`. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "The score goes up when the ball is touching now and was not touching a frame ago: the `score += 1` sits inside that `if`. `colliding()` gives a number (0 when not touching), so test the memory with `!wasTouching`: `wasTouching === false` is never true. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*(?:\\(\\s*){0,2}(?:(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?(?:\\s*\\)){0,2}\\s*&&\\s*(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+\\s*===?\\s*false)(?:\\s*\\)){0,2}|(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+\\s*===?\\s*false)(?:\\s*\\)){0,2}\\s*&&\\s*(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?(?:\\s*\\)){0,2})(?:\\s*\\)){0,2}\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]{0,200}?)score\\s*(?:\\+=|\\+\\+|=\\s*score\\s*\\+)|if\\s*\\(\\s*(?:(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?(?:\\s*\\)){0,2}|(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+\\s*===?\\s*false)(?:\\s*\\)){0,2})\\s*\\)\\s*(?:\\{\\s*)?if\\s*\\(\\s*(?:(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+\\s*===?\\s*false)(?:\\s*\\)){0,2}|(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*===?\\s*true)?(?:\\s*\\)){0,2})\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]{0,200}?)score\\s*(?:\\+=|\\+\\+|=\\s*score\\s*\\+)",
+      "pattern": "if\\s*\\(\\s*(?:\\(\\s*){0,2}(?:(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*\\))?(?:\\s*==\\s*true\\b|\\s*(?:>|!==?)\\s*0(?![\\w.]))?(?:\\s*\\)){0,2}\\s*&&\\s*(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+(?:\\s*\\))?\\s*(?:==\\s*false\\b|===?\\s*0(?![\\w.])))(?:\\s*\\)){0,2}|(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+(?:\\s*\\))?\\s*(?:==\\s*false\\b|===?\\s*0(?![\\w.])))(?:\\s*\\)){0,2}\\s*&&\\s*(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*\\))?(?:\\s*==\\s*true\\b|\\s*(?:>|!==?)\\s*0(?![\\w.]))?(?:\\s*\\)){0,2})(?:\\s*\\)){0,2}\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]{0,200}?)score\\s*(?:\\+=|\\+\\+|=\\s*(?:\\(\\s*)?score\\s*\\+)|if\\s*\\(\\s*(?:(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*\\))?(?:\\s*==\\s*true\\b|\\s*(?:>|!==?)\\s*0(?![\\w.]))?(?:\\s*\\)){0,2}|(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+(?:\\s*\\))?\\s*(?:==\\s*false\\b|===?\\s*0(?![\\w.])))(?:\\s*\\)){0,2})\\s*\\)\\s*(?:\\{\\s*)?if\\s*\\(\\s*(?:(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+(?:\\s*\\))?\\s*(?:==\\s*false\\b|===?\\s*0(?![\\w.])))(?:\\s*\\)){0,2}|(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*\\))?(?:\\s*==\\s*true\\b|\\s*(?:>|!==?)\\s*0(?![\\w.]))?(?:\\s*\\)){0,2})\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]{0,200}?)score\\s*(?:\\+=|\\+\\+|=\\s*(?:\\(\\s*)?score\\s*\\+)",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -69,7 +69,7 @@
       "description": "The variable that remembers last frame is given this frame's answer on every frame, so the next touch is recognised. Any name works. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:const|let|var)\\s+(\\w+)\\s*=\\s*(?:ball\\.colliding\\s*\\(\\s*goal|goal\\.colliding\\s*\\(\\s*ball)\\s*\\)[\\s\\S]{0,800}?(?:!\\s*(?:\\(\\s*)?|\\b(?=\\w+\\s*\\)?\\s*===?\\s*false\\b))(\\w+)[\\s\\S]{0,800}?(?:(?=\\b\\2\\s*=\\s*(?:\\(\\s*)?\\1\\b(?!\\s*[=(.]))(?<!\\bif\\s*\\([^{}]{0,200}\\)\\s*\\{[^{}]{0,300}\\bscore\\b[^{}]{0,300})\\b\\2|\\b\\2\\s*=(?!=)(?:[^{}]{0,300}\\}|[^{};]{0,300};)\\s*else\\b\\s*(?:if\\s*\\([^{};]{0,200}\\)\\s*)?(?:\\{[^{}]{0,300}?|[^{};]{0,300}?)\\b\\2\\s*=(?!=))",
+      "pattern": "(?:const|let|var)\\s+(\\w+)\\s*=\\s*(?:ball\\.colliding\\s*\\(\\s*goal|goal\\.colliding\\s*\\(\\s*ball)\\s*\\)[\\s\\S]{0,800}?(?:!\\s*(?:\\(\\s*)?|\\b(?=\\w+\\s*\\)?\\s*===?\\s*(?:false\\b|0(?![\\w.]))))(\\w+)[\\s\\S]{0,800}?(?:(?=\\b\\2\\s*=\\s*(?:\\(\\s*)?\\1\\b(?!\\s*[=(.]))(?<!\\bif\\s*\\([^{}]{0,200}\\)\\s*\\{[^{}]{0,300}\\bscore\\b[^{}]{0,300})\\b\\2|\\b\\2\\s*=(?!=)(?:[^{}]{0,300}\\}|[^{};]{0,300};)\\s*else\\b\\s*(?:if\\s*\\([^{};]{0,200}\\)\\s*)?(?:\\{[^{}]{0,300}?|[^{};]{0,300}?)\\b\\2\\s*=(?!=))",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -79,7 +79,7 @@
       "description": "Gravity goes to 0 and the pipes stop too (their vel.x goes to 0), so nothing keeps moving. The bird's own vel.x line from the starter does not count: it is the pipes that must stop. Help: 5.4.5 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*world\\.gravity\\.y\\s*=\\s*0(?![\\d.]))(?=[\\s\\S]*(?:(?<!bird)\\.vel\\.x\\s*=\\s*0(?![\\d.])|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?(?<![\\w$.])(?!bird\\b)[\\w$]+(?:\\[[^\\]]*\\])?(?:\\.mate)?\\.x\\s*(?:-=|=\\s*[\\w$.\\[\\]]+\\.x\\s*-)))",
+      "pattern": "^(?=[\\s\\S]*world\\.gravity\\.y\\s*=\\s*(?:\\(\\s*)?0(?![\\d.]))(?=[\\s\\S]*(?:(?<!bird)\\.vel\\.x\\s*=\\s*(?:\\(\\s*)?0(?![\\d.])|\\bif\\s*\\(\\s*(?!true\\b|false\\b)(?:!\\s*\\w+|\\w+(?:\\s*===?\\s*(?:true|false))?)\\s*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?(?<![\\w$.])(?!bird\\b)[\\w$]+(?:\\[[^\\]]*\\])?(?:\\.mate)?\\.x\\s*(?:-=|=\\s*[\\w$.\\[\\]]+\\.x\\s*-)))",
       "flags": "",
       "points": 0,
       "status": "pending"

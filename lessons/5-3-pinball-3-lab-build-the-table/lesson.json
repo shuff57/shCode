@@ -55,7 +55,7 @@
       "description": "`setup()` turns gravity on (a number other than 0) so the ball falls. Help: 5.2.6 (Reading: Gravity)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "world\\.gravity\\.y\\s*=\\s*-?(?:[1-9]|0?\\.\\d*[1-9])|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*-?(?:[1-9]|0?\\.\\d*[1-9])[^;\\n]*[;\\n][\\s\\S]*?world\\.gravity\\.y\\s*=\\s*\\1\\b",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*(?:\\(\\s*)?-?(?:[1-9]|0?\\.\\d*[1-9])|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\(\\s*)?-?(?:[1-9]|0?\\.\\d*[1-9])[^;\\n]*[;\\n][\\s\\S]*?world\\.gravity\\.y\\s*=\\s*(?:\\(\\s*)?\\1\\b",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -77,7 +77,7 @@
       "description": "The ball's `bounciness` is set above 0.5, so it keeps most of its speed. Help: 5.2.11 (Reading: Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "bounciness\\s*=\\s*(?:0?\\.[5-9]|[1-9])|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:0?\\.[5-9]|[1-9])[^;\\n]*[;\\n][\\s\\S]*?bounciness\\s*=\\s*\\1\\b",
+      "pattern": "bounciness\\s*=\\s*(?:\\(\\s*)?(?:0?\\.[5-9]|[1-9])|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\(\\s*)?(?:0?\\.[5-9]|[1-9])[^;\\n]*[;\\n][\\s\\S]*?bounciness\\s*=\\s*(?:\\(\\s*)?\\1\\b",
       "flags": "",
       "points": 0,
       "status": "pending"

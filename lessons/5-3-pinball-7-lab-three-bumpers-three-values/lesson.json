@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Loop instead of naming one",
-      "instructions": "Replace the single `bumpers[0]` check with a loop over every bumper in the array. Inside the loop, apply the same edge check you wrote in 5.3.7, but on the bumper's own `wasTouching`.",
+      "instructions": "Replace the single `bumpers[0]` check with a loop over every bumper in the array. Inside the loop, apply the same edge check you wrote in 5.3.7, but on the bumper's own `wasTouching`. `colliding()` gives a number, not `true` or `false`, so after the first frame the memory holds 0: test it with `!b.wasTouching`, because `b.wasTouching === false` is never true.",
       "hints": [
         "`for (const b of bumpers) { ... }` visits each bumper in turn; the loop shape is the one from 3.3.5. A counting loop, `for (let i = 0; i < bumpers.length; i++)`, works too: then the bumper is `bumpers[i]`.",
         "Inside the loop the check reads `touching && !b.wasTouching`."
@@ -58,7 +58,7 @@
       "description": "The bumper's own `wasTouching` is updated on every frame, so every bumper can be hit once per contact. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+(?:\\[\\s*\\w+\\s*\\])?\\.wasTouching\\s*=\\s*(?!false\\b|true\\b)\\w+",
+      "pattern": "(?<=[\\w$\\]])\\.wasTouching\\s*=\\s*(?:\\(\\s*)?(?!false\\b|true\\b)\\w+",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -66,10 +66,10 @@
     {
       "id": "r3",
       "title": "The bumper's own worth is added only when contact starts",
-      "description": "Different bumpers are worth different amounts, because the score uses each bumper's own `worth`. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "Different bumpers are worth different amounts, because the score uses each bumper's own `worth`, added only when the touch starts. `colliding()` gives a number (0 when not touching), so test the memory with `!b.wasTouching`: `b.wasTouching === false` is never true. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.wasTouching\\b[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)score\\s*(?:\\+=|=\\s*score\\s*\\+)\\s*\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth",
+      "pattern": "(?<![!=]==\\s*(?:true|false)\\b[^{};]{0,200})\\.wasTouching\\b(?:(?![!=]==\\s*(?:true|false)\\b)[^{};]){0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)score\\s*(?:\\+=\\s*(?:\\(\\s*)?\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth|=\\s*(?:\\(\\s*)?(?:score\\s*\\+\\s*(?:\\(\\s*)?\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth|\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth(?:\\s*\\))?\\s*\\+\\s*score\\b))",
       "flags": "",
       "points": 0,
       "status": "pending"
