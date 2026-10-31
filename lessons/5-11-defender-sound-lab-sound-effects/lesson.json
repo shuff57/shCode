@@ -1,0 +1,96 @@
+{
+  "id": "5-11-defender-sound-lab-sound-effects",
+  "title": "5.11.9 Lab: Sound effects",
+  "description": "The game gets sound. Load a sound once in setup(), then play it from inside methods you already wrote: a zap from the Bullet constructor for every shot, and a boom from takeHit() for every enemy a shot finishes. A mute key is optional.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.11 Project: Defender, Part C",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Load two sounds",
+      "instructions": "The game in the editor is your 5.11.6 game; it plays exactly as before, with no sound. Each step below teaches what it asks for (`content.md`, in the File tab, says the same with a little more).\n\n`loadSound(path)` downloads a sound file and gives you back a **Sound** object. Keep it in a variable, the way you keep a sprite. The course has two sound files, and the path is typed exactly, quotes included: `'/moshion/assets/coin.wav'` is a short blip, and `'/moshion/assets/music.wav'` is a five-second tune. A misspelled path shows no error; the sound just never plays.\n\n**Load once, in `setup()`; play later.** A file has to download before it can play, and a `.play()` that comes before the download finishes does nothing at all. So load each sound once in `setup()`. Loading in `draw()` or in a constructor would start a new download every time, and no `.play()` would ever be heard.\n\nA Sound has two settings you can change, the way a sprite has `color`: `.volume` runs from `0` (silent) to `1` (full), and `.rate` is the playback speed, which changes the pitch too (`0.5` is slower and lower). That is how one file gives two sounds. Under the scene's other `let` lines add `let zap, boom;`, then in `setup()`, after `new Canvas(400, 400);`:\n\n```js\nzap = loadSound('/moshion/assets/coin.wav');\nzap.volume = 0.3;    // shots come often, so keep them quiet\nboom = loadSound('/moshion/assets/coin.wav');\nboom.rate = 0.5;     // the same blip, slower and lower\n```",
+      "hints": [
+        "Type the path exactly as shown, quotes included. A misspelled path gives no error; the sound just never plays.",
+        "Load in setup() only. Anywhere that runs again and again would download the file again and again, and it would never be ready in time."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A shot makes a sound",
+      "instructions": "`zap.play();` plays the sound once, from the start. Every call starts a fresh copy, so two shots close together give two zaps that overlap instead of one cutting the other off.\n\nA sound belongs in the one place where its event happens **exactly once**. `fire()` makes every shot with `new Bullet(...)`, so `Bullet`'s constructor runs once for every shot and at no other time. Add `zap.play();` as the last line of that constructor. (`draw()` would be wrong: it runs 60 times a second.)\n\nA browser makes no sound until the player has pressed a key or clicked the page. moSHion switches sound on at the first key press, and in Defender the first sound is a shot, which needs Space, so this never gets in your way. Run, click the game so it gets your keys, and hold Space: one zap per shot.",
+      "hints": [
+        "Nothing to hear? Click the game before pressing Space, and check that the browser tab and your speakers are not muted."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "A finished enemy makes a sound",
+      "instructions": "Every hit calls `takeHit(1)`, so `takeHit` runs once per hit. In `Enemy`'s `takeHit(n)`, after the line that shows the new hp, add:\n\n```js\nif (!this.isAlive()) boom.play();\n```\n\nThe enemy asks itself the question the scene asks, and plays only on the hit that left it with no hp. Not in `isAlive()` itself: that is asked many times every frame, so a sound there would play over and over. Play a round: an orange 3-hp enemy booms once, on its third hit, and an enemy that reaches the base makes no sound.",
+      "hints": [
+        "`takeHit` runs once for every hit. The `if` keeps the boom for the one hit that left the enemy with no hp."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Optional: a mute key",
+      "instructions": "`masterVolume(0)` turns every sound off at once, `masterVolume(1)` turns them all back on, and `masterVolume()` with nothing in the brackets tells you the level it is at now. In `draw()`, next to the R line and outside `if (playing)` so it also works on the game-over screen:\n\n```js\nif (kb.presses('m')) {\n  if (masterVolume() > 0) masterVolume(0);\n  else masterVolume(1);\n}\n```\n\nThis step has no check; the game is finished without it.",
+      "hints": [
+        "`masterVolume()` with nothing in the brackets reads the level now; `masterVolume(0)` and `masterVolume(1)` set it."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Sounds are loaded once, in setup()",
+      "description": "setup() loads a sound into a variable with loadSound('/moshion/assets/coin.wav') (or music.wav), so it has downloaded before the game needs it. Any variable name and any quotes; the path must name one of the two files. Help: the section 'A sound is an object you load' on this page.",
+      "hint": "Check the path letter by letter: '/moshion/assets/coin.wav'. And load it in setup(), not in draw() or a constructor.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bfunction\\s+setup\\s*\\(\\s*\\)\\s*\\{(?:(?!\\bfunction\\b|\\bclass\\s)[\\s\\S])*?=\\s*loadSound\\s*\\(\\s*['\"`](?:(?:https?:\\/\\/[^'\"`\\s]*)?\\/moshion\\/assets\\/|(?:\\.\\/)?assets\\/)(?:coin|music)\\.wav['\"`]|^(?:(?:const|let|var)\\s+)?[A-Za-z_$][\\w$]*\\s*=\\s*loadSound\\s*\\(\\s*['\"`](?:(?:https?:\\/\\/[^'\"`\\s]*)?\\/moshion\\/assets\\/|(?:\\.\\/)?assets\\/)(?:coin|music)\\.wav['\"`]",
+      "flags": "m",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "A shot makes a sound",
+      "description": "A sound's .play() runs once for every shot: in Bullet's constructor, or right beside new Bullet(...) in fire(). Help: 5.11.5 (Lab: Bullet, and a hit that takes an enemy)",
+      "hint": "Bullet's constructor runs once per shot, so its last line is the place for .play().",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bclass\\s+Bullet\\b(?:(?!\\bclass\\s)[\\s\\S])*?\\bconstructor\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{|\\bclass\\s)[\\s\\S])*?[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\(|\\bnew\\s+Bullet\\s*\\([^{}]{0,400}?[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\(|[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\([^{}]{0,400}?\\bnew\\s+Bullet\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A finished enemy makes a sound",
+      "description": "A sound's .play() runs when a shot finishes an enemy: in Enemy's takeHit(), or under an if that asks the enemy isAlive() or about its hp. Help: 5.11.4 (Lab: Enemy takes over)",
+      "hint": "In takeHit(), after the hp line: if (!this.isAlive()) then play the sound.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\btakeHit\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{|\\bclass\\s)[\\s\\S])*?[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\(|\\bif\\s*\\((?=[^;{}]{0,160}?(?:\\bhp\\b|\\bisAlive\\b))[^;{}]{0,160}\\)\\s*(?:\\{[^{}]{0,400}?|[^;{}]{0,160}?)[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

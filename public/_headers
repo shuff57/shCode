@@ -16,3 +16,11 @@
 /reshape/kernel/*
   Access-Control-Allow-Origin: *
   Cross-Origin-Resource-Policy: cross-origin
+
+# moSHion's loadSound() fetch()es its file in CORS mode for the same reason, so a
+# sketch's sound would fail with "Failed to fetch" and stay silent without this.
+# Pages already sends Access-Control-Allow-Origin: * on static files (measured
+# 2026-10-31); this says it on purpose, for the folder the course's sounds live in.
+/moshion/assets/*
+  Access-Control-Allow-Origin: *
+  Cross-Origin-Resource-Policy: cross-origin

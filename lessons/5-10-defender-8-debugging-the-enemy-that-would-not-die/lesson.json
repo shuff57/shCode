@@ -75,7 +75,8 @@
         "removeEnemy"
       ],
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*\\benemies\\.splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\.splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\.splice\\s*\\()",
+      "pattern": "^(?:(?=[\\s\\S]*\\bremoveEnemy\\s*\\()(?=[\\s\\S]*\\benemies\\.splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\.splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\.splice\\s*\\()|(?=[\\s\\S]*?\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\benemies\\.splice\\s*\\()(?=[\\s\\S]*?\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\benemyHp\\.splice\\s*\\()(?=[\\s\\S]*?\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\benemyWorth\\.splice\\s*\\())",
+      "ignoreStrings": true,
       "flags": "",
       "points": 0,
       "status": "pending"

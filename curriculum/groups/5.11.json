@@ -24,11 +24,12 @@
     },
     {
       "id": "close",
-      "title": "Playtest, check, and make it yours",
-      "objective": "Students will be able to playtest the rebuilt game, link what they saw to a class, compare the class version with the procedural one, and extend it with a rule of their own.",
+      "title": "Playtest, check, add sound, and make it yours",
+      "objective": "Students will be able to playtest the rebuilt game, link what they saw to a class, compare the class version with the procedural one, play sound effects from inside the classes' own methods, and extend it with a rule of their own.",
       "screens": [
         "5-11-defender-7-playtest-and-reflect",
         "5-11-defender-8-quiz-defender-with-classes",
+        "5-11-defender-sound-lab-sound-effects",
         "5-11-defender-9-challenges-make-it-yours"
       ]
     }

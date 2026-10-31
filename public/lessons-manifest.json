@@ -7139,7 +7139,20 @@
     },
     {
       "id": "5-11-defender-9-challenges-make-it-yours",
-      "title": "5.11.9 Challenges: Make it yours",
+      "title": "5.11.10 Challenges: Make it yours",
+      "unit": "5.11 Project: Defender, Part C",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 12,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-11-defender-sound-lab-sound-effects",
+      "title": "5.11.9 Lab: Sound effects",
       "unit": "5.11 Project: Defender, Part C",
       "preview": "moshion",
       "type": "lesson",
