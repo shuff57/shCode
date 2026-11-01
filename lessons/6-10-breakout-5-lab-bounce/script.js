@@ -46,8 +46,9 @@ function movePaddle() {
 // Move the ball one step, and bounce it off the walls and the paddle.
 function moveBall() {
   // STEP 1: move the ball one step: add vx to its x and vy to its y.
-  // STEP 2: bounce off the walls. Past the left or right wall (closer than
-  //   R), flip the sign of vx. Past the top, flip the sign of vy.
+  // STEP 2: bounce off the walls. Past the left wall (closer than R) while
+  //   moving left, or past the right wall while moving right, flip the sign
+  //   of vx. Past the top, flip the sign of vy.
   // STEP 3: bounce off the paddle, but only while the ball is coming down (vy
   //   above 0): flip vy, then steer: vx is the ball's x minus the paddle's x,
   //   divided by 10.

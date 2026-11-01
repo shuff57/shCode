@@ -17,14 +17,15 @@ ball.x += vx;
 ball.y += vy;
 ```
 
-Why not let physics bounce it, with the `bounciness` of 5.2.11? A physics bounce can lose a little speed and pick up some spin, and Breakout wants the same speed every time. And the bricks will not be sprites at all, so there would be nothing for a physics ball to bounce off.
+Why not let physics bounce it, with the `bounciness` of 5.2.11? Because the bricks will not be sprites at all: they are data, a list of rows (6.9.9), so there would be nothing for a physics ball to bounce off. And the paddle steers the ball by setting its speed, which is simplest when the speed is two numbers your own code owns.
 
 **A bounce is a flipped sign.** When the ball reaches the right wall it has to go left at the same speed. `vx = -vx` turns `3` into `-3`. At the left wall the same line turns `-3` back into `3`. The top flips `vy` the same way. The speed never changes, only its direction.
 
-**`x` is the centre, so the wall is `R` away.** A sprite's x and y are its centre (5.1.6). The ball is 12 pixels wide, so its radius, `R`, is 6, and its left side touches the left wall when `ball.x` is 6, not 0. The canvas is 400 wide, so its right side touches the right wall when `ball.x` is `400 - R`:
+**`x` is the centre, so the wall is `R` away.** A sprite's x and y are its centre (5.1.6). The ball is 12 pixels wide, so its radius, `R`, is 6, and its left side touches the left wall when `ball.x` is 6, not 0. The canvas is 400 wide, so its right side touches the right wall when `ball.x` is `400 - R`. Each side wall turns only a ball that is moving into it, `vx < 0` (going left) at the left wall and `vx > 0` (going right) at the right one; the paddle section below says why:
 
 ```js
-if (ball.x < R || ball.x > 400 - R) vx = -vx;
+if (ball.x < R && vx < 0) vx = -vx;
+if (ball.x > 400 - R && vx > 0) vx = -vx;
 if (ball.y < R) vy = -vy;
 ```
 
@@ -53,7 +54,7 @@ if (ball.overlaps(paddle) && vy > 0) {
 }
 ```
 
-After the flip `vy` is negative, so the test stays false until the ball comes down again.
+After the flip `vy` is negative, so the test stays false until the ball comes down again. The side walls test the direction for the same reason: the paddle can steer a ball back toward a wall it is still touching, and a wall that flipped on `ball.x < R` alone would flip it again on every frame and glue it to the wall, so `&& vx < 0` (and `&& vx > 0` on the right) lets a wall turn only a ball that is moving into it.
 
 **The paddle steers.** The second line inside that `if` is what makes Breakout a game you play rather than watch. `ball.x - paddle.x` is how far from the paddle's centre the ball landed: the "from A to B" subtraction of 6.8.8. It is negative on the left half of the paddle, positive on the right half, and near 0 in the middle. Divided by 10 it becomes the new `vx`. Catch the ball on the left end and it flies off to the left; on the right end, to the right; in the middle, nearly straight up. Without that line the player cannot aim: the paddle only sends the ball back up, and where it goes next was decided before it landed.
 

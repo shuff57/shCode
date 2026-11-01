@@ -522,7 +522,7 @@ function moveBall() {
   ball.y += vy;
 //<<
 //>> s2
-  if (ball.x < R || ball.x > 400 - R) vx = -vx;
+  if ((ball.x < R && vx < 0) || (ball.x > 400 - R && vx > 0)) vx = -vx;
   if (ball.y < R) vy = -vy;
 //<<
 //>> s3
@@ -613,7 +613,7 @@ function movePaddle() {
 function moveBall() {
   ball.x += vx;
   ball.y += vy;
-  if (ball.x < R || ball.x > 400 - R) vx = -vx;
+  if ((ball.x < R && vx < 0) || (ball.x > 400 - R && vx > 0)) vx = -vx;
   if (ball.y < R) vy = -vy;
   if (ball.overlaps(paddle) && vy > 0) {
     vy = -vy;
@@ -748,7 +748,7 @@ function movePaddle() {
 function moveBall() {
   ball.x += vx;
   ball.y += vy;
-  if (ball.x < R || ball.x > 400 - R) vx = -vx;
+  if ((ball.x < R && vx < 0) || (ball.x > 400 - R && vx > 0)) vx = -vx;
   if (ball.y < R) vy = -vy;
   if (ball.overlaps(paddle) && vy > 0) {
     vy = -vy;
@@ -897,7 +897,7 @@ function movePaddle() {
 function moveBall() {
   ball.x += vx;
   ball.y += vy;
-  if (ball.x < R || ball.x > 400 - R) vx = -vx;
+  if ((ball.x < R && vx < 0) || (ball.x > 400 - R && vx > 0)) vx = -vx;
   if (ball.y < R) vy = -vy;
   if (ball.overlaps(paddle) && vy > 0) {
     vy = -vy;
@@ -1093,7 +1093,7 @@ function movePaddle() {
 function moveBall() {
   ball.x += vx;
   ball.y += vy;
-  if (ball.x < R || ball.x > 400 - R) vx = -vx;
+  if ((ball.x < R && vx < 0) || (ball.x > 400 - R && vx > 0)) vx = -vx;
   if (ball.y < R) vy = -vy;
   if (ball.overlaps(paddle) && vy > 0) {
     vy = -vy;
@@ -1222,7 +1222,7 @@ function draw() {
   ball.y += vy;
 
   // A bounce is a flipped sign. x is the ball's CENTRE, so it touches a wall at R, not 0.
-  if (ball.x < R || ball.x > 400 - R) vx = -vx;
+  if ((ball.x < R && vx < 0) || (ball.x > 400 - R && vx > 0)) vx = -vx;
   if (ball.y < R) vy = -vy;
 
   // The paddle: only while the ball is coming down, then steer by where it landed.

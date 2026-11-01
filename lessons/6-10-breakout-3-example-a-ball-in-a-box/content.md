@@ -36,7 +36,9 @@ function draw() {
   ball.y += vy;
 
   // A bounce is a flipped sign. x is the ball's CENTRE, so it touches a wall at R, not 0.
-  if (ball.x < R || ball.x > 400 - R) vx = -vx;
+  // A side wall turns only a ball moving into it: vx below 0 on the left, above 0 on the right.
+  if (ball.x < R && vx < 0) vx = -vx;
+  if (ball.x > 400 - R && vx > 0) vx = -vx;
   if (ball.y < R) vy = -vy;
 
   // The paddle: only while the ball is coming down, then steer by where it landed.
@@ -69,7 +71,7 @@ function drawTop() {
 
 1. Catch the ball on the left end of the paddle, then on the right end, then in the middle, and watch `vx` on the top line each time. The left end makes it negative (the ball leaves to the left), the right end positive, and the middle close to 0 (nearly straight up).
 2. Delete the line `vx = (ball.x - paddle.x) / 10;` and press Run. Now `vx` is only ever 3 or -3: whatever you do with the paddle, the ball flies at the same angle, back and forth on the same path. Put the line back.
-3. In the wall test, change `ball.x < R || ball.x > 400 - R` to `ball.x < 0 || ball.x > 400` and press Run. The ball now goes half into each side wall before it turns, because `ball.x` is its centre. Put `R` back.
+3. In the two side-wall tests, change `ball.x < R` to `ball.x < 0` and `ball.x > 400 - R` to `ball.x > 400`, and press Run. The ball now goes half into each side wall before it turns, because `ball.x` is its centre. Put `R` back.
 4. Change the `/ 10` in the steering line to `/ 4`. The ends of the paddle now throw the ball off almost sideways. Put it back to `/ 10`.
 
 **What each Try found.** Try 1: where the ball lands on the paddle decides which way it leaves. Try 2: without the steering line the player cannot aim, and every rally is the same. Try 3: the wall tests use `R` because x is the centre of the ball, not its edge. Try 4: the number you divide by sets how hard the ends of the paddle steer.

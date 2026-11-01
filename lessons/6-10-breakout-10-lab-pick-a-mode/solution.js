@@ -93,7 +93,8 @@ function movePaddle() {
 function moveBall() {
   ball.x += vx;
   ball.y += vy;
-  if (ball.x < R || ball.x > 400 - R) vx = -vx;
+  if (ball.x < R && vx < 0) vx = -vx;
+  if (ball.x > 400 - R && vx > 0) vx = -vx;
   if (ball.y < R) vy = -vy;
   if (ball.overlaps(paddle) && vy > 0) {
     vy = -vy;

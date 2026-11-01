@@ -36,7 +36,7 @@
       "title": "The ball breaks a brick",
       "instructions": "`draw()` calls `hitBricks()` every frame. In it, ask `hitAt` about the ball's centre, and flip `vy` when it says `true`: `if (hitAt(ball.x, ball.y)) vy = -vy;`. `hitAt` takes the brick out, and flipping `vy` sends the ball back the way it came. Run it and play a while. It works, mostly. Watch closely as a brick breaks: the ball is already half inside it. And watch a ball that passes close beside a brick: it can slide through the corner without breaking it. The next reading is about why.",
       "hints": [
-        "This is the call 6.9.11 promised: the ball asks the same `hitAt` your mouse clicks used.",
+        "The ball asks the same `hitAt` your mouse clicks used in 6.9.11.",
         "`hitAt` gives back `true` only when it took a brick out, so the flip happens once per brick."
       ]
     }
@@ -62,7 +62,7 @@
       "type": "inFunction",
       "file": "script.js",
       "function": "makeBricks",
-      "pattern": "^(?=[\\s\\S]*(?:(?:===?|!==?)\\s*(['\"\\x60]) \\1|(['\"\\x60]) \\2\\s*(?:===?|!==?)|\\bcase\\s*(['\"\\x60]) \\3))(?=[\\s\\S]*(?:\\.\\s*push\\s*\\(\\s*1\\s*\\)[\\s\\S]*\\.\\s*push\\s*\\(\\s*0\\s*\\)|\\.\\s*push\\s*\\(\\s*0\\s*\\)[\\s\\S]*\\.\\s*push\\s*\\(\\s*1\\s*\\)|\\?\\s*1\\s*:\\s*0\\b|\\?\\s*0\\s*:\\s*1\\b|\\]\\s*=\\s*1\\s*;[\\s\\S]*\\]\\s*=\\s*0\\s*;|\\]\\s*=\\s*0\\s*;[\\s\\S]*\\]\\s*=\\s*1\\s*;))",
+      "pattern": "^(?=[\\s\\S]*?(?:(?:===?|!==?)\\s*['\"\\x60] {1}['\"\\x60]|['\"\\x60] {1}['\"\\x60]\\s*(?:===?|!==?)|\\bcase\\s*['\"\\x60] {1}['\"\\x60]))(?=[\\s\\S]*?(?:\\.\\s*push\\s*\\(\\s*1\\s*\\)[\\s\\S]*?\\.\\s*push\\s*\\(\\s*0\\s*\\)|\\.\\s*push\\s*\\(\\s*0\\s*\\)[\\s\\S]*?\\.\\s*push\\s*\\(\\s*1\\s*\\)|\\?\\s*1\\s*:\\s*0\\b|\\?\\s*0\\s*:\\s*1\\b|\\]\\s*=\\s*1\\s*;[\\s\\S]*?\\]\\s*=\\s*0\\s*;|\\]\\s*=\\s*0\\s*;[\\s\\S]*?\\]\\s*=\\s*1\\s*;|\\.\\s*push\\s*\\(\\s*0\\s*\\)[\\s\\S]*?\\]\\s*=(?!=)\\s*1\\b|\\.\\s*push\\s*\\(\\s*1\\s*\\)[\\s\\S]*?\\]\\s*=(?!=)\\s*0\\b|\\.\\s*push\\s*\\(\\s*(?:Number\\s*\\(|\\+\\s*\\()[^;\\n]{0,200}(?:===?|!==?)))",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
@@ -75,7 +75,7 @@
       "type": "inFunction",
       "file": "script.js",
       "function": "drawBricks",
-      "pattern": "^(?=[\\s\\S]*\\b(?:for|while)\\b[\\s\\S]*\\b(?:for|while)\\b)(?=[\\s\\S]*(?:\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]|\\bof\\s+bricks\\b))(?=[\\s\\S]*\\bfill\\s*\\()(?=[\\s\\S]*\\b(?:rect|square)\\s*\\()",
+      "pattern": "^(?=[\\s\\S]*?\\b(?:for|forEach|while)\\b[\\s\\S]*?\\b(?:for|forEach|while)\\b)(?=[\\s\\S]*?(?:\\bbricks\\s*\\[[^\\]]{1,40}\\]\\s*\\[[^\\]]{1,40}\\]|\\bof\\s+bricks\\b|\\b(?:const|let|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*bricks\\s*\\[[^\\]]{1,40}\\]\\s*;|\\bbricks\\s*\\.\\s*forEach\\s*\\())(?=[\\s\\S]*?\\bfill\\s*\\()(?=[\\s\\S]*?\\b(?:rect|square)\\s*\\()",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
@@ -101,7 +101,7 @@
       "type": "inFunction",
       "file": "script.js",
       "function": "hitBricks",
-      "pattern": "\\bif\\s*\\((?=[^;{}]*\\bhitAt\\s*\\((?=[^;{}]*\\bball\\b))[^;{}]*\\)\\s*\\{?\\s*\\bvy\\s*(?:=(?!=)\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\b(?:const|let|var)\\s+(?<h>[A-Za-z_$][\\w$]*)\\s*=\\s*hitAt\\s*\\((?=[^;\\n]*\\bball\\b)[^;\\n]*[;\\n][\\s\\S]*?\\bif\\s*\\((?=[^;{}]*\\b\\k<h>\\b)[^;{}]*\\)\\s*\\{?\\s*\\bvy\\s*(?:=(?!=)\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)",
+      "pattern": "\\bif\\s*\\((?=[^;{}]{0,200}\\bhitAt\\s*\\((?=[^;{}]{0,200}\\bball\\b))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bvy\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\b(?:const|let|var)\\s+(?<h>[A-Za-z_$][\\w$]*)\\s*=\\s*\\bhitAt\\s*\\((?=[^;{}]{0,200}\\bball\\b)[^;\\n]{0,200}[;\\n][\\s\\S]{0,600}?\\bif\\s*\\((?=[^;{}]{0,200}\\b\\k<h>\\b)[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bvy\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvy\\s*=(?!=)[^;\\n]{0,200}\\bhitAt\\s*\\((?=[^;{}]{0,200}\\bball\\b)[^;\\n]{0,200}\\?\\s*-\\s*\\(?\\s*vy\\b|\\bhitAt\\s*\\((?=[^;{}]{0,200}\\bball\\b)[^;\\n]{0,200}\\)\\s*&&\\s*\\(?\\s*\\bvy\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bif\\s*\\(\\s*!\\s*\\bhitAt\\s*\\((?=[^;{}]{0,200}\\bball\\b)[^;{}]{0,200}\\)\\s*\\)\\s*\\{?\\s*return\\b[\\s\\S]{0,300}?\\bvy\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,

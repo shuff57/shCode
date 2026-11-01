@@ -9,6 +9,6 @@ Add `Press 3 for one ball, with the mouse` to the title screen. In `pickMode()`,
 Write `'2'` in `WALL` for a brick that takes two hits. `makeBricks()` pushes 2 for it, `hitAt` lowers a cell by 1 instead of setting it to 0, `drawBricks()` fills a 2 with `'silver'`, and the three `=== 1` tests (`drawBricks`, `hitAt`, `bricksLeft`) become `> 0`.
 
 **Challenge 3: a second wall (hard).**
-Make `WALLS` a list of walls and `wallNum` the one in play, as 6.9.8 did with levels. `makeBricks()` reads `WALLS[wallNum]`. A cleared wall adds 1 to `wallNum` and builds the next one; after the last wall, the state becomes `'won'`.
+Make `WALLS` a list of walls and `wallNum` the one in play, as 6.9.8 did with levels. `startGame()` sets `wallNum` to 0 above `bricks = makeBricks();`, because `makeBricks()` reads `WALLS[wallNum]`. A cleared wall adds 1 to `wallNum` and builds the next one; after the last wall, the state becomes `'won'`.
 
-Whatever you pick, play it to the end and press R afterwards: check the game comes back whole.
+Whatever you pick, play it to the end and press R afterwards (click the canvas first so the sketch hears your keys): check the game comes back whole.

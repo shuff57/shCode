@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Move the ball",
-      "instructions": "The starter has the finished paddle from 6.10.4 and a ball: a white circle 12 pixels wide, so its radius `R` is 6. It has `collider = 'none'`, so nothing pushes it, slows it or pulls it down: your code moves it, as with Defender's shots in 5.9.5. `vx` and `vy` hold its speed in pixels per frame: `vx` across (`+` is right) and `vy` down (`+` is down, `-` is up). `serve()` puts the ball at (200, 300) with `vx` 3 and `vy` -4, and `draw()` calls `moveBall()` every frame, which is empty. The words at the top show vx and vy.\n\nIn `moveBall()`, add `vx` to the ball's x and `vy` to its y. Run it: the ball flies up and to the right, and off the screen. Press Run again to bring it back.",
+      "instructions": "The starter has the finished paddle from 6.10.4 and a ball: a white circle 12 pixels wide, so its radius `R` is 6. It has `collider = 'none'`, so nothing pushes it, slows it or pulls it down: your code moves it, as with Defender's shots in 5.9.5. `vx` and `vy` hold its speed in pixels per frame: `vx` across (`+` is right) and `vy` down (`+` is down, `-` is up). `serve()` puts the ball at (200, 300) with `vx` 3 and `vy` -4, and `draw()` calls `moveBall()` every frame, which is empty. The words at the top show vx and vy.\n\nIn `moveBall()`, add `vx` to the ball's x and `vy` to its y. Run it: the ball flies up and to the right, and off the screen. Press Stop, then Run, to bring it back.",
       "hints": [
         "`ball.x += vx;` and `ball.y += vy;`",
         "`+=` adds to what is there: `ball.x += vx` is `ball.x = ball.x + vx`."
@@ -25,9 +25,9 @@
     {
       "id": "s2",
       "title": "Bounce off three walls",
-      "instructions": "A bounce is a flipped sign: `vx = -vx` turns 3 into -3 (going left) and -3 back into 3. The ball's x is its centre, so its side touches the left wall when `ball.x` is `R`, not 0, and the right wall when it is `400 - R` (6.10.2). Under the two moving lines, add: if `ball.x` is less than `R` OR more than `400 - R`, flip `vx`. Then: if `ball.y` is less than `R` (the top), flip `vy`. There is no bottom wall. Run it: the ball bounces off the left, the right and the top, and falls out at the bottom.",
+      "instructions": "A bounce is a flipped sign: `vx = -vx` turns 3 into -3 (going left) and -3 back into 3. The ball's x is its centre, so its side touches the left wall when `ball.x` is `R`, not 0, and the right wall when it is `400 - R` (6.10.2). Under the two moving lines, add: if `ball.x` is less than `R` and `vx` is below 0 (moving left), flip `vx`; if `ball.x` is more than `400 - R` and `vx` is above 0 (moving right), flip `vx`. A wall turns only a ball that is moving into it, the same idea as the paddle's `vy > 0` in step 3: the paddle can steer a ball back toward a wall it is still touching, and without the direction test that wall would flip it on every frame and glue it there (6.10.2). Then: if `ball.y` is less than `R` (the top), flip `vy`. There is no bottom wall. Run it: the ball bounces off the left, the right and the top, and falls out at the bottom.",
       "hints": [
-        "`if (ball.x < R || ball.x > 400 - R) vx = -vx;`",
+        "`if (ball.x < R && vx < 0) vx = -vx;` and `if (ball.x > 400 - R && vx > 0) vx = -vx;`",
         "`if (ball.y < R) vy = -vy;`"
       ]
     },
@@ -67,11 +67,19 @@
     {
       "id": "r2",
       "title": "The side walls flip vx",
-      "description": "When the ball is less than R from the left wall or more than 400 - R across, vx changes sign. Help: 6.10.2 (Reading: A ball you move yourself)",
+      "description": "When the ball reaches the left wall (x less than R) or the right wall (x more than 400 - R), vx changes sign. Testing the way it moves as well (vx < 0 on the left, vx > 0 on the right) keeps it from sticking to a wall. Help: 6.10.2 (Reading: A ball you move yourself)",
       "type": "inFunction",
       "file": "script.js",
-      "function": "moveBall",
-      "pattern": "^(?=[\\s\\S]*?\\bif\\s*\\((?=[^;{}]*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;{}]*<)(?=[^;{}]*(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:[1-9]|1[0-2])\\b))[^;{}]*\\)\\s*\\{?\\s*(?:\\bvx\\s*(?:=(?!=)\\s*(?:-\\s*\\(?\\s*vx\\b|0\\s*-\\s*vx\\b|\\(?\\s*vx\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vx\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vx\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvx\\s*=(?!=)\\s*-?\\s*\\d))(?=[\\s\\S]*?\\bif\\s*\\((?=[^;{}]*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;{}]*>)(?=[^;{}]*(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:39\\d|38[89])\\b|\\bwidth\\b))[^;{}]*\\)\\s*\\{?\\s*(?:\\bvx\\s*(?:=(?!=)\\s*(?:-\\s*\\(?\\s*vx\\b|0\\s*-\\s*vx\\b|\\(?\\s*vx\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vx\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vx\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvx\\s*=(?!=)\\s*-?\\s*\\d))",
+      "function": [
+        "moveBall",
+        "bounceWalls",
+        "bounceOffWalls",
+        "wallBounce",
+        "checkWalls",
+        "hitWalls",
+        "walls"
+      ],
+      "pattern": "^(?=[\\s\\S]*?(?:\\bif\\s*\\((?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b[^;{}]{0,200}<|>\\s*\\(?\\s*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b))(?=[^;{}]{0,200}(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:[1-9]|1[0-2])\\b))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?(?:\\bvx\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vx\\b|0\\s*-\\s*vx\\b|\\(?\\s*vx\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vx\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vx\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvx\\s*=(?!=)\\s*\\(?\\s*-?\\s*(?:[1-9]|0?\\.\\d*[1-9]))|\\bvx\\s*=(?!=)\\s*\\(?(?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b[^;{}]{0,200}<|>\\s*\\(?\\s*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b))(?=[^;{}]{0,200}(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:[1-9]|1[0-2])\\b))[^;{}?]{0,200}\\?\\s*-\\s*\\(?\\s*vx\\b))(?=[\\s\\S]*?(?:\\bif\\s*\\((?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b[^;{}]{0,200}>|<\\s*\\(?\\s*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b))(?=[^;{}]{0,200}(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:39\\d|38[89])\\b|\\bwidth\\b))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?(?:\\bvx\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vx\\b|0\\s*-\\s*vx\\b|\\(?\\s*vx\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vx\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vx\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvx\\s*=(?!=)\\s*\\(?\\s*-?\\s*(?:[1-9]|0?\\.\\d*[1-9]))|\\bvx\\s*=(?!=)\\s*\\(?(?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b[^;{}]{0,200}>|<\\s*\\(?\\s*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b))(?=[^;{}]{0,200}(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:39\\d|38[89])\\b|\\bwidth\\b))[^;{}?]{0,200}\\?\\s*-\\s*\\(?\\s*vx\\b))",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
@@ -83,8 +91,16 @@
       "description": "When the ball is less than R from the top, vy changes sign. Help: 6.10.2 (Reading: A ball you move yourself)",
       "type": "inFunction",
       "file": "script.js",
-      "function": "moveBall",
-      "pattern": "\\bif\\s*\\((?=[^;{}]*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]*<)(?=[^;{}]*(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:[1-9]|1[0-2])\\b))[^;{}]*\\)\\s*\\{?\\s*(?:\\bvy\\s*(?:=(?!=)\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvy\\s*=(?!=)\\s*\\d)",
+      "function": [
+        "moveBall",
+        "bounceWalls",
+        "bounceOffWalls",
+        "wallBounce",
+        "checkWalls",
+        "hitWalls",
+        "walls"
+      ],
+      "pattern": "(?:\\bif\\s*\\((?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b[^;{}]{0,200}<|>\\s*\\(?\\s*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b))(?=[^;{}]{0,200}(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:[1-9]|1[0-2])\\b))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?(?:\\bvy\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvy\\s*=(?!=)\\s*\\(?\\s*-?\\s*(?:[1-9]|0?\\.\\d*[1-9]))|\\bvy\\s*=(?!=)\\s*\\(?(?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b[^;{}]{0,200}<|>\\s*\\(?\\s*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b))(?=[^;{}]{0,200}(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:[1-9]|1[0-2])\\b))[^;{}?]{0,200}\\?\\s*-\\s*\\(?\\s*vy\\b)",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
@@ -97,7 +113,7 @@
       "type": "inFunction",
       "file": "script.js",
       "function": "moveBall",
-      "pattern": "^(?=[\\s\\S]*(?:\\bball\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*paddle\\b|\\bpaddle\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*ball\\b|\\bif\\s*\\((?=[^;{}]*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]*\\bpaddle\\s*\\.\\s*(?:x|y|pos)\\b)))(?=[\\s\\S]*(?:\\bvy\\s*>=?\\s*0\\b|\\b0\\s*<=?\\s*vy\\b|\\bvy\\s*=(?!=)\\s*-\\s*\\(?\\s*(?:(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\)|\\d|[A-Z][A-Z_\\d]*\\b)))",
+      "pattern": "\\bif\\s*\\((?=[^;{}]{0,200}(?:\\bvy\\s*>=?\\s*0\\b|\\b0\\s*<=?\\s*vy\\b))(?:(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*paddle\\b|\\bpaddle\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*ball\\b))|(?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]{0,200}\\bpaddle\\s*\\.\\s*(?:x|y|pos)\\b))[^;{}]{0,200}\\)|\\bif\\s*\\((?:(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*paddle\\b|\\bpaddle\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*ball\\b))|(?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]{0,200}\\bpaddle\\s*\\.\\s*(?:x|y|pos)\\b))[^;{}]{0,200}\\)\\s*\\{[^{}]{0,300}?\\bif\\s*\\((?=[^;{}]{0,200}(?:\\bvy\\s*>=?\\s*0\\b|\\b0\\s*<=?\\s*vy\\b))|\\bif\\s*\\((?=[^;{}]{0,200}(?:\\bvy\\s*>=?\\s*0\\b|\\b0\\s*<=?\\s*vy\\b))[^;{}]{0,200}\\)\\s*\\{[^{}]{0,300}?\\bif\\s*\\((?:(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*paddle\\b|\\bpaddle\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*ball\\b))|(?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]{0,200}\\bpaddle\\s*\\.\\s*(?:x|y|pos)\\b))|\\bif\\s*\\((?:(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*paddle\\b|\\bpaddle\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*ball\\b))|(?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]{0,200}\\bpaddle\\s*\\.\\s*(?:x|y|pos)\\b))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bvy\\s*=(?!=)\\s*-\\s*\\(?\\s*(?:(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\)|\\d|[A-Z][A-Z_\\d]*\\b)|\\b(?:const|let|var)\\s+(?<ov>[A-Za-z_$][\\w$]*)\\s*=\\s*[^;\\n]{0,100}(?:\\bball\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*paddle\\b|\\bpaddle\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*ball\\b)[\\s\\S]{0,600}?\\bif\\s*\\((?=[^;{}]{0,200}(?:\\bvy\\s*>=?\\s*0\\b|\\b0\\s*<=?\\s*vy\\b))(?=[^;{}]{0,200}\\b\\k<ov>\\b)",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
@@ -126,7 +142,7 @@
         "moveBall",
         "draw"
       ],
-      "pattern": "\\bif\\s*\\((?=[^;{}]*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]*>)[^;{}]*\\)\\s*\\{?\\s*(?:serve\\s*\\(\\s*\\)|ball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\s*=(?!=)|ball\\s*\\.\\s*pos\\s*=(?!=)|startGame\\s*\\(\\s*\\))",
+      "pattern": "\\bif\\s*\\((?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]{0,200}(?:\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b[^;{}]{0,200}>|<\\s*\\(?\\s*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b))(?=[^;{}]{0,200}(?:\\b(?:3[6-9]\\d|[4-9]\\d\\d)\\b|\\bheight\\b|\\bwindowHeight\\b|\\bcanvas\\s*\\.\\s*h\\b))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?(?:serve\\s*\\(\\s*\\)|\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b\\s*=(?!=)|\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b\\s*=(?!=)|\\bball\\s*\\.\\s*pos\\s*=(?!=)|startGame\\s*\\(\\s*\\))",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
