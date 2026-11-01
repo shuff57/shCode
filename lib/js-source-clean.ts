@@ -7,7 +7,7 @@
 // survive. Template literals (with `${ }` code inside them) and regex
 // literals are tracked so their text is never read as a comment, and a
 // comment inside `${ }` is never kept as string text.
-export function stripJsComments(src: string): string {
+export function stripJsComments(src: string, htmlComments = true): string {
   let out = '';
   // `shadow` is `out` as blankStringContents would see it (string and template text and regex bodies blanked), so the
   // "does this / start a regex" question is answered on the same text by both scanners. Parentheses inside a string
@@ -19,6 +19,7 @@ export function stripJsComments(src: string): string {
   // Template literals nest: `${ ... }` is code (comments in it are comments), and a backtick inside it opens another template.
   const exprDepth: number[] = []; // open-brace depth inside each active ${ }
   const blankOf = (t: string) => t.replace(/[^\n]/g, ' ');
+  let newlineCommentAt = -1;
   while (i < n) {
     const c = src[i];
     const nx = src[i + 1];
@@ -64,18 +65,29 @@ export function stripJsComments(src: string): string {
         exprDepth[exprDepth.length - 1]--;
       }
     }
+    // Annex B: a classic <script> (which is how the sketch runs) treats `<!--` anywhere as a line comment, and `-->` as one
+    // when only whitespace (or comments) came before it on the line. Without this `<!-- player.overlaps(...)` ran nothing and read as code.
+    // A hashbang line (`#!` as the very first two characters) is a comment too (ES2023, Chrome 74+ in a classic script).
+    if (htmlComments && i === 0 && c === '#' && nx === '!') { while (i < n && src[i] !== '\n') i++; continue; }
+    if (htmlComments && ((c === '<' && src.startsWith('<!--', i)) || (c === '-' && src.startsWith('-->', i) && /^[ \t\r\f\v]*$/.test(out.slice(Math.max(out.lastIndexOf('\n') + 1, newlineCommentAt)))))) {
+      while (i < n && src[i] !== '\n') i++;
+      continue;
+    }
     if (c === '/' && nx === '/') {
       while (i < n && src[i] !== '\n') i++;
       continue;
     }
     if (c === '/' && nx === '*') {
+      const start = i;
       i += 2;
       while (i < n && !(src[i] === '*' && src[i + 1] === '/')) i++;
       i += 2;
+      if (src.slice(start, i).includes('\n')) newlineCommentAt = out.length; // a block comment with a line break in it counts as a line start for `-->`
       continue;
     }
     if (c === '/' && slashStartsRegex(shadow)) {
-      // A regular-expression literal: copy it whole, so a quote inside it ( /'/ ) does not open a phantom string
+      // A regular-expression literal: copy it whole (unless a '/' or '*' follows its closing slash: that slash opened a // or /* comment
+      // and this one is a division, as in `x = function () {} / 1 // note`), so a quote inside it ( /'/ ) does not open a phantom string
       // that carries the comments after it through as code.
       let j = i + 1;
       let inClass = false;
@@ -88,7 +100,7 @@ export function stripJsComments(src: string): string {
         else if (d === '/' && !inClass) { closed = true; break; }
         j++;
       }
-      if (closed && j > i + 1) {
+      if (closed && j > i + 1 && !(src[j + 1] === '/' || src[j + 1] === '*')) {
         out += src.slice(i, j + 1);
         shadow += '/' + blankOf(src.slice(i + 1, j)) + '/';
         i = j + 1;
@@ -188,7 +200,7 @@ export function blankStringContents(src: string): string {
           else if (d === '/' && !inClass) { closed = true; break; }
           j++;
         }
-        if (closed && j > i + 1) {
+        if (closed && j > i + 1 && !(src[j + 1] === '/' || src[j + 1] === '*')) {
           out += '/' + ' '.repeat(j - i - 1) + '/';
           i = j + 1;
           continue;

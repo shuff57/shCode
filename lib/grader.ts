@@ -44,7 +44,8 @@ export interface GradeReport {
 // requirement sets `ignoreStrings`, string contents blanked.
 function readableSource(req: Requirement, raw: string): string {
   if (req.stripComments === false) return raw;
-  const code = stripJsComments(raw);
+  // `<!--` / `-->` / `#!` are comments only in JavaScript; a README plan line may start with an arrow `-->`.
+  const code = stripJsComments(raw, !/\.(md|txt)$/i.test(req.file || ''));
   return req.ignoreStrings ? blankStringContents(code) : code;
 }
 

@@ -251,3 +251,33 @@ Cost, accepted: with strings blanked, 6.9.4 r1 to r3 check the length of the col
 Still red, unchanged and declared before: 6.9.10 r1 / 6.9.11 r1 `Array.from` and spread builds, 6.9.10 r2 `forEach`, r5 row alias, r4 `y -= TOP; if (y < 0) return;` and reversed `TOP > y`, r6 a counter not named `n`; 6.9.7 r3 guard-return.
 
 Not changed: `server.js` (the Express dev server) keeps its own older `stripJsComments` copy for its `POST /api/grade` route; the browser grader and every check script use `lib/js-source-clean.ts`.
+
+## Round 6 additions (2026-10-31)
+
+Source: `codehs-review/loop/grids-advanced-r6.md`. Same method (lib/grader.ts bundled by esbuild; OLD = HEAD `lib/js-source-clean.ts`, NEW = this round; same `lesson.json` on both sides). Only `lib/js-source-clean.ts` changed; no lesson file, no requirement.
+
+`lib/js-source-clean.ts`, both rules from the report's diff:
+- `stripJsComments` reads the three Annex B / hashbang comment forms a classic `<script>` (the sketch runner) honours: `<!--` anywhere outside a string, template or regex literal is a line comment; `-->` is one when only whitespace (or a block comment holding a line break) came before it on its line; `#!` as the first two characters of the file is one.
+- Both scanners: a candidate regex literal whose closing slash is directly followed by `/` or `*` is not a regex (that slash opened a comment, so the first one was a division). Closes `x = function () {} / 1 // ...` and the object-literal, class-expression and async-function forms without classifying braces.
+
+| Lab | Case | Result |
+| --- | --- | --- |
+| 6.9.4/6/7/8/10/11 | cheat: every line of the reference prefixed `<!-- ` or `--> ` | 0/n (was full) |
+| 6.9.14 | cheat: the same, and the two-line `// it gives five points` / `<!-- score += 5;` | 1/2 r2+ (was 2/2); r2 reads the comment by design |
+| 6.9.4/6/7/8/10/11 | cheat: whole reference on one `#!` first line | 0/n (was full) |
+| 6.9.14 | cheat: the same | 0/2 (was 1/2) |
+| 6.9.7 | cheat: minimal `<!--` and `#!` bodies, `{}`-division then `//` | 0/4 (was 4/4) |
+| 6.9.6/7/8/10/11 | cheat: `const t = function () {} / 1 // <body>` in every graded function | 0/n (was 2/5 to 5/6) |
+| 6.9.4/6/7/8/10/11 | cheat: the same with a sacrificial `/` after `//` | 0/n (was full) |
+| all | honest: `while (n --> 0)`, `k = i-->0 ? 1 : 2`, `a = b <! --c`, `"<!-- text"`, `` `<!-- ${x}` ``, `/<!--/.test(s)`, `'-->'`, `if (a) { } /x/.test(s); // c`, `a / b / c`, `/a\/b/g`, `x = {a:1} / 2 / 3; // c`, `#!` not at index 0 | unchanged (cleaner output byte-identical) |
+| all | `x = {a:1} / 2 // c`, `x = {a:1} / 2 /* c */` | comment now stripped (was kept as code; the report's "mis-read before" note belongs to this form, not to `/ 2 / 3`) |
+
+Replay: the 789 earlier case files (rounds 1 to 5, incl. the duplicated `cases` sets and the 15 round-5 smuggles): 0 differences. The 37 round-6 smuggle files: 36 changed as above, 1 (6.9.4 `fnexpr_division_comment`) already 0/5. Every 6.9 starter 0 (4: 0/5, 6: 0/5, 7: 0/4, 8: 0/5, 10: 0/6, 11: 0/6, 14: 0/2), every reference full. Whole course: 288 graded lessons, 584 starters / `solution.js` / `solution/` roots / per-problem variants / starter variants graded old vs new: 0 differences. `stripJsComments` + `blankStringContents` over 2593 files (14.5 M characters; js, mjs, cjs, ts, tsx, md, json in lessons, scripts, lib, components, app, functions, curriculum, pa-pseudocode, public/moshion/docs, public/reshape/docs): 28 differ, every one the first line of a real hashbang script (`#!/usr/bin/env node`).
+
+Speed, 5000-character adversarial input (`-->`, `a-->`, `<!--`, whitespace-then-`-->` per line, block-comment-newline-then-`-->`, `{}/1//`, `{}/ 1 /`, `(/a//`, `(/a/*`, a 4000-character string then 1000 `-->` or divisions): cleaner worst 2.4 ms; grading all seven 6.9 labs worst 45.8 ms in total (6.5 ms per lab). 170 KB ordinary file: 129 ms (HEAD 117 ms). The `-->` test reads back only to the start of the current output line.
+
+Also green: generators (module-docs, lessons-manifest, ai-graders, quiz-keys, solutions, lesson-starters), `check-lesson-numbers`, `check-lesson-groups`, `check-prompt-pointers`, `check-lesson-citations`, `check-hints`, `check-live-blocks`, `check-starters`, `check-solution-leak`, `test-quiz`, `test-2-7-3-comments`, `audit-grader-tolerance --gate`, `tsc --noEmit`.
+
+Open, found while verifying (not changed): `readableSource` in `lib/grader.ts` runs `stripJsComments` on every regex requirement unless `stripComments: false`, and 19 requirements on `README.md` plans keep it on (1.3.19 r9 r10; 1.6.1, 1.7.4, 2.6.1, 2.7.4, 3.9.1 plan cards). A plan that writes an arrow at the start of an indented line (`  --> report that the job can be printed`) now loses that line: built honest plans for 1.6.1 and 1.7.4 drop `reports-each-way`, 2.7.4 drops `three-way-report` (all green on HEAD). No lesson file contains such a line, which is why the course replay shows 0. Fix options: apply the Annex B forms only when the graded file is JavaScript (an option on `stripJsComments`, passed from `readableSource` by file extension), or set `stripComments: false` on those 19 requirements.
+
+Not changed: `server.js` keeps its own `stripJsComments` for the dev server's `POST /api/grade`. That copy has no template, regex-literal or unterminated-string handling, nothing in the client calls that route, and adding only the Annex B forms there would not make it agree with `lib/`.
