@@ -295,3 +295,222 @@ Whole `grade()` call, best of 3, 5000-character adversarial bodies in every grad
 ### Gates
 
 Generators (module-docs, lessons-manifest, ai-graders, quiz-keys, solutions, lesson-starters; no tracked file changed), `check-lesson-numbers`, `check-lesson-groups`, `check-prompt-pointers`, `check-lesson-citations` (838 lessons; the 2 FORWARD notes are 1.4.9 and 6.4.4, as before), `check-hints` (382), `check-live-blocks` (491, all match), `check-starters` (every reference full, every starter not), `check-solution-leak`, `test-quiz`, `test-grader-tolerance` (334 cases), `audit-grader-tolerance --gate`, `tsc --noEmit`: all green. The full audit on 6-10 has the same single triage hit as round 1 (6.10.13 r2 refusing a `/* */` sentence, tagged maybe-intentional).
+
+## Round 3 (2026-11-01)
+
+Sources: `breakout-advanced-r3.md` (+ `breakout-advanced-r3-patterns.json`) and the owner-side lead's brief for this round (apply the ten fixes; one exception, an honest alias shape a fix newly refuses is widened back, since lax grading is policy; 6.10.8's `x`/`y` alias must pass; four shapes declared). Method as in rounds 1 and 2: `lib/grader.ts` bundled by esbuild (no change to `lib/`), each case a lab's reference or starter with one function body replaced, graded against `lesson.json` at HEAD (d284c5bf) and as edited. Case sets: round 1's 111 cases, round 2's 79 cases and 7 declared rows, the r3 lens's 901 named cases and 96 restyles, and the 166 new cases below. **166 new cases (161 labelled, 5 info rows), 0 mismatches; rounds 1 and 2: every score and every red set unchanged.**
+
+### What changed
+
+Only `pattern` strings, in 11 cards of five labs (6.10.4 r3; 6.10.5 r2, r3, r5, r6; 6.10.8 r1, r2; 6.10.9 r1, r2, r3; 6.10.10 r2). Card types, `function` lists, titles and descriptions are unchanged; no lesson text, starter or reference changed.
+
+1. **Fixes 1 to 10, as the r3 lens tested them** (the patterns file applied as is, then the alias widening below on top of 6.10.4 r3 and 6.10.5 r2, r3, r6).
+   - 1, 6.10.5 r2, r3, r6 and 6.10.9 r2: the comparison is bound to the ball. The operator and the limit sit next to `ball.x` / `ball.y` (`ball.x < R`, `R > ball.x`, `ball.x - R <= 0`, `ball.x > 400 - R`, `ball.x + R >= width`, `ball.y > 400 + R`, `400 + R < ball.y` ...), so `vx > 0` can no longer lend the right wall its `>`, and `ball.x > R`, `ball.x < 400 - R`, `ball.y > 0 && ...` are red.
+   - 2, 6.10.9 r1: a `continue` must sit under a zero test and be followed by the count going up; `n += cell === 0 ...` is refused beside round 2's A; a `.filter` predicate must keep the bricks (`=== 1`, `> 0`, `!== 0`, bare, `Boolean`) and a row filter needs a receiver that is a row of `bricks`; each loop needs a bound that covers the wall (a `.length`, `BRICK_ROWS`, a name, 5 or more, `for...of`, `forEach`, a reverse `>= 0`).
+   - 3, 6.10.5 r5: the `if` that holds the steer must name the paddle in its head (`paddle`, `overlaps`, an overlap alias), read over the head only, so the steer's own `paddle.x` cannot supply it; `vx += (ball.x - paddle.x) / 10` is accepted.
+   - 4, 6.10.4 r3: the value the clamp compares must be `paddle.x` itself (optionally `- 40` / `+ 40`, either side), in the `if` and the ternary forms.
+   - 5, 6.10.10 r2: the `if` that sets `state = 'play'` (or the guard that returns before it) must test a key: a `kb.presses|pressed|released|pressing(` call, a comparison with a one-character string or a digit, a variable bound to a `kb` call, or a flag set to `true`.
+   - 6, 6.10.5 r6 and 6.10.9 r2: an x-only "serve" (`ball.x = 200`) no longer counts; `serve()`, `startGame()`, `ball.y =`, `ball.pos.y`, `ball.pos =` do.
+   - 7, 6.10.9 r2 and r3: a ternary is read for its sense and its word (`lives === 0 ? 'lost'`, `lives > 0 ? ... : 'lost'`, `bricksLeft() === 0 ? 'won'`, `bricksLeft() > 0 ? ... : 'won'`).
+   - 8, 6.10.8 r1, r2: `ball.x` / `ball.y` held in a variable count (`const x = ball.x; const y = ball.y; hitAt(x, y - R)`: 0/2 at HEAD, 2/2 now).
+   - 9, 6.10.9 r2: the guard-return lost shape `if (lives > 0) { serve(); return; } state = 'lost';` is accepted; a bare call in the lost-ball guard must be a name from the card's list (`noop()`, `redraw()` are red).
+   - 10, 6.10.4 r3: a half-width under any name (`const h = PADDLE_W / 2`, `w2`), and margins 30 to 99 / 300 to 369 (`50 / 350`, `60 / 340` full; `30 / 370`, `20 / 380` still red).
+2. **The alias exception.** Fix 4 refused `const px = paddle.x; if (px < 40) paddle.x = 40; ...` (3/3 at HEAD); it is full again. The same widening is applied wherever a fix binds a comparison to a coordinate: 6.10.4 r3 (`paddle.x`), 6.10.5 r2 (`ball.x`, each wall on its own), r3 and r6 (`ball.y`). Each card gets one more alternative: `^(?=[\s\S]*?\b(?:const|let|var)\s+(?<name>…)\s*=\s*<coordinate>\s*[;,\n])` captures the first declaration whose value is the coordinate alone, then a copy of the card's comparison alternatives reads the alias in its place (on 6.10.4 either spelling, so `if (px < 40)` beside `if (paddle.x > 360)` passes). The character the head scan reads just before the alias may not be a word character or a dot, so `mouse.x` is never taken for an alias `x`. `const px = mouse.x`, `= PADDLE_W`, `const bx = ball.y` for a wall, and an alias declared but never compared all stay red. The 6.10.5 ball aliases were refused at HEAD as well (5/6, or 3/6 for `const x = ball.x; const y = ball.y;`); they are full now. 6.10.9 r2 already took `const y = ball.y` through round 1's alias alternative and is not changed beyond Fixes 1, 6, 7 and 9. 6.10.5 r5 is not widened: a position-test head written with `px` is red on r4 at HEAD too (r4 is unchanged), so no full answer is lost.
+
+### Case table (new cases)
+
+| Lab | Case | Expected | HEAD | Now | Verdict |
+| --- | --- | --- | --- | --- | --- |
+| 6.10.4 | cheat 4: heads about score | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | cheat 4: heads 1 < 2 / 2 > 1 | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | cheat 4: heads about lives | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | cheat 4: heads test mouse.x (keys never clamped) | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | cheat 4: ternary tests mouse.x | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | honest 4: reversed, 40 > paddle.x / 360 < paddle.x | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest 4: paddle.x - 40 < 0 / paddle.x + 40 > 400 | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest 4: (paddle.x), <= and >= | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest 4: else if, braces | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest 4: Math.max(Math.min()) | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest 4: nested ternary | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest 4: LEFT / RIGHT constants | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest 4: halfW and width - halfW | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest 4: paddle.pos.x and paddle.w / 2 | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest 10: const h = PADDLE_W / 2 | full | 2/3 (red r3) | 3/3 | OK |
+| 6.10.4 | honest 10: const w2 = PADDLE_W / 2 | full | 2/3 (red r3) | 3/3 | OK |
+| 6.10.4 | honest 10: margins 50 / 350 | full | 2/3 (red r3) | 3/3 | OK |
+| 6.10.4 | honest 10: margins 60 / 340 | full | 2/3 (red r3) | 3/3 | OK |
+| 6.10.4 | fail 10: 30 / 370 (paddle half off the screen) | below full | 2/3 (red r3) | 2/3 (red r3) | OK |
+| 6.10.4 | fail 10: 20 / 380 | below full | 2/3 (red r3) | 2/3 (red r3) | OK |
+| 6.10.4 | honest alias: const px = paddle.x, ifs 40 / 360 (Fix 4 cost, widened) | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest alias: let x = paddle.x, PADDLE_W / 2 | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest alias: px, braces, else if | full | 2/3 (red r3) | 3/3 | OK |
+| 6.10.4 | honest alias: 40 > px / 360 < px | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest alias: px - 40 < 0 / px + 40 > 400 | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest alias: px with a half variable | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest alias: px with const h (Fix 10 and the alias together) | full | 2/3 (red r3) | 3/3 | OK |
+| 6.10.4 | honest alias: x, nested ternary | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest alias: x, then one ternary on paddle.x | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest alias: px first if, paddle.x second | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest alias: paddle.pos.x alias | full | 3/3 | 3/3 | OK |
+| 6.10.4 | cheat alias: px is mouse.x | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | cheat alias: px is PADDLE_W | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | cheat alias: px declared, heads about score | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | cheat alias: x declared, heads read mouse.x (not the alias) | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | cheat alias: px declared, second head mouse.x | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | cheat alias: assigns 0 / 400 | below full | 2/3 (red r3) | 2/3 (red r3) | OK |
+| 6.10.4 | declared: wrong-direction clamp (pins the paddle left) | info | 3/3 | 3/3 | declared |
+| 6.10.5 | cheat 1: one wall line, ball.x < R && vx > 0 | below full | 6/6 | 5/6 (red r2) | OK |
+| 6.10.5 | cheat 1: right wall ball.x > R | below full | 6/6 | 5/6 (red r2) | OK |
+| 6.10.5 | cheat 1: left wall ball.x < 400 - R | below full | 6/6 | 5/6 (red r2) | OK |
+| 6.10.5 | cheat 1: left wall ball.x < width - R && vx < 0 | below full | 6/6 | 5/6 (red r2) | OK |
+| 6.10.5 | cheat 1: the left line twice, second with vx > 0 | below full | 6/6 | 5/6 (red r2) | OK |
+| 6.10.5 | cheat 1: top ball.y > 0 && vy < 5 | below full | 6/6 | 5/6 (red r3) | OK |
+| 6.10.5 | cheat 1: serve when ball.y > 0 && ball.x < 400 | below full | 6/6 | 5/6 (red r6) | OK |
+| 6.10.5 | cheat 1: serve when ball.y > 0 && score < 999 | below full | 6/6 | 5/6 (red r6) | OK |
+| 6.10.5 | cheat 3: steer under if (vy) | below full | 6/6 | 5/6 (red r5) | OK |
+| 6.10.5 | cheat 3: steer inside the top-wall if | below full | 6/6 | 5/6 (red r5) | OK |
+| 6.10.5 | cheat 3: steer under if (true) | below full | 6/6 | 5/6 (red r5) | OK |
+| 6.10.5 | cheat 3: steer under if (control === 'mouse') | below full | 6/6 | 5/6 (red r5) | OK |
+| 6.10.5 | cheat 6: serve moves x only | below full | 6/6 | 5/6 (red r6) | OK |
+| 6.10.5 | honest 1: walls ball.x - R < 0 / ball.x + R > 400 | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls ball.x - R <= 0 / ball.x + R >= width | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls ball.d / 2 and width - ball.d / 2 | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls R > ball.x / 400 - R < ball.x | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls ball.x < 6 / ball.x > 394 | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls ball.x < R + 1 / ball.x > 399 - R | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls ball.pos.x | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls vx *= -1 / 0 - vx | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls -1 * vx / abs | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls ternary walls | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls one \|\| line | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: walls Allman | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: top ball.y < 0 + R | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: lost 400 + R < ball.y | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: lost ball.y - R > 400 | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 1: lost ball.y > height | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: vx += (ball.x - paddle.x) / 10 (was 5/6) | full | 5/6 (red r5) | 6/6 | OK |
+| 6.10.5 | honest 3: steer before the flip | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: offset variable inside the if | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: offset variable before the if | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: nested overlaps then vy > 0 | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: hit alias | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: position-test head with paddle.x | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: constrain((ball.x - paddle.x) * 0.1, -4, 4) | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: map(ball.x - paddle.x, -40, 40, -4, 4) | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: / paddle.w * 8 | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: else if after a wall if | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 3: paddle.overlaps(ball), extra parentheses | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 6: serve() | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest 6: inline reset as 6.10.3 | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest alias: const bx = ball.x for both walls | full | 5/6 (red r2) | 6/6 | OK |
+| 6.10.5 | honest alias: const x, y for walls, top and lost | full | 3/6 (red r2,r3,r6) | 6/6 | OK |
+| 6.10.5 | honest alias: by for the top | full | 5/6 (red r3) | 6/6 | OK |
+| 6.10.5 | honest alias: by for the lost ball | full | 5/6 (red r6) | 6/6 | OK |
+| 6.10.5 | honest alias: bx, R > bx / width - R < bx | full | 5/6 (red r2) | 6/6 | OK |
+| 6.10.5 | cheat alias: bx, one wall line | below full | 5/6 (red r2) | 5/6 (red r2) | OK |
+| 6.10.5 | cheat alias: by, lost on by > 0 | below full | 5/6 (red r6) | 5/6 (red r6) | OK |
+| 6.10.5 | cheat alias: by, top on by > R | below full | 5/6 (red r3) | 5/6 (red r3) | OK |
+| 6.10.5 | cheat alias: bx is ball.y | below full | 5/6 (red r2) | 5/6 (red r2) | OK |
+| 6.10.5 | cheat alias: x declared, walls test paddle.x | below full | 5/6 (red r2) | 5/6 (red r2) | OK |
+| 6.10.5 | declared: the whole moveBall body moved into setup() | info | 6/6 | 6/6 | declared |
+| 6.10.8 | honest 8: const x = ball.x; const y = ball.y; hitAt(x, y - R) (was 0/2) | full | 0/2 (red r1,r2) | 2/2 | OK |
+| 6.10.8 | honest 8: let bx, by | full | 0/2 (red r1,r2) | 2/2 | OK |
+| 6.10.8 | honest 8: x, y with braces and four ifs | full | 0/2 (red r1,r2) | 2/2 | OK |
+| 6.10.8 | cheat 8: x, y, centre only | below full | 0/2 (red r1,r2) | 0/2 (red r1,r2) | OK |
+| 6.10.8 | cheat 8: x, y declared, offsets on another name | below full | 0/2 (red r1,r2) | 0/2 (red r1,r2) | OK |
+| 6.10.8 | cheat 8: x, y declared, flips not tied to a hit | below full | 0/2 (red r1,r2) | 0/2 (red r1,r2) | OK |
+| 6.10.9 | cheat 2: continue on a gap, n never counted | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: continue on a brick, then n++ (counts gaps) | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: continue on !== 0, then n += 1 | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: continue on a truthy cell, then n++ | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: n += cell === 0 ? 1 : 0 | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: n += (cell === 0) | below full | 2/3 (red r1) | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: flat().filter(b => b === 0) | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: flat().filter(b => !b) | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: flat().filter(() => true) | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: row.filter(cell => cell === 0) in a loop | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: loops r < 1, c < 1 | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: c < 3 only | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: while (false) loops | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat 2: loops then WALL.filter | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | honest 2: reference | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: continue on a gap then n++ | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: continue braced, else | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: n += bricks[r][c] | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: n += cell === 1 ? 1 : 0 | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: flat().filter(b => b === 1) | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: flat().filter(b => b > 0) | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: flat().filter(b => b !== 0) | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: flat().filter(b => b) | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: flat().filter(Boolean) | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: bricks[r].filter in an index loop | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: row.filter(cell => cell) over for...of | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: row alias then filter | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: forEach of forEach | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: r < BRICK_ROWS, c < BRICK_COLS | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: r < 5, c < 8 | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: r !== bricks.length, c <= length - 1 | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 2: reverse loops r >= 0 | full | 3/3 | 3/3 | OK |
+| 6.10.9 | cheat 1: lose a life when ball.y > 0 && score < 999 | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.9 | cheat 6: x-only serve in else | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.9 | cheat 7: state = lives > 0 ? 'play' : 'won' | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.9 | cheat 7: state = bricksLeft() > 0 ? 'won' : 'play' | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.9 | cheat 7: state = bricksLeft() ? 'won' : 'play' | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.9 | cheat 9: guard calls noop() and the life is lost elsewhere | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.9 | honest 7: state = lives === 0 ? 'lost' : 'play' | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 7: state = lives > 0 ? 'play' : 'lost' | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 7: state = bricksLeft() === 0 ? 'won' : state | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 9: guard return, if (lives > 0) { serve(); return; } (was 2/3) | full | 2/3 (red r2) | 3/3 | OK |
+| 6.10.9 | honest 6: inline reset in else, ball.pos.x | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 6: inline reset under lives > 0 | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest 1: height + R, braces | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest alias: const y = ball.y | full | 3/3 | 3/3 | OK |
+| 6.10.9 | declared: serve() outside the lost branch | info | 3/3 | 3/3 | declared |
+| 6.10.9 | open: alias y, lost on y > 0 (the bool/value alias route is not bound) | info | 3/3 | 3/3 | open |
+| 6.10.10 | cheat 5: if (true) state = 'play' | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.10 | cheat 5: if (1) state = 'play' | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.10 | cheat 5: if (control) state = 'play' | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.10 | cheat 5: if (kb) state = 'play' | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.10 | cheat 5: if (!false) state = 'play' | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.10 | cheat 5: if (score >= 0) state = 'play' | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.10 | cheat 5: if (state) state = 'play' | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.10 | cheat 5: if (false) return; state = 'play' | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.10 | honest 5: reference | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest 5: else if | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest 5: combined \|\| then one state | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest 5: const k = kb.presses(...) then if (k) | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest 5: chosen flag | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest 5: picked === true | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest 5: guard return | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest 5: switch on a key variable | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest 5: start('mouse') helper | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest 5: kb.pressed, double quotes, no semicolons | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest 5: kb.presses(1), extra parentheses | full | 3/3 | 3/3 | OK |
+| 6.10.10 | declared: if (kb.presses('9')) state = 'play' | info | 3/3 | 3/3 | declared |
+
+Of the 161 labelled rows: 99 honest (16 refused at HEAD, all full now; 83 full at HEAD and still full) and 62 cheats (50 full at HEAD, all red now; 12 already red and still red). References full and starters below full on every lab, unchanged: 6.10.4 3/3, 6.10.5 6/6, 6.10.6 5/5, 6.10.8 2/2, 6.10.9 3/3, 6.10.10 3/3, 6.10.13 2/2; every starter 0, and `check-starters` agrees.
+
+### Replays
+
+- **Round 1's 111 cases and round 2's 79 cases and 7 declared rows**: the same output, score and red set, at HEAD and now.
+- **Advanced r3 lens, 901 named cases** (its own case files, replayed): 199 mismatches against the lens's labels at HEAD, 137 under the lens's patterns file, 136 now. The one difference from the lens patch is the `const px = paddle.x` clamp (refused under the lens patch, full now). No case mismatches now that did not at HEAD. By the lens's own accounting the rest are its declared leftovers, its section 3, the "not fixed" elegance rows, and seven cases it marked as mislabelled; the lens report says 142 for its patch where its case files replay to 137 here.
+- **96 restyles** of the six graded references (`==`, `let`/`var`, no spaces, double quotes, backticks, Allman, CRLF, tabs, blank lines, brace-less to braced, `ball.pos.x`, `n++`/`lives--`, longhand, extra parentheses round every `if`, unchanged): all full; 6.10.13 under the same transforms: full.
+
+### Declared, left lax on purpose (round 3, owner decision)
+
+- **6.10.9 r2, `serve()` outside the lost branch**: `if (bricksLeft() === 0) { state = 'won'; serve(); }` with the lost branch only counting lives, or `serve();` as the last line of `checkEnd`, stays 3/3. The serve lookahead reads the whole listed-function body; tying it to the lost block needs a brace-depth model.
+- **6.10.4 r3, the wrong-direction clamp**: `if (paddle.x > 40) paddle.x = 40; if (paddle.x > 360) paddle.x = 360;` stays 3/3. A direction rule breaks the `40 > paddle.x` pairs and the combined `||` shape; it is a wrong-value mistake like the declared `1 / 399`.
+- **6.10.10 r2, `kb.presses('9')` as the state change**: `if (kb.presses('9')) state = 'play';` after key 1 and key 2 set only `control` stays 3/3 (the same shape as round 2's "key 2 without its own `state`").
+- **6.10.5, the `moveBall` body inside `setup()`**: the whole body moved into `setup()` (or `serve()`) and `moveBall` left empty stays 6/6. The price of round 2's whole-file `regex` (Fix H).
+
+Found while checking aliases, **not fixed, not declared (for the owner)**: 6.10.9 r2's round-1 alias alternative (`const lost = ...ball.y...; if (lost)`) is not bound to a lost-ball comparison, so `const y = ball.y; if (y > 0) { lives -= 1; ... }` and `const lost = ball.y > 0; if (lost) { ... }` stay 3/3, as at HEAD. It is Fix 1's sibling on the alias route. Binding it means requiring a lost-ball comparison in the declaration or on the alias in the head, and an offset alias such as `const by = ball.y + R; if (by > 400)` (3/3 at HEAD) would then need its own alternative.
+
+**The advanced pattern loop for 6.10 ends here.** What remains (the four declared shapes above, round 1 and round 2's declared floor, the r3 lens's section 3) cannot be told from honest code by reading the text: it needs a `tests` requirement that runs the sketch through `scripts/moshion-harness.mjs` (for example `checkEnd` called with `ball.y = 500`, expecting the ball back on the screen; `moveBall` called once, expecting the ball to move). Whether to add one is a later decision.
+
+### Speed
+
+Whole `grade()` call on 5000-character adversarial bodies placed in every graded function of 6.10.4, .5, .8, .9 and .10: 2184 combinations, from the r3 lens's 29 triggers plus 23 alias triggers (`const px = paddle.x; if (px < `, `if (px `, `px < 40 ? 40 : px > 360 ? `, `const h = PADDLE_W / 2; const px = paddle.x; `, `const bx = ball.x; if (bx < R && `, `if (by > `, `const x = ball.x; const y = ball.y; `, `if (( x `, `let x = ball.x, ` ...), each with and without an alias declaration in front, and with no closer, `}}}}` or `))))`. The machine sat at load average 66 to 84 throughout, so wall times are inflated: the first pass (best of 3) read up to 246 ms on a 6.10.5 trigger that no changed card reacts to. Every combination over 30 ms on that pass (187) was measured again, best of 10: worst wall time 68.3 ms, worst CPU time (`process.cpuUsage`) 30.4 ms, both on 6.10.5 with `if (` repeated. Nothing over 100 ms. The slowest single changed card is 6.10.4 r3 on `const px = paddle.x;`, then `if (` x 1250, then `))))`, best of 15: 3.2 ms CPU at HEAD, 5.7 ms with the lens patch, 15.0 ms now (the alias copy reads every `if (` head a second time). No lookbehind in any 6.10 pattern. The alias alternatives start at `^`, so each one runs from a single start position, and every scan they add is bounded (`[^;{}]{0,200}?`) apart from the one lazy `[\s\S]*?` from `^`, as in rounds 1 and 2.
+
+### Gates
+
+Generators (module-docs, lessons-manifest, ai-graders, quiz-keys, solutions, lesson-starters; no tracked file changed), `check-lesson-numbers`, `check-lesson-groups`, `check-prompt-pointers`, `check-lesson-citations` (838 lessons; the 2 FORWARD notes are 1.4.9 and 6.4.4, as before), `check-hints` (382), `check-live-blocks` (491, all match), `check-starters` (every reference full, every starter not), `check-solution-leak`, `test-quiz`, `test-grader-tolerance` (334 cases), `audit-grader-tolerance --gate`, `tsc --noEmit`: all green. The full audit on 6-10 has the same single triage hit as rounds 1 and 2 (6.10.13 r2 refusing a `/* */` sentence, tagged maybe-intentional). The full `npm test` was not run.
