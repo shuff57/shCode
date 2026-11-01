@@ -206,3 +206,19 @@ Same method (lib/grader.ts bundled, current lesson.json). Replayed the 159 round
 | js-source-clean | `1 / /player.overlaps(coins) coin.delete()/` no longer hides code; `i++ / 2; coins.delete()` no longer false-reds | fixed |
 
 Declined: computed-but-unused guards (10 r4, 11 r4, 6.9.7 r4), hybrid index/of loops, forEach, `row[c] = false; g[r] = row` builds, reversed operands `ROWS > r`.
+
+## Round 4 additions (2026-10-31)
+
+Same method (lib/grader.ts bundled, current lesson.json). Replayed the 344 earlier advanced case files: byte-identical results. Every starter 0, every reference full. Worst regex time on 5000-char adversarial input: under 20 ms; no lookbehind. `lib/js-source-clean.ts`: 1494 lesson / pa-pseudocode / scratch blocks, 0 changed; `test-2-7-3-comments`, `test-grader`, `test-grader-tolerance`, `test-grader-alternatives-2x`, `test-find-and-fix`, `test-console-labs`, `test-runtime-labs`, `check-starters` and `audit-grader-tolerance --gate` green.
+
+| Lab | Case | Result |
+| --- | --- | --- |
+| 6.9.7 | cheat: `/'/` regex literal plus a trailing comment that carries code; `await /re/`, `new /re/`; `k+++/re/` | 0/4 (was 4/4) |
+| 6.9.10 | cheat: bounds joined by `||` (`r >= 0 \|\| r < ROWS`, pair, precedence slip), `r < 0 && r >= ROWS` | 5/6 r4- |
+| 6.9.11 | cheat: `(r >= 0 \|\| r < BRICK_ROWS) && ...`, `... \|\| bricks[r][c] === 1` | 5/6 r3- |
+| 6.9.10 | cheat: early-return guard plus two plain ifs, or `= true; = false;` | 5/6 r5- |
+| 6.9.10 | cheat: `floor(y / CELL) - TOP / CELL` (TOP / CELL is 0.8 here) | 5/6 r3- |
+| 6.9.10 | honest: `\|\|` return guard (either order), nested ifs, two returns, `r > -1`, `!(...)`, if/else (any layout), early-return flip with or without semicolons, else-if chain, ternary; 7 offset spellings | 6/6 |
+| 6.9.11 | honest: `bricks[r]?.[c] === 1` as the brick test (r4 now accepts it, like 6.9.10 r4), return guard, alias cell | 6/6 |
+
+Declined: wrong-cell flip (`!grid[c][r]`), TOP applied to the column, count of one cell, `grid[c] !== undefined` as the whole guard.

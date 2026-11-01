@@ -57,6 +57,26 @@ export function stripJsComments(src: string): string {
       i += 2;
       continue;
     }
+    if (c === '/' && slashStartsRegex(out)) {
+      // A regular-expression literal: copy it whole, so a quote inside it ( /'/ ) does not open a phantom string
+      // that carries the comments after it through as code.
+      let j = i + 1;
+      let inClass = false;
+      let closed = false;
+      while (j < n && src[j] !== '\n') {
+        const d = src[j];
+        if (d === '\\') { j += 2; continue; }
+        if (d === '[') inClass = true;
+        else if (d === ']') inClass = false;
+        else if (d === '/' && !inClass) { closed = true; break; }
+        j++;
+      }
+      if (closed && j > i + 1) {
+        out += src.slice(i, j + 1);
+        i = j + 1;
+        continue;
+      }
+    }
     out += c;
     i++;
   }
@@ -77,6 +97,20 @@ function closesStatementHead(before: string): boolean {
     }
   }
   return false;
+}
+
+// How many copies of the final character end `s` side by side (`a+++` is 3).
+function signRun(s: string): number {
+  let k = 0;
+  while (k < s.length && s[s.length - 1 - k] === s[s.length - 1]) k++;
+  return k;
+}
+
+// Shared by stripJsComments and blankStringContents: does a '/' that follows `out` start a regex literal?
+function slashStartsRegex(out: string): boolean {
+  const before = out.replace(/\s+$/, '');
+  const last = before[before.length - 1];
+  return before === '' || (/[(,=:\[!&|?{};*%<>~^/]/.test(last) || (/[+\-]/.test(last) && signRun(before) % 2 === 1)) || /(?:^|[^\w$.])(?:return|typeof|else|do|case|throw|void|delete|in|new|instanceof|await)$/.test(before) || closesStatementHead(before);
 }
 
 // Blank the CONTENT of string literals and template-literal text (the quote
@@ -120,9 +154,7 @@ export function blankStringContents(src: string): string {
     // A '/' starts one when the last thing before it is an operator, an opening bracket, a
     // separator (a '/' after a division '/' too; a '+' or '-' only when it is not the second sign of ++ / --), or return/typeof; after an identifier, a number or ')' / ']' it is division.
     if (c === '/') {
-      const before = out.replace(/\s+$/, '');
-      const last = before[before.length - 1];
-      const startsRegex = before === '' || (/[(,=:\[!&|?{};*%<>~^/]/.test(last) || (/[+\-]/.test(last) && before[before.length - 2] !== last)) || /(?:^|[^\w$.])(?:return|typeof|else|do|case|throw|void|delete|in)$/.test(before) || closesStatementHead(before);
+      const startsRegex = slashStartsRegex(out);
       if (startsRegex) {
         let j = i + 1;
         let inClass = false;
