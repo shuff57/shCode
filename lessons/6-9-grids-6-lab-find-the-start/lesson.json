@@ -49,8 +49,9 @@
       "type": "inFunction",
       "function": "findStart",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*\\b(?:for|while)\\b[\\s\\S]*\\b(?:for|while)\\b)|\\.indexOf\\s*\\(\\s*['\"]P['\"]\\s*\\)",
+      "pattern": "^(?=[\\s\\S]*\\b(?:for|while)\\b[\\s\\S]*\\b(?:for|while)\\b)|\\.indexOf\\s*\\(\\s*(['\"`])\\s\\1\\s*\\)",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
@@ -61,8 +62,9 @@
       "type": "inFunction",
       "function": "findStart",
       "file": "script.js",
-      "pattern": "===?\\s*['\"]P['\"]|['\"]P['\"]\\s*===?|\\.(?:includes|indexOf)\\s*\\(\\s*['\"]P['\"]",
+      "pattern": "===?\\s*(['\"`])\\s\\1|(['\"`])\\s\\2\\s*===?|\\.(?:includes|indexOf)\\s*\\(\\s*(['\"`])\\s\\3",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },

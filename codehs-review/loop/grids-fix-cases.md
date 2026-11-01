@@ -222,3 +222,32 @@ Same method (lib/grader.ts bundled, current lesson.json). Replayed the 344 earli
 | 6.9.11 | honest: `bricks[r]?.[c] === 1` as the brick test (r4 now accepts it, like 6.9.10 r4), return guard, alias cell | 6/6 |
 
 Declined: wrong-cell flip (`!grid[c][r]`), TOP applied to the column, count of one cell, `grid[c] !== undefined` as the whole guard.
+
+## Round 5 additions (2026-10-31)
+
+Source: `codehs-review/loop/grids-advanced-r5.md`. Same method (lib/grader.ts bundled; OLD = HEAD stripper + HEAD lesson.json, NEW = this round). Replayed the 456 earlier advanced case files: only two string-only cheats changed (6.9.4 `string_only` 5/5 to 0/5, 6.9.6 `ALL_functions_as_string_statements` 2/5 to 0/5); all 203 honest cases identical. Every 6.9 starter 0, every reference full. Whole course: 293 graded lessons (70 with `ignoreStrings`), 589 starters / references / solution directories / per-problem variants / starter variants graded old vs new: 0 differences. `stripJsComments` + `blankStringContents` on 7569 text blocks (11.3 M characters: every js/ts file and fenced js block in lessons, pa-pseudocode, scripts, lib, components, app, functions, curriculum, reshape docs, plus long lesson.json strings): 0 changed. Fuzzer with the TypeScript parser as the oracle for what each marker is: 0 leaks and 0 lost code in 53,597 valid programs (HEAD: 3668 leaks in 7152). Worst regex time on 5000-char adversarial input: 21 ms (the `[\w$]*[yY][\w$]*` class on a 5000-letter identifier); no lookbehind.
+
+`lib/js-source-clean.ts`: `stripJsComments` now tracks `${ }` inside template literals (a comment there is a comment; a backtick there opens a nested template) and asks "does this `/` start a regex" on a shadow copy with string, template and regex text blanked, the same text `blankStringContents` sees, so a `"("` can no longer make the two scans disagree. Also `slashStartsRegex` trims with `trimEnd()` instead of `.replace(/\s+$/, '')`: that regex is quadratic on every long blank run, and this runs once per `/`. A 4000-character string followed by 500 divisions took 23 to 53 s per grade at HEAD (in the student's browser); it now takes under 25 ms. Same character set, so no output changes.
+
+| Lab | Case | Result |
+| --- | --- | --- |
+| 6.9.6/7/8/10/11 | cheat: `` const t = `${ 1 /* reference body */ }`; `` in every graded function | 0/n (was full on 7, 8, 10, 11; 5/5 on 6) |
+| 6.9.6/7/8/10/11 | cheat: the same with a `//` line comment inside `${ }` | 0/n (was 4/4 to 5/6) |
+| 6.9.7/8/10/11 | cheat: `if (typeof score == "(") /'/; // reference body '` | 0/n (was 3/5 to 5/6) |
+| 6.9.6 | cheat: the same string-paren shape | 1/5 r2+ (was 4/5): the decoy's own `== "("` is a real comparison with a one-character string, which the new r2 accepts by design; the comment no longer counts |
+| 6.9.4 | cheat: the whole answer as one string, as a template, or in `/* */` inside a template expression | 0/5 (was 5/5) |
+| 6.9.6 | cheat: hard-coded start plus a string, a template or a regex literal holding the loops and `'P'` | 3/5 r1- r2- (was 5/5 or 4/5) |
+| 6.9.10 | cheat: `if (x < TOP) return;`, `c < TOP`, an unrelated `k < 40`, before an upper-only test | 5/6 r4- (was 6/6) |
+| 6.9.11 | cheat: `x < TOP`, `c < TOP`, `score < TOP` return before an upper-only test | 5/6 r3- (was 6/6) |
+| 6.9.4 | honest: double quotes everywhere, legend in a variable, legend over several lines, `0.5` and `(TILE / 2)` centres | 5/5 (unchanged) |
+| 6.9.4 | honest: `` walls.collider = `static` `` | 5/5 (was 4/5) |
+| 6.9.6 | honest: `while` loops, `for...of`, `indexOf('P')` per row, `"P" === ch`, `charAt(c) == 'P'`, `includes` then `indexOf` | 5/5 (unchanged) |
+| 6.9.10 | honest: `y < TOP`, `mouseY < TOP`, `y < 40` return guards; 152 earlier 6.9.10 case files | 6/6, 0 changed |
+| 6.9.11 | honest: `y < TOP`, `mouseY < TOP` return guards; 84 earlier 6.9.11 case files | 6/6, 0 changed |
+| all | honest templates: `` `score: ${score}` ``, `` `${a} // not a comment ${b}` ``, `` `${ f({a:1}) } x` ``, nested templates, `` `${ '}' }` ``, escaped backtick, multi-line, `` `${ a / b }` ``, ternary of templates | unchanged |
+
+Cost, accepted: with strings blanked, 6.9.4 r1 to r3 check the length of the collider value (6 for static, 4 for none) and r4 checks one-character keys, and 6.9.6 r1 and r2 accept any one-character string (`' '` or `'Q'` too). Both are wrong-answer cases, not skipping the exercise.
+
+Still red, unchanged and declared before: 6.9.10 r1 / 6.9.11 r1 `Array.from` and spread builds, 6.9.10 r2 `forEach`, r5 row alias, r4 `y -= TOP; if (y < 0) return;` and reversed `TOP > y`, r6 a counter not named `n`; 6.9.7 r3 guard-return.
+
+Not changed: `server.js` (the Express dev server) keeps its own older `stripJsComments` copy for its `POST /api/grade` route; the browser grader and every check script use `lib/js-source-clean.ts`.

@@ -4,26 +4,36 @@
 
 // Strip JS // and /* */ comments so a commented-out answer can't pass a
 // regex requirement. Respects strings so tokens inside "// not a comment"
-// survive. Naive: no template-literal or regex-literal handling, which
-// is fine for student moSHion code.
+// survive. Template literals (with `${ }` code inside them) and regex
+// literals are tracked so their text is never read as a comment, and a
+// comment inside `${ }` is never kept as string text.
 export function stripJsComments(src: string): string {
   let out = '';
+  // `shadow` is `out` as blankStringContents would see it (string and template text and regex bodies blanked), so the
+  // "does this / start a regex" question is answered on the same text by both scanners. Parentheses inside a string
+  // ("(") otherwise made the two disagree and let a comment ride through as code.
+  let shadow = '';
   let i = 0;
   const n = src.length;
   let inStr: string | null = null;
+  // Template literals nest: `${ ... }` is code (comments in it are comments), and a backtick inside it opens another template.
+  const exprDepth: number[] = []; // open-brace depth inside each active ${ }
+  const blankOf = (t: string) => t.replace(/[^\n]/g, ' ');
   while (i < n) {
     const c = src[i];
     const nx = src[i + 1];
     if (inStr) {
-      out += c;
-      if (c === '\\' && i + 1 < n) { out += src[i + 1]; i += 2; continue; }
+      if (c === '\\' && i + 1 < n) { out += c + src[i + 1]; shadow += inStr === '`' ? (src[i + 1] === '\n' ? ' \n' : '  ') : '  '; i += 2; continue; }
+      if (inStr === '`' && c === '$' && nx === '{') { out += '${'; shadow += '${'; exprDepth.push(0); inStr = null; i += 2; continue; }
       // A " or ' string cannot span a raw newline, so an unterminated one
       // ends at the end of its line instead of swallowing the rest of the
       // file. Without this the scan desynchronizes on the first missing
       // quote and never recovers: every comment below it survives as
       // "string content", so a fix written in a comment satisfies the regex.
       // Measured on 2.7.3, whose starter opens with an unterminated string.
-      if (c === inStr || ((inStr === '"' || inStr === "'") && c === '\n')) inStr = null;
+      out += c;
+      if (c === inStr || ((inStr === '"' || inStr === "'") && c === '\n')) { shadow += c === '\n' ? '\n' : c; inStr = null; }
+      else shadow += c === '\n' ? '\n' : ' ';
       i++;
       continue;
     }
@@ -43,9 +53,16 @@ export function stripJsComments(src: string): string {
           if (src[j] === c) { closed = true; break; }
           j++;
         }
-        if (!closed) { out += c; i++; continue; }
+        if (!closed) { out += c; shadow += c; i++; continue; }
       }
-      inStr = c; out += c; i++; continue;
+      inStr = c; out += c; shadow += c; i++; continue;
+    }
+    if (exprDepth.length) {
+      if (c === '{') exprDepth[exprDepth.length - 1]++;
+      else if (c === '}') {
+        if (exprDepth[exprDepth.length - 1] === 0) { exprDepth.pop(); out += c; shadow += c; inStr = '`'; i++; continue; }
+        exprDepth[exprDepth.length - 1]--;
+      }
     }
     if (c === '/' && nx === '/') {
       while (i < n && src[i] !== '\n') i++;
@@ -57,7 +74,7 @@ export function stripJsComments(src: string): string {
       i += 2;
       continue;
     }
-    if (c === '/' && slashStartsRegex(out)) {
+    if (c === '/' && slashStartsRegex(shadow)) {
       // A regular-expression literal: copy it whole, so a quote inside it ( /'/ ) does not open a phantom string
       // that carries the comments after it through as code.
       let j = i + 1;
@@ -73,11 +90,13 @@ export function stripJsComments(src: string): string {
       }
       if (closed && j > i + 1) {
         out += src.slice(i, j + 1);
+        shadow += '/' + blankOf(src.slice(i + 1, j)) + '/';
         i = j + 1;
         continue;
       }
     }
     out += c;
+    shadow += c;
     i++;
   }
   return out;
@@ -108,7 +127,9 @@ function signRun(s: string): number {
 
 // Shared by stripJsComments and blankStringContents: does a '/' that follows `out` start a regex literal?
 function slashStartsRegex(out: string): boolean {
-  const before = out.replace(/\s+$/, '');
+  // trimEnd, not .replace(/\s+$/, ''): that regex is quadratic on every long blank run (a blanked string is one), and
+  // this runs once per '/', so 4000 characters of string then 500 divisions took 4 to 7 seconds. Same character set.
+  const before = out.trimEnd();
   const last = before[before.length - 1];
   return before === '' || (/[(,=:\[!&|?{};*%<>~^/]/.test(last) || (/[+\-]/.test(last) && signRun(before) % 2 === 1)) || /(?:^|[^\w$.])(?:return|typeof|else|do|case|throw|void|delete|in|new|instanceof|await)$/.test(before) || closesStatementHead(before);
 }

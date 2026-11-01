@@ -48,8 +48,9 @@
       "description": "Walls never move: their collider is static. Help: 6.9.2 (Reading: A map is rows of text)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bwalls\\.collider\\s*=\\s*(?:['\"]static['\"]|STATIC\\b|STA\\b)",
+      "pattern": "\\bwalls\\.collider\\s*=\\s*(?:(['\"`])\\s{6}\\1|STATIC\\b|STA\\b)",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
@@ -59,8 +60,9 @@
       "description": "Coins do not block the player: their collider is none. Help: 6.9.2 (Reading: A map is rows of text)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bcoins\\.collider\\s*=\\s*['\"]none['\"]",
+      "pattern": "\\bcoins\\.collider\\s*=\\s*(['\"`])\\s{4}\\1",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
@@ -70,8 +72,9 @@
       "description": "The goal is its own Group and does not block the player either. Help: step 2 of this lab",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bgoals\\.collider\\s*=\\s*['\"]none['\"]",
+      "pattern": "\\bgoals\\.collider\\s*=\\s*(['\"`])\\s{4}\\1",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
@@ -81,8 +84,9 @@
       "description": "new Tiles(map, ...) with a legend: # builds walls, c builds coins, G builds goals. Help: step 3 of this lab",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*\\bnew\\s+Tiles\\s*\\()(?=[\\s\\S]*['\"]#['\"]\\s*:\\s*walls\\b)(?=[\\s\\S]*['\"]c['\"]\\s*:\\s*coins\\b)(?=[\\s\\S]*['\"]G['\"]\\s*:\\s*goals\\b)",
+      "pattern": "^(?=[\\s\\S]*\\bnew\\s+Tiles\\s*\\()(?=[\\s\\S]*['\"`]\\s['\"`]\\s*:\\s*walls\\b)(?=[\\s\\S]*['\"`]\\s['\"`]\\s*:\\s*coins\\b)(?=[\\s\\S]*['\"`]\\s['\"`]\\s*:\\s*goals\\b)",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     },
@@ -94,6 +98,7 @@
       "file": "script.js",
       "pattern": "new\\s+Tiles\\s*\\(\\s*[\\w$.\\[\\]]+\\s*,\\s*\\(?\\s*(?:20|TILE\\s*\\/\\s*2|0?\\.5\\s*\\*\\s*TILE|TILE\\s*\\*\\s*0?\\.5)\\s*\\)?\\s*,\\s*\\(?\\s*(?:20|TILE\\s*\\/\\s*2|0?\\.5\\s*\\*\\s*TILE|TILE\\s*\\*\\s*0?\\.5)\\s*\\)?\\s*,",
       "flags": "",
+      "ignoreStrings": true,
       "points": 0,
       "status": "pending"
     }
