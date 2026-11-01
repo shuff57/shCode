@@ -41,9 +41,9 @@ function setup() {
 
 // The saved options, read back once when the game starts.
 function loadSettings() {
-  const savedLevel = getItem('soundLevel');
+  const savedLevel = getItem('mySoundLevel');
   if (savedLevel !== null) level = savedLevel;
-  const savedMuted = getItem('soundMuted');
+  const savedMuted = getItem('mySoundMuted');
   if (savedMuted !== null) muted = savedMuted;
 }
 
@@ -56,8 +56,8 @@ function applySound() {
 function soundChanged() {
   applySound();
   chime.play();          // a sample, so the player hears the new level
-  storeItem('soundLevel', level);
-  storeItem('soundMuted', muted);
+  storeItem('mySoundLevel', level);
+  storeItem('mySoundMuted', muted);
 }
 
 // The sound options screen: one frame of it.
@@ -134,7 +134,8 @@ function playGame() {
     chime.pan = (star.x - 200) / 200;   // challenge 2: from where the star was caught
     chime.play();
     const names = ['one', 'two', 'three', 'four'];
-    notes.play(names[floor(random(names.length))]);   // challenge 3: one slice of the tune
+    const pick = floor(random(names.length));
+    notes.play(names[pick]);   // challenge 3: one slice of the tune
     dropStar();
   }
 

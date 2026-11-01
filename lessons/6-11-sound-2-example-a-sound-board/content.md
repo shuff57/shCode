@@ -41,14 +41,14 @@ function drawTop() {
 }
 ```
 
-**What you'll see:** four lines of words. `chime loaded` turns `true` a moment after Run, once the file has arrived. Press 1, 2, 3 and 4: the same chime four times, from low and slow to high and quick. Press T: `tune playing: true`, and the tune loops under everything until you press X.
+**What you'll see:** five lines of words: two that name the keys, then three that report on the sounds. `chime loaded` (the `.loaded` from 6.11.1) turns `true` a moment after Run, once the file has arrived. Press 1, 2, 3 and 4: the same chime four times, from low and slow to high and quick. Press T: `tune playing: true`, and the tune loops under everything until you press X.
 
 **Try this:**
 
 1. Press 1 and then 4, and listen to how long each one lasts. `rate` is the speed and the pitch together, so at 0.5 the chime is lower and twice as long as at 1.
 2. Change `kb.presses('3')` to `kb.pressing('3')`, press Run, click the canvas, and hold 3 for a second. You hear a buzz, not a chime: `pressing` is true on every frame the key is held, and each frame starts a new copy, about 60 a second, piled on top of each other. Put `presses` back.
 3. Press T three times, then listen. There is still only one tune: `loop()` while the tune is already looping does nothing. Press X and it stops. Now press 1 quickly five times: five chimes that overlap, because every `play()` is a new copy.
-4. Move the line `tune.loop();` into `setup()`, under the volume line, and press Run. Do not touch anything yet. `tune playing` turns `true` as soon as the file arrives, because `loop()` remembered it was asked. If your browser is holding sound back until you click or press a key, you hear nothing yet; click the canvas and the tune starts. Then put the line back.
+4. Delete the whole T line, `if (kb.presses('t')) tune.loop();`, and write `tune.loop();` on a line of its own in `setup()`, under the volume line. Press Run. Do not touch anything yet. `tune playing` turns `true` as soon as the file arrives, because `loop()` remembered it was asked. If your browser is holding sound back until you click or press a key, you hear nothing yet; click the canvas and the tune starts. Then take `tune.loop();` out of `setup()` and put the T line back.
 
 **What each Try found.** Try 1: `rate` gives you many sounds from one file. Try 2: a sound for a key goes under `kb.presses`, never `kb.pressing`. Try 3: `play()` adds a copy each time; `loop()` keeps one. Try 4: `loop()` waits for the file, and the browser waits for the player.
 

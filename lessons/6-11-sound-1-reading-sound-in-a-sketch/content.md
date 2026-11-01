@@ -32,7 +32,7 @@ function setup() {
 
 **`play()` is one copy; `loop()` keeps going.** `chime.play();` plays the sound once, from the start. Every call starts a fresh copy, so two quick calls give two chimes that overlap. `music.loop();` plays the sound and starts it again each time it ends, until `music.stop();`. A sound has only one looping copy: `loop()` while it is already looping does nothing, so calling it again is safe.
 
-`loop()` is also the one call that waits for the file. Asked for before the file has arrived, it is remembered, and the sound starts when the file lands. That is why `music.loop()` can sit in `setup()`. `.playing` is `true` while any copy of the sound is going.
+`loop()` is also the one call that waits for the file. Asked for before the file has arrived, it is remembered, and the sound starts when the file lands. That is why `music.loop()` can sit in `setup()`. `.playing` is `true` while any copy of the sound is going, and `.loaded` is `true` once the file has arrived and can play (`false` until then); the sound board in 6.11.2 shows both on the screen.
 
 **Three settings.** A Sound has properties you set the way you set a sprite's `color`:
 
@@ -64,6 +64,7 @@ function setup() {
 | **`.loop()`** | Plays the sound over and over until `.stop()`. One looping copy at most, so calling it again does nothing. |
 | **`.stop()`** | Stops every copy of that sound. |
 | **`.playing`** | `true` while any copy of the sound is going. |
+| **`.loaded`** | `true` once the file has arrived and can play; `false` until then. |
 | **`.volume`** | This sound's own level, from 0 to 1. |
 | **`.rate`** | Playback speed. The pitch moves with it: below 1 is lower and longer, above 1 is higher and shorter. |
 | **`masterVolume(v)`** | One level for every sound at once. `masterVolume()` reads it. |

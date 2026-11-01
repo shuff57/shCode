@@ -35,9 +35,9 @@ function setup() {
 
 // The saved options, read back once when the game starts.
 function loadSettings() {
-  const savedLevel = getItem('soundLevel');
+  const savedLevel = getItem('mySoundLevel');
   if (savedLevel !== null) level = savedLevel;
-  const savedMuted = getItem('soundMuted');
+  const savedMuted = getItem('mySoundMuted');
   if (savedMuted !== null) muted = savedMuted;
 }
 
@@ -50,8 +50,8 @@ function applySound() {
 function soundChanged() {
   applySound();
   chime.play();          // a sample, so the player hears the new level
-  storeItem('soundLevel', level);
-  storeItem('soundMuted', muted);
+  storeItem('mySoundLevel', level);
+  storeItem('mySoundMuted', muted);
 }
 
 // The sound options screen: one frame of it.

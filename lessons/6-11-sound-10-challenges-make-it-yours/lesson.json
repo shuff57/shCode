@@ -16,10 +16,10 @@
     {
       "id": "s1",
       "title": "Pick a sound rule and add it",
-      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough; an idea of your own is welcome on top. Start from the finished game in the editor (your 6.11.8 game). Headphones help with challenge 2.\n\n**Challenge 1: a streak that climbs (easy).** Each catch in a row sounds a step higher. Add `let streak = 0;` at the top. In the catch block in `playGame()`, add 1 to `streak` and replace the random rate line with `chime.rate = 1 + streak * 0.1;`. In the miss block, set `streak` back to 0, and set it to 0 in `startGame()` as well.\n\n**Challenge 2: the chime comes from where you caught it (medium).** `.pan` places a sound between the left speaker (`-1`), the middle (`0`) and the right speaker (`1`). The star's x runs from 0 to 400, so `(star.x - 200) / 200` runs from -1 to 1. In the catch block, before `chime.play();`, add `chime.pan = (star.x - 200) / 200;`. A catch at the left edge now sounds from the left.\n\n**Challenge 3: chords from one file (hard).** One file can hold many sounds, each a slice of it given as `[startSeconds, endSeconds]`. Add `let notes;` at the top, and in `setup()` load the tune a second time, cut into four slices: `notes = loadSound('/moshion/assets/music.wav', { clips: { one: [0, 1.3], two: [1.3, 2.6], three: [2.6, 4], four: [4, 5.3] } });`. Then `notes.play('two')` plays only the slice named `two`, and a name that is not in the list plays nothing. In the catch block, replace `chime.play();` with a random slice: put the four names in a list and pick one, the way 6.11.5 picked a thud.",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough; an idea of your own is welcome on top. Start from the finished game in the editor (your 6.11.8 game). It saves its sound options under its own names, `'mySoundLevel'` and `'mySoundMuted'`, so a level or a mute you left in 6.11.8 does not carry over: this game starts at level 5 with the sound on. Headphones help with challenge 2.\n\n**Challenge 1: a streak that climbs (easy).** Each catch in a row sounds a step higher. Add `let streak = 0;` at the top. In the catch block in `playGame()`, add 1 to `streak` and replace the random rate line with `chime.rate = 1 + streak * 0.1;`. In the miss block, set `streak` back to 0, and set it to 0 in `startGame()` as well.\n\n**Challenge 2: the chime comes from where you caught it (medium).** `.pan` places a sound between the left speaker (`-1`), the middle (`0`) and the right speaker (`1`). The star's x runs from 0 to 400, so `(star.x - 200) / 200` runs from -1 to 1. In the catch block, before `chime.play();`, add `chime.pan = (star.x - 200) / 200;`. A catch at the left edge now sounds from the left.\n\n**Challenge 3: chords from one file (hard).** One file can hold many sounds, each a slice of it given as `[startSeconds, endSeconds]`. Add `let notes;` at the top, and in `setup()` load the tune a second time, cut into four slices:\n\n```js\nnotes = loadSound('/moshion/assets/music.wav', {\n  clips: { one: [0, 1.3], two: [1.3, 2.6], three: [2.6, 4], four: [4, 5.3] },\n});\n```\n\nThen `notes.play('two')` plays only the slice named `two`, and a name that is not in the list plays nothing. In the catch block, replace `chime.play();` with a random slice: put the four names in a list and pick one, the way 6.11.5 picked a thud.",
       "hints": [
         "Whatever you pick, play a whole game and press R at the end: the title's tune should still come back.",
-        "Challenge 3: `const names = ['one', 'two', 'three', 'four'];` then `notes.play(names[floor(random(names.length))]);`"
+        "Challenge 3: `const names = ['one', 'two', 'three', 'four'];` then `const pick = floor(random(names.length));` then `notes.play(names[pick]);`"
       ]
     },
     {
@@ -35,26 +35,26 @@
     {
       "id": "r1",
       "title": "You added one sound rule",
-      "description": "Any one challenge turns this green: a streak that sets the chime's rate, a pan, or slices of one file (or a sound rule of your own, such as a fade, or a rate that follows the score). Help: 6.11.5 (Lab: A sound that varies)",
+      "description": "Any one challenge turns this green: a streak that sets the chime's rate, a pan that follows something in the game (not a fixed number), or slices of one file (or a sound rule of your own, such as a fade, or a rate that follows the score). Help: 6.11.5 (Lab: A sound that varies)",
       "hint": "Challenge 1 is one new variable and three lines: streak += 1; chime.rate = 1 + streak * 0.1; and streak = 0; for a miss.",
       "file": "script.js",
       "flags": "",
       "ignoreStrings": true,
       "type": "regex",
-      "pattern": "\\.\\s*pan\\s*=(?![=>])|\\bclips\\s*:|\\.\\s*play\\s*\\(\\s*[^)\\s]|\\.\\s*fade\\s*\\(|\\.\\s*rate\\s*(?:\\+=|-=|\\*=|\\/=)|\\.\\s*rate\\s*=(?![=>])(?![^;\\n]*\\brandom\\s*\\()[^;\\n]*[A-Za-z_$]",
+      "pattern": "\\.\\s*pan\\s*=(?![=>])[^;\\n]*[A-Za-z_$]|\\bclips\\s*:|\\.\\s*play\\s*\\(\\s*[^)\\s]|\\.\\s*fade\\s*\\(|\\.\\s*rate\\s*(?:\\+=|-=|\\*=|\\/=)|\\.\\s*rate\\s*=(?![=>])(?![^;\\n]*\\brandom\\s*\\()[^;\\n]*[A-Za-z_$]",
       "points": 0,
       "status": "pending"
     },
     {
       "id": "r2",
       "title": "You wrote your sentence",
-      "description": "A // comment of at least four words at the top of the file, above the first line of code, saying what your rule is and what the game would sound like without it. Any wording works; only the title line already at the top, which starts with the lesson number, does not count. Help: this lab's step 2",
+      "description": "A // comment of at least four words at the top of the file, above the first line of code, saying what your rule is and what the game would sound like without it. Any wording works; only the title line already at the top does not count, with or without its lesson number. Help: this lab's step 2",
       "hint": "Under the title line: // then a sentence, such as: Each catch in a row is a step higher, so a streak sounds like a climb.",
       "file": "script.js",
       "flags": "i",
       "type": "regex",
       "stripComments": false,
-      "pattern": "^(?:[ \\t]*(?:\\/\\/[^\\n]*)?\\r?\\n)*?[ \\t]*\\/\\/[ \\t]*(?!\\d+\\.\\d)(?:\\S+[ \\t]+){3}\\S|\\/\\/[^\\n]*\\b(?:would|without|otherwise|instead|if|remov\\w*)\\b",
+      "pattern": "^(?:[ \\t]*(?:\\/\\/[^\\n]*)?\\r?\\n)*?[ \\t]*\\/\\/(?![^\\n]{0,200}\\bMake it yours\\b)[ \\t]*(?!\\d+\\.\\d)(?:\\S+[ \\t]+){3}\\S|\\/\\/(?![^\\n]{0,200}\\bMake it yours\\b)[^\\n]{0,200}\\b(?:would|without|otherwise|instead|if|remov\\w*)\\b",
       "points": 0,
       "status": "pending"
     }
