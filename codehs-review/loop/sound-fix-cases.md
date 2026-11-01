@@ -372,3 +372,203 @@ older than this round), `check-hints` (382), `check-live-blocks` (491), `check-s
 | 6.11.8 | starter | starter | red r1,r2,r3,r4 | 0/4 (red r1,r2,r3,r4) | 0/4 (red r1,r2,r3,r4) | OK |
 | 6.11.10 | ref | reference | full | 2/2 | 2/2 | OK |
 | 6.11.10 | starter | starter | red r1,r2 | 0/2 (red r1,r2) | 0/2 (red r1,r2) | OK |
+
+## Round 2 (2026-11-01), the last pattern round
+
+Inputs: `sound-advanced-r2.md` and its tested `sound-advanced-r2-patterns.json` (strong-student lens, round 2). Method as rounds 0
+and 1: the app's own `lib/grader.ts` through `scripts/register-ts.mjs`, the shipped `lesson.json`, each case one change to a
+reference or starter. No change to `lib/`, to any lesson text, step, hint or card description, or to any starter or reference.
+**The advanced pattern loop for 6.11 ends here**: what is still open below is declared, not queued.
+
+### What changed
+
+The lens's patch file, applied as tested, eleven cards:
+
+- **6.11.3 r1**: the load must not start inside a quote (whole string literals before it on the line are skipped, no
+  lookbehind). `let s = "x = loadSound('...')"`, a template literal and a `console.log('... loadSound(...)')` no longer pass.
+- **6.11.3 r2 / r3**: a head that holds `||` and the other event no longer counts (`star.overlaps(basket) || star.y > 410`
+  for both events with one sound; either order). `overlaps(a) || overlaps(b)`, `&& !star.overlaps(basket)` still pass.
+- **6.11.4 r4**: the off value and the on value must each sit under a `kb.presses` test (key body, `&&` head, a key alias, or
+  a helper called from one), or a flag is toggled under one. A `masterVolume(0)` in `setup()`, in an uncalled function, or a
+  dead `on = !on;` no longer stands in for the missing half.
+- **6.11.4 r3 and 6.11.8 r1**: a name followed by `?` is a condition, not the stepped number (8.r1: up and down stepping
+  `muted` no longer passes). 4.r3 shares the change and grades every case as before.
+- **6.11.7 r2 / r3**: `default:`, the `:` side of a ternary, a play or loop after a `return; }` block, and an `if` on a boolean
+  alias (`const looping = next === 'title' || next === 'play'`) count as "under a test". The five honest shapes of lens
+  section 2 now pass.
+- **6.11.8 r2**: the flipped name must reach a `masterVolume(...)` argument or an `if (name) masterVolume(` head, before or
+  after the key (bounded to 80 characters of argument and guarded by "a `kb.presses` exists": the unbounded draft took 5.4 s).
+- **6.11.8 r3**: the saved value must contain a bare variable or an empty call; `5e0`, `0x5`, `Infinity`, `NaN`, `Math.PI`,
+  `Number(5)`, `abs(5)`, `int(5)`, `Math.max(5, 5)`, `parseInt("5")`, `({a: 5})` no longer pass.
+- **6.11.10 r1**: `.rate =` a bare name counts only when that name was not rolled from `random(`.
+
+One widening on top (lax policy: the lens's 10.r1 fix refused honest shapes that HEAD accepted). The lens's version took a bare
+name only when a plain `=` assignment ending in `;` sat within 400 characters before it, so these were refused:
+`pitch += 0.1; chime.rate = pitch;` (and `*=`), the same with no semicolons, `function setRate(r) { chime.rate = r; }` (the
+lens's named cost), and a global stepped in a helper defined below the catch. **6.11.10 r1** now accepts, for `.rate = name`
+(or `(name)`): an assignment `= += -= *= /=` or `++` / `--` with no `random(` on its line, ending in `;` or a line break, within
+400 characters before; the same assignment anywhere later in the file; or `name` as a parameter of the function (or arrow
+function) whose body sets the rate. The captured name is never one after a dot, which also closes a hole the lens version left
+open: `thuds[0].rate = 0.4;` just above a split roll used to supply `rate` as the "assigned" name.
+
+**Not added: the 6.11.7 per-screen `music.rate` card** (lens 1.8). It was added as `r4` (the lens's tested pattern, `inFunction`
+over r1's function list) and run against every table: it passes the reference and the lens's seven rate shapes, but it turns red
+nine earlier honest 6.11.7 cases that carry no rate line (three of round 0's: separate tune objects, loop or play by if / else,
+the `loops[next].loop()` lookup; six of the lens's: its boolean-alias, ternary-chain, two-tune and tune-object shapes), round 0's
+declared `if (true)` row and seven of the lens's documented full-scoring rows, and it grows the red set of round 0's starter and
+five of its cheat rows. The condition for adding it (no earlier honest shape fails) is not met, so it was removed and is
+declared below.
+
+### Replays
+
+- **Round 0's 129 cases: 0 mismatches**; the markdown table is byte-identical to the same runner's output at HEAD.
+- **Round 1's 76 cases: 0 mismatches**; byte-identical to the HEAD run.
+- **The advanced lens's case files, rerun at HEAD and on this tree** (its harness, its bundle of `lib/grader.ts`, which is
+  byte-identical to a fresh esbuild of today's file): the 349 cases of rounds 0-1 go from 262 as the lens expected to 266
+  (4 improve, 0 worse); its 198 new round-2 cases from 125 to 156 (31 improve, 0 worse); its 137 patch-validation cases from
+  102 to 137 (35 improve, 0 worse); no case keeps its verdict with a different score. Its 102 mechanical restyles and its
+  29 re-run round-0/1 cheats are identical to HEAD. Against the lens's own patched run the tree differs in one case only:
+  `thuds[0].rate = misses;` once in `setup()` passes again, as at HEAD (see declared).
+- **Round 2's own table below: 94 cases, 0 mismatches**; 33 of them were wrong at HEAD (26 cheats, the five 6.11.7 shapes,
+  two named costs). All six references full, all six starters 0.
+
+### Speed
+
+Every 6.11 card (18) on 5000-character adversarial input through the real grader, 541 inputs per card: the lens's 491-input
+sweep, its two targeted sweeps (`t2`, `t3`), and 18 shapes aimed at the widened 10.r1 (bare `.rate = a` repeated with and
+without a later assignment, parameter heads, `++`, no-semicolon lines). **Worst: 68 ms (6.11.8 r2) and 68 ms (6.11.8 r1)**,
+retimed five times at 66-72 ms; 4.r4 32 ms, 4.r3 31-36 ms, 8.r3 10 ms, 10.r1 9 ms, every other card under 9 ms. 8.r1's worst
+shape (`masterVolume(a) if (kb.presses(x)) { a = !a; ` repeated) is HEAD's own, 50-70 ms there too; the patch only narrows it.
+8.r2's worst (`const c = kb.presses('m'); if (c) { masterVolume(1 - ` repeated) was 25-31 ms at HEAD: the price of following the flag.
+8.r2 on `if (muted) masterVolume(` x200 (5.4 s for the lens's unbounded draft) takes 7.6 ms. No lookbehind and no repeated
+group name in any 6.11 pattern (scanned).
+
+### Declared, left as they are (round 2)
+
+- **6.11.4 r3, the volume line's placement (lens 1.7)**: keys that only step `level`, with `music.volume = level / 10` in the
+  miss block, the catch block, or a `setup()` defined below the keys, pass. The honest per-frame shapes (`draw()` after the keys,
+  `drawTop()`, a change-detect `if`) are the same kind of block; a regex cannot tell them apart without depth.
+- **Rarer honest refusals with no fix, unchanged from HEAD**: a predicate helper `if (isCaught())` / `if (isMissed())` (3.r2 /
+  3.r3); `level / MAX`, `Math.round(level) / 10`, `constrain(level, 0, 10) / 10` (4.r2) and a `setVol(level)` helper (4.r3);
+  `level = 1 + level` (4.r3, 8.r1); `storeItem` inside `applySound()` and a change-detect save in `draw()` (8.r3); 6.11.5 r2's
+  pick made outside the miss block, `random([a, b, c]).play()`, `playRandom(list)` (the step puts the pick in the miss block;
+  `random(list)` is not taught).
+- **Named costs of the applied fixes**: 8.r3 refuses `getLevel(2)` (a helper with a literal argument) when it is the only save:
+  it cannot be told from `Number(5)`; beside `storeItem('soundMuted', muted)` the card is green anyway. 8.r2 refuses an
+  `applySound()` rewritten with the flag in a variable first (`const v = muted ? 0 : level / 10; masterVolume(v);`); r1 already
+  refused that shape at HEAD, and `applySound()` is given code that no step asks the student to change.
+- **What the 10.r1 widening lets in**: a rate set once in `setup()` from a variable the game changes later
+  (`thuds[0].rate = misses;`, as at HEAD; the lens version refused it only through its 400-character window);
+  `setRate(random(0.8, 1.25))` through a parameter helper; a split random roll with a decoy non-random assignment to the same
+  name written on purpose nearby or later. Same class as "code written but never called".
+- **Steps nothing grades (not carded)**: the `music = loadSound(...)` line of 6.11.4 (deleting it throws on Run); `thud.rate`
+  on 6.11.3; the three thud rates on 6.11.5; the per-screen `music.rate` on 6.11.7 (card tried and removed, above).
+- **6.11.10 r2's one-word floor** (`// if`), the same class as round 0's four-word floor.
+- Everything declared in rounds 0 and 1 stands.
+
+### Gates
+
+Six generators re-run (module-docs, lessons-manifest, ai-graders, quiz-keys, solutions, lesson-starters). Green:
+`check-lesson-numbers` (848, no collisions), `check-lesson-groups`, `check-prompt-pointers`, `check-lesson-citations` (the same two
+FORWARD notes as round 1, both outside 6.11), `check-hints` (382), `check-live-blocks` (491), `check-starters`,
+`check-solution-leak`, `test-quiz` (36 quizzes), `test-grader-tolerance` (334 cases), `audit-grader-tolerance --gate` (290
+lessons, 0 refuse), `tsc --noEmit`. Full `npm test` not run.
+
+### Case table (round 2, new cases)
+
+| Lab | Kind | Case | Expected | HEAD (d62de274) | Round 2 | Verdict |
+| --- | --- | --- | --- | --- | --- | --- |
+| 6.11.3 | cheat | r1: the load only inside a string: let s = "x = loadSound(...)" (lens 1.2) | red r1 | 3/3 | 2/3 (red r1) | OK |
+| 6.11.3 | cheat | r1: the load only inside a template literal | red r1 | 3/3 | 2/3 (red r1) | OK |
+| 6.11.3 | cheat | r1: the load only inside console.log('chime = loadSound(...)') | red r1 | 3/3 | 2/3 (red r1) | OK |
+| 6.11.3 | honest | r1: both loads on one line | full | 3/3 | 3/3 | OK |
+| 6.11.3 | honest | r1: console.log('loading'); then the load on the same line | full | 3/3 | 3/3 | OK |
+| 6.11.3 | honest | r1: a trailing comment with a quote in it (// don't) | full | 3/3 | 3/3 | OK |
+| 6.11.3 | honest | r1: sounds in a list over three lines | full | 3/3 | 3/3 | OK |
+| 6.11.3 | cheat | r2/r3: one if for both events, one sound: star.overlaps(basket) \|\| star.y > 410 (lens 1.3) | red r2,r3 | 3/3 | 1/3 (red r2,r3) | OK |
+| 6.11.3 | cheat | r2/r3: the same, y test first | red r2,r3 | 3/3 | 1/3 (red r2,r3) | OK |
+| 6.11.3 | honest | r3: miss head star.y > 410 && !star.overlaps(basket) | full | 3/3 | 3/3 | OK |
+| 6.11.3 | honest | r2: catch head star.overlaps(basket) && star.y < 400 | full | 3/3 | 3/3 | OK |
+| 6.11.3 | honest | r2: catch head a.overlaps(b) \|\| b.overlaps(a) (round 1, kept) | full | 3/3 | 3/3 | OK |
+| 6.11.3 | declared | r2: a predicate helper, if (isCaught()) (not fixed) | red r2 | 2/3 (red r2) | 2/3 (red r2) | OK |
+| 6.11.4 | cheat | r4: masterVolume(0) in setup(), M only masterVolume(1) (lens 1.1) | red r4 | 4/4 | 3/4 (red r4) | OK |
+| 6.11.4 | cheat | r4: masterVolume(0) in a function nothing calls, M only masterVolume(1) | red r4 | 4/4 | 3/4 (red r4) | OK |
+| 6.11.4 | cheat | r4: a dead on = !on; at the bottom, M only masterVolume(1) | red r4 | 4/4 | 3/4 (red r4) | OK |
+| 6.11.4 | cheat | r4: M only masterVolume(0), masterVolume(1) at the top of setup() | red r4 | 4/4 | 3/4 (red r4) | OK |
+| 6.11.4 | honest | r4: M turns it off, N turns it on (two keys) | full | 4/4 | 4/4 | OK |
+| 6.11.4 | honest | r4: sound = sound === 1 ? 0 : 1; masterVolume(sound); under M | full | 4/4 | 4/4 | OK |
+| 6.11.4 | honest | r4: muted flipped under M, applied every frame in draw() | full | 4/4 | 4/4 | OK |
+| 6.11.4 | honest | r4: toggleMute() defined after, called from M | full | 4/4 | 4/4 | OK |
+| 6.11.4 | honest | r4: const pm = kb.presses('m'); if (pm) { ... } | full | 4/4 | 4/4 | OK |
+| 6.11.4 | declared | r3: keys step level, the volume set only in the miss block (lens 1.7, placement not read) | full | 4/4 | 4/4 | OK |
+| 6.11.4 | declared | r2: music.volume = level / MAX (not fixed) | red r2 | 3/4 (red r2) | 3/4 (red r2) | OK |
+| 6.11.4 | declared | r3: level = 1 + level (number first; not fixed) | red r3 | 3/4 (red r3) | 3/4 (red r3) | OK |
+| 6.11.7 | honest | r3: switch (next) with a default: for the last screen | full | 2/3 (red r3) | 3/3 | OK |
+| 6.11.7 | honest | r3: early returns for title and play, then one play for the end screens | full | 2/3 (red r3) | 3/3 | OK |
+| 6.11.7 | honest | r2: early return for won \|\| lost, then one loop for title and play | full | 2/3 (red r2) | 3/3 | OK |
+| 6.11.7 | honest | r3: a ternary chain ending in the play | full | 2/3 (red r3) | 3/3 | OK |
+| 6.11.7 | honest | r2: a boolean for the compound test: const looping = next === 'title' \|\| next === 'play' | full | 2/3 (red r2) | 3/3 | OK |
+| 6.11.7 | cheat | r2/r3: loop and play with no test at all | red r2,r3 | 1/3 (red r2,r3) | 1/3 (red r2,r3) | OK |
+| 6.11.7 | cheat | r2/r3: an object literal (colons) then loop and play with no test | red r2,r3 | 1/3 (red r2,r3) | 1/3 (red r2,r3) | OK |
+| 6.11.7 | cheat | r2/r3: a switch with no music in it, loop and play below | red r2,r3 | 1/3 (red r2,r3) | 1/3 (red r2,r3) | OK |
+| 6.11.7 | declared | no music.rate line anywhere (steps 2-3 rates, ungraded; the rate card was tried and not added) | full | 3/3 | 3/3 | OK |
+| 6.11.8 | cheat | r1: up and down step muted, the other name applySound reads (lens 1.5) | red r1 | 4/4 | 3/4 (red r1) | OK |
+| 6.11.8 | cheat | r2: M flips other, a flag nothing reads (lens 1.5) | red r2 | 4/4 | 3/4 (red r2) | OK |
+| 6.11.8 | cheat | r2: M flips speed | red r2 | 4/4 | 3/4 (red r2) | OK |
+| 6.11.8 | honest | r1: ternary clamp, level = level < 10 ? level + 1 : 10 | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r2: applySound rewritten if (muted) masterVolume(0); else masterVolume(level / 10); | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r2: the flag renamed silent everywhere | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r2: muted = muted ? false : true | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r2: toggleMute() helper defined after | full | 4/4 | 4/4 | OK |
+| 6.11.8 | cheat | r3: a fixed value in disguise saved: storeItem('soundLevel', 5e0) (lens 1.4) | red r3 | 4/4 | 3/4 (red r3) | OK |
+| 6.11.8 | cheat | r3: a fixed value in disguise saved: storeItem('soundLevel', 0x5) (lens 1.4) | red r3 | 4/4 | 3/4 (red r3) | OK |
+| 6.11.8 | cheat | r3: a fixed value in disguise saved: storeItem('soundLevel', Infinity) (lens 1.4) | red r3 | 4/4 | 3/4 (red r3) | OK |
+| 6.11.8 | cheat | r3: a fixed value in disguise saved: storeItem('soundLevel', Math.PI) (lens 1.4) | red r3 | 4/4 | 3/4 (red r3) | OK |
+| 6.11.8 | cheat | r3: a fixed value in disguise saved: storeItem('soundLevel', Number(5)) (lens 1.4) | red r3 | 4/4 | 3/4 (red r3) | OK |
+| 6.11.8 | cheat | r3: a fixed value in disguise saved: storeItem('soundLevel', abs(5)) (lens 1.4) | red r3 | 4/4 | 3/4 (red r3) | OK |
+| 6.11.8 | cheat | r3: a fixed value in disguise saved: storeItem('soundLevel', Math.max(5, 5)) (lens 1.4) | red r3 | 4/4 | 3/4 (red r3) | OK |
+| 6.11.8 | cheat | r3: a fixed value in disguise saved: storeItem('soundLevel', ({a: 5})) (lens 1.4) | red r3 | 4/4 | 3/4 (red r3) | OK |
+| 6.11.8 | honest | r3: storeItem('soundLevel', String(level)) | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r3: storeItem('soundLevel', Number(level)) | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r3: storeItem('soundLevel', Math.round(level)) | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r3: storeItem('soundLevel', level / 10) | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r3: storeItem('soundLevel', (level)) | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r3: storeItem('soundLevel', max(0, level)) | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r3: storeItem('soundLevel', int(level)) | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r3: storeItem('soundLevel', getLevel()) | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r3: storeItem('soundMuted', muted ? 1 : 0) | full | 4/4 | 4/4 | OK |
+| 6.11.8 | honest | r3: one object, JSON.stringify({ level, muted }) | full | 4/4 | 4/4 | OK |
+| 6.11.8 | declared | r3: getLevel(2), a helper with a literal argument, as the only save (named cost of the 1.4 fix) | red r3 | 4/4 | 3/4 (red r3) | OK |
+| 6.11.8 | declared | r3: getLevel(2) beside storeItem('soundMuted', muted): the other save carries the card | full | 4/4 | 4/4 | OK |
+| 6.11.8 | declared | r2: applySound with the flag in a variable first (const v = muted ? 0 : level / 10; masterVolume(v);): r1 already red at HEAD | red r1,r2 | 3/4 (red r1) | 2/4 (red r1,r2) | OK |
+| 6.11.8 | declared | r3: storeItem inside applySound() (two hops, defined above; not fixed) | red r3 | 3/4 (red r3) | 3/4 (red r3) | OK |
+| 6.11.8 | declared | r1: level = 1 + level (number first; not fixed) | red r1 | 3/4 (red r1) | 3/4 (red r1) | OK |
+| 6.11.10 | cheat | r1: the starter roll split: const r = random(0.8, 1.25); chime.rate = r; (lens 1.6) | red r1 | 2/2 | 1/2 (red r1) | OK |
+| 6.11.10 | cheat | r1: the same through let rate | red r1 | 2/2 | 1/2 (red r1) | OK |
+| 6.11.10 | cheat | r1: the same, chime.rate = (r) | red r1 | 2/2 | 1/2 (red r1) | OK |
+| 6.11.10 | cheat | r1: chime.rate = rate, rate never defined | red r1 | 2/2 | 1/2 (red r1) | OK |
+| 6.11.10 | cheat | r1: the split roll with a thuds[0].rate = 0.4 line just above it (a .rate is not the name) | red r1 | 2/2 | 1/2 (red r1) | OK |
+| 6.11.10 | cheat | r1: r += random(0.1); chime.rate = r; | red r1 | 2/2 | 1/2 (red r1) | OK |
+| 6.11.10 | honest | r1: const rate = 1 + streak * 0.1; chime.rate = rate; (a named step) | full | 2/2 | 2/2 | OK |
+| 6.11.10 | honest | r1: a global pitch: pitch += 0.1; chime.rate = pitch; reset on a miss (widened) | full | 2/2 | 2/2 | OK |
+| 6.11.10 | honest | r1: the same with pitch *= 1.1 | full | 2/2 | 2/2 | OK |
+| 6.11.10 | honest | r1: pitch = pitch + 0.1 with no semicolons (widened) | full | 2/2 | 2/2 | OK |
+| 6.11.10 | honest | r1: setRate(r) helper with a parameter, defined after (widened; lens named cost) | full | 2/2 | 2/2 | OK |
+| 6.11.10 | honest | r1: setRate(r) defined before playGame() | full | 2/2 | 2/2 | OK |
+| 6.11.10 | honest | r1: pitch stepped in a helper defined below, chime.rate = pitch in the catch (widened) | full | 2/2 | 2/2 | OK |
+| 6.11.10 | honest | r1: chime.rate = 1 + score * 0.05 (a rate that follows the score) | full | 2/2 | 2/2 | OK |
+| 6.11.10 | declared | r1: thuds[0].rate = misses; once in setup() (passes as at HEAD: misses is set later in the file) | full | 2/2 | 2/2 | OK |
+| 6.11.10 | declared | r1: setRate(random(0.8, 1.25)) through a parameter helper (the widening lets it in) | full | 2/2 | 2/2 | OK |
+| 6.11.10 | declared | r2: the one-word // if floor, with challenge 1 done (lens 1.6 r2; declared floor) | full | 2/2 | 2/2 | OK |
+| 6.11.3 | ref | reference | full | 3/3 | 3/3 | OK |
+| 6.11.3 | starter | starter | red r1,r2,r3 | 0/3 (red r1,r2,r3) | 0/3 (red r1,r2,r3) | OK |
+| 6.11.4 | ref | reference | full | 4/4 | 4/4 | OK |
+| 6.11.4 | starter | starter | red r1,r2,r3,r4 | 0/4 (red r1,r2,r3,r4) | 0/4 (red r1,r2,r3,r4) | OK |
+| 6.11.5 | ref | reference | full | 2/2 | 2/2 | OK |
+| 6.11.5 | starter | starter | red r1,r2 | 0/2 (red r1,r2) | 0/2 (red r1,r2) | OK |
+| 6.11.7 | ref | reference | full | 3/3 | 3/3 | OK |
+| 6.11.7 | starter | starter | red r1,r2,r3 | 0/3 (red r1,r2,r3) | 0/3 (red r1,r2,r3) | OK |
+| 6.11.8 | ref | reference | full | 4/4 | 4/4 | OK |
+| 6.11.8 | starter | starter | red r1,r2,r3,r4 | 0/4 (red r1,r2,r3,r4) | 0/4 (red r1,r2,r3,r4) | OK |
+| 6.11.10 | ref | reference | full | 2/2 | 2/2 | OK |
+| 6.11.10 | starter | starter | red r1,r2 | 0/2 (red r1,r2) | 0/2 (red r1,r2) | OK |
