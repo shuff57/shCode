@@ -118,11 +118,11 @@ export function blankStringContents(src: string): string {
     if (c === '`') { out += c; inTemplate = true; i++; continue; }
     // A regular-expression literal is text, not code: `const r = /a.push(.)/` calls nothing.
     // A '/' starts one when the last thing before it is an operator, an opening bracket, a
-    // separator, or return/typeof; after an identifier, a number or ')' / ']' it is division.
+    // separator (a '/' after a division '/' too; a '+' or '-' only when it is not the second sign of ++ / --), or return/typeof; after an identifier, a number or ')' / ']' it is division.
     if (c === '/') {
       const before = out.replace(/\s+$/, '');
       const last = before[before.length - 1];
-      const startsRegex = before === '' || /[(,=:\[!&|?{};+\-*%<>~^]/.test(last) || /(?:^|[^\w$.])(?:return|typeof|else|do|case|throw|void|delete|in)$/.test(before) || closesStatementHead(before);
+      const startsRegex = before === '' || (/[(,=:\[!&|?{};*%<>~^/]/.test(last) || (/[+\-]/.test(last) && before[before.length - 2] !== last)) || /(?:^|[^\w$.])(?:return|typeof|else|do|case|throw|void|delete|in)$/.test(before) || closesStatementHead(before);
       if (startsRegex) {
         let j = i + 1;
         let inClass = false;

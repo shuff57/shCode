@@ -106,7 +106,7 @@
         "options": [
           "`grid[-1]` is `undefined`, but the line is skipped quietly and the sketch carries on",
           "`grid[-1]` counts from the end, so row 7 is flipped instead",
-          "`grid[-1]` is `undefined`, and reading a cell from it stops the sketch",
+          "`grid[-1]` is `undefined`, and writing a cell into it stops the sketch",
           "`grid[-1]` makes the grid grow a new row at the front"
         ],
         "answer": 2,

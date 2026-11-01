@@ -186,3 +186,23 @@ Same method (lib/grader.ts bundled, current lesson.json). Round-1 replay: 159 ca
 | 6.9.14 | honest: ternary_two_hit  | 2/2 r1+ r2+ |
 
 Declined: named callback passed to overlaps (6.9.7), niche shapes no lesson models (hybrid wrong-cell counts, second hp array), the `||` double-if forms and a dummy statement before an ungated increment (needs a runtime test), 6.9.6 cellToPixel body, `// if` alone still passes the keyword alternative of 14 r2. Regex-literal fix in lib/js-source-clean.ts: a '/' after else/do/case/throw/void/delete/in or after the ) of an if/while/for/with head now starts a regex; `(a + b) / 2`, `f(x) / 3`, `arr[i] / n` still divide.
+
+## Round 3 additions (2026-10-31)
+
+Same method (lib/grader.ts bundled, current lesson.json). Replayed the 159 round-1 + 60 round-2 + 65 round-3 advanced cases: only the intended closes changed, every starter 0, every reference full. Worst regex time on 5000-char adversarial input: 10 ms; no lookbehind. `audit-grader-tolerance --gate` and `check-starters` green. `lib/js-source-clean.ts`: 700 lesson/pa-pseudocode js blocks, 0 changed; `test-2-7-3-comments` ok.
+
+| Lab | Case | Result |
+| --- | --- | --- |
+| 6.9.10 | cheat: column-only bounds (`c < 8`, `c < ROWS`, `c < grid.length`) | 5/6 r4- |
+| 6.9.10 | cheat: empty `if (y < TOP) {}` plus column test | 5/6 r4- |
+| 6.9.11 | cheat: `c < 5` / `c < BRICK_ROWS` column-only, `y > TOP` empty plus `c < 5` | 5/6 r3- |
+| 6.9.10 | cheat: unused `const t = y - TOP`, `floor(y / CELL) - TOP`, TOP inside a comparison | 5/6 r3- |
+| 6.9.11 | cheat: `y + TOP`, `y * TOP`, unused `y - TOP` | 5/6 r2- |
+| 6.9.10 | cheat: two plain ifs (true then false), `= true; = false;` in a row | 5/6 r5- |
+| 6.9.10 | honest: drawGrid nested while; countLit nested while, for/while mix | 6/6 |
+| 6.9.11 | honest: bricksLeft nested while | 6/6 |
+| 6.9.10 | honest: flip with `!`, ternary, if/else (either order), early return, old-value ternary | 6/6 |
+| 6.9.10/11 | honest: 83 guard spellings, 24 offset spellings (round 1-3 sets) | unchanged |
+| js-source-clean | `1 / /player.overlaps(coins) coin.delete()/` no longer hides code; `i++ / 2; coins.delete()` no longer false-reds | fixed |
+
+Declined: computed-but-unused guards (10 r4, 11 r4, 6.9.7 r4), hybrid index/of loops, forEach, `row[c] = false; g[r] = row` builds, reversed operands `ROWS > r`.
