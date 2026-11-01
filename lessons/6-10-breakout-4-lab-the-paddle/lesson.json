@@ -1,0 +1,90 @@
+{
+  "id": "6-10-breakout-4-lab-the-paddle",
+  "title": "6.10.4 Lab: The paddle",
+  "description": "A paddle along the bottom that follows the mouse, or the arrow keys, and never leaves the screen. The canvas and the paddle are made for you.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.10 Breakout",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Follow the mouse",
+      "instructions": "The starter makes the canvas (400 by 400) and the paddle: a white `'static'` sprite 80 wide (`PADDLE_W`) and 12 tall at y 370. `'static'` means it never falls and nothing pushes it; your code moves it, like Defender's ship in 5.9.5. A variable `control` says who steers, `'mouse'` or `'keys'`, and it starts as `'mouse'`. `draw()` calls `movePaddle()` every frame, and the words at the top show `control` and the paddle's x. Right now `movePaddle()` is empty, so the paddle sits still in the middle.\n\nIn `movePaddle()`, when `control` is `'mouse'`, set the paddle's x to the mouse's x (`mouse.x`, 6.7.3). Run it and move the mouse over the canvas: the paddle follows it left and right and stays on its row, because only x changes. Move the mouse to the far left: half the paddle goes off the screen. Step 3 fixes that.",
+      "hints": [
+        "`if (control === 'mouse') {`, then `paddle.x = mouse.x;`, then `}`.",
+        "Only x is set. The y stays 370, so the paddle can only slide sideways."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Or the arrow keys",
+      "instructions": "Some players would rather use the keys. Add a second `if`: when `control` is `'keys'`, the left arrow moves the paddle 6 pixels left and the right arrow 6 pixels right, `if (kb.pressing('left')) paddle.x -= 6;` and the same with `'right'` and `+= 6` (5.1.13). Use `kb.pressing`, not `kb.presses`: the paddle should keep moving while the key is held (6.3.3). To try it, change `'mouse'` to `'keys'` in the line `let control = 'mouse';` at the top, press Run, and hold the arrows. Then put it back to `'mouse'`. The last lab of this module lets the player choose.",
+      "hints": [
+        "`if (control === 'keys') { ... }` goes around the two key lines.",
+        "`paddle.x -= 6;` is the same as `paddle.x = paddle.x - 6;`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Stay on the screen",
+      "instructions": "The paddle's x is its centre (5.1.6), so its left end is half a paddle to the left of x. It is fully on the screen while `paddle.x` is at least `PADDLE_W / 2` (40) and at most `400 - PADDLE_W / 2` (360). After the mouse and key lines, add two more `if`s: if `paddle.x` is less than `PADDLE_W / 2`, set it to `PADDLE_W / 2`; if it is more than `400 - PADDLE_W / 2`, set it to that. Run it and push the mouse (or hold an arrow) all the way to each side. The words stop at `paddle x: 40` and `paddle x: 360`, and the whole paddle stays in view.",
+      "hints": [
+        "`if (paddle.x < PADDLE_W / 2) paddle.x = PADDLE_W / 2;`",
+        "These two lines go after the mouse and key lines, so they correct wherever the paddle was put this frame."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The paddle follows the mouse",
+      "description": "When control is 'mouse', the paddle's x is set to the mouse's x every frame. Help: 6.10.2 (Reading: A ball you move yourself)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "movePaddle",
+      "pattern": "^(?=[\\s\\S]*\\bpaddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\s*=(?!=)[^;\\n]*\\bmouse\\s*\\.\\s*(?:pos\\s*\\.\\s*)?x\\b)(?=[\\s\\S]*(?:\\bcontrol\\s*[!=]==?|[!=]==?\\s*control\\b|\\bswitch\\s*\\(\\s*control\\s*\\)))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The arrow keys move it",
+      "description": "When control is 'keys', kb.pressing('left') and kb.pressing('right') move the paddle's x by 6. Help: 6.10.2 (Reading: A ball you move yourself)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "movePaddle",
+      "pattern": "^(?=[\\s\\S]*\\bkb\\s*\\.\\s*(?:pressing|holding|presses|pressed|down)\\s*\\([\\s\\S]*?\\bkb\\s*\\.\\s*(?:pressing|holding|presses|pressed|down)\\s*\\()(?=[\\s\\S]*\\bpaddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\s*(?:-=|--|=(?!=)\\s*\\(?\\s*paddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\s*-))(?=[\\s\\S]*\\bpaddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\s*(?:\\+=|\\+\\+|=(?!=)\\s*\\(?\\s*paddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\s*\\+))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "The paddle stays on the screen",
+      "description": "If its x goes below half its width, or above 400 minus half its width, it is put back on the edge. Help: 6.10.2 (Reading: A ball you move yourself)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "movePaddle",
+      "pattern": "\\bif\\s*\\((?=[^;{}]*\\bpaddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;{}]*[<>])[^;{}]*\\)\\s*\\{?\\s*paddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\s*=(?!=)[\\s\\S]*?\\bif\\s*\\((?=[^;{}]*\\bpaddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;{}]*[<>])[^;{}]*\\)\\s*\\{?\\s*paddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\s*=(?!=)|\\bpaddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\s*=(?!=)\\s*\\(?\\s*(?:constrain|Math\\s*\\.\\s*(?:min|max)|min|max)\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

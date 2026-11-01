@@ -1,0 +1,141 @@
+{
+  "id": "6-10-breakout-5-lab-bounce",
+  "title": "6.10.5 Lab: Bounce",
+  "description": "The ball moves by two speeds you control. Bounce it off three walls and the paddle, let the paddle steer it, and serve it again when it falls out.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.10 Breakout",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Move the ball",
+      "instructions": "The starter has the finished paddle from 6.10.4 and a ball: a white circle 12 pixels wide, so its radius `R` is 6. It has `collider = 'none'`, so nothing pushes it, slows it or pulls it down: your code moves it, as with Defender's shots in 5.9.5. `vx` and `vy` hold its speed in pixels per frame: `vx` across (`+` is right) and `vy` down (`+` is down, `-` is up). `serve()` puts the ball at (200, 300) with `vx` 3 and `vy` -4, and `draw()` calls `moveBall()` every frame, which is empty. The words at the top show vx and vy.\n\nIn `moveBall()`, add `vx` to the ball's x and `vy` to its y. Run it: the ball flies up and to the right, and off the screen. Press Run again to bring it back.",
+      "hints": [
+        "`ball.x += vx;` and `ball.y += vy;`",
+        "`+=` adds to what is there: `ball.x += vx` is `ball.x = ball.x + vx`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Bounce off three walls",
+      "instructions": "A bounce is a flipped sign: `vx = -vx` turns 3 into -3 (going left) and -3 back into 3. The ball's x is its centre, so its side touches the left wall when `ball.x` is `R`, not 0, and the right wall when it is `400 - R` (6.10.2). Under the two moving lines, add: if `ball.x` is less than `R` OR more than `400 - R`, flip `vx`. Then: if `ball.y` is less than `R` (the top), flip `vy`. There is no bottom wall. Run it: the ball bounces off the left, the right and the top, and falls out at the bottom.",
+      "hints": [
+        "`if (ball.x < R || ball.x > 400 - R) vx = -vx;`",
+        "`if (ball.y < R) vy = -vy;`"
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Off the paddle, and steer",
+      "instructions": "`ball.overlaps(paddle)` is true on every frame the two touch (5.9.5), so flip `vy` only while the ball is coming down: `if (ball.overlaps(paddle) && vy > 0) { ... }`. Inside, flip `vy`, then set `vx` from where the ball landed: `vx = (ball.x - paddle.x) / 10;`. `ball.x - paddle.x` is how far right of the paddle's centre the ball is, negative on the left half (the A-to-B subtraction of 6.8.8), so the left end sends the ball left and the right end sends it right. Run it and catch the ball on different parts of the paddle: watch `vx` change in the words.",
+      "hints": [
+        "Two lines inside the `if`: `vy = -vy;` and then `vx = (ball.x - paddle.x) / 10;`.",
+        "Without `&& vy > 0`, a paddle sliding into the ball from the side can flip it again and again while they touch."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "A lost ball comes back",
+      "instructions": "The bottom is open. At the end of `moveBall()`, if the ball's y is more than `400 + R` (all of it below the bottom edge), call `serve()` to put it back. Run it, miss on purpose, and the ball comes back above the paddle.",
+      "hints": [
+        "`if (ball.y > 400 + R) serve();`",
+        "`serve()` is already written: it puts the ball back and resets vx and vy."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The ball moves by vx and vy",
+      "description": "Every frame vx is added to the ball's x and vy to its y. Help: 6.10.2 (Reading: A ball you move yourself)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "moveBall",
+      "pattern": "^(?=[\\s\\S]*(?:\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\s*(?:\\+=\\s*\\(?\\s*vx\\b|=(?!=)\\s*\\(?\\s*(?:ball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\s*\\+\\s*\\(?\\s*vx|vx\\s*\\+\\s*ball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x))\\b)|\\bball\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)\\s*vx\\b))(?=[\\s\\S]*(?:\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\s*(?:\\+=\\s*\\(?\\s*vy\\b|=(?!=)\\s*\\(?\\s*(?:ball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\s*\\+\\s*\\(?\\s*vy|vy\\s*\\+\\s*ball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y))\\b)|\\bball\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)\\s*vy\\b))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The side walls flip vx",
+      "description": "When the ball is less than R from the left wall or more than 400 - R across, vx changes sign. Help: 6.10.2 (Reading: A ball you move yourself)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "moveBall",
+      "pattern": "^(?=[\\s\\S]*?\\bif\\s*\\((?=[^;{}]*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;{}]*<)(?=[^;{}]*(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:[1-9]|1[0-2])\\b))[^;{}]*\\)\\s*\\{?\\s*(?:\\bvx\\s*(?:=(?!=)\\s*(?:-\\s*\\(?\\s*vx\\b|0\\s*-\\s*vx\\b|\\(?\\s*vx\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vx\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vx\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvx\\s*=(?!=)\\s*-?\\s*\\d))(?=[\\s\\S]*?\\bif\\s*\\((?=[^;{}]*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;{}]*>)(?=[^;{}]*(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:39\\d|38[89])\\b|\\bwidth\\b))[^;{}]*\\)\\s*\\{?\\s*(?:\\bvx\\s*(?:=(?!=)\\s*(?:-\\s*\\(?\\s*vx\\b|0\\s*-\\s*vx\\b|\\(?\\s*vx\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vx\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vx\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvx\\s*=(?!=)\\s*-?\\s*\\d))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "The top flips vy",
+      "description": "When the ball is less than R from the top, vy changes sign. Help: 6.10.2 (Reading: A ball you move yourself)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "moveBall",
+      "pattern": "\\bif\\s*\\((?=[^;{}]*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]*<)(?=[^;{}]*(?:\\bR\\b|\\bball\\s*\\.\\s*(?:r|w|h|d|width|height|diameter|radius)\\b|\\b(?:[1-9]|1[0-2])\\b))[^;{}]*\\)\\s*\\{?\\s*(?:\\bvy\\s*(?:=(?!=)\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvy\\s*=(?!=)\\s*\\d)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "The paddle bounces it only while it comes down",
+      "description": "When the ball overlaps the paddle AND vy is above 0, vy changes sign. Help: 6.10.2 (Reading: A ball you move yourself)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "moveBall",
+      "pattern": "^(?=[\\s\\S]*(?:\\bball\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*paddle\\b|\\bpaddle\\s*\\.\\s*overlap(?:s|ping)\\s*\\(\\s*ball\\b|\\bif\\s*\\((?=[^;{}]*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]*\\bpaddle\\s*\\.\\s*(?:x|y|pos)\\b)))(?=[\\s\\S]*(?:\\bvy\\s*>=?\\s*0\\b|\\b0\\s*<=?\\s*vy\\b|\\bvy\\s*=(?!=)\\s*-\\s*\\(?\\s*(?:(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\)|\\d|[A-Z][A-Z_\\d]*\\b)))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "Where it lands steers it",
+      "description": "After a paddle bounce, vx is worked out from the ball's x minus the paddle's x. Help: 6.10.3 (Worked Example: A ball in a box)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "moveBall",
+      "pattern": "\\bvx\\s*=(?!=)(?=[^;\\n]*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)(?=[^;\\n]*\\bpaddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b)|\\b(?:const|let|var)\\s+(?<o>[A-Za-z_$][\\w$]*)\\s*=\\s*(?=[^;\\n]*\\b(?:ball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)|paddle\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x))\\b)[^;\\n]*[;\\n][\\s\\S]*?\\bvx\\s*=(?!=)(?=[^;\\n]*\\b\\k<o>\\b)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r6",
+      "title": "A lost ball is served again",
+      "description": "When the ball's y is past the bottom, serve() puts it back. Help: 6.10.3 (Worked Example: A ball in a box)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": [
+        "moveBall",
+        "draw"
+      ],
+      "pattern": "\\bif\\s*\\((?=[^;{}]*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)(?=[^;{}]*>)[^;{}]*\\)\\s*\\{?\\s*(?:serve\\s*\\(\\s*\\)|ball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\s*=(?!=)|ball\\s*\\.\\s*pos\\s*=(?!=)|startGame\\s*\\(\\s*\\))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

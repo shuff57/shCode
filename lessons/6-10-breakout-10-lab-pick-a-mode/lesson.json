@@ -1,0 +1,96 @@
+{
+  "id": "6-10-breakout-10-lab-pick-a-mode",
+  "title": "6.10.10 Lab: Pick a mode",
+  "description": "A title screen that waits for a key: 1 plays with the mouse, 2 with the arrow keys. Write the choices, read the key, and send R back to the title. With a note on prompt().",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.10 Breakout",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "The title words",
+      "instructions": "The starter is your finished game from 6.10.9 with one more state, `'title'`. `state` starts as `'title'`, and while it is, `draw()` calls `pickMode()` and moves nothing. `pickMode()` is empty, so right now the game waits on the title forever. This is the title screen of 6.6.11, and the way out of it is a key, as in 6.6.16.\n\nIn `drawTop()`, when `state` is `'title'`, write the name of the game and the two choices: `Press 1 to play with the mouse` and `Press 2 to play with the arrow keys`. Put them under the wall, between y 200 and 280, so they do not cover the bricks (the ball waits at y 300). Run it: the words show, and nothing moves yet.",
+      "hints": [
+        "`if (state === 'title') { ... }` with two or three `text(...)` lines inside, as in 6.6.11.",
+        "`textSize(28)` before the name makes it bigger; set it back to 16 for the two lines."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A key picks the mode",
+      "instructions": "In `pickMode()`: when `kb.presses('1')` is true, set `control` to `'mouse'` and `state` to `'play'`; when `kb.presses('2')` is true, set `control` to `'keys'` and `state` to `'play'`. A number key's name is its digit in quotes, `'1'`, the same way `'r'` names the R key. Use `kb.presses`, not `kb.pressing`: one press is one choice (6.3.3). Run it and press 1: the game starts with the mouse. Run again and press 2: the arrow keys steer the paddle.\n\n**A note on prompt().** You could ask with `prompt('Press 1 for the mouse or 2 for the keys')` instead; the sketch allows it. It gives back what was typed as text, a string, which is why 3.1.9 wrapped it in `Number(prompt(...))`. So you compare with `'1'`, not `1`. But a prompt freezes the whole game until it is answered, it looks like the browser and not like your game, and a mistyped answer leaves you with nothing to start. A title screen keeps the game running and shows the choice in your game's own style, which is why games use one. The check accepts either; if you try a prompt, put it in `pickMode()` in place of the two key tests.",
+      "hints": [
+        "`if (kb.presses('1')) { control = 'mouse'; state = 'play'; }`",
+        "The second `if` is the same with `'2'` and `'keys'`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "R goes back to the title",
+      "instructions": "When a game ends, the starter's R starts the next one straight away (`startGame();` then `state = 'play';` in `draw()`). Change it so R sets up the new game and goes back to the title, so the next player can choose: `state = 'title'` instead of `'play'`. Play to the end (miss three times to be quick), press R, and the title comes back with a whole wall and three lives.",
+      "hints": [
+        "Only the word changes: `state = 'title';`.",
+        "`startGame()` still builds the new wall and resets the score and the lives; the title then waits for 1 or 2."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The title screen says what to press",
+      "description": "While state is 'title', the name of the game and the two choices are written on the screen. Help: 6.6.11 (Worked Example: Title Screen with Start Button)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": [
+        "drawTop",
+        "draw"
+      ],
+      "pattern": "\\bif\\s*\\((?=[^;{}]*(?:\\bstate\\s*===?\\s*(?<a>['\"\\x60]) {5}\\k<a>|(?<b>['\"\\x60]) {5}\\k<b>\\s*===?\\s*state\\b))[^;{}]*\\)\\s*\\{[^}]*?\\btext\\s*\\([^}]*?\\btext\\s*\\(|\\bcase\\s*(?<c>['\"\\x60]) {5}\\k<c>\\s*:(?:(?!\\bcase\\b|\\bbreak\\b)[^}])*?\\btext\\s*\\((?:(?!\\bcase\\b|\\bbreak\\b)[^}])*?\\btext\\s*\\(",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "A key picks the mode",
+      "description": "Key 1 sets control to 'mouse' and key 2 sets it to 'keys', and each one sets state to 'play'. Help: 6.6.16 (Worked Example: Keyboard-Driven State Changes)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "pickMode",
+      "pattern": "^(?=[\\s\\S]*(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released|pressing)\\s*\\(\\s*(?:(['\"\\x60]) \\1|\\d)\\s*\\)[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed|released|pressing)\\s*\\(\\s*(?:(['\"\\x60]) \\2|\\d)\\s*\\)|\\bprompt\\s*\\())(?=[\\s\\S]*\\bcontrol\\s*=(?!=)\\s*(['\"\\x60]) {5}\\3)(?=[\\s\\S]*\\bcontrol\\s*=(?!=)\\s*(['\"\\x60]) {4}\\4)(?=[\\s\\S]*\\bstate\\s*=(?!=)\\s*(['\"\\x60]) {4}\\5)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "R goes back to the title",
+      "description": "After the game ends, R starts a new game and sets state to 'title'. Help: 6.6.16 (Worked Example: Keyboard-Driven State Changes)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": [
+        "draw",
+        "startGame"
+      ],
+      "pattern": "\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\(\\s*(['\"\\x60]) \\1\\s*\\)[\\s\\S]*?\\bstate\\s*=(?!=)\\s*(['\"\\x60]) {5}\\2",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

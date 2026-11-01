@@ -1,0 +1,66 @@
+{
+  "id": "6-10-breakout-13-challenges-make-it-yours",
+  "title": "6.10.13 Challenges: Make it yours",
+  "description": "Your Breakout is complete. Change one rule of your own: a third mode, bricks that take two hits, or a second wall. Pick one; add an idea of your own on top if you like.",
+  "type": "lesson",
+  "estimateMins": 30,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.10 Breakout",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a rule and change it",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from the finished game in the editor.\n\n**Challenge 1: a third mode (easy).** Add a choice to the title screen, `Press 3 for one ball, with the mouse`. In `pickMode()`, when `kb.presses('3')` is true, set `control` to `'mouse'`, set `lives` to 1 and set `state` to `'play'`. `startGame()` already set `lives` to 3, so this overwrites it for this game only.\n\n**Challenge 2: two-hit bricks (medium).** Some bricks take two hits, as in 6.9.14. Write `'2'` in `WALL` where a two-hit brick goes (try the whole top row). In `makeBricks()`, push 2 for a `'2'`. In `hitAt`, lower the cell by 1 (`bricks[r][c] -= 1;`) instead of setting it to 0. In `drawBricks()`, fill a 2 with `'silver'`. Then change the three places that test `=== 1` (`drawBricks`, `hitAt` and `bricksLeft`) to `> 0`, so a brick that is down to 1 still draws, can still be hit and still counts.\n\n**Challenge 3: a second wall (hard).** When the first wall is cleared, a second one comes, the way 6.9.8 loaded the next level. Turn `WALL` into a list of walls, `WALLS`, each one five rows of eight letters, and keep `BRICK_ROWS` and `BRICK_COLS` from `WALLS[0]`. Add `let wallNum;`, set it to 0 in `startGame()`, and make `makeBricks()` read `WALLS[wallNum]`. In `checkEnd()`, when no bricks are left, add 1 to `wallNum`: if that was the last wall, the state becomes `'won'`; otherwise build the next wall with `bricks = makeBricks();` and `serve()`.",
+      "hints": [
+        "Whatever you pick, play it to the end and press R: check the game comes back whole.",
+        "Challenge 2 needs the 2 drawn too: `fill(bricks[r][c] === 2 ? 'silver' : ROW_COLORS[r]);`"
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Name what you changed",
+      "instructions": "At the top of `script.js`, write one sentence as a `//` comment saying what your rule is and what would happen if you took it out.",
+      "hints": [
+        "A rule is something the game decides. 'Key 3 gives one ball' is a rule; 'I changed a colour' is not."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "You changed one rule of the game",
+      "description": "Any one challenge turns this green: a third mode, two-hit bricks or a second wall (or a rule of your own, such as a faster ball or a different score). Help: 6.10.10 (Lab: Pick a mode)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=(?:[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\(){4})|\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*(?:-=\\s*1\\b|--|=(?!=)\\s*bricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*-\\s*1\\b)|\\.\\s*push\\s*\\(\\s*2\\s*\\)|\\bWALLS\\s*\\[\\s*[A-Za-z_$]|\\b(?:wallNum|levelNum|level|wall)\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\+\\+\\s*(?:wallNum|levelNum|level|wall)\\b|\\bv[xy]\\s*(?:\\*=\\s*-?\\s*\\(?\\s*(?:\\d*\\.\\d+|[2-9]\\d*)|=(?!=)\\s*-?\\s*\\(?\\s*-?\\s*v[xy]\\s*\\)?\\s*\\*\\s*-?\\s*\\(?\\s*(?:\\d*\\.\\d+|[2-9]\\d*))|\\bscore\\s*(?:\\+=|=\\s*score\\s*\\+)(?!\\s*10\\s*(?:[;})\\n]|$))|\\blives\\s*=(?!=)\\s*(?!3\\b)\\d+|\\bPADDLE_W\\s*=\\s*(?!80\\b)\\d+",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "You wrote your sentence",
+      "description": "A // comment of a few words at the top of the file says what your rule is and what would happen without it (any wording works; a comment that starts with a number, like the title line, does not count). Help: this lab's step 2",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?:[ \\t]*(?:\\/\\/[^\\n]*)?\\r?\\n)*?[ \\t]*\\/\\/[ \\t]*(?:[A-Za-z][A-Za-z'-]*[,.:;!?]?[ \\t]+){3}[A-Za-z]|\\/\\/[^\\n]*\\b(?:would|without|otherwise|instead|if|remov\\w*)\\b",
+      "flags": "i",
+      "stripComments": false,
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
