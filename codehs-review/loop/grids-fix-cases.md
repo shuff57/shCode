@@ -317,3 +317,9 @@ Speed, steady state, 5000-character adversarial input (load average about 30 on 
 Also green: generators (module-docs, lessons-manifest, ai-graders, quiz-keys, pa-pseudocode, solutions, lesson-starters; no tracked file changed), `check-lesson-numbers`, `check-lesson-groups`, `check-prompt-pointers`, `check-lesson-citations`, `check-hints`, `check-live-blocks`, `check-starters`, `check-solution-leak`, `test-quiz`, `audit-grader-tolerance --gate`, `test-2-7-3-comments`, `test-grader-tolerance` (334 cases), `tsc --noEmit`; and, beyond the list, `test-grader-tolerance-3x` (953), `test-grader-alternatives-2x` (24), `test-rubric-tolerance-2-1`, `test-grader`.
 
 Not changed, as before: `server.js`'s own `stripJsComments` (dev server `POST /api/grade` only) disagrees with `lib/` on every round-4 to round-7 item. The report's alternative (a cleaner built on `@lezer/javascript` spans) was not built.
+
+## Round 8 (decision)
+
+Closed: `const t = /P///` (a regex literal followed by a comment) -- the "closing slash followed by `/` or `*` is division" guard from round 6 was redundant after round 7's brace logic and is removed from both scanners.
+
+Declared, not fixed (deliberate): six lexer-level families that need hand-crafted JavaScript (`\u{61}return`, `a. return`, `of`/`yield`/`await` as plain names, spread or `extends` before a regex, `++/P/.x`, deleted block comments fusing tokens). No honest student answer reaches them; closing the class would mean a second reading by @lezer/javascript or an engine syntax gate, a larger change than the lax-grading policy warrants. See grids-advanced-r8.md for the programs.

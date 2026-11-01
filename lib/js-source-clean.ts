@@ -158,7 +158,7 @@ export function stripJsComments(src: string, htmlComments = true): string {
         else if (d === '/' && !inClass) { closed = true; break; }
         j++;
       }
-      if (closed && j > i + 1 && !(src[j + 1] === '/' || src[j + 1] === '*')) {
+      if (closed && j > i + 1) {
         out.add(src.slice(i, j + 1));
         shadow.add('/' + blankOf(src.slice(i + 1, j)) + '/');
         regexEnd = shadow.len;
@@ -441,7 +441,7 @@ export function blankStringContents(src: string): string {
           else if (d === '/' && !inClass) { closed = true; break; }
           j++;
         }
-        if (closed && j > i + 1 && !(src[j + 1] === '/' || src[j + 1] === '*')) {
+        if (closed && j > i + 1) {
           out.add('/' + ' '.repeat(j - i - 1) + '/');
           regexEnd = out.len;
           i = j + 1;
