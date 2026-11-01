@@ -79,7 +79,7 @@
       "type": "inFunction",
       "function": "checkGoal",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\([^{}]*\\)[\\s\\S]*?\\bwon\\s*=\\s*true\\b|\\bwon\\s*=\\s*[^;]*&&",
+      "pattern": "\\bif\\s*\\([^{}]*\\)\\s*(?:\\{[^}]*)?\\bwon\\s*=\\s*true\\b|\\bwon\\s*=\\s*[^;]*&&",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,

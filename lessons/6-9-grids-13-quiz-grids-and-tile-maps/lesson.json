@@ -104,9 +104,9 @@
         "source": "6.9.10",
         "question": "The grid has 8 rows (0 to 7) and a words strip above it. A click lands in the strip, so `floor((y - TOP) / CELL)` is -1. What happens if the code goes straight to `grid[r][c] = ...`?",
         "options": [
-          "`grid[-1]` is skipped, so nothing happens and the sketch carries on",
+          "`grid[-1]` is `undefined`, but the line is skipped quietly and the sketch carries on",
           "`grid[-1]` counts from the end, so row 7 is flipped instead",
-          "`grid[-1]` is `undefined`, so reading a cell from it stops the sketch",
+          "`grid[-1]` is `undefined`, and reading a cell from it stops the sketch",
           "`grid[-1]` makes the grid grow a new row at the front"
         ],
         "answer": 2,

@@ -52,7 +52,7 @@ function drawBricks() {
   }
 }
 
-// Something hit the wall at pixel (x, y). If a brick is there, take it out and say true.
+// Something hit the wall at pixel (x, y). When a brick is there, take it out and say true.
 function hitAt(x, y) {
   const c = floor(x / BW);
   const r = floor((y - TOP) / BH);

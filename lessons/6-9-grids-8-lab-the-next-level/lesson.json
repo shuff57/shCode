@@ -49,7 +49,7 @@
     {
       "id": "r2",
       "title": "The new level comes from the levels list",
-      "description": "loadLevel(n) builds level n with Tiles, using levels[n]. Help: 6.9.2 (Reading: A map is rows of text)",
+      "description": "loadLevel(n) builds level n with Tiles, using levels[n]. Help: 6.9.5 (Reading: Reading a map as data)",
       "type": "inFunction",
       "function": "loadLevel",
       "file": "script.js",
@@ -75,7 +75,7 @@
     {
       "id": "r4",
       "title": "Reaching the goal moves to the next level",
-      "description": "The goal test (no coins left AND the player on the goal) comes first, then levelNum goes up by 1 and loadLevel builds that level. Help: 6.9.7 (Lab: Coins and the goal)",
+      "description": "The goal test (no coins left AND the player on the goal) comes first, then levelNum goes up by 1 and loadLevel builds that level. Help: step 2 of this lab",
       "type": "inFunction",
       "function": "checkGoal",
       "file": "script.js",
@@ -92,7 +92,7 @@
       "type": "inFunction",
       "function": "checkGoal",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*(?:\\blevelNum\\b[^;{}]*\\blevels\\.length\\b|\\blevels\\.length\\b[^;{}]*\\blevelNum\\b|\\blevelNum\\s*(?:===?|>=|>|<)\\s*\\d))(?=[\\s\\S]*\\bwon\\s*=\\s*true\\b)",
+      "pattern": "^(?=[\\s\\S]*(?:\\blevelNum\\b[^;{}]*\\blevels\\.length\\b|\\blevels\\.length\\b[^;{}]*\\blevelNum\\b|\\blevelNum\\s*(?:===?|>=|>|<)\\s*\\d|\\b(?:const|let|var)\\s+(?<ll>[A-Za-z_$][\\w$]*)\\s*=\\s*[^;]*\\blevels\\.length\\b[^;]*;[\\s\\S]*?(?:\\blevelNum\\b[^;{}]*\\b\\k<ll>\\b|\\b\\k<ll>\\b[^;{}]*\\blevelNum\\b)))(?=[\\s\\S]*\\bwon\\s*=\\s*true\\b)",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,

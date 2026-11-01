@@ -39,7 +39,7 @@
       "description": "Any one challenge turns this green: two-hit bricks, points by row (or any other score rule), or a wall read from text. Help: 6.9.11 (Lab: A wall of bricks)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*(?:-=\\s*1\\b|--|=\\s*1\\b|=\\s*bricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*-\\s*1\\b)|\\bscore\\s*(?:\\+=|=\\s*score\\s*\\+)(?!\\s*10\\s*(?:[;})]|$))|\\bSHAPE\\s*\\[\\s*[\\w$]+\\s*\\]\\s*(?:\\[|\\.(?:charAt|substring|slice|split|at)\\s*\\()|\\bof\\s+SHAPE\\b",
+      "pattern": "\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*(?:-=\\s*1\\b|--|=\\s*1\\b|=\\s*bricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*-\\s*1\\b)|\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*=(?!=)(?!\\s*bricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*;)\\s*[^;]*(?:\\?|\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\])|\\bscore\\s*(?:\\+=|=\\s*score\\s*\\+)(?!\\s*10\\s*(?:[;})]|$))|\\bSHAPE\\s*\\[\\s*[\\w$]+\\s*\\]\\s*(?:\\[|\\.(?:charAt|substring|slice|split|at)\\s*\\()|\\bof\\s+SHAPE\\b|=\\s*SHAPE\\s*\\[\\s*[\\w$]+\\s*\\]\\s*;",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,
@@ -48,11 +48,11 @@
     {
       "id": "r2",
       "title": "You wrote your sentence",
-      "description": "A // comment says what your rule is and what would happen without it (any wording that says what would happen if, or without, works). Help: this lab's step 2",
+      "description": "A // comment of a few words at the top of the file says what your rule is and what would happen without it (any wording works; a comment that starts with a number, like the title line, does not count). Help: this lab's step 2",
       "type": "regex",
       "file": "script.js",
-      "pattern": "//[^\\n]*\\b(?:would|without|otherwise|instead|if)\\b",
-      "flags": "",
+      "pattern": "^(?:[ \\t]*(?:\\/\\/[^\\n]*)?\\r?\\n)*?[ \\t]*\\/\\/[ \\t]*(?:[A-Za-z][A-Za-z'-]*[,.:;!?]?[ \\t]+){3}[A-Za-z]|\\/\\/[^\\n]*\\b(?:would|without|otherwise|instead|if|remov\\w*)\\b",
+      "flags": "i",
       "stripComments": false,
       "points": 0,
       "status": "pending"

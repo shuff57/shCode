@@ -92,7 +92,7 @@ function setup() {
   coins.color = 'gold';
   new Tiles(map, TILE / 2, TILE / 2, TILE, TILE, { '#': walls, 'c': coins });
 
-  // Forward: look at every letter. When it is the P, turn its row and column into pixels.
+  // Look at every letter. When it is the P, turn its row and column into pixels.
   for (let r = 0; r < map.length; r++) {
     for (let c = 0; c < map[r].length; c++) {
       if (map[r][c] === 'P') {

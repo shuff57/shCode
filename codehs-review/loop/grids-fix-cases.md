@@ -125,3 +125,64 @@ Runtime check (moSHion node harness): 6.9.10 reference lights and unlights cells
 - 6.9.10/6.9.11: counting the wrong cell (`!grid[r][c]`) still passes; the starting screen (`lit: 64`) shows it.
 - 6.9.11 r3: a zero test that is only on the column, with the row bounded above, passes; the row upper bound against `BRICK_ROWS`/`5` is required.
 - 6.9.13 quiz: only q6 had a real tell (the one option in code formatting); it was rewritten with four code-formatted options. The mild content tells in q1, q3, q4, q5 are left. The answer key shipping to the browser is an author decision (formative quiz).
+
+## Round 2 additions (2026-10-31)
+
+Same method (lib/grader.ts bundled, current lesson.json). Round-1 replay: 159 cases and the 60 round-2 report cases, all as expected; the only changes are the intended closes (10 r4, 10 r3 TOP, 11 r3, 11 r4 cell gate, 7 r4 won under the test, regex literal after if/else) and the intended opens (11 r5 named points, 10 r6 row alias, 14 r2 any wording). Old 10 honest cases written before TOP existed read red on r3 by design. Starters 0, references full for 4, 6, 7, 8, 10, 11, 14. Worst regex time on 5000-char adversarial input: 14 ms (no lookbehind). New cases below (expected = observed):
+
+| Lab | Case | Result |
+| --- | --- | --- |
+| 6.9.7 | cheat: brace_slip  | 3/4 r1+ r2+ r3+ r4- |
+| 6.9.7 | cheat: won_under_empty_ifs  | 3/4 r1+ r2+ r3+ r4- |
+| 6.9.7 | honest: braceless  | 4/4 r1+ r2+ r3+ r4+ |
+| 6.9.7 | honest: nested  | 4/4 r1+ r2+ r3+ r4+ |
+| 6.9.8 | cheat: lastLevel_unrelated_var  | 4/5 r1+ r2+ r3+ r4+ r5- |
+| 6.9.8 | honest: lastLevel_helper_after_inc  | 5/5 r1+ r2+ r3+ r4+ r5+ |
+| 6.9.8 | honest: lastLevel_helper  | 5/5 r1+ r2+ r3+ r4+ r5+ |
+| 6.9.10 | cheat: click_col_guard_only  | 5/6 r1+ r2+ r3+ r4- r5+ r6+ |
+| 6.9.10 | cheat: click_no_TOP  | 5/6 r1+ r2+ r3- r4+ r5+ r6+ |
+| 6.9.10 | cheat: click_read_first_andand  | 5/6 r1+ r2+ r3+ r4- r5+ r6+ |
+| 6.9.10 | cheat: click_row_upper_only  | 5/6 r1+ r2+ r3+ r4- r5+ r6+ |
+| 6.9.10 | cheat: count_row_alias_unused  | 5/6 r1+ r2+ r3+ r4+ r5+ r6- |
+| 6.9.10 | cheat: make_one_loop_push_false  | 5/6 r1- r2+ r3+ r4+ r5+ r6+ |
+| 6.9.10 | honest: click_early_return_four  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.10 | honest: click_inline_40  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.10 | honest: click_optional_chain  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.10 | honest: click_strip_return_then_upper  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.10 | honest: click_y_minus_TOP_var  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.10 | honest: count_hybrid_forof_row  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.10 | honest: count_row_alias  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.10 | honest: make_index_empty  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.10 | honest: make_push_empty  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.10 | honest: make_while  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.11 | cheat: hit_flag_never_true  | 5/6 r1+ r2+ r3+ r4+ r5- r6+ |
+| 6.9.11 | cheat: hit_no_return_true  | 5/6 r1+ r2+ r3+ r4+ r5- r6+ |
+| 6.9.11 | cheat: hit_row_upper_only  | 5/6 r1+ r2+ r3- r4+ r5+ r6+ |
+| 6.9.11 | cheat: make_one_loop  | 5/6 r1- r2+ r3+ r4+ r5+ r6+ |
+| 6.9.11 | honest: count_hybrid  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.11 | honest: count_row_alias  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.11 | honest: hit_alias_cell_gate  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.11 | honest: hit_const_points  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.11 | honest: hit_flag  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.11 | honest: make_index_push  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.11 | honest: make_push_empty  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.11 | honest: make_while  | 6/6 r1+ r2+ r3+ r4+ r5+ r6+ |
+| 6.9.14 | cheat: no_rule_just_zero  | 1/2 r1- r2+ |
+| 6.9.14 | cheat: no_sentence_title_only  | 1/2 r1+ r2- |
+| 6.9.14 | cheat: self_assign  | 1/2 r1- r2+ |
+| 6.9.14 | cheat: sentence_below_code_no_keyword  | 1/2 r1+ r2- |
+| 6.9.14 | cheat: sentence_numbers  | 1/2 r1+ r2- |
+| 6.9.14 | cheat: sentence_too_short  | 1/2 r1+ r2- |
+| 6.9.14 | honest: ch3_line_alias  | 2/2 r1+ r2+ |
+| 6.9.14 | honest: rhs_reads_cell  | 2/2 r1+ r2+ |
+| 6.9.14 | honest: sentence_any_words_after_blank  | 2/2 r1+ r2+ |
+| 6.9.14 | honest: sentence_any_words  | 2/2 r1+ r2+ |
+| 6.9.14 | honest: sentence_below_with_keyword  | 2/2 r1+ r2+ |
+| 6.9.14 | honest: sentence_If_capital  | 2/2 r1+ r2+ |
+| 6.9.14 | honest: sentence_Remove  | 2/2 r1+ r2+ |
+| 6.9.14 | honest: sentence_Removing  | 2/2 r1+ r2+ |
+| 6.9.14 | honest: sentence_Without_capital  | 2/2 r1+ r2+ |
+| 6.9.14 | honest: ternary_other  | 2/2 r1+ r2+ |
+| 6.9.14 | honest: ternary_two_hit  | 2/2 r1+ r2+ |
+
+Declined: named callback passed to overlaps (6.9.7), niche shapes no lesson models (hybrid wrong-cell counts, second hp array), the `||` double-if forms and a dummy statement before an ungated increment (needs a runtime test), 6.9.6 cellToPixel body, `// if` alone still passes the keyword alternative of 14 r2. Regex-literal fix in lib/js-source-clean.ts: a '/' after else/do/case/throw/void/delete/in or after the ) of an if/while/for/with head now starts a regex; `(a + b) / 2`, `f(x) / 3`, `arr[i] / n` still divide.

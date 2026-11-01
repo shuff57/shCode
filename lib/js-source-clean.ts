@@ -63,6 +63,22 @@ export function stripJsComments(src: string): string {
   return out;
 }
 
+// True when `before` ends with the ')' of an if / while / for / with head: a '/' there starts a
+// regular-expression literal (`if (ok) /text/;`), while after `f(x)` or `(a + b)` it divides.
+function closesStatementHead(before: string): boolean {
+  if (before[before.length - 1] !== ')') return false;
+  let depth = 0;
+  for (let k = before.length - 1; k >= 0; k--) {
+    const ch = before[k];
+    if (ch === ')') depth++;
+    else if (ch === '(') {
+      depth--;
+      if (depth === 0) return /(?:^|[^\w$.])(?:if|while|for|with)\s*$/.test(before.slice(0, k));
+    }
+  }
+  return false;
+}
+
 // Blank the CONTENT of string literals and template-literal text (the quote
 // characters stay, `${...}` expressions stay code), preserving length and
 // newlines. Runs after comment stripping. Without it a regex requirement is
@@ -106,7 +122,7 @@ export function blankStringContents(src: string): string {
     if (c === '/') {
       const before = out.replace(/\s+$/, '');
       const last = before[before.length - 1];
-      const startsRegex = before === '' || /[(,=:\[!&|?{};+\-*%<>~^]/.test(last) || /(?:^|[^\w$])(?:return|typeof)$/.test(before);
+      const startsRegex = before === '' || /[(,=:\[!&|?{};+\-*%<>~^]/.test(last) || /(?:^|[^\w$.])(?:return|typeof|else|do|case|throw|void|delete|in)$/.test(before) || closesStatementHead(before);
       if (startsRegex) {
         let j = i + 1;
         let inClass = false;

@@ -67,7 +67,7 @@
     {
       "id": "r3",
       "title": "The goal lets you walk through",
-      "description": "The goal is its own Group and does not block the player either. Help: 6.9.2 (Reading: A map is rows of text)",
+      "description": "The goal is its own Group and does not block the player either. Help: step 2 of this lab",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bgoals\\.collider\\s*=\\s*['\"]none['\"]",
@@ -78,7 +78,7 @@
     {
       "id": "r4",
       "title": "The level is built from the map with Tiles",
-      "description": "new Tiles(map, ...) with a legend: # builds walls, c builds coins, G builds goals. Help: 6.9.2 (Reading: A map is rows of text)",
+      "description": "new Tiles(map, ...) with a legend: # builds walls, c builds coins, G builds goals. Help: step 3 of this lab",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?=[\\s\\S]*\\bnew\\s+Tiles\\s*\\()(?=[\\s\\S]*['\"]#['\"]\\s*:\\s*walls\\b)(?=[\\s\\S]*['\"]c['\"]\\s*:\\s*coins\\b)(?=[\\s\\S]*['\"]G['\"]\\s*:\\s*goals\\b)",
