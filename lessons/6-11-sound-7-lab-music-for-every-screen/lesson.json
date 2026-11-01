@@ -1,0 +1,125 @@
+{
+  "id": "6-11-sound-7-lab-music-for-every-screen",
+  "title": "6.11.7 Lab: Music for every screen",
+  "description": "Star catch has a title, the game, a win and a loss, and every change of screen goes through goTo(next). Make goTo change the music: stop what was playing, loop the tune on the title and in the game, and play it once for a win or a loss.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.11 Sound and Music",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Stop the music first",
+      "instructions": "The starter is Star catch with screens, using the state variable of 6.6.7: `state` is `'title'`, `'play'`, `'won'` or `'lost'`. Enter on the title starts a game; 10 catches win; 3 misses lose; R on an end screen goes back to the title. Every change of screen goes through one function, `goTo(next)`, and so far it only does `state = next;`. `setup()` loads one tune, `music`, and ends with `goTo('title')`. Run it and play a game to the end: no music anywhere. That is this lab.\n\nMusic changes when the screen changes, so it belongs in `goTo`, not in `draw()` (6.11.6). First, at the top of `goTo`, stop whatever is playing with `music.stop();`. Without it two things go wrong: `loop()` while the tune is already looping does nothing, and `play()` starts a second copy on top of the first.",
+      "hints": [
+        "`music.stop();` is the first line inside `goTo(next)`, above `state = next;`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "The title and the game loop the tune",
+      "instructions": "After `state = next;`, start the new screen's music. The title loops the tune slower and lower; the game loops it as it was made:\n\n```js\nif (next === 'title') {\n  music.rate = 0.8;\n  music.loop();\n}\n```\n\nand the same for `'play'` with `music.rate = 1;`. Set the rate first, then start it. Run it: a calm tune on the title (after your first click or key), and the quicker one when you press Enter.",
+      "hints": [
+        "`next` is the screen being entered; `state = next;` has just set `state` to it.",
+        "Click the canvas before you press Enter: the click switches sound on and gives the sketch your keys (5.1.13)."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "A win and a loss play it once",
+      "instructions": "A win and a loss each play the tune once, not looping, so the end screen goes quiet after it. Add two more `if`s in `goTo`: for `'won'`, `music.rate = 1.25;` (faster and higher), then `music.play();`; for `'lost'`, `music.rate = 0.6;` (slow and low), then `music.play();`. Play to a win and to a loss, and press R after each: the title's tune comes back, alone, because `goTo('title')` stopped the end tune first.",
+      "hints": [
+        "`play()`, not `loop()`: the end tune plays once and then stops by itself.",
+        "To reach a win sooner while you test, change the `10` in `if (score >= 10)` to `2`, then put it back."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A new screen stops the old music",
+      "description": "Inside goTo(next), a sound's .stop() runs, so the last screen's music cannot carry on under the next one. Help: 6.11.6 (Reading: Music that follows the game)",
+      "hint": "music.stop(); as the first line of goTo(next).",
+      "file": "script.js",
+      "flags": "",
+      "ignoreStrings": true,
+      "type": "inFunction",
+      "function": [
+        "goTo",
+        "goto",
+        "changeState",
+        "setState",
+        "switchState",
+        "enterState",
+        "changeScreen",
+        "goToState",
+        "setScreen",
+        "showScreen"
+      ],
+      "pattern": "[\\w$\\])]\\s*\\??\\.\\s*(?:stop|pause)\\s*\\(",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The title and the game loop the tune",
+      "description": "Inside goTo(next), .loop() runs under an if (or a case) on the screen being entered: one for the title and one for the game, or one if that asks for both. Help: 6.11.6 (Reading: Music that follows the game)",
+      "hint": "if (next === 'title') { music.rate = 0.8; music.loop(); }, and the same for 'play' with rate 1.",
+      "file": "script.js",
+      "flags": "",
+      "ignoreStrings": true,
+      "type": "inFunction",
+      "function": [
+        "goTo",
+        "goto",
+        "changeState",
+        "setState",
+        "switchState",
+        "enterState",
+        "changeScreen",
+        "goToState",
+        "setScreen",
+        "showScreen"
+      ],
+      "pattern": "^(?=(?:[\\s\\S]*?(?:\\bif\\s*\\([^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?|[^;{}]{0,160}?)|\\belse\\b(?!\\s*if\\b)\\s*(?:\\{[^{}]{0,300}?|[^;{}]{0,160}?)|\\bcase\\b[^:;{}]{0,60}:[^{}]{0,300}?|\\?[^;{}]{0,120}?|&&[^;{}]{0,120}?)[\\w$\\])]\\s*\\??\\.\\s*loop\\s*\\(){2})|\\bif\\s*\\((?=[^;{}]{0,200}\\|\\|)[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?|[^;{}]{0,160}?)[\\w$\\])]\\s*\\??\\.\\s*loop\\s*\\(|\\belse\\b(?!\\s*if\\b)\\s*(?:\\{[^{}]{0,300}?|[^;{}]{0,160}?)[\\w$\\])]\\s*\\??\\.\\s*loop\\s*\\(|\\[\\s*[A-Za-z_$][\\w$]*\\s*\\]\\s*\\??\\.\\s*loop\\s*\\(",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A win and a loss play it once",
+      "description": "Inside goTo(next), .play() runs under an if (or a case) on the screen being entered: one for a win and one for a loss, or one if that asks for both. Help: 6.11.6 (Reading: Music that follows the game)",
+      "hint": "if (next === 'won') { music.rate = 1.25; music.play(); }, and the same for 'lost' with rate 0.6.",
+      "file": "script.js",
+      "flags": "",
+      "ignoreStrings": true,
+      "type": "inFunction",
+      "function": [
+        "goTo",
+        "goto",
+        "changeState",
+        "setState",
+        "switchState",
+        "enterState",
+        "changeScreen",
+        "goToState",
+        "setScreen",
+        "showScreen"
+      ],
+      "pattern": "^(?=(?:[\\s\\S]*?(?:\\bif\\s*\\([^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?|[^;{}]{0,160}?)|\\belse\\b(?!\\s*if\\b)\\s*(?:\\{[^{}]{0,300}?|[^;{}]{0,160}?)|\\bcase\\b[^:;{}]{0,60}:[^{}]{0,300}?|\\?[^;{}]{0,120}?|&&[^;{}]{0,120}?)[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\(){2})|\\bif\\s*\\((?=[^;{}]{0,200}\\|\\|)[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?|[^;{}]{0,160}?)[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\(|\\belse\\b(?!\\s*if\\b)\\s*(?:\\{[^{}]{0,300}?|[^;{}]{0,160}?)[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\(|\\[\\s*[A-Za-z_$][\\w$]*\\s*\\]\\s*\\??\\.\\s*play\\s*\\(",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "id": "6-11-sound-9-quiz-sound-and-music",
+  "title": "6.11.9 Check: Sound and music",
+  "description": "Eight multiple-choice questions on the browser's rule, loading once, play and loop, rate, a random pick, stopping the music on a new screen, and a saved 0. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.11 Sound and Music",
+  "preview": "quiz",
+  "week": 18,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-browser",
+        "source": "6.11.1",
+        "question": "A sketch calls `music.loop()` in `setup()`. In a fresh tab the tune stays silent until the player clicks the game, and then it starts. Why?",
+        "options": [
+          "`loop()` always waits for a click on the canvas before it starts to play",
+          "The file only begins to download at the first click",
+          "`setup()` runs a second time on the first click",
+          "A browser lets a page make no sound before a click or a key"
+        ],
+        "answer": 3,
+        "explanation": "Browsers refuse to make sound until the person has clicked or pressed a key on the page. moSHion switches sound on at the first one, and the loop that was waiting starts then.",
+        "sourceIds": [
+          "6-11-sound-1-reading-sound-in-a-sketch"
+        ]
+      },
+      {
+        "id": "q2-load",
+        "source": "6.11.1",
+        "question": "Why is `loadSound` called once in `setup()` and not in `draw()`?",
+        "options": [
+          "`draw()` would start a new download every frame; a sound plays only once its file has arrived",
+          "`loadSound` stops the sketch with an error anywhere but `setup()`",
+          "A sound loaded in `draw()` plays sixty times a second, all on top of each other, until the game ends",
+          "Only `setup()` is allowed to give a variable its first value"
+        ],
+        "answer": 0,
+        "explanation": "A file takes a moment to arrive, and play() before it has arrived does nothing. draw() runs 60 times a second, so loading there starts a fresh download every frame and none is ever ready.",
+        "sourceIds": [
+          "6-11-sound-1-reading-sound-in-a-sketch"
+        ]
+      },
+      {
+        "id": "q3-pressing",
+        "source": "6.11.2",
+        "question": "The code says `if (kb.pressing('3')) chime.play();` and the player holds 3 down for one second. What do they hear?",
+        "options": [
+          "One chime, on the frame the key went down",
+          "One chime, on the frame the key came back up",
+          "About sixty chimes, one each frame, piled on top of each other",
+          "Nothing at all, because play() waits until the key has been let go again"
+        ],
+        "answer": 2,
+        "explanation": "kb.pressing is true on every frame the key is held, and every play() starts a new copy. kb.presses is true only on the frame the key goes down: one press, one chime.",
+        "sourceIds": [
+          "6-11-sound-2-example-a-sound-board"
+        ]
+      },
+      {
+        "id": "q4-loop",
+        "source": "6.11.1 and 6.11.2",
+        "question": "`music.loop()` runs in `draw()`, every frame. What does the player hear?",
+        "options": [
+          "Sixty copies of the tune a second, piling up",
+          "One copy of the tune, looping",
+          "The first moment of the tune, restarted every frame",
+          "Nothing, because `loop()` works only in `setup()`"
+        ],
+        "answer": 1,
+        "explanation": "A sound has one looping copy. loop() while it is already looping does nothing, so calling it every frame is safe. play() is the one that starts a new copy every call.",
+        "sourceIds": [
+          "6-11-sound-1-reading-sound-in-a-sketch",
+          "6-11-sound-2-example-a-sound-board"
+        ]
+      },
+      {
+        "id": "q5-rate",
+        "source": "6.11.1",
+        "question": "The thud is set up with `thud.rate = 0.5;` before `thud.play();`. Compared with a rate of 1, how does it sound?",
+        "options": [
+          "The same note, only half as loud",
+          "Higher, and over in half the time",
+          "Lower, and twice as long",
+          "Exactly the same: rate only changes a looping sound"
+        ],
+        "answer": 2,
+        "explanation": "rate is the playback speed, and the pitch moves with it. Half speed is lower and takes twice as long; 1.5 would be higher and shorter.",
+        "sourceIds": [
+          "6-11-sound-1-reading-sound-in-a-sketch"
+        ]
+      },
+      {
+        "id": "q6-pick",
+        "source": "6.11.5",
+        "question": "`thuds` is a list of three sounds. Which line plays one of them, picked at random?",
+        "options": [
+          "`thuds[random(3)].play();`",
+          "`thuds[thuds.length].play();`",
+          "`thuds[floor(random(thuds.length + 1))].play();`",
+          "`thuds[floor(random(thuds.length))].play();`"
+        ],
+        "answer": 3,
+        "explanation": "thuds.length is 3, and floor(random(3)) is 0, 1 or 2: the three positions. random(3) alone gives a decimal such as 1.7, which is not a position; thuds.length + 1 can give 3, and thuds[3] is past the end.",
+        "sourceIds": [
+          "6-11-sound-5-lab-a-sound-that-varies"
+        ]
+      },
+      {
+        "id": "q7-stop",
+        "source": "6.11.6",
+        "question": "In `goTo(next)`, why does `music.stop()` come before the new screen's tune starts?",
+        "options": [
+          "The old copy would carry on: `loop()` while looping does nothing, and `play()` adds a copy",
+          "`stop()` rewinds the file so the next start plays it from the beginning",
+          "The browser refuses to start a second sound while another sound from the same file is going",
+          "`stop()` downloads the file again, ready for the next screen"
+        ],
+        "answer": 0,
+        "explanation": "Without stop(), the title loop would just keep going into the game (loop() while looping does nothing), and a win's play() would start on top of the game's loop.",
+        "sourceIds": [
+          "6-11-sound-6-reading-music-that-follows-the-game"
+        ]
+      },
+      {
+        "id": "q8-null",
+        "source": "6.11.6 and 6.11.8",
+        "question": "A player turned the level down to 0, and it was saved. Next time the game starts, `level = getItem('soundLevel') || 5;` runs. What is `level`?",
+        "options": [
+          "0, the level that was saved",
+          "5, because 0 counts as false for `||`, just like `null`",
+          "`null`, because a 0 is never saved",
+          "`'0'`, as text, because getItem always gives back a string of text"
+        ],
+        "answer": 1,
+        "explanation": "getItem gives back the number 0, but || picks its right side whenever the left counts as false, and 0 does. if (saved !== null) level = saved; keeps the 0.",
+        "sourceIds": [
+          "6-11-sound-6-reading-music-that-follows-the-game",
+          "6-11-sound-8-lab-a-settings-screen-that-remembers"
+        ]
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

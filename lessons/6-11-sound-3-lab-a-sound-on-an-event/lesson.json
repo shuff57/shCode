@@ -1,0 +1,99 @@
+{
+  "id": "6-11-sound-3-lab-a-sound-on-an-event",
+  "title": "6.11.3 Lab: A sound on an event",
+  "description": "Star catch makes no sound yet. Load two sounds once, in setup(), then play a chime for each star you catch and a low thud for each one you miss, each in the one place where its event happens once.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.11 Sound and Music",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Load two sounds",
+      "instructions": "The game in the editor is Star catch: the arrow keys slide the orange basket along the bottom, and a gold star falls from the top. A catch (the star `overlaps()` the basket, 5.9.5) adds 1 to `caught`; a star that falls past the bottom adds 1 to `missed`. Either way `dropStar()` sends the star back to the top, at a random x, at once. Run it, click the canvas so the sketch hears your keys (5.1.13), and catch a few. It is silent: sound is this lab.\n\n`loadSound(path)` starts downloading a sound file and gives you back a Sound to keep in a variable, the way you keep a sprite (6.11.1). The course has two files: `'/moshion/assets/coin.wav'` is a short chime and `'/moshion/assets/music.wav'` is a tune. Type the path exactly, quotes included: a misspelled path shows no error and never plays. Load each sound once, in `setup()`: a file has to arrive before it can play, and `draw()` would start a new download 60 times a second.\n\nThe starter already has `let chime, thud;`. In `setup()`, after the star's lines, load the chime, then load the same file again as the thud, at half speed so it comes out lower:\n\n```js\nchime = loadSound('/moshion/assets/coin.wav');\nthud = loadSound('/moshion/assets/coin.wav');\nthud.rate = 0.5;   // the same file, slower and lower\n```",
+      "hints": [
+        "Type the path letter by letter: '/moshion/assets/coin.wav'. A typo shows no error; the sound just never plays.",
+        "Load in setup() only. draw() runs 60 times a second and would start a new download every frame."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A catch plays the chime",
+      "instructions": "`chime.play();` plays the chime once, from the start. It goes in the one place where a catch happens **exactly once**. In `draw()`, the `if (star.overlaps(basket))` block runs on the frame the star touches the basket, and its `dropStar()` moves the star away at once, so the block runs once for each catch. Put `chime.play();` inside that block, where the STEP 2 line is.\n\nNot straight in `draw()`: that runs 60 times a second, so the chime would start 60 times a second. Run it, click the canvas, and catch a star. The click on the canvas also switches sound on: a browser makes no sound until the player has clicked or pressed a key (6.11.1). If you still hear nothing, check that the browser tab and your speakers are not muted.",
+      "hints": [
+        "Inside the braces of `if (star.overlaps(basket)) { ... }`: `chime.play();`",
+        "`score += 1;` and `dropStar();` are already in that block. The chime can go anywhere inside it."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "A miss plays the thud",
+      "instructions": "A miss is the star falling past the bottom: the `if (star.y > 410)` block. It calls `dropStar()` too, so it also runs once for each miss. Put `thud.play();` inside it, where the STEP 3 line is. Run it and let a star fall: a low thud, slower than the chime because its rate is 0.5. Then catch one: the chime. Two events, two sounds, each played once.",
+      "hints": [
+        "Inside the braces of `if (star.y > 410) { ... }`: `thud.play();`"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Sounds are loaded once, in setup()",
+      "description": "setup() loads a sound into a variable with loadSound and the path '/moshion/assets/coin.wav' (or music.wav), so it is ready before the game needs it. Any variable name works. Help: 6.11.1 (Reading: Sound in a sketch)",
+      "hint": "Check the path letter by letter: '/moshion/assets/coin.wav'. And load it in setup(), not in draw().",
+      "file": "script.js",
+      "flags": "",
+      "type": "inFunction",
+      "function": [
+        "setup",
+        "loadSounds",
+        "loadAllSounds",
+        "setupSounds",
+        "makeSounds",
+        "loadAudio",
+        "setupAudio",
+        "startMusic",
+        "startSounds"
+      ],
+      "pattern": "=\\s*\\[?\\s*loadSound\\s*\\(\\s*['\"\\x60](?:(?:https?:\\/\\/[^'\"\\x60\\s]*)?\\/moshion\\/assets\\/|(?:\\.\\/)?assets\\/)(?:coin|music)\\.wav['\"\\x60]|\\.\\s*push\\s*\\(\\s*loadSound\\s*\\(\\s*['\"\\x60](?:(?:https?:\\/\\/[^'\"\\x60\\s]*)?\\/moshion\\/assets\\/|(?:\\.\\/)?assets\\/)(?:coin|music)\\.wav['\"\\x60]",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "A catch plays a sound",
+      "description": "A sound's .play() runs inside the if that asks star.overlaps(basket), the block that runs once for each catch (or in a function that block calls). Help: 6.11.1 (Reading: Sound in a sketch)",
+      "hint": "Put chime.play(); inside the braces of if (star.overlaps(basket)) { ... }.",
+      "file": "script.js",
+      "flags": "",
+      "ignoreStrings": true,
+      "type": "regex",
+      "pattern": "\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\b(?:overlap\\w*|collid\\w*)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()|(?:\\b(?:overlap\\w*|collid\\w*)\\s*\\()[^;{}]{0,160}?&&[^;{}]{0,160}?(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()|\\b(?:(?:const|let|var)\\s+)?(?<c1>[A-Za-z_$][\\w$]*)\\s*=(?![=>])[^;\\n]{0,200}?(?:\\b(?:overlap\\w*|collid\\w*)\\s*\\()[^;\\n]{0,200}[;\\n][\\s\\S]{0,800}?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\b\\k<c1>\\b))[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()|\\bfunction\\s+(?<h2>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,800}?(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()[\\s\\S]*?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\b(?:overlap\\w*|collid\\w*)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)\\b\\k<h2>\\s*\\(|\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\b(?:overlap\\w*|collid\\w*)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)\\b(?<h3>[A-Za-z_$][\\w$]*)\\s*\\(\\s*\\)[\\s\\S]*?\\bfunction\\s+\\k<h3>\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,800}?(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()|\\.\\s*(?:overlap\\w*|collid\\w*)\\s*\\([^;{}]{0,120}?(?:=>|\\bfunction\\b[^{]{0,60})\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A miss plays a sound",
+      "description": "A sound's .play() runs inside the if that finds the star past the bottom (star.y > 410), the block that runs once for each miss. Help: 6.11.1 (Reading: Sound in a sketch)",
+      "hint": "Put thud.play(); inside the braces of if (star.y > 410) { ... }.",
+      "file": "script.js",
+      "flags": "",
+      "ignoreStrings": true,
+      "type": "regex",
+      "pattern": "\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\b[\\w$]+\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*>=?\\s*\\(?\\s*(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b|\\b(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*<=?\\s*\\(?\\s*\\b[\\w$]+\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b))[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()|(?:\\b[\\w$]+\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*>=?\\s*\\(?\\s*(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b|\\b(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*<=?\\s*\\(?\\s*\\b[\\w$]+\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)[^;{}]{0,160}?&&[^;{}]{0,160}?(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()|\\b(?:(?:const|let|var)\\s+)?(?<c4>[A-Za-z_$][\\w$]*)\\s*=(?![=>])[^;\\n]{0,200}?(?:\\b[\\w$]+\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*>=?\\s*\\(?\\s*(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b|\\b(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*<=?\\s*\\(?\\s*\\b[\\w$]+\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)[^;\\n]{0,200}[;\\n][\\s\\S]{0,800}?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\b\\k<c4>\\b))[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()|\\bfunction\\s+(?<h5>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,800}?(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()[\\s\\S]*?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\b[\\w$]+\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*>=?\\s*\\(?\\s*(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b|\\b(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*<=?\\s*\\(?\\s*\\b[\\w$]+\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b))[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)\\b\\k<h5>\\s*\\(|\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\b[\\w$]+\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*>=?\\s*\\(?\\s*(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b|\\b(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*<=?\\s*\\(?\\s*\\b[\\w$]+\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b))[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)\\b(?<h6>[A-Za-z_$][\\w$]*)\\s*\\(\\s*\\)[\\s\\S]*?\\bfunction\\s+\\k<h6>\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,800}?(?:[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\()",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

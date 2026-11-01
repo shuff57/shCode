@@ -1,0 +1,115 @@
+{
+  "id": "6-11-sound-8-lab-a-settings-screen-that-remembers",
+  "title": "6.11.8 Lab: A settings screen that remembers",
+  "description": "A sound options screen: up and down step the level, M mutes, and both are saved with storeItem when they change and loaded with getItem when the game starts, so the game remembers them.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.11 Sound and Music",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Change the level and the mute",
+      "instructions": "The starter is your 6.11.7 game with a fifth screen, `'settings'`: O on the title opens it, and O there goes back. It shows `level` (how loud everything is, 0 to 10) and whether the sound is on. Two variables hold them, `let level = 5;` and `let muted = false;`, and `applySound()` turns them into sound for everything at once with `masterVolume(muted ? 0 : level / 10);` (6.11.6). `soundChanged()` calls `applySound()` and plays the chime as a sample, so the player hears the new level.\n\n`settingsScreen()` runs every frame on that screen and so far has only the O key. Above that line, add the controls: up raises `level` by 1 (only while it is below 10), down lowers it by 1 (only while it is above 0), and M flips `muted` with `muted = !muted;`. Each one then calls `soundChanged();`. Use `kb.presses`, so one press is one step (6.3.3). Run it, click the canvas, press O, and try them.",
+      "hints": [
+        "`if (kb.presses('up') && level < 10) { level += 1; soundChanged(); }`, then the same shape for down and for M.",
+        "`!muted` is the opposite of `muted`: `true` becomes `false`, and `false` becomes `true`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Save each change",
+      "instructions": "Press Stop, then Run again: the level is back at 5 and the sound is on. A player expects a setting to stay. Save it once, when it changes (6.5.3). `soundChanged()` runs after every change, so at its end add:\n\n```js\nstoreItem('soundLevel', level);\nstoreItem('soundMuted', muted);\n```\n\n`storeItem` keeps a value under a name after the sketch stops. `'soundLevel'` and `'soundMuted'` are those names: any names work, as long as step 3 reads back the same ones. Nothing reads them back yet; that is step 3.",
+      "hints": [
+        "Both lines go inside `soundChanged()`, after `chime.play();`.",
+        "Saving in `draw()` would write 60 times a second a value that changes only when a key is pressed."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Load them when the game starts",
+      "instructions": "`setup()` calls `loadSettings()` before `applySound()`, and `loadSettings()` is empty. `getItem(name)` gives back exactly what was saved under that name, a number for `level` and `true` or `false` for `muted`, or `null` if nothing was ever saved (6.5.5, 6.5.6). So use what came back only when it is not `null`:\n\n```js\nconst savedLevel = getItem('soundLevel');\nif (savedLevel !== null) level = savedLevel;\n```\n\nand the same for `muted`. Why not `level = getItem('soundLevel') || 5;`, the way 6.5.6 did a first run? `||` picks the 5 whenever the left side counts as false, and a saved level of `0` counts as false just like `null`: a player who turned the sound all the way down would come back to 5. `!== null` keeps the 0. Run it, change the level, mute it, press Stop and Run: the options come back as you left them.",
+      "hints": [
+        "Two `getItem`s, each followed by an `if (... !== null)`.",
+        "On the very first run both give back `null`, so `level` stays 5 and `muted` stays false."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Up and down change the level",
+      "description": "Under kb.presses, one key raises level by 1 and another lowers it, and level is what masterVolume uses (through applySound). Any variable name works. Help: 6.3.3 (Reading: moSHion docs: Input edges)",
+      "hint": "if (kb.presses('up') && level < 10) { level += 1; soundChanged(); }, and the same for 'down'.",
+      "file": "script.js",
+      "flags": "",
+      "ignoreStrings": true,
+      "type": "regex",
+      "pattern": "^(?=[\\s\\S]*?(?:\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:\\b(?<v49>[A-Za-z_$][\\w$]*)\\s*(?:\\+=\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+)|\\+\\+|=(?![=>])\\s*(?:(?:Math\\s*\\.\\s*)?(?:min|max|constrain)\\s*\\(\\s*)?\\k<v49>\\s*\\+\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+))|\\+\\+\\s*(?<v50>[A-Za-z_$][\\w$]*)\\b)[\\s\\S]*?(?:\\.\\s*volume\\s*=(?![=>])|\\bmasterVolume\\s*\\()[^;\\n]{0,160}\\b\\k<v49>\\k<v50>\\b|(?:\\.\\s*volume\\s*=(?![=>])|\\bmasterVolume\\s*\\()[^;\\n]{0,120}?\\b(?<w51>[A-Za-z_$][\\w$]*)\\b(?=\\s*[\\/*),;:?])[\\s\\S]*?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:\\b\\k<w51>\\s*(?:\\+=\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+)|\\+\\+|=(?![=>])\\s*(?:(?:Math\\s*\\.\\s*)?(?:min|max|constrain)\\s*\\(\\s*)?\\k<w51>\\s*\\+\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+))|\\+\\+\\s*\\k<w51>\\b)|\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:\\.\\s*volume\\s*(?:\\+=|=(?![=>])\\s*[\\w$.\\s]*\\bvolume\\s*\\+)|\\bmasterVolume\\s*\\(\\s*masterVolume\\s*\\(\\s*\\)\\s*\\+)|\\b[\\w$.]+\\s*[+-]=\\s*\\(?\\s*kb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())(?=[\\s\\S]*?(?:\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:\\b(?<v52>[A-Za-z_$][\\w$]*)\\s*(?:-=\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+)|--|=(?![=>])\\s*(?:(?:Math\\s*\\.\\s*)?(?:min|max|constrain)\\s*\\(\\s*)?\\k<v52>\\s*-\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+))|--\\s*(?<v53>[A-Za-z_$][\\w$]*)\\b)[\\s\\S]*?(?:\\.\\s*volume\\s*=(?![=>])|\\bmasterVolume\\s*\\()[^;\\n]{0,160}\\b\\k<v52>\\k<v53>\\b|(?:\\.\\s*volume\\s*=(?![=>])|\\bmasterVolume\\s*\\()[^;\\n]{0,120}?\\b(?<w54>[A-Za-z_$][\\w$]*)\\b(?=\\s*[\\/*),;:?])[\\s\\S]*?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:\\b\\k<w54>\\s*(?:-=\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+)|--|=(?![=>])\\s*(?:(?:Math\\s*\\.\\s*)?(?:min|max|constrain)\\s*\\(\\s*)?\\k<w54>\\s*-\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+))|--\\s*\\k<w54>\\b)|\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}){0,600}?|[^;{}]{0,200}?)(?:\\.\\s*volume\\s*(?:-=|=(?![=>])\\s*[\\w$.\\s]*\\bvolume\\s*-)|\\bmasterVolume\\s*\\(\\s*masterVolume\\s*\\(\\s*\\)\\s*-)|\\b[\\w$.]+\\s*[+-]=\\s*\\(?\\s*kb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "M flips the sound off and on",
+      "description": "Under a kb.presses test, muted is flipped (muted = !muted, or an if and an else), or masterVolume is set. Help: 6.11.6 (Reading: Music that follows the game)",
+      "hint": "if (kb.presses('m')) { muted = !muted; soundChanged(); }",
+      "file": "script.js",
+      "flags": "",
+      "ignoreStrings": true,
+      "type": "regex",
+      "pattern": "^(?=[\\s\\S]*?\\bmasterVolume\\s*\\(\\s*(?!0\\s*\\))[^)\\s])(?=[\\s\\S]*?(?:\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,600}?|[^;{}]{0,200}?)(?:\\bmasterVolume\\s*\\(\\s*[^)\\s]|\\b(?<t58>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*!\\s*\\(?\\s*\\k<t58>\\b|\\b(?<t59>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*\\k<t59>\\s*\\)?\\s*\\?\\s*false\\s*:\\s*true\\b|\\b(?<t60>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*\\k<t60>\\s*===?\\s*false\\b|\\b(?<t61>[A-Za-z_$][\\w$]*)\\s*(?:=(?![=>])\\s*1\\s*-\\s*\\k<t61>\\b|\\^=\\s*(?:1|true)\\b)|\\bif\\s*\\(\\s*!?\\s*(?<t62>[A-Za-z_$][\\w$]*)\\s*(?:===?\\s*(?:true|false)\\s*)?\\)\\s*\\{?\\s*\\k<t62>\\s*=(?![=>])\\s*(?:true|false)\\b[^{}]{0,80}?\\}?\\s*else\\s*\\{?\\s*\\k<t62>\\s*=(?![=>])\\s*(?:true|false)\\b)|(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\()[^;{}]{0,160}?&&[^;{}]{0,160}?(?:\\bmasterVolume\\s*\\(\\s*[^)\\s]|\\b(?<t63>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*!\\s*\\(?\\s*\\k<t63>\\b|\\b(?<t64>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*\\k<t64>\\s*\\)?\\s*\\?\\s*false\\s*:\\s*true\\b|\\b(?<t65>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*\\k<t65>\\s*===?\\s*false\\b|\\b(?<t66>[A-Za-z_$][\\w$]*)\\s*(?:=(?![=>])\\s*1\\s*-\\s*\\k<t66>\\b|\\^=\\s*(?:1|true)\\b)|\\bif\\s*\\(\\s*!?\\s*(?<t67>[A-Za-z_$][\\w$]*)\\s*(?:===?\\s*(?:true|false)\\s*)?\\)\\s*\\{?\\s*\\k<t67>\\s*=(?![=>])\\s*(?:true|false)\\b[^{}]{0,80}?\\}?\\s*else\\s*\\{?\\s*\\k<t67>\\s*=(?![=>])\\s*(?:true|false)\\b)|\\b(?:(?:const|let|var)\\s+)?(?<c55>[A-Za-z_$][\\w$]*)\\s*=(?![=>])[^;\\n]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\()[^;\\n]{0,200}[;\\n][\\s\\S]{0,800}?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\b\\k<c55>\\b))[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,600}?|[^;{}]{0,200}?)(?:\\bmasterVolume\\s*\\(\\s*[^)\\s]|\\b(?<t68>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*!\\s*\\(?\\s*\\k<t68>\\b|\\b(?<t69>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*\\k<t69>\\s*\\)?\\s*\\?\\s*false\\s*:\\s*true\\b|\\b(?<t70>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*\\k<t70>\\s*===?\\s*false\\b|\\b(?<t71>[A-Za-z_$][\\w$]*)\\s*(?:=(?![=>])\\s*1\\s*-\\s*\\k<t71>\\b|\\^=\\s*(?:1|true)\\b)|\\bif\\s*\\(\\s*!?\\s*(?<t72>[A-Za-z_$][\\w$]*)\\s*(?:===?\\s*(?:true|false)\\s*)?\\)\\s*\\{?\\s*\\k<t72>\\s*=(?![=>])\\s*(?:true|false)\\b[^{}]{0,80}?\\}?\\s*else\\s*\\{?\\s*\\k<t72>\\s*=(?![=>])\\s*(?:true|false)\\b)|\\bfunction\\s+(?<h56>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,800}?(?:\\bmasterVolume\\s*\\(\\s*[^)\\s]|\\b(?<t73>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*!\\s*\\(?\\s*\\k<t73>\\b|\\b(?<t74>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*\\k<t74>\\s*\\)?\\s*\\?\\s*false\\s*:\\s*true\\b|\\b(?<t75>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*\\k<t75>\\s*===?\\s*false\\b|\\b(?<t76>[A-Za-z_$][\\w$]*)\\s*(?:=(?![=>])\\s*1\\s*-\\s*\\k<t76>\\b|\\^=\\s*(?:1|true)\\b)|\\bif\\s*\\(\\s*!?\\s*(?<t77>[A-Za-z_$][\\w$]*)\\s*(?:===?\\s*(?:true|false)\\s*)?\\)\\s*\\{?\\s*\\k<t77>\\s*=(?![=>])\\s*(?:true|false)\\b[^{}]{0,80}?\\}?\\s*else\\s*\\{?\\s*\\k<t77>\\s*=(?![=>])\\s*(?:true|false)\\b)[\\s\\S]*?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,600}?|[^;{}]{0,200}?)\\b\\k<h56>\\s*\\(|\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,600}?|[^;{}]{0,200}?)\\b(?<h57>[A-Za-z_$][\\w$]*)\\s*\\(\\s*\\)[\\s\\S]*?\\bfunction\\s+\\k<h57>\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,800}?(?:\\bmasterVolume\\s*\\(\\s*[^)\\s]|\\b(?<t78>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*!\\s*\\(?\\s*\\k<t78>\\b|\\b(?<t79>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*\\k<t79>\\s*\\)?\\s*\\?\\s*false\\s*:\\s*true\\b|\\b(?<t80>[A-Za-z_$][\\w$]*)\\s*=(?![=>])\\s*\\(?\\s*\\k<t80>\\s*===?\\s*false\\b|\\b(?<t81>[A-Za-z_$][\\w$]*)\\s*(?:=(?![=>])\\s*1\\s*-\\s*\\k<t81>\\b|\\^=\\s*(?:1|true)\\b)|\\bif\\s*\\(\\s*!?\\s*(?<t82>[A-Za-z_$][\\w$]*)\\s*(?:===?\\s*(?:true|false)\\s*)?\\)\\s*\\{?\\s*\\k<t82>\\s*=(?![=>])\\s*(?:true|false)\\b[^{}]{0,80}?\\}?\\s*else\\s*\\{?\\s*\\k<t82>\\s*=(?![=>])\\s*(?:true|false)\\b)))",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A change is saved",
+      "description": "storeItem runs when a key changes a setting: inside that if, or in a function it calls, such as soundChanged(). Help: 6.5.3 (Reading: storeItem: Save Game Data)",
+      "hint": "storeItem('soundLevel', level); and storeItem('soundMuted', muted); at the end of soundChanged().",
+      "file": "script.js",
+      "flags": "",
+      "ignoreStrings": true,
+      "type": "regex",
+      "pattern": "\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,600}?|[^;{}]{0,200}?)(?:\\bstoreItem\\s*\\()|(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\()[^;{}]{0,160}?&&[^;{}]{0,160}?(?:\\bstoreItem\\s*\\()|\\b(?:(?:const|let|var)\\s+)?(?<c85>[A-Za-z_$][\\w$]*)\\s*=(?![=>])[^;\\n]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\()[^;\\n]{0,200}[;\\n][\\s\\S]{0,800}?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\b\\k<c85>\\b))[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,600}?|[^;{}]{0,200}?)(?:\\bstoreItem\\s*\\()|\\bfunction\\s+(?<h86>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,800}?(?:\\bstoreItem\\s*\\()[\\s\\S]*?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,600}?|[^;{}]{0,200}?)\\b\\k<h86>\\s*\\(|\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,600}?|[^;{}]{0,200}?)\\b(?<h87>[A-Za-z_$][\\w$]*)\\s*\\(\\s*\\)[\\s\\S]*?\\bfunction\\s+\\k<h87>\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,800}?(?:\\bstoreItem\\s*\\()|^(?=[\\s\\S]*?\\bfunction\\s+(?<y83>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,800}?\\bstoreItem\\s*\\()(?=[\\s\\S]*?\\bfunction\\s+(?<x84>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,800}?\\b\\k<y83>\\s*\\()(?=[\\s\\S]*?\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\())[^;{}]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{){0,600}?|[^;{}]{0,200}?)\\b\\k<x84>\\s*\\()",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "The settings are loaded at the start",
+      "description": "setup() (or loadSettings(), which it calls) reads a setting with getItem and deals with the null that comes back when nothing was saved: !== null, === null, ?? or ||. Help: 6.5.5 (Reading: getItem: Load Saved Data)",
+      "hint": "const savedLevel = getItem('soundLevel'); then if (savedLevel !== null) level = savedLevel;",
+      "file": "script.js",
+      "flags": "",
+      "ignoreStrings": true,
+      "type": "inFunction",
+      "function": [
+        "setup",
+        "loadSettings",
+        "loadSaved",
+        "loadSave",
+        "restoreSettings",
+        "readSettings",
+        "getSettings",
+        "loadOptions",
+        "loadPrefs",
+        "loadPreferences"
+      ],
+      "pattern": "^(?=[\\s\\S]*?\\bgetItem\\s*\\()(?=[\\s\\S]*?(?:\\bnull\\b|\\?\\?|\\|\\||\\btypeof\\b|\\bif\\s*\\(\\s*!?\\s*[A-Za-z_$][\\w$]*\\s*\\)))",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
