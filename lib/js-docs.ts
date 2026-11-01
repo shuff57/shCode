@@ -848,7 +848,7 @@ The pattern is always the same: stringify the data, store it under a key, and on
 
 Everything comes back as a string. Save the number 1200 and you get the string "1200" — add 1 to it and you get "12001", not 1201. And a key that was never saved gives null, not undefined, so a first run has to check for it.
 
-In this course, moSHion's storeItem and getItem are the same idea with friendlier names — a key-value store for game saves. The shape of the code is identical: save by key, load by key, and check whether anything was saved before you parse.
+In this course, moSHion's storeItem and getItem are the same idea with friendlier names — a key-value store for game saves. The shape of the code is identical: save by key, load by key, and check whether anything was saved before you parse. One difference: localStorage hands back text, while moSHion's getItem hands back the type you saved (a saved number comes back a number).
 
 This console runner has no browser, so the localStorage here is a small stand-in that lives for the one run. The pattern is real — save, load, parse, missing-key check — but the "survives the page closing" half is what a real browser adds.`,
         code: `// Save
