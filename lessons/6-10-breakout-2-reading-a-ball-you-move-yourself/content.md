@@ -45,7 +45,7 @@ if (paddle.x < PADDLE_W / 2) paddle.x = PADDLE_W / 2;
 if (paddle.x > 400 - PADDLE_W / 2) paddle.x = 400 - PADDLE_W / 2;
 ```
 
-**Off the paddle, only while coming down.** `ball.overlaps(paddle)` is true on every frame the two touch, not only the first (5.9.5). If the paddle slides into the ball from the side, they can touch for several frames in a row, and flipping `vy` on every one of them sends the ball up, down, up: it shivers along the paddle. So the bounce happens only while the ball is falling, `vy > 0`:
+**Off the paddle, only while coming down.** `ball.overlaps(paddle)` is true on every frame the two touch, not only the first (5.9.5). If the paddle slides into the ball from the side, they can touch for several frames in a row, and flipping `vy` on every one of them sends the ball up, down, up: it shivers along the paddle. So the bounce happens only while the ball is falling, `vy > 0`. Inside the `if`, the first line flips `vy`; the second sets `vx` from where the ball landed on the paddle, which aims it ("The paddle steers", below):
 
 ```js
 if (ball.overlaps(paddle) && vy > 0) {

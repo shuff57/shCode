@@ -45,11 +45,11 @@
     {
       "id": "r1",
       "title": "The wall is built from WALL with two loops",
-      "description": "A row is made for each row of WALL, filled from its letters, and pushed onto b (two loops, for or while). Help: 6.9.10 (Lab: Light the grid)",
+      "description": "A row is made for each row of WALL, filled from its letters, and pushed onto b (two loops: for, while or forEach). Help: 6.9.10 (Lab: Light the grid)",
       "type": "inFunction",
       "file": "script.js",
       "function": "makeBricks",
-      "pattern": "^(?=[\\s\\S]*\\b(?:for|while)\\b[\\s\\S]*\\b(?:for|while)\\b)(?=[\\s\\S]*(?:\\bWALL\\s*\\[[^\\]]+\\]\\s*(?:\\[|\\.\\s*(?:charAt|at)\\s*\\()|\\bof\\s+WALL\\b|=\\s*WALL\\s*\\[))(?=[\\s\\S]*(?:\\.\\s*push\\s*\\(\\s*(?!\\d|true\\b|false\\b)[A-Za-z_$][\\w$]*\\s*\\)|\\.\\s*push\\s*\\(\\s*\\[\\s*\\]\\s*\\)|\\]\\s*=\\s*\\[\\s*\\]))|^(?=[\\s\\S]*\\b(?:for|while)\\b)(?=[\\s\\S]*\\bWALL\\b[^;\\n]*\\.\\s*(?:map|split)\\s*\\()",
+      "pattern": "^(?=[\\s\\S]*\\b(?:for|forEach|while)\\b[\\s\\S]*\\b(?:for|forEach|while)\\b)(?=[\\s\\S]*(?:\\bWALL\\s*\\[[^\\]]+\\]\\s*(?:\\[|\\.\\s*(?:charAt|at)\\s*\\()|\\bof\\s+WALL\\b|=\\s*WALL\\s*\\[))(?=[\\s\\S]*(?:\\.\\s*push\\s*\\(\\s*(?!\\d|true\\b|false\\b)[A-Za-z_$][\\w$]*\\s*\\)|\\.\\s*push\\s*\\(\\s*\\[\\s*\\]\\s*\\)|\\]\\s*=\\s*\\[\\s*\\]))|^(?=[\\s\\S]*\\b(?:for|forEach|while)\\b)(?=[\\s\\S]*\\bWALL\\b[^;\\n]*\\.\\s*(?:map|split|forEach)\\s*\\()",
       "flags": "",
       "ignoreStrings": true,
       "points": 0,

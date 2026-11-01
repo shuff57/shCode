@@ -140,6 +140,8 @@ Sources: `breakout-beginner.md`, `breakout-moderate.md`, `breakout-advanced.md` 
 - Blanked strings: 6.10.10 r1 cannot read the title words, 6.10.4 r2 cannot tell left from right (reversed arrows pass), 6.10.9 r2 cannot tell `'lost'` from `'play'`.
 - 6.10.8: the centre test kept with the edge points as dead expressions; the swapped edge pairing (as before).
 - 6.10.5 walls at 1 / 399 (any small number counts as the radius), and the structural class from 6.9 (dead code, decoy functions).
+- 6.10.10 r1, starter plus one line (round 2, owner decision: accepted as the lax floor). `if (state === 'title') anyName();` added to the untouched starter turns r1 green (1/3 of the lab; r2 and r3 stay red), and the reference with an empty `function showTitle() {}` stays 3/3: the card reads a title test and a call, and a later `text(` in `drawTop()` (the `won` / `lost` lines) satisfies its lazy scan, so the title is never required to be drawn. No pattern-only fix leaves the honest helper shapes (`showMenu`, `drawStartScreen`) alone; only a `tests` requirement could, and none is added.
+- 6.10.10 r3, unconditional `state = 'title'` (round 2, owner decision: accepted as the lax floor). `state = 'title';` written after the R branch in `draw()`, or `kb.presses('r'); state = 'title';` as bare statements, scores 3/3 while the game can never leave the title. The card joins `draw` and `startGame` into one body, so a pattern cannot tell this line from the honest "`startGame()` sets the title" shape; no fragile pattern is added for it.
 
 ### Physics (headless bot, `scripts/moshion-harness.mjs`)
 
@@ -170,3 +172,126 @@ Generators (module-docs, lessons-manifest, ai-graders, quiz-keys, solutions, les
 ### Outside 6.10 (reported, not changed)
 
 6.5.6 teaches that `getItem` gives back a string. moSHion's `storeItem` stores `JSON.stringify(val)` and `getItem` returns `JSON.parse(raw)` (`public/moshion/moshion.js` 3160 to 3173), so a stored number comes back a number: the page's own live block prints `without coercion: 6`, not the `"51"` its comment and prose promise (measured on the harness). The same claim runs through 6.5.5, 6.5.7, 6.5.10, 6.5.11, 6.5.13, 6.5.25 and 6.5.26, so it is a unit-level rewrite, not a cheap fix; `Number(getItem(...)) || 0` stays harmless, so student code still works.
+
+## Round 2 (2026-11-01)
+
+Sources: `breakout-advanced-r2.md` (+ `breakout-advanced-r2-patterns.json`), `breakout-moderate-r2.md`, `breakout-beginner-r2.md`, `breakout-editors-r2.md` (its one gap, M1), and the owner-side lead's decisions on advanced gaps 1 and 6. Method as in round 1: `lib/grader.ts` bundled by esbuild (no change to `lib/`), each case a lab's reference or starter with one function body replaced (or a helper added), graded against `lesson.json` at HEAD (59d61d25) and as edited. Three case sets: round 1's 111 cases, the advanced r2 lens's 502 cases, and the 79 new cases below. **79 new cases, 0 mismatches; round 1's 111 cases, every verdict unchanged.**
+
+### What changed
+
+1. **Patches A to H, as the advanced r2 lens tested them** (the patterns file applied as is; a lens-only replay of the 502 cases with the file and with the shipped result gives identical output).
+   - A, 6.10.9 r1: the counter is whatever identifier `bricksLeft` returns, so `count`, `total`, `left`, `howMany` ... all count; a zero test (`=== 0`, `== 0`, `< 1`, `<= 0`, `!x`) directly followed by the increment is refused, so counting the gaps is red, and so are `return n + 1` and `return 0`.
+   - B, 6.10.9 r2: `if (...) state = 'lost'` needs a zero test on `lives`; `else state = 'lost'` needs a positive `if (lives > 0 / >= 1 / !== 0)` in front of it. Losing on the first miss is red.
+   - C, 6.10.5 r5: the steer line sits inside an `if` body and reads `ball.x` before `paddle.x` (or `-(paddle.x - ball.x)`); offset aliases are kept. A steer outside the `if`, after an empty `if`, or the wrong way round is red.
+   - D, 6.10.10 r2: `state = 'play'` has to be under an `if`, a `case`, or after a guard `return`; a bare first or last line is red.
+   - E, 6.10.4 r3: what the clamp assigns must carry a limit too, so `paddle.x = 400` / `= 0` / `= 1000` clamps are red.
+   - F, 6.10.5 r2: the right wall also takes `400 - 6` (any `400 - 1..12`).
+   - G, 6.10.6 r1: `forEach` counts as a loop and `WALL.forEach(` as a way to read the rows.
+   - H, 6.10.4 r2, r3 and 6.10.5 r1 to r6: whole-file `regex` instead of `inFunction` over a list of names (the `function` lists are dropped), so a helper under any name is read. Labs 6.10.6, .8, .9, .10 are not switched (the lens showed it lets `makeBricks`'s loops satisfy `drawBricks`, and any `serve()` satisfy 6.10.9 r2).
+2. **Four widenings on 6.10.9, on top of A and B** (each in the table below as W1 to W4):
+   - W1, r1: the returned counter may be written `return count` with no semicolon (end of line or end of body) or `return (count);`. Without this A refused a missing semicolon on the return line; `return count + 1` stays red.
+   - W2, r2 (moderate N1, the brief's 6.10.9 item): "served again" also takes the inline reset 6.10.3 models, `ball.x = ...` / `ball.y = ...` (or `ball.pos.x`) in place of `serve()`, as 6.10.5 r6 already does.
+   - W3, r1: a cell loop `for (const cell of bricks[r])` inside the index loop, or `for (const cell of row)` over a `const row = bricks[r]` alias, then a test or a sum on the cell (`n += cell`). Refused at HEAD and under the lens patch.
+   - W4, r1: the inner `forEach` callback written `function (cell) { ... }` as well as an arrow (it captured `function` as the cell's name). Refused at HEAD and under the lens patch.
+3. **Card text.** 6.10.6 r1 "(two loops: for, while or forEach)"; 6.10.9 r1 "the counter it gives back (n, or any name) goes up".
+4. **Lesson text.** 6.10.5 s2: the wall test is "the same idea as the paddle test you add next" (was "the paddle's `vy > 0` in step 3", not yet written). 6.10.13 Challenge 1, step and content page: the title line is given with its place, `text('Press 3 for one ball, with the mouse', 27, 290);` under the two `Press` lines in `drawTop()` (the reference's numbers). 6.10.2: one sentence before the paddle block says what its two lines do ("the first line flips `vy`; the second sets `vx` from where the ball landed on the paddle, which aims it"), pointing at "The paddle steers" below. 6.10.10 s1 (editors r2, M1): `Press 2 to play with the arrow keys` is "about 340 pixels wide" (was 300; the runner's 16 px monospace measures 336), and the step's conclusions stand (x 30 ends at 366 and fits, x 100 ends at 436 and is cut off).
+5. **Declared floor (owner decision).** Advanced gaps 1 (6.10.10 r1, starter plus one line) and 6 (6.10.10 r3, unconditional `state = 'title'`) are accepted as the lax floor and added to the declared list above. No pattern was added for them.
+
+### Case table (new cases)
+
+| Lab | Case | Expected | HEAD | Now | Verdict |
+| --- | --- | --- | --- | --- | --- |
+| 6.10.9 | cheat A: count the gaps (=== 0) | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat A: count the gaps (== 0) | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat A: count the gaps (!cell) | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat A: count the gaps, renamed counter | below full | 2/3 (red r1) | 2/3 (red r1) | OK |
+| 6.10.9 | cheat A: return n + 1 | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat A: return count + 1 (no semicolon) | below full | 2/3 (red r1) | 2/3 (red r1) | OK |
+| 6.10.9 | cheat A: return 0 in place of the count | below full | 3/3 | 2/3 (red r1) | OK |
+| 6.10.9 | cheat A: counts into k, returns n (always 0) | below full | 2/3 (red r1) | 2/3 (red r1) | OK |
+| 6.10.9 | honest A: counter named count, count++ | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: counter named total, total++ | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: counter named left, left++ | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: counter named num, num++ | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: counter named sum, sum++ | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: counter named bricks_left, bricks_left++ | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: counter named c2, c2++ | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: counter named howMany, howMany++ | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: count += 1 | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: count = count + 1 | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: ++count | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: count = count + bricks[r][c] | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: total += bricks[r][c] | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: for...of, if (cell) total += 1 | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: forEach count, named count | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest W1: return count with no semicolon | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest W1: return n with no semicolon (starter name) | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest W1: return (count); | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest W1: one-line body, no semicolon before } | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: brick test != 0 | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest A: continue on a gap, renamed | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest W3: index rows, for (const cell of bricks[r]), n += cell | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest W3: for (const cell of bricks[r]), if (cell === 1) count++ | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | honest W3: row alias, for (const cell of row) | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | cheat W3: for (const cell of bricks[r]) counting gaps | below full | 2/3 (red r1) | 2/3 (red r1) | OK |
+| 6.10.9 | cheat W3: for (const cell of bricks[r]), cell never read | below full | 2/3 (red r1) | 2/3 (red r1) | OK |
+| 6.10.9 | honest W4: forEach(function (cell) { if (cell > 0) count = count + 1; }) | full | 2/3 (red r1) | 3/3 | OK |
+| 6.10.9 | cheat W4: forEach(function (cell) ...) counting gaps | below full | 2/3 (red r1) | 2/3 (red r1) | OK |
+| 6.10.9 | cheat B: lives > 0 -> lost (game ends on the first miss) | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.9 | cheat B: lives !== 0 -> lost | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.9 | cheat B: lives >= 1 -> lost | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.9 | cheat B: lives === 0 -> serve, else lost | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.9 | cheat: no serve and no reset (ball never comes back) | below full | 2/3 (red r2) | 2/3 (red r2) | OK |
+| 6.10.9 | honest B: lives > 0 serve, else lost | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest B: lives <= 0 | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest B: !lives | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest B: lives < 1, braces | full | 3/3 | 3/3 | OK |
+| 6.10.9 | honest W2 (moderate N1): inline reset in else, as 6.10.3 | full | 2/3 (red r2) | 3/3 | OK |
+| 6.10.9 | honest W2: inline reset under lives > 0, else lost | full | 2/3 (red r2) | 3/3 | OK |
+| 6.10.9 | honest W2: inline reset written with ball.pos.x | full | 2/3 (red r2) | 3/3 | OK |
+| 6.10.5 | cheat C: steer outside the paddle if (every frame) | below full | 6/6 | 5/6 (red r5) | OK |
+| 6.10.5 | cheat C: wrong-way steer (paddle.x - ball.x) | below full | 6/6 | 5/6 (red r5) | OK |
+| 6.10.5 | cheat C: steer after an empty if | below full | 6/6 | 5/6 (red r5) | OK |
+| 6.10.5 | honest C: steer before the flip | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest C: offset variable inside the if | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest C: offset variable before the if | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest C: nested overlap / vy > 0 | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest C: -(paddle.x - ball.x) / 10 | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest C: one line with braces | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest C: * 0.1 and ball.pos.x | full | 6/6 | 6/6 | OK |
+| 6.10.5 | honest F: right wall written 400 - 6 | full | 5/6 (red r2) | 6/6 | OK |
+| 6.10.5 | honest H: walls in wallsBounce() | full | 4/6 (red r2,r3) | 6/6 | OK |
+| 6.10.5 | honest H: walls in bounceOffEdges() | full | 4/6 (red r2,r3) | 6/6 | OK |
+| 6.10.5 | honest H: paddle in bouncePaddle() | full | 4/6 (red r4,r5) | 6/6 | OK |
+| 6.10.5 | honest H: move in moveIt() | full | 5/6 (red r1) | 6/6 | OK |
+| 6.10.5 | cheat H: walls in a helper with vx = 0 | below full | 4/6 (red r2,r3) | 5/6 (red r2) | OK |
+| 6.10.4 | cheat E: clamp sends the paddle to the far side (400 / 0) | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | cheat E: clamp assigns 1000 | below full | 3/3 | 2/3 (red r3) | OK |
+| 6.10.4 | honest E: 40 / 360 literals | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest E: 400 - 40 | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest E: ternary clamp | full | 3/3 | 3/3 | OK |
+| 6.10.4 | honest H: keys in moveWithKeys() | full | 2/3 (red r2) | 3/3 | OK |
+| 6.10.4 | honest H: clamp in limitPaddle() | full | 2/3 (red r3) | 3/3 | OK |
+| 6.10.6 | honest G: WALL.forEach + split forEach | full | 4/5 (red r1) | 5/5 | OK |
+| 6.10.10 | cheat D: state = play unconditional, last line | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.10 | cheat D: state = play unconditional, first line | below full | 3/3 | 2/3 (red r2) | OK |
+| 6.10.10 | honest D: guard return, then state = play | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest D: combined \|\| if | full | 3/3 | 3/3 | OK |
+| 6.10.10 | honest D: if / else if / else | full | 3/3 | 3/3 | OK |
+| 6.10.10 | declared: r1 green from the starter plus one line | info | 1/3 (red r2,r3) | 1/3 (red r2,r3) | declared |
+| 6.10.10 | declared: r3 unconditional state = title after the R branch | info | 3/3 | 3/3 | declared |
+
+References full and starters below full on every lab, as before: the round 1 rows (6.10.4 3/3, 6.10.5 6/6, 6.10.6 5/5, 6.10.8 2/2, 6.10.9 3/3, 6.10.10 3/3, 6.10.13 2/2; every starter 0) are unchanged, and `check-starters` agrees.
+
+### Replays
+
+- **Round 1's 111 cases**: every verdict unchanged. One score moved, on a cheat that was already red: "bare overlaps and vy > 0 statements" 5/6 (red r4) is now 4/6 (red r4, r5), Fix C. In round 1's declared rows, "empty paddle if, flip after it" went from 6/6 to 5/6 (r5 red, Fix C closes part of that leftover), and "helper with an unlisted name (moveWalls)" from 4/6 to 6/6 (Fix H).
+- **Advanced r2 lens, 502 cases**: against the lens's own expectations, 125 mismatches at HEAD, 71 under the lens patch, 69 now (W3 and W4 accept `n += cell` over `bricks[r]` and the `function (cell)` forEach). No case mismatches now that did not at HEAD. The 69 left are the lens's "not fixed" rows: 39 cheats still full (6.10.6 fragments and decoys, 6.10.8 centre / pairing / combined flip, 6.10.5 `abs` sign and `vx = 1`, 1/399 and 12/388 walls, 6.10.4 `-= 0` and reversed arrows, 6.10.10 key 2 with no `state` of its own, the two declared 6.10.10 rows, structural dead code) and 30 honest refusals (helpers named off the list on 6.10.6 / .8 / .9 / .10, a radius named `RADIUS` or `r`, `hw2`, `clampToScreen(x)`, `isLost()`, `map` / `Array.from` with no loop, a single loop with `%`, an `x, y` alias on 6.10.6 r5, the ternary and `&&` titles, `restart()`, `if (vy < 0) {} else if (overlap)`, and the untaught `.reduce` and bare `key === '1'`; 6.10.13 rules the card does not name and a sentence trailing on a code line).
+
+### Speed
+
+Whole `grade()` call, best of 3, 5000-character adversarial bodies in every graded function and helper name, load average 15 to 24. Round 1's sweep (720 combinations): worst 15.2 ms (6.10.5 `draw` on `if (`). The lens's sweep plus 16 new triggers for C, W1 to W4 (`return count `, `return (`, `if (!bricks[r][c]) `, `ball.x = `, `if (lives > 0) { ball.x = 200; `, `if (x) { { } { } `, ...; 591 combinations): worst 12.4 ms. A targeted 6.10.9 sweep (30 triggers, including `for (const c of bricks[r]) `, `const row = bricks[r]; for (const c of row) `, `row.forEach(function (`, `if (` + 4996 identifier characters; 3 functions; 3 closers): worst 8.9 ms. Nothing over 50 ms. No lookbehind in any 6.10 pattern; the new alternatives are bounded (`[\s\S]{0,400}?`, `[^\]]{1,40}`).
+
+### Gates
+
+Generators (module-docs, lessons-manifest, ai-graders, quiz-keys, solutions, lesson-starters; no tracked file changed), `check-lesson-numbers`, `check-lesson-groups`, `check-prompt-pointers`, `check-lesson-citations` (838 lessons; the 2 FORWARD notes are 1.4.9 and 6.4.4, as before), `check-hints` (382), `check-live-blocks` (491, all match), `check-starters` (every reference full, every starter not), `check-solution-leak`, `test-quiz`, `test-grader-tolerance` (334 cases), `audit-grader-tolerance --gate`, `tsc --noEmit`: all green. The full audit on 6-10 has the same single triage hit as round 1 (6.10.13 r2 refusing a `/* */` sentence, tagged maybe-intentional).
