@@ -13,7 +13,7 @@ does not need a fixed one; empty `if` bodies refused where a pattern can tie the
 free number in Chapter 6 after 6.10 Breakout is **6.11**; neither PLACEMENT.md nor PACING.md says otherwise. Folders are
 `6-11-sound-<n>-<slug>` (the D1 ids, final once shipped); titles start `6.11.N`.
 
-**Week 18.** The module needs 6.5 (storeItem, week 16) and 6.6 (state machines, week 17), so it cannot go earlier than
+**Week 19 (moved from 18 on 2026-11-01 to ease week 18; the text below explains the original week-18 choice).** The module needs 6.5 (storeItem, week 16) and 6.6 (state machines, week 17), so it cannot go earlier than
 week 17. Measured from every `lesson.json` on 2026-11-01: week 17 holds 760 min (6.6-6.8), week 18 holds 527 (6.10 and
 7.1). This module is 150 min: week 17 would become 910 (2.1 x the 440-min Q2 average of PACING.md), week 18 becomes 677
 (1.5 x). Week 18 is the lighter of the two and keeps 6.11 after 6.10 in the week order as well as the numbering.
