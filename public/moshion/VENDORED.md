@@ -3,24 +3,38 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `91f7e6be54018a062c9304bba5c1933fb61e741e` (`91f7e6b`), branch `default-gravity-0` (off `gaps-fix`) |
-| Commit date | 2026-11-01 |
-| Vendored | 2026-11-01 |
+| Commit | `d8068bb2438d62c4449d531f309e93eb5dabe1c3` (`d8068bb`), branch `main` (= `origin/main`) |
+| Commit date | 2026-11-02 |
+| Vendored | 2026-11-02 |
 
-`default-gravity-0` (and `gaps-fix` under it) had not been pushed or merged
-into the repo's `main` when this copy was taken. Once it is, this pin still
-names the right bytes: the commit hash does not change on a fast-forward
-merge.
+`main` now carries both the default-gravity-0 change (`91f7e6b`, vendored
+2026-11-01) and the math coordinates work on top of it (`4b36bef` engine,
+`b7186a2` its browser spec, `d8068bb` docs).
 
-This sync changes one behaviour: **world gravity now starts at 0**, as in
-p5play, instead of 9.8. A plain `new Sprite()` stays put until a sketch sets
-`world.gravity.y`. The before/after audit of every course sketch is in
+This sync adds one opt-in mode and two helpers, and changes no default:
+
+- **`world.origin = 'math'`**: (0, 0) at the canvas centre, y grows up, a
+  positive rotation turns counter-clockwise; a falling world is
+  `world.gravity.y = -10`. The default stays `'screen'` (top-left, y down,
+  like the browser canvas and p5play).
+- **`showGrid(step)`** (labelled axes, default step 50) and **`showMouse()`**
+  (the pointer's (x, y)), called from `draw()`, label whichever mode is active.
+
+No sketch that never sets `world.origin` changes. Proof, 2026-11-02: every
+moSHion sketch in the course (the `test-moshion.mjs --corpus` discovery plus the
+`solution/` directory form, and the examples in `lib/moshion-docs.ts` as of
+HEAD) was run in `scripts/moshion-harness.mjs` on the old engine (`91f7e6b`)
+and this one, 180 frames each, once with no input and once with a fixed mouse
+and keyboard script, `Math.random` seeded the same; the hash of every draw op,
+the console, errors, audio log and every sprite's position at frames 60 and
+180 matched for every sketch. Gravity's own audit is in
 `codehs-review/loop/gravity-default-audit.md`.
 
 ## Copied byte for byte from that commit
 
 - `planck.min.js` (unchanged by this sync)
-- `docs/moshion.d.ts` (the `World.gravity` doc comment), `docs/challenges.md`
+- `docs/moshion.d.ts` (`World.origin`, `showGrid`, `showMouse`, and the
+  "90 is down by default and up in math mode" notes), `docs/challenges.md`
   (unchanged by this sync)
 - `textures/*.png`, `textures/LICENSE.txt` (unchanged by this sync)
 - `assets/grass_tile.png`, `assets/ground_tile.png` and the other picture
@@ -28,10 +42,11 @@ p5play, instead of 9.8. A plain `new Sprite()` stays put until a sketch sets
 
 ## Copied with one change
 
-- `moshion.js`: one line differs. The empty-catalog fallback near line 387
-  returns `base: '/moshion/textures/'` here, `base: 'textures/'` in the repo.
-  shCode serves the engine at `/moshion/`, so texture URLs need the absolute
-  path. Re-apply this line after every copy.
+- `moshion.js`: one line differs. The empty-catalog fallback near line 495
+  (it was near line 387 before this sync) returns `base: '/moshion/textures/'`
+  here, `base: 'textures/'` in the repo. shCode serves the engine at
+  `/moshion/`, so texture URLs need the absolute path. Re-apply this line
+  after every copy.
 
 ## Kept as shCode's own (do not overwrite from the repo)
 
@@ -50,11 +65,13 @@ p5play, instead of 9.8. A plain `new Sprite()` stays put until a sketch sets
   `public/moshion/textures/`) where the repo's name its own. Engine
   invariants are added to `docs/CLAUDE.md` by hand: the exact overlap
   broadphase, render culling and `addSensor` in the 3b77bf6 sync, the
-  gravity-starts-at-0 note in this one.
+  gravity-starts-at-0 note in the 91f7e6b one, the `world.origin` bullet and
+  the "Coordinates (`world.origin`)" section in this one.
 - Not copied: the repo's `docs/data/moshion-docs.js` (its docs site; shCode's
   in-app docs are `lib/moshion-docs.ts`, which carries the same three gravity
-  wording changes by hand), `assets/favicon.svg`, `index.html`,
-  `sandbox.html`, `games/`, `tests/`.
+  wording changes and, from this sync, the three-page Coordinates section by
+  hand), the repo's `README.md`, `assets/favicon.svg`, `index.html`,
+  `sandbox.html`, `games/`, `tests/` (including `tests/math-origin.spec.mjs`).
 
 ## To resync
 

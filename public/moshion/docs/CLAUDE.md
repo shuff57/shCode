@@ -71,6 +71,9 @@ Key classes and where they live in `moshion.js`:
   Gravity STARTS at 0, as in p5play (`_world()`): a plain `new Sprite()`
   stays put until a sketch sets `world.gravity.y`. It was 9.8 until
   2026-11-01; a lesson that relies on falling sets its own gravity line.
+- `world.origin` (~289, `ORIGIN_`) — `'screen'` (the default: top-left, y
+  down) or `'math'` (centre, y up, counter-clockwise angles). See
+  "Coordinates" below.
 - Joints (~501–595) — thin facades over planck joints: `HingeJoint`,
   `DistanceJoint`, `SliderJoint`, `WheelJoint`, `GrabberJoint`, `GlueJoint`.
   All share `Joint.delete()`; there is no `joint.remove()`.
@@ -78,6 +81,51 @@ Key classes and where they live in `moshion.js`:
   `mouse.pressing`/`presses`/`released`. Edge flags reset AFTER the frame's
   update/draw ran (see the comment at ~728 — reordering this breaks
   `presses()`).
+
+### Coordinates (`world.origin`)
+
+Default = **screen**: (0, 0) is the canvas's top-left corner, x grows right
+and y grows DOWN, like the browser canvas and p5play. Opt-in = **math**:
+`world.origin = 'math'` as the first line after `new Canvas()` puts (0, 0) at
+the canvas centre, y grows UP and a positive rotation turns counter-clockwise.
+A falling world is then `world.gravity.y = -10`. `showGrid(50)` and
+`showMouse()`, called from `draw()`, label whichever mode is active (axes, and
+the pointer's (x, y)). It is a mode, not a new default: no sketch that never
+sets `world.origin` may change by a pixel. When it was vendored (moSHion
+d8068bb, 2026-11-02) every moSHion sketch in the course and every example in
+`lib/moshion-docs.ts` was run on both engines in `scripts/moshion-harness.mjs`
+for 180 frames, with and without scripted mouse and key input, and compared
+op for op: identical.
+
+How it is built, and the rule for extending it: **the physics world is never
+converted.** Box2D's own frame is already the math one (y up, CCW), and screen
+mode has always drawn that frame onto a y-down canvas without flipping, which
+is why `vel.y = 5` moves down there. Math mode changes only the canvas
+transform (`_applyFrame()`: centre, `scale(1, -1)`) and flips text, emoji,
+pictures and patterns back so they read upright. Every number the sketch sees
+-- x/y, vel, rotation, direction, gravity, forces, joint anchors, ray casts,
+mouse -- is a Box2D number shown the Box2D way round. The places that have an
+opinion about which way is up are each branched on `ORIGIN_` and listed at its
+declaration: `_applyFrame`, `background`, `text`, `Sprite._draw`,
+`_cullView`, `_frameOrigin` (canvasPos / screen-space hit-tests),
+`_pointerTo`, `Canvas`/`_parkCamera`, `Tiles` (row direction), `Walls`,
+`Group.cull`, `_drawGrid`/`_drawMouse`. A new feature that asks "which way is
+up" belongs on that list; one that only moves or measures things does not.
+
+Consequences a lesson author relies on: `direction = 90` and `vel.y > 0` go
+up; `Tiles` row 0 is still the top row (y decreases per row); `Walls.top` is
+still above the screen (larger y); `addSensor(0, -21, ...)` is the foot
+sensor; `rect(x, y, w, h)` covers `y..y+h` (upward); `camera.off()`,
+`drawTop()` and `screenSpace` draw in the same centred y-up frame with the
+camera at (0, 0). A sketch's own `sprite.draw` that writes to the canvas
+context directly sees the flipped transform and must counter-flip its own
+text and images. `showGrid()`/`showMouse()` paint in pixel space after
+`render()` and before `drawTop()`, and change no sprite or physics.
+
+The setter refuses, with a plain message, any value but the two strings
+(TypeError), and any change once a sprite exists, gravity is non-zero or a
+frame has run (Error). The in-app docs teach it in the Coordinates section of
+`lib/moshion-docs.ts`; no lesson uses it yet.
 
 ### Key invariants when editing
 
