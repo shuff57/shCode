@@ -1,9 +1,9 @@
 {
   "id": "5-1-2-video-intro",
   "title": "5.1.2 Video: Your first moSHion sketch",
-  "description": "5-min walkthrough introducing canvas, sprite, and run cycle. Watch before the Hello Sprite lesson.",
+  "description": "A 2-and-a-half-minute walkthrough of the canvas, a sprite, and the Run button. Watch before the Hello Sprite lesson.",
   "type": "lesson",
-  "estimateMins": 5,
+  "estimateMins": 3,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "video",
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "videoUrl": "",
+  "videoUrl": "/videos/5-1-2/index.html",
   "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
   "steps": [],
   "requirements": [],
