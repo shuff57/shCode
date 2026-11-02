@@ -24,7 +24,7 @@ Your game should follow the state-machine pattern from Unit 6.6: **title → pla
 | 1 | Two-player keyboard input | `kb.pressing(...)` is called with keys for both players |
 | 2 | Independent score variables | `p1Score` and `p2Score` are declared at the top of the file |
 | 3 | Bounciness is set | `.bounciness` is assigned on at least one sprite |
-| 4 | No gravity | `world.gravity.y = 0` appears in your setup |
+| 4 | No gravity | `world.gravity.y = 0` appears in your setup (gravity starts at 0, so never turning it on also counts) |
 | 5 | Score is rendered | `text(...)` displays `p1Score` or `p2Score` on screen inside `draw()` |
 | 6 | Win condition | A comparison against a number (e.g. `>= 5`) triggers the win state |
 | 7 | At least one joint | A `new DistanceJoint(...)` or `new HingeJoint(...)` is created somewhere |

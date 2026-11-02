@@ -3,31 +3,41 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `3b77bf6c578bd24cdba78e5aef5db7c65a538180` (`3b77bf6`), branch `gaps-fix` |
-| Commit date | 2026-10-31 |
-| Vendored | 2026-10-31 |
+| Commit | `91f7e6be54018a062c9304bba5c1933fb61e741e` (`91f7e6b`), branch `default-gravity-0` (off `gaps-fix`) |
+| Commit date | 2026-11-01 |
+| Vendored | 2026-11-01 |
 
-`gaps-fix` had not been pushed or merged into the repo's `main` when this copy
-was taken. Once it is, this pin still names the right bytes: the commit hash
-does not change on a fast-forward merge.
+`default-gravity-0` (and `gaps-fix` under it) had not been pushed or merged
+into the repo's `main` when this copy was taken. Once it is, this pin still
+names the right bytes: the commit hash does not change on a fast-forward
+merge.
+
+This sync changes one behaviour: **world gravity now starts at 0**, as in
+p5play, instead of 9.8. A plain `new Sprite()` stays put until a sketch sets
+`world.gravity.y`. The before/after audit of every course sketch is in
+`codehs-review/loop/gravity-default-audit.md`.
 
 ## Copied byte for byte from that commit
 
-- `planck.min.js`
-- `docs/moshion.d.ts`, `docs/challenges.md`
+- `planck.min.js` (unchanged by this sync)
+- `docs/moshion.d.ts` (the `World.gravity` doc comment), `docs/challenges.md`
+  (unchanged by this sync)
 - `textures/*.png`, `textures/LICENSE.txt` (unchanged by this sync)
-- `assets/coin.wav`, `assets/music.wav`, `assets/grass_tile.png`,
-  `assets/ground_tile.png` and the other assets (unchanged by this sync)
+- `assets/grass_tile.png`, `assets/ground_tile.png` and the other picture
+  assets (unchanged by this sync)
 
 ## Copied with one change
 
-- `moshion.js`: one line differs. The empty-catalog fallback near line 381
+- `moshion.js`: one line differs. The empty-catalog fallback near line 387
   returns `base: '/moshion/textures/'` here, `base: 'textures/'` in the repo.
   shCode serves the engine at `/moshion/`, so texture URLs need the absolute
   path. Re-apply this line after every copy.
 
 ## Kept as shCode's own (do not overwrite from the repo)
 
+- `assets/coin.wav`, `assets/music.wav`. Generated stand-in tones made in
+  shCode on 2026-11-01 (commit `57e7af4b`); the repo's copies are silent.
+  Do not copy the repo's over them.
 - `runner.html`. The repo's runner takes the sketch over `postMessage`; this
   one reads `?code=<base64url>`, which is what `components/MoshionPreview.tsx`
   builds. Copying the repo runner without changing the host would leave every
@@ -37,17 +47,20 @@ does not change on a fast-forward merge.
   `scripts/check-moshion-textures.mjs` checks them against the PNGs.
 - `docs/README.md`, `docs/CLAUDE.md`, `docs/LICENSE.md`, `docs/index.html`.
   These name shCode paths (`scripts/make-moshion-textures.py`,
-  `public/moshion/textures/`) where the repo's name its own. The new engine
-  invariants (exact overlap broadphase, render culling, `addSensor`) were
-  added to `docs/CLAUDE.md` by hand in this sync.
+  `public/moshion/textures/`) where the repo's name its own. Engine
+  invariants are added to `docs/CLAUDE.md` by hand: the exact overlap
+  broadphase, render culling and `addSensor` in the 3b77bf6 sync, the
+  gravity-starts-at-0 note in this one.
 - Not copied: the repo's `docs/data/moshion-docs.js` (its docs site; shCode's
-  in-app docs are `lib/moshion-docs.ts`), `assets/favicon.svg`, `index.html`,
+  in-app docs are `lib/moshion-docs.ts`, which carries the same three gravity
+  wording changes by hand), `assets/favicon.svg`, `index.html`,
   `sandbox.html`, `games/`, `tests/`.
 
 ## To resync
 
 1. Copy the files in the first two lists from the new commit, then re-apply
-   the `/moshion/textures/` line in `moshion.js`.
+   the `/moshion/textures/` line in `moshion.js`. Leave `coin.wav` and
+   `music.wav` alone.
 2. Run `node --import ./scripts/register-ts.mjs scripts/check-moshion-textures.mjs`
    and `node --import ./scripts/register-ts.mjs scripts/test-moshion.mjs`.
 3. Update the commit, dates and lists in this file.

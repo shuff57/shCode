@@ -266,7 +266,7 @@ function draw() {
         title: 'Your first sprite',
         body: `A Sprite is the basic building block of any moSHion game. Every sprite has a position, a size, and (usually) a physics body that moves and collides automatically.
 
-new Sprite(x, y, width, height) creates a rectangular sprite centered on (x, y). With no extra argument it's dynamic, meaning gravity pulls it and it bumps into other sprites.
+new Sprite(x, y, width, height) creates a rectangular sprite centered on (x, y). With no extra argument it's dynamic, meaning gravity pulls it and it bumps into other sprites. Gravity starts at 0, so this one stays where you put it until you set world.gravity.y.
 
 Store the sprite in a variable declared outside setup() so update() and draw() can reach it later. Without a reference, you can't move it or check its state.`,
         code: `let player;
@@ -657,7 +657,7 @@ function draw() {
     pages: [
       {
         title: 'Gravity and velocity',
-        body: `world.gravity.y pulls every dynamic sprite downward. 10 feels roughly earth-like; set it to 0 for top-down games, or try negative values for "upside-down" worlds.
+        body: `world.gravity.y pulls every dynamic sprite downward. It starts at 0, so nothing falls until you set it. 10 feels roughly earth-like; leave it at 0 for top-down games, or try negative values for "upside-down" worlds.
 
 Each sprite has a .vel vector with .x and .y components, measured in pixels per frame. At 60 fps, vel.x = 4 means the sprite moves 240 pixels per second. Reading .vel tells you how fast a sprite is moving; writing it overrides physics for that frame.
 
@@ -1893,7 +1893,7 @@ function draw() {
     pages: [
       {
         title: 'Top-down movement',
-        body: `For top-down games, set world.gravity.y = 0 so nothing falls. Move the player by writing to vel.x and vel.y based on the arrow keys.
+        body: `For top-down games, keep world.gravity.y at 0 (where it starts) so nothing falls. Writing world.gravity.y = 0 in setup() anyway makes that choice plain to a reader. Move the player by writing to vel.x and vel.y based on the arrow keys.
 
 Clamp the player's position to the canvas edges each frame so it can't leave the screen. A simple Math.max / Math.min pair handles this.
 

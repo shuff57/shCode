@@ -54,7 +54,7 @@ function draw() {
 
 ### The word collision to watch for
 
-This course already uses the word **static** for something unrelated. In 5.2 you met `new Sprite(x, y, w, h, 'static')`, which is a **body type**: that sprite ignores gravity. That `'static'` is a string handed to a constructor. `static spawned = 0` is a keyword in the class body. Same word, two jobs, no connection. If a sprite in this module refuses to fall, check the body type before you check the class.
+This course already uses the word **static** for something unrelated. In 5.2 you met `new Sprite(x, y, w, h, 'static')`, which is a **body type**: that sprite ignores gravity. That `'static'` is a string handed to a constructor. `static spawned = 0` is a keyword in the class body. Same word, two jobs, no connection. If a sprite refuses to fall once `world.gravity.y` is set, check the body type before you check the class.
 
 ### When not to use it
 

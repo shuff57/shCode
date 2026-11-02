@@ -2221,7 +2221,9 @@ them gate the build:
   The reference API-faithful edge semantics live on `collides()` / `overlapping()` / `overlapped()`.
 - **Named key properties return `pressing()`'s value**, not the reference API's raw signed counter,
   so `if (kb.space)` cannot double-fire on key-up.
-- **Defaults differ**: density 1 (not 5), friction 0, bounciness 0, gravity (0, 9.8).
+- **Defaults differ**: density 1 (not 5), friction 0, bounciness 0. Gravity was (0, 9.8) here
+  until 2026-11-01; it now starts at (0, 0) like the reference, so a lesson that wants falling
+  sets `world.gravity.y` itself (audit: `codehs-review/loop/gravity-default-audit.md`).
 - **The direction alias is reference-counted** — releasing `d` while ArrowRight is still
   held keeps `'right'` alive. The reference API has this bug; moSHion does not.
 - **`rotateTowards` always turns the short way.** the reference API's number form does not.

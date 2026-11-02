@@ -18,7 +18,7 @@
     {
       "id": "s1",
       "title": "Arena setup: canvas and gravity",
-      "instructions": "Create a canvas (e.g. 600×400). Set world.gravity.y = 0 so paddles and ball glide instead of falling.",
+      "instructions": "Create a canvas (e.g. 600×400). Gravity starts at 0, so paddles and ball already glide instead of falling. Write world.gravity.y = 0 in setup() anyway, so a reader can see the arena is top-down.",
       "hints": [
         "Check the Canvas section of the moSHion docs drawer. For no-gravity setup see 6.7.16."
       ]
@@ -106,10 +106,10 @@
     {
       "id": "r4",
       "title": "Top-down arena: no gravity",
-      "description": "world.gravity.y is set to 0 so the sprites glide instead of falling. Help: 5.2.6 (Gravity)",
+      "description": "world.gravity.y stays 0 so the sprites glide instead of falling: world.gravity.y = 0 in setup() passes, and so does never turning gravity on. Help: 5.2.6 (Gravity)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "world\\.gravity\\.y\\s*=\\s*0(?:\\.0*)?(?![.\\d])",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*0(?:\\.0*)?(?![.\\d])|^(?![\\s\\S]*world\\s*\\.\\s*gravity(?:\\s*\\.\\s*y)?\\s*=(?!=))",
       "flags": "",
       "points": 0
     },

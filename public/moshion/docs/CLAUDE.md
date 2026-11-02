@@ -68,6 +68,9 @@ Key classes and where they live in `moshion.js`:
 - `allSprites` (~468) — implicit group every sprite auto-joins.
 - `world` (~92) — `world.gravity` is a live proxy vector (raw Box2D m/s²,
   `y = 10` ≈ 1g); `world.getSpriteAt(x, y)` is a top-most layer hit-test.
+  Gravity STARTS at 0, as in p5play (`_world()`): a plain `new Sprite()`
+  stays put until a sketch sets `world.gravity.y`. It was 9.8 until
+  2026-11-01; a lesson that relies on falling sets its own gravity line.
 - Joints (~501–595) — thin facades over planck joints: `HingeJoint`,
   `DistanceJoint`, `SliderJoint`, `WheelJoint`, `GrabberJoint`, `GlueJoint`.
   All share `Joint.delete()`; there is no `joint.remove()`.
