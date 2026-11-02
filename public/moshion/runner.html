@@ -81,9 +81,74 @@
 			el.textContent = name + ': ' + msg + (locStr ? '  @ ' + locStr : '');
 		}
 	}
+	// "Script error." -- and why most engine errors never reach the window
+	// error event at all.
+	//
+	// This frame is sandboxed without allow-same-origin, so it has an opaque
+	// origin, and every <script src> it loads (planck, textures, the moSHion
+	// engine) counts as CROSS-ORIGIN to it. A browser mutes an uncaught error
+	// thrown inside a cross-origin script: the error event carries only the
+	// message "Script error.", no error object, no file, no line. So when the
+	// engine threw -- "new Canvas(w, h) must be called in setup()", a bad
+	// argument to showGrid(), world.origin set too late -- the student saw
+	// "Error: Script error." and nothing else. Measured 2026-11-02 on the
+	// 5.1.11, 5.1.20, 5.1.22, 5.1.24 and 5.6.14 starters (none makes a canvas
+	// yet). Errors thrown by the student's own code were never muted: the
+	// sketch is an inline script, which the rule does not touch.
+	//
+	// Muting only applies to an error nobody caught. A try/catch gets the real
+	// Error object, message and stack included. So the two ways the engine is
+	// driven are caught here instead of left to the error event: the boot call
+	// (setup(), and the canvas check after it) in the body script below, and
+	// every animation frame (update/draw/drawTop, physics, render) through the
+	// requestAnimationFrame wrapper below. Both report and stop -- the frame
+	// that threw does not schedule the next one, exactly as before, so a
+	// broken sketch freezes rather than spinning. Do NOT "fix" the muting with
+	// allow-same-origin on the iframe (see components/MoshionPreview.tsx), and
+	// do not add a crossorigin attribute to the engine tag without a CORS
+	// header on every host: without one the engine would not load at all.
+	//
+	// What is left muted: an engine error thrown while the sketch's top-level
+	// code runs (outside setup() and draw()). That cannot be caught without
+	// changing how the sketch is loaded, so it gets a plain sentence instead.
+	var reported = typeof WeakSet === 'function' ? new WeakSet() : null;
+	function caught(err) {
+		if (err && (typeof err === 'object' || typeof err === 'function') && reported) {
+			if (reported.has(err)) return;
+			try { reported.add(err); } catch (_) { /* frozen or exotic */ }
+		}
+		reportError(err, null);
+	}
+	window.__moshionReportError = caught;
+	var MUTED_TOP = 'moSHion stopped while your code outside setup() and draw() was running, but the browser hid the reason. Move moSHion commands into setup() (after new Canvas(...)) or draw(), then Run again to see the real error.';
+	var MUTED_ANY = 'moSHion stopped your sketch, but the browser hid the reason. Look at the moSHion command on the line you changed last: it may have been given a value it cannot use.';
+	window.__moshionPhase = 'loading';
+	function isMuted(e) {
+		return !e.error && /^(Uncaught )?Script error\.?$/i.test(String(e.message || '')) && !e.filename && !e.lineno;
+	}
 	window.addEventListener('error', function(e) {
+		if (e.error && reported && (typeof e.error === 'object' || typeof e.error === 'function') && reported.has(e.error)) return;
+		if (isMuted(e)) {
+			reportError(null, window.__moshionPhase === 'top' ? MUTED_TOP : MUTED_ANY);
+			return;
+		}
 		reportError(e.error, e.message, e.filename, e.lineno, e.colno);
 	});
+	// See the "Script error." note above: every frame the engine runs comes
+	// through here, so an error it throws is caught with its real message and
+	// stack. The callback is only wrapped, never replaced or reordered, so a
+	// sketch that does not throw runs exactly as it did. Installed before the
+	// engine script loads, because the engine looks the function up by name.
+	var nativeRaf = window.requestAnimationFrame;
+	if (typeof nativeRaf === 'function') {
+		window.requestAnimationFrame = function(cb) {
+			if (typeof cb !== 'function') return nativeRaf.call(window, cb);
+			return nativeRaf.call(window, function(t) {
+				try { return cb(t); }
+				catch (err) { caught(err); }
+			});
+		};
+	}
 	window.addEventListener('unhandledrejection', function(e) {
 		var r = e.reason;
 		var err = (r && r.stack) ? r : new Error(r && r.message ? r.message : String(r));
@@ -193,10 +258,21 @@
 		// The //# sourceURL pragma makes V8 attribute thrown errors to "sketch.js"
 		// with line numbers relative to the student's source instead of this host doc.
 		s.textContent = code + '\n//# sourceURL=sketch.js';
+		window.__moshionPhase = 'top';
 		document.head.appendChild(s);
+		window.__moshionPhase = 'boot';
 		// The engine's auto-boot already ran and found no setup(); tell it to
-		// look again now that the sketch is actually here.
-		if (typeof window._moshionAutoBoot === 'function') window._moshionAutoBoot();
+		// look again now that the sketch is actually here. Caught rather than
+		// left to the error event: the engine's own checks (a missing canvas)
+		// throw from the engine script, and uncaught they arrive muted as
+		// "Script error." -- see the note in the head script.
+		try {
+			if (typeof window._moshionAutoBoot === 'function') window._moshionAutoBoot();
+		} catch (err) {
+			if (typeof window.__moshionReportError === 'function') window.__moshionReportError(err);
+			else throw err;
+		}
+		window.__moshionPhase = 'running';
 	}
 
 	// Saves. Sandboxed into an opaque origin, this frame cannot so much as
