@@ -41,7 +41,8 @@
       "pattern": "takeHit\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.hp\\s*(?:-=\\s*\\(?\\s*\\1\\b|=(?!=)[^;{}]*?this\\.hp\\s*-\\s*\\(?\\s*\\1\\b)|\\b(?:let|const|var)\\s+(\\w+)\\s*=\\s*\\(?\\s*this\\.hp\\s*-\\s*\\(?\\s*\\1\\b(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\bthis\\.hp\\s*=(?!=)[^;{}]*?\\b\\2\\b)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -52,7 +53,8 @@
       "pattern": "takeHit\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:(?:this\\.hp\\b[^;{}=]*?[<>]|[<>]=?\\s*\\(?\\s*this\\.hp\\b|!\\s*\\(?\\s*this\\.isAlive\\b|this\\.isAlive\\s*\\(\\s*\\)\\s*\\)?\\s*===?\\s*false)(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.hp\\s*=\\s*\\(?\\s*0(?![\\w.])|this\\.hp\\s*=(?!=)[^;{}?]*\\?\\s*(?:\\(?\\s*0\\s*\\)?\\s*:|[^;{}:]*:\\s*\\(?\\s*0(?![\\w.]))|this\\.hp\\s*=(?!=)[^;{}]*?\\b(?:max|constrain)\\s*\\(\\s*(?:0\\s*,|[^;]*?,\\s*\\(?\\s*0\\s*\\)?\\s*[,)]))",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

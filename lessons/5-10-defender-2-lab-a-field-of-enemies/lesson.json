@@ -62,7 +62,8 @@
       "pattern": "^(?=[\\s\\S]*\\benemies\\.push\\s*\\()(?=[\\s\\S]*\\benemyHp\\.push\\s*\\()(?=[\\s\\S]*\\benemyWorth\\.push\\s*\\()",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -74,7 +75,8 @@
       "pattern": "\\.y\\s*(?:\\+=|=\\s*[^;]*\\+)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -86,7 +88,8 @@
       "pattern": "(?:if\\s*\\((?=[^{;]{0,200}?(?:\\.y\\s*\\)?\\s*>=?\\s*\\(?\\s*(?:BASE_Y|\\d+)|\\b(?:BASE_Y|\\d+)\\s*\\)?\\s*<=?\\s*\\(?\\s*[\\w$.\\[\\]]+\\.y\\b))[^{;]{0,200}\\)\\s*\\{?|(?:const|let|var)\\s+(\\w+)\\s*=[^;\\n]{0,200}?(?:\\.y\\s*\\)?\\s*>=?\\s*\\(?\\s*(?:BASE_Y|\\d+)|\\b(?:BASE_Y|\\d+)\\s*\\)?\\s*<=?\\s*\\(?\\s*[\\w$.\\[\\]]+\\.y\\b)[\\s\\S]{0,300}?if\\s*\\(\\s*\\(?\\s*\\1\\s*\\)?\\s*\\)\\s*\\{?)[^}]{0,600}?(?:\\bbaseHp\\s*(?:-=\\s*\\(?\\s*1\\b|--)|--\\s*baseHp\\b|\\bbaseHp\\s*=\\s*\\(?\\s*baseHp\\s*-\\s*\\(?\\s*1\\b)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r5",
@@ -101,7 +104,8 @@
       "pattern": "\\{(?=[^{}]*?(?:\\bbaseHp\\s*(?:-=\\s*\\(?\\s*1\\b|--|=\\s*\\(?\\s*baseHp\\s*-\\s*\\(?\\s*1\\b)|--\\s*baseHp\\b))(?=[^{}]*?\\.(?:delete|remove)\\s*\\(\\s*\\))(?=[^{}]*?\\benemies\\s*\\.\\s*splice\\s*\\(\\s*([\\w$]+)\\s*,\\s*1\\s*\\))(?=[^{}]*?\\benemyHp\\s*\\.\\s*splice\\s*\\(\\s*\\1\\s*,\\s*1\\s*\\))(?=[^{}]*?\\benemyWorth\\s*\\.\\s*splice\\s*\\(\\s*\\1\\s*,\\s*1\\s*\\))|\\{(?=[^{}]*?(?:\\bbaseHp\\s*(?:-=\\s*\\(?\\s*1\\b|--|=\\s*\\(?\\s*baseHp\\s*-\\s*\\(?\\s*1\\b)|--\\s*baseHp\\b))(?=[^{}]*?\\bremoveEnemy\\s*\\()(?=[\\s\\S]*\\.(?:delete|remove)\\s*\\(\\s*\\))(?=[\\s\\S]*\\benemies\\s*\\.\\s*splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\s*\\.\\s*splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\s*\\.\\s*splice\\s*\\()",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

@@ -40,9 +40,10 @@
     {
       "id": "s4",
       "title": "Use one OOP feature",
-      "instructions": "Pick a challenge from content.md and implement it using at least one of: `this.<property>` access, `extends` another class, or a `super(...)` call.",
+      "instructions": "Pick one of the challenges below and build it using at least one of: `this.<property>` access, `extends` another class, or a `super(...)` call.\n\n**Challenge 1: isAlive (easy).** Write `class Enemy` whose constructor stores `x`, `y` and `hp` on `this`, with an `isAlive()` method that returns `this.hp > 0`. Build one with `new Enemy(...)` and check `enemy.isAlive()` in `draw()`.\n\n**Challenge 2: a Player class (medium).** Write `class Player` whose constructor makes a sprite and stores it on `this.sprite`. Give it a `move(dir)` method that sets `this.sprite.vel.x` (negative for `'left'`, positive for `'right'`) and a `jump()` method that sets `this.sprite.vel.y` to a negative number. Build one with `new Player(200, 200)` and call `player.move('left')` or `player.jump()` from `draw()`.\n\n**Challenge 3: a PowerUp subclass (hard).** Write `class Collectible` whose constructor stores `x`, `y`, `value` and `color` on `this`. Then write `class PowerUp extends Collectible` (the `extends` from 5.7.21): its constructor takes the same four arguments and must call `super(x, y, value, color);` first, which runs the parent's constructor, before it touches `this`. Add a `boost()` method that returns `this.value * 2`, and build one with `new PowerUp(100, 100, 10, 'gold')`.",
       "hints": [
-        "content.md lists three challenges with hints for each. Pick whichever interests you: the auto-grader accepts `this.`, `extends`, or `super(`."
+        "All three challenges pass the check with `this.` alone; `extends` and `super(` count too.",
+        "5.7.11 (Worked Example: Write an Enemy class (integration)) builds a class with a constructor, `this.sprite` and methods: the same shape works for every challenge."
       ]
     }
   ],
@@ -50,32 +51,35 @@
     {
       "id": "r1",
       "title": "Define at least one class",
-      "description": "script.js contains at least one class definition. Help: 5.7.1 (Methods: functions that live on a class)",
+      "description": "script.js contains at least one class definition. Help: 5.6.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "class\\s+\\w+",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
       "title": "Instantiates a class of your own",
-      "description": "Builds an object from a class the student defined: new Canvas() and new Sprite() are boilerplate and do not count. Help: 5.7.1 (Methods: functions that live on a class)",
+      "description": "Builds an object from a class the student defined: new Canvas() and new Sprite() are boilerplate and do not count. Help: 5.6.4 (The new operator)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+(?!Canvas\\b|Sprite\\b|Group\\b)[A-Z]\\w*\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
       "title": "Write a constructor",
-      "description": "At least one class has a constructor method. Help: 5.7.1 (Methods: functions that live on a class)",
+      "description": "At least one class has a constructor method. Help: 5.6.5 (constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "constructor\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -85,7 +89,8 @@
       "file": "script.js",
       "pattern": "this\\.\\w+|extends\\s+\\w+|super\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

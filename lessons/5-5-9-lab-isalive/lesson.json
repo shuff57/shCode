@@ -38,10 +38,11 @@
       "description": "The class has an `isAlive()` method that returns a comparison on `this.hp`. Help: 5.8.6 (Worked Example: The number anyone can set)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "isAlive\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?return\\s+this\\.hp\\s*>\\s*0",
+      "pattern": "\\bisAlive\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:\\breturn\\b[^;{}]*?(?:this\\.hp\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*this\\.hp\\b|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*this\\.hp\\b|!\\s*\\(\\s*this\\.hp\\s*(?:<=\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|===?\\s*\\(?\\s*0(?![\\w.]))\\s*\\))|\\bif\\s*\\([^;{}]*?(?:this\\.hp\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*this\\.hp\\b|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*this\\.hp\\b|!\\s*\\(\\s*this\\.hp\\s*(?:<=\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|===?\\s*\\(?\\s*0(?![\\w.]))\\s*\\))[^;{}]*\\)(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\breturn\\s*\\(?\\s*true\\b|\\bif\\s*\\([^;{}]*?(?:this\\.hp\\s*\\)?\\s*(?:<=\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|===?\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:>=|===?)\\s*\\(?\\s*this\\.hp\\b|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*this\\.hp\\b)[^;{}]*\\)\\s*\\{?\\s*return\\s*\\(?\\s*false\\b|\\b(?:const|let|var)\\s+([\\w$]+)\\s*=[^;{}]*?(?:this\\.hp\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*this\\.hp\\b|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*this\\.hp\\b|!\\s*\\(\\s*this\\.hp\\s*(?:<=\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|===?\\s*\\(?\\s*0(?![\\w.]))\\s*\\))[^;{}]*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\breturn\\s*\\(?\\s*\\1\\b)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -49,10 +50,11 @@
       "description": "The scene calls `e.isAlive()` rather than comparing `e.hp` itself. Help: 5.8.6 (Worked Example: The number anyone can set)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "function\\s+draw\\s*\\([\\s\\S]*?\\.isAlive\\s*\\(\\s*\\)",
+      "pattern": "function\\s+draw\\s*\\([\\s\\S]*?(?:\\bif\\s*\\([^;{}]*|[=?:(&|!]\\s*)[\\w$.\\[\\]]+\\.isAlive\\s*\\(\\s*\\)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

@@ -50,7 +50,8 @@
       "pattern": "\\bif\\s*\\([^{};]*?(?:frameCount\\s*%\\s*\\(?\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*\\)?\\s*===?\\s*0(?![\\w.])|(?<![\\w.])0\\s*===?\\s*\\(?\\s*frameCount\\s*%)(?=[^{};]*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)]))|(?:const|let|var)\\s+\\w+\\s*=[^;{}]*?(?:frameCount\\s*%\\s*\\(?\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*\\)?\\s*===?\\s*0(?![\\w.])|(?<![\\w.])0\\s*===?\\s*\\(?\\s*frameCount\\s*%)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -61,7 +62,8 @@
       "pattern": "\\bif\\s*\\([^{};]*?(?:enemies\\.length\\s*\\)?\\s*(?:===?\\s*0(?![\\w.])|<\\s*1(?![\\w.])|<=\\s*0(?![\\w.]))|(?<![\\w.])0\\s*===?\\s*\\(?\\s*enemies\\.length\\b|!\\s*\\(?\\s*enemies\\.length\\b)(?=[^{};]*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)]))|(?:const|let|var)\\s+\\w+\\s*=[^;{}]*?(?:enemies\\.length\\s*\\)?\\s*(?:===?\\s*0(?![\\w.])|<\\s*1(?![\\w.])|<=\\s*0(?![\\w.]))|(?<![\\w.])0\\s*===?\\s*\\(?\\s*enemies\\.length\\b|!\\s*\\(?\\s*enemies\\.length\\b)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -72,7 +74,8 @@
       "pattern": "enemies\\.push\\s*\\(\\s*new\\s+Enemy\\s*\\(|enemies\\s*=\\s*\\[[^\\]]*?new\\s+Enemy\\s*\\(|\\bnew\\s+Enemy\\s*\\([^;]*;[\\s\\S]{0,200}?enemies\\.push\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -83,7 +86,8 @@
       "pattern": "enemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|(?<![\\w.])0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|(?<![\\w.])0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)[\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

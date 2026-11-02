@@ -15,8 +15,8 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Define the Collectible class",
-      "instructions": "Write `class Collectible { }` with a `constructor(x, y, value, color)`. Store the data on `this` and create `this.sprite = new Sprite(...)`.",
+      "title": "Fill in the Collectible constructor",
+      "instructions": "The class shell is already in the editor: `class Collectible` with an empty `constructor(x, y, value, color)` and an empty `collect()`. Fill in the constructor: store the data on `this` and create `this.sprite = new Sprite(...)`.",
       "hints": [
         "Re-read 5.7.11 Worked Example: the `Enemy` constructor follows the same `this.x = x` / `this.sprite = new Sprite(...)` pattern."
       ]
@@ -51,12 +51,13 @@
     {
       "id": "r1",
       "title": "Constructor stores state on the object",
-      "description": "The constructor body assigns at least one argument onto this: the class shell is provided, so this checks the part the student writes. Help: 5.7.18 (When to reach for OOP)",
+      "description": "The constructor body assigns at least one argument onto this: the class shell is provided, so this checks the part the student writes. Help: 5.6.5 (constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?this\\.\\w+\\s*=",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -66,27 +67,30 @@
       "file": "script.js",
       "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?this\\.sprite\\s*=\\s*new\\s+Sprite",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
       "title": "collect() method does work",
-      "description": "A collect() method whose body returns something AND deletes the sprite (via this.sprite.delete() or sprite.remove()). Help: 5.7.18 (When to reach for OOP)",
+      "description": "A collect() method whose body returns something AND deletes the sprite (via this.sprite.delete() or sprite.remove()). Help: 5.7.10 (Lab: Cleanup with this.sprite.delete())",
       "type": "regex",
       "file": "script.js",
       "pattern": "collect\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?(this\\.sprite\\.delete|\\.remove)[\\s\\S]*?return\\b|collect\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?return[\\s\\S]*?(this\\.sprite\\.delete|\\.remove)",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
       "title": "At least one instance",
-      "description": "At least one Collectible is instantiated. Help: 5.7.18 (When to reach for OOP)",
+      "description": "At least one Collectible is instantiated. Help: 5.6.4 (The new operator)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Collectible\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r5",
@@ -97,7 +101,8 @@
       "file": "script.js",
       "pattern": "\\.overlap(?:s|ping)\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

@@ -72,7 +72,8 @@
       "pattern": "\\bmakeWave\\s*\\(\\s*\\)\\s*\\{(?=(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\s*\\.\\s*wave\\s*(?:\\+=\\s*\\(?\\s*1(?![\\w.])|\\+\\+)|\\+\\+\\s*this\\s*\\.\\s*wave\\b|this\\s*\\.\\s*wave\\s*=\\s*this\\s*\\.\\s*wave\\s*\\+\\s*\\(?\\s*1(?![\\w.])|this\\s*\\.\\s*wave\\s*=\\s*1\\s*\\+\\s*this\\s*\\.\\s*wave\\b))(?=(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\bnew\\s+Enemy\\s*\\()(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\breturn\\s*\\(?\\s*[\\w$]",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -83,7 +84,8 @@
       "pattern": "^(?=[\\s\\S]*\\bspawner\\s*\\.\\s*ready\\s*\\()(?=[\\s\\S]*(?:=|\\(|\\.\\.\\.)\\s*spawner\\s*\\.\\s*makeWave\\s*\\()",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -95,7 +97,8 @@
       "pattern": "\\bspawner\\s*=\\s*new\\s+Spawner\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r5",
@@ -106,7 +109,8 @@
       "pattern": "^(?=[\\s\\S]*\\bstatic\\s+spawned\\s*=\\s*\\(?\\s*0(?![\\w.]))(?=[\\s\\S]*\\bconstructor\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:(?:Enemy|this\\s*\\.\\s*constructor)\\s*\\.\\s*spawned\\s*(?:\\+=\\s*\\(?\\s*1(?![\\w.])|\\+\\+)|\\+\\+\\s*(?:Enemy|this\\s*\\.\\s*constructor)\\s*\\.\\s*spawned\\b|(?:Enemy|this\\s*\\.\\s*constructor)\\s*\\.\\s*spawned\\s*=\\s*(?:Enemy|this\\s*\\.\\s*constructor)\\s*\\.\\s*spawned\\s*\\+\\s*\\(?\\s*1(?![\\w.])|(?:Enemy|this\\s*\\.\\s*constructor)\\s*\\.\\s*spawned\\s*=\\s*1\\s*\\+\\s*(?:Enemy|this\\s*\\.\\s*constructor)\\s*\\.\\s*spawned\\b))(?=[\\s\\S]*\\bfunction\\s+startRound\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\bEnemy\\s*\\.\\s*spawned\\s*=\\s*\\(?\\s*0(?![\\w.]))",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r6",

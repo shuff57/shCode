@@ -53,7 +53,8 @@
       "pattern": "new\\s+Sprite\\s*\\(\\s*(?!180\\s*,\\s*180\\s*,)\\d+\\s*,\\s*\\d+\\s*,",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -64,7 +65,8 @@
       "pattern": "new\\s+Sprite\\s*\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*(?!60\\s*,\\s*60\\s*\\))\\d+\\s*,\\s*\\d+\\s*\\)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r3",

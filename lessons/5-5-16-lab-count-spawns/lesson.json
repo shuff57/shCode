@@ -42,7 +42,8 @@
       "pattern": "static\\s+spawned\\s*=\\s*\\(?\\s*0(?![\\w.])",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -53,7 +54,8 @@
       "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:(?:Enemy|this\\.constructor)\\.spawned\\s*(?:\\+=|\\+\\+|=(?!=)\\s*\\(?\\s*(?:(?:Enemy|this\\.constructor)\\.spawned\\s*\\+|1\\s*\\+\\s*(?:Enemy|this\\.constructor)\\.spawned\\b))|\\+\\+\\s*(?:Enemy|this\\.constructor)\\.spawned\\b)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

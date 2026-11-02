@@ -33,7 +33,8 @@
       "pattern": "(?=[\\s\\S]*console\\.log\\s*\\([^)]*\\bb\\s*\\.\\s*color)(?=[\\s\\S]*console\\.log\\s*\\([^)]*\\bb\\s*\\.\\s*size)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

@@ -30,10 +30,11 @@
       "description": "Inside `tick()`, the change lands on `this.n` (for example `this.n += 1`), so the value survives the call. Help: 5.8.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "tick\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?this\\.n\\s*(?:\\+=|\\+\\+|=\\s*this\\.n\\s*\\+\\s*1)",
+      "pattern": "\\btick\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.n\\s*(?:\\+=|\\+\\+|=\\s*\\(?\\s*this\\.n\\s*\\+|=\\s*\\(?\\s*1\\s*\\+\\s*this\\.n\\b)|\\+\\+\\s*this\\.n\\b|\\b(?:let|const|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*this\\.n\\s*\\)?\\s*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:\\b\\1\\s*(?:\\+=\\s*\\(?\\s*1\\b|\\+\\+|=\\s*\\(?\\s*\\1\\s*\\+\\s*\\(?\\s*1\\b|=\\s*\\(?\\s*1\\s*\\+\\s*\\1\\b)|\\+\\+\\s*\\1\\b)(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\bthis\\.n\\s*=\\s*\\(?\\s*\\1\\b|\\b(?:let|const|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*(?:this\\.n\\s*\\+\\s*\\(?\\s*1\\b|1\\s*\\+\\s*this\\.n\\b)[^;{}]*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\bthis\\.n\\s*=\\s*\\(?\\s*\\2\\b)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

@@ -60,7 +60,8 @@
       "pattern": "\\btakeHit\\s*\\(\\s*([\\w$]+)\\s*\\)\\s*\\{(?=(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.hp\\s*(?:-=\\s*\\(?\\s*\\1\\b|=(?!=)[^;{}]*?this\\.hp\\s*-\\s*\\(?\\s*\\1\\b)|\\b(?:let|const|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*this\\.hp\\s*-\\s*\\(?\\s*\\1\\b(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\bthis\\.hp\\s*=(?!=)[^;{}]*?\\b\\2\\b))(?=(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:(?:this\\.hp\\b[^;{}=]*?[<>]|[<>]=?\\s*\\(?\\s*this\\.hp\\b|!\\s*\\(?\\s*this\\.isAlive\\b|this\\.isAlive\\s*\\(\\s*\\)\\s*\\)?\\s*===?\\s*false)(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.hp\\s*=\\s*\\(?\\s*0(?![\\w.])|this\\.hp\\s*=(?!=)[^;{}?]*\\?\\s*(?:\\(?\\s*0\\s*\\)?\\s*:|[^;{}:]*:\\s*\\(?\\s*0(?![\\w.]))|this\\.hp\\s*=(?!=)[^;{}]*?\\b(?:max|constrain)\\s*\\(\\s*(?:0\\s*,|[^;]*?,\\s*\\(?\\s*0\\s*\\)?\\s*[,)])))",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -71,7 +72,8 @@
       "pattern": "\\bisAlive\\s*\\(\\s*\\)\\s*\\{(?=[^}]*?\\breturn\\b)[^}]*?(?:this\\.hp\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*(?:<|!==?)\\s*\\(?\\s*this\\.hp\\b|\\b1\\s*<=\\s*\\(?\\s*this\\.hp\\b|!\\s*\\(\\s*this\\.hp\\s*(?:<=\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|===?\\s*\\(?\\s*0(?![\\w.]))|this\\.hp\\s*(?:<=\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|===?\\s*\\(?\\s*0(?![\\w.]))[^;{}]*?(?:\\)\\s*\\{?\\s*return\\s+false\\b|\\?\\s*false\\b))",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -82,7 +84,8 @@
       "pattern": "\\bland\\s*\\(\\s*\\)\\s*\\{[^}]*?(?:this\\.hp\\s*=\\s*\\(?\\s*0(?![\\w.])|this\\.hp\\s*-=\\s*this\\.hp\\b|this\\.takeHit\\s*\\(\\s*this\\.hp\\s*\\))",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -93,7 +96,8 @@
       "pattern": "^(?![\\s\\S]*\\benemy(?:Hp|Worth)\\b)[\\s\\S]*\\bnew\\s+Enemy\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r5",
@@ -104,7 +108,8 @@
       "pattern": "^(?=[\\s\\S]*\\.\\s*takeHit\\s*\\()(?=[\\s\\S]*\\.\\s*land\\s*\\(\\s*\\))(?=[\\s\\S]*\\.\\s*reachedBase\\s*\\(\\s*\\))(?=[\\s\\S]*?\\bfunction\\s+hitEnemies\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?:function|class)\\b)[\\s\\S])*?(?:\\bisAlive\\s*\\(|\\.\\s*hp\\s*>)(?:(?!\\b(?:function|class)\\b)[\\s\\S])*?\\.\\s*takeHit\\s*\\()",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r6",
@@ -115,7 +120,8 @@
       "pattern": "^(?=[\\s\\S]*?(?:for\\s*\\(\\s*(?:const|let|var)\\s+([\\w$]+)\\s+of\\s+enemies\\s*\\)\\s*\\{?[^{}]{0,120}?if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*\\1\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))|\\benemies\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([\\w$]+)\\s*\\)?\\s*(?:=>)?\\s*\\{?[^{}]{0,120}?if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*\\2\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))|if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*enemies\\s*\\[\\s*[\\w$]+\\s*\\]\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)))[\\s\\S]*?\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,80}?(?:isAlive\\s*\\(\\s*\\)|\\.\\s*hp\\s*>))|^(?=[\\s\\S]*?\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,80}?(?:isAlive\\s*\\(\\s*\\)|\\.\\s*hp\\s*>))(?=[\\s\\S]*?(?:for\\s*\\(\\s*(?:const|let|var)\\s+([\\w$]+)\\s+of\\s+enemies\\s*\\)\\s*\\{?[^{}]{0,120}?if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*\\4\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))|\\benemies\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([\\w$]+)\\s*\\)?\\s*(?:=>)?\\s*\\{?[^{}]{0,120}?if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*\\5\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))|if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*enemies\\s*\\[\\s*[\\w$]+\\s*\\]\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)))[\\s\\S]*?\\benemies\\s*=\\s*\\3\\b)|^(?=[\\s\\S]*?\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,80}?(?:!\\s*\\(?\\s*[\\w$]+\\s*\\.\\s*isAlive\\s*\\(\\s*\\)|isAlive\\s*\\(\\s*\\)\\s*===?\\s*false|\\.\\s*hp\\s*(?:<=?\\s*\\(?\\s*[01]\\b|===?\\s*\\(?\\s*0\\b)|(?<!!\\s*)\\b[\\w$]+\\s*\\.\\s*spent\\b(?!\\s*===?\\s*false))[\\s\\S]*?\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,80}?(?:isAlive\\s*\\(\\s*\\)|\\.\\s*hp\\s*>))(?=[\\s\\S]*?(?:for\\s*\\(\\s*(?:const|let|var)\\s+([\\w$]+)\\s+of\\s+\\6\\s*\\)\\s*\\{?\\s*\\7\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))|\\b\\6\\s*\\.\\s*forEach\\s*\\([^;]{0,80}?\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))))|\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\((?:[^()]|\\((?:[^()]|\\((?:[^()]|\\([^()]*\\))*\\))*\\))*?\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))|if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{(?=[^}]*?\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)))(?=[^}]*?\\benemies\\s*\\.\\s*splice\\s*\\()|^(?=[\\s\\S]*?(?:for\\s*\\(\\s*(?:const|let|var)\\s+([\\w$]+)\\s+of\\s+enemies\\s*\\)\\s*\\{?[^{}]{0,120}?if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*\\8\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))|\\benemies\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*)?\\(?\\s*([\\w$]+)\\s*\\)?\\s*(?:=>)?\\s*\\{?[^{}]{0,120}?if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*\\9\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))|if\\s*\\(\\s*(?:[^;{}]{0,60}?(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b)[^;{}]{0,40}?|!?\\s*[\\w$]+\\s*)\\)\\s*\\{?\\s*enemies\\s*\\[\\s*[\\w$]+\\s*\\]\\s*\\.\\s*(?:remove\\s*\\(\\s*\\)|sprite\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)))[\\s\\S]*?\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\))(?=[\\s\\S]*\\b(?:function\\s+\\10\\b[^{]*\\{[^}]{0,200}?|(?:const|let|var)\\s+\\10\\s*=[^;]{0,200}?)(?:isAlive|\\.\\s*hp\\b|\\.\\s*spent\\b))",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

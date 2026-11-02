@@ -55,9 +55,10 @@
       "description": "The constructor stores the x argument on this as a property named x. Help: 5.6.5 (Reading: constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "this\\.x\\s*=\\s*x\\b",
+      "pattern": "\\bconstructor\\s*\\([^)]{0,120}?\\b(\\w+)\\b[^)]{0,120}\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.x\\s*=\\s*\\(?\\s*\\1\\b",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -65,9 +66,10 @@
       "description": "The constructor stores the y argument on this as a property named y. Help: 5.6.5 (Reading: constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "this\\.y\\s*=\\s*y\\b",
+      "pattern": "\\bconstructor\\s*\\([^)]{0,120}?\\b(\\w+)\\b[^)]{0,120}\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.y\\s*=\\s*\\(?\\s*\\1\\b",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -75,9 +77,10 @@
       "description": "The constructor stores the words argument on this as a property named words. Help: 5.6.5 (Reading: constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "this\\.words\\s*=\\s*words\\b",
+      "pattern": "\\bconstructor\\s*\\([^)]{0,120}?\\b(\\w+)\\b[^)]{0,120}\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.words\\s*=\\s*\\(?\\s*\\1\\b",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -87,7 +90,8 @@
       "file": "script.js",
       "pattern": "new\\s+Message\\s*\\([^)]+\\)[\\s\\S]*new\\s+Message\\s*\\([^)]+\\)",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r5",
@@ -97,7 +101,8 @@
       "file": "script.js",
       "pattern": "new\\s+Message\\s*\\(([^)]*)\\)[\\s\\S]*new\\s+Message\\s*\\((?!\\1\\))[^)]*\\)",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

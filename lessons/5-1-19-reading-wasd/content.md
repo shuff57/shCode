@@ -34,10 +34,10 @@ function draw() {
   background('#222');
   box.color = 'gray';
 
-  if (kb.pressing('a'))     box.color = 'tomato';
   if (kb.pressing('left'))  box.color = 'gold';
-  if (kb.pressing('d'))     box.color = 'mediumseagreen';
+  if (kb.pressing('a'))     box.color = 'tomato';
   if (kb.pressing('right')) box.color = 'orchid';
+  if (kb.pressing('d'))     box.color = 'mediumseagreen';
 }
 ```
 

@@ -1,0 +1,470 @@
+{
+ "5-1-7-lab-one-sprite": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  }
+ },
+ "5-1-11-moshion-intro": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  }
+ },
+ "5-1-18-lab-else-to-zero": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "else[\\s{]*player\\.vel\\.x\\s*=\\s*0(?![\\w.])"
+  },
+  "r2": {
+   "ignoreStrings": true,
+   "pattern": "else[\\s{]*player\\.vel\\.y\\s*=\\s*0(?![\\w.])"
+  }
+ },
+ "5-1-20-moshion-move-keys": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true,
+   "pattern": "\\.vel\\.x\\s*=(?!=)"
+  },
+  "r6": {
+   "ignoreStrings": true,
+   "pattern": "\\.vel\\.y\\s*=(?!=)"
+  },
+  "r7": {
+   "ignoreStrings": true
+  }
+ },
+ "5-1-21-a10-1-sprite-playground": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true,
+   "pattern": "else[\\s{]*\\w+\\.vel\\.[xy]\\s*=\\s*0(?![\\w.])"
+  },
+  "r6": {
+   "ignoreStrings": true
+  },
+  "r7": {
+   "ignoreStrings": true
+  },
+  "r8": {
+   "ignoreStrings": true
+  }
+ },
+ "5-1-23-challenges": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  }
+ },
+ "5-3-8-lab-read-property": {
+  "r1": {
+   "ignoreStrings": true
+  }
+ },
+ "5-3-9-lab-write-property": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "b\\s*\\.\\s*color\\s*=(?!=)"
+  },
+  "r2": {
+   "ignoreStrings": true,
+   "pattern": "(?:\\bif\\s*\\([^;{}]*|[=&|?!(]\\s*)kb\\.presses\\b"
+  }
+ },
+ "5-3-10-lab-two-instances": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true,
+   "pattern": "^(?![\\s\\S]*\\bb2\\s*\\.\\s*color\\s*=(?!=))[\\s\\S]*\\bb1\\s*\\.\\s*color\\s*=(?!=)"
+  }
+ },
+ "5-3-13-lab-build-sprite": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true
+  }
+ },
+ "5-3-36-lab-write-constructor": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\bconstructor\\s*\\([^)]*?\\b(\\w+)\\b[^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.x\\s*=\\s*\\(?\\s*\\1\\b"
+  },
+  "r2": {
+   "ignoreStrings": true,
+   "pattern": "\\bconstructor\\s*\\([^)]*?\\b(\\w+)\\b[^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.y\\s*=\\s*\\(?\\s*\\1\\b"
+  },
+  "r3": {
+   "ignoreStrings": true,
+   "pattern": "\\bconstructor\\s*\\([^)]*?\\b(\\w+)\\b[^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.words\\s*=\\s*\\(?\\s*\\1\\b"
+  },
+  "r4": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true
+  }
+ },
+ "5-3-17-lab-method-no-params": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\btick\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.n\\s*(?:\\+=|\\+\\+|=\\s*\\(?\\s*this\\.n\\s*\\+|=\\s*\\(?\\s*1\\s*\\+\\s*this\\.n\\b)|\\+\\+\\s*this\\.n\\b)",
+   "flags": ""
+  }
+ },
+ "5-3-18-lab-method-with-params": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true,
+   "pattern": "\\baddBy\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.n\\s*(?:\\+=\\s*\\(?\\s*(?:Number\\s*\\(\\s*)?\\1\\b|=\\s*\\(?\\s*this\\.n\\s*\\+\\s*\\(?\\s*(?:Number\\s*\\(\\s*)?\\1\\b|=\\s*\\(?\\s*\\1\\s*\\+\\s*this\\.n\\b)"
+  }
+ },
+ "5-3-19-lab-method-returns": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\bisHigh\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:\\breturn\\b[^;{}]*?(?:this\\.n\\s*\\)?\\s*(?:>\\s*\\(?\\s*(?:10|[A-Za-z_$][\\w$]*)|>=\\s*\\(?\\s*11)(?![\\w.])|\\b10\\s*\\)?\\s*<\\s*\\(?\\s*this\\.n\\b|!\\s*\\(\\s*this\\.n\\s*<=\\s*\\(?\\s*10\\b)|\\bif\\s*\\([^;{}]*?(?:this\\.n\\s*\\)?\\s*(?:>\\s*\\(?\\s*(?:10|[A-Za-z_$][\\w$]*)|>=\\s*\\(?\\s*11)(?![\\w.])|\\b10\\s*\\)?\\s*<\\s*\\(?\\s*this\\.n\\b|!\\s*\\(\\s*this\\.n\\s*<=\\s*\\(?\\s*10\\b)[^;{}]*\\)[\\s\\S]*?\\breturn\\b)"
+  }
+ },
+ "5-3-20-lab-method-calls-method": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\bbigStep\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.addBy\\s*\\(\\s*(?:5|\\(\\s*5\\s*\\)|2\\s*\\+\\s*3|[A-Za-z_$][\\w$]*)\\s*\\)(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:\\breturn\\s*\\(?\\s*this\\.isHigh\\s*\\(\\s*\\)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*this\\.isHigh\\s*\\(\\s*\\)\\s*;[\\s\\S]*?\\breturn\\s+\\(?\\s*\\1\\b)"
+  }
+ },
+ "5-3-22-lab-mutate-sprite-prop": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\bmoveRight\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\s*\\.\\s*sprite\\s*\\.\\s*(?:pos\\s*\\.\\s*|position\\s*\\.\\s*)?x\\s*(?:\\+=\\s*\\(?\\s*\\1\\b|=\\s*\\(?\\s*this\\s*\\.\\s*sprite\\s*\\.\\s*(?:pos\\s*\\.\\s*|position\\s*\\.\\s*)?x\\s*\\+\\s*\\(?\\s*\\1\\b|=\\s*\\(?\\s*\\1\\s*\\+\\s*this\\s*\\.\\s*sprite\\s*\\.\\s*(?:pos\\s*\\.\\s*|position\\s*\\.\\s*)?x)"
+  }
+ },
+ "5-3-23-lab-cleanup": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\bpop\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.sprite\\.(?:delete|remove)\\s*\\(\\s*\\)|this\\.(\\w+)\\s*\\(\\s*\\)[\\s\\S]*?\\b\\1\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.sprite\\.(?:delete|remove)\\s*\\(\\s*\\))"
+  }
+ },
+ "5-3-25-lab-three-vars": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  }
+ },
+ "5-3-26-lab-array-of-instances": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "(?:enemies\\.push\\s*\\(\\s*new\\s+Enemy[\\s\\S]*?){5}|for\\s*\\([^)]*\\)\\s*\\{?[^{}]*?enemies\\.push\\s*\\(|\\bwhile\\s*\\([^)]*\\)\\s*\\{[^{}]*?enemies\\.push\\s*\\("
+  }
+ },
+ "5-3-27-lab-loop-instances": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "for\\s*\\([^)]*\\benemies\\b[^)]*\\)[\\s\\S]*?\\brender\\s*\\("
+  },
+  "r2": {
+   "ignoreStrings": true
+  }
+ },
+ "5-3-31-a12-1-collectible": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true
+  }
+ },
+ "5-3-34-challenges": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  }
+ },
+ "5-5-3-lab-move-counter-to-this": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\btick\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.n\\s*(?:\\+=|\\+\\+|=\\s*\\(?\\s*this\\.n\\s*\\+\\s*\\(?\\s*1\\b|=\\s*\\(?\\s*1\\s*\\+\\s*this\\.n\\b)|\\+\\+\\s*this\\.n\\b|\\b(?:let|const|var)\\s+(\\w+)\\s*=\\s*this\\.n\\s*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\b\\1\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*\\1\\s*\\+\\s*1\\b)(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.n\\s*=\\s*\\(?\\s*\\1\\b)"
+  }
+ },
+ "5-5-4-lab-locals-are-private": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\bthis\\.step\\s*=(?!=)"
+  },
+  "r2": {
+   "ignoreStrings": true,
+   "pattern": "\\badd\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.points\\s*(?:\\+=|=\\s*this\\.points\\s*\\+)\\s*this\\.step\\b"
+  },
+  "r3": {
+   "ignoreStrings": true,
+   "pattern": "\\bundo\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.points\\s*(?:-=|=\\s*this\\.points\\s*-)\\s*this\\.step\\b"
+  }
+ },
+ "5-5-8-lab-takehit-floor": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  }
+ },
+ "5-5-9-lab-isalive": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\bisAlive\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:\\breturn\\b[^;{}]*?(?:this\\.hp\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*this\\.hp\\b|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*this\\.hp\\b|!\\s*\\(\\s*this\\.hp\\s*(?:<=\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|===?\\s*\\(?\\s*0(?![\\w.]))\\s*\\))|\\bif\\s*\\([^;{}]*?(?:this\\.hp\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*this\\.hp\\b|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*this\\.hp\\b|!\\s*\\(\\s*this\\.hp\\s*(?:<=\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|===?\\s*\\(?\\s*0(?![\\w.]))\\s*\\))[^;{}]*\\)[\\s\\S]*?\\breturn\\s+true\\b)"
+  },
+  "r2": {
+   "ignoreStrings": true,
+   "pattern": "function\\s+draw\\s*\\([\\s\\S]*?(?:\\bif\\s*\\([^;{}]*|[=?:(&|!]\\s*)[\\w$.\\[\\]]+\\.isAlive\\s*\\(\\s*\\)"
+  }
+ },
+ "5-5-12-lab-write-hit": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\bhit\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\b\\1\\s*\\.\\s*takeHit\\s*\\("
+  },
+  "r2": {
+   "ignoreStrings": true,
+   "pattern": "\\bhit\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:\\b\\1\\s*\\.\\s*takeHit\\s*\\([^)]*this\\.power|\\b(?:const|let|var)\\s+(\\w+)\\s*=\\s*this\\.power\\s*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\b\\1\\s*\\.\\s*takeHit\\s*\\(\\s*\\2\\b)"
+  }
+ },
+ "5-5-13-lab-reap-the-dead": {
+  "r1": {
+   "ignoreStrings": true,
+   "pattern": "\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\(|\\b(?:const|let|var)\\s+\\w+\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,200}?\\benemies\\s*=\\s*\\w+\\b"
+  },
+  "r2": {
+   "ignoreStrings": true,
+   "pattern": "enemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|(?<![\\w.])0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|(?<![\\w.])0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)[\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b"
+  }
+ },
+ "5-5-16-lab-count-spawns": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  }
+ },
+ "5-5-18-lab-wave-spawner": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  }
+ },
+ "5-9-defender-4-lab-fly-and-fire": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true
+  }
+ },
+ "5-9-defender-6-lab-hit-the-drone": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  }
+ },
+ "5-9-defender-7-lab-hold-the-base": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  }
+ },
+ "5-10-defender-2-lab-a-field-of-enemies": {
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true
+  }
+ },
+ "5-10-defender-5-lab-shoot-them-down": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true,
+   "pattern": "\\bif\\s*\\((?=[^{};]{0,200}\\boverlaps\\s*\\()[^{};]{0,200}\\)\\s*\\{(?=(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\bbullets\\s*\\[\\s*\\w+\\s*\\]\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)|\\bbullets\\.splice\\s*\\([^()]*\\)\\s*\\[\\s*0\\s*\\]\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*bullets\\s*\\[\\s*\\w+\\s*\\][^;]*;[\\s\\S]*?\\b\\1\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)))(?=\\s*)(?=(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\bbullets\\.splice\\s*\\()|(?:const|let|var)\\s+(\\w+)\\s*=\\s*bullets\\s*\\[\\s*\\w+\\s*\\][^;]*;[\\s\\S]{0,300}?\\bif\\s*\\((?=[^{};]{0,200}\\boverlaps\\s*\\()[^{};]{0,200}\\)\\s*\\{(?=(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\b\\2\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))(?=\\s*)(?=(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\bbullets\\.splice\\s*\\()"
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true
+  }
+ },
+ "5-10-defender-7-lab-waves": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  }
+ },
+ "5-11-defender-4-lab-enemy-takes-over": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true
+  },
+  "r6": {
+   "ignoreStrings": true
+  }
+ },
+ "5-11-defender-5-lab-bullet": {
+  "r1": {
+   "ignoreStrings": true
+  },
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true
+  },
+  "r6": {
+   "ignoreStrings": true
+  }
+ },
+ "5-11-defender-6-lab-a-spawner-for-the-waves": {
+  "r2": {
+   "ignoreStrings": true
+  },
+  "r3": {
+   "ignoreStrings": true
+  },
+  "r4": {
+   "ignoreStrings": true
+  },
+  "r5": {
+   "ignoreStrings": true
+  }
+ },
+ "5-11-defender-9-challenges-make-it-yours": {
+  "r1": {
+   "ignoreStrings": true
+  }
+ },
+ "5-11-defender-sound-lab-sound-effects": {
+  "r3": {
+   "pattern": "\\btakeHit\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\bif\\s*\\([^;{}]*?(?:\\bhp\\b|\\bisAlive\\b)[^;{}]*\\)\\s*return\\b[^;{}]*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\(|\\bif\\s*\\((?=[^;{}]{0,160}?(?:\\bhp\\b|\\bisAlive\\b))[^;{}]{0,160}\\)\\s*(?:\\{[^{}]{0,400}?|[^;{}]{0,160}?)[\\w$\\])]\\s*\\??\\.\\s*play\\s*\\(",
+   "ignoreStrings": true
+  }
+ }
+}

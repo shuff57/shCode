@@ -16,9 +16,9 @@
     {
       "id": "s1",
       "title": "Keep only the living",
-      "instructions": "`filter` builds a new array from the ones that pass a test; it does not change the old array. Use it to keep the enemies where `isAlive()` is true, and store the result back in `enemies`. Put it after the hit check and before the loop.\n\nPress Space five times: the counter at the bottom should go 3 → 2 → 1 → 0, and each press should hit a living enemy.",
+      "instructions": "`filter` builds a new array from the ones that pass a test; it does not change the old array. Use it to keep the enemies where `isAlive()` is true, and store the result back in `enemies`. Put it after the hit check and before the loop.\n\nPress Space six times. Every enemy starts with 4 hp and each hit takes 2, so it takes two presses to finish one: the counter at the bottom should go 3 → 2 → 1 → 0, dropping on every second press, and each press should hit a living enemy.",
       "hints": [
-        "The shape is in 3.7 (Reading: Array Methods): `enemies = enemies.filter((e) => e.isAlive());`.",
+        "The shape is in 3.7.20 (Worked Example: Chaining `.map()` off a `.push()`-Built Array): `curved.filter((score) => score >= 80)` keeps the scores that pass the test. Here that is `enemies = enemies.filter((e) => e.isAlive());`.",
         "`filter` hands back a new array, so writing `enemies.filter(...)` without `enemies =` throws the result away."
       ]
     }
@@ -27,24 +27,26 @@
     {
       "id": "r1",
       "title": "A filtered list is stored back in enemies",
-      "description": "`filter` is used and its result is assigned back to `enemies`, so the array itself gets shorter. Help: 3.7.19 (Reading: What Else Is Out There)",
+      "description": "`filter` is used and its result is assigned back to `enemies`, so the array itself gets shorter. Help: 3.7.20 (Worked Example: Chaining `.map()` off a `.push()`-Built Array)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "enemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\(",
+      "pattern": "\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\(|\\b(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
       "title": "The test keeps the enemies that are still alive",
-      "description": "The filter keeps the living — it asks each enemy `isAlive()`, or compares its health. Help: 3.7.19 (Reading: What Else Is Out There)",
+      "description": "The filter keeps the living — it asks each enemy `isAlive()`, or compares its health. Help: 3.7.20 (Worked Example: Chaining `.map()` off a `.push()`-Built Array)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "enemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,80}?(?:isAlive\\s*\\(\\s*\\)|hp\\s*>\\s*0)",
+      "pattern": "\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\((?:[^()]|\\([^()]*\\)|\\()*?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|[^\\w.]0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)|\\b(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\((?:[^()]|\\([^()]*\\)|\\()*?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|[^\\w.]0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)[\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

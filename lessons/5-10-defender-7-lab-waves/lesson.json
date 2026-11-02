@@ -51,7 +51,8 @@
       "pattern": "^(?=[\\s\\S]*\\bwave\\s*=\\s*\\(?\\s*0\\b)(?=[\\s\\S]*\\bwavePause\\s*=\\s*\\(?\\s*(?:\\d|(?!(?:wavePause|undefined|null|false|NaN)\\b)[A-Za-z_$][\\w$]*))",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -95,7 +96,8 @@
       "pattern": "^(?=[\\s\\S]*(?:\\bwave\\s*(?:\\+=\\s*\\(?\\s*1\\b|\\+\\+)|\\+\\+\\s*wave\\b|\\bwave\\s*=\\s*\\(?\\s*wave\\s*\\+\\s*\\(?\\s*1\\b|\\bwave\\s*=\\s*\\(?\\s*1\\s*\\+\\s*wave\\b))(?=[\\s\\S]*(?:for|while)\\s*\\([\\s\\S]*?spawnEnemy\\s*\\()",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

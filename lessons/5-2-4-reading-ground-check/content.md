@@ -5,7 +5,7 @@
 **What you'll learn from it:**
 
 - `sprite.colliding(other)` returns true while two sprites are touching.
-- `kb.presses(key)` fires once per press (edge-triggered), where `kb.pressing(key)` (5.1) fires every frame the key is held (level-triggered).
+- `kb.presses(key)` fires once per press (edge-triggered), where `kb.pressing(key)` (5.1) fires every frame the key is held (level-triggered). Edge-triggered means a check is true only on the one frame something changes (the key going down); level-triggered means it stays true for every frame the state lasts (the key staying down).
 - A jump needs both a press check and a ground check together, or the player jumps endlessly in mid-air.
 
 **Try it:**

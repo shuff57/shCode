@@ -49,7 +49,7 @@ function draw() {
 
 **What you'll see:** a blue square on the left and an orange square on the right. Each box holds its own `color` value: changing one won't touch the other.
 
-**Try this:** add a third property `this.size = 40` to the constructor. Then in `draw`, change `b2.size` to `80` after the canvas is created and observe that only the right square grows. One property, two instances, two independent values.
+**Try this:** the constructor already gives every box a second property, `this.size = 40`, and `draw()` uses it for each square's size. In `setup()`, after `b2 = new Box('orange');`, add the line `b2.size = 80;` and rerun: only the right square grows. One property name, two instances, two independent values.
 
 ---
 

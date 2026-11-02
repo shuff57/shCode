@@ -58,7 +58,8 @@
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -68,7 +69,8 @@
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\([\\s\\S]*?new\\s+Sprite\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -108,9 +110,10 @@
         "update"
       ],
       "file": "script.js",
-      "pattern": "else[\\s{]*\\w+\\.vel\\.[xy]\\s*=\\s*0",
+      "pattern": "else[\\s{]*\\w+\\.vel\\.[xy]\\s*=\\s*0(?![\\w.])",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r6",
@@ -124,7 +127,8 @@
       "file": "script.js",
       "pattern": "\\bframeCount\\b",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r7",
@@ -135,7 +139,8 @@
       "file": "script.js",
       "pattern": "\\btext\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r8",
@@ -146,7 +151,8 @@
       "file": "script.js",
       "pattern": "background\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

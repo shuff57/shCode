@@ -29,10 +29,11 @@
       "description": "Write a `pop()` method inside `Bubble` that calls `this.sprite.delete()` to remove the wrapped sprite. Help: 5.2.15 (Cleanup and Delete)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "pop[\\s\\S]*this\\.sprite\\.delete\\s*\\(\\s*\\)",
+      "pattern": "\\bpop\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.sprite\\.(?:delete|remove)\\s*\\(\\s*\\)|this\\.(\\w+)\\s*\\(\\s*\\)[\\s\\S]*?\\b\\1\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.sprite\\.(?:delete|remove)\\s*\\(\\s*\\))",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

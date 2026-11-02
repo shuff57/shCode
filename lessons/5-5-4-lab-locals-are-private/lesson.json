@@ -45,10 +45,11 @@
       "description": "The constructor stores the step as a property, so both methods can read the same number. Help: 5.8.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "this\\.step\\s*=",
+      "pattern": "\\bthis\\.step\\s*=(?!=)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -56,10 +57,11 @@
       "description": "`add()` adds the stored step rather than a local of its own. Help: 5.8.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "add\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?this\\.points\\s*(?:\\+=|=\\s*this\\.points\\s*\\+)\\s*this\\.step",
+      "pattern": "\\badd\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.points\\s*(?:\\+=\\s*\\(?\\s*this\\.step\\b|=\\s*\\(?\\s*this\\.points\\s*\\+\\s*\\(?\\s*this\\.step\\b|=\\s*\\(?\\s*this\\.step\\s*\\+\\s*this\\.points\\b)|\\b(?:let|const|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*this\\.step\\s*\\)?\\s*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.points\\s*(?:\\+=\\s*\\(?\\s*\\1\\b|=\\s*\\(?\\s*this\\.points\\s*\\+\\s*\\(?\\s*\\1\\b|=\\s*\\(?\\s*\\1\\s*\\+\\s*this\\.points\\b))",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -67,10 +69,11 @@
       "description": "`undo()` subtracts the stored step, so the two methods cannot drift apart. Help: 5.8.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "undo\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?this\\.points\\s*(?:-=|=\\s*this\\.points\\s*-)\\s*this\\.step",
+      "pattern": "\\bundo\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.points\\s*(?:-=\\s*\\(?\\s*this\\.step\\b|=\\s*\\(?\\s*this\\.points\\s*-\\s*\\(?\\s*this\\.step\\b)|\\b(?:let|const|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*this\\.step\\s*\\)?\\s*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.points\\s*(?:-=\\s*\\(?\\s*\\1\\b|=\\s*\\(?\\s*this\\.points\\s*-\\s*\\(?\\s*\\1\\b))",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

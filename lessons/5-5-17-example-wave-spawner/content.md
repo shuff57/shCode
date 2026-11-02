@@ -6,7 +6,7 @@
 
 ## Step 1: A timer that makes enemies
 
-`frameCount` (5.1.14) already counts frames for you. `frameCount % 90 === 0` is true on frame 90, 180, 270 — once every one and a half seconds.
+`frameCount` (5.2.1) already counts frames for you. `frameCount % 90 === 0` is true on frame 90, 180, 270 — once every one and a half seconds.
 
 ```js live
 class Enemy {

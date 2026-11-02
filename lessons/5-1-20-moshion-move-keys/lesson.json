@@ -56,7 +56,8 @@
       "pattern": "new\\s+Canvas\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -67,7 +68,8 @@
       "pattern": "new\\s+Sprite\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r3",
@@ -100,10 +102,11 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "\\.vel\\.x\\s*=",
+      "pattern": "\\.vel\\.x\\s*=(?!=)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r6",
@@ -112,10 +115,11 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "\\.vel\\.y\\s*=",
+      "pattern": "\\.vel\\.y\\s*=(?!=)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r7",
@@ -127,7 +131,8 @@
       "pattern": "background\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

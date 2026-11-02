@@ -133,7 +133,7 @@ function drawTop() {
 **Try this:**
 
 1. In `hitDrone()`, delete the line `resetDrone();`. The drone keeps falling after a hit. Each shot that reaches it still adds 1 and vanishes, because the shot leaves on the frame it hits.
-2. Now also delete the two lines that remove the shot, `bullets[i].delete();` and `bullets.splice(i, 1);`. Fire one single shot at the drone: it passes straight through, and the score jumps by about 4, once for every frame the two overlap.
+2. Now also delete the two lines that remove the shot, `bullets[i].delete();` and `bullets.splice(i, 1);`. Fire one single shot at the drone: it passes straight through, and the score jumps by about 5, once for every frame the two overlap.
 3. Put all three lines back and change `overlaps` to `colliding`. Nothing ever scores: neither sprite has a body for `colliding()` to feel.
 
 ---

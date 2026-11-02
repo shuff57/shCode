@@ -1,7 +1,7 @@
 {
   "id": "5-1-18-lab-else-to-zero",
   "title": "5.1.19 Lab: Delete the else, watch drift",
-  "description": "Start from a working WASD movement pattern, delete the two else lines, observe drift, then restore them.",
+  "description": "Start from a working WASD movement pattern, delete the two else lines and watch the sprite drift, then restore them and set a speed of your own.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Run as-is and confirm movement stops",
-      "instructions": "Click Run (or the preview area). Hold a WASD key: the sprite moves. Release: it stops. Confirm the else-to-zero rule is working.",
+      "instructions": "Click Run, then click the preview so it gets your keys. Hold a WASD key: the sprite moves. Release it: the sprite stops. That stop is the else-to-zero rule from 5.1.18 at work: each chain ends in an `else` line that sets the velocity back to 0.",
       "hints": [
         "Open the moSHion docs drawer on the right and find the Sprite velocity section."
       ]
@@ -38,10 +38,11 @@
     },
     {
       "id": "s4",
-      "title": "Restore the else lines",
-      "instructions": "Put both else lines back so the sprite stops when no key is held. The grader checks that both `else player.vel.x = 0` and `else player.vel.y = 0` are present in draw().",
+      "title": "Restore the else lines, then pick your speed",
+      "instructions": "Put both else lines back (`else player.vel.x = 0;` and `else player.vel.y = 0;`) so the sprite stops when no key is held. Then make the speed your own: change the 4s and the -4s to another speed from 2 to 6, as 5.1.17's Try this did. Run it once more: the sprite moves at your speed and still stops the moment you let go. The grader checks that both else lines are back in draw() and that at least one movement line uses a speed other than 4.",
       "hints": [
-        "Open the moSHion docs drawer on the right and review the velocity section for the correct pattern."
+        "Open the moSHion docs drawer on the right and review the velocity section for the correct pattern.",
+        "Keep the minus sign on the `a` and `w` lines: `player.vel.x = -3;` moves left and `player.vel.x = 3;` moves right."
       ]
     }
   ],
@@ -53,10 +54,11 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "else[\\s{]*player\\.vel\\.x\\s*=\\s*0",
+      "pattern": "else[\\s{]*player\\.vel\\.x\\s*=\\s*0(?![\\w.])",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -65,10 +67,24 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "else[\\s{]*player\\.vel\\.y\\s*=\\s*0",
+      "pattern": "else[\\s{]*player\\.vel\\.y\\s*=\\s*0(?![\\w.])",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "A speed of your own",
+      "description": "At least one movement line in draw() sets player.vel.x or player.vel.y to a speed other than the starter's 4, so the sprite moves at a speed you chose (5.1.17 suggests 2 to 6). Help: 5.1.17 (Movement pattern (if / else if / else))",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "\\bplayer\\.vel\\.[xy]\\s*=(?!=)\\s*(?:-\\s*)?\\(?\\s*(?!(?:4|0)(?![\\w.]))[\\w$]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {
