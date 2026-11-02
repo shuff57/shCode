@@ -5,7 +5,8 @@ let p1, p2, ball;
 const winScore = 5;
 
 function setup() {
-  // STEP 1: Create a canvas (try 600×400) and turn off gravity so sprites glide
+  // STEP 1: Create a canvas (try 600×400) and write world.gravity.y = 0 so a reader
+  //         sees sprites glide (gravity already starts at 0)
 
   // STEP 2: Create two static wall sprites along the top and bottom edges
 
