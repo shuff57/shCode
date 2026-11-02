@@ -1,0 +1,108 @@
+{
+  "id": "5-10-defender-7-lab-waves",
+  "title": "5.10.7 Lab: Waves",
+  "description": "Enemies stop arriving on a beat and come in waves instead: each wave only after the field is clear and a pause has run out, each one bigger and faster. Write nextWave and spawnWave, and start every round at wave 0.",
+  "type": "lesson",
+  "estimateMins": 18,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.10 Project: Defender, Part B",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "A round starts at wave 0",
+      "instructions": "`spawnOnBeat()` is gone: enemies now come in waves. The top of the screen says `wave: undefined`, running into `base:` beside it, because nothing sets the wave yet. In `startRound()`, set `wave` to 0 and `wavePause` to 60, so every round, the first one and every one after R, starts with a one-second pause before wave 1. Run it: the top should read `wave: 0`.",
+      "hints": [
+        "`wave = 0;` and `wavePause = 60;`, beside the other lines that put a round back.",
+        "`startRound()` is called by `setup()` and by the R key, so one place covers both."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Count down on a clear field",
+      "instructions": "In `nextWave()`, return straight away while any enemies are left. Otherwise count `wavePause` down by 1, and when it reaches 0 call `spawnWave()` and set `wavePause` back to 90. This is 5.10.6's `nextWave()`, word for word.",
+      "hints": [
+        "`if (enemies.length > 0) return;` is the first line.",
+        "The countdown is Part A's cooldown under another name: take 1 off every frame, and act at 0."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Build a wave",
+      "instructions": "In `spawnWave()`, add 1 to `wave` and set `fallSpeed` to `0.5 + wave * 0.25`, so each wave falls a little faster. Then loop `wave + 2` times. On loop number `i` the enemy is tough (3 hp) when `i % 3 === 2` and has 1 hp otherwise; build it with `spawnEnemy(40 + floor(random(8)) * 45, -20 - i * 50, hp)`, which stacks the wave above the top in a staggered line, each at a random spot across the screen. Play to wave 3, then press R in the middle of a wave: the field should empty, `wave:` should read 0, and wave 1 should come again after the pause.",
+      "hints": [
+        "`const hp = i % 3 === 2 ? 3 : 1;` makes every third enemy a tough one.",
+        "`-20 - i * 50` puts each enemy 50 pixels above the one before it, so they come down one after another."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Every round starts at wave 0 with a pause",
+      "description": "startRound sets wave to 0 and gives wavePause a number of frames (a number, or a named constant). Help: 5.10.6 (Worked Example: Waves with a pause)",
+      "type": "inFunction",
+      "function": "startRound",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*\\bwave\\s*=\\s*\\(?\\s*0\\b)(?=[\\s\\S]*\\bwavePause\\s*=\\s*\\(?\\s*(?:\\d|(?!(?:wavePause|undefined|null|false|NaN)\\b)[A-Za-z_$][\\w$]*))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The pause counts down only on a clear field",
+      "description": "nextWave counts wavePause down by 1 only on a clear field: it returns while any enemies are left, as 5.10.6 does (or, as in 5.8.18, starts a wave only when the field is clear on a frameCount beat). Help: 5.10.6 (Worked Example: Waves with a pause)",
+      "type": "inFunction",
+      "function": [
+        "nextWave",
+        "draw"
+      ],
+      "file": "script.js",
+      "pattern": "^(?=(?:[\\s\\S]*?\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*(?:\\(\\s*){0,4}(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:===?\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|<=\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:===?|>=)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?<!!\\s*)!\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)(?!\\s*\\)?\\s*[-+*/%<>=!.\\[(])|!\\s*\\(\\s*(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?:\\benemies\\s*\\.\\s*length\\b))\\s*\\))(?:\\s*\\)){0,4}[ \\t\\r]*(?:;|\\n)|[\\s\\S]*?\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*(?:\\(\\s*){0,4}(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?:\\benemies\\s*\\.\\s*length\\b)(?!\\s*\\)?\\s*[-+*/%<>=!.\\[(])|!\\s*\\(\\s*(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:===?\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|<=\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:===?|>=)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))\\s*\\))(?:\\s*\\)){0,4}[ \\t\\r]*(?:;|\\n))?)(?:(?=[\\s\\S]*(?:\\bwavePause\\s*(?:-=\\s*\\(?\\s*1(?![\\w.])|--)|--\\s*wavePause\\b|\\bwavePause\\s*=\\s*\\(?\\s*wavePause\\s*-\\s*\\(?\\s*1(?![\\w.])))[\\s\\S]*?(?:\\bif\\s*\\(\\s*(?:(?:(?!!\\s*\\()(?!\\bif\\b)[^{};&]){0,80}?\\|\\|\\s*)?(?:\\(\\s*){0,4}(?:(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?:\\benemies\\s*\\.\\s*length\\b)(?!\\s*\\)?\\s*[-+*/%<>=!.\\[(])|!\\s*\\(\\s*(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:===?\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|<=\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:===?|>=)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))\\s*\\))|(?<![\\w$.])(?=[A-Za-z_$])\\2(?![\\w$])|!\\s*(?<![\\w$.])(?=[A-Za-z_$])\\1(?![\\w$]))(?:\\s*\\)){0,4}\\s*(?:\\|\\|(?:(?!!\\s*\\()(?!\\bif\\b)[^{};&]){0,80}?)?\\)\\s*(?:\\{[^{}]*?)?\\breturn\\b[\\s\\S]*?(?:\\bwavePause\\s*(?:-=\\s*\\(?\\s*1(?![\\w.])|--)|--\\s*wavePause\\b|\\bwavePause\\s*=\\s*\\(?\\s*wavePause\\s*-\\s*\\(?\\s*1(?![\\w.]))|\\bif\\s*\\(\\s*(?:(?:(?!!\\s*\\()(?!\\bif\\b)[^{};|]){0,80}?&&\\s*)?(?:\\(\\s*){0,4}(?:(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:===?\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|<=\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:===?|>=)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?<!!\\s*)!\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)(?!\\s*\\)?\\s*[-+*/%<>=!.\\[(])|!\\s*\\(\\s*(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?:\\benemies\\s*\\.\\s*length\\b))\\s*\\))|(?<![\\w$.])(?=[A-Za-z_$])\\1(?![\\w$])|!\\s*(?<![\\w$.])(?=[A-Za-z_$])\\2(?![\\w$]))(?:\\s*\\)){0,4}\\s*(?:&&(?:(?!!\\s*\\()(?!\\bif\\b)[^{};|]){0,80}?)?\\)\\s*(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?)?(?:\\bwavePause\\s*(?:-=\\s*\\(?\\s*1(?![\\w.])|--)|--\\s*wavePause\\b|\\bwavePause\\s*=\\s*\\(?\\s*wavePause\\s*-\\s*\\(?\\s*1(?![\\w.]))|\\bif\\s*\\(\\s*(?:(?:(?!!\\s*\\()(?!\\bif\\b)[^{};&]){0,80}?\\|\\|\\s*)?(?:\\(\\s*){0,4}(?:(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?:\\benemies\\s*\\.\\s*length\\b)(?!\\s*\\)?\\s*[-+*/%<>=!.\\[(])|!\\s*\\(\\s*(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:===?\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|<=\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:===?|>=)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))\\s*\\))|(?<![\\w$.])(?=[A-Za-z_$])\\2(?![\\w$])|!\\s*(?<![\\w$.])(?=[A-Za-z_$])\\1(?![\\w$]))(?:\\s*\\)){0,4}\\s*(?:\\|\\|(?:(?!!\\s*\\()(?!\\bif\\b)[^{};&]){0,80}?)?\\)\\s*(?:\\{[^{}]*\\}|[^{};]*;)\\s*else\\b\\s*(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?)?(?:\\bwavePause\\s*(?:-=\\s*\\(?\\s*1(?![\\w.])|--)|--\\s*wavePause\\b|\\bwavePause\\s*=\\s*\\(?\\s*wavePause\\s*-\\s*\\(?\\s*1(?![\\w.]))|\\bif\\s*\\(\\s*(?:(?:(?!!\\s*\\()(?!\\bif\\b)[^{};|]){0,80}?&&\\s*)?(?:\\(\\s*){0,4}(?:(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:===?\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|<=\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:===?|>=)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?<!!\\s*)!\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)(?!\\s*\\)?\\s*[-+*/%<>=!.\\[(])|!\\s*\\(\\s*(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?:\\benemies\\s*\\.\\s*length\\b))\\s*\\))|(?<![\\w$.])(?=[A-Za-z_$])\\1(?![\\w$])|!\\s*(?<![\\w$.])(?=[A-Za-z_$])\\2(?![\\w$]))(?:\\s*\\)){0,4}\\s*(?:&&(?:(?!!\\s*\\()(?!\\bif\\b)[^{};|]){0,80}?)?\\)\\s*(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?)?\\bnextWave\\s*\\()|[\\s\\S]*?\\bif\\s*\\((?=[^{};]{0,200}\\bframeCount\\s*\\)?\\s*%)\\s*(?:(?:(?!!\\s*\\()(?!\\bif\\b)[^{};|]){0,80}?&&\\s*)?(?:\\(\\s*){0,4}(?:(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:===?\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|<=\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:===?|>=)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?<!!\\s*)!\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)(?!\\s*\\)?\\s*[-+*/%<>=!.\\[(])|!\\s*\\(\\s*(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?:\\benemies\\s*\\.\\s*length\\b))\\s*\\))|(?<![\\w$.])(?=[A-Za-z_$])\\1(?![\\w$])|!\\s*(?<![\\w$.])(?=[A-Za-z_$])\\2(?![\\w$]))(?:\\s*\\)){0,4}\\s*(?:&&(?:(?!!\\s*\\()(?!\\bif\\b)[^{};|]){0,80}?)?\\)\\s*(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?)?\\bspawnWave\\s*\\(\\s*\\))",
+      "ignoreStrings": true,
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "At 0 the next wave comes and the pause starts again",
+      "description": "When wavePause reaches 0, nextWave calls spawnWave() and sets wavePause back to a number above 0 (or a named constant). Help: 5.10.6 (Worked Example: Waves with a pause)",
+      "type": "inFunction",
+      "function": [
+        "nextWave",
+        "draw"
+      ],
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*wavePause\\s*\\)?\\s*(?:<=\\s*\\(?\\s*0|===?\\s*\\(?\\s*0|<\\s*\\(?\\s*1))[\\s\\S]*?if\\s*\\([^{]*\\)\\s*\\{(?=[^}]*spawnWave\\s*\\(\\s*\\))(?=[^}]*\\bwavePause\\s*=\\s*\\(?\\s*(?:[1-9]|(?!(?:wavePause|undefined|null|false|NaN)\\b)[A-Za-z_$][\\w$]*))|^(?=(?:[\\s\\S]*?\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*(?:\\(\\s*){0,4}(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:===?\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|<=\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:===?|>=)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?<!!\\s*)!\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)(?!\\s*\\)?\\s*[-+*/%<>=!.\\[(])|!\\s*\\(\\s*(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?:\\benemies\\s*\\.\\s*length\\b))\\s*\\))(?:\\s*\\)){0,4}[ \\t\\r]*(?:;|\\n)|[\\s\\S]*?\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*(?:\\(\\s*){0,4}(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?:\\benemies\\s*\\.\\s*length\\b)(?!\\s*\\)?\\s*[-+*/%<>=!.\\[(])|!\\s*\\(\\s*(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:===?\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|<=\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:===?|>=)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))\\s*\\))(?:\\s*\\)){0,4}[ \\t\\r]*(?:;|\\n))?)[\\s\\S]*?\\bif\\s*\\((?=[^{};]{0,200}\\bframeCount\\s*\\)?\\s*%)\\s*(?:(?:(?!!\\s*\\()(?!\\bif\\b)[^{};|]){0,80}?&&\\s*)?(?:\\(\\s*){0,4}(?:(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:===?\\s*\\(?\\s*0(?![\\w.])|<\\s*\\(?\\s*1(?![\\w.])|<=\\s*\\(?\\s*0(?![\\w.]))|\\b0\\s*\\)?\\s*(?:===?|>=)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*>\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?<!!\\s*)!\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)(?!\\s*\\)?\\s*[-+*/%<>=!.\\[(])|!\\s*\\(\\s*(?:(?:(?:\\benemies\\s*\\.\\s*length\\b)\\s*\\)?\\s*(?:>\\s*\\(?\\s*0(?![\\w.])|!==?\\s*\\(?\\s*0(?![\\w.])|>=\\s*\\(?\\s*1(?![\\w.]))|\\b0\\s*\\)?\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b)|\\b1\\s*\\)?\\s*<=\\s*\\(?\\s*(?:\\benemies\\s*\\.\\s*length\\b))|(?:\\benemies\\s*\\.\\s*length\\b))\\s*\\))|(?<![\\w$.])(?=[A-Za-z_$])\\1(?![\\w$])|!\\s*(?<![\\w$.])(?=[A-Za-z_$])\\2(?![\\w$]))(?:\\s*\\)){0,4}\\s*(?:&&(?:(?!!\\s*\\()(?!\\bif\\b)[^{};|]){0,80}?)?\\)\\s*(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?)?\\bspawnWave\\s*\\(\\s*\\)",
+      "ignoreStrings": true,
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "A wave adds 1 to the wave number and builds its enemies in a loop",
+      "description": "spawnWave adds 1 to wave and calls spawnEnemy inside a loop. Help: 5.10.6 (Worked Example: Waves with a pause)",
+      "type": "inFunction",
+      "function": "spawnWave",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*(?:\\bwave\\s*(?:\\+=\\s*\\(?\\s*1\\b|\\+\\+)|\\+\\+\\s*wave\\b|\\bwave\\s*=\\s*\\(?\\s*wave\\s*\\+\\s*\\(?\\s*1\\b|\\bwave\\s*=\\s*\\(?\\s*1\\s*\\+\\s*wave\\b))(?=[\\s\\S]*(?:for|while)\\s*\\([\\s\\S]*?spawnEnemy\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,4 +1,4 @@
-// 5.2.5 Lab: Add a Jump: gate a jump on a key press and a ground check.
+// 5.2.10 Lab: Add a Jump: gate a jump on a key press and a ground check.
 
 let player, ground;
 
@@ -21,6 +21,6 @@ function draw() {
   else                        player.vel.x = 0;
 
   if (kb.presses(' ') && player.colliding(ground)) {
-    player.vel.y = -8;
+    player.vel.y = -7;
   }
 }

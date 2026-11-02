@@ -1,0 +1,51 @@
+{
+  "id": "5-4-flappy-9-challenges-make-it-yours",
+  "title": "5.4.11 Challenges: Make it yours",
+  "description": "The game is complete. Change one rule of your own: a narrower gap, pipes that speed up with the score, a best score that survives a crash, or a wobbling gap. Pick one; add an idea of your own on top if you like.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.4 Project: Flappy",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a rule and change it",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from your finished 5.4.8.\n\n**Challenge 1: harder as you go (easy).** Make the pipes faster, or the gap narrower, as the score grows. The rule reads the score, so it can live in `makePipe()` or in the loop.\n\n**Challenge 2: your best score (medium).** A restart wipes the score, which is right. Keep a second variable that is *not* reset when R is pressed, update it when the score beats it, and show it beside the current score in `drawTop()`.\n\n**Challenge 3: a wobbling gap (hard).** Give each pipe a little up-and-down wobble of its own, using `random` for how fast it wobbles: for example, a small `vel.y` from `random`, turned the other way on a beat. The top and bottom halves must move together, by the same amount, or the gap stops being a gap.",
+      "hints": [
+        "Whatever you pick, press R afterwards and check the game still starts cleanly."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Name what you changed",
+      "instructions": "At the top of `script.js`, write one sentence as a `//` comment saying what your rule is and what would happen if you removed it.",
+      "hints": [
+        "A rule is something the game decides. 'The gap shrinks every five points' is a rule; 'I changed a colour' is not."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Your rule is in the code",
+      "description": "One of the three challenges is there: something depends on the score (harder as you go, or a best score), or a wobble made with random moves the pipes up and down. Help: 5.4.7 (Lab: Score a gap) and 5.4.6 (Lab: Pipes that come and go)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "score\\s*[*/%<>]|[*/%<>]\\s*score\\b|\\bmin\\s*\\(|\\bmax\\s*\\(|(?<![\\w$])([A-Za-z_$][\\w$]*)\\s*=\\s*\\(?\\s*random\\s*\\([\\s\\S]*?(?<!bird)\\.(?:vel\\.)?y\\s*[+-]?=(?!=)[^;\\n]*?(?<![\\w$])\\1\\b|(?<!bird)\\.(?:vel\\.)?y\\s*[+-]?=(?!=)[^;\\n]*?\\brandom\\s*\\(|(?<![\\w$.])(?!score\\b)[A-Za-z_$][\\w$]*(?:\\.[\\w$]+)*\\s*=(?!=)[^;\\n]*\\bscore\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

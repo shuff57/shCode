@@ -1,4 +1,4 @@
-// 5.2.13 A5.2.1 Pinball Scene: gravity, obstacles, a bouncy ball, a reset key.
+// 5.2.18 A5.2.1 Pinball Scene: gravity, obstacles, a bouncy ball, a reset key.
 
 let ball;
 
@@ -14,8 +14,8 @@ function setup() {
   bumperMid.color = 'sienna';
   bumperMid.rotation = 20;
 
-  const floor = new Sprite(200, 380, 400, 20, 'static');
-  floor.color = 'gray';
+  const ground = new Sprite(200, 380, 400, 20, 'static');
+  ground.color = 'gray';
 
   ball = new Sprite(200, 40, 24);
   ball.color = 'deepskyblue';

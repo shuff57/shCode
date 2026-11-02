@@ -1,17 +1,18 @@
 ## Gravity
 
-**Read before `5.2.3 Lab: Tune Gravity`.**
+**Read before `5.2.8 Lab: Tune Gravity`.**
 
 **What you'll learn from it:**
 
 - `world.gravity.y` is a per-world setting, not a per-sprite one: one number affects every dynamic sprite in the scene.
-- Positive values pull down, `0` turns gravity off, negative values pull up.
+- Gravity starts at `0`. A sprite does not fall until you set `world.gravity.y`: that is why no sprite in 5.1 ever fell.
+- Positive values pull down, `0` means no gravity, negative values pull up.
 - A `dynamic` sprite (the default) is affected by gravity and forces. A `static` sprite is immovable: that's why `ground` is `static` and `player` isn't.
 
 **Try it:**
 
-```js live
-let ball, floor;
+```js live console
+let ball, ground;
 
 function setup() {
   new Canvas(360, 300);
@@ -20,8 +21,8 @@ function setup() {
   ball = new Sprite(180, 60, 30, 30);
   ball.color = 'deepskyblue';
 
-  floor = new Sprite(180, 280, 360, 20, 'static');
-  floor.color = 'gray';
+  ground = new Sprite(180, 280, 360, 20, 'static');
+  ground.color = 'gray';
 }
 
 function draw() {
@@ -32,7 +33,7 @@ function draw() {
 }
 ```
 
-Run it and watch `ball.y` climb every second as the ball falls. Then change `world.gravity.y = 10` to `world.gravity.y = 0` and rerun: the ball just floats. Try `-5` next: it drifts upward instead.
+Run it and read the console under the canvas: once a second it prints `ball.y`. The number grows while the ball falls (a bigger `y` is further down), then stops changing once the ball lands on the ground. Then change `world.gravity.y = 10` to `world.gravity.y = 0` and rerun: the ball just floats. Deleting the line does the same, because the world starts at `0`. Try `-5` next: it drifts upward instead.
 
 ---
 

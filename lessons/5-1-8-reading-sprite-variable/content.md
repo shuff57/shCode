@@ -14,7 +14,7 @@ Once a sprite exists you'll want to move it, recolor it, or read its position. T
 
 - Declare the variable (`let player;`) at the **top of the file**, outside both functions.
 - Assign the sprite (`player = new Sprite(...)`) inside `setup()`, which runs exactly once.
-- If you call `new Sprite(...)` inside `draw()`, you create a brand-new sprite **every frame**: 60 per second, and they pile up invisibly.
+- If you call `new Sprite(...)` inside `draw()`, you create a brand-new sprite **every frame**: 60 per second, and they push each other apart into a growing crowd of squares.
 - A file-scope `let` is visible inside both `setup()` and `draw()`, so you can reference the same sprite in both places.
 
 **Try it:**
@@ -32,7 +32,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** the canvas looks fine at first, but the engine creates a new sprite on every frame. Switch to this corrected version:
+**What you'll see:** a square in the middle, then more and more squares crowding out around it, because the engine creates a new sprite on every frame. Switch to this corrected version:
 
 ```js live
 let player;

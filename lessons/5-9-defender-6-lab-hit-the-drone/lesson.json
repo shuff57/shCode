@@ -1,0 +1,92 @@
+{
+  "id": "5-9-defender-6-lab-hit-the-drone",
+  "title": "5.9.6 Lab: Hit the drone",
+  "description": "Shots fly straight through the falling drone. Use overlaps() so a shot that touches it scores, leaves the screen and the array, and sends the drone back to the top.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.9 Project: Defender, Part A",
+  "preview": "moshion",
+  "week": 14,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "The shot that hits leaves",
+      "instructions": "The drone falls from the top, and the starter sends it back up when it reaches the base. Your work is all in `hitDrone()`, which already loops backwards over `bullets`. Inside the loop, test `bullets[i].overlaps(drone)`. When it is true, delete the shot and splice it out of `bullets` on that same frame: `overlaps()` stays true on every frame the two touch, so a shot left in place would keep hitting.",
+      "hints": [
+        "`if (bullets[i].overlaps(drone)) { ... }`",
+        "Inside the braces: `bullets[i].delete();` then `bullets.splice(i, 1);`, the same two lines `moveBullets()` uses."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A hit scores and resets the drone",
+      "instructions": "In the same if, add 1 to `score` and call `resetDrone()`, which puts the drone back above the top at a random x. Play: each shot that lands should add exactly 1, and the drone should jump straight back to the top.",
+      "hints": [
+        "`score += 1;` and `resetDrone();` go after the splice, inside the same braces.",
+        "If the score climbs while nothing is touching the drone, `score += 1` has ended up outside the if."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "overlaps is used on the drone",
+      "description": "Each shot asks overlaps(drone) on every frame. Help: 5.9.5 (Reading: Did the shot hit?)",
+      "type": "inFunction",
+      "function": [
+        "hitDrone",
+        "moveBullets",
+        "draw"
+      ],
+      "file": "script.js",
+      "pattern": "\\.\\s*overlaps\\s*\\(\\s*(?:\\(\\s*)?drone\\s*(?:\\)\\s*)?\\)|\\bdrone\\s*\\.\\s*overlaps\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The shot that hit leaves the screen and the array",
+      "description": "Inside the overlaps if, the shot is deleted and spliced out of bullets on the frame it hits. Help: 5.9.5 (Reading: Did the shot hit?)",
+      "type": "inFunction",
+      "function": [
+        "hitDrone",
+        "moveBullets",
+        "draw"
+      ],
+      "file": "script.js",
+      "pattern": "if\\s*\\((?=[^{};]{0,200}overlaps\\s*\\()[^{};]{0,200}\\)\\s*\\{(?=(?:[^{}]|\\{[^{}]*\\})*?\\.(?:delete|remove)\\s*\\(\\s*\\))(?=(?:[^{}]|\\{[^{}]*\\})*?bullets\\s*\\.\\s*splice\\s*\\()|(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}overlaps\\s*\\()[^;]{0,200}?[;\\n][\\s\\S]{0,300}?if\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\1\\b)[^{};]{0,200}\\)\\s*\\{(?=(?:[^{}]|\\{[^{}]*\\})*?\\.(?:delete|remove)\\s*\\(\\s*\\))(?=(?:[^{}]|\\{[^{}]*\\})*?bullets\\s*\\.\\s*splice\\s*\\()|if\\s*\\((?=[^{};]{0,200}overlaps\\s*\\()[^{};]{0,200}\\)\\s*bullets\\s*\\.\\s*splice\\s*\\([^;{}]{0,80}\\)\\s*\\[\\s*0\\s*\\]\\s*\\.(?:delete|remove)\\s*\\(\\s*\\)|^(?=[\\s\\S]*?if\\s*\\((?=[^{};]{0,200}overlaps\\s*\\()[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)\\.(?:delete|remove)\\s*\\(\\s*\\))(?=[\\s\\S]*\\bbullets\\s*=\\s*bullets\\s*\\.\\s*filter\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "A hit scores 1 and resets the drone",
+      "description": "Inside the same if, score goes up by 1 and the drone goes back to the top. Help: 5.9.5 (Reading: Did the shot hit?)",
+      "type": "inFunction",
+      "function": [
+        "hitDrone",
+        "moveBullets",
+        "draw"
+      ],
+      "file": "script.js",
+      "pattern": "if\\s*\\((?=[^{};]{0,200}overlaps\\s*\\()[^{};]{0,200}\\)\\s*\\{(?=(?:[^{}]|\\{[^{}]*\\})*?(?:\\bscore\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\+\\+\\s*score\\b|\\bscore\\s*=(?!=)\\s*(?:\\(\\s*)?(?:score\\s*\\+\\s*1|1\\s*\\+\\s*score)\\b))(?=(?:[^{}]|\\{[^{}]*\\})*?(?:resetDrone\\s*\\(\\s*\\)|\\bdrone\\s*\\.\\s*(?:pos\\s*\\.\\s*)?y\\s*(?:=(?!=)|[-+]=)))|(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}overlaps\\s*\\()[^;]{0,200}?[;\\n][\\s\\S]{0,300}?if\\s*\\((?=(?:[^{};]{0,199}[^\\w$.{};])?\\1\\b)[^{};]{0,200}\\)\\s*\\{(?=(?:[^{}]|\\{[^{}]*\\})*?(?:\\bscore\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\+\\+\\s*score\\b|\\bscore\\s*=(?!=)\\s*(?:\\(\\s*)?(?:score\\s*\\+\\s*1|1\\s*\\+\\s*score)\\b))(?=(?:[^{}]|\\{[^{}]*\\})*?(?:resetDrone\\s*\\(\\s*\\)|\\bdrone\\s*\\.\\s*(?:pos\\s*\\.\\s*)?y\\s*(?:=(?!=)|[-+]=)))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

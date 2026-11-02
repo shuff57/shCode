@@ -1,6 +1,6 @@
 ## Sprite: new Sprite(x, y, w, h)
 
-Read before `5.1.7 Lab: Drop one sprite, change its color`. About 5 minutes.
+Read before `5.1.7 Exploration: Move, resize and recolor a sprite`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

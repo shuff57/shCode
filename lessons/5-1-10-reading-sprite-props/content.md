@@ -1,6 +1,6 @@
 ## Sprite property tour: pos, rotation, layer
 
-Read before `5.1.4 Worked Example: Minimum Sprite Program`. About 5 minutes.
+Read before `5.1.11 Hello Sprite`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -56,4 +56,4 @@ function draw() {
 | **`rotation`** | Clockwise tilt in degrees. `0` = upright; `90` = top edge points right. |
 | **`layer`** | Draw-order index. Higher value = drawn in front of lower-value sprites. |
 
-*"One more sprite property exists: `vel`, but it deserves its own reading. You'll meet it in 5.1.15."*
+*"One more sprite property exists: `vel`, but it deserves its own reading. You'll meet it in 5.1.16."*

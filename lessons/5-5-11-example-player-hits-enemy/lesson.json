@@ -1,0 +1,23 @@
+{
+  "id": "5-5-11-example-player-hits-enemy",
+  "title": "5.8.11 Worked Example: player.hit(enemy)",
+  "description": "The scene hits the enemy directly, then a Player class takes over with `hit(other)` calling `other.takeHit(this.power)`. Changing the player's power then changes the fight without touching Enemy.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.8 Inside a Class",
+  "preview": "example",
+  "week": 14,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

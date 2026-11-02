@@ -1,16 +1,16 @@
 ## Ground-Gated Actions
 
-**Read before `5.2.5 Lab: Add a Jump`.**
+**Read before `5.2.10 Lab: Add a Jump`.**
 
 **What you'll learn from it:**
 
 - `sprite.colliding(other)` returns true while two sprites are touching.
-- `kb.presses(key)` fires once per press (edge-triggered), where `kb.pressing(key)` (5.1) fires every frame the key is held (level-triggered).
+- `kb.presses(key)` fires once per press (edge-triggered), where `kb.pressing(key)` (5.1) fires every frame the key is held (level-triggered). Edge-triggered means a check is true only on the one frame something changes (the key going down); level-triggered means it stays true for every frame the state lasts (the key staying down).
 - A jump needs both a press check and a ground check together, or the player jumps endlessly in mid-air.
 
 **Try it:**
 
-```js live
+```js live console
 let player, ground;
 
 function setup() {
@@ -36,7 +36,7 @@ function draw() {
 }
 ```
 
-Run it. `touching` prints every frame the player rests on the ground. Now hold the space bar down: `space pressed once` prints only on the very first frame of the press, not the whole time you hold it.
+Run it and read the console under the canvas. `touching` prints every frame the player rests on the ground. Now hold the space bar down: `space pressed once` prints only on the very first frame of the press, not the whole time you hold it.
 
 ---
 

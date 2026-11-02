@@ -1,13 +1,13 @@
 {
   "id": "5-3-27-lab-loop-instances",
-  "title": "5.4.13 Lab: Loop over an array of instances",
+  "title": "5.7.14 Lab: Loop over an array of instances",
   "description": "Write a `for...of` loop in `draw()` that calls `.render()` on each enemy: dispatching a method to every element in the array with one loop.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Writing Your Own Classes",
+  "unit": "5.7 Writing Your Own Classes",
   "preview": "moshion",
-  "week": 12,
+  "week": 13,
   "slos": [
     "SLO-2",
     "SLO-3"
@@ -26,26 +26,28 @@
     {
       "id": "r1",
       "title": "for loop over enemies in draw()",
-      "description": "Write a `for...of` (or `for` index) loop over the `enemies` array inside `draw()`. Help: 5.4.1 (Methods: functions that live on a class)",
+      "description": "Write a `for...of` (or `for` index) loop over the `enemies` array inside `draw()`. Help: 3.3.5 (Looping Over Arrays)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "for\\s*\\(",
+      "pattern": "for\\s*\\([^)]*\\benemies\\b[^)]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{)*?|[^{};]*?)\\brender\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
       "title": "Method called on loop variable",
-      "description": "Inside the loop body, call a method on the loop variable (e.g. `e.render()`). Help: 5.4.1 (Methods: functions that live on a class)",
+      "description": "Inside the loop body, call a method on the loop variable (e.g. `e.render()`). Help: 3.3.5 (Looping Over Arrays) and 5.7.1 (Methods: functions that live on a class)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
       "pattern": "(?:\\w|\\])\\.render\\s*\\(\\s*\\)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

@@ -1,49 +1,54 @@
-## WASD-not-arrows
+## Key names: WASD and the arrow keys
 
-Read before `5.1.14 Worked Example: Keyboard Movement`. About 5 minutes.
+Read before `5.1.15 Worked Example: Keyboard Movement`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
-- Why do arrow keys cause problems in the in-app editor?
-- How do you swap arrow keys for WASD in the movement pattern?
-- Are `'a'`/`'d'`/`'w'`/`'s'` and `'left'`/`'right'`/`'up'`/`'down'` interchangeable everywhere?
+- What goes inside the parentheses of `kb.pressing(...)` to pick a letter key? To pick an arrow key?
+- Which four letter keys do games usually use for left, right, up and down?
+- Do you have to choose one set of keys for a whole program?
 
-The movement pattern you've been practicing works with any key names `kb.pressing` accepts. This reading explains the one rule you follow for **graded labs**: use WASD, not the arrow keys.
+You already know that `kb.pressing('w')` is `true` while the **w** key is held. The text inside the quotes is a **key name**, and it decides which key the line is listening to. There are two sets of key names you will use to move things.
 
 **What you'll learn from it:**
 
-- In some browsers, the arrow keys also scroll the page or the editor's iframe while you're playing.
-- That makes the canvas jump around while you try to control your sprite: a bad experience during graded work.
-- WASD (`'a'`, `'d'`, `'w'`, `'s'`) does not trigger browser scroll, so the canvas stays put.
-- The movement pattern is identical, only the key name strings change.
+- A letter key is named by its letter, in lowercase, inside quotes: `'a'`, `'d'`, `'w'`, `'s'`.
+- An arrow key is named by a word: `'left'`, `'right'`, `'up'`, `'down'`.
+- Many games use the four letters **WASD** for movement because they sit under one hand: `'a'` is left, `'d'` is right, `'w'` is up, and `'s'` is down.
+- Both sets work anywhere `kb.pressing(...)` works. The rest of the code stays exactly the same; only the key name changes. In this module's labs, either set is accepted.
+- The sketch only hears your keys after you click on it, so click the canvas before you press anything.
 
 **Try it:**
 
+Each key below turns the square a different color, so you can see which one you pressed. When no key is held, the square goes back to gray, because `draw()` runs again every frame.
+
 ```js live
-let player;
+let box;
 
 function setup() {
-  new Canvas(360, 360);
-  player = new Sprite(180, 180, 40, 40);
-  player.color = 'mediumseagreen';
+  new Canvas(360, 200);
+  box = new Sprite(180, 100, 80, 80);
 }
 
 function draw() {
   background('#222');
+  box.color = 'gray';
 
-  if      (kb.pressing('a')) player.vel.x = -4;
-  else if (kb.pressing('d')) player.vel.x =  4;
-  else                       player.vel.x =  0;
-
-  if      (kb.pressing('w')) player.vel.y = -4;
-  else if (kb.pressing('s')) player.vel.y =  4;
-  else                       player.vel.y =  0;
+  if (kb.pressing('left'))  box.color = 'gold';
+  if (kb.pressing('a'))     box.color = 'tomato';
+  if (kb.pressing('right')) box.color = 'orchid';
+  if (kb.pressing('d'))     box.color = 'mediumseagreen';
 }
 ```
 
-**What you'll see:** the same 4-direction movement you practiced before. Click the preview area to focus it, then use A/D/W/S to move. The page does not scroll.
+**What you'll see:** a gray square. Click the canvas, then hold **a**, **left**, **d** or **right**. Each one gives its own color.
 
-**Try this:** replace `'a'` with `'left'` and `'d'` with `'right'`. Run it and try to use the arrow keys. Notice the page or editor frame may scroll. Switch back to WASD.
+**Try this:**
+
+1. Hold **a**, then let go and hold the **left arrow**. Both name the "left" direction, but they are different keys, so each has its own line.
+2. Change `'a'` to `'w'` and `'left'` to `'up'`. Rerun, click the canvas, and check that **w** and the **up arrow** now change the color.
+3. Change `'d'` to `'s'` and `'right'` to `'down'`. Rerun and check **s** and the **down arrow**.
+4. Hold two keys at once. The color of the line written **lowest** wins, because the lines run from top to bottom and the last one to change the color has the final say.
 
 ---
 
@@ -51,6 +56,7 @@ function draw() {
 
 | Term | Meaning |
 |------|---------|
-| **WASD** | The four letter keys used for movement in graded labs: `'a'` (left), `'d'` (right), `'w'` (up), `'s'` (down). |
-| **iframe scroll conflict** | Arrow keys scroll the browser page or embedded iframe in addition to triggering `kb.pressing`, disrupting canvas interaction. |
-| **Key name string** | The argument passed to `kb.pressing()`: e.g. `'a'`, `'space'`, `'left'`. Case-sensitive; use lowercase. |
+| **Key name** | The text in quotes you give `kb.pressing(...)` to say which key to listen to. Always lowercase. |
+| **WASD** | The four letter keys often used for movement: `'a'` left, `'d'` right, `'w'` up, `'s'` down. |
+| **Arrow key names** | The words `'left'`, `'right'`, `'up'` and `'down'`. |
+| **Focus** | A sketch only receives key presses after you click on it. |

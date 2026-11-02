@@ -1,13 +1,13 @@
 {
   "id": "5-2-9-lab-wind-zone",
-  "title": "5.2.9 Lab: Wind Zone",
+  "title": "5.2.14 Lab: Wind Zone",
   "description": "Push the player with applyForce inside a conditional zone. Auto-graded.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
   "preview": "moshion",
-  "week": 15,
+  "week": 11,
   "slos": [
     "SLO-3"
   ],
@@ -25,7 +25,7 @@
     {
       "id": "r1",
       "title": "Use applyForce on the player",
-      "description": "The player is pushed with .applyForce(fx, fy) somewhere in the sketch. Help: 5.2.8 (Forces vs Velocity)",
+      "description": "The player is pushed with .applyForce(fx, fy) somewhere in the sketch. Help: 5.2.13 (Forces vs Velocity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.applyForce\\s*\\(",
@@ -41,6 +41,17 @@
       "function": "draw",
       "file": "script.js",
       "pattern": "if\\s*\\([^{};]*[<>][^{};]*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)\\.applyForce\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "The wind pushes up",
+      "description": "The force's second number (fy) is negative, so the wind pushes the player up against gravity: applyForce(0, -3). Help: 5.2.13 (Forces vs Velocity)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.applyForce\\s*\\(\\s*[^,()]*,\\s*-\\s*[\\w.(]|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*-\\s*[\\d.][^;\\n]*[;\\n][\\s\\S]*?\\.applyForce\\s*\\(\\s*[^,()]*,\\s*\\1\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"

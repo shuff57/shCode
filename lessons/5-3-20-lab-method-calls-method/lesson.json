@@ -1,13 +1,13 @@
 {
   "id": "5-3-20-lab-method-calls-method",
-  "title": "5.4.5 Lab: A method calling this.otherMethod()",
+  "title": "5.7.6 Lab: A method calling this.otherMethod()",
   "description": "Write `Counter.bigStep()` which calls `this.addBy(5)` and returns `this.isHigh()`: one method dispatching another on the same instance.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Writing Your Own Classes",
+  "unit": "5.7 Writing Your Own Classes",
   "preview": "moshion",
-  "week": 12,
+  "week": 13,
   "slos": [
     "SLO-2",
     "SLO-3"
@@ -26,13 +26,14 @@
     {
       "id": "r1",
       "title": "bigStep() calls this.addBy(5) and returns this.isHigh()",
-      "description": "Write `bigStep()` inside `Counter`. It must call `this.addBy(5)` and return `this.isHigh()`. Help: 5.4.1 (Methods: functions that live on a class)",
+      "description": "Write `bigStep()` inside `Counter`. It must call `this.addBy(5)` and return `this.isHigh()`. Help: 5.7.1 (Methods: functions that live on a class)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "bigStep[\\s\\S]*this\\.addBy\\s*\\(\\s*5\\s*\\)[\\s\\S]*return\\s+this\\.isHigh\\s*\\(\\s*\\)",
+      "pattern": "\\bbigStep\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.addBy\\s*\\(\\s*(?:5|\\(\\s*5\\s*\\)|2\\s*\\+\\s*3|[A-Za-z_$][\\w$]*)\\s*\\)(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:\\breturn\\s*\\(?\\s*this\\.isHigh\\s*\\(\\s*\\)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*this\\.isHigh\\s*\\(\\s*\\)\\s*;[\\s\\S]*?\\breturn\\s+\\(?\\s*\\1\\b)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

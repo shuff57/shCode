@@ -1,13 +1,13 @@
 {
   "id": "5-3-19-lab-method-returns",
-  "title": "5.4.4 Lab: Method that returns a value",
-  "description": "Add `Counter.isHigh()` which returns `true` when `this.n > 10`. The driver uses the return value to color the display red.",
+  "title": "5.7.5 Lab: Method that returns a value",
+  "description": "Add `Counter.isHigh()` which returns `true` when `this.n > 10`. The driver (the code in `draw()`) uses the return value to color the display red.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Writing Your Own Classes",
+  "unit": "5.7 Writing Your Own Classes",
   "preview": "moshion",
-  "week": 12,
+  "week": 13,
   "slos": [
     "SLO-2",
     "SLO-3"
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Write the isHigh() method",
-      "instructions": "Inside the `Counter` class body, write an `isHigh()` method that returns `true` if `this.n` is greater than 10, and `false` otherwise. The driver already uses `c.isHigh()` to turn the number red: you supply the method.",
+      "instructions": "Inside the `Counter` class body, write an `isHigh()` method that returns `true` if `this.n` is greater than 10, and `false` otherwise. The driver (the code in `draw()` that runs the sketch and calls your method) already uses `c.isHigh()` to turn the number red: you supply the method.",
       "hints": [
         "Open the moSHion docs drawer on the right: methods that return values use the `return` keyword just like regular functions."
       ]
@@ -26,13 +26,14 @@
     {
       "id": "r1",
       "title": "isHigh() compares this.n to 10",
-      "description": "Write an `isHigh()` method inside `Counter` whose body compares `this.n` to `10` (e.g. `return this.n > 10`). The driver paints the number red when it returns truthy. Help: 5.4.1 (Methods: functions that live on a class)",
+      "description": "Write an `isHigh()` method inside `Counter` whose body compares `this.n` to `10` (e.g. `return this.n > 10`). The driver (the code in `draw()`) paints the number red when it returns a truthy value: one an `if` treats as true, such as `true` itself. Help: 5.7.1 (Methods: functions that live on a class)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "isHigh\\s*\\([^)]*\\)\\s*\\{(?=[\\s\\S]*?\\breturn\\b)(?=[\\s\\S]*?(?:this\\.n\\s*>\\s*10|10\\s*<\\s*this\\.n))",
+      "pattern": "\\bisHigh\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:\\breturn\\b[^;{}]*?(?:this\\.n\\s*\\)?\\s*(?:>\\s*\\(?\\s*(?:10|[A-Za-z_$][\\w$]*)|>=\\s*\\(?\\s*11)(?![\\w.])|\\b10\\s*\\)?\\s*<\\s*\\(?\\s*this\\.n\\b|!\\s*\\(\\s*this\\.n\\s*<=\\s*\\(?\\s*10\\b)|\\bif\\s*\\([^;{}]*?(?:this\\.n\\s*\\)?\\s*(?:>\\s*\\(?\\s*(?:10|[A-Za-z_$][\\w$]*)|>=\\s*\\(?\\s*11)(?![\\w.])|\\b10\\s*\\)?\\s*<\\s*\\(?\\s*this\\.n\\b|!\\s*\\(\\s*this\\.n\\s*<=\\s*\\(?\\s*10\\b)[^;{}]*\\)(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\breturn\\b|\\bif\\s*\\([^;{}]*?(?:this\\.n\\s*\\)?\\s*(?:<=\\s*\\(?\\s*10|<\\s*\\(?\\s*11)(?![\\w.])|\\b10\\s*\\)?\\s*>=\\s*\\(?\\s*this\\.n\\b)[^;{}]*\\)\\s*\\{?\\s*return\\s*\\(?\\s*false\\b|\\b(?:const|let|var)\\s+([\\w$]+)\\s*=[^;{}]*?(?:this\\.n\\s*\\)?\\s*(?:>\\s*\\(?\\s*(?:10|[A-Za-z_$][\\w$]*)|>=\\s*\\(?\\s*11)(?![\\w.])|\\b10\\s*\\)?\\s*<\\s*\\(?\\s*this\\.n\\b|!\\s*\\(\\s*this\\.n\\s*<=\\s*\\(?\\s*10\\b)[^;{}]*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\breturn\\s*\\(?\\s*\\1\\b)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

@@ -1,11 +1,11 @@
 {
   "id": "5-3-10-lab-two-instances",
-  "title": "5.3.10 Lab: Two sprites, two property values",
+  "title": "5.6.11 Lab: Two sprites, two property values",
   "description": "Instantiate b1 and b2 from the same class with different colors, then mutate only b1 to confirm each instance's state is independent.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.3 Classes and Objects via moSHion",
+  "unit": "5.6 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -34,24 +34,26 @@
     {
       "id": "r1",
       "title": "Two distinct new Box(...) calls",
-      "description": "Create `b1` and `b2` with separate `new Box(...)` calls: each gets its own color argument. Help: 5.3.3 (Class and instance)",
+      "description": "Create `b1` and `b2` with separate `new Box(...)` calls: each gets its own color argument. Help: 5.6.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Box\\s*\\([\\s\\S]*?new\\s+Box\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
       "title": "Only b1.color is reassigned",
-      "description": "Assign a new value to `b1.color` (not `b2.color`) to demonstrate independent instance state. Help: 5.3.3 (Class and instance)",
+      "description": "Assign a new value to `b1.color` (not `b2.color`) to demonstrate independent instance state. Help: 5.6.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "b1\\s*\\.\\s*color\\s*=",
+      "pattern": "^(?![\\s\\S]*\\bb2\\s*\\.\\s*color\\s*=(?!=))[\\s\\S]*\\bb1\\s*\\.\\s*color\\s*=(?!=)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

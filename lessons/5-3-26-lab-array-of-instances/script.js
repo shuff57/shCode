@@ -1,4 +1,4 @@
-// 5.4.12 Lab: An array of Enemies.
+// 5.7.13 Lab: An array of Enemies.
 
 class Enemy {
   constructor(x, y, hp) {

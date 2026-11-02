@@ -1,0 +1,22 @@
+{
+  "id": "5-3-pinball-5-example-the-score-that-climbs",
+  "title": "5.3.6 Worked Example: The score that climbs by itself",
+  "description": "The same table counted two ways: once per frame, where the score races into the hundreds, and once per touch with a remembered last frame. Ends by showing the pattern belongs to any lasting condition, not just collisions.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.3 Project: Pinball",
+  "preview": "example",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

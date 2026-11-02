@@ -1,0 +1,24 @@
+{
+  "id": "5-1-24-reading-text-labels",
+  "title": "5.1.21 Reading: Words on the canvas: text()",
+  "description": "How text(words, x, y) puts words on the canvas, what fill() and textSize() change, and why text goes after background(). Read before 5.1.22.",
+  "type": "lesson",
+  "estimateMins": 5,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "reading",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/moshion",
+  "externalLinkLabel": "Open the in-app moSHion docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

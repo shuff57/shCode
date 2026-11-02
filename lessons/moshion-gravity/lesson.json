@@ -1,37 +1,37 @@
 {
   "id": "moshion-gravity",
-  "title": "5.1.24 Falling Block: Example",
-  "description": "A dynamic block falls under gravity and lands on a static floor. Read the example, then experiment.",
+  "title": "5.2.7 Worked Example: Falling Block",
+  "description": "A dynamic block falls under gravity and lands on the static ground. Read the example, then experiment. Follows 5.2.6 (Reading: Gravity).",
   "type": "example",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.1 Hello Sprite and Movement",
+  "unit": "5.2 Physics Feel",
   "preview": "moshion",
-  "week": 10,
+  "week": 11,
   "slos": [
-    "SLO-1"
+    "SLO-3"
   ],
   "steps": [
     {
       "id": "s1",
       "title": "Run it",
-      "instructions": "Click Run. The block falls and the floor catches it.",
+      "instructions": "Click Run. The block falls and the ground catches it.",
       "hints": [
         "Static sprites don't move; they push back on dynamic ones."
       ]
     },
     {
       "id": "s2",
-      "title": "Turn gravity off",
-      "instructions": "Change `world.gravity.y = 10` to `world.gravity.y = 0`. The block floats.",
+      "title": "Turn gravity off, then up",
+      "instructions": "Change `world.gravity.y = 10` to `world.gravity.y = 0` and Run. The block floats. Then change it to `world.gravity.y = 20` and Run again. The block falls faster. Leave it at 20 for the next steps.",
       "hints": [
         "Gravity units are roughly pixels per second²."
       ]
     },
     {
       "id": "s3",
-      "title": "Make the floor dynamic",
-      "instructions": "Remove the `'static'` argument from the ground sprite. Both pieces fall now: that's why the floor is static.",
+      "title": "Make the ground dynamic",
+      "instructions": "With gravity still on, remove the `'static'` argument from the ground sprite. Both pieces fall now: that's why the ground is static.",
       "hints": [
         "new Sprite(x, y, w, h) defaults to dynamic. Add 'static' to anchor it."
       ]
@@ -44,5 +44,23 @@
         "Give them different x positions so they don't spawn on top of each other."
       ]
     }
-  ]
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "You changed the gravity",
+      "description": "End with `world.gravity.y` set to a number other than 10 (step 2 uses 20). Help: 5.2.6 (Reading: Gravity)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*(?!\\(?\\s*10(?:\\.0*)?\\s*\\)?\\s*(?:;|\\r?\\n|$))[-\\d(.]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
 }

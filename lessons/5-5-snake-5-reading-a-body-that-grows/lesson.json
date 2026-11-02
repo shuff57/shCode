@@ -1,0 +1,20 @@
+{
+  "id": "5-5-snake-5-reading-a-body-that-grows",
+  "title": "5.5.5 Reading: A body that grows",
+  "description": "The snake is a list of cells. Shows the trick that makes it move and grow: add a new head, and remove the tail unless the snake just ate.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "reading",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

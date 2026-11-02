@@ -1,0 +1,20 @@
+{
+  "id": "5-5-snake-7-reading-searching-the-array",
+  "title": "5.5.7 Reading: Searching the array",
+  "description": "Two questions need the snake searched: did the head run into the body, and is this cell free for food? Shows one helper, written once, that answers both.",
+  "type": "lesson",
+  "estimateMins": 7,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "reading",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

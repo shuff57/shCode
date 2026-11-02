@@ -1,4 +1,4 @@
-*You've now built each of these pieces in isolation: a constructor (5.3.5), properties (5.3.7–d), `this` (5.3.11–5a), each method shape (5.4.1–e), composition (5.4.7–g), and cleanup (5.4.9). This lesson assembles them into one class.*
+*You've now built each of these pieces in isolation: a constructor (5.6.5), properties (5.6.8–5.6.11), `this` (5.6.12–5.6.13), each method shape (5.7.3–5.7.6), composition (5.7.8–5.7.9), and cleanup (5.7.10). This lesson assembles them into one class.*
 
 **Goal:** Write your first class from scratch. Prove the constructor creates per-instance state and that methods can reach that state via `this`.
 

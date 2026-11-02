@@ -1,11 +1,11 @@
 {
   "id": "5-3-13-lab-build-sprite",
-  "title": "5.3.13 Your Turn: Build a Sprite",
-  "description": "Low-stakes autograded practice. Instantiate the Sprite class twice (rectangle form and circle form), set properties on each instance, and give one sprite a stroke. Bridges the 5.3.6 / 5.3.12 worked examples and the 5.4.10 Enemy class worked example.",
+  "title": "5.6.14 Your Turn: Build a Sprite",
+  "description": "Low-stakes autograded practice. Instantiate the Sprite class twice (rectangle form and circle form), set properties on each instance, and give one sprite a stroke. Bridges the 5.6.7 / 5.6.13 worked examples and the 5.7.11 Enemy class worked example.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.3 Classes and Objects via moSHion",
+  "unit": "5.6 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Create the canvas",
-      "instructions": "In `setup()`, create a canvas. `Canvas` is a class, and `new Canvas(...)` stamps out an instance: the same constructor-call pattern you saw in 5.3.6.",
+      "instructions": "In `setup()`, create a canvas. `Canvas` is a class, and `new Canvas(...)` stamps out an instance: the same constructor-call pattern you saw in 5.6.7.",
       "hints": [
         "Open the moSHion docs drawer on the right and find the Canvas section."
       ]
@@ -32,7 +32,7 @@
     {
       "id": "s3",
       "title": "Instantiate a circle sprite",
-      "instructions": "Store a second sprite using the 3-argument constructor form `new Sprite(x, y, diameter)`. Give this instance its own `.color` (different from the first, so you can tell them apart).",
+      "instructions": "Store a second sprite using the 3-argument constructor form `new Sprite(x, y, diameter)`. With one size instead of a width and a height, moSHion makes a circle, that many pixels across. Give this instance its own `.color` (different from the first, so you can tell them apart).",
       "hints": [
         "Check the Sprite section of the moSHion docs drawer for the 3-argument constructor form."
       ]
@@ -40,7 +40,7 @@
     {
       "id": "s4",
       "title": "Give one sprite a stroke",
-      "instructions": "Pick either sprite and set its `.stroke` AND its `.strokeWeight`. You'll see a visible outline on that sprite.",
+      "instructions": "Pick either sprite and set its `.stroke` AND its `.strokeWeight`. These are two more properties every sprite has: `.stroke` is the color of its outline, a color string just like `.color`, and `.strokeWeight` is how thick that outline is, in pixels (for example `s.stroke = 'yellow';` then `s.strokeWeight = 4;`). You'll see a visible outline on that sprite.",
       "hints": [
         "Look up sprite properties in the moSHion docs drawer."
       ]
@@ -56,47 +56,52 @@
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+(?:,[^)]*)?\\)",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
       "title": "Rectangle sprite (4-arg form)",
-      "description": "At least one `new Sprite(x, y, w, h)` call with four arguments. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+      "description": "At least one `new Sprite(x, y, w, h)` call with four arguments. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\(\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+\\s*\\)",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
       "title": "Circle sprite (3-arg form)",
-      "description": "At least one `new Sprite(x, y, diameter)` call with exactly three arguments. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+      "description": "At least one `new Sprite(x, y, diameter)` call with exactly three arguments. Help: step 3 of this lab.",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\(\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+\\s*\\)",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
       "title": "Property set on an instance",
-      "description": "At least one `.color` assignment on a sprite instance. Help: 5.3.3 (Class and instance)",
+      "description": "At least one `.color` assignment on a sprite instance. Help: 5.6.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.color\\s*=",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r5",
       "title": "Stroke used",
-      "description": "A `.stroke` or `.strokeWeight` property is assigned.",
+      "description": "A `.stroke` or `.strokeWeight` property is assigned. Help: step 4 of this lab.",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.stroke(?:Weight)?\\s*=",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

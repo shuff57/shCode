@@ -1,0 +1,80 @@
+{
+  "moduleId": "5.1",
+  "source": "Seams follow CodeHS Video Game Design in JavaScript 3.2 Program Structure, 3.3 The Canvas, 3.4 Your First Sprites. Structure only: no CodeHS text, problems or code is copied.",
+  "lessons": [
+    {
+      "id": "frame-loop",
+      "title": "The frame loop",
+      "objective": "Students will be able to say what runs once and what runs every frame, and read a sketch that has both setup() and draw().",
+      "screens": [
+        "5-1-1-slides",
+        "5-1-2-video-intro",
+        "5-1-3-reading-canvas-sprite",
+        "5-1-4-example-minimum-sprite"
+      ]
+    },
+    {
+      "id": "canvas-and-sprite",
+      "title": "The canvas and the sprite",
+      "objective": "Students will be able to create a canvas, put a sprite on it, keep that sprite in a variable, and name the properties that position and paint it.",
+      "screens": [
+        "5-1-5-reading-canvas",
+        "5-1-6-reading-sprite",
+        "5-1-7-lab-one-sprite",
+        "5-1-8-reading-sprite-variable",
+        "5-1-9-reading-background",
+        "5-1-10-reading-sprite-props"
+      ]
+    },
+    {
+      "id": "hello-sprite",
+      "title": "Hello Sprite",
+      "objective": "Students will be able to build a sketch of their own that draws one sprite, and explain which line of it runs once and which runs every frame.",
+      "screens": [
+        "5-1-11-moshion-intro",
+        "5-1-12-video-frame-loop"
+      ]
+    },
+    {
+      "id": "input-and-velocity",
+      "title": "Keyboard input and velocity",
+      "objective": "Students will be able to read a key with kb.pressing() using either WASD or arrow-key names, turn that reading into a velocity, and predict where the sprite goes next frame.",
+      "screens": [
+        "5-1-13-reading-input",
+        "5-1-19-reading-wasd",
+        "5-1-14-example-keyboard",
+        "5-1-15-reading-velocity",
+        "5-1-16-reading-movement-pattern"
+      ]
+    },
+    {
+      "id": "else-to-zero",
+      "title": "The else-to-zero rule",
+      "objective": "Students will be able to explain why a sprite keeps drifting when the else branch is missing, and build four-direction keyboard movement that stops when no key is held.",
+      "screens": [
+        "5-1-17-reading-else-to-zero",
+        "5-1-18-lab-else-to-zero",
+        "5-1-20-moshion-move-keys"
+      ]
+    },
+    {
+      "id": "build-and-prove",
+      "title": "Build it and prove it",
+      "objective": "Students will be able to put words on the canvas with text(), build the sprite playground and its second auto-moving sprite, write the frame-loop explanation, and take on the stretch challenges.",
+      "screens": [
+        "5-1-24-reading-text-labels",
+        "5-1-21-a10-1-sprite-playground",
+        "5-1-22-a10-2-frame-loop",
+        "5-1-23-challenges"
+      ]
+    },
+    {
+      "id": "math-grid-optional",
+      "title": "Optional: a grid like math",
+      "objective": "Students will be able to read a coordinate grid over the canvas, and say where (0, 0) is and which way y grows in the default mode and in the optional math mode.",
+      "screens": [
+        "5-1-25-math-grid"
+      ]
+    }
+  ]
+}

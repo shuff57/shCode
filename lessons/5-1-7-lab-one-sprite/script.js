@@ -1,13 +1,9 @@
-// 5.1.7 Lab: Drop one sprite, change its color.
+// 5.1.7 Exploration: change one thing, rerun, and see what moved.
+// This sketch already works. Follow the steps and change the numbers.
 
 function setup() {
-  // STEP 1: Make a canvas (any reasonable size, e.g. 360x360).
-
-  // STEP 2: Create one sprite at the centre of your canvas.
-
-  // STEP 3: Set the sprite's color to anything you like.
-  //         Chain `.color = '...'` onto the new Sprite(...) call,
-  //         the same way you saw in the 5.1.6 reading.
+  new Canvas(360, 360);
+  new Sprite(180, 180, 60, 60).color = 'tomato';
 }
 
 function draw() {

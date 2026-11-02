@@ -13,8 +13,8 @@
 **Prerequisites:** complete both in-app lessons (`5.1.11 Hello Sprite` + `5.1.20 Make it Move`) before starting this lab.
 
 **Module resources:**
-- 💡 5.1.14 Worked Examples: reference code from the class walkthroughs
-- ⭐ 5.1.23 Challenges: stretch problems if you finish early
+- 💡 5.1.15 Worked Examples: reference code from the class walkthroughs
+- ⭐ 5.1.24 Challenges: stretch problems if you finish early
 
 ---
 
@@ -33,7 +33,7 @@ Create a new sketch in the in-app editor with the following features.
 ### Required features
 
 1. **A canvas** between 300×300 and 800×600 pixels.
-2. **One controllable sprite** that moves with WASD keys:
+2. **One controllable sprite** that moves with the keyboard (WASD or the arrow keys, your choice):
    - `W` → up, `S` → down, `A` → left, `D` → right
    - Use `kb.pressing('w')`, etc.
    - Assign `player.vel.x` and `player.vel.y`
@@ -42,13 +42,13 @@ Create a new sketch in the in-app editor with the following features.
    - Oscillate left–right: `sprite.pos.x = 200 + sin(frameCount * 0.05) * 100;`
    - Orbit in a circle: use both `sin` and `cos`
    - Spin: `sprite.rotation = frameCount * 2;`
-4. **An on-screen text label at the top of the canvas** displaying a message of your choice. Use `text()` and `textSize()`.
+4. **An on-screen text label at the top of the canvas** displaying a message of your choice. Use `fill()`, `textSize()` and `text()`.
 5. **`background(...)` is called at the start of every `draw()`**: otherwise old frames will stack up.
 6. Code follows the class style guide (camelCase, 2-space indent, meaningful variable names, comments on non-obvious lines).
 
-### Why WASD and not arrow keys?
+### Which keys?
 
-Arrow keys also scroll the browser iframe. Your controllable sprite will be fighting the page scroll. WASD is the safe default for moSHion labs.
+Either set works: WASD (`'a'`, `'d'`, `'w'`, `'s'`) or the arrow keys (`'left'`, `'right'`, `'up'`, `'down'`). Pick one set and use it for all four directions. 5.1.14 lists both. Click the canvas before you press a key so the sketch receives it.
 
 ---
 
@@ -79,7 +79,7 @@ function setup() {
 function draw() {
   background('#222');
 
-  // TODO: WASD input: remember the else-to-zero pattern
+  // TODO: keyboard input (WASD or arrows): remember the else-to-zero pattern
   if (kb.pressing('a')) player.vel.x = -4;
   else if (kb.pressing('d')) player.vel.x = 4;
   else player.vel.x = 0;
@@ -90,7 +90,7 @@ function draw() {
   // Example: mover.pos.x = 400 + sin(frameCount * 0.05) * 80;
 
   // TODO: add a text label at the top of the canvas
-  // Hint: textSize(18); fill(255); text('Your message', 20, 30);
+  // Hint: fill('white'); textSize(18); text('Your message', 20, 30);
 }
 ```
 
@@ -101,7 +101,7 @@ function draw() {
 | Criterion | Pts |
 |-----------|-----|
 | Canvas renders; no errors on Run | 2 |
-| Controllable sprite responds correctly to WASD | 4 |
+| Controllable sprite responds correctly to the keyboard | 4 |
 | Automatic sprite moves on its own | 3 |
 | Text label appears at top of canvas | 2 |
 | `background(...)` called at start of `draw()` | 1 |

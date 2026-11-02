@@ -1,13 +1,13 @@
 {
   "id": "5-2-10-reading-delete",
-  "title": "5.2.10 Reading: Cleanup and Delete",
-  "description": "delete() vs .visible. Read before 5.2.11 Lab: Reaching the Goal.",
+  "title": "5.2.15 Reading: Cleanup and Delete",
+  "description": "delete() vs .visible. Read before 5.2.16 Worked Example: The Finished Scene.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
   "preview": "reading",
-  "week": 15,
+  "week": 11,
   "slos": [
     "SLO-3"
   ],

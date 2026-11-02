@@ -1,6 +1,6 @@
 ## Cleanup and Delete
 
-**Read before `5.2.11 Lab: Reaching the Goal`.**
+**Read before `5.2.16 Worked Example: The Finished Scene`.**
 
 **What you'll learn from it:**
 
@@ -9,7 +9,7 @@
 
 **Try it:**
 
-```js live
+```js live console
 let a, b;
 
 function setup() {
@@ -34,7 +34,7 @@ function draw() {
 }
 ```
 
-Press **d**: the blue sprite vanishes for good, and pressing **d** again logs nothing more, since `a` is now `null`. Press **v** repeatedly instead: the orange sprite toggles hidden and visible, but it never actually leaves the scene.
+Keep an eye on the console under the canvas. Press **d**: the blue sprite vanishes for good, and pressing **d** again logs nothing more, since `a` is now `null`. Press **v** repeatedly instead: the orange sprite toggles hidden and visible, but it never actually leaves the scene.
 
 ---
 

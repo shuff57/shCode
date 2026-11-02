@@ -1,13 +1,13 @@
 {
   "id": "5-3-18-lab-method-with-params",
-  "title": "5.4.3 Lab: Method with parameters",
+  "title": "5.7.4 Lab: Method with parameters",
   "description": "Add `Counter.addBy(n)`: a method that takes an argument and uses it to increment `this.n`. Keys 1/2/3 add different amounts.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Writing Your Own Classes",
+  "unit": "5.7 Writing Your Own Classes",
   "preview": "moshion",
-  "week": 12,
+  "week": 13,
   "slos": [
     "SLO-2",
     "SLO-3"
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Write the addBy(n) method",
-      "instructions": "Inside the `Counter` class body, write an `addBy(n)` method that adds the argument `n` to `this.n`. The driver already calls `c.addBy(1)`, `c.addBy(2)`, and `c.addBy(3)` on keys 1/2/3: you just need the method.",
+      "instructions": "Inside the `Counter` class body, write an `addBy(n)` method that adds the argument `n` to `this.n`. The driver, the code in `draw()` under the class that runs the sketch, already calls `c.addBy(1)`, `c.addBy(2)`, and `c.addBy(3)` on keys 1/2/3: you just need the method.",
       "hints": [
         "Open the moSHion docs drawer on the right and review the class method section: methods can declare parameters just like regular functions."
       ]
@@ -26,13 +26,14 @@
     {
       "id": "r1",
       "title": "addBy(n) method declared",
-      "description": "Write an `addBy(n)` method inside `Counter` that takes a parameter and uses it. Help: 5.4.1 (Methods: functions that live on a class)",
+      "description": "Write an `addBy(n)` method inside `Counter` that takes a parameter and uses it. Help: 5.7.1 (Methods: functions that live on a class)",
       "type": "regex",
       "file": "script.js",
       "pattern": "addBy\\s*\\(\\s*\\w+\\s*\\)\\s*\\{",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -40,10 +41,11 @@
       "description": "The parameter passed to `addBy` is referenced inside the method body (e.g. `this.n += n`). Help: 3.2.5 (Parameters and Arguments)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "addBy\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{[\\s\\S]*?this\\.n\\s*(?:\\+=\\s*\\1|=\\s*this\\.n\\s*\\+\\s*\\1)",
+      "pattern": "\\baddBy\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.n\\s*(?:\\+=\\s*\\(?\\s*(?:Number\\s*\\(\\s*)?\\1\\b|=\\s*\\(?\\s*this\\.n\\s*\\+\\s*\\(?\\s*(?:Number\\s*\\(\\s*)?\\1\\b|=\\s*\\(?\\s*\\1\\s*\\+\\s*this\\.n\\b)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

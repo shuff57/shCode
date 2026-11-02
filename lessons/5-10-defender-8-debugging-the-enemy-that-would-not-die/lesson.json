@@ -1,0 +1,90 @@
+{
+  "id": "5-10-defender-8-debugging-the-enemy-that-would-not-die",
+  "title": "5.10.8 Debugging: The enemy that would not die",
+  "description": "The finished Part B game with one line missing. After a landing, a crimson 1 takes three shots and an orange 3 dies in one. Make it happen, find the line, fix it.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.10 Project: Defender, Part B",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Make it happen",
+      "instructions": "Run the game. Let ONE enemy of wave 1 land on the base, then shoot the other two. Now watch wave 2. Its first enemy, the lowest, is crimson and says 1, but it takes three shots, and the first shot makes its label go UP to 2. The orange 3 dies in one shot. Nothing crashes.",
+      "hints": [
+        "The bug needs a landing first. If you shoot all of wave 1, wave 2 behaves.",
+        "Wave 2's first enemy is the lowest one in its staggered line, the first to come down."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Find it",
+      "instructions": "The bug only shows after a landing, and the hit loop it shows up in is correct. Two pieces of code remove an enemy: the landing in `moveEnemies()` and the kill in `hitEnemies()`. Put them side by side and compare them line by line, with 5.10.1's rule in mind: every splice happens to all three arrays.",
+      "hints": [
+        "Count the `splice` lines in each of the two places.",
+        "To watch the arrays drift, add `text('lengths: ' + enemies.length + ' ' + enemyHp.length + ' ' + enemyWorth.length, 12, 50);` to `drawTop()`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Fix it",
+      "instructions": "Add the missing line. Then run the same test again: after a landing, every label in wave 2 should match the number of shots it takes, and if you added the lengths line, the three numbers should stay equal.",
+      "hints": [
+        "It is one line, in `moveEnemies()`, beside the other splices."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "(optional) Make it impossible to forget",
+      "instructions": "Move the four removal lines (the delete and the three splices) into `function removeEnemy(j)` and call it from both places. The checks read `removeEnemy` too, so they stay green.",
+      "hints": [
+        "`function removeEnemy(j) { enemies[j].delete(); ... }`, then `removeEnemy(j);` where each copy used to be."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A landed enemy leaves all three arrays",
+      "description": "The landing in moveEnemies splices enemies, enemyHp and enemyWorth at the same index j, together (or calls a removeEnemy helper that does). Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
+      "type": "inFunction",
+      "function": [
+        "moveEnemies",
+        "removeEnemy"
+      ],
+      "file": "script.js",
+      "pattern": "(?:^|\\{)(?=[^{}]*?\\benemies\\s*\\.\\s*splice\\s*\\(\\s*([\\w$]+)\\s*,\\s*1\\s*\\))(?=[^{}]*?\\benemyHp\\s*\\.\\s*splice\\s*\\(\\s*\\1\\s*,\\s*1\\s*\\))(?=[^{}]*?\\benemyWorth\\s*\\.\\s*splice\\s*\\(\\s*\\1\\s*,\\s*1\\s*\\))|\\{(?=[^{}]*?(?:\\bbaseHp\\s*(?:-=\\s*\\(?\\s*1\\b|--|=\\s*\\(?\\s*baseHp\\s*-\\s*\\(?\\s*1\\b)|--\\s*baseHp\\b))(?=[^{}]*?\\bremoveEnemy\\s*\\()(?=[\\s\\S]*\\benemies\\s*\\.\\s*splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\s*\\.\\s*splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\s*\\.\\s*splice\\s*\\()",
+      "ignoreStrings": true,
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "A shot-down enemy leaves all three arrays",
+      "description": "The kill in hitEnemies (or a removeEnemy helper it calls) splices enemies, enemyHp and enemyWorth. Help: 5.10.4 (Reading: Every shot against every enemy)",
+      "type": "inFunction",
+      "function": [
+        "hitEnemies",
+        "removeEnemy"
+      ],
+      "file": "script.js",
+      "pattern": "^(?:(?=[\\s\\S]*\\bremoveEnemy\\s*\\()(?=[\\s\\S]*\\benemies\\.splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\.splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\.splice\\s*\\()|(?=[\\s\\S]*?\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\benemies\\.splice\\s*\\()(?=[\\s\\S]*?\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\benemyHp\\.splice\\s*\\()(?=[\\s\\S]*?\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\benemyWorth\\.splice\\s*\\())",
+      "ignoreStrings": true,
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

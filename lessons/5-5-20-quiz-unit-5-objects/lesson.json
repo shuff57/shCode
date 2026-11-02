@@ -1,0 +1,157 @@
+{
+  "id": "5-5-20-quiz-unit-5-objects",
+  "title": "5.8.20 Unit 5 Check: classes, objects and methods",
+  "description": "Eight multiple-choice questions closing Unit 5: class versus instance, the constructor, this, method syntax, separate state on two instances, arrays of instances, where a variable lives, and what a class variable is. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.8 Inside a Class",
+  "preview": "quiz",
+  "week": 14,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-new-makes-one",
+        "source": "5.6.4",
+        "question": "You call `new Sprite(100, 100, 40, 40)` three times. What do you have afterwards?",
+        "options": [
+          "One sprite that has been moved twice",
+          "Three sprites, each with its own position and size",
+          "One sprite and two errors, because a class can only be used once",
+          "Three variables, but only the last one is usable"
+        ],
+        "answer": 1,
+        "explanation": "`new` runs the constructor and hands back a fresh instance every time. Three calls, three objects — which is why you store them in three variables or in an array.",
+        "sourceIds": [
+          "5-3-4-reading-new-operator"
+        ]
+      },
+      {
+        "id": "q2-constructor-job",
+        "source": "5.6.5",
+        "question": "What is a constructor for?",
+        "options": [
+          "It destroys the object when it is no longer needed",
+          "It runs once per frame to draw the object",
+          "It runs once, when the object is created, and sets up its starting state",
+          "It is another name for `draw()`"
+        ],
+        "answer": 2,
+        "explanation": "The constructor runs exactly once, at `new`. That is where a new object's properties get their first values: `this.hp = 10`, `this.sprite = new Sprite(...)`.",
+        "sourceIds": [
+          "5-3-5-reading-constructor"
+        ]
+      },
+      {
+        "id": "q3-this-is-the-receiver",
+        "source": "5.6.13",
+        "question": "Inside `enemy.takeHit(1)`, what does `this` mean?",
+        "options": [
+          "The class `Enemy`",
+          "The number 1",
+          "The specific enemy the method was called on",
+          "The file, so `this` is the same everywhere"
+        ],
+        "answer": 2,
+        "explanation": "`this` is the object before the dot. Call `otherEnemy.takeHit(1)` and the same method body runs with `this` set to `otherEnemy`, so it changes that enemy's health instead.",
+        "sourceIds": [
+          "5-3-12-example-this-pronoun"
+        ]
+      },
+      {
+        "id": "q4-method-syntax",
+        "source": "5.7.1",
+        "question": "Which line declares a method correctly inside a class body?",
+        "options": [
+          "`function tick() { this.n += 1; }`",
+          "`tick() { this.n += 1; }`",
+          "`method tick() { this.n += 1; }`",
+          "`let tick = () => { this.n += 1; };`"
+        ],
+        "answer": 1,
+        "explanation": "Inside a class body you drop the `function` keyword: a method is `name(params) { ... }`. Writing `function tick()` there is a syntax error, and the file will not run at all.",
+        "sourceIds": [
+          "5-3-16-reading-methods-intro"
+        ]
+      },
+      {
+        "id": "q5-separate-state",
+        "source": "5.7.11",
+        "question": "Two enemies are built with `new Enemy(100, 100)`. You put one of them through `takeHit(3)`. What is the other one's health?",
+        "options": [
+          "Three lower, because they share the same `hp`",
+          "Zero, because `takeHit` resets every enemy",
+          "Unchanged, because each instance keeps its own copy of `hp`",
+          "`undefined`, because properties are cleared after a method runs"
+        ],
+        "answer": 2,
+        "explanation": "`hp` is an instance property: each object got its own copy when its constructor ran. Changing one instance's `this.hp` cannot reach the other, which is the whole reason to use objects instead of shared variables.",
+        "sourceIds": [
+          "5-3-24-example-enemy-class"
+        ]
+      },
+      {
+        "id": "q6-loop-over-instances",
+        "source": "5.7.14",
+        "question": "You have `enemies`, an array of `Enemy` instances. What does a loop over it give you that three named variables did not?",
+        "options": [
+          "It makes each enemy run faster",
+          "It lets one method call reach every enemy, however many there are",
+          "It stops the enemies from sharing properties",
+          "It is required before `filter` can be used on them"
+        ],
+        "answer": 1,
+        "explanation": "A loop turns \"do this to each enemy\" into one line, no matter whether there are three or thirty. That is what makes a spawner possible: the array grows, and the loop keeps working.",
+        "sourceIds": [
+          "5-3-27-lab-loop-instances"
+        ]
+      },
+      {
+        "id": "q7-where-does-it-live",
+        "source": "5.8.1",
+        "question": "A method declares `let step = 3;` and uses it. What happens on the next call to the same method?",
+        "options": [
+          "`step` is still 3, and any changes made to it are still there",
+          "`step` is a brand-new local, made again from the declaration",
+          "The declaration is skipped, because `step` already exists",
+          "The method errors, because a local cannot be declared twice"
+        ],
+        "answer": 1,
+        "explanation": "A local lives for one call. The next call builds a fresh one from the same line, so it starts at 3 again no matter what the last call did with it. Anything that must survive belongs on `this`.",
+        "sourceIds": [
+          "5-5-1-reading-three-places"
+        ]
+      },
+      {
+        "id": "q8-class-variable",
+        "source": "5.8.14",
+        "question": "`class Enemy { static spawned = 0; }` and two enemies exist. Which expression counts how many enemies have ever been built?",
+        "options": [
+          "`enemy.spawned`, which reads one enemy's own property",
+          "`this.spawned`, written inside `draw()`",
+          "`Enemy.spawned`, which reads the property that belongs to the class",
+          "`enemy.spawned + enemy.spawned`, to add up both enemies"
+        ],
+        "answer": 2,
+        "explanation": "A `static` property belongs to the class, so it is reached through the class name. `enemy.spawned` looks for a property on that one object, finds nothing, and gives `undefined`.",
+        "sourceIds": [
+          "5-5-14-reading-static"
+        ]
+      }
+    ]
+  }
+}

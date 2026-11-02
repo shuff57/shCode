@@ -1,10 +1,10 @@
-# 5.1.14 Worked Examples
+# 5.1.15 Worked Examples
 
-Teacher-led walkthroughs for Module 5.1. Students can reference these after class when building 5.1.21 Sprite Playground.
+Teacher-led walkthroughs for Module 5.1. Students can reference these after class when building 5.1.22 Sprite Playground.
 
 All three examples are designed to be typed (not pasted) into the moSHion in-app editor so the code sinks in line-by-line.
 
-**Elsewhere in Module 5.1:** 5.1.22 Frame Loop Writeup · 5.1.23 Challenges
+**Elsewhere in Module 5.1:** 5.1.23 Frame Loop Writeup · 5.1.24 Challenges
 
 ---
 
@@ -193,7 +193,7 @@ function draw() {
 
 ### What `frameCount` does
 
-`frameCount` is a built-in counter that starts at 0 and increments by 1 every frame. At 60 fps, after 1 second it's 60. After 10 seconds it's 600.
+`frameCount` is a built-in counter that is `1` on the first frame and goes up by 1 every frame after. At 60 fps, after 1 second it's 60. After 10 seconds it's 600.
 
 ### What the math does
 

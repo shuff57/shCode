@@ -1,0 +1,53 @@
+{
+  "id": "5-11-defender-9-challenges-make-it-yours",
+  "title": "5.11.10 Challenges: Make it yours",
+  "description": "The game is complete. Change one rule of your own: a best score that survives a restart, a boss every fifth wave, or a Ship class that owns its own cooldown. Pick one; add an idea of your own on top if you like.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.11 Project: Defender, Part C",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a rule and change it",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from the game in the editor. This game starts without the sound effects from 5.11.9; add them back if you like, but they are not required.\n\n**Challenge 1: a best score (easy).** Keep a second variable called `best` that `startRound()` never resets. When a round ends (where `playing` becomes `false`), update `best` if the score beat it, and show it in `drawTop()` under the score. Press R: the score goes back to 0, and `best` stays.\n\n**Challenge 2: a boss wave (medium).** In `makeWave()`, every fifth wave also gets a boss: `this.wave % 5 === 0` is true on waves 5, 10, 15 and so on. On those waves, push one more `new Enemy(...)` into the wave before it is returned, with 10 hp, half the wave's speed, and `boss.sprite.color = 'purple';` so it stands out. Because the boss is an `Enemy`, everything else already works.\n\n**Challenge 3: a Ship class (hard).** Make `class Ship` with `this.sprite` and `this.cooldown`, and move `moveShip()` into it as `move()` and `fire()` into it as `fire()`. The list of shots belongs to the scene, so `fire()` *gives back* what it made: a new `Bullet` when Space is held and the cooldown is done, otherwise `null`. The scene keeps the list:\n\n```js\nconst shot = ship.fire();\nif (shot) bullets.push(shot);\n```\n\n`if (shot)` is false for `null` and true for a Bullet. Delete the old `cooldown` from the scene and reset `ship.cooldown` in `startRound()`.",
+      "hints": [
+        "Whatever you pick, press R afterwards and check the game still starts cleanly."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Name what you changed",
+      "instructions": "At the top of `script.js`, write one sentence as a `//` comment saying what your rule is and what would happen if you removed it.",
+      "hints": [
+        "A rule is something the game decides. 'A boss comes every fifth wave' is a rule; 'I changed a colour' is not."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Your rule is in the code",
+      "description": "One of the three challenges is there: a best score kept across rounds, a boss on every fifth wave (this.wave % 5 === 0), or a Ship class that owns this.cooldown. Help: 5.11.6 (Lab: A Spawner for the waves)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bbest\\s*=\\s*(?:\\(\\s*)?(?:Math\\s*\\.\\s*)?max\\s*\\(|\\bbest\\s*=\\s*\\(?\\s*score\\b|if\\s*\\(\\s*(?:\\(\\s*){0,2}(?:score(?:\\s*\\))?\\s*>=?\\s*(?:\\(\\s*)?best|best(?:\\s*\\))?\\s*<=?\\s*(?:\\(\\s*)?score)\\b|\\bwave\\s*\\)?\\s*%\\s*\\(?\\s*[\\w$]+\\s*\\)?\\s*===?\\s*\\(?\\s*0(?![\\w.])|\\bclass\\s+Ship\\b[\\s\\S]*?\\bthis\\s*\\.\\s*cooldown\\b|\\b0\\s*===?\\s*\\(?\\s*(?:this\\s*\\.\\s*)?wave\\s*\\)?\\s*%\\s*\\(?\\s*[\\w$]+\\s*\\)?|!\\s*\\(\\s*(?:this\\s*\\.\\s*)?wave\\s*\\)?\\s*%\\s*\\(?\\s*[\\w$]+\\s*\\)?\\)|\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*(?:this\\s*\\.\\s*)?wave\\s*\\)?\\s*%\\s*\\(?\\s*[\\w$]+\\s*\\)?\\s*;?[\\s\\S]{0,300}?(?:\\b\\1\\s*\\)?\\s*===?\\s*\\(?\\s*0(?![\\w.])|\\b0\\s*===?\\s*\\(?\\s*\\1\\b|!\\s*\\(?\\s*\\1\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "id": "5-11-defender-8-quiz-defender-with-classes",
+  "title": "5.11.8 Check: Defender with classes",
+  "description": "Seven multiple-choice questions on where things live after the refactor: hp on the enemy, a hit loop with no splices, what filter does not do, a parameter that is another object, static, the checklist, and the cost of a new fact. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.11 Project: Defender, Part C",
+  "preview": "quiz",
+  "week": 15,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-hp",
+        "source": "5.11.4",
+        "question": "After 5.11.4, where does an enemy's hp live?",
+        "options": [
+          "In `enemyHp`, at the enemy's index",
+          "On its own Enemy object, as `this.hp`",
+          "In the sprite's text, which `takeHit()` reads back as a number",
+          "In `Enemy.spawned`"
+        ],
+        "answer": 1,
+        "explanation": "Each Enemy keeps its own hp on `this`. The parallel array `enemyHp` is gone, and the sprite's text only shows the number.",
+        "sourceIds": [
+          "5-11-defender-4-lab-enemy-takes-over"
+        ]
+      },
+      {
+        "id": "q2-nosplice",
+        "source": "5.11.3 and 5.11.5",
+        "question": "Why does `hitEnemies()` no longer splice anything?",
+        "options": [
+          "`splice` is not allowed on an array of objects, only on numbers and sprites",
+          "A `for...of` loop has no index to splice with, so the finished objects stay in both arrays until the next round starts",
+          "Objects only change their state there; `clearFinished()` removes the finished ones once, at the end of the frame",
+          "Bullets can never hit twice, because `hits()` deletes the shot's sprite the moment it overlaps"
+        ],
+        "answer": 2,
+        "explanation": "A hit calls `spend()` and `takeHit(1)`, and nothing leaves a list until `clearFinished()` runs at the end of the frame: finished in one place.",
+        "sourceIds": [
+          "5-11-defender-3-example-finished-in-one-place",
+          "5-11-defender-5-lab-bullet"
+        ]
+      },
+      {
+        "id": "q3-filter",
+        "source": "5.11.3",
+        "question": "What does `enemies = enemies.filter((e) => e.isAlive());` NOT do by itself?",
+        "options": [
+          "Keep the enemies that are still alive in the list",
+          "Delete the finished enemies' sprites",
+          "Make a new array",
+          "Call `isAlive()` on each enemy"
+        ],
+        "answer": 1,
+        "explanation": "`filter` only builds a new list. The finished enemies' sprites stay on screen unless something calls `remove()` on them first, which is why the remove loop runs before it.",
+        "sourceIds": [
+          "5-11-defender-3-example-finished-in-one-place"
+        ]
+      },
+      {
+        "id": "q4-param",
+        "source": "5.11.5",
+        "question": "In `b.hits(e)`, what is `e`?",
+        "options": [
+          "A number: the index of the enemy in `enemies`",
+          "The bullet's own sprite, which `hits()` compares with the enemy",
+          "The Enemy class itself, so `hits()` can test every enemy at once",
+          "Another object, an Enemy, handed to the bullet's method"
+        ],
+        "answer": 3,
+        "explanation": "The parameter is another object, as in 5.8.12's `hit(other)`. Inside `hits(enemy)` the bullet reads `enemy.sprite` and asks `enemy.isAlive()`.",
+        "sourceIds": [
+          "5-11-defender-5-lab-bullet"
+        ]
+      },
+      {
+        "id": "q5-static",
+        "source": "5.11.6",
+        "question": "Why is `spawned` declared `static`?",
+        "options": [
+          "It is a fact about all enemies, so it belongs to the class (`Enemy.spawned`), not to one enemy",
+          "So it can never change once the first enemy has been built",
+          "So each enemy keeps its own count of how many enemies were built before it",
+          "Because a number kept on a class must be `static`, or the constructor will not run"
+        ],
+        "answer": 0,
+        "explanation": "One counter for every enemy built lives on the class. Each new enemy adds 1 to it in the constructor, and `startRound()` sets it back to 0.",
+        "sourceIds": [
+          "5-11-defender-6-lab-a-spawner-for-the-waves"
+        ]
+      },
+      {
+        "id": "q6-checklist",
+        "source": "5.11.1",
+        "question": "Which class answers \"no\" to the checklist's first question, \"more than one of this thing?\"",
+        "options": [
+          "Enemy",
+          "Bullet",
+          "Spawner",
+          "None of them"
+        ],
+        "answer": 2,
+        "explanation": "There is only one spawner. It is a class anyway because its wave and pause change together, so a restart is one line, `spawner = new Spawner();`, that cannot forget a piece.",
+        "sourceIds": [
+          "5-11-defender-1-reading-count-the-cost"
+        ]
+      },
+      {
+        "id": "q7-shield",
+        "source": "5.11.1",
+        "question": "Each enemy needs a shield value. In Part C, where does the change go?",
+        "options": [
+          "In the Enemy constructor, and the one place that uses it",
+          "A new array, a push, two splices and a line in `startRound`",
+          "In every loop in `draw()`",
+          "Only in `Spawner`"
+        ],
+        "answer": 0,
+        "explanation": "The enemy keeps its own facts, so a new fact is one more `this.shield` in the constructor plus the code that uses it. In Part B the same change needed a new array, a push, a splice in both removal copies and a line in `startRound`.",
+        "sourceIds": [
+          "5-11-defender-1-reading-count-the-cost"
+        ]
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

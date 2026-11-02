@@ -1,13 +1,13 @@
 {
   "id": "5-3-26-lab-array-of-instances",
-  "title": "5.4.12 Lab: An array of Enemies",
+  "title": "5.7.13 Lab: An array of Enemies",
   "description": "Store five Enemy instances in a single array by pushing new Enemy(...) calls into `enemies`: practice managing many instances without separate named variables.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Writing Your Own Classes",
+  "unit": "5.7 Writing Your Own Classes",
   "preview": "moshion",
-  "week": 12,
+  "week": 13,
   "slos": [
     "SLO-2",
     "SLO-3"
@@ -26,13 +26,14 @@
     {
       "id": "r1",
       "title": "enemies.push(new Enemy(...)) used at least once",
-      "description": "Use `enemies.push(new Enemy(...))` to add Enemy instances to the array. Help: 5.4.1 (Methods: functions that live on a class)",
+      "description": "Use `enemies.push(new Enemy(...))` to add Enemy instances to the array. Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:enemies\\.push\\s*\\(\\s*new\\s+Enemy[\\s\\S]*?){5}|for\\s*\\([\\s\\S]{0,120}?\\)[\\s\\S]{0,60}?enemies\\.push\\s*\\(\\s*new\\s+Enemy",
+      "pattern": "(?:enemies\\.push\\s*\\(\\s*new\\s+Enemy[\\s\\S]*?){5}|for\\s*\\([^)]*\\)\\s*\\{?[^{}]*?enemies\\.push\\s*\\(|\\bwhile\\s*\\([^)]*\\)\\s*\\{[^{}]*?enemies\\.push\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {

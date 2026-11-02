@@ -1,0 +1,21 @@
+{
+  "id": "5-11-defender-1-reading-count-the-cost",
+  "title": "5.11.1 Reading: Count the cost",
+  "description": "Count what Part B's parallel arrays cost (8 splices, 13 lines, two removal copies), run the checklist on bullet, enemy and spawner, and see where every fact lives after the rebuild.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.11 Project: Defender, Part C",
+  "preview": "reading",
+  "week": 15,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

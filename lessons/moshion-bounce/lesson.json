@@ -1,13 +1,13 @@
 {
   "id": "moshion-bounce",
-  "title": "5.2.7 Bouncy Ball",
+  "title": "5.2.12 Bouncy Ball",
   "description": "Learn how bounciness and friction change how sprites feel.",
   "type": "lesson",
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
   "preview": "moshion",
-  "week": 15,
+  "week": 11,
   "slos": [
     "SLO-3"
   ],
@@ -47,7 +47,7 @@
     {
       "id": "r1",
       "title": "Create multiple static walls",
-      "description": "At least two 'static' sprites. Help: 5.2.6 (Bounciness and Friction)",
+      "description": "At least two 'static' sprites. Help: 5.2.11 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\([^)]*['\"]static['\"][\\s\\S]*new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
@@ -68,11 +68,11 @@
     },
     {
       "id": "r3",
-      "title": "Set bounciness",
-      "description": "Assign to .bounciness. Help: 5.2.6 (Bounciness and Friction)",
+      "title": "Make it bouncy",
+      "description": "The ball's .bounciness is set near the top of the 0 to 1 range: 0.5 or more. Help: 5.2.11 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.bounciness\\s*=",
+      "pattern": "\\.bounciness\\s*=\\s*(?:1(?:\\.\\d+)?\\b|0?\\.[5-9])",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -80,7 +80,7 @@
     {
       "id": "r4",
       "title": "Set friction",
-      "description": "Assign to .friction. Help: 5.2.6 (Bounciness and Friction)",
+      "description": "Assign to .friction. Help: 5.2.11 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.friction\\s*=",

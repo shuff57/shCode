@@ -1,13 +1,13 @@
 {
   "id": "5-2-5-lab-add-a-jump",
-  "title": "5.2.5 Lab: Add a Jump",
+  "title": "5.2.10 Lab: Add a Jump",
   "description": "Gate a jump on a key press and a ground check. Auto-graded.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
   "preview": "moshion",
-  "week": 15,
+  "week": 11,
   "slos": [
     "SLO-3"
   ],
@@ -36,7 +36,7 @@
     {
       "id": "r2",
       "title": "Check that the player is on the ground",
-      "description": "Somewhere in the sketch, the player is checked against another sprite with .colliding(...). Help: 5.2.4 (Ground-Gated Actions)",
+      "description": "Somewhere in the sketch, the player is checked against another sprite with .colliding(...). Help: 5.2.9 (Ground-Gated Actions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.colliding\\s*\\(",
@@ -51,7 +51,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "kb\\.presses\\s*\\([^)]*\\)\\s*&&[\\s\\S]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*&&[\\s\\S]*?kb\\.presses\\s*\\(",
+      "pattern": "\\b(?:if|while)\\s*\\([^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?kb\\.presses\\s*\\()(?=[^{};]*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)]))|(?:const|let|var)\\s+\\w+\\s*=[^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?kb\\.presses\\s*\\()|(?:(?:const|let|var)\\s+)?(\\w+)\\s*=[^;{}]*?\\.colliding\\s*\\([^;{}]*;[\\s\\S]{0,200}?\\b(?:if|while)\\s*\\([^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\b\\1\\b|\\b\\1\\b[^{};]*?&&\\s*\\(?\\s*kb\\.presses\\s*\\()",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -59,7 +59,7 @@
     {
       "id": "r4",
       "title": "Launch the player upward",
-      "description": "Inside draw(), the player's vertical velocity is set to a negative number (or a variable holding one) when the jump fires. Help: 5.2.2 (Gravity)",
+      "description": "Inside draw(), the player's vertical velocity is set to a negative number (or a variable holding one) when the jump fires. Help: 5.1.16 (Velocity: vel.x and vel.y)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

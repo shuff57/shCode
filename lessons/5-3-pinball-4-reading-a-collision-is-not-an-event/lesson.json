@@ -1,0 +1,21 @@
+{
+  "id": "5-3-pinball-4-reading-a-collision-is-not-an-event",
+  "title": "5.3.5 Reading: A collision is not an event",
+  "description": "`colliding()` is level-triggered: it is true on every frame two sprites touch. Shows why a score written on a collision climbs sixty times a second, and the three-line pattern that turns a frame into an event.",
+  "type": "lesson",
+  "estimateMins": 6,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.3 Project: Pinball",
+  "preview": "reading",
+  "week": 11,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

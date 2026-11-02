@@ -1,0 +1,51 @@
+{
+  "id": "5-5-snake-11-challenges-make-it-yours",
+  "title": "5.5.11 Challenges: Make it yours",
+  "description": "The game is complete. Change one rule of your own: a snake that speeds up as it eats, a best score that survives a loss, or a fix for the quick double-turn. Pick one; add an idea of your own on top if you like.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a rule and change it",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from the game in the editor.\n\n**Challenge 1: a faster snake (easy).** The starter keeps the beat in `const BEAT = 8;` and steps on `frameCount % BEAT`. A `const` can never change, so turn it into `let beat = 8;` and use `frameCount % beat`. Make `beat` smaller every time the snake eats, with a floor so the game never becomes impossible.\n\n**Challenge 2: your best score (medium).** A restart wipes the score, which is right. Keep a second variable called `best` that is *not* reset when R is pressed, update it when the score beats it, and show it beside the current score in `drawTop()`.\n\n**Challenge 3: the quick double-turn (hard).** Move right, then press up and left very quickly, both within one step: the snake runs back into itself, because the second key was tested against a direction that had only just changed. Store each turn in `turnX` and `turnY`, and apply it at the start of the next step.",
+      "hints": [
+        "Whatever you pick, press R afterwards and check the game still starts cleanly."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Name what you changed",
+      "instructions": "At the top of `script.js`, write one sentence as a `//` comment saying what your rule is and what would happen if you removed it.",
+      "hints": [
+        "A rule is something the game decides. 'The snake speeds up with each food' is a rule; 'I changed a colour' is not."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Your rule is in the code",
+      "description": "One of the three challenges is there: a beat that gets shorter, a best score kept across rounds, or a turn stored in turnX and turnY for the next step. Help: 5.5.2 (Reading: A world on a grid) and 5.5.4 (Lab: Steer it)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bbeat\\s*(?:-=|--|=\\s*(?:\\(\\s*)?(?:(?:Math\\.)?max\\s*\\(|beat\\s*-))|--\\s*beat\\b|if\\s*\\(\\s*(?:\\(\\s*){0,2}(?:score(?:\\s*\\))?\\s*>=?\\s*(?:\\(\\s*)?best|best(?:\\s*\\))?\\s*<=?\\s*(?:\\(\\s*)?score)\\b(?:\\s*\\)){1,3}|\\bbest\\s*=\\s*(?:\\(\\s*)?(?:Math\\.)?max\\s*\\(|\\bturnX\\s*=",
+      "flags": "i",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

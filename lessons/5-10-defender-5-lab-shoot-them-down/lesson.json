@@ -1,0 +1,118 @@
+{
+  "id": "5-10-defender-5-lab-shoot-them-down",
+  "title": "5.10.5 Lab: Shoot them down",
+  "description": "Shots fly straight through the enemies. Write hitEnemies: every shot against every enemy, a hit that removes the shot and takes 1 hp, and an enemy at 0 hp that scores its worth and leaves all three arrays.",
+  "type": "lesson",
+  "estimateMins": 18,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.10 Project: Defender, Part B",
+  "preview": "moshion",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Every shot against every enemy",
+      "instructions": "Shots fly through enemies because nothing tests them. All your work is in `hitEnemies()`, which `draw()` already calls. Write a loop over `bullets` from the end to the start, and inside it a loop over `enemies` from the end to the start, as 5.10.4 showed. When `bullets[i]` overlaps `enemies[j]`, delete the shot, splice it out of `bullets`, and `break`: that shot is gone, so it must not be tested against the other enemies. Run it: a shot that reaches an enemy should vanish.",
+      "hints": [
+        "Two backwards loops, one inside the other: `for (let i = bullets.length - 1; i >= 0; i--)` outside, and the same shape with `j` and `enemies` inside.",
+        "`break` goes last inside the overlap `if`, after everything the hit does."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A hit takes 1 hp",
+      "instructions": "On the same hit, inside the overlap `if` and above the `break`, take 1 from `enemyHp[j]` and show the new number on the enemy with `enemies[j].text = String(enemyHp[j]);`. Run it: an orange enemy's 3 should count down to 2, then 1.",
+      "hints": [
+        "`enemyHp[j] -= 1;` changes the number; the `.text` line is what makes the change show.",
+        "Both lines go inside the overlap `if`, before the `break`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Shot down",
+      "instructions": "If that hit leaves `enemyHp[j]` at 0 or less, the enemy is shot down: add `enemyWorth[j]` to `score`, delete the enemy's sprite and splice index `j` out of all three arrays. A crimson enemy should score 10 and an orange one 30. These are the same four removal lines as the landing in `moveEnemies()`; if you would rather type them once, move them into `function removeEnemy(j)` and call it from both places (the check reads it too).",
+      "hints": [
+        "Add `enemyWorth[j]` to `score` before the splices: once index `j` is spliced, `enemyWorth[j]` belongs to a different enemy.",
+        "`if (enemyHp[j] <= 0) { ... }` holds the score line and the four removal lines."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Every shot is tested against every enemy",
+      "description": "hitEnemies has a loop over bullets and, inside it, a loop over enemies (either way round), and tests them with overlaps. Help: 5.10.4 (Reading: Every shot against every enemy)",
+      "type": "inFunction",
+      "function": "hitEnemies",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*\\.overlaps\\s*\\()(?:[\\s\\S]*?for\\s*\\([^)]*\\bbullets\\b[\\s\\S]*?for\\s*\\([^)]*\\benemies\\b|[\\s\\S]*?for\\s*\\([^)]*\\benemies\\b[\\s\\S]*?for\\s*\\([^)]*\\bbullets\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A hit removes the shot",
+      "description": "The shot that hit is deleted from the screen and spliced out of bullets. Help: 5.10.4 (Reading: Every shot against every enemy)",
+      "type": "inFunction",
+      "function": "hitEnemies",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\((?=[^{};]{0,200}\\boverlaps\\s*\\()[^{};]{0,200}\\)\\s*\\{(?=(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\bbullets\\s*\\[\\s*\\w+\\s*\\]\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)|\\bbullets\\.splice\\s*\\([^()]*\\)\\s*\\[\\s*0\\s*\\]\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*bullets\\s*\\[\\s*\\w+\\s*\\][^;]*;[\\s\\S]*?\\b\\1\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\)))(?=\\s*)(?=(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\bbullets\\.splice\\s*\\()|(?:const|let|var)\\s+(\\w+)\\s*=\\s*bullets\\s*\\[\\s*\\w+\\s*\\][^;]*;[\\s\\S]{0,300}?\\bif\\s*\\((?=[^{};]{0,200}\\boverlaps\\s*\\()[^{};]{0,200}\\)\\s*\\{(?=(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\b\\2\\s*\\.\\s*(?:delete|remove)\\s*\\(\\s*\\))(?=\\s*)(?=(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\bbullets\\.splice\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "A hit takes 1 hp",
+      "description": "Inside the if that sees the overlap, and before its break, enemyHp[j] goes down by 1 (a line after the break never runs). Help: 5.10.4 (Reading: Every shot against every enemy)",
+      "type": "inFunction",
+      "function": "hitEnemies",
+      "file": "script.js",
+      "pattern": "if\\s*\\((?=[^{};]{0,200}\\boverlaps\\s*\\()[^{};]{0,200}\\)\\s*\\{(?:(?!\\b(?:break|return|continue)\\b)[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{[^{}]*?)?(?:\\benemyHp\\s*\\[\\s*[\\w$]+\\s*\\]\\s*(?:-=\\s*\\(?\\s*1\\b|--)|--\\s*enemyHp\\s*\\[|\\benemyHp\\s*\\[\\s*[\\w$]+\\s*\\]\\s*=\\s*\\(?\\s*enemyHp\\s*\\[\\s*[\\w$]+\\s*\\]\\s*-\\s*\\(?\\s*1\\b)|(?:const|let|var)\\s+([\\w$]+)\\s*=(?![=>])[^;]{0,200}\\boverlaps\\s*\\([^;]{0,200};[\\s\\S]{0,300}?\\bif\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\1\\b)[^{};]{0,200}\\)\\s*\\{(?:(?!\\b(?:break|return|continue)\\b)[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?(?:\\{[^{}]*?)?(?:\\benemyHp\\s*\\[\\s*[\\w$]+\\s*\\]\\s*(?:-=\\s*\\(?\\s*1\\b|--)|--\\s*enemyHp\\s*\\[|\\benemyHp\\s*\\[\\s*[\\w$]+\\s*\\]\\s*=\\s*\\(?\\s*enemyHp\\s*\\[\\s*[\\w$]+\\s*\\]\\s*-\\s*\\(?\\s*1\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "At 0 hp the enemy scores its worth and leaves all three arrays",
+      "description": "When enemyHp[j] reaches 0, score goes up by enemyWorth[j] BEFORE the splices (after them, index j is a different enemy) and before the break, then index j is spliced out of enemies, enemyHp and enemyWorth (in hitEnemies, or in a removeEnemy helper it calls). Help: 5.10.4 (Reading: Every shot against every enemy)",
+      "type": "inFunction",
+      "function": [
+        "hitEnemies",
+        "removeEnemy"
+      ],
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*?(?:\\benemyWorth\\s*\\.\\s*splice\\s*\\(|\\bremoveEnemy\\s*\\()[^{}]*?\\benemyWorth\\s*\\[)(?![\\s\\S]*?(?<!(?:\\)|\\belse)\\s*)\\b(?:break|return)\\b[^;{}]*;(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}){0,800}?(?:\\{[^{}]*?)?(?:\\bscore\\s*(?:\\+=|=(?!=))|\\benemyWorth\\s*\\[))(?=[\\s\\S]*(?:if\\s*\\(\\s*(?:\\(\\s*){0,3}|=\\s*(?:\\(\\s*){0,3})enemyHp\\s*\\[\\s*\\w+\\s*\\]\\s*\\)?\\s*(?:<=\\s*\\(?\\s*0\\b|===?\\s*\\(?\\s*0\\b|<\\s*\\(?\\s*1\\b))(?=[\\s\\S]*(?:\\bscore\\s*(?:\\+=\\s*\\(?\\s*|=\\s*\\(?\\s*score\\s*\\+\\s*\\(?\\s*)enemyWorth\\s*\\[|\\bscore\\s*=\\s*\\(?\\s*enemyWorth\\s*\\[[^;]{0,40}\\+\\s*\\(?\\s*score\\b|(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*enemyWorth\\s*\\[[^;]{0,40};[\\s\\S]{0,300}?\\bscore\\s*(?:\\+=\\s*\\(?\\s*|=\\s*\\(?\\s*score\\s*\\+\\s*\\(?\\s*)\\1\\b))(?:(?=[\\s\\S]*\\bremoveEnemy\\s*\\()(?=[\\s\\S]*\\benemies\\.splice\\s*\\()(?=[\\s\\S]*\\benemyHp\\.splice\\s*\\()(?=[\\s\\S]*\\benemyWorth\\.splice\\s*\\()|(?=[\\s\\S]*?\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\benemies\\.splice\\s*\\()(?=[\\s\\S]*?\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\benemyHp\\.splice\\s*\\()(?=[\\s\\S]*?\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\benemyWorth\\.splice\\s*\\())",
+      "ignoreStrings": true,
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "A shot that hit is not tested again",
+      "description": "Inside the if that sees the overlap, the inner loop stops with break (or return), so a shot that has been spliced out is never read again. Help: 2.4.27 (Worked Example: break Leaves Only the Inner Loop)",
+      "type": "inFunction",
+      "function": "hitEnemies",
+      "file": "script.js",
+      "pattern": "if\\s*\\((?=[^{};]{0,200}\\boverlaps\\s*\\()[^{};]{0,200}\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\b(?:break|return)\\b|(?:const|let|var)\\s+([\\w$]+)\\s*=(?![=>])[^;]{0,200}\\boverlaps\\s*\\([^;]{0,200};[\\s\\S]{0,300}?\\bif\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\1\\b)[^{};]{0,200}\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?\\b(?:break|return)\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

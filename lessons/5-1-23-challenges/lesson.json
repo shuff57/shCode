@@ -1,6 +1,6 @@
 {
   "id": "5-1-23-challenges",
-  "title": "5.1.23 Challenges",
+  "title": "5.1.24 Challenges",
   "description": "Pick one or more of the stretch challenges and implement them in the editor. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
@@ -38,10 +38,11 @@
     },
     {
       "id": "s4",
-      "title": "Use one advanced feature",
-      "instructions": "Pick a challenge from content.md and implement it using at least one technique beyond canvas + sprite + background: kb.presses, sin/cos, mouse.x/y, lerp, frameCount %, or text().",
+      "title": "Build one challenge",
+      "instructions": "Pick one of the challenges below and build it in `draw()`. The check turns green once `draw()` uses `sin()`, `cos()` or `text()`, the tools 5.1.15 and 5.1.21 taught, so any one of challenges 2 to 5 is enough on its own; challenge 1 needs one of them added.\n\n**Challenge 1: color by key (easy).** While an arrow key is held, the player wears a different color: test the key with `kb.pressing(...)` (5.1.13) and set `player.color`.\n\n**Challenge 2: an orbiting companion (medium).** A second sprite circles the player. Every frame, set its `pos.x` to `player.pos.x + cos(frameCount * 0.05) * 60`, and its `pos.y` the same way with `sin` (5.1.15).\n\n**Challenge 3: show a value (easy).** Draw one of the player's values on the canvas with `text()` (5.1.21), joining words and a number with `+`, for example `text('x: ' + player.pos.x, 10, 20);`.\n\n**Challenge 4: a HUD (medium).** At the top of the canvas, show `'Frame: ' + frameCount` on one line and the player's x and y on the next, one `text()` call per line.\n\n**Challenge 5: a wave (medium).** A sprite that bobs up and down on its own: every frame, set its `pos.y` to a middle value plus `sin(frameCount * 0.05) * 80`, the way 5.1.15's mover swings sideways.",
       "hints": [
-        "content.md lists six challenges with hints for each. Pick whichever interests you: the auto-grader accepts any of the techniques above."
+        "Everything these challenges use has been shown in 5.1: the sin and cos lines are in 5.1.15 (Worked Example: Keyboard Movement), and text() is in 5.1.21 (Reading: Words on the canvas: text()).",
+        "Doing more than one challenge is fine: the check needs only one."
       ]
     }
   ],
@@ -54,7 +55,8 @@
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -64,18 +66,20 @@
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r3",
       "title": "Background set each frame",
-      "description": "Calls background() inside draw() with a colour of the student choosing. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+      "description": "Calls background() inside draw() with a colour of the student choosing. Help: 5.1.9 (background(color) wipe rule)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
       "pattern": "background\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     },
     {
       "id": "r4",
@@ -89,7 +93,8 @@
       "file": "script.js",
       "pattern": "kb\\.presses\\s*\\(|\\bsin\\s*\\(|\\bcos\\s*\\(|mouse\\.(x|y|pressed|pressing)|\\blerp\\s*\\(|frameCount\\s*%|\\btext\\s*\\(",
       "flags": "",
-      "points": 0
+      "points": 0,
+      "ignoreStrings": true
     }
   ],
   "grading": {

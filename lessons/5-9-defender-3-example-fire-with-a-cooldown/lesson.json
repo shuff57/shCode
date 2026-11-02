@@ -1,0 +1,22 @@
+{
+  "id": "5-9-defender-3-example-fire-with-a-cooldown",
+  "title": "5.9.3 Worked Example: Fire with a cooldown",
+  "description": "Hold Space and the ship fires one shot every 12 frames. Change COOLDOWN to 0, 4 and 30 and watch the gap between the shots.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.9 Project: Defender, Part A",
+  "preview": "example",
+  "week": 14,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

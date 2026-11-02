@@ -1,4 +1,4 @@
-let player, ground, goal1, goal2;
+let player, ground, goal1, goal2, leftWall, rightWall;
 let collected = 0;
 
 function setup() {
@@ -7,7 +7,7 @@ function setup() {
 
   player = new Sprite(200, 60, 40, 40);
   player.color = 'deepskyblue';
-  player.bounciness = 0.6;
+  player.bounciness = 0.2;
 
   ground = new Sprite(200, 380, 400, 20, 'static');
   ground.friction = 0.5;
@@ -19,6 +19,11 @@ function setup() {
   goal2 = new Sprite(360, 120, 24, 24);
   goal2.collider = 'none';
   goal2.color = 'gold';
+
+  leftWall = new Sprite(6, 200, 12, 400, 'static');
+  leftWall.color = 'sienna';
+  rightWall = new Sprite(394, 200, 12, 400, 'static');
+  rightWall.color = 'sienna';
 }
 
 function draw() {
@@ -29,7 +34,7 @@ function draw() {
   else                        player.vel.x = 0;
 
   if (kb.presses(' ') && player.colliding(ground)) {
-    player.vel.y = -8;
+    player.vel.y = -7;
   }
 
   if (player.y < 200) {

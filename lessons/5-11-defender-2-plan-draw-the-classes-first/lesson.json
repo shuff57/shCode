@@ -1,0 +1,56 @@
+{
+  "id": "5-11-defender-2-plan-draw-the-classes-first",
+  "title": "5.11.2 Plan: Draw the classes first",
+  "description": "Before any code: say what Bullet, Enemy and Spawner each remember and can do, one job that moves into a class, and which class fails the checklist's first question. AI-graded with hints.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.11 Project: Defender, Part C",
+  "preview": "assignment",
+  "week": 15,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "aiGrader": {
+    "rubricTitle": "Plan the classes: AI-graded rubric",
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": [],
+    "prompt": "Everything you need is on this page and in 5.11.1 (Reading: Count the cost): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to rebuild Defender with three classes: Bullet, Enemy and Spawner. Before you move any code, plan them.\n\n1. For at least two of the three classes, name one thing each one remembers.\n\n2. For at least two of them, name one thing each one can do or answer.\n\n3. Name one job that leaves draw() or a Part B function and moves into a class.\n\n4. Which class answers \"no\" to the checklist's first question, \"more than one of this thing?\", and why might it still be a class?",
+    "rubric": [
+      {
+        "id": "remember",
+        "title": "Names something two of the classes remember",
+        "description": "The student names, for at least two of Bullet, Enemy and Spawner, something each one remembers, such as a shot's sprite or whether it is used up, an enemy's hp, worth or speed, or the spawner's wave number or pause. Any property, in any words, earns full credit, and one class is enough if the answer clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "does",
+        "title": "Names something two of the classes can do or answer",
+        "description": "The student names, for at least two of the classes, something each can do or answer, such as a shot moving or saying whether it hit an enemy, an enemy taking a hit or saying whether it is alive, or the spawner building a wave. Any method or action, in any words, earns full credit, and one class is enough if the answer clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "moves",
+        "title": "Names one job that moves into a class",
+        "description": "The student names one job that used to sit in draw() or a Part B function and now belongs to a class, for example what a hit does, an enemy landing, removing finished enemies, or the pause before the next wave. Any job they connect to a class earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "checklist",
+        "title": "Names the class that fails the first checklist question, or why one might still be a class",
+        "description": "The student says which class fails the checklist's first question (the Spawner, because there is only one), or gives any reason one might still be a class, such as its facts changing together or a restart being one line. Either half on its own earns full credit, and so does a different class with a reason. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

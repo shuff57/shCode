@@ -1,0 +1,21 @@
+{
+  "id": "5-5-5-reading-object-owns-its-rule",
+  "title": "5.8.5 Reading: Who may change a property",
+  "description": "A property is open: any code holding the object can write it. Shows health counting down past zero while the enemy is still on screen, and the alternative — a method that owns the rule, so the outside asks the class instead of doing its arithmetic.",
+  "type": "lesson",
+  "estimateMins": 6,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.8 Inside a Class",
+  "preview": "reading",
+  "week": 14,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

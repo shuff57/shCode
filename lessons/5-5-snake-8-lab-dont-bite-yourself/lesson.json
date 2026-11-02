@@ -1,0 +1,83 @@
+{
+  "id": "5-5-snake-8-lab-dont-bite-yourself",
+  "title": "5.5.8 Lab: Don't bite yourself",
+  "description": "The snake passes through itself and the food can appear under its body. Write one search helper and use it both to end the round on a bite and to keep the food off the snake.",
+  "type": "lesson",
+  "estimateMins": 14,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the search",
+      "instructions": "Fill in `isBody(col, row)`: loop through `segments`, and if one has the same `col` and `row`, return `true` straight away. After the loop, return `false`.",
+      "hints": [
+        "`for (const s of segments) { ... }`",
+        "The `return false;` goes after the closing brace of the loop, not inside it."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A bite ends the round",
+      "instructions": "In `step()`, add `isBody(col, row)` to the test that ends the round at the walls, so running into your own body ends it too. Run it and steer into your tail to check.",
+      "hints": [
+        "Join it to the wall test with `||`.",
+        "You need a snake of four or more cells to bite yourself, so eat a few first."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Keep the food off the snake",
+      "instructions": "In `makeFood()`, keep picking a new random cell for as long as `isBody(col, row)` is true. That means the two picks must be `let`, not `const`, so they can be reassigned.",
+      "hints": [
+        "`while (isBody(col, row)) { ... }` with two new picks inside.",
+        "Make the snake long and watch the food: it should never appear under a green cell."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "isBody searches the segments",
+      "description": "A loop (for...of, or an index loop) goes through every segment and returns true when one matches. Help: 5.5.7 (Reading: Searching the array)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\([^)]*\\bsegments\\b[^)]*\\)[\\s\\S]{0,200}?\\bif\\s*\\([^{};]*\\)[^;]{0,120}?return\\s+true|for\\s*\\([^)]*\\bsegments\\b[^)]*\\)[\\s\\S]{0,200}?\\bif\\s*\\([^{};]*\\)[^;]{0,120}?(?<![\\w.$])(\\w+)\\s*=\\s*true\\b[\\s\\S]{0,200}?return\\s+\\1\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "A bite ends the round",
+      "description": "The same test that checks the walls also asks isBody. Help: 5.5.7 (Reading: Searching the array)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "isBody\\s*\\([^)]*\\)[\\s\\S]{0,120}?playing\\s*=\\s*false",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Food keeps re-picking until the cell is free",
+      "description": "A while loop repeats the pick while the cell is part of the body. Help: 5.5.7 (Reading: Searching the array)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "while\\s*\\(\\s*(?:\\(\\s*){0,3}isBody\\s*\\([^)]*\\)[^{]*?(?:\\{[^}]*?|[^{;]*?)(?<![\\w$.=!<>])\\w+\\s*=(?!=)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "5-5-snake-9-playtest-and-reflect",
+  "title": "5.5.9 Playtest and reflect: Snake",
+  "description": "Play your game at least three times, find one thing that surprised you, link it to your code and choose one change. AI-graded with hints.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "assignment",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "aiGrader": {
+    "rubricTitle": "Playtest Snake: AI-graded rubric",
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": [],
+    "prompt": "Everything you need is in 5.5.1 (Plan: Break Snake into parts) and 5.5.8 (Lab: Don't bite yourself): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Snake at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many rounds they played and how it went",
+        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how long the snake got). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as the beat, the tail removal, the isBody search or the food placement, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

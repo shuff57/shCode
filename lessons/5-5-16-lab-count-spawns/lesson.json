@@ -1,0 +1,66 @@
+{
+  "id": "5-5-16-lab-count-spawns",
+  "title": "5.8.16 Lab: Count your spawns",
+  "description": "The scene already prints `Enemy.spawned`, which is `undefined` because nothing declares it. Add a counter that belongs to the class and bump it in the constructor, so every enemy ever built is counted.",
+  "type": "lesson",
+  "estimateMins": 6,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.8 Inside a Class",
+  "preview": "moshion",
+  "week": 14,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare the class's counter",
+      "instructions": "Above the constructor, inside the class body, declare a `static` property named `spawned` and start it at 0. Run it: the counter at the top stops saying `undefined` and reads `0`.",
+      "hints": [
+        "The line has three parts: the word `static`, the name `spawned`, and `= 0`.",
+        "5.8.14 (Reading: One value shared by every instance) has the same line in its first code block."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Bump it in the constructor",
+      "instructions": "Add one to the counter at the end of the constructor, so that building an enemy is what counts it. Run it and click: 'enemies ever built' should climb, while 'still here' goes back down as you knock them off with Space.",
+      "hints": [
+        "Write the increment on the class: `Enemy.spawned += 1;`. `this.spawned` is a property of one enemy, which is the thing you are trying not to use.",
+        "Put it after the sprite is set up: once the object exists, it has been counted."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A static counter named spawned is declared",
+      "description": "The class body declares `static spawned` and starts it at 0. Help: 5.8.14 (Reading: One value shared by every instance)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "static\\s+spawned\\s*=\\s*\\(?\\s*0(?![\\w.])",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The constructor counts every new enemy",
+      "description": "The constructor adds one to the class's counter, so every enemy is counted wherever it was created. Help: 5.8.14 (Reading: One value shared by every instance)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:(?:Enemy|this\\.constructor)\\.spawned\\s*(?:\\+=|\\+\\+|=(?!=)\\s*\\(?\\s*(?:(?:Enemy|this\\.constructor)\\.spawned\\s*\\+|1\\s*\\+\\s*(?:Enemy|this\\.constructor)\\.spawned\\b))|\\+\\+\\s*(?:Enemy|this\\.constructor)\\.spawned\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

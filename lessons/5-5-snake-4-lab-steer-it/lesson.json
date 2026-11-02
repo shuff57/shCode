@@ -1,0 +1,83 @@
+{
+  "id": "5-5-snake-4-lab-steer-it",
+  "title": "5.5.4 Lab: Steer it",
+  "description": "The block only walks right and walks off the edge. Add the four arrow keys with two direction variables, forbid turning back on yourself, and end the round at a wall.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Project: Snake",
+  "preview": "moshion",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn with the arrow keys",
+      "instructions": "The block moves by `dx` and `dy` each step, but nothing changes them. In `draw()`, set `dx` and `dy` when an arrow key is pressed: up is `dx = 0; dy = -1`, and so on for down, left and right.",
+      "hints": [
+        "`kb.presses('up')` is true on the frame the key goes down.",
+        "Four `if` lines, one per key. Each sets both `dx` and `dy` so the block never moves diagonally."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "No turning back",
+      "instructions": "Pressing the opposite key while moving would send the snake straight back into itself. Allow up and down only when `dy === 0`, and left and right only when `dx === 0`.",
+      "hints": [
+        "Add `&& dy === 0` to the up and down tests, and `&& dx === 0` to left and right.",
+        "Run it and press left while moving right. Nothing should happen."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Stop at the wall",
+      "instructions": "After the step, if the new column or row is off the grid (below 0, or 20 or more), set `playing` to `false`. Otherwise move the block on screen: the two pixel lines already in the starter go in the `else`, so a dead block stays on the last cell it reached. The starter already shows 'Game over' when `playing` is false, from `drawTop()` at the bottom, so the block can never cover the words.",
+      "hints": [
+        "`head.col < 0 || head.col >= 20 || head.row < 0 || head.row >= 20`",
+        "`if (...off the grid...) { playing = false; } else { head.x = ...; head.y = ...; }`"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Each arrow key sets the direction",
+      "description": "Pressing up, down, left or right changes dx and dy together. Help: 5.5.2 (Reading: A world on a grid)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*kb\\.press\\w*\\s*\\(\\s*['\"]up['\"]\\s*\\)[\\s\\S]{0,80}?dy\\s*=\\s*-\\s*1\\b)(?=[\\s\\S]*kb\\.press\\w*\\s*\\(\\s*['\"]down['\"]\\s*\\)[\\s\\S]{0,80}?dy\\s*=\\s*1\\b)(?=[\\s\\S]*kb\\.press\\w*\\s*\\(\\s*['\"]left['\"]\\s*\\)[\\s\\S]{0,80}?dx\\s*=\\s*-\\s*1\\b)(?=[\\s\\S]*kb\\.press\\w*\\s*\\(\\s*['\"]right['\"]\\s*\\)[\\s\\S]{0,80}?dx\\s*=\\s*1\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "A turn straight back is refused",
+      "description": "Each of the four keys refuses a turn straight back: up and down only when the block is not already moving up or down (dy === 0), left and right only when dx === 0. Help: 5.5.2 (Reading: A world on a grid)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*(?:kb\\.press\\w*\\s*\\(\\s*[\\'\"]up[\\'\"]\\s*\\)\\s*&&\\s*\\(?\\s*(?:\\bdy\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dy\\b)|(?:\\bdy\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dy\\b)\\s*\\)?\\s*&&\\s*kb\\.press\\w*\\s*\\(\\s*[\\'\"]up[\\'\"]\\s*\\)|kb\\.press\\w*\\s*\\(\\s*[\\'\"]up[\\'\"]\\s*\\)\\s*\\)\\s*\\{?\\s*if\\s*\\(\\s*(?:\\bdy\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dy\\b)|if\\s*\\(\\s*(?:\\bdy\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dy\\b)\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|(?:if\\s*\\(\\s*)?)kb\\.press\\w*\\s*\\(\\s*[\\'\"]up[\\'\"]\\s*\\)))(?=[\\s\\S]*(?:kb\\.press\\w*\\s*\\(\\s*[\\'\"]down[\\'\"]\\s*\\)\\s*&&\\s*\\(?\\s*(?:\\bdy\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dy\\b)|(?:\\bdy\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dy\\b)\\s*\\)?\\s*&&\\s*kb\\.press\\w*\\s*\\(\\s*[\\'\"]down[\\'\"]\\s*\\)|kb\\.press\\w*\\s*\\(\\s*[\\'\"]down[\\'\"]\\s*\\)\\s*\\)\\s*\\{?\\s*if\\s*\\(\\s*(?:\\bdy\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dy\\b)|if\\s*\\(\\s*(?:\\bdy\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dy\\b)\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|(?:if\\s*\\(\\s*)?)kb\\.press\\w*\\s*\\(\\s*[\\'\"]down[\\'\"]\\s*\\)))(?=[\\s\\S]*(?:kb\\.press\\w*\\s*\\(\\s*[\\'\"]left[\\'\"]\\s*\\)\\s*&&\\s*\\(?\\s*(?:\\bdx\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dx\\b)|(?:\\bdx\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dx\\b)\\s*\\)?\\s*&&\\s*kb\\.press\\w*\\s*\\(\\s*[\\'\"]left[\\'\"]\\s*\\)|kb\\.press\\w*\\s*\\(\\s*[\\'\"]left[\\'\"]\\s*\\)\\s*\\)\\s*\\{?\\s*if\\s*\\(\\s*(?:\\bdx\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dx\\b)|if\\s*\\(\\s*(?:\\bdx\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dx\\b)\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|(?:if\\s*\\(\\s*)?)kb\\.press\\w*\\s*\\(\\s*[\\'\"]left[\\'\"]\\s*\\)))(?=[\\s\\S]*(?:kb\\.press\\w*\\s*\\(\\s*[\\'\"]right[\\'\"]\\s*\\)\\s*&&\\s*\\(?\\s*(?:\\bdx\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dx\\b)|(?:\\bdx\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dx\\b)\\s*\\)?\\s*&&\\s*kb\\.press\\w*\\s*\\(\\s*[\\'\"]right[\\'\"]\\s*\\)|kb\\.press\\w*\\s*\\(\\s*[\\'\"]right[\\'\"]\\s*\\)\\s*\\)\\s*\\{?\\s*if\\s*\\(\\s*(?:\\bdx\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dx\\b)|if\\s*\\(\\s*(?:\\bdx\\s*(?:===?\\s*0|!==?\\s*-?\\s*1)\\b|\\b0\\s*===?\\s*dx\\b)\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|(?:if\\s*\\(\\s*)?)kb\\.press\\w*\\s*\\(\\s*[\\'\"]right[\\'\"]\\s*\\)))",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Leaving the grid ends the round",
+      "description": "A column or row off the grid sets the flag false. Help: 5.4.8 (Lab: Crash, and start again)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:<\\s*0|>=\\s*20|>\\s*19|===?\\s*(?:20|-1))\\b[\\s\\S]{0,160}?playing\\s*=\\s*false",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

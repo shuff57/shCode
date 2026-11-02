@@ -1,0 +1,156 @@
+{
+  "id": "5-4-flappy-8-quiz-flappy-check",
+  "title": "5.4.10 Check: the flapping game",
+  "description": "Eight multiple-choice questions on gravity and the flap, the scrolling world, timed spawning, removing what has left, scoring a pass once, and what a restart puts back. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.4 Project: Flappy",
+  "preview": "quiz",
+  "week": 12,
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-flap-sets",
+        "source": "5.4.2",
+        "question": "Why does the flap write `bird.vel.y = -4` instead of `bird.vel.y -= 4`?",
+        "options": [
+          "`-=` is not allowed on a sprite",
+          "Setting it gives the same flap size however fast the bird was falling",
+          "`=` runs faster",
+          "`-=` would move the bird down"
+        ],
+        "answer": 1,
+        "explanation": "Setting the speed makes every flap identical. Subtracting from a speed that is already large and downward only slows the fall.",
+        "sourceIds": [
+          "5-4-flappy-1-reading-gravity-and-the-flap"
+        ]
+      },
+      {
+        "id": "q2-presses",
+        "source": "5.4.2",
+        "question": "While the space bar is held, the bird climbs at one steady speed; let go and it falls. Which line was used?",
+        "options": [
+          "`kb.presses(' ')`",
+          "`kb.pressing(' ')`",
+          "`kb.released(' ')`",
+          "`world.gravity.y = 0`"
+        ],
+        "answer": 1,
+        "explanation": "`kb.pressing` is true on every frame the key is held, so the speed is reset on every frame. `kb.presses` fires once per tap.",
+        "sourceIds": [
+          "5-4-flappy-1-reading-gravity-and-the-flap"
+        ]
+      },
+      {
+        "id": "q3-scroll",
+        "source": "5.4.5",
+        "question": "In this game, what makes the bird look as though it is flying forward?",
+        "options": [
+          "The bird's x increases",
+          "The pipes are given a leftward speed",
+          "The canvas is resized",
+          "Gravity pulls sideways"
+        ],
+        "answer": 1,
+        "explanation": "The bird's x never changes. The pipes slide left, which reads as forward motion.",
+        "sourceIds": [
+          "5-4-flappy-4-reading-a-world-that-scrolls"
+        ]
+      },
+      {
+        "id": "q4-beat",
+        "source": "5.4.5",
+        "question": "What does `if (frameCount % 90 === 0)` do?",
+        "options": [
+          "Runs on every frame",
+          "Runs once, on frame 90",
+          "Runs on every 90th frame, again and again",
+          "Runs only after 90 seconds"
+        ],
+        "answer": 2,
+        "explanation": "`frameCount % 90` repeats 0 to 89, and it equals 0 once per cycle, so the test is true every 90 frames.",
+        "sourceIds": [
+          "5-4-flappy-4-reading-a-world-that-scrolls"
+        ]
+      },
+      {
+        "id": "q5-backwards",
+        "source": "5.4.5",
+        "question": "Why does the loop that removes off-screen pipes count down from the end?",
+        "options": [
+          "It is faster",
+          "`splice` shifts later items down, and counting upward would skip one",
+          "Arrays can only be read backwards",
+          "`delete()` requires it"
+        ],
+        "answer": 1,
+        "explanation": "After `splice`, every later item moves down one place. Counting down, the items still to visit are never moved.",
+        "sourceIds": [
+          "5-4-flappy-4-reading-a-world-that-scrolls"
+        ]
+      },
+      {
+        "id": "q6-two-things",
+        "source": "5.4.6",
+        "question": "A pipe has slid off the left edge. What must happen to it?",
+        "options": [
+          "Its sprite is deleted and it is spliced out of the array",
+          "Its sprite is deleted; the array can keep it",
+          "It is spliced out of the array; the sprite can stay",
+          "Nothing; the engine removes it"
+        ],
+        "answer": 0,
+        "explanation": "Deleting takes it off the screen. Splicing takes it out of the array. If only one is done, the other keeps pointing at something that is gone.",
+        "sourceIds": [
+          "5-4-flappy-5-lab-pipes-that-come-and-go"
+        ]
+      },
+      {
+        "id": "q7-passed",
+        "source": "5.4.7",
+        "question": "What is the `passed` flag on each pipe for?",
+        "options": [
+          "It makes the pipe move",
+          "It makes sure each pipe adds to the score once, not on every frame",
+          "It stores the pipe's colour",
+          "It marks the pipe as deleted"
+        ],
+        "answer": 1,
+        "explanation": "Without it, `p.x < bird.x` stays true every frame after the pipe is behind the bird, and the score races, the same as in 5.3.5.",
+        "sourceIds": [
+          "5-4-flappy-6-lab-score-a-gap"
+        ]
+      },
+      {
+        "id": "q8-restart",
+        "source": "5.4.8",
+        "question": "What must a restart put back in this game, besides the bird and the score?",
+        "options": [
+          "Only the flag",
+          "The pipes, the gravity and the flag",
+          "Nothing; the next frame fixes it",
+          "The canvas size"
+        ],
+        "answer": 1,
+        "explanation": "Everything a round owns: the pipes are deleted and the array emptied, gravity goes back on, and the flag is set true again.",
+        "sourceIds": [
+          "5-4-flappy-7-lab-crash-and-start-again"
+        ]
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

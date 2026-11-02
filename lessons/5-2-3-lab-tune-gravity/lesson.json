@@ -1,13 +1,13 @@
 {
   "id": "5-2-3-lab-tune-gravity",
-  "title": "5.2.3 Lab: Tune Gravity",
-  "description": "Try different world.gravity.y values on the same scene and describe how each one feels. Non-graded: discuss with a partner.",
+  "title": "5.2.8 Lab: Tune Gravity",
+  "description": "Try different world.gravity.y values on the same scene and describe how each one feels. Change the value, then write one sentence per value as a comment.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
   "preview": "moshion",
-  "week": 15,
+  "week": 11,
   "slos": [
     "SLO-3"
   ],
@@ -22,12 +22,24 @@
     },
     {
       "id": "s2",
-      "title": "Describe what you noticed",
-      "instructions": "For each value, describe in a sentence what it felt like: did the player fall, float, or drift upward? Fast or slow?",
+      "title": "Note what you noticed",
+      "instructions": "For each value, write one sentence as a `//` comment at the bottom of the code: did the player fall, float, or drift upward? Fast or slow?",
       "hints": []
     }
   ],
-  "requirements": [],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Gravity changed from the starting value",
+      "description": "Try a gravity value other than 10 in `world.gravity.y`. Help: 5.2.6 (Reading: Gravity)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*(?!\\(?\\s*10(?:\\.0*)?\\s*\\)?\\s*(?:;|\\r?\\n|$))[-\\d(.]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,

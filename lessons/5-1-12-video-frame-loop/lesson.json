@@ -1,7 +1,7 @@
 {
   "id": "5-1-12-video-frame-loop",
   "title": "5.1.12 Video: The Frame Loop Explained",
-  "description": "3-min walkthrough of the setup/draw frame loop at 60 fps. Watch after Hello Sprite, before Make it Move.",
+  "description": "A 2-and-a-half-minute walkthrough of the frame loop: setup() runs once, draw() runs about 60 times a second, and a sprite moves because draw() changes its x a little each frame. Watch after Hello Sprite.",
   "type": "lesson",
   "estimateMins": 3,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "videoUrl": "",
+  "videoUrl": "/videos/5-1-12/index.html",
   "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link.",
   "steps": [],
   "requirements": [],

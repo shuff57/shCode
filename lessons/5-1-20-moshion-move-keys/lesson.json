@@ -1,7 +1,7 @@
 {
   "id": "5-1-20-moshion-move-keys",
   "title": "5.1.20 Make it Move",
-  "description": "Drive a sprite with the arrow keys by setting vel.x and vel.y based on what's pressed.",
+  "description": "Drive a sprite with the keyboard by setting vel.x and vel.y from the keys that are held. Use WASD or the arrow keys, your choice.",
   "type": "lesson",
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -14,33 +14,36 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Set up a sprite in an empty world",
-      "instructions": "Make a 400×400 canvas, set `world.gravity.y = 0` (no falling), and create a dynamic sprite in the middle.",
+      "title": "Make a canvas and a sprite",
+      "instructions": "In `setup()`, make a 400 by 400 canvas and create one sprite in the middle. Store the sprite in the variable `player` that is already declared at the top of the file, so `draw()` can reach it.",
       "hints": [
-        "Gravity off keeps the sprite where you put it until you move it yourself."
+        "5.1.8 shows how a sprite is stored in a variable that is declared outside `setup()`."
       ]
     },
     {
       "id": "s2",
-      "title": "Horizontal movement",
-      "instructions": "In update() (it runs every frame, just before draw()), if kb.pressing('left') set player.vel.x = -4; else if kb.pressing('right') set +4; else set it to 0. WASD ('a' / 'd') works the same way and is what the graded labs use.",
+      "title": "Clear the background",
+      "instructions": "Make `background('#222')` the first line of `draw()`, so old frames do not pile up.",
       "hints": [
-        "vel.x is pixels per frame. Positive = right, negative = left."
+        "5.1.9 explains why the background goes first in `draw()`."
       ]
     },
     {
       "id": "s3",
-      "title": "Vertical movement",
-      "instructions": "Same pattern with 'up' / 'down' (or 'w' / 's') on player.vel.y. Remember: in screen coords, up is negative y.",
+      "title": "Horizontal movement",
+      "instructions": "In `draw()`, use the pattern from 5.1.17: if the left key is held, set `player.vel.x` to `-4`; else if the right key is held, set it to `4`; else set it to `0`. Choose `'a'` and `'d'` or `'left'` and `'right'`.",
       "hints": [
-        "Always reset vel.y to 0 in the else branch or the sprite will coast forever."
+        "Positive `vel.x` moves right and negative moves left.",
+        "The final `else` that sets `vel.x` to `0` is what stops the sprite when you let go (5.1.18)."
       ]
     },
     {
       "id": "s4",
-      "title": "Clear the background",
-      "instructions": "Call background('...') in draw() so old frames don't stack.",
-      "hints": []
+      "title": "Vertical movement",
+      "instructions": "Write the same pattern for `player.vel.y`, using `'w'` and `'s'` or `'up'` and `'down'`. Up is a **negative** `vel.y`, because `y` gets bigger going down.",
+      "hints": [
+        "Keep the final `else` that sets `vel.y` to `0`, or the sprite will keep drifting."
+      ]
     }
   ],
   "requirements": [
@@ -53,7 +56,8 @@
       "pattern": "new\\s+Canvas\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r2",
@@ -64,17 +68,15 @@
       "pattern": "new\\s+Sprite\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r3",
       "title": "Horizontal keyboard input",
-      "description": "Left/right (or A/D) keys affect the sprite each frame. Help: 5.1.13 (kb.pressing(key))",
+      "description": "The left or right key (`'a'`, `'d'`, `'left'` or `'right'`) is read each frame. Help: 5.1.14 (Key names: WASD and the arrow keys)",
       "type": "inFunction",
-      "function": [
-        "update",
-        "draw"
-      ],
+      "function": "draw",
       "file": "script.js",
       "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:left|right|a|d)['\"]",
       "flags": "",
@@ -84,12 +86,9 @@
     {
       "id": "r4",
       "title": "Vertical keyboard input",
-      "description": "Up/down (or W/S) keys affect the sprite each frame. Help: 5.1.13 (kb.pressing(key))",
+      "description": "The up or down key (`'w'`, `'s'`, `'up'` or `'down'`) is read each frame. Help: 5.1.14 (Key names: WASD and the arrow keys)",
       "type": "inFunction",
-      "function": [
-        "update",
-        "draw"
-      ],
+      "function": "draw",
       "file": "script.js",
       "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:up|down|w|s)['\"]",
       "flags": "",
@@ -99,44 +98,41 @@
     {
       "id": "r5",
       "title": "Set horizontal velocity",
-      "description": "Horizontal velocity is set each frame. Help: 5.1.15 (Velocity: vel.x and vel.y)",
+      "description": "Horizontal velocity is set each frame. Help: 5.1.16 (Velocity: vel.x and vel.y)",
       "type": "inFunction",
-      "function": [
-        "update",
-        "draw"
-      ],
+      "function": "draw",
       "file": "script.js",
-      "pattern": "\\.vel\\.x\\s*=",
+      "pattern": "\\.vel\\.x\\s*=(?!=)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r6",
       "title": "Set vertical velocity",
-      "description": "Vertical velocity is set each frame. Help: 5.1.15 (Velocity: vel.x and vel.y)",
+      "description": "Vertical velocity is set each frame. Help: 5.1.16 (Velocity: vel.x and vel.y)",
       "type": "inFunction",
-      "function": [
-        "update",
-        "draw"
-      ],
+      "function": "draw",
       "file": "script.js",
-      "pattern": "\\.vel\\.y\\s*=",
+      "pattern": "\\.vel\\.y\\s*=(?!=)",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     },
     {
       "id": "r7",
       "title": "Clear the background each frame",
-      "description": "Previous frames don't stack up.",
+      "description": "Previous frames don't stack up. Help: 5.1.9 (background(color) wipe rule)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
       "pattern": "background\\s*\\(",
       "flags": "",
       "points": 0,
-      "status": "pending"
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {
