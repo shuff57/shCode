@@ -6,9 +6,16 @@
     "characters": [
       "player",
       "playerBeige",
+      "playerBeigeWalk",
       "playerBlue",
+      "playerBlueWalk",
       "playerPink",
-      "playerYellow"
+      "playerPinkWalk",
+      "playerWalk",
+      "playerYellow",
+      "playerYellowWalk",
+      "runner",
+      "runnerJump"
     ],
     "pickups": [
       "coin",
@@ -40,15 +47,20 @@
     ],
     "creatures": [
       "bat",
+      "batFly",
       "bee",
+      "beeFly",
       "bird",
       "fish",
       "fishPink",
+      "fishSwim",
       "ghost",
       "ladybug",
+      "ladybugWalk",
       "slime",
       "slimeBlue",
       "snail",
+      "snailCrawl",
       "worm"
     ]
   },
@@ -292,6 +304,100 @@
       "w": 21,
       "h": 21,
       "group": "creatures"
+    },
+    "batFly": {
+      "file": "batFly.png",
+      "w": 84,
+      "h": 21,
+      "group": "creatures",
+      "frames": 4,
+      "frameDelay": 6
+    },
+    "beeFly": {
+      "file": "beeFly.png",
+      "w": 84,
+      "h": 21,
+      "group": "creatures",
+      "frames": 4,
+      "frameDelay": 5
+    },
+    "fishSwim": {
+      "file": "fishSwim.png",
+      "w": 84,
+      "h": 21,
+      "group": "creatures",
+      "frames": 4,
+      "frameDelay": 8
+    },
+    "ladybugWalk": {
+      "file": "ladybugWalk.png",
+      "w": 84,
+      "h": 21,
+      "group": "creatures",
+      "frames": 4,
+      "frameDelay": 8
+    },
+    "snailCrawl": {
+      "file": "snailCrawl.png",
+      "w": 84,
+      "h": 21,
+      "group": "creatures",
+      "frames": 4,
+      "frameDelay": 14
+    },
+    "playerWalk": {
+      "file": "playerWalk.png",
+      "w": 84,
+      "h": 21,
+      "group": "characters",
+      "frames": 4,
+      "frameDelay": 8
+    },
+    "playerBlueWalk": {
+      "file": "playerBlueWalk.png",
+      "w": 84,
+      "h": 21,
+      "group": "characters",
+      "frames": 4,
+      "frameDelay": 8
+    },
+    "playerPinkWalk": {
+      "file": "playerPinkWalk.png",
+      "w": 84,
+      "h": 21,
+      "group": "characters",
+      "frames": 4,
+      "frameDelay": 8
+    },
+    "playerYellowWalk": {
+      "file": "playerYellowWalk.png",
+      "w": 84,
+      "h": 21,
+      "group": "characters",
+      "frames": 4,
+      "frameDelay": 8
+    },
+    "playerBeigeWalk": {
+      "file": "playerBeigeWalk.png",
+      "w": 84,
+      "h": 21,
+      "group": "characters",
+      "frames": 4,
+      "frameDelay": 8
+    },
+    "runner": {
+      "file": "runner.png",
+      "w": 144,
+      "h": 24,
+      "group": "characters",
+      "frames": 6,
+      "frameDelay": 4
+    },
+    "runnerJump": {
+      "file": "runnerJump.png",
+      "w": 24,
+      "h": 24,
+      "group": "characters"
     }
   }
 }

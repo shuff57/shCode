@@ -219,8 +219,13 @@ const MUTATIONS = [
     name: 'increment written as x = x + 1',
     teaches: /increment|shorthand|compound|\+\+/i,
     fn: (s) => {
-      const out = s.replace(/\b([A-Za-z_$][\w$]*)\s*(?:\+\+|\+=\s*1\b)/g,
-        (m, n) => `${n} = ${n} + 1`);
+      // Keep the whole member path: `this.n += 1` is `this.n = this.n + 1`. With only
+      // the last identifier it became `this.n = n + 1`, a different (wrong) answer, and
+      // every requirement that refused it was a false positive.
+      // A path that starts after `.` or `]` (`bullets[i].y++`) is left alone: its head
+      // is not part of the match, so rewriting it would drop that head the same way.
+      const out = s.replace(/\b([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*(?:\+\+|\+=\s*1\b)/g,
+        (m, n, at, all) => (/[.\]]/.test(all[at - 1] ?? '') ? m : `${n} = ${n} + 1`));
       return out === s ? null : out;
     },
   },

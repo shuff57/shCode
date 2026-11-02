@@ -77,8 +77,19 @@ function forCards(l: Lesson): Lesson {
 }
 
 export default async function HomePage() {
-  const lessons = await loadLessons();
-  const units = await listUnits();
+  const allLessons = await loadLessons();
+  const allUnits = await listUnits();
+
+  // A `hidden` module keeps its pages and its direct links, but is not
+  // advertised on the course list. Its lessons must go too, or search would
+  // still surface them one at a time. `listModules()` itself stays unfiltered:
+  // module pages generate their static params from it, and a hidden module
+  // still has to exist at /module/<id>.
+  const hiddenIds = new Set(allUnits.filter((u) => u.hidden).map((u) => u.id));
+  const units = allUnits.filter((u) => !u.hidden);
+  const lessons = hiddenIds.size
+    ? allLessons.filter((l) => !hiddenIds.has(String(l.title || '').match(/^\d+\.\d+/)?.[0] ?? ''))
+    : allLessons;
 
   return (
     <div className="p-4">

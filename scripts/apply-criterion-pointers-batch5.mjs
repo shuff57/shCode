@@ -59,13 +59,13 @@ const PER_CRITERION = {
 
   // --- 6.8.14 Two-Player Pong-Sumo ---------------------------------------
   '6-7-27-a17-1-pong-sumo\u0000Two-player keyboard input':
-    { target: '5.1.14', note: 'Keyboard Movement' },
+    { target: '5.1.15', note: 'Keyboard Movement' },
   '6-7-27-a17-1-pong-sumo\u0000Independent per-player score variables':
     { target: '1.2.2', note: 'Declaring Variables with let and const' },
   '6-7-27-a17-1-pong-sumo\u0000Push-collision physics tuned with bounciness':
     { target: '6.7.14', note: 'moSHion docs: sprite.bounciness' },
   '6-7-27-a17-1-pong-sumo\u0000Top-down arena: no gravity':
-    { target: '5.2.2', note: 'Gravity' },
+    { target: '5.2.6', note: 'Gravity' },
   '6-7-27-a17-1-pong-sumo\u0000Win condition fires on a threshold':
     { target: '2.1.3', note: 'If / Else if / Else' },
   '6-7-27-a17-1-pong-sumo\u0000At least one joint is used':
@@ -79,9 +79,9 @@ const PER_CRITERION = {
   '7-1-1-arcade-cabinet\u0000An overlap or collision':
     { target: '6.2.3', note: 'moSHion docs: Collisions + Overlaps' },
   '7-1-1-arcade-cabinet\u0000Player input':
-    { target: '5.1.14', note: 'Keyboard Movement' },
+    { target: '5.1.15', note: 'Keyboard Movement' },
   '7-1-1-arcade-cabinet\u0000Motion tuned on purpose':
-    { target: '5.2.8', note: 'Forces vs Velocity' },
+    { target: '5.2.13', note: 'Forces vs Velocity' },
   '7-1-1-arcade-cabinet\u0000Game states':
     { target: '2.3.3', note: 'switch Statements' },
   '7-1-1-arcade-cabinet\u0000Saves and loads':

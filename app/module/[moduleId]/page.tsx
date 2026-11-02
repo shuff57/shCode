@@ -23,7 +23,7 @@ export default async function ModulePage({
   // (including 2.7.3's answer-key table) shipped to every visitor until
   // 2026-09-18. The doc now travels through the role-gated
   // /api/module-doc/[id] and is fetched client-side by ModuleTeacherPanel.
-  const { summary, lessons } = result;
+  const { summary, lessons, groups } = result;
 
   return (
     <main
@@ -48,7 +48,12 @@ export default async function ModulePage({
         >
           Lessons in this module
         </h2>
-        <ModuleLessonsList lessons={lessons} moduleId={summary.id} unitId={summary.category ?? null} />
+        <ModuleLessonsList
+          lessons={lessons}
+          moduleId={summary.id}
+          unitId={summary.category ?? null}
+          groups={groups}
+        />
       </section>
 
       <ModuleTeacherPanel moduleId={summary.id} />

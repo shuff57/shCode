@@ -9,7 +9,7 @@
 //   world.realTime / world.autoStep / world.physicsUpdate, world.allowSleeping /
 //   sprite.sleeping, world.explodeAt, world.rayCast / world.rayCastAll,
 //   world.getSpritesAt, sprite.passes / pass, sprite.angleTo /
-//   bearing, sprite.addCollider / addSensor / addDefaultSensors,
+//   bearing, sprite.addCollider / addDefaultSensors,
 //   sprite.update / sprite.draw overrides, sprite.playAni / playAnis (Promise-based),
 //   sprite.drag / rotationDrag / applyTorque / rotationSpeed,
 //   sprite.grabbable, group.addTiles / tile,
@@ -33,6 +33,13 @@
 //     opposites and siblings of methods the course teaches), the cascading
 //     Group forms of those, mouse.left / center / right / pos, and
 //     kb.shift / control / alt plus the other named-key properties.
+// The moSHion 3b77bf6 sync (2026-10-31) added pages for Walls, Tiles (moSHion's
+// legend form, not p5play's group.tile), sprite.addSensor, every / after, and the
+// plain drawing shapes (square() now follows fill()).
+// The moSHion d8068bb sync (2026-11-02) added the Coordinates section: world.origin =
+// 'math' (centre, y up, counter-clockwise angles) and the showGrid() / showMouse()
+// helpers. It follows the moSHion repo's docs/data/moshion-docs.js Coordinates pages;
+// the default stays screen coordinates (top-left, y down), as in p5play.
 // If a future lesson needs one of the still-listed items, that's a new gap to close then.
 
 import {
@@ -225,6 +232,146 @@ function draw() {
   background('rgba(0, 0, 0, 0.1)');
 }`,
       },
+      {
+        title: 'Drawing plain shapes',
+        body: `Not everything on screen has to be a sprite. Inside draw() you can paint a shape straight onto the canvas: rect(x, y, w, h), square(x, y, size), circle(x, y, diameter) and line(x1, y1, x2, y2). These have no physics and nothing collides with them; they are just pixels, redrawn every frame after background().
+
+rect and square are placed by their top-left corner. circle is placed by its centre, the same way a sprite is.
+
+fill(color) sets the colour inside the next shapes, and stroke(color) sets the outline. noFill() and noStroke() turn either one off, and strokeWeight(n) makes the outline thicker. They stay set until you change them, so set the colour just before the shape it belongs to. square() follows fill() like every other shape: fill('deepskyblue') then square(...) draws a blue square.`,
+        code: `function setup() {
+  new Canvas(400, 300);
+}
+
+function draw() {
+  background('#222');
+
+  noStroke();
+  fill('deepskyblue');
+  square(40, 60, 80);
+
+  fill('tomato');
+  circle(220, 100, 80);
+
+  noFill();
+  stroke('gold');
+  strokeWeight(4);
+  rect(280, 60, 80, 120);
+  line(40, 240, 360, 240);
+}`,
+      },
+    ],
+  },
+  {
+    slug: 'coordinates',
+    title: 'Coordinates',
+    pages: [
+      {
+        title: 'Where is (0, 0)?',
+        body: `By default, (0, 0) is the top-left corner of the canvas. x counts to the right and y counts DOWN, so a bigger y is lower on the screen. The browser's own canvas works this way, and so does p5play. These are called screen coordinates, and every sketch uses them unless you ask for something else.
+
+If you are used to graphs from math class, where y goes up, this can feel upside down. Two helpers show you what is going on. showGrid(50) draws a light grid with a line every 50 pixels and the axes labelled, so you can see exactly where (0, 0) is and which way y grows. showMouse() writes the pointer's (x, y) right next to it. Call both from draw(), every frame. They only draw: nothing collides with the grid.
+
+Move the mouse over the canvas and read the numbers: y gets bigger as you move down.`,
+        code: `let box;
+
+function setup() {
+  new Canvas(400, 300);
+  box = new Sprite(100, 50, 40, 40, 'static');
+  box.color = 'deepskyblue';
+}
+
+function draw() {
+  background('#222');
+  showGrid(50);
+  showMouse();
+}`,
+      },
+      {
+        title: 'Math mode: centre, y up',
+        body: `Put world.origin = 'math' on the line right after new Canvas() and the canvas becomes the graph from math class. (0, 0) is the CENTRE of the canvas, x grows to the right and y grows UP. A positive rotation turns counter-clockwise, the way math measures angles from the +x axis.
+
+Every number keeps its meaning but points the math way. vel.y = 5 moves a sprite up. direction = 90 points up. Gravity pulls toward smaller y, so a falling world is world.gravity.y = -10, with a minus sign, because down is negative now. The camera starts at (0, 0). Text and pictures still read the right way up, and showGrid() and showMouse() label the math numbers.
+
+Set it first: before you make any sprite and before you set gravity. The engine will not move things that already exist, so setting it too late stops the sketch with an error that tells you to move the line up. Any value other than 'math' or 'screen' is an error too. 'screen' is the default, so you never need to write it.
+
+In this example the ball starts 100 above the centre and falls onto the floor at y = -120.`,
+        code: `let ball, floor;
+
+function setup() {
+  new Canvas(400, 300);
+  world.origin = 'math';
+  world.gravity.y = -10;
+
+  ball = new Sprite(0, 100, 30);
+  ball.color = 'tomato';
+  ball.bounciness = 0.6;
+
+  floor = new Sprite(0, -120, 300, 20, 'static');
+  floor.color = 'gray';
+}
+
+function draw() {
+  background('#222');
+  showGrid(50);
+  showMouse();
+}`,
+      },
+      {
+        title: 'Math mode: what else changes',
+        body: `A tile map still reads top to bottom: the first string is the top row, and each row below it has a smaller y. new Walls() still calls the wall above the screen walls.top (its y is the bigger one) and the wall below it walls.bottom. A ground sensor under a player 40 tall is addSensor(0, -21, 26, 4), because down is negative now.
+
+rect(x, y, w, h) covers x to x + w and y to y + h, so from its corner it grows right and UP. text(str, x, y) puts the bottom of the letters on y, and the letters sit above it, still the right way up.
+
+drawTop() and camera.off() still draw in a frame that ignores the camera, but that frame is centred and y-up too: on a 400 by 300 canvas, text('Score', -190, 130) sits near the top-left corner. mouse.x and mouse.y are math numbers as well, so the mouse and the grid always agree.
+
+Drive the player with the arrow keys and watch the camera follow. The grid moves with the world, so its labels always say where the player really is.`,
+        code: `let walls, level, player;
+
+function setup() {
+  new Canvas(400, 300);
+  world.origin = 'math';
+
+  walls = new Group();
+  walls.collider = 'static';
+  walls.color = 'gray';
+
+  level = new Tiles([
+    '#########',
+    '#       #',
+    '#   #   #',
+    '#       #',
+    '#########',
+  ], -160, 80, 40, 40, { '#': walls });
+
+  player = new Sprite(-80, 0, 24, 24);
+  player.color = 'gold';
+}
+
+function update() {
+  if (kb.pressing('right'))     player.vel.x = 3;
+  else if (kb.pressing('left')) player.vel.x = -3;
+  else                          player.vel.x = 0;
+
+  if (kb.pressing('up'))        player.vel.y = 3;
+  else if (kb.pressing('down')) player.vel.y = -3;
+  else                          player.vel.y = 0;
+
+  camera.x = player.x;
+  camera.y = player.y;
+}
+
+function draw() {
+  background('#222');
+  showGrid(40);
+}
+
+function drawTop() {
+  fill('white');
+  textSize(14);
+  text('x: ' + round(player.x) + '  y: ' + round(player.y), -190, 135);
+}`,
+      },
     ],
   },
   {
@@ -235,7 +382,7 @@ function draw() {
         title: 'Your first sprite',
         body: `A Sprite is the basic building block of any moSHion game. Every sprite has a position, a size, and (usually) a physics body that moves and collides automatically.
 
-new Sprite(x, y, width, height) creates a rectangular sprite centered on (x, y). With no extra argument it's dynamic, meaning gravity pulls it and it bumps into other sprites.
+new Sprite(x, y, width, height) creates a rectangular sprite centered on (x, y). With no extra argument it's dynamic, meaning gravity pulls it and it bumps into other sprites. Gravity starts at 0, so this one stays where you put it until you set world.gravity.y.
 
 Store the sprite in a variable declared outside setup() so update() and draw() can reach it later. Without a reference, you can't move it or check its state.`,
         code: `let player;
@@ -626,7 +773,7 @@ function draw() {
     pages: [
       {
         title: 'Gravity and velocity',
-        body: `world.gravity.y pulls every dynamic sprite downward. 10 feels roughly earth-like; set it to 0 for top-down games, or try negative values for "upside-down" worlds.
+        body: `world.gravity.y pulls every dynamic sprite downward. It starts at 0, so nothing falls until you set it. 10 feels roughly earth-like; leave it at 0 for top-down games, or try negative values for "upside-down" worlds.
 
 Each sprite has a .vel vector with .x and .y components, measured in pixels per frame. At 60 fps, vel.x = 4 means the sprite moves 240 pixels per second. Reading .vel tells you how fast a sprite is moving; writing it overrides physics for that frame.
 
@@ -683,6 +830,32 @@ These are per-sprite properties. When two sprites touch, Box2D combines their va
   slippery.friction = 0;
   slippery.bounciness = 0.4;
   slippery.color = 'deepskyblue';
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Walls around the canvas',
+        body: `new Walls() puts four static walls just outside the edges of the canvas, so sprites bounce off the edges of the screen instead of falling out of it. The walls sit off screen, so you don't see them, and the whole canvas stays playable. Make them in setup(), after new Canvas().
+
+What you get back is a Group of the four walls, and each one also has a name: walls.top, walls.bottom, walls.left and walls.right. player.colliding(walls) asks "is the player touching any edge?" and player.colliding(walls.bottom) asks "is it on the floor?"
+
+new Walls(100) makes them thicker (the default is 50), which helps if something fast keeps slipping through. The walls stay where the canvas was when you made them; they do not follow the camera.`,
+        code: `let walls;
+
+function setup() {
+  new Canvas(400, 300);
+  world.gravity.y = 10;
+  walls = new Walls();
+
+  for (let i = 0; i < 10; i++) {
+    const ball = new Sprite(40 + i * 35, 60 + (i % 3) * 40, 24);
+    ball.bounciness = 0.8;
+    ball.vel.x = i % 2 === 0 ? 6 : -6;
+    ball.color = i % 2 === 0 ? 'tomato' : 'gold';
+  }
 }
 
 function draw() {
@@ -757,7 +930,9 @@ function draw() {
 
 Dynamic and static sprites collide by default. To let one sprite pass through another without stopping, set its .collider to 'none' — the sprite still draws and you can still test for overlap, but there's no physical pushback.
 
-Use colliding for ground checks, walls, and enemies that block the player. Use overlapping for coins, goal zones, power-ups, and other triggers that shouldn't shove the player.`,
+Use colliding for ground checks, walls, and enemies that block the player. Use overlapping for coins, goal zones, power-ups, and other triggers that shouldn't shove the player.
+
+overlaps() is a question you ask, not a setting you turn on. a.overlaps(b) answers "are these touching right now?" and changes nothing, so calling it once in setup() does not make a and b pass through each other (in p5play it does). To let a coin, a pickup or a bullet pass through, set its collider to 'none'; then ask overlaps() or overlapping() every frame in update() to find out when something reaches it.`,
         code: `let player, wall, zone;
 
 function setup() {
@@ -881,6 +1056,49 @@ function draw() {
   text('HP: ' + hp, 14, 24);
 }`,
       },
+      {
+        title: 'Ground sensors',
+        body: `player.colliding(ground) is true whenever the player touches the ground anywhere: standing on it, but also pressed against it from the side or bumping it from below. If the floor, the walls and the ceiling are all one group, a jump check written with colliding() lets the player climb a wall by jumping against it.
+
+A sensor fixes that. sprite.addSensor(offsetX, offsetY, w, h) adds a box that rides on the sprite and only detects: it pushes nothing and weighs nothing. Put a thin one just under the player's feet, and feet.overlaps(walls) is true only when something is under them.
+
+The offsets are measured from the sprite's centre. For a player 40 tall, the feet are 20 below the centre, so a strip 4 tall at offset 21 sits just under them. Make it a little narrower than the player so it doesn't touch a wall beside them.
+
+A sensor has two questions: feet.overlaps(walls) (true or false) and feet.overlapping(walls) (how many frames it has been touching). feet.remove() takes it off again; deleting the sprite does that too.`,
+        code: `let player, walls, feet;
+
+function setup() {
+  new Canvas(400, 300);
+  world.gravity.y = 10;
+
+  walls = new Group();
+  walls.collider = 'static';
+  walls.color = 'slategray';
+  new walls.Sprite(200, 290, 400, 20);
+  new walls.Sprite(300, 200, 20, 160);
+  new walls.Sprite(120, 150, 120, 16);
+
+  player = new Sprite(100, 240, 30, 40);
+  player.color = 'deepskyblue';
+  player.rotationLock = true;
+  feet = player.addSensor(0, 21, 26, 4);
+}
+
+function update() {
+  if (kb.pressing('left'))       player.vel.x = -4;
+  else if (kb.pressing('right')) player.vel.x = 4;
+  else                           player.vel.x = 0;
+
+  if (kb.presses('up') && feet.overlaps(walls)) {
+    player.vel.y = -8;
+  }
+  player.color = feet.overlaps(walls) ? 'deepskyblue' : 'orange';
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
     ],
   },
   {
@@ -912,6 +1130,64 @@ function setup() {
 
 function draw() {
   background('#112');
+}`,
+      },
+      {
+        title: 'Tile maps from text',
+        body: `new Tiles(map, x, y, w, h, legend) builds a level out of rows of text. map is an array of strings, one per row. legend says which Group each character builds: { '#': walls, 'c': coins }. Any character the legend doesn't name, like a space or a dot, is an empty cell.
+
+Each tile is made with new group.Sprite(), so the group's defaults apply exactly as if you had made it by hand: walls.collider = 'static' makes every wall static, and coins.diameter = 14 makes every coin a small circle instead of a full tile.
+
+x and y are the centre of the top-left tile, the same way a sprite's x and y are its centre, and w and h are the size of one tile. For 40-pixel tiles starting in the canvas corner, pass 20, 20, 40, 40.
+
+What you get back is itself a Group holding every sprite it made, so level.delete() clears the whole level when you want to load the next one.`,
+        code: `let walls, coins, player, level;
+let score = 0;
+
+function setup() {
+  new Canvas(400, 240);
+  world.gravity.y = 10;
+
+  walls = new Group();
+  walls.collider = 'static';
+  walls.color = 'slategray';
+
+  coins = new Group();
+  coins.collider = 'none';
+  coins.diameter = 14;
+  coins.color = 'gold';
+
+  level = new Tiles([
+    '##########',
+    '#        #',
+    '#  c  c  #',
+    '#  ##  c #',
+    '# c      #',
+    '##########',
+  ], 20, 20, 40, 40, { '#': walls, 'c': coins });
+
+  player = new Sprite(60, 100, 20, 28);
+  player.color = 'deepskyblue';
+  player.rotationLock = true;
+}
+
+function update() {
+  if (kb.pressing('left'))       player.vel.x = -3;
+  else if (kb.pressing('right')) player.vel.x = 3;
+  else                           player.vel.x = 0;
+  if (kb.presses('up')) player.vel.y = -6;
+
+  player.overlaps(coins, (p, coin) => {
+    coin.delete();
+    score++;
+  });
+}
+
+function draw() {
+  background('#112');
+  fill('white');
+  textSize(14);
+  text('coins: ' + score, 50, 32);
 }`,
       },
       {
@@ -1083,7 +1359,9 @@ function draw() {
 
 Each sprite gets its own copy of the value on spawn, so changing one enemy's hp doesn't affect the others. The group just holds the template.
 
-This is how you keep gameplay data attached to the right sprite. Tag sprites with custom fields like .hp, .score, .kind, or anything else your game needs, and read them back off the individual sprite during collisions.`,
+This is how you keep gameplay data attached to the right sprite. Tag sprites with custom fields like .hp, .score, .kind, or anything else your game needs, and read them back off the individual sprite during collisions.
+
+Pick names the sprite doesn't already use. A sprite has built-in properties, and a field with the same name drives the built-in one instead of making a new field: speed sets its velocity (and reads back 0 on a static sprite), life deletes it after that many frames, direction turns it, and text draws a label on it. The same goes for color, scale, mass, x, y, w, h, d, r, width, height, visible and removed. Use names like hp, moveSpeed, heading or label. This matters most in a class that extends Sprite, where this.speed = 5 looks like your own field and isn't.`,
         code: `let player, enemies;
 
 function setup() {
@@ -1731,7 +2009,7 @@ function draw() {
     pages: [
       {
         title: 'Top-down movement',
-        body: `For top-down games, set world.gravity.y = 0 so nothing falls. Move the player by writing to vel.x and vel.y based on the arrow keys.
+        body: `For top-down games, keep world.gravity.y at 0 (where it starts) so nothing falls. Writing world.gravity.y = 0 in setup() anyway makes that choice plain to a reader. Move the player by writing to vel.x and vel.y based on the arrow keys.
 
 Clamp the player's position to the canvas edges each frame so it can't leave the screen. A simple Math.max / Math.min pair handles this.
 
@@ -1883,6 +2161,44 @@ function draw() {
   textSize(18);
   text('Score: ' + score, 14, 26);
   text('Time: ' + timeLeft, 14, 50);
+}`,
+      },
+      {
+        title: 'Timers: every and after',
+        body: `every(frames, fn) calls a function every so many frames, and after(frames, fn) calls it once, that many frames from now. At 60 frames a second, every(60, spawn) runs spawn about once a second.
+
+They count frames, not seconds, so they stay in step with frameCount: every(60, spawn) made in setup() fires on exactly the frames where frameCount % 60 === 0 is true. They pause when the sketch stops with noLoop().
+
+Both give back a timer you can keep in a variable and stop() later: const t = every(30, blink); ... t.stop(); timer.active tells you whether it is still going (an after() timer stops being active once it has fired).`,
+        code: `let pipes;
+let spawner;
+
+function setup() {
+  new Canvas(400, 300);
+  world.gravity.y = 0;
+  pipes = new Group();
+  pipes.color = 'limegreen';
+  pipes.collider = 'none';
+
+  spawner = every(45, () => {
+    const p = new pipes.Sprite(420, 40 + Math.random() * 220, 30, 80);
+    p.vel.x = -3;
+  });
+
+  after(600, () => {
+    spawner.stop();
+  });
+}
+
+function update() {
+  pipes.cull(60);
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(14);
+  text(spawner.active ? 'spawning' : 'stopped', 14, 20);
 }`,
       },
       {

@@ -1205,6 +1205,13 @@ details.console > summary::-webkit-details-marker { display: none; }
   margin: 0.25rem 0;
 }
 
+/* The Steps panel is narrow and clips; a long line of example code wrapped
+   instead of running off the right edge (5.11.9 step 1 lost its file paths). */
+.step-instructions pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .step-hints summary {
   font-size: 0.8rem;
   cursor: pointer;

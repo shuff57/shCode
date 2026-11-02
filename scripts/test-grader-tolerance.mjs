@@ -944,6 +944,34 @@ for (const id of Object.values(L)) {
   reject(D, 'score > 70 leaves out exactly 70', 'r1', edit(sol, 'if (score >= 70) {', 'if (score > 70) {'));
 }
 
+// ---------------------------------------------------------------- 5.1.25 (optional math grid)
+//
+// An optional, ungraded preview of world.origin = 'math'. Lax on purpose: any
+// quote style, any spacing, with or without semicolons, any grid spacing and
+// any sprite above the centre. What it must still refuse: the mode named only
+// in a comment, a comparison instead of an assignment, a sprite below the
+// centre, and the overlays called from setup() (they draw for one frame).
+{
+  const D = '5-1-25-math-grid';
+  const sol = solutionFiles(D);
+  const origin = `world.origin = ${AP}math${AP};`;
+  accept(D, 'reference solution', sol);
+  reject(D, 'untouched starter', null, starterFiles(D));
+  accept(D, 'double quotes', edit(sol, origin, 'world.origin = "math";'));
+  accept(D, 'backticks', edit(sol, origin, `world.origin = ${BT}math${BT};`));
+  accept(D, 'no spaces, no semicolon', edit(sol, origin, `world.origin=${AP}math${AP}`));
+  accept(D, 'set before new Canvas', edit(edit(sol, origin, ''), 'new Canvas(400, 400);', origin + nl + '  new Canvas(400, 400);'));
+  accept(D, 'a different grid spacing', edit(sol, 'showGrid(50);', 'showGrid(25);'));
+  accept(D, 'a sprite left of the centre, not stored', edit(sol, 'box = new Sprite(100, 50, 40, 40);', 'new Sprite(-80, 120, 30, 30);'));
+  accept(D, 'a decimal y', edit(sol, 'box = new Sprite(100, 50, 40, 40);', 'box = new Sprite(100, 0.5, 40, 40);'));
+  reject(D, 'math mode only in a comment', 'r2', edit(sol, origin, `// ${origin}`));
+  reject(D, 'a comparison, not an assignment', 'r2', edit(sol, origin, `world.origin === ${AP}math${AP};`));
+  reject(D, 'a sprite below the centre', 'r3', edit(sol, 'new Sprite(100, 50, 40, 40)', 'new Sprite(100, -50, 40, 40)'));
+  reject(D, 'a sprite on the x axis', 'r3', edit(sol, 'new Sprite(100, 50, 40, 40)', 'new Sprite(100, 0, 40, 40)'));
+  reject(D, 'showGrid in setup() only', 'r1', edit(edit(sol, '  showGrid(50);' + nl, ''), origin, origin + nl + '  showGrid(50);'));
+  reject(D, 'showMouse in setup() only', 'r4', edit(edit(sol, '  showMouse();' + nl, ''), origin, origin + nl + '  showMouse();'));
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(

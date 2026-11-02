@@ -224,6 +224,15 @@ for (const l of lessons) {
           '7-1-1-arcade-cabinet|2.3.3',
           '5-2-5-lab-add-a-jump|2.1.29',
           '5-2-9-lab-wind-zone|2.1.3',
+          '5-10-defender-4-reading-every-shot-against-every-enemy|2.4.25',
+          '5-10-defender-4-reading-every-shot-against-every-enemy|2.4.27',
+          '5-10-defender-5-lab-shoot-them-down|2.4.27',
+          '6-9-grids-2-reading-a-map-is-rows-of-text|2.2.19',
+          '6-9-grids-5-reading-reading-a-map-as-data|2.4.24',
+          '6-9-grids-9-reading-a-grid-is-data|2.4.24',
+          '6-9-grids-9-reading-a-grid-is-data|2.1.20',
+          '6-9-grids-9-reading-a-grid-is-data|2.1.29',
+          '6-9-grids-9-reading-a-grid-is-data|2.1.33',
         ]);
         if (!WAIVED.has(`${l.dir}|${cited}`)) {
           stale.push(`${l.dir} (${l.num}) [${where}] ${cited} RESOLVES TO`

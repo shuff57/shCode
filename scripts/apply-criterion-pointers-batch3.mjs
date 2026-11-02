@@ -85,9 +85,9 @@ const PER_CRITERION = {
   '6-1-11-a13-1-asteroid-field\u0000Safe despawn loop':
     { target: '6.1.4', note: 'Iterating a Group' },
   '6-1-11-a13-1-asteroid-field\u0000Asteroids have velocity':
-    { target: '5.1.15', note: 'Velocity: vel.x and vel.y' },
+    { target: '5.1.16', note: 'Velocity: vel.x and vel.y' },
   '6-1-11-a13-1-asteroid-field\u0000WASD ship input':
-    { target: '5.1.14', note: 'Keyboard Movement' },
+    { target: '5.1.15', note: 'Keyboard Movement' },
   '6-1-11-a13-1-asteroid-field\u0000Overlap detection':
     { target: '6.2.1', note: 'overlaps() boolean vs callback' },
   '6-1-12-challenges\u0000Use overlaps()':

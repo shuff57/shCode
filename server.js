@@ -136,6 +136,17 @@ app.prepare().catch((err) => {
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     next();
   });
+  // moSHion's loadSound() fetch()es its file (Web Audio needs the bytes to
+  // decode), and a fetch from the sandboxed runner is CORS mode, so without
+  // this every sound in a sketch fails with "Failed to fetch" and stays
+  // silent -- measured 2026-10-31 on 5.11.9's coin.wav. Production already
+  // answers these files with `Access-Control-Allow-Origin: *`, and
+  // public/_headers now says so for this prefix too.
+  server.use('/moshion/assets', (_req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+  });
 
   // ---- gated dev stubs: fail-closed, explicit opt-in ----------------------
   // Everything between this if and its closing brace exists only to make

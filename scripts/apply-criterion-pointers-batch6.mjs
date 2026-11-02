@@ -19,10 +19,10 @@ const POINTERS = {
   '1-1-11-name-that-umbrella': { target: '1.1.10', note: 'Umbrella Activities' },
 
   // --- 6.3.9 Space Jumper: gravity, then the module's own input material --
-  '6-3-9-a14-1-space-jumper': { target: '5.2.2', note: 'Gravity' },
+  '6-3-9-a14-1-space-jumper': { target: '5.2.6', note: 'Gravity' },
 
   // --- 6.3.10 Car on a Ramp: same gravity reading -------------------------
-  '6-3-10-a14-2-car-ramp': { target: '5.2.2', note: 'Gravity' },
+  '6-3-10-a14-2-car-ramp': { target: '5.2.6', note: 'Gravity' },
 };
 
 // Per-CRITERION overrides. Key is "<folder>\u0000<title substring>"; longest
@@ -61,7 +61,7 @@ const PER_CRITERION = {
 
   // --- 6.3.9 Space Jumper: module 6.3 teaches edges and ground checks -----
   '6-3-9-a14-1-space-jumper\u0000WASD horizontal input':
-    { target: '5.1.14', note: 'Keyboard Movement' },
+    { target: '5.1.15', note: 'Keyboard Movement' },
   '6-3-9-a14-1-space-jumper\u0000Edge-triggered jump':
     { target: '6.3.3', note: 'moSHion docs: Input edges' },
   '6-3-9-a14-1-space-jumper\u0000Ground-gated jump':
@@ -71,9 +71,9 @@ const PER_CRITERION = {
 
   // --- 6.3.10 Car on a Ramp ----------------------------------------------
   '6-3-10-a14-2-car-ramp\u0000WASD drives the car':
-    { target: '5.1.14', note: 'Keyboard Movement' },
+    { target: '5.1.15', note: 'Keyboard Movement' },
   '6-3-10-a14-2-car-ramp\u0000Sets horizontal velocity':
-    { target: '5.1.15', note: 'Velocity: vel.x and vel.y' },
+    { target: '5.1.16', note: 'Velocity: vel.x and vel.y' },
   '6-3-10-a14-2-car-ramp\u0000Tilted ramp via rotation':
     { target: '5.1.10', note: 'Sprite property tour: pos, rotation, scale' },
   '6-3-10-a14-2-car-ramp\u0000Uses WheelJoint':
@@ -86,7 +86,7 @@ const PER_CRITERION = {
   '6-4-9-animated-sprites-sandbox\u0000Two or more visual states':
     { target: '6.4.3', note: 'moSHion docs: Animation' },
   '6-4-9-animated-sprites-sandbox\u0000Visual swap driven by input':
-    { target: '5.1.14', note: 'Keyboard Movement' },
+    { target: '5.1.15', note: 'Keyboard Movement' },
 
   // --- 6.4.18 Side-Scrolling Platformer ----------------------------------
   '6-4-18-a15-1-platformer\u0000Two or more animation states':

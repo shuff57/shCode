@@ -24,11 +24,19 @@
  *   square(x,y,s)  cos/sin  mouseX/mouseY  width/height  noLoop()
  *   storeItem/getItem         (localStorage)
  *   sprite.addAni/changeAni   (2.4.x minimal sprite-sheet animation)
- *   sprite.image = url        (still image; a string with no '.' is an emoji
- *                             placeholder instead of a URL, e.g. '🧍')
+ *   sprite.image = url        (still image / <img> / <canvas>; a string with no '.' is an
+ *                             emoji placeholder instead of a URL, e.g. '🧍'; group.image = x
+ *                             sets it on every member and on new groupName.Sprite()s)
+ *   sprite.pattern = url      (repeats at natural size inside the shape instead of stretching,
+ *                             for ground/walls; also a group default)
+ *   sprite.texture = 'coin'   (a NAMED pixel-art picture from textures/, or one saved with
+ *                             saveTexture(); textureNames() lists them; also a group default)
  *   new HingeJoint(a,b,opt)   new DistanceJoint(a,b,opt)   joint.delete()
  *   new SliderJoint(a,b,opt)  new WheelJoint(a,b,opt)  new GrabberJoint(a,b,opt)
  *   new GlueJoint(a,b)        joint.length (DistanceJoint, settable post-construction)
+ *   world.origin = 'math'     opt-in coordinate mode: origin at the canvas CENTRE, y UP,
+ *                             angles counter-clockwise (default 'screen': top-left, y down)
+ *   showGrid(step) showMouse() draw-time helpers that label the active coordinates
  *
  * Physics: REAL Box2D (via planck.js), not arcade.
  *   - Stacking, sleeping, actual circle colliders, joints (W17) all work.
@@ -159,7 +167,7 @@
     // same cursor in SCREEN pixels, which is what a fixed HUD needs: without
     // it, a HUD button hit-tested against mouse.x starts answering wrong the
     // moment the camera moves, and nothing errors.
-    get canvasPos() { return { x: MOUSE.x - _camLeft(), y: MOUSE.y - _camTop() }; },
+    get canvasPos() { const o = _frameOrigin(); return { x: MOUSE.x - o.x, y: MOUSE.y - o.y }; },
     // Boolean, matching mouse.pressing() as taught in 6.7.3/6.7.8 (used as
     // `if (!mouse.pressing())` in the drag-and-drop lesson).
     pressing: () => { const v = MOUSE._c; return v === -3 || v > 0; },
@@ -233,12 +241,75 @@
   }
 
   // world.gravity — raw Box2D m/s², exactly like the reference API's world.gravity.
-  // `world.gravity.y = 10` is ~1g; `= 0` is zero-G. The px/frame² facade
+  // `world.gravity.y = 10` is ~1g; `= 0` is zero-G. In 'math' mode (y up) the
+  // same raw number points the other way on screen: a falling world there is
+  // `world.gravity.y = -10`, exactly as a physics class writes it. The world STARTS at 0, as
+  // the reference API's does: a plain `new Sprite()` stays where it was put
+  // until a sketch turns gravity on (see _world()). The px/frame² facade
   // unit was 60x too strong (10 px/frame² = 1200 m/s² = 122g), which crushed
   // wheel-joint suspensions and sent pong balls flying. Live proxy vector so
   // `world.gravity.y = 0` sticks (a plain getter returning a fresh object
   // made gravity writes silent no-ops).
   const world = {};
+
+  // ---- coordinate mode: world.origin = 'screen' | 'math' ------------------
+  //
+  // 'screen' (the default, and what every existing sketch runs on): (0, 0) is
+  // the canvas's top-left corner, x grows right, y grows DOWN, and a positive
+  // rotation turns clockwise -- the browser canvas's own convention, p5play's
+  // too. 'math' is the opt-in mode for a module that wants the grid students
+  // know from math class: (0, 0) is the CENTRE of the canvas, y grows UP, and
+  // a positive rotation turns counter-clockwise from the +x axis.
+  //
+  // How it works, and why this way: the physics world is left entirely alone.
+  // Box2D's own frame IS the math one (y up, angles counter-clockwise), and in
+  // 'screen' mode this engine has always drawn that frame onto a y-down canvas
+  // without ever flipping anything, which is why `vel.y = 5` moves a sprite
+  // down the screen and gravity is `+10`. So 'math' mode changes ONE thing:
+  // the canvas transform every draw goes through (`_applyFrame()`) becomes
+  // "centre the origin, flip y", and text and pictures are flipped back so
+  // they read upright. Every number a sketch reads or writes -- sprite.x/y,
+  // vel, rotation, direction, gravity, forces, joint anchors, ray casts,
+  // the mouse -- is then a Box2D number shown the Box2D way round. Nothing is
+  // converted at the API boundary, so there is no sign to get wrong twice.
+  // The places that DO have an opinion about which way is up are each
+  // branched on `ORIGIN_` and listed here so the audit is one grep:
+  //   _applyFrame (the transform), background, text, Sprite._draw (pictures,
+  //   emoji, patterns and labels flipped back), _cullView, _frameOrigin
+  //   (canvasPos / screen-space hit-tests), _pointerTo (the mouse), Canvas
+  //   and the origin setter (camera start), Tiles (row direction),
+  //   Walls, Group.cull (which edge is "top"), _drawGrid / _drawMouse.
+  //
+  // The rule for when it may be set: at the top of setup(), before any sprite
+  // exists, before gravity is set and before the first frame. Nothing already
+  // in the world is converted (a sprite made at y = 50 in screen mode would
+  // jump to a different place on the canvas), so the setter refuses with a
+  // plain message rather than move things. It also parks the camera on the
+  // mode's own origin, the same place `new Canvas()` would have put it.
+  let ORIGIN_ = 'screen';
+  const ORIGIN_CHOICES_ = "'screen' (top-left corner, y grows down -- the default) or 'math' (canvas centre, y grows up)";
+  Object.defineProperty(world, 'origin', {
+    enumerable: true,
+    get() { return ORIGIN_; },
+    set(v) {
+      if (v !== 'screen' && v !== 'math') {
+        throw new TypeError(`world.origin must be ${ORIGIN_CHOICES_}, not ${JSON.stringify(v)}`);
+      }
+      if (v === ORIGIN_) return;
+      if (ALL_.length || FRAME_ > 0) {
+        throw new Error(`world.origin = '${v}' must come before any sprite is made and before the first frame -- put it at the top of setup()`);
+      }
+      if (WORLD_) {
+        const g = WORLD_.getGravity();
+        if (g.x !== 0 || g.y !== 0) {
+          throw new Error(`world.origin = '${v}' must come before world.gravity is set -- in 'math' mode a falling world is world.gravity.y = -10`);
+        }
+      }
+      ORIGIN_ = v;
+      if (CANVAS_) _parkCamera();
+    },
+  });
+
   Object.defineProperty(world, 'gravity', {
     get() {
       const g = _world().getGravity();
@@ -282,8 +353,43 @@
   function _camLeft() { return camera.x - (W_ || 0) / 2; }
   function _camTop() { return camera.y - (H_ || 0) / 2; }
 
-  function _applyCamera() {
-    if (camera._active) CTX_.translate(-_camLeft(), -_camTop());
+  // The transform for one drawing pass. `withCamera` false is the fixed frame
+  // a HUD draws in (drawTop(), camera.off(), screenSpace sprites). In 'screen'
+  // mode that frame is the raw canvas, so nothing happens; in 'math' mode it
+  // is still centred and y-up -- "the camera is off" means "the camera is
+  // back at (0, 0)", not "fall back to top-left pixels".
+  function _applyFrame(withCamera) {
+    if (ORIGIN_ === 'math') {
+      CTX_.translate(W_ / 2, H_ / 2);
+      CTX_.scale(1, -1);
+      if (withCamera) CTX_.translate(-camera.x, -camera.y);
+      return;
+    }
+    if (withCamera) CTX_.translate(-_camLeft(), -_camTop());
+  }
+  function _applyCamera() { _applyFrame(camera._active); }
+
+  // The world point that sits at the fixed frame's origin: subtracting it
+  // from a world coordinate gives canvasPos. 'screen': the viewport's top-left
+  // corner; 'math': the point the camera is centred on.
+  function _frameOrigin() {
+    if (ORIGIN_ === 'math') return { x: camera.x, y: camera.y };
+    return { x: _camLeft(), y: _camTop() };
+  }
+
+  // World -> canvas pixel (top-left origin, y down), camera included. Used by
+  // the overlays that paint in pixel space so their text stays upright.
+  function _toPixel(wx, wy) {
+    if (ORIGIN_ === 'math') return { x: wx - camera.x + W_ / 2, y: H_ / 2 - (wy - camera.y) };
+    return { x: wx - _camLeft(), y: wy - _camTop() };
+  }
+
+  // Where an untouched camera rests: the canvas centre, in the mode's own
+  // numbers. 'screen' calls the centre (w/2, h/2); 'math' calls it (0, 0).
+  function _parkCamera() {
+    if (ORIGIN_ === 'math') { camera.x = 0; camera.y = 0; return; }
+    camera.x = W_ / 2;
+    camera.y = H_ / 2;
   }
 
   // Named collider-type constants, matching the reference API's globals. Their VALUES
@@ -302,25 +408,58 @@
       CANVAS_.width = w; CANVAS_.height = h;
       CTX_ = CANVAS_.getContext('2d');
       // An untouched camera must be a no-op, so it starts centred on the
-      // canvas rather than at the world origin.
-      camera.x = w / 2;
-      camera.y = h / 2;
+      // canvas rather than at the world origin (in 'math' mode the centre IS
+      // the origin, so it starts at (0, 0) -- see _parkCamera).
+      _parkCamera();
       document.body.appendChild(CANVAS_);
     }
   }
 
   function background(color) {
     CTX_.save();
+    if (ORIGIN_ === 'math') {
+      // The whole canvas, whatever the camera is doing: the same answer the
+      // branch below gives, without a flipped rect to reason about.
+      CTX_.resetTransform();
+      CTX_.fillStyle = color;
+      CTX_.fillRect(0, 0, W_, H_);
+      CTX_.restore();
+      return;
+    }
     _applyCamera();
     CTX_.fillStyle = color;
     CTX_.fillRect(_camLeft(), _camTop(), W_, H_);
     CTX_.restore();
   }
 
+  // Default gravity is 0, matching p5play: a sketch that never mentions
+  // world.gravity gets sprites that stay put. It was 9.8 until 2026-11-01,
+  // which made a plain `new Sprite()` fall off the canvas in sketches that
+  // never asked for gravity. Turn it on with `world.gravity.y = 10`.
   function _world() {
-    if (!WORLD_) WORLD_ = pl.World({ gravity: pl.Vec2(0, 9.8) });
+    if (!WORLD_) WORLD_ = pl.World({ gravity: pl.Vec2(0, 0) });
     return WORLD_;
   }
+
+  // ---- art loading --------------------------------------------------------
+  // One <img> per URL, shared by every sprite that asks for it: a bullet group
+  // spawning 200 sprites with the same picture decodes it once, not 200 times.
+  const ART_CACHE_ = new Map();
+  function isUrl_(s) { return /[./]/.test(s) || /^(data|blob):/.test(s); }
+  function loadArt_(art) {
+    if (typeof art !== 'string') return art; // <img>, <canvas>, ImageBitmap: use as given
+    let img = ART_CACHE_.get(art);
+    if (!img) {
+      img = new Image();
+      img.addEventListener('error', () => { img._failed = true; });
+      img.src = art;
+      ART_CACHE_.set(art, img);
+    }
+    return img;
+  }
+  // canvas / ImageBitmap have no `complete`; they are ready the moment they exist.
+  function artReady_(a) { return !a._failed && (a.complete === undefined || (a.complete && a.naturalWidth > 0)); }
+  function artFailed_(a) { return !!a._failed || (a.complete === true && a.naturalWidth === 0); }
 
   // ---- textures ---------------------------------------------------------
 
@@ -331,7 +470,7 @@
   //   saved     art the student made, kept in the moSHion store under
   //             'texture:<name>' as a data: URL
   //   built-in  window.MOSHION_TEXTURES -- generated by
-  //             scripts/make-moshion-textures.py, loaded by runner.html as a
+  //             scripts/make-textures.py, loaded by runner.html as a
   //             <script> BEFORE this file
   //
   // Saved wins, so a student who draws their own `coin` gets theirs and not
@@ -347,7 +486,6 @@
   // breaking it. Note 'texmeta:' does not start with 'texture:', so meta keys
   // never show up in textureNames().
   const TEXMETA_PREFIX_ = 'texmeta:';
-  const TEX_CACHE_ = {};   // src -> Image, so twenty coins share one decode
 
   function _textureCatalog() {
     const cat = global.MOSHION_TEXTURES;
@@ -372,8 +510,16 @@
     return entry ? cat.base + entry.file : null;
   }
 
-  // { frames, frameDelay } for a saved animation, or null for a still.
+  // { frames, frameDelay, delays } for a saved animation, or null for a still.
   function _textureMeta(name) {
+    // A built-in animation is a catalog entry with `frames`. Art the student
+    // saved under the same name replaces it, still or not, so only fall to the
+    // catalog when nothing is saved.
+    if (!_savedTextureSrc(name)) {
+      const e = _textureCatalog().textures[name];
+      if (e && e.frames > 1) return { frames: e.frames, frameDelay: Math.max(1, e.frameDelay | 0 || 4), delays: null };
+      return null;
+    }
     const m = getItem(TEXMETA_PREFIX_ + name);
     if (!m || typeof m !== 'object') return null;
     const frames = Math.floor(m.frames);
@@ -387,12 +533,6 @@
       frameDelay: Math.max(1, Math.floor(m.frameDelay) || 4),
       delays: delays,
     };
-  }
-
-  function _textureImage(src) {
-    let img = TEX_CACHE_[src];
-    if (!img) { img = new Image(); img.src = src; TEX_CACHE_[src] = img; }
-    return img;
   }
 
   function _storeKeys() {
@@ -457,7 +597,7 @@
       // the still gets sliced into N pieces and only a sliver ever draws.
       removeItem(TEXMETA_PREFIX_ + name);
     }
-    delete TEX_CACHE_[dataUrl];   // redrawn under the same name: decode again
+    ART_CACHE_.delete(dataUrl);   // redrawn under the same name: decode again
   }
 
   function deleteTexture(name) {
@@ -759,9 +899,12 @@
     // pixel it appears at is its own x/y. Subtracting the camera from it
     // reported a HUD button at x=-440 while it was plainly visible at x=60.
     // canvasPos means "where is this on screen"; for these it is identity.
+    // "On screen" is the fixed frame drawTop() draws in: raw pixels in
+    // 'screen' mode, the centred y-up frame with the camera removed in 'math'.
     get canvasPos() {
       if (this.screenSpace) return { x: this.x, y: this.y };
-      return { x: this.x - _camLeft(), y: this.y - _camTop() };
+      const o = _frameOrigin();
+      return { x: this.x - o.x, y: this.y - o.y };
     }
 
     // prevPos/previousPosition, prevRotation/previousRotation: the position
@@ -1007,21 +1150,21 @@
     set velocity(v) { this.vel.x = v.x; this.vel.y = v.y; }
 
     // still art — mutually exclusive with an active `ani` (2.4.3d).
-    // A string with no '.' is treated as an emoji/text placeholder rather
-    // than an image URL (matches the reference API's `img` setter heuristic —
-    // exercised by real lesson code, e.g. `player.image = '🧍'`).
+    // Accepts: an emoji / short text (a string that is not a URL), an image URL,
+    // a data:/blob: URL, or a ready-made <img> / <canvas> / ImageBitmap (e.g.
+    // from createImg or a canvas you drew on). null or '' goes back to the
+    // plain colored shape. A string with no '.', no '/' and no data:/blob:
+    // prefix is an emoji/text placeholder, matching the reference API's `img`
+    // setter heuristic (exercised by lesson code, e.g. `player.image = '🧍'`).
     get image() { return this._img || this._emoji; }
-    set image(url) {
-      if (typeof url === 'string' && !url.includes('.')) {
-        this._emoji = url;
-        this._img = null;
-      } else {
-        this._img = new Image();
-        this._img.src = url;
-        this._emoji = null;
-      }
+    set image(art) {
       this.ani = null;
+      this._img = null;
+      this._emoji = null;
       this._texture = null;   // a raw URL is not a named texture any more
+      if (art == null || art === '') return;
+      if (typeof art === 'string' && !isUrl_(art)) this._emoji = art;
+      else this._img = loadArt_(art);
     }
 
     // Named art, resolved through the texture catalog above. Mutually
@@ -1033,8 +1176,10 @@
     get texture() { return this._texture; }
     set texture(name) {
       if (name === null || name === undefined || name === '') {
+        // Only undo art that CAME from a texture; an addAni()/image the sketch
+        // set itself is not ours to clear.
+        if (this._texture) { this._img = null; this.ani = null; }
         this._texture = null;
-        this._img = null;
         return;
       }
       const src = _textureSrc(name);
@@ -1067,9 +1212,20 @@
         this.ani = ani;
         this._img = null;
       } else {
-        this._img = _textureImage(src);
+        this._img = loadArt_(src);
         this.ani = null;
       }
+    }
+
+    // pattern: a picture that REPEATS inside the sprite's shape at its natural
+    // size, anchored to the sprite's top-left, instead of stretching like
+    // `image` does. For big surfaces (ground, walls, platforms) where a stretched
+    // picture would smear. Takes a URL, data:/blob: URL, <img> or <canvas>;
+    // null clears it. Any `image` / `texture` / `ani` draws instead of the tile.
+    get pattern() { return this._pattern || null; }
+    set pattern(art) {
+      this._patternPat = null;
+      this._pattern = art == null || art === '' ? null : loadArt_(art);
     }
 
     // minimal sprite-sheet animation (2.4.3a–2.4.3c): a named animation is a
@@ -1362,6 +1518,41 @@
     // lesson code (e.g. 2.6.11, 2.6.13) — same full-destroy behavior.
     remove() { this.delete(); }
 
+    // addSensor(offsetX, offsetY, w, h): a box riding on this sprite that
+    // only DETECTS. It is an extra planck fixture marked as a sensor with no
+    // density, so it pushes nothing, weighs nothing and does not change how
+    // the sprite moves; `colliding()` never counts it. Ask it directly:
+    //
+    //   feet = player.addSensor(0, 21, 26, 4); // a strip under a 30x40 player
+    //   if (kb.presses('space') && feet.overlaps(ground)) player.vel.y = -9;
+    //
+    // which is true on the floor and false against a wall or a ceiling, where
+    // `player.colliding(ground)` is true in all three. Offsets are from the
+    // sprite's centre and turn with it, in the active coordinates: +offsetY is
+    // below the sprite in 'screen' mode and ABOVE it in 'math' mode, where the
+    // same foot sensor is addSensor(0, -21, 26, 4). Defaults: no offset, the
+    // sprite's size.
+    // Box2D only reports contacts that involve a moving (dynamic) body, so a
+    // sensor on a static or kinematic sprite sees only dynamic ones. Like
+    // colliding(), the answer is from this frame's physics step. world.rayCast
+    // reports a sensor's box as part of its sprite.
+    addSensor(offsetX = 0, offsetY = 0, w = this.w, h = this.h) {
+      for (const [k, v] of [['offsetX', offsetX], ['offsetY', offsetY], ['w', w], ['h', h]]) {
+        if (typeof v !== 'number' || !Number.isFinite(v)) {
+          throw new TypeError(`sprite.addSensor(offsetX, offsetY, w, h): ${k} must be a number`);
+        }
+      }
+      const fixture = this._body.createFixture({
+        shape: pl.Box(Math.abs(w) / 2 / PXM, Math.abs(h) / 2 / PXM, pl.Vec2(offsetX / PXM, offsetY / PXM), 0),
+        density: 0,
+        isSensor: true,
+      });
+      const sensor = new Sensor(this, fixture);
+      fixture.setUserData(sensor);
+      SENSORS_.push(sensor);
+      return sensor;
+    }
+
     _draw() {
       if (!this.visible) return;
       CTX_.save();
@@ -1369,31 +1560,50 @@
       CTX_.translate(this.x, this.y);
       CTX_.rotate((this.rotation * Math.PI) / 180);
       CTX_.scale(this.scale.x, this.scale.y);
-      if (this.ani && this.ani.spriteSheet.complete) {
-        const img = this.ani.spriteSheet;
-        const fw = img.naturalWidth / this.ani.frameCount;
-        // An ANIMATED texture is still pixel art and must not blur. A sheet
-        // loaded by addAni() keeps smoothing, matching .image -- the opt-in is
-        // "did this come from .texture", not "is it animated".
-        const smoothA_ = CTX_.imageSmoothingEnabled;
+      // 'math' mode draws through a y-flipped canvas (see _applyFrame). The
+      // coloured rect and circle are symmetric about the centre, so flipping
+      // back here changes nothing for them, and it is what turns a picture, an
+      // emoji or a tiling pattern the right way up again.
+      if (ORIGIN_ === 'math') CTX_.scale(1, -1);
+      // Art that is still loading draws nothing (no flash of the colored block
+      // before the picture pops in); art that FAILED to load falls back to the
+      // colored shape, so a typo in a URL shows a block, not an invisible sprite.
+      const sheet = this.ani && this.ani.spriteSheet;
+      if (sheet && artReady_(sheet)) {
+        const fw = sheet.naturalWidth / this.ani.frameCount;
+        // Named textures are pixel art: smoothing off, so a 21x21 tile stretched
+        // across a 50x50 sprite stays blocky instead of blurring. A plain
+        // .image / addAni still smooths.
+        const smoothA = CTX_.imageSmoothingEnabled;
         if (this._texture) CTX_.imageSmoothingEnabled = false;
-        CTX_.drawImage(img, this.ani.frame * fw, 0, fw, img.naturalHeight, -this.w / 2, -this.h / 2, this.w, this.h);
-        CTX_.imageSmoothingEnabled = smoothA_;
-      } else if (this._img && this._img.complete) {
-        // A 21x21 texture blown up to a 50x50 sprite has to stay blocky, or
-        // pixel art arrives as a smear. Only textures opt in -- a `.image`
-        // photo keeps smoothing, which is what the existing lessons expect.
-        const smooth_ = CTX_.imageSmoothingEnabled;
+        CTX_.drawImage(sheet, this.ani.frame * fw, 0, fw, sheet.naturalHeight, -this.w / 2, -this.h / 2, this.w, this.h);
+        CTX_.imageSmoothingEnabled = smoothA;
+      } else if (this._img && artReady_(this._img)) {
+        const smooth = CTX_.imageSmoothingEnabled;
         if (this._texture) CTX_.imageSmoothingEnabled = false;
         CTX_.drawImage(this._img, -this.w / 2, -this.h / 2, this.w, this.h);
-        CTX_.imageSmoothingEnabled = smooth_;
+        CTX_.imageSmoothingEnabled = smooth;
       } else if (this._emoji) {
-        CTX_.font = `${this.h}px sans-serif`;
+        // Sized to the smaller side so a tall, thin sprite's emoji stays inside
+        // its collider instead of overflowing it.
+        CTX_.font = `${Math.min(this.w, this.h)}px sans-serif`;
+        CTX_.fillStyle = this.color;
         CTX_.textAlign = 'center';
         CTX_.textBaseline = 'middle';
         CTX_.fillText(this._emoji, 0, 0);
-      } else if (!this.ani && !this._img) {
-        CTX_.fillStyle = this.color;
+      } else if (!(sheet && !artFailed_(sheet)) && !(this._img && !artFailed_(this._img))
+                 && !(this._pattern && !artReady_(this._pattern) && !artFailed_(this._pattern))) {
+        // A texture that is ready fills the shape with its tiling pattern; one
+        // still loading skips the frame, one that failed uses the plain color.
+        if (this._pattern && artReady_(this._pattern)) {
+          if (!this._patternPat) this._patternPat = CTX_.createPattern(this._pattern, 'repeat');
+          // A pattern is anchored where the canvas origin is at FILL time, so shift
+          // it to the sprite's top-left (re-set each frame: w/h can change).
+          this._patternPat.setTransform(new DOMMatrix().translate(-this.w / 2, -this.h / 2));
+          CTX_.fillStyle = this._patternPat;
+        } else {
+          CTX_.fillStyle = this.color;
+        }
         if (this.shape === 'circle') {
           CTX_.beginPath();
           CTX_.arc(0, 0, this.w / 2, 0, Math.PI * 2);
@@ -1433,6 +1643,7 @@
         CTX_.save();
         CTX_.globalAlpha = this.opacity;
         CTX_.translate(this.x, this.y);
+        if (ORIGIN_ === 'math') CTX_.scale(1, -1); // read upright through the flipped frame
         CTX_.font = `${this.textSize}px monospace`;
         CTX_.textAlign = 'center';
         CTX_.textBaseline = 'middle';
@@ -1450,6 +1661,44 @@
     }
   }
 
+  // What sprite.addSensor() returns. Its overlap ledger is its own (keyed by
+  // the other sprite), filled once per frame by _updateContacts() from
+  // planck's contact list, using the same signed counter as colliding().
+  const SENSORS_ = [];
+  class Sensor {
+    constructor(sprite, fixture) {
+      this.sprite = sprite;
+      this._fixture = fixture;
+      this._hits = new Map();
+      this._removed = false;
+    }
+    // Frames this sensor has been touching `other` (a Sprite, or for a Group
+    // the longest-touching member); 0 when it is not.
+    overlapping(other) {
+      if (other instanceof Group) {
+        let n = 0;
+        for (const s of other) n = Math.max(n, this._count(s));
+        return n;
+      }
+      return this._count(other);
+    }
+    // True while this sensor touches `other` (a Sprite, or any member of a Group).
+    overlaps(other) { return this.overlapping(other) > 0; }
+    _count(other) {
+      const v = this._hits.get(other) || 0;
+      return v > 0 ? v : 0;
+    }
+    // Takes the sensor off its sprite. Deleting the sprite does this too.
+    remove() {
+      if (this._removed) return;
+      this._removed = true;
+      if (!this.sprite._dead) this.sprite._body.destroyFixture(this._fixture);
+      this._hits.clear();
+      const i = SENSORS_.indexOf(this);
+      if (i >= 0) SENSORS_.splice(i, 1);
+    }
+  }
+
   // ---- animation (2.4.x) --------------------------------------------------
   // Minimal sprite-sheet animation: a named horizontal frame-strip, advanced
   // on a fixed delay. Not the reference API's full texture-atlas system (no multi-row
@@ -1461,16 +1710,15 @@
       this.frameCount = frameCount || 1;
       this.frameDelay = 4; // game frames per animation frame (the reference API default)
       // OPTIONAL per-frame holds, one entry per frame. Null for everything
-      // addAni() builds, so the uniform-delay path below is byte-identical to
-      // what it has always been -- this exists for textures drawn in the
-      // editor, where a pose can be held longer than the frames around it.
+      // addAni() builds, so the uniform-delay path below is what it has always
+      // been -- this exists for textures drawn in an editor, where a pose can
+      // be held longer than the frames around it.
       this.frameDelays = Array.isArray(frameDelays) && frameDelays.length === this.frameCount
         ? frameDelays.map(function (d) { return Math.max(1, Math.floor(d) || 1); })
         : null;
       this.frame = 0;
       this._tick = 0;
-      this.spriteSheet = new Image();
-      this.spriteSheet.src = sheetUrl;
+      this.spriteSheet = loadArt_(sheetUrl);
     }
     /** How long the frame showing right now is held, in game frames. */
     holdOf(frame) {
@@ -1508,12 +1756,39 @@
             if (/^\d+$/.test(key)) continue; // array indices = existing members, not defaults
             this[key] = group[key];
           }
+          if (group._groupImage != null) this.image = group._groupImage;
+          if (group._groupTexture != null) this.texture = group._groupTexture;
+          if (group._groupPattern != null) this.pattern = group._groupPattern;
           group.push(this);
         }
       }
       Object.defineProperty(this, 'Sprite', { value: GroupSprite, enumerable: false });
     }
     newSprite(x, y, w, h) { const s = new Sprite(x, y, w, h); this.push(s); return s; }
+
+    // texture: same cascade-and-remember behaviour as `image`, by catalog name.
+    get texture() { return this._groupTexture == null ? null : this._groupTexture; }
+    set texture(name) {
+      Object.defineProperty(this, '_groupTexture', { value: name, writable: true, configurable: true, enumerable: false });
+      for (const s of this) s.texture = name;
+    }
+
+    // pattern: same cascade-and-remember behaviour as `image` above, for repeating fills.
+    get pattern() { return this._groupPattern == null ? null : this._groupPattern; }
+    set pattern(art) {
+      Object.defineProperty(this, '_groupPattern', { value: art, writable: true, configurable: true, enumerable: false });
+      for (const s of this) s.pattern = art;
+    }
+
+    // image: art for every member, current and future — `coins.image = '🪙'`.
+    // Cascades like autoDraw below AND is remembered as the default for the
+    // `new coins.Sprite()` factory (which copies enumerable props, so this
+    // accessor on the prototype is applied separately in GroupSprite).
+    get image() { return this._groupImage == null ? null : this._groupImage; }
+    set image(art) {
+      Object.defineProperty(this, '_groupImage', { value: art, writable: true, configurable: true, enumerable: false });
+      for (const s of this) s.image = art;
+    }
 
     // Track membership on every sprite pushed in, however it gets here
     // (direct `.push()`, `.newSprite()`, or the `.Sprite` factory above) —
@@ -1663,9 +1938,16 @@
         throw new TypeError('the callback to group.cull() must be a function');
       }
       // Bounds are in world space, so a scrolled camera culls against what is
-      // actually on screen rather than against the origin.
-      const minX = _camLeft() - left, minY = _camTop() - top;
-      const maxX = _camLeft() + W_ + right, maxY = _camTop() + H_ + bottom;
+      // actually on screen rather than against the origin. `top` is always the
+      // margin past the top EDGE of the screen: the larger y in 'math' mode.
+      let minX, minY, maxX, maxY;
+      if (ORIGIN_ === 'math') {
+        minX = camera.x - W_ / 2 - left; maxX = camera.x + W_ / 2 + right;
+        minY = camera.y - H_ / 2 - bottom; maxY = camera.y + H_ / 2 + top;
+      } else {
+        minX = _camLeft() - left; minY = _camTop() - top;
+        maxX = _camLeft() + W_ + right; maxY = _camTop() + H_ + bottom;
+      }
       let culled = 0;
       // Snapshot first: deleting a member mutates the array underneath us.
       for (const s of [...this]) {
@@ -1684,6 +1966,115 @@
   // Real usage: `player.colliding(allSprites)` (2.4.10 platformer) to test
   // against "anything", not one specific ground sprite/group.
   const allSprites = new Group();
+
+  // ---- tile maps and walls ------------------------------------------------
+
+  // new Tiles(map, x, y, w, h, legend): builds a level out of rows of text.
+  //
+  //   walls = new Group(); walls.collider = 'static'; walls.color = 'gray';
+  //   coins = new Group(); coins.collider = 'none';  coins.diameter = 14;
+  //   level = new Tiles([
+  //     '##########',
+  //     '#  c   c #',
+  //     '##########',
+  //   ], 20, 20, 40, 40, { '#': walls, 'c': coins });
+  //
+  // Each character that the legend names becomes one `new group.Sprite()`
+  // from that group, so the group's defaults (collider, color, diameter,
+  // texture, custom fields) apply exactly as they would by hand. Any other
+  // character (a space, '.') is an empty cell. Column c of row r is centred
+  // at (x + c * w, y + r * h), so x, y is the CENTRE of the top-left tile,
+  // the same way a sprite's x, y is its centre; a group default size (e.g.
+  // coins.diameter) wins over the tile size. `h` defaults to `w`. Rows go
+  // DOWN the screen in both coordinate modes -- the first string is the top
+  // row -- so in 'math' mode (y up) row r is centred at y - r * h.
+  //
+  // The Tiles object is itself a Group holding every sprite it made, in
+  // reading order, so `level.delete()` clears the level. Legend keys may be
+  // any single character, emoji included.
+  //
+  // p5play builds tiles from groups that carry a `.tile` letter instead of
+  // a legend; this takes the legend, so the map and what it means sit side
+  // by side in the sketch. (p5play's form is recalled, not verified.)
+  class Tiles extends Group {
+    // tiles.filter(...) and friends hand back a plain Group, not a new map.
+    static get [Symbol.species]() { return Group; }
+    constructor(map, x, y, w, h, legend) {
+      super();
+      const sig = 'new Tiles(map, x, y, w, h, legend)';
+      if (!Array.isArray(map) || map.some((row) => typeof row !== 'string')) {
+        throw new TypeError(`${sig}: map must be an array of strings, one string per row`);
+      }
+      if (typeof x !== 'number' || typeof y !== 'number') {
+        throw new TypeError(`${sig}: x and y must be numbers (the centre of the top-left tile)`);
+      }
+      if (typeof w !== 'number' || !(w > 0)) {
+        throw new TypeError(`${sig}: w must be a number above 0 (the width of one tile)`);
+      }
+      if (h === undefined || h === null) h = w;
+      if (typeof h !== 'number' || !(h > 0)) {
+        throw new TypeError(`${sig}: h must be a number above 0 (the height of one tile)`);
+      }
+      if (!legend || typeof legend !== 'object') {
+        throw new TypeError(`${sig}: legend must be an object naming the Group each character builds, like { '#': walls }`);
+      }
+      for (const key of Object.keys(legend)) {
+        if (!(legend[key] instanceof Group)) {
+          throw new TypeError(`${sig}: legend['${key}'] must be a Group (made with new Group())`);
+        }
+      }
+      const rowStep = ORIGIN_ === 'math' ? -h : h; // the next row is further down the screen
+      for (let r = 0; r < map.length; r++) {
+        const cells = Array.from(map[r]); // by character, so an emoji is one cell
+        for (let c = 0; c < cells.length; c++) {
+          const ch = cells[c];
+          if (!Object.prototype.hasOwnProperty.call(legend, ch)) continue;
+          this.push(new legend[ch].Sprite(x + c * w, y + r * rowStep, w, h));
+        }
+      }
+    }
+  }
+
+  // new Walls(thickness = 50): four static walls just OUTSIDE the edges of
+  // what the canvas shows, so sprites bounce off the edges of the screen
+  // and the whole canvas stays playable. Off screen, so not seen. Call it
+  // after new Canvas(). It is a Group of the four walls, which are also
+  // walls.top / .bottom / .left / .right, so `player.colliding(walls)` asks
+  // "touching any edge" and `player.colliding(walls.bottom)` asks "on the floor".
+  // The walls are placed where the camera is looking when it is called and
+  // stay there; they do not follow the camera.
+  class Walls extends Group {
+    static get [Symbol.species]() { return Group; }
+    constructor(thickness = 50) {
+      super();
+      if (!CANVAS_) throw new Error('new Walls() must come after new Canvas(w, h)');
+      if (typeof thickness !== 'number' || !(thickness > 0)) {
+        throw new TypeError('new Walls(thickness): thickness must be a number above 0');
+      }
+      const t = thickness, w = W_, h = H_;
+      const make = (name, cx, cy, ww, hh) => {
+        const s = new Sprite(cx, cy, ww, hh, 'static');
+        s.color = 'gray';
+        this.push(s);
+        Object.defineProperty(this, name, { value: s, enumerable: false });
+      };
+      if (ORIGIN_ === 'math') {
+        // Same four walls, with "top" the larger y. walls.top is still the
+        // one above the screen and walls.bottom the floor.
+        const cx = camera.x, cy = camera.y;
+        make('top', cx, cy + h / 2 + t / 2, w + 2 * t, t);
+        make('bottom', cx, cy - h / 2 - t / 2, w + 2 * t, t);
+        make('left', cx - w / 2 - t / 2, cy, t, h);
+        make('right', cx + w / 2 + t / 2, cy, t, h);
+        return;
+      }
+      const l = _camLeft(), top = _camTop();
+      make('top', l + w / 2, top - t / 2, w + 2 * t, t);
+      make('bottom', l + w / 2, top + h + t / 2, w + 2 * t, t);
+      make('left', l - t / 2, top + h / 2, t, h);
+      make('right', l + w + t / 2, top + h / 2, t, h);
+    }
+  }
 
   // spatial hit-test (2.7.6): top-most (highest layer) live sprite at a point,
   // or undefined. `x`/`y` are world coords, same space as mouse.x/y and sprite.x/y.
@@ -1732,7 +2123,8 @@
       // sprite that is not in world space. Doing it here means the natural
       // call keeps working for both kinds at once.
       if (s.screenSpace) {
-        const sx = x - _camLeft(), sy = y - _camTop();
+        const o = _frameOrigin();
+        const sx = x - o.x, sy = y - o.y;
         if (radius > 0) {
           if (s.shape === 'circle') return Math.hypot(sx - s.x, sy - s.y) <= s.w / 2 + radius;
           const sb = s._bounds();
@@ -1844,6 +2236,42 @@
       // explosion is a single instant.
       s._body.applyLinearImpulse(pl.Vec2((dx / d) * mag, (dy / d) * mag), s._body.getWorldCenter(), true);
     }
+  };
+
+  // rayCast: cast a ray through the physics world and call callback for each
+  // fixture hit. Matches planck.js/Box2D signature:
+  //   world.rayCast(x1, y1, x2, y2, callback)
+  //   world.rayCast({x, y}, {x, y}, callback)
+  // callback(fixture, point, normal, fraction) → return:
+  //   fraction (0..1): clip ray at hit, continue → finds CLOSEST
+  //   0: stop at first hit → finds ANY
+  //   1: continue without clipping → finds ALL
+  //  -1: ignore this fixture, continue
+  // point/normal are in PIXELS (world coords), fraction is 0..1
+  world.rayCast = function (x1, y1, x2, y2, callback) {
+    // Support object form: world.rayCast({x, y}, {x, y}, callback)
+    if (x1 !== null && typeof x1 === 'object') {
+    [x1, y1, x2, y2, callback] = [x1.x, x1.y, y1.x, y1.y, x2];
+    }
+    if (typeof callback !== 'function') return;
+    const p1 = pl.Vec2(x1 / PXM, y1 / PXM);
+    const p2 = pl.Vec2(x2 / PXM, y2 / PXM);
+    _world().rayCast(p1, p2, function (fixture, point, normal, fraction) {
+      // Convert hit point and normal back to pixels
+      const hitPoint = { x: point.x * PXM, y: point.y * PXM };
+      const hitNormal = { x: normal.x, y: normal.y }; // already unit vector
+      // Find the sprite owning this fixture
+      const body = fixture.getBody();
+      const sprite = body.getUserData();
+      // Call user callback with sprite (or null), point, normal, fraction
+      const result = callback(sprite instanceof Sprite ? sprite : null, hitPoint, hitNormal, fraction);
+      // Return value controls raycast continuation (Box2D convention)
+      if (result === 0) return 0;       // stop
+      if (result === 1) return 1;       // continue, don't clip
+      if (result === -1) return -1;     // filter fixture
+      if (typeof result === 'number' && result >= 0 && result <= 1) return result; // clip at fraction
+      return fraction; // default: clip at hit, continue (closest)
+    });
   };
 
   // ---- joints (W17) — thin facades over planck joints ---------------------
@@ -2004,13 +2432,18 @@
   // frame and keep a running signed frame count on each sprite.
   function _updateContacts() {
     const now = new Map(); // sprite -> Set(other sprites touching this frame)
+    const sensed = SENSORS_.length ? new Map() : null; // Sensor -> Set(sprites), addSensor() only
     for (let c = _world().getContactList(); c; c = c.getNext()) {
       if (!c.isTouching()) continue;
       // Sensor fixtures (collider = 'none') still show up as "touching" in
       // planck's contact list (only the solver skips their impulse) — but
       // colliding() is documented as solid-body contact only (2.3.17), so
       // a sensor pair must never count here even though overlaps() sees it.
-      if (c.getFixtureA().isSensor() || c.getFixtureB().isSensor()) continue;
+      if (c.getFixtureA().isSensor() || c.getFixtureB().isSensor()) {
+        // ...but a sensor made by addSensor() is listening for exactly this.
+        if (sensed) _noteSensed(sensed, c.getFixtureA(), c.getFixtureB());
+        continue;
+      }
       const a = c.getFixtureA().getBody().getUserData();
       const b = c.getFixtureB().getBody().getUserData();
       if (!(a instanceof Sprite) || !(b instanceof Sprite)) continue;
@@ -2031,11 +2464,42 @@
     for (const s of ALL_) {
       const cur = now.get(s);
       s._touch ??= new Map();
+      // Same short cut as in _updateOverlaps(): no keys to visit at all.
+      if (!cur && s._touch.size === 0) continue;
       const keys = new Set(s._touch.keys());
       if (cur) for (const o of cur) keys.add(o);
       for (const other of keys) {
         const next = _advanceContact(s._touch.get(other) || 0, !!(cur && cur.has(other)));
         if (next === 0) s._touch.delete(other); else s._touch.set(other, next);
+      }
+    }
+    if (sensed) _advanceSensors(sensed);
+  }
+
+  // addSensor() bookkeeping for _updateContacts(). A fixture whose user data
+  // is a Sensor belongs to addSensor(); every other fixture (the sprite's own,
+  // including a collider = 'none' one) has none, so nothing here touches a
+  // sketch that never called addSensor().
+  function _noteSensed(sensed, fa, fb) {
+    for (const [mine, theirs] of [[fa, fb], [fb, fa]]) {
+      const sensor = mine.getUserData();
+      if (!(sensor instanceof Sensor)) continue;
+      const other = theirs.getBody().getUserData();
+      if (!(other instanceof Sprite) || other === sensor.sprite) continue;
+      if (!sensed.has(sensor)) sensed.set(sensor, new Set());
+      sensed.get(sensor).add(other);
+    }
+  }
+  function _advanceSensors(sensed) {
+    for (const sensor of SENSORS_.slice()) {
+      if (sensor.sprite._dead) { sensor.remove(); continue; }
+      const cur = sensed.get(sensor);
+      if (!cur && sensor._hits.size === 0) continue;
+      const keys = new Set(sensor._hits.keys());
+      if (cur) for (const o of cur) keys.add(o);
+      for (const other of keys) {
+        const next = _advanceContact(sensor._hits.get(other) || 0, !!(cur && cur.has(other)));
+        if (next === 0) sensor._hits.delete(other); else sensor._hits.set(other, next);
       }
     }
   }
@@ -2046,23 +2510,46 @@
   // planck at all — it's the same manual bounding-box/circle test
   // _overlapsOne() uses, just run for every live pair once per frame so a
   // signed counter can be kept.
+  //
+  // Every pair used to be tested every frame: 600 sprites is ~180,000
+  // _overlapsOne() calls, each reading both positions back out of planck, and
+  // a 40x30 tile map (1,200 sprites) ran at about 6 fps. _overlapCandidates()
+  // below is a sort-and-sweep broadphase that only hands on pairs whose boxes
+  // could touch. It is EXACT, not an approximation: the same _overlapsOne()
+  // still decides every pair it hands on, the pairs it drops are ones that
+  // test could never pass, and they are visited in the same (i, j) order the
+  // old double loop used. No sketch can tell the difference except by speed.
   function _updateOverlaps() {
     const alive = ALL_.filter((s) => !s._dead);
     const now = new Map();
-    for (let i = 0; i < alive.length; i++) {
-      const a = alive[i];
-      for (let j = i + 1; j < alive.length; j++) {
-        const b = alive[j];
-        if (!a._overlapsOne(b)) continue;
-        if (!now.has(a)) now.set(a, new Set());
-        if (!now.has(b)) now.set(b, new Set());
-        now.get(a).add(b);
-        now.get(b).add(a);
+    const mark = (a, b) => {
+      if (!now.has(a)) now.set(a, new Set());
+      if (!now.has(b)) now.set(b, new Set());
+      now.get(a).add(b);
+      now.get(b).add(a);
+    };
+    const n = alive.length;
+    const pairs = _overlapCandidates(alive);
+    if (pairs === null) {
+      for (let i = 0; i < n; i++) {
+        const a = alive[i];
+        for (let j = i + 1; j < n; j++) {
+          const b = alive[j];
+          if (a._overlapsOne(b)) mark(a, b);
+        }
+      }
+    } else {
+      for (let k = 0; k < pairs.length; k++) {
+        const i = Math.floor(pairs[k] / n), j = pairs[k] - i * n;
+        if (alive[i]._overlapsOne(alive[j])) mark(alive[i], alive[j]);
       }
     }
     for (const s of alive) {
       s._overlap ??= new Map();
       const cur = now.get(s);
+      // Nothing touching now and nothing remembered: the loop below would
+      // visit no keys at all, so skip building an empty Set per sprite.
+      if (!cur && s._overlap.size === 0) continue;
       const keys = new Set(s._overlap.keys());
       if (cur) for (const o of cur) keys.add(o);
       for (const other of keys) {
@@ -2070,6 +2557,54 @@
         if (next === 0) s._overlap.delete(other); else s._overlap.set(other, next);
       }
     }
+  }
+
+  // Broadphase for _updateOverlaps(). Returns the pairs that COULD overlap as
+  // sorted numbers i * n + j (i < j, indices into `list`), or null to mean
+  // "test every pair the old way". It answers null whenever it cannot be sure
+  // of being exact:
+  //   - a small world, where the double loop is already cheap;
+  //   - a sprite whose _overlapsOne/_bounds is not the stock one (a subclass
+  //     or an instance overriding it could define overlap however it likes);
+  //   - a NaN or infinite edge anywhere (it cannot be sorted safely);
+  //   - so many candidates that the sweep saves nothing.
+  // A box here is _bounds() made inclusive and padded a hair, so it is a
+  // superset of both narrow tests: the strict rect test (a.l < b.r) and the
+  // circle test, which counts exactly-touching circles (<=). A circle's
+  // _bounds() is x/y +- w/2 on both axes, the same radius its test uses, and
+  // min/max straightens out a negative width.
+  const OVERLAP_SWEEP_MIN_ = 32;
+  function _overlapCandidates(list) {
+    const n = list.length;
+    if (n < OVERLAP_SWEEP_MIN_) return null;
+    const x0 = new Float64Array(n), x1 = new Float64Array(n);
+    const y0 = new Float64Array(n), y1 = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      const s = list[i];
+      if (s._overlapsOne !== Sprite.prototype._overlapsOne || s._bounds !== Sprite.prototype._bounds) return null;
+      const b = s._bounds();
+      const l = Math.min(b.l, b.r), r = Math.max(b.l, b.r);
+      const t = Math.min(b.t, b.b), bt = Math.max(b.t, b.b);
+      // NaN never sorts; an infinite edge makes the sort's subtraction NaN.
+      if (!Number.isFinite(l) || !Number.isFinite(r) || !Number.isFinite(t) || !Number.isFinite(bt)) return null;
+      const px = 1e-6 + 1e-9 * (Math.abs(l) + Math.abs(r));
+      const py = 1e-6 + 1e-9 * (Math.abs(t) + Math.abs(bt));
+      x0[i] = l - px; x1[i] = r + px; y0[i] = t - py; y1[i] = bt + py;
+    }
+    const order = Array.from({ length: n }, (_, i) => i).sort((a, b) => x0[a] - x0[b]);
+    const cap = (n * (n - 1)) / 4; // past half of all pairs, just test them all
+    const out = [];
+    for (let k = 0; k < n; k++) {
+      const i = order[k];
+      for (let m = k + 1; m < n; m++) {
+        const j = order[m];
+        if (x0[j] > x1[i]) break; // sorted by left edge: nothing further reaches i
+        if (y0[j] > y1[i] || y0[i] > y1[j]) continue;
+        out.push(i < j ? i * n + j : j * n + i);
+      }
+      if (out.length > cap) return null;
+    }
+    return Float64Array.from(out).sort();
   }
 
   // ---- render -----------------------------------------------------------
@@ -2087,16 +2622,18 @@
     // .layer still orders them among themselves.
     const drawPass = (list, useCamera) => {
       if (!list.length) return;
+      const view = _cullView(useCamera);
       CTX_.save();
-      if (useCamera) _applyCamera();
+      _applyFrame(useCamera && camera._active);
       for (const s of list) {
         if (!s.autoDraw) continue; // Sprite, SPEC-surface #3: false skips this sprite entirely
-        if (s.ani) s.ani._advance();
+        if (s.ani) s.ani._advance(); // advances on or off screen, so culling never freezes it
         // A sketch-assigned sprite.draw REPLACES the default rendering for
         // that sprite (Sprite, SPEC-surface #3) — everything else (layer
         // order, ani advance, autoDraw gating above) still applies around it.
+        // It is never culled: it may do more than draw.
         if (typeof s.draw === 'function') s.draw();
-        else s._draw();
+        else if (!view || !_offView(s, view)) s._draw();
       }
       CTX_.restore();
     };
@@ -2105,12 +2642,56 @@
     drawPass(ordered.filter((s) => s.screenSpace), false);
   }
 
+  // Off-screen culling for render(). A sprite whose whole picture lies outside
+  // the visible canvas skips its default _draw(), which is pure painting: no
+  // state changes, so skipping an invisible one changes nothing on screen.
+  // Measured 2026-10-31, headless Chromium: drawing 1,200 tile sprites costs
+  // about 1.7 ms a frame, so a long scrolling level pays for every tile it
+  // is not showing. The guards are what keep this safe:
+  //   - only the stock _draw() is ever skipped; a sketch's own sprite.draw
+  //     (which may count, move or spawn) always runs, and ani still advances;
+  //   - the context must be untransformed when render() starts (a sketch
+  //     that grabbed the canvas and transformed it itself is never culled),
+  //     and a context with no getTransform() is never culled at all;
+  //   - the reach is generous: the larger of w/h times the larger scale
+  //     (at least 1), which covers the art rotated any way, plus the stroke,
+  //     and for a text label (drawn unscaled) its character count + 2 times
+  //     textSize. A NaN anywhere compares false and the sprite draws.
+  // Returns {l, t, r, b} in the space the pass draws in, or null for "draw all".
+  function _cullView(useCamera) {
+    if (!CTX_ || typeof CTX_.getTransform !== 'function') return null;
+    const m = CTX_.getTransform();
+    if (!m || m.a !== 1 || m.b !== 0 || m.c !== 0 || m.d !== 1 || m.e !== 0 || m.f !== 0) return null;
+    const w = CANVAS_ ? CANVAS_.width : W_, h = CANVAS_ ? CANVAS_.height : H_;
+    const cam = useCamera && camera._active;
+    if (ORIGIN_ === 'math') {
+      // Centred frame: t/b are just the smaller and larger y, which is all
+      // _offView() needs.
+      const cx = cam ? camera.x : 0, cy = cam ? camera.y : 0;
+      return { l: cx - w / 2, t: cy - h / 2, r: cx + w / 2, b: cy + h / 2 };
+    }
+    const l = cam ? _camLeft() : 0, t = cam ? _camTop() : 0;
+    return { l, t, r: l + w, b: t + h };
+  }
+  function _offView(s, v) {
+    if (s._draw !== Sprite.prototype._draw) return false;
+    const k = Math.max(Math.abs(s._scale.x), Math.abs(s._scale.y), 1);
+    let reach = Math.max(Math.abs(s.w), Math.abs(s.h)) * k + 2;
+    if (s.stroke) reach += Math.abs(s.strokeWeight) || 0;
+    if (s.text) {
+      const tw = (String(s.text).length + 2) * (Math.abs(s.textSize) || 16) + (Math.abs(s._textStrokeWeight) || 0);
+      if (tw > reach) reach = tw;
+    }
+    const x = s.x, y = s.y;
+    return x + reach < v.l || x - reach > v.r || y + reach < v.t || y - reach > v.b;
+  }
+
   // text styling state (fill/textSize/textAlign) — q5.js-style globals that
   // real lesson code sets before every text() call (HUD scores, title
   // screens, game-over messages — 27 real script.js/solution.js files).
   let TEXT_COLOR = 'white', TEXT_SIZE = 14, TEXT_ALIGN = 'left';
   const CENTER = 'center', LEFT = 'left', RIGHT = 'right';
-  function fill(c) { TEXT_COLOR = typeof c === 'number' ? `rgb(${c},${c},${c})` : c; }
+  function fill(c) { TEXT_COLOR = typeof c === 'number' ? `rgb(${c},${c},${c})` : c; HAS_FILL = true; }
   function textSize(px) { TEXT_SIZE = px; }
   function textAlign(mode) { TEXT_ALIGN = mode; }
 
@@ -2120,17 +2701,117 @@
     CTX_.fillStyle = color || TEXT_COLOR;
     CTX_.font = (size || TEXT_SIZE) + 'px monospace';
     CTX_.textAlign = TEXT_ALIGN;
-    CTX_.fillText(str, x, y);
+    if (ORIGIN_ === 'math') {
+      // Flip back at the anchor so the text reads upright. The baseline still
+      // sits on y; the letters rise above it, which in this mode is +y.
+      CTX_.translate(x, y);
+      CTX_.scale(1, -1);
+      CTX_.fillText(str, 0, 0);
+    } else {
+      CTX_.fillText(str, x, y);
+    }
+    CTX_.restore();
+  }
+
+  // ---- coordinate overlays: showGrid(step), showMouse() --------------------
+  //
+  // Both are called from draw() and remembered for the frame; loop() paints
+  // them right after the sprites and before drawTop(), so they sit over the
+  // world and under a HUD. They paint in canvas pixels (text stays upright in
+  // either mode) and touch nothing but the canvas: no sprite, no physics.
+  let GRID_STEP_ = null, SHOW_MOUSE_ = false;
+
+  // A light grid every `step` world units with the axes drawn heavier and
+  // labelled in the ACTIVE coordinates: 'math' puts the origin at the centre
+  // with y labels growing upward; 'screen' puts 0,0 at the top-left with y
+  // labels growing downward. The grid is in world space, so it scrolls with
+  // the camera and its labels keep telling the truth about sprite.x/y.
+  function showGrid(step) {
+    if (step === undefined) step = 50;
+    if (typeof step !== 'number' || !(step > 0)) {
+      throw new TypeError(`showGrid(step): step must be a number above 0 -- the distance between grid lines (default 50), got ${String(step)}`);
+    }
+    GRID_STEP_ = step;
+  }
+  function showMouse() { SHOW_MOUSE_ = true; }
+
+  function _drawOverlays() {
+    if (GRID_STEP_ !== null) { _drawGrid(GRID_STEP_); GRID_STEP_ = null; }
+    if (SHOW_MOUSE_) { _drawMouse(); SHOW_MOUSE_ = false; }
+  }
+
+  function _drawGrid(step) {
+    // World coordinates of the visible edges, as the smaller/larger value on
+    // each axis so the loops below do not care which way is up.
+    const math = ORIGIN_ === 'math';
+    const l = math ? camera.x - W_ / 2 : _camLeft();
+    const yLo = math ? camera.y - H_ / 2 : _camTop();
+    const r = l + W_, yHi = yLo + H_;
+    // Many hundreds of lines a frame would stall the sketch; coarsen quietly.
+    while (Math.max(W_, H_) / step > 200) step *= 2;
+    CTX_.save();
+    CTX_.resetTransform();
+    CTX_.lineWidth = 1;
+    CTX_.font = '11px monospace';
+    CTX_.textAlign = 'left';
+    CTX_.textBaseline = 'alphabetic';
+    const axis = _toPixel(0, 0);
+    // Labels hug the axes while they are on screen and the nearest edge once
+    // they have scrolled off, so a label is always readable.
+    const ax = Math.min(Math.max(axis.x, 0), W_ - 36);
+    const ay = Math.min(Math.max(axis.y, 14), H_ - 4);
+    const line = (x1, y1, x2, y2) => { CTX_.beginPath(); CTX_.moveTo(x1, y1); CTX_.lineTo(x2, y2); CTX_.stroke(); };
+    const px = (v) => Math.round(v) + 0.5;
+    CTX_.strokeStyle = 'rgba(136, 136, 136, 0.4)';
+    for (let x = Math.ceil(l / step) * step; x <= r; x += step) {
+      if (x !== 0) line(px(_toPixel(x, 0).x), 0, px(_toPixel(x, 0).x), H_);
+    }
+    for (let y = Math.ceil(yLo / step) * step; y <= yHi; y += step) {
+      if (y !== 0) line(0, px(_toPixel(0, y).y), W_, px(_toPixel(0, y).y));
+    }
+    CTX_.strokeStyle = 'rgba(136, 136, 136, 0.95)';
+    CTX_.lineWidth = 1.5;
+    if (axis.x >= 0 && axis.x <= W_) line(px(axis.x), 0, px(axis.x), H_);
+    if (axis.y >= 0 && axis.y <= H_) line(0, px(axis.y), W_, px(axis.y));
+    CTX_.fillStyle = '#9aa0ad';
+    for (let x = Math.ceil(l / step) * step; x <= r; x += step) {
+      if (x !== 0) CTX_.fillText(String(x), _toPixel(x, 0).x + 3, ay);
+    }
+    for (let y = Math.ceil(yLo / step) * step; y <= yHi; y += step) {
+      if (y !== 0) CTX_.fillText(String(y), ax + 4, _toPixel(0, y).y - 3);
+    }
+    if (axis.x >= 0 && axis.x <= W_ && axis.y >= 0 && axis.y <= H_) CTX_.fillText('0', axis.x + 4, axis.y + 12);
+    CTX_.restore();
+  }
+
+  // The pointer's position in the active coordinates, printed beside it.
+  function _drawMouse() {
+    if (!MOUSE._seen) return;
+    const p = _toPixel(MOUSE.x, MOUSE.y);
+    const label = `(${Math.round(MOUSE.x)}, ${Math.round(MOUSE.y)})`;
+    CTX_.save();
+    CTX_.resetTransform();
+    CTX_.font = '12px monospace';
+    CTX_.textAlign = 'left';
+    CTX_.textBaseline = 'alphabetic';
+    CTX_.lineWidth = 3;
+    CTX_.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+    CTX_.strokeText(label, p.x + 12, p.y - 8);
+    CTX_.fillStyle = 'white';
+    CTX_.fillText(label, p.x + 12, p.y - 8);
     CTX_.restore();
   }
 
   // ---- q5.js drawing primitives (used by real lesson code) ---------------
 
-  function square(x, y, s) {
-    CTX_.save();
-    _applyCamera();
-    CTX_.fillRect(x, y, s, s);
-    CTX_.restore();
+  // square(x, y, s) is rect(x, y, s, s), as in p5: it uses fill(), stroke(),
+  // noFill() and noStroke() like every other shape. It used to call fillRect
+  // without ever setting a colour, so every square came out black whatever
+  // fill() said -- shCode's labs 5.6.9-5.6.11 promise "a blue square" and drew
+  // a black one.
+  // `function` declarations hoist, so rect() below is in scope here.
+  function square(x, y, s, r) {
+    rect(x, y, s, s, r);
   }
 
   // stroke() / noStroke() / strokeWeight() / noFill() — general draw state,
@@ -2294,6 +2975,41 @@
   // scope (flagged to team-lead, not built). The read path real lesson code
   // actually uses — "frameRate() returns the actual fps" (5.1.23) — is real.
   function frameRate() { return FPS_; }
+
+  // ---- frame timers -------------------------------------------------------
+  // every(frames, fn) calls fn every `frames` frames; after(frames, fn) calls
+  // it once, `frames` frames from now. Both count FRAMES, not seconds, so they
+  // pause with noLoop() and stay in step with frameCount: every(60, fn) made
+  // in setup() fires on the same frames as `if (frameCount % 60 === 0)`.
+  // They run each frame after update() and before the physics step, so a
+  // sprite a timer spawns is in that frame's physics. Each returns a handle
+  // whose stop() cancels it. A timer never fires in the frame that made it.
+  let TIMERS_ = [];
+  function _timer(name, frames, fn, repeat) {
+    if (typeof frames !== 'number' || !(frames >= 1)) {
+      throw new TypeError(`${name}(frames, fn): frames must be a number, 1 or more (got ${String(frames)})`);
+    }
+    if (typeof fn !== 'function') throw new TypeError(`${name}(frames, fn): fn must be a function`);
+    const n = Math.floor(frames);
+    const t = {
+      _due: FRAME_ + n, _every: repeat ? n : 0, _fn: fn, _on: true,
+      get active() { return t._on; },
+      stop() { t._on = false; },
+    };
+    TIMERS_.push(t);
+    return t;
+  }
+  function every(frames, fn) { return _timer('every', frames, fn, true); }
+  function after(frames, fn) { return _timer('after', frames, fn, false); }
+  function _runTimers() {
+    if (!TIMERS_.length) return;
+    for (const t of TIMERS_.slice()) { // a timer may start another
+      if (!t._on || FRAME_ < t._due) continue;
+      if (t._every) t._due += t._every; else t._on = false;
+      t._fn();
+    }
+    TIMERS_ = TIMERS_.filter((t) => t._on);
+  }
 
   // p5's nf(num, left, right) — zero-pad the integer part to `left` digits,
   // fix the decimal part to `right` digits. Not in the brief's table; found
@@ -2787,8 +3503,14 @@
       const r = CANVAS_.getBoundingClientRect();
       const sx = r.width ? CANVAS_.width / r.width : 1;
       const sy = r.height ? CANVAS_.height / r.height : 1;
-      MOUSE.x = (clientX - r.left) * sx + _camLeft();
-      MOUSE.y = (clientY - r.top) * sy + _camTop();
+      if (ORIGIN_ === 'math') {
+        // Pixel -> centred, y-up world point (the inverse of _toPixel).
+        MOUSE.x = (clientX - r.left) * sx - W_ / 2 + camera.x;
+        MOUSE.y = H_ / 2 - (clientY - r.top) * sy + camera.y;
+      } else {
+        MOUSE.x = (clientX - r.left) * sx + _camLeft();
+        MOUSE.y = (clientY - r.top) * sy + _camTop();
+      }
       MOUSE._seen = true;
     };
     CANVAS_.addEventListener('mousemove', (e) => {
@@ -2913,6 +3635,7 @@
         if (s._dead || !s.autoUpdate) continue;
         if (typeof s.update === 'function') s.update();
       }
+      _runTimers(); // every()/after(): after update, before physics
       // world.autoStep (World, SPEC-surface #5): false means the sketch
       // calls world.physicsUpdate() itself instead of this automatic step.
       if (AUTO_STEP_) {
@@ -2922,6 +3645,7 @@
       }
       drawFn();
       render();
+      _drawOverlays(); // showGrid()/showMouse(): over the world, under the HUD
       // drawTop(): the HUD hook. render() paints sprites AFTER the sketch's
       // draw(), so anything draw() puts on the canvas with primitives ends up
       // UNDERNEATH every sprite — a score at the top-left vanishes behind
@@ -2994,6 +3718,10 @@
   global.Canvas = Canvas;
   global.Sprite = Sprite;
   global.Group = Group;
+  global.Tiles = Tiles;
+  global.Walls = Walls;
+  global.every = every;
+  global.after = after;
   global.HingeJoint = HingeJoint;
   global.DistanceJoint = DistanceJoint;
   global.SliderJoint = SliderJoint;
@@ -3029,13 +3757,13 @@
   global.CENTER = CENTER;
   global.LEFT = LEFT;
   global.RIGHT = RIGHT;
+  global.storeItem = storeItem;
+  global.getItem = getItem;
+  global.removeItem = removeItem;
   global.textureNames = textureNames;
   global.hasTexture = hasTexture;
   global.saveTexture = saveTexture;
   global.deleteTexture = deleteTexture;
-  global.storeItem = storeItem;
-  global.getItem = getItem;
-  global.removeItem = removeItem;
   global.clearStorage = clearStorage;
   global.noLoop = noLoop;
   global.start = start;
@@ -3044,6 +3772,8 @@
   global.rect = rect;
   global.line = line;
   global.clear = clear;
+  global.showGrid = showGrid;
+  global.showMouse = showMouse;
   global.stroke = stroke;
   global.noStroke = noStroke;
   global.strokeWeight = strokeWeight;

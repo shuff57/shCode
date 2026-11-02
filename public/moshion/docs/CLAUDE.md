@@ -68,6 +68,12 @@ Key classes and where they live in `moshion.js`:
 - `allSprites` (~468) — implicit group every sprite auto-joins.
 - `world` (~92) — `world.gravity` is a live proxy vector (raw Box2D m/s²,
   `y = 10` ≈ 1g); `world.getSpriteAt(x, y)` is a top-most layer hit-test.
+  Gravity STARTS at 0, as in p5play (`_world()`): a plain `new Sprite()`
+  stays put until a sketch sets `world.gravity.y`. It was 9.8 until
+  2026-11-01; a lesson that relies on falling sets its own gravity line.
+- `world.origin` (~289, `ORIGIN_`) — `'screen'` (the default: top-left, y
+  down) or `'math'` (centre, y up, counter-clockwise angles). See
+  "Coordinates" below.
 - Joints (~501–595) — thin facades over planck joints: `HingeJoint`,
   `DistanceJoint`, `SliderJoint`, `WheelJoint`, `GrabberJoint`, `GlueJoint`.
   All share `Joint.delete()`; there is no `joint.remove()`.
@@ -75,6 +81,52 @@ Key classes and where they live in `moshion.js`:
   `mouse.pressing`/`presses`/`released`. Edge flags reset AFTER the frame's
   update/draw ran (see the comment at ~728 — reordering this breaks
   `presses()`).
+
+### Coordinates (`world.origin`)
+
+Default = **screen**: (0, 0) is the canvas's top-left corner, x grows right
+and y grows DOWN, like the browser canvas and p5play. Opt-in = **math**:
+`world.origin = 'math'` as the first line after `new Canvas()` puts (0, 0) at
+the canvas centre, y grows UP and a positive rotation turns counter-clockwise.
+A falling world is then `world.gravity.y = -10`. `showGrid(50)` and
+`showMouse()`, called from `draw()`, label whichever mode is active (axes, and
+the pointer's (x, y)). It is a mode, not a new default: no sketch that never
+sets `world.origin` may change by a pixel. When it was vendored (moSHion
+d8068bb, 2026-11-02) every moSHion sketch in the course and every example in
+`lib/moshion-docs.ts` was run on both engines in `scripts/moshion-harness.mjs`
+for 180 frames, with and without scripted mouse and key input, and compared
+op for op: identical.
+
+How it is built, and the rule for extending it: **the physics world is never
+converted.** Box2D's own frame is already the math one (y up, CCW), and screen
+mode has always drawn that frame onto a y-down canvas without flipping, which
+is why `vel.y = 5` moves down there. Math mode changes only the canvas
+transform (`_applyFrame()`: centre, `scale(1, -1)`) and flips text, emoji,
+pictures and patterns back so they read upright. Every number the sketch sees
+-- x/y, vel, rotation, direction, gravity, forces, joint anchors, ray casts,
+mouse -- is a Box2D number shown the Box2D way round. The places that have an
+opinion about which way is up are each branched on `ORIGIN_` and listed at its
+declaration: `_applyFrame`, `background`, `text`, `Sprite._draw`,
+`_cullView`, `_frameOrigin` (canvasPos / screen-space hit-tests),
+`_pointerTo`, `Canvas`/`_parkCamera`, `Tiles` (row direction), `Walls`,
+`Group.cull`, `_drawGrid`/`_drawMouse`. A new feature that asks "which way is
+up" belongs on that list; one that only moves or measures things does not.
+
+Consequences a lesson author relies on: `direction = 90` and `vel.y > 0` go
+up; `Tiles` row 0 is still the top row (y decreases per row); `Walls.top` is
+still above the screen (larger y); `addSensor(0, -21, ...)` is the foot
+sensor; `rect(x, y, w, h)` covers `y..y+h` (upward); `camera.off()`,
+`drawTop()` and `screenSpace` draw in the same centred y-up frame with the
+camera at (0, 0). A sketch's own `sprite.draw` that writes to the canvas
+context directly sees the flipped transform and must counter-flip its own
+text and images. `showGrid()`/`showMouse()` paint in pixel space after
+`render()` and before `drawTop()`, and change no sprite or physics.
+
+The setter refuses, with a plain message, any value but the two strings
+(TypeError), and any change once a sprite exists, gravity is non-zero or a
+frame has run (Error). The in-app docs teach it in the Coordinates section of
+`lib/moshion-docs.ts`; the only lesson that uses it is the optional, ungraded
+`5.1.25 Lab: A grid like math (optional)` (`lessons/5-1-25-math-grid`).
 
 ### Key invariants when editing
 
@@ -86,7 +138,22 @@ Key classes and where they live in `moshion.js`:
 - **`overlaps()` and `colliding()` are NOT aliases.** `overlaps()` is a manual
   bounding-box query (works for `collider = 'none'` sensors); `colliding()`
   reads planck's real contact list and excludes sensor fixtures. See
-  `_updateContacts()` (~606).
+  `_updateContacts()`. `overlaps()` is a QUERY, not p5play's pass-through
+  rule: calling it once in setup() changes nothing. A fixture made by
+  `addSensor()` carries its `Sensor` as fixture user data (no other fixture
+  has any), and `_updateContacts()` routes sensor contacts to it only while
+  `SENSORS_` is non-empty.
+- **The overlap broadphase must stay EXACT.** `_updateOverlaps()` hands only
+  the pairs `_overlapCandidates()` lets through to `_overlapsOne()`; a pair it
+  drops must be one `_overlapsOne()` could never pass (its boxes are inclusive
+  and padded, because the circle test counts exact touching), and it returns
+  null (test every pair) for a non-stock `_overlapsOne`/`_bounds`, a non-finite
+  edge, or a small world. The moSHion repo's `tests/gaps.spec.mjs` P1 compares
+  `overlapping()` with `overlaps()` for every pair, every frame.
+- **Culling skips only the stock `_draw()`.** A sketch's `sprite.draw` always
+  runs, `ani` always advances, and nothing is culled unless the context is
+  untransformed at render time and has `getTransform()` (the node harness in
+  `scripts/moshion-harness.mjs` stubs none, so it never culls there).
 - **`group.remove(sprite)` only unparents** — the sprite keeps existing,
   drawing, and running physics. `sprite.delete()` (alias `remove()`) is full
   destruction: destroys the body and unparents from every group.

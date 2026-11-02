@@ -1405,7 +1405,7 @@ export default function LessonWorkspace({
                   ? aiCheckNote.text
                   : isTextMode
                     ? 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'
-                    : 'Run shows what your code prints. Grade has the AI read it and mark the Quest cards, whatever shape you wrote it in.'}
+                    : 'Run shows what your code prints. Check has the AI read it and mark the Quest cards, whatever shape you wrote it in.'}
               </div>
               {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
                 <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: '#8393c4' }}>

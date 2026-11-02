@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
+import { loadModuleGroups, validateGroups, type LessonGroup } from './lesson-groups';
 
 /**
  * Hierarchy:
@@ -57,6 +58,17 @@ export interface ModuleSummary {
   environment?: string;
   category?: string;     // category lesson.json must match to appear in this module
   slug: string;          // e.g. "2.1_moshion-foundations"
+  /**
+   * Keep this module out of the COURSE LIST (home page and its search), while
+   * still building its pages and letting a direct link work.
+   *
+   * Deliberately not `status`: that field says how finished a module's DOC is,
+   * and 23 of the 40 modules say `draft` — all of Unit 1 among them — so
+   * filtering on it would hide most of the course. `hidden` says exactly one
+   * thing: do not advertise this module yet. 8.1 Solid Shapes is the first user
+   * (the 3D track is paused).
+   */
+  hidden?: boolean;
 }
 
 export interface LessonInModule {
@@ -100,6 +112,7 @@ export async function listModules(): Promise<ModuleSummary[]> {
       environment: data.environment,
       category: data.category,
       slug: f.replace(/\.md$/, ''),
+      hidden: data.hidden === true,
     });
   }
   modules.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
@@ -154,6 +167,8 @@ export async function getModule(moduleId: string): Promise<{
   html: string;
   lessons: LessonInModule[];
   artifacts: ModuleArtifact[];
+  /** The module's lesson layer, or null when it has none authored yet. */
+  groups: LessonGroup[] | null;
 } | null> {
   const modules = await listModules();
   const summary = modules.find((m) => m.id === moduleId);
@@ -163,6 +178,18 @@ export async function getModule(moduleId: string): Promise<{
   const { body } = parseFrontmatter(src);
   const html = await renderMarkdown(body);
   const lessons = await listLessonsInModule(moduleId, summary.category);
+
+  // The lesson layer (curriculum/groups/<id>.json). A module without the file
+  // renders exactly as before, so this can be adopted one module at a time.
+  // A group file that disagrees with the folder tree is a build error rather
+  // than a screen quietly falling outside every lesson.
+  const groups = await loadModuleGroups(moduleId);
+  if (groups) {
+    const problems = validateGroups(groups, lessons.map((l) => l.id));
+    if (problems.length) {
+      throw new Error(`curriculum/groups/${moduleId}.json:\n  ${problems.join('\n  ')}`);
+    }
+  }
 
   // Collect any module-level artifacts in assignments/{moduleId}_* for legacy support
   const artifacts: ModuleArtifact[] = [];
@@ -181,6 +208,6 @@ export async function getModule(moduleId: string): Promise<{
     }
   } catch { /* no assignments dir */ }
 
-  return { summary, html, lessons, artifacts };
+  return { summary, html, lessons, artifacts, groups };
 }
 
