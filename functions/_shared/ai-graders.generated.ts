@@ -7266,8 +7266,8 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "contextDocs": []
   },
   "5-1-22-a10-2-frame-loop": {
-    "lessonTitle": "5.1.22 Frame Loop Writeup",
-    "prompt": "Answer all three. Everything you need is in 5.1.3 (Frame loop), 5.1.15 (Velocity) and the 5.1.12 video: go back and reread or rewatch if you get stuck. A few sentences each is plenty, in your own everyday words.\n\nQuestion 1, In your own words, what is the difference between setup() and draw() in a moSHion sketch? When does each one run? (5.1.3, the worked example in 5.1.4, and the 5.1.12 video)\n\nQuestion 2: moSHion runs at about 60 frames per second. If you set player.vel.x = 4, how many pixels does the sprite move in one second? Show your math. How far in 5 seconds? If your canvas is 400 pixels wide, roughly how long until the sprite crosses the whole canvas? (5.1.15)\n\nQuestion 3: Why do you think the engine gives us vel (velocity) instead of making us set pos.x ourselves every frame? Give one reason. (5.1.15)",
+    "lessonTitle": "5.1.23 Frame Loop Writeup",
+    "prompt": "Answer all three. Everything you need is in 5.1.3 (Frame loop), 5.1.16 (Velocity) and the 5.1.12 video: go back and reread or rewatch if you get stuck. A few sentences each is plenty, in your own everyday words.\n\nQuestion 1, In your own words, what is the difference between setup() and draw() in a moSHion sketch? When does each one run? (5.1.3, the worked example in 5.1.4, and the 5.1.12 video)\n\nQuestion 2: moSHion runs at about 60 frames per second. If you set player.vel.x = 4, how many pixels does the sprite move in one second? Show your math. How far in 5 seconds? If your canvas is 400 pixels wide, roughly how long until the sprite crosses the whole canvas? (5.1.16)\n\nQuestion 3: Why do you think the engine gives us vel (velocity) instead of making us set pos.x ourselves every frame? Give one reason. (5.1.16)",
     "rubric": [
       {
         "id": "q1-setup-vs-draw",
@@ -7294,57 +7294,153 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       "sprite"
     ]
   },
+  "5-10-defender-3-plan-the-hit-loop": {
+    "lessonTitle": "5.10.3 Plan: The hit loop in plain words",
+    "prompt": "Everything you need is on this page, in 2.4.26 (Plain English to Pseudocode: Nested Loops) and in 5.9.6 (Lab: Hit the drone): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYour Defender has many enemies now, and shots still fly straight through them. Before you write any code, plan the check that runs once every frame, in plain words or pseudocode.\n\n1. Which two lists does the check go through, and how does every shot get tested against every enemy?\n\n2. A shot hits an enemy. What happens to the shot?\n\n3. What happens to the enemy it hit? What if that hit leaves it with no hp?\n\n4. When an enemy is shot down, which lists have to change?",
+    "rubric": [
+      {
+        "id": "pairs",
+        "title": "Names the two lists and has every shot meet every enemy",
+        "description": "The student says the check goes through the shots and the enemies so that every shot is tested against every enemy, for example a loop inside a loop, 'for each shot, check each enemy', or any gesture at going through both lists; naming only one list, or saying it loosely, still earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "shot",
+        "title": "Says what happens to a shot that hits",
+        "description": "The student says the shot that hits goes away, from the screen, from the list, or both, in any words such as 'delete it', 'remove it' or 'it disappears'. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "enemy",
+        "title": "Says what happens to the enemy that was hit",
+        "description": "The student says the enemy loses hp (or a life, or a hit), or that with none left it is gone or scores points; any one part of that earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "arrays",
+        "title": "Says which lists change when an enemy is shot down",
+        "description": "The student names the lists that change when an enemy is shot down, ideally all three (the sprites, the hp and the worth); naming one of them, or saying 'the enemy lists' or 'all of them', also earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-11-defender-2-plan-draw-the-classes-first": {
+    "lessonTitle": "5.11.2 Plan: Draw the classes first",
+    "prompt": "Everything you need is on this page and in 5.11.1 (Reading: Count the cost): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to rebuild Defender with three classes: Bullet, Enemy and Spawner. Before you move any code, plan them.\n\n1. For at least two of the three classes, name one thing each one remembers.\n\n2. For at least two of them, name one thing each one can do or answer.\n\n3. Name one job that leaves draw() or a Part B function and moves into a class.\n\n4. Which class answers \"no\" to the checklist's first question, \"more than one of this thing?\", and why might it still be a class?",
+    "rubric": [
+      {
+        "id": "remember",
+        "title": "Names something two of the classes remember",
+        "description": "The student names, for at least two of Bullet, Enemy and Spawner, something each one remembers, such as a shot's sprite or whether it is used up, an enemy's hp, worth or speed, or the spawner's wave number or pause. Any property, in any words, earns full credit, and one class is enough if the answer clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "does",
+        "title": "Names something two of the classes can do or answer",
+        "description": "The student names, for at least two of the classes, something each can do or answer, such as a shot moving or saying whether it hit an enemy, an enemy taking a hit or saying whether it is alive, or the spawner building a wave. Any method or action, in any words, earns full credit, and one class is enough if the answer clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "moves",
+        "title": "Names one job that moves into a class",
+        "description": "The student names one job that used to sit in draw() or a Part B function and now belongs to a class, for example what a hit does, an enemy landing, removing finished enemies, or the pause before the next wave. Any job they connect to a class earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "checklist",
+        "title": "Names the class that fails the first checklist question, or why one might still be a class",
+        "description": "The student says which class fails the checklist's first question (the Spawner, because there is only one), or gives any reason one might still be a class, such as its facts changing together or a restart being one line. Either half on its own earns full credit, and so does a different class with a reason. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-11-defender-7-playtest-and-reflect": {
+    "lessonTitle": "5.11.7 Playtest and reflect: Defender",
+    "prompt": "Everything you need is in 5.9.1 (Plan: Break Defender into parts) and 5.11.6 (Lab: A Spawner for the waves): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Defender at least three times, and lose in three different ways: let a wave through on purpose, get overrun in a late wave, and press R in the middle of a wave. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which class or function do you think that comes from?\n\n4. What is one change that is easier, or harder, in Part C than it was in Part B, and why?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many rounds they played and how it went",
+        "description": "The student says they played, or gives any detail of a round (a score, the wave they reached, a way they lost, what pressing R did). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which class or function that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as Bullet, Enemy, Spawner, the hit loop, clearFinished or startRound, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "compare",
+        "title": "Compares one change in Part C with Part B",
+        "description": "The student names one change and says anything about whether it is easier or harder with classes than it was in Part B, for example giving every enemy a new property, the 5.10.8 bug, or the restart. Any comparison, in either direction, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
   "5-2-13-a5-2-1-pinball-scene": {
-    "lessonTitle": "5.2.13 Pinball Scene",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.13 Pinball Scene\". The task they were given: Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "lessonTitle": "5.2.18 Pinball Scene",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.18 Pinball Scene\". The task they were given: Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment never runs. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",
         "title": "Turn on gravity",
-        "description": "world.gravity.y is set to a non-zero value. Help: 5.2.2 (Gravity)",
+        "description": "world.gravity.y is set to a non-zero value. Help: 5.2.6 (Reading: Gravity)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "Add at least three static obstacles",
-        "description": "At least three 'static' sprites exist in the scene. Help: 5.2.6 (Bounciness and Friction)",
+        "description": "At least three 'static' sprites exist in the scene. Help: 5.2.6 (Reading: Gravity)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "Make the ball genuinely bouncy",
-        "description": "The ball's bounciness is set above 0.8. Help: 5.2.6 (Bounciness and Friction)",
+        "description": "The ball's bounciness is set to 0.8 or more. Help: 5.2.11 (Reading: Bounciness and Friction)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "Add a reset key",
-        "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.6 (Bounciness and Friction)",
+        "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.9 (Reading: Ground-Gated Actions)",
         "points": 1
       }
     ]
   },
   "5-2-14-a5-2-2-vel-vs-applyforce": {
-    "lessonTitle": "5.2.14 Vel vs applyForce",
-    "prompt": "Everything you need is in 5.2.8 (Reading: Forces vs Velocity) and 5.2.9 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.8, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.8 and 5.2.9)",
+    "lessonTitle": "5.2.19 Vel vs applyForce",
+    "prompt": "Everything you need is in 5.2.13 (Reading: Forces vs Velocity) and 5.2.14 (Lab: Wind Zone): go back and reread them if you get stuck. Your own everyday words throughout.\n\nQuestion 1: Why does setting a sprite's .vel directly, every frame, \"fight\" the physics engine once gravity or other forces are also acting on that sprite? (5.2.13, and your own experience writing the movement code back in 5.1)\n\nQuestion 2: Describe a situation where you would use applyForce instead of setting .vel directly, and explain why applyForce is the better tool there. (5.2.13 and 5.2.14)",
     "rubric": [
       {
         "id": "q1-fight-explanation",
         "title": "Q1: Explains why .vel fights the physics engine",
-        "description": "Student explains that setting .vel directly every frame overrides whatever the physics engine (gravity, applyForce, collisions) already computed for that sprite that frame, so the engine's own influence gets thrown away and re-imposed instead of blending with it. Accept any everyday phrasing of overriding, resetting, or cancelling out the physics engine's own effect; it doesn't need textbook precision.",
-        "points": 1
+        "description": "Student explains that setting .vel directly every frame overrides whatever the physics engine (gravity, applyForce, collisions) already computed for that sprite that frame, so the engine's own influence gets thrown away and re-imposed instead of blending with it. Accept any everyday phrasing of overriding, resetting, or cancelling out the physics engine's own effect; it doesn't need textbook precision. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the part labelled with this question: if anything anywhere in it touches this question, even indirectly, give full credit. If the response as a whole is about sprite movement, .vel, applyForce, forces or the physics engine at all, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
       },
       {
         "id": "q2-applyforce-scenario",
         "title": "Q2: Describes a real scenario where applyForce is the better tool",
-        "description": "Student names a concrete scenario (wind, thrust, a magnet, a continuous push layered on top of gravity, etc.) where applyForce is the better tool, and gives a reason: it respects mass and adds to existing motion instead of replacing it. Credit any concrete scenario with a reason attached, even loosely worded.",
-        "points": 1
+        "description": "Student names a concrete scenario (wind, thrust, a magnet, a continuous push layered on top of gravity, etc.) where applyForce is the better tool, and gives a reason: it respects mass and adds to existing motion instead of replacing it. Credit any situation at all, even loosely worded; a reason, even a vague one, is welcome but not required. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the part labelled with this question: if anything anywhere in it touches this question, even indirectly, give full credit. If the response as a whole is about sprite movement, .vel, applyForce, forces or the physics engine at all, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
       },
       {
         "id": "writing-clarity",
         "title": "Writing clarity",
         "description": "Response is clearly organized and easy to follow. Deduct this point only for significant issues: incoherent structure, or writing that makes it difficult to assess the content. Do not deduct for length.",
-        "points": 1
+        "points": 0
       }
     ],
     "model": "glm-5.3-flash:cloud",
@@ -7353,8 +7449,8 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ]
   },
   "5-3-20a-chart-the-method-chain": {
-    "lessonTitle": "5.4.6 Plain English to Pseudocode: A Method That Calls a Method",
-    "prompt": "The student was given plain-English steps for the lab \"5.4.6 Plain English to Pseudocode: A Method That Calls a Method\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** The enemy is hit for some amount of damage. **2.** Take that amount off the enemy's health. **3.** If the health is now zero or less, the enemy dies. **4.** Either way, the enemy flashes red to show it was hit. **5.** Then control goes back to whoever hit it. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for a decision, and CALL for another method. The two methods here are named `die` and `flashRed`. Number every line, including the indented one and END IF. Each keyword looks like this, in a different program: - `SET score TO score + 10` (a change) - `IF lives <= 0` ... `END IF` (a decision; indent what is inside it) - `CALL playSound` (call another method; `CALL this.playSound` is fine too) The chart shows the shape. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, IF, ELSE, CALL, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, capitalisation and numbering. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
+    "lessonTitle": "5.7.7 Plain English to Pseudocode: A Method That Calls a Method",
+    "prompt": "The student was given plain-English steps for the lab \"5.7.7 Plain English to Pseudocode: A Method That Calls a Method\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** The enemy is hit for some amount of damage. **2.** Take that amount off the enemy's health. **3.** If the health is now zero or less, the enemy dies. **4.** Either way, the enemy flashes red to show it was hit. **5.** Then control goes back to whoever hit it. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for a decision, and CALL for another method. The two methods here are named `die` and `flashRed`. Number every line, including the indented one and END IF. Each keyword looks like this, in a different program: - `SET score TO score + 10` (a change) - `IF lives <= 0` ... `END IF` (a decision; indent what is inside it) - `CALL playSound` (call another method; `CALL this.playSound` is fine too) The chart shows the shape. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, IF, ELSE, CALL, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, capitalisation and numbering. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",
@@ -7395,8 +7491,8 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ]
   },
   "5-3-32-a12-2-oop-writeup": {
-    "lessonTitle": "5.4.19 Procedural vs OOP Writeup",
-    "prompt": "Answer all four questions. Questions 1 and 4 come from the readings; questions 2 and 3 come from code you have written yourself. Your own everyday words throughout: do not copy definitions from the internet.\n\nQuestion 1: Definitions in your own words. What does procedural programming mean? What does object-oriented programming mean? (1.4.8 for procedural; 5.3.3, 5.4.14 and the side-by-side worked example in 5.4.15 for object-oriented)\n\nQuestion 2: A specific procedural example from your first-quarter code (Units 1 to 3, before moSHion). Name a specific assignment or program you wrote then that used a procedural approach, and describe it in one or two sentences. Name the assignment.\n\nQuestion 3: A specific moSHion OOP example. Name a specific place in your moSHion code: the A12.1 Collectible class, or an earlier class you wrote: where you used OOP. Describe how the class organised your code: what data and what behaviour did it group together? (5.3.7 and 5.4.1)\n\nQuestion 4: When OOP wins. Describe one situation, hypothetical is fine, where OOP is clearly the better choice than procedural code. Explain why, using at least one of these: readability, extensibility, or keeping data and behaviour together. (5.4.16 and 5.4.17)",
+    "lessonTitle": "5.7.20 Procedural vs OOP Writeup",
+    "prompt": "Answer all four questions. Questions 1 and 4 come from the readings; questions 2 and 3 come from code you have written yourself. Your own everyday words throughout: do not copy definitions from the internet.\n\nQuestion 1: Definitions in your own words. What does procedural programming mean? What does object-oriented programming mean? (1.4.8 for procedural; 5.6.3, 5.7.15 and the side-by-side worked example in 5.7.16 for object-oriented)\n\nQuestion 2: A specific procedural example from your first-quarter code (Units 1 to 3, before moSHion). Name a specific assignment or program you wrote then that used a procedural approach, and describe it in one or two sentences. Name the assignment.\n\nQuestion 3: A specific moSHion OOP example. Name a specific place in your moSHion code: the 5.7.19 Collectible class, or an earlier class you wrote: where you used OOP. Describe how the class organised your code: what data and what behaviour did it group together? (5.6.8 and 5.7.1)\n\nQuestion 4: When OOP wins. Describe one situation, hypothetical is fine, where OOP is clearly the better choice than procedural code. Explain why, using at least one of these: readability, extensibility, or keeping data and behaviour together. (5.7.17 and 5.7.18)",
     "rubric": [
       {
         "id": "q1-definitions",
@@ -7434,6 +7530,260 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       "overview",
       "sprite"
     ]
+  },
+  "5-3-pinball-plan-sketch-the-game": {
+    "lessonTitle": "5.3.1 Plan: Sketch your pinball game",
+    "prompt": "Everything you need is on this page and in 5.2.18 (Pinball Scene): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to turn your pinball scene into a pinball game. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one moment to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of pinball in their own words, such as the ball, the bumpers, a goal, the score, a way to lose and a way to start again. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about pinball at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between moments",
+        "description": "The student names at least two things the game has to remember from one moment to the next, for example the score, whether the round is still being played, where the ball is, or whether the ball was touching a bumper a moment ago. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about pinball at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about pinball at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as counting a hit only once or ending the round, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about pinball at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-3-pinball-playtest-and-reflect": {
+    "lessonTitle": "5.3.11 Playtest and reflect: Pinball",
+    "prompt": "Everything you need is in 5.3.1 (Plan: Sketch your pinball game) and 5.3.10 (Lab: Lose, and start again): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished pinball game at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many rounds they played and how it went",
+        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how it felt). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their pinball game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their pinball game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as the score, the memory of the last moment, the state flag or the restart, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their pinball game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their pinball game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-4-flappy-plan-sketch-the-game": {
+    "lessonTitle": "5.4.1 Plan: Sketch your Flappy game",
+    "prompt": "Everything you need is on this page and in 5.3.10 (Lab: Lose, and start again): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build a flapping-bird game. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one moment to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of the flapping game in their own words, such as the bird, gravity, the flap, the pipes, the gaps, the score, losing and restarting. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about the flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between moments",
+        "description": "The student names at least two things the game has to remember from one moment to the next, for example the bird's speed, where the pipes are, the score, or whether the round is still being played. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about the flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about the flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as making pipes keep appearing or removing the ones that have left, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about the flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-4-flappy-playtest-and-reflect": {
+    "lessonTitle": "5.4.9 Playtest and reflect: Flappy",
+    "prompt": "Everything you need is in 5.4.1 (Plan: Sketch your Flappy game) and 5.4.8 (Lab: Crash, and start again): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished flapping game at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many rounds they played and how it went",
+        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how it felt). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as the flap, the timer that builds pipes, the deleting of old pipes, the score or the restart, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their flapping game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-5-19-assignment-where-state-lives": {
+    "lessonTitle": "5.8.19 Your Turn: Where the state lives",
+    "prompt": "The student was asked, for a wave-spawner program, to say where each of three numbers should live — a local variable in a method, a property on `this`, or a class variable declared with `static` — and to give one sentence of reasoning for each. The three numbers: (1) the list of enemies still on the field, (2) one enemy's health, (3) how many enemies have ever been built. The right answers, in the course's terms: the list is a property of the scene (or a plain array at file scope, which is the same idea in this program) because it must outlive a frame and hold several objects; health is a property on `this` because each enemy needs its own copy; the all-time count is a class variable (`static`) because it belongs to the class rather than to any one enemy. Judge each criterion ONLY by whether the idea is present, however the student words it. Do not require the words 'local', 'property' or 'static' — 'belongs to the class', 'each one has its own', 'survives the call' and similar phrases are the same ideas. A student who places a number in a defensible but different place (for example, calling the enemy list a file-scope variable) is right enough for 'met', as long as the reason holds. Mark a criterion 'missing' only when the answer is absent or the reasoning is the opposite of the idea. Write each note for THIS student's own words: in a not-met note, name the exact phrase that causes the problem (quote at most a few words), say in plain words what it claims now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the answer for them. In a met note, say in one short phrase what in their answer satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Three answers, each with a reason",
+        "description": "All three numbers are answered, and each answer carries a reason rather than a bare label.",
+        "points": 0
+      },
+      {
+        "id": "r2",
+        "title": "The list of live enemies is placed and justified",
+        "description": "The list is placed somewhere it can outlive a frame and hold several objects, with a reason.",
+        "points": 0
+      },
+      {
+        "id": "r3",
+        "title": "One enemy's health is placed and justified",
+        "description": "Health is given to each enemy individually, with a reason that says so.",
+        "points": 0
+      },
+      {
+        "id": "r4",
+        "title": "The count of enemies ever built is placed and justified",
+        "description": "The all-time count is placed on the class rather than on an instance, with a reason.",
+        "points": 0
+      }
+    ]
+  },
+  "5-5-snake-1-plan-break-snake-into-parts": {
+    "lessonTitle": "5.5.1 Plan: Break Snake into parts",
+    "prompt": "Everything you need is on this page and in 5.4.8 (Lab: Crash, and start again): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build Snake. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of Snake in their own words, such as the snake's cells, the food, steering, the beat that moves it, scoring, losing and restarting. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Snake at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between frames",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example where every cell of the snake is, which way it is heading, where the food is, the score, or whether the round is still being played. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Snake at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Snake at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as growing the body or making the snake not bite itself, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Snake at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-5-snake-9-playtest-and-reflect": {
+    "lessonTitle": "5.5.9 Playtest and reflect: Snake",
+    "prompt": "Everything you need is in 5.5.1 (Plan: Break Snake into parts) and 5.5.8 (Lab: Don't bite yourself): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Snake at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many rounds they played and how it went",
+        "description": "The student says they played, or gives any detail of a round (a score, a way they lost, how long the snake got). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they checked earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as the beat, the tail removal, the isBody search or the food placement, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change, or add, and says anything about what it would do. Any change idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Snake game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "5-9-defender-1-plan-break-defender-into-parts": {
+    "lessonTitle": "5.9.1 Plan: Break Defender into parts",
+    "prompt": "Everything you need is on this page and in 5.5.1 (Plan: Break Snake into parts): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build Defender. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of Defender in their own words, such as the ship, the shots, the enemies, the base, the score, the waves, game over and restarting. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between frames",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example where the shots are, each enemy's hp, the score, the base's hp, the cooldown, or whether the round is still being played. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as firing at a steady rate, telling when a shot hits, or bringing the enemies in waves, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Defender at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
   },
   "6-6-13a-chart-the-state-machine": {
     "lessonTitle": "6.6.14 Plain English to Pseudocode: The Three-State Machine",
