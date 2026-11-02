@@ -1,0 +1,118 @@
+{
+  "id": "5-1-25-math-grid",
+  "title": "5.1.25 Lab: A grid like math (optional)",
+  "description": "Optional: a preview of an optional mode. Draw a grid over the canvas, then switch it to math mode, where (0, 0) is the centre and y grows up. Nothing after this lab needs it, and it is not graded.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "moshion",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Draw the grid",
+      "instructions": "This lab is optional: it previews a mode the rest of the course does not use. Click Run first. The starter already works: a 400 by 400 canvas, painted dark. Now, inside draw(), on the line after `background('#222');`, add `showGrid(50);` and Run again. It draws a light grid with a line every 50 pixels and numbers along the top and left edges. Read it: (0, 0) is the top-left corner, x grows to the right, and y grows DOWN, so a bigger y is lower on the canvas. That is the default, the same as the browser's own canvas and every sketch you have made so far. showGrid() goes in draw(), not setup(): it draws for one frame at a time, so draw() has to ask for it every frame.",
+      "hints": [
+        "Open the moSHion docs drawer on the right and find the Coordinates section."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Switch on math mode",
+      "instructions": "In setup(), on the line right after `new Canvas(400, 400);`, add `world.origin = 'math';` and Run. Look at the grid again. The two brighter, thicker lines (the axes) now cross in the CENTRE of the canvas, and that point is (0, 0). x still grows to the right, but y grows UP: the numbers above the centre are positive and the ones below it are negative, like a graph in math class. The line has to come before you make any sprite. If it comes after one, the sketch stops with an error that tells you to move it up.",
+      "hints": [
+        "Spell it exactly: world, a dot, origin, then = 'math' with the quotes.",
+        "Put it on the very next line after new Canvas(400, 400); so it comes before any sprite."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Place a sprite at (100, 50)",
+      "instructions": "Below the math-mode line, still inside setup(), make a sprite and store it in `box` (the starter already declares `let box;`): `box = new Sprite(100, 50, 40, 40);`. Give it a color too if you like, as in 5.1.11. Run it. The sprite sits 100 to the right of the centre and 50 ABOVE it, because a positive y means up in math mode. Check it against the grid. In the default mode the same two numbers would put it in the top-left quarter of the canvas instead.",
+      "hints": [
+        "The second number is y. In math mode a positive y is above the centre, so 50 puts the sprite a little above the middle."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Show the mouse",
+      "instructions": "In draw(), on the line after `showGrid(50);`, add `showMouse();` and Run. Move the mouse over the canvas: the numbers beside the pointer are its (x, y). Find (0, 0) in the centre. Then find a spot where both numbers are negative: it is below and to the left of the centre. Rest the pointer on your sprite: it reads close to (100, 50).",
+      "hints": [
+        "The numbers only appear after the mouse has moved over the canvas."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "What else changes in math mode",
+      "instructions": "Nothing to type here. Two more things turn around in math mode, for when you meet them later. A positive rotation turns a sprite counter-clockwise, the way angles go in math class. And a world where things fall needs world.gravity.y = -10, with a minus sign, because down is negative now. The rest of the course uses the default mode, with (0, 0) at the top-left and y growing down, so you can leave math mode here.",
+      "hints": [
+        "To go back to the default mode, delete the world.origin line."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Draw the grid",
+      "description": "draw() calls showGrid(), so the grid is drawn every frame. Any spacing counts; the lab uses 50.",
+      "hint": "showGrid(50); goes on its own line inside draw(). In setup() it would show for one frame and vanish.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "showGrid\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Switch on math mode",
+      "description": "The sketch sets world.origin to 'math'. Single quotes, double quotes or backticks all count.",
+      "hint": "In setup(), on the line right after new Canvas(400, 400);, set world.origin to the word math in quotes.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bworld\\s*\\.\\s*origin\\s*=\\s*(['\"`])math\\1",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A sprite above the centre",
+      "description": "A sprite is made with a positive second number, its y, such as new Sprite(100, 50, 40, 40). In math mode a positive y is above the centre. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+      "hint": "The second number inside new Sprite( ) is y. Make it a number above 0, like 50.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sprite\\s*\\(\\s*[^,()]+,\\s*\\+?(?!0*\\.?0*\\s*[,)])\\d*\\.?\\d+\\s*[,)]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "Show the mouse",
+      "description": "draw() calls showMouse(), which writes the pointer's (x, y) beside it.",
+      "hint": "showMouse(); goes inside draw(). Move the mouse over the canvas to see the numbers.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "showMouse\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
