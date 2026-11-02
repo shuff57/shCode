@@ -7,5 +7,6 @@ A lesson plays one with `"videoUrl": "/videos/<name>/index.html"` (dev serves no
 | Folder | Lesson | Length | Voice |
 | --- | --- | --- | --- |
 | `5-1-2/` | 5.1.2 Your first moSHion sketch | 2:39 | sandbox Edge TTS (en-US-AndrewMultilingualNeural, -10%), not the cloned voice |
+| `5-1-12/` | 5.1.12 The Frame Loop Explained | 2:40 | same voice and rate |
 
 Re-copy the bookSHelf `site/` folder over the matching folder to update. Do not hand-edit.
