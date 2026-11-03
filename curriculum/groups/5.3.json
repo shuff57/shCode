@@ -41,6 +41,15 @@
         "5-3-pinball-playtest-and-reflect",
         "5-3-pinball-10-challenges-make-it-yours"
       ]
+    },
+    {
+      "id": "sound-on-a-hit",
+      "title": "A sound on a hit",
+      "objective": "Students will be able to load a sound once in setup(), play it once per hit by putting .play() inside the same edge check that scores, and explain why a game can stay silent until the first click.",
+      "screens": [
+        "5-3-pinball-sound-1-reading-a-sound-on-a-hit",
+        "5-3-pinball-sound-2-lab-a-chime-on-every-hit"
+      ]
     }
   ]
 }
