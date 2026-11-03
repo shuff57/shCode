@@ -32,6 +32,8 @@ s.row = 5;
 
 The sprite is made 2 pixels smaller than the cell, so a thin gap shows between neighbouring cells.
 
+**Pick a name moSHion does not already use.** Every sprite already has some properties, and storing your own value under one of their names does not make a new property: it changes the sprite. `s.life = 3` deletes the sprite three frames later, `speed` and `direction` change how it moves, `mass` changes how heavy it is, and `color` and `text` change how it looks. Other names a sprite already has: `x`, `y`, `w`, `h`, `d`, `rotation`, `scale`, `visible`, `layer` and `shape`. Words like `col`, `row`, `worth`, `points` and `wasTouching` are free, so use names like those.
+
 **Move on a beat.** If the snake moved every frame it would cross the canvas in under a second. Instead the game moves it only once every few frames, using the beat from 5.4.5:
 
 ```js
