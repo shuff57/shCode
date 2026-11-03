@@ -178,6 +178,17 @@ export function moshionSubmitWords(s: { need: MoshionRunNeed; cardsOk: boolean; 
   return { note, title };
 }
 
+/**
+ * The Check note when the current run stopped with an error. The AI's cheerful summary ("Great
+ * job! (5 of 5 green)") would sit beside a toolbar that says the run failed, so when every card
+ * is green and the run is bad one plain sentence stands in for it. Marks and grades are untouched.
+ */
+export const GREEN_BUT_RUN_ERROR = 'Your cards are green, but your last Run stopped with an error. Fix it and press Run again to submit.';
+export function aiNoteForRun(note: { kind: 'ok' | 'error'; text: string } | null, s: { allGreen: boolean; runErrored: boolean }): string | null {
+  if (!note) return null;
+  return note.kind === 'ok' && s.allGreen && s.runErrored ? GREEN_BUT_RUN_ERROR : note.text;
+}
+
 /** Only a clear "met" turns a card green. "partial" and "missing" stay red, with the AI's note. */
 export function verdictsFromCriteria(criteria: AiCheckCriterion[], knownIds: string[]): AiVerdicts {
   const known = new Set(knownIds);
