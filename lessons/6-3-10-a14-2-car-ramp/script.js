@@ -10,7 +10,9 @@ function setup() {
   // ramp. Use .rotation in degrees to tilt the ramp.
 
   // STEP 2: Build the vehicle: a dynamic chassis rectangle and two dynamic
-  // circular wheels (use .diameter to make them round).
+  // circular wheels (use .diameter to make them round). Give the wheels, the
+  // ground and the ramp a .friction of 1: friction starts at 0 (ice), and a
+  // wheel only grips a surface that has friction too.
 
   // STEP 3: Attach each wheel to the chassis with a HingeJoint, wheel first
   // so the pin sits at the wheel's centre.

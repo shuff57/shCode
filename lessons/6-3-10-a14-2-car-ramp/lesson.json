@@ -24,10 +24,11 @@
     {
       "id": "s2",
       "title": "Chassis + wheels",
-      "instructions": "Chassis: one dynamic rectangle. Two wheels: dynamic sprites with a `diameter` so they're circular.",
+      "instructions": "Chassis: one dynamic rectangle. Two wheels: dynamic sprites with a `diameter` so they're circular. Then give both wheels, the ground and the ramp a `.friction` of 1. Every sprite starts at friction 0, which is ice, and two touching sprites grip with a mix of both values (5.2.11), so a grippy wheel on icy ground still slides.",
       "hints": [
         "Place the wheels slightly below the chassis corners so the joints have room.",
-        "The Physics docs chapter explains dynamic vs static bodies."
+        "The Physics docs chapter explains dynamic vs static bodies.",
+        "Four lines: leftWheel.friction = 1; rightWheel.friction = 1; ground.friction = 1; ramp.friction = 1;"
       ]
     },
     {
@@ -45,7 +46,7 @@
       "instructions": "In draw(), use kb.pressing('a') / kb.pressing('d') to set chassis.vel.x (positive = right, negative = left, 0 = stop). The grader looks for an assignment to .vel.x (or an applyForce call).",
       "hints": [
         "Open the Input docs chapter for kb.pressing. Don't use arrow keys: they scroll the editor.",
-        "vel.x sets horizontal velocity directly each frame; the wheels will roll from friction as the chassis moves. Spinning the wheels alone does not move the car."
+        "vel.x sets horizontal velocity directly each frame; with the friction from step 2 the wheels roll as the chassis moves (at friction 0 they slide along without turning). Spinning the wheels alone does not move the car."
       ]
     }
   ],
