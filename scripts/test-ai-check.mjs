@@ -75,6 +75,43 @@ if (typeof fallbackRunner === 'function') {
   check(!/^\s*else runCode\(\);\s*$/m.test(body.split('fallbackRunner')[0] ?? ''), 'LessonWorkspace: no unconditional runCode() before the runner is picked');
 }
 
+// A sketch that threw is not submittable through Check (5.1.25, 2026-11-03). With the AI
+// unreachable, Check's fallback re-runs the sketch (runQ5 clears the run error) and marks the cards
+// 400 ms later. On a cold load the frame had not reported by then, so `!runtimeError` alone let
+// Submit through with four green cards until the error arrived. The run is now "pending" until its
+// frame reports: an error, or `preview-status` once the first frame ran clean.
+const { runLetsSubmit } = aiCheckLib;
+check(typeof runLetsSubmit === 'function', 'lib/ai-check.ts exports runLetsSubmit');
+if (typeof runLetsSubmit === 'function') {
+  const ERR = "Error: world.origin = 'math' must come before any sprite is made (line 7, col 16)";
+  // The Check-fallback sequence on a sketch that throws, step by step.
+  const afterRunQ5 = { error: null, pending: true };        // runQ5(): error cleared, frame loading
+  check(!runLetsSubmit(afterRunQ5), 'fallback on a throwing sketch: Submit stays shut while the re-run has not reported (cards already green at 400 ms)');
+  const oldGate = (run) => !run.error;
+  check(oldGate(afterRunQ5) === true, 'calibration: the old gate (!runtimeError alone) was open at that moment');
+  const afterError = { error: ERR, pending: false };         // the frame posts preview-error
+  check(!runLetsSubmit(afterError), 'fallback on a throwing sketch: Submit stays shut once the error arrives');
+  // The same sequence on a sketch that runs clean: only the grading failed.
+  check(runLetsSubmit({ error: null, pending: false }), 'fallback on a clean sketch: Submit opens once the frame reports it came up');
+  // Everything else keeps its old answer.
+  check(runLetsSubmit({ error: null, pending: false }) === true, 'no run yet, or a clean run: open (unchanged)');
+  check(runLetsSubmit({ error: ERR, pending: false }) === false, 'a run error: shut (unchanged)');
+  check(runLetsSubmit({ error: ERR, pending: false }, true) === true, 'expectsRuntimeError accepts the error (unchanged)');
+  check(runLetsSubmit({ error: null, pending: true }, true) === false, 'expectsRuntimeError does not accept a run that has not reported');
+}
+{
+  const lw = readFileSync(path.join(root, 'components/LessonWorkspace.tsx'), 'utf8');
+  const fn = (name) => { const s = lw.indexOf(`function ${name}(`); return s < 0 ? '' : lw.slice(s, lw.indexOf('\n  }', s)); };
+  check(/setRunPending\(true\)/.test(fn('runQ5')), 'LessonWorkspace: runQ5() marks the run pending');
+  check(/setRunPending\(false\)/.test(fn('stopRun')), 'LessonWorkspace: Stop clears the pending run');
+  const handler = lw.slice(lw.indexOf("data.source === 'preview-status'"), lw.indexOf("data.source === 'preview-error'") + 200);
+  check(/event\.source === frame\.contentWindow\) setRunPending\(false\)/.test(handler), "LessonWorkspace: only the lab's own frame's preview-status ends the pending run");
+  check(/data\.source === 'preview-error' && data\.error\) \{\s*setRunPending\(false\)/.test(lw), 'LessonWorkspace: a preview-error ends the pending run');
+  check(/runLetsSubmit\(\{ error: runtimeError, pending: isMoshionMode && runPending \}, expectsRuntimeError\)/.test(lw), 'LessonWorkspace: canSubmitByWork gates on runLetsSubmit');
+  const runner = readFileSync(path.join(root, 'public/moshion/runner.html'), 'utf8');
+  check(runner.includes("source: 'preview-status', status: 'running'"), "runner.html posts preview-status 'running' (scripts/test-runner-errors.mjs measures when)");
+}
+
 // wiring of every lesson that carries aiCheck
 const gen =readFileSync(path.join(root, 'functions/_shared/ai-graders.generated.ts'), 'utf8');
 let labs = 0;

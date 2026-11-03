@@ -6,6 +6,8 @@ import { Trash2 } from 'lucide-react';
 interface PreviewError {
   name: string;
   message: string;
+  /** The moSHion runner's plain first sentence for a common slip (may be empty). */
+  hint?: string;
   file: string | null;
   line: number | null;
   col: number | null;
@@ -139,6 +141,7 @@ export default function Console({ resetKey }: { resetKey: string }) {
           filtered.map((log, i) =>
             log.err ? (
               <div key={i} className="log-entry log-error log-error-rich">
+                {log.err.hint ? <div className="log-msg">{log.err.hint}</div> : null}
                 <div className="log-error-line">
                   <span className="log-time">{log.timestamp}</span>
                   <span className="log-error-name">{log.err.name}:</span>

@@ -57,20 +57,120 @@
 		var arr = src.split('\n');
 		return (arr[line - 1] || '').replace(/^\s+/, '').slice(0, 200);
 	}
+	// A plain first sentence for the slips a beginner makes most (the 5.1
+	// walk, 2026-11-03: a missing bracket, Sprite(...) without new, a colour
+	// with no quotes, a sketch with no canvas yet). It goes ON TOP of the
+	// engine's message, never instead of it: the real message stays word for
+	// word on the next line, so CODY, the console and a teacher still see it.
+	// Posted as `hint` beside the untouched name/message.
+	var NO_CANVAS = 'new Canvas(w, h) must be called in setup()';
+	// Chrome wraps a parse error in a script added with appendChild in its own
+	// words ("Failed to execute 'appendChild' on 'Node': missing ) after
+	// argument list"). That half is about the runner, not the student's code.
+	var HOST_PREFIX = /^Failed to execute '[^']*' on '[^']*': /;
+	// Where a typo is. A parse error carries no position in the student's code
+	// (its stack points at the runner's inject()), so ask the engine instead:
+	// the error is on the first line whose prefix already fails with the SAME
+	// message as the whole sketch. Same method as locateSyntaxError in
+	// lib/js-runner-source.ts (the console runner), which this copies.
+	function locateTypo(code, message) {
+		var lines = String(code).split('\n');
+		if (lines.length > 2000) return null;
+		if (/unexpected eof/i.test(message)) return null;
+		var lastLine = function() {
+			for (var i = lines.length - 1; i >= 0; i--) if (lines[i].trim() !== '') return i + 1;
+			return null;
+		};
+		if (/end of (input|script)|unterminated template/i.test(message)) return lastLine();
+		// The Function constructor closes the body with a "}" of its own, so an
+		// unclosed brace swallows it and reads as "Unexpected token ')'". If a
+		// closer makes the sketch parse, it simply ends too soon.
+		var closers = ['}', ')', ']', '}}', '})', '}]', '))', ')}'];
+		for (var c = 0; c < closers.length; c++) {
+			try { new Function(String(code) + '\n' + closers[c]); return lastLine(); } catch (e) { /* not this closer */ }
+		}
+		for (var k = 1; k <= lines.length; k++) {
+			try { new Function(lines.slice(0, k).join('\n')); }
+			catch (e) { if (e && e.name === 'SyntaxError' && e.message === message) return k; }
+		}
+		return null;
+	}
+	// The sketch itself does not parse. A SyntaxError thrown while it RUNS
+	// (JSON.parse of a bad string) is not a typo, and must not be called one.
+	function sketchFailsToParse(code) {
+		if (typeof code !== 'string') return false;
+		try { new Function(code); return false; } catch (e) { return !!(e && e.name === 'SyntaxError'); }
+	}
+	// `deepskyblue is not defined` gets the quotes advice only when the word
+	// is used bare. `bakground(...)` is a misspelt command and `plyer.x` a
+	// misspelt name; quotes would make either one worse.
+	function usedBare(word, text) {
+		if (!text) return true;
+		var rx = new RegExp('(^|[^\\w$.])' + word.replace(/\$/g, '\\$') + '(?![\\w$])\\s*(.?)', 'g');
+		var m, seen = false;
+		while ((m = rx.exec(text))) {
+			seen = true;
+			if (m[2] !== '(' && m[2] !== '.') return true;
+		}
+		return !seen;
+	}
+	function plainSentence(name, msg, text) {
+		var m;
+		if (msg === NO_CANVAS) return 'Your sketch needs a canvas first: inside setup(), write new Canvas(400, 400).';
+		if (name === 'TypeError' && (m = /^Class constructor ([A-Za-z_$][\w$]*) cannot be invoked without 'new'$/.exec(msg))) {
+			return 'Put the word new in front: new ' + m[1] + '(...).';
+		}
+		if (name === 'ReferenceError' && (m = /^([A-Za-z_$][\w$]*) is not defined$/.exec(msg)) && usedBare(m[1], text)) {
+			return 'The word ' + m[1] + ' is not defined. If it is a colour or text, put quotes around it.';
+		}
+		return '';
+	}
+	// "It came up." The host keeps Submit shut from Run until this frame has
+	// reported back one way or the other: an error (reportError), or this
+	// message once the sketch's first frame has run clean -- or at once after
+	// boot when there is no setup() for the engine to start, since no frame
+	// will come. Without it a sketch that throws looked submittable: the host
+	// marks the cards 400 ms after Run, and on a cold load the frame had not
+	// said anything yet (5.1.25 with Check's pattern fallback, 2026-11-03; see
+	// runPending in components/LessonWorkspace.tsx).
+	var errored = false, cameUp = false;
+	function reportCameUp() {
+		if (errored || cameUp) return;
+		cameUp = true;
+		try { window.parent.postMessage({ source: 'preview-status', status: 'running' }, '*'); } catch (e) { /* parent gone */ }
+	}
+	window.__moshionCameUp = reportCameUp;
 	function reportError(err, fallbackMsg, fbFile, fbLine, fbCol) {
-		var loc = parseStudentFrame(err && err.stack);
+		errored = true;
+		var frame = parseStudentFrame(err && err.stack);
+		var loc = frame;
 		if (!loc && fbFile && (window.__previewSources || {})[fbFile]) {
 			loc = { file: fbFile, line: fbLine || 0, col: fbCol || 0 };
 		}
 		var name = (err && err.name) || 'Error';
 		var msg = (err && err.message) || fallbackMsg || String(err);
+		var hint = '';
+		if (name === 'SyntaxError' && !frame) {
+			var wrapped = HOST_PREFIX.test(msg);
+			msg = msg.replace(HOST_PREFIX, '');
+			var code = (window.__previewSources || {})['sketch.js'];
+			if (wrapped || sketchFailsToParse(code)) {
+				if (!loc || !loc.line) {
+					var at = sketchFailsToParse(code) ? locateTypo(code, msg) : null;
+					loc = at ? { file: 'sketch.js', line: at, col: 0 } : null;
+				}
+				hint = loc && loc.line ? 'There is a typo near line ' + loc.line + ': ' + msg : 'There is a typo in your code: ' + msg;
+			}
+		} else {
+			hint = plainSentence(name, msg, loc ? lineSnippet(loc.file, loc.line) : '');
+		}
 		var file = loc ? loc.file : null;
 		var line = loc ? loc.line : null;
 		var col = loc ? loc.col : null;
 		try {
 			window.parent.postMessage({
 				source: 'preview-error',
-				error: { name: name, message: msg, file: file, line: line, col: col, snippet: file ? lineSnippet(file, line) : '' }
+				error: { name: name, message: msg, hint: hint, file: file, line: line, col: col, snippet: file ? lineSnippet(file, line) : '' }
 			}, '*');
 		} catch (e) { /* parent gone */ }
 		var locStr = file ? file + ':' + line + (col ? ':' + col : '') : '';
@@ -78,7 +178,7 @@
 		var el = document.getElementById('error');
 		if (el) {
 			el.style.display = 'block';
-			el.textContent = name + ': ' + msg + (locStr ? '  @ ' + locStr : '');
+			el.textContent = (hint ? hint + '\n' : '') + name + ': ' + msg + (locStr ? '  @ ' + locStr : '');
 		}
 	}
 	// "Script error." -- and why most engine errors never reach the window
@@ -144,7 +244,11 @@
 		window.requestAnimationFrame = function(cb) {
 			if (typeof cb !== 'function') return nativeRaf.call(window, cb);
 			return nativeRaf.call(window, function(t) {
-				try { return cb(t); }
+				try {
+					var out = cb(t);
+					if (window.__moshionPhase === 'running') reportCameUp();
+					return out;
+				}
 				catch (err) { caught(err); }
 			});
 		};
@@ -273,6 +377,10 @@
 			else throw err;
 		}
 		window.__moshionPhase = 'running';
+		// No setup(), so the engine never started and no frame will come: the
+		// sketch is as far up as it gets. (A started engine reports from its
+		// first frame instead -- see the requestAnimationFrame wrapper.)
+		if (!window._moshionStarted && typeof window.__moshionCameUp === 'function') window.__moshionCameUp();
 	}
 
 	// Saves. Sandboxed into an opaque origin, this frame cannot so much as

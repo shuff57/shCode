@@ -301,6 +301,12 @@ details.editor-card > summary:hover::before {
   align-items: center;
   gap: 12px;
   margin-bottom: 8px;
+  /* Wrap instead of squeezing. With a drawer open (1280 wide) the row had no
+     room once a run error added its status line: Stop became a two-line
+     block, "Commit (1)" broke in two and the status read "x Fix runtim...".
+     A row that does not fit now moves its right-hand group down a line. */
+  flex-wrap: wrap;
+  row-gap: 8px;
 }
 
 .editor-file-toolbar {
@@ -334,6 +340,7 @@ details.editor-card > summary:hover::before {
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s;
+  white-space: nowrap;
 }
 
 .btn-run:hover {
@@ -409,6 +416,17 @@ details.editor-card > summary:hover::before {
   position: relative;
   display: flex;
   flex-direction: column;
+}
+
+/* The lesson drawer remembers its open tab (TabbedRightDrawer,
+   localStorage `shCode:drawer:active`), so once a student opens Steps it stays
+   open on every lab after it and takes 320px off the page. At 1280 wide that
+   left a 50/50 split with a ~420px editor, and ordinary lines wrapped. The
+   editor keeps at least 480px (never more than 60% of the split, so a wide
+   drawer still leaves the preview room); the preview's canvas scales down to
+   fit instead. Desktop only: the phone layout stacks the panes. */
+@media (min-width: 721px) {
+  .editor-preview-container:not(.sandbox-split) > #editorPane { min-width: min(480px, 60%); }
 }
 
 #editor {

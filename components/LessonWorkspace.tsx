@@ -9,7 +9,7 @@ import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
-import { aiCheckText, applyAiVerdicts, fallbackRunner, reportFromRequirements, verdictsFromCriteria, type AiVerdicts } from '../lib/ai-check';
+import { aiCheckText, applyAiVerdicts, fallbackRunner, reportFromRequirements, runLetsSubmit, verdictsFromCriteria, type AiVerdicts } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
@@ -183,6 +183,9 @@ export default function LessonWorkspace({
   // Submit even when every requirement is green — otherwise students could
   // submit code that satisfies static graders but crashes at runtime.
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
+  // A moSHion run that has started but not yet reported back from its frame (an error, or
+  // `preview-status` once its first frame ran clean). Submit waits for it: see runLetsSubmit.
+  const [runPending, setRunPending] = useState(false);
   const [shortcutModalOpen, setShortcutModalOpen] = useState(false);
 
   const isAssignment = mode === 'assignment' || lesson.type === 'assignment' || lesson.type === 'project';
@@ -597,6 +600,7 @@ export default function LessonWorkspace({
   // We snapshot so edits after Run don't re-trigger the iframe until the next Run.
   function runQ5() {
     setRuntimeError(null);
+    setRunPending(true);
     setQ5Code(files['script.js'] || '');
     setRunKey((k) => k + 1);
     setConsoleResetKey((k) => k + 1);
@@ -613,6 +617,7 @@ export default function LessonWorkspace({
     setConsoleResetKey((k) => k + 1);
     setIsRunning(false);
     setRuntimeError(null);
+    setRunPending(false);
   }
 
   // Listen for uncaught errors from the moSHion/reSHape iframe runner. The runner
@@ -631,11 +636,21 @@ export default function LessonWorkspace({
         setRuntimeError(null);
         return;
       }
+      // The lab's own frame says its sketch came up clean. Only that frame: a
+      // docs-drawer snippet runs the same runner and must not open Submit.
+      if (data && data.source === 'preview-status' && data.status === 'running') {
+        const frame = document.getElementById('preview') as HTMLIFrameElement | null;
+        if (frame && event.source === frame.contentWindow) setRunPending(false);
+        return;
+      }
       if (data && data.source === 'preview-error' && data.error) {
+        setRunPending(false);
         // The moSHion / reSHape runners report a line already (their own frame
         // parse); keep it rather than flattening the payload to a bare message.
-        const err = data.error as { name?: string; message?: string; line?: number | null; col?: number | null };
-        setRuntimeError(errorWithLocation(err.name, err.message, err.line, err.col));
+        // `hint` is the moSHion runner's plain first sentence for a common slip.
+        const err = data.error as { name?: string; message?: string; hint?: string; line?: number | null; col?: number | null };
+        const where = errorWithLocation(err.name, err.message, err.line, err.col);
+        setRuntimeError(err.hint ? `${err.hint}\n${where}` : where);
       }
     };
     window.addEventListener('message', handler);
@@ -1022,9 +1037,10 @@ export default function LessonWorkspace({
   // both satisfy their regexes and then crash by design, so the generic
   // "don't ship code that crashes" rule made them permanently unsubmittable.
   const expectsRuntimeError = !!lesson.grading?.expectsRuntimeError;
+  // A moSHion run must also have reported back before Submit opens (runLetsSubmit, lib/ai-check.ts).
   const canSubmitByWork =
     isSummative ||
-    ((!runtimeError || expectsRuntimeError) &&
+    (runLetsSubmit({ error: runtimeError, pending: isMoshionMode && runPending }, expectsRuntimeError) &&
       (isMoshionMode || isNoPoints
         ? allRequirementsPassed
         : totalScore >= (lesson.grading?.passingScore ?? 0)));
@@ -1347,6 +1363,8 @@ export default function LessonWorkspace({
                   fontSize: 13,
                   marginLeft: 8,
                   fontWeight: 500,
+                  // The row wraps (globals.css .run-toolbar) when this does not
+                  // fit, so it is never squeezed below its own width any more.
                   maxWidth: 360,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
