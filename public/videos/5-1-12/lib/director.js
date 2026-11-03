@@ -12,6 +12,9 @@
 // short right/wrong reactions in a check (answer effects already live on the wall clock in the engine).
 // moshion-5.1.2-style COPY (MS changes): home corner from window.PM.charHome, every colour (effects and the baked body)
 // from lib/tokens.js, the canvas text font from the token file, HAND positions for the new poses, and MV.wave.
+// PLAY LAYER (added): CH.play holds the student's drag, the proximity power-up and the spoken word. It is applied
+// on the wall clock after the teaching state, so it never changes a sought frame or CH.signature(). MV.teleport
+// is the one move added for it. The pointer lives in lib/play.js; this file only draws what that file asks for.
 'use strict';
 (function () {
   const KG = window.__KG, KGC = window.__KGC;
@@ -205,6 +208,31 @@
     s.lean += 6 * throwK * (1 - done);
   };
 
+  // Teleport (AUTHORED for the play layer): a blink between two stage points. The body is moved by
+  // applyPlay() below; this draws only the tear at the old spot and the flash at the new one. Pure in u.
+  MV.teleport = (u, s, { from, to }) => {
+    const F = R(s, from), T = R(s, to);
+    const out = ease(seg(u, 0, .30)), inn = ease(seg(u, .22, .58)), fade = 1 - ease(seg(u, .62, 1));
+    s.pose = u < .30 ? 'down' : 'up';
+    if (out > 0 && fade > 0) {
+      for (let i = 0; i < 4; i++) {                                  // the old spot: a torn ring and three speed ticks
+        const a = -0.6 + i * 0.42 + u * 3.2, rr = 12 + 26 * out + i * 4, fy = F[1] + 46 / s.Z;
+        ln(s, [[F[0] + Math.cos(a) * rr, fy + Math.sin(a) * rr * .7],
+               [F[0] + Math.cos(a) * (rr + 16), fy + Math.sin(a) * (rr + 16) * .7]], 1.5, 'blue', { alpha: .55 * fade * (1 - inn * .6) });
+      }
+      ring(s, F[0], F[1] + 46 / s.Z, 10 + 30 * out, 'blue', false);
+    }
+    if (inn > 0 && fade > 0) {
+      ring(s, T[0], T[1] + 46 / s.Z, 40 * (1 - inn) + 8, 'cyan', false);
+      for (let i = 0; i < 10; i++) {                                 // the new spot: an arrival flash
+        const a = i / 10 * Math.PI * 2 + .2, r0 = 9 + 14 * (1 - inn), r1 = r0 + 16, ty = T[1] + 46 / s.Z;
+        ln(s, [[T[0] + Math.cos(a) * r0, ty + Math.sin(a) * r0],
+               [T[0] + Math.cos(a) * r1, ty + Math.sin(a) * r1]], 1.5, 'gold-hot', { alpha: .8 * (1 - inn) * fade });
+      }
+    }
+    s.hop -= 5 * Math.sin(Math.PI * Math.min(1, u / .5));
+  };
+
   // Beam (reel 'beam', copied). ADAPTED: target is stage px; the expression text is the lesson's own SVG.
   MV.beam = (u, s, { tgt }) => {
     const ch = ease(seg(u, .06, .42)), fire = ease(seg(u, .46, .62));
@@ -310,11 +338,15 @@
   };
 
   // Speech bubble (reel 'speech', copied). One or two words only.
+  // PLAY LAYER: the bubble flips to his left / below when the dragged body is near the stage edge, so a "Woo!"
+  // dropped in a corner is still readable instead of being clipped.
   MV.speech = (u, s, { text }) => {
     const k = ease(seg(u, .12, .24)) * (1 - ease(seg(u, .80, .92)));
     const hx = s.cx + s.lean + 35, hy = s.cy + s.hop;
-    bubble(s, hx + 70, hy - 30, 48, 22, { to: [hx + 18, hy + 14], k });
-    word(text, hx + 70, hy - 24, 17, 'ember', k);
+    const bx = (hx + 70 + 50) * s.Z > 1600 ? hx - 70 : hx + 70;
+    const by = (hy - 52) * s.Z < 8 ? hy + 62 : hy - 30;
+    bubble(s, bx, by, 48, 22, { to: [hx + (bx < hx ? -18 : 18), hy + 14], k });
+    word(text, bx, by + 6, 17, 'ember', k);
     s.lean += k * 4; s.hop -= k * 3;
   };
 
@@ -480,7 +512,8 @@
   window.CHAR_HOME = [HOME.x, HOME.y];
 
   /* ======================== state, clock, render ======================== */
-  const CH = window.CHAR = { on: true, react: null, thinkT0: null, sig: '' };
+  const CH = window.CHAR = { on: true, react: null, thinkT0: null, sig: '',
+    play: { drag: null, hold: null, fx: null, say: null } };   // PLAY LAYER: filled by lib/play.js
   try { CH.on = localStorage.getItem('pm-char') !== '0'; } catch {}
   const FR = {};
   function framesFor(pose, blonde, expr = '', gx = 0, gy = 0, tilt = 0, amp = 1) {
@@ -494,9 +527,82 @@
     return FR[key];
   }
   // Chapter beats give { act(t, m, D, s, MV) } for lesson choreography. Asks get idle + reactions.
-  function state(Z = Z0) { return { sk: FX, Z, cx: HOME.x / Z, cy: HOME.y / Z, pose: 'point', hop: 0, lean: 0, scale: 1, face: 1, turn: 1, blonde: false, hide: false,
+  function state(Z = Z0) { return { sk: FX, Z, cx: HOME.x / Z, cy: HOME.y / Z, pose: 'point', hop: 0, lean: 0, scale: 1, face: 1, turn: 1, rot: 0, blonde: false, hide: false,
     expr: '', gaze: [0, 0], tilt: 0, amp: 1, look: null }; }
   CH.home = () => [HOME.x, HOME.y];
+  // ---- PLAY LAYER (lib/play.js): drag position, proximity power-up, spoken word ----------------------------
+  CH.now = () => clock;
+  CH.bounds = () => { const Z = (typeof BEATS !== 'undefined' && BEATS[P.i] && BEATS[P.i].charZ) || Z0; return { w: SW * Z, h: SH * Z }; };
+  CH.clamp = (x, y, pad = 0) => { const b = CH.bounds(); return { x: Math.max(pad, Math.min(1600 - b.w - pad, x)), y: Math.max(pad, Math.min(900 - b.h - pad, y)) }; };
+  CH.hit = (x, y) => { const b = CH.box; if (!b) return false; const pad = 12 + Math.abs(CH.rot || 0) * .8; return x >= b[0] - pad && x <= b[0] + b[2] + pad && y >= b[1] - pad && y <= b[1] + b[3] + pad; };
+  CH.at = () => CH.box ? [CH.box[0] + CH.box[2] / 2, CH.box[1] + CH.box[3] / 2] : [HOME.x + SW * Z0 / 2, HOME.y + SH * Z0 / 2];
+  // Applied after the beat's own choreography, and only when drawing (never for signature/boxNow/prewarm), so a
+  // dragged or powered-up frame is still a pure function of wall time and the teaching state is untouched.
+  function applyPlay(s) {
+    const PL = CH.play;
+    if (!PL) return;
+    const now = clock;
+    let tx = null, ty = null;
+    if (PL.drag) { tx = PL.drag.x; ty = PL.drag.y; }
+    else if (PL.hold) {
+      const h = PL.hold;
+      if (h.start && now < h.start) { /* still at the beat's place: the teleport tear is drawing */ }
+      else if (h.mode === 'hold') {
+        if (now >= h.until) { h.mode = 'back'; h.t0 = now; h.dur = .55; }
+        else { tx = h.x; ty = h.y; }
+      }
+      if (h.mode === 'back') {
+        const u = clamp01((now - h.t0) / h.dur);
+        const sx = (s.cx + s.lean) * s.Z, sy = (s.cy + s.hop) * s.Z;   // the beat's own place
+        tx = h.x + (sx - h.x) * ease(u); ty = h.y + (sy - h.y) * ease(u);
+        if (u >= 1) PL.hold = null;
+      }
+    }
+    if (tx != null) {
+      // Ragdoll: the held body lags the pointer's velocity, swings on the grab point, and hangs with its arms down.
+      // play.js puts vx/vy (stage px/s) on the drag; the offset decays in a few frames when the pointer stops moving.
+      let rx = 0, ry = 0, pad = 0;
+      if (PL.drag) {
+        const d = PL.drag, age = Math.max(0, now - (d.t || now)), damp = Math.exp(-age * 4);
+        const vx = (d.vx || 0) * damp, vy = (d.vy || 0) * damp;
+        rx = Math.max(-56, Math.min(56, vx * .05)) + Math.sin(now * 7.5) * 5;
+        ry = Math.max(-34, Math.min(34, vy * .032)) + 7 + Math.sin(now * 6.2) * 3;
+        // The body really tips: a drawn raster rotated about its middle, plus the head tilt and the dangle pose.
+        s.rot = Math.max(-42, Math.min(42, vx * .062)) + Math.sin(now * 6.8) * 6;
+        s.pose = 'down';                       // limp while he is held
+        s.tilt = (s.tilt || 0) + Math.max(-30, Math.min(30, vx * .045));
+        s.scale *= 1 + .025 * Math.sin(now * 11);   // squash-and-stretch on the swing
+        if (Math.abs(vx) > 60) s.face = vx < 0 ? -1 : 1;
+        pad = 62;                              // room for the rotated box, so he still cannot leave the stage
+      } else if (PL.hold && PL.hold.vx != null) {
+        // Let the tip and the sway settle after release instead of snapping upright.
+        const h = PL.hold, age = Math.max(0, now - (h.t0rel || now)), damp = Math.exp(-age * 3.2);
+        const vx = (h.vx || 0) * damp, vy = (h.vy || 0) * damp;
+        s.rot = Math.max(-26, Math.min(26, vx * .05)) + Math.sin(now * 6) * 3 * damp;
+        s.tilt = (s.tilt || 0) + Math.max(-18, Math.min(18, vx * .03));
+        rx = Math.sin(now * 6) * 3 * damp;                                  // a short settling wobble
+        ry = Math.max(-14, Math.min(14, vy * .022)) + Math.sin(now * 5) * 2 * damp;
+      }
+      const c = CH.clamp(tx + rx, ty + ry, pad);
+      s.cx = c.x / s.Z - s.lean; s.cy = c.y / s.Z - s.hop;
+    }
+    const fx = PL.fx;
+    if (fx) {
+      const u = (now - fx.t0) / fx.dur;
+      if (u >= 1) PL.fx = null;
+      else if (u >= 0) {
+        if (fx.kind === 'powerup') MV.powerup(u, s, { size: fx.size || 1, auraK: 1 });
+        else if (fx.kind === 'rasengan') MV.rasengan(u, s, { tokens: fx.tokens, tgt: fx.tgt });
+        else if (fx.kind === 'teleport') MV.teleport(u, s, { from: fx.from, to: fx.to });
+      }
+    }
+    const say = PL.say;
+    if (say) {
+      const u = (now - say.t0) / say.dur;
+      if (u >= 1) PL.say = null;
+      else if (u >= 0) MV.speech(u, s, { text: say.text });
+    }
+  }
   function compute(teachOnly, bi = P.i, tt = P.t) {
     const b = BEATS[bi], tm = TIMINGS[b.id], t = tt;
     const m = (k, off = 0) => { if (!(k in tm.marks)) throw new Error(`${b.id}: missing mark ${k}`); return tm.marks[k] + off; };
@@ -514,6 +620,7 @@
       }
     }
     if (!STILL && !b.noIdle) MV.idle(((clock % 5.4) / 5.4), s, { rest: !!b.ask });
+    applyPlay(s);   // PLAY LAYER: wall-clock drag / power-up / speech, after the beat has placed him
     if (s.look) {   // gaze toward the thing the narration is about, in sprite space (a mirrored sprite flips x)
       const hx = (s.cx + s.lean + 35) * s.Z, hy = (s.cy + s.hop + 24) * s.Z, dx = s.look[0] - hx, dy = s.look[1] - hy;
       s.gaze = [(dx > 90 ? 1 : dx < -90 ? -1 : 0) * Math.sign(s.face || 1), dy > 90 ? 1 : dy < -90 ? -1 : 0];
@@ -540,6 +647,7 @@
       if (STILL) { s.hop = 0; s.lean = 0; s.scale = 1; s.turn = 1; s.face = 1; }
     } catch (e) { console.error(e); return; }
     CH.box = [(s.cx + s.lean) * s.Z, (s.cy + s.hop) * s.Z, SW * s.Z, SH * s.Z];   // stage px, for the spacing gate
+    CH.rot = s.rot || 0;                                                          // PLAY LAYER: a wider hit box when tipped
     if (s.hide) return;
     const q4 = Math.round((s.tilt || 0) / 4) * 4;
     let im = framesFor(s.pose, s.blonde, s.expr, s.gaze[0], s.gaze[1], q4, s.amp)[boilK];
@@ -547,9 +655,10 @@
     if (im && im.complete && im.naturalWidth) {
       lastGood = im;
       ctx.save();
-      ctx.translate(s.cx + s.lean + SW / 2, s.cy + s.hop + SH);
+      ctx.translate(s.cx + s.lean + SW / 2, s.cy + s.hop + SH / 2);   // centre pivot (same picture when rot is 0)
+      if (s.rot) ctx.rotate(s.rot * Math.PI / 180);                   // PLAY LAYER: the ragdoll tip
       ctx.scale((s.face || 1) * (s.turn == null ? 1 : s.turn) * s.scale, s.scale);
-      ctx.drawImage(im, -SW / 2, -SH, SW, SH);
+      ctx.drawImage(im, -SW / 2, -SH / 2, SW, SH);
       ctx.restore();
     } else lastDraw = -1;                             // not decoded yet: try again next frame
   }

@@ -10,3 +10,13 @@ A lesson plays one with `"videoUrl": "/videos/<name>/index.html"` (dev serves no
 | `5-1-12/` | 5.1.12 The Frame Loop Explained | 2:40 | same voice and rate |
 
 Re-copy the bookSHelf `site/` folder over the matching folder to update. Do not hand-edit.
+
+**The character is playable** (both explainers, `lib/play.js` + `CHAR.play` hooks in `lib/director.js`).
+He can be grabbed and dragged (1:1 with the pointer, grab offset respected, hard-clamped inside the
+1600x900 stage), dangles and swings with the drag velocity, and says an exclamation while he is held
+(again every ~0.8 s while being ragged). A pointer that comes within 165 stage px of him fires one of
+his power-ups in rotation: rasengan, super saiyan, teleport; it re-arms only after the pointer leaves a
+300 px ring, with a 3.6 s cooldown. Clicks on him never toggle playback. It all runs on the wall clock,
+so `CH.signature()` and the spacing gate (`CH.boxNow()`) still see the untouched teaching state.
+`5-1-12/beats.js` keeps the play-mode label plain ("slow motion" / "slow motion: one frame at a time");
+"moSHion" is used only where the video names the sketch or its canvas.
