@@ -46,6 +46,20 @@ export function aiCheckText(config: Pick<AiCheckConfig, 'file' | 'alsoFiles'>, f
   return main + more.join('');
 }
 
+/**
+ * When the AI cannot answer, the pattern check marks the cards instead, and it must grade through
+ * the same runner a plain Run of that lab uses: a text lab has nothing to run (grade the file), a
+ * moSHion sketch runs in the moSHion runner, anything else in the console runner. The console runner
+ * on a moSHion sketch reports `Canvas is not defined` for top-level sprite code, which raised a
+ * bogus run error and locked Submit.
+ */
+export type FallbackRunner = 'grade' | 'moshion' | 'console';
+export function fallbackRunner(lesson: { editor?: string; preview?: string }): FallbackRunner {
+  if (lesson.editor === 'text') return 'grade';
+  if (lesson.preview === 'moshion') return 'moshion';
+  return 'console';
+}
+
 /** Only a clear "met" turns a card green. "partial" and "missing" stay red, with the AI's note. */
 export function verdictsFromCriteria(criteria: AiCheckCriterion[], knownIds: string[]): AiVerdicts {
   const known = new Set(knownIds);
