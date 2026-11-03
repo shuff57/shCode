@@ -13,7 +13,7 @@
 **Prerequisites:** complete both in-app lessons (`5.1.11 Hello Sprite` + `5.1.20 Make it Move`) before starting this lab.
 
 **Module resources:**
-- 💡 5.1.18 Worked Examples: reference code from the class walkthroughs
+- 💡 5.1.18 Worked Example: Keyboard Movement: reference code from the class walkthroughs
 - 💡 5.1.22 Moving on its own: frameCount and sin(): the lines that make the mover move with no key held
 - ⭐ 5.1.25 Challenges: stretch problems if you finish early
 

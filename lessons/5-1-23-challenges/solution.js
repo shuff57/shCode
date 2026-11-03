@@ -1,8 +1,10 @@
 // 5.1.25 Challenges (reference solution).
 // Demonstrates Challenge 1 (stretched: the color cycles once per tap with
-// kb.presses, which 5.2.9 teaches), Challenge 2 (orbiting companion) and
+// kb.presses, which 5.1.13 shows), Challenge 2 (orbiting companion) and
 // Challenge 4 (frameCount HUD). Any one of the five challenges listed in
-// step 4 is enough to pass the grader.
+// step 4 is enough to pass the grader. player.x is the short name for
+// player.pos.x (5.1.10), and collider = 'none' lets the companion pass
+// through the player (5.1.22).
 
 let player, companion;
 let palette = ['deepskyblue', 'hotpink', 'orange', 'limegreen'];
@@ -41,9 +43,9 @@ function draw() {
   companion.x = player.x + cos(frameCount * 0.05) * 60;
   companion.y = player.y + sin(frameCount * 0.05) * 60;
 
-  // Challenge 4: HUD with frameCount and rounded position.
-  fill(255);
+  // Challenge 4: HUD with frameCount and the position rounded with round().
+  fill('white');
   textSize(14);
   text('Frame: ' + frameCount, 12, 20);
-  text('Player: (' + Math.round(player.x) + ', ' + Math.round(player.y) + ')', 12, 38);
+  text('Player: (' + round(player.x) + ', ' + round(player.y) + ')', 12, 38);
 }
