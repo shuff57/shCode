@@ -1,8 +1,8 @@
-Write your response in the box below. Short, clear answers are fine: full paragraphs not required. Aim to cover every criterion in the rubric below; the lesson counts as complete once the grader finds at least half of them met, and you can revise and resubmit as many times as you like.
+The three questions are further down this page, in the **What to answer** box, and the box for your response is right under them. Read the questions first. Short, clear answers are fine: full paragraphs not required. The table below is how each answer is checked, one row per question; the lesson counts as complete once the grader finds at least half of them met, and you can revise and resubmit as many times as you like.
 
 ---
 
-## Rubric
+## How each answer is checked
 
 | # | Criterion |
 |---|-----------|

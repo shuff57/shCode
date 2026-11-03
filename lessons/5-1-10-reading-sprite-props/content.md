@@ -13,6 +13,7 @@ Once you have a sprite stored in a variable, you can read or change its properti
 **What you'll learn from it:**
 
 - `player.pos.x` and `player.pos.y` hold the sprite's current centre position; you can read or overwrite them.
+- `player.x` is a shorter name for `player.pos.x`, and `player.y` for `player.pos.y`. Both names read and change the same number. This course writes `pos.x`, but you will see `.x` in some answers.
 - `player.rotation` is the tilt in degrees (clockwise). `0` is upright; `90` points the top edge to the right.
 - `player.layer` controls draw order. A sprite with a higher layer number appears in front of sprites with lower numbers.
 - `player.color` (already familiar from 5.1.6) is also a property: included here as a recap row.
@@ -51,7 +52,7 @@ function draw() {
 
 **What you'll see:** a tilted blue square overlapping a red square, with the blue one on top because its `layer` is higher. Sprites are solid, so on their own the engine would push these two apart until they only touched. The lines in `draw()` put them back every frame, so they stay overlapping and you can see which one is on top.
 
-**Try this:** swap the two `layer` values (`player.layer = 1`, `box.layer = 2`) and run again: the red square jumps in front. Then change `player.pos.x = 120;` to `player.pos.x = 80;` and rerun: the blue square moves left, and the two squares overlap less.
+**Try this:** swap the two `layer` values (`player.layer = 1`, `box.layer = 2`) and run again: the red square jumps in front. Then change `player.pos.x = 120;` to `player.pos.x = 80;` and rerun: the blue square moves left, and the two squares overlap less. Last, change that line to the short name, `player.x = 80;`, and rerun: nothing changes, because `x` and `pos.x` are the same number.
 
 ---
 
@@ -61,6 +62,7 @@ function draw() {
 |------|---------|
 | **Property** | A named value attached to an object, accessed with dot notation (`player.color`). |
 | **`pos`** | An object holding the sprite's current centre. Read or set via `player.pos.x` / `player.pos.y`. |
+| **`x`, `y`** | Short names: `player.x` is `player.pos.x`, and `player.y` is `player.pos.y`. |
 | **`rotation`** | Clockwise tilt in degrees. `0` = upright; `90` = top edge points right. |
 | **`layer`** | Draw-order index. Higher value = drawn in front of lower-value sprites. |
 

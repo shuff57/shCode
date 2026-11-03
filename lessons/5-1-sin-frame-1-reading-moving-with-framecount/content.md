@@ -15,6 +15,7 @@ So far a sprite moved because you held a key, or because a velocity carried it o
 - `frameCount` is a counter moSHion keeps for you. It goes up by one every frame: `1` on the first frame, `2` on the next, and so on. At about 60 frames a second it reaches 60 after one second and 600 after ten.
 - `sin(n)` takes a number and gives back a number between `-1` and `1`. As `n` grows steadily, the answer glides up to `1`, back down through `0` to `-1`, and up again, over and over: a smooth wave.
 - moSHion's `sin()` counts in **radians**, not the degrees that `rotation` uses. You don't need radians here. Just know that the wave repeats each time the number inside `sin()` grows by about `6.28`.
+- `sin()` is moSHion's short name for JavaScript's own `Math.sin()`: both give exactly the same number. This course writes `sin()`, but `Math.sin()` works too if you meet it somewhere else.
 - Put the two together: `sin(frameCount * 0.05)` swings between `-1` and `1` all by itself, because `frameCount` never stops growing.
 
 **Try it:**
@@ -73,6 +74,7 @@ function setup() {
 
   mover = new Sprite(280, 120, 30, 30);
   mover.color = 'orange';
+  mover.collider = 'none';
 }
 
 function draw() {
@@ -86,7 +88,9 @@ function draw() {
 }
 ```
 
-**What you'll see:** the blue square moves left and right while you hold **a** or **d** and stops when you let go. The orange square bobs up and down on its own the whole time, whether you press a key or not.
+**What you'll see:** the blue square moves left and right while you hold **a** or **d** and stops when you let go. The orange square bobs up and down on its own the whole time, whether you press a key or not. Nothing stops the blue square at the edge, so if you hold a key for long it runs off the canvas: hold the other key to bring it back.
+
+**The new line, `mover.collider = 'none';`,** makes the orange square a sprite that does not bump into anything: the blue one passes straight through it. **Try this:** delete that line, rerun, and drive the blue square into the orange one. Now they crash: both get knocked crooked, and sometimes the orange square is shoved right off its path.
 
 ---
 
@@ -95,7 +99,8 @@ function draw() {
 | Term | Meaning |
 |------|---------|
 | **`frameCount`** | A counter moSHion keeps: `1` on the first frame, then one more every frame. |
-| **`sin(n)`** | Gives back a number between `-1` and `1`. As `n` grows, the answer swings smoothly back and forth. |
+| **`sin(n)`** | Gives back a number between `-1` and `1`. As `n` grows, the answer swings smoothly back and forth. The same as `Math.sin(n)`. |
 | **`cos(n)`** | The partner of `sin()`: the same wave, a quarter of a swing later. `sin` for x and `cos` for y makes a circle. |
 | **Radians** | The angle unit `sin()` and `cos()` use. The wave repeats every time the number inside grows by about `6.28`. |
 | **`rotationSpeed`** | How many degrees a sprite turns each frame. Set it once and the engine keeps it spinning. |
+| **`collider = 'none'`** | Makes a sprite that does not bump into anything: other sprites pass straight through it. |

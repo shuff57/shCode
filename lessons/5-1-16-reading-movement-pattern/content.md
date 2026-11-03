@@ -14,7 +14,7 @@ You know how to set `vel.x` to move a sprite, and you know `kb.pressing(key)` re
 
 - The pattern belongs in `draw()` because it runs once per frame: the only place you can react to live key input.
 - An `if / else if / else` chain means **exactly one branch runs** per frame: the left one, the right one, or the `else`. Because they are one chain, the final `else` runs only when **neither** key is held.
-- A velocity stays until your code changes it. So every frame that no key is held, something has to set it back to `0`, or the sprite keeps sliding after you let go. The `else` at the end of the chain is that line. With two separate `if` lines and no `else`, nothing ever sets it back. The next reading covers this in detail.
+- A velocity stays until your code changes it. So every frame that no key is held, something has to set it back to `0`, or the sprite keeps sliding after you let go. The `else` at the end of the chain is that line. With two separate `if` lines and no `else`, nothing ever sets it back. And an `else` belongs only to the `if` right above it, so it has to end the whole chain. The next reading covers both in detail.
 - Velocity values of 2–6 give good feel; the pattern works identically regardless of the specific number.
 
 **Try it:**

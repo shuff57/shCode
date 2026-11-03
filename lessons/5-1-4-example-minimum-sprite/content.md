@@ -2,7 +2,7 @@
 
 ## Step 1: Hit Run
 
-You'll see a dark canvas. A square appears in the middle, then more and more squares pile up and spread out until they cover the whole canvas. Step 2 explains why.
+You'll see a dark canvas with a pink square in the middle. Then more squares shove out from it in every direction, until the canvas is almost solid pink. Step 2 explains why.
 
 ```js live
 function setup() {
@@ -19,7 +19,7 @@ function draw() {
 
 **Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame**: 60 per second. If you run this for 5 seconds, 300 sprites exist. Every new one starts in the same spot, but sprites are solid and push each other apart, so the pile keeps spreading until the squares fill the canvas and spill off its edges.
 
-Let it run for a while. Squares keep piling up, and every frame adds one more sprite for the computer to move and draw, so a sketch left running long enough starts to slow down.
+Let it run for a while. The squares keep coming, and every frame adds one more sprite for the computer to move and draw, so a sketch left running long enough starts to slow down.
 
 ```js live
 function setup() {
