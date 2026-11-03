@@ -3,9 +3,9 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `d8068bb2438d62c4449d531f309e93eb5dabe1c3` (`d8068bb`), branch `main` (= `origin/main`) |
-| Commit date | 2026-11-02 |
-| Vendored | 2026-11-02 |
+| Commit | `f259b22ce679eaa778d400293b4a7301d1e46270` (`f259b22`), branch `main` (= `origin/main`) |
+| Commit date | 2026-11-03 |
+| Vendored | 2026-11-03 (the `f259b22` sound sync on top of `d8068bb`) |
 
 `main` now carries both the default-gravity-0 change (`91f7e6b`, vendored
 2026-11-01) and the math coordinates work on top of it (`4b36bef` engine,
@@ -30,12 +30,17 @@ the console, errors, audio log and every sprite's position at frames 60 and
 180 matched for every sketch. Gravity's own audit is in
 `codehs-review/loop/gravity-default-audit.md`.
 
+A later sync, 2026-11-03 (`f259b22`), adds the sound work. `loadSound('name')`
+looks a bare code-safe name up in the store under `sound:<name>` before using
+it as a URL; a path or a data: URI still bypasses the store. The 8-bit palette
+(`coin`, `music`, and the effect/menu cues) is upstream now too.
+
 ## Copied byte for byte from that commit
 
 - `planck.min.js` (unchanged by this sync)
-- `docs/moshion.d.ts` (`World.origin`, `showGrid`, `showMouse`, and the
-  "90 is down by default and up in math mode" notes), `docs/challenges.md`
-  (unchanged by this sync)
+- `docs/moshion.d.ts` (`World.origin`, `showGrid`, `showMouse`, the
+  "90 is down by default and up in math mode" notes, and the 2026-11-03
+  `loadSound` saved-name note), `docs/challenges.md` (unchanged by this sync)
 - `textures/*.png`, `textures/LICENSE.txt` (unchanged by this sync)
 - `assets/grass_tile.png`, `assets/ground_tile.png` and the other picture
   assets (unchanged by this sync)
@@ -46,17 +51,19 @@ the console, errors, audio log and every sprite's position at frames 60 and
   (it was near line 387 before this sync) returns `base: '/moshion/textures/'`
   here, `base: 'textures/'` in the repo. shCode serves the engine at
   `/moshion/`, so texture URLs need the absolute path. Re-apply this line
-  after every copy.
+  after every copy. The two sound comment blocks also name the shCode mixer and
+  `/moshion/assets/` here where the repo says "host page" and `/assets/`; the
+  code is identical.
 
 ## Kept as shCode's own (do not overwrite from the repo)
 
 - `assets/coin.wav`, `assets/music.wav`, and the 8-bit palette beside them
   (`jump`, `hit`, `laser`, `powerup`, `explode`, `blip`, `select`, `tone`,
-  `title`, `win`, `lose`). Generated in shCode; the repo's copies of the two
-  original files are silent. Since 2026-11-03 they are produced by
+  `title`, `win`, `lose`). Since upstream `f259b22` these are the SAME files
+  there, so a resync may copy them. They are generated in shCode by
   `node --import ./scripts/register-ts.mjs scripts/make-moshion-sounds.mjs`,
   which drives the vendored jsfxr and ZzFXM engines in `lib/sound/vendor/`
-  (Unlicense and MIT respectively). Do not copy the repo's over them.
+  (Unlicense and MIT respectively); re-run it only when the palette changes.
 - `runner.html`. The repo's runner takes the sketch over `postMessage`; this
   one reads `?code=<base64url>`, which is what `components/MoshionPreview.tsx`
   builds. Copying the repo runner without changing the host would leave every
@@ -80,8 +87,8 @@ the console, errors, audio log and every sprite's position at frames 60 and
 ## To resync
 
 1. Copy the files in the first two lists from the new commit, then re-apply
-   the `/moshion/textures/` line in `moshion.js`. Leave `coin.wav` and
-   `music.wav` alone.
+   the `/moshion/textures/` line in `moshion.js`. The WAV palette now matches
+   `f259b22`; copy it or leave it, the files are identical.
 2. Run `node --import ./scripts/register-ts.mjs scripts/check-moshion-textures.mjs`
    and `node --import ./scripts/register-ts.mjs scripts/test-moshion.mjs`.
 3. Update the commit, dates and lists in this file.
