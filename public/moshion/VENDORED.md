@@ -50,9 +50,13 @@ the console, errors, audio log and every sprite's position at frames 60 and
 
 ## Kept as shCode's own (do not overwrite from the repo)
 
-- `assets/coin.wav`, `assets/music.wav`. Generated stand-in tones made in
-  shCode on 2026-11-01 (commit `57e7af4b`); the repo's copies are silent.
-  Do not copy the repo's over them.
+- `assets/coin.wav`, `assets/music.wav`, and the 8-bit palette beside them
+  (`jump`, `hit`, `laser`, `powerup`, `explode`, `blip`, `select`, `tone`,
+  `title`, `win`, `lose`). Generated in shCode; the repo's copies of the two
+  original files are silent. Since 2026-11-03 they are produced by
+  `node --import ./scripts/register-ts.mjs scripts/make-moshion-sounds.mjs`,
+  which drives the vendored jsfxr and ZzFXM engines in `lib/sound/vendor/`
+  (Unlicense and MIT respectively). Do not copy the repo's over them.
 - `runner.html`. The repo's runner takes the sketch over `postMessage`; this
   one reads `?code=<base64url>`, which is what `components/MoshionPreview.tsx`
   builds. Copying the repo runner without changing the host would leave every

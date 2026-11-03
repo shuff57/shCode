@@ -61,6 +61,10 @@ export default function HeaderNav() {
             only from the docs: a page nothing navigates to is the failure
             check-reachable.mjs exists to catch. */}
         <Link href="/textures" style={itemStyle}>Textures</Link>
+        {/* The 8-bit sound mixer behind `loadSound('name')`. Link it beside
+            the texture editor for the same reason: a tool no page reaches is
+            a tool nobody finds. */}
+        <Link href="/sound" style={itemStyle}>Sounds</Link>
         {/* One Docs tab for the whole family — JavaScript, moSHion and reSHape
             each have a set inside, switched from the hub at /docs and from the
             family switcher on every docs page. */}

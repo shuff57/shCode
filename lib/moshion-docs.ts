@@ -1270,7 +1270,9 @@ function draw() {
         title: 'Sound',
         body: `loadSound('file.mp3') gives you a Sound. Call .play() for a one-off effect and .loop() for music that should keep going.
 
-moSHion ships two sounds you can load straight away, and the example uses both: '/moshion/assets/coin.wav' is a short chime and '/moshion/assets/music.wav' is a short tune. Type the path exactly as shown: a misspelled path shows no error, the sound just never plays.
+moSHion ships a small 8-bit palette you can load straight away: '/moshion/assets/coin.wav' is a short chime, '/moshion/assets/music.wav' is a short tune, and jump.wav, hit.wav, laser.wav, powerup.wav, explode.wav, blip.wav, select.wav and tone.wav sit in the same folder. Type the path exactly as shown: a misspelled path shows no error, the sound just never plays.
+
+The sound mixer at /sound (also the Sounds tab beside a moSHion lesson's code) builds a sound from a chip preset and saves it in this browser. Load a saved sound by name instead of by path: let zap = loadSound('zap');. A saved name wins over a built-in file with the same name.
 
 .play() starts a fresh copy every time it's called, so firing a laser three times in three frames gives you three overlapping shots rather than one restarting over and over. .loop() is the opposite — it's the single track you start once and stop later, and calling it again while it's already going does nothing.
 

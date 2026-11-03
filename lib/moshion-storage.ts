@@ -39,7 +39,41 @@ const KEY = 'moshion.store.v1';
 const MAX_VALUE_BYTES = 64 * 1024;
 const MAX_TOTAL_BYTES = 512 * 1024;
 
+// ---- saved sounds ---------------------------------------------------------
+//
+// The mixer (app/sound) saves a generated WAV here under `sound:<name>`, and
+// the preview bridge hands the sketch the same store. `loadSound('myZap')`
+// then resolves the name, with no upload and no API route -- the exact shape
+// saved textures already use.
+//
+// Audio is larger than pixel art, so sound keys get their own ceiling. Keeping
+// the two budgets separate is the important part: a few megabytes of music
+// must never be able to push out a student's lesson draft.
+const SOUND_PREFIX = 'sound:';
+// Metadata for reopening a sound in the mixer: preset/loop, volume, rate, pan.
+// Like `texmeta:`, it deliberately does not start with `sound:` so it never
+// lists as a sound.
+const SNDMETA_PREFIX = 'sndmeta:';
+const MAX_SOUND_VALUE_BYTES = 256 * 1024;
+const MAX_SOUND_TOTAL_BYTES = 2 * 1024 * 1024;
+
 type Store = Record<string, string>;
+
+function storeBytes(store: Store): { draft: number; sound: number } {
+  let draft = 0;
+  let sound = 0;
+  for (const [key, value] of Object.entries(store)) {
+    const bytes = key.length + value.length;
+    if (key.startsWith(SOUND_PREFIX)) sound += bytes;
+    else draft += bytes;
+  }
+  return { draft, sound };
+}
+
+function withinCaps(store: Store): boolean {
+  const { draft, sound } = storeBytes(store);
+  return draft <= MAX_TOTAL_BYTES && sound <= MAX_SOUND_TOTAL_BYTES;
+}
 
 function readStore(): Store {
   try {
@@ -54,9 +88,8 @@ function readStore(): Store {
 
 function writeStore(store: Store): void {
   try {
-    const raw = JSON.stringify(store);
-    if (raw.length > MAX_TOTAL_BYTES) return;
-    window.localStorage.setItem(KEY, raw);
+    if (!withinCaps(store)) return;
+    window.localStorage.setItem(KEY, JSON.stringify(store));
   } catch {
     /* quota, private mode -- the sketch keeps its in-frame copy either way */
   }
@@ -185,7 +218,7 @@ export function saveTexture(
     // still gets sliced into N pieces and only a sliver ever draws.
     delete next[TEXMETA_PREFIX + name];
   }
-  if (JSON.stringify(next).length > MAX_TOTAL_BYTES) {
+  if (!withinCaps(next)) {
     return 'Saved textures are full. Delete one before saving another.';
   }
   writeStore(next);
@@ -196,6 +229,138 @@ export function deleteSavedTexture(name: string): void {
   const store = readStore();
   delete store[TEXTURE_PREFIX + name];
   delete store[TEXMETA_PREFIX + name];
+  writeStore(store);
+}
+
+// ---- saved sounds ---------------------------------------------------------
+
+export type SavedSoundKind = 'sfx' | 'music';
+
+export interface SoundMeta {
+  kind: SavedSoundKind;
+  /** jsfxr preset name (sfx) or ZzFXM loop id (music). */
+  source: string;
+  volume?: number;
+  rate?: number;
+  pan?: number;
+  /**
+   * The full jsfxr definition for an effect, so the mixer can reopen it and
+   * keep tweaking. Music has no per-note definition here; its `source` names
+   * the loop. Older saves have no def and fall back to the preset.
+   */
+  def?: Record<string, unknown>;
+}
+
+export interface SavedSound extends Required<Omit<SoundMeta, 'def'>> {
+  name: string;
+  dataUri: string;
+  bytes: number;
+  /** Empty for music; a plain jsfxr definition for an effect. */
+  def: Record<string, unknown>;
+}
+
+const clamp01 = (n: unknown): number => Math.max(0, Math.min(1, Number(n) || 0));
+const clampRate = (n: unknown): number => Math.max(0.25, Math.min(4, Number(n) || 1));
+const clampPan = (n: unknown): number => Math.max(-1, Math.min(1, Number(n) || 0));
+
+function readSoundMeta(
+  store: Store,
+  name: string
+): Required<Omit<SoundMeta, 'def'>> & { def: Record<string, unknown> } {
+  const fallback = {
+    kind: 'sfx' as const,
+    source: 'pickupCoin',
+    volume: 1,
+    rate: 1,
+    pan: 0,
+    def: {} as Record<string, unknown>,
+  };
+  const raw = store[SNDMETA_PREFIX + name];
+  if (!raw) return fallback;
+  try {
+    const parsed = JSON.parse(raw);
+    // Older saves (and anything written through storeItem) are JSON-encoded
+    // twice; unwrap the second layer when it is a string.
+    const m = typeof parsed === 'string' ? JSON.parse(parsed) : parsed;
+    const def =
+      m?.def && typeof m.def === 'object' && !Array.isArray(m.def)
+        ? (m.def as Record<string, unknown>)
+        : {};
+    return {
+      kind: m?.kind === 'music' ? 'music' : 'sfx',
+      source: typeof m?.source === 'string' ? m.source : fallback.source,
+      volume: clamp01(m?.volume ?? 1),
+      rate: clampRate(m?.rate ?? 1),
+      pan: clampPan(m?.pan ?? 0),
+      def,
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+/** Every sound saved in this browser, sorted by name. */
+export function listSavedSounds(): SavedSound[] {
+  const store = readStore();
+  const out: SavedSound[] = [];
+  for (const key of Object.keys(store)) {
+    if (!key.startsWith(SOUND_PREFIX)) continue;
+    let dataUri: string;
+    try {
+      const parsed = JSON.parse(store[key]);
+      if (typeof parsed !== 'string') continue;
+      dataUri = parsed;
+    } catch {
+      continue; // not ours, or corrupted -- skip rather than throw
+    }
+    if (!dataUri.startsWith('data:audio/')) continue;
+    const name = key.slice(SOUND_PREFIX.length);
+    const meta = readSoundMeta(store, name);
+    out.push({ name, dataUri, bytes: store[key].length, ...meta });
+  }
+  return out.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Save one sound. Returns null on success, or a human-readable reason.
+ *
+ * The name becomes the argument a sketch writes: `loadSound('myZap')`. That
+ * is why it is restricted to a code-safe identifier, exactly as a texture
+ * name is.
+ */
+export function saveSound(name: string, dataUri: string, meta: SoundMeta): string | null {
+  if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(name)) {
+    return 'Name must start with a letter and contain only letters, digits and _ (it becomes a name in code).';
+  }
+  if (!dataUri.startsWith('data:audio/')) return 'That is not a sound.';
+  const encoded = JSON.stringify(dataUri);
+  if (encoded.length > MAX_SOUND_VALUE_BYTES) {
+    return `That sound is ${Math.round(encoded.length / 1024)} KB; the limit is ${Math.round(MAX_SOUND_VALUE_BYTES / 1024)} KB. Try a shorter version.`;
+  }
+  const store = readStore();
+  const next: Store = {
+    ...store,
+    [SOUND_PREFIX + name]: encoded,
+    [SNDMETA_PREFIX + name]: JSON.stringify({
+      kind: meta.kind,
+      source: meta.source,
+      volume: clamp01(meta.volume ?? 1),
+      rate: clampRate(meta.rate ?? 1),
+      pan: clampPan(meta.pan ?? 0),
+      def: meta.def && typeof meta.def === 'object' && !Array.isArray(meta.def) ? meta.def : {},
+    }),
+  };
+  if (!withinCaps(next)) {
+    return 'Saved sounds are full. Delete one before saving another.';
+  }
+  writeStore(next);
+  return null;
+}
+
+export function deleteSavedSound(name: string): void {
+  const store = readStore();
+  delete store[SOUND_PREFIX + name];
+  delete store[SNDMETA_PREFIX + name];
   writeStore(store);
 }
 
@@ -232,7 +397,8 @@ export function useMoshionStorage(ref: RefObject<HTMLIFrameElement | null>): voi
       if (d.op === 'remove') {
         delete store[d.key];
       } else if (d.op === 'set') {
-        if (typeof d.value !== 'string' || d.value.length > MAX_VALUE_BYTES) return;
+        const limit = d.key.startsWith(SOUND_PREFIX) ? MAX_SOUND_VALUE_BYTES : MAX_VALUE_BYTES;
+        if (typeof d.value !== 'string' || d.value.length > limit) return;
         store[d.key] = d.value;
       } else {
         return;

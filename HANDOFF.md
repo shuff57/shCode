@@ -1,4 +1,74 @@
-# 2026-10-30 (latest): 5.3 Pinball, 5.4 Flappy and 5.5 Snake are built; the CodeHS review is written up
+# 2026-11-03 (latest): the 8-bit sound mixer, and sounds saved by name
+
+**Branch `codehs-inspiration`.** `/sound` is now a tool page beside `/textures`:
+a multi-channel mixer that builds sound effects from jsfxr presets and music
+from ZzFXM loops, with mute/solo, volume, rate, pan, play-all, WAV downloads and
+a "copy `loadSound(...)`" snippet. It is linked from **Learn > Sounds**, sits as
+a **Sounds** tab in every moSHion lesson and in `/sandbox`, and is taught in
+6.11.1, 6.11.2 (Try 5) and 6.11.10 (an optional "make your own sound").
+
+The effect channels also have a **Tweak** panel over jsfxr's own parameters:
+wave shape, pitch, floor, slide, bend, vibrato, arpeggio, attack, sustain,
+decay, punch, duty, repeat, low/high pass and flanger, with Random, Mutate and
+Reset. The edited definition is what is rendered (`renderSfxDef`), and it is
+saved under `sndmeta:<name>.def`, so the library's **Edit** reopens the same
+knobs. The toolbar's **master** is this page's mix bus; it does not change a
+saved sound's own `.volume`.
+
+**Mic match.** Each effect channel also has a **Mic** panel. It records up to
+3 seconds with `MediaRecorder`, decodes it with the mixer's `AudioContext`, and
+`lib/sound/match.ts` fits pitch, envelope, waveform and brightness to the Tweak
+definition. This is local signal analysis, not a model call: nothing is
+uploaded, and the result is deliberately a starting point. The mapping is
+measured against the engine (`frequency = rate * (p^2 + 0.001) / 6.25`, an
+envelope stage lasts `p^2 * 2.2676 s`); wave shape comes from harmonic ratios,
+so a decaying sine is not mistaken for a saw. `scripts/test-sound-match.mjs`
+pins sine/square/saw/noise, rising/falling slides, a 6 Hz wobble and silence;
+`check-moshion-sounds.mjs` checks the mixer still wires `matchRecording` and
+`getUserMedia`. A fake-device Chrome run recorded, decoded and matched through
+the real UI ("Matched", then the Tweak panel opened).
+
+**The seam.** A saved sound is written to the same `moshion.store.v1` store as
+saved textures, under `sound:<name>` (metadata under `sndmeta:<name>`). The
+preview bridge already hydrates that store into the sandboxed iframe, and
+`public/moshion/moshion.js` now resolves a bare code-safe name in `loadSound()`
+through `_savedSoundSrc()`. A path (`/moshion/assets/coin.wav`) still bypasses
+the store. No API route and no upload. `lib/moshion-storage.ts` gives sound keys
+their own 256 KB per value / 2 MB total budget, separate from the 512 KB lesson
+draft budget, so a mix cannot evict a student's unsaved work.
+
+**The palette.** `scripts/make-moshion-sounds.mjs` regenerates 13 WAVs in
+`public/moshion/assets/` from `lib/sound/vendor/`: `coin` and `music` (the two
+the course already used; now real 8-bit audio, not the 2026-11-01 stand-in
+tones) plus `jump`, `hit`, `laser`, `powerup`, `explode`, `blip`, `select`,
+`tone`, `title`, `win`, `lose`. `music.wav` must stay 5.2-5.6 s: 6.11.10 slices
+it at `[0, 1.3, 2.6, 4, 5.3]`. Re-run the script and commit the WAVs whenever the
+palette changes; `check-moshion-sounds.mjs` (prebuild and `npm test`) checks
+that every file exists, is non-silent 8-bit PCM, and that `music.wav` still fits
+those slices.
+
+**The trap that cost a cycle: do not put a `package.json` declaring
+`"type": "commonjs"` in the jsfxr vendor folder.** Next's dev React Refresh
+loader injects `import.meta.webpackHot` into the modules it treats as ESM. The
+package.json made webpack parse the UMD files as CommonJS while the loader still
+injected `import.meta`, so `/sound` answered **500 "Cannot use 'import.meta'
+outside a module"**. The vendored files are `riffwave.cjs` and `sfxr.cjs`; the
+`.cjs` extension keeps them out of that loader. `check-moshion-sounds.mjs`
+asserts `sfxr.mjs` still imports the `.cjs` files.
+
+**Verified.** `test-moshion.mjs --corpus` 517/517; `tsc --noEmit`; the sound,
+texture, citation, reachability, hints, starters, docs-prose and live-block
+checks; and a real browser walk: Save on `/sound` wrote `sound:coin`, a 6.11.3
+sketch running `loadSound('coin')` reported `loaded true null 0.218625`, and the
+lesson's Sounds tab rendered the mixer. A production build reached static-page
+generation, then failed on an unrelated `content.md.tmp.<pid>...` ENOENT caused
+by **another Claude session (PID 17542) editing 5.1 lesson prose concurrently**;
+type-check, lint and webpack compilation had already passed. Re-run the build
+when no other session is writing lessons.
+
+---
+
+# 2026-10-30: 5.3 Pinball, 5.4 Flappy and 5.5 Snake are built; the CodeHS review is written up
 
 **Branch `codehs-inspiration`.** Built since the section below: `5.3 Project: Pinball` (10 screens,
 `6805ddf9`) and `5.4 Project: Flappy` (9 screens, `656d9dd2`), both in their own folder prefixes

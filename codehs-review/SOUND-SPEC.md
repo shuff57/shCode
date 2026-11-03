@@ -26,7 +26,9 @@ no written plan and no playtest screen (the brief: a concept module does not nee
 
 ---
 
-## 0. A blocking fact found while building: the course's two sound files are silent
+## 0. A blocking fact found while building: the course's two sound files were silent
+
+> **Update, 2026-11-03.** Resolved. `scripts/make-moshion-sounds.mjs` now generates `coin.wav` and `music.wav` — plus an 8-bit palette (`jump`, `hit`, `laser`, `powerup`, `explode`, `blip`, `select`, `tone`, `title`, `win`, `lose`) — from the vendored jsfxr and ZzFXM engines. The files are no longer silent, and the palette is reproducible. The history below is kept because it explains why the files are generated here rather than copied from the moSHion repo.
 
 `public/moshion/assets/coin.wav` (8,379 frames, 0.19 s) and `music.wav` (235,201 frames, 5.33 s) are valid 16-bit mono
 44.1 kHz WAV files whose every sample is **0**. Measured with Python's `wave` module (max 0, min 0, 0 non-zero samples)
