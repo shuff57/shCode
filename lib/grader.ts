@@ -1,4 +1,4 @@
-import type { Requirement } from './types';
+import type { Requirement, FunctionClause } from './types';
 import type { ModelDoc } from './model-types';
 import { checkModel, type Refusals } from './model-check';
 import type { TestRunResults } from './test-harness-source';
@@ -53,7 +53,7 @@ function readableSource(req: Requirement, raw: string): string {
 // or null if the function isn't found. Lets requirements scope a pattern
 // to e.g. draw()'s body instead of the whole file.
 function extractFunctionBody(src: string, name: string): string | null {
-  const re = new RegExp(`function\\s+${name}\\s*\\([^)]*\\)\\s*\\{`);
+  const re = new RegExp(`function\\s+${name.replace(/\$/g, '\\$')}\\s*\\([^)]*\\)\\s*\\{`);
   const m = src.match(re);
   if (!m || m.index === undefined) return null;
   let depth = 1;
@@ -90,20 +90,68 @@ function checkRegex(req: Requirement, files: Record<string, string>): boolean {
   return regex.test(content);
 }
 
-function checkInFunction(req: Requirement, files: Record<string, string>): boolean {
-  if (!req.pattern) return false; // same fail-closed reason as checkRegex
-  const raw = files[req.file || ''] || '';
-  const content = readableSource(req, raw);
-  const names = Array.isArray(req.function)
-    ? req.function
-    : [req.function || 'draw'];
+// `followCalls`: the bodies of the student's own functions that `bodies` call,
+// followed two calls deep (draw() -> helper -> helper). A call is `name(` not
+// after a dot (kb.pressing() is a method, not a helper) and not the `function
+// name(` of a declaration, where `function name(...) {` is declared in the file.
+// A helper that nothing calls is never read, so it cannot satisfy a card on its
+// own. Plain linear scans, one extract per declared name at most, so adversarial
+// text stays cheap (following calls inside one big regex took 20+ s).
+function calledHelperBodies(src: string, bodies: string[], seen: Set<string>): string[] {
+  const declared = new Set<string>();
+  for (const m of src.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g)) declared.add(m[1]);
+  const found: string[] = [];
+  let frontier = bodies;
+  for (let depth = 0; depth < 2 && frontier.length > 0; depth++) {
+    const next: string[] = [];
+    for (const body of frontier) {
+      for (const m of body.matchAll(/(^|[^\w$.])([A-Za-z_$][\w$]*)(?=\s*\()/g)) {
+        const name = m[2];
+        if (seen.has(name) || !declared.has(name)) continue;
+        const at = (m.index ?? 0) + m[1].length;
+        if (/\bfunction\s*$/.test(body.slice(Math.max(0, at - 20), at))) continue;
+        seen.add(name);
+        const helper = extractFunctionBody(src, name);
+        if (helper !== null) next.push(helper);
+      }
+    }
+    found.push(...next);
+    frontier = next;
+  }
+  return found;
+}
+
+// The text an inFunction pattern reads: the named functions' bodies, then (with
+// followCalls) the bodies of the helpers they call. Empty when none is declared.
+function functionBodies(content: string, fn: string | string[] | undefined, followCalls: boolean): string[] {
+  const names = Array.isArray(fn) ? fn : [fn || 'draw'];
   const bodies = names
     .map((n) => extractFunctionBody(content, n))
     .filter((b): b is string => b !== null);
+  if (!followCalls || bodies.length === 0) return bodies;
+  return [...bodies, ...calledHelperBodies(content, bodies, new Set(names))];
+}
+
+// One pattern tested on the bodies of some functions (and, with the
+// requirement's followCalls, the helpers they call). A clause may read strings
+// differently from its requirement: `ignoreStrings` on the clause wins.
+function clauseMatches(req: Requirement, raw: string, clause: FunctionClause): boolean {
+  if (!clause.pattern) return false;
+  const content = readableSource({ ...req, ignoreStrings: clause.ignoreStrings ?? req.ignoreStrings }, raw);
+  const bodies = functionBodies(content, clause.function, !!req.followCalls);
   if (bodies.length === 0) return false;
-  const combined = bodies.join('\n');
-  const regex = new RegExp(bindPattern(req.pattern || '', req, raw), req.flags ?? '');
-  return regex.test(combined);
+  return new RegExp(bindPattern(clause.pattern, req, raw), req.flags ?? '').test(bodies.join('\n'));
+}
+
+function checkInFunction(req: Requirement, files: Record<string, string>): boolean {
+  if (!req.pattern) return false; // same fail-closed reason as checkRegex
+  const raw = files[req.file || ''] || '';
+  // `orIn`: other places that also count ("a velocity set once in setup()").
+  const found = clauseMatches(req, raw, { function: req.function ?? 'draw', pattern: req.pattern })
+    || (req.orIn ?? []).some((c) => clauseMatches(req, raw, c));
+  if (!found) return false;
+  // `forbidIn`: places that must NOT have it ("made in setup() and never in draw()").
+  return !(req.forbidIn ?? []).some((c) => clauseMatches(req, raw, c));
 }
 
 // ---- Main grader ----
