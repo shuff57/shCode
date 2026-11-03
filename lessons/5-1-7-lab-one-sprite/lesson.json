@@ -84,5 +84,30 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.7 Exploration: Move, resize and recolor a sprite\". The task they were given: Start from a sketch that already works and change its numbers, one at a time: move the sprite away from the centre by changing the first two numbers in new Sprite(...), change its size with the last two numbers, and give it a colour other than tomato. There is no new code to write. What the starter file already had: a 360 by 360 canvas and one sprite made at x 180, y 180 (the centre), 60 wide and 60 tall, coloured 'tomato', and a dark background in draw(). Those starting values are not a change, so the starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: new Sprite(x, y, w, h): the first two numbers are the sprite's centre, x then y, and the last two are its width then its height. (0, 0) is the top-left corner, x grows to the right and y grows DOWN. A colour is a CSS colour name in quotes, such as 'gold', or a hex code such as '#ff0'. The sprite does not have to be stored in a variable: setting .color straight on new Sprite(...) works. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Moved the sprite",
+        "description": "The sprite no longer sits at the starter's 180, 180: at least one of the first two numbers in new Sprite(...) is different, so it is somewhere other than the centre. Any new position counts, even one near an edge. Moving it another way, such as setting its x or y on a later line, counts too. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Resized the sprite",
+        "description": "The sprite is no longer 60 by 60: at least one of the last two numbers (width, height) is different. Any new size counts. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Recolored the sprite",
+        "description": "The sprite's colour is set to something other than 'tomato': any colour name, hex code or other colour value the sketch can show counts. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      }
+    ]
   }
 }

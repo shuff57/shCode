@@ -53,5 +53,24 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.13 Lab: Reap the dead with filter\". The task they were given: Dead enemies stay in the enemies array, so the list never gets shorter and Space keeps hitting a corpse at the front. After the hit check and before the loop in draw(), build a new list that keeps only the enemies that are still alive, using filter, and store it back in enemies, so the count at the bottom goes 3, 2, 1, 0. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. Each enemy has isAlive(), true while its hp is above 0. filter builds a NEW array of the items whose test is true and does not change the old one, so its result has to be stored back in enemies or it is thrown away. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (isAlive) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. A loop that walks enemies from the end to the start and splices out each enemy that is not alive also shortens the list and counts as met on both criteria; say in the note that filter is the tool this lab practises. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A filtered list is stored back in enemies",
+        "description": "Every frame, filter runs on enemies and its result ends up in enemies again (enemies = enemies.filter(...), or kept in another variable first and then assigned to enemies). Calling enemies.filter(...) without storing the result is not met: nothing changes.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The test keeps the enemies that are still alive",
+        "description": "The test inside filter keeps the living, in any shape: it asks each enemy isAlive(), or keeps those whose hp is above 0 (an arrow with or without braces, a function with return, === true). A test that keeps the dead (such as !e.isAlive() or hp <= 0) is the opposite and not met.",
+        "points": 1
+      }
+    ]
   }
 }

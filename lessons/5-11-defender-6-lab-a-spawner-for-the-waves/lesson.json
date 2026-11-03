@@ -129,5 +129,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.6 Lab: A Spawner for the waves\". The task they were given: The waves move into a new Spawner class that keeps this.wave and this.pause. Write ready(enemiesLeft): answer false while enemiesLeft is above 0; otherwise count this.pause down by 1 and answer whether it has reached 0. Write makeWave(): add 1 to this.wave, set this.pause back to 90, work out the speed from this.wave, build the wave's enemies with new Enemy(...) into a new array in a loop, and return that array. In draw(), replace nextWave() with: when spawner.ready(...) says yes, enemies = spawner.makeWave(). In startRound(), the old wave lines become spawner = new Spawner(). Delete the old wave variables, spawnEnemy(), spawnWave() and nextWave(), and make the HUD in drawTop() read spawner.wave. Last, give Enemy a static spawned counter that starts at 0, add 1 to it in Enemy's constructor, set it back to 0 in startRound(), and show it on the game-over screen. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. In Part C each game object is a class instance that keeps its sprite in this.sprite, so a touch test names the sprites (this.sprite.overlaps(e.sprite)), not the objects. The game's classes have their own remove() that deletes the sprite. A finished object stays in its list until the clear-up at the end of the frame; filter returns a NEW array of the items whose test is true, so removing the finished sprites has to happen before the filter, or those sprites are left behind on screen. A static property belongs to the class and is reached as ClassName.name. return hands a value back to whoever called the method. A wave only arrives on a clear field, so putting the new array in enemies loses nothing. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (ready, makeWave, startRound, drawTop) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's ready() and makeWave() are empty and the old wave code is still there: missing on every criterion. The exact speeds, positions and wave size are asked by the steps but are not criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "ready() counts down only on a clear field",
+        "description": "ready(...) answers false while enemies are left (its parameter above 0, or enemies.length above 0) without touching this.pause, and only on a clear field takes 1 off this.pause and answers whether it has reached 0 (return this.pause <= 0, or an if that returns true, then false). A ready() that counts down while enemies are still on the field is not met, and so is one that can never return true.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "makeWave() builds and returns a new array of enemies",
+        "description": "makeWave() raises this.wave by 1, builds the wave's enemies with new Enemy(...) in a loop into a new array of any name, and RETURNS that array. A makeWave() that returns nothing is not met: enemies = spawner.makeWave() would then store undefined.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "draw() asks the spawner",
+        "description": "Every frame while playing, the game asks spawner.ready(...) with the number of enemies left and, when it answers yes, keeps what spawner.makeWave() gives back in enemies (enemies = spawner.makeWave(), or pushing its items into enemies). Calling makeWave() without keeping its result is not met: those enemies would never move or be hit. Calling makeWave() every frame without asking ready() is not met.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A restart is a new Spawner",
+        "description": "startRound() sets spawner = new Spawner(), so the wave number and the pause start again together. Making the Spawner only in setup() is not met: R would keep the old wave number.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The class counts its enemies, and a round resets the count",
+        "description": "Three parts: Enemy declares static spawned = 0 in its class body; its constructor adds 1 to Enemy.spawned (+= 1, ++, or this.constructor.spawned); and startRound() sets Enemy.spawned back to 0. this.spawned instead of Enemy.spawned is not met: that belongs to one enemy, not the class. Two of the three parts is partial.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The old wave globals are gone",
+        "description": "wavePause, spawnWave() and nextWave() no longer appear in running code (a mention in a comment is fine), and the HUD in drawTop() reads spawner.wave instead of the old wave. A drawTop() that still reads the bare wave is not met: once the old variable is gone it stops the game with 'wave is not defined'. A leftover nextWave() or spawnWave() that is still called is not met; one left defined but never called is partial.",
+        "points": 1
+      }
+    ]
   }
 }

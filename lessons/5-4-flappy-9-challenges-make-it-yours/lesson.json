@@ -47,5 +47,18 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.11 Challenges: Make it yours\". The task they were given: The Flappy game is complete. Change one rule: (1) harder as you go: the pipes get faster or the gap narrower as the score grows; (2) a best score: a second variable that is not reset when R is pressed, updated when the score beats it, and shown beside the score in drawTop(); or (3) a wobbling gap: each pipe wobbles up and down at a speed picked with random, turned the other way on a beat, with the top and bottom halves moving together. One of the three is enough. Step 2 also asks for a one-sentence // comment at the top naming the rule; no criterion checks that comment. You cannot run their code: read it and judge what it WOULD do when the sketch runs. makePipe() builds each pair and returns the top pipe (the bottom one is its mate); startRound() runs on R and resets the score; endRound() runs on a crash. y grows downward, so vel.y moves a pipe up or down. random(a, b) gives a number between a and b. A const can never be changed after it is made. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Read the whole sketch and look for any one of the three challenges, written any way: a speed or a gap size worked out from the score (in makePipe() or the loop), an if on the score that changes them, min or max used to cap the change, a best-style variable updated when the score beats it, or a vertical speed for each pipe picked with random. A rule of the student's own that changes how the game plays in the same way (it reads the score, or it moves the pipes with random) also counts. A purely cosmetic change (a colour, a fixed size) is not a rule, and neither is text that only prints the score. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Your rule is in the code",
+        "description": "At least one of: (1) something about the pipes, their speed or the gap, is worked out from the score, so the game gets harder as the score grows; (2) a best score that startRound() does not reset, updated when the score beats it (if (score > best), max(...), or similar), where showing it in drawTop() is what the challenge asks and is welcome; (3) each pipe gets a wobble speed from random, and the top and bottom halves move by the same amount. Missing: none of these is there, or the only change is how something looks. Help: 5.4.7 (Lab: Score a gap) and 5.4.6 (Lab: Pipes that come and go)",
+        "points": 1
+      }
+    ]
   }
 }

@@ -41,5 +41,18 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.9 Lab: Read a property\". The task they were given: A Box class is given, and b = new Box() is built in setup(); b has a color property ('red') and a size property (40). Inside draw(), call console.log to print b.color and b.size, once each, so both values appear in the on-canvas console. You cannot run their code: read it and judge what it WOULD do when the sketch runs. console.log in a moSHion sketch prints to the console under the canvas. draw() runs every frame, so a console.log there prints on every frame, which is expected here. Reading a property is the object, a dot and the property name: b.color. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. A label in the same call is fine (a word, then the property), and so are one console.log that prints both, or a template string that includes them. Printing a value typed in by hand ('red' or 40) does not read the property. The starter's fill(b.color) and square(..., b.size) lines are not console.log calls and do not count. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Read b.color and b.size with console.log",
+        "description": "console.log is called with b.color and with b.size (two calls, or one call holding both, with or without labels), inside draw() or a function it calls. Printing them in setup() also reads the properties and counts. Partial: only one of the two. Missing: no console.log reads them, or only typed-in values are printed. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      }
+    ]
   }
 }

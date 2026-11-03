@@ -109,5 +109,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.16 Your Turn: Fill in a Constructor\". The task they were given: The Message class is given with constructor(x, y, words) and an empty body. Inside the constructor, store each argument on this instance: the x argument as a property named x, y as y, and words as words. Then, in setup(), build two Message instances with new, with different values, and store them in first and second; draw() already shows each one's words at its x and y. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Inside a constructor, this is the new object being built; this.x = x stores the argument x on it as a property named x. draw() reads first.words, first.x and first.y, so the property names must be x, y and words. The parameter names are the student's choice; what matters is that each property gets the matching argument. Arguments in new Message(...) go in the order x, y, words. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. A line that stores a fixed value (a number typed in) instead of the argument, or a local variable (let or const) instead of a property on this, does not store the argument. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Constructor stores x",
+        "description": "Inside the constructor, the x argument (whatever that parameter is called) is stored on this as a property named x. Missing: no this.x line, or it is given a fixed value instead of the argument. Help: 5.6.5 (Reading: constructor and its parameters)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Constructor stores y",
+        "description": "Inside the constructor, the y argument (whatever that parameter is called) is stored on this as a property named y. Missing: no this.y line, or it is given a fixed value instead of the argument. Help: 5.6.5 (Reading: constructor and its parameters)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Constructor stores words",
+        "description": "Inside the constructor, the words argument (whatever that parameter is called) is stored on this as a property named words. Missing: no this.words line, or it is given a fixed value instead of the argument. Help: 5.6.5 (Reading: constructor and its parameters)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Two instances built",
+        "description": "At least two new Message(...) calls with arguments. Storing them in first and second is what step 4 asks, so that draw() can show them. Missing: fewer than two. Help: 5.6.6 (Worked Example: The parts of a class)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The two instances differ",
+        "description": "The two new Message(...) calls are not given exactly the same arguments: a different position or different words is enough. Missing: identical arguments. Help: 5.6.4 (Reading: The new operator)",
+        "points": 1
+      }
+    ]
   }
 }

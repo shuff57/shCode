@@ -110,5 +110,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.9.7 Lab: Hold the base, and start again\". The task they were given: The drone can land as often as it likes. In startRound(), give baseHp 3 at the start of every round. In moveDrone(), inside the if that sees the drone reach the base, take 1 off baseHp, and when baseHp is 0 or less set playing to false. In drawTop(), when the round is over (not playing), write Game over and press R to play again in the middle of the screen. In draw(), after the whole if (playing) { ... } block, start a new round when R is pressed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. startRound() is called by setup() and should also be called by the R key, so whatever it sets comes back on a restart. Everything that moves is inside if (playing) in draw(), so playing = false stops the game, and any key check written inside that block can never run once the round is over. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (startRound, moveDrone, drawTop, resetDrone) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter has only STEP comments where each piece goes: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Every round starts with base hp",
+        "description": "startRound() (or a function it calls) sets baseHp to 3, or any starting number above 0, or a named constant. Setting it only in setup() is not met: R would not give the hp back. Setting it in draw() is not met: it would refill every frame.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Reaching the base costs 1",
+        "description": "baseHp goes down by exactly 1 (-= 1, --, or = baseHp - 1) inside the if that sees the drone reach the base (in moveDrone(), or wherever the landing is checked each frame). Taking hp outside that if, on every frame, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "At 0 the round ends",
+        "description": "When baseHp reaches 0 or less (<= 0, === 0, or < 1), playing is set to false (an if, or playing = baseHp > 0). The check can sit in moveDrone(), draw() or another function that runs every frame. playing = false with no test on baseHp is not met.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Game over is written in drawTop when the round is over",
+        "description": "In drawTop() (or a function drawTop() calls), words that say the game is over are written only when the round is over (if (!playing), if (playing === false), or the else of if (playing)). Wording close to Game over is fine; the press R line is welcome but not needed for this card. Writing it in draw() instead is partial: words drawn there land under the sprites. Writing it with no check on playing, so it always shows, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "R starts a new round",
+        "description": "Something that runs every frame (draw(), outside if (playing) { ... }, or the else of it) calls startRound() when R is pressed (kb.presses('r'), either case), directly or through the student's own function that calls it. An R check inside if (playing) { ... } is not met: after Game over it never runs. Resetting a few values by hand instead of calling startRound() is partial.",
+        "points": 1
+      }
+    ]
   }
 }

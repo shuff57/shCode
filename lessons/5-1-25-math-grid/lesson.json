@@ -114,5 +114,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.25 Lab: A grid like math (optional)\". The task they were given: An optional lab. In draw(), after the background, call showGrid(50) to draw a grid. In setup(), on the line right after new Canvas(400, 400), switch on math mode with world.origin set to 'math', so (0, 0) is the centre and y grows up. Below that, still in setup(), make a sprite at (100, 50), 40 by 40, and store it in box. In draw(), call showMouse() so the pointer's (x, y) shows beside it. What the starter file already had: `let box;` at the top, a 400 by 400 canvas in setup(), and background('#222') in draw(), with step comments and nothing else. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: showGrid(spacing) and showMouse() draw for one frame at a time, so they belong in draw(), which runs every frame; called only in setup() they show for one frame and vanish. world.origin can only be 'screen' (the default: (0, 0) at the top-left, y grows down) or 'math' ((0, 0) at the centre, y grows up). Setting it after a sprite has been made, after gravity has been turned on, or once frames have run stops the sketch with an error that says to move the line up. In math mode a positive y is above the centre. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Draw the grid",
+        "description": "showGrid(...) is called inside draw(), with any spacing (the lab uses 50). A call only in setup() shows for one frame and vanishes, so it is not met.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Switch on math mode",
+        "description": "world.origin is set to the word math in quotes (single, double or backticks), before any sprite is made, normally right after new Canvas(...) in setup(). If it comes after a sprite is made, the sketch would stop with an error, so that is not met yet.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A sprite above the centre",
+        "description": "A sprite is made with new Sprite(...) whose second number, its y, is above 0, such as the lab's (100, 50). In math mode a positive y is above the centre. Any positive y and any x count, and storing it in box is what the step asks but is not needed for this card. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Show the mouse",
+        "description": "showMouse() is called inside draw(), so the pointer's (x, y) is written beside it every frame.",
+        "points": 1
+      }
+    ]
   }
 }

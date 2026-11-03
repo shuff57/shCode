@@ -62,5 +62,24 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.16 Lab: Count your spawns\". The task they were given: The scene prints Enemy.spawned, which says undefined because nothing declares it. Inside the class body, above the constructor, declare a static property named spawned that starts at 0; then, at the end of the constructor, add 1 to the class's counter, so every enemy ever built is counted. Each click builds one enemy. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. A property declared with static in the class body belongs to the class and is reached as Enemy.spawned. this.spawned would be a property of one enemy, which is the thing this lab is avoiding. mouse.presses() builds a new Enemy once per click. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The counter's name has to be spawned, because the scene's text line reads Enemy.spawned, unless the student also changed that line to their own name. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A static counter named spawned is declared",
+        "description": "The class body declares static spawned and starts it at 0. Writing Enemy.spawned = 0 once, outside the class and outside draw(), is the same class-level counter and also counts. A this.spawned set in the constructor is not met: that belongs to one enemy, not to the class. Setting the counter to 0 inside draw() is not met: it would be wiped every frame.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The constructor counts every new enemy",
+        "description": "Inside the constructor, the CLASS counter goes up by 1: Enemy.spawned += 1, Enemy.spawned++, Enemy.spawned = Enemy.spawned + 1, or this.constructor.spawned += 1. this.spawned += 1 is not met: it changes the one new enemy, not the class's count. Counting in draw() beside the push instead of in the constructor is partial: it only counts enemies built in that one place.",
+        "points": 1
+      }
+    ]
   }
 }

@@ -122,5 +122,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.8 Lab: Crash, and start again\". The task they were given: Touching a pipe ends the round. Add a playing flag that starts true. Inside the pipe loop, when bird.colliding(p) or bird.colliding(p.mate) is true, set playing to false and freeze the world: gravity to 0, the bird's vel.y to 0, and every pipe's and mate's vel.x to 0. Wrap the play code in draw() (the flap, the edge check, the new pipes on the beat and both pipe loops) in if (playing) { ... }, and draw 'Game over' in drawTop() when the round is over. When R is pressed (outside that if), delete every pipe and empty the array, reset the bird's position and speed, turn gravity back on, zero the score and set playing back to true. You cannot run their code: read it and judge what it WOULD do when the sketch runs. bird.colliding(other) is true on every frame the two sprites touch, and p.colliding(bird) is the same test. drawTop() runs after the sprites are drawn, so words there are never hidden by a pipe. kb.presses('r') and kb.presses('R') are the same key. Code inside if (playing) stops running once playing is false, so an R check placed inside it can never run after a crash. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. These shapes all express the same ideas and all count: a gameOver flag that starts false and becomes true; the crash and restart code moved into helper functions (endRound(), startRound() or any names) called from the right place; an early return from draw() while the round is over; if (!playing) with the play code in its else. If the R check sits inside the if (playing) block, the restart criterion is partial and the note should say why. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A flag says whether the game is being played",
+        "description": "A variable that holds the game's state and starts out saying the round is on: playing = true (in setup() or where it is declared), or a game-over flag that starts false and is set true on a crash. Missing: no such variable. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Touching a pipe ends the round",
+        "description": "A collision test between the bird and a pipe (bird.colliding(p), p.colliding(bird), and the mate the same way) that flips the flag (playing = false, or the game-over flag = true), directly or through a function it calls. Testing both halves, p and p.mate, is what step 1 asks and is welcome; a test that reaches the pipe sprites and flips the flag counts here. Missing: no collision test changes the flag. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The crash freezes the world",
+        "description": "When the round ends (in the crash code, a function it calls, or code that runs while the flag says the round is over), gravity is set to 0 AND the pipes stop: each pipe's vel.x, and its mate's, set to 0, usually in a loop over pipes. The starter's bird.vel.x = 0 line does not count: it is the pipes that must stop. Setting the bird's vel.y to 0 too is what step 2 asks and is welcome. Partial: only the gravity, or only the pipes. Help: 5.4.5 (Reading: A world that scrolls)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The game runs only while the flag is true",
+        "description": "The code that builds new pipes on the beat (the frameCount % ... test) runs only while the round is on: inside if (playing) { ... }, in the else of if (!playing), after an early return while the round is over, or with the flag joined to the beat test by &&. Putting the flap, the edge check and the pipe loops inside it as well is what step 3 asks and is welcome. Missing: new pipes still arrive after a crash. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Game over shows when the round ends",
+        "description": "When the flag says the round is over (if (!playing), playing === false, an else after if (playing), or if (gameOver)), text(...) draws a message that says the round ended: 'Game over' in any capitals, or other words that clearly mean it. Drawing it in drawTop() is what step 3 asks; in draw() it still counts here. Missing: no message, or one that shows while the game is being played. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The restart clears the pipes",
+        "description": "Pressing R (kb.presses('r') or 'R'), directly or through a function it calls such as startRound(), empties the pipes array: pipes = [], pipes.length = 0, pipes.splice(0), or a loop that pops or splices every pipe. Deleting each pipe and its mate first is what step 4 asks and is welcome. Partial: the sprites are deleted but the array is never emptied, or the R check sits inside if (playing) and can never run after a crash. Missing: no R check, or R does not touch the pipes. Help: 5.4.5 (Reading: A world that scrolls)",
+        "points": 1
+      }
+    ]
   }
 }

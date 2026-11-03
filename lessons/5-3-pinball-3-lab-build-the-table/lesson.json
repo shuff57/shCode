@@ -98,5 +98,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.4 Lab: Build the table\". The task they were given: Build the pinball table in setup(): turn gravity on so the ball falls; build at least three static obstacles that do not fall, storing at least one in a named variable; build the ball as a circle (one size number) starting at (70, 60), with a colour and a bounciness above 0.5; and add a gold block with the same static body type, stored in goal, where the ball really goes. The score is drawn but does not change yet. What the starter file already had: a 400 by 400 canvas, `let ball, goal, score;`, score set to 0, and a draw() that shows the score and puts the ball back at (70, 60) when R is pressed. There is no gravity, no obstacle, no ball and no goal yet, so the starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Gravity is on",
+        "description": "world.gravity.y is set to a positive number (directly or through a variable), so the ball falls down the screen. 0 is not on. A negative number would send the ball up the screen, the opposite of falling, so it is not met. Help: 5.2.6 (Reading: Gravity)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "At least three obstacles stay put",
+        "description": "Three or more sprites are static (made with 'static', or given .collider = 'static'), so they do not fall. Walls, a ground, bumpers and ramps all count, in any shapes, sizes and places. Help: 5.2.6 (Reading: Gravity)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The ball is genuinely bouncy",
+        "description": "The ball's bounciness is set to 0.5 or more (directly or through a variable), so it keeps most of its speed. A value under 0.5 is not met yet. Help: 5.2.11 (Reading: Bounciness and Friction)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A goal is on the table",
+        "description": "A static sprite (made with 'static', or given .collider = 'static') is stored in goal, in a colour the player can see: gold is what the step asks, but any visible colour counts, and so does leaving the default colour. A goal that is not static would fall with gravity, so it is not met yet. Help: 5.3.3 (Worked Example: The table and the goal)",
+        "points": 1
+      }
+    ]
   }
 }

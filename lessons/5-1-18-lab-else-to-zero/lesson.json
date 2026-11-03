@@ -91,5 +91,30 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.19 Lab: Delete the else, watch drift\". The task they were given: The starter ships a working WASD movement pattern in draw(): for each direction, an if / else if chain sets player.vel.x (or player.vel.y) from the keys and ends in an else that sets it back to 0. The student deletes both else lines, watches the sprite drift, then puts both else lines back so the sprite stops when no key is held, and changes the speed of 4 (and -4) to a speed of their own, from 2 to 6. What the starter file already had: exactly that working pattern, with a speed of 4 on every movement line. Because the starter already has both else lines, the first two criteria read as met on the starter; the speed criterion is the one the starter does not meet. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: kb.pressing('a') is true on every frame the key is held. vel.x and vel.y are the sprite's speed in pixels per frame, and a sprite keeps its velocity until code changes it, which is why it drifts when nothing sets the speed back to 0. y grows downward, so a negative vel.y moves up. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Restore else player.vel.x = 0",
+        "description": "In draw(), when neither the left nor the right key is held, player.vel.x is set back to 0, so the sprite stops sideways. The else at the end of the chain is the shape the lab uses (with or without braces); any other way that sets vel.x to 0 whenever no left or right key is held also counts. Help: 5.1.18 (The else-to-zero rule)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Restore else player.vel.y = 0",
+        "description": "In draw(), when neither the up nor the down key is held, player.vel.y is set back to 0, so the sprite stops up and down. The else at the end of the chain is the shape the lab uses (with or without braces); any other way that sets vel.y to 0 whenever no up or down key is held also counts. Help: 5.1.18 (The else-to-zero rule)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A speed of your own",
+        "description": "At least one movement line in draw() sets player.vel.x or player.vel.y to a speed other than 4 (or -4), so the sprite moves at a speed the student chose. 5.1.17 suggests 2 to 6, but any other speed that moves the sprite counts, including a decimal or a variable holding the speed. The lines that set the speed back to 0 are not a speed. If every movement line still uses 4, it is not met yet. Help: 5.1.17 (Movement pattern (if / else if / else))",
+        "points": 1
+      }
+    ]
   }
 }

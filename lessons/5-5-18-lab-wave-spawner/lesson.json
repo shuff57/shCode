@@ -94,5 +94,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.18 Lab: Build a wave\". The task they were given: draw() has three empty steps. First, when the field is clear, send a wave of three new enemies (at x = 90, 260 and 430, all at y = 100), but only on a frameCount timer, not on every frame. Second, Space knocks one hp off the first enemy in the list, and does nothing when the list is empty. Third, keep only the enemies that are still alive, storing the filtered list back in enemies. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. frameCount starts at 0 and goes up by 1 every frame, so frameCount % 90 === 0 is true once every 90 frames, while frameCount === 90 is true on one frame only, ever. Each enemy has takeHit(n) and isAlive(). Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit, isAlive) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. Step two (Space hits the first enemy) has no criterion; do not mark anything down for it. The exact x and y numbers are not a criterion either. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A wave only arrives on a timer",
+        "description": "The check that sends a wave is a repeating timer: frameCount with % and any number of frames (or a named constant), so it is true once every N frames rather than on every frame. A counter of the student's own that rises every frame, sends the wave and starts again also counts. frameCount === N (true on one frame ever) is not met, and neither is a wave sent with no timer at all.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A wave only arrives when the field is clear",
+        "description": "The same spawn check also asks that the enemies list is empty (enemies.length === 0, < 1, or !enemies.length), joined to the timer with && or by putting one if inside the other, so a new group waits until the last one is cleared. A length check that does not stop the spawn is not met.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "New enemies are pushed onto the list",
+        "description": "Each arriving enemy is a new Enemy(...) put into the enemies array: separate pushes, one push with three arguments, a loop that pushes, or enemies = [new Enemy(...), ...] all count. Enemies built but never put in enemies are not met: the scene would never hit, count or reap them.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The dead are filtered out",
+        "description": "Every frame the list is rebuilt from the living and stored back into enemies (enemies = enemies.filter(...) with a test that keeps isAlive() or hp above 0, in any shape). A filter whose result is not stored, or whose test keeps the dead, is not met. A loop from the end to the start that splices out each dead enemy also counts; say filter is the shape this lab practises.",
+        "points": 1
+      }
+    ]
   }
 }

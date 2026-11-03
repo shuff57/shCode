@@ -92,5 +92,30 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.9 Lab: Sound effects\". The task they were given: The game is the 5.11.6 game with no sound. Make two sound variables and, in setup(), load each with loadSound and one of the course's two files, '/moshion/assets/coin.wav' or '/moshion/assets/music.wav' (volume and rate can be changed). Play one sound once for every shot, as the last line of Bullet's constructor; and in Enemy's takeHit(n), after the hp line, play the other only when that hit leaves the enemy not alive. A mute key with masterVolume() is optional and has no criterion. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. In Part C each game object is a class instance that keeps its sprite in this.sprite, so a touch test names the sprites (this.sprite.overlaps(e.sprite)), not the objects. The game's classes have their own remove() that deletes the sprite. A finished object stays in its list until the clear-up at the end of the frame; filter returns a NEW array of the items whose test is true, so removing the finished sprites has to happen before the filter, or those sprites are left behind on screen. A static property belongs to the class and is reached as ClassName.name. loadSound(path) starts a download and gives back a Sound; a .play() before the download finishes does nothing, so a sound is loaded once, in setup(), never in draw() or a constructor. A misspelled path gives no error: the sound just never plays. sound.play() plays it once from the start. Bullet's constructor runs once per shot and takeHit runs once per hit, while draw() and isAlive() run many times a second, so a .play() there would repeat. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit, isAlive) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter makes no sound at all: missing on every criterion. Any variable names for the sounds are fine. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Sounds are loaded once, in setup()",
+        "description": "setup() (or a line at the top of the file, outside every function, which also runs once) stores loadSound('/moshion/assets/coin.wav') or loadSound('/moshion/assets/music.wav') in a variable, with single or double quotes. A path spelled any other way is not met: it never plays. Loading inside draw(), a constructor or takeHit is not met: it downloads again every time and is never ready in time.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A shot makes a sound",
+        "description": "A sound's .play() runs once for every shot: as a line in Bullet's constructor, or right beside new Bullet(...) inside the if in fire() that makes the shot. A .play() in draw(), or under a check that stays true for many frames, is not met: it would play over and over.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A finished enemy makes a sound",
+        "description": "A sound's .play() runs on the hit that finishes an enemy: in Enemy's takeHit() under an if that asks !this.isAlive() or this.hp <= 0 (or after an early return while the enemy is still alive), or in hitEnemies() inside the if that sees the enemy is no longer alive. A .play() inside isAlive() is not met: isAlive() is asked many times a frame. A .play() on every hit with no check is partial: it also plays on hits that do not finish the enemy.",
+        "points": 1
+      }
+    ]
   }
 }

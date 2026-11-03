@@ -129,5 +129,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.5 Lab: Bullet, and a hit that takes an enemy\". The task they were given: Shots become Bullet objects. In the Bullet class write isAlive() (true while this.spent is false AND this.sprite.y is more than -20), hits(enemy) (true when this shot is alive, that enemy is alive, and this sprite overlaps the enemy's sprite; it answers the question and changes nothing) and spend() (sets this.spent to true). Make fire() push a new Bullet built just above the ship onto bullets, and make moveBullets() just ask every shot to move(). Rewrite hitEnemies() as every shot against every enemy: if the shot hits the enemy, spend the shot, call takeHit(1) on the enemy and, when that leaves it not alive, add its worth to score, with no splice and no break. Rename clearEnemies() to clearFinished() and give it the same two parts for bullets (remove() the finished ones, then filter the living into bullets), above the part for enemies; startRound() calls remove() on each shot. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. In Part C each game object is a class instance that keeps its sprite in this.sprite, so a touch test names the sprites (this.sprite.overlaps(e.sprite)), not the objects. The game's classes have their own remove() that deletes the sprite. A finished object stays in its list until the clear-up at the end of the frame; filter returns a NEW array of the items whose test is true, so removing the finished sprites has to happen before the filter, or those sprites are left behind on screen. A static property belongs to the class and is reached as ClassName.name. A spent shot is no longer alive, so hits() answers false for every enemy after the one it hit; that is why the hit loop needs no splice and no break any more. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (isAlive, hits, spend, move, remove, fire, hitEnemies, takeHit) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's three Bullet methods are empty and fire() still pushes a bare sprite: missing on every criterion. for...of loops and index loops are equally fine. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A bullet is alive while not spent and on screen",
+        "description": "Bullet's isAlive() returns true only while the shot is not spent (!this.spent, or this.spent === false) AND its sprite's y is above the top edge (this.sprite.y > -20, or another value near 0), joined with && or written as ifs that return false for either case. Checking only one of the two is not met: a spent shot would keep hitting, or a shot off the top would never be cleared.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "hits(enemy) asks about the other object's sprite",
+        "description": "hits(...) returns whether this shot's sprite overlaps the sprite of the enemy passed in (parameter any name), and only while both this shot and that enemy are alive. It answers: calling takeHit inside hits() is not met. Testing the enemy object instead of its sprite is not met: no hit would be seen. Leaving out the alive checks is partial: a spent shot could hit again.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "spend() marks the shot used",
+        "description": "spend() sets this.spent to true. A spend() that deletes or splices instead, leaving spent false, is not met: isAlive() reads spent.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "fire() builds a Bullet",
+        "description": "fire() makes each shot with new Bullet(...) and puts it into bullets (bullets.push(new Bullet(...)), or a variable that is then pushed). A Bullet built but never pushed is not met: it is never moved or seen. Still pushing a bare new Sprite is not met.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The hit loop asks the bullet",
+        "description": "hitEnemies() asks a shot .hits(...) about an enemy and, when the answer is yes, calls .spend() on that shot. Testing the overlap by hand in hitEnemies() instead of asking hits() is partial.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Finished shots leave the screen and the list",
+        "description": "Once a frame (clearFinished() or a function like it that draw() calls while playing), every finished shot's sprite is removed (b.remove(), or b.sprite.delete()) and then the finished shots are dropped from bullets (bullets = bullets.filter(...) keeping the living), in that order. A loop from the end to the start that removes and splices each finished shot is met too. Filtering first is not met: the sprites stay on screen. No clear-up for shots at all is not met.",
+        "points": 1
+      }
+    ]
   }
 }

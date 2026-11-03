@@ -40,5 +40,18 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.3 Lab: Method with no params\". The task they were given: A Counter class stores this.n = 0. Inside the class body, after the constructor, write a tick() method that adds 1 to this.n. The driver in draw() already calls c.tick() when space is pressed and shows c.n on screen. You cannot run their code: read it and judge what it WOULD do when the sketch runs. A method is written inside the class body as name() { ... }, with no word function in front. Inside a method, this is the object the method was called on, so this.n is that counter's count. The driver calls c.tick(), so the method must be named tick; draw() shows c.n, so this.n is what must change. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. this.n += 1, this.n++, ++this.n and this.n = this.n + 1 all add 1. A function tick() written outside the class is not a method of Counter, so c.tick() would fail. n += 1 without this. changes no counter. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "tick() method increments this.n",
+        "description": "Inside the Counter class there is a tick() method whose body adds 1 to this.n (+=, ++, or this.n = this.n + 1). Partial: it changes a different property, or adds something other than 1. Missing: no tick method inside the class, or its body does not change this.n. Help: 5.7.1 (Methods: functions that live on a class)",
+        "points": 1
+      }
+    ]
   }
 }

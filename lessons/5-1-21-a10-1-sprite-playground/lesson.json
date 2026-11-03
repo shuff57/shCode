@@ -159,5 +159,60 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.22 Sprite Playground\". The task they were given: Make a canvas (any size from 300 by 300 to 800 by 600) and two sprites: player, which the keys control, and mover, which moves on its own. In draw(): paint the background every frame; move the player with kb.pressing and WASD or the arrow keys by setting its velocity, with an else that sets the velocity back to 0 when no key is held; make the mover move on its own using frameCount (any pattern: swing back and forth, orbit or spin); and draw a text label on the canvas with fill(), textSize() and text(). What the starter file already had: `let player, mover;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame (update(), if the student writes one, also runs every frame). frameCount is the number of frames since the sketch started, so anything worked out from it changes every frame; sin() and cos() of a small number times frameCount swing between -1 and 1. kb.pressing(key) is true on every frame the key is held. vel.x and vel.y are speed in pixels per frame, and y grows downward. text(words, x, y) draws words on the canvas; fill() sets their colour and textSize() their size. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Create a canvas",
+        "description": "new Canvas(...) is called when the sketch starts, normally in setup(). Any size counts; the step suggests 300 by 300 up to 800 by 600, and a size a little outside that is close enough. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Create at least 2 sprites",
+        "description": "Two or more sprites are made with new Sprite(...), normally in setup(): one for the player and one for the mover. Any names, positions and sizes count. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Horizontal keyboard input",
+        "description": "In draw() (or update()), a left or right key is read with kb.pressing(...) ('a', 'd', 'left', 'right' or another spelling of the arrow keys) and moves the player sideways. Help: 5.1.14 (Key names: WASD and the arrow keys)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Vertical keyboard input",
+        "description": "In draw() (or update()), an up or down key is read with kb.pressing(...) ('w', 's', 'up', 'down' or another spelling of the arrow keys) and moves the player up or down. Help: 5.1.14 (Key names: WASD and the arrow keys)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Velocity resets to zero",
+        "description": "When no movement key is held, the player's vel.x or vel.y (one or both) is set back to 0, so the player stops. An else at the end of the key chain is the course's shape (with or without braces); any other way that sets it to 0 when no key is held also counts. Help: 5.1.18 (The else-to-zero rule)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Automatic motion for the mover",
+        "description": "The mover changes every frame with no key held. The step asks for frameCount, such as the mover's x, y or rotation worked out from frameCount (with or without sin() or cos()); any other honest way that keeps it moving on its own also counts, such as adding a little to its x or rotation every frame in draw(), or giving it a velocity that nothing stops. A mover that only moves while a key is held, or that never moves, is not met. Help: 5.1.15 (Worked Example: Keyboard Movement)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "On-screen text label",
+        "description": "text(...) is called inside draw() with any words or value, so a label shows on the canvas. fill() and textSize() help it show but are not needed for this card. A text() call only in setup() is wiped by the next background(), so it is not met. Help: 5.1.21 (Words on the canvas: text())",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "Clear the background each frame",
+        "description": "background(...) is called inside draw(), with any colour, so previous frames do not stack up. Help: 5.1.9 (background(color) wipe rule)",
+        "points": 1
+      }
+    ]
   }
 }

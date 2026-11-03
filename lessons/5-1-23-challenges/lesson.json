@@ -101,5 +101,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.24 Challenges\". The task they were given: In setup(), make a canvas of any size and at least one sprite, the player. Call background() as the first line of draw(). Then build at least one of five challenges in draw(): (1) while an arrow key is held, the player wears a different colour; (2) a second sprite circles the player, placed with cos and sin of frameCount; (3) one of the player's values is drawn on the canvas with text(); (4) a HUD at the top shows the frame count on one line and the player's x and y on the next; (5) a sprite bobs up and down on its own, placed with sin of frameCount. The starter's comments also suggest moving the player with the keys, but that is not one of the challenges. What the starter file already had: a setup() with only comments (no canvas, no sprite) and a draw() that already calls background('#222') followed by step comments. There is no `let player;` line in the starter, so the student may add their own variables. On the starter only the background criterion is met. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame (update() too, if the student writes one). kb.pressing(key) is true on every frame a key is held; kb.presses(key) only on the frame it goes down. frameCount counts the frames since the start; sin() and cos() of a small number times frameCount swing between -1 and 1, so multiplying by 60 or 80 gives a swing that many pixels wide. A sprite's position can be read and set as x and y or as pos.x and pos.y. text(words, x, y) draws on the canvas, and words and a number join with +. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Create a canvas",
+        "description": "new Canvas(...) is called when the sketch starts, normally in setup(). Any size counts. The starter has no canvas, so this is not met until the student adds one. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Create at least one sprite",
+        "description": "At least one sprite is made with new Sprite(...), normally in setup(). Any name, position and size count. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Background set each frame",
+        "description": "background(...) is called inside draw(), with any colour. The starter already has this line, so it stays met unless it was deleted or moved out of draw(). Help: 5.1.9 (background(color) wipe rule)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Use at least one advanced feature",
+        "description": "At least one of the five challenges is built and would really run in draw() (or update()): a held key changes the player's colour; a second sprite is placed around the player with cos and sin; a value is drawn with text(); a HUD of text() lines; or a sprite is moved up and down with sin. Other honest extras beyond a canvas, a sprite and a background also count, such as using the mouse's position, kb.presses(...), or a timer built from frameCount. Moving the player with the keys on its own is the earlier lab's job, not a challenge, so that alone is not met yet.",
+        "points": 1
+      }
+    ]
   }
 }

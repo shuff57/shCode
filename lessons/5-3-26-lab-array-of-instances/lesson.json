@@ -40,5 +40,18 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.13 Lab: An array of Enemies\". The task they were given: An Enemy class is given and enemies starts as an empty array. In setup(), call enemies.push(new Enemy(...)) five times with different x positions, so enemies.length is 5 and five red squares appear; draw() already loops over enemies and renders each one. You cannot run their code: read it and judge what it WOULD do when the sketch runs. push adds one item to the end of an array. Each new Enemy(...) builds one enemy with its own sprite. draw() only renders what is in enemies, so an enemy kept in a separate variable is never rendered. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Five push lines, a for or while loop that pushes once per pass and runs five times, or an Enemy stored in a variable and then pushed all count. Writing the array out with five new Enemy(...) calls inside the brackets also puts five enemies in the one array and counts. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "enemies.push(new Enemy(...)) used at least once",
+        "description": "Five Enemy objects end up in the enemies array: pushed one by one, pushed in a loop that runs five times, or built straight into the array. Partial: fewer than five go in. Missing: no Enemy ever goes into enemies (for example, five separate variables instead). Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      }
+    ]
   }
 }

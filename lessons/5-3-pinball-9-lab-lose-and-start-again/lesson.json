@@ -89,5 +89,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.10 Lab: Lose, and start again\". The task they were given: Give the game an end. Add a flag variable that says whether the game is being played, starting at true and created once (next to score, not every frame). In draw(), when the ball has fallen past the bottom of the canvas, set the flag to false. When the flag is false, draw 'Game over' and the final score instead of the play area. When R is pressed, set the flag back to true and put the score back to 0, as well as putting the ball back. What the starter file already had: the table, the goal scoring once per touch with a wasTouching memory, and an R key that puts the ball back at the top but leaves the score alone. There is no game-state flag yet: wasTouching is the goal's touch memory, not the state of the game. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame, so a variable given its starting value at the top of draw() is reset on every frame. The canvas is 400 tall and y grows downward, so a ball past the bottom has a y above 400 (height also holds the canvas height). kb.presses('r') is true on the one frame R goes down. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A flag says whether the game is being played",
+        "description": "A variable (any name) is the game's state: created once, at the top of the file or in setup(), and starting true. A flag that means the opposite and starts false, such as gameOver, also counts. Not met: a flag set back to its starting value at the top of draw() on every frame. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The ball falling past the bottom ends the round",
+        "description": "When the ball's y is past the bottom of the canvas (greater than 400 or height, or a number at the bottom edge), the flag is set to say the round is over. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A restart puts the score back",
+        "description": "Pressing R sets the score back to 0, directly or by calling a function that does it. Setting the flag back to playing is part of the step too, but this card is about the score. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The game reads the flag",
+        "description": "The flag is tested somewhere in draw() and the test changes what happens: for example the play area while playing, and 'Game over' with the final score once the round has ended, or the same with a gameOver flag tested the other way round. An if with nothing inside its braces changes nothing, so it is not met. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      }
+    ]
   }
 }

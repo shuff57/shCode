@@ -40,5 +40,18 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.6 Lab: A method calling this.otherMethod()\". The task they were given: The Counter class has n, tick(), addBy(n) and isHigh(). Inside the class body, write a bigStep() method that calls this.addBy(5) and then returns this.isHigh(). The driver calls c.bigStep() when B is pressed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Inside a method, another method of the same object is called with this. in front. Without this., addBy is not defined there and the sketch stops with an error. The order matters: isHigh has to be asked after the 5 is added, so it reports the new count. The driver calls c.bigStep(), so the method must be named bigStep. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Storing the answer in a variable first and then returning it counts, and so does this.addBy(2 + 3). Doing the work by hand (this.n += 5, or returning this.n > 10 directly) skips calling the other methods, which is the point of this lab. Calling them on the global c (c.addBy(5)) inside the method only works for that one counter. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "bigStep() calls this.addBy(5) and returns this.isHigh()",
+        "description": "Inside the Counter class there is a bigStep() method that calls this.addBy with 5 and afterwards returns what this.isHigh() gives back. Partial: one of the two calls is missing, done by hand, or made on c instead of this; isHigh is asked before the 5 is added; or the answer is not returned. Missing: no bigStep method inside the class. Help: 5.7.1 (Methods: functions that live on a class)",
+        "points": 1
+      }
+    ]
   }
 }
