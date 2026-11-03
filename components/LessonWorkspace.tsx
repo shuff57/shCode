@@ -9,7 +9,7 @@ import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
-import { aiCheckText, applyAiVerdicts, reportFromRequirements, verdictsFromCriteria, type AiVerdicts } from '../lib/ai-check';
+import { aiCheckText, applyAiVerdicts, fallbackRunner, reportFromRequirements, verdictsFromCriteria, type AiVerdicts } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
@@ -773,7 +773,10 @@ export default function LessonWorkspace({
   const fallBackToPatternCheck = (text: string, why: string) => {
     aiFallbackRef.current = text;
     setAiCheckNote({ kind: 'error', text: `${why} The pattern check marked your cards instead, so you can keep going.` });
-    if (isTextMode) trackRun(runTests());
+    // The same runner a plain Run of this lab uses (lib/ai-check.ts fallbackRunner).
+    const runner = fallbackRunner(lesson);
+    if (runner === 'grade') trackRun(runTests());
+    else if (runner === 'moshion') runQ5();
     else runCode();
   };
 

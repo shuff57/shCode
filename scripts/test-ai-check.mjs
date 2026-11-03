@@ -8,7 +8,8 @@
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { applyAiVerdicts, reportFromRequirements, verdictsFromCriteria } from '../lib/ai-check.ts';
+import * as aiCheckLib from '../lib/ai-check.ts';
+const { applyAiVerdicts, reportFromRequirements, verdictsFromCriteria } = aiCheckLib;
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 let n = 0, failures = 0;
@@ -55,8 +56,27 @@ check(sr.totalScore === 25 && sr.totalPossible === 30, 'report: green cards earn
 check(sr.passed === true && sr.passingScore === 20, 'report: a scored lab passes on its passing score, not on every card');
 check(reportFromRequirements(scored, 28).passed === false, 'report: below the passing score is not passed');
 
+// The pattern-check fallback (AI unreachable) grades through the runner a plain Run of the lab uses.
+// It used to call the console runner on every code lab, so a moSHion sketch with top-level sprite
+// code showed "ReferenceError: Canvas is not defined" after Check and Submit locked.
+const { fallbackRunner } = aiCheckLib;
+check(typeof fallbackRunner === 'function', 'lib/ai-check.ts exports fallbackRunner');
+if (typeof fallbackRunner === 'function') {
+  check(fallbackRunner({ preview: 'moshion' }) === 'moshion', 'fallback: a moSHion lab runs in the moSHion runner');
+  check(fallbackRunner({ preview: 'console' }) === 'console', 'fallback: a console lab runs in the console runner (unchanged)');
+  check(fallbackRunner({ editor: 'text', preview: 'console' }) === 'grade', 'fallback: a text lab only grades the file (unchanged)');
+}
+{
+  const lw = readFileSync(path.join(root, 'components/LessonWorkspace.tsx'), 'utf8');
+  const start = lw.indexOf('const fallBackToPatternCheck');
+  const body = start < 0 ? '' : lw.slice(start, lw.indexOf('\n  };', start));
+  check(body.includes('fallbackRunner(lesson)'), 'LessonWorkspace: the fallback picks its runner with fallbackRunner(lesson)');
+  check(/runner === 'moshion'\)\s*runQ5\(\)/.test(body), 'LessonWorkspace: the fallback runs a moSHion lab through runQ5()');
+  check(!/^\s*else runCode\(\);\s*$/m.test(body.split('fallbackRunner')[0] ?? ''), 'LessonWorkspace: no unconditional runCode() before the runner is picked');
+}
+
 // wiring of every lesson that carries aiCheck
-const gen = readFileSync(path.join(root, 'functions/_shared/ai-graders.generated.ts'), 'utf8');
+const gen =readFileSync(path.join(root, 'functions/_shared/ai-graders.generated.ts'), 'utf8');
 let labs = 0;
 for (const id of readdirSync(path.join(root, 'lessons'))) {
   const f = path.join(root, 'lessons', id, 'lesson.json');
@@ -70,6 +90,9 @@ for (const id of readdirSync(path.join(root, 'lessons'))) {
   check(l.aiCheck.rubric.length === l.requirements.length, `${id}: aiCheck covers every requirement`);
   check(typeof l.aiCheck.prompt === 'string' && l.aiCheck.prompt.length > 40, `${id}: aiCheck has a grading brief`);
   check(gen.includes(JSON.stringify(id) + ':'), `${id}: the server-side grader config was generated`);
+  if (l.preview === 'moshion' && typeof fallbackRunner === 'function') {
+    check(fallbackRunner(l) === 'moshion', `${id}: a moSHion aiCheck lab falls back to the moSHion runner`);
+  }
 }
 check(labs >= 1, 'at least one lesson carries aiCheck');
 
