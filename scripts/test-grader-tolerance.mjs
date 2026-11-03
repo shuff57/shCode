@@ -1296,6 +1296,128 @@ for (const id of Object.values(L)) {
   }
 }
 
+// ---------------------------------------------------------------- 5.2.22 (update) and 5.3.14 (sound)
+//
+// Two labs appended on 2026-11-02 so 5.1-5.5 teach update() and a first sound.
+// Lax on purpose: every shape the course taught for the move, the jump, the load
+// and the play must pass. What each card must still refuse is the version that
+// does not work in a browser: an update() moSHion never calls (misspelled, or
+// written inside another function), a sound loaded where only setup() sees it
+// or every frame, and a play() that runs on every frame of a touch (a buzz).
+{
+  const run = (id, list) => {
+    for (const [name, req, files] of list) {
+      if (req === 'pass') accept(id, name, files);
+      else reject(id, name, req, files);
+    }
+  };
+
+  // 5.2.22 Lab: Rules in update(), picture in draw()
+  {
+    const id = '5-2-update-2-lab-rules-in-update';
+    const S = solutionFiles(id);
+    const move = "  if (kb.pressing('a'))       player.vel.x = -4;" + nl + "  else if (kb.pressing('d'))  player.vel.x = 4;" + nl + "  else                        player.vel.x = 0;";
+    const jump = "  if (kb.presses(' ') && player.colliding(ground)) {" + nl + '    player.vel.y = -7;' + nl + '  }';
+    const head = 'function update() {';
+    const words = "  text('a and d move, space jumps', 20, 26);";
+    // the whole update() block, cut out and pasted after draw()
+    const upd = S['script.js'].slice(S['script.js'].indexOf(head), S['script.js'].indexOf('// the picture'));
+    run(id, [
+      ['reference', 'pass', S],
+      ['untouched starter', 'r1', starterFiles(id)],
+      ['update(step) with a parameter', 'pass', edit(S, head, 'function update(step) {')],
+      ['no spaces, brace on the next line', 'pass', edit(S, head, 'function update()' + nl + '{')],
+      ['update() written after draw()', 'pass', { 'script.js': S['script.js'].replace(upd, '') + nl + upd }],
+      ['arrow keys', 'pass', edit(edit(S, "kb.pressing('a')", "kb.pressing('left')"), "kb.pressing('d')", "kb.pressing('right')")],
+      ['movement with braces', 'pass', edit(S, move, "  if (kb.pressing('a')) {" + nl + '    player.vel.x = -4;' + nl + "  } else if (kb.pressing('d')) {" + nl + '    player.vel.x = 4;' + nl + '  } else {' + nl + '    player.vel.x = 0;' + nl + '  }')],
+      ['movement as a ternary', 'pass', edit(S, move, "  player.vel.x = kb.pressing('d') ? 4 : kb.pressing('a') ? -4 : 0;")],
+      ['movement by changing x', 'pass', edit(S, move, "  if (kb.pressing('a')) player.x -= 4;" + nl + "  if (kb.pressing('d')) player.x += 4;")],
+      ['jump as two nested ifs', 'pass', edit(S, jump, "  if (kb.presses(' ')) {" + nl + '    if (player.colliding(ground)) {' + nl + '      player.vel.y = -7;' + nl + '    }' + nl + '  }')],
+      ['the ground asks about the player', 'pass', edit(S, 'player.colliding(ground)', 'ground.colliding(player)')],
+      ["'space' as the key name", 'pass', edit(S, "kb.presses(' ')", "kb.presses('space')")],
+      ['the ground test in a variable first', 'pass', edit(S, jump, '  const onGround = player.colliding(ground);' + nl + "  if (kb.presses(' ') && onGround) {" + nl + '    player.vel.y = -7;' + nl + '  }')],
+      ['double quotes everywhere', 'pass', { 'script.js': S['script.js'].replace(/'/g, '"') }],
+      ['draw() with only the background', 'pass', edit(edit(edit(S, words, ''), "  fill('white');" + nl, ''), '  textSize(14);' + nl, '')],
+      ['update only in a comment', 'r1', edit(S, head, '// ' + head + nl + 'function rules() {')],
+      ['Update with a capital U', 'r1', edit(S, head, 'function Update() {')],
+      ['update() written inside setup()', 'r1', { 'script.js': S['script.js'].replace(upd, '').replace("  ground.color = 'gray';" + nl + '}', "  ground.color = 'gray';" + nl + nl + '  ' + upd.trim() + nl + '}') }],
+      ['empty update(), nothing moved', 'r2', edit(starterFiles(id), '// STEP 1: add an empty update() function here, below setup().', 'function update() {' + nl + '}')],
+      ['movement copied into update() but left in draw() too', 'r4', edit(S, words, words + nl + move)],
+      ['jump left in draw()', 'r3', edit(edit(S, jump, ''), words, words + nl + jump)],
+      ['jump on || in update()', 'r3', edit(S, "kb.presses(' ') && player", "kb.presses(' ') || player")],
+      ['jump on kb.pressing alone', 'r3', edit(S, jump, "  if (kb.pressing(' ')) {" + nl + '    player.vel.y = -7;' + nl + '  }')],
+      ['background() moved into update()', 'r4', edit(edit(S, "  background('#222');" + nl, ''), head, head + nl + "  background('#222');")],
+      ['update() sets a speed with no key test', 'r2', edit(S, move, '  player.vel.x = 4;')],
+    ]);
+  }
+
+  // 5.3.14 Lab: A chime on every bumper hit
+  {
+    const id = '5-3-pinball-sound-2-lab-a-chime-on-every-hit';
+    const S = solutionFiles(id);
+    const load = "  chime = loadSound('/moshion/assets/coin.wav');";
+    const hit = '    if (touching && !b.wasTouching) {' + nl + '      score += b.worth;' + nl + '      chime.play();' + nl + '    }';
+    const noPlay = '    if (touching && !b.wasTouching) {' + nl + '      score += b.worth;' + nl + '    }';
+    const mem = '    b.wasTouching = touching;';
+    const p = (s) => "loadSound('" + s + "')";
+    const helperBelow = { 'script.js': edit(S, hit, '    if (touching && !b.wasTouching) {' + nl + '      score += b.worth;' + nl + '      ding();' + nl + '    }')['script.js'] + nl + 'function ding() {' + nl + '  chime.play();' + nl + '}' + nl };
+    const helperAbove = edit(edit(S, hit, '    if (touching && !b.wasTouching) {' + nl + '      score += b.worth;' + nl + '      ding();' + nl + '    }'), 'function draw() {', 'function ding() {' + nl + '  chime.play();' + nl + '}' + nl + nl + 'function draw() {');
+    const loopStart = '  for (const b of bumpers) {';
+    const loopEnd = mem + nl + '  }' + nl;
+    const src = S['script.js'];
+    const loop = src.slice(src.indexOf(loopStart), src.indexOf(loopEnd) + loopEnd.length);
+    run(id, [
+      ['reference', 'pass', S],
+      ['untouched starter', 'r1', starterFiles(id)],
+      // r1: the load
+      ['double quotes', 'pass', edit(S, p('/moshion/assets/coin.wav'), 'loadSound("/moshion/assets/coin.wav")')],
+      ['backticks', 'pass', edit(S, p('/moshion/assets/coin.wav'), 'loadSound(' + BT + '/moshion/assets/coin.wav' + BT + ')')],
+      ['the short path assets/coin.wav', 'pass', edit(S, p('/moshion/assets/coin.wav'), p('assets/coin.wav'))],
+      ['./assets/coin.wav', 'pass', edit(S, p('/moshion/assets/coin.wav'), p('./assets/coin.wav'))],
+      ['music.wav instead', 'pass', edit(S, p('/moshion/assets/coin.wav'), p('/moshion/assets/music.wav'))],
+      ['loaded first, before the canvas', 'pass', edit(edit(S, load + nl, ''), '  new Canvas(440, 420);', load + nl + '  new Canvas(440, 420);')],
+      ['on the same line as the score', 'pass', edit(edit(S, load + nl, ''), '  score = 0;', '  score = 0; ' + load.trim())],
+      ['a volume line after it', 'pass', edit(S, load, load + nl + '  chime.volume = 0.5;')],
+      ['another name, no semicolons', 'pass', { 'script.js': src.replace(/chime/g, 'ding').replace("loadSound('/moshion/assets/coin.wav');", "loadSound('/moshion/assets/coin.wav')").replace('ding.play();', 'ding.play()') }],
+      ['var at the top', 'pass', edit(S, 'let chime;', 'var chime;')],
+      ['a sound on each bumper', 'pass', edit(edit(S, load, "  b1.ding = loadSound('/moshion/assets/coin.wav');" + nl + "  b2.ding = loadSound('/moshion/assets/coin.wav');" + nl + "  b3.ding = loadSound('/moshion/assets/coin.wav');"), 'chime.play();', 'b.ding.play();')],
+      ['sounds kept in a list', 'pass', edit(edit(edit(S, 'let chime;', 'let sounds = [];'), load, "  sounds.push(loadSound('/moshion/assets/coin.wav'));"), 'chime.play();', 'sounds[0].play();')],
+      ['let in front, inside setup()', 'r1', edit(S, load, '  let ' + load.trim())],
+      ['const in front, inside setup()', 'r1', edit(S, load, '  const ' + load.trim())],
+      ['path typo: asset', 'r1', edit(S, p('/moshion/assets/coin.wav'), p('/moshion/asset/coin.wav'))],
+      ['a file that does not exist: coin.mp3', 'r1', edit(S, p('/moshion/assets/coin.wav'), p('/moshion/assets/coin.mp3'))],
+      ['loaded again in draw()', 'r1', edit(S, "  background('#222');", "  background('#222');" + nl + load)],
+      ['loaded only in draw()', 'r1', edit(edit(S, load + nl, ''), "  background('#222');", "  background('#222');" + nl + load)],
+      ['the load only in a comment', 'r1', edit(S, load, '  // ' + load.trim())],
+      ['loaded at the top of the file, not in setup() (not taught)', 'r1', edit(edit(S, load + nl, ''), 'let chime;', "let chime = loadSound('/moshion/assets/coin.wav');")],
+      // r2: the play
+      ['play above the score line', 'pass', edit(S, hit, '    if (touching && !b.wasTouching) {' + nl + '      chime.play();' + nl + '      score += b.worth;' + nl + '    }')],
+      ['a second braceless if', 'pass', edit(S, hit, noPlay + nl + '    if (touching && !b.wasTouching) chime.play();')],
+      ['the two tests the other way round', 'pass', edit(S, 'touching && !b.wasTouching', '!b.wasTouching && touching')],
+      ['colliding() inline, memory set from it', 'pass', edit(edit(S, '    const touching = ball.colliding(b);' + nl + '    if (touching && !b.wasTouching) {', '    if (ball.colliding(b) && !b.wasTouching) {'), mem, '    b.wasTouching = ball.colliding(b);')],
+      ['nested: touching, then not before', 'pass', edit(S, hit, '    if (touching) {' + nl + '      if (!b.wasTouching) {' + nl + '        score += b.worth;' + nl + '        chime.play();' + nl + '      }' + nl + '    }')],
+      ['nested: not before, then touching', 'pass', edit(S, hit, '    if (!b.wasTouching) {' + nl + '      if (touching) {' + nl + '        score += b.worth;' + nl + '        chime.play();' + nl + '      }' + nl + '    }')],
+      ['the hit in a variable first', 'pass', edit(S, hit, '    const isHit = touching && !b.wasTouching;' + nl + '    if (isHit) {' + nl + '      score += b.worth;' + nl + '      chime.play();' + nl + '    }')],
+      ['memory tested with == false', 'pass', edit(S, '!b.wasTouching', 'b.wasTouching == false')],
+      ['a helper written below draw()', 'pass', helperBelow],
+      ['a helper written above draw()', 'pass', helperAbove],
+      ['optional chaining', 'pass', edit(S, 'chime.play();', 'chime?.play();')],
+      ['the loop moved into update() (5.2.21)', 'pass', { 'script.js': src.replace(loop, '') + nl + 'function update() {' + nl + loop + '}' + nl }],
+      ['play straight in draw()', 'r2', edit(edit(S, hit, noPlay), "  background('#222');", "  background('#222');" + nl + '  chime.play();')],
+      ['play in the loop, after the if', 'r2', edit(edit(S, hit, noPlay), mem, mem + nl + '    chime.play();')],
+      ['play under if (touching) alone', 'r2', edit(S, hit, noPlay + nl + '    if (touching) chime.play();')],
+      ['play under colliding() alone', 'r2', edit(S, hit, noPlay + nl + '    if (ball.colliding(b)) {' + nl + '      chime.play();' + nl + '    }')],
+      ['play under ||', 'r2', edit(S, hit, noPlay + nl + '    if (touching || !b.wasTouching) chime.play();')],
+      ['play in the else', 'r2', edit(S, hit, noPlay + ' else {' + nl + '      chime.play();' + nl + '    }')],
+      ['play under the R key', 'r2', edit(edit(S, hit, noPlay), "  if (kb.presses('r')) {", "  if (kb.presses('r')) {" + nl + '    chime.play();')],
+      ['play only in setup()', 'r2', edit(edit(S, hit, noPlay), load, load + nl + '  chime.play();')],
+      ['play only in a comment', 'r2', edit(S, '      chime.play();', '      // chime.play();')],
+      ['memory tested with === false (never true)', 'r2', edit(S, '!b.wasTouching', 'b.wasTouching === false')],
+      ['if (!b.wasTouching) alone (every frame apart)', 'r2', edit(S, hit, noPlay + nl + '    if (!b.wasTouching) chime.play();')],
+    ]);
+  }
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(

@@ -1,0 +1,24 @@
+{
+  "id": "5-2-update-1-reading-update-runs-before-physics",
+  "title": "5.2.21 Reading: update() runs before physics",
+  "description": "moSHion runs a third function on every frame, update(), before the physics step moves the sprites; draw() runs after it. So the rules of the game (keys, movement, the jump) can go in update(), and the picture (background, words) stays in draw(). Read before 5.2.22 Lab: Rules in update(), picture in draw().",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "reading",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/moshion",
+  "externalLinkLabel": "Open the in-app moSHion docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
