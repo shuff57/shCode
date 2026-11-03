@@ -1,5 +1,8 @@
+let player;
+
 function setup() {
-  // STEP 1: Create a player sprite: position it and give it a size.
+  // STEP 1: Create a canvas, then a sprite stored in `player`: position it
+  //   and give it a size.
 
   // STEP 2: (Challenge 2) Create a companion sprite for the orbiting challenge
 
