@@ -6671,7 +6671,7 @@
     },
     {
       "id": "5-1-14-example-keyboard",
-      "title": "5.1.15 Worked Example: Keyboard Movement",
+      "title": "5.1.18 Worked Example: Keyboard Movement",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "example",
       "type": "lesson",
@@ -6684,7 +6684,7 @@
     },
     {
       "id": "5-1-15-reading-velocity",
-      "title": "5.1.16 Reading: Velocity: vel.x and vel.y",
+      "title": "5.1.15 Reading: Velocity: vel.x and vel.y",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
@@ -6697,7 +6697,7 @@
     },
     {
       "id": "5-1-16-reading-movement-pattern",
-      "title": "5.1.17 Reading: Movement pattern (if / else if / else)",
+      "title": "5.1.16 Reading: Movement pattern (if / else if / else)",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
@@ -6710,7 +6710,7 @@
     },
     {
       "id": "5-1-17-reading-else-to-zero",
-      "title": "5.1.18 Reading: The else-to-zero rule",
+      "title": "5.1.17 Reading: The else-to-zero rule",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
@@ -6775,7 +6775,7 @@
     },
     {
       "id": "5-1-21-a10-1-sprite-playground",
-      "title": "5.1.22 Sprite Playground",
+      "title": "5.1.23 Sprite Playground",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "assignment",
@@ -6788,7 +6788,7 @@
     },
     {
       "id": "5-1-22-a10-2-frame-loop",
-      "title": "5.1.23 Frame Loop Writeup",
+      "title": "5.1.24 Frame Loop Writeup",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "assignment",
       "type": "assignment",
@@ -6801,7 +6801,7 @@
     },
     {
       "id": "5-1-23-challenges",
-      "title": "5.1.24 Challenges",
+      "title": "5.1.25 Challenges",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "challenge",
@@ -6827,7 +6827,7 @@
     },
     {
       "id": "5-1-25-math-grid",
-      "title": "5.1.25 Lab: A grid like math (optional)",
+      "title": "5.1.26 Lab: A grid like math (optional)",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "lesson",
@@ -6919,6 +6919,19 @@
     {
       "id": "5-1-9-reading-background",
       "title": "5.1.9 Reading: background(color) wipe rule",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 10,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-1-sin-frame-1-reading-moving-with-framecount",
+      "title": "5.1.22 Reading: Moving on its own: frameCount and sin()",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
