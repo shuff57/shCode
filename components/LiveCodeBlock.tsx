@@ -124,6 +124,9 @@ function runPlainCode(code: string, done: (logs: PlainLogEntry[]) => void): () =
   };
 }
 
+/** Window event a live block's sketch Run sends; every other block stops its own sketch on it. */
+const LIVE_SKETCH_RUN = 'shcode:live-sketch-run';
+
 function storageKeyFor(lessonId: string | undefined, blockId: string | undefined): string | null {
   if (!lessonId || !blockId) return null;
   return `shCode:liveBlock:${lessonId}:${blockId}`;
@@ -171,6 +174,20 @@ export default function LiveCodeBlock({
   const [committedCode, setCommittedCode] = useState('');
   const [runKey, setRunKey] = useState(0);
 
+  // One sketch at a time. Running a block stops every other block's sketch on the page (its frame
+  // unmounts back to "Click Run"), so a reading with three blocks does not end up with three
+  // sketches ticking at once (5.1.4's two sprite crowds doubled the cost; 5.1 editor audit r2).
+  const blockToken = useRef({});
+  useEffect(() => {
+    const onOtherRun = (e: Event) => {
+      if ((e as CustomEvent<{ token: object }>).detail?.token === blockToken.current) return;
+      setCommittedCode('');
+      setRunKey(0);
+    };
+    window.addEventListener(LIVE_SKETCH_RUN, onOtherRun);
+    return () => window.removeEventListener(LIVE_SKETCH_RUN, onOtherRun);
+  }, []);
+
   // Persist edits to localStorage, debounced so we don't write on every
   // keystroke. Removes the entry when the code is back at its starter so
   // stale storage doesn't accumulate.
@@ -208,6 +225,7 @@ export default function LiveCodeBlock({
       });
       return;
     }
+    window.dispatchEvent(new CustomEvent(LIVE_SKETCH_RUN, { detail: { token: blockToken.current } }));
     setCommittedCode(editorCode);
     setRunKey((k) => k + 1);
   }
