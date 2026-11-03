@@ -16,7 +16,7 @@ classes / then concepts). It renumbers about 166 lessons by title and citation o
 moves, no D1 migration). Recommended after unit 5 content exists, in one commit.
 
 **moSHion findings that block planned work** (details and evidence in `MOSHION-GAPS.md`): the copy
-vendored in `public/moshion/` was re-synced to moSHion 3b77bf6 (branch `gaps-fix`, not yet merged or pushed; see `public/moshion/VENDORED.md`), which added `Tiles`, `Walls`, `every`/`after` and `addSensor`; there is still no `camera.follow`; `this.speed` on a class that
+vendored in `public/moshion/` is moSHion `d8068bb` on `main` (vendored 2026-11-02; see `public/moshion/VENDORED.md`). The earlier `3b77bf6` sync added `Tiles`, `Walls`, `every`/`after` and `addSensor`; `main` since carries gravity starting at 0 (`91f7e6b`) and the opt-in `world.origin = 'math'` with `showGrid()`/`showMouse()` (`d8068bb`). There is still no `camera.follow`; `this.speed` on a class that
 extends Sprite collides with a built-in accessor. Lesson `6.4.19` hints at a `camera.follow` that
 does not exist.
 

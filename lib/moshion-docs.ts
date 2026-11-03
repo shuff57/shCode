@@ -3,23 +3,25 @@
 // actual engine surface differs (planck.js-backed, gaps closed per the audit gate).
 
 // Scope-out (stated explicitly so a future maintainer doesn't rediscover the boundary):
-// These moSHion API areas were dropped because no runnable lesson exercises them:
+// These moSHion API areas are not in the engine, because no runnable lesson exercises them:
 //   Visual / Visuals, EmojiImage, multitouch pointer/pointers,
 //   world.renderStats / world.meterSize, palettes, world.timeScale / world.physicsTime /
-//   world.realTime / world.autoStep / world.physicsUpdate, world.allowSleeping /
-//   sprite.sleeping, world.explodeAt, world.rayCast / world.rayCastAll,
-//   world.getSpritesAt, sprite.passes / pass, sprite.angleTo /
-//   bearing, sprite.addCollider / addDefaultSensors,
-//   sprite.update / sprite.draw overrides, sprite.playAni / playAnis (Promise-based),
-//   sprite.drag / rotationDrag / applyTorque / rotationSpeed,
-//   sprite.grabbable, group.addTiles / tile,
-//   autoCull, group.life / autoDraw / autoUpdate, group.amount, subgroups (Group(parent)),
-//   camera.zoom / camera.off / camera.on, mouse.drags / dragging / dragged,
-//   contros (gamepad), pointer,
+//   world.realTime, world.rayCastAll, sprite.passes / pass, sprite.bearing,
+//   sprite.addCollider / addDefaultSensors, sprite.playAni / playAnis (Promise-based),
+//   sprite.grabbable, group.addTiles / tile, autoCull, group.life,
+//   subgroups (Group(parent)), camera.zoom, contros (gamepad), pointer,
 //   joint.springiness / damping / limitsEnabled / range / forceThreshold / torqueThreshold /
 //   offsetA / offsetB, color(), triangle drawing primitive,
 //   textFont, parseTextureAtlas, loadImage, EmojiImage,
 //   sprite.addAnis, anis.cutFrames / offset.
+// Built in the engine since this list was first written (public/moshion/docs/moshion.d.ts,
+// checked against moSHion d8068bb on 2026-11-03), so no longer scoped out: world.autoStep /
+// world.physicsUpdate, world.allowSleeping / sprite.sleeping, world.explodeAt,
+// world.rayCast, world.getSpritesAt, sprite.angleTo, the sprite.update / sprite.draw
+// overrides, sprite.drag / rotationDrag / applyTorque / rotationSpeed, group.amount /
+// autoDraw / autoUpdate, camera.off / camera.on, and mouse.drags / dragging / dragged.
+// Of these, only sprite.angleTo and camera.off have a page or a mention below; the rest
+// are engine-only, with no page here yet.
 // sprite.mass / density / opacity, sprite.moveTowards, sprite.rotateTo, sprite.debug, and
 // frameRate() were in this list too — a lesson audit found them reachable
 // (6-5-21, 5-1-23, and six sprite.text label lessons) and they're built now; see the

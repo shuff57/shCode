@@ -71,17 +71,32 @@ the written plan, the pseudocode step and the playtest/reflection close.
 9. **Scope first, static later.**
 11. **Pacing: option B** (`PACING.md`): `week` fields and module-doc `weeks:` set to the B column; 5.2 moves to week 11.
 
+## Decided by the owner, 2026-11-02
+
+13. **Chapter 5 is the basics plus functional game design.** Sprites, movement, physics feel, random and
+    timers, `update()`, and the functional builds (Pinball, Flappy, Snake) on individual sprites and arrays.
+14. **Classes and OOP stay in the later module.** No classes, groups or `this` in 5.1-5.5.
+15. **Sound is one lab inside Pinball**, not a module: built as 5.3.13 (Reading: A sound on a hit) and
+    5.3.14 (Lab: A chime on every bumper hit).
+16. **`update()` is taught in 5.2**: built as 5.2.21 (Reading: update() runs before physics) and 5.2.22
+    (Lab: Rules in update(), picture in draw()).
+
 ## Still open
 
-4. **Console user input.** Wanted at all, or keyboard-only from 5.1?
-5. **Sound.** New lesson inside a build, or a standalone module?
+Items 4, 5, 8, 9 and 11 below are now decided and 12 is applied; they stay listed with where the answer is.
+
+4. ~~**Console user input.**~~ Decided 2026-10-31, #5: a key-press title screen, no module.
+5. ~~**Sound.**~~ Decided 2026-11-02, #15: one Pinball lab, built as 5.3.13-5.3.14.
 7. **Breakout and a projectile build** as extra functional games, or hold at Pinball, Flappy, Snake?
-8. **Inheritance.** CSA does not teach it, so it cannot settle the question. A name-only reading at
-   the end of the class unit, or nothing?
-9. **Static before or after scope/access** (CSA does static first; ours is built the other way).
-10. **Hex/RGB colour reading** in Unit 5.
-11. **Pacing.** 5.7 is about 4h45m, 5.8 about 3h, against a 1.75 contact-hour note; unresolved.
-12. **Numbering.** Apply the unit-level repartition now or after Unit 5 content exists.
+   Breakout is decided (2026-10-31, #7: Chapter 6, after grids; built as 6.10). **Still open:** which games
+   to change or add for projectiles, platforms and chasing.
+8. ~~**Inheritance.**~~ Decided 2026-10-31, #8: one Chapter 7 module, taught through enemy types; and
+   2026-11-02, #14: classes and OOP stay in the later module.
+9. ~~**Static before or after scope/access.**~~ Decided 2026-10-31, #9: scope first, static later.
+10. **Hex/RGB colour reading** in Unit 5. Still open.
+11. ~~**Pacing.**~~ Decided 2026-10-31, #11: option B (`PACING.md`).
+12. ~~**Numbering.**~~ Applied in lesson titles (5.8.13 lives in `lessons/5-5-13-*`); folders keep the old
+    ids, as the repartition plan in `HANDOFF.md` intended (titles and citations only, no folder moves).
 
 ## What I could not check
 
