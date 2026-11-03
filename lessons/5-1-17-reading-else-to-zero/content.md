@@ -7,6 +7,7 @@ By the end of this reading you should be able to answer:
 - What value does `vel.x` have the frame after you release a key, if there is no `else` branch?
 - Why does the engine not reset velocity automatically between frames?
 - Where does the bug show up, and what one-line fix corrects it?
+- Which `if` does an `else` belong to?
 
 You know the movement pattern. This reading focuses on the single most common bug in this module: the missing `else` branch.
 
@@ -46,6 +47,30 @@ function draw() {
 **What you'll see:** the sprite drifts off-screen after a single keypress because velocity is never reset.
 
 **Try this:** add the two missing `else` lines: `else player.vel.x = 0;` and `else player.vel.y = 0;`, and rerun. The sprite now stops the moment you release the key.
+
+**Where the `else` goes.** An `else` belongs only to the `if` right above it. Below, two separate `if` lines get one `else` under them, so that `else` listens to the **d** line alone:
+
+```js live
+let player;
+
+function setup() {
+  new Canvas(360, 200);
+  player = new Sprite(180, 100, 40, 40);
+  player.color = 'tomato';
+}
+
+function draw() {
+  background('#222');
+
+  if (kb.pressing('a')) player.vel.x = -4;
+  if (kb.pressing('d')) player.vel.x = 4;
+  else player.vel.x = 0; // belongs to the d line only
+}
+```
+
+**What you'll see:** click the canvas and hold **d**: the square moves right. Hold **a**: it does not move at all. The **a** line sets `vel.x` to `-4`, then, because **d** is not held, the `else` sets it straight back to `0` in the same frame.
+
+**The fix:** make the three lines one chain by putting `else` in front of the second `if`: `else if (kb.pressing('d')) player.vel.x = 4;`. Rerun: both keys work, and the last `else` runs only when neither key is held.
 
 ---
 

@@ -32,7 +32,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** a square in the middle, then more and more squares piling up and spreading out until they fill the canvas, because the code makes a new sprite on every frame. Switch to this corrected version:
+**What you'll see:** a pink square in the middle, then more squares shoving out from it until the canvas is almost solid pink, because the code makes a new sprite on every frame. Switch to this corrected version:
 
 ```js live
 let player;

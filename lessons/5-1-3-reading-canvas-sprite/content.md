@@ -34,7 +34,7 @@ function draw() {
 }
 ```
 
-**Words in this sketch:** `function`, `let` and `console.log` are the same ones you used in Chapters 1 to 3. Three are new, and a later reading covers them properly: `fill('white')` picks the color for words, `textSize(20)` picks how tall the letters are, and `text(...)` writes words on the canvas at the x and y you give it. The `+` joins words and a number, as in Chapter 1.
+**Words in this sketch:** `function`, `let` and `console.log` are the same ones you used in Chapters 1 to 3. `let frames = 0;` makes a **variable**: a name that holds a value (here a count) your code can change later. Three are new, and a later reading covers them properly: `fill('white')` picks the color for words, `textSize(20)` picks how tall the letters are, and `text(...)` writes words on the canvas at the x and y you give it. The `+` joins words and a number, as in Chapter 1.
 
 **What you'll see:** the canvas appears, `setup ran` prints **once** in the Console box under the canvas, then on the canvas you'll see `frames: 1`, `frames: 2`, `frames: 3` … climbing by about 60 each second.
 

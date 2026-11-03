@@ -47,7 +47,7 @@ In 5.1.9 a sprite moved because `draw()` changed its position every frame: `play
 - With `pos`, **your code** moves the sprite. It jumps a few pixels every frame, whatever is in the way, and the engine is never told how fast it is going.
 - With `vel`, you give the **engine** a speed and the engine moves the sprite. Because the engine knows the speed, it can work out what happens when the sprite bumps into another one.
 
-Both squares below head for a gray box at the same speed, 3 pixels per frame. The blue one is moved by `pos`, the orange one by `vel`.
+Both squares below head for a gray box at the same speed, 3 pixels per frame. The blue one is moved by `pos`, the orange one by `vel`. The first line, `let blue, orange;`, makes two variables at once: the same as writing `let blue;` and `let orange;`.
 
 ```js live
 let blue, orange;

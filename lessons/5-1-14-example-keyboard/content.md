@@ -1,16 +1,14 @@
-# 5.1.18 Worked Examples
+A teacher-led walkthrough of one idea: moving a sprite with the keyboard, and making it stop when you let go. Part 1 is only the starting point, the sprite program from 5.1.4. Come back to this when you build 5.1.23 Sprite Playground.
 
-Teacher-led walkthroughs for Module 5.1. Students can come back to them when building 5.1.23 Sprite Playground.
-
-Each example builds up one step at a time. The code in the steps is there to read, one change at a time; each example ends with a block you can run and change right here.
+Each part builds up one step at a time. The code in the steps is there to read, one change at a time; each part ends with a block you can run and change right here.
 
 **Elsewhere in Module 5.1:** 5.1.24 Frame Loop Writeup · 5.1.25 Challenges
 
 ---
 
-## Worked Example 1: Minimum sprite program
+## Part 1: The starting point (the sprite from 5.1.4)
 
-**Goal:** Prove that a canvas + sprite + background is the smallest possible moSHion program. This is the program from 5.1.4 again, as a reminder.
+**Goal:** A sprite to move. This is the program from 5.1.4 again, as a reminder: a canvas, a sprite and a background are the smallest possible moSHion program.
 
 ### Step 1: The first try
 
@@ -29,7 +27,7 @@ This puts a square in the middle of a dark canvas, and then something goes wrong
 
 ### Step 2: Notice the bug
 
-**Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame**: 60 per second. If you run this for 5 seconds, 300 sprites exist. Every new one starts in the same spot, but sprites are solid and push each other apart, so squares keep piling up and spreading out until they cover the whole canvas. You watched this happen in 5.1.4.
+**Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame**: 60 per second. If you run this for 5 seconds, 300 sprites exist. Every new one starts in the same spot, but sprites are solid and push each other apart, so new squares keep shoving out from the middle until the canvas is almost solid pink. You watched this happen in 5.1.4.
 
 ### Step 3: Hoist the sprite
 
@@ -76,11 +74,11 @@ function draw() {
 
 ---
 
-## Worked Example 2: Keyboard movement
+## Part 2: Keyboard movement
 
 **Goal:** Make the sprite respond to the keyboard.
 
-Start from Worked Example 1's final code.
+Start from Part 1's final code.
 
 ### Step 1: Add horizontal movement
 
@@ -105,7 +103,7 @@ Comment out the `else` branch:
   // else player.vel.x = 0;  ← commented out
 ```
 
-Try it in the block at the end of this example: put `//` in front of the first `else` line (the one that sets `player.vel.x` to `0`), Run, click the canvas, hold the left arrow, then let go. **The sprite drifts forever.** This is the **drifting sprite bug**: the #1 bug students hit this week.
+Try it in the block at the end of this part: put `//` in front of the line `else player.vel.x = 0;` (the plain `else` line, not the `else if` line above it), Run, click the canvas, hold the left arrow, then let go. **The sprite drifts forever.** This is the **drifting sprite bug**: the #1 bug students hit this week.
 
 Why? A velocity stays until your code changes it. `vel.x` keeps its last value (−4), and without the `else`, nothing sets it back to `0` when you let go.
 
@@ -142,13 +140,13 @@ function setup() {
 function draw() {
   background('#222');
 
-  if (kb.pressing('left'))       player.vel.x = -4;
+  if (kb.pressing('left'))  player.vel.x = -4;
   else if (kb.pressing('right')) player.vel.x = 4;
-  else                           player.vel.x = 0;
+  else player.vel.x = 0;
 
-  if (kb.pressing('up'))         player.vel.y = -4;
-  else if (kb.pressing('down'))  player.vel.y = 4;
-  else                           player.vel.y = 0;
+  if (kb.pressing('up'))    player.vel.y = -4;
+  else if (kb.pressing('down')) player.vel.y = 4;
+  else player.vel.y = 0;
 }
 ```
 
