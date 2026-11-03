@@ -40,5 +40,18 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.10 Lab: Cleanup with this.sprite.delete()\". The task they were given: A Bubble class wraps a sprite: its constructor stores this.sprite = new Sprite(x, y, 20). Inside the class body, write a pop() method that calls this.sprite.delete(), so the bubble removes the sprite it owns. The driver calls b.pop() when the mouse is clicked. You cannot run their code: read it and judge what it WOULD do when the sketch runs. sprite.delete() takes a sprite off the screen and out of the physics world; sprite.remove() is the same method under another name. JavaScript's own delete operator (delete this.sprite) only forgets the property, and the sprite stays on screen. Hiding a sprite leaves it in the world. The driver calls b.pop(), so the method must be named pop. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Calling this.sprite.delete() through another method of the class counts. Reaching the global b (b.sprite.delete()) inside the method works only for that one bubble instead of this one. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "pop() calls this.sprite.delete()",
+        "description": "Inside the Bubble class there is a pop() method that calls delete() or remove() on this.sprite, directly or through another method of the class. Partial: it hides the sprite instead, or deletes it through the global b instead of this. Missing: no pop method inside the class, or it never removes the sprite (delete this.sprite is the JavaScript operator, which leaves the sprite on screen). Help: 5.2.15 (Cleanup and Delete)",
+        "points": 1
+      }
+    ]
   }
 }

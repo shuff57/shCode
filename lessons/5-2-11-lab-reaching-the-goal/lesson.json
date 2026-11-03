@@ -93,5 +93,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.17 Lab: Reaching the Goal\". The task they were given: At the bottom of draw(), add an if that checks goal, so the win check only runs while the goal still exists. Inside it, work out the distance from the player to the goal: dx is the gap left to right between their x values, dy the gap up and down, and the distance is the square root of dx times dx plus dy times dy, kept in a variable. Still inside it, when the distance is less than 25, log a win message, delete the goal with goal.delete(), and set goal to null so the check can never run again. What the starter file already had: the finished scene: gravity, a player moved with a and d, a space-bar jump gated on the ground, a wind zone, walls, the ground, and a gold goal sprite stored in goal. The win check is not written yet, so the starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame. sprite.delete() removes a sprite from the world for good (remove() does the same). After the goal is deleted, the variable still points at the deleted sprite until it is set to null. if (goal) is false once goal is null, and reading goal.x while goal is null stops the sketch with an error. Math.sqrt, Math.hypot, dist(x1, y1, x2, y2), ** 0.5 and a sprite's distanceTo(another sprite) can all be used to work out a distance. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Guard the check on the goal still existing",
+        "description": "The win check (the distance work and the test) sits inside an if that only runs while the goal still exists: if (goal), if (goal !== null), if (goal != null), or goal joined with && to the test. A check with no such guard would read the goal's position after it is gone and stop the sketch, so it is not met. Help: 5.2.16 (Worked Example: The Finished Scene)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Compute the distance and test it",
+        "description": "The distance between the player and the goal is worked out from their positions (a square root of dx times dx plus dy times dy, Math.hypot, dist(...), ** 0.5, or distanceTo) and an if tests it against a small number (the lab uses less than 25; any small threshold counts). Comparing dx times dx plus dy times dy with the threshold squared does the same job and counts, and so does a test that both gaps are small. Not met: a test that never looks at how far apart they are, such as overlaps() alone. Help: 5.2.16 (Worked Example: The Finished Scene)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Delete the goal on arrival",
+        "description": "When the distance test passes, goal.delete() (or goal.remove(), which is the same) is called. Help: 5.2.15 (Reading: Cleanup and Delete)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Clear the goal variable",
+        "description": "After deleting, goal is set to null (or another empty value the guard treats as false, such as undefined), so the win check can never fire twice. Help: 5.2.15 (Reading: Cleanup and Delete)",
+        "points": 1
+      }
+    ]
   }
 }

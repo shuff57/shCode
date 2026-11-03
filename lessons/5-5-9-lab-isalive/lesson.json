@@ -61,5 +61,24 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.9 Lab: Give the class its own isAlive()\". The task they were given: The scene asks e.hp > 0 twice, by hand. Add an isAlive() method to the Enemy class that takes no arguments and returns true while this.hp is above 0 and false once it is not, then make draw() ask e.isAlive() in place of both hand comparisons. What shows on screen should not change: the rule moves into the class, the behaviour stays. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. takeHit already stops hp at 0, so hp is never negative here. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter has no isAlive() and draw() compares e.hp itself, which is missing on both criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "isAlive() returns whether this.hp is above 0",
+        "description": "The class has an isAlive() method that RETURNS true while this.hp is above 0 and false at 0: return this.hp > 0, return this.hp >= 1, or an if/else that returns true or false. A method that returns nothing, or that answers the opposite (true at 0), is not met.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "draw() asks isAlive() instead of comparing hp",
+        "description": "draw() calls e.isAlive() and uses its answer (in a ternary, an if, or anywhere) to decide what the enemy shows, instead of comparing e.hp to 0 itself. If one hand comparison of e.hp is still left in draw(), it can still be met; name that leftover line in the note.",
+        "points": 1
+      }
+    ]
   }
 }

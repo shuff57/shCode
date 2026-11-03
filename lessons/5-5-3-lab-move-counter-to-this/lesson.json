@@ -41,5 +41,18 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.3 Lab: Move the counter onto this\". The task they were given: The starter's tick() makes a fresh local variable on every call, so the count on screen stays at 1 however often Space is pressed. Rewrite the body of tick() so the change lands on the object's own property this.n, and each press makes the count climb 1, 2, 3, 4. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. Each Space press calls c.tick() once. A variable made with let inside a method is made new on every call and is gone when the call ends; a property on this stays on the object from one call to the next. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (tick) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. Watch for the starter's own shape: a tick() that copies a local into this.n, where the local starts again at 0 on every call, still leaves this.n at 1 forever, so that is NOT met even though it writes this.n. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "tick() adds 1 to this.n",
+        "description": "Each call to tick() leaves this.n one bigger than it was, because the new value is built from the old this.n: this.n += 1, this.n++, this.n = this.n + 1, or a local copied from this.n, raised by 1 and written back. A tick() that writes this.n from a local that starts at 0 on every call is not met: the count would stay at 1.",
+        "points": 1
+      }
+    ]
   }
 }

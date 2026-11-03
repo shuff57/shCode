@@ -92,5 +92,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.20 Challenges: Optional Stretch\". The task they were given: Starting from the one-goal scene of 5.2.17, add a second goal sprite somewhere harder to reach and give it its own distance check in draw() that deletes it, the same shape as the first goal's check. Keep track of when both goals are gone (a counter that goes up by one per goal, or a test that both goal variables are gone), and print 'All goals collected!' with console.log only after both goals are gone, and only once. What the starter file already had: the one-goal scene: player, ground, walls, wind zone and jump, and one gold goal stored in goal with its own guarded distance check that logs a win, deletes it and sets it to null. That first check and its delete() were already in the starter, so on their own they do not meet the second-goal criteria. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame. sprite.delete() (or remove()) removes a sprite for good, and setting the variable to null stops its check. A test like counter === 2, or both goal variables being null, stays true on every frame after it first becomes true, so a print under it repeats unless something stops it, such as moving the counter past 2 or a flag. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Add a second goal sprite",
+        "description": "A second goal sprite is made with new Sprite(...) (any name, position, size or colour), so the scene has two goals as well as the player. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Give the second goal its own check",
+        "description": "The second goal has its own check, like the first goal's, that deletes it when the player reaches it, so the sketch calls delete() (or remove()) for each of the two goals. One check written to handle both goals also counts if it really deletes each one. Help: 5.2.17 (Lab: Reaching the Goal)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Track collection progress",
+        "description": "The code knows when both goals are gone: a counter that changes by one per goal collected and is then compared with a number (such as 2), or a test that both goal variables are gone (both null, or neither truthy). Help: 5.2.17 (Lab: Reaching the Goal)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Print the finish message",
+        "description": "'All goals collected!' (any close wording) is printed with console.log from inside an if that only becomes true once both goals are gone. The step also asks for it to print only once: if nothing stops that if from staying true, it would print on every frame. Still mark this card met in that case, but say so in the note. Printing after only one goal is not met. Help: 5.2.17 (Lab: Reaching the Goal)",
+        "points": 1
+      }
+    ]
   }
 }

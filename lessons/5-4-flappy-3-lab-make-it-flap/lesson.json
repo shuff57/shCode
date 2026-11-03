@@ -70,5 +70,30 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.4 Lab: Make it flap\". The task they were given: The bird falls under gravity and nothing lifts it. In draw(), when the space bar is pressed, set the bird's vertical speed (bird.vel.y) to a negative number so each tap sends it up in one arc. Then, when the bird goes below the bottom of the 400 by 400 canvas or above the top, put it back in the middle with no speed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. The starter sets world.gravity.y = 20 in setup(), so the bird falls. y grows DOWNWARD: a negative vel.y moves the bird up and a positive one moves it down. kb.presses(' ') and kb.presses('space') are the same test and are true only on the frame the key goes down; kb.pressing(...) is true on every frame the key is held. bird.y and bird.pos.y are the same number. The bottom edge is y = 400 (height also holds 400), the top edge is y = 0, and the middle is y = 200. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Setting the speed with = and adding to it with += or -= are different ideas: the first criterion accepts any space-bar line that sends the bird upward, and the second criterion is the one that asks for = rather than += or -=. A positive vel.y on the flap sends the bird down, which is the opposite. Moving bird.y itself on the key press is a jump in position, not a flap. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The space bar flaps the bird",
+        "description": "In draw() (or a function it calls), a test for the space bar (kb.presses(' ') or kb.presses('space'); kb.pressing also counts) whose body makes the bird's vertical speed point up: bird.vel.y given a negative number, a negative expression or a variable holding one (a line that subtracts from vel.y also counts here). An if block, a one-line if, or the key test stored in a variable first are all fine. Missing: no space-bar test, or the speed it gives is positive (down). Help: 5.4.2 (Reading: Gravity and the flap)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The flap sets the speed rather than adding",
+        "description": "The flap line gives bird.vel.y a new value with plain = (a negative number, an expression or a variable), so every flap is the same size whatever the bird was doing. Partial: the flap uses += or -=, which adds to the old speed, so a flap while falling fast barely lifts. The vel.y = 0 in the put-back code is not the flap. Missing: no flap line at all. Help: 5.4.2 (Reading: Gravity and the flap)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The bird is put back when it leaves the screen",
+        "description": "A test on the bird's y going past the bottom (greater than 400 or height, or a number a little inside it) or above the top (less than 0), in one if joined with || or in two ifs, whose body puts bird.y back on the screen (200, height / 2, or another on-screen spot). Setting vel.y to 0 there too is what step 2 asks and is welcome, but this criterion is about the position. Missing: no edge test, or the test never changes bird.y. Help: 5.4.3 (Worked Example: The bird that flaps)",
+        "points": 1
+      }
+    ]
   }
 }

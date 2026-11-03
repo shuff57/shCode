@@ -108,5 +108,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.14 Your Turn: Build a Sprite\". The task they were given: Starting from an empty setup(): create a canvas with new Canvas(width, height); store a rectangle sprite made with the 4-argument form new Sprite(x, y, width, height) in a variable and set its .color; store a circle sprite made with the 3-argument form new Sprite(x, y, diameter) and give it its own .color; then give one of the two sprites a .stroke and a .strokeWeight. You cannot run their code: read it and judge what it WOULD do when the sketch runs. new Sprite(x, y, w, h) makes a rectangle; new Sprite(x, y, d), with one size, makes a circle d pixels across. A fifth argument such as 'static' only sets the body type, so it is still the rectangle form. sprite.stroke is the outline colour and sprite.strokeWeight its thickness in pixels. A plain stroke(...) or strokeWeight(...) call is a drawing setting, not a property of a sprite. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Any numbers, expressions (such as width / 2) or variables work as arguments. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Canvas created with a size",
+        "description": "setup() calls new Canvas(...) with a width and a height (numbers, expressions or variables). Missing: no canvas.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Rectangle sprite (4-arg form)",
+        "description": "At least one new Sprite(...) given x, y, a width and a height (four values). A fifth body-type argument such as 'static' still makes a rectangle and counts. Missing: no sprite with both a width and a height. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Circle sprite (3-arg form)",
+        "description": "At least one new Sprite(...) given exactly three values: x, y and a diameter. Missing: no three-value sprite. Help: step 3 of this lab.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Property set on an instance",
+        "description": "At least one sprite's .color is assigned with =. Missing: no .color is set on a sprite. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Stroke used",
+        "description": "A sprite's .stroke or .strokeWeight is assigned with =. Setting both is what step 4 asks and is welcome. A plain stroke(...) function call does not set a sprite's property. Missing: neither property is set on a sprite. Help: step 4 of this lab.",
+        "points": 1
+      }
+    ]
   }
 }

@@ -47,5 +47,18 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.5.11 Challenges: Make it yours\". The task they were given: The Snake game is complete. Change one rule: (1) a faster snake: turn const BEAT into a let variable used in frameCount % beat, made smaller every time the snake eats, with a floor so the game never becomes impossible; (2) a best score: a second variable that is not reset when R is pressed, updated when the score beats it, and shown beside the score in drawTop(); or (3) the quick double-turn fix: store each turn in turnX and turnY in draw() and apply it to dx and dy at the start of the next step(). One of the three is enough. Step 2 also asks for a one-sentence // comment at the top naming the rule; no criterion checks that comment. You cannot run their code: read it and judge what it WOULD do when the sketch runs. A const can never be changed: a line that subtracts from a const stops the sketch with an error. frameCount % beat === 0 comes true every beat frames, so a smaller beat means a faster snake, and a beat of 0 never comes true. startRound() runs at the start and on R. step() runs once per beat. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Look for any one of the three, written any way and with any names. A rule of the student's own that does the same kind of job (the game speeds up as the snake eats, or a record survives a restart) also counts. A purely cosmetic change (a colour) is not a rule. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Your rule is in the code",
+        "description": "At least one of: (1) the beat lives in a variable that can change, is used in the frameCount % test, and gets smaller when the snake eats (a floor with max(...) or an if is what the challenge asks and is welcome); (2) a best score that startRound() does not reset, updated when the score beats it, where showing it is what the challenge asks and is welcome; (3) turns stored in their own variables (turnX and turnY, or other names) when a key is pressed, and copied into dx and dy at the start of step(). Missing: none of these is there, or the change would stop the sketch (subtracting from a const). Help: 5.5.2 (Reading: A world on a grid) and 5.5.4 (Lab: Steer it)",
+        "points": 1
+      }
+    ]
   }
 }

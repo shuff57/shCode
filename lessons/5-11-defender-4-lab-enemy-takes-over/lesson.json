@@ -128,5 +128,48 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.4 Lab: Enemy takes over\". The task they were given: The game is Part B's with a new Enemy class nothing uses yet. Fill in Enemy's three empty methods: takeHit(n) takes n off this.hp, puts it back to 0 if it went below, and shows the new hp on the sprite; isAlive() returns whether this.hp is above 0; land() sets this.hp to 0. Make spawnEnemy push one new Enemy(x, y, hp, fallSpeed) into enemies, and delete enemyHp and enemyWorth everywhere. Make the scene ask the enemy: in moveEnemies() each enemy moves itself, and one that is alive and has reached the base costs the base 1 and calls land(); in hitEnemies() a hit tests the enemy's sprite and asks isAlive() first, then calls takeHit(1) and, when that leaves it not alive, adds its worth to score. Last, write clearEnemies(): first remove() every enemy that is not alive, then keep only the living in enemies with filter; call it last inside if (playing) in draw(). The game must play exactly as before. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. In Part C each game object is a class instance that keeps its sprite in this.sprite, so a touch test names the sprites (this.sprite.overlaps(e.sprite)), not the objects. The game's classes have their own remove() that deletes the sprite. A finished object stays in its list until the clear-up at the end of the frame; filter returns a NEW array of the items whose test is true, so removing the finished sprites has to happen before the filter, or those sprites are left behind on screen. A static property belongs to the class and is reached as ClassName.name. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit, isAlive, land, move, reachedBase, remove, moveEnemies, hitEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's Enemy methods are empty and the scene still uses the parallel arrays: missing on every criterion. Using a for...of loop or an index loop over enemies is equally fine everywhere. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "takeHit lowers hp, never below 0",
+        "description": "Enemy's takeHit takes its parameter off this.hp and then makes sure this.hp is not below 0 (an if that sets 0, a ternary, or Math.max/max(0, ...)). Showing the new hp on the sprite is asked by the step but is not this card. Subtracting a typed 1 instead of the parameter is not met. A check only before subtracting, so hp can still end below 0, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "isAlive answers from hp",
+        "description": "Enemy's isAlive() RETURNS true while this.hp is above 0 and false at 0 (return this.hp > 0, >= 1, or an if/else that returns true or false). A method that returns nothing, or the opposite answer, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "land() uses the enemy up",
+        "description": "land() leaves this.hp at 0 (this.hp = 0, this.hp -= this.hp, or this.takeHit(this.hp)), so isAlive() answers false and the clear-up takes the enemy away. A land() that deletes or splices instead and leaves hp unchanged is not met.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "One array of Enemy objects; enemyHp and enemyWorth are gone",
+        "description": "Enemies are made with new Enemy(...) and kept in the one enemies array, and no line of running code names enemyHp or enemyWorth any more (the let line, spawnEnemy, both removal places, hitEnemies and startRound). A mention inside a comment does not count against it. Any leftover enemyHp or enemyWorth in code is not met.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The scene asks the enemy",
+        "description": "The game calls the enemy's own methods: in hitEnemies(), a hit asks the enemy isAlive() (or checks its hp is above 0) before it counts and then calls takeHit(...) on it; and a landing calls reachedBase() and then land(). Lowering e.hp by hand instead of calling takeHit is not met. A landing that tests the enemy's sprite y by hand instead of asking reachedBase() is partial. An overlap test that names the enemy object instead of its sprite is partial: no hit would ever be seen.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Finished enemies leave the screen and the list",
+        "description": "Once a frame (clearEnemies() or a function like it that draw() calls while playing), every finished enemy's sprite is removed from the screen (e.remove(), or e.sprite.delete()) and then the finished enemies are dropped from the list (enemies = enemies.filter(...) keeping the living), in that order. A loop from the end to the start that removes and splices each finished enemy does the same job and is met. Filtering first and removing after is not met: the finished sprites are left behind on screen. A clear-up function that nothing calls is not met.",
+        "points": 1
+      }
+    ]
   }
 }

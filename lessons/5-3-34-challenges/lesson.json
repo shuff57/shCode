@@ -97,5 +97,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.22 Challenges\". The task they were given: Pick one (or more) object-oriented challenge: (1) an Enemy class whose constructor stores x, y and hp on this, with an isAlive() method that returns whether this.hp is above 0, checked in draw(); (2) a Player class whose constructor makes a sprite and stores it on this.sprite, with a move(dir) method that sets this.sprite.vel.x and a jump() method that sets this.sprite.vel.y to a negative number, called from draw(); or (3) a Collectible class that stores x, y, value and color on this, and a PowerUp class that extends it, whose constructor calls super(...) with the same four arguments first, with a boost() method that returns double the value. Four things are checked: a class is defined, it has a constructor, an object is built from it with new, and it uses this.<property>, extends or super(...). You cannot run their code: read it and judge what it WOULD do when the sketch runs. class Name { ... } defines a class; constructor(...) runs once when new Name(...) builds an object, and this is that object. new Canvas(...), new Sprite(...) and new Group(...) build moSHion's own classes, not the student's. In a class that extends another, super(...) must run before the constructor touches this. y grows downward, so a negative vel.y moves up. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Judge the four criteria on whichever classes the student wrote: any class name, any of the three challenges, or a class of their own design all count. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Define at least one class",
+        "description": "The file defines at least one class of the student's own with the class keyword. Missing: no class. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Instantiates a class of your own",
+        "description": "An object is built with new from a class the student defined (not Canvas, Sprite or Group). Storing it in a variable is what step 2 asks. Missing: only moSHion's own classes are built. Help: 5.6.4 (The new operator)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Write a constructor",
+        "description": "At least one of the student's classes has a constructor(...). Storing its arguments on this is what step 3 asks. Missing: no constructor. Help: 5.6.5 (constructor and its parameters)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Use one OOP feature",
+        "description": "One of the student's classes uses at least one of: a this.<property> read or write, extends another class, or a super(...) call. Missing: none of these. Help: 5.7.21 (Encapsulation, inheritance, polymorphism)",
+        "points": 1
+      }
+    ]
   }
 }

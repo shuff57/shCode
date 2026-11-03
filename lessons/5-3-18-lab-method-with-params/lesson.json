@@ -52,5 +52,24 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.4 Lab: Method with parameters\". The task they were given: The Counter class has n and tick(). Inside the class body, write an addBy(n) method that adds its argument to this.n. The driver in draw() already calls c.addBy(1), c.addBy(2) and c.addBy(3) on the keys 1, 2 and 3. You cannot run their code: read it and judge what it WOULD do when the sketch runs. A method can take parameters like a function. Inside it, the parameter holds the number the driver passed in, and this.n is the counter's own count. The parameter can be named anything; naming it n is fine because this.n and n are different things. The driver calls c.addBy(...), so the method must be named addBy. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Ignoring the parameter (adding a fixed 1) or replacing the count with it (this.n = the parameter) does not add the argument. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "addBy(n) method declared",
+        "description": "Inside the Counter class there is an addBy method with one parameter (any name) and a body. Missing: no addBy method inside the class, or it takes no parameter. Help: 5.7.1 (Methods: functions that live on a class)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Parameter used inside method body",
+        "description": "The method's body adds the parameter to this.n: +=, this.n = this.n + the parameter, or the same with the parameter first. Calling this.tick() in a loop that runs that many times also adds it. Partial: the parameter is used but replaces the count instead of adding to it. Missing: the parameter is never used. Help: 3.2.5 (Parameters and Arguments)",
+        "points": 1
+      }
+    ]
   }
 }

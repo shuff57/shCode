@@ -53,5 +53,24 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.12 Lab: Write hit(other)\". The task they were given: The Enemy class already has takeHit(n). Inside the Player class, write a method hit(other) that takes one argument, another object, and asks THAT object to take damage equal to the player's own this.power. Space calls p.hit(e), so the enemy's hp should fall by 2 on each press. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. A parameter is the name a method uses for whatever object was handed in: p.hit(e) hands the enemy in, so inside hit the parameter IS that enemy. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (hit, takeHit) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's Player has no hit method, which is missing on both criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "hit(other) asks the argument to take the hit",
+        "description": "The Player class has a method named hit with one parameter (any name), and its body calls takeHit on that parameter, the object handed in. Calling this.takeHit(...) is not met: the player has no takeHit, and it is the other object that should be hit. Calling takeHit on the global e instead of the parameter is not met: hit would ignore which object it was given. Lowering the other object's hp by hand instead of asking it to takeHit is partial.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The damage is the player's own power",
+        "description": "The amount handed to takeHit is this.power (directly, or through a local copied from this.power), so a stronger player would hit harder. A typed 2 is not met: it matches today's power by luck and ignores the property.",
+        "points": 1
+      }
+    ]
   }
 }

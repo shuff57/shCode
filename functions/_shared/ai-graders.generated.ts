@@ -7265,6 +7265,162 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "5-1-11-moshion-intro": {
+    "lessonTitle": "5.1.11 Hello Sprite",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.11 Hello Sprite\". The task they were given: Make a first moSHion sketch. In setup(): make a 400 by 400 canvas, make a sprite at the centre (200, 200) that is 40 wide and 40 tall and store it in player, and give it a colour. In draw(): paint the background every frame so the sprite can be seen clearly. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once when the sketch starts, and draw() runs again on every frame, about 60 times a second. new Canvas(w, h) makes the drawing area. new Sprite(x, y, w, h) makes a sprite; the course makes sprites once, in setup(). background(colour) inside draw() repaints the whole canvas every frame, so old frames do not pile up. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Create a canvas",
+        "description": "new Canvas(...) is called when the sketch starts, normally in setup(). Any size counts; the lab uses 400 by 400. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Create at least one sprite",
+        "description": "At least one sprite is made with new Sprite(...). Storing it in player is what the step asks, but any name, or no variable at all, still counts, and so does any position and size. A sprite made inside draw() still exists, so it counts, but say in the note that it belongs in setup(), because draw() makes a new one every frame.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Set a sprite color",
+        "description": "A sprite is given a colour with .color = ..., on the stored variable or straight on new Sprite(...). Any colour name or hex code counts. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Clear the background each frame",
+        "description": "background(...) is called inside draw(), with any colour, so each frame starts clean. A background() call only in setup() runs once, so it is not met.",
+        "points": 1
+      }
+    ]
+  },
+  "5-1-18-lab-else-to-zero": {
+    "lessonTitle": "5.1.19 Lab: Delete the else, watch drift",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.19 Lab: Delete the else, watch drift\". The task they were given: The starter ships a working WASD movement pattern in draw(): for each direction, an if / else if chain sets player.vel.x (or player.vel.y) from the keys and ends in an else that sets it back to 0. The student deletes both else lines, watches the sprite drift, then puts both else lines back so the sprite stops when no key is held, and changes the speed of 4 (and -4) to a speed of their own, from 2 to 6. What the starter file already had: exactly that working pattern, with a speed of 4 on every movement line. Because the starter already has both else lines, the first two criteria read as met on the starter; the speed criterion is the one the starter does not meet. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: kb.pressing('a') is true on every frame the key is held. vel.x and vel.y are the sprite's speed in pixels per frame, and a sprite keeps its velocity until code changes it, which is why it drifts when nothing sets the speed back to 0. y grows downward, so a negative vel.y moves up. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Restore else player.vel.x = 0",
+        "description": "In draw(), when neither the left nor the right key is held, player.vel.x is set back to 0, so the sprite stops sideways. The else at the end of the chain is the shape the lab uses (with or without braces); any other way that sets vel.x to 0 whenever no left or right key is held also counts. Help: 5.1.18 (The else-to-zero rule)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Restore else player.vel.y = 0",
+        "description": "In draw(), when neither the up nor the down key is held, player.vel.y is set back to 0, so the sprite stops up and down. The else at the end of the chain is the shape the lab uses (with or without braces); any other way that sets vel.y to 0 whenever no up or down key is held also counts. Help: 5.1.18 (The else-to-zero rule)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A speed of your own",
+        "description": "At least one movement line in draw() sets player.vel.x or player.vel.y to a speed other than 4 (or -4), so the sprite moves at a speed the student chose. 5.1.17 suggests 2 to 6, but any other speed that moves the sprite counts, including a decimal or a variable holding the speed. The lines that set the speed back to 0 are not a speed. If every movement line still uses 4, it is not met yet. Help: 5.1.17 (Movement pattern (if / else if / else))",
+        "points": 1
+      }
+    ]
+  },
+  "5-1-20-moshion-move-keys": {
+    "lessonTitle": "5.1.20 Make it Move",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.20 Make it Move\". The task they were given: In setup(), make a 400 by 400 canvas and one sprite in the middle, stored in the player variable declared at the top. In draw(), paint the background first, then set player.vel.x from the left and right keys and player.vel.y from the up and down keys: if one key is held set a speed, else if the other key is held set the opposite speed, else set 0. Up is a negative vel.y. WASD ('a', 'd', 'w', 's') or the arrow keys ('left', 'right', 'up', 'down') are both fine. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame. kb.pressing(key) is true on every frame the key is held. The key names 'left', 'right', 'up' and 'down' are the arrow keys, and spellings such as 'ArrowLeft' work too. vel.x and vel.y are the sprite's speed in pixels per frame. y grows downward, so moving up is a negative vel.y. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Create a canvas",
+        "description": "new Canvas(...) is called when the sketch starts, normally in setup(). Any size counts; the lab uses 400 by 400. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Create a sprite",
+        "description": "A sprite is made with new Sprite(...), normally in setup() and stored in player. Any position and size count. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Horizontal keyboard input",
+        "description": "Inside draw() (or update(), if the student wrote one), a left or right key is read every frame with kb.pressing(...): 'a', 'd', 'left', 'right', or another spelling of the arrow keys. Help: 5.1.14 (Key names: WASD and the arrow keys)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Vertical keyboard input",
+        "description": "Inside draw() (or update(), if the student wrote one), an up or down key is read every frame with kb.pressing(...): 'w', 's', 'up', 'down', or another spelling of the arrow keys. Help: 5.1.14 (Key names: WASD and the arrow keys)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Set horizontal velocity",
+        "description": "Inside draw() (or update()), the sprite's vel.x is set every frame, to numbers such as a speed, the opposite speed and 0. Changing the sprite's x position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.16 (Velocity: vel.x and vel.y)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Set vertical velocity",
+        "description": "Inside draw() (or update()), the sprite's vel.y is set every frame, to numbers such as a speed, the opposite speed and 0. Changing the sprite's y position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.16 (Velocity: vel.x and vel.y)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "Clear the background each frame",
+        "description": "background(...) is called inside draw(), with any colour, so old frames do not pile up. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
+        "points": 1
+      }
+    ]
+  },
+  "5-1-21-a10-1-sprite-playground": {
+    "lessonTitle": "5.1.22 Sprite Playground",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.22 Sprite Playground\". The task they were given: Make a canvas (any size from 300 by 300 to 800 by 600) and two sprites: player, which the keys control, and mover, which moves on its own. In draw(): paint the background every frame; move the player with kb.pressing and WASD or the arrow keys by setting its velocity, with an else that sets the velocity back to 0 when no key is held; make the mover move on its own using frameCount (any pattern: swing back and forth, orbit or spin); and draw a text label on the canvas with fill(), textSize() and text(). What the starter file already had: `let player, mover;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame (update(), if the student writes one, also runs every frame). frameCount is the number of frames since the sketch started, so anything worked out from it changes every frame; sin() and cos() of a small number times frameCount swing between -1 and 1. kb.pressing(key) is true on every frame the key is held. vel.x and vel.y are speed in pixels per frame, and y grows downward. text(words, x, y) draws words on the canvas; fill() sets their colour and textSize() their size. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Create a canvas",
+        "description": "new Canvas(...) is called when the sketch starts, normally in setup(). Any size counts; the step suggests 300 by 300 up to 800 by 600, and a size a little outside that is close enough. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Create at least 2 sprites",
+        "description": "Two or more sprites are made with new Sprite(...), normally in setup(): one for the player and one for the mover. Any names, positions and sizes count. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Horizontal keyboard input",
+        "description": "In draw() (or update()), a left or right key is read with kb.pressing(...) ('a', 'd', 'left', 'right' or another spelling of the arrow keys) and moves the player sideways. Help: 5.1.14 (Key names: WASD and the arrow keys)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Vertical keyboard input",
+        "description": "In draw() (or update()), an up or down key is read with kb.pressing(...) ('w', 's', 'up', 'down' or another spelling of the arrow keys) and moves the player up or down. Help: 5.1.14 (Key names: WASD and the arrow keys)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Velocity resets to zero",
+        "description": "When no movement key is held, the player's vel.x or vel.y (one or both) is set back to 0, so the player stops. An else at the end of the key chain is the course's shape (with or without braces); any other way that sets it to 0 when no key is held also counts. Help: 5.1.18 (The else-to-zero rule)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Automatic motion for the mover",
+        "description": "The mover changes every frame with no key held. The step asks for frameCount, such as the mover's x, y or rotation worked out from frameCount (with or without sin() or cos()); any other honest way that keeps it moving on its own also counts, such as adding a little to its x or rotation every frame in draw(), or giving it a velocity that nothing stops. A mover that only moves while a key is held, or that never moves, is not met. Help: 5.1.15 (Worked Example: Keyboard Movement)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "On-screen text label",
+        "description": "text(...) is called inside draw() with any words or value, so a label shows on the canvas. fill() and textSize() help it show but are not needed for this card. A text() call only in setup() is wiped by the next background(), so it is not met. Help: 5.1.21 (Words on the canvas: text())",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "Clear the background each frame",
+        "description": "background(...) is called inside draw(), with any colour, so previous frames do not stack up. Help: 5.1.9 (background(color) wipe rule)",
+        "points": 1
+      }
+    ]
+  },
   "5-1-22-a10-2-frame-loop": {
     "lessonTitle": "5.1.23 Frame Loop Writeup",
     "prompt": "Answer all three. Everything you need is in 5.1.3 (Frame loop), 5.1.16 (Velocity) and the 5.1.12 video: go back and reread or rewatch if you get stuck. A few sentences each is plenty, in your own everyday words.\n\nQuestion 1, In your own words, what is the difference between setup() and draw() in a moSHion sketch? When does each one run? (5.1.3, the worked example in 5.1.4, and the 5.1.12 video)\n\nQuestion 2: moSHion runs at about 60 frames per second. If you set player.vel.x = 4, how many pixels does the sprite move in one second? Show your math. How far in 5 seconds? If your canvas is 400 pixels wide, roughly how long until the sprite crosses the whole canvas? (5.1.16)\n\nQuestion 3: Why do you think the engine gives us vel (velocity) instead of making us set pos.x ourselves every frame? Give one reason. (5.1.16)",
@@ -7292,6 +7448,126 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "contextDocs": [
       "overview",
       "sprite"
+    ]
+  },
+  "5-1-23-challenges": {
+    "lessonTitle": "5.1.24 Challenges",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.24 Challenges\". The task they were given: In setup(), make a canvas of any size and at least one sprite, the player. Call background() as the first line of draw(). Then build at least one of five challenges in draw(): (1) while an arrow key is held, the player wears a different colour; (2) a second sprite circles the player, placed with cos and sin of frameCount; (3) one of the player's values is drawn on the canvas with text(); (4) a HUD at the top shows the frame count on one line and the player's x and y on the next; (5) a sprite bobs up and down on its own, placed with sin of frameCount. The starter's comments also suggest moving the player with the keys, but that is not one of the challenges. What the starter file already had: a setup() with only comments (no canvas, no sprite) and a draw() that already calls background('#222') followed by step comments. There is no `let player;` line in the starter, so the student may add their own variables. On the starter only the background criterion is met. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame (update() too, if the student writes one). kb.pressing(key) is true on every frame a key is held; kb.presses(key) only on the frame it goes down. frameCount counts the frames since the start; sin() and cos() of a small number times frameCount swing between -1 and 1, so multiplying by 60 or 80 gives a swing that many pixels wide. A sprite's position can be read and set as x and y or as pos.x and pos.y. text(words, x, y) draws on the canvas, and words and a number join with +. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Create a canvas",
+        "description": "new Canvas(...) is called when the sketch starts, normally in setup(). Any size counts. The starter has no canvas, so this is not met until the student adds one. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Create at least one sprite",
+        "description": "At least one sprite is made with new Sprite(...), normally in setup(). Any name, position and size count. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Background set each frame",
+        "description": "background(...) is called inside draw(), with any colour. The starter already has this line, so it stays met unless it was deleted or moved out of draw(). Help: 5.1.9 (background(color) wipe rule)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Use at least one advanced feature",
+        "description": "At least one of the five challenges is built and would really run in draw() (or update()): a held key changes the player's colour; a second sprite is placed around the player with cos and sin; a value is drawn with text(); a HUD of text() lines; or a sprite is moved up and down with sin. Other honest extras beyond a canvas, a sprite and a background also count, such as using the mouse's position, kb.presses(...), or a timer built from frameCount. Moving the player with the keys on its own is the earlier lab's job, not a challenge, so that alone is not met yet.",
+        "points": 1
+      }
+    ]
+  },
+  "5-1-25-math-grid": {
+    "lessonTitle": "5.1.25 Lab: A grid like math (optional)",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.25 Lab: A grid like math (optional)\". The task they were given: An optional lab. In draw(), after the background, call showGrid(50) to draw a grid. In setup(), on the line right after new Canvas(400, 400), switch on math mode with world.origin set to 'math', so (0, 0) is the centre and y grows up. Below that, still in setup(), make a sprite at (100, 50), 40 by 40, and store it in box. In draw(), call showMouse() so the pointer's (x, y) shows beside it. What the starter file already had: `let box;` at the top, a 400 by 400 canvas in setup(), and background('#222') in draw(), with step comments and nothing else. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: showGrid(spacing) and showMouse() draw for one frame at a time, so they belong in draw(), which runs every frame; called only in setup() they show for one frame and vanish. world.origin can only be 'screen' (the default: (0, 0) at the top-left, y grows down) or 'math' ((0, 0) at the centre, y grows up). Setting it after a sprite has been made, after gravity has been turned on, or once frames have run stops the sketch with an error that says to move the line up. In math mode a positive y is above the centre. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Draw the grid",
+        "description": "showGrid(...) is called inside draw(), with any spacing (the lab uses 50). A call only in setup() shows for one frame and vanishes, so it is not met.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Switch on math mode",
+        "description": "world.origin is set to the word math in quotes (single, double or backticks), before any sprite is made, normally right after new Canvas(...) in setup(). If it comes after a sprite is made, the sketch would stop with an error, so that is not met yet.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A sprite above the centre",
+        "description": "A sprite is made with new Sprite(...) whose second number, its y, is above 0, such as the lab's (100, 50). In math mode a positive y is above the centre. Any positive y and any x count, and storing it in box is what the step asks but is not needed for this card. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Show the mouse",
+        "description": "showMouse() is called inside draw(), so the pointer's (x, y) is written beside it every frame.",
+        "points": 1
+      }
+    ]
+  },
+  "5-1-7-lab-one-sprite": {
+    "lessonTitle": "5.1.7 Exploration: Move, resize and recolor a sprite",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.7 Exploration: Move, resize and recolor a sprite\". The task they were given: Start from a sketch that already works and change its numbers, one at a time: move the sprite away from the centre by changing the first two numbers in new Sprite(...), change its size with the last two numbers, and give it a colour other than tomato. There is no new code to write. What the starter file already had: a 360 by 360 canvas and one sprite made at x 180, y 180 (the centre), 60 wide and 60 tall, coloured 'tomato', and a dark background in draw(). Those starting values are not a change, so the starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: new Sprite(x, y, w, h): the first two numbers are the sprite's centre, x then y, and the last two are its width then its height. (0, 0) is the top-left corner, x grows to the right and y grows DOWN. A colour is a CSS colour name in quotes, such as 'gold', or a hex code such as '#ff0'. The sprite does not have to be stored in a variable: setting .color straight on new Sprite(...) works. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Moved the sprite",
+        "description": "The sprite no longer sits at the starter's 180, 180: at least one of the first two numbers in new Sprite(...) is different, so it is somewhere other than the centre. Any new position counts, even one near an edge. Moving it another way, such as setting its x or y on a later line, counts too. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Resized the sprite",
+        "description": "The sprite is no longer 60 by 60: at least one of the last two numbers (width, height) is different. Any new size counts. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Recolored the sprite",
+        "description": "The sprite's colour is set to something other than 'tomato': any colour name, hex code or other colour value the sketch can show counts. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      }
+    ]
+  },
+  "5-10-defender-2-lab-a-field-of-enemies": {
+    "lessonTitle": "5.10.2 Lab: A field of enemies",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.10.2 Lab: A field of enemies\". The task they were given: spawnOnBeat() already asks spawnEnemy(x, y, hp) for an enemy every 60 frames. Fill in spawnEnemy: build a 30 by 30 sprite at (x, y) with collider 'none', coloured orange when hp is more than 1 and crimson otherwise, with its hp written on it as text, then push the sprite onto enemies, hp onto enemyHp and hp * 10 onto enemyWorth. Then, in moveEnemies(), loop over enemies from the end to the start: move each one down by fallSpeed, and when one's y is more than BASE_Y, take 1 from baseHp, delete its sprite and splice index j out of all three arrays. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. A sprite's collider can be set with .collider = 'none' or by passing 'none' as the last argument to new Sprite, the way the starter passes 'static' for the base. A 'none' sprite passes through other sprites and does not fall by itself, but a vel still moves it. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (spawnEnemy, moveEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's spawnEnemy() and the loop in moveEnemies() are only STEP comments: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "spawnEnemy builds a pass-through sprite",
+        "description": "spawnEnemy makes a new Sprite and gives it collider 'none' (with .collider = 'none', or 'none' as the last argument to new Sprite). The colour and the text are asked by the step but are not this card. A sprite left solid is not met: shots and enemies would shove each other around.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "One push per array",
+        "description": "spawnEnemy pushes once onto each of enemies (the sprite), enemyHp (the hp) and enemyWorth (the worth), so index j is the same enemy in all three. Missing any one of the three pushes is not met.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Enemies fall",
+        "description": "Every frame moveEnemies() moves each enemy down: adding fallSpeed (or another positive number) to its y in a loop over enemies (+=, or = y + ...), or giving it a downward vel. Subtracting from y moves it up: not met. Moving only one enemy, such as enemies[0], is partial.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A landing costs the base 1",
+        "description": "Inside an if that tests an enemy's y against BASE_Y (more than, or at least; a typed 370 is fine), baseHp goes down by exactly 1. Taking hp outside that if is not met.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "A landed enemy leaves the screen and all three arrays",
+        "description": "Inside that landing if, the enemy's sprite is deleted (.delete() or .remove()) and index j is spliced out of enemies, enemyHp AND enemyWorth (or a removeEnemy(j) helper that does those four things is called there). Missing only the delete is partial: the enemy would stay stuck on the base. Splicing only one or two of the three arrays is not met.",
+        "points": 1
+      }
     ]
   },
   "5-10-defender-3-plan-the-hit-loop": {
@@ -7326,6 +7602,90 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "5-10-defender-5-lab-shoot-them-down": {
+    "lessonTitle": "5.10.5 Lab: Shoot them down",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.10.5 Lab: Shoot them down\". The task they were given: Shots fly straight through the enemies. All the work is in hitEnemies(), which draw() already calls. Loop over bullets from the end to the start and, inside it, over enemies from the end to the start. When bullets[i] overlaps enemies[j]: delete the shot and splice it out of bullets; take 1 from enemyHp[j] and show the new number on the enemy; if that leaves enemyHp[j] at 0 or less, add enemyWorth[j] to score, delete the enemy's sprite and splice index j out of all three arrays; and end with break, because that shot is gone. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. A splice moves every later item down one place, so after bullets.splice(i, 1) the index i names a different shot or nothing, and after the three enemy arrays are spliced at j, enemyWorth[j] belongs to a different enemy. break leaves only the innermost loop; a line after it inside the same block never runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (hitEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's hitEnemies() is only STEP comments: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Every shot is tested against every enemy",
+        "description": "hitEnemies has a loop over bullets with a loop over enemies inside it (either way round, index loops or for...of), and tests each pair with overlaps(). A single loop, or testing only one shot or only one enemy, is not met: not every shot meets every enemy.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A hit removes the shot",
+        "description": "Inside the if that sees the overlap, the shot's sprite is deleted (.delete() or .remove()) and the shot is spliced out of bullets. Only one of the two is partial.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A hit takes 1 hp",
+        "description": "Inside the overlap if, and before any break or return that ends it, enemyHp[j] (the same index as the enemy that was hit) goes down by exactly 1. A line after the break never runs: not met. Changing only the sprite's text, or another index, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "At 0 hp the enemy scores its worth and leaves all three arrays",
+        "description": "When enemyHp[j] is 0 or less (<= 0, === 0, or < 1), score goes up by enemyWorth[j] BEFORE the splices and before the break, and then index j is spliced out of enemies, enemyHp and enemyWorth (directly, or through a removeEnemy(j) helper). Adding the worth after the splices is not met: by then it is another enemy's worth. Splicing fewer than all three arrays is not met. Splicing all three but never deleting the enemy's sprite is partial.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "A shot that hit is not tested again",
+        "description": "Inside the overlap if, once the shot is spliced, the inner loop stops (break, return, or a flag that ends the inner loop), so the spliced shot's index is never read again. With no way out, the next pass reads bullets[i], which is now another shot or nothing: not met.",
+        "points": 1
+      }
+    ]
+  },
+  "5-10-defender-7-lab-waves": {
+    "lessonTitle": "5.10.7 Lab: Waves",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.10.7 Lab: Waves\". The task they were given: Enemies now come in waves. In startRound(), set wave to 0 and wavePause to 60. In nextWave(), return straight away while any enemies are left; otherwise count wavePause down by 1, and when it reaches 0 call spawnWave() and set wavePause back to 90. In spawnWave(), add 1 to wave, make each wave fall a little faster than the last, and loop wave + 2 times, building each enemy with spawnEnemy(...), every third one a tough one with 3 hp. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. startRound() runs from setup() and from the R key, so it is the one place a round's numbers start again. draw() calls nextWave() every frame while playing. return inside a function ends that function for this frame. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (startRound, nextWave, spawnWave, spawnEnemy) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's three places are only STEP comments: missing on every criterion. The exact numbers for speed, hp, positions and wave size are asked by the steps but are not criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Every round starts at wave 0 with a pause",
+        "description": "startRound() sets wave to 0 and gives wavePause a number of frames above 0 (60 in the step; any number or a named constant). Setting them only in setup() is not met: R would not reset them. Leaving wavePause unset is not met: the countdown could never reach 0.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The pause counts down only on a clear field",
+        "description": "nextWave() takes 1 off wavePause only while no enemies are left: an early return while enemies.length is above 0, or the countdown inside an if that asks the list is empty. Starting a wave only on a clear field on a frameCount % beat (the 5.8.18 shape) also counts. A countdown that runs while enemies are still falling is not met.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "At 0 the next wave comes and the pause starts again",
+        "description": "When wavePause reaches 0 (<= 0, === 0, or < 1), nextWave() calls spawnWave() and sets wavePause back to a number above 0 (or a named constant). Never setting wavePause back is not met: after the first wave a new one would start on every clear frame. With the 5.8.18 frameCount beat instead, calling spawnWave() inside that clear-field beat counts.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A wave adds 1 to the wave number and builds its enemies in a loop",
+        "description": "spawnWave() raises wave by 1 (+= 1, ++, or = wave + 1) and calls spawnEnemy(...) inside a for or while loop, so the number of enemies can grow with the wave. Calling spawnEnemy a fixed number of times by hand, with no loop, is partial.",
+        "points": 1
+      }
+    ]
+  },
+  "5-10-defender-8-debugging-the-enemy-that-would-not-die": {
+    "lessonTitle": "5.10.8 Debugging: The enemy that would not die",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.10.8 Debugging: The enemy that would not die\". The task they were given: The editor holds the finished Part B game with one line missing. After an enemy lands on the base, the labels in the next wave are wrong: a crimson 1 takes three shots and an orange 3 dies in one, and nothing crashes. The two places that remove an enemy, the landing in moveEnemies() and the kill in hitEnemies(), must each splice all three parallel arrays at the same index. Find the missing line and add it. Optionally, move the removal lines into function removeEnemy(j) and call it from both places. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (moveEnemies, hitEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. Check each of the three array names in each of the two removal places. As the starter comes, the landing splices only two of the three arrays: that is the bug, so the landing criterion is NOT met until all three are spliced there. In a not-met note, say which function the problem is in and that one of the three arrays is not spliced there, but do not name which array: finding it is the exercise. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A landed enemy leaves all three arrays",
+        "description": "In the landing (the if in moveEnemies() that sees an enemy pass BASE_Y), index j is spliced out of enemies, enemyHp AND enemyWorth, in any order (or a removeEnemy(j) helper that splices all three is called there). Two of the three is exactly the bug this lab is about: not met.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A shot-down enemy leaves all three arrays",
+        "description": "In the kill (the if in hitEnemies() that sees an enemy's hp reach 0), index j is spliced out of enemies, enemyHp and enemyWorth (directly, or through a removeEnemy(j) helper that splices all three). The starter already does this, so it stays met unless the student's changes broke it, for example by deleting one of those splices or by calling a helper that is missing one.",
+        "points": 1
+      }
+    ]
+  },
   "5-11-defender-2-plan-draw-the-classes-first": {
     "lessonTitle": "5.11.2 Plan: Draw the classes first",
     "prompt": "Everything you need is on this page and in 5.11.1 (Reading: Count the cost): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to rebuild Defender with three classes: Bullet, Enemy and Spawner. Before you move any code, plan them.\n\n1. For at least two of the three classes, name one thing each one remembers.\n\n2. For at least two of them, name one thing each one can do or answer.\n\n3. Name one job that leaves draw() or a Part B function and moves into a class.\n\n4. Which class answers \"no\" to the checklist's first question, \"more than one of this thing?\", and why might it still be a class?",
@@ -7358,6 +7718,132 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "5-11-defender-4-lab-enemy-takes-over": {
+    "lessonTitle": "5.11.4 Lab: Enemy takes over",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.4 Lab: Enemy takes over\". The task they were given: The game is Part B's with a new Enemy class nothing uses yet. Fill in Enemy's three empty methods: takeHit(n) takes n off this.hp, puts it back to 0 if it went below, and shows the new hp on the sprite; isAlive() returns whether this.hp is above 0; land() sets this.hp to 0. Make spawnEnemy push one new Enemy(x, y, hp, fallSpeed) into enemies, and delete enemyHp and enemyWorth everywhere. Make the scene ask the enemy: in moveEnemies() each enemy moves itself, and one that is alive and has reached the base costs the base 1 and calls land(); in hitEnemies() a hit tests the enemy's sprite and asks isAlive() first, then calls takeHit(1) and, when that leaves it not alive, adds its worth to score. Last, write clearEnemies(): first remove() every enemy that is not alive, then keep only the living in enemies with filter; call it last inside if (playing) in draw(). The game must play exactly as before. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. In Part C each game object is a class instance that keeps its sprite in this.sprite, so a touch test names the sprites (this.sprite.overlaps(e.sprite)), not the objects. The game's classes have their own remove() that deletes the sprite. A finished object stays in its list until the clear-up at the end of the frame; filter returns a NEW array of the items whose test is true, so removing the finished sprites has to happen before the filter, or those sprites are left behind on screen. A static property belongs to the class and is reached as ClassName.name. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit, isAlive, land, move, reachedBase, remove, moveEnemies, hitEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's Enemy methods are empty and the scene still uses the parallel arrays: missing on every criterion. Using a for...of loop or an index loop over enemies is equally fine everywhere. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "takeHit lowers hp, never below 0",
+        "description": "Enemy's takeHit takes its parameter off this.hp and then makes sure this.hp is not below 0 (an if that sets 0, a ternary, or Math.max/max(0, ...)). Showing the new hp on the sprite is asked by the step but is not this card. Subtracting a typed 1 instead of the parameter is not met. A check only before subtracting, so hp can still end below 0, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "isAlive answers from hp",
+        "description": "Enemy's isAlive() RETURNS true while this.hp is above 0 and false at 0 (return this.hp > 0, >= 1, or an if/else that returns true or false). A method that returns nothing, or the opposite answer, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "land() uses the enemy up",
+        "description": "land() leaves this.hp at 0 (this.hp = 0, this.hp -= this.hp, or this.takeHit(this.hp)), so isAlive() answers false and the clear-up takes the enemy away. A land() that deletes or splices instead and leaves hp unchanged is not met.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "One array of Enemy objects; enemyHp and enemyWorth are gone",
+        "description": "Enemies are made with new Enemy(...) and kept in the one enemies array, and no line of running code names enemyHp or enemyWorth any more (the let line, spawnEnemy, both removal places, hitEnemies and startRound). A mention inside a comment does not count against it. Any leftover enemyHp or enemyWorth in code is not met.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The scene asks the enemy",
+        "description": "The game calls the enemy's own methods: in hitEnemies(), a hit asks the enemy isAlive() (or checks its hp is above 0) before it counts and then calls takeHit(...) on it; and a landing calls reachedBase() and then land(). Lowering e.hp by hand instead of calling takeHit is not met. A landing that tests the enemy's sprite y by hand instead of asking reachedBase() is partial. An overlap test that names the enemy object instead of its sprite is partial: no hit would ever be seen.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Finished enemies leave the screen and the list",
+        "description": "Once a frame (clearEnemies() or a function like it that draw() calls while playing), every finished enemy's sprite is removed from the screen (e.remove(), or e.sprite.delete()) and then the finished enemies are dropped from the list (enemies = enemies.filter(...) keeping the living), in that order. A loop from the end to the start that removes and splices each finished enemy does the same job and is met. Filtering first and removing after is not met: the finished sprites are left behind on screen. A clear-up function that nothing calls is not met.",
+        "points": 1
+      }
+    ]
+  },
+  "5-11-defender-5-lab-bullet": {
+    "lessonTitle": "5.11.5 Lab: Bullet, and a hit that takes an enemy",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.5 Lab: Bullet, and a hit that takes an enemy\". The task they were given: Shots become Bullet objects. In the Bullet class write isAlive() (true while this.spent is false AND this.sprite.y is more than -20), hits(enemy) (true when this shot is alive, that enemy is alive, and this sprite overlaps the enemy's sprite; it answers the question and changes nothing) and spend() (sets this.spent to true). Make fire() push a new Bullet built just above the ship onto bullets, and make moveBullets() just ask every shot to move(). Rewrite hitEnemies() as every shot against every enemy: if the shot hits the enemy, spend the shot, call takeHit(1) on the enemy and, when that leaves it not alive, add its worth to score, with no splice and no break. Rename clearEnemies() to clearFinished() and give it the same two parts for bullets (remove() the finished ones, then filter the living into bullets), above the part for enemies; startRound() calls remove() on each shot. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. In Part C each game object is a class instance that keeps its sprite in this.sprite, so a touch test names the sprites (this.sprite.overlaps(e.sprite)), not the objects. The game's classes have their own remove() that deletes the sprite. A finished object stays in its list until the clear-up at the end of the frame; filter returns a NEW array of the items whose test is true, so removing the finished sprites has to happen before the filter, or those sprites are left behind on screen. A static property belongs to the class and is reached as ClassName.name. A spent shot is no longer alive, so hits() answers false for every enemy after the one it hit; that is why the hit loop needs no splice and no break any more. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (isAlive, hits, spend, move, remove, fire, hitEnemies, takeHit) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's three Bullet methods are empty and fire() still pushes a bare sprite: missing on every criterion. for...of loops and index loops are equally fine. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A bullet is alive while not spent and on screen",
+        "description": "Bullet's isAlive() returns true only while the shot is not spent (!this.spent, or this.spent === false) AND its sprite's y is above the top edge (this.sprite.y > -20, or another value near 0), joined with && or written as ifs that return false for either case. Checking only one of the two is not met: a spent shot would keep hitting, or a shot off the top would never be cleared.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "hits(enemy) asks about the other object's sprite",
+        "description": "hits(...) returns whether this shot's sprite overlaps the sprite of the enemy passed in (parameter any name), and only while both this shot and that enemy are alive. It answers: calling takeHit inside hits() is not met. Testing the enemy object instead of its sprite is not met: no hit would be seen. Leaving out the alive checks is partial: a spent shot could hit again.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "spend() marks the shot used",
+        "description": "spend() sets this.spent to true. A spend() that deletes or splices instead, leaving spent false, is not met: isAlive() reads spent.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "fire() builds a Bullet",
+        "description": "fire() makes each shot with new Bullet(...) and puts it into bullets (bullets.push(new Bullet(...)), or a variable that is then pushed). A Bullet built but never pushed is not met: it is never moved or seen. Still pushing a bare new Sprite is not met.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The hit loop asks the bullet",
+        "description": "hitEnemies() asks a shot .hits(...) about an enemy and, when the answer is yes, calls .spend() on that shot. Testing the overlap by hand in hitEnemies() instead of asking hits() is partial.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Finished shots leave the screen and the list",
+        "description": "Once a frame (clearFinished() or a function like it that draw() calls while playing), every finished shot's sprite is removed (b.remove(), or b.sprite.delete()) and then the finished shots are dropped from bullets (bullets = bullets.filter(...) keeping the living), in that order. A loop from the end to the start that removes and splices each finished shot is met too. Filtering first is not met: the sprites stay on screen. No clear-up for shots at all is not met.",
+        "points": 1
+      }
+    ]
+  },
+  "5-11-defender-6-lab-a-spawner-for-the-waves": {
+    "lessonTitle": "5.11.6 Lab: A Spawner for the waves",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.6 Lab: A Spawner for the waves\". The task they were given: The waves move into a new Spawner class that keeps this.wave and this.pause. Write ready(enemiesLeft): answer false while enemiesLeft is above 0; otherwise count this.pause down by 1 and answer whether it has reached 0. Write makeWave(): add 1 to this.wave, set this.pause back to 90, work out the speed from this.wave, build the wave's enemies with new Enemy(...) into a new array in a loop, and return that array. In draw(), replace nextWave() with: when spawner.ready(...) says yes, enemies = spawner.makeWave(). In startRound(), the old wave lines become spawner = new Spawner(). Delete the old wave variables, spawnEnemy(), spawnWave() and nextWave(), and make the HUD in drawTop() read spawner.wave. Last, give Enemy a static spawned counter that starts at 0, add 1 to it in Enemy's constructor, set it back to 0 in startRound(), and show it on the game-over screen. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. In Part C each game object is a class instance that keeps its sprite in this.sprite, so a touch test names the sprites (this.sprite.overlaps(e.sprite)), not the objects. The game's classes have their own remove() that deletes the sprite. A finished object stays in its list until the clear-up at the end of the frame; filter returns a NEW array of the items whose test is true, so removing the finished sprites has to happen before the filter, or those sprites are left behind on screen. A static property belongs to the class and is reached as ClassName.name. return hands a value back to whoever called the method. A wave only arrives on a clear field, so putting the new array in enemies loses nothing. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (ready, makeWave, startRound, drawTop) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's ready() and makeWave() are empty and the old wave code is still there: missing on every criterion. The exact speeds, positions and wave size are asked by the steps but are not criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "ready() counts down only on a clear field",
+        "description": "ready(...) answers false while enemies are left (its parameter above 0, or enemies.length above 0) without touching this.pause, and only on a clear field takes 1 off this.pause and answers whether it has reached 0 (return this.pause <= 0, or an if that returns true, then false). A ready() that counts down while enemies are still on the field is not met, and so is one that can never return true.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "makeWave() builds and returns a new array of enemies",
+        "description": "makeWave() raises this.wave by 1, builds the wave's enemies with new Enemy(...) in a loop into a new array of any name, and RETURNS that array. A makeWave() that returns nothing is not met: enemies = spawner.makeWave() would then store undefined.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "draw() asks the spawner",
+        "description": "Every frame while playing, the game asks spawner.ready(...) with the number of enemies left and, when it answers yes, keeps what spawner.makeWave() gives back in enemies (enemies = spawner.makeWave(), or pushing its items into enemies). Calling makeWave() without keeping its result is not met: those enemies would never move or be hit. Calling makeWave() every frame without asking ready() is not met.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A restart is a new Spawner",
+        "description": "startRound() sets spawner = new Spawner(), so the wave number and the pause start again together. Making the Spawner only in setup() is not met: R would keep the old wave number.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The class counts its enemies, and a round resets the count",
+        "description": "Three parts: Enemy declares static spawned = 0 in its class body; its constructor adds 1 to Enemy.spawned (+= 1, ++, or this.constructor.spawned); and startRound() sets Enemy.spawned back to 0. this.spawned instead of Enemy.spawned is not met: that belongs to one enemy, not the class. Two of the three parts is partial.",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "The old wave globals are gone",
+        "description": "wavePause, spawnWave() and nextWave() no longer appear in running code (a mention in a comment is fine), and the HUD in drawTop() reads spawner.wave instead of the old wave. A drawTop() that still reads the bare wave is not met: once the old variable is gone it stops the game with 'wave is not defined'. A leftover nextWave() or spawnWave() that is still called is not met; one left defined but never called is partial.",
+        "points": 1
+      }
+    ]
+  },
   "5-11-defender-7-playtest-and-reflect": {
     "lessonTitle": "5.11.7 Playtest and reflect: Defender",
     "prompt": "Everything you need is in 5.9.1 (Plan: Break Defender into parts) and 5.11.6 (Lab: A Spawner for the waves): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Defender at least three times, and lose in three different ways: let a wave through on purpose, get overrun in a late wave, and press R in the middle of a wave. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which class or function do you think that comes from?\n\n4. What is one change that is easier, or harder, in Part C than it was in Part B, and why?",
@@ -7389,6 +7875,72 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
+  },
+  "5-11-defender-9-challenges-make-it-yours": {
+    "lessonTitle": "5.11.10 Challenges: Make it yours",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.10 Challenges: Make it yours\". The task they were given: The game is complete. Pick ONE of three challenges and add it (an idea of the student's own on top is welcome). Challenge 1, a best score: a variable best that startRound() never resets, raised when a round ends if the score beat it, and shown in drawTop(). Challenge 2, a boss wave: in makeWave(), on every fifth wave, push one more Enemy into the wave before it is returned, with 10 hp, half the wave's speed and a purple sprite. Challenge 3, a Ship class: a class Ship with its own this.sprite and this.cooldown, whose move() and fire() replace moveShip() and fire(), where fire() gives back a new Bullet or null and the scene pushes it. Then write one // comment at the top saying what the rule is. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. In Part C each game object is a class instance that keeps its sprite in this.sprite, so a touch test names the sprites (this.sprite.overlaps(e.sprite)), not the objects. The game's classes have their own remove() that deletes the sprite. A finished object stays in its list until the clear-up at the end of the frame; filter returns a NEW array of the items whose test is true, so removing the finished sprites has to happen before the filter, or those sprites are left behind on screen. A static property belongs to the class and is reached as ClassName.name. startRound() runs on every restart, so anything it sets goes back; a value that must survive R is set once, outside it. % gives the remainder, so wave % 5 === 0 is true on waves 5, 10 and 15. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (startRound, makeWave, drawTop) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. One challenge is enough for met; more than one is fine. The // comment from the second step is not this card. The starter has none of the three challenges: missing. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Your rule is in the code",
+        "description": "At least ONE of the three challenges really works in the code: (1) a best value that survives a restart (startRound() does not reset it) and is raised to the score when a round ends with a higher score (if (score > best) best = score, or Math.max, in any shape); (2) on every fifth wave (a % 5 test on the wave number, any shape) makeWave() adds one more Enemy to the array it returns; (3) a Ship class that keeps its own cooldown (this.cooldown) and does the moving or firing, with the scene using that class. Other numbers, colours or speeds than the suggested ones are fine. A best that startRound() sets back to 0 is not met: it never survives R. A boss that is built but never reaches the wave is not met. A different rule of the student's own, with none of the three, is partial: say this card looks for one of the three.",
+        "points": 1
+      }
+    ]
+  },
+  "5-11-defender-sound-lab-sound-effects": {
+    "lessonTitle": "5.11.9 Lab: Sound effects",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.9 Lab: Sound effects\". The task they were given: The game is the 5.11.6 game with no sound. Make two sound variables and, in setup(), load each with loadSound and one of the course's two files, '/moshion/assets/coin.wav' or '/moshion/assets/music.wav' (volume and rate can be changed). Play one sound once for every shot, as the last line of Bullet's constructor; and in Enemy's takeHit(n), after the hp line, play the other only when that hit leaves the enemy not alive. A mute key with masterVolume() is optional and has no criterion. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. In Part C each game object is a class instance that keeps its sprite in this.sprite, so a touch test names the sprites (this.sprite.overlaps(e.sprite)), not the objects. The game's classes have their own remove() that deletes the sprite. A finished object stays in its list until the clear-up at the end of the frame; filter returns a NEW array of the items whose test is true, so removing the finished sprites has to happen before the filter, or those sprites are left behind on screen. A static property belongs to the class and is reached as ClassName.name. loadSound(path) starts a download and gives back a Sound; a .play() before the download finishes does nothing, so a sound is loaded once, in setup(), never in draw() or a constructor. A misspelled path gives no error: the sound just never plays. sound.play() plays it once from the start. Bullet's constructor runs once per shot and takeHit runs once per hit, while draw() and isAlive() run many times a second, so a .play() there would repeat. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit, isAlive) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter makes no sound at all: missing on every criterion. Any variable names for the sounds are fine. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Sounds are loaded once, in setup()",
+        "description": "setup() (or a line at the top of the file, outside every function, which also runs once) stores loadSound('/moshion/assets/coin.wav') or loadSound('/moshion/assets/music.wav') in a variable, with single or double quotes. A path spelled any other way is not met: it never plays. Loading inside draw(), a constructor or takeHit is not met: it downloads again every time and is never ready in time.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A shot makes a sound",
+        "description": "A sound's .play() runs once for every shot: as a line in Bullet's constructor, or right beside new Bullet(...) inside the if in fire() that makes the shot. A .play() in draw(), or under a check that stays true for many frames, is not met: it would play over and over.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A finished enemy makes a sound",
+        "description": "A sound's .play() runs on the hit that finishes an enemy: in Enemy's takeHit() under an if that asks !this.isAlive() or this.hp <= 0 (or after an early return while the enemy is still alive), or in hitEnemies() inside the if that sees the enemy is no longer alive. A .play() inside isAlive() is not met: isAlive() is asked many times a frame. A .play() on every hit with no check is partial: it also plays on hits that do not finish the enemy.",
+        "points": 1
+      }
+    ]
+  },
+  "5-2-11-lab-reaching-the-goal": {
+    "lessonTitle": "5.2.17 Lab: Reaching the Goal",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.17 Lab: Reaching the Goal\". The task they were given: At the bottom of draw(), add an if that checks goal, so the win check only runs while the goal still exists. Inside it, work out the distance from the player to the goal: dx is the gap left to right between their x values, dy the gap up and down, and the distance is the square root of dx times dx plus dy times dy, kept in a variable. Still inside it, when the distance is less than 25, log a win message, delete the goal with goal.delete(), and set goal to null so the check can never run again. What the starter file already had: the finished scene: gravity, a player moved with a and d, a space-bar jump gated on the ground, a wind zone, walls, the ground, and a gold goal sprite stored in goal. The win check is not written yet, so the starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame. sprite.delete() removes a sprite from the world for good (remove() does the same). After the goal is deleted, the variable still points at the deleted sprite until it is set to null. if (goal) is false once goal is null, and reading goal.x while goal is null stops the sketch with an error. Math.sqrt, Math.hypot, dist(x1, y1, x2, y2), ** 0.5 and a sprite's distanceTo(another sprite) can all be used to work out a distance. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Guard the check on the goal still existing",
+        "description": "The win check (the distance work and the test) sits inside an if that only runs while the goal still exists: if (goal), if (goal !== null), if (goal != null), or goal joined with && to the test. A check with no such guard would read the goal's position after it is gone and stop the sketch, so it is not met. Help: 5.2.16 (Worked Example: The Finished Scene)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Compute the distance and test it",
+        "description": "The distance between the player and the goal is worked out from their positions (a square root of dx times dx plus dy times dy, Math.hypot, dist(...), ** 0.5, or distanceTo) and an if tests it against a small number (the lab uses less than 25; any small threshold counts). Comparing dx times dx plus dy times dy with the threshold squared does the same job and counts, and so does a test that both gaps are small. Not met: a test that never looks at how far apart they are, such as overlaps() alone. Help: 5.2.16 (Worked Example: The Finished Scene)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Delete the goal on arrival",
+        "description": "When the distance test passes, goal.delete() (or goal.remove(), which is the same) is called. Help: 5.2.15 (Reading: Cleanup and Delete)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Clear the goal variable",
+        "description": "After deleting, goal is set to null (or another empty value the guard treats as false, such as undefined), so the win check can never fire twice. Help: 5.2.15 (Reading: Cleanup and Delete)",
+        "points": 1
+      }
+    ]
   },
   "5-2-13-a5-2-1-pinball-scene": {
     "lessonTitle": "5.2.18 Pinball Scene",
@@ -7448,6 +8000,282 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       "physics"
     ]
   },
+  "5-2-15-challenges": {
+    "lessonTitle": "5.2.20 Challenges: Optional Stretch",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.20 Challenges: Optional Stretch\". The task they were given: Starting from the one-goal scene of 5.2.17, add a second goal sprite somewhere harder to reach and give it its own distance check in draw() that deletes it, the same shape as the first goal's check. Keep track of when both goals are gone (a counter that goes up by one per goal, or a test that both goal variables are gone), and print 'All goals collected!' with console.log only after both goals are gone, and only once. What the starter file already had: the one-goal scene: player, ground, walls, wind zone and jump, and one gold goal stored in goal with its own guarded distance check that logs a win, deletes it and sets it to null. That first check and its delete() were already in the starter, so on their own they do not meet the second-goal criteria. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame. sprite.delete() (or remove()) removes a sprite for good, and setting the variable to null stops its check. A test like counter === 2, or both goal variables being null, stays true on every frame after it first becomes true, so a print under it repeats unless something stops it, such as moving the counter past 2 or a flag. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Add a second goal sprite",
+        "description": "A second goal sprite is made with new Sprite(...) (any name, position, size or colour), so the scene has two goals as well as the player. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Give the second goal its own check",
+        "description": "The second goal has its own check, like the first goal's, that deletes it when the player reaches it, so the sketch calls delete() (or remove()) for each of the two goals. One check written to handle both goals also counts if it really deletes each one. Help: 5.2.17 (Lab: Reaching the Goal)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Track collection progress",
+        "description": "The code knows when both goals are gone: a counter that changes by one per goal collected and is then compared with a number (such as 2), or a test that both goal variables are gone (both null, or neither truthy). Help: 5.2.17 (Lab: Reaching the Goal)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Print the finish message",
+        "description": "'All goals collected!' (any close wording) is printed with console.log from inside an if that only becomes true once both goals are gone. The step also asks for it to print only once: if nothing stops that if from staying true, it would print on every frame. Still mark this card met in that case, but say so in the note. Printing after only one goal is not met. Help: 5.2.17 (Lab: Reaching the Goal)",
+        "points": 1
+      }
+    ]
+  },
+  "5-2-3-lab-tune-gravity": {
+    "lessonTitle": "5.2.8 Lab: Tune Gravity",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.8 Lab: Tune Gravity\". The task they were given: Try world.gravity.y at 10, then 0, then -5, then 20, running the sketch after each change, and write one sentence per value as a // comment at the bottom of the code saying how the player moved: did it fall, float or drift upward, fast or slow? There is no single right value. What the starter file already had: world.gravity.y set to 10 in setup(), a player moved with a and d, a static ground, a gold goal block, and a comment at the bottom that explains the task. That comment is the starter's instructions, not the student's notes. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y sets the pull: a positive number pulls down the screen (y grows downward), 0 means no pull, and a negative number pulls things up. Comments never run, so the student's notes do not change the gravity; only the real world.gravity.y line does. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Gravity changed from the starting value",
+        "description": "The world.gravity.y line that runs holds a value other than the starter's 10 (0, -5, 20 or any other value counts). A value written only in a note does not change the gravity. One exception: if the line is back at 10 but the student's own notes clearly describe what several other values did, they did the trying the lab asks for, so count it. Help: 5.2.6 (Reading: Gravity)",
+        "points": 1
+      }
+    ]
+  },
+  "5-2-5-lab-add-a-jump": {
+    "lessonTitle": "5.2.10 Lab: Add a Jump",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.10 Lab: Add a Jump\". The task they were given: In draw(), make the player jump: when the jump key is pressed (an edge-triggered check that fires once per press) AND the player is touching the ground, set the player's vertical velocity to a negative number so it launches upward. What the starter file already had: gravity at 10, a player moved with a and d, a static ground, and a comment where the jump goes. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: kb.presses(key) is true only on the one frame a key goes down (edge-triggered); kb.pressing(key) is true on every frame it is held. ' ' and 'space' both name the space bar, and any key is fine for the jump. a.colliding(b) is truthy while the two sprites touch (0 while they are apart, a count of frames while they touch), and either sprite can ask about the other. y grows downward, so a negative vel.y moves up. && is true only when both sides are true. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Use an edge-triggered key check",
+        "description": "The jump key is read with kb.presses(...), which fires once per press. Any key counts. kb.pressing(...) is the one that is true on every frame the key is held, so a jump on kb.pressing alone is not met.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Check that the player is on the ground",
+        "description": "The player is checked against the ground with .colliding(...), asked either way round (the player about the ground, or the ground about the player). Any other honest test that is only true while the player stands on the ground also counts. Help: 5.2.9 (Ground-Gated Actions)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Combine both checks with &&",
+        "description": "The jump only happens when the key press and the ground check are both true: joined with && in one if, or one if nested inside the other, which does the same job. Not met: the two checks in separate ifs that can each launch the player, or joined with ||, because then the player can jump in mid-air. Help: 2.1.29 (Logical Operators: && || !)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Launch the player upward",
+        "description": "Inside draw(), when the jump fires, the player's vel.y is set to a negative number (or a variable holding one), so the player goes up. A positive number pushes it down, which is the opposite, and setting it on every frame with no jump test makes it fly away, so neither is met. Help: 5.1.16 (Velocity: vel.x and vel.y)",
+        "points": 1
+      }
+    ]
+  },
+  "5-2-9-lab-wind-zone": {
+    "lessonTitle": "5.2.14 Lab: Wind Zone",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.14 Lab: Wind Zone\". The task they were given: In draw(), add a wind zone: when the player's y position is above the zone line (the starter's comment uses y less than 200), call applyForce on the player with an upward force (a negative second number), so it pushes back against gravity instead of overriding the fall. What the starter file already had: gravity at 10, a player moved with a and d that jumps with the space bar from the ground, a static ground and two static side walls. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: sprite.applyForce(fx, fy) gives the sprite a push on each frame it is called, adding to what gravity and its velocity are already doing, while setting vel replaces the speed outright. y grows downward, so a negative fy pushes up, and 'above the line' means a smaller y. Gravity is 10 here. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Use applyForce on the player",
+        "description": "The player is pushed with .applyForce(...) somewhere the sketch runs. Help: 5.2.13 (Forces vs Velocity)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Only apply the force inside a zone",
+        "description": "The applyForce call sits inside an if that compares the player's position with a line or a range (braces optional), so it only pushes in part of the canvas, not on every frame everywhere. A zone above y 200 is what the lab uses; a zone in another place, or one tested on x, also counts. Help: 2.1.3 (If / Else if / Else)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The wind pushes up",
+        "description": "The force's second number (fy) is negative, straight in the call or through a variable holding a negative number, so the wind pushes up against gravity. Any size counts. A positive fy pushes down along with gravity, which is the opposite, so it is not met. Help: 5.2.13 (Forces vs Velocity)",
+        "points": 1
+      }
+    ]
+  },
+  "5-2-random-3-lab-random-spot-and-colour": {
+    "lessonTitle": "5.2.3 Lab: A random spot and colour",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.3 Lab: A random spot and colour\". The task they were given: draw() already has a block that runs once a second, an if that tests frameCount % 60 === 0. Inside it: set coin.x to a random number from 30 to 370 and coin.y to a random number from 30 to 270, so the coin jumps somewhere new but stays fully on the 400 by 300 canvas; set roll to a random whole number from 1 to 6 (it is shown in the corner); and pick a random position in the colors list (a whole number from 0 up to the last position, using the list's .length so it keeps working if a colour is added), then set coin.color to the colour at that position. What the starter file already had: the canvas, the coin, a five-colour list called colors, roll starting at 0, the text that shows roll, and the empty once-a-second block with step comments. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: random(a, b) gives a decimal from a up to, but never reaching, b; random(n) gives a decimal from 0 up to n; random(list) gives one item of the list. floor() (also int() and Math.floor()) drops the decimal part, rounding down. Math.random() gives a decimal from 0 up to 1. The positions in a list start at 0, so a five-item list has positions 0 to 4 and its .length is 5. frameCount % 60 === 0 is true once every 60 frames, which is once a second. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The coin gets a random x",
+        "description": "coin.x is set from random(...) (or Math.random()), on the same line or through a variable first, or the coin is made at a random x. The lab asks for 30 to 370 so the coin stays fully on the canvas; any range that keeps it on the 400-wide canvas counts. Setting it outside the once-a-second block still counts for this card (the coin just jumps every frame). Help: 5.2.1 (Reading: Random numbers and timers)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The coin gets a random y",
+        "description": "coin.y is set from random(...) (or Math.random()), on the same line or through a variable first, or the coin is made at a random y. The lab asks for 30 to 270 so the coin stays fully on the canvas; any range that keeps it on the 300-tall canvas counts. Setting it outside the once-a-second block still counts for this card. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The die is a whole number from 1 to 6",
+        "description": "roll is set to a random whole number whose smallest possible value is 1 and largest is 6: a random number with its decimal dropped by floor (or int, Math.floor), and a range or a + 1 that makes it start at 1. Remember the top of random(a, b) is never reached. A round() of a random number from 1 to 6 also stays inside 1 to 6 and counts. Not met: a decimal with nothing dropping the decimal part, a range that can give 0 or 7, or a range that can never give 6. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A random position in the colors list",
+        "description": "A whole number from 0 up to the list's last position is picked at random using the list's .length (a random number up to the length with its decimal dropped), so it keeps working if a colour is added. Picking an item straight from the list with random(colors) also counts. Not met: a pick that can never reach the first or the last colour, a position with a decimal part, or no randomness. A fixed 5 in place of the length picks correctly today, but the step asks for the list's length: mark that partial and say why. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The coin takes the chosen colour",
+        "description": "coin.color is set to an item of the colors list: read with square brackets and a position (a variable or an expression), or picked with random(colors). Setting one fixed colour is not met. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "points": 1
+      }
+    ]
+  },
+  "5-2-random-4-lab-beat-and-one-shot": {
+    "lessonTitle": "5.2.4 Lab: A beat and a one-shot",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.4 Lab: A beat and a one-shot\". The task they were given: In draw(): (1) a beat: every 30 frames, flip the variable on between true and false, so the lamp, which the starter already colours gold when on is true and gray when it is false, blinks twice a second; (2) a one-shot: when frameCount reaches 300, set message to 'Time is up!' and log it with console.log, once, not on every frame; (3) repair the 'Almost!' check at the bottom, which should log on frame 70 but sits inside if (on) and so never runs: the frame-70 test must not be inside another condition. What the starter file already had: the lamp sprite, on starting false, message starting empty, text that shows the frame number and the message, the if (on) block that colours the lamp, and at the bottom the frame-70 check wrapped inside if (on). The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame, about 60 times a second, and frameCount counts the frames. frameCount % 30 === 0 is true once every 30 frames. frameCount === 300 is true on exactly one frame, while frameCount >= 300 or > 300 stays true on every frame after it, so on its own it repeats. ! turns true into false and false into true. A test written inside another if is only looked at on frames when the outer if is true. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A repeating beat",
+        "description": "The code tests frameCount % N against 0 (with === or ==) to act every N frames. Any N counts; the lab uses 30. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The beat flips the lamp",
+        "description": "Inside the beat's if, on is switched so it keeps alternating between true and false: on = !on, an if/else that sets it to the opposite, or a ternary. Setting on to true only, and never back to false, turns the lamp on and leaves it on, so that is not met. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A one-shot at frame 300",
+        "description": "The code tests frameCount === 300 (or == 300, or against 5 * 60, or against a variable holding 300), which is true on one frame only. A test with >= or > on its own would act on every frame after 300, so it is not met unless something else stops it from repeating. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The one-shot sets the message",
+        "description": "Inside that frame-300 one-shot, message is set to the words (the lab uses 'Time is up!'; any wording counts). Logging it with console.log is part of the step but not of this card. Help: 5.2.2 (Worked Example: Sparkles on a beat)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The frame 70 check is not inside another condition",
+        "description": "The frameCount === 70 test that logs 'Almost!' still exists and stands on its own: not inside if (on), not joined to on with && or ||, and not inside the beat's block or any other if, so it really runs on frame 70. Deleting the check is not a fix. The starter's version, wrapped in if (on), is not met yet. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-10-lab-two-instances": {
+    "lessonTitle": "5.6.11 Lab: Two sprites, two property values",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.11 Lab: Two sprites, two property values\". The task they were given: A Box class takes a colour: new Box(c) stores it in this.color. In setup(), create b1 = new Box('red') and b2 = new Box('blue'). In draw(), press space to change b1.color only, and watch b2 stay blue. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Every new Box(...) call makes a separate object with its own color, so changing b1.color does not touch b2. kb.presses('space') is true on the frame the space bar goes down. draw() already paints both boxes once b1 and b2 exist. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Different colours in the two calls are what step 1 asks. Setting b1 to a brand-new Box replaces the whole object instead of writing its property. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Two distinct new Box(...) calls",
+        "description": "b1 and b2 each come from their own new Box(...) call, each given a colour (different colours are what step 1 asks). Missing: only one Box is made, or b2 is set to b1 (the same object). Help: 5.6.3 (Class and instance)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Only b1.color is reassigned",
+        "description": "The code assigns a new value to b1.color with =, and nothing anywhere assigns b2.color. Doing it on a space-bar press is what step 2 asks. Partial: b1 is replaced with a new Box instead of its color being written. Missing: b2.color is assigned too, or b1.color never changes. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-13-lab-build-sprite": {
+    "lessonTitle": "5.6.14 Your Turn: Build a Sprite",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.14 Your Turn: Build a Sprite\". The task they were given: Starting from an empty setup(): create a canvas with new Canvas(width, height); store a rectangle sprite made with the 4-argument form new Sprite(x, y, width, height) in a variable and set its .color; store a circle sprite made with the 3-argument form new Sprite(x, y, diameter) and give it its own .color; then give one of the two sprites a .stroke and a .strokeWeight. You cannot run their code: read it and judge what it WOULD do when the sketch runs. new Sprite(x, y, w, h) makes a rectangle; new Sprite(x, y, d), with one size, makes a circle d pixels across. A fifth argument such as 'static' only sets the body type, so it is still the rectangle form. sprite.stroke is the outline colour and sprite.strokeWeight its thickness in pixels. A plain stroke(...) or strokeWeight(...) call is a drawing setting, not a property of a sprite. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Any numbers, expressions (such as width / 2) or variables work as arguments. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Canvas created with a size",
+        "description": "setup() calls new Canvas(...) with a width and a height (numbers, expressions or variables). Missing: no canvas.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Rectangle sprite (4-arg form)",
+        "description": "At least one new Sprite(...) given x, y, a width and a height (four values). A fifth body-type argument such as 'static' still makes a rectangle and counts. Missing: no sprite with both a width and a height. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Circle sprite (3-arg form)",
+        "description": "At least one new Sprite(...) given exactly three values: x, y and a diameter. Missing: no three-value sprite. Help: step 3 of this lab.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Property set on an instance",
+        "description": "At least one sprite's .color is assigned with =. Missing: no .color is set on a sprite. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Stroke used",
+        "description": "A sprite's .stroke or .strokeWeight is assigned with =. Setting both is what step 4 asks and is welcome. A plain stroke(...) function call does not set a sprite's property. Missing: neither property is set on a sprite. Help: step 4 of this lab.",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-17-lab-method-no-params": {
+    "lessonTitle": "5.7.3 Lab: Method with no params",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.3 Lab: Method with no params\". The task they were given: A Counter class stores this.n = 0. Inside the class body, after the constructor, write a tick() method that adds 1 to this.n. The driver in draw() already calls c.tick() when space is pressed and shows c.n on screen. You cannot run their code: read it and judge what it WOULD do when the sketch runs. A method is written inside the class body as name() { ... }, with no word function in front. Inside a method, this is the object the method was called on, so this.n is that counter's count. The driver calls c.tick(), so the method must be named tick; draw() shows c.n, so this.n is what must change. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. this.n += 1, this.n++, ++this.n and this.n = this.n + 1 all add 1. A function tick() written outside the class is not a method of Counter, so c.tick() would fail. n += 1 without this. changes no counter. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "tick() method increments this.n",
+        "description": "Inside the Counter class there is a tick() method whose body adds 1 to this.n (+=, ++, or this.n = this.n + 1). Partial: it changes a different property, or adds something other than 1. Missing: no tick method inside the class, or its body does not change this.n. Help: 5.7.1 (Methods: functions that live on a class)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-18-lab-method-with-params": {
+    "lessonTitle": "5.7.4 Lab: Method with parameters",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.4 Lab: Method with parameters\". The task they were given: The Counter class has n and tick(). Inside the class body, write an addBy(n) method that adds its argument to this.n. The driver in draw() already calls c.addBy(1), c.addBy(2) and c.addBy(3) on the keys 1, 2 and 3. You cannot run their code: read it and judge what it WOULD do when the sketch runs. A method can take parameters like a function. Inside it, the parameter holds the number the driver passed in, and this.n is the counter's own count. The parameter can be named anything; naming it n is fine because this.n and n are different things. The driver calls c.addBy(...), so the method must be named addBy. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Ignoring the parameter (adding a fixed 1) or replacing the count with it (this.n = the parameter) does not add the argument. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "addBy(n) method declared",
+        "description": "Inside the Counter class there is an addBy method with one parameter (any name) and a body. Missing: no addBy method inside the class, or it takes no parameter. Help: 5.7.1 (Methods: functions that live on a class)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Parameter used inside method body",
+        "description": "The method's body adds the parameter to this.n: +=, this.n = this.n + the parameter, or the same with the parameter first. Calling this.tick() in a loop that runs that many times also adds it. Partial: the parameter is used but replaces the count instead of adding to it. Missing: the parameter is never used. Help: 3.2.5 (Parameters and Arguments)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-19-lab-method-returns": {
+    "lessonTitle": "5.7.5 Lab: Method that returns a value",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.5 Lab: Method that returns a value\". The task they were given: The Counter class has n, tick() and addBy(n). Inside the class body, write an isHigh() method that returns true when this.n is greater than 10 and false otherwise. The driver in draw() already uses c.isHigh() to paint the number red. You cannot run their code: read it and judge what it WOULD do when the sketch runs. return hands a value back to the code that called the method; the driver uses it as fill(c.isHigh() ? 'red' : 'white'). A comparison such as this.n > 10 is itself true or false, so returning it directly is enough. A value that is worked out but not returned is lost. The driver calls c.isHigh(), so the method must be named isHigh. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Returning the comparison, an if/else that returns true and false, this.n >= 11, 10 < this.n, or a variable holding the comparison that is then returned all count. An if that returns true with no return false after it still works, because the method then gives back nothing, which the driver treats as false. >= 10 is true at exactly 10, one step too early. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "isHigh() compares this.n to 10",
+        "description": "Inside the Counter class there is an isHigh() method that compares this.n with 10 and returns a value that is true when the count is over 10 and not true at 10 or below. Partial: the comparison is off by one (>= 10), or it compares something other than this.n. Missing: no isHigh method inside the class, or it compares but never returns anything. Help: 5.7.1 (Methods: functions that live on a class)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-20-lab-method-calls-method": {
+    "lessonTitle": "5.7.6 Lab: A method calling this.otherMethod()",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.6 Lab: A method calling this.otherMethod()\". The task they were given: The Counter class has n, tick(), addBy(n) and isHigh(). Inside the class body, write a bigStep() method that calls this.addBy(5) and then returns this.isHigh(). The driver calls c.bigStep() when B is pressed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Inside a method, another method of the same object is called with this. in front. Without this., addBy is not defined there and the sketch stops with an error. The order matters: isHigh has to be asked after the 5 is added, so it reports the new count. The driver calls c.bigStep(), so the method must be named bigStep. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Storing the answer in a variable first and then returning it counts, and so does this.addBy(2 + 3). Doing the work by hand (this.n += 5, or returning this.n > 10 directly) skips calling the other methods, which is the point of this lab. Calling them on the global c (c.addBy(5)) inside the method only works for that one counter. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "bigStep() calls this.addBy(5) and returns this.isHigh()",
+        "description": "Inside the Counter class there is a bigStep() method that calls this.addBy with 5 and afterwards returns what this.isHigh() gives back. Partial: one of the two calls is missing, done by hand, or made on c instead of this; isHigh is asked before the 5 is added; or the answer is not returned. Missing: no bigStep method inside the class. Help: 5.7.1 (Methods: functions that live on a class)",
+        "points": 1
+      }
+    ]
+  },
   "5-3-20a-chart-the-method-chain": {
     "lessonTitle": "5.7.7 Plain English to Pseudocode: A Method That Calls a Method",
     "prompt": "The student was given plain-English steps for the lab \"5.7.7 Plain English to Pseudocode: A Method That Calls a Method\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** The enemy is hit for some amount of damage. **2.** Take that amount off the enemy's health. **3.** If the health is now zero or less, the enemy dies. **4.** Either way, the enemy flashes red to show it was hit. **5.** Then control goes back to whoever hit it. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for a decision, and CALL for another method. The two methods here are named `die` and `flashRed`. Number every line, including the indented one and END IF. Each keyword looks like this, in a different program: - `SET score TO score + 10` (a change) - `IF lives <= 0` ... `END IF` (a decision; indent what is inside it) - `CALL playSound` (call another method; `CALL this.playSound` is fine too) The chart shows the shape. Judge each criterion ONLY by whether its idea is present in the student's steps, however they word it. Plain English, keywords such as SET, FOR EACH, END FOR, IF, ELSE, CALL, RETURN, OUTPUT, or a mix of both are all fine, and so are different names, capitalisation and numbering. Do not require any particular keyword. A step that is clearly aimed at the criterion is enough for 'met'. Mark a criterion 'missing' only when the idea is absent or the steps do the opposite. Write each note for THIS student's own steps: in a not-met note, name the exact step or word in their steps that causes the problem (quote at most a few words), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected steps. In a met note, say in one short phrase what in their steps satisfied it. Do not use generic praise.",
@@ -7486,6 +8314,126 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "r6",
         "title": "Exactly two calls",
         "description": "One call for die and one for flashRed. Do not write what those methods do.",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-22-lab-mutate-sprite-prop": {
+    "lessonTitle": "5.7.9 Lab: Mutate this.sprite.x from a method",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.9 Lab: Mutate this.sprite.x from a method\". The task they were given: A Mover class wraps a sprite: its constructor stores this.sprite = new Sprite(x, y, 30, 30). Inside the class body, write a moveRight(dx) method that adds dx to this.sprite.x. The driver calls m.moveRight(2) on every frame the right arrow is held. You cannot run their code: read it and judge what it WOULD do when the sketch runs. this.sprite is the moSHion sprite the Mover owns; this.sprite.x is its horizontal position, and x grows to the right. this.sprite.pos.x is the same number. kb.pressing('right') is true on every frame the key is held, so the method runs once per frame while it is held. The driver calls m.moveRight(...), so the method must be named moveRight. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. +=, this.sprite.x = this.sprite.x + the parameter, and the pos.x spelling all count, whatever the parameter is called. Changing this.x changes a property of the Mover, not of its sprite, so nothing moves. Setting the sprite's vel.x gives it a speed that keeps it sliding after the key is released, which is a different idea from moving its position by dx. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "moveRight(dx) mutates this.sprite.x",
+        "description": "Inside the Mover class there is a moveRight method with one parameter whose body adds that parameter to this.sprite.x. Partial: it adds a fixed number instead of the parameter, or sets the sprite's speed instead of its position. Missing: no moveRight method inside the class, or it changes something other than the sprite's x. Help: 5.7.8 (Why this.sprite, not extends Sprite)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-23-lab-cleanup": {
+    "lessonTitle": "5.7.10 Lab: Cleanup with this.sprite.delete()",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.10 Lab: Cleanup with this.sprite.delete()\". The task they were given: A Bubble class wraps a sprite: its constructor stores this.sprite = new Sprite(x, y, 20). Inside the class body, write a pop() method that calls this.sprite.delete(), so the bubble removes the sprite it owns. The driver calls b.pop() when the mouse is clicked. You cannot run their code: read it and judge what it WOULD do when the sketch runs. sprite.delete() takes a sprite off the screen and out of the physics world; sprite.remove() is the same method under another name. JavaScript's own delete operator (delete this.sprite) only forgets the property, and the sprite stays on screen. Hiding a sprite leaves it in the world. The driver calls b.pop(), so the method must be named pop. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Calling this.sprite.delete() through another method of the class counts. Reaching the global b (b.sprite.delete()) inside the method works only for that one bubble instead of this one. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "pop() calls this.sprite.delete()",
+        "description": "Inside the Bubble class there is a pop() method that calls delete() or remove() on this.sprite, directly or through another method of the class. Partial: it hides the sprite instead, or deletes it through the global b instead of this. Missing: no pop method inside the class, or it never removes the sprite (delete this.sprite is the JavaScript operator, which leaves the sprite on screen). Help: 5.2.15 (Cleanup and Delete)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-25-lab-three-vars": {
+    "lessonTitle": "5.7.12 Lab: Three Enemies in three variables",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.12 Lab: Three Enemies in three variables\". The task they were given: An Enemy class is given: new Enemy(x, y, hp) stores hp and builds a red square sprite. The starter declares let e1, e2, e3 at the top. In setup(), create three Enemy instances, e1, e2 and e3, at three different positions; draw() calls render() on each so its hp shows on its square. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Each new Enemy(...) call makes a separate object with its own hp and its own sprite. draw() reads the e1, e2 and e3 declared at the top of the file. Writing let or const in front of the name again inside setup() makes a new variable that only setup() can see, so draw()'s variable stays empty and that enemy's hp label never appears. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Any positions and hp values count; different positions are what step 1 asks, so all three squares can be seen. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Three separate new Enemy(...) calls",
+        "description": "setup() makes three Enemy objects with three separate new Enemy(...) calls. Missing: fewer than three calls. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "e1 assigned to a new Enemy",
+        "description": "The e1 that draw() uses is given a new Enemy(...). Partial: a new let or const e1 inside setup(), which draw() never sees. Missing: e1 is never given an Enemy. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "e2 assigned to a new Enemy",
+        "description": "The e2 that draw() uses is given a new Enemy(...). Partial: a new let or const e2 inside setup(), which draw() never sees. Missing: e2 is never given an Enemy. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "e3 assigned to a new Enemy",
+        "description": "The e3 that draw() uses is given a new Enemy(...). Partial: a new let or const e3 inside setup(), which draw() never sees. Missing: e3 is never given an Enemy. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-26-lab-array-of-instances": {
+    "lessonTitle": "5.7.13 Lab: An array of Enemies",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.13 Lab: An array of Enemies\". The task they were given: An Enemy class is given and enemies starts as an empty array. In setup(), call enemies.push(new Enemy(...)) five times with different x positions, so enemies.length is 5 and five red squares appear; draw() already loops over enemies and renders each one. You cannot run their code: read it and judge what it WOULD do when the sketch runs. push adds one item to the end of an array. Each new Enemy(...) builds one enemy with its own sprite. draw() only renders what is in enemies, so an enemy kept in a separate variable is never rendered. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Five push lines, a for or while loop that pushes once per pass and runs five times, or an Enemy stored in a variable and then pushed all count. Writing the array out with five new Enemy(...) calls inside the brackets also puts five enemies in the one array and counts. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "enemies.push(new Enemy(...)) used at least once",
+        "description": "Five Enemy objects end up in the enemies array: pushed one by one, pushed in a loop that runs five times, or built straight into the array. Partial: fewer than five go in. Missing: no Enemy ever goes into enemies (for example, five separate variables instead). Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-27-lab-loop-instances": {
+    "lessonTitle": "5.7.14 Lab: Loop over an array of instances",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.14 Lab: Loop over an array of instances\". The task they were given: An Enemy class is given and setup() pushes five enemies into enemies. In draw(), write a for...of loop over enemies and call .render() on the loop variable, so all five hp labels appear. You cannot run their code: read it and judge what it WOULD do when the sketch runs. for (let e of enemies) visits each item in turn, with e holding the current enemy. An index loop with enemies[i], and enemies.forEach(...), visit them too. render() is a method of each Enemy, not of the array, so calling it on enemies itself would fail. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Five separate render calls on enemies[0] to enemies[4] call the method but are not a loop. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "for loop over enemies in draw()",
+        "description": "Inside draw() (or a function it calls), a loop goes over the enemies array (for...of, an index loop, or forEach) and render is called inside it. Missing: no loop over enemies in draw(). Help: 3.3.5 (Looping Over Arrays)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Method called on loop variable",
+        "description": "Inside draw() (or a function it calls), render() is called on an enemy: on the loop variable, on enemies[i], or on the forEach item. Missing: render is called on the array itself, called with no object in front, or never called. Help: 3.3.5 (Looping Over Arrays) and 5.7.1 (Methods: functions that live on a class)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-31-a12-1-collectible": {
+    "lessonTitle": "5.7.19 Collectible Class",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.19 Collectible Class\". The task they were given: The Collectible class shell is given: constructor(x, y, value, color) and collect(), both empty. Fill in the constructor: store the data on this (at least the value) and create this.sprite = new Sprite(...) in the given colour. Write collect() so it deletes the sprite and returns this.value. In setup(), push at least five new Collectible(...) into collectibles at different positions, with different values and colours. In draw(), go through collectibles; when player.overlaps(c.sprite) is true, call c.collect(), add what it returns to totalScore, and remove that item from the array. You cannot run their code: read it and judge what it WOULD do when the sketch runs. player.overlaps(other) is true on every frame the two touch, and it takes a sprite, so it is given c.sprite (the Collectible's own sprite), not the Collectible object. sprite.delete() (or remove()) takes a sprite off the screen. Code after a return never runs, so in collect() the delete must come before the return. Removing items from an array while looping forward skips the next item; looping backwards, or over a copy, avoids that. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: a return placed before the delete (the delete never runs); overlaps given the Collectible itself instead of its sprite; a collect() that returns nothing. Any parameter names, any sprite size or shape, and a for, for...of or backwards loop all count. colliding(...) also detects the touch and counts for the overlap criterion. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Constructor stores state on the object",
+        "description": "The constructor body stores at least one of its arguments on this (the value, x, y or the colour). Missing: nothing is stored on this. Help: 5.6.5 (constructor and its parameters)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Constructor creates the sprite",
+        "description": "The constructor creates a new Sprite(...) and stores it as this.sprite. Missing: no sprite, or it is kept in a local variable instead of this.sprite. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "collect() method does work",
+        "description": "collect() deletes this.sprite (delete() or remove()) and returns a value (this.value is what step 2 asks), with the delete placed where it actually runs, before the return. Partial: only one of the two, or a delete that sits after the return and never runs. Missing: collect() is still empty. Help: 5.7.10 (Lab: Cleanup with this.sprite.delete())",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "At least one instance",
+        "description": "At least one new Collectible(...) is built. Five or more, pushed into collectibles, is what step 3 asks and is welcome. Missing: no Collectible is ever built. Help: 5.6.4 (The new operator)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Overlap detection",
+        "description": "Inside draw() (or a function it calls), the code tests whether the player touches a collectible's sprite: player.overlaps(...) given the sprite, the same test the other way round, overlapping(...), or colliding(...). Partial: the test is given the Collectible object instead of its sprite. Missing: no touch test in draw().",
         "points": 1
       }
     ]
@@ -7529,6 +8477,222 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "contextDocs": [
       "overview",
       "sprite"
+    ]
+  },
+  "5-3-34-challenges": {
+    "lessonTitle": "5.7.22 Challenges",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.22 Challenges\". The task they were given: Pick one (or more) object-oriented challenge: (1) an Enemy class whose constructor stores x, y and hp on this, with an isAlive() method that returns whether this.hp is above 0, checked in draw(); (2) a Player class whose constructor makes a sprite and stores it on this.sprite, with a move(dir) method that sets this.sprite.vel.x and a jump() method that sets this.sprite.vel.y to a negative number, called from draw(); or (3) a Collectible class that stores x, y, value and color on this, and a PowerUp class that extends it, whose constructor calls super(...) with the same four arguments first, with a boost() method that returns double the value. Four things are checked: a class is defined, it has a constructor, an object is built from it with new, and it uses this.<property>, extends or super(...). You cannot run their code: read it and judge what it WOULD do when the sketch runs. class Name { ... } defines a class; constructor(...) runs once when new Name(...) builds an object, and this is that object. new Canvas(...), new Sprite(...) and new Group(...) build moSHion's own classes, not the student's. In a class that extends another, super(...) must run before the constructor touches this. y grows downward, so a negative vel.y moves up. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Judge the four criteria on whichever classes the student wrote: any class name, any of the three challenges, or a class of their own design all count. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Define at least one class",
+        "description": "The file defines at least one class of the student's own with the class keyword. Missing: no class. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Instantiates a class of your own",
+        "description": "An object is built with new from a class the student defined (not Canvas, Sprite or Group). Storing it in a variable is what step 2 asks. Missing: only moSHion's own classes are built. Help: 5.6.4 (The new operator)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Write a constructor",
+        "description": "At least one of the student's classes has a constructor(...). Storing its arguments on this is what step 3 asks. Missing: no constructor. Help: 5.6.5 (constructor and its parameters)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Use one OOP feature",
+        "description": "One of the student's classes uses at least one of: a this.<property> read or write, extends another class, or a super(...) call. Missing: none of these. Help: 5.7.21 (Encapsulation, inheritance, polymorphism)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-36-lab-write-constructor": {
+    "lessonTitle": "5.6.16 Your Turn: Fill in a Constructor",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.16 Your Turn: Fill in a Constructor\". The task they were given: The Message class is given with constructor(x, y, words) and an empty body. Inside the constructor, store each argument on this instance: the x argument as a property named x, y as y, and words as words. Then, in setup(), build two Message instances with new, with different values, and store them in first and second; draw() already shows each one's words at its x and y. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Inside a constructor, this is the new object being built; this.x = x stores the argument x on it as a property named x. draw() reads first.words, first.x and first.y, so the property names must be x, y and words. The parameter names are the student's choice; what matters is that each property gets the matching argument. Arguments in new Message(...) go in the order x, y, words. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. A line that stores a fixed value (a number typed in) instead of the argument, or a local variable (let or const) instead of a property on this, does not store the argument. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Constructor stores x",
+        "description": "Inside the constructor, the x argument (whatever that parameter is called) is stored on this as a property named x. Missing: no this.x line, or it is given a fixed value instead of the argument. Help: 5.6.5 (Reading: constructor and its parameters)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Constructor stores y",
+        "description": "Inside the constructor, the y argument (whatever that parameter is called) is stored on this as a property named y. Missing: no this.y line, or it is given a fixed value instead of the argument. Help: 5.6.5 (Reading: constructor and its parameters)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Constructor stores words",
+        "description": "Inside the constructor, the words argument (whatever that parameter is called) is stored on this as a property named words. Missing: no this.words line, or it is given a fixed value instead of the argument. Help: 5.6.5 (Reading: constructor and its parameters)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Two instances built",
+        "description": "At least two new Message(...) calls with arguments. Storing them in first and second is what step 4 asks, so that draw() can show them. Missing: fewer than two. Help: 5.6.6 (Worked Example: The parts of a class)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The two instances differ",
+        "description": "The two new Message(...) calls are not given exactly the same arguments: a different position or different words is enough. Missing: identical arguments. Help: 5.6.4 (Reading: The new operator)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-8-lab-read-property": {
+    "lessonTitle": "5.6.9 Lab: Read a property",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.9 Lab: Read a property\". The task they were given: A Box class is given, and b = new Box() is built in setup(); b has a color property ('red') and a size property (40). Inside draw(), call console.log to print b.color and b.size, once each, so both values appear in the on-canvas console. You cannot run their code: read it and judge what it WOULD do when the sketch runs. console.log in a moSHion sketch prints to the console under the canvas. draw() runs every frame, so a console.log there prints on every frame, which is expected here. Reading a property is the object, a dot and the property name: b.color. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. A label in the same call is fine (a word, then the property), and so are one console.log that prints both, or a template string that includes them. Printing a value typed in by hand ('red' or 40) does not read the property. The starter's fill(b.color) and square(..., b.size) lines are not console.log calls and do not count. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Read b.color and b.size with console.log",
+        "description": "console.log is called with b.color and with b.size (two calls, or one call holding both, with or without labels), inside draw() or a function it calls. Printing them in setup() also reads the properties and counts. Partial: only one of the two. Missing: no console.log reads them, or only typed-in values are printed. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-9-lab-write-property": {
+    "lessonTitle": "5.6.10 Lab: Write a property",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.10 Lab: Write a property\". The task they were given: A Box class is given, and b = new Box() is built in setup(); draw() paints the box in b.color. Inside draw(), detect a space-bar press with kb.presses('space') and assign a new colour to b.color, so the box changes colour on screen. You cannot run their code: read it and judge what it WOULD do when the sketch runs. kb.presses(key) is true only on the frame the key goes down and kb.pressing(key) on every frame it is held; ' ' and 'space' are the same key. Writing a property is the object, a dot, the property name and then =. draw() runs every frame and already paints the box with fill(b.color). Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Any new colour counts: a colour name, a hex string, or a value picked from an array. Comparing with === is not assigning. Building a new Box does not change b's own property. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Assign to b.color",
+        "description": "Somewhere in draw() (or a function it calls) a new value is assigned to b.color with = (most naturally inside the key test). Missing: b.color is never assigned, or the colour goes into a different variable. Help: 5.6.3 (Class and instance)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Detect a key press",
+        "description": "draw() (or a function it calls) tests a key with kb.presses(...) (kb.pressing(...) also counts), so the sketch responds to the keyboard. Any key counts; the space bar is what the step asks. Missing: no key test in draw(). Help: 5.2.9 (Ground-Gated Actions)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-pinball-10-challenges-make-it-yours": {
+    "lessonTitle": "5.3.12 Challenges: Make it yours",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.12 Challenges: Make it yours\". The task they were given: The game is complete. Change one rule of the student's own choosing: (1) a second goal worth more than the first, with its own worth and its own remembered last frame; (2) a short static bumper that slides left and right, its x changed a little every frame in draw() and turned round at an edge by flipping the sign of its step; or (3) a best score kept in a second variable that is not reset when R is pressed, updated when the score beats it and shown beside the score. Combining them, or inventing a different rule, also counts. Then write one sentence as a // comment at the top naming the rule and what would happen without it. What the starter file already had: a finished game: two walls, one bumper, a ground, one gold goal scoring 1 per touch with a wasTouching memory, a playing flag, a Game over screen and an R restart. Anything the starter already had is not a new rule, so the starter does not meet the criterion. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame. A sprite made with 'static' does not fall, but code can still move it by changing its x or y. ball.colliding(x) gives 0 while apart and a count of frames while touching. Comments never run: the sentence at the top explains the rule but does not make it happen, so judge the code itself. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Your game has a rule of your own",
+        "description": "The student's code adds at least one rule the starter did not have, and it would really run: a second thing that scores, something on the table that moves on its own, a best score kept across restarts, a score worth something other than 1, or a rule they invented (a timer, a speed change, a bonus, and so on). A change only to how things look, such as a colour or the words on screen, is not a new rule. Help: 5.3.8 (Lab: Three bumpers, three values)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-pinball-3-lab-build-the-table": {
+    "lessonTitle": "5.3.4 Lab: Build the table",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.4 Lab: Build the table\". The task they were given: Build the pinball table in setup(): turn gravity on so the ball falls; build at least three static obstacles that do not fall, storing at least one in a named variable; build the ball as a circle (one size number) starting at (70, 60), with a colour and a bounciness above 0.5; and add a gold block with the same static body type, stored in goal, where the ball really goes. The score is drawn but does not change yet. What the starter file already had: a 400 by 400 canvas, `let ball, goal, score;`, score set to 0, and a draw() that shows the score and puts the ball back at (70, 60) when R is pressed. There is no gravity, no obstacle, no ball and no goal yet, so the starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Gravity is on",
+        "description": "world.gravity.y is set to a positive number (directly or through a variable), so the ball falls down the screen. 0 is not on. A negative number would send the ball up the screen, the opposite of falling, so it is not met. Help: 5.2.6 (Reading: Gravity)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "At least three obstacles stay put",
+        "description": "Three or more sprites are static (made with 'static', or given .collider = 'static'), so they do not fall. Walls, a ground, bumpers and ramps all count, in any shapes, sizes and places. Help: 5.2.6 (Reading: Gravity)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The ball is genuinely bouncy",
+        "description": "The ball's bounciness is set to 0.5 or more (directly or through a variable), so it keeps most of its speed. A value under 0.5 is not met yet. Help: 5.2.11 (Reading: Bounciness and Friction)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A goal is on the table",
+        "description": "A static sprite (made with 'static', or given .collider = 'static') is stored in goal, in a colour the player can see: gold is what the step asks, but any visible colour counts, and so does leaving the default colour. A goal that is not static would fall with gravity, so it is not met yet. Help: 5.3.3 (Worked Example: The table and the goal)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-pinball-6-lab-score-one-point-per-touch": {
+    "lessonTitle": "5.3.7 Lab: Score one point per touch",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.7 Lab: Score one point per touch\". The task they were given: The starter adds a point on every frame the ball touches the gold goal, so one roll across it scores about 33. Fix it so one touch is worth one point: in draw(), check the touch once, into a variable; keep a second variable, made outside draw(), that remembers whether the ball was touching last frame; add a point only when the ball is touching now and was not a frame ago; then store this frame's answer in the memory, on every frame. What the starter file already had: the full table (walls, bumper, ground, gold goal, bouncy ball), score starting at 0, the R reset, and in draw() an if that adds 1 to the score whenever the ball is colliding with the goal. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame. ball.colliding(goal) is true on every frame the two touch, not just the first. It gives a number, not true or false: 0 while they are apart and a count of frames (1, 2, 3 ...) while they touch, so a test that it equals 1 is true only on the first frame of a touch. Because of that, a memory that holds colliding()'s number holds 0 after the first frame, so testing it with === false is never true, while testing it with ! works. If the student turned the answer into true or false first (for example with > 0), === false works. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The touch is checked once into a variable",
+        "description": "This frame's answer to whether the ball and the goal are touching (colliding() asked either way round) is stored in a variable, new or already declared, so the same answer can be used for the test and for the memory. Help: 5.3.5 (Reading: A collision is not an event)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A point is added only when contact starts",
+        "description": "The score goes up only on the frame contact starts: inside an if that needs touching now AND not touching last frame (joined with &&, or one if nested in the other), or any other test that is only true on the first frame of a touch. Not met: the starter's point on every touching frame, or a memory test written as === false while the memory holds colliding()'s number, which is never true. Help: 5.3.5 (Reading: A collision is not an event)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The memory is updated every frame",
+        "description": "The remembering variable is given this frame's touch answer on every frame, outside the scoring if, or by an if/else that sets it to true while touching and false when not, every frame. Any name works. Not met: the update only inside the scoring if (then nothing ever sets it back), or no update at all. Help: 5.3.5 (Reading: A collision is not an event)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-pinball-7-lab-three-bumpers-three-values": {
+    "lessonTitle": "5.3.8 Lab: Three bumpers, three values",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.8 Lab: Three bumpers, three values\". The task they were given: Three bumpers in the array bumpers carry worth values of 1, 5 and 10. The starter scores only bumpers[0], and on every frame. In setup(), give each bumper its own wasTouching of false. In draw(), replace the single check with a loop over every bumper in the array; inside the loop, use the same edge check as 5.3.7 but on the bumper's own wasTouching, add that bumper's worth to the score only when its touch starts, and update its wasTouching on every frame. One drop should read 1, then 6, then 16. What the starter file already had: two walls, the three bumpers (each with its own worth) pushed into bumpers, a ground, a ball that rolls, score starting at 0, the R reset, and in draw() one if that adds 1 to the score whenever the ball is colliding with bumpers[0]. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: A sprite is an object, so code can store its own values on it, such as b.worth or b.wasTouching. for (const b of bumpers), a counting for loop up to bumpers.length, and bumpers.forEach(...) all visit every item. ball.colliding(b) gives 0 while they are apart and a count of frames while they touch; a memory holding that number holds 0 after the first frame, so testing it with === false is never true, while ! works. If the student turned the answer into true or false first (for example with > 0), === false works. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Every bumper is checked in a loop",
+        "description": "One loop visits every bumper in the array: for...of, a counting for loop over the array's length, or forEach. A counting loop that stops at 3 also visits all three here and counts. Three separate ifs, one per bumper, are not a loop, so they are not met. Help: 3.3.5 (Reading: Looping Over Arrays (for / for…of))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Each bumper remembers its own last frame",
+        "description": "Each bumper's own memory (its wasTouching, or any name) is given this frame's touch answer for that bumper on every frame, inside the loop, so every bumper can be hit once per contact. An if/else that sets it to true while touching and false when not also counts, and so does a separate list holding one memory per bumper. One shared memory for all three bumpers is not met, because each bumper overwrites the others. Help: 5.3.5 (Reading: A collision is not an event)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The bumper's own worth is added only when contact starts",
+        "description": "The score adds the bumper's own worth (not always 1), inside an if that is only true on the frame that bumper's touch starts: touching now and not touching last frame, by that bumper's own memory. Not met: adding the worth on every touching frame, or a memory test written as === false while the memory holds colliding()'s number, which is never true. Help: 5.3.5 (Reading: A collision is not an event)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-pinball-9-lab-lose-and-start-again": {
+    "lessonTitle": "5.3.10 Lab: Lose, and start again",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.10 Lab: Lose, and start again\". The task they were given: Give the game an end. Add a flag variable that says whether the game is being played, starting at true and created once (next to score, not every frame). In draw(), when the ball has fallen past the bottom of the canvas, set the flag to false. When the flag is false, draw 'Game over' and the final score instead of the play area. When R is pressed, set the flag back to true and put the score back to 0, as well as putting the ball back. What the starter file already had: the table, the goal scoring once per touch with a wasTouching memory, and an R key that puts the ball back at the top but leaves the score alone. There is no game-state flag yet: wasTouching is the goal's touch memory, not the state of the game. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame, so a variable given its starting value at the top of draw() is reset on every frame. The canvas is 400 tall and y grows downward, so a ball past the bottom has a y above 400 (height also holds the canvas height). kb.presses('r') is true on the one frame R goes down. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A flag says whether the game is being played",
+        "description": "A variable (any name) is the game's state: created once, at the top of the file or in setup(), and starting true. A flag that means the opposite and starts false, such as gameOver, also counts. Not met: a flag set back to its starting value at the top of draw() on every frame. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The ball falling past the bottom ends the round",
+        "description": "When the ball's y is past the bottom of the canvas (greater than 400 or height, or a number at the bottom edge), the flag is set to say the round is over. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A restart puts the score back",
+        "description": "Pressing R sets the score back to 0, directly or by calling a function that does it. Setting the flag back to playing is part of the step too, but this card is about the score. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The game reads the flag",
+        "description": "The flag is tested somewhere in draw() and the test changes what happens: for example the play area while playing, and 'Game over' with the final score once the round has ended, or the same with a gameOver flag tested the other way round. An if with nothing inside its braces changes nothing, so it is not met. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      }
     ]
   },
   "5-3-pinball-plan-sketch-the-game": {
@@ -7595,6 +8759,132 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "5-4-flappy-3-lab-make-it-flap": {
+    "lessonTitle": "5.4.4 Lab: Make it flap",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.4 Lab: Make it flap\". The task they were given: The bird falls under gravity and nothing lifts it. In draw(), when the space bar is pressed, set the bird's vertical speed (bird.vel.y) to a negative number so each tap sends it up in one arc. Then, when the bird goes below the bottom of the 400 by 400 canvas or above the top, put it back in the middle with no speed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. The starter sets world.gravity.y = 20 in setup(), so the bird falls. y grows DOWNWARD: a negative vel.y moves the bird up and a positive one moves it down. kb.presses(' ') and kb.presses('space') are the same test and are true only on the frame the key goes down; kb.pressing(...) is true on every frame the key is held. bird.y and bird.pos.y are the same number. The bottom edge is y = 400 (height also holds 400), the top edge is y = 0, and the middle is y = 200. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Setting the speed with = and adding to it with += or -= are different ideas: the first criterion accepts any space-bar line that sends the bird upward, and the second criterion is the one that asks for = rather than += or -=. A positive vel.y on the flap sends the bird down, which is the opposite. Moving bird.y itself on the key press is a jump in position, not a flap. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The space bar flaps the bird",
+        "description": "In draw() (or a function it calls), a test for the space bar (kb.presses(' ') or kb.presses('space'); kb.pressing also counts) whose body makes the bird's vertical speed point up: bird.vel.y given a negative number, a negative expression or a variable holding one (a line that subtracts from vel.y also counts here). An if block, a one-line if, or the key test stored in a variable first are all fine. Missing: no space-bar test, or the speed it gives is positive (down). Help: 5.4.2 (Reading: Gravity and the flap)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The flap sets the speed rather than adding",
+        "description": "The flap line gives bird.vel.y a new value with plain = (a negative number, an expression or a variable), so every flap is the same size whatever the bird was doing. Partial: the flap uses += or -=, which adds to the old speed, so a flap while falling fast barely lifts. The vel.y = 0 in the put-back code is not the flap. Missing: no flap line at all. Help: 5.4.2 (Reading: Gravity and the flap)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The bird is put back when it leaves the screen",
+        "description": "A test on the bird's y going past the bottom (greater than 400 or height, or a number a little inside it) or above the top (less than 0), in one if joined with || or in two ifs, whose body puts bird.y back on the screen (200, height / 2, or another on-screen spot). Setting vel.y to 0 there too is what step 2 asks and is welcome, but this criterion is about the position. Missing: no edge test, or the test never changes bird.y. Help: 5.4.3 (Worked Example: The bird that flaps)",
+        "points": 1
+      }
+    ]
+  },
+  "5-4-flappy-5-lab-pipes-that-come-and-go": {
+    "lessonTitle": "5.4.6 Lab: Pipes that come and go",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.6 Lab: Pipes that come and go\". The task they were given: makePipe() is given: it builds one pair of pipes just off the right edge, moving left, and returns the top pipe (the bottom one is stored as its mate). In draw(), call it on a repeating beat (every 90 frames) and push the result into the pipes array; the starter builds only one pair, on frame 1. Then loop over pipes from the end to the start and, when a pipe's x is less than -30, delete its mate and the pipe and splice it out of the array. Finally show pipes.length in drawTop(). You cannot run their code: read it and judge what it WOULD do when the sketch runs. draw() runs every frame and frameCount counts the frames, so frameCount % 90 === 0 is true once every 90 frames, while frameCount === 1 is true only once. sprite.delete() (or its twin sprite.remove()) takes a sprite off the screen and out of the physics world; pipes.splice(i, 1) only takes it out of the array. The pipes move left, so a pipe that has left the screen has a small or negative x. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: keeping the starter's frameCount === 1 test (one pair, never again); a push that runs every frame, outside the beat; a test that deletes pipes still on the screen (x greater than something). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A pair is built on a repeating beat",
+        "description": "A test that comes true again and again at a steady rate: frameCount % N === 0 or == 0 for any N, or a frame counter of the student's own that counts up and is reset each time it fires. Missing: only the starter's frameCount === 1, which is true once. Help: 5.4.5 (Reading: A world that scrolls)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Every pair goes into the array",
+        "description": "Inside that beat's if (or an if that reads a variable holding the beat test), a new pair is made with makePipe() and pushed into pipes, in one line or stored in a variable first. Missing: no push, or a push that runs on every frame outside the beat. Help: 5.4.5 (Reading: A world that scrolls)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Pipes that have left are deleted and spliced out",
+        "description": "A loop over pipes with an if that tests a pipe's x for being off the left edge (less than -30, less than 0, or similar), whose body both deletes that pipe's sprite (delete() or remove()) and takes it out of the array (splice, or rebuilding the array without it), in either order. Deleting its mate as well is what step 2 asks and is welcome. A backwards loop is what the reading teaches; a forward loop still does the job here. Partial: only one of the two (deleted but left in the array, or spliced out but left on the screen). Help: 5.4.5 (Reading: A world that scrolls)",
+        "points": 1
+      }
+    ]
+  },
+  "5-4-flappy-6-lab-score-a-gap": {
+    "lessonTitle": "5.4.7 Lab: Score a gap",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.7 Lab: Score a gap\". The task they were given: Pipes already arrive, slide left and are cleaned up, and every pipe starts with passed set to false. In draw(), loop over the pipes; a pipe has been passed when its x is less than the bird's x and it has not been counted yet (!p.passed). Inside that test, add 1 to score and set that pipe's passed to true, so each pipe is counted once. You cannot run their code: read it and judge what it WOULD do when the sketch runs. The starter holds bird.x at 100 on every frame and the pipes move left, so a pipe's x drops below the bird's x once the bird is past it. draw() runs every frame, so a test with no flag stays true on every frame after the bird passes and the score races. A for...of loop, an index loop (pipes[i] in place of p) and pipes.forEach(...) all visit every pipe. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. The starter's backwards loop that deletes old pipes compares nothing with the bird; it counts for the first criterion only if the student puts the passing test inside it. A single flag shared by all the pipes (on the bird, or one global) counts only the first pipe ever. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Every pipe is checked",
+        "description": "A loop that visits each pipe in pipes (for...of, an index loop, or forEach) and compares that pipe's position with the bird inside it. Adding the test to the existing delete loop is fine. Missing: no loop compares anything with the bird. Help: 5.3.8 (Lab: Three bumpers, three values)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A pipe is passed when it is behind the bird",
+        "description": "One test (an && or an if inside an if) asks both that the pipe's x is less than the bird's x (bird.x > p.x, <=, or the pipe's x plus some width also count; so does the number 100, since the starter holds the bird at x = 100) and that this pipe has not been counted yet (!p.passed, p.passed === false, or a flag of the student's own on the pipe). Partial: only one of the two halves, or a flag that is not kept per pipe. Help: 5.3.5 (Reading: A collision is not an event)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Each pipe is counted once",
+        "description": "Inside the test that reads the pipe's flag, the score goes up by one (score += 1, score++ or score = score + 1) and the same pipe's flag is set to true, in either order. Missing: the score goes up but the flag is never set (the score races), or the two happen in different places. Help: 5.3.5 (Reading: A collision is not an event)",
+        "points": 1
+      }
+    ]
+  },
+  "5-4-flappy-7-lab-crash-and-start-again": {
+    "lessonTitle": "5.4.8 Lab: Crash, and start again",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.8 Lab: Crash, and start again\". The task they were given: Touching a pipe ends the round. Add a playing flag that starts true. Inside the pipe loop, when bird.colliding(p) or bird.colliding(p.mate) is true, set playing to false and freeze the world: gravity to 0, the bird's vel.y to 0, and every pipe's and mate's vel.x to 0. Wrap the play code in draw() (the flap, the edge check, the new pipes on the beat and both pipe loops) in if (playing) { ... }, and draw 'Game over' in drawTop() when the round is over. When R is pressed (outside that if), delete every pipe and empty the array, reset the bird's position and speed, turn gravity back on, zero the score and set playing back to true. You cannot run their code: read it and judge what it WOULD do when the sketch runs. bird.colliding(other) is true on every frame the two sprites touch, and p.colliding(bird) is the same test. drawTop() runs after the sprites are drawn, so words there are never hidden by a pipe. kb.presses('r') and kb.presses('R') are the same key. Code inside if (playing) stops running once playing is false, so an R check placed inside it can never run after a crash. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. These shapes all express the same ideas and all count: a gameOver flag that starts false and becomes true; the crash and restart code moved into helper functions (endRound(), startRound() or any names) called from the right place; an early return from draw() while the round is over; if (!playing) with the play code in its else. If the R check sits inside the if (playing) block, the restart criterion is partial and the note should say why. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A flag says whether the game is being played",
+        "description": "A variable that holds the game's state and starts out saying the round is on: playing = true (in setup() or where it is declared), or a game-over flag that starts false and is set true on a crash. Missing: no such variable. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Touching a pipe ends the round",
+        "description": "A collision test between the bird and a pipe (bird.colliding(p), p.colliding(bird), and the mate the same way) that flips the flag (playing = false, or the game-over flag = true), directly or through a function it calls. Testing both halves, p and p.mate, is what step 1 asks and is welcome; a test that reaches the pipe sprites and flips the flag counts here. Missing: no collision test changes the flag. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The crash freezes the world",
+        "description": "When the round ends (in the crash code, a function it calls, or code that runs while the flag says the round is over), gravity is set to 0 AND the pipes stop: each pipe's vel.x, and its mate's, set to 0, usually in a loop over pipes. The starter's bird.vel.x = 0 line does not count: it is the pipes that must stop. Setting the bird's vel.y to 0 too is what step 2 asks and is welcome. Partial: only the gravity, or only the pipes. Help: 5.4.5 (Reading: A world that scrolls)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The game runs only while the flag is true",
+        "description": "The code that builds new pipes on the beat (the frameCount % ... test) runs only while the round is on: inside if (playing) { ... }, in the else of if (!playing), after an early return while the round is over, or with the flag joined to the beat test by &&. Putting the flap, the edge check and the pipe loops inside it as well is what step 3 asks and is welcome. Missing: new pipes still arrive after a crash. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Game over shows when the round ends",
+        "description": "When the flag says the round is over (if (!playing), playing === false, an else after if (playing), or if (gameOver)), text(...) draws a message that says the round ended: 'Game over' in any capitals, or other words that clearly mean it. Drawing it in drawTop() is what step 3 asks; in draw() it still counts here. Missing: no message, or one that shows while the game is being played. Help: 5.3.9 (Reading: The state of the game)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The restart clears the pipes",
+        "description": "Pressing R (kb.presses('r') or 'R'), directly or through a function it calls such as startRound(), empties the pipes array: pipes = [], pipes.length = 0, pipes.splice(0), or a loop that pops or splices every pipe. Deleting each pipe and its mate first is what step 4 asks and is welcome. Partial: the sprites are deleted but the array is never emptied, or the R check sits inside if (playing) and can never run after a crash. Missing: no R check, or R does not touch the pipes. Help: 5.4.5 (Reading: A world that scrolls)",
+        "points": 1
+      }
+    ]
+  },
+  "5-4-flappy-9-challenges-make-it-yours": {
+    "lessonTitle": "5.4.11 Challenges: Make it yours",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.11 Challenges: Make it yours\". The task they were given: The Flappy game is complete. Change one rule: (1) harder as you go: the pipes get faster or the gap narrower as the score grows; (2) a best score: a second variable that is not reset when R is pressed, updated when the score beats it, and shown beside the score in drawTop(); or (3) a wobbling gap: each pipe wobbles up and down at a speed picked with random, turned the other way on a beat, with the top and bottom halves moving together. One of the three is enough. Step 2 also asks for a one-sentence // comment at the top naming the rule; no criterion checks that comment. You cannot run their code: read it and judge what it WOULD do when the sketch runs. makePipe() builds each pair and returns the top pipe (the bottom one is its mate); startRound() runs on R and resets the score; endRound() runs on a crash. y grows downward, so vel.y moves a pipe up or down. random(a, b) gives a number between a and b. A const can never be changed after it is made. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Read the whole sketch and look for any one of the three challenges, written any way: a speed or a gap size worked out from the score (in makePipe() or the loop), an if on the score that changes them, min or max used to cap the change, a best-style variable updated when the score beats it, or a vertical speed for each pipe picked with random. A rule of the student's own that changes how the game plays in the same way (it reads the score, or it moves the pipes with random) also counts. A purely cosmetic change (a colour, a fixed size) is not a rule, and neither is text that only prints the score. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Your rule is in the code",
+        "description": "At least one of: (1) something about the pipes, their speed or the gap, is worked out from the score, so the game gets harder as the score grows; (2) a best score that startRound() does not reset, updated when the score beats it (if (score > best), max(...), or similar), where showing it in drawTop() is what the challenge asks and is welcome; (3) each pipe gets a wobble speed from random, and the top and bottom halves move by the same amount. Missing: none of these is there, or the only change is how something looks. Help: 5.4.7 (Lab: Score a gap) and 5.4.6 (Lab: Pipes that come and go)",
+        "points": 1
+      }
+    ]
+  },
   "5-4-flappy-plan-sketch-the-game": {
     "lessonTitle": "5.4.1 Plan: Sketch your Flappy game",
     "prompt": "Everything you need is on this page and in 5.3.10 (Lab: Lose, and start again): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build a flapping-bird game. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one moment to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
@@ -7659,6 +8949,90 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "5-5-12-lab-write-hit": {
+    "lessonTitle": "5.8.12 Lab: Write hit(other)",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.12 Lab: Write hit(other)\". The task they were given: The Enemy class already has takeHit(n). Inside the Player class, write a method hit(other) that takes one argument, another object, and asks THAT object to take damage equal to the player's own this.power. Space calls p.hit(e), so the enemy's hp should fall by 2 on each press. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. A parameter is the name a method uses for whatever object was handed in: p.hit(e) hands the enemy in, so inside hit the parameter IS that enemy. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (hit, takeHit) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's Player has no hit method, which is missing on both criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "hit(other) asks the argument to take the hit",
+        "description": "The Player class has a method named hit with one parameter (any name), and its body calls takeHit on that parameter, the object handed in. Calling this.takeHit(...) is not met: the player has no takeHit, and it is the other object that should be hit. Calling takeHit on the global e instead of the parameter is not met: hit would ignore which object it was given. Lowering the other object's hp by hand instead of asking it to takeHit is partial.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The damage is the player's own power",
+        "description": "The amount handed to takeHit is this.power (directly, or through a local copied from this.power), so a stronger player would hit harder. A typed 2 is not met: it matches today's power by luck and ignores the property.",
+        "points": 1
+      }
+    ]
+  },
+  "5-5-13-lab-reap-the-dead": {
+    "lessonTitle": "5.8.13 Lab: Reap the dead with filter",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.13 Lab: Reap the dead with filter\". The task they were given: Dead enemies stay in the enemies array, so the list never gets shorter and Space keeps hitting a corpse at the front. After the hit check and before the loop in draw(), build a new list that keeps only the enemies that are still alive, using filter, and store it back in enemies, so the count at the bottom goes 3, 2, 1, 0. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. Each enemy has isAlive(), true while its hp is above 0. filter builds a NEW array of the items whose test is true and does not change the old one, so its result has to be stored back in enemies or it is thrown away. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (isAlive) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. A loop that walks enemies from the end to the start and splices out each enemy that is not alive also shortens the list and counts as met on both criteria; say in the note that filter is the tool this lab practises. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A filtered list is stored back in enemies",
+        "description": "Every frame, filter runs on enemies and its result ends up in enemies again (enemies = enemies.filter(...), or kept in another variable first and then assigned to enemies). Calling enemies.filter(...) without storing the result is not met: nothing changes.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The test keeps the enemies that are still alive",
+        "description": "The test inside filter keeps the living, in any shape: it asks each enemy isAlive(), or keeps those whose hp is above 0 (an arrow with or without braces, a function with return, === true). A test that keeps the dead (such as !e.isAlive() or hp <= 0) is the opposite and not met.",
+        "points": 1
+      }
+    ]
+  },
+  "5-5-16-lab-count-spawns": {
+    "lessonTitle": "5.8.16 Lab: Count your spawns",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.16 Lab: Count your spawns\". The task they were given: The scene prints Enemy.spawned, which says undefined because nothing declares it. Inside the class body, above the constructor, declare a static property named spawned that starts at 0; then, at the end of the constructor, add 1 to the class's counter, so every enemy ever built is counted. Each click builds one enemy. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. A property declared with static in the class body belongs to the class and is reached as Enemy.spawned. this.spawned would be a property of one enemy, which is the thing this lab is avoiding. mouse.presses() builds a new Enemy once per click. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The counter's name has to be spawned, because the scene's text line reads Enemy.spawned, unless the student also changed that line to their own name. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A static counter named spawned is declared",
+        "description": "The class body declares static spawned and starts it at 0. Writing Enemy.spawned = 0 once, outside the class and outside draw(), is the same class-level counter and also counts. A this.spawned set in the constructor is not met: that belongs to one enemy, not to the class. Setting the counter to 0 inside draw() is not met: it would be wiped every frame.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The constructor counts every new enemy",
+        "description": "Inside the constructor, the CLASS counter goes up by 1: Enemy.spawned += 1, Enemy.spawned++, Enemy.spawned = Enemy.spawned + 1, or this.constructor.spawned += 1. this.spawned += 1 is not met: it changes the one new enemy, not the class's count. Counting in draw() beside the push instead of in the constructor is partial: it only counts enemies built in that one place.",
+        "points": 1
+      }
+    ]
+  },
+  "5-5-18-lab-wave-spawner": {
+    "lessonTitle": "5.8.18 Lab: Build a wave",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.18 Lab: Build a wave\". The task they were given: draw() has three empty steps. First, when the field is clear, send a wave of three new enemies (at x = 90, 260 and 430, all at y = 100), but only on a frameCount timer, not on every frame. Second, Space knocks one hp off the first enemy in the list, and does nothing when the list is empty. Third, keep only the enemies that are still alive, storing the filtered list back in enemies. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. frameCount starts at 0 and goes up by 1 every frame, so frameCount % 90 === 0 is true once every 90 frames, while frameCount === 90 is true on one frame only, ever. Each enemy has takeHit(n) and isAlive(). Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit, isAlive) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. Step two (Space hits the first enemy) has no criterion; do not mark anything down for it. The exact x and y numbers are not a criterion either. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A wave only arrives on a timer",
+        "description": "The check that sends a wave is a repeating timer: frameCount with % and any number of frames (or a named constant), so it is true once every N frames rather than on every frame. A counter of the student's own that rises every frame, sends the wave and starts again also counts. frameCount === N (true on one frame ever) is not met, and neither is a wave sent with no timer at all.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A wave only arrives when the field is clear",
+        "description": "The same spawn check also asks that the enemies list is empty (enemies.length === 0, < 1, or !enemies.length), joined to the timer with && or by putting one if inside the other, so a new group waits until the last one is cleared. A length check that does not stop the spawn is not met.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "New enemies are pushed onto the list",
+        "description": "Each arriving enemy is a new Enemy(...) put into the enemies array: separate pushes, one push with three arguments, a loop that pushes, or enemies = [new Enemy(...), ...] all count. Enemies built but never put in enemies are not met: the scene would never hit, count or reap them.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The dead are filtered out",
+        "description": "Every frame the list is rebuilt from the living and stored back into enemies (enemies = enemies.filter(...) with a test that keeps isAlive() or hp above 0, in any shape). A filter whose result is not stored, or whose test keeps the dead, is not met. A loop from the end to the start that splices out each dead enemy also counts; say filter is the shape this lab practises.",
+        "points": 1
+      }
+    ]
+  },
   "5-5-19-assignment-where-state-lives": {
     "lessonTitle": "5.8.19 Your Turn: Where the state lives",
     "prompt": "The student was asked, for a wave-spawner program, to say where each of three numbers should live — a local variable in a method, a property on `this`, or a class variable declared with `static` — and to give one sentence of reasoning for each. The three numbers: (1) the list of enemies still on the field, (2) one enemy's health, (3) how many enemies have ever been built. The right answers, in the course's terms: the list is a property of the scene (or a plain array at file scope, which is the same idea in this program) because it must outlive a frame and hold several objects; health is a property on `this` because each enemy needs its own copy; the all-time count is a class variable (`static`) because it belongs to the class rather than to any one enemy. Judge each criterion ONLY by whether the idea is present, however the student words it. Do not require the words 'local', 'property' or 'static' — 'belongs to the class', 'each one has its own', 'survives the call' and similar phrases are the same ideas. A student who places a number in a defensible but different place (for example, calling the enemy list a file-scope variable) is right enough for 'met', as long as the reason holds. Mark a criterion 'missing' only when the answer is absent or the reasoning is the opposite of the idea. Write each note for THIS student's own words: in a not-met note, name the exact phrase that causes the problem (quote at most a few words), say in plain words what it claims now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the answer for them. In a met note, say in one short phrase what in their answer satisfied it. Do not use generic praise.",
@@ -7686,6 +9060,78 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "title": "The count of enemies ever built is placed and justified",
         "description": "The all-time count is placed on the class rather than on an instance, with a reason.",
         "points": 0
+      }
+    ]
+  },
+  "5-5-3-lab-move-counter-to-this": {
+    "lessonTitle": "5.8.3 Lab: Move the counter onto this",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.3 Lab: Move the counter onto this\". The task they were given: The starter's tick() makes a fresh local variable on every call, so the count on screen stays at 1 however often Space is pressed. Rewrite the body of tick() so the change lands on the object's own property this.n, and each press makes the count climb 1, 2, 3, 4. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. Each Space press calls c.tick() once. A variable made with let inside a method is made new on every call and is gone when the call ends; a property on this stays on the object from one call to the next. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (tick) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. Watch for the starter's own shape: a tick() that copies a local into this.n, where the local starts again at 0 on every call, still leaves this.n at 1 forever, so that is NOT met even though it writes this.n. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "tick() adds 1 to this.n",
+        "description": "Each call to tick() leaves this.n one bigger than it was, because the new value is built from the old this.n: this.n += 1, this.n++, this.n = this.n + 1, or a local copied from this.n, raised by 1 and written back. A tick() that writes this.n from a local that starts at 0 on every call is not met: the count would stay at 1.",
+        "points": 1
+      }
+    ]
+  },
+  "5-5-4-lab-locals-are-private": {
+    "lessonTitle": "5.8.4 Lab: Share one number between two methods",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.4 Lab: Share one number between two methods\". The task they were given: add() keeps its own local step of 3 and undo() types the 3 again, so the two numbers could drift apart. Store the step once as a property on this in the constructor, then make add() raise this.points by that property and undo() lower it by the same property, so pressing A three times and U once comes back by exactly one step. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. kb.presses('a') calls s.add() once per press and kb.presses('u') calls s.undo() once per press. A local made with let inside one method cannot be seen by any other method; a property set on this in the constructor can be read by every method of the class. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (add, undo) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter itself is not met on any criterion: its add() uses a local and its undo() uses a typed 3. The property may have another name than step, as long as add() and undo() read the same property. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The step is stored on this",
+        "description": "The constructor gives the object a step property (this.step = 3, any number above 0, or another property name used by both methods), so it exists before add() or undo() first runs. A step kept only in a local inside one method is not met. A property first set inside add() is not met: undo() pressed first would read undefined.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "add() uses this.step",
+        "description": "add() raises this.points by the stored property (this.points += this.step, or this.points = this.points + this.step), not by its own local or a typed number.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "undo() uses the same this.step",
+        "description": "undo() lowers this.points by the SAME stored property that add() uses (this.points -= this.step, or this.points = this.points - this.step), not by a typed 3 or a local of its own, so A then U always lands back where it started.",
+        "points": 1
+      }
+    ]
+  },
+  "5-5-8-lab-takehit-floor": {
+    "lessonTitle": "5.8.8 Lab: takeHit with a floor at zero",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.8 Lab: takeHit with a floor at zero\". The task they were given: The enemy starts with 5 health and each Space press calls takeHit(2). Write the body of takeHit(n): take the argument off this.hp, then keep this.hp from going below zero, so the lowest number the enemy ever shows is 0. The rule lives in the class, not in the scene. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. draw() shows this.hp as text on the enemy every frame. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's takeHit is empty, which is missing on both criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "takeHit(n) subtracts the argument from this.hp",
+        "description": "Inside takeHit, this.hp goes down by the parameter, whatever the student named it: this.hp -= n, this.hp = this.hp - n, or this.hp = Math.max(0, this.hp - n) all count. Subtracting a typed 2 instead of the parameter is not met: a hit of another size would be ignored.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "takeHit(n) never leaves health below zero",
+        "description": "When takeHit finishes, this.hp is never below 0: an if after the subtraction that sets it back to 0, a ternary, Math.max(0, ...) or max(0, ...), or an if/else that sets 0 when the hit is bigger than what is left. A check that only asks whether hp is above 0 BEFORE subtracting is not met: 1 - 2 still gives -1.",
+        "points": 1
+      }
+    ]
+  },
+  "5-5-9-lab-isalive": {
+    "lessonTitle": "5.8.9 Lab: Give the class its own isAlive()",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.9 Lab: Give the class its own isAlive()\". The task they were given: The scene asks e.hp > 0 twice, by hand. Add an isAlive() method to the Enemy class that takes no arguments and returns true while this.hp is above 0 and false once it is not, then make draw() ask e.isAlive() in place of both hand comparisons. What shows on screen should not change: the rule moves into the class, the behaviour stays. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. takeHit already stops hp at 0, so hp is never negative here. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter has no isAlive() and draw() compares e.hp itself, which is missing on both criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "isAlive() returns whether this.hp is above 0",
+        "description": "The class has an isAlive() method that RETURNS true while this.hp is above 0 and false at 0: return this.hp > 0, return this.hp >= 1, or an if/else that returns true or false. A method that returns nothing, or that answers the opposite (true at 0), is not met.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "draw() asks isAlive() instead of comparing hp",
+        "description": "draw() calls e.isAlive() and uses its answer (in a ternary, an if, or anywhere) to decide what the enemy shows, instead of comparing e.hp to 0 itself. If one hand comparison of e.hp is still left in draw(), it can still be met; name that leftover line in the note.",
+        "points": 1
       }
     ]
   },
@@ -7720,6 +9166,96 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
+  },
+  "5-5-snake-11-challenges-make-it-yours": {
+    "lessonTitle": "5.5.11 Challenges: Make it yours",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.5.11 Challenges: Make it yours\". The task they were given: The Snake game is complete. Change one rule: (1) a faster snake: turn const BEAT into a let variable used in frameCount % beat, made smaller every time the snake eats, with a floor so the game never becomes impossible; (2) a best score: a second variable that is not reset when R is pressed, updated when the score beats it, and shown beside the score in drawTop(); or (3) the quick double-turn fix: store each turn in turnX and turnY in draw() and apply it to dx and dy at the start of the next step(). One of the three is enough. Step 2 also asks for a one-sentence // comment at the top naming the rule; no criterion checks that comment. You cannot run their code: read it and judge what it WOULD do when the sketch runs. A const can never be changed: a line that subtracts from a const stops the sketch with an error. frameCount % beat === 0 comes true every beat frames, so a smaller beat means a faster snake, and a beat of 0 never comes true. startRound() runs at the start and on R. step() runs once per beat. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Look for any one of the three, written any way and with any names. A rule of the student's own that does the same kind of job (the game speeds up as the snake eats, or a record survives a restart) also counts. A purely cosmetic change (a colour) is not a rule. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Your rule is in the code",
+        "description": "At least one of: (1) the beat lives in a variable that can change, is used in the frameCount % test, and gets smaller when the snake eats (a floor with max(...) or an if is what the challenge asks and is welcome); (2) a best score that startRound() does not reset, updated when the score beats it, where showing it is what the challenge asks and is welcome; (3) turns stored in their own variables (turnX and turnY, or other names) when a key is pressed, and copied into dx and dy at the start of step(). Missing: none of these is there, or the change would stop the sketch (subtracting from a const). Help: 5.5.2 (Reading: A world on a grid) and 5.5.4 (Lab: Steer it)",
+        "points": 1
+      }
+    ]
+  },
+  "5-5-snake-4-lab-steer-it": {
+    "lessonTitle": "5.5.4 Lab: Steer it",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.5.4 Lab: Steer it\". The task they were given: The block (head) moves one cell per beat by dx and dy on a 20 by 20 grid of 20-pixel cells. In draw(), set dx and dy when an arrow key is pressed: up is dx = 0, dy = -1, and so on for down, left and right, each key setting both. Refuse a turn straight back: allow up and down only when dy === 0, and left and right only when dx === 0. After the step, if the new column or row is off the grid (below 0, or 20 or more), set playing to false; otherwise move the block on screen. You cannot run their code: read it and judge what it WOULD do when the sketch runs. y grows DOWNWARD, so up is a negative row change. kb.presses('up') is true on the frame the key goes down and kb.pressing('up') on every frame it is held; the arrow keys and w/a/s/d answer to the same names 'up', 'down', 'left' and 'right'. head.col and head.row are the block's cell (0 to 19), and cellToPixel turns a cell number into pixels. The starter already shows 'Game over' when playing is false. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. A key that sets only one of dx and dy leaves the other at its old value, so the block can move diagonally. Up with dy = 1 (or down with dy = -1) is the opposite direction. For the turn-back rule, dy === 0, dy == 0, !dy, or ruling out only the straight-back case (up refused while dy is 1, written dy !== 1) all do the job, written with && or as an if inside an if, in either order. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Each arrow key sets the direction",
+        "description": "Four key tests (up, down, left, right; presses or pressing), each setting the direction it names: up dy = -1, down dy = 1, left dx = -1, right dx = 1, with the other variable set to 0. Separate ifs, else if or a switch are all fine. Partial: a key is missing, or a key changes only one of dx and dy. Missing: no key changes the direction, or the directions are reversed. Help: 5.5.2 (Reading: A world on a grid)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A turn straight back is refused",
+        "description": "Each of the four key tests also checks the current direction so the block cannot turn back onto itself: up and down only when it is not already moving up or down (dy === 0, or the straight-back case ruled out with dy !== 1 for up and dy !== -1 for down), left and right only when dx === 0 (or the matching !== test). Partial: some keys are guarded and some are not. Missing: no key checks the direction. Help: 5.5.2 (Reading: A world on a grid)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Leaving the grid ends the round",
+        "description": "After the step, a test of the new column or row being off the grid (below 0, or 20 or more; > 19 and === -1 style tests also count) sets playing to false. Testing all four sides is what step 3 asks; a test that clearly covers leaving the grid counts here. Moving the block on screen only in the else is also what step 3 asks and is welcome. Missing: nothing sets playing to false, or it is set false while the block is still on the grid. Help: 5.4.8 (Lab: Crash, and start again)",
+        "points": 1
+      }
+    ]
+  },
+  "5-5-snake-6-lab-grow-and-eat": {
+    "lessonTitle": "5.5.6 Lab: Grow and eat",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.5.6 Lab: Grow and eat\". The task they were given: The snake is an array, segments, with the head at segments[0], made of sprites built by makeSegment(col, row). All the work is in step(): replace its last two lines (delete the head and build a new one) with: put a new head at the front of segments with unshift, then pop the tail and delete it. Then, when the new head's cell is the food's cell (col === food.col and row === food.row), add 1 to score, delete the food, make a new one with makeFood(), and do not remove the tail on that step; otherwise remove the tail as before. You cannot run their code: read it and judge what it WOULD do when the sketch runs. unshift(x) adds x at the front of an array (index 0); pop() takes the last item off and gives it back, and splice(segments.length - 1, 1) does the same. Taking a sprite out of the array does not take it off the screen: that needs sprite.delete() (or its twin remove()). step() runs once per beat, and return ends it early. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: removing the tail on every step, the eating step included (the score rises but the snake never grows); adding the new head at the end with push (the rest of the code treats segments[0] as the head); a pop with no delete (the old tail stays drawn). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A new head goes on the front",
+        "description": "A new segment for the next cell (made with makeSegment) goes on the front of segments: segments.unshift(...) directly, stored in a variable and then unshifted, or splice(0, 0, ...). Missing: the new cell is added at the end, or never added. Help: 5.5.5 (Reading: A body that grows)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The tail is removed and deleted",
+        "description": "The last segment leaves the array (pop(), or a splice of the last index) AND its sprite is deleted (delete() or remove()), in either order: kept in a variable and deleted, chained straight onto the pop, or read with segments[segments.length - 1] and deleted before the pop. Partial: only one of the two. Help: 5.5.5 (Reading: A body that grows)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Eating scores and replaces the food",
+        "description": "When the snake reaches the food, the score goes up by one (score += 1, score++ or score = score + 1) and food becomes a new piece from makeFood(). Deleting the old food first is what step 2 asks and is welcome. Partial: only one of the two. Help: 5.5.5 (Reading: A body that grows)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Eating keeps the tail, so the snake grows",
+        "description": "The eating test compares the new head's cell with the food's cell, column AND row (comparing the head sprite's x and y with the food's x and y, or segments[0] after the unshift, is the same idea), and the tail comes off only on a step that does not eat: in the else, after the eating branch has returned, behind an if that the snake did not eat, or behind a flag. Missing: the tail is removed whether or not the snake ate, or there is no eating test. Help: 5.5.5 (Reading: A body that grows)",
+        "points": 1
+      }
+    ]
+  },
+  "5-5-snake-8-lab-dont-bite-yourself": {
+    "lessonTitle": "5.5.8 Lab: Don't bite yourself",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.5.8 Lab: Don't bite yourself\". The task they were given: Fill in isBody(col, row): loop through segments and return true as soon as one has the same col and row; after the loop, return false. In step(), add isBody(col, row) to the test that ends the round at the walls, so running into the body ends it too. In makeFood(), keep picking a new random cell for as long as isBody(col, row) is true; the two picks must become let, not const, so they can be changed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. return ends the whole function at once, so a return true inside the loop answers as soon as a match is found. In step(), col and row are the NEXT cell, worked out before the new head is added; the current head is segments[0], which is always part of the body. Changing a const stops the sketch with an error, so the picks in makeFood() must be let. floor(random(20)) picks a whole number from 0 to 19. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: a return false inside the loop (for example in an else), which answers after looking at only the first segment; a match that joins the col and row tests with || instead of && (any segment in the same column would count as a bite); a return true inside a forEach callback, which returns from the callback and not from isBody; asking isBody about the current head's cell, or after the new head has been added (both are always true, so the round ends at once); an if instead of a while in makeFood() (it re-picks only once). The same ideas written differently all count: an index loop, a flag variable returned after the loop, segments.some(...) with both checks, or a separate if in step() that sets playing to false and returns. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "isBody searches the segments",
+        "description": "isBody goes through every segment (for...of, an index loop, or some) and answers true when one has the same col AND the same row as the cell asked about, with false given only after every segment has been checked. Partial: the match tests only one of col and row, or false is returned inside the loop. Missing: no loop over segments. Help: 5.5.7 (Reading: Searching the array)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A bite ends the round",
+        "description": "step() asks isBody about the next cell (the col and row the head is about to move into, before the new head is added), and when it is true the round ends (playing = false), joined to the wall test with || or in an if of its own. Missing: isBody is never asked in step(), or it is asked about a cell that is always part of the body. Help: 5.5.7 (Reading: Searching the array)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Food keeps re-picking until the cell is free",
+        "description": "In makeFood(), a loop (while, or do...while) keeps choosing a new column and row for as long as isBody says that cell is part of the snake, and the picks can be changed (let, not const). Partial: an if that re-picks only once, or picks still declared const (the sketch stops with an error when it tries to change them). Missing: the food's cell is never checked. Help: 5.5.7 (Reading: Searching the array)",
+        "points": 1
+      }
+    ]
   },
   "5-5-snake-9-playtest-and-reflect": {
     "lessonTitle": "5.5.9 Playtest and reflect: Snake",
@@ -7784,6 +9320,102 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
+  },
+  "5-9-defender-4-lab-fly-and-fire": {
+    "lessonTitle": "5.9.4 Lab: Fly and fire",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.9.4 Lab: Fly and fire\". The task they were given: Three functions to finish. In moveShip(), after the two lines that move the ship, add two ifs so ship.x never goes below 20 or above 380. In fire(), first count cooldown down by 1 while it is above 0; then, when Space is held AND cooldown is 0, build a 6 by 14 yellow shot with collider 'none' just above the ship, push it onto bullets, and set cooldown to 12. In moveBullets(), inside the loop that already runs from the end of bullets to the start, a shot whose y is less than -20 has left the top: delete its sprite and splice it out of bullets. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. A shot that climbs has a y that gets smaller, and leaves the top once y is below 0. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (moveShip, fire, moveBullets) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's moveShip(), fire() and moveBullets() bodies have only STEP comments where the work goes: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The ship stays on the canvas",
+        "description": "After the ship moves, ship.x is held between 20 and 380 on BOTH sides: two ifs that set it back, an if/else if, constrain(ship.x, 20, 380), or max/min. Nearby limits (such as 18 and 382) are fine. Only one side held is partial. Limits that still let the ship leave the canvas (below 0 or above 400) are not met.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The cooldown counts down",
+        "description": "Every frame fire() runs, cooldown goes down by 1 while it is above 0, and it does not run on below 0 (an if (cooldown > 0) guard, or max(0, cooldown - 1)). With no guard and a firing test of cooldown === 0, it is not met: cooldown would pass 0 into negatives, never equal 0 again, and the ship could fire only once. If the student's firing test asks cooldown <= 0 instead, an unguarded countdown still works and counts as met.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A shot is made only when Space is held and the cooldown is 0",
+        "description": "The push of a new shot onto bullets sits inside a test that asks BOTH that Space is down (kb.pressing('space'), or kb.presses('space'), which fires once per tap) AND that cooldown has reached 0 (=== 0, <= 0, < 1, or !cooldown), joined with && or written as one if inside the other. A shot made on Space alone, or on the cooldown alone, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Firing sets the cooldown again",
+        "description": "In the same block that pushes the shot, before or after the push, cooldown is set to 12 or any number above 0 (or a named constant), so the next shot has to wait. Setting it to 0, or setting it outside that block so it refills every frame, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Shots that leave the top are deleted and spliced out",
+        "description": "Inside moveBullets()'s loop, an if that asks whether the shot's y has gone above the top (less than -20, or another value near the top such as less than 0) both deletes the shot's sprite (.delete() or .remove()) and splices it out of bullets at that index. Only one of the two is partial: a spliced shot that is not deleted stays on screen, and a deleted shot left in bullets keeps counting. A test with > (a y below the bottom) is the opposite and not met.",
+        "points": 1
+      }
+    ]
+  },
+  "5-9-defender-6-lab-hit-the-drone": {
+    "lessonTitle": "5.9.6 Lab: Hit the drone",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.9.6 Lab: Hit the drone\". The task they were given: Shots fly straight through the falling drone. All the work is in hitDrone(), which already loops backwards over bullets. Inside the loop, test whether bullets[i] overlaps the drone. When it does, on that same frame: delete the shot's sprite and splice it out of bullets, add 1 to score, and call resetDrone(), which sends the drone back above the top at a random x. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. overlaps() stays true on every frame two sprites touch, which is why a shot that hit has to leave on that frame. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (hitDrone, resetDrone) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's hitDrone() loop has only STEP comments inside it: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "overlaps is used on the drone",
+        "description": "Every frame (in hitDrone(), or another function draw() calls while playing), each shot is tested against the drone with overlaps(): bullets[i].overlaps(drone), drone.overlaps(bullets[i]), a local copy of bullets[i], or overlapping(). A test with colliding() is not met: it never sees a sprite whose collider is 'none'. A test only in setup() is not met: it runs once.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The shot that hit leaves the screen and the array",
+        "description": "Inside the if that sees the overlap, on the same frame, the shot's sprite is deleted (.delete() or .remove()) and the shot is spliced out of bullets at that index. Only one of the two is partial: a spliced shot that is not deleted stays on screen, and a deleted shot left in bullets is still tested.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A hit scores 1 and resets the drone",
+        "description": "Inside the same if, score goes up by exactly 1 (+= 1, ++, or = score + 1) and the drone goes back to the top (resetDrone(), or setting drone.y back above the screen). A score line outside the if, so it climbs on every frame, is not met.",
+        "points": 1
+      }
+    ]
+  },
+  "5-9-defender-7-lab-hold-the-base": {
+    "lessonTitle": "5.9.7 Lab: Hold the base, and start again",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.9.7 Lab: Hold the base, and start again\". The task they were given: The drone can land as often as it likes. In startRound(), give baseHp 3 at the start of every round. In moveDrone(), inside the if that sees the drone reach the base, take 1 off baseHp, and when baseHp is 0 or less set playing to false. In drawTop(), when the round is over (not playing), write Game over and press R to play again in the middle of the screen. In draw(), after the whole if (playing) { ... } block, start a new round when R is pressed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. startRound() is called by setup() and should also be called by the R key, so whatever it sets comes back on a restart. Everything that moves is inside if (playing) in draw(), so playing = false stops the game, and any key check written inside that block can never run once the round is over. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (startRound, moveDrone, drawTop, resetDrone) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter has only STEP comments where each piece goes: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Every round starts with base hp",
+        "description": "startRound() (or a function it calls) sets baseHp to 3, or any starting number above 0, or a named constant. Setting it only in setup() is not met: R would not give the hp back. Setting it in draw() is not met: it would refill every frame.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Reaching the base costs 1",
+        "description": "baseHp goes down by exactly 1 (-= 1, --, or = baseHp - 1) inside the if that sees the drone reach the base (in moveDrone(), or wherever the landing is checked each frame). Taking hp outside that if, on every frame, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "At 0 the round ends",
+        "description": "When baseHp reaches 0 or less (<= 0, === 0, or < 1), playing is set to false (an if, or playing = baseHp > 0). The check can sit in moveDrone(), draw() or another function that runs every frame. playing = false with no test on baseHp is not met.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Game over is written in drawTop when the round is over",
+        "description": "In drawTop() (or a function drawTop() calls), words that say the game is over are written only when the round is over (if (!playing), if (playing === false), or the else of if (playing)). Wording close to Game over is fine; the press R line is welcome but not needed for this card. Writing it in draw() instead is partial: words drawn there land under the sprites. Writing it with no check on playing, so it always shows, is not met.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "R starts a new round",
+        "description": "Something that runs every frame (draw(), outside if (playing) { ... }, or the else of it) calls startRound() when R is pressed (kb.presses('r'), either case), directly or through the student's own function that calls it. An R check inside if (playing) { ... } is not met: after Game over it never runs. Resetting a few values by hand instead of calling startRound() is partial.",
+        "points": 1
+      }
+    ]
   },
   "6-10-breakout-1-plan-break-breakout-into-parts": {
     "lessonTitle": "6.10.1 Plan: Break Breakout into parts",
@@ -8094,5 +9726,47 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ],
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
+  },
+  "moshion-bounce": {
+    "lessonTitle": "5.2.12 Bouncy Ball",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.12 Bouncy Ball\". The task they were given: Build a closed box with a ball in it: turn gravity on, make four long thin static walls (top, bottom, left, right), make the ball as a dynamic sprite with one size number so it is a circle, store it in ball and colour it, make it bouncy (near the top of the 0 to 1 range), give it a friction value (the steps try 0 and then 5), give it a sideways starting speed, and paint the background in draw(). What the starter file already had: `let ball;`, a 400 by 400 canvas, and step comments in setup() and draw(). The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: A sprite made with 'static' as its last argument never moves or falls; one made without it is dynamic, so gravity and collisions move it. A sprite's body type can also be set afterwards with .collider = 'static'. new Sprite(x, y, d) with one size number makes a circle that many pixels across. bounciness runs from 0 (sticks) to 1 (gives back all its energy). friction is drag along a surface; 0 slides freely. world.gravity.y starts at 0 until a sketch sets it. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Create multiple static walls",
+        "description": "At least two sprites are static (made with 'static', or given .collider = 'static'). The step asks for four walls; two or more count for this card. Help: 5.2.11 (Bounciness and Friction)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Create a dynamic ball",
+        "description": "At least one sprite is made without the static body type, so it is dynamic and can move: that is the ball. A circle (one size number) is what the step asks, but a dynamic square still counts for this card.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Make it bouncy",
+        "description": "The ball's bounciness is set to 0.5 or more (the lab suggests near 1). A value under 0.5 is not met yet. Help: 5.2.11 (Bounciness and Friction)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Set friction",
+        "description": "A sprite's friction, normally the ball's, is set to any value (the steps try 0, then 5; a very low value keeps it rolling). Help: 5.2.11 (Bounciness and Friction)",
+        "points": 1
+      }
+    ]
+  },
+  "moshion-gravity": {
+    "lessonTitle": "5.2.7 Worked Example: Falling Block",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.7 Worked Example: Falling Block\". The task they were given: A worked example: a block falls under gravity and lands on a static ground. The student changes world.gravity.y from 10 to 0 (the block floats), then to 20 (it falls faster) and leaves it at 20, then removes 'static' from the ground to watch both fall, and adds a second falling block in another colour. Only the gravity change is checked. What the starter file already had: world.gravity.y set to 10 in setup(), an orange block and a gray static ground. With gravity still at 10 the criterion is not met. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y sets how hard things are pulled: a positive number pulls down the screen because y grows downward, and 0 means no pull. Only the line that really runs counts; a value written only in a comment changes nothing. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "You changed the gravity",
+        "description": "The world.gravity.y line that runs ends with a value other than 10. Step 2 ends at 20, but 0, a negative number or any other value also shows the student changed it, so it counts. Gravity set back to 10, or a new value written only in a comment, is not met. Help: 5.2.6 (Reading: Gravity)",
+        "points": 1
+      }
+    ]
   }
 };

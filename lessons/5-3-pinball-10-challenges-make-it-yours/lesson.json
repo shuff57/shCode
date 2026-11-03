@@ -47,5 +47,18 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.12 Challenges: Make it yours\". The task they were given: The game is complete. Change one rule of the student's own choosing: (1) a second goal worth more than the first, with its own worth and its own remembered last frame; (2) a short static bumper that slides left and right, its x changed a little every frame in draw() and turned round at an edge by flipping the sign of its step; or (3) a best score kept in a second variable that is not reset when R is pressed, updated when the score beats it and shown beside the score. Combining them, or inventing a different rule, also counts. Then write one sentence as a // comment at the top naming the rule and what would happen without it. What the starter file already had: a finished game: two walls, one bumper, a ground, one gold goal scoring 1 per touch with a wasTouching memory, a playing flag, a Game over screen and an R restart. Anything the starter already had is not a new rule, so the starter does not meet the criterion. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame. A sprite made with 'static' does not fall, but code can still move it by changing its x or y. ball.colliding(x) gives 0 while apart and a count of frames while touching. Comments never run: the sentence at the top explains the rule but does not make it happen, so judge the code itself. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Your game has a rule of your own",
+        "description": "The student's code adds at least one rule the starter did not have, and it would really run: a second thing that scores, something on the table that moves on its own, a best score kept across restarts, a score worth something other than 1, or a rule they invented (a timer, a speed change, a bonus, and so on). A change only to how things look, such as a colour or the words on screen, is not a new rule. Help: 5.3.8 (Lab: Three bumpers, three values)",
+        "points": 1
+      }
+    ]
   }
 }

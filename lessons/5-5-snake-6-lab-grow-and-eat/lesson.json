@@ -89,5 +89,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.5.6 Lab: Grow and eat\". The task they were given: The snake is an array, segments, with the head at segments[0], made of sprites built by makeSegment(col, row). All the work is in step(): replace its last two lines (delete the head and build a new one) with: put a new head at the front of segments with unshift, then pop the tail and delete it. Then, when the new head's cell is the food's cell (col === food.col and row === food.row), add 1 to score, delete the food, make a new one with makeFood(), and do not remove the tail on that step; otherwise remove the tail as before. You cannot run their code: read it and judge what it WOULD do when the sketch runs. unshift(x) adds x at the front of an array (index 0); pop() takes the last item off and gives it back, and splice(segments.length - 1, 1) does the same. Taking a sprite out of the array does not take it off the screen: that needs sprite.delete() (or its twin remove()). step() runs once per beat, and return ends it early. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: removing the tail on every step, the eating step included (the score rises but the snake never grows); adding the new head at the end with push (the rest of the code treats segments[0] as the head); a pop with no delete (the old tail stays drawn). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A new head goes on the front",
+        "description": "A new segment for the next cell (made with makeSegment) goes on the front of segments: segments.unshift(...) directly, stored in a variable and then unshifted, or splice(0, 0, ...). Missing: the new cell is added at the end, or never added. Help: 5.5.5 (Reading: A body that grows)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The tail is removed and deleted",
+        "description": "The last segment leaves the array (pop(), or a splice of the last index) AND its sprite is deleted (delete() or remove()), in either order: kept in a variable and deleted, chained straight onto the pop, or read with segments[segments.length - 1] and deleted before the pop. Partial: only one of the two. Help: 5.5.5 (Reading: A body that grows)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Eating scores and replaces the food",
+        "description": "When the snake reaches the food, the score goes up by one (score += 1, score++ or score = score + 1) and food becomes a new piece from makeFood(). Deleting the old food first is what step 2 asks and is welcome. Partial: only one of the two. Help: 5.5.5 (Reading: A body that grows)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Eating keeps the tail, so the snake grows",
+        "description": "The eating test compares the new head's cell with the food's cell, column AND row (comparing the head sprite's x and y with the food's x and y, or segments[0] after the unshift, is the same idea), and the tail comes off only on a step that does not eat: in the else, after the eating branch has returned, behind an if that the snake did not eat, or behind a flag. Missing: the tail is removed whether or not the snake ate, or there is no eating test. Help: 5.5.5 (Reading: A body that grows)",
+        "points": 1
+      }
+    ]
   }
 }

@@ -139,5 +139,54 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.20 Make it Move\". The task they were given: In setup(), make a 400 by 400 canvas and one sprite in the middle, stored in the player variable declared at the top. In draw(), paint the background first, then set player.vel.x from the left and right keys and player.vel.y from the up and down keys: if one key is held set a speed, else if the other key is held set the opposite speed, else set 0. Up is a negative vel.y. WASD ('a', 'd', 'w', 's') or the arrow keys ('left', 'right', 'up', 'down') are both fine. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame. kb.pressing(key) is true on every frame the key is held. The key names 'left', 'right', 'up' and 'down' are the arrow keys, and spellings such as 'ArrowLeft' work too. vel.x and vel.y are the sprite's speed in pixels per frame. y grows downward, so moving up is a negative vel.y. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Create a canvas",
+        "description": "new Canvas(...) is called when the sketch starts, normally in setup(). Any size counts; the lab uses 400 by 400. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Create a sprite",
+        "description": "A sprite is made with new Sprite(...), normally in setup() and stored in player. Any position and size count. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Horizontal keyboard input",
+        "description": "Inside draw() (or update(), if the student wrote one), a left or right key is read every frame with kb.pressing(...): 'a', 'd', 'left', 'right', or another spelling of the arrow keys. Help: 5.1.14 (Key names: WASD and the arrow keys)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Vertical keyboard input",
+        "description": "Inside draw() (or update(), if the student wrote one), an up or down key is read every frame with kb.pressing(...): 'w', 's', 'up', 'down', or another spelling of the arrow keys. Help: 5.1.14 (Key names: WASD and the arrow keys)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Set horizontal velocity",
+        "description": "Inside draw() (or update()), the sprite's vel.x is set every frame, to numbers such as a speed, the opposite speed and 0. Changing the sprite's x position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.16 (Velocity: vel.x and vel.y)",
+        "points": 1
+      },
+      {
+        "id": "r6",
+        "title": "Set vertical velocity",
+        "description": "Inside draw() (or update()), the sprite's vel.y is set every frame, to numbers such as a speed, the opposite speed and 0. Changing the sprite's y position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.16 (Velocity: vel.x and vel.y)",
+        "points": 1
+      },
+      {
+        "id": "r7",
+        "title": "Clear the background each frame",
+        "description": "background(...) is called inside draw(), with any colour, so old frames do not pile up. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
+        "points": 1
+      }
+    ]
   }
 }

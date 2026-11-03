@@ -100,5 +100,36 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.11 Hello Sprite\". The task they were given: Make a first moSHion sketch. In setup(): make a 400 by 400 canvas, make a sprite at the centre (200, 200) that is 40 wide and 40 tall and store it in player, and give it a colour. In draw(): paint the background every frame so the sprite can be seen clearly. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once when the sketch starts, and draw() runs again on every frame, about 60 times a second. new Canvas(w, h) makes the drawing area. new Sprite(x, y, w, h) makes a sprite; the course makes sprites once, in setup(). background(colour) inside draw() repaints the whole canvas every frame, so old frames do not pile up. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Create a canvas",
+        "description": "new Canvas(...) is called when the sketch starts, normally in setup(). Any size counts; the lab uses 400 by 400. Help: 5.1.5 (Canvas: new Canvas(w, h))",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Create at least one sprite",
+        "description": "At least one sprite is made with new Sprite(...). Storing it in player is what the step asks, but any name, or no variable at all, still counts, and so does any position and size. A sprite made inside draw() still exists, so it counts, but say in the note that it belongs in setup(), because draw() makes a new one every frame.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Set a sprite color",
+        "description": "A sprite is given a colour with .color = ..., on the stored variable or straight on new Sprite(...). Any colour name or hex code counts. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Clear the background each frame",
+        "description": "background(...) is called inside draw(), with any colour, so each frame starts clean. A background() call only in setup() runs once, so it is not met.",
+        "points": 1
+      }
+    ]
   }
 }

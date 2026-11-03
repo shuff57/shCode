@@ -40,5 +40,18 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.5 Lab: Method that returns a value\". The task they were given: The Counter class has n, tick() and addBy(n). Inside the class body, write an isHigh() method that returns true when this.n is greater than 10 and false otherwise. The driver in draw() already uses c.isHigh() to paint the number red. You cannot run their code: read it and judge what it WOULD do when the sketch runs. return hands a value back to the code that called the method; the driver uses it as fill(c.isHigh() ? 'red' : 'white'). A comparison such as this.n > 10 is itself true or false, so returning it directly is enough. A value that is worked out but not returned is lost. The driver calls c.isHigh(), so the method must be named isHigh. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Returning the comparison, an if/else that returns true and false, this.n >= 11, 10 < this.n, or a variable holding the comparison that is then returned all count. An if that returns true with no return false after it still works, because the method then gives back nothing, which the driver treats as false. >= 10 is true at exactly 10, one step too early. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "isHigh() compares this.n to 10",
+        "description": "Inside the Counter class there is an isHigh() method that compares this.n with 10 and returns a value that is true when the count is over 10 and not true at 10 or below. Partial: the comparison is off by one (>= 10), or it compares something other than this.n. Missing: no isHigh method inside the class, or it compares but never returns anything. Help: 5.7.1 (Methods: functions that live on a class)",
+        "points": 1
+      }
+    ]
   }
 }

@@ -109,5 +109,42 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.19 Collectible Class\". The task they were given: The Collectible class shell is given: constructor(x, y, value, color) and collect(), both empty. Fill in the constructor: store the data on this (at least the value) and create this.sprite = new Sprite(...) in the given colour. Write collect() so it deletes the sprite and returns this.value. In setup(), push at least five new Collectible(...) into collectibles at different positions, with different values and colours. In draw(), go through collectibles; when player.overlaps(c.sprite) is true, call c.collect(), add what it returns to totalScore, and remove that item from the array. You cannot run their code: read it and judge what it WOULD do when the sketch runs. player.overlaps(other) is true on every frame the two touch, and it takes a sprite, so it is given c.sprite (the Collectible's own sprite), not the Collectible object. sprite.delete() (or remove()) takes a sprite off the screen. Code after a return never runs, so in collect() the delete must come before the return. Removing items from an array while looping forward skips the next item; looping backwards, or over a copy, avoids that. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: a return placed before the delete (the delete never runs); overlaps given the Collectible itself instead of its sprite; a collect() that returns nothing. Any parameter names, any sprite size or shape, and a for, for...of or backwards loop all count. colliding(...) also detects the touch and counts for the overlap criterion. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Constructor stores state on the object",
+        "description": "The constructor body stores at least one of its arguments on this (the value, x, y or the colour). Missing: nothing is stored on this. Help: 5.6.5 (constructor and its parameters)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Constructor creates the sprite",
+        "description": "The constructor creates a new Sprite(...) and stores it as this.sprite. Missing: no sprite, or it is kept in a local variable instead of this.sprite. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "collect() method does work",
+        "description": "collect() deletes this.sprite (delete() or remove()) and returns a value (this.value is what step 2 asks), with the delete placed where it actually runs, before the return. Partial: only one of the two, or a delete that sits after the return and never runs. Missing: collect() is still empty. Help: 5.7.10 (Lab: Cleanup with this.sprite.delete())",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "At least one instance",
+        "description": "At least one new Collectible(...) is built. Five or more, pushed into collectibles, is what step 3 asks and is welcome. Missing: no Collectible is ever built. Help: 5.6.4 (The new operator)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Overlap detection",
+        "description": "Inside draw() (or a function it calls), the code tests whether the player touches a collectible's sprite: player.overlaps(...) given the sprite, the same test the other way round, overlapping(...), or colliding(...). Partial: the test is given the Collectible object instead of its sprite. Missing: no touch test in draw().",
+        "points": 1
+      }
+    ]
   }
 }

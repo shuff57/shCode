@@ -80,5 +80,30 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.4 Lab: Share one number between two methods\". The task they were given: add() keeps its own local step of 3 and undo() types the 3 again, so the two numbers could drift apart. Store the step once as a property on this in the constructor, then make add() raise this.points by that property and undo() lower it by the same property, so pressing A three times and U once comes back by exactly one step. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. kb.presses('a') calls s.add() once per press and kb.presses('u') calls s.undo() once per press. A local made with let inside one method cannot be seen by any other method; a property set on this in the constructor can be read by every method of the class. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (add, undo) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter itself is not met on any criterion: its add() uses a local and its undo() uses a typed 3. The property may have another name than step, as long as add() and undo() read the same property. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The step is stored on this",
+        "description": "The constructor gives the object a step property (this.step = 3, any number above 0, or another property name used by both methods), so it exists before add() or undo() first runs. A step kept only in a local inside one method is not met. A property first set inside add() is not met: undo() pressed first would read undefined.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "add() uses this.step",
+        "description": "add() raises this.points by the stored property (this.points += this.step, or this.points = this.points + this.step), not by its own local or a typed number.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "undo() uses the same this.step",
+        "description": "undo() lowers this.points by the SAME stored property that add() uses (this.points -= this.step, or this.points = this.points - this.step), not by a typed 3 or a local of its own, so A then U always lands back where it started.",
+        "points": 1
+      }
+    ]
   }
 }
