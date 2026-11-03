@@ -15,10 +15,11 @@
     {
       "id": "s1",
       "title": "Give every bumper its own memory",
-      "instructions": "A sprite is an object, so you can store your own values on it — the starter already stores `worth`. In `setup()`, give each bumper a `wasTouching` of `false`, so each one can remember its own last frame.",
+      "instructions": "A sprite is an object, so you can store your own values on it — the starter already stores `worth`. In `setup()`, give each bumper a `wasTouching` of `false`, so each one can remember its own last frame. Use a name moSHion does not already use: every sprite already has a `life`, `speed`, `direction`, `mass`, `color` and `text`, and storing your own value under one of those changes the sprite instead (a `life` of 3 deletes it three frames later). `worth`, `points` and `wasTouching` are safe.",
       "hints": [
         "It is the same three lines for each bumper: `b1.wasTouching = false;` and so on.",
-        "Why one per bumper rather than one shared variable? Because two bumpers can be touched in different frames, and one shared memory would mix them up."
+        "Why one per bumper rather than one shared variable? Because two bumpers can be touched in different frames, and one shared memory would mix them up.",
+        "Other names every sprite already has: `x`, `y`, `w`, `h`, `d`, `rotation`, `scale`, `visible`, `layer`, `shape`. If a sprite vanishes, speeds off or changes how it looks right after you store a value on it, give the value a different name."
       ]
     },
     {
