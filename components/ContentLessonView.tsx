@@ -8,6 +8,7 @@ import CompletionPanel from './CompletionPanel';
 import WrittenGrader from './WrittenGrader';
 import DiagramAssignmentView from './DiagramAssignmentView';
 import { taskSections } from '../lib/diagram-task-sections';
+import { splitRubric } from '../lib/rubric-split';
 import QuizView from './QuizView';
 import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
 import HeaderLessonNav from './HeaderLessonNav';
@@ -48,6 +49,10 @@ export default function ContentLessonView({ lesson }: Props) {
   const badge = badgeFor(preview);
   const contentMd = findContent(lesson);
   const meta = lesson as any;
+  // A writeup (the WrittenGrader branch below) draws its rubric AFTER the "What to answer"
+  // box, not above it in file order. No rubric heading: everything renders as before.
+  const rubricSplit = !meta.quiz && !meta.diagram && meta.aiGrader ? splitRubric(contentMd) : null;
+  const bodyMd = rubricSplit ? rubricSplit.before : contentMd;
 
   // A lesson can name a deck that hasn't been authored yet. Embedding that URL
   // blind puts a raw 404 page inside the lesson, which is a worse first
@@ -268,9 +273,9 @@ export default function ContentLessonView({ lesson }: Props) {
         </p>
       ) : null}
 
-      {contentMd ? (
+      {bodyMd ? (
         <div style={{ marginTop: 20 }}>
-          <MarkdownWithLiveBlocks src={contentMd} lessonId={lesson.id} />
+          <MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} />
         </div>
       ) : null}
 
@@ -299,6 +304,7 @@ export default function ContentLessonView({ lesson }: Props) {
           // prompt IS the instructions and keeps rendering as before.
           prompt={meta.aiGrader.summative ? '' : (meta.aiGrader.prompt ?? contentMd.slice(0, 2000))}
           config={meta.aiGrader}
+          afterPrompt={rubricSplit ? <MarkdownWithLiveBlocks src={rubricSplit.rubric} lessonId={lesson.id} /> : undefined}
         />
       ) : (
         <CompletionPanel lessonId={lesson.id} lessonType={preview} />
