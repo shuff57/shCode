@@ -65,10 +65,10 @@
     {
       "id": "r2",
       "title": "Touching a pipe ends the round",
-      "description": "A collision with the bird flips the flag (playing = false, or a game-over flag = true). Help: 5.3.9 (Reading: The state of the game)",
+      "description": "A collision with the bird flips the flag (playing = false, or a game-over flag = true), directly or in a function it calls such as endRound(). Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,320}?(?<![\\w.$])\\w+\\s*=\\s*(?:false|true)\\b",
+      "pattern": "(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,320}?(?<![\\w.$])\\w+\\s*=\\s*(?:false|true)\\b|(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[^{};]{0,200}?\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,400}\\}){0,400}?)?[^\\w$.{}](?<h52b>[A-Za-z_$][\\w$]*)\\s*\\([^()]*\\)(?=[\\s\\S]{0,4000}?\\bfunction\\s+\\k<h52b>\\s*\\([^)]*\\)\\s*\\{(?:(?:[^{}]|\\{[^{}]{0,400}\\}){0,400}?[^\\w$.{}])?[A-Za-z_$][\\w$]*\\s*=\\s*(?:false|true)\\b)|\\bfunction\\s+(?<h52c>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:(?:[^{}]|\\{[^{}]{0,400}\\}){0,400}?[^\\w$.{}])?[A-Za-z_$][\\w$]*\\s*=\\s*(?:false|true)\\b[\\s\\S]{0,4000}?(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[^{};]{0,200}?\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,400}\\}){0,400}?)?[^\\w$.{}]\\k<h52c>\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -101,7 +101,7 @@
       "description": "While the flag is false, the screen says Game over. Help: 5.3.9 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:\\}\\s*else\\s*\\{?|if\\s*\\(\\s*(?:\\(\\s*){0,3}(?:!\\s*(?:\\(\\s*){0,3}\\w+|\\w+\\s*===?\\s*false)(?:\\s*\\)){0,3}\\s*\\)\\s*\\{?)[\\s\\S]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over|^(?=[\\s\\S]*(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,160}?(?<![\\w.$])(\\w+)\\s*=\\s*true\\b)(?=[\\s\\S]*if\\s*\\(\\s*(?:\\(\\s*){0,3}\\1\\s*(?:===?\\s*true\\s*)?(?:\\s*\\)){0,3}\\s*\\)\\s*\\{?[^{}]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over)",
+      "pattern": "(?:\\}\\s*else\\s*\\{?|if\\s*\\(\\s*(?:\\(\\s*){0,3}(?:!\\s*(?:\\(\\s*){0,3}\\w+|\\w+\\s*===?\\s*false)(?:\\s*\\)){0,3}\\s*\\)\\s*\\{?)[\\s\\S]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over|^(?=[\\s\\S]*(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[\\s\\S]{0,160}?(?<![\\w.$])(\\w+)\\s*=\\s*true\\b)(?=[\\s\\S]*if\\s*\\(\\s*(?:\\(\\s*){0,3}\\1\\s*(?:===?\\s*true\\s*)?(?:\\s*\\)){0,3}\\s*\\)\\s*\\{?[^{}]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over)|^(?=[\\s\\S]*?\\bfunction\\s+(?!(?:setup|draw|drawTop|update)\\b)(?<h56>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:(?:[^{}]|\\{[^{}]{0,400}\\}){0,400}?[^\\w$.{}])?(?<f56>[A-Za-z_$][\\w$]*)\\s*=\\s*true\\b)(?=[\\s\\S]*?(?:bird\\.colliding\\s*\\(|\\.colliding\\s*\\(\\s*bird\\b)[^{};]{0,200}?\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,400}\\}){0,400}?)?[^\\w$.{}]\\k<h56>\\s*\\()(?=[\\s\\S]*?\\bif\\s*\\(\\s*(?:\\(\\s*){0,3}\\k<f56>\\s*(?:===?\\s*true\\s*)?(?:\\s*\\)){0,3}\\s*\\)\\s*\\{?[^{}]{0,200}?text\\s*\\(\\s*['\"`][^'\"`]*game\\s*over)",
       "flags": "i",
       "points": 0,
       "status": "pending"

@@ -1198,6 +1198,32 @@ for (const id of Object.values(L)) {
     ]);
   }
 
+  // 5.3.8 r3: the memory is any property the student names (r2 already took any name); r3 used to
+  // demand the exact word wasTouching. It must still refuse a score on every touching frame.
+  {
+    const id = '5-3-pinball-7-lab-three-bumpers-three-values'; const S = sol(id);
+    const named = (name) => ({ 'script.js': S['script.js'].split('wasTouching').join(name) });
+    const H = named('hit');
+    const ifLine = '    if (touching && !b.hit) {';
+    const scoreIf = ifLine + nl + '      score += b.worth;' + nl + '    }';
+    run(id, [
+      A('memory named hit', H),
+      A('memory named touchedLast', named('touchedLast')),
+      A('memory named lastFrame, set straight from colliding()', edit(edit(named('lastFrame'), '    b.lastFrame = touching;', '    b.lastFrame = ball.colliding(b);'), '    const touching = ball.colliding(b);' + nl + '    if (touching && !b.lastFrame) {', '    if (ball.colliding(b) && !b.lastFrame) {')),
+      A('memory named hit, if/else true / false', edit(H, '    b.hit = touching;', '    if (touching) {' + nl + '      b.hit = true;' + nl + '    } else {' + nl + '      b.hit = false;' + nl + '    }')),
+      A('memory named hit, bumpers[i] in a counting loop', edit(H, '  for (const b of bumpers) {' + nl + '    const touching = ball.colliding(b);' + nl + scoreIf + nl + '    b.hit = touching;', '  for (let i = 0; i < bumpers.length; i++) {' + nl + '    const touching = ball.colliding(bumpers[i]);' + nl + '    if (touching && !bumpers[i].hit) {' + nl + '      score += bumpers[i].worth;' + nl + '    }' + nl + '    bumpers[i].hit = touching;')),
+      A('memory named hit, == false', edit(H, '!b.hit', 'b.hit == false')),
+      A('memory named hit, nested ifs', edit(H, scoreIf, '    if (touching) {' + nl + '      if (!b.hit) {' + nl + '        score += b.worth;' + nl + '      }' + nl + '    }')),
+      A('memory named hit, braceless score line', edit(H, scoreIf, ifLine.replace(' {', '') + ' score += b.worth;')),
+      R('worth on every touching frame', 'r3', edit(S, '    if (touching && !b.wasTouching) {', '    if (ball.colliding(b)) {')),
+      R('touching alone, no memory in the test', 'r3', edit(H, ifLine, '    if (touching) {')),
+      R('memory named hit, === false (it holds a number)', 'r3', edit(H, '!b.hit', 'b.hit === false')),
+      R('a property that is not a memory: ball.vel.y', 'r3', edit(H, ifLine, '    if (touching && ball.vel.y > 0) {')),
+      R('the worth itself in the test', 'r3', edit(H, ifLine, '    if (touching && b.worth > 0) {')),
+      R('memory named hit, adds 1 instead of the worth', 'r3', edit(H, 'score += b.worth;', 'score += 1;')),
+    ]);
+  }
+
   // 5.4.7 r1
   {
     const id = '5-4-flappy-6-lab-score-a-gap'; const S = sol(id);
@@ -1210,6 +1236,64 @@ for (const id of Object.values(L)) {
       A('scoring inside the delete loop', edit(edit(S, forOf, ''), delLoop, delLoop + nl + '    if (pipes[i].x < bird.x && !pipes[i].passed) {' + nl + '      score += 1;' + nl + '      pipes[i].passed = true;' + nl + '    }')),
       A('index loop, braceless body', edit(S, forOf, '  for (let i = 0; i < pipes.length; i++) if (pipes[i].x < bird.x && !pipes[i].passed) {' + nl + '    score += 1;' + nl + '    pipes[i].passed = true;' + nl + '  }' + nl)),
       R('no scoring, a bird.x line after the delete loop', 'r1', edit(S, forOf, '  bird.x = 100;' + nl)),
+    ]);
+  }
+
+  // 5.4.8 r2, r6: a gameOver flag with the crash and the restart in helpers (endRound(), startRound()).
+  // The flag flips inside the helper, so r2 must follow the call from the collision into the helper's
+  // body, and r6 must know that if (gameOver) means the round is over because the crash helper set it true.
+  {
+    const id = '5-4-flappy-7-lab-crash-and-start-again'; const S = sol(id);
+    const crash = '        playing = false;' + nl + '        world.gravity.y = 0;' + nl + '        bird.vel.y = 0;' + nl + '        for (const q of pipes) {' + nl + '          q.vel.x = 0;' + nl + '          q.mate.vel.x = 0;' + nl + '        }';
+    const restart = '    for (const p of pipes) {' + nl + '      p.mate.delete();' + nl + '      p.delete();' + nl + '    }' + nl + '    pipes = [];' + nl + '    bird.y = 200;' + nl + '    bird.vel.y = 0;' + nl + '    world.gravity.y = 20;' + nl + '    score = 0;' + nl + '    playing = true;';
+    const startFn = 'function startRound() {' + nl + restart.replace(/^ {2}/gm, '').replace('playing = true;', 'gameOver = false;') + nl + '}' + nl;
+    const endFn = 'function endRound() {' + nl + crash.replace(/^ {6}/gm, '').replace('playing = false;', 'gameOver = true;') + nl + '}' + nl;
+    const helpers = (src, above) => {
+      let s = edit(src, 'let bird, pipes, score, playing;', 'let bird, pipes, score, gameOver;');
+      s = edit(s, '  pipes = [];' + nl + '  score = 0;' + nl + '  playing = true;' + nl + '}' + nl, '  pipes = [];' + nl + '  startRound();' + nl + '}' + nl + nl + (above ? startFn + nl + endFn : ''));
+      s = edit(s, crash, '        endRound();');
+      s = edit(s, restart, '    startRound();');
+      s = edit(s, '  if (playing) {', '  if (!gameOver) {');
+      s = edit(s, '  if (!playing) {', '  if (gameOver) {');
+      return above ? s : { 'script.js': s['script.js'] + nl + startFn + nl + endFn };
+    };
+    const G = helpers(S, true);
+    run(id, [
+      A('gameOver + endRound()/startRound() written above draw()', G),
+      A('gameOver + endRound()/startRound() written at the bottom', helpers(S, false)),
+      A('helper takes an argument', edit(edit(G, 'function endRound() {', 'function endRound(reason) {'), '        endRound();', "        endRound('pipe');")),
+      A('braceless collision if calls the helper', edit(G, '      if (bird.colliding(p) || bird.colliding(p.mate)) {' + nl + '        endRound();' + nl + '      }', '      if (bird.colliding(p) || bird.colliding(p.mate)) endRound();')),
+      A('the pipe asks about the bird', edit(G, 'bird.colliding(p) || bird.colliding(p.mate)', 'p.colliding(bird) || p.mate.colliding(bird)')),
+      A('the flag set last in endRound()', edit(edit(G, '  gameOver = true;' + nl, ''), '    q.mate.vel.x = 0;' + nl + '  }' + nl + '}', '    q.mate.vel.x = 0;' + nl + '  }' + nl + '  gameOver = true;' + nl + '}')),
+      A('if (gameOver === true) and GAME OVER', edit(G, "  if (gameOver) {" + nl + '    textSize(28);' + nl + "    text('Game over'", "  if (gameOver === true) {" + nl + '    textSize(28);' + nl + "    text('GAME OVER'")),
+      A('playing flag kept, endRound() sets it false', edit(edit(edit(edit(edit(G, 'let bird, pipes, score, gameOver;', 'let bird, pipes, score, playing;'), '  gameOver = false;', '  playing = true;'), '  gameOver = true;', '  playing = false;'), '  if (!gameOver) {', '  if (playing) {'), '  if (gameOver) {', '  if (!playing) {')),
+      R('endRound() only freezes, nothing flips the flag', 'r2', edit(G, '  gameOver = true;' + nl, '')),
+      R('if (playing) shows Game over', 'r6', edit(edit(edit(edit(edit(G, 'let bird, pipes, score, gameOver;', 'let bird, pipes, score, playing;'), '  gameOver = false;', '  playing = true;'), '  gameOver = true;', '  playing = false;'), '  if (!gameOver) {', '  if (playing) {'), '  if (gameOver) {', '  if (playing) {')),
+      R('Game over drawn on every frame', 'r6', edit(G, '  if (gameOver) {' + nl + '    textSize(28);' + nl + "    text('Game over', 130, 190);" + nl + '    textSize(14);' + nl + "    text('press R to play again', 130, 215);" + nl + '  }', "  text('Game over', 130, 190);")),
+    ]);
+  }
+
+  // 5.5.4 r1: every key sets BOTH dx and dy inside its own if. The old pattern looked for one value in the
+  // 80 characters after the key test, so up and down could set only dy (the block then moves diagonally).
+  {
+    const id = '5-5-snake-4-lab-steer-it'; const S = sol(id);
+    const four = "  if (kb.presses('up') && dy === 0) { dx = 0; dy = -1; }" + nl + "  if (kb.presses('down') && dy === 0) { dx = 0; dy = 1; }" + nl + "  if (kb.presses('left') && dx === 0) { dx = -1; dy = 0; }" + nl + "  if (kb.presses('right') && dx === 0) { dx = 1; dy = 0; }";
+    const w = (to) => edit(S, four, to);
+    const keys = [['up', 0, -1, 'dy'], ['down', 0, 1, 'dy'], ['left', -1, 0, 'dx'], ['right', 1, 0, 'dx']];
+    run(id, [
+      A('reference', S), R('starter', 'r1', starter(id)),
+      A('one statement per line, dy first', w(keys.map(([k, x, y, g]) => `  if (kb.presses('${k}') && ${g} === 0) {` + nl + `    dy = ${y};` + nl + `    dx = ${x};` + nl + '  }').join(nl))),
+      A('else-if chain', w(keys.map(([k, x, y, g], i) => (i ? '  } else if' : '  if') + ` (kb.presses('${k}') && ${g} === 0) {` + nl + `    dx = ${x};` + nl + `    dy = ${y};`).join(nl) + nl + '  }')),
+      A('the guard first, then the key', w(keys.map(([k, x, y, g]) => `  if (${g} === 0 && kb.presses('${k}')) { dx = ${x}; dy = ${y}; }`).join(nl))),
+      A('nested: the key, then the guard', w(keys.map(([k, x, y, g]) => `  if (kb.presses('${k}')) {` + nl + `    if (${g} === 0) {` + nl + `      dx = ${x};` + nl + `      dy = ${y};` + nl + '    }' + nl + '  }').join(nl))),
+      A('nested: one guard holds two keys', w('  if (dy === 0) {' + nl + keys.slice(0, 2).map(([k, x, y]) => `    if (kb.presses('${k}')) { dx = ${x}; dy = ${y}; }`).join(nl) + nl + '  }' + nl + '  if (dx === 0) {' + nl + keys.slice(2).map(([k, x, y]) => `    if (kb.presses('${k}')) { dx = ${x}; dy = ${y}; }`).join(nl) + nl + '  }')),
+      A('kb.pressing and double quotes', w(four.replace(/presses\('(\w+)'\)/g, 'pressing("$1")'))),
+      A('braceless, both set with a comma', w(keys.map(([k, x, y, g]) => `  if (kb.presses('${k}') && ${g} === 0) dx = ${x}, dy = ${y};`).join(nl))),
+      R('up and down set only dy', 'r1', w(keys.map(([k, x, y, g]) => `  if (kb.presses('${k}') && ${g} === 0) { ${g === 'dy' ? '' : `dx = ${x}; `}dy = ${y}; }`).join(nl))),
+      R('only up sets only dy', 'r1', edit(S, "{ dx = 0; dy = -1; }", '{ dy = -1; }')),
+      R('left and right set only dx', 'r1', w(keys.map(([k, x, y, g]) => `  if (kb.presses('${k}') && ${g} === 0) { dx = ${x};${g === 'dx' ? '' : ` dy = ${y};`} }`).join(nl))),
+      R('up and down swapped', 'r1', w(four.replace('dy = -1;', 'dy = TMP;').replace('dy = 1;', 'dy = -1;').replace('dy = TMP;', 'dy = 1;'))),
+      R('dx = 0 once, outside every key', 'r1', w('  dx = 0;' + nl + keys.map(([k, x, y, g]) => `  if (kb.presses('${k}') && ${g} === 0) { ${g === 'dy' ? '' : `dx = ${x}; `}dy = ${y}; }`).join(nl))),
     ]);
   }
 
@@ -1270,6 +1354,41 @@ for (const id of Object.values(L)) {
       A('backward loop, a local and === false', edit(S, line, '  for (let i = enemies.length - 1; i >= 0; i--) {' + nl + '    const e = enemies[i];' + nl + '    if (e.isAlive() === false) {' + nl + '      enemies.splice(i, 1);' + nl + '    }' + nl + '  }')),
       R('backward loop splices the living', 'r2', edit(S, line, loop('enemies[i].isAlive()'))),
       R('backward loop splices every enemy', 'r1', edit(S, line, '  for (let i = enemies.length - 1; i >= 0; i--) {' + nl + '    enemies.splice(i, 1);' + nl + '  }')),
+    ]);
+  }
+
+  // 5.8.13 r1, r2: every honest way to rebuild the list of the living, not only filter and the backward
+  // splice: a new list filled with push in a loop and stored back, a while loop that splices or shifts out
+  // the dead, and a loop from the start that splices and steps its counter back.
+  {
+    const id = '5-5-13-lab-reap-the-dead'; const S = sol(id);
+    const line = '  enemies = enemies.filter((e) => e.isAlive());';
+    const w = (to) => edit(S, line, to);
+    const pushed = (head, test, item, close = '  }') => w('  const alive = [];' + nl + head + nl + `    if (${test}) {` + nl + `      alive.push(${item});` + nl + '    }' + nl + close + nl + '  enemies = alive;');
+    run(id, [
+      A('for...of pushes the living into a new list', pushed('  for (const e of enemies) {', 'e.isAlive()', 'e')),
+      A('for...of push, braceless, let', w('  let living = [];' + nl + '  for (let e of enemies) if (e.isAlive()) living.push(e);' + nl + '  enemies = living;')),
+      A('for...of push, hp > 0', pushed('  for (const e of enemies) {', 'e.hp > 0', 'e')),
+      A('for...of push, isAlive() === true', pushed('  for (const e of enemies) {', 'e.isAlive() === true', 'e')),
+      A('for...of push, continue past the dead', w('  const alive = [];' + nl + '  for (const e of enemies) {' + nl + '    if (!e.isAlive()) continue;' + nl + '    alive.push(e);' + nl + '  }' + nl + '  enemies = alive;')),
+      A('counting loop pushes the living', pushed('  for (let i = 0; i < enemies.length; i++) {', 'enemies[i].isAlive()', 'enemies[i]')),
+      A('forEach pushes the living', pushed('  enemies.forEach((e) => {', 'e.isAlive()', 'e', '  });')),
+      A('while splices the dead, else steps on', w('  let i = 0;' + nl + '  while (i < enemies.length) {' + nl + '    if (!enemies[i].isAlive()) {' + nl + '      enemies.splice(i, 1);' + nl + '    } else {' + nl + '      i++;' + nl + '    }' + nl + '  }')),
+      A('while from the end', w('  let i = enemies.length - 1;' + nl + '  while (i >= 0) {' + nl + '    if (enemies[i].hp <= 0) enemies.splice(i, 1);' + nl + '    i--;' + nl + '  }')),
+      A('while shifts the dead off the front', w('  while (enemies.length > 0 && !enemies[0].isAlive()) {' + nl + '    enemies.shift();' + nl + '  }')),
+      A('while shifts, braceless, hp <= 0', w('  while (enemies.length && enemies[0].hp <= 0) enemies.shift();')),
+      A('loop from the start splices, then i--', w('  for (let i = 0; i < enemies.length; i++) {' + nl + '    if (!enemies[i].isAlive()) {' + nl + '      enemies.splice(i, 1);' + nl + '      i--;' + nl + '    }' + nl + '  }')),
+      A('filter kept in a variable first', w('  const alive = enemies.filter((e) => e.isAlive());' + nl + '  enemies = alive;')),
+      A('filter with a function and return', w('  enemies = enemies.filter(function (e) {' + nl + '    return e.isAlive();' + nl + '  });')),
+      R('new list never stored back', 'r1', w('  const alive = [];' + nl + '  for (const e of enemies) {' + nl + '    if (e.isAlive()) alive.push(e);' + nl + '  }')),
+      R('new list keeps the dead', 'r2', pushed('  for (const e of enemies) {', '!e.isAlive()', 'e')),
+      R('new list keeps hp <= 0', 'r2', pushed('  for (const e of enemies) {', 'e.hp <= 0', 'e')),
+      R('new list keeps everyone', 'r2', w('  const alive = [];' + nl + '  for (const e of enemies) {' + nl + '    alive.push(e);' + nl + '  }' + nl + '  enemies = alive;')),
+      R('while splices the living', 'r2', w('  let i = 0;' + nl + '  while (i < enemies.length) {' + nl + '    if (enemies[i].isAlive()) {' + nl + '      enemies.splice(i, 1);' + nl + '    } else {' + nl + '      i++;' + nl + '    }' + nl + '  }')),
+      R('while empties the list', 'r1', w('  while (enemies.length > 0) {' + nl + '    enemies.shift();' + nl + '  }')),
+      R('while shifts the living', 'r2', w('  while (enemies.length > 0 && enemies[0].isAlive()) enemies.shift();')),
+      R('loop from the start splices without stepping back', 'r1', w('  for (let i = 0; i < enemies.length; i++) {' + nl + '    if (!enemies[i].isAlive()) {' + nl + '      enemies.splice(i, 1);' + nl + '    }' + nl + '  }')),
+      R('filter result thrown away', 'r1', w('  enemies.filter((e) => e.isAlive());')),
     ]);
   }
 
