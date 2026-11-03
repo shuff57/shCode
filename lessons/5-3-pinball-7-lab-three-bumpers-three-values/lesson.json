@@ -69,7 +69,7 @@
       "description": "Different bumpers are worth different amounts, because the score uses each bumper's own `worth`, added only when the touch starts. `colliding()` gives a number (0 when not touching), so to ask \"was it NOT touching?\", put a `!` in front of the memory instead of comparing it to `false`. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?<![!=]==\\s*(?:true|false)\\b[^{};]{0,200})\\.wasTouching\\b(?:(?![!=]==\\s*(?:true|false)\\b)[^{};]){0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]*?)score\\s*(?:\\+=\\s*(?:\\(\\s*)?\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth|=\\s*(?:\\(\\s*)?(?:score\\s*\\+\\s*(?:\\(\\s*)?\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth|\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth(?:\\s*\\))?\\s*\\+\\s*score\\b))",
+      "pattern": "(?<![!=]==\\s*(?:true|false)\\b[^{};]{0,200})\\.(?!worth\\b)(?<m38>[A-Za-z_$][\\w$]*)\\b(?!\\s*\\()(?:(?![!=]==\\s*(?:true|false)\\b)[^{};]){0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?(?:\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?)?|(?:if\\s*\\([^{};]{0,200}?\\)\\s*)?)score\\s*(?:\\+=\\s*(?:\\(\\s*)?\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth|=\\s*(?:\\(\\s*)?(?:score\\s*\\+\\s*(?:\\(\\s*)?\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth|\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth(?:\\s*\\))?\\s*\\+\\s*score\\b))(?=[\\s\\S]{0,4000}?[\\w$\\]]\\.\\k<m38>\\s*=(?![=>])\\s*[A-Za-z_$(!])",
       "flags": "",
       "points": 0,
       "status": "pending"
