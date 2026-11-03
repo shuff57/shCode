@@ -47,10 +47,10 @@
     {
       "id": "r1",
       "title": "Create multiple static walls",
-      "description": "At least two 'static' sprites. Help: 5.2.11 (Bounciness and Friction)",
+      "description": "At least two 'static' sprites (made with 'static', or given .collider = 'static'). Help: 5.2.11 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Sprite\\s*\\([^)]*['\"]static['\"][\\s\\S]*new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
+      "pattern": "(?:new\\s+Sprite\\s*\\([^)]*['\"`]static['\"`]|\\.collider\\s*=\\s*['\"`]static['\"`])[\\s\\S]*?(?:new\\s+Sprite\\s*\\([^)]*['\"`]static['\"`]|\\.collider\\s*=\\s*['\"`]static['\"`])",
       "flags": "",
       "points": 0,
       "status": "pending"

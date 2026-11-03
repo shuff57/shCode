@@ -68,11 +68,11 @@
     {
       "id": "r3",
       "title": "The die is a whole number from 1 to 6",
-      "description": "random is wrapped in floor and shifted so the answers run 1 to 6. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "random is wrapped in floor (or int) and shifted so the answers run 1 to 6; a round() of random(1, 6) also counts. Help: 5.2.1 (Reading: Random numbers and timers)",
       "hint": "The top of random(1, 7) is never reached, so floor of it is 1 to 6.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "floor\\s*\\(\\s*random\\s*\\(\\s*1\\s*,\\s*(?:7|6\\s*\\+\\s*1)\\s*\\)\\s*\\)|floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\)\\s*\\+\\s*1|1\\s*\\+\\s*floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\)|floor\\s*\\(\\s*random\\s*\\(\\s*6\\s*\\)\\s*\\+\\s*1\\s*\\)|floor\\s*\\(\\s*Math\\.random\\s*\\(\\s*\\)\\s*\\*\\s*6\\s*\\)\\s*\\+\\s*1",
+      "pattern": "\\b(?:floor|int)\\s*\\(\\s*random\\s*\\(\\s*1\\s*,\\s*(?:7|6\\s*\\+\\s*1)\\s*\\)\\s*\\)|\\b(?:floor|int)\\s*\\(\\s*(?:random\\s*\\(\\s*(?:0\\s*,\\s*)?6\\s*\\)|Math\\.random\\s*\\(\\s*\\)\\s*\\*\\s*6\\b|6\\s*\\*\\s*Math\\.random\\s*\\(\\s*\\))\\s*\\)\\s*\\+\\s*1\\b|\\b1\\s*\\+\\s*\\b(?:floor|int)\\s*\\(\\s*(?:random\\s*\\(\\s*(?:0\\s*,\\s*)?6\\s*\\)|Math\\.random\\s*\\(\\s*\\)\\s*\\*\\s*6\\b|6\\s*\\*\\s*Math\\.random\\s*\\(\\s*\\))\\s*\\)|\\b(?:floor|int)\\s*\\(\\s*(?:random\\s*\\(\\s*(?:0\\s*,\\s*)?6\\s*\\)|Math\\.random\\s*\\(\\s*\\)\\s*\\*\\s*6\\b|6\\s*\\*\\s*Math\\.random\\s*\\(\\s*\\))\\s*\\+\\s*1\\s*\\)|\\bround\\s*\\(\\s*random\\s*\\(\\s*1\\s*,\\s*6\\s*\\)\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"

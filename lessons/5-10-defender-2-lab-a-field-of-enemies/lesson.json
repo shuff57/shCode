@@ -47,7 +47,7 @@
       "type": "inFunction",
       "function": "spawnEnemy",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*new\\s+Sprite\\s*\\()(?=[\\s\\S]*\\.collider\\s*=\\s*['\"`]none['\"`])",
+      "pattern": "^(?=[\\s\\S]*new\\s+Sprite\\s*\\()(?=[\\s\\S]*(?:\\.collider\\s*=\\s*['\"`]none['\"`]|new\\s+Sprite\\s*\\([^;]*?,\\s*['\"`]none['\"`]\\s*\\)))",
       "flags": "",
       "points": 0,
       "status": "pending"

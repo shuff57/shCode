@@ -52,10 +52,10 @@
     {
       "id": "r1",
       "title": "Gravity is on",
-      "description": "`setup()` turns gravity on (a number other than 0) so the ball falls. Help: 5.2.6 (Reading: Gravity)",
+      "description": "`setup()` turns gravity on with a positive number, so the ball falls down the screen. Help: 5.2.6 (Reading: Gravity)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "world\\.gravity\\.y\\s*=\\s*(?:\\(\\s*)?-?(?:[1-9]|0?\\.\\d*[1-9])|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\(\\s*)?-?(?:[1-9]|0?\\.\\d*[1-9])[^;\\n]*[;\\n][\\s\\S]*?world\\.gravity\\.y\\s*=\\s*(?:\\(\\s*)?\\1\\b",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*(?:\\(\\s*)?\\+?\\s*(?:[1-9]|0?\\.\\d*[1-9])|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\(\\s*)?\\+?\\s*(?:[1-9]|0?\\.\\d*[1-9])[^;\\n]*[;\\n][\\s\\S]*?world\\.gravity\\.y\\s*=\\s*(?:\\(\\s*)?\\1\\b",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -37,9 +37,10 @@
       "description": "One of the three challenges is there: something depends on the score (harder as you go, or a best score), or a wobble made with random moves the pipes up and down. Help: 5.4.7 (Lab: Score a gap) and 5.4.6 (Lab: Pipes that come and go)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "score\\s*[*/%<>]|[*/%<>]\\s*score\\b|\\bmin\\s*\\(|\\bmax\\s*\\(|(?<![\\w$])([A-Za-z_$][\\w$]*)\\s*=\\s*\\(?\\s*random\\s*\\([\\s\\S]*?(?<!bird)\\.(?:vel\\.)?y\\s*[+-]?=(?!=)[^;\\n]*?(?<![\\w$])\\1\\b|(?<!bird)\\.(?:vel\\.)?y\\s*[+-]?=(?!=)[^;\\n]*?\\brandom\\s*\\(|(?<![\\w$.])(?!score\\b)[A-Za-z_$][\\w$]*(?:\\.[\\w$]+)*\\s*=(?!=)[^;\\n]*\\bscore\\b",
+      "pattern": "\\b(?:vel|speed|gap\\w*|topH|botH|interval|spawn\\w*)\\b[^;{}\\n]*\\bscore\\b|\\bscore\\b[^;{}\\n]*\\b(?:vel|speed|gap\\w*|topH|botH|interval|spawn\\w*)\\b|frameCount\\s*%[^;{}\\n]*\\bscore\\b|\\b(?!score\\b)([A-Za-z_$][\\w$]*)\\s*=(?!=)[^;\\n]*\\bscore\\b[^;\\n]*[;\\n][\\s\\S]{0,1500}?(?:\\b(?:vel|speed|gap\\w*|topH|botH|interval|spawn\\w*)\\b|frameCount\\s*%)[^;{}\\n]*\\b\\1\\b|\\bif\\s*\\([^{};]*\\bscore\\b[^{};]*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)\\b(?:vel|speed|gap\\w*|topH|botH|interval|spawn\\w*)\\b|\\bif\\s*\\([^{};]*\\bscore\\b[^{};]*\\)\\s*\\{?\\s*(?!score\\b)([A-Za-z_$][\\w$]*)\\s*=\\s*score\\b|\\b(?!score\\b)([A-Za-z_$][\\w$]*)\\s*=\\s*(?:Math\\.)?max\\s*\\([^;\\n]*\\bscore\\b|\\b(?!score\\b)([A-Za-z_$][\\w$]*)\\s*=\\s*\\(?\\s*(?:score\\s*>=?\\s*\\(?\\s*\\4\\b|\\4\\s*\\)?\\s*<=?\\s*score\\b)|(?:^|[^\\w$])([A-Za-z_$][\\w$]*)\\s*=\\s*\\(?\\s*random\\s*\\([\\s\\S]*?(?:^|[^\\w$.])(?!bird\\b)[A-Za-z_$][\\w$]*(?:\\.[\\w$]+)*?\\.(?:vel\\.)?y\\s*[+-]?=(?!=)[^;\\n]*?[^\\w$]\\5\\b|(?:^|[^\\w$.])(?!bird\\b)[A-Za-z_$][\\w$]*(?:\\.[\\w$]+)*?\\.(?:vel\\.)?y\\s*[+-]?=(?!=)[^;\\n]*?\\brandom\\s*\\(",
       "flags": "",
       "points": 0,
+      "ignoreStrings": true,
       "status": "pending"
     }
   ],

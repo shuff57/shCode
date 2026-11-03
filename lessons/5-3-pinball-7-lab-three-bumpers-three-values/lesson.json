@@ -47,7 +47,7 @@
       "description": "One loop visits every bumper in the array instead of naming one. Help: 3.3.5 (Reading: Looping Over Arrays (for / for…of))",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*(?:const|let|var)\\s+\\w+\\s+of\\s+bumpers\\s*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;])|for\\s*\\([^;]*;\\s*\\w+\\s*<=?\\s*bumpers\\.length[^{}]{0,40}?\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)])|bumpers\\.forEach\\s*\\(",
+      "pattern": "for\\s*\\(\\s*(?:const|let|var)\\s+\\w+\\s+of\\s+bumpers\\s*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;])|for\\s*\\([^;]*;\\s*\\(?\\s*\\w+\\s*(?:<=?\\s*bumpers\\.length|<\\s*3\\b|<=\\s*2\\b)[^{}]{0,40}?\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)])|bumpers\\.forEach\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -58,7 +58,7 @@
       "description": "The bumper's own `wasTouching` is updated on every frame, so every bumper can be hit once per contact. Help: 5.3.5 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?<=[\\w$\\]])\\.wasTouching\\s*=\\s*(?:\\(\\s*)?(?!false\\b|true\\b)\\w+",
+      "pattern": "[\\w$\\]]\\.wasTouching\\s*=\\s*(?:\\(\\s*)?(?!false\\b|true\\b)\\w+|[\\w$\\]]\\.\\w+\\s*=\\s*\\(?\\s*[\\w$.]+\\.colliding\\s*\\(|\\b(?:const|let|var)\\s+(\\w+)\\s*=\\s*\\(?\\s*[\\w$.]+\\.colliding\\s*\\([^;]*;[\\s\\S]{0,400}?[\\w$\\]]\\.\\w+\\s*=\\s*\\(?\\s*\\1\\s*\\)?\\s*[;\\n}]|\\bif\\s*\\([^{};]*\\)\\s*\\{?\\s*[\\w$.\\[\\]]+?\\.(\\w+)\\s*=\\s*(true|false)\\b[^{}]*?\\}?\\s*else\\s*\\{?\\s*[\\w$.\\[\\]]+?\\.\\2\\s*=\\s*(?!\\3\\b)(?:true|false)\\b",
       "flags": "",
       "points": 0,
       "status": "pending"
