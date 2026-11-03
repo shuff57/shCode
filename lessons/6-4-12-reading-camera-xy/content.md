@@ -5,7 +5,7 @@
 **What you'll learn from it:**
 
 - `camera.x` and `camera.y` are the **center** of the visible area in world coordinates.
-- Their default of `(canvas.w / 2, canvas.h / 2)` keeps the viewport centered on the world's `(0, 0)` origin.
+- Their default is `(width / 2, height / 2)`, the middle of the canvas (`width` and `height` hold the two numbers you gave `new Canvas(w, h)`). So a new sketch shows the world starting from `(0, 0)` in the canvas's top-left corner, exactly as if there were no camera.
 - Assigning a new value shifts the view; no sprite's `pos.x` or `pos.y` changes.
 - The change takes effect on the **next** frame's render.
 
@@ -39,4 +39,4 @@ Watch the row of dots scroll past as `camera.x` grows. No sprite moved, only the
 | **`camera.x` / `camera.y`** | The center of the visible viewport in world coordinates. |
 | **Viewport** | The rectangular window into the world that is rendered to the canvas. |
 | **World coordinates** | A sprite's absolute `pos.x` / `pos.y`, independent of camera position. |
-| **Default camera** | `camera.x = canvas.w / 2`, `camera.y = canvas.h / 2`: the view starts at the world origin, so a sprite at `(0, 0)` sits in the canvas's top-left corner. |
+| **Default camera** | `camera.x = width / 2`, `camera.y = height / 2`: the view starts at the world origin, so a sprite at `(0, 0)` sits in the canvas's top-left corner. |

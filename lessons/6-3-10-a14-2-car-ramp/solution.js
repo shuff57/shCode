@@ -1,5 +1,5 @@
 // 6.3.10 A14.1 Car on a Ramp (reference solution).
-// Two-wheeled chassis joined by WheelJoints; WASD drives the wheels.
+// Two-wheeled chassis joined by HingeJoints; A and D drive the chassis.
 
 let ground, ramp, chassis, leftWheel, rightWheel;
 
@@ -25,8 +25,10 @@ function setup() {
   rightWheel.diameter = 20;
   rightWheel.color = 'orange';
 
-  new WheelJoint(chassis, leftWheel);
-  new WheelJoint(chassis, rightWheel);
+  // Wheel first: the hinge pins at the FIRST sprite, so each pin sits at
+  // the wheel's own centre, like an axle (6.3.8).
+  new HingeJoint(leftWheel, chassis);
+  new HingeJoint(rightWheel, chassis);
 }
 
 function draw() {

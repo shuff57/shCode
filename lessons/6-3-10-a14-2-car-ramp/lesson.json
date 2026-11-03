@@ -1,7 +1,7 @@
 {
   "id": "6-3-10-a14-2-car-ramp",
   "title": "6.3.10 Car on a Ramp",
-  "description": "Build a two-wheeled car using WheelJoints and drive it up a ramp with WASD. The harder of the two A14 options.",
+  "description": "Build a two-wheeled car using HingeJoints and drive it up a ramp with WASD. The harder of the two A14 options.",
   "type": "assignment",
   "estimateMins": 45,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -32,10 +32,11 @@
     },
     {
       "id": "s3",
-      "title": "Join the wheels with WheelJoint",
-      "instructions": "new WheelJoint(chassis, leftWheel) and again for the right wheel. A WheelJoint is a joint made for vehicles: it pins a wheel to the chassis so the wheel can spin freely.",
+      "title": "Join the wheels with HingeJoint",
+      "instructions": "new HingeJoint(leftWheel, chassis) and again for the right wheel. A HingeJoint pins two sprites at one point and lets them turn around it, like 6.3.8's pendulum. The pin goes where the FIRST sprite is, so name the wheel first: the pin lands at the wheel's centre, and the wheel can turn on it like an axle while staying fixed to the chassis.",
       "hints": [
-        "The Joints docs chapter covers WheelJoint, including suspension travel options."
+        "6.3.8 (Worked Example: Swinging Pendulum) uses new HingeJoint(anchor, rod): the rod turns around the anchor, the first sprite.",
+        "Wheel first, chassis second. With the chassis first, the pin sits in the middle of the chassis and the wheel swings around it like the pendulum's rod instead of turning in place."
       ]
     },
     {
@@ -51,11 +52,11 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "Uses WheelJoint",
-      "description": "Create at least one WheelJoint. Help: 6.3.8 (Worked Example: Swinging Pendulum)",
+      "title": "Uses HingeJoint",
+      "description": "Join a wheel to the chassis with at least one new HingeJoint(...). A WheelJoint, from the Joints chapter of the docs drawer, also counts. Help: 6.3.8 (Worked Example: Swinging Pendulum)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+WheelJoint\\s*\\(",
+      "pattern": "new\\s+(?:Hinge|Wheel)Joint\\s*\\(",
       "flags": "",
       "points": 0
     },
