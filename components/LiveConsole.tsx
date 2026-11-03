@@ -7,6 +7,8 @@ import { RefObject, useEffect, useRef, useState } from 'react';
 interface PreviewError {
   name: string;
   message: string;
+  /** The moSHion runner's plain first sentence for a common slip (may be empty). */
+  hint?: string;
   file: string | null;
   line: number | null;
   col: number | null;
@@ -128,6 +130,7 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
           entries.map((e, i) =>
             e.err ? (
               <div key={i} className="liveconsole-entry liveconsole-error liveconsole-error-rich">
+                {e.err.hint ? <div className="liveconsole-text">{e.err.hint}</div> : null}
                 <div className="liveconsole-error-line">
                   <span className="liveconsole-gutter">!</span>
                   <span className="liveconsole-error-name">{e.err.name}:</span>

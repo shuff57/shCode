@@ -60,6 +60,22 @@ export function fallbackRunner(lesson: { editor?: string; preview?: string }): F
   return 'console';
 }
 
+/**
+ * Whether the latest run lets Submit through. It must have reported back and not have thrown.
+ *
+ * A moSHion run reports from its frame some time after Run (public/moshion/runner.html: an error,
+ * or `preview-status` once its first frame ran clean), and a cold load can take seconds. Check's
+ * pattern fallback re-runs the sketch and marks the cards 400 ms later, so a sketch that throws
+ * showed four green cards and an enabled Submit until its error arrived (5.1.25 with
+ * `world.origin = 'math'` after the sprite, 2026-11-03). `pending` is that gap. A sketch that only
+ * failed to GRADE (the AI unreachable) still submits once its run comes up clean.
+ * `expectsRuntimeError` (Grading.expectsRuntimeError) accepts the error, never the gap.
+ */
+export function runLetsSubmit(run: { error: string | null; pending: boolean }, expectsRuntimeError = false): boolean {
+  if (run.pending) return false;
+  return !run.error || expectsRuntimeError;
+}
+
 /** Only a clear "met" turns a card green. "partial" and "missing" stay red, with the AI's note. */
 export function verdictsFromCriteria(criteria: AiCheckCriterion[], knownIds: string[]): AiVerdicts {
   const known = new Set(knownIds);

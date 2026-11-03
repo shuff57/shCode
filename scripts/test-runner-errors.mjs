@@ -8,7 +8,7 @@
 // window error event gets "Script error." and nothing else. Until 2026-11-02
 // that was all a student saw whenever the ENGINE threw, which is what every
 // starter that has not made its canvas yet does ("new Canvas(w, h) must be
-// called in setup()"): 5.1.11, 5.1.20, 5.1.22, 5.1.24 and 5.6.14.
+// called in setup()"): 5.1.11, 5.1.20, 5.1.23, 5.1.25 and 5.6.14.
 //
 // The runner now catches the two ways the engine is driven (the boot call and
 // every animation frame) and reports the real Error. This test runs the REAL
@@ -25,7 +25,7 @@
 //   node scripts/test-runner-errors.mjs --runner=/path/to/runner.html   # calibrate on another copy
 
 import { readFileSync } from 'node:fs';
-import { createContext, runInContext } from 'node:vm';
+import { createContext, runInContext, Script } from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -161,7 +161,21 @@ function runFrame(code, { frames = 30 } = {}) {
       appendChild(el) {
         if (el.tagName === 'SCRIPT') {
           const name = (/\/\/# sourceURL=(\S+)\s*$/.exec(el.textContent) || [])[1] || 'inline.js';
-          task(() => runInContext(el.textContent, ctx, { filename: name }));
+          let script;
+          try {
+            script = new Script(el.textContent, { filename: name });
+          } catch (err) {
+            if (!err || err.name !== 'SyntaxError') throw err;
+            // A sketch that does not parse, the way Chrome reports it (seen
+            // 2026-11-03 on 5.1.11): the message in Chrome's own words, the
+            // stack at the runner's inject() and NOT at the sketch, so the
+            // error carries no line of the student's code at all.
+            const chrome = new SyntaxError(`Failed to execute 'appendChild' on 'Node': ${err.message}`);
+            chrome.stack = `SyntaxError: ${chrome.message}\n    at inject (runner.html:262:17)\n    at start (runner.html:290:3)`;
+            reportUncaught(chrome);
+            return;
+          }
+          task(() => script.runInContext(ctx));
         }
       },
     },
@@ -237,7 +251,11 @@ function runFrame(code, { frames = 30 } = {}) {
   const frameCount = (() => { try { return runInContext('typeof frameCount === "number" ? frameCount : -1', ctx); } catch (_) { return -1; } })();
   return {
     errors: posted.filter((m) => m && m.source === 'preview-error').map((m) => m.error),
+    // "It came up": the host keeps Submit shut until this or an error arrives.
+    cameUp: posted.filter((m) => m && m.source === 'preview-status' && m.status === 'running').length,
     errorEvents, ran, frameCount, pendingFrames: raf.length, canvas,
+    // What the red box over the preview says -- what the student reads.
+    box: errorBox.style.display === 'block' ? errorBox.textContent : '',
   };
 }
 
@@ -255,17 +273,21 @@ const lesson = (folder, file) => readFileSync(join(REPO, 'lessons', folder, file
 const STARTERS = [
   ['5.1.11', '5-1-11-moshion-intro'],
   ['5.1.20', '5-1-20-moshion-move-keys'],
-  ['5.1.22', '5-1-21-a10-1-sprite-playground'],
-  ['5.1.24', '5-1-23-challenges'],
+  ['5.1.23', '5-1-21-a10-1-sprite-playground'],
+  ['5.1.25', '5-1-23-challenges'],
   ['5.6.14', '5-3-13-lab-build-sprite'],
 ];
 const NO_CANVAS = 'new Canvas(w, h) must be called in setup()';
+
+const CANVAS_HINT = 'Your sketch needs a canvas first: inside setup(), write new Canvas(400, 400).';
 
 console.log('starters that have not made a canvas yet');
 for (const [num, folder] of STARTERS) {
   const r = runFrame(lesson(folder, 'script.js'));
   check(`${num} starter shows "${NO_CANVAS}", once, not "Script error."`,
     r.errors.length === 1 && r.errors[0].message === NO_CANVAS, show(r));
+  check(`${num} starter says the plain sentence first, then the engine's own words`,
+    r.errors.length === 1 && r.errors[0].hint === CANVAS_HINT && r.box === `${CANVAS_HINT}\nError: ${NO_CANVAS}`, JSON.stringify(r.box));
   check(`${num} starter stops cleanly (no frame loop left running)`, r.pendingFrames === 0 && r.ran === 0, `ran ${r.ran}, pending ${r.pendingFrames}`);
 }
 
@@ -311,6 +333,111 @@ console.log('the engine\'s throw, at each stage (these used to arrive as "Script
   check('the model mutes it the way a browser does (calibration)', r.errorEvents.length >= 1 && r.errorEvents[0].message === 'Script error.' && r.errorEvents[0].error === null, JSON.stringify(r.errorEvents));
   check('a muted engine error at the top level becomes a plain sentence, not "Script error."',
     r.errors.length === 1 && !/Script error/i.test(r.errors[0].message) && /outside setup\(\) and draw\(\)/.test(r.errors[0].message), show(r));
+}
+
+// "It came up" (preview-status). The host keeps Submit shut from Run until the
+// frame reports: an error, or this, once the first frame ran clean. A sketch
+// that throws must never send it, or Check's fallback could open Submit on a
+// crash (5.1.25, 2026-11-03).
+console.log('the frame says when the sketch came up, and never for one that threw');
+{
+  // The math-grid lab's reference, and the walk's crash: the same lines with
+  // world.origin moved below the sprite (lessons/5-1-25-math-grid).
+  const grid = (originFirst) => [
+    'let box;', '', 'function setup() {', '  new Canvas(400, 400);',
+    ...(originFirst ? ["  world.origin = 'math';"] : []),
+    '  box = new Sprite(100, 50, 40, 40);', "  box.color = 'deepskyblue';",
+    ...(originFirst ? [] : ["  world.origin = 'math';"]),
+    '}', '', 'function draw() {', "  background('#222');", '  showGrid(50);', '  showMouse();', '}', '',
+  ].join('\n');
+  const r0 = runFrame(grid(true), { frames: 0 });
+  check('a started sketch waits for its first frame before saying it came up', r0.errors.length === 0 && r0.cameUp === 0, `cameUp ${r0.cameUp} ${show(r0)}`);
+  const r = runFrame(grid(true), { frames: 5 });
+  check('5.1.25 reference: says it came up, once, after its first frame', r.errors.length === 0 && r.cameUp === 1, `cameUp ${r.cameUp} ${show(r)}`);
+  const rl = runFrame(grid(false), { frames: 5 });
+  check('5.1.25 with world.origin after the sprite: an error and never "came up"',
+    rl.errors.length === 1 && /must come before any sprite/.test(rl.errors[0].message) && rl.errors[0].line === 7 && rl.cameUp === 0, `cameUp ${rl.cameUp} ${show(rl)}`);
+}
+for (const [num, folder] of STARTERS) {
+  const r = runFrame(lesson(folder, 'script.js'));
+  check(`${num} starter (no canvas): never "came up"`, r.cameUp === 0, `cameUp ${r.cameUp}`);
+}
+{
+  const r = runFrame("function setup() {\n  new Canvas(200, 200);\n}\nfunction draw() {\n  background('black');\n  if (frameCount > 2) throw new Error('boom in draw');\n}\n", { frames: 30 });
+  check('a sketch that comes up and throws later says both, in that order of arrival', r.cameUp === 1 && r.errors.length === 1, `cameUp ${r.cameUp} ${show(r)}`);
+  const rs = runFrame("let p;\nfunction setup() {\n  new Canvas(200, 200);\n  p = new Sprite(10, 10, 10, 10;\n}\n");
+  check('a sketch with a typo never "came up"', rs.cameUp === 0 && rs.errors.length === 1, `cameUp ${rs.cameUp} ${show(rs)}`);
+  const rn = runFrame('let total = 2 + 3;\n', { frames: 0 });
+  check('a sketch with no setup() (no engine, no frames) says it came up at once', rn.errors.length === 0 && rn.cameUp === 1, `cameUp ${rn.cameUp} ${show(rn)}`);
+}
+
+// The three slips a beginner made in the 5.1 walk (2026-11-03), and what the
+// student reads: a plain sentence first, the engine's message kept after it.
+// Each has a negative twin, so a sentence cannot fire where it would mislead.
+const sketch = (...body) => body.join('\n') + '\n';
+const hintOf = (r) => JSON.stringify(r.errors.map((e) => ({ name: e.name, message: e.message, hint: e.hint, line: e.line })));
+console.log('a plain first sentence for the slips beginners make');
+{
+  const r = runFrame(sketch(
+    'let player;', '', 'function setup() {', '  new Canvas(400, 400);',
+    '  player = new Sprite(200, 200, 40, 40;', '}', '', 'function draw() {', "  background('#222');", '}'));
+  check('the model reports a parse error the way Chrome does (calibration)',
+    r.errorEvents.length === 1 && /^Uncaught SyntaxError: Failed to execute 'appendChild' on 'Node': /.test(r.errorEvents[0].message), JSON.stringify(r.errorEvents.map((e) => e.message)));
+  check('a missing ) says "There is a typo near line 5" with the engine\'s words, not "Failed to execute appendChild"',
+    r.errors.length === 1 && r.errors[0].name === 'SyntaxError' && r.errors[0].line === 5
+      && r.errors[0].message === 'missing ) after argument list'
+      && r.errors[0].hint === 'There is a typo near line 5: missing ) after argument list'
+      && !/appendChild/.test(r.box) && r.box.startsWith('There is a typo near line 5: missing ) after argument list\nSyntaxError: missing ) after argument list'), hintOf(r) + ' ' + JSON.stringify(r.box));
+}
+{
+  const r = runFrame(sketch('function setup() {', '  new Canvas(400, 400);', '', 'function draw() {', "  background('#222');", '}'));
+  check('a missing } is placed on the last line, where the closing half is missing',
+    r.errors.length === 1 && r.errors[0].line === 6 && /^There is a typo near line 6: /.test(r.errors[0].hint || ''), hintOf(r));
+}
+{
+  // Not a typo: the sketch parses, and a SyntaxError thrown while it runs
+  // (JSON.parse of a bad string) must keep its own line and no typo sentence.
+  const r = runFrame(sketch('function setup() {', '  new Canvas(200, 200);', "  JSON.parse('{oops');", '}'));
+  check('a SyntaxError thrown at run time is not called a typo',
+    r.errors.length === 1 && r.errors[0].name === 'SyntaxError' && r.errors[0].line === 3 && !r.errors[0].hint, hintOf(r));
+}
+{
+  const r = runFrame(sketch(
+    'let player;', '', 'function setup() {', '  new Canvas(400, 400);',
+    '  player = Sprite(200, 200, 40, 40);', '}'));
+  check('Sprite(...) without new says "Put the word new in front: new Sprite(...)", engine message kept, line 5',
+    r.errors.length === 1 && r.errors[0].name === 'TypeError' && r.errors[0].line === 5
+      && r.errors[0].message === "Class constructor Sprite cannot be invoked without 'new'"
+      && r.errors[0].hint === 'Put the word new in front: new Sprite(...).'
+      && r.box.startsWith("Put the word new in front: new Sprite(...).\nTypeError: Class constructor Sprite cannot be invoked without 'new'"), hintOf(r) + ' ' + JSON.stringify(r.box));
+}
+{
+  const r = runFrame(sketch(
+    'let player;', '', 'function setup() {', '  new Canvas(400, 400);',
+    '  player = new Sprite(200, 200, 40, 40);', '  player.color = deepskyblue;', '}'));
+  check('an unquoted colour says "The word deepskyblue is not defined ... put quotes around it", line 6',
+    r.errors.length === 1 && r.errors[0].name === 'ReferenceError' && r.errors[0].line === 6
+      && r.errors[0].message === 'deepskyblue is not defined'
+      && r.errors[0].hint === 'The word deepskyblue is not defined. If it is a colour or text, put quotes around it.'
+      && r.box.startsWith('The word deepskyblue is not defined. If it is a colour or text, put quotes around it.\nReferenceError: deepskyblue is not defined'), hintOf(r) + ' ' + JSON.stringify(r.box));
+}
+{
+  // Quotes would make these worse: a misspelt command, a misspelt name.
+  const r1 = runFrame(sketch('function setup() {', '  new Canvas(400, 400);', '}', 'function draw() {', "  bakground('#222');", '}'));
+  check('a misspelt command (bakground(...)) gets no quotes advice',
+    r1.errors.length === 1 && r1.errors[0].message === 'bakground is not defined' && !r1.errors[0].hint && r1.box === 'ReferenceError: bakground is not defined  @ sketch.js:5:3', hintOf(r1) + ' ' + JSON.stringify(r1.box));
+  const r2 = runFrame(sketch('let player;', 'function setup() {', '  new Canvas(400, 400);', '  player = new Sprite(200, 200, 40, 40);', "  plyer.color = 'red';", '}'));
+  check('a misspelt name used with a dot (plyer.color) gets no quotes advice',
+    r2.errors.length === 1 && r2.errors[0].message === 'plyer is not defined' && !r2.errors[0].hint, hintOf(r2));
+}
+{
+  // Errors that are not one of the slips keep exactly what they said before.
+  const r = runFrame(sketch('function setup() {', '  new Canvas(200, 200);', "  throw new Error('boom in setup');", '}'));
+  check('any other error gets no sentence and an unchanged red box',
+    r.errors.length === 1 && !r.errors[0].hint && r.box === 'Error: boom in setup  @ sketch.js:3:9', hintOf(r) + ' ' + JSON.stringify(r.box));
+  const r2 = runFrame(sketch('let s;', 'function setup() {', '  new Canvas(200, 200);', '  s.pos.x = 3;', '}'));
+  check('an ordinary TypeError (reading a property of undefined) gets no sentence',
+    r2.errors.length === 1 && r2.errors[0].name === 'TypeError' && r2.errors[0].line === 4 && !r2.errors[0].hint, hintOf(r2));
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall runner error checks passed');
