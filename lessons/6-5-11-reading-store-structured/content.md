@@ -5,7 +5,7 @@
 By the end of this reading you should be able to answer:
 
 - What are the four steps of a complete save/load round-trip?
-- Why do numbers need `Number()` after `JSON.parse`?
+- Numbers come back as numbers after `JSON.parse`, so why does this code still wrap them in `Number()`?
 - Where does the save-check go in your program?
 
 You've seen `stringify` + `storeItem` (save) and `getItem` + `parse` (load) separately. Now put them together into one program.
@@ -14,7 +14,7 @@ You've seen `stringify` + `storeItem` (save) and `getItem` + `parse` (load) sepa
 
 - Before anything else, check if a save exists in `setup()`.
 - Build your save object with every value your game needs to remember.
-- After `JSON.parse`, numeric fields come back as numbers, but always coerce them with `Number()` to be safe when combining with user input or new defaults.
+- After `JSON.parse`, numeric fields come back as numbers. The code below still writes `Number(...) || default` for each one, as a safety net for a field that is missing or was saved as text.
 
 **Try it:**
 
@@ -77,7 +77,7 @@ function draw() {
 
 That is the full round-trip. Build an object, stringify, store. Later: getItem, parse, coerce, restore.
 
-**Why coerce after parse?** `JSON.stringify` preserves that `42` was a number. `JSON.parse` restores it as a number. But if you're building a save object that mixes parsed values with new ones (like adding 1 to a score), always `Number()` the parsed field. It costs you nothing and protects against a stray string sneaking in.
+**Why `Number()` after parse?** `JSON.stringify` keeps that `42` was a number, and `JSON.parse` gives back the number `42`, so for a save your own code wrote, `Number()` changes nothing. It is a safety net. A field saved as text (`'42'`) becomes a real number, and a field that is missing altogether, say from a save an older version of your game wrote, gives `Number(undefined)`, which is `NaN`. `NaN` is falsy, so the `|| 0` picks the default and the screen never shows `score: NaN`. It costs one word per field.
 
 ---
 

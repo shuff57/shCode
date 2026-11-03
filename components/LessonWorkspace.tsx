@@ -41,6 +41,7 @@ import { useCloudWorkspace } from '../lib/lesson-sync';
 import { addLocalSnapshot } from '../lib/local-history';
 import DocsDrawer from './DocsDrawer';
 import TextureEditor from './TextureEditor';
+import SoundMixer from './SoundMixer';
 import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
@@ -1152,6 +1153,25 @@ export default function LessonWorkspace({
                   headerExtra: (
                     <a
                       href="/textures"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-secondary btn-sm"
+                    >
+                      Full page ↗
+                    </a>
+                  ),
+                },
+                // The same seam for sound. A sound saved here lands in
+                // `sound:<name>` in the store the preview bridge hydrates, so
+                // the sketch can play it by name without leaving the lesson.
+                {
+                  key: 'sounds',
+                  label: 'Sounds',
+                  color: '#50fa7b',
+                  content: <SoundMixer />,
+                  headerExtra: (
+                    <a
+                      href="/sound"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-secondary btn-sm"

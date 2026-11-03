@@ -1,0 +1,101 @@
+{
+  "id": "6-10-breakout-9-lab-win-or-lose",
+  "title": "6.10.9 Lab: Win or lose",
+  "description": "Three balls to clear the wall. Count the bricks left, take a life for every ball that falls out, and end the game when the wall is cleared or the balls run out.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.10 Breakout",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Count the bricks",
+      "instructions": "The starter is the game from 6.10.8 with three new things. `lives` starts at 3. `state` is `'play'` while the game runs, the state variable of 6.6.7: the starter's `draw()` only moves the paddle and the ball while `state` is `'play'`, and once it is anything else, pressing R calls `startGame()` for a new wall, a new score and three new lives. The lost-ball test has moved into a new function, `checkEnd()`, still as `if (ball.y > 400 + R) serve();`. The words at the top show the score, the bricks left and the lives, and they say `You cleared the wall!` when `state` is `'won'` and `Out of balls.` when it is `'lost'`.\n\n`bricksLeft()` gives back 0 for now. Make it count: two loops over `bricks`, adding 1 to `n` for every cell that is `1`, as in 6.9.11. The words should read `bricks left: 36` and go down as bricks break.",
+      "hints": [
+        "The same two loops as `drawBricks()`, with `if (bricks[r][c] === 1) n += 1;` inside.",
+        "`n` starts at 0 and is given back at the end for you."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A lost ball costs a life",
+      "instructions": "In `checkEnd()`, change the lost-ball line so that, when the ball is past the bottom, it takes 1 from `lives`. Then, if `lives` is now 0, set `state` to `'lost'`; otherwise `serve()` again. Run it and miss three times: the third miss stops the game with `Out of balls. Press R`. Then click the canvas so the sketch hears your keys (5.1.13) and press R for a new game.",
+      "hints": [
+        "`if (ball.y > 400 + R) { lives -= 1; ... }`, with an `if` and an `else` inside the braces.",
+        "Inside: `if (lives === 0) state = 'lost'; else serve();`"
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Clear the wall to win",
+      "instructions": "Still in `checkEnd()`, under the lost-ball test: when `bricksLeft()` is 0, set `state` to `'won'`, a change of state driven by a condition, as in 6.6.17. Clear the wall (it takes a while) and the screen says `You cleared the wall! Press R`. To test it faster, change most of the `'#'` in `WALL` to `'.'` so only two or three bricks are left, then put them back.",
+      "hints": [
+        "`if (bricksLeft() === 0) state = 'won';`",
+        "`draw()` reads `state` on the next frame: once it is not `'play'`, nothing moves."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "bricksLeft counts the bricks",
+      "description": "Two loops (index or for...of), counting only the cells that hold a brick, and the counter it gives back (n, or any name) goes up. Help: 6.9.11 (Lab: A wall of bricks)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "bricksLeft",
+      "pattern": "^(?:(?=[\\s\\S]*?\\breturn(?:\\s+|\\s*\\(\\s*)(?<cnt>[A-Za-z_$][\\w$]*)[ \\t]*\\)?[ \\t]*(?:;|\\r?\\n|$))(?![\\s\\S]*?\\bif\\s*\\(\\s*(?:!\\s*[\\w$.\\[\\]]+|[\\w$.\\[\\]]+\\s*(?:===?\\s*0\\b|<\\s*1\\b|<=\\s*0\\b))\\s*\\)\\s*\\{?\\s*(?:\\k<cnt>\\s*(?:\\+\\+|\\+=\\s*1\\b|=(?!=)\\s*\\k<cnt>\\s*\\+\\s*1\\b)|\\+\\+\\s*\\k<cnt>\\b))(?![\\s\\S]*?\\b\\k<cnt>\\s*(?:\\+=|=(?!=)\\s*\\k<cnt>\\s*\\+)\\s*\\(?\\s*[\\w$.\\[\\]]+\\s*(?:===?\\s*0\\b|<\\s*1\\b|<=\\s*0\\b))(?=[\\s\\S]*?(?:\\bfor\\s*\\((?:[^;(){}]|\\([^()]*\\))*;\\s*[\\w$.\\[\\]]+\\s*(?:<=?\\s*\\(?\\s*(?![0-4]\\b)[\\w$.\\[\\]]|>=?\\s*\\(?\\s*-?\\d\\b|!==?\\s*\\(?\\s*(?![0-4]\\b)[\\w$.\\[\\]])|\\bfor\\s*\\([^;{}]*\\b(?:of|in)\\b|\\bforEach\\b|\\bwhile\\s*\\((?!\\s*(?:false|0|null)\\s*\\)))[\\s\\S]*?(?:\\bfor\\s*\\((?:[^;(){}]|\\([^()]*\\))*;\\s*[\\w$.\\[\\]]+\\s*(?:<=?\\s*\\(?\\s*(?![0-4]\\b)[\\w$.\\[\\]]|>=?\\s*\\(?\\s*-?\\d\\b|!==?\\s*\\(?\\s*(?![0-4]\\b)[\\w$.\\[\\]])|\\bfor\\s*\\([^;{}]*\\b(?:of|in)\\b|\\bforEach\\b|\\bwhile\\s*\\((?!\\s*(?:false|0|null)\\s*\\))))(?=[\\s\\S]*?(?:\\bif\\s*\\([^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?(?:\\b\\k<cnt>\\s*(?:\\+\\+|\\+=\\s*1\\b|=(?!=)\\s*\\k<cnt>\\s*\\+\\s*1\\b)|\\+\\+\\s*\\k<cnt>\\b)|(?:\\b\\k<cnt>\\s*\\+=\\s*(?=[^\\d\\s;])|\\b\\k<cnt>\\s*=(?!=)\\s*\\k<cnt>\\s*\\+\\s*(?=[^\\d\\s;])|\\b\\k<cnt>\\s*=(?!=)\\s*(?!\\k<cnt>\\b)[A-Za-z_$][\\w$]*(?:\\s*\\[[^\\]]{1,40}\\])*\\s*\\+\\s*\\k<cnt>\\b)|\\bif\\s*\\(\\s*(?:!\\s*[\\w$.\\[\\]]+|[\\w$.\\[\\]]+\\s*(?:===?\\s*0\\b|<=?\\s*0\\b|<\\s*1\\b|!==?\\s*[1-9]\\b))\\s*\\)\\s*\\{?\\s*continue\\b[\\s\\S]{0,200}?(?:\\b\\k<cnt>\\s*(?:\\+\\+|\\+=|=(?!=)\\s*\\k<cnt>\\s*\\+)|\\+\\+\\s*\\k<cnt>\\b)))(?=[\\s\\S]*?(?:\\bif\\s*\\([^;{}]{0,200}\\bbricks\\s*\\[[^\\]]{1,40}\\]\\s*\\[[^\\]]{1,40}\\]|\\bbricks\\s*\\[[^\\]]{1,40}\\]\\s*\\[[^\\]]{1,40}\\]\\s*\\?|\\+=\\s*\\bbricks\\s*\\[[^\\]]{1,40}\\]\\s*\\[[^\\]]{1,40}\\]|=(?!=)\\s*\\k<cnt>\\s*\\+\\s*\\bbricks\\s*\\[[^\\]]{1,40}\\]\\s*\\[[^\\]]{1,40}\\]|\\bbricks\\s*\\[[^\\]]{1,40}\\]\\s*\\[[^\\]]{1,40}\\]\\s*\\+\\s*\\k<cnt>\\b|\\bfor\\s*\\(\\s*(?:const|let|var)\\s+(?<o1>[A-Za-z_$][\\w$]*)\\s+of\\s+bricks\\b[\\s\\S]{0,400}?\\bfor\\s*\\(\\s*(?:const|let|var)\\s+(?<o2>[A-Za-z_$][\\w$]*)\\s+of\\s+\\k<o1>\\b[\\s\\S]{0,400}?(?:\\bif\\s*\\(\\s*!?\\s*\\(?\\s*\\k<o2>\\b|\\b\\k<o2>\\s*(?:===?|!==?|>|\\?)|\\+=\\s*\\k<o2>\\b|\\b\\k<cnt>\\s*\\+\\s*\\k<o2>\\b|\\b\\k<o2>\\s*\\+\\s*\\k<cnt>\\b)|\\b(?:const|let|var)\\s+(?<a1>[A-Za-z_$][\\w$]*)\\s*=\\s*\\bbricks\\s*\\[[^\\]]{1,40}\\]\\s*\\[[^\\]]{1,40}\\]\\s*;[\\s\\S]{0,400}?(?:\\bif\\s*\\(\\s*!?\\s*\\(?\\s*\\k<a1>\\b|\\b\\k<a1>\\s*(?:===?|!==?|>|\\?)|\\+=\\s*\\k<a1>\\b|\\b\\k<cnt>\\s*\\+\\s*\\k<a1>\\b|\\b\\k<a1>\\s*\\+\\s*\\k<cnt>\\b)|\\b(?:const|let|var)\\s+(?<rw>[A-Za-z_$][\\w$]*)\\s*=\\s*bricks\\s*\\[[^\\]]{1,40}\\]\\s*;[\\s\\S]{0,400}?(?:\\bif\\s*\\([^;{}]{0,200}\\b\\k<rw>\\s*\\[|\\b\\k<rw>\\s*\\[[^\\]]{1,40}\\]\\s*\\?|\\+=\\s*\\k<rw>\\s*\\[|\\b\\k<cnt>\\s*\\+\\s*\\k<rw>\\s*\\[|\\bfor\\s*\\(\\s*(?:const|let|var)\\s+(?<oc2>[A-Za-z_$][\\w$]*)\\s+of\\s+\\k<rw>\\s*\\)[\\s\\S]{0,400}?(?:\\bif\\s*\\(\\s*!?\\s*\\(?\\s*\\k<oc2>\\b|\\b\\k<oc2>\\s*(?:===?|!==?|>|\\?)|\\+=\\s*\\k<oc2>\\b|\\b\\k<cnt>\\s*\\+\\s*\\k<oc2>\\b|\\b\\k<oc2>\\s*\\+\\s*\\k<cnt>\\b))|\\bfor\\s*\\(\\s*(?:const|let|var)\\s+(?<rf>[A-Za-z_$][\\w$]*)\\s+of\\s+bricks\\b[\\s\\S]{0,400}?(?:\\bif\\s*\\([^;{}]{0,200}\\b\\k<rf>\\s*\\[|\\b\\k<rf>\\s*\\[[^\\]]{1,40}\\]\\s*\\?|\\+=\\s*\\k<rf>\\s*\\[|\\b\\k<cnt>\\s*\\+\\s*\\k<rf>\\s*\\[)|\\bfor\\s*\\(\\s*(?:const|let|var)\\s+(?<oc>[A-Za-z_$][\\w$]*)\\s+of\\s+bricks\\s*\\[[^\\]]{1,40}\\]\\s*\\)[\\s\\S]{0,400}?(?:\\bif\\s*\\(\\s*!?\\s*\\(?\\s*\\k<oc>\\b|\\b\\k<oc>\\s*(?:===?|!==?|>|\\?)|\\+=\\s*\\k<oc>\\b|\\b\\k<cnt>\\s*\\+\\s*\\k<oc>\\b|\\b\\k<oc>\\s*\\+\\s*\\k<cnt>\\b)|\\bbricks\\s*\\.\\s*forEach\\s*\\([\\s\\S]{0,200}?\\.\\s*forEach\\s*\\(\\s*(?:function\\s*\\(|\\()?\\s*(?<fe>[A-Za-z_$][\\w$]*)[\\s\\S]{0,400}?(?:\\bif\\s*\\(\\s*!?\\s*\\(?\\s*\\k<fe>\\b|\\b\\k<fe>\\s*(?:===?|!==?|>|\\?)|\\+=\\s*\\k<fe>\\b|\\b\\k<cnt>\\s*\\+\\s*\\k<fe>\\b|\\b\\k<fe>\\s*\\+\\s*\\k<cnt>\\b)))|(?=[\\s\\S]*?\\bbricks\\s*\\.\\s*flat\\s*\\([^)]{0,20}\\)\\s*\\.\\s*filter\\s*\\(\\s*(?:Boolean\\b|\\(?\\s*(?<fp1>[A-Za-z_$][\\w$]*)\\s*\\)?\\s*=>\\s*\\(?\\s*(?:\\{\\s*return\\s+)?(?:\\k<fp1>\\s*(?:===?\\s*1\\b|!==?\\s*0\\b|>\\s*0\\b|>=\\s*1\\b|[)};,]|$)|!\\s*!\\s*\\k<fp1>\\b)|function\\s*\\(\\s*(?<fq1>[A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{\\s*return\\s+\\k<fq1>\\s*(?:===?\\s*1\\b|!==?\\s*0\\b|>\\s*0\\b|>=\\s*1\\b|;|\\})))|(?=[\\s\\S]*?\\b(?:for|while)\\b)(?=[\\s\\S]*?(?:\\bbricks\\s*\\[[^\\]]{1,40}\\]\\s*\\.\\s*filter\\s*\\(\\s*(?:Boolean\\b|\\(?\\s*(?<fp2>[A-Za-z_$][\\w$]*)\\s*\\)?\\s*=>\\s*\\(?\\s*(?:\\{\\s*return\\s+)?(?:\\k<fp2>\\s*(?:===?\\s*1\\b|!==?\\s*0\\b|>\\s*0\\b|>=\\s*1\\b|[)};,]|$)|!\\s*!\\s*\\k<fp2>\\b)|function\\s*\\(\\s*(?<fq2>[A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{\\s*return\\s+\\k<fq2>\\s*(?:===?\\s*1\\b|!==?\\s*0\\b|>\\s*0\\b|>=\\s*1\\b|;|\\}))|\\bfor\\s*\\(\\s*(?:const|let|var)\\s+(?<fr>[A-Za-z_$][\\w$]*)\\s+of\\s+bricks\\b[\\s\\S]{0,400}?\\b\\k<fr>\\s*\\.\\s*filter\\s*\\(\\s*(?:Boolean\\b|\\(?\\s*(?<fp3>[A-Za-z_$][\\w$]*)\\s*\\)?\\s*=>\\s*\\(?\\s*(?:\\{\\s*return\\s+)?(?:\\k<fp3>\\s*(?:===?\\s*1\\b|!==?\\s*0\\b|>\\s*0\\b|>=\\s*1\\b|[)};,]|$)|!\\s*!\\s*\\k<fp3>\\b)|function\\s*\\(\\s*(?<fq3>[A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{\\s*return\\s+\\k<fq3>\\s*(?:===?\\s*1\\b|!==?\\s*0\\b|>\\s*0\\b|>=\\s*1\\b|;|\\}))|\\b(?:const|let|var)\\s+(?<fr2>[A-Za-z_$][\\w$]*)\\s*=\\s*bricks\\s*\\[[^\\]]{1,40}\\]\\s*;[\\s\\S]{0,400}?\\b\\k<fr2>\\s*\\.\\s*filter\\s*\\(\\s*(?:Boolean\\b|\\(?\\s*(?<fp4>[A-Za-z_$][\\w$]*)\\s*\\)?\\s*=>\\s*\\(?\\s*(?:\\{\\s*return\\s+)?(?:\\k<fp4>\\s*(?:===?\\s*1\\b|!==?\\s*0\\b|>\\s*0\\b|>=\\s*1\\b|[)};,]|$)|!\\s*!\\s*\\k<fp4>\\b)|function\\s*\\(\\s*(?<fq4>[A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{\\s*return\\s+\\k<fq4>\\s*(?:===?\\s*1\\b|!==?\\s*0\\b|>\\s*0\\b|>=\\s*1\\b|;|\\}))|\\bbricks\\s*\\.\\s*forEach\\s*\\(\\s*(?:function\\s*\\(|\\()?\\s*(?<fr3>[A-Za-z_$][\\w$]*)[\\s\\S]{0,400}?\\b\\k<fr3>\\s*\\.\\s*filter\\s*\\(\\s*(?:Boolean\\b|\\(?\\s*(?<fp5>[A-Za-z_$][\\w$]*)\\s*\\)?\\s*=>\\s*\\(?\\s*(?:\\{\\s*return\\s+)?(?:\\k<fp5>\\s*(?:===?\\s*1\\b|!==?\\s*0\\b|>\\s*0\\b|>=\\s*1\\b|[)};,]|$)|!\\s*!\\s*\\k<fp5>\\b)|function\\s*\\(\\s*(?<fq5>[A-Za-z_$][\\w$]*)\\s*\\)\\s*\\{\\s*return\\s+\\k<fq5>\\s*(?:===?\\s*1\\b|!==?\\s*0\\b|>\\s*0\\b|>=\\s*1\\b|;|\\})))))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "A lost ball costs a life",
+      "description": "When the ball falls out, lives goes down by 1; at 0 the state becomes 'lost', otherwise the ball is served again. Help: 6.6.7 (Reading: moSHion docs: The state Variable)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": [
+        "checkEnd",
+        "loseBall",
+        "loseLife",
+        "loseALife",
+        "lostBall",
+        "ballLost",
+        "lifeLost",
+        "missBall",
+        "missedBall",
+        "ballOut"
+      ],
+      "pattern": "^(?=[\\s\\S]*?(?:\\bif\\s*\\((?=[^;{}]{0,200}?(?:\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*>=?\\s*\\(?\\s*(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b|(?:3[6-9]\\d|[4-9]\\d\\d|height|windowHeight|canvas\\s*\\.\\s*h)\\b(?:\\s*[-+]\\s*\\(?\\s*[\\w.]+(?:\\s*\\/\\s*\\d+)?\\s*\\)?)?\\s*\\)?\\s*<=?\\s*\\(?\\s*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?(?:(?:\\blives\\s*(?:-=\\s*1\\b|--)|--\\s*lives\\b|\\blives\\s*=(?!=)\\s*lives\\s*-\\s*1\\b)|(?:loseBall|loseLife|loseALife|lostBall|ballLost|lifeLost|missBall|missedBall|ballOut)\\s*\\(\\s*\\))|\\bif\\s*\\((?=[^;{}]{0,200}\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)[^;{}]{0,200}\\)\\s*\\{?\\s*return\\b[\\s\\S]{0,400}?(?:\\blives\\s*(?:-=\\s*1\\b|--)|--\\s*lives\\b|\\blives\\s*=(?!=)\\s*lives\\s*-\\s*1\\b)|\\b(?:const|let|var)\\s+(?<lb>[A-Za-z_$][\\w$]*)\\s*=\\s*(?=[^;\\n]{0,200}\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b)[^;\\n]{0,200}[;\\n][\\s\\S]{0,600}?\\bif\\s*\\((?=[^;{}]{0,200}\\b\\k<lb>\\b)[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?(?:(?:\\blives\\s*(?:-=\\s*1\\b|--)|--\\s*lives\\b|\\blives\\s*=(?!=)\\s*lives\\s*-\\s*1\\b)|(?:loseBall|loseLife|loseALife|lostBall|ballLost|lifeLost|missBall|missedBall|ballOut)\\s*\\(\\s*\\))))(?=[\\s\\S]*?(?:\\blives\\s*(?:-=\\s*1\\b|--)|--\\s*lives\\b|\\blives\\s*=(?!=)\\s*lives\\s*-\\s*1\\b))(?=[\\s\\S]*?(?:\\blives\\s*(?:===?\\s*0|<=\\s*0|<\\s*1|>\\s*0|>=\\s*1|!==?\\s*0)\\b|\\b0\\s*(?:===?|>=|<|!==?)\\s*lives\\b|\\b1\\s*>\\s*lives\\b|!\\s*\\(?\\s*lives\\b))(?=[\\s\\S]*?(?:\\bif\\s*\\((?=[^;{}]{0,200}(?:\\blives\\s*(?:===?\\s*0|<=\\s*0|<\\s*1)\\b|\\b0\\s*(?:===?|>=)\\s*lives\\b|\\b1\\s*>\\s*lives\\b|!\\s*\\(?\\s*lives\\b))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bstate\\s*=(?!=)\\s*['\"\\x60] {4}['\"\\x60]|\\bif\\s*\\((?=[^;{}]{0,200}(?:\\blives\\s*(?:>\\s*0|>=\\s*1|!==?\\s*0)\\b|\\b0\\s*(?:<|!==?)\\s*lives\\b|\\b1\\s*<=\\s*lives\\b))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}\\}|[^;{}]{0,300};)\\s*else\\s*(?:\\{[^{}]{0,300}?)?\\bstate\\s*=(?!=)\\s*['\"\\x60] {4}['\"\\x60]|\\bif\\s*\\((?=[^;{}]{0,200}(?:\\blives\\s*(?:>\\s*0|>=\\s*1|!==?\\s*0)\\b|\\b0\\s*(?:<|!==?)\\s*lives\\b|\\b1\\s*<=\\s*lives\\b))[^;{}]{0,200}\\)\\s*\\{[^{}]{0,300}?\\breturn\\b[^;{}]{0,100};\\s*\\}\\s*(?:\\bstate\\s*=(?!=)\\s*['\"\\x60] {4}['\"\\x60])|\\bstate\\s*=(?!=)\\s*\\(?\\s*(?:lives\\s*(?:===?\\s*0|<=\\s*0|<\\s*1)\\s*\\)?\\s*\\?\\s*['\"\\x60] {4}['\"\\x60]|0\\s*(?:===?|>=)\\s*lives\\s*\\?\\s*['\"\\x60] {4}['\"\\x60]|!\\s*lives\\s*\\?\\s*['\"\\x60] {4}['\"\\x60]|lives\\s*(?:>\\s*0|>=\\s*1|!==?\\s*0)\\s*\\)?\\s*\\?[^:;\\n]{0,200}:\\s*['\"\\x60] {4}['\"\\x60]|lives\\s*\\?[^:;\\n]{0,200}:\\s*['\"\\x60] {4}['\"\\x60])))(?=[\\s\\S]*?(?:\\bserve\\s*\\(\\s*\\)|\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y|pos)\\s*=(?!=)))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "A cleared wall wins",
+      "description": "When bricksLeft() is 0, the state becomes 'won'. Help: 6.6.17 (Reading: moSHion docs: Condition-Driven Transitions)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "checkEnd",
+      "pattern": "\\bif\\s*\\((?=[^;{}]{0,200}(?:\\bbricksLeft\\s*\\(\\s*\\)\\s*(?:===?\\s*0|<=?\\s*0|<\\s*1)\\b|\\b0\\s*(?:===?|>=)\\s*bricksLeft\\s*\\(\\s*\\)|!\\s*\\(?\\s*bricksLeft\\s*\\(\\s*\\)))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bstate\\s*=(?!=)\\s*['\"\\x60] {3}['\"\\x60]|\\b(?:const|let|var)\\s+(?<bl>[A-Za-z_$][\\w$]*)\\s*=\\s*bricksLeft\\s*\\(\\s*\\)[\\s\\S]{0,600}?\\bif\\s*\\((?=[^;{}]{0,200}(?:\\b\\k<bl>\\s*(?:===?\\s*0|<=?\\s*0|<\\s*1)\\b|!\\s*\\k<bl>\\b|\\b0\\s*===?\\s*\\k<bl>\\b))[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bstate\\s*=(?!=)\\s*['\"\\x60] {3}['\"\\x60]|\\bstate\\s*=(?!=)\\s*\\(?\\s*(?:bricksLeft\\s*\\(\\s*\\)\\s*(?:===?\\s*0|<=?\\s*0|<\\s*1)\\s*\\)?\\s*\\?\\s*['\"\\x60] {3}['\"\\x60]|!\\s*bricksLeft\\s*\\(\\s*\\)\\s*\\?\\s*['\"\\x60] {3}['\"\\x60]|0\\s*===?\\s*bricksLeft\\s*\\(\\s*\\)\\s*\\?\\s*['\"\\x60] {3}['\"\\x60]|bricksLeft\\s*\\(\\s*\\)\\s*(?:>\\s*0|>=\\s*1|!==?\\s*0)?\\s*\\)?\\s*\\?[^:;\\n]{0,200}:\\s*['\"\\x60] {3}['\"\\x60])",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

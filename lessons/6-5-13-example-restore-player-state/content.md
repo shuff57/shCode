@@ -39,7 +39,7 @@ function draw() {
 }
 ```
 
-No save yet: shows 0 and 1. That's fine. The important thing is that skipping the null check would crash with `JSON.parse`.
+No save yet: shows 0 and 1. That's fine. The important thing is the null check: without it, `JSON.parse(null)` hands back `null`, and the first field you read from it, like `state.score`, crashes.
 
 ---
 
@@ -183,7 +183,7 @@ Now the real test: move somewhere, score some points, press S. Then **refresh th
 
 ## Key takeaways
 
-- **Check for null.** `getItem` returns `null` when nothing's been saved. Parse `null` and you crash.
-- **Coerce after parse.** `JSON.parse` restores numbers correctly, but always `Number()` fields you depend on. It's one line and defends against bad data.
+- **Check for null.** `getItem` returns `null` when nothing's been saved. Parse `null` and you get `null` back, and reading a field from it crashes.
+- **Coerce after parse.** `JSON.parse` restores numbers as numbers, so for your own saves `Number()` changes nothing. It is a safety net for a field that is missing or was saved as text, and it costs one word.
 - **Apply to game objects.** Parsing gives you values. You own what to do with them: put them into sprites, variables, whatever holds your game state.
 - **The round-trip is reliable.** Once you wire both directions (save + restore), refresh becomes invisible to your players.

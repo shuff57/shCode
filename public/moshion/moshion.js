@@ -502,6 +502,21 @@
     return (typeof raw === 'string' && raw.slice(0, 5) === 'data:') ? raw : null;
   }
 
+  // `loadSound('myZap')` resolves a sound the mixer saved under
+  // `sound:<name>`, the same way a saved texture resolves. Only a code-safe
+  // NAME is looked up: a path or a data: URI is left alone, so
+  // `/moshion/assets/coin.wav` and a pasted data URI behave exactly as before.
+  // The mixer's save path writes the data: URI here through the same storage
+  // bridge, so there is no upload and no API route.
+  const SOUND_PREFIX_ = 'sound:';
+  function _savedSoundSrc(name) {
+    if (typeof name !== 'string') return null;
+    const explicit = name.slice(0, SOUND_PREFIX_.length) === SOUND_PREFIX_;
+    if (!explicit && !/^[A-Za-z][A-Za-z0-9_]*$/.test(name)) return null;
+    const raw = getItem(explicit ? name : SOUND_PREFIX_ + name);
+    return (typeof raw === 'string' && raw.slice(0, 11) === 'data:audio/') ? raw : null;
+  }
+
   function _textureSrc(name) {
     const saved = _savedTextureSrc(name);
     if (saved) return saved;
@@ -3163,7 +3178,9 @@
       const ctx = _audioCtx();
       if (!ctx || typeof fetch !== 'function') return null;
       try {
-        const res = await fetch(this.url);
+        // A sound saved by the mixer is a data: URI under `sound:<name>`; a
+        // path or a pasted data: URI passes through untouched.
+        const res = await fetch(_savedSoundSrc(this.url) || this.url);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const bytes = await res.arrayBuffer();
         this._buffer = await ctx.decodeAudioData(bytes);

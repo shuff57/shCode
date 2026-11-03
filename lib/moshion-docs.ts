@@ -3,23 +3,25 @@
 // actual engine surface differs (planck.js-backed, gaps closed per the audit gate).
 
 // Scope-out (stated explicitly so a future maintainer doesn't rediscover the boundary):
-// These moSHion API areas were dropped because no runnable lesson exercises them:
+// These moSHion API areas are not in the engine, because no runnable lesson exercises them:
 //   Visual / Visuals, EmojiImage, multitouch pointer/pointers,
 //   world.renderStats / world.meterSize, palettes, world.timeScale / world.physicsTime /
-//   world.realTime / world.autoStep / world.physicsUpdate, world.allowSleeping /
-//   sprite.sleeping, world.explodeAt, world.rayCast / world.rayCastAll,
-//   world.getSpritesAt, sprite.passes / pass, sprite.angleTo /
-//   bearing, sprite.addCollider / addDefaultSensors,
-//   sprite.update / sprite.draw overrides, sprite.playAni / playAnis (Promise-based),
-//   sprite.drag / rotationDrag / applyTorque / rotationSpeed,
-//   sprite.grabbable, group.addTiles / tile,
-//   autoCull, group.life / autoDraw / autoUpdate, group.amount, subgroups (Group(parent)),
-//   camera.zoom / camera.off / camera.on, mouse.drags / dragging / dragged,
-//   contros (gamepad), pointer,
+//   world.realTime, world.rayCastAll, sprite.passes / pass, sprite.bearing,
+//   sprite.addCollider / addDefaultSensors, sprite.playAni / playAnis (Promise-based),
+//   sprite.grabbable, group.addTiles / tile, autoCull, group.life,
+//   subgroups (Group(parent)), camera.zoom, contros (gamepad), pointer,
 //   joint.springiness / damping / limitsEnabled / range / forceThreshold / torqueThreshold /
 //   offsetA / offsetB, color(), triangle drawing primitive,
 //   textFont, parseTextureAtlas, loadImage, EmojiImage,
 //   sprite.addAnis, anis.cutFrames / offset.
+// Built in the engine since this list was first written (public/moshion/docs/moshion.d.ts,
+// checked against moSHion d8068bb on 2026-11-03), so no longer scoped out: world.autoStep /
+// world.physicsUpdate, world.allowSleeping / sprite.sleeping, world.explodeAt,
+// world.rayCast, world.getSpritesAt, sprite.angleTo, the sprite.update / sprite.draw
+// overrides, sprite.drag / rotationDrag / applyTorque / rotationSpeed, group.amount /
+// autoDraw / autoUpdate, camera.off / camera.on, and mouse.drags / dragging / dragged.
+// Of these, only sprite.angleTo and camera.off have a page or a mention below; the rest
+// are engine-only, with no page here yet.
 // sprite.mass / density / opacity, sprite.moveTowards, sprite.rotateTo, sprite.debug, and
 // frameRate() were in this list too — a lesson audit found them reachable
 // (6-5-21, 5-1-23, and six sprite.text label lessons) and they're built now; see the
@@ -1268,7 +1270,9 @@ function draw() {
         title: 'Sound',
         body: `loadSound('file.mp3') gives you a Sound. Call .play() for a one-off effect and .loop() for music that should keep going.
 
-moSHion ships two sounds you can load straight away, and the example uses both: '/moshion/assets/coin.wav' is a short chime and '/moshion/assets/music.wav' is a short tune. Type the path exactly as shown: a misspelled path shows no error, the sound just never plays.
+moSHion ships a small 8-bit palette you can load straight away: '/moshion/assets/coin.wav' is a short chime, '/moshion/assets/music.wav' is a short tune, and jump.wav, hit.wav, laser.wav, powerup.wav, explode.wav, blip.wav, select.wav and tone.wav sit in the same folder. Type the path exactly as shown: a misspelled path shows no error, the sound just never plays.
+
+The sound mixer at /sound (also the Sounds tab beside a moSHion lesson's code) builds a sound from a chip preset and saves it in this browser. Load a saved sound by name instead of by path: let zap = loadSound('zap');. A saved name wins over a built-in file with the same name.
 
 .play() starts a fresh copy every time it's called, so firing a laser three times in three frames gives you three overlapping shots rather than one restarting over and over. .loop() is the opposite — it's the single track you start once and stop later, and calling it again while it's already going does nothing.
 

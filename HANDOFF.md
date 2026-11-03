@@ -1,3 +1,74 @@
+# 2026-11-03 (latest): the 8-bit sound mixer, and sounds saved by name
+
+**Branch `codehs-inspiration`.** `/sound` is now a tool page beside `/textures`:
+a multi-channel mixer that builds sound effects from jsfxr presets and music
+from ZzFXM loops, with mute/solo, volume, rate, pan, play-all, WAV downloads and
+a "copy `loadSound(...)`" snippet. It is linked from **Learn > Sounds**, sits as
+a **Sounds** tab in every moSHion lesson and in `/sandbox`, and is taught in
+6.11.1, 6.11.2 (Try 5) and 6.11.10 (an optional "make your own sound").
+
+The effect channels also have a **Tweak** panel over jsfxr's own parameters:
+wave shape, pitch, floor, slide, bend, vibrato, arpeggio, attack, sustain,
+decay, punch, duty, repeat, low/high pass and flanger, with Random, Mutate and
+Reset. The edited definition is what is rendered (`renderSfxDef`), and it is
+saved under `sndmeta:<name>.def`, so the library's **Edit** reopens the same
+knobs. The toolbar's **master** is this page's mix bus; it does not change a
+saved sound's own `.volume`.
+
+**Mic match.** Each effect channel also has a **Mic** panel. It records up to
+3 seconds with `MediaRecorder`, decodes it with the mixer's `AudioContext`, and
+`lib/sound/match.ts` fits pitch, envelope, waveform and brightness to the Tweak
+definition. This is local signal analysis, not a model call: nothing is
+uploaded, and the result is deliberately a starting point. The mapping is
+measured against the engine (`frequency = rate * (p^2 + 0.001) / 6.25`, an
+envelope stage lasts `p^2 * 2.2676 s`); wave shape comes from harmonic ratios,
+so a decaying sine is not mistaken for a saw. `scripts/test-sound-match.mjs`
+pins sine/square/saw/noise, rising/falling slides, a 6 Hz wobble and silence;
+`check-moshion-sounds.mjs` checks the mixer still wires `matchRecording` and
+`getUserMedia`. A fake-device Chrome run recorded, decoded and matched through
+the real UI ("Matched", then the Tweak panel opened).
+
+**The seam.** A saved sound is written to the same `moshion.store.v1` store as
+saved textures, under `sound:<name>` (metadata under `sndmeta:<name>`). The
+preview bridge already hydrates that store into the sandboxed iframe, and
+`public/moshion/moshion.js` now resolves a bare code-safe name in `loadSound()`
+through `_savedSoundSrc()`. A path (`/moshion/assets/coin.wav`) still bypasses
+the store. No API route and no upload. `lib/moshion-storage.ts` gives sound keys
+their own 256 KB per value / 2 MB total budget, separate from the 512 KB lesson
+draft budget, so a mix cannot evict a student's unsaved work.
+
+**The palette.** `scripts/make-moshion-sounds.mjs` regenerates 13 WAVs in
+`public/moshion/assets/` from `lib/sound/vendor/`: `coin` and `music` (the two
+the course already used; now real 8-bit audio, not the 2026-11-01 stand-in
+tones) plus `jump`, `hit`, `laser`, `powerup`, `explode`, `blip`, `select`,
+`tone`, `title`, `win`, `lose`. `music.wav` must stay 5.2-5.6 s: 6.11.10 slices
+it at `[0, 1.3, 2.6, 4, 5.3]`. Re-run the script and commit the WAVs whenever the
+palette changes; `check-moshion-sounds.mjs` (prebuild and `npm test`) checks
+that every file exists, is non-silent 8-bit PCM, and that `music.wav` still fits
+those slices.
+
+**The trap that cost a cycle: do not put a `package.json` declaring
+`"type": "commonjs"` in the jsfxr vendor folder.** Next's dev React Refresh
+loader injects `import.meta.webpackHot` into the modules it treats as ESM. The
+package.json made webpack parse the UMD files as CommonJS while the loader still
+injected `import.meta`, so `/sound` answered **500 "Cannot use 'import.meta'
+outside a module"**. The vendored files are `riffwave.cjs` and `sfxr.cjs`; the
+`.cjs` extension keeps them out of that loader. `check-moshion-sounds.mjs`
+asserts `sfxr.mjs` still imports the `.cjs` files.
+
+**Verified.** `test-moshion.mjs --corpus` 517/517; `tsc --noEmit`; the sound,
+texture, citation, reachability, hints, starters, docs-prose and live-block
+checks; and a real browser walk: Save on `/sound` wrote `sound:coin`, a 6.11.3
+sketch running `loadSound('coin')` reported `loaded true null 0.218625`, and the
+lesson's Sounds tab rendered the mixer. A production build reached static-page
+generation, then failed on an unrelated `content.md.tmp.<pid>...` ENOENT caused
+by **another Claude session (PID 17542) editing 5.1 lesson prose concurrently**;
+type-check, lint and webpack compilation had already passed. Re-run the build
+when no other session is writing lessons.
+
+---
+
+
 # 2026-11-02: save-for-another-device replaces the Pull banner
 
 A student can **save a lesson's workspace for another device**, and it loads
@@ -47,6 +118,248 @@ Pull banner is retired (`CrossDeviceSyncBanner` deleted; `LessonWorkspace` mount
   student and reproduce the 409.
 - **Deploy:** apply 0037 (`npm run d1:migrate`) before deploying; the migration
   preflight blocks otherwise. The sync route 500s until the table exists.
+
+
+# 2026-10-30: 5.3 Pinball, 5.4 Flappy and 5.5 Snake are built; the CodeHS review is written up
+
+**Branch `codehs-inspiration`.** Built since the section below: `5.3 Project: Pinball` (10 screens,
+`6805ddf9`) and `5.4 Project: Flappy` (9 screens, `656d9dd2`), both in their own folder prefixes
+(`5-3-pinball-*`, `5-4-flappy-*`) because `5-3-*` and `5-5-*` still key what is now 5.6 and 5.8.
+**5.5 Snake is built** (11 screens in `5-5-snake-*`; an array that grows and is searched; no classes, no groups). It is the **first build with the five-step close**: `5.5.1` is an AI-graded written plan and `5.5.9` an AI-graded playtest-and-reflect. **5.3 and 5.4 do not have them yet** (decided 2026-10-30; retrofit is next). Also owed: the random-numbers-and-timers lesson as the first lesson of 5.2.
+
+**The CodeHS review is in `codehs-review/`**: per-course lesson-by-lesson dispositions
+(`gamedesign`, `videogamedesign`, `apcsp_js`, `apcsacortado`), `csa-3.3-3.9.md`, `PLACEMENT.md`
+(proposed module rows; **4 decisions made 2026-10-30** (groups stay at 6.1; one grids module; a random+timers lesson before Unit 5; the five-step build close, AI-graded) and **8 still open**) and
+`MOSHION-GAPS.md` (library gaps against the planned modules). `PROGRESS.md` has the log and
+what was and was not verified. Read `PLACEMENT.md` first.
+
+**Not started: the unit-level repartition** (unit 5 functional / unit 6 OOP use / unit 7 writing
+classes / then concepts). It renumbers about 166 lessons by title and citation only (no folder
+moves, no D1 migration). Recommended after unit 5 content exists, in one commit.
+
+**moSHion findings that block planned work** (details and evidence in `MOSHION-GAPS.md`): the copy
+vendored in `public/moshion/` is moSHion `d8068bb` on `main` (vendored 2026-11-02; see `public/moshion/VENDORED.md`). The earlier `3b77bf6` sync added `Tiles`, `Walls`, `every`/`after` and `addSensor`; `main` since carries gravity starting at 0 (`91f7e6b`) and the opt-in `world.origin = 'math'` with `showGrid()`/`showMouse()` (`d8068bb`). There is still no `camera.follow`; `this.speed` on a class that
+extends Sprite collides with a built-in accessor. Lesson `6.4.19` hints at a `camera.follow` that
+does not exist.
+
+**Traps this session cost a cycle each:** `pkill -f <name>` can match and kill your own shell
+(exit 144), so kill by pid; a background command ending with `&` keeps running after the tool
+reports "completed", so run long jobs as the foreground command of a background call and verify
+a `.done` marker; only one process may drive the logged-in `codehs` playwright session.
+
+---
+
+# 2026-10-29: module 5.5 (now 5.8) is built; the 5.3/5.4 grouping is committed
+
+**Branch `codehs-inspiration`** (cut from `cs-3d`). Read `CODEHS-INSPIRATION.md`
+(why CodeHS, six-course measurements) and `CODEHS-MAP.md` (per-module map, fit levels).
+
+## State of the tree
+
+Committed: `f6ba94ff` (5.1/5.2 content pass), `1a0d2b14` (5.3 class-anatomy example +
+fill-in-the-constructor lab), `3594e0ff` (5.3/5.4 lesson grouping + the this-keyword video
+moved to 5.4.2), `82e46363` (**module 5.5**).
+
+All three steps of the object plan are done. `.gauntlet/occt-checks.json` shows as modified
+only after a test run; leave it out of commits.
+
+## Scope, decided 2026-10-29: moSHion and 2D game design only
+
+**Chapters 8–13 are paused.** The 3D track (JSCAD in the book's outline; reSHape Script on the
+B-rep kernel in the app) is not being built out. `8.1 Solid Shapes` exists and ships — 11 screens,
+`status: draft`, quarter 3 — but nothing follows it, and no one should start 8.2 without a new
+decision.
+
+**What "in scope" means for the tree:** modules 5.1–5.5 and 6.1–6.8, plus chapter 7's capstone.
+That is where the remaining work is:
+
+### Decided 2026-10-29: a game-build block, and OOP moves behind it — **DONE**
+
+The renumber is committed (`53bc896e`). 5.3 and 5.4 are now built, 5.5 is free, and 5.6–5.8 hold the OOP block.
+
+**The shape, settled with the owner:** the games are the spine, and the two blocks differ only in
+how you build them. 2–3 games per block, one per module, and 2–3 classes written across the OOP
+block.
+
+| Block | Modules | Games | How it is built |
+| --- | --- | --- | --- |
+| Functional game dev | **5.3, 5.4, 5.5** | Pinball first, then a Flappy-style and Snake (2–3 in all) | functions, arrays, sprite variables — no classes |
+| Class-oriented game design | **5.6, 5.7, 5.8** | **new games, not rebuilds** | your own classes: 2–3 of them across the block |
+
+**Constraints that shaped it:**
+- Nothing before 6.1/6.2 teaches `new Group()`, so every game in 5.3–5.5 uses individual sprites
+  and `colliding()`. Pinball, Flappy and Snake all fit; nothing may use groups.
+- 5.2.14 already builds a pinball scene, so 5.3 starts from something the student has made.
+- **Unit 6 still defines no class.** After 5.6–5.8 students write classes and then go 106 screens
+  without one. Either 6.x’s builds start reusing them, or the OOP block stays a self-contained
+  unit — undecided, and it does not block 5.3.
+
+- grouped so far: 5.1, 5.3, 5.4, 5.6, 5.7, 5.8. **Ungrouped: 5.2, 6.1–6.8, 7.1** (about 120 screens).
+  5.3 and 5.4 are built; 5.5 (Snake) is not.
+- the book's chapter 6 also lists **6.9 Timing and Async** and **6.10 Sound and Texture**;
+  neither exists in the app.
+- **chapter 7 is two screens** (`7.1.1` Arcade Cabinet, `7.1.2` Q2 Reflection). If the course is
+  now "moSHion and 2D game design", this is the design surface, and CodeHS's five-beat project
+  close (Pattern 4 in `CODEHS-INSPIRATION.md`) is the model for filling it.
+- tiles and spritesheets are CodeHS ideas with no shCode counterpart (see `CODEHS-MAP.md`).
+
+## What 5.8 (built as 5.5) is, and what the check changed
+
+`5.8 Inside a Class` (built as 5.5, renumbered) — 20 screens, six lessons, after 5.4 and before 6.1. **Not a book
+section**: Unit 5 ended on 5.4's challenges with no internal check.
+
+The draft in the previous section of this file was a general "design a class" module.
+Reading the 5.4 screen *bodies* killed half of it — 5.4.11 already writes an Enemy class,
+5.4.19 already has students write a class from scratch with five instances and remove
+collected items from an array, 5.4.7 is the plain-English-to-pseudocode screen. The table
+of what was cut is in `curriculum/modules/5.5_inside-a-class.md`.
+
+What shipped instead, because nothing earlier teaches it:
+- **scope inside a class** — 3.2.24/25 teach local-vs-global *in functions*; the third
+  place (`this`) and one method's local being invisible to the next are new.
+- **access** — 5.4.21 names encapsulation as vocabulary only; 5.5.5–5.5.9 make it concrete
+  (`takeHit` with a floor at zero, `isAlive`).
+- **your own object taking your own object** — 5.4.1's `distanceTo(other)` shows the syntax
+  in passing; `player.hit(enemy)` and the direction it implies are new.
+- **`static`** — never taught. The reading opens by separating it from moSHion's
+  `new Sprite(..., 'static')` **body type** (5.2). That collision is the trap to keep saying.
+- **the wave spawner** build, and a written "where does each piece of state live" answer.
+- **two checks**, because the unit had none: one gating scope/access, one closing 5.3–5.5.
+
+## Traps (each cost real thought)
+
+- **Taught before asked** (memory `feedback_lesson-voice-taught-before-asked`). Every term in a
+  step, hint or requirement must come from an EARLIER screen in module order. Verify with
+  `grep` before assuming: `frameCount` is taught in 5.1.14, `'static'` body type in 5.2, `.filter`
+  in **3.7.19** (not 3.7.18, which is a spread lab).
+- **`Help: N.N.N (Title)` must reproduce the other lesson's title.** `check-help-pointer-titles`
+  normalises case and punctuation but not *meaning*; the pointer must point at the lesson that
+  actually teaches the thing. It found two wrong pointers in 5.5.13 (fixed).
+- **A quiz's `source` and `sourceIds` must agree in count and in meaning.**
+  `check-lesson-numbers` reports both mismatches; `node scripts/pin-quiz-sources.mjs` re-pins
+  `source` to the folder ids. Also: `test-quiz` rejects two options that differ only by case
+  (`enemy.spawned` vs `Enemy.spawned`) — it was a real failure in 5.5.20.
+- **A lesson with `requirements` but no reference warns in `check-starters`.** Give it a
+  `solution/` file. The reference must score FULL and the starter must not; that is the whole
+  invariant, and it caught a too-narrow regex in 5.5.19.
+- **The starter/reference bundles go stale.** After adding lessons, `check-solution-leak` fails
+  with "not in solutions.generated.ts". Run `node scripts/generate-solutions.mjs` and
+  `node scripts/generate-lesson-starters.mjs`.
+- **Generated files** (`ai-graders.generated.ts`, `module-docs.generated.ts`,
+  `public/lessons-manifest.json`, `public/lesson-requirements.json`) are rewritten by the
+  generators. Commit them with the content that caused them.
+- **Lesson ends.** The group README's rule: a lesson needs a closing check only when its last
+  screen is a reading or a video. 5.5's lessons end in labs or examples, so its two quizzes are
+  a deliberate gate and a unit close, not per-lesson closers.
+- **Renumbering.** `scripts/renumber-module.mjs --plan <plan> [--dry-run]` rewrites titles and
+  citations but not folders. To move a lesson ACROSS modules, first retitle it with a number
+  inside the destination module and set its `unit`, then run the plan. A new lesson's own text
+  is not rewritten, so write its citations in the FINAL numbering.
+- **`pkill -f "next dev"` kills the shell (exit 144)** — hit again this session. Kill the pid
+  from `ss -lptn 'sport = :3002'`.
+- **Process.** Stop the dev server before `npm run build` or `npm test`. Dev server:
+  `DEV_ROLE=teacher npm run dev`, port 3002. Browser: `playwright-cli`, named sessions, close
+  throwaway ones, never close `mom`. A student-role dev server shows the lesson-lock gate;
+  use `DEV_ROLE=teacher` to read a new module's content.
+
+## Verified, and not
+
+Checked as a teacher in a browser: the module page lists 20 lessons, 5.5.15's `static spawned`
+runs and the HUD reads it, 5.5.18's starter runs with "Still needed (4)", 5.5.20's quiz serves
+and says "6 of 8".
+**Not walked as a student** (the lock gate blocks it until earlier lessons are completed), and
+the AI check on 5.5.19 has not had a live model run — `test-ai-check` only checks the shape.
+
+## Other open items
+
+- `5-3-15-video-this-keyword` (5.4.2) still has an empty `videoUrl`; it shows the
+  teacher-recorded fallback text. Record or link it.
+- Add moSHion terms (`text(`, `update(`, `world.gravity`, `'static'`/`'dynamic'`, `frameCount`)
+  to the `scripts/check-concept-order.mjs` catalog; today it only checks console labs, so it
+  would not have caught the 5.1 defects and cannot check 5.5's labs either.
+- Group the remaining 31 modules one at a time (objectives are hand-written; user reviews each).
+- Closing checks for reading-heavy modules (1.2, 1.5, 3.2, 6.5, 6.7).
+- A standard project close-out for 7.1 (two screens today).
+- **Pacing: the worst block is gone, the conflict is not.** 5.4's lesson 4 ("Choosing OOP",
+  127 min, both graded parts in one lesson) was split three ways on 2026-10-29 — *When to reach
+  for OOP* (51), *Defend the choice* (40), *Name the pillars* (36) — leaving 5.4 at **6 lessons
+  over 22 screens**, longest 63 min. The split is a `curriculum/groups/5.4.json` edit only:
+  no screen moved, no renumber, no migration, and the module still estimates ~4 h 45 min,
+  which still disagrees with the 5.3/5.4 note's ~1.75 contact hours. 5.5 adds about 3 hours on
+  top. Teacher decision on the prose estimate is pending — nothing depends on the answer.
+- A one-screen lesson is legal (`lib/lesson-groups.ts` caps at 8 and sets no floor), but it was
+  the first one in the course: `ModuleLessonsList` said "1 screens" until it was fixed to
+  pluralise.
+- 10 pre-existing `check-help-pointer-titles` mismatches (1.4.10, 2.5.6, 3.4.12 x4, 5.1.10,
+  6.6.24 x2, 6.8.7). None in 5.1–5.5.
+- 5.2.4 Lab: Tune Gravity partly overlaps the Falling Block example (5.2.3); intended
+  example-then-lab.
+- I read only titles of CodeHS's other courses, not bodies. Re-fetch
+  `https://codehs.com/course/apcsacortado/explore` (public, no login) if a closer comparison is
+  wanted.
+
+# 2026-10-29 (later): lesson layer added, piloted on 5.1
+
+**What exists now.** `curriculum/groups/<moduleId>.json` groups a module's screens
+into lessons (title, objective, ordered screens). `lib/lesson-groups.ts` loads and
+validates them; `getModule()` returns `groups` and **throws** if a group file
+disagrees with the folder tree; `scripts/check-lesson-groups.mjs` runs the same
+validator in `prebuild` and `npm test`. The module page shows a heading per group
+(`ModuleLessonsList`). Individual screens deliberately show nothing: a per-screen
+banner was built, reviewed and removed on request.
+**Progress is still per screen** — the layer is presentation only, so it cannot
+orphan D1 completions the way a renumber does.
+
+Only 5.1 is grouped (6 lessons over 24 screens). Every other module renders
+exactly as before; adopting one module at a time is the intended path.
+`curriculum/groups/README.md` holds the schema rules and the check policy.
+
+**Check policy, decided here and worth not re-litigating.** A lesson needs a
+closing check only when its last screen is a reading or a video. 5.1 ends every
+lesson in a lab, example or challenge, so it gets **no new checks**. The
+reading-heavy modules do: 1.2, 1.5, 3.2, 6.5, 6.7.
+
+**Trap found while mapping.** A group file must key screens by lesson FOLDER id,
+not the numbered title — `5.1.24` lives in the folder `moshion-gravity`. And
+module order is the number on the TITLE, never readdir order; the first version of
+the checker sorted by folder name and reported a false "out of order".
+
+**Do not insert a check screen mid-module.** Lesson numbering keys D1 progress;
+a renumber orphans every completion it passes. A new check goes at the end of a
+module, or ships with a migration.
+
+**5.1 content pass (same day), driven by one rule: never ask a student for anything
+not taught on an EARLIER screen** (saved as a memory; assume zero prior knowledge).
+Audit found: 5.1.20 asked for `update()`, `world.gravity` and `'dynamic'`, never taught
+in 5.1; 5.1.7 told students to "store the sprite in a variable" while its own starter
+said to chain `.color`, and the variable reading comes after it; the playground asked
+for `text()` that no screen explains; several "Read before" pointers were stale or
+pointed backwards. Done: 5.1.7 is now an exploration (change a number, predict, rerun);
+5.1.14 is a key-names reading (WASD and arrows, taught one after the other, demo uses
+only `kb.pressing` and `.color`); 5.1.20 rewritten in `draw()` with either key set;
+5.1.21 is a new `text()` reading; playground pointers and requirements fixed and
+accept either key set; Falling Block moved 5.1.24 -> 5.2.3 (it follows Reading:
+Gravity). **No D1 migration:** `scripts/renumber-module.mjs` renumbers TITLES and
+never renames folders, and folder names are the ids D1 keys on. Plan:
+`scripts/renumber-plans/5.1-5.2-codehs-pass.json`. The tool's last step (rebuild the
+module doc table) fails on 5.1 (no table) and 5.2 (6 columns, not 5), so both module
+docs were fixed by hand. Falling Block moving modules means a class with a MODULE due
+date on 5.1 sees it inherit 5.2's date instead.
+**Arrow keys:** the "arrows scroll the iframe" rule (lab-assignment-conventions.md §4)
+was tested once in Chromium: with the sketch focused, ArrowDown did not scroll the
+page. Not tested elsewhere. The lessons now only say "click the canvas first". The
+convention doc still says WASD-only and now disagrees with 5.1.
+**Follow-up, not done:** `scripts/check-concept-order.mjs` enforces the taught-before-
+asked rule for console labs but its catalog has no moSHion features (`text(`,
+`update(`, `world.gravity`, `'static'`); adding them would have caught all of the above.
+Pre-existing, unrelated: 6.3.10 cites 5.1.10 as "...rotation, scale" but the title says
+"layer".
+
+**Also recorded:** `CODEHS-MAP.md` maps all 35 modules to their closest CodeHS
+lesson, and `CODEHS-INSPIRATION.md` holds the structural findings. Two facts there
+are not obvious from the tree: 5.4's screens live in `5-3-*` folders, 6.2's in
+`6-1-*` and 6.8's in `6-7-*` (folder prefixes are frozen, the `unit` field is
+authoritative — `CLAUDE.md` mentioned 5.3/5.4 but not 6.2/6.8).
 
 # 2026-10-29: 3.9.1 is a find-and-fix; 3.10 is four parts (both before they are sat)
 
@@ -2030,7 +2343,9 @@ them gate the build:
   The reference API-faithful edge semantics live on `collides()` / `overlapping()` / `overlapped()`.
 - **Named key properties return `pressing()`'s value**, not the reference API's raw signed counter,
   so `if (kb.space)` cannot double-fire on key-up.
-- **Defaults differ**: density 1 (not 5), friction 0, bounciness 0, gravity (0, 9.8).
+- **Defaults differ**: density 1 (not 5), friction 0, bounciness 0. Gravity was (0, 9.8) here
+  until 2026-11-01; it now starts at (0, 0) like the reference, so a lesson that wants falling
+  sets `world.gravity.y` itself (audit: `codehs-review/loop/gravity-default-audit.md`).
 - **The direction alias is reference-counted** — releasing `d` while ArrowRight is still
   held keeps `'right'` alive. The reference API has this bug; moSHion does not.
 - **`rotateTowards` always turns the short way.** the reference API's number form does not.

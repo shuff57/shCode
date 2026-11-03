@@ -1,0 +1,157 @@
+{
+  "id": "6-10-breakout-12-quiz-breakout",
+  "title": "6.10.12 Check: Breakout",
+  "description": "Eight multiple-choice questions on flipping a speed, the radius, the paddle bounce, steering, the ball's edges and prompt(). Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.10 Breakout",
+  "preview": "quiz",
+  "week": 18,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-flip",
+        "source": "6.10.2",
+        "question": "The ball reaches the right wall moving across at `vx = 3`, and the code runs `vx = -vx`. What happens next?",
+        "options": [
+          "It stops dead, because -3 and 3 add up to 0",
+          "It moves left at the same speed, 3 pixels a frame",
+          "It moves left, a little slower after every bounce",
+          "It falls straight down, since only vy is left over"
+        ],
+        "answer": 1,
+        "explanation": "Flipping the sign keeps the speed and reverses the direction: 3 pixels a frame to the right becomes 3 pixels a frame to the left.",
+        "sourceIds": [
+          "6-10-breakout-2-reading-a-ball-you-move-yourself"
+        ]
+      },
+      {
+        "id": "q2-radius",
+        "source": "6.10.2",
+        "question": "The ball is 12 pixels wide, so `R` is 6. Why does the left-wall test use `ball.x < R` and not `ball.x < 0`?",
+        "options": [
+          "`ball.x` is the centre, so the ball's side reaches the wall at 6",
+          "moSHion never lets a sprite stand at x = 0 anywhere on the canvas",
+          "Comparing with R makes the ball bounce back off the wall faster",
+          "The canvas starts at x = 6, so x = 0 is just off the screen"
+        ],
+        "answer": 0,
+        "explanation": "A sprite's x is its centre. The ball's edge is R from its centre, so the edge reaches the wall when x is R. Testing 0 lets half the ball into the wall first.",
+        "sourceIds": [
+          "6-10-breakout-2-reading-a-ball-you-move-yourself"
+        ]
+      },
+      {
+        "id": "q3-down",
+        "source": "6.10.2",
+        "question": "Why is the paddle bounce written `if (ball.overlaps(paddle) && vy > 0)`?",
+        "options": [
+          "`overlaps()` is only ever true while the ball is falling, never going up",
+          "`vy > 0` adds a little speed, so the ball leaves faster after every bounce",
+          "They touch for several frames, and a flip on each would bounce it up, down, up",
+          "Without `vy > 0` the ball would sink through the paddle and fall out the bottom"
+        ],
+        "answer": 2,
+        "explanation": "overlaps() is true on every frame they touch. Flipping only while vy is above 0 means one flip per landing: after it vy is negative and the test stays false.",
+        "sourceIds": [
+          "6-10-breakout-2-reading-a-ball-you-move-yourself"
+        ]
+      },
+      {
+        "id": "q4-steer",
+        "source": "6.10.3",
+        "question": "The paddle is at x = 200 and the ball lands on it at x = 230. With `vx = (ball.x - paddle.x) / 10`, how does the ball leave?",
+        "options": [
+          "To the left, with vx = -3",
+          "Straight up, with vx = 0",
+          "To the right, with vx = 23",
+          "To the right, with vx = 3"
+        ],
+        "answer": 3,
+        "explanation": "230 - 200 is 30: the ball landed 30 pixels right of the centre. 30 / 10 is 3, so it leaves to the right at 3 pixels a frame.",
+        "sourceIds": [
+          "6-10-breakout-3-example-a-ball-in-a-box"
+        ]
+      },
+      {
+        "id": "q5-top",
+        "source": "6.10.7",
+        "question": "`R` is 6 and the ball is at (100, 170), moving up toward the wall. Which call asks about the point at the very top of the ball?",
+        "options": [
+          "`hitAt(100, 176)`",
+          "`hitAt(100, 164)`",
+          "`hitAt(94, 170)`",
+          "`hitAt(100, 170)`"
+        ],
+        "answer": 1,
+        "explanation": "The top edge is straight above the centre, R away. y grows downward, so it is 170 - 6 = 164, with the same x.",
+        "sourceIds": [
+          "6-10-breakout-7-reading-the-ball-has-edges"
+        ]
+      },
+      {
+        "id": "q6-side",
+        "source": "6.10.7",
+        "question": "`hitAt(ball.x - R, ball.y)` breaks a brick. Which speed should flip, and why?",
+        "options": [
+          "`vy`, because every brick the ball hits sends it straight back down",
+          "Both, because the ball has to turn all the way back around",
+          "Neither, because `hitAt` already moved the ball out of the brick",
+          "`vx`: the brick is beside the ball, so the ball turns back across"
+        ],
+        "answer": 3,
+        "explanation": "The left edge point found the brick, so the brick is beside the ball, like a wall. A sideways bounce flips vx; vy keeps going.",
+        "sourceIds": [
+          "6-10-breakout-7-reading-the-ball-has-edges"
+        ]
+      },
+      {
+        "id": "q7-centre",
+        "source": "6.10.7",
+        "question": "The ball only asks `hitAt(ball.x, ball.y)`. What goes wrong?",
+        "options": [
+          "It sinks into a brick before turning, and can miss one it scrapes",
+          "Every hit breaks two bricks at once, the one above and below",
+          "Bricks break a few frames before the ball has reached them",
+          "hitAt stops the sketch with an error when the ball is above the wall"
+        ],
+        "answer": 0,
+        "explanation": "The centre is R inside the ball's edge. It reaches a brick late, so half the ball is in it first, and a ball passing beside a brick overlaps it without its centre ever entering.",
+        "sourceIds": [
+          "6-10-breakout-7-reading-the-ball-has-edges"
+        ]
+      },
+      {
+        "id": "q8-prompt",
+        "source": "6.10.10",
+        "question": "A player is asked `prompt('Press 1 for the mouse or 2 for the keys')` and types 1. What does `prompt` give back?",
+        "options": [
+          "The number 1, ready to compare with `=== 1`",
+          "The value true, because an answer was typed",
+          "The text `'1'`, a string, so compare with `'1'`",
+          "Nothing until the player presses a key in the game"
+        ],
+        "answer": 2,
+        "explanation": "prompt gives back whatever was typed as a string, which is why 3.1.9 wrapped it in Number(...). So the test is === '1'. That is one reason this game uses a key-press title screen instead.",
+        "sourceIds": [
+          "6-10-breakout-10-lab-pick-a-mode"
+        ]
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -125,6 +125,25 @@ for (const l of lessons) {
 // Lesson prose cites lessons by number, not by link, so the rule is simply:
 // off-site links are fine, absolute paths must exist under public/, and a bare
 // relative path is a defect.
+// A lesson may also link to an app page the export serves (the texture
+// editor, the sound mixer, the docs). Those live under app/<route>/page.tsx,
+// not under public/, and before this the only way to link one was to stop
+// linking it at all. Keep the rule narrow: an exact route file, no globs,
+// no dynamic segments.
+function appRouteExists(href) {
+  const clean = href.replace(/^\//, '').split(/[?#]/)[0].replace(/\/$/, '');
+  const bases = clean ? [clean] : [''];
+  for (const base of bases) {
+    for (const ext of ['tsx', 'ts', 'jsx', 'js']) {
+      const p = base
+        ? path.join(root, 'app', base, `page.${ext}`)
+        : path.join(root, 'app', `page.${ext}`);
+      if (fs.existsSync(p)) return true;
+    }
+  }
+  return false;
+}
+
 let deadLinks = 0;
 for (const l of lessons) {
   const md = path.join(lessonsDir, l.dir, 'content.md');
@@ -134,9 +153,10 @@ for (const l of lessons) {
     const href = m[1];
     if (/^(?:https?:|mailto:|#)/i.test(href)) continue;
     if (href.startsWith('/')) {
-      if (fs.existsSync(path.join(root, 'public', href.replace(/^\//, '').split(/[?#]/)[0]))) continue;
+      const served = fs.existsSync(path.join(root, 'public', href.replace(/^\//, '').split(/[?#]/)[0]));
+      if (served || appRouteExists(href)) continue;
       deadLinks++;
-      console.error(`DEADLINK    ${l.dir} links ${href}, which is not in public/`);
+      console.error(`DEADLINK    ${l.dir} links ${href}, which is not in public/ or an app route`);
       continue;
     }
     deadLinks++;

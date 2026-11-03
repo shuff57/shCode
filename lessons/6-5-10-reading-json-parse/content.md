@@ -6,7 +6,7 @@ By the end of this reading you should be able to answer:
 
 - What does `JSON.parse` do to a JSON string?
 - How do you access individual fields after parsing?
-- Why does `JSON.parse` fail on a missing key?
+- What goes wrong when the key is missing?
 
 You now know `JSON.stringify` turns an object into a string. `JSON.parse` does the reverse: it takes a JSON string and builds a live JavaScript object from it.
 
@@ -14,7 +14,7 @@ You now know `JSON.stringify` turns an object into a string. `JSON.parse` does t
 
 - `JSON.parse(str)` converts a JSON string back into a JS object.
 - Once parsed, you can access fields with `.` notation like any other object.
-- `JSON.parse` throws an error if the string is not valid JSON, so only call it when you know the key exists.
+- `JSON.parse` throws an error if the string is not valid JSON, and a missing key gives you `null` instead of a save, so check the key exists before you parse.
 
 **Try it:**
 
@@ -58,9 +58,11 @@ function draw() {
 
 **What you'll see:** the first run stores a default save. Refresh the page, and this time the console says "restored:" with the object. The canvas displays every field from the save.
 
-That's the pattern: `getItem` to pull the string out, `JSON.parse` to turn it back into something useful.
+That's the pattern: `getItem` hands back the JSON text you stored, and `JSON.parse` turns it back into something useful.
 
-**Watch out:** `JSON.parse(null)` or `JSON.parse(undefined)` throws an error. Always check `getItem` returns a real string before parsing.
+**Watch out:** on a first run `getItem` returns `null`. `JSON.parse(null)` gives back `null` without complaint, and the next line that reads a field, like `saved.score`, crashes. Always check `getItem` did not return `null` before you parse.
+
+**Pack and unpack in pairs.** `JSON.parse` is for text you packed with `JSON.stringify`. If you saved an object without packing it, `getItem` already gives the object back, and `JSON.parse` on an object throws an error.
 
 ---
 

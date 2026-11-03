@@ -1,0 +1,68 @@
+{
+  "id": "6-10-breakout-8-lab-hit-with-the-edges",
+  "title": "6.10.8 Lab: Hit with the edges",
+  "description": "The ball breaks bricks with its centre and sinks into them. Test its four edges instead, and send it back up-and-down or across depending on which edge hit.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.10 Breakout",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Top and bottom edges",
+      "instructions": "The starter is the game from 6.10.6, finished: the paddle, the ball, the wall from text and `hitAt`. `hitBricks()` still holds the centre test, `if (hitAt(ball.x, ball.y)) vy = -vy;`, and the ball still sinks into bricks and scrapes past them. `R` is the ball's radius, 6.\n\nReplace that line. Ask `hitAt` about the ball's top edge, `(ball.x, ball.y - R)`, and its bottom edge, `(ball.x, ball.y + R)`, joined with `||` in one `if`, and flip `vy` when either one hits a brick (6.10.7). Run it: the ball now turns as soon as its top touches a brick.",
+      "hints": [
+        "`if (hitAt(ball.x, ball.y - R) || hitAt(ball.x, ball.y + R)) vy = -vy;`",
+        "y grows downward, so the top of the ball is `ball.y - R`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Left and right edges",
+      "instructions": "Add a second `if` for the sides: the left edge `(ball.x - R, ball.y)` and the right edge `(ball.x + R, ball.y)`. A brick beside the ball sends it back across, so this one flips `vx`. Run it and play a full round. Bricks break the moment the ball touches them, from below, from above (once the ball gets behind the wall) and from the side, and the ball no longer slides through corners.",
+      "hints": [
+        "`if (hitAt(ball.x - R, ball.y) || hitAt(ball.x + R, ball.y)) vx = -vx;`",
+        "A brick beside the ball is like the canvas walls in 6.10.5: it flips vx, not vy."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The top and bottom edges flip vy",
+      "description": "hitAt is asked about (ball.x, ball.y - R) and (ball.x, ball.y + R), and a hit flips vy. Help: 6.10.7 (Reading: The ball has edges)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "hitBricks",
+      "pattern": "^(?=[\\s\\S]*?(?:\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b\\s*-\\s*\\(?\\s*(?:R\\b|6\\b|ball\\s*\\.\\s*(?:r|radius)\\b|\\(?\\s*ball\\s*\\.\\s*(?:d|w|h|diameter|width|height)\\s*\\/\\s*2\\b)|\\b(?:const|let|var)\\s+(?<a1r1>[A-Za-z_$][\\w$]*)\\s*=\\s*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b\\s*[;\\n][\\s\\S]*?\\b\\k<a1r1>\\s*-\\s*\\(?\\s*(?:R\\b|6\\b|ball\\s*\\.\\s*(?:r|radius)\\b|\\(?\\s*ball\\s*\\.\\s*(?:d|w|h|diameter|width|height)\\s*\\/\\s*2\\b)))(?=[\\s\\S]*?(?:\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b\\s*\\+\\s*\\(?\\s*(?:R\\b|6\\b|ball\\s*\\.\\s*(?:r|radius)\\b|\\(?\\s*ball\\s*\\.\\s*(?:d|w|h|diameter|width|height)\\s*\\/\\s*2\\b)|\\b(?:R|6)\\s*\\+\\s*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b|\\b(?:const|let|var)\\s+(?<a2r1>[A-Za-z_$][\\w$]*)\\s*=\\s*\\bball\\s*\\.\\s*(?:y|pos\\s*\\.\\s*y)\\b\\s*[;\\n][\\s\\S]*?\\b\\k<a2r1>\\s*\\+\\s*\\(?\\s*(?:R\\b|6\\b|ball\\s*\\.\\s*(?:r|radius)\\b|\\(?\\s*ball\\s*\\.\\s*(?:d|w|h|diameter|width|height)\\s*\\/\\s*2\\b)))(?=[\\s\\S]*?\\bhitAt\\s*\\([\\s\\S]*?\\bhitAt\\s*\\()(?=[\\s\\S]*?(?:\\bif\\s*\\((?=[^;{}]{0,200}\\bhitAt\\s*\\()[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bvy\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\b(?:(?:const|let|var)\\s+)?(?<h>[A-Za-z_$][\\w$]*)\\s*=(?!=)[^;\\n]{0,200}\\bhitAt\\s*\\([\\s\\S]{0,800}?\\bif\\s*\\((?=[^;{}]{0,200}\\b\\k<h>\\b)[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bvy\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bif\\s*\\((?=[^;{}]{0,200}\\bhitAt\\s*\\()[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?(?<g>[A-Za-z_$][\\w$]*)\\s*=(?!=)\\s*(?:true|1)\\b[\\s\\S]{0,800}?\\bif\\s*\\((?=[^;{}]{0,200}\\b\\k<g>\\b)[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bvy\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvy\\s*=(?!=)[^;\\n]{0,200}\\bhitAt\\s*\\([^;\\n]{0,200}\\?\\s*-\\s*\\(?\\s*vy\\b|\\bvy\\s*\\*=[^;\\n]{0,200}\\bhitAt\\s*\\([^;\\n]{0,200}\\?\\s*\\(?\\s*-\\s*1\\b|\\bhitAt\\s*\\([^;\\n]{0,200}\\)\\s*&&\\s*\\(?\\s*\\bvy\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vy\\b|0\\s*-\\s*vy\\b|\\(?\\s*vy\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vy\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vy\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The left and right edges flip vx",
+      "description": "hitAt is asked about (ball.x - R, ball.y) and (ball.x + R, ball.y), and a hit flips vx. Help: 6.10.7 (Reading: The ball has edges)",
+      "type": "inFunction",
+      "file": "script.js",
+      "function": "hitBricks",
+      "pattern": "^(?=[\\s\\S]*?(?:\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b\\s*-\\s*\\(?\\s*(?:R\\b|6\\b|ball\\s*\\.\\s*(?:r|radius)\\b|\\(?\\s*ball\\s*\\.\\s*(?:d|w|h|diameter|width|height)\\s*\\/\\s*2\\b)|\\b(?:const|let|var)\\s+(?<a1r2>[A-Za-z_$][\\w$]*)\\s*=\\s*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b\\s*[;\\n][\\s\\S]*?\\b\\k<a1r2>\\s*-\\s*\\(?\\s*(?:R\\b|6\\b|ball\\s*\\.\\s*(?:r|radius)\\b|\\(?\\s*ball\\s*\\.\\s*(?:d|w|h|diameter|width|height)\\s*\\/\\s*2\\b)))(?=[\\s\\S]*?(?:\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b\\s*\\+\\s*\\(?\\s*(?:R\\b|6\\b|ball\\s*\\.\\s*(?:r|radius)\\b|\\(?\\s*ball\\s*\\.\\s*(?:d|w|h|diameter|width|height)\\s*\\/\\s*2\\b)|\\b(?:R|6)\\s*\\+\\s*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b|\\b(?:const|let|var)\\s+(?<a2r2>[A-Za-z_$][\\w$]*)\\s*=\\s*\\bball\\s*\\.\\s*(?:x|pos\\s*\\.\\s*x)\\b\\s*[;\\n][\\s\\S]*?\\b\\k<a2r2>\\s*\\+\\s*\\(?\\s*(?:R\\b|6\\b|ball\\s*\\.\\s*(?:r|radius)\\b|\\(?\\s*ball\\s*\\.\\s*(?:d|w|h|diameter|width|height)\\s*\\/\\s*2\\b)))(?=[\\s\\S]*?\\bhitAt\\s*\\([\\s\\S]*?\\bhitAt\\s*\\()(?=[\\s\\S]*?(?:\\bif\\s*\\((?=[^;{}]{0,200}\\bhitAt\\s*\\()[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bvx\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vx\\b|0\\s*-\\s*vx\\b|\\(?\\s*vx\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vx\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vx\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\b(?:(?:const|let|var)\\s+)?(?<h>[A-Za-z_$][\\w$]*)\\s*=(?!=)[^;\\n]{0,200}\\bhitAt\\s*\\([\\s\\S]{0,800}?\\bif\\s*\\((?=[^;{}]{0,200}\\b\\k<h>\\b)[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bvx\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vx\\b|0\\s*-\\s*vx\\b|\\(?\\s*vx\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vx\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vx\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bif\\s*\\((?=[^;{}]{0,200}\\bhitAt\\s*\\()[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?(?<g>[A-Za-z_$][\\w$]*)\\s*=(?!=)\\s*(?:true|1)\\b[\\s\\S]{0,800}?\\bif\\s*\\((?=[^;{}]{0,200}\\b\\k<g>\\b)[^;{}]{0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\bvx\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vx\\b|0\\s*-\\s*vx\\b|\\(?\\s*vx\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vx\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vx\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)|\\bvx\\s*=(?!=)[^;\\n]{0,200}\\bhitAt\\s*\\([^;\\n]{0,200}\\?\\s*-\\s*\\(?\\s*vx\\b|\\bvx\\s*\\*=[^;\\n]{0,200}\\bhitAt\\s*\\([^;\\n]{0,200}\\?\\s*\\(?\\s*-\\s*1\\b|\\bhitAt\\s*\\([^;\\n]{0,200}\\)\\s*&&\\s*\\(?\\s*\\bvx\\s*(?:=(?!=)\\s*\\(?\\s*(?:-\\s*\\(?\\s*vx\\b|0\\s*-\\s*vx\\b|\\(?\\s*vx\\s*\\)?\\s*\\*\\s*\\(?\\s*-\\s*1\\b|-\\s*1\\s*\\*\\s*vx\\b|-?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(\\s*vx\\s*\\))|\\*=\\s*\\(?\\s*-\\s*1\\b)))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

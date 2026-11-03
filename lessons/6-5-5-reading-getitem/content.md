@@ -28,10 +28,10 @@ function draw() {
 
 `getItem` returns one of two things:
 
-- A **string** if the key exists, even if you originally stored a number.
+- **The value you saved, as the same type.** Save a number and you get a number back; save text and you get text back; save `true` and you get `true` back.
 - `null` if the key has never been saved.
 
-This has a catch: comparing strings and numbers can give surprising results. `"42" > "100"` is `true` in JavaScript because strings compare character by character. The fix: wrapping `getItem` in `Number()`: is covered in the next reading (6.5.6).
+That is different from the browser's own `localStorage` in 3.8.15, which gave back text whatever you saved. moSHion's `storeItem` writes your value down in a form that remembers its type, and `getItem` reads it back that way. What to do with that `null`, and the one case where you still get text, is the next reading (6.5.6).
 
 ---
 
@@ -39,6 +39,6 @@ This has a catch: comparing strings and numbers can give surprising results. `"4
 
 | Term | Meaning |
 |------|---------|
-| **`getItem(key)`** | moSHion function: reads the value from the save slot named `key`. Returns a string, or `null` if nothing was saved yet. |
+| **`getItem(key)`** | moSHion function: reads the value from the save slot named `key`. Returns it as the type you saved (a number stays a number), or `null` if nothing was saved yet. |
 | **key** | The string name of the save slot you want to read: must match the key you used with `storeItem`. |
 | **`null`** | JavaScript's way of saying "nothing here." `getItem` returns `null` when the key has never been used. |

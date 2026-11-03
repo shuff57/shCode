@@ -1,0 +1,107 @@
+{
+  "id": "6-9-grids-8-lab-the-next-level",
+  "title": "6.9.8 Lab: The next level",
+  "description": "The game has three maps in a list called levels, but the screen is blank and the goal ends nothing. Write loadLevel(n) to throw the old level away and build level n, then make the goal move on to the next level, and win after the last one.",
+  "type": "lesson",
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.9 Grids and Tile Maps",
+  "estimateMins": 20,
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build level n",
+      "instructions": "The starter keeps three maps in `levels`, and `startGame()` resets the score and calls `loadLevel(levelNum)`; the screen is blank until you fill in `loadLevel(n)`. In it, do four things in order. First delete the old level if there is one: `if (level) level.delete();` (the first time there is no `level` yet, and an unset variable is falsy, so the `if` skips it). Then set `map = levels[n];`. Then build the new level exactly as in 6.9.4: `level = new Tiles(map, TILE / 2, TILE / 2, TILE, TILE, { '#': walls, 'c': coins, 'G': goals });`. Last, put the player on the new map's P: `const start = findStart(map);` then `player.x = start.x;` and `player.y = start.y;`. Run it: level 1 of 3 appears with the player on its P.",
+      "hints": [
+        "`level.delete()` is from 6.9.2: `Tiles` gives back a Group of every tile, and `delete()` clears the lot. Without it, level 2 would be built on top of level 1.",
+        "`levels[n]` is one whole map, the way `levels[1][3][2]` is a letter in 6.9.5. `findStart` is from 6.9.6 and already in the starter."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Next level, then the end",
+      "instructions": "In `checkGoal()`, when no coins are left and the player is on the goal, add 1 to `levelNum` with `levelNum += 1;`. Then ask whether that was the last level: when `levelNum === levels.length` set `won = true;`, otherwise call `loadLevel(levelNum);` to build the next one. Play it through: level 2 and level 3 should load with their own coins, and after level 3 the screen says 'You escaped!'. R starts over.",
+      "hints": [
+        "The whole body goes inside `if (coins.length === 0 && player.overlaps(goals)) { ... }`, the test from 6.9.7.",
+        "After three goals `levelNum` is 3, which equals `levels.length`, so there is no level 3 to load: that is the end of the game."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The old level is thrown away",
+      "description": "level.delete() before a new level is built (the first time there is no level yet). Help: 6.9.2 (Reading: A map is rows of text)",
+      "type": "inFunction",
+      "function": "loadLevel",
+      "file": "script.js",
+      "pattern": "\\blevel\\s*\\??\\.\\s*(?:delete|remove|deleteAll)\\s*\\(|^(?=[\\s\\S]*\\bwalls\\s*\\.\\s*(?:deleteAll|delete)\\s*\\()(?=[\\s\\S]*\\bcoins\\s*\\.\\s*(?:deleteAll|delete)\\s*\\()(?=[\\s\\S]*\\bgoals\\s*\\.\\s*(?:deleteAll|delete)\\s*\\()",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The new level comes from the levels list",
+      "description": "loadLevel(n) builds level n with Tiles, using levels[n]. Help: 6.9.5 (Reading: Reading a map as data)",
+      "type": "inFunction",
+      "function": "loadLevel",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*\\bnew\\s+Tiles\\s*\\()(?=[\\s\\S]*\\blevels\\s*\\[\\s*[A-Za-z_$])",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "The player is put on the new level's P",
+      "description": "findStart on the new map, then player.x and player.y. Help: 6.9.6 (Lab: Find the start)",
+      "type": "inFunction",
+      "function": "loadLevel",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*\\bfindStart\\s*\\()(?=[\\s\\S]*\\bplayer\\.(?:x|pos(?:ition)?)\\b)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "Reaching the goal moves to the next level",
+      "description": "The goal test (no coins left AND the player on the goal) comes first, then levelNum goes up by 1 and loadLevel builds that level. Help: step 2 of this lab",
+      "type": "inFunction",
+      "function": "checkGoal",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*\\bcoins\\.length\\b[\\s\\S]*?(?:\\blevelNum\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\+\\+\\s*levelNum\\b|\\blevelNum\\s*=\\s*levelNum\\s*\\+\\s*1\\b))(?=[\\s\\S]*\\b(?:player\\.overlaps\\s*\\(\\s*goals|goals\\.overlaps\\s*\\(\\s*player)\\b[\\s\\S]*?(?:\\blevelNum\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\+\\+\\s*levelNum\\b|\\blevelNum\\s*=\\s*levelNum\\s*\\+\\s*1\\b))(?=[\\s\\S]*\\bloadLevel\\s*\\()",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "The last level ends the game",
+      "description": "After the final level, won becomes true instead of loading another. Help: 6.9.5 (Reading: Reading a map as data), where levels.length is how many levels there are",
+      "type": "inFunction",
+      "function": "checkGoal",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*(?:\\blevelNum\\b[^;{}]*\\blevels\\.length\\b|\\blevels\\.length\\b[^;{}]*\\blevelNum\\b|\\blevelNum\\s*(?:===?|>=|>|<)\\s*\\d|\\b(?:const|let|var)\\s+(?<ll>[A-Za-z_$][\\w$]*)\\s*=\\s*[^;]*\\blevels\\.length\\b[^;]*;[\\s\\S]*?(?:\\blevelNum\\b[^;{}]*\\b\\k<ll>\\b|\\b\\k<ll>\\b[^;{}]*\\blevelNum\\b)))(?=[\\s\\S]*\\bwon\\s*=\\s*true\\b)",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

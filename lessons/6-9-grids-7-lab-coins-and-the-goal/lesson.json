@@ -1,0 +1,94 @@
+{
+  "id": "6-9-grids-7-lab-coins-and-the-goal",
+  "title": "6.9.7 Lab: Coins and the goal",
+  "description": "The player walks the maze but the coins do nothing and the goal never opens. Pick up each coin when the player touches it, count it in the score, and let the goal win only when no coin is left.",
+  "type": "lesson",
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.9 Grids and Tile Maps",
+  "estimateMins": 20,
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick up the coins",
+      "instructions": "The starter has the whole maze, the player on its P, a `score` that starts at 0, and a `won` flag. In `collect()`, use the callback form of `overlaps` from 6.2.3: `player.overlaps(coins, (p, coin) => { ... });`. Inside the braces, delete that coin with `coin.delete();` and add 1 to the score with `score += 1;`. Run it: walk over a coin, it should vanish, `coins left` should drop by 1 and `score` should go up by 1.",
+      "hints": [
+        "`player.overlaps(coins, (p, coin) => { ... });` runs the braces once for each coin the player is touching. `coin` is that one coin.",
+        "Inside the braces: `coin.delete();` and `score += 1;`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "The goal opens last",
+      "instructions": "In `checkGoal()`, set `won` to `true` when no coins are left AND the player is on the goal. `coins.length === 0` is true when no coins are left; `player.overlaps(goals)` is true while the player touches the green goal. Join the two with `&&`, as in `if (coins.length === 0 && player.overlaps(goals)) { won = true; }`. Try the goal first: nothing should happen until the last coin is gone, only 'Grab every coin first!'. Then collect all five and walk onto the goal: 'You escaped!' appears.",
+      "hints": [
+        "`coins.length === 0` counts the coins still in the group. Every `coin.delete()` takes one out.",
+        "Both tests go in one `if`, joined with `&&`, so the goal does nothing while a coin is left."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Walking over a coin picks it up",
+      "description": "When the player overlaps a coin, that coin is deleted. Help: 6.2.3 (Reading: moSHion docs: Collisions + Overlaps)",
+      "type": "inFunction",
+      "function": "collect",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*(?:\\bplayer\\.overlaps\\s*\\(\\s*[\\w$]+|\\bcoins\\.overlaps\\s*\\(\\s*player\\b))(?=[\\s\\S]*\\.(?:delete|remove)\\s*\\(\\s*\\))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Each coin adds to the score",
+      "description": "Picking up a coin raises score. Help: 6.2.2 (Worked Example: Apple Catcher)",
+      "type": "inFunction",
+      "function": "collect",
+      "file": "script.js",
+      "pattern": "\\bscore\\s*(?:\\+=\\s*[1-9]\\d*|\\+\\+|=\\s*score\\s*\\+\\s*[1-9]\\d*)|\\+\\+\\s*score\\b",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "The goal only counts when no coins are left",
+      "description": "checkGoal asks both: no coins left AND the player is on the goal. Help: 6.9.5 (Reading: Reading a map as data), where && joins tests and stops at the first false one",
+      "type": "inFunction",
+      "function": "checkGoal",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*(?:&&|\\bif\\s*\\([\\s\\S]*\\bif\\s*\\())^(?=[\\s\\S]*(?:\\bcoins\\.length\\s*(?:===?\\s*0|<=\\s*0|<\\s*1)\\b|\\b0\\s*===?\\s*coins\\.length\\b|!\\s*coins\\.length\\b))(?=[\\s\\S]*(?:\\bplayer\\.overlaps\\s*\\(\\s*goals\\b|\\bgoals\\.overlaps\\s*\\(\\s*player\\b))",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "Reaching the goal wins",
+      "description": "When both are true, set won to true. Help: step 2 of this lab",
+      "type": "inFunction",
+      "function": "checkGoal",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\([^{}]*\\)\\s*(?:\\{[^}]*)?\\bwon\\s*=\\s*true\\b|\\bwon\\s*=\\s*[^;]*&&",
+      "flags": "",
+      "ignoreStrings": true,
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

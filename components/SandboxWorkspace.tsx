@@ -11,6 +11,7 @@ import Console from './Console';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import TextureEditor from './TextureEditor';
+import SoundMixer from './SoundMixer';
 import DocsDrawer from './DocsDrawer';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode } from '../lib/js-runner-source';
 import {
@@ -458,6 +459,17 @@ export default function SandboxWorkspace() {
           content: <TextureEditor />,
           headerExtra: (
             <a href="/textures" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+              Full page ↗
+            </a>
+          ),
+        } as DrawerTab,
+        {
+          key: 'sounds',
+          label: 'Sounds',
+          color: '#50fa7b',
+          content: <SoundMixer />,
+          headerExtra: (
+            <a href="/sound" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
               Full page ↗
             </a>
           ),
