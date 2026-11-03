@@ -7411,6 +7411,32 @@
       "scoreKind": null
     },
     {
+      "id": "5-2-update-1-reading-update-runs-before-physics",
+      "title": "5.2.21 Reading: update() runs before physics",
+      "unit": "5.2 Physics Feel",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-2-update-2-lab-rules-in-update",
+      "title": "5.2.22 Lab: Rules in update(), picture in draw()",
+      "unit": "5.2 Physics Feel",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "5-3-1-slides",
       "title": "5.6.1 Slides: Object-Oriented Programming",
       "unit": "5.6 Classes and Objects via moSHion",
@@ -8057,6 +8083,32 @@
       "week": 11,
       "assignmentCode": null,
       "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-3-pinball-sound-1-reading-a-sound-on-a-hit",
+      "title": "5.3.13 Reading: A sound on a hit",
+      "unit": "5.3 Project: Pinball",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-3-pinball-sound-2-lab-a-chime-on-every-hit",
+      "title": "5.3.14 Lab: A chime on every bumper hit",
+      "unit": "5.3 Project: Pinball",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
     },
