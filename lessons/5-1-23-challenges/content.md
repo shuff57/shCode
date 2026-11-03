@@ -1,97 +1,22 @@
-## Challenge 1: Color-changing sprite (easy)
+## Challenges
 
-Make the player sprite change color every time any arrow key is pressed.
+These are the same challenges as the Steps panel beside the editor. The Steps panel is the one to follow; this page only repeats it.
 
-**Hints:**
-- Use `kb.presses('left')` (not `pressing`) so the color only changes once per key tap, not 60 times per second.
-- Pick from an array of colors: `let colors = ['red', 'green', 'blue', 'hotpink'];`
-- Keep a counter and do `colors[counter % colors.length]` to cycle.
+1. **Create a canvas.** Inside `setup()`, create a canvas of any size.
+2. **Create at least one sprite.** In `setup()`, create a sprite and store it in the top-level `player` variable.
+3. **Clear the background each frame.** Call `background()` as the first line of `draw()` so old frames don't stack up.
+4. **Build one challenge.** Pick one of the challenges below and build it in `draw()`. The check turns green once any one of them is in `draw()`, so one is enough on its own.
 
-**Stretch it further:** random color each press: `player.color = colors[Math.floor(Math.random() * colors.length)];`
+**Challenge 1: color by key (easy).** While an arrow key is held, the player wears a different color: test the key with `kb.pressing(...)` (5.1.13) and set `player.color`.
 
----
+**Challenge 2: an orbiting companion (medium).** A second sprite circles the player. Every frame, set its `pos.x` to `player.pos.x + cos(frameCount * 0.05) * 60`, and its `pos.y` the same way with `sin` (5.1.22).
 
-## Challenge 2: Orbiting companion (medium)
+**Challenge 3: show a value (easy).** Draw one of the player's values on the canvas with `text()` (5.1.21), joining words and a number with `+`, for example `text('x: ' + player.pos.x, 10, 20);`.
 
-Add a second sprite that moves in a **circle** around the player. It should follow the player wherever the player goes.
+**Challenge 4: a HUD (medium).** At the top of the canvas, show `'Frame: ' + frameCount` on one line and the player's x and y on the next, one `text()` call per line.
 
-**Hints:**
-- Use both `sin` and `cos`:
-  ```js
-  companion.pos.x = player.pos.x + cos(frameCount * 0.05) * 60;
-  companion.pos.y = player.pos.y + sin(frameCount * 0.05) * 60;
-  ```
-- Because `companion.pos.x/y` is set every frame, the companion won't respond to physics: that's fine for this challenge.
+**Challenge 5: a wave (medium).** A sprite that bobs up and down on its own: every frame, set its `pos.y` to a middle value plus `sin(frameCount * 0.05) * 80`, the way 5.1.22's mover swings sideways.
 
-**Stretch it further:** two companions orbiting in opposite directions (one uses `+frameCount`, one uses `-frameCount`).
+**Your own idea.** Something else beyond a canvas, a sprite and a background counts too. Two that work: a player that spins, with `player.rotation = frameCount * 2;` (5.1.22), or a fading trail: write `background('rgba(34, 34, 34, 0.1)')` in place of `background('#222')`. The last number makes each frame's paint only 10% solid, so the old frames fade out slowly behind a moving sprite instead of vanishing at once (moSHion docs: Background and clearing).
 
----
-
-## Challenge 3: Inspect + display (hard)
-
-Open browser DevTools (`F12`) with your sketch running, poke at `player` in the Console tab, then render one of the values you found **on the canvas** using `text()`.
-
-**Hints:**
-- In DevTools: try `player.color`, `player.constructor.name`, `Object.keys(player)`. You don't need to understand all of it: you'll learn about classes in Week 12.
-- Back in the editor, `text('hello', 10, 20)` draws text at pixel (10, 20). Call `fill(255)` and `textSize(14)` first.
-- Render something dynamic: `text(\`x: ${Math.round(player.pos.x)}\`, 10, 20)` updates as the sprite moves.
-
-**Stretch it further:** Two lines of text: one for `player.color`, one for `player.pos`. Use a template string to combine them.
-
----
-
-## Challenge 4, On-screen HUD with multiple values (medium)
-
-Display three things at the top of your canvas:
-- The current `frameCount`
-- The current player `x` and `y` position (rounded to integers)
-- The current frame rate (`frameRate()` returns the actual fps)
-
-**Hints:**
-- Use `textSize(14); fill(255);` before drawing text.
-- `text()` can be called multiple times at different y positions.
-- `Math.round(player.pos.x)` keeps the number from jittering.
-
-**Example output:**
-```
-Frame: 432
-Player: (247, 103)
-FPS: 60.0
-```
-
----
-
-## Challenge 5: Trail effect (medium, creative)
-
-Make the player sprite leave a trail behind it as it moves.
-
-**Hints:**
-- Easy path: call `background('rgba(34, 34, 34, 0.1)')` instead of `background('#222')`. It is the same dark grey (`#222` is red, green and blue 34 each), but the last number makes it only 10% solid, so each frame paints only part of the way over the last one and older frames fade instead of vanishing (moSHion docs: Background and clearing). The last number runs from 0 (see-through) to 1 (solid).
-- Honest path: track the last N positions in an array. Each frame, `trail.push({x: player.pos.x, y: player.pos.y})` then `trail.shift()` once the array is longer than you want.
-- To draw the trail, `circle(x, y, 6)` works, and `fill('rgba(255, 255, 255, ' + (i / trail.length) + ')')` fades older positions: the oldest point (`i` near 0) is nearly see-through and the newest is solid. Give `fill()` one colour like this: moSHion reads only the first value, so `fill(255, 255, 255, 120)` paints solid white.
-
-**Stretch it further:** rainbow trail: vary `fill()` by `i` so each trail-point is a different hue.
-
----
-
-## Challenge 6: Very hard, very stretchy: mouse-following
-
-Make a third sprite that always follows the **mouse cursor**, but smoothly, not snappily.
-
-**Hints:**
-- `mouse.x` and `mouse.y` give the mouse position each frame.
-- For smoothness, use linear interpolation: `lerp(a, b, t)` returns a value `t` of the way from `a` to `b`.
-  ```js
-  third.pos.x = lerp(third.pos.x, mouse.x, 0.05);
-  third.pos.y = lerp(third.pos.y, mouse.y, 0.05);
-  ```
-- Smaller `t` = laggier follow. Larger `t` = snappier.
-
-This is the same math you'll use in Module 6.4 for smooth camera follow.
-
----
-
-## If you finish all six
-
-- Try pairing up: give your best challenge solution to a classmate to read. Explain what it does.
-- Browse `/docs/moshion` beyond the chapters this week. Find one feature that looks interesting. Read about it. Come tell the class next session what you found.
+Doing more than one challenge is fine: the check needs only one.

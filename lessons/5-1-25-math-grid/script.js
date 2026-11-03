@@ -1,4 +1,4 @@
-// 5.1.25 Lab: A grid like math (optional).
+// 5.1.26 Lab: A grid like math (optional).
 // A preview of an optional mode. No later lesson needs it.
 
 let box;

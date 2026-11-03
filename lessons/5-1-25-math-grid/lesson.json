@@ -1,6 +1,6 @@
 {
   "id": "5-1-25-math-grid",
-  "title": "5.1.25 Lab: A grid like math (optional)",
+  "title": "5.1.26 Lab: A grid like math (optional)",
   "description": "Optional: a preview of an optional mode. Draw a grid over the canvas, then switch it to math mode, where (0, 0) is the centre and y grows up. Nothing after this lab needs it, and it is not graded.",
   "type": "lesson",
   "estimateMins": 10,
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Draw the grid",
-      "instructions": "This lab is optional: it previews a mode the rest of the course does not use. Click Run first. The starter already works: a 400 by 400 canvas, painted dark. Now, inside draw(), on the line after `background('#222');`, add `showGrid(50);` and Run again. It draws a light grid with a line every 50 pixels and numbers along the top and left edges. Read it: (0, 0) is the top-left corner, x grows to the right, and y grows DOWN, so a bigger y is lower on the canvas. That is the default, the same as the browser's own canvas and every sketch you have made so far. showGrid() goes in draw(), not setup(): it draws for one frame at a time, so draw() has to ask for it every frame.",
+      "instructions": "This lab is optional: it previews a mode the rest of the course does not use.\n\nClick Run first. The starter already works: a 400 by 400 canvas, painted dark.\n\nNow, inside draw(), on the line after `background('#222');`, add `showGrid(50);` and Run again. It draws a light grid with a line every 50 pixels and numbers along the top and left edges.\n\nRead it: (0, 0) is the top-left corner, x grows to the right, and y grows DOWN, so a bigger y is lower on the canvas. That is the default, the same as the browser's own canvas and every sketch you have made so far.\n\nshowGrid() goes in draw(), not setup(): it draws for one frame at a time, so draw() has to ask for it every frame.",
       "hints": [
         "Open the moSHion docs drawer on the right and find the Coordinates section."
       ]
@@ -85,11 +85,11 @@
     {
       "id": "r3",
       "title": "A sprite above the centre",
-      "description": "A sprite is made with a positive second number, its y, such as new Sprite(100, 50, 40, 40). In math mode a positive y is above the centre. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+      "description": "A sprite is made with a positive second number, its y, such as new Sprite(100, 50, 40, 40). A variable holding the y, or a sum such as 25 * 2, counts too. In math mode a positive y is above the centre. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "hint": "The second number inside new Sprite( ) is y. Make it a number above 0, like 50.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Sprite\\s*\\(\\s*[^,()]+,\\s*\\+?(?!0*\\.?0*\\s*[,)])\\d*\\.?\\d+\\s*[,)]",
+      "pattern": "new\\s+Sprite\\s*\\(\\s*[^,()]+,\\s*(?:\\+?(?!0*\\.?0*\\s*[,)*])\\d*\\.?\\d+(?:\\s*[*+]\\s*\\d*\\.?\\d+){0,3}|[A-Za-z_$][\\w$.]*(?:\\s*[*/+]\\s*[\\w$.]+){0,3})\\s*[,)]",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -118,7 +118,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.25 Lab: A grid like math (optional)\". The task they were given: An optional lab. In draw(), after the background, call showGrid(50) to draw a grid. In setup(), on the line right after new Canvas(400, 400), switch on math mode with world.origin set to 'math', so (0, 0) is the centre and y grows up. Below that, still in setup(), make a sprite at (100, 50), 40 by 40, and store it in box. In draw(), call showMouse() so the pointer's (x, y) shows beside it. What the starter file already had: `let box;` at the top, a 400 by 400 canvas in setup(), and background('#222') in draw(), with step comments and nothing else. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: showGrid(spacing) and showMouse() draw for one frame at a time, so they belong in draw(), which runs every frame; called only in setup() they show for one frame and vanish. world.origin can only be 'screen' (the default: (0, 0) at the top-left, y grows down) or 'math' ((0, 0) at the centre, y grows up). Setting it after a sprite has been made, after gravity has been turned on, or once frames have run stops the sketch with an error that says to move the line up. In math mode a positive y is above the centre. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.26 Lab: A grid like math (optional)\". The task they were given: An optional lab. In draw(), after the background, call showGrid(50) to draw a grid. In setup(), on the line right after new Canvas(400, 400), switch on math mode with world.origin set to 'math', so (0, 0) is the centre and y grows up. Below that, still in setup(), make a sprite at (100, 50), 40 by 40, and store it in box. In draw(), call showMouse() so the pointer's (x, y) shows beside it. What the starter file already had: `let box;` at the top, a 400 by 400 canvas in setup(), and background('#222') in draw(), with step comments and nothing else. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: showGrid(spacing) and showMouse() draw for one frame at a time, so they belong in draw(), which runs every frame; called only in setup() they show for one frame and vanish. world.origin can only be 'screen' (the default: (0, 0) at the top-left, y grows down) or 'math' ((0, 0) at the centre, y grows up). Setting it after a sprite has been made, after gravity has been turned on, or once frames have run stops the sketch with an error that says to move the line up. In math mode a positive y is above the centre. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
@@ -135,7 +135,7 @@
       {
         "id": "r3",
         "title": "A sprite above the centre",
-        "description": "A sprite is made with new Sprite(...) whose second number, its y, is above 0, such as the lab's (100, 50). In math mode a positive y is above the centre. Any positive y and any x count, and storing it in box is what the step asks but is not needed for this card. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "description": "A sprite is made with new Sprite(...) whose second number, its y, is above 0, such as the lab's (100, 50). In math mode a positive y is above the centre. Any positive y and any x count (a variable or a sum that works out above 0 counts too), and storing it in box is what the step asks but is not needed for this card. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
         "points": 1
       },
       {

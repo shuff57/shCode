@@ -47,10 +47,10 @@
     {
       "id": "r1",
       "title": "Moved the sprite",
-      "description": "Change the first two numbers in new Sprite(...) so the sprite sits somewhere other than the center. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+      "description": "Change the first two numbers in new Sprite(...) so the sprite sits somewhere other than the center. A negative number or a decimal counts too. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Sprite\\s*\\(\\s*(?!180\\s*,\\s*180\\s*,)\\d+\\s*,\\s*\\d+\\s*,",
+      "pattern": "new\\s+Sprite\\s*\\(\\s*(?!180(?:\\.0+)?\\s*,\\s*180(?:\\.0+)?\\s*,)-?\\d+(?:\\.\\d+)?\\s*,\\s*-?\\d+(?:\\.\\d+)?\\s*,",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -59,10 +59,10 @@
     {
       "id": "r2",
       "title": "Resized the sprite",
-      "description": "Change the last two numbers in new Sprite(...) so the sprite is not 60 by 60. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+      "description": "Change the last two numbers in new Sprite(...) so the sprite is not 60 by 60. A decimal counts too. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Sprite\\s*\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*(?!60\\s*,\\s*60\\s*\\))\\d+\\s*,\\s*\\d+\\s*\\)",
+      "pattern": "new\\s+Sprite\\s*\\(\\s*-?\\d+(?:\\.\\d+)?\\s*,\\s*-?\\d+(?:\\.\\d+)?\\s*,\\s*(?!60(?:\\.0+)?\\s*,\\s*60(?:\\.0+)?\\s*\\))-?\\d+(?:\\.\\d+)?\\s*,\\s*-?\\d+(?:\\.\\d+)?\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -93,13 +93,13 @@
       {
         "id": "r1",
         "title": "Moved the sprite",
-        "description": "The sprite no longer sits at the starter's 180, 180: at least one of the first two numbers in new Sprite(...) is different, so it is somewhere other than the centre. Any new position counts, even one near an edge. Moving it another way, such as setting its x or y on a later line, counts too. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "description": "The sprite no longer sits at the starter's 180, 180: at least one of the first two numbers in new Sprite(...) is different, so it is somewhere other than the centre. Any new position counts, even one near an edge, a negative number or a decimal. Moving it another way, such as setting its x or y on a later line, counts too. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "Resized the sprite",
-        "description": "The sprite is no longer 60 by 60: at least one of the last two numbers (width, height) is different. Any new size counts. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "description": "The sprite is no longer 60 by 60: at least one of the last two numbers (width, height) is different. Any new size counts, decimals too. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
         "points": 1
       },
       {

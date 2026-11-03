@@ -1,4 +1,4 @@
-// 5.1.24 Challenges (reference solution).
+// 5.1.25 Challenges (reference solution).
 // Demonstrates Challenge 1 (stretched: the color cycles once per tap with
 // kb.presses, which 5.2.9 teaches), Challenge 2 (orbiting companion) and
 // Challenge 4 (frameCount HUD). Any one of the five challenges listed in

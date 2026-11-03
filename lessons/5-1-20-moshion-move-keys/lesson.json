@@ -31,10 +31,10 @@
     {
       "id": "s3",
       "title": "Horizontal movement",
-      "instructions": "In `draw()`, use the pattern from 5.1.17: if the left key is held, set `player.vel.x` to `-4`; else if the right key is held, set it to `4`; else set it to `0`. Choose `'a'` and `'d'` or `'left'` and `'right'`.",
+      "instructions": "In `draw()`, use the pattern from 5.1.16: if the left key is held, set `player.vel.x` to `-4`; else if the right key is held, set it to `4`; else set it to `0`. Choose `'a'` and `'d'` or `'left'` and `'right'`.",
       "hints": [
         "Positive `vel.x` moves right and negative moves left.",
-        "The final `else` that sets `vel.x` to `0` is what stops the sprite when you let go (5.1.18)."
+        "The final `else` that sets `vel.x` to `0` is what stops the sprite when you let go (5.1.17)."
       ]
     },
     {
@@ -74,11 +74,10 @@
     {
       "id": "r3",
       "title": "Horizontal keyboard input",
-      "description": "The left or right key (`'a'`, `'d'`, `'left'` or `'right'`) is read each frame. Help: 5.1.14 (Key names: WASD and the arrow keys)",
-      "type": "inFunction",
-      "function": "draw",
+      "description": "The left or right key (`'a'`, `'d'`, `'left'` or `'right'`) is read each frame, in draw() or in a function of your own (not setup(), which runs once). Help: 5.1.14 (Key names: WASD and the arrow keys)",
+      "type": "regex",
       "file": "script.js",
-      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:left|right|a|d)['\"]",
+      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:kb\\.pressing\\s*\\(\\s*['\"](?:[aAdD]|(?:[Aa]rrow)?(?:[Ll]eft|[Rr]ight))['\"])",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -86,23 +85,22 @@
     {
       "id": "r4",
       "title": "Vertical keyboard input",
-      "description": "The up or down key (`'w'`, `'s'`, `'up'` or `'down'`) is read each frame. Help: 5.1.14 (Key names: WASD and the arrow keys)",
-      "type": "inFunction",
-      "function": "draw",
+      "description": "The up or down key (`'w'`, `'s'`, `'up'` or `'down'`) is read each frame, in draw() or in a function of your own (not setup(), which runs once). Help: 5.1.14 (Key names: WASD and the arrow keys)",
+      "type": "regex",
       "file": "script.js",
-      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:up|down|w|s)['\"]",
+      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:kb\\.pressing\\s*\\(\\s*['\"](?:[wWsS]|(?:[Aa]rrow)?(?:[Uu]p|[Dd]own))['\"])",
       "flags": "",
       "points": 0,
       "status": "pending"
     },
     {
       "id": "r5",
-      "title": "Set horizontal velocity",
-      "description": "Horizontal velocity is set each frame. Help: 5.1.16 (Velocity: vel.x and vel.y)",
-      "type": "inFunction",
-      "function": "draw",
+      "title": "Set horizontal velocity, and stop",
+      "description": "The left and right keys set vel.x each frame, and vel.x goes back to 0 when neither key is held, so the sprite stops when you let go. The final else that sets it to 0 does this; setting it to 0 at the top of draw(), before the key checks, works too. Help: 5.1.15 (Velocity: vel.x and vel.y) and 5.1.17 (The else-to-zero rule)",
+      "hint": "Tap a left or right key and let go. If the sprite keeps sliding, nothing sets vel.x back to 0 when no key is held.",
+      "type": "regex",
       "file": "script.js",
-      "pattern": "\\.vel\\.x\\s*=(?!=)",
+      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\.\\s*vel\\s*\\.\\s*x\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.]))[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$))",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -110,12 +108,12 @@
     },
     {
       "id": "r6",
-      "title": "Set vertical velocity",
-      "description": "Vertical velocity is set each frame. Help: 5.1.16 (Velocity: vel.x and vel.y)",
-      "type": "inFunction",
-      "function": "draw",
+      "title": "Set vertical velocity, and stop",
+      "description": "The up and down keys set vel.y each frame, and vel.y goes back to 0 when neither key is held, so the sprite stops when you let go. The final else that sets it to 0 does this; setting it to 0 at the top of draw(), before the key checks, works too. Help: 5.1.15 (Velocity: vel.x and vel.y) and 5.1.17 (The else-to-zero rule)",
+      "hint": "Tap an up or down key and let go. If the sprite keeps sliding, nothing sets vel.y back to 0 when no key is held.",
+      "type": "regex",
       "file": "script.js",
-      "pattern": "\\.vel\\.y\\s*=(?!=)",
+      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\.\\s*vel\\s*\\.\\s*y\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.]))[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$))",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -160,25 +158,25 @@
       {
         "id": "r3",
         "title": "Horizontal keyboard input",
-        "description": "Inside draw() (or update(), if the student wrote one), a left or right key is read every frame with kb.pressing(...): 'a', 'd', 'left', 'right', or another spelling of the arrow keys. Help: 5.1.14 (Key names: WASD and the arrow keys)",
+        "description": "Inside draw() (or update(), or a function of the student's that they call from there), a left or right key is read every frame with kb.pressing(...): 'a', 'd', 'left', 'right', or another spelling of the arrow keys. Help: 5.1.14 (Key names: WASD and the arrow keys)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "Vertical keyboard input",
-        "description": "Inside draw() (or update(), if the student wrote one), an up or down key is read every frame with kb.pressing(...): 'w', 's', 'up', 'down', or another spelling of the arrow keys. Help: 5.1.14 (Key names: WASD and the arrow keys)",
+        "description": "Inside draw() (or update(), or a function of the student's that they call from there), an up or down key is read every frame with kb.pressing(...): 'w', 's', 'up', 'down', or another spelling of the arrow keys. Help: 5.1.14 (Key names: WASD and the arrow keys)",
         "points": 1
       },
       {
         "id": "r5",
-        "title": "Set horizontal velocity",
-        "description": "Inside draw() (or update()), the sprite's vel.x is set every frame, to numbers such as a speed, the opposite speed and 0. Changing the sprite's x position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.16 (Velocity: vel.x and vel.y)",
+        "title": "Set horizontal velocity, and stop",
+        "description": "Inside draw() (or update(), or a function of the student's that they call), the sprite's vel.x is set every frame from the left and right keys, AND it goes back to 0 when neither key is held, so the sprite stops when the key is let go. The final else that sets 0 is the course's shape; setting vel.x to 0 at the top of draw() before the key checks, or a ternary that ends in 0, also counts. Separate ifs with nothing that sets 0 leave the sprite drifting after one tap, so that is not met yet. Changing the sprite's x position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.15 (Velocity: vel.x and vel.y) and 5.1.17 (The else-to-zero rule)",
         "points": 1
       },
       {
         "id": "r6",
-        "title": "Set vertical velocity",
-        "description": "Inside draw() (or update()), the sprite's vel.y is set every frame, to numbers such as a speed, the opposite speed and 0. Changing the sprite's y position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.16 (Velocity: vel.x and vel.y)",
+        "title": "Set vertical velocity, and stop",
+        "description": "Inside draw() (or update(), or a function of the student's that they call), the sprite's vel.y is set every frame from the up and down keys, AND it goes back to 0 when neither key is held, so the sprite stops when the key is let go. The final else that sets 0 is the course's shape; setting vel.y to 0 at the top of draw() before the key checks, or a ternary that ends in 0, also counts. Separate ifs with nothing that sets 0 leave the sprite drifting after one tap, so that is not met yet. Changing the sprite's y position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.15 (Velocity: vel.x and vel.y) and 5.1.17 (The else-to-zero rule)",
         "points": 1
       },
       {
