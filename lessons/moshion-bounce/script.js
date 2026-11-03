@@ -4,25 +4,24 @@ let ball;
 
 function setup() {
   new Canvas(400, 400);
+  world.gravity.y = 10; // gravity pulls down the screen (5.2.6)
 
-  // STEP 1: Turn gravity on, pulling downward.
-
-  // STEP 2: Build four static walls: top, bottom, left and right, so the
+  // STEP 1: Build four static walls: top, bottom, left and right, so the
   //         ball cannot escape. Each is a long thin static sprite; give
   //         them a colour so you can see them.
 
-  // STEP 3: Create the ball as a dynamic sprite. One size argument instead
-  //         of two makes it a circle. Store it in `ball` and colour it.
+  // STEP 2: Create the ball as a dynamic sprite. One size argument (its
+  //         diameter) instead of two makes it a circle. Store it in `ball`
+  //         and colour it, then give it a sideways kick with ball.vel.x so
+  //         it travels rather than dropping straight down.
 
-  // STEP 4: Make it bouncy. The property runs 0 (sticky) to 1 (perfectly
+  // STEP 3: Make it bouncy. The property runs 0 (sticky) to 1 (perfectly
   //         elastic): pick something near the top of that range.
 
-  // STEP 5: Give it very low friction, so it does not drag to a stop.
-
-  // STEP 6: Give it a starting horizontal kick, so it travels rather than
-  //         dropping straight down.
+  // STEP 4: Give it a friction. Try 0 first, then 5, and watch how it
+  //         rolls versus drags.
 }
 
 function draw() {
-  // STEP 7: Clear the background each frame.
+  background('#111'); // clear the screen every frame
 }
