@@ -25,6 +25,9 @@ interface AssignmentHeaderProps {
   unmetTitles?: string[];
   /** On an AI Check lab: Run does not mark the cards, Check does. Shown beside the count. */
   unmetNote?: string;
+  /** Why Submit is shut when no card is: on a moSHion lab, the code in the editor has not run
+   *  clean yet (lib/ai-check.ts moshionSubmitWords). Shown in place of the "Still needed" list. */
+  blockedNote?: string;
 }
 
 export default function AssignmentHeader({
@@ -40,6 +43,7 @@ export default function AssignmentHeader({
   scoreAlign = 'center',
   unmetTitles,
   unmetNote,
+  blockedNote,
 }: AssignmentHeaderProps) {
   const pct = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
 
@@ -76,6 +80,8 @@ export default function AssignmentHeader({
           ))}
         </ul>
       </details>
+    ) : !submitted && !canSubmit && blockedNote ? (
+      <div className="assignment-unmet-hint">{blockedNote}</div>
     ) : null;
 
   const submitButton = showSubmit ? (

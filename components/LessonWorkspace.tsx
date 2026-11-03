@@ -9,7 +9,7 @@ import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
-import { aiCheckText, applyAiVerdicts, fallbackRunner, reportFromRequirements, runLetsSubmit, verdictsFromCriteria, type AiVerdicts } from '../lib/ai-check';
+import { aiCheckText, applyAiVerdicts, canSubmitMoshion, fallbackRunner, moshionRunNeed, moshionRunStep, moshionSubmitWords, NO_MOSHION_RUN, reportFromRequirements, runLetsSubmit, verdictsFromCriteria, type AiVerdicts, type MoshionRun } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
@@ -183,9 +183,12 @@ export default function LessonWorkspace({
   // Submit even when every requirement is green — otherwise students could
   // submit code that satisfies static graders but crashes at runtime.
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
-  // A moSHion run that has started but not yet reported back from its frame (an error, or
-  // `preview-status` once its first frame ran clean). Submit waits for it: see runLetsSubmit.
-  const [runPending, setRunPending] = useState(false);
+  // The latest moSHion Run: the script.js text it started with, and what its frame reported
+  // (`preview-status` once its first frame ran clean, `preview-error` for a throw at any point).
+  // Submit needs green cards AND a clean Run of the code now in the editor: see canSubmitMoshion.
+  const [moshionRun, setMoshionRun] = useState<MoshionRun>(NO_MOSHION_RUN);
+  // The lab's own sketch frame. Only its reports count: a docs-drawer snippet runs the same runner.
+  const labFrameRef = useRef<HTMLIFrameElement | null>(null);
   const [shortcutModalOpen, setShortcutModalOpen] = useState(false);
 
   const isAssignment = mode === 'assignment' || lesson.type === 'assignment' || lesson.type === 'project';
@@ -371,6 +374,9 @@ export default function LessonWorkspace({
   }, [planLines, planKind, files, lesson, updateFile]);
   const isReshapeMode = lesson.preview === 'reshape';
   const isMoshionMode = lesson.preview === 'moshion';
+  // For the message listener, which is registered once.
+  const isMoshionRef = useRef(isMoshionMode);
+  isMoshionRef.current = isMoshionMode;
 
   // reSHape lessons: ReshapeStudio hydrates its own model from script.js on
   // mount and reports every built doc back through onDocChange. Grading has
@@ -598,15 +604,21 @@ export default function LessonWorkspace({
 
   // For moSHion lessons: snapshot the current code and bump runKey to reload the iframe.
   // We snapshot so edits after Run don't re-trigger the iframe until the next Run.
+  //
+  // The text comes from the store, not this render's `files`: Check's fallback calls runQ5 after
+  // awaiting the grader, and Ctrl+Enter calls it from a handler registered once at mount, so the
+  // closure's copy can be older than the editor. The cards are marked by the latest runTests for
+  // the same reason.
   function runQ5() {
+    const code = useLessonStore.getState().fileContents['script.js'] || '';
     setRuntimeError(null);
-    setRunPending(true);
-    setQ5Code(files['script.js'] || '');
+    setMoshionRun((r) => moshionRunStep(r, { type: 'run', text: code }));
+    setQ5Code(code);
     setRunKey((k) => k + 1);
     setConsoleResetKey((k) => k + 1);
     setConsoleOpen(true);
     setIsRunning(true);
-    setTimeout(() => runTests(), 400);
+    setTimeout(() => runTestsRef.current(), 400);
   }
 
   // Stop unloads the iframe back to its empty state without touching the editor.
@@ -617,7 +629,8 @@ export default function LessonWorkspace({
     setConsoleResetKey((k) => k + 1);
     setIsRunning(false);
     setRuntimeError(null);
-    setRunPending(false);
+    // The record stays: a run that came up clean still counts, a crash still blocks.
+    setMoshionRun((r) => moshionRunStep(r, { type: 'stop' }));
   }
 
   // Listen for uncaught errors from the moSHion/reSHape iframe runner. The runner
@@ -638,13 +651,18 @@ export default function LessonWorkspace({
       }
       // The lab's own frame says its sketch came up clean. Only that frame: a
       // docs-drawer snippet runs the same runner and must not open Submit.
+      const fromLabFrame = !!labFrameRef.current && event.source === labFrameRef.current.contentWindow;
       if (data && data.source === 'preview-status' && data.status === 'running') {
-        const frame = document.getElementById('preview') as HTMLIFrameElement | null;
-        if (frame && event.source === frame.contentWindow) setRunPending(false);
+        if (fromLabFrame) setMoshionRun((r) => moshionRunStep(r, { type: 'came-up' }));
         return;
       }
       if (data && data.source === 'preview-error' && data.error) {
-        setRunPending(false);
+        // On a moSHion lab only the lab's frame speaks for the student's code: a
+        // docs-drawer snippet that throws must not lock Submit either.
+        if (isMoshionRef.current && !fromLabFrame) return;
+        // Any error, at boot or at frame 120, ends the clean-run record at once:
+        // Submit re-locks and stays locked until the code runs clean again.
+        setMoshionRun((r) => moshionRunStep(r, { type: 'error' }));
         // The moSHion / reSHape runners report a line already (their own frame
         // parse); keep it rather than flattening the payload to a bare message.
         // `hint` is the moSHion runner's plain first sentence for a common slip.
@@ -682,6 +700,11 @@ export default function LessonWorkspace({
   // lesson against the null doc it held at mount (moderate lens, 2026-09-04).
   const runTestsRef = useRef(runTests);
   useEffect(() => { runTestsRef.current = runTests; });
+  // The same trap for a console lab's Ctrl+Enter: runCode() from the first render reads that
+  // render's `files`, so it ran the code the page loaded with, not what the student had typed
+  // (5.1 batch 2). Through this ref Ctrl+Enter calls the latest render's runCode, as Run does.
+  const runCodeRef = useRef(runCode);
+  useEffect(() => { runCodeRef.current = runCode; });
   // Ctrl+Enter on a text lesson grades with the AI; assigned below, once the
   // callback exists, without adding it to this once-registered effect.
   const runAiCheckRef = useRef<() => void>(() => {});
@@ -698,7 +721,7 @@ export default function LessonWorkspace({
           if (useLessonStore.getState().lesson?.aiCheck) void runAiCheckRef.current();
           else runTestsRef.current();
         } else if (isConsoleMode) {
-          runCode();
+          runCodeRef.current();
         } else if (isReshapeMode) {
           // ReshapeStudio owns its own Ctrl+Enter handling, scoped to its
           // Code side -- see that component's own keydown effect.
@@ -788,6 +811,13 @@ export default function LessonWorkspace({
   // When the AI cannot answer, the lab's own pattern check (what Run used to do) marks the cards for
   // this exact text, so a student is never stuck behind an outage. Editing clears it, like the AI's marks.
   const fallBackToPatternCheck = (text: string, why: string) => {
+    // Same rule as the AI's own marks: they belong to `text`. If the student kept typing while the
+    // grader failed, marking (on a moSHion lab, running) the old text would put cards for code
+    // that is no longer in the editor beside it.
+    if (aiText(useLessonStore.getState().fileContents) !== text) {
+      setAiCheckNote({ kind: 'error', text: `${why} Your ${isTextMode ? 'text' : 'code'} changed meanwhile, so press Check again.` });
+      return;
+    }
     aiFallbackRef.current = text;
     setAiCheckNote({ kind: 'error', text: `${why} The pattern check marked your cards instead, so you can keep going.` });
     // The same runner a plain Run of this lab uses (lib/ai-check.ts fallbackRunner).
@@ -799,7 +829,9 @@ export default function LessonWorkspace({
 
   const runAiCheck = async () => {
     if (!aiCheck || aiCheckBusy) return;
-    const text = aiText(files);
+    // The store, not this render's `files`: a click can land before the render that follows the
+    // last keystroke, and Ctrl+Enter calls this through a ref.
+    const text = aiText(useLessonStore.getState().fileContents);
     setAiCheckBusy(true);
     setAiCheckNote(null);
     try {
@@ -822,7 +854,7 @@ export default function LessonWorkspace({
       // The verdicts describe `text`. If the student kept typing while the AI was
       // reading, they belong to text that is no longer in the file.
       if (aiText(useLessonStore.getState().fileContents) !== text) {
-        setAiCheckNote({ kind: 'ok', text: 'Your text changed while the AI was reading — press Grade again.' });
+        setAiCheckNote({ kind: 'ok', text: `Your ${isTextMode ? 'text' : 'code'} changed while the AI was reading — press Check again.` });
         return;
       }
       const verdicts = verdictsFromCriteria(data.criteria ?? [], aiCheck.rubric.map((r) => r.id));
@@ -1037,14 +1069,23 @@ export default function LessonWorkspace({
   // both satisfy their regexes and then crash by design, so the generic
   // "don't ship code that crashes" rule made them permanently unsubmittable.
   const expectsRuntimeError = !!lesson.grading?.expectsRuntimeError;
-  // A moSHion run must also have reported back before Submit opens (runLetsSubmit, lib/ai-check.ts).
+  // A moSHion lab needs green cards AND a clean Run of the code now in the editor
+  // (canSubmitMoshion, lib/ai-check.ts): Check's AI path reads the text, it never runs it.
+  const moshionText = files['script.js'] || '';
+  const moshionNeed = isMoshionMode ? moshionRunNeed(moshionRun, moshionText, expectsRuntimeError) : null;
   const canSubmitByWork =
     isSummative ||
-    (runLetsSubmit({ error: runtimeError, pending: isMoshionMode && runPending }, expectsRuntimeError) &&
-      (isMoshionMode || isNoPoints
-        ? allRequirementsPassed
-        : totalScore >= (lesson.grading?.passingScore ?? 0)));
+    (isMoshionMode
+      ? canSubmitMoshion({ cardsOk: allRequirementsPassed, run: moshionRun, currentText: moshionText, expectsRuntimeError })
+      : runLetsSubmit({ error: runtimeError, pending: false }, expectsRuntimeError) &&
+        (isNoPoints ? allRequirementsPassed : totalScore >= (lesson.grading?.passingScore ?? 0)));
   const canSubmit = canSubmitByWork && !cap.unknown && !cap.reached;
+  // Why a moSHion lab's Submit is shut, in the header and on Submit's hover. A test part, a spent
+  // try cap or a submitted lab says nothing here: the banner and the header already do.
+  const moshionWords =
+    isMoshionMode && !isSummative && !submitted && !cap.unknown && !cap.reached
+      ? moshionSubmitWords({ need: moshionNeed, cardsOk: allRequirementsPassed, aiCheck: !!aiCheck })
+      : {};
   // Any lesson with graded criteria keeps the score header, not just the
   // assignment routes — ch2's labs are `type: "lesson"` but still scored.
   const showAssignmentHeader = isAssignment || isMoshionMode || totalCriteria > 0;
@@ -1197,7 +1238,8 @@ export default function LessonWorkspace({
           showSubmit={!isMoshionMode}
           scoreAlign={isMoshionMode ? 'right' : 'center'}
           unmetTitles={unmetTitles}
-          unmetNote={aiCheck ? 'press Check to mark them' : undefined}
+          unmetNote={isMoshionMode ? moshionWords.note : aiCheck ? 'press Check to mark them' : undefined}
+          blockedNote={moshionWords.line}
         />
       ) : (
         <div id="titleRow">
@@ -1303,6 +1345,8 @@ export default function LessonWorkspace({
                     if (window.confirm(`Reset your ${what} to the starter? Unsaved work will be lost.`)) {
                       resetLesson(lesson);
                       stopRun();
+                      // The starter has not been run either: "Press Run", not "you changed your code".
+                      setMoshionRun(NO_MOSHION_RUN);
                       setSolutionLoaded(false);
                       // Reset also discards any AI marks: the starter has not been graded.
                       aiVerdictsRef.current = null;
@@ -1433,6 +1477,7 @@ export default function LessonWorkspace({
                   className="btn-primary btn-sm"
                   onClick={handleSubmit}
                   disabled={submitted || !canSubmit}
+                  title={!canSubmit ? moshionWords.title : undefined}
                 >
                   <Send size={14} />
                   Submit
@@ -1449,7 +1494,9 @@ export default function LessonWorkspace({
                   ? aiCheckNote.text
                   : isTextMode
                     ? 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'
-                    : 'Run shows what your code does. Press Check to have the AI read it and mark the Quest cards, whatever shape you wrote it in. Submit turns on once they are green.'}
+                    : isMoshionMode
+                      ? 'Run shows what your code does. Press Check to have the AI read it and mark the Quest cards, whatever shape you wrote it in. Submit turns on once they are green and this code has run with no error.'
+                      : 'Run shows what your code does. Press Check to have the AI read it and mark the Quest cards, whatever shape you wrote it in. Submit turns on once they are green.'}
               </div>
               {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
                 <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: '#8393c4' }}>
@@ -1530,7 +1577,7 @@ export default function LessonWorkspace({
                       </pre>
                     </>
                   ) : isMoshionMode ? (
-                    <MoshionPreview code={q5Code} runKey={runKey} />
+                    <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} />
                   ) : (
                     <LivePreview srcDoc={srcDoc} />
                   )}

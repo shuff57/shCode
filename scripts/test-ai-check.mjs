@@ -99,15 +99,84 @@ if (typeof runLetsSubmit === 'function') {
   check(runLetsSubmit({ error: ERR, pending: false }, true) === true, 'expectsRuntimeError accepts the error (unchanged)');
   check(runLetsSubmit({ error: null, pending: true }, true) === false, 'expectsRuntimeError does not accept a run that has not reported');
 }
+// The moSHion Submit gate (owner decision 2026-11-03): green cards AND a clean Run of the SAME
+// code. Check's AI path reads the text and never runs it: with the grader mocked all-met, a sketch
+// with `nope();` first in setup() lit Submit 2.2 s after Check with no frame ever mounted (5.1 walk,
+// round 2, N1). The record is exact text; a late error clears it (N7).
+const { canSubmitMoshion, moshionRunNeed, moshionRunStep, moshionSubmitWords, NO_MOSHION_RUN } = aiCheckLib;
+check(typeof canSubmitMoshion === 'function' && typeof moshionRunStep === 'function', 'lib/ai-check.ts exports canSubmitMoshion and moshionRunStep');
+if (typeof canSubmitMoshion === 'function' && typeof moshionRunStep === 'function') {
+  const CODE = "let box;\nfunction setup() {\n  new Canvas(400, 400);\n  box = new Sprite(100, 50, 40, 40);\n}\n";
+  const step = (run, ...evs) => evs.reduce((r, ev) => moshionRunStep(r, ev), run);
+  const gate = (run, currentText = CODE, cardsOk = true, expectsRuntimeError = false) => canSubmitMoshion({ cardsOk, run, currentText, expectsRuntimeError });
+  const ran = step(NO_MOSHION_RUN, { type: 'run', text: CODE });
+  const clean = step(ran, { type: 'came-up' });
+
+  check(!gate(NO_MOSHION_RUN), 'never ran: shut, even with every card green');
+  check(moshionRunNeed(NO_MOSHION_RUN, CODE) === 'run', 'never ran: the need is "run"');
+  check(!gate(NO_MOSHION_RUN, CODE, true), 'AI green + never ran = blocked (the N1 hole)');
+  check(!gate(ran), 'a run in flight (frame has not reported): shut');
+  check(moshionRunNeed(ran, CODE) === 'wait', 'a run in flight: the need is "wait"');
+  check(gate(clean), 'ran clean, same text, green cards: open');
+  check(!gate(clean, CODE, false), 'ran clean, cards not green: shut');
+  check(!gate(clean, CODE + '  nope();\n'), 'ran clean then edited: shut');
+  check(moshionRunNeed(clean, CODE + 'x') === 'rerun', 'ran clean then edited: the need is "rerun"');
+  check(!gate(clean, CODE + ' '), 'a whitespace-only edit also needs a new Run (exact text, as the AI marks)');
+  check(gate(clean, CODE), 'edited and typed back to the run text: open again (it is the same code)');
+  const late = step(clean, { type: 'error' });
+  check(!gate(late), 'ran clean then a late error (frame 30, a timer): shut at once');
+  check(moshionRunNeed(late, CODE) === 'fix', 'a late error: the need is "fix"');
+  check(!gate(step(late, { type: 'stop' })), 'Stop after a late error keeps it shut (the code crashed)');
+  check(!gate(step(late, { type: 'came-up' })), 'a "came up" after an error does not re-open it');
+  check(gate(step(late, { type: 'run', text: CODE }, { type: 'came-up' })), 'a fresh clean Run of the code re-opens it');
+  check(gate(step(clean, { type: 'stop' })), 'Stop after a clean run: still open (that code ran clean)');
+  check(!gate(step(ran, { type: 'stop' })), 'Stop before the frame reported: shut (it never came up)');
+  check(moshionRunNeed(step(ran, { type: 'stop' }), CODE) === 'run', 'Stop before the frame reported: the need is "run"');
+  const crashed = step(ran, { type: 'error' });
+  check(!gate(crashed), 'a run that threw at boot: shut');
+  check(gate(crashed, CODE, true, true), 'expectsRuntimeError: a run that threw, of the same code, counts');
+  check(!gate(ran, CODE, true, true), 'expectsRuntimeError: a run that has not reported does not');
+  check(!gate(crashed, CODE + 'x', true, true), 'expectsRuntimeError: an edit after the run still needs a new Run');
+  // A new Run of edited code replaces the record; the old clean run does not carry over.
+  check(!gate(step(clean, { type: 'run', text: CODE + 'x' }), CODE + 'x'), 'Run again after an edit: shut until that run reports');
+
+  // The words beside a shut Submit.
+  const w = (need, cardsOk, aiCheck = true) => moshionSubmitWords({ need, cardsOk, aiCheck });
+  check(w('run', false).note === 'press Run, then Check', 'header: neither Run nor Check yet says "press Run, then Check"');
+  check(w(null, false).note === 'press Check to mark them', 'header: ran clean, cards not marked keeps "press Check to mark them"');
+  check(w('wait', false).note === 'press Check to mark them', 'header: a run in flight does not ask for another Run');
+  check(w('rerun', false).note === 'press Run, then Check' && w('fix', false).note === 'press Run, then Check', 'header: an edit or a crash asks for Run, then Check');
+  check(w('run', true).line === 'Press Run so we can see your sketch work, then Submit.', 'header, cards green, never ran: the plain sentence');
+  check(/changed your code since the last Run/.test(w('rerun', true).line ?? ''), 'header, cards green, edited since the run: says so');
+  check(/stopped with an error/.test(w('fix', true).line ?? ''), 'header, cards green, the run crashed: says so');
+  check(w('wait', true).line === undefined && /starting/.test(w('wait', true).title ?? ''), 'a run in flight: no header line (it would flash on every Run), but Submit\'s hover says why');
+  check(Object.keys(w(null, true)).length === 0, 'nothing in the way: no words at all');
+  check(/Press Run, then Check/.test(w('run', false).title ?? ''), 'Submit hover, neither yet: "Press Run, then Check"');
+  check(/Press Check/.test(w(null, false).title ?? ''), 'Submit hover, ran clean, cards red: "Press Check"');
+  check(w('run', false, false).note === 'press Run to mark them' && w(null, false, false).note === undefined, 'a lab with no AI Check: Run marks the cards, so the note says Run');
+}
 {
   const lw = readFileSync(path.join(root, 'components/LessonWorkspace.tsx'), 'utf8');
   const fn = (name) => { const s = lw.indexOf(`function ${name}(`); return s < 0 ? '' : lw.slice(s, lw.indexOf('\n  }', s)); };
-  check(/setRunPending\(true\)/.test(fn('runQ5')), 'LessonWorkspace: runQ5() marks the run pending');
-  check(/setRunPending\(false\)/.test(fn('stopRun')), 'LessonWorkspace: Stop clears the pending run');
-  const handler = lw.slice(lw.indexOf("data.source === 'preview-status'"), lw.indexOf("data.source === 'preview-error'") + 200);
-  check(/event\.source === frame\.contentWindow\) setRunPending\(false\)/.test(handler), "LessonWorkspace: only the lab's own frame's preview-status ends the pending run");
-  check(/data\.source === 'preview-error' && data\.error\) \{\s*setRunPending\(false\)/.test(lw), 'LessonWorkspace: a preview-error ends the pending run');
-  check(/runLetsSubmit\(\{ error: runtimeError, pending: isMoshionMode && runPending \}, expectsRuntimeError\)/.test(lw), 'LessonWorkspace: canSubmitByWork gates on runLetsSubmit');
+  const q5 = fn('runQ5');
+  check(/moshionRunStep\(r, \{ type: 'run', text: code \}\)/.test(q5), 'LessonWorkspace: runQ5() records the text it runs');
+  check(/useLessonStore\.getState\(\)\.fileContents\['script\.js'\]/.test(q5), 'LessonWorkspace: runQ5() runs the store\'s text, not a stale render\'s');
+  check(/setQ5Code\(code\)/.test(q5), 'LessonWorkspace: runQ5() runs exactly the text it records');
+  check(/moshionRunStep\(r, \{ type: 'stop' \}\)/.test(fn('stopRun')), 'LessonWorkspace: Stop ends a pending run without forgetting a crash');
+  const handler = lw.slice(lw.indexOf("data.source === 'preview-status'"), lw.indexOf('setRuntimeError(err.hint'));
+  check(/if \(fromLabFrame\) setMoshionRun\(\(r\) => moshionRunStep\(r, \{ type: 'came-up' \}\)\)/.test(handler), "LessonWorkspace: only the lab's own frame's preview-status counts as a clean run");
+  check(/if \(isMoshionRef\.current && !fromLabFrame\) return;\s*(\/\/[^\n]*\s*)*setMoshionRun\(\(r\) => moshionRunStep\(r, \{ type: 'error' \}\)\)/.test(handler), "LessonWorkspace: a preview-error from the lab's frame clears the clean-run record");
+  check(/canSubmitMoshion\(\{ cardsOk: allRequirementsPassed, run: moshionRun, currentText: moshionText, expectsRuntimeError \}\)/.test(lw), 'LessonWorkspace: a moSHion lab gates Submit on canSubmitMoshion');
+  const ai = lw.slice(lw.indexOf('const runAiCheck = async'), lw.indexOf('runAiCheckRef.current = runAiCheck'));
+  check(!/runQ5|setMoshionRun/.test(ai.split('fallBackToPatternCheck(')[0]), 'LessonWorkspace: Check\'s AI path neither runs nor touches the run record');
+  check(/const text = aiText\(useLessonStore\.getState\(\)\.fileContents\)/.test(ai), 'LessonWorkspace: Check reads the store\'s text (no stale closure)');
+  const fb = lw.slice(lw.indexOf('const fallBackToPatternCheck'), lw.indexOf('const runAiCheck = async'));
+  check(/aiText\(useLessonStore\.getState\(\)\.fileContents\) !== text\) \{[\s\S]*?return;/.test(fb), 'LessonWorkspace: the fallback refuses to mark text the student has since changed');
+  check(/ref=\{labFrameRef\}/.test(lw), 'LessonWorkspace: the lab frame is known by ref');
+  // Ctrl+Enter's handler is registered once, so a direct runCode() there runs the page-load text.
+  const keys = lw.slice(lw.indexOf("if (e.ctrlKey && e.key === 'Enter')"), lw.indexOf("if (e.ctrlKey && e.shiftKey && e.key === 'H')"));
+  check(/isConsoleMode\) \{\s*runCodeRef\.current\(\);/.test(keys) && !/(^|[^.\w])runCode\(\)/.test(keys), 'LessonWorkspace: Ctrl+Enter on a console lab runs the latest runCode (the current text), not the first render\'s');
+  check(/useEffect\(\(\) => \{ runCodeRef\.current = runCode; \}\);/.test(lw), 'LessonWorkspace: runCodeRef follows every render');
   const runner = readFileSync(path.join(root, 'public/moshion/runner.html'), 'utf8');
   check(runner.includes("source: 'preview-status', status: 'running'"), "runner.html posts preview-status 'running' (scripts/test-runner-errors.mjs measures when)");
 }

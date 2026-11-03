@@ -76,6 +76,108 @@ export function runLetsSubmit(run: { error: string | null; pending: boolean }, e
   return !run.error || expectsRuntimeError;
 }
 
+/**
+ * A moSHion lab's Submit gate: green cards AND a clean Run of the SAME code (owner decision,
+ * 2026-11-03). Check's AI path reads the text and never runs it, so cards alone let a sketch with
+ * `nope();` as the first line of setup() submit without a frame ever mounting (5.1 walk, round 2).
+ *
+ * `MoshionRun` is what the lab knows about its latest Run. `text` is the script.js text that run
+ * started with, compared EXACTLY with the editor: any edit, whitespace included, needs a new Run.
+ * (A newline can change what JavaScript does, through automatic semicolons, and the AI's marks
+ * already go stale on the same exact-text rule.) The frame reports through `moshionRunStep`:
+ * `came-up` once its first frame ran clean, `error` for a throw at ANY point, so a late error (a
+ * throw at frame 120, or from a timer) re-locks Submit at once and keeps it locked after Stop.
+ */
+export interface MoshionRun {
+  /** The script.js text the latest Run started with; null before the first Run (and after Reset). */
+  text: string | null;
+  /** Started, and its frame has not reported yet. */
+  pending: boolean;
+  /** Its first frame ran with no error. */
+  clean: boolean;
+  /** It threw, at boot or any later frame. */
+  errored: boolean;
+}
+export const NO_MOSHION_RUN: MoshionRun = { text: null, pending: false, clean: false, errored: false };
+
+export type MoshionRunEvent =
+  | { type: 'run'; text: string }
+  | { type: 'came-up' }
+  | { type: 'error' }
+  | { type: 'stop' };
+
+export function moshionRunStep(run: MoshionRun, ev: MoshionRunEvent): MoshionRun {
+  switch (ev.type) {
+    case 'run':
+      return { text: ev.text, pending: true, clean: false, errored: false };
+    case 'came-up':
+      // A frame that threw never says it came up (runner.html); this guards the order anyway.
+      return run.errored ? run : { ...run, pending: false, clean: true };
+    case 'error':
+      return { ...run, pending: false, clean: false, errored: true };
+    case 'stop':
+      // A clean run stays clean and a crash stays a crash; a run stopped before its frame
+      // reported never came up, so it does not count.
+      return { ...run, pending: false };
+    default:
+      return run;
+  }
+}
+
+/** What stands between this code and Submit on the run side. null = the run is good. */
+export type MoshionRunNeed = 'run' | 'rerun' | 'wait' | 'fix' | null;
+
+export function moshionRunNeed(run: MoshionRun, currentText: string, expectsRuntimeError = false): MoshionRunNeed {
+  if (run.text === null) return 'run';
+  if (run.text !== currentText) return 'rerun';
+  if (run.pending) return 'wait';
+  if (run.errored) return expectsRuntimeError ? null : 'fix';
+  return run.clean ? null : 'run';
+}
+
+export function canSubmitMoshion(s: { cardsOk: boolean; run: MoshionRun; currentText: string; expectsRuntimeError?: boolean }): boolean {
+  return s.cardsOk && moshionRunNeed(s.run, s.currentText, s.expectsRuntimeError) === null;
+}
+
+/**
+ * The words beside a shut Submit on a moSHion lab. `note` follows "Still needed (N) · " in the
+ * header while cards are red; `line` stands in for that summary when every card is green but the
+ * run is not; `title` is Submit's hover text. A run in flight gets no `line`: it resolves itself
+ * in a moment, and a line that flashed on every Run would be noise.
+ */
+export function moshionSubmitWords(s: { need: MoshionRunNeed; cardsOk: boolean; aiCheck: boolean }): {
+  note?: string;
+  line?: string;
+  title?: string;
+} {
+  const runBad = s.need === 'run' || s.need === 'rerun' || s.need === 'fix';
+  const note = s.cardsOk
+    ? undefined
+    : s.aiCheck
+      ? runBad ? 'press Run, then Check' : 'press Check to mark them'
+      : runBad ? 'press Run to mark them' : undefined;
+  const runWords: Record<'run' | 'rerun' | 'wait' | 'fix', string> = {
+    run: 'Press Run so we can see your sketch work, then Submit.',
+    rerun: 'You changed your code since the last Run. Press Run again, then Submit.',
+    wait: 'Your sketch is starting. Submit turns on once it is running.',
+    fix: 'Your last Run stopped with an error. Fix it, then press Run again.',
+  };
+  if (s.cardsOk) {
+    if (!s.need) return {};
+    return { line: s.need === 'wait' ? undefined : runWords[s.need], title: runWords[s.need] };
+  }
+  const title = s.need === 'fix'
+    ? runWords.fix
+    : runBad
+      ? s.aiCheck
+        ? 'Press Run, then Check. Submit turns on when this code has run with no error and every Quest card is green.'
+        : 'Press Run. Submit turns on when this code has run with no error and every Quest card is green.'
+      : s.aiCheck
+        ? 'Press Check to mark the Quest cards. Submit turns on when every card is green.'
+        : 'Submit turns on when every Quest card is green.';
+  return { note, title };
+}
+
 /** Only a clear "met" turns a card green. "partial" and "missing" stay red, with the AI's note. */
 export function verdictsFromCriteria(criteria: AiCheckCriterion[], knownIds: string[]): AiVerdicts {
   const known = new Set(knownIds);

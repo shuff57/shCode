@@ -28,6 +28,8 @@ import { readFileSync } from 'node:fs';
 import { createContext, runInContext, Script } from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+// The host's Submit gate, fed the frame's reports (Node 22 strips the types itself).
+import { canSubmitMoshion, moshionRunNeed, moshionRunStep, NO_MOSHION_RUN } from '../lib/ai-check.ts';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MOSHION_DIR = join(REPO, 'public', 'moshion');
@@ -80,10 +82,14 @@ function permissiveCtx() {
   });
 }
 
-function runFrame(code, { frames = 30 } = {}) {
+// `timers: true` makes setTimeout(fn, ms > 0) wait for the frame clock to reach it, so a sketch
+// can throw from a timer AFTER it came up. Off by default: every other check here runs timers at
+// once, as they always have.
+function runFrame(code, { frames = 30, timers = false } = {}) {
   const posted = [];          // every message the frame posted to its parent
   const errorEvents = [];     // what reached the window error event, raw
   const tasks = [];           // macrotask queue (timers, message events)
+  const later = [];           // { at, fn }: timers waiting for the clock (timers: true only)
   let raf = [];               // animation-frame callbacks for the next frame
   let clock = 0;
   const listeners = new Map();
@@ -208,7 +214,12 @@ function runFrame(code, { frames = 30 } = {}) {
     performance: { now: () => clock },
     requestAnimationFrame: (fn) => { raf.push(fn); return raf.length; },
     cancelAnimationFrame() {},
-    setTimeout: (fn) => { if (typeof fn === 'function') tasks.push(fn); return tasks.length; },
+    setTimeout: (fn, ms) => {
+      if (typeof fn !== 'function') return 0;
+      if (timers && ms > 0) later.push({ at: clock + ms, fn });
+      else tasks.push(fn);
+      return tasks.length + later.length;
+    },
     clearTimeout() {},
     setInterval: () => 0,   // the runner's storage request is also sent once directly
     clearInterval() {},
@@ -246,6 +257,10 @@ function runFrame(code, { frames = 30 } = {}) {
     clock += FRAME_MS;
     for (const cb of due) task(() => cb(clock));
     drain();
+    for (let k = 0; k < later.length; ) {
+      if (later[k].at <= clock) { const { fn } = later.splice(k, 1)[0]; task(fn); drain(); }
+      else k++;
+    }
     ran++;
   }
   const frameCount = (() => { try { return runInContext('typeof frameCount === "number" ? frameCount : -1', ctx); } catch (_) { return -1; } })();
@@ -253,6 +268,10 @@ function runFrame(code, { frames = 30 } = {}) {
     errors: posted.filter((m) => m && m.source === 'preview-error').map((m) => m.error),
     // "It came up": the host keeps Submit shut until this or an error arrives.
     cameUp: posted.filter((m) => m && m.source === 'preview-status' && m.status === 'running').length,
+    // The two reports the host's Submit gate listens to, in the order they were posted.
+    reports: posted
+      .filter((m) => m && ((m.source === 'preview-status' && m.status === 'running') || m.source === 'preview-error'))
+      .map((m) => (m.source === 'preview-error' ? 'error' : 'came-up')),
     errorEvents, ran, frameCount, pendingFrames: raf.length, canvas,
     // What the red box over the preview says -- what the student reads.
     box: errorBox.style.display === 'block' ? errorBox.textContent : '',
@@ -369,6 +388,39 @@ for (const [num, folder] of STARTERS) {
   check('a sketch with a typo never "came up"', rs.cameUp === 0 && rs.errors.length === 1, `cameUp ${rs.cameUp} ${show(rs)}`);
   const rn = runFrame('let total = 2 + 3;\n', { frames: 0 });
   check('a sketch with no setup() (no engine, no frames) says it came up at once', rn.errors.length === 0 && rn.cameUp === 1, `cameUp ${rn.cameUp} ${show(rn)}`);
+}
+
+// A late error (5.1 walk round 2, N7): a sketch that comes up clean and throws later (at frame 30,
+// at frame 120, from a 1.5 s timer) let Submit sit lit for 0.2 to 1.7 s. The frame must report the
+// late error after "came up", and the host's gate (lib/ai-check.ts, fed the reports in the order
+// the frame posted them) must shut Submit on it and keep it shut, through Stop as well.
+console.log('a late error re-locks Submit');
+{
+  const late = (body) => ['let p;', 'function setup() {', '  new Canvas(200, 200);', '  p = new Sprite(100, 100, 20, 20);', ...body.setup, '}',
+    'function draw() {', "  background('#222');", ...body.draw, '}'].join('\n') + '\n';
+  const cases = [
+    ['frame 30', late({ setup: [], draw: ['  if (frameCount > 30) nope();'] }), { frames: 60 }],
+    ['frame 120', late({ setup: [], draw: ['  if (frameCount > 120) nope();'] }), { frames: 150 }],
+    ['a 1.5 s timer in setup()', late({ setup: ['  setTimeout(() => nope(), 1500);'], draw: [] }), { frames: 150, timers: true }],
+  ];
+  for (const [name, code, opts] of cases) {
+    const r = runFrame(code, opts);
+    check(`${name}: the frame says "came up", then the error, and nothing after`,
+      JSON.stringify(r.reports) === '["came-up","error"]' && r.errors.length === 1 && r.errors[0].message === 'nope is not defined',
+      `${JSON.stringify(r.reports)} ${show(r)}`);
+    // The host, fed the same reports: Run, then each message as it arrives.
+    let run = moshionRunStep(NO_MOSHION_RUN, { type: 'run', text: code });
+    const gate = () => canSubmitMoshion({ cardsOk: true, run, currentText: code });
+    const seen = [gate()];
+    for (const rep of r.reports) { run = moshionRunStep(run, { type: rep }); seen.push(gate()); }
+    check(`${name}: Submit is shut while loading, open once it came up, shut at the error`, JSON.stringify(seen) === '[false,true,false]', JSON.stringify(seen));
+    run = moshionRunStep(run, { type: 'stop' });
+    check(`${name}: Stop after the error keeps Submit shut (the code crashed)`, gate() === false && moshionRunNeed(run, code) === 'fix', moshionRunNeed(run, code));
+  }
+  // The timer case keeps animating after the throw (only a frame that throws stops the loop), so
+  // the frame must not say "came up" again on the next clean frame.
+  const t = runFrame(late({ setup: ['  setTimeout(() => nope(), 1500);'], draw: [] }), { frames: 150, timers: true });
+  check('a timer error does not stop the frames, and they never re-open Submit', t.ran === 150 && t.cameUp === 1, `ran ${t.ran} cameUp ${t.cameUp}`);
 }
 
 // The three slips a beginner made in the 5.1 walk (2026-11-03), and what the
