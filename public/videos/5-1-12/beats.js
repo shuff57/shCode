@@ -21,6 +21,8 @@
 // Three kinds of picture (STYLE section 5): the preview PANE is the run (#111 page, the #222 canvas background() paints, the
 // sprite); everything outside the pane (frame counter, x readout, labels, pages, the timeline) is an explanation; the only helper
 // drawn ON the canvas is the wipe's sweep line, and only under the "slow motion" label. No faint old-position squares are used.
+// The mode label says plain "slow motion": that is the playback term. "moSHion" is the course's sketch/canvas name and is
+// used where the video names the sketch, never as a spelling of the English phrase (owner's rule).
 // Every colour comes from lib/tokens.js. Helper names are prefixed ms (copied from 5.1.2) or fl (new): lib globals (frame, label,
 // draw, tick, dot, move, rect, X, NEG, ...) must not be shadowed.
 'use strict';
