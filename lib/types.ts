@@ -49,6 +49,14 @@ interface Step {
   requiredCommit?: boolean;
 }
 
+/** A pattern scoped to some functions' bodies (an inFunction requirement's
+ *  `orIn` / `forbidIn`). `ignoreStrings` here overrides the requirement's. */
+export interface FunctionClause {
+  function: string | string[];
+  pattern: string;
+  ignoreStrings?: boolean;
+}
+
 export interface Requirement {
   id: string;
   title: string;
@@ -62,6 +70,17 @@ export interface Requirement {
   /** For inFunction type: a single function name ("draw") or a list of names
    *  ("draw" + "update") whose bodies are concatenated before matching. */
   function?: string | string[];
+  /** For inFunction type: also read the bodies of the student's own functions
+   *  that the named functions call (`name(`), two calls deep, so a helper
+   *  counts only when it is called. lib/grader.ts `calledHelperBodies`.
+   *  Applies to `orIn` and `forbidIn` too. */
+  followCalls?: boolean;
+  /** For inFunction type: other functions where a match ALSO passes the
+   *  requirement: "per-frame motion in draw(), or a velocity set once in setup()". */
+  orIn?: FunctionClause[];
+  /** For inFunction type: the requirement fails when any of these is found:
+   *  "the sprite is made in setup() and never in draw()". */
+  forbidIn?: FunctionClause[];
   expected?: string;
   testFn?: string;
   /** Shown to the student ONLY when this requirement fails — grade() copies

@@ -1031,10 +1031,11 @@ for (const id of Object.values(L)) {
   // ---------------------------------------------------------------- 5.1 lab batch, 2026-11-03
   // Owner policy: lax. Each card accepts every honest shape the course taught (or that the AI
   // prompt already accepts) and refuses only the wrong idea. A helper function of the student's
-  // own counts wherever the card says "in draw()": the patterns look in any function but setup()
-  // (following the call from draw() into the helper cost 20+ s on adversarial input, so a helper
-  // nobody calls is the accepted residual). No pattern here uses lookbehind, and each stays under
-  // a few ms on 5000-character adversarial input.
+  // own counts wherever the card says "in draw()". Since batch 2 (below) the cards are inFunction
+  // with `followCalls` (lib/grader.ts): draw() and update(), plus the helpers they CALL, two calls
+  // deep, found by linear scans in the grader rather than inside one regex (that cost 20+ s on
+  // adversarial input). No pattern here uses lookbehind, and each stays under a few ms on
+  // 5000-character adversarial input.
 
   // 5.1.23 r3-r7: helpers, the arrow-key spellings the AI prompt accepts, the stop shapes (r5),
   // and r6 any name for the mover, which must itself be what changes and must not be the
@@ -1129,7 +1130,7 @@ for (const id of Object.values(L)) {
   // r3 no longer reads the kb in a ternary as the speed, so a ternary still at 4 is not "your own".
   {
     const id = '5-1-18-lab-else-to-zero'; const S = sol(id);
-    const both = "  if      (kb.pressing('a')) player.vel.x = -3;" + nl + "  else if (kb.pressing('d')) player.vel.x =  3;" + nl + "  else                       player.vel.x =  0;" + nl + nl + "  if      (kb.pressing('w')) player.vel.y = -3;" + nl + "  else if (kb.pressing('s')) player.vel.y =  3;" + nl + "  else                       player.vel.y =  0;";
+    const both = "  if (kb.pressing('a')) player.vel.x = -3;" + nl + "  else if (kb.pressing('d')) player.vel.x = 3;" + nl + '  else player.vel.x = 0;' + nl + nl + "  if (kb.pressing('w')) player.vel.y = -3;" + nl + "  else if (kb.pressing('s')) player.vel.y = 3;" + nl + '  else player.vel.y = 0;';
     const b = (to) => edit(S, both, to);
     const four = (n) => `  if (kb.pressing('a')) player.vel.x = -${n};` + nl + `  if (kb.pressing('d')) player.vel.x = ${n};` + nl + `  if (kb.pressing('w')) player.vel.y = -${n};` + nl + `  if (kb.pressing('s')) player.vel.y = ${n};`;
     run(id, [
@@ -1137,9 +1138,9 @@ for (const id of Object.values(L)) {
       A('a ternary ending in 0', b("  player.vel.x = kb.pressing('d') ? 3 : kb.pressing('a') ? -3 : 0;" + nl + "  player.vel.y = kb.pressing('s') ? 3 : kb.pressing('w') ? -3 : 0;")),
       A('0 at the top, then four ifs', b('  player.vel.x = 0;' + nl + '  player.vel.y = 0;' + nl + four(3))),
       A('(d - a) * 3', b("  player.vel.x = (kb.pressing('d') - kb.pressing('a')) * 3;" + nl + "  player.vel.y = (kb.pressing('s') - kb.pressing('w')) * 3;")),
-      A('else 0.0', b(both.replace(/= {2}0;/g, '= 0.0;'))),
+      A('else 0.0', b(both.replace(/= 0;/g, '= 0.0;'))),
       R('the else lines deleted (drift)', 'r1', b(four(3))),
-      R('only the y else deleted', 'r2', edit(S, nl + '  else                       player.vel.y =  0;', '')),
+      R('only the y else deleted', 'r2', edit(S, nl + '  else player.vel.y = 0;', '')),
       R('0 set after the ifs, so it never moves', 'r1', b(four(3) + nl + '  player.vel.x = 0;' + nl + '  player.vel.y = 0;')),
       R('a ternary with no 0 never stops', 'r1', b("  player.vel.x = kb.pressing('d') ? 3 : -3;" + nl + "  player.vel.y = kb.pressing('s') ? 3 : -3;")),
       R('a ternary still at 4', 'r3', b("  player.vel.x = kb.pressing('d') ? 4 : kb.pressing('a') ? -4 : 0;" + nl + "  player.vel.y = kb.pressing('s') ? 4 : kb.pressing('w') ? -4 : 0;")),
@@ -1199,6 +1200,178 @@ for (const id of Object.values(L)) {
       A('y = height / 4', edit(S, sp, 'box = new Sprite(100, height / 4, 40, 40);')),
       R('0 * 5 is on the axis', 'r3', edit(S, sp, 'box = new Sprite(100, 0 * 5, 40, 40);')),
     ]);
+  }
+
+  // ---------------------------------------------------------------- 5.1 lab batch 2, 2026-11-03
+  // Owner decisions, each pinned both ways:
+  //  1. A misplaced else (`if (left) ...; if (right) ...; else vel.x = 0;`) leaves one key dead,
+  //     so the stop cards refuse a direction undone later in the same frame (an else under a
+  //     second, separate if, or an unconditional 0 after it). Chains, 0 at the top, ternaries,
+  //     a guarded else-if and an else on the FIRST if (which works) all still pass.
+  //  2. "Make your sprite once, in setup()": new Sprite( in setup() (or a helper setup() calls)
+  //     and no new Sprite( / new Canvas( in draw(), update() or a helper they call.
+  //  3. A helper counts only when it is CALLED from draw()/update() (two calls deep).
+  //  4. Playground: the mover moves by its own rule (no key test, no copy of the player's
+  //     speed), and the stop card needs both axes.
+  //  5-7. 5.1.19 follows a called helper; Challenges accepts rotationSpeed once in setup(), a
+  //     sprite that grows, pulses or wanders, and reads strings blank except for the rgba trail;
+  //     5.1.26 accepts its overlays in a called helper.
+  {
+    const code = (s) => ({ 'script.js': s });
+    // ---- 5.1.20
+    {
+      const id = '5-1-20-moshion-move-keys'; const S = sol(id);
+      const keys = "  if      (kb.pressing('a')) player.vel.x = -4;" + nl + "  else if (kb.pressing('d')) player.vel.x =  4;" + nl + "  else                       player.vel.x =  0;" + nl + nl + "  if      (kb.pressing('w')) player.vel.y = -4;" + nl + "  else if (kb.pressing('s')) player.vel.y =  4;" + nl + "  else                       player.vel.y =  0;";
+      const k = (to) => edit(S, keys, to);
+      const yChain = "  if (kb.pressing('w')) player.vel.y = -4;" + nl + "  else if (kb.pressing('s')) player.vel.y = 4;" + nl + '  else player.vel.y = 0;';
+      const xChain = "  if (kb.pressing('a')) player.vel.x = -4;" + nl + "  else if (kb.pressing('d')) player.vel.x = 4;" + nl + '  else player.vel.x = 0;';
+      const misX = "  if (kb.pressing('left'))  player.vel.x = -4;" + nl + "  if (kb.pressing('right')) player.vel.x = 4;" + nl + '  else player.vel.x = 0;';
+      const misY = "  if (kb.pressing('up'))    player.vel.y = -4;" + nl + "  if (kb.pressing('down'))  player.vel.y = 4;" + nl + '  else player.vel.y = 0;';
+      const helper = (body, name = 'move') => code(k(`  ${name}();`)['script.js'] + nl + `function ${name}() {` + nl + body + nl + '}' + nl);
+      const unused = code(k('')['script.js'] + nl + 'function unused() {' + nl + keys + nl + '}' + nl);
+      const setupLine = "  player.color = 'deepskyblue';";
+      const made = '  player = new Sprite(200, 200, 40, 40);';
+      run(id, [
+        A('0 at the top, braced ifs with a colour first', k('  player.vel.x = 0;' + nl + '  player.vel.y = 0;' + nl + "  if (kb.pressing('a')) {" + nl + "    player.color = 'red';" + nl + '    player.vel.x = -4;' + nl + '  }' + nl + "  if (kb.pressing('d')) player.vel.x = 4;" + nl + "  if (kb.pressing('w')) player.vel.y = -4;" + nl + "  if (kb.pressing('s')) player.vel.y = 4;")),
+        A('two ifs, the second an else if guarded by !a', k("  if (kb.pressing('a')) player.vel.x = -4;" + nl + "  if (kb.pressing('d')) player.vel.x = 4;" + nl + "  else if (!kb.pressing('a')) player.vel.x = 0;" + nl + yChain)),
+        A('an else on the FIRST if, a plain if after it (both keys work)', k("  if (kb.pressing('a')) player.vel.x = -4;" + nl + '  else player.vel.x = 0;' + nl + "  if (kb.pressing('d')) player.vel.x = 4;" + nl + "  if (kb.pressing('w')) player.vel.y = -4;" + nl + '  else player.vel.y = 0;' + nl + "  if (kb.pressing('s')) player.vel.y = 4;")),
+        A('nested: else { if (d) ... else 0 }', k("  if (kb.pressing('a')) player.vel.x = -4;" + nl + '  else {' + nl + "    if (kb.pressing('d')) player.vel.x = 4;" + nl + '    else player.vel.x = 0;' + nl + '  }' + nl + yChain)),
+        A('braced chain, a colour then 0 in the else block', k("  if (kb.pressing('a')) {" + nl + '    player.vel.x = -4;' + nl + "    player.color = 'red';" + nl + "  } else if (kb.pressing('d')) {" + nl + '    player.vel.x = 4;' + nl + '  } else {' + nl + "    player.color = 'deepskyblue';" + nl + '    player.vel.x = 0;' + nl + '  }' + nl + yChain)),
+        A('arrow names in double quotes', code(S['script.js'].replace(/'a'/g, '"left"').replace(/'d'/g, '"right"').replace(/'w'/g, '"up"').replace(/'s'/g, '"down"'))),
+        A('two levels: draw -> controls -> moveX / moveY', code(k('  controls();')['script.js'] + nl + 'function controls() {' + nl + '  moveX();' + nl + '  moveY();' + nl + '}' + nl + 'function moveX() {' + nl + xChain + nl + '}' + nl + 'function moveY() {' + nl + yChain + nl + '}' + nl)),
+        A('a helper with a parameter: steer(player)', code(k('  steer(player);')['script.js'] + nl + 'function steer(p) {' + nl + keys.split('player').join('p') + nl + '}' + nl)),
+        A('the sprite made in a helper that setup() calls', edit(edit(S, made, '  makePlayer();'), 'function draw() {', 'function makePlayer() {' + nl + made + nl + '}' + nl + nl + 'function draw() {')),
+        A('background() in a helper that draw() calls', edit(edit(S, "  background('#222');", '  wipe();'), 'function draw() {', 'function wipe() {' + nl + "  background('#222');" + nl + '}' + nl + nl + 'function draw() {')),
+        R('misplaced else: the left key never works', 'r5', k(misX + nl + yChain)),
+        R('misplaced else: the up key never works', 'r6', k(xChain + nl + misY)),
+        R('misplaced else, braced', 'r5', k("  if (kb.pressing('a')) {" + nl + '    player.vel.x = -4;' + nl + '  }' + nl + "  if (kb.pressing('d')) {" + nl + '    player.vel.x = 4;' + nl + '  } else {' + nl + '    player.vel.x = 0;' + nl + '  }' + nl + yChain)),
+        R('misplaced else, the y ifs in between', 'r5', k("  if (kb.pressing('a')) player.vel.x = -4;" + nl + "  if (kb.pressing('w')) player.vel.y = -4;" + nl + "  if (kb.pressing('d')) player.vel.x = 4;" + nl + '  else player.vel.x = 0;' + nl + "  if (kb.pressing('s')) player.vel.y = 4;" + nl + '  else player.vel.y = 0;')),
+        R('two separate ifs, each with an else', 'r5', k("  if (kb.pressing('a')) player.vel.x = -4;" + nl + '  else player.vel.x = 0;' + nl + "  if (kb.pressing('d')) player.vel.x = 4;" + nl + '  else player.vel.x = 0;' + nl + yChain)),
+        R('0 at the top, then the misplaced else', 'r5', k('  player.vel.x = 0;' + nl + misX + nl + yChain)),
+        R('the right chain, then 0 again after it', 'r5', k(xChain + nl + '  player.vel.x = 0;' + nl + yChain)),
+        R('the misplaced else inside a called helper', 'r5', helper(misX + nl + yChain)),
+        R('0 first, then a speed with no key test', 'r5', k("  kb.pressing('a');" + nl + "  kb.pressing('w');" + nl + '  player.vel.x = 0;' + nl + '  player.vel.y = 0;' + nl + '  player.vel.x = 4;' + nl + '  player.vel.y = 4;')),
+        R('the keys in a helper nobody calls (r3)', 'r3', unused), R('the keys in a helper nobody calls (r4)', 'r4', unused),
+        R('the keys in a helper nobody calls (r5)', 'r5', unused), R('the keys in a helper nobody calls (r6)', 'r6', unused),
+        R('the keys in a helper only setup() calls', 'r3', edit(code(k('')['script.js'] + nl + 'function move() {' + nl + keys + nl + '}' + nl), setupLine, setupLine + nl + '  move();')),
+        R('the helper call only in a comment', 'r5', code(k('  // move();')['script.js'] + nl + 'function move() {' + nl + keys + nl + '}' + nl)),
+        R('the sprite made in draw()', 'r8', edit(edit(S, made + nl + setupLine, ''), "  background('#222');", "  background('#222');" + nl + made)),
+        R('a second sprite made when a key is pressed', 'r8', edit(S, "  background('#222');", "  background('#222');" + nl + "  if (kb.pressing('space')) new Sprite(100, 100, 10, 10);")),
+        R('the canvas made in draw()', 'r8', edit(edit(S, '  new Canvas(400, 400);', ''), "  background('#222');", '  new Canvas(400, 400);' + nl + "  background('#222');")),
+        R('the sprite made in a helper that draw() calls', 'r8', code(edit(edit(S, made + nl + setupLine, ''), "  background('#222');", "  background('#222');" + nl + '  spawn();')['script.js'] + nl + 'function spawn() {' + nl + made + nl + '}' + nl)),
+        R('a helper called from setup() AND draw()', 'r8', code(edit(edit(S, made, '  spawn();'), "  background('#222');", "  background('#222');" + nl + '  spawn();')['script.js'] + nl + 'function spawn() {' + nl + made + nl + '}' + nl)),
+        R('no sprite at all', 'r8', edit(S, made, '')),
+        R('the sprite only inside a string', 'r8', edit(S, made, "  let s = 'new Sprite(1, 2)';")),
+      ]);
+    }
+
+    // ---- 5.1.23 Playground
+    {
+      const id = '5-1-21-a10-1-sprite-playground'; const S = sol(id);
+      const line = '  mover.x = 80 + Math.sin(frameCount * 0.05) * 60;';
+      const w = (to) => edit(S, line, to);
+      const keys = "  if      (kb.pressing('a')) player.vel.x = -4;" + nl + "  else if (kb.pressing('d')) player.vel.x =  4;" + nl + "  else                       player.vel.x =  0;" + nl + "  if      (kb.pressing('w')) player.vel.y = -4;" + nl + "  else if (kb.pressing('s')) player.vel.y =  4;" + nl + "  else                       player.vel.y =  0;";
+      const label = "  fill('white');" + nl + '  textSize(14);' + nl + "  text('WASD to move the blue sprite', 12, 24);";
+      const frameLabel = (f) => edit(f, "text('WASD to move the blue sprite', 12, 24);", "text('frame ' + frameCount, 12, 24);");
+      const unused = code(edit(edit(edit(S, keys, ''), line, ''), label, '')['script.js'] + nl + 'function unused() {' + nl + keys + nl + line + nl + label + nl + '}' + nl);
+      const both = "  if (kb.pressing('a')) {" + nl + '    player.vel.x = -4;' + nl + '    mover.vel.x = -4;' + nl + "  } else if (kb.pressing('d')) {" + nl + '    player.vel.x = 4;' + nl + '    mover.vel.x = 4;' + nl + '  } else {' + nl + '    player.vel.x = 0;' + nl + '    mover.vel.x = 0;' + nl + '  }' + nl + "  if (kb.pressing('w')) player.vel.y = -4;" + nl + "  else if (kb.pressing('s')) player.vel.y = 4;" + nl + '  else player.vel.y = 0;';
+      const sprites = '  player = new Sprite(250, 200, 40, 40);' + nl + "  player.color = 'deepskyblue';" + nl + '  mover = new Sprite(80, 200, 30, 30);' + nl + "  mover.color = 'orange';";
+      run(id, [
+        A('++mover.x', w('  ++mover.x;')),
+        A('frameCount through a variable, no sin', w('  let t = frameCount;' + nl + '  mover.x = t % 500;')),
+        A('an orbit around the player worked out from frameCount', w('  mover.x = player.x + cos(frameCount * 0.05) * 60;' + nl + '  mover.y = player.y + sin(frameCount * 0.05) * 60;')),
+        A('a velocity set in a helper that setup() calls', edit(edit(edit(S, line, ''), "mover.color = 'orange';", "mover.color = 'orange';" + nl + '  launch();'), 'function draw() {', 'function launch() {' + nl + '  mover.vel.x = 2;' + nl + '}' + nl + nl + 'function draw() {')),
+        A('a template-string label', edit(S, "text('WASD to move the blue sprite', 12, 24);", 'text(`frame ${frameCount}`, 12, 24);')),
+        A('background() in a helper that draw() calls', edit(edit(S, "  background('#222');", '  wipe();'), 'function draw() {', 'function wipe() {' + nl + "  background('#222');" + nl + '}' + nl + nl + 'function draw() {')),
+        R('mover.x = start (a variable), frameCount in the label', 'r6', frameLabel(edit(w('  mover.x = start;'), 'let player, mover;', 'let player, mover;' + nl + 'let start = 80;'))),
+        R('let t = frameCount; mover.x = 80', 'r6', w('  let t = frameCount;' + nl + '  mover.x = 80;')),
+        R('a nudge of 0.0', 'r6', w('  mover.x += 0.0;')),
+        R('the mover copies the player velocity', 'r6', w('  mover.vel.x = player.vel.x;' + nl + '  mover.vel.y = player.vel.y;')),
+        R('the mover nudged by the player velocity', 'r6', w('  mover.x += player.vel.x;')),
+        R('the mover moved inside the key branches', 'r6', edit(w(''), keys, both)),
+        R('the mover nudged inside a braced key if', 'r6', w("  if (kb.pressing('m')) {" + nl + "    mover.color = 'red';" + nl + '    mover.x += 2;' + nl + '  }')),
+        R('the mover speed set from a key ternary', 'r6', w("  mover.vel.x = kb.pressing('m') ? 2 : 0;")),
+        R('only x stops, y has no else (r5)', 'r5', edit(S, keys, "  if (kb.pressing('a')) player.vel.x = -4;" + nl + "  else if (kb.pressing('d')) player.vel.x = 4;" + nl + '  else player.vel.x = 0;' + nl + "  if (kb.pressing('w')) player.vel.y = -4;" + nl + "  else if (kb.pressing('s')) player.vel.y = 4;")),
+        R('misplaced else on x (r5)', 'r5', edit(S, keys, "  if (kb.pressing('a')) player.vel.x = -4;" + nl + "  if (kb.pressing('d')) player.vel.x = 4;" + nl + '  else player.vel.x = 0;' + nl + "  if (kb.pressing('w')) player.vel.y = -4;" + nl + "  else if (kb.pressing('s')) player.vel.y = 4;" + nl + '  else player.vel.y = 0;')),
+        R('misplaced else on y (r5)', 'r5', edit(S, keys, "  if (kb.pressing('a')) player.vel.x = -4;" + nl + "  else if (kb.pressing('d')) player.vel.x = 4;" + nl + '  else player.vel.x = 0;' + nl + "  if (kb.pressing('w')) player.vel.y = -4;" + nl + "  if (kb.pressing('s')) player.vel.y = 4;" + nl + '  else player.vel.y = 0;')),
+        R('keys, mover and label in a helper nobody calls (r3)', 'r3', unused),
+        R('keys, mover and label in a helper nobody calls (r5)', 'r5', unused),
+        R('keys, mover and label in a helper nobody calls (r6)', 'r6', unused),
+        R('keys, mover and label in a helper nobody calls (r7)', 'r7', unused),
+        R('both sprites made in draw()', 'r9', edit(edit(S, sprites, ''), "  background('#222');", "  background('#222');" + nl + '  player = new Sprite(250, 200, 40, 40);' + nl + '  mover = new Sprite(80 + frameCount, 200, 30, 30);')),
+        R('the mover made again each frame', 'r9', edit(S, "  background('#222');", "  background('#222');" + nl + '  mover = new Sprite(80, 200, 30, 30);')),
+      ]);
+    }
+
+    // ---- 5.1.11
+    {
+      const id = '5-1-11-moshion-intro'; const S = sol(id);
+      const made = '  player = new Sprite(200, 200, 40, 40);';
+      run(id, [
+        A('the sprite made in a helper that setup() calls', edit(edit(S, made, '  makePlayer();'), 'function draw() {', 'function makePlayer() {' + nl + made + nl + '}' + nl + nl + 'function draw() {')),
+        A('background() in a helper that draw() calls', edit(edit(S, "  background('#222');", '  paint();'), 'function draw() {', 'function paint() {' + nl + "  background('#222');" + nl + '}' + nl + nl + 'function draw() {')),
+        R('the starter (r5)', 'r5', starter(id)),
+        R('the sprite made in draw()', 'r5', edit(edit(S, made + nl + "  player.color = 'deepskyblue';", ''), "  background('#222');", "  background('#222');" + nl + made + nl + "  player.color = 'deepskyblue';")),
+        R('the canvas made in draw()', 'r5', edit(edit(S, '  new Canvas(400, 400);', ''), "  background('#222');", '  new Canvas(400, 400);' + nl + "  background('#222');")),
+        R('the sprite made at the top of the file', 'r5', edit(edit(S, made, ''), 'let player;', 'let player = new Sprite(200, 200, 40, 40);')),
+        R('background() in a helper nobody calls', 'r4', edit(edit(S, "  background('#222');", ''), 'function draw() {', 'function paint() {' + nl + "  background('#222');" + nl + '}' + nl + nl + 'function draw() {')),
+      ]);
+    }
+
+    // ---- 5.1.19
+    {
+      const id = '5-1-18-lab-else-to-zero'; const S = sol(id);
+      const both = "  if (kb.pressing('a')) player.vel.x = -3;" + nl + "  else if (kb.pressing('d')) player.vel.x = 3;" + nl + '  else player.vel.x = 0;' + nl + nl + "  if (kb.pressing('w')) player.vel.y = -3;" + nl + "  else if (kb.pressing('s')) player.vel.y = 3;" + nl + '  else player.vel.y = 0;';
+      const b = (to) => edit(S, both, to);
+      run(id, [
+        A('the whole pattern in a helper draw() calls', code(b('  steer();')['script.js'] + nl + 'function steer() {' + nl + both + nl + '}' + nl)),
+        A('the pattern in update()', code(b('')['script.js'] + nl + 'function update() {' + nl + both + nl + '}' + nl)),
+        R('the pattern in a helper nobody calls', 'r1', code(b('')['script.js'] + nl + 'function steer() {' + nl + both + nl + '}' + nl)),
+        R('the x else put back under the wrong if', 'r1', b("  if (kb.pressing('a')) player.vel.x = -3;" + nl + "  if (kb.pressing('d')) player.vel.x = 3;" + nl + '  else player.vel.x = 0;' + nl + "  if (kb.pressing('w')) player.vel.y = -3;" + nl + "  else if (kb.pressing('s')) player.vel.y = 3;" + nl + '  else player.vel.y = 0;')),
+        R('the y else put back under the wrong if', 'r2', b("  if (kb.pressing('a')) player.vel.x = -3;" + nl + "  else if (kb.pressing('d')) player.vel.x = 3;" + nl + '  else player.vel.x = 0;' + nl + "  if (kb.pressing('w')) player.vel.y = -3;" + nl + "  if (kb.pressing('s')) player.vel.y = 3;" + nl + '  else player.vel.y = 0;')),
+      ]);
+    }
+
+    // ---- 5.1.25 Challenges r4
+    {
+      const id = '5-1-23-challenges';
+      const base = (body, setupExtra = '') => code([
+        'let player;', '', 'function setup() {', '  new Canvas(400, 400);', '  player = new Sprite(200, 200, 40, 40);', "  player.color = 'deepskyblue';" + setupExtra, '}', '',
+        'function draw() {', "  background('#222');", body, '}', ''].join(nl));
+      const move = "  if (kb.pressing('left')) player.vel.x = -3;" + nl + '  else player.vel.x = 0;';
+      const bg = (to) => code(base(move)['script.js'].replace("background('#222');", to));
+      run(id, [
+        A('a spin: rotationSpeed set once in setup()', base(move, nl + '  player.rotationSpeed = 3;')),
+        A('a spin: rotationSpeed in draw()', base('  player.rotationSpeed = 2;')),
+        A('grow: player.w += 1', base('  player.w += 1;')),
+        A('grow while space is held', base("  if (kb.pressing('space')) player.w += 1;")),
+        A('pulse: player.scale *= 1.01', base('  player.scale *= 1.01;')),
+        A('wander: x += Math.random() * 4 - 2', base('  player.x += Math.random() * 4 - 2;')),
+        A('wander: random(-2, 2) on vel', base('  player.vel.x = random(-2, 2);')),
+        A('trail: rgba in backticks', bg('background(`rgba(0, 0, 0, 0.2)`);')),
+        A('trail: the rgba background in a helper draw() calls', code(bg('fade();')['script.js'] + nl + 'function fade() {' + nl + "  background('rgba(34, 34, 34, 0.1)');" + nl + '}' + nl)),
+        A('challenge 3 with round()', base("  text('x: ' + round(player.pos.x), 10, 20);")),
+        R('keys move the player by x, nothing else', 'r4', base("  if (kb.pressing('left')) player.x -= 3;")),
+        R("text( only inside a string", 'r4', base(move + nl + '  let s = "text(";')),
+        R("sin( only inside a string", 'r4', base(move + nl + "  let s = 'sin(frameCount)';")),
+        R("background('rgba( only inside a string", 'r4', base(move + nl + "  let s = \"background('rgba(0,0,0,0.1)')\";")),
+        R('rotationSpeed 0 in setup()', 'r4', base(move, nl + '  player.rotationSpeed = 0;')),
+        R('the challenge in a helper nobody calls', 'r4', code(base(move)['script.js'] + nl + 'function unused() {' + nl + '  player.pos.y = 200 + sin(frameCount * 0.05) * 80;' + nl + '}' + nl)),
+      ]);
+    }
+
+    // ---- 5.1.26 r1, r4
+    {
+      const id = '5-1-25-math-grid'; const S = sol(id);
+      const two = '  showGrid(50);' + nl + '  showMouse();';
+      const helperDef = 'function overlay() {' + nl + two + nl + '}' + nl;
+      run(id, [
+        A('showGrid and showMouse in a helper draw() calls', code(edit(S, two, '  overlay();')['script.js'] + nl + helperDef)),
+        A('the helper written above draw()', edit(edit(S, two, '  overlay();'), 'function draw() {', helperDef + nl + 'function draw() {')),
+        R('the overlay helper never called', 'r1', code(edit(S, two, '')['script.js'] + nl + helperDef)),
+        R('the overlay helper called only from setup()', 'r4', edit(code(edit(S, two, '')['script.js'] + nl + helperDef), "  box.color = 'deepskyblue';", "  box.color = 'deepskyblue';" + nl + '  overlay();')),
+      ]);
+    }
   }
 
   // 5.10.2 r1
