@@ -113,7 +113,7 @@
     {
       "id": "req4",
       "title": "Player input",
-      "description": "Keyboard or mouse input the player uses to control the game. Help: 5.1.15 (Keyboard Movement)",
+      "description": "Keyboard or mouse input the player uses to control the game. Help: 5.1.18 (Keyboard Movement)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\b(kb|keyboard)\\s*\\.\\s*(pressing|presses|pressed|released|releases)\\s*\\(|\\bmouse\\s*\\.\\s*(pressing|presses|pressed)\\s*\\(",

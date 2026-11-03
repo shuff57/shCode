@@ -59,7 +59,7 @@
     {
       "id": "r4",
       "title": "Launch the player upward",
-      "description": "Inside draw(), the player's vertical velocity is set to a negative number (or a variable holding one) when the jump fires. Help: 5.1.16 (Velocity: vel.x and vel.y)",
+      "description": "Inside draw(), the player's vertical velocity is set to a negative number (or a variable holding one) when the jump fires. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -100,7 +100,7 @@
       {
         "id": "r4",
         "title": "Launch the player upward",
-        "description": "Inside draw(), when the jump fires, the player's vel.y is set to a negative number (or a variable holding one), so the player goes up. A positive number pushes it down, which is the opposite, and setting it on every frame with no jump test makes it fly away, so neither is met. Help: 5.1.16 (Velocity: vel.x and vel.y)",
+        "description": "Inside draw(), when the jump fires, the player's vel.y is set to a negative number (or a variable holding one), so the player goes up. A positive number pushes it down, which is the opposite, and setting it on every frame with no jump test makes it fly away, so neither is met. Help: 5.1.15 (Velocity: vel.x and vel.y)",
         "points": 1
       }
     ]

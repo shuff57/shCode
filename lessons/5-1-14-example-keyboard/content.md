@@ -1,18 +1,18 @@
-# 5.1.15 Worked Examples
+# 5.1.18 Worked Examples
 
-Teacher-led walkthroughs for Module 5.1. Students can reference these after class when building 5.1.22 Sprite Playground.
+Teacher-led walkthroughs for Module 5.1. Students can come back to them when building 5.1.23 Sprite Playground.
 
-All three examples are designed to be typed (not pasted) into the moSHion in-app editor so the code sinks in line-by-line.
+Each example builds up one step at a time. The code in the steps is there to read, one change at a time; each example ends with a block you can run and change right here.
 
-**Elsewhere in Module 5.1:** 5.1.23 Frame Loop Writeup · 5.1.24 Challenges
+**Elsewhere in Module 5.1:** 5.1.24 Frame Loop Writeup · 5.1.25 Challenges
 
 ---
 
 ## Worked Example 1: Minimum sprite program
 
-**Goal:** Prove that a canvas + sprite + background is the smallest possible moSHion program.
+**Goal:** Prove that a canvas + sprite + background is the smallest possible moSHion program. This is the program from 5.1.4 again, as a reminder.
 
-### Step 1: Type this exactly
+### Step 1: The first try
 
 ```js
 function setup() {
@@ -25,13 +25,11 @@ function draw() {
 }
 ```
 
-Click Run. You'll see a dark canvas with a square in the middle.
+This puts a square in the middle of a dark canvas, and then something goes wrong.
 
 ### Step 2: Notice the bug
 
-**Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame**: 60 per second. If you run this for 5 seconds, 300 sprites exist. You just can't see them because they're all in the same spot.
-
-Open the in-app editor's performance tab (or the browser DevTools) to confirm. The frame rate will slowly drop.
+**Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame**: 60 per second. If you run this for 5 seconds, 300 sprites exist. Every new one starts in the same spot, but sprites are solid and push each other apart, so squares keep piling up and spreading out until they cover the whole canvas. You watched this happen in 5.1.4.
 
 ### Step 3: Hoist the sprite
 
@@ -51,7 +49,7 @@ function draw() {
 }
 ```
 
-Run. **One** sprite exists. It's rendered automatically every frame: you don't call any render function. The engine sees the sprite in its world and draws it for you.
+Run the block below. **One** sprite exists. It's rendered automatically every frame: you don't call any render function. The engine sees the sprite in its world and draws it for you.
 
 **Try the combined final: tweak and Run:**
 
@@ -95,7 +93,7 @@ function draw() {
 }
 ```
 
-Run. Hold the left arrow key. Sprite moves left. Hold right. Sprite moves right. Release both. **Sprite stops**, because of the `else` branch.
+With this `draw()`, holding the left arrow moves the sprite left and holding the right arrow moves it right. Let go of both and the **sprite stops**, because of the `else` branch.
 
 ### Step 2: Break it on purpose
 
@@ -107,9 +105,9 @@ Comment out the `else` branch:
   // else player.vel.x = 0;  ← commented out
 ```
 
-Run. Hold left, release. **Sprite drifts forever.** This is the **drifting sprite bug**: the #1 bug students hit this week.
+Try it in the block at the end of this example: put `//` in front of the first `else` line (the one that sets `player.vel.x` to `0`), Run, click the canvas, hold the left arrow, then let go. **The sprite drifts forever.** This is the **drifting sprite bug**: the #1 bug students hit this week.
 
-Why? `vel.x` keeps its last value (−4) until you assign something else. Without the `else`, you only ever assign on key presses.
+Why? A velocity stays until your code changes it. `vel.x` keeps its last value (−4), and without the `else`, nothing sets it back to `0` when you let go.
 
 Put the `else` back.
 
@@ -157,96 +155,8 @@ function draw() {
 ### Key takeaways
 
 - `kb.pressing(key)` is **level-triggered**: true every frame while the key is held.
-- **Always include the else branch** to reset velocity. This is 80% of the bugs this week.
+- **Always include the `else` branch** that sets the velocity back to `0`. Leaving it out is the most common bug in this module.
 - Y-axis is flipped compared to math class. Up = negative, down = positive.
-
----
-
-## Worked Example 3: Automatic motion with `frameCount`
-
-**Goal:** Make a sprite move on its own, no keyboard required. Useful for animated backgrounds, orbiting enemies, oscillating platforms.
-
-```js
-let player, mover;
-
-function setup() {
-  new Canvas(500, 400);
-  player = new Sprite(100, 200, 40, 40);
-  player.color = 'deepskyblue';
-
-  mover = new Sprite(400, 200, 30, 30);
-  mover.color = 'orange';
-}
-
-function draw() {
-  background('#222');
-
-  // Player movement with WASD: see Worked Example 2
-  if (kb.pressing('a')) player.vel.x = -4;
-  else if (kb.pressing('d')) player.vel.x = 4;
-  else player.vel.x = 0;
-
-  // Mover oscillates left-right using frameCount
-  mover.pos.x = 400 + sin(frameCount * 0.05) * 80;
-}
-```
-
-### What `frameCount` does
-
-`frameCount` is a built-in counter that is `1` on the first frame and goes up by 1 every frame after. At 60 fps, after 1 second it's 60. After 10 seconds it's 600.
-
-### What the math does
-
-- `frameCount * 0.05`: scales down the counter so motion is slow enough to see.
-- `sin(...)`: produces a smooth wave between −1 and +1.
-- `* 80`: multiplies the wave to a range of ±80 pixels.
-- `400 + ...`: centers the motion around x = 400.
-
-Result: the mover sprite slides smoothly left and right around x = 400, going 80 pixels each way.
-
-### Variations to try
-
-- **Circle:** use both `sin` and `cos`:
-  ```js
-  mover.pos.x = 400 + sin(frameCount * 0.05) * 60;
-  mover.pos.y = 200 + cos(frameCount * 0.05) * 60;
-  ```
-- **Spin:** rotate the sprite without moving it:
-  ```js
-  mover.rotation = frameCount * 2;
-  ```
-- **Faster / slower:** change `0.05` → smaller = slower, larger = faster. `0.1` moves twice as fast.
-
-**Try the combined final: WASD moves the player, the orange sprite moves on its own:**
-
-```js live
-let player, mover;
-
-function setup() {
-  new Canvas(500, 400);
-  player = new Sprite(100, 200, 40, 40);
-  player.color = 'deepskyblue';
-
-  mover = new Sprite(400, 200, 30, 30);
-  mover.color = 'orange';
-}
-
-function draw() {
-  background('#222');
-
-  if (kb.pressing('a')) player.vel.x = -4;
-  else if (kb.pressing('d')) player.vel.x = 4;
-  else player.vel.x = 0;
-
-  mover.pos.x = 400 + sin(frameCount * 0.05) * 80;
-}
-```
-
-### Key takeaways
-
-- `frameCount` is a universal timing tool, whenever you need "do something periodically," reach for it.
-- `sin` + scale + offset is the smooth-oscillation pattern. You'll use it a lot.
-- Setting `.pos.x` directly (without using `vel`) is fine when you don't want physics to affect motion. It's a "kinematic" style of motion.
 
 ---
 
@@ -273,7 +183,4 @@ function setup() {
 if (kb.pressing('a')) player.vel.x = -4;
 else if (kb.pressing('d')) player.vel.x = 4;
 else player.vel.x = 0;
-
-// Automatic motion
-sprite.pos.x = centerX + sin(frameCount * 0.05) * amplitude;
 ```

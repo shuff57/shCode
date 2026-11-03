@@ -1,7 +1,7 @@
 {
   "id": "5-1-24-reading-text-labels",
   "title": "5.1.21 Reading: Words on the canvas: text()",
-  "description": "How text(words, x, y) puts words on the canvas, what fill() and textSize() change, and why text goes after background(). Read before 5.1.22.",
+  "description": "How text(words, x, y) puts words on the canvas, what fill() and textSize() change, and why text goes after background(). Read before 5.1.23.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",

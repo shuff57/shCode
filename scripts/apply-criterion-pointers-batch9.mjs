@@ -44,9 +44,9 @@ const POINTERS = {
   // --- 5.1 moSHion basics -------------------------------------------------
   '5-1-7-lab-one-sprite': { target: '5.1.6', note: 'Sprite: new Sprite(x, y, w, h) + .color' },
   '5-1-11-moshion-intro': { target: '5.1.6', note: 'Sprite: new Sprite(x, y, w, h) + .color' },
-  '5-1-18-lab-else-to-zero': { target: '5.1.18', note: 'The else-to-zero rule' },
+  '5-1-18-lab-else-to-zero': { target: '5.1.17', note: 'The else-to-zero rule' },
   '5-1-20-moshion-move-keys': { target: '5.1.13', note: 'kb.pressing(key)' },
-  '5-1-21-a10-1-sprite-playground': { target: '5.1.17', note: 'Movement pattern (if / else if / else)' },
+  '5-1-21-a10-1-sprite-playground': { target: '5.1.16', note: 'Movement pattern (if / else if / else)' },
   '5-1-23-challenges': { target: '5.1.5', note: 'Canvas: new Canvas(w, h)' },
 };
 
@@ -93,7 +93,7 @@ const PER_CRITERION = {
   '5-1-11-moshion-intro\u0000Set a sprite color':
     { target: '5.1.6', note: 'Sprite: new Sprite(x, y, w, h) + .color' },
   '5-1-18-lab-else-to-zero\u0000Restore else player.vel.x = 0':
-    { target: '5.1.18', note: 'The else-to-zero rule' },
+    { target: '5.1.17', note: 'The else-to-zero rule' },
   '5-1-20-moshion-move-keys\u0000Create a canvas':
     { target: '5.1.5', note: 'Canvas: new Canvas(w, h)' },
   '5-1-20-moshion-move-keys\u0000Create a sprite':
@@ -103,9 +103,9 @@ const PER_CRITERION = {
   '5-1-20-moshion-move-keys\u0000Vertical keyboard input':
     { target: '5.1.13', note: 'kb.pressing(key)' },
   '5-1-20-moshion-move-keys\u0000Set horizontal velocity':
-    { target: '5.1.16', note: 'Velocity: vel.x and vel.y' },
+    { target: '5.1.15', note: 'Velocity: vel.x and vel.y' },
   '5-1-20-moshion-move-keys\u0000Set vertical velocity':
-    { target: '5.1.16', note: 'Velocity: vel.x and vel.y' },
+    { target: '5.1.15', note: 'Velocity: vel.x and vel.y' },
   '5-1-21-a10-1-sprite-playground\u0000Create a canvas':
     { target: '5.1.5', note: 'Canvas: new Canvas(w, h)' },
   '5-1-21-a10-1-sprite-playground\u0000Horizontal WASD input':
@@ -113,7 +113,7 @@ const PER_CRITERION = {
   '5-1-21-a10-1-sprite-playground\u0000Vertical WASD input':
     { target: '5.1.14', note: 'WASD-not-arrows' },
   '5-1-21-a10-1-sprite-playground\u0000Velocity resets to zero':
-    { target: '5.1.18', note: 'The else-to-zero rule' },
+    { target: '5.1.17', note: 'The else-to-zero rule' },
   '5-1-23-challenges\u0000Create at least one sprite':
     { target: '5.1.6', note: 'Sprite: new Sprite(x, y, w, h) + .color' },
 };

@@ -69,7 +69,7 @@ coin.color = colors[pick];
 
 ### A timer is a frame count
 
-moSHion runs `draw()` about 60 times every second. `frameCount` is the number of times it has run: `1` on the first frame, `2` on the second, and so on. You saw it move a sprite in 5.1.15. It is also a clock.
+moSHion runs `draw()` about 60 times every second. `frameCount` is the number of times it has run: `1` on the first frame, `2` on the second, and so on. You saw it move a sprite in 5.1.22. It is also a clock.
 
 | Frames | About how long |
 | --- | --- |

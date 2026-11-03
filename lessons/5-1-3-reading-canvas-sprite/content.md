@@ -17,7 +17,7 @@ You don't call `setup()` or `draw()` yourself. You **define** them, and moSHion 
 
 **Try it:**
 
-```js live
+```js live console
 let frames = 0;
 
 function setup() {
@@ -34,9 +34,11 @@ function draw() {
 }
 ```
 
-**What you'll see:** the canvas appears, `setup ran` prints **once** in the on-canvas console, then on the canvas you'll see `frames: 1`, `frames: 2`, `frames: 3` … climbing by about 60 each second.
+**Words in this sketch:** `function`, `let` and `console.log` are the same ones you used in Chapters 1 to 3. Three are new, and a later reading covers them properly: `fill('white')` picks the color for words, `textSize(20)` picks how tall the letters are, and `text(...)` writes words on the canvas at the x and y you give it. The `+` joins words and a number, as in Chapter 1.
 
-**Try this:** stop and restart the sketch. Notice `setup ran` prints once *each time you start*, while `frames` resets to 0 and climbs again. That's the schedule: `setup()` once per start, `draw()` every frame after.
+**What you'll see:** the canvas appears, `setup ran` prints **once** in the Console box under the canvas, then on the canvas you'll see `frames: 1`, `frames: 2`, `frames: 3` … climbing by about 60 each second.
+
+**Try this:** press **Run** again. That restarts the sketch: `setup ran` prints once *for that start*, and `frames` goes back to 0 and climbs again. That's the schedule: `setup()` once per start, `draw()` every frame after.
 
 ---
 

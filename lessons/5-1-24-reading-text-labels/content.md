@@ -1,6 +1,6 @@
 ## Words on the canvas: text()
 
-Read before `5.1.22 Sprite Playground`. About 5 minutes.
+Read before `5.1.23 Sprite Playground`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 - What do `fill()` and `textSize()` change?
 - Why must the `text()` line come **after** `background()` inside `draw()`?
 
-So far everything on the canvas has been a sprite. Sometimes a sketch also needs words: a title, a score, a label. moSHion draws words with `text()`.
+You have already seen words on the canvas twice: the frame counter in 5.1.3 and the `w is HELD` sketch in 5.1.13. A sketch often needs words like that: a title, a score, a label. moSHion draws them with `text()`, and this reading explains how it works.
 
 **What you'll learn from it:**
 

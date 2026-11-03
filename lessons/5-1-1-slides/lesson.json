@@ -1,7 +1,7 @@
 {
   "id": "5-1-1-slides",
   "title": "5.1.1 Slides: moSHion Foundations",
-  "description": "Hello Sprite and Movement slides: canvas, sprites, keyboard input, and the frame loop. Placeholder until the deck is rebuilt from bookSHelf.",
+  "description": "An overview of this module: the canvas, sprites, keyboard input, and the frame loop that runs your code about 60 times a second.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
