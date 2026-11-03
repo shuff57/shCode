@@ -972,6 +972,330 @@ for (const id of Object.values(L)) {
   reject(D, 'showMouse in setup() only', 'r4', edit(edit(sol, '  showMouse();' + nl, ''), origin, origin + nl + '  showMouse();'));
 }
 
+// ---------------------------------------------------------------- Chapter 5 flagged requirements
+//
+// The Chapter 5 aiCheck live sample (codehs-review/loop/aicheck-ch5-live-sample.md)
+// listed 23 regex requirements that refused a shape the course taught, or let the
+// wrong idea through. The AI Check grades these labs when it is reachable; the
+// regex is what marks the cards when it is not, so each fix is pinned here: the
+// honest shapes that must now pass, and the wrong idea each card must still refuse.
+{
+  const sol = solutionFiles;
+  const starter = starterFiles;
+  const A = (name, files) => ({ name, files, expect: 'pass' });
+  const R = (name, req, files) => ({ name, files, expect: 'fail', req });
+  const run = (id, list) => {
+    for (const c of list) {
+      if (c.expect === 'pass') accept(id, c.name, c.files);
+      else reject(id, c.name, c.req, c.files);
+    }
+  };
+
+  // 5.1.22 r6
+  {
+    const id = '5-1-21-a10-1-sprite-playground'; const S = sol(id);
+    const line = '  mover.x = 80 + Math.sin(frameCount * 0.05) * 60;';
+    run(id, [
+      A('reference', S), R('starter', 'r6', starter(id)),
+      A('rotation and x nudged every frame', edit(S, line, '  mover.rotation += 2;' + nl + '  mover.x += 1;')),
+      A('x = x + 1 longhand', edit(S, line, '  mover.x = mover.x + 1;')),
+      A('mover.x++', edit(S, line, '  mover.x++;')),
+      A('velocity set once in setup (5.1.15)', edit(edit(S, line, ''), "mover.color = 'orange';", "mover.color = 'orange';" + nl + '  mover.vel.x = 2;')),
+      A('rotationSpeed set once in setup', edit(edit(S, line, ''), "mover.color = 'orange';", "mover.color = 'orange';" + nl + '  mover.rotationSpeed = 3;')),
+      A('velocity set in draw', edit(S, line, '  mover.vel.y = 1;')),
+      A('frameCount-driven, inside a braced if', edit(S, line, '  if (true) {' + nl + '    mover.rotation = frameCount * 2;' + nl + '  }')),
+      R('moves only while a key is held', 'r6', edit(S, line, "  if (kb.pressing('m')) mover.x += 2;")),
+      R('frameCount line put in setup (runs once)', 'r6', edit(edit(S, line, ''), "mover.color = 'orange';", "mover.color = 'orange';" + nl + '  mover.x = 80 + Math.sin(frameCount * 0.05) * 60;')),
+      R('a nudge of zero', 'r6', edit(S, line, '  mover.x += 0;')),
+      R('velocity of zero in setup', 'r6', edit(edit(S, line, ''), "mover.color = 'orange';", "mover.color = 'orange';" + nl + '  mover.vel.x = 0;')),
+    ]);
+  }
+
+  // 5.1.24 r4
+  {
+    const id = '5-1-23-challenges';
+    const base = (body) => ({ 'script.js': [
+      'let player;', '', 'function setup() {', '  new Canvas(400, 400);', '  player = new Sprite(200, 200, 40, 40);', "  player.color = 'deepskyblue';", '}', '',
+      'function draw() {', "  background('#222');", body, '}', ''].join(nl) });
+    run(id, [
+      A('reference', sol(id)), R('starter', 'r4', starter(id)),
+      A('challenge 1: kb.pressing changes the colour', base("  if (kb.pressing('left')) player.color = 'red';" + nl + "  else player.color = 'deepskyblue';")),
+      A('challenge 1 with braces and ||', base("  if (kb.pressing('left') || kb.pressing('right')) {" + nl + "    player.color = 'orange';" + nl + '  } else {' + nl + "    player.color = 'deepskyblue';" + nl + '  }')),
+      A('challenge 1: moves and recolours in one block', base("  if (kb.pressing('left')) {" + nl + '    player.vel.x = -3;' + nl + "    player.color = 'red';" + nl + '  } else {' + nl + '    player.vel.x = 0;' + nl + '  }')),
+      A('challenge 1 as a ternary', base("  player.color = kb.pressing('left') ? 'red' : 'deepskyblue';")),
+      R('keys only move the player', 'r4', base("  if (kb.pressing('left')) player.vel.x = -3;" + nl + '  else player.vel.x = 0;')),
+      R('colour set with no key test', 'r4', base("  if (kb.pressing('left')) player.vel.x = -3;" + nl + "  player.color = 'red';")),
+    ]);
+  }
+
+  // 5.10.2 r1
+  {
+    const id = '5-10-defender-2-lab-a-field-of-enemies'; const S = sol(id);
+    const two = "  const e = new Sprite(x, y, 30, 30);" + nl + "  e.collider = 'none';";
+    run(id, [
+      A('reference', S),
+      A("'none' as the fifth argument", edit(S, two, "  const e = new Sprite(x, y, 30, 30, 'none');")),
+      A('"none" in double quotes as the fifth argument', edit(S, two, '  const e = new Sprite(x, y, 30, 30, "none");')),
+      R('sprite left solid', 'r1', edit(S, two, '  const e = new Sprite(x, y, 30, 30);')),
+      R("fifth argument 'static'", 'r1', edit(S, two, "  const e = new Sprite(x, y, 30, 30, 'static');")),
+    ]);
+  }
+
+  // 5.2.17 r3
+  {
+    const id = '5-2-11-lab-reaching-the-goal'; const S = sol(id);
+    run(id, [
+      A('reference', S),
+      A('goal.remove()', edit(S, 'goal.delete();', 'goal.remove();')),
+      R('goal only hidden', 'r3', edit(S, 'goal.delete();', 'goal.visible = false;')),
+    ]);
+  }
+
+  // 5.2.10 r3
+  {
+    const id = '5-2-5-lab-add-a-jump'; const S = sol(id);
+    const head = "  if (kb.presses(' ') && player.colliding(ground)) {";
+    const block = head + nl + '    player.vel.y = -7;' + nl + '  }';
+    run(id, [
+      A('reference', S),
+      A('nested ifs on one line', edit(S, head, "  if (kb.presses(' ')) if (player.colliding(ground)) {")),
+      A('nested ifs, each braced', edit(S, block, "  if (kb.presses(' ')) {" + nl + '    if (player.colliding(ground)) {' + nl + '      player.vel.y = -7;' + nl + '    }' + nl + '  }')),
+      A('nested ifs, ground test outside', edit(S, block, '  if (player.colliding(ground)) {' + nl + "    if (kb.presses(' ')) {" + nl + '      player.vel.y = -7;' + nl + '    }' + nl + '  }')),
+      R('two separate ifs that can each launch', 'r3', edit(S, block, "  if (kb.presses(' ')) player.vel.y = -7;" + nl + '  if (player.colliding(ground)) {' + nl + '    player.vel.y = -7;' + nl + '  }')),
+      R('joined with ||', 'r3', edit(S, head, "  if (kb.presses(' ') || player.colliding(ground)) {")),
+    ]);
+  }
+
+  // 5.2.3 r3
+  {
+    const id = '5-2-random-3-lab-random-spot-and-colour'; const S = sol(id);
+    const line = 'roll = floor(random(1, 7));';
+    const w = (to) => edit(S, line, to);
+    run(id, [
+      A('reference', S),
+      A('round(random(1, 6))', w('roll = round(random(1, 6));')),
+      A('int(random(1, 7))', w('roll = int(random(1, 7));')),
+      A('Math.floor(random(1, 7))', w('roll = Math.floor(random(1, 7));')),
+      A('floor(random(0, 6)) + 1', w('roll = floor(random(0, 6)) + 1;')),
+      A('1 + int(random(6))', w('roll = 1 + int(random(6));')),
+      A('Math.floor(Math.random() * 6 + 1)', w('roll = Math.floor(Math.random() * 6 + 1);')),
+      A('Math.round(random(1, 6))', w('roll = Math.round(random(1, 6));')),
+      R('a decimal', 'r3', w('roll = random(1, 7);')),
+      R('0 to 5', 'r3', w('roll = floor(random(0, 6));')),
+      R('never 6', 'r3', w('roll = floor(random(1, 6));')),
+      R('round of 0 to 6 can give 0', 'r3', w('roll = round(random(0, 6));')),
+    ]);
+  }
+
+  // 5.2.4 r2
+  {
+    const id = '5-2-random-4-lab-beat-and-one-shot'; const S = sol(id);
+    const line = '    on = !on;';
+    const w = (to) => edit(S, line, to);
+    run(id, [
+      A('reference', S), R('starter', 'r2', starter(id)),
+      A('if/else flips it', w('    if (on) {' + nl + '      on = false;' + nl + '    } else {' + nl + '      on = true;' + nl + '    }')),
+      A('if/else without braces', w('    if (on === true) on = false;' + nl + '    else on = true;')),
+      A('if (!on) on = true else false', w('    if (!on) {' + nl + '      on = true;' + nl + '    } else {' + nl + '      on = false;' + nl + '    }')),
+      A('ternary', w('    on = on ? false : true;')),
+      A('on = on === false', w('    on = on === false;')),
+      R('the beat only sets on = true', 'r2', w('    on = true;')),
+      R('the beat only sets on = false', 'r2', w('    on = false;')),
+    ]);
+  }
+
+  // 5.6.14 r2
+  {
+    const id = '5-3-13-lab-build-sprite'; const S = sol(id);
+    run(id, [
+      A('reference', S),
+      A("a fifth 'static' argument", edit(S, 'rect = new Sprite(120, 150, 80, 50);', "rect = new Sprite(120, 150, 80, 50, 'static');")),
+      R('no rectangle at all', 'r2', edit(S, 'rect = new Sprite(120, 150, 80, 50);', 'rect = new Sprite(120, 150, 80);')),
+    ]);
+  }
+
+  // 5.7.13 r1
+  {
+    const id = '5-3-26-lab-array-of-instances'; const S = sol(id);
+    const five = [50, 130, 210, 290, 370];
+    const pushes = S['script.js'].match(/  enemies\.push\(new Enemy\(50[\s\S]*?6\)\);/)[0];
+    run(id, [
+      A('reference', S), R('starter', 'r1', starter(id)),
+      A('five built straight into the array', edit(S, pushes, '  enemies = [' + five.map((x) => `new Enemy(${x}, 100, 3)`).join(', ') + '];')),
+      A('a single push', edit(S, pushes, '  enemies.push(new Enemy(50, 100, 5));')),
+      A('made first, then pushed', edit(S, pushes, '  const e = new Enemy(50, 100, 5);' + nl + '  enemies.push(e);')),
+      A('pushed in a loop', edit(S, pushes, '  for (let i = 0; i < 5; i++) {' + nl + '    enemies.push(new Enemy(50 + i * 80, 100, 3));' + nl + '  }')),
+      R('five separate variables', 'r1', edit(S, pushes, five.map((x, i) => `  let e${i} = new Enemy(${x}, 100, 3);`).join(nl))),
+    ]);
+  }
+
+  // 5.7.14 r1
+  {
+    const id = '5-3-27-lab-loop-instances'; const S = sol(id);
+    const loop = '  for (let e of enemies) {' + nl + '    e.render();' + nl + '  }';
+    run(id, [
+      A('reference', S), R('starter', 'r1', starter(id)),
+      A('forEach with an arrow', edit(S, loop, '  enemies.forEach((e) => e.render());')),
+      A('forEach with a function', edit(S, loop, '  enemies.forEach(function (e) {' + nl + '    e.render();' + nl + '  });')),
+      A('index loop', edit(S, loop, '  for (let i = 0; i < enemies.length; i++) {' + nl + '    enemies[i].render();' + nl + '  }')),
+      R('only the first enemy', 'r1', edit(S, loop, '  enemies[0].render();')),
+      R('forEach that never renders', 'r1', edit(S, loop, '  enemies.forEach((e) => e.hp);')),
+    ]);
+  }
+
+  // 5.7.19 r3
+  {
+    const id = '5-3-31-a12-1-collectible'; const S = sol(id);
+    const body = '    this.sprite.delete();' + nl + '    return this.value;';
+    const w = (to) => edit(S, body, to);
+    run(id, [
+      A('reference', S),
+      A('kept in a variable, remove(), then returned', w('    const v = this.value;' + nl + '    this.sprite.remove();' + nl + '    return v;')),
+      A('delete inside an if, then return', w('    if (this.sprite) {' + nl + '      this.sprite.delete();' + nl + '    }' + nl + '    return this.value;')),
+      R('delete after the return never runs', 'r3', w('    return this.value;' + nl + '    this.sprite.delete();')),
+      R('return only', 'r3', w('    return this.value;')),
+      R('delete only', 'r3', w('    this.sprite.delete();')),
+    ]);
+  }
+
+  // 5.6.10 r2
+  {
+    const id = '5-3-9-lab-write-property'; const S = sol(id);
+    run(id, [
+      A('reference', S), R('starter', 'r2', starter(id)),
+      A('kb.pressing', edit(S, "if (kb.presses('space')) {", "if (kb.pressing('space')) {")),
+      R('no key test, a timer instead', 'r2', edit(S, "if (kb.presses('space')) {", 'if (frameCount % 60 === 0) {')),
+    ]);
+  }
+
+  // 5.3.4 r1
+  {
+    const id = '5-3-pinball-3-lab-build-the-table'; const S = sol(id);
+    const w = (to) => edit(S, 'world.gravity.y = 10;', to);
+    run(id, [
+      A('reference', S),
+      A('a decimal', w('world.gravity.y = 9.8;')),
+      A('through a variable', w('const G = 10;' + nl + '  world.gravity.y = G;')),
+      R('negative: the ball rises', 'r1', w('world.gravity.y = -10;')),
+      R('negative through a variable', 'r1', w('const G = -10;' + nl + '  world.gravity.y = G;')),
+      R('zero', 'r1', w('world.gravity.y = 0;')),
+    ]);
+  }
+
+  // 5.3.8 r1, r2
+  {
+    const id = '5-3-pinball-7-lab-three-bumpers-three-values'; const S = sol(id);
+    run(id, [
+      A('reference', S), R('starter', 'r1', starter(id)),
+      A('counting loop that stops at 3', edit(S, '  for (const b of bumpers) {', '  for (let i = 0; i < 3; i++) {' + nl + '    const b = bumpers[i];')),
+      A('counting loop over the length', edit(S, '  for (const b of bumpers) {', '  for (let i = 0; i < bumpers.length; i++) {' + nl + '    const b = bumpers[i];')),
+      R('three separate ifs', 'r1', edit(S, '  for (const b of bumpers) {', '  {' + nl + '    const b = bumpers[0];')),
+      A('if/else sets the memory to true / false', edit(S, '    b.wasTouching = touching;', '    if (touching) {' + nl + '      b.wasTouching = true;' + nl + '    } else {' + nl + '      b.wasTouching = false;' + nl + '    }')),
+      A('if/else without braces', edit(S, '    b.wasTouching = touching;', '    if (touching) b.wasTouching = true;' + nl + '    else b.wasTouching = false;')),
+      A('memory set straight from colliding()', edit(edit(S, '    b.wasTouching = touching;', '    b.wasTouching = ball.colliding(b);'), '    const touching = ball.colliding(b);' + nl + '    if (touching && !b.wasTouching) {', '    if (ball.colliding(b) && !b.wasTouching) {')),
+      R('one shared memory', 'r2', { 'script.js': edit(edit(S, '!b.wasTouching', '!wasTouching'), '    b.wasTouching = touching;', '    wasTouching = touching;')['script.js'].replace('let bumpers = [];', 'let bumpers = [];' + nl + 'let wasTouching = false;') }),
+      R('one shared memory, if/else', 'r2', { 'script.js': edit(edit(S, '!b.wasTouching', '!wasTouching'), '    b.wasTouching = touching;', '    if (touching) wasTouching = true;' + nl + '    else wasTouching = false;')['script.js'].replace('let bumpers = [];', 'let bumpers = [];' + nl + 'let wasTouching = false;') }),
+    ]);
+  }
+
+  // 5.4.7 r1
+  {
+    const id = '5-4-flappy-6-lab-score-a-gap'; const S = sol(id);
+    const forOf = '  for (const p of pipes) {' + nl + '    if (p.x < bird.x && !p.passed) {' + nl + '      score += 1;' + nl + '      p.passed = true;' + nl + '    }' + nl + '  }' + nl;
+    const delLoop = '  for (let i = pipes.length - 1; i >= 0; i--) {';
+    const fe = '  pipes.forEach((p) => {' + nl + '    if (p.x < bird.x && !p.passed) {' + nl + '      score += 1;' + nl + '      p.passed = true;' + nl + '    }' + nl + '  });' + nl + nl;
+    run(id, [
+      A('reference', S), R('starter', 'r1', starter(id)),
+      A('forEach above the delete loop', edit(edit(S, forOf, ''), delLoop, fe + delLoop)),
+      A('scoring inside the delete loop', edit(edit(S, forOf, ''), delLoop, delLoop + nl + '    if (pipes[i].x < bird.x && !pipes[i].passed) {' + nl + '      score += 1;' + nl + '      pipes[i].passed = true;' + nl + '    }')),
+      A('index loop, braceless body', edit(S, forOf, '  for (let i = 0; i < pipes.length; i++) if (pipes[i].x < bird.x && !pipes[i].passed) {' + nl + '    score += 1;' + nl + '    pipes[i].passed = true;' + nl + '  }' + nl)),
+      R('no scoring, a bird.x line after the delete loop', 'r1', edit(S, forOf, '  bird.x = 100;' + nl)),
+    ]);
+  }
+
+  // 5.4.11 r1
+  {
+    const id = '5-4-flappy-9-challenges-make-it-yours'; const T = starter(id);
+    const vel = '  top.vel.x = -2;' + nl + '  bottom.vel.x = -2;';
+    const topH = '  const topH = gapY - 65;' + nl + '  const botH = 400 - (gapY + 65);';
+    run(id, [
+      A('reference', sol(id)), R('starter', 'r1', T),
+      R('looks only: fill from the score', 'r1', edit(T, "  fill('white');" + nl + '  textSize(22);', "  fill(score > 5 ? 'gold' : 'white');" + nl + '  textSize(22);')),
+      R('looks only: score drawn ten times bigger', 'r1', edit(T, "text('score: ' + score, 20, 36);", "text('score: ' + score * 10, 20, 36);")),
+      A('speed worked out from the score', edit(T, vel, '  top.vel.x = -(2 + score * 0.2);' + nl + '  bottom.vel.x = top.vel.x;')),
+      A('faster past 5, in an if', edit(T, vel, vel + nl + '  if (score > 5) {' + nl + '    top.vel.x = -3;' + nl + '    bottom.vel.x = -3;' + nl + '  }')),
+      A('a level variable from the score', edit(T, vel, '  const level = floor(score / 5);' + nl + '  top.vel.x = -2 - level;' + nl + '  bottom.vel.x = -2 - level;')),
+      A('a narrower gap', edit(T, topH, '  const gap = 130 - score * 5;' + nl + '  const topH = gapY - gap / 2;' + nl + '  const botH = 400 - (gapY + gap / 2);')),
+      A('best score named highScore', edit(edit(edit(T, 'let bird, pipes, score, playing;', 'let bird, pipes, score, playing;' + nl + 'let highScore = 0;'), '  playing = false;' + nl + '  world.gravity.y = 0;', '  playing = false;' + nl + '  if (score > highScore) {' + nl + '    highScore = score;' + nl + '  }' + nl + '  world.gravity.y = 0;'), "text('score: ' + score, 20, 36);", "text('score: ' + score + '  best: ' + highScore, 20, 36);")),
+      A('best score with max', edit(edit(T, 'let bird, pipes, score, playing;', 'let bird, pipes, score, playing;' + nl + 'let best = 0;'), '  playing = false;' + nl + '  world.gravity.y = 0;', '  playing = false;' + nl + '  best = max(best, score);' + nl + '  world.gravity.y = 0;')),
+      A('wobble from random', edit(T, vel, vel + nl + '  const wob = random(0.3, 0.7);' + nl + '  top.vel.y = wob;' + nl + '  bottom.vel.y = wob;')),
+    ]);
+  }
+
+  // 5.5.6 r2
+  {
+    const id = '5-5-snake-6-lab-grow-and-eat'; const S = sol(id);
+    const two = '    const tail = segments.pop();' + nl + '    tail.delete();';
+    run(id, [
+      A('reference', S),
+      A('tail.remove()', edit(S, 'tail.delete();', 'tail.remove();')),
+      A('pop chained with remove()', edit(S, two, '    segments.pop().remove();')),
+      R('popped but never deleted', 'r2', edit(S, two, '    segments.pop();')),
+    ]);
+  }
+
+  // 5.5.11 r1
+  {
+    const id = '5-5-snake-11-challenges-make-it-yours'; const T = starter(id);
+    const over = '    playing = false;' + nl + '    return;';
+    const decl = 'let segments, food, dx, dy, score, playing;';
+    run(id, [
+      A('reference', sol(id)), R('starter', 'r1', T),
+      A('best score named highScore', edit(edit(T, decl, decl + nl + 'let highScore = 0;'), over, '    playing = false;' + nl + '    if (score > highScore) highScore = score;' + nl + '    return;')),
+      A('highScore with max', edit(edit(T, decl, decl + nl + 'let highScore = 0;'), over, '    playing = false;' + nl + '    highScore = max(highScore, score);' + nl + '    return;')),
+      A('highScore, braced', edit(edit(T, decl, decl + nl + 'let highScore = 0;'), over, '    playing = false;' + nl + '    if (highScore < score) {' + nl + '      highScore = score;' + nl + '    }' + nl + '    return;')),
+      R('a highScore that is only shown', 'r1', edit(edit(T, decl, decl + nl + 'let highScore = 0;'), "text('score: ' + score, 20, 32);", "text('score: ' + score + ' best: ' + highScore, 20, 32);")),
+    ]);
+  }
+
+  // 5.8.13 r1, r2
+  {
+    const id = '5-5-13-lab-reap-the-dead'; const S = sol(id);
+    const line = '  enemies = enemies.filter((e) => e.isAlive());';
+    const loop = (test) => '  for (let i = enemies.length - 1; i >= 0; i--) {' + nl + `    if (${test}) {` + nl + '      enemies.splice(i, 1);' + nl + '    }' + nl + '  }';
+    run(id, [
+      A('reference', S), R('starter', 'r1', starter(id)),
+      A('backward loop splices the dead', edit(S, line, loop('!enemies[i].isAlive()'))),
+      A('backward loop, hp <= 0, braceless', edit(S, line, '  for (let i = enemies.length - 1; i >= 0; i--) if (enemies[i].hp <= 0) enemies.splice(i, 1);')),
+      A('backward loop, a local and === false', edit(S, line, '  for (let i = enemies.length - 1; i >= 0; i--) {' + nl + '    const e = enemies[i];' + nl + '    if (e.isAlive() === false) {' + nl + '      enemies.splice(i, 1);' + nl + '    }' + nl + '  }')),
+      R('backward loop splices the living', 'r2', edit(S, line, loop('enemies[i].isAlive()'))),
+      R('backward loop splices every enemy', 'r1', edit(S, line, '  for (let i = enemies.length - 1; i >= 0; i--) {' + nl + '    enemies.splice(i, 1);' + nl + '  }')),
+    ]);
+  }
+
+  // 5.8.18 r4
+  {
+    const id = '5-5-18-lab-wave-spawner'; const S = sol(id);
+    const line = '  enemies = enemies.filter((e) => e.isAlive());';
+    run(id, [
+      A('reference', S), R('starter', 'r4', starter(id)),
+      A('backward loop splices the dead', edit(S, line, '  for (let i = enemies.length - 1; i >= 0; i--) {' + nl + '    if (!enemies[i].isAlive()) {' + nl + '      enemies.splice(i, 1);' + nl + '    }' + nl + '  }')),
+      R('backward loop splices the living', 'r4', edit(S, line, '  for (let i = enemies.length - 1; i >= 0; i--) {' + nl + '    if (enemies[i].isAlive()) {' + nl + '      enemies.splice(i, 1);' + nl + '    }' + nl + '  }')),
+    ]);
+  }
+
+  // 5.2.12 r1
+  {
+    const id = 'moshion-bounce'; const S = sol(id);
+    const plain = { 'script.js': S['script.js'].replace(/, 'static'\);/g, ');').replace("  top.color = '#445';", "  top.collider = 'static';" + nl + "  bottom.collider = 'static';" + nl + "  leftWall.collider = 'static';" + nl + "  rightWall.collider = 'static';" + nl + "  top.color = '#445';") };
+    run(id, [
+      A('reference', S), R('starter', 'r1', starter(id)),
+      A("walls made plain, then .collider = 'static'", plain),
+      R('only one static wall', 'r1', { 'script.js': S['script.js'].replace(/, 'static'\);/g, ');').replace("  top.color = '#445';", "  top.collider = 'static';" + nl + "  top.color = '#445';") }),
+    ]);
+  }
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(
