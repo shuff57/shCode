@@ -41,6 +41,13 @@ function draw() {
 
 Add the P-key check inside both states. In `'play'`, pressing P switches to `'pause'`. In `'pause'`, pressing P switches back. Notice: score **stops** incrementing while paused: that's the point.
 
+Two details make the toggle work:
+
+- Use `kb.presses('p')`, not `kb.pressing('p')`. `pressing` is true on every frame the key is held down, so the state would flip back and forth for as long as your finger is on P. `presses` is true only on the one frame the key goes down.
+- Make the second check an `else if`. With two separate `if`s, the frame that switches to `'pause'` also runs the pause case, sees the same press, and switches straight back to `'play'`. With `else if`, only one state runs each frame.
+
+The pause case also sets `player.vel.x = 0`, so a player who was moving when you pressed P stops where they are instead of sliding on.
+
 ```js live
 let state, score, player;
 
@@ -64,17 +71,16 @@ function draw() {
     text(`Score: ${score}`, 10, 20);
     text('Press P to pause', 10, 50);
 
-    if (kb.pressing('p')) state = 'pause';
-  }
-
-  if (state === 'pause') {
+    if (kb.presses('p')) state = 'pause';
+  } else if (state === 'pause') {
+    player.vel.x = 0;   // a paused player stands still
     text(`Score: ${score}`, 10, 20);
     textSize(32);
     text('PAUSED', 170, 200);
     textSize(16);
     text('Press P to resume', 180, 240);
 
-    if (kb.pressing('p')) state = 'play';
+    if (kb.presses('p')) state = 'play';
   }
 }
 ```
@@ -106,10 +112,9 @@ function draw() {
     text(`Score: ${score}`, 10, 20);
     text('Press P to pause', 10, 50);
 
-    if (kb.pressing('p')) state = 'pause';
-  }
-
-  if (state === 'pause') {
+    if (kb.presses('p')) state = 'pause';
+  } else if (state === 'pause') {
+    player.vel.x = 0;   // a paused player stands still
     text(`Score: ${score}`, 10, 20);
 
     fill('rgba(0, 0, 0, 0.5)');   // black at half strength: dims, does not hide
@@ -120,7 +125,7 @@ function draw() {
     textSize(16);
     text('Press P to resume', 180, 240);
 
-    if (kb.pressing('p')) state = 'play';
+    if (kb.presses('p')) state = 'play';
   }
 }
 ```
@@ -129,6 +134,6 @@ function draw() {
 
 - Pause **stops updating** game variables: score freezes, movement stops.
 - Game data (score, position) is **preserved**, just not changed while paused.
-- The toggle pattern: pressing the same key in opposite states toggles between them.
+- The toggle pattern: pressing the same key in opposite states toggles between them. It needs `kb.presses` (one frame per press) and `else if` (one state per frame), or the state flips straight back.
 - Draw the game behind the overlay so the player sees what's frozen.
 - A semi-transparent rectangle (`fill('rgba(0, 0, 0, 0.5)')`) dims the background to make the overlay pop. The last number in `rgba(...)` runs from 0 (see-through) to 1 (solid). moSHion's `fill()` reads only its first value, so p5's `fill(0, 0, 0, 120)` would paint solid black over the frozen score instead of dimming it.

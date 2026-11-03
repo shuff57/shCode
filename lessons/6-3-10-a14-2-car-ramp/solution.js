@@ -25,6 +25,13 @@ function setup() {
   rightWheel.diameter = 20;
   rightWheel.color = 'orange';
 
+  // Friction starts at 0 (ice) and two touching sprites use a mix of both
+  // values, so the wheels AND what they roll on need it, or the wheels slide.
+  leftWheel.friction = 1;
+  rightWheel.friction = 1;
+  ground.friction = 1;
+  ramp.friction = 1;
+
   // Wheel first: the hinge pins at the FIRST sprite, so each pin sits at
   // the wheel's own centre, like an axle (6.3.8).
   new HingeJoint(leftWheel, chassis);
