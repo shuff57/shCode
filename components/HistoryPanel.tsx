@@ -8,13 +8,14 @@
 // The two sources stay separate because they mean different things:
 //   This device — localStorage snapshots (lib/local-history.ts), only here.
 //   Cloud       — saves in D1 (lesson_sync_history), reachable anywhere.
-// Selecting a version previews it against the current file. Restoring puts it
-// in the editor; it does not write to the cloud until Save is pressed.
+// Selecting a version previews it. Restoring on This device changes only this
+// browser; restoring on Cloud also makes it the saved copy every device loads.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { diffLines } from 'diff';
 import { useLessonStore } from '../lib/store';
 import { getCurrentUser } from '../lib/auth';
+import { restoreVersionToCloud } from '../lib/lesson-sync';
 import { listLocalHistory, type LocalSnapshot } from '../lib/local-history';
 import type { FileMap } from '../lib/lesson-sync-merge';
 import { Cloud, HardDrive, RotateCcw, X } from 'lucide-react';
@@ -164,6 +165,20 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
   // as it was, not a red/green diff they have to decode. Highlighting is opt-in.
   const [showChanges, setShowChanges] = useState(false);
   const [initial, setInitial] = useState('Y');
+  const [restoring, setRestoring] = useState(false);
+  const [restoreNote, setRestoreNote] = useState<string | null>(null);
+  // Under 700px the two columns stack: timeline on top, preview underneath.
+  const [narrow, setNarrow] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 700px)').matches : false,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 700px)');
+    const update = () => setNarrow(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   const currentFile = useLessonStore((s) => s.currentFile);
   const fileContents = useLessonStore((s) => s.fileContents);
@@ -224,6 +239,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
     setCloudSel(null);
     setCloudOpening(true);
     setCloudErr(null);
+    setRestoreNote(null);
     try {
       const res = await fetch(`/api/lesson-sync-history?id=${encodeURIComponent(meta.id)}`, {
         credentials: 'same-origin',
@@ -293,12 +309,31 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
 
   if (!isOpen) return null;
 
-  const restore = () => {
-    if (!snapshot) return;
-    if (!window.confirm('Restore this version? Anything unsaved on this device will be replaced.')) {
+  const restore = async () => {
+    if (!snapshot || restoring) return;
+    const toCloud = tab === 'cloud';
+    const question = toCloud
+      ? 'Restore this version for every device? It becomes the saved copy other devices load.'
+      : 'Restore this version on this device? Anything unsaved here will be replaced.';
+    if (!window.confirm(question)) return;
+
+    setRestoreNote(null);
+    useLessonStore.setState({ fileContents: { ...snapshot } });
+
+    // This device only: the editor change is the whole action.
+    if (!toCloud) {
+      onClose();
       return;
     }
-    useLessonStore.setState({ fileContents: { ...snapshot } });
+
+    // Cloud: also write it back, so another device loading this lesson gets it.
+    setRestoring(true);
+    const result = await restoreVersionToCloud(lessonId, snapshot);
+    setRestoring(false);
+    if (result === 'error') {
+      setRestoreNote('Restored on this device, but could not save it for other devices. Press Save to try again.');
+      return;
+    }
     onClose();
   };
 
@@ -335,20 +370,23 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
         {/* Header */}
         <div
           style={{
-            padding: '14px 18px',
+            padding: narrow ? '12px 48px 12px 16px' : '14px 18px',
             borderBottom: `1px solid ${BORDER}`,
             display: 'flex',
-            alignItems: 'center',
+            alignItems: narrow ? 'flex-start' : 'center',
+            flexWrap: 'wrap',
+            rowGap: 8,
             gap: 12,
             flexShrink: 0,
+            position: 'relative',
           }}
         >
           <div style={{ fontSize: 18, fontWeight: 600 }}>Version history</div>
-          <div style={{ display: 'flex', gap: 4, marginLeft: 8 }}>
-            <button style={tabStyle(tab === 'device')} onClick={() => { setTab('device'); setCloudSel(null); }}>
+          <div style={{ display: 'flex', gap: 4, marginLeft: narrow ? 0 : 8 }}>
+            <button style={tabStyle(tab === 'device')} onClick={() => { setTab('device'); setCloudSel(null); setRestoreNote(null); }}>
               <HardDrive size={14} /> This device
             </button>
-            <button style={tabStyle(tab === 'cloud')} onClick={() => { setTab('cloud'); setDeviceSel(null); }}>
+            <button style={tabStyle(tab === 'cloud')} onClick={() => { setTab('cloud'); setDeviceSel(null); setRestoreNote(null); }}>
               <Cloud size={14} /> Cloud
             </button>
           </div>
@@ -356,7 +394,10 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
             aria-label="Close"
             onClick={onClose}
             style={{
-              marginLeft: 'auto',
+              marginLeft: narrow ? 0 : 'auto',
+              position: narrow ? 'absolute' : undefined,
+              right: narrow ? 12 : undefined,
+              top: narrow ? 12 : undefined,
               background: 'none',
               border: 'none',
               color: MUTED,
@@ -371,12 +412,14 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
         </div>
 
         {/* Body */}
-        <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: narrow ? 'column' : 'row', minHeight: 0 }}>
           {/* Timeline */}
           <div
             style={{
-              width: 310,
-              borderRight: `1px solid ${BORDER}`,
+              width: narrow ? '100%' : 310,
+              maxHeight: narrow ? '40%' : undefined,
+              borderRight: narrow ? 'none' : `1px solid ${BORDER}`,
+              borderBottom: narrow ? `1px solid ${BORDER}` : 'none',
               overflowY: 'auto',
               flexShrink: 0,
               paddingBottom: 12,
@@ -393,7 +436,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
                       <button
                         key={s.id}
                         style={rowStyleBase(deviceSel?.id === s.id)}
-                        onClick={() => { setDeviceSel(s); setCloudSel(null); }}
+                        onClick={() => { setDeviceSel(s); setCloudSel(null); setRestoreNote(null); }}
                       >
                         <span style={avatarStyle}>{initial}</span>
                         <span style={{ flex: 1, minWidth: 0 }}>
@@ -457,6 +500,8 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
                     borderBottom: `1px solid ${BORDER}`,
                     display: 'flex',
                     alignItems: 'center',
+                    flexWrap: 'wrap',
+                    rowGap: 8,
                     gap: 10,
                     flexShrink: 0,
                   }}
@@ -482,7 +527,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
                       borderRadius: 4,
                       padding: '4px 8px',
                       fontSize: 12,
-                      maxWidth: 220,
+                      maxWidth: narrow ? '100%' : 220,
                     }}
                   >
                     {filesInSnapshot.map((f) => (
@@ -540,6 +585,8 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
                     borderTop: `1px solid ${BORDER}`,
                     display: 'flex',
                     alignItems: 'center',
+                    flexWrap: 'wrap',
+                    rowGap: 8,
                     gap: 12,
                     flexShrink: 0,
                   }}
@@ -556,10 +603,23 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
                     />
                     Highlight changes
                   </label>
+                  {restoreNote && (
+                    <span style={{ color: '#ff5555', fontSize: 12, flex: '1 1 100%' }}>
+                      {restoreNote}
+                    </span>
+                  )}
                   <button
-                    onClick={restore}
+                    onClick={() => void restore()}
+                    disabled={restoring}
+                    title={
+                      tab === 'cloud'
+                        ? 'Restore this version and save it for every device'
+                        : 'Restore this version on this device only'
+                    }
                     style={{
-                      marginLeft: 'auto',
+                      marginLeft: narrow ? 0 : 'auto',
+                      width: narrow ? '100%' : undefined,
+                      justifyContent: 'center',
                       background: '#50fa7b',
                       color: '#282a36',
                       border: 'none',
@@ -567,13 +627,14 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
                       padding: '8px 16px',
                       fontWeight: 700,
                       fontSize: 13,
-                      cursor: 'pointer',
+                      cursor: restoring ? 'default' : 'pointer',
+                      opacity: restoring ? 0.6 : 1,
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 6,
                     }}
                   >
-                    <RotateCcw size={14} /> Restore this version
+                    <RotateCcw size={14} /> {restoring ? 'Restoring…' : 'Restore this version'}
                   </button>
                 </div>
               </>

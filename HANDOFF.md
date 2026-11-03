@@ -30,9 +30,11 @@ Pull banner is retired (`CrossDeviceSyncBanner` deleted; `LessonWorkspace` mount
   on the right showing the version **exactly as it was** (highlighting the red/green
   diff is an opt-in "Highlight changes" checkbox, off by default — a beginner should
   not have to decode a diff), and **Restore this version** at the bottom. Restoring
-  either tab puts that version in the editor; it does not write to the cloud until
-  Save is pressed again. The store's `restoreCommit` / `restoreVersion` actions are
-  now unused by any component but stay for the tests and future use.
+  on **This device** changes only this browser; restoring on **Cloud** also pushes
+  the chosen version back (`restoreVersionToCloud`), so every device loads it — the
+  version it replaced stays in Cloud history. Below 700px the timeline and preview
+  stack vertically. The store's `restoreCommit` / `restoreVersion` actions are now
+  unused by any component but stay for the tests and future use.
 - localStorage still holds the draft. A first visit with no sync record seeds the merge
   base from `lastCommittedFileContents` (so uncommitted edits win), else the starter.
   Reset clears the local draft but deliberately not the sync record, so a Save after

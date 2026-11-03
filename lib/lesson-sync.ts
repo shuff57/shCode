@@ -254,6 +254,41 @@ async function saveWorkspace(lesson: Lesson): Promise<SaveResult> {
 }
 
 /**
+ * Make a chosen Cloud version the current copy. Unlike a normal save this does
+ * not merge: the student picked the version, so it wins over the live row (the
+ * version it replaces stays in Cloud history). Used by History's Cloud tab.
+ */
+export async function restoreVersionToCloud(lessonId: string, files: FileMap): Promise<SaveResult> {
+  const lesson = useLessonStore.getState().lesson;
+  if (!lesson || lesson.id !== lessonId) return 'error';
+  const rt = runtimeFor(lesson);
+
+  // A normal Save is in flight; let it settle before taking over.
+  if (rt.saving) {
+    try { await rt.saving; } catch { /* the restore still decides the result */ }
+  }
+
+  // This is already the copy this device has; the local restore is enough.
+  if (filesEqual(files, rt.base)) return 'saved';
+
+  let base = rt.revision;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const result = await pushWorkspace(lessonId, files, base);
+    if (result.ok) {
+      rt.base = files;
+      rt.revision = result.revision;
+      writeRecord(lessonId, { base: files, revision: result.revision });
+      return 'saved';
+    }
+    if (!('conflict' in result) || result.conflict.files === null) return 'error';
+    // Another device saved between our read and this write. The chosen
+    // version still wins; name the revision it just handed us and retry.
+    base = result.conflict.revision;
+  }
+  return 'error';
+}
+
+/**
  * Read the lesson's saved workspace and merge it under anything this device has
  * changed. Silent by design: this is the retired Pull button, done on arrival.
  * Never writes.
