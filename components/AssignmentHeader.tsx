@@ -23,6 +23,8 @@ interface AssignmentHeaderProps {
    *  student isn't stuck guessing what's missing (issue #26) -- the Submit
    *  gate itself is unchanged, this only makes the reason visible. */
   unmetTitles?: string[];
+  /** On an AI Check lab: Run does not mark the cards, Check does. Shown beside the count. */
+  unmetNote?: string;
 }
 
 export default function AssignmentHeader({
@@ -37,6 +39,7 @@ export default function AssignmentHeader({
   showSubmit = true,
   scoreAlign = 'center',
   unmetTitles,
+  unmetNote,
 }: AssignmentHeaderProps) {
   const pct = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
 
@@ -66,7 +69,7 @@ export default function AssignmentHeader({
       // comma of its own ("Save function stores by key, ..."), and a joined
       // line then reads as more items than the "/N" counter says there are.
       <details className="assignment-unmet-hint">
-        <summary>Still needed ({unmetTitles.length})</summary>
+        <summary>Still needed ({unmetTitles.length}){unmetNote ? ` · ${unmetNote}` : ''}</summary>
         <ul>
           {unmetTitles.map((t, i) => (
             <li key={i}>{t}</li>

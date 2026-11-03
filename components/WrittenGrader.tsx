@@ -167,7 +167,6 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   // Which grader marks this. Remembered per browser; see useGraderChoice.
   const { graders, grader, setGrader } = useGraderChoice();
   // The model the server will really use (Workers AI's), not the lesson file's legacy Ollama id.
-  const shownModel = graders.find((g) => g.available !== false && g.model)?.model ?? config.model;
   const totalPossible = config.rubric.reduce((s, r) => s + r.points, 0);
   // A test, not a practice assignment: see AiGraderConfig.summative.
   const summative = !!config.summative;
@@ -672,11 +671,6 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
               : `${maxSubmissions - attempts} of ${maxSubmissions} attempts left`}
           </span>
         )}
-        {hasGraderChoice(graders) ? null : shownModel ? (
-          <code style={{ color: '#6272a4', fontSize: 11, marginLeft: 'auto' }}>
-            model: {shownModel}
-          </code>
-        ) : null}
       </div>
 
       {/* Its own row rather than squeezed in beside Submit: on a narrow screen
@@ -689,7 +683,6 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           value={grader}
           onChange={setGrader}
           disabled={loading || locked}
-          cloudModel={shownModel}
         />
       </div>
 
