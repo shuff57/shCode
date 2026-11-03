@@ -57,7 +57,7 @@
       "description": "The last cell leaves the array and the screen. Help: 5.5.5 (Reading: A body that grows)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?<![\\w$.])(\\w+)\\s*=\\s*segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1\\s*,\\s*1\\s*\\)(?:\\s*\\[\\s*0\\s*\\])?)\\s*;?[\\s\\S]{0,80}?\\b\\1\\.delete\\s*\\(\\s*\\)|segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1\\s*,\\s*1\\s*\\)\\s*\\[\\s*0\\s*\\])\\s*\\.delete\\s*\\(\\s*\\)|segments\\[\\s*segments\\.length\\s*-\\s*1\\s*\\]\\s*\\.delete\\s*\\(\\s*\\)[\\s\\S]{0,80}?segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1)|(?<![\\w$.])(\\w+)\\s*=\\s*segments\\[\\s*segments\\.length\\s*-\\s*1\\s*\\]\\s*;?[\\s\\S]{0,80}?\\b\\2\\.delete\\s*\\(\\s*\\)[\\s\\S]{0,80}?segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1)",
+      "pattern": "(?:^|[^\\w$.])(\\w+)\\s*=\\s*segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1\\s*,\\s*1\\s*\\)(?:\\s*\\[\\s*0\\s*\\])?)\\s*;?[\\s\\S]{0,80}?\\b\\1\\.(?:delete|remove)\\s*\\(\\s*\\)|segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1\\s*,\\s*1\\s*\\)\\s*\\[\\s*0\\s*\\])\\s*\\.(?:delete|remove)\\s*\\(\\s*\\)|segments\\[\\s*segments\\.length\\s*-\\s*1\\s*\\]\\s*\\.(?:delete|remove)\\s*\\(\\s*\\)[\\s\\S]{0,80}?segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1)|(?:^|[^\\w$.])(\\w+)\\s*=\\s*segments\\[\\s*segments\\.length\\s*-\\s*1\\s*\\]\\s*;?[\\s\\S]{0,80}?\\b\\2\\.(?:delete|remove)\\s*\\(\\s*\\)[\\s\\S]{0,80}?segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1)",
       "flags": "",
       "points": 0,
       "status": "pending"

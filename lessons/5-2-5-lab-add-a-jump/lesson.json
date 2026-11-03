@@ -47,11 +47,11 @@
     {
       "id": "r3",
       "title": "Combine both checks with &&",
-      "description": "The jump is guarded by both the key press and the ground check together, joined with &&, so the player can't jump in mid-air. Help: 2.1.29 (Logical Operators: && || !)",
+      "description": "The jump is guarded by both the key press and the ground check together, joined with && (or one if nested inside the other), so the player can't jump in mid-air. Help: 2.1.29 (Logical Operators: && || !)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "\\b(?:if|while)\\s*\\([^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?kb\\.presses\\s*\\()(?=[^{};]*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)]))|(?:const|let|var)\\s+\\w+\\s*=[^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?kb\\.presses\\s*\\()|(?:(?:const|let|var)\\s+)?(\\w+)\\s*=[^;{}]*?\\.colliding\\s*\\([^;{}]*;[\\s\\S]{0,200}?\\b(?:if|while)\\s*\\([^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\b\\1\\b|\\b\\1\\b[^{};]*?&&\\s*\\(?\\s*kb\\.presses\\s*\\()",
+      "pattern": "\\b(?:if|while)\\s*\\([^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?kb\\.presses\\s*\\()(?=[^{};]*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)]))|(?:const|let|var)\\s+\\w+\\s*=[^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?kb\\.presses\\s*\\()|(?:(?:const|let|var)\\s+)?(\\w+)\\s*=[^;{}]*?\\.colliding\\s*\\([^;{}]*;[\\s\\S]{0,200}?\\b(?:if|while)\\s*\\([^{};]*?(?:kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*&&[^{};]*?\\b\\1\\b|\\b\\1\\b[^{};]*?&&\\s*\\(?\\s*kb\\.presses\\s*\\()|\\bif\\s*\\(\\s*\\(?\\s*kb\\.presses\\s*\\([^)]*\\)\\s*\\)?\\s*\\)\\s*\\{?\\s*if\\s*\\([^{};]*?\\.colliding\\s*\\(|\\bif\\s*\\(\\s*\\(?\\s*[\\w$.]+\\.colliding\\s*\\([^)]*\\)\\s*\\)?\\s*\\)\\s*\\{?\\s*if\\s*\\([^{};]*?kb\\.presses\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -62,10 +62,10 @@
     {
       "id": "r2",
       "title": "Rectangle sprite (4-arg form)",
-      "description": "At least one `new Sprite(x, y, w, h)` call with four arguments. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+      "description": "At least one `new Sprite(x, y, w, h)` call with four arguments (a fifth body-type argument such as 'static' is fine). Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Sprite\\s*\\(\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+\\s*\\)",
+      "pattern": "new\\s+Sprite\\s*\\(\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+,\\s*(?:[^,()]|\\([^()]*\\))+(?:,\\s*(?:[^,()]|\\([^()]*\\))+)?\\s*\\)",
       "flags": "",
       "points": 0,
       "ignoreStrings": true

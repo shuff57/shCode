@@ -80,10 +80,10 @@
     {
       "id": "r4",
       "title": "The dead are filtered out",
-      "description": "The list is rebuilt from the living with `filter`, and stored back into `enemies`. Help: 5.8.13 (Lab: Reap the dead with filter)",
+      "description": "The list is rebuilt from the living with `filter`, and stored back into `enemies` (a loop from the end that splices out the dead also counts). Help: 5.8.13 (Lab: Reap the dead with filter)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "enemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|(?<![\\w.])0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|(?<![\\w.])0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)[\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b",
+      "pattern": "enemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|[^\\w.]0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|[^\\w.]0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)[\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b|for\\s*\\(\\s*(?:let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*length\\s*-\\s*1\\b[^)]*\\)\\s*\\{?(?:[^{}]|\\{[^{}]*\\})*?\\bif\\s*\\([^{};]*?(?:!\\s*\\(?\\s*[\\w$.\\[\\]]*?isAlive\\s*\\(\\s*\\)|[\\w$.\\[\\]]*?\\bisAlive\\s*\\(\\s*\\)\\s*===?\\s*false\\b|[\\w$.\\[\\]]*?\\bhp\\s*\\)?\\s*(?:<=\\s*0|<\\s*1|===?\\s*0)(?![\\w.])|[^\\w.]0\\s*(?:>=|===?)\\s*\\(?\\s*[\\w$.\\[\\]]*?\\bhp\\b)[^{};]*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)\\benemies\\s*\\.\\s*splice\\s*\\(\\s*\\2\\s*,\\s*1\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending",

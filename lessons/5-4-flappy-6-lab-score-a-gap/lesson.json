@@ -35,10 +35,10 @@
     {
       "id": "r1",
       "title": "Every pipe is checked",
-      "description": "A loop looks at each pipe in the array (a for...of loop or an index loop). Help: 5.3.8 (Lab: Three bumpers, three values)",
+      "description": "A loop looks at each pipe in the array (a for...of loop, an index loop or forEach) and compares it with the bird inside the loop. Help: 5.3.8 (Lab: Three bumpers, three values)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\([^)]*\\bpipes\\b[^)]*\\)[\\s\\S]{0,300}?bird\\.x",
+      "pattern": "for\\s*\\([^)]*\\bpipes\\b[^)]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{)*?|[^{};]*?)bird\\.(?:pos\\.)?x\\b|\\bpipes\\s*\\.\\s*forEach\\s*\\([^{};]*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{)*?)?bird\\.(?:pos\\.)?x\\b",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -26,11 +26,11 @@
     {
       "id": "r1",
       "title": "for loop over enemies in draw()",
-      "description": "Write a `for...of` (or `for` index) loop over the `enemies` array inside `draw()`. Help: 3.3.5 (Looping Over Arrays)",
+      "description": "Write a `for...of` (or `for` index) loop over the `enemies` array inside `draw()`, or call `enemies.forEach(...)`, and render each enemy in it. Help: 3.3.5 (Looping Over Arrays)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "for\\s*\\([^)]*\\benemies\\b[^)]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{)*?|[^{};]*?)\\brender\\s*\\(",
+      "pattern": "for\\s*\\([^)]*\\benemies\\b[^)]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{)*?|[^{};]*?)\\brender\\s*\\(|\\benemies\\s*\\.\\s*forEach\\s*\\([^{};]*(?:\\{[^{}]*?)?\\brender\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending",

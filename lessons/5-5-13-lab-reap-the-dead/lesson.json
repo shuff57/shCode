@@ -27,10 +27,10 @@
     {
       "id": "r1",
       "title": "A filtered list is stored back in enemies",
-      "description": "`filter` is used and its result is assigned back to `enemies`, so the array itself gets shorter. Help: 3.7.20 (Worked Example: Chaining `.map()` off a `.push()`-Built Array)",
+      "description": "`filter` is used and its result is assigned back to `enemies`, so the array itself gets shorter (a loop from the end that splices out the dead also counts). Help: 3.7.20 (Worked Example: Chaining `.map()` off a `.push()`-Built Array)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\(|\\b(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b",
+      "pattern": "\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\(|\\b(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b|for\\s*\\(\\s*(?:let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*length\\s*-\\s*1\\b[^)]*\\)\\s*\\{?(?:[^{}]|\\{[^{}]*\\})*?\\bif\\s*\\([^{};]*[^{};]*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)\\benemies\\s*\\.\\s*splice\\s*\\(\\s*\\2\\s*,\\s*1\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -39,10 +39,10 @@
     {
       "id": "r2",
       "title": "The test keeps the enemies that are still alive",
-      "description": "The filter keeps the living — it asks each enemy `isAlive()`, or compares its health. Help: 3.7.20 (Worked Example: Chaining `.map()` off a `.push()`-Built Array)",
+      "description": "The filter keeps the living — it asks each enemy `isAlive()`, or compares its health (a loop from the end that splices out the enemies that are not alive also counts). Help: 3.7.20 (Worked Example: Chaining `.map()` off a `.push()`-Built Array)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\((?:[^()]|\\([^()]*\\)|\\()*?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|[^\\w.]0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)|\\b(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\((?:[^()]|\\([^()]*\\)|\\()*?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|[^\\w.]0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)[\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b",
+      "pattern": "\\benemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\((?:[^()]|\\([^()]*\\)|\\()*?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|[^\\w.]0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)|\\b(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\((?:[^()]|\\([^()]*\\)|\\()*?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|[^\\w.]0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)[\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b|for\\s*\\(\\s*(?:let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*length\\s*-\\s*1\\b[^)]*\\)\\s*\\{?(?:[^{}]|\\{[^{}]*\\})*?\\bif\\s*\\([^{};]*?(?:!\\s*\\(?\\s*[\\w$.\\[\\]]*?isAlive\\s*\\(\\s*\\)|[\\w$.\\[\\]]*?\\bisAlive\\s*\\(\\s*\\)\\s*===?\\s*false\\b|[\\w$.\\[\\]]*?\\bhp\\s*\\)?\\s*(?:<=\\s*0|<\\s*1|===?\\s*0)(?![\\w.])|[^\\w.]0\\s*(?:>=|===?)\\s*\\(?\\s*[\\w$.\\[\\]]*?\\bhp\\b)[^{};]*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)\\benemies\\s*\\.\\s*splice\\s*\\(\\s*\\2\\s*,\\s*1\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -62,13 +62,13 @@
       {
         "id": "r1",
         "title": "A filtered list is stored back in enemies",
-        "description": "Every frame, filter runs on enemies and its result ends up in enemies again (enemies = enemies.filter(...), or kept in another variable first and then assigned to enemies). Calling enemies.filter(...) without storing the result is not met: nothing changes.",
+        "description": "Every frame, filter runs on enemies and its result ends up in enemies again (enemies = enemies.filter(...), or kept in another variable first and then assigned to enemies). A loop that walks enemies from the end to the start and splices out each dead enemy also shortens the list and counts; say in the note that filter is the tool this lab practises. Calling enemies.filter(...) without storing the result is not met: nothing changes.",
         "points": 1
       },
       {
         "id": "r2",
         "title": "The test keeps the enemies that are still alive",
-        "description": "The test inside filter keeps the living, in any shape: it asks each enemy isAlive(), or keeps those whose hp is above 0 (an arrow with or without braces, a function with return, === true). A test that keeps the dead (such as !e.isAlive() or hp <= 0) is the opposite and not met.",
+        "description": "The test inside filter keeps the living, in any shape: it asks each enemy isAlive(), or keeps those whose hp is above 0 (an arrow with or without braces, a function with return, === true). In a loop from the end that splices, the splice must happen for the enemies that are NOT alive. A test that keeps the dead (such as !e.isAlive() inside filter, or hp <= 0) is the opposite and not met.",
         "points": 1
       }
     ]

@@ -39,11 +39,11 @@
     {
       "id": "r2",
       "title": "Detect a key press",
-      "description": "Use `kb.presses(...)` inside `draw()` to respond to keyboard input. Help: 5.2.9 (Ground-Gated Actions)",
+      "description": "Use `kb.presses(...)` (or `kb.pressing(...)`) inside `draw()` to respond to keyboard input. Help: 5.2.9 (Ground-Gated Actions)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "(?:\\bif\\s*\\([^;{}]*|[=&|?!(]\\s*)kb\\.presses\\b",
+      "pattern": "(?:\\bif\\s*\\([^;{}]*|[=&|?!(]\\s*)kb\\.(?:presses|pressing)\\b",
       "flags": "",
       "points": 0,
       "status": "pending",

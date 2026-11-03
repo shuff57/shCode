@@ -26,10 +26,10 @@
     {
       "id": "r1",
       "title": "enemies.push(new Enemy(...)) used at least once",
-      "description": "Use `enemies.push(new Enemy(...))` to add Enemy instances to the array. Help: 3.3.2 (Array Basics: Index, push, pop)",
+      "description": "Use `enemies.push(new Enemy(...))` to add Enemy instances to the array (listing them straight into the array also counts). Help: 3.3.2 (Array Basics: Index, push, pop)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:enemies\\.push\\s*\\(\\s*new\\s+Enemy[\\s\\S]*?){5}|for\\s*\\([^)]*\\)\\s*\\{?[^{}]*?enemies\\.push\\s*\\(|\\bwhile\\s*\\([^)]*\\)\\s*\\{[^{}]*?enemies\\.push\\s*\\(",
+      "pattern": "\\benemies\\s*\\.\\s*push\\s*\\(\\s*new\\s+Enemy\\b|\\benemies\\s*=\\s*\\[\\s*new\\s+Enemy\\b|\\b(\\w+)\\s*=\\s*new\\s+Enemy\\b[^;]*;?[\\s\\S]{0,200}?\\benemies\\s*\\.\\s*push\\s*\\(\\s*\\1\\s*[,)]|for\\s*\\([^)]*\\)\\s*\\{?[^{}]*?enemies\\.push\\s*\\(|\\bwhile\\s*\\([^)]*\\)\\s*\\{[^{}]*?enemies\\.push\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -49,7 +49,7 @@
       {
         "id": "r1",
         "title": "enemies.push(new Enemy(...)) used at least once",
-        "description": "Five Enemy objects end up in the enemies array: pushed one by one, pushed in a loop that runs five times, or built straight into the array. Partial: fewer than five go in. Missing: no Enemy ever goes into enemies (for example, five separate variables instead). Help: 3.3.2 (Array Basics: Index, push, pop)",
+        "description": "At least one Enemy object ends up in the enemies array: pushed with enemies.push(new Enemy(...)), made first and then pushed, pushed in a loop, or built straight into the array. The step asks for five spread across the canvas; one or more counts for this card. Missing: no Enemy ever goes into enemies (for example, five separate variables instead). Help: 3.3.2 (Array Basics: Index, push, pop)",
         "points": 1
       }
     ]

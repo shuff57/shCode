@@ -56,11 +56,11 @@
     {
       "id": "r2",
       "title": "The beat flips the lamp",
-      "description": "Inside the beat, on is changed: flipped with ! or set to true or false. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "Inside the beat, on is flipped to the opposite: with on = !on, a ternary, or an if/else that sets it to false when it is true and to true when it is false. Help: 5.2.1 (Reading: Random numbers and timers)",
       "hint": "Inside the if, write on = !on; so it flips each beat.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "frameCount\\s*%\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*===?\\s*0\\s*\\)(?:\\s*\\)){0,3}\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false|on\\s*\\)?\\s*\\?)|\\{\\s*if\\s*\\([^)]*\\)(?:\\s*\\)){0,3}\\s*\\{?[^{}]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false|on\\s*\\)?\\s*\\?)|[^{};]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on|true|false|on\\s*\\)?\\s*\\?))",
+      "pattern": "frameCount\\s*%\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*===?\\s*0\\s*\\)(?:\\s*\\)){0,3}\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on\\b|on\\s*\\)?\\s*\\?|on\\s*(?:===?\\s*false|!==?\\s*true)\\b)|\\{\\s*if\\s*\\([^)]*\\)(?:\\s*\\)){0,3}\\s*\\{?[^{}]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on\\b|on\\s*\\)?\\s*\\?|on\\s*(?:===?\\s*false|!==?\\s*true)\\b)|\\{\\s*if\\s*\\([^)]*\\)(?:\\s*\\)){0,3}\\s*\\{?[^{}]*?\\bon\\s*=\\s*(true|false)\\b[^{}]*?\\}?\\s*else\\s*\\{?[^{}]*?\\bon\\s*=\\s*(?!\\1\\b)(?:true|false)\\b|[^{};]*?\\bon\\s*=\\s*\\(?\\s*(?:!\\s*\\(?\\s*on\\b|on\\s*\\)?\\s*\\?|on\\s*(?:===?\\s*false|!==?\\s*true)\\b))",
       "flags": "",
       "points": 0,
       "status": "pending"

@@ -67,11 +67,11 @@
     {
       "id": "r3",
       "title": "Delete the goal on arrival",
-      "description": "When the player reaches the goal, goal.delete() is called. Help: 5.2.15 (Reading: Cleanup and Delete)",
+      "description": "When the player reaches the goal, goal.delete() (or goal.remove()) is called. Help: 5.2.15 (Reading: Cleanup and Delete)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "goal\\.delete\\s*\\(\\s*\\)",
+      "pattern": "goal\\.(?:delete|remove)\\s*\\(\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"

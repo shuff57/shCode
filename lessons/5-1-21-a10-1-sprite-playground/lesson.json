@@ -118,14 +118,10 @@
     {
       "id": "r6",
       "title": "Automatic motion for the mover",
-      "description": "The mover sprite animates without keyboard input. Help: 5.1.15 (Worked Example: Keyboard Movement)",
-      "type": "inFunction",
-      "function": [
-        "draw",
-        "update"
-      ],
+      "description": "The mover sprite moves on its own, with no key held: driven by frameCount or nudged every frame in draw(), or given a velocity. Help: 5.1.15 (Worked Example: Keyboard Movement)",
+      "type": "regex",
       "file": "script.js",
-      "pattern": "\\bframeCount\\b",
+      "pattern": "(?:^|[;{}\\n])[^\\S\\n]*mover\\s*\\.\\s*(?:vel\\s*\\.\\s*[xy]|rotationSpeed)\\s*=\\s*\\(?\\s*-?\\s*\\(?\\s*(?:[1-9]|0?\\.\\d*[1-9])|function\\s+(?:draw|update)\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?\\bframeCount\\b|function\\s+(?:draw|update)\\s*\\([^)]*\\)\\s*\\{(?:(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?[;{}\\n])?[^\\S\\n]*(?:mover\\s*\\.\\s*(?:x|y|rotation|pos\\s*\\.\\s*[xy])\\s*(?:[-+]=\\s*\\(?\\s*(?!0(?![.\\d]))[-\\w$.(]|\\+\\+|--)|(?:\\+\\+|--)\\s*mover\\s*\\.\\s*(?:x|y|rotation)\\b|mover\\s*\\.\\s*(x|y|rotation)\\s*=\\s*\\(?\\s*mover\\s*\\.\\s*\\1\\s*[-+]\\s*\\(?\\s*(?!0(?![.\\d]))[-\\w$.(])",
       "flags": "",
       "points": 0,
       "ignoreStrings": true
