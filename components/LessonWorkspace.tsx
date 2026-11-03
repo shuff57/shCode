@@ -21,7 +21,7 @@ import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader
 import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-mode';
 import type { ModelDoc } from '../lib/model-types';
 
-import { RUN_MAX_LOGS, RUN_TIMEOUT_MS, errorWithLocation, lineColOf, runStudentCode } from '../lib/js-runner-source';
+import { RUN_TIMEOUT_MS, errorWithLocation, lineColOf, runStudentCode } from '../lib/js-runner-source';
 import { RequirementBatcher } from '../lib/requirement-batch';
 import { jobsFromRequirements, type TestRunResults } from '../lib/test-harness-source';
 import FileExplorer from './FileExplorer';
@@ -32,13 +32,13 @@ import RequirementsSection from './RequirementsSection';
 import PlanChartPanel from './PlanChartPanel';
 import LessonSteps from './LessonSteps';
 import Console from './Console';
-import CommitDialog from './CommitDialog';
 import HistoryPanel from './HistoryPanel';
 import AssignmentHeader from './AssignmentHeader';
 import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
-import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
+import { useCloudWorkspace } from '../lib/lesson-sync';
+import { addLocalSnapshot } from '../lib/local-history';
 import DocsDrawer from './DocsDrawer';
 import TextureEditor from './TextureEditor';
 import AiHelpPanel from './AiHelpPanel';
@@ -48,7 +48,7 @@ import LabPlanChart from './LabPlanChart';
 import StarterPicker from './StarterPicker';
 import { isPlanLesson, planGradeReport, planRequirements } from '../lib/plan-requirements';
 import KeyboardShortcutModal from './KeyboardShortcutModal';
-import { RotateCcw, Send } from 'lucide-react';
+import { CloudUpload, RotateCcw, Send } from 'lucide-react';
 
 // The B-rep kernel + three.js viewport are heavy; the ~270-odd non-reshape
 // lesson pages should never pay for them. Same pattern DiagramAssignmentView
@@ -73,7 +73,6 @@ export default function LessonWorkspace({
   const setRequirements = useLessonStore((s) => s.setRequirements);
   const commits = useLessonStore((s) => s.commits);
   const commitChanges = useLessonStore((s) => s.commitChanges);
-  const getDirtyCount = useLessonStore((s) => s.getDirtyCount);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Live console-lesson runner, so a re-run or an unmount can stop it — including
@@ -142,7 +141,6 @@ export default function LessonWorkspace({
   // the collapsible Console panel.
   const [consoleResetKey, setConsoleResetKey] = useState(0);
   const [consoleOpen, setConsoleOpen] = useState(false);
-  const [commitOpen, setCommitOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -298,6 +296,12 @@ export default function LessonWorkspace({
     setLesson(lesson);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lesson]);
+
+  // "Save for another device": a deliberate toolbar button parks the workspace
+  // on the server, and opening the lesson elsewhere restores it. Paused while
+  // the reference solution is loaded, for the same reason the localStorage
+  // autosave is. See lib/lesson-sync.ts.
+  const cloud = useCloudWorkspace(lesson, lessonProgress.authed && !solutionLoaded);
 
   const isConsoleMode = lesson.preview === 'console';
   // A lesson whose graded file is prose/pseudocode (README.md), not a script the
@@ -685,8 +689,6 @@ export default function LessonWorkspace({
           // Code side -- see that component's own keydown effect.
         } else if (isMoshionMode) {
           runQ5();
-        } else {
-          setCommitOpen(true);
         }
       }
       if (e.ctrlKey && e.shiftKey && e.key === 'H') {
@@ -855,19 +857,6 @@ export default function LessonWorkspace({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aiCheck, aiCheckedText]);
 
-  const handleCommit = async (message: string) => {
-    try {
-      await commitChanges(message);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (msg.startsWith('401')) {
-        alert('Please sign in to save your work. Reload the page to sign in, then try again.');
-      } else {
-        alert(`Commit failed: ${msg}`);
-      }
-    }
-  };
-
   const runAiGrade = async () => {
     if (!lesson.aiGrader || aiGrading || cap.unknown || cap.reached) return;
     setAiGrading(true);
@@ -968,6 +957,8 @@ export default function LessonWorkspace({
       lastCommittedFileContents: state.lastCommittedFileContents,
       completedSteps: [],
     });
+    // A submission is a version the student will want to find again.
+    addLocalSnapshot(lesson.id, state.fileContents, 'Submitted');
     if (gradeReport) {
       const ok = await recordSubmission({
         lessonId: lesson.id,
@@ -995,7 +986,6 @@ export default function LessonWorkspace({
     navigateToNextLesson(lesson.id);
   };
 
-  const dirtyCount = getDirtyCount();
   const totalScore = gradeReport?.totalScore || 0;
   const totalPossible = gradeReport?.totalPossible || 0;
   const passedCriteria = requirements.filter((r) => r.status === 'passed').length;
@@ -1052,7 +1042,6 @@ export default function LessonWorkspace({
 
   return (
     <>
-      <CrossDeviceSyncBanner />
       <TeacherPushBanner />
       <TabbedRightDrawer
         storageKey="shCode:drawer"
@@ -1381,12 +1370,45 @@ export default function LessonWorkspace({
                   setSolutionLoaded(true);
                 }}
               />
-              <button className="btn-secondary btn-sm" onClick={() => setCommitOpen(true)}>
-                Commit{dirtyCount > 0 ? ` (${dirtyCount})` : ''}
-              </button>
               <button className="btn-secondary btn-sm" onClick={() => setHistoryOpen(true)}>
                 History
               </button>
+              {lessonProgress.authed && !solutionLoaded && (
+                <>
+                  <button
+                    className="btn-secondary btn-sm"
+                    onClick={() => {
+                      // Keep a copy on this device even if the cloud save fails.
+                      addLocalSnapshot(
+                        lesson.id,
+                        useLessonStore.getState().fileContents,
+                        'Saved on this device',
+                      );
+                      void cloud.save();
+                    }}
+                    disabled={cloud.saving}
+                    title="Save this lesson to the cloud so you can open it on another device."
+                  >
+                    <CloudUpload size={14} />
+                    {cloud.saving ? 'Saving…' : 'Save'}
+                  </button>
+                  {cloud.note && (
+                    <span
+                      role="status"
+                      aria-live="polite"
+                      style={{
+                        color: cloud.note.kind === 'error' ? '#ff5555' : '#50fa7b',
+                        fontSize: 12,
+                        alignSelf: 'center',
+                        maxWidth: 230,
+                      }}
+                    >
+                      {cloud.note.kind === 'error' ? '✗ ' : '✓ '}
+                      {cloud.note.text}
+                    </span>
+                  )}
+                </>
+              )}
               {isMoshionMode && (
                 <button
                   className="btn-primary btn-sm"
@@ -1532,15 +1554,10 @@ export default function LessonWorkspace({
         />
       )}
 
-      <CommitDialog
-        isOpen={commitOpen}
-        onClose={() => setCommitOpen(false)}
-        onCommit={handleCommit}
-        dirtyCount={dirtyCount}
-      />
       <HistoryPanel
         isOpen={historyOpen}
         onClose={() => setHistoryOpen(false)}
+        lessonId={lesson.id}
       />
       <SubmitDialog
         isOpen={submitOpen}

@@ -235,6 +235,62 @@ app.prepare().catch((err) => {
     devDrafts.delete(draftKey(req));
     res.json({ ok: true });
   });
+  // Cross-device workspace sync. Real route: functions/api/lesson-sync/[lessonId].ts
+  // (D1 table lesson_sync). Held in memory here, keyed the same way. The revision
+  // guard is copied, so two browser contexts that share a `dev_student` cookie
+  // behave like two devices of one student: the second one to save gets 409 with
+  // the live row, exactly as in production.
+  const devSync = new Map(); // `${identity}\u0000${lessonId}` -> { files, revision, updatedAt }
+  const devSyncHistory = new Map(); // same key -> [{ id, files, revision, updatedAt }], newest first
+  const syncKey = (req) => `${devIdentity(req)}\u0000${req.params.lessonId}`;
+  server.get('/api/lesson-sync/:lessonId', (req, res) => {
+    const row = devSync.get(syncKey(req));
+    if (!row) return res.json({ files: null, revision: 0, updatedAt: null });
+    res.json(row);
+  });
+  server.put('/api/lesson-sync/:lessonId', express.json({ limit: '5mb' }), (req, res) => {
+    const { files, baseRevision } = req.body || {};
+    if (!files || typeof files !== 'object' || Array.isArray(files)) {
+      return res.status(400).json({ error: 'files object required' });
+    }
+    const base = Number.isInteger(baseRevision) && baseRevision >= 0 ? baseRevision : 0;
+    const key = syncKey(req);
+    const row = devSync.get(key);
+    if (row && row.revision !== base) {
+      return res.status(409).json({
+        conflict: true,
+        files: row.files,
+        revision: row.revision,
+        updatedAt: row.updatedAt,
+      });
+    }
+    const next = { files, revision: (row?.revision ?? 0) + 1, updatedAt: Date.now() };
+    devSync.set(key, next);
+    // The Cloud tab of History, same 20-row cap as the real table.
+    const history = devSyncHistory.get(key) ?? [];
+    history.unshift({ id: crypto.randomUUID(), files, revision: next.revision, updatedAt: next.updatedAt });
+    devSyncHistory.set(key, history.slice(0, 20));
+    res.json({ revision: next.revision, updatedAt: next.updatedAt });
+  });
+  // Cloud save history. Real route: functions/api/lesson-sync-history/index.ts.
+  server.get('/api/lesson-sync-history', (req, res) => {
+    const id = typeof req.query.id === 'string' ? req.query.id : null;
+    if (id) {
+      const identity = devIdentity(req);
+      for (const [key, list] of devSyncHistory) {
+        if (!key.startsWith(`${identity}\u0000`)) continue;
+        const row = list.find((r) => r.id === id);
+        if (row) return res.json({ save: { ...row, lessonId: key.slice(identity.length + 1) } });
+      }
+      return res.status(404).json({ error: 'Save not found' });
+    }
+    const lessonId = typeof req.query.lessonId === 'string' ? req.query.lessonId : null;
+    if (!lessonId) return res.status(400).json({ error: 'lessonId or id required' });
+    const list = devSyncHistory.get(`${devIdentity(req)}\u0000${lessonId}`) ?? [];
+    res.json({
+      saves: list.map(({ id: saveId, revision, updatedAt }) => ({ id: saveId, revision, updatedAt })),
+    });
+  });
   // Grading targets. Real route: functions/api/grade-written.ts onRequestGet.
   // No OLLAMA/Workers-AI credentials exist in dev, so the honest answer is an
   // empty list -- GraderPicker's hasGraderChoice() renders nothing below two

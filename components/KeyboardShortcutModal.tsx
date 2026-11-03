@@ -8,7 +8,7 @@ interface KeyboardShortcutModalProps {
 }
 
 const shortcuts: { keys: string; description: string }[] = [
-  { keys: 'Ctrl + Enter', description: 'Run code / Commit' },
+  { keys: 'Ctrl + Enter', description: 'Run code / check your work' },
   { keys: 'Ctrl + Shift + H', description: 'Toggle History panel' },
   { keys: 'Ctrl + Shift + T', description: 'Run tests' },
   { keys: '?', description: 'Show this dialog' },

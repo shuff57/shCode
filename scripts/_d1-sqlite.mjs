@@ -46,7 +46,12 @@ export function makeD1() {
         bind: (...a) => { args = a; return stmt; },
         first: async () => st.get(...args) ?? null,
         all: async () => ({ results: st.all(...args) }),
-        run: async () => { st.run(...args); return { success: true }; },
+        run: async () => {
+          const result = st.run(...args);
+          // D1 reports affected rows in `meta.changes`; the revision-guarded
+          // UPDATE in api/lesson-sync reads it, so the facade must too.
+          return { success: true, meta: { changes: Number(result.changes ?? 0) } };
+        },
       };
       return stmt;
     },

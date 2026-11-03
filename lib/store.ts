@@ -261,8 +261,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       }));
       // Flush to localStorage immediately. The 2-second autosave in
       // LessonWorkspace can lag a quick refresh, leaving a stale
-      // lastCommittedFileContents that makes CrossDeviceSyncBanner think
-      // we're behind the server.
+      // lastCommittedFileContents that shows changes nobody made.
       const fresh = get();
       saveProgress(state.lesson.id, {
         fileContents: fresh.fileContents,

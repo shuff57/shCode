@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useLessonStore } from '../lib/store';
+import { addLocalSnapshot } from '../lib/local-history';
 import { getCurrentUser } from '../lib/auth';
 import type { CurrentUser } from '../lib/auth';
 import type { Commit } from '../lib/types';
@@ -264,9 +265,11 @@ export default function TeacherPushBanner() {
   function handleAdopt(commit: Commit) {
     // Overwrite working files with the teacher's snapshot, but do NOT truncate
     // the commit history (unlike restoreCommit which pops history).
-    useLessonStore.setState((s) => ({
-      fileContents: { ...s.fileContents, ...commit.fileContentsSnapshot },
-    }));
+    const merged = { ...useLessonStore.getState().fileContents, ...commit.fileContentsSnapshot };
+    useLessonStore.setState({ fileContents: merged });
+    // Keep a copy on this device so the adopted edit appears in This device history.
+    const lessonId = useLessonStore.getState().lesson?.id;
+    if (lessonId) addLocalSnapshot(lessonId, merged, "Teacher's edit");
     setModalOpen(false);
     handleDismiss();
   }

@@ -1,212 +1,610 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useLessonStore } from '../lib/store';
-import type { Commit, Version, FileNode } from '../lib/types';
-import { History, Clock, X, RotateCcw } from 'lucide-react';
-import DiffViewer from './DiffViewer';
+// Version history, in the shape students already know from Google Docs:
+//   a full-height panel, a date-grouped timeline on the left (time + author +
+//   what happened), and one preview on the right with a "Show changes" toggle
+//   and "Restore this version" at the bottom.
+//
+// The two sources stay separate because they mean different things:
+//   This device — localStorage snapshots (lib/local-history.ts), only here.
+//   Cloud       — saves in D1 (lesson_sync_history), reachable anywhere.
+// Selecting a version previews it against the current file. Restoring puts it
+// in the editor; it does not write to the cloud until Save is pressed.
 
-function findFileByPath(nodes: FileNode[], target: string): FileNode | null {
-  for (const n of nodes) {
-    if (n.type === 'file' && n.path === target) return n;
-    if (n.type === 'folder' && n.children) {
-      const hit = findFileByPath(n.children, target);
-      if (hit) return hit;
-    }
-  }
-  return null;
-}
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { diffLines } from 'diff';
+import { useLessonStore } from '../lib/store';
+import { getCurrentUser } from '../lib/auth';
+import { listLocalHistory, type LocalSnapshot } from '../lib/local-history';
+import type { FileMap } from '../lib/lesson-sync-merge';
+import { Cloud, HardDrive, RotateCcw, X } from 'lucide-react';
 
 interface HistoryPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  lessonId: string;
 }
 
-export default function HistoryPanel({ isOpen, onClose }: HistoryPanelProps) {
-  const [tab, setTab] = useState<'file' | 'project'>('file');
-  const [selectedCommit, setSelectedCommit] = useState<Commit | null>(null);
-  const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
+type Tab = 'device' | 'cloud';
+
+interface CloudMeta {
+  id: string;
+  revision: number;
+  updatedAt: number;
+}
+
+interface CloudSave extends CloudMeta {
+  files: FileMap;
+}
+
+const MUTED = '#8393c4';
+const BORDER = '#44475a';
+const TEXT = '#f8f8f2';
+const ACCENT = '#bd93f9';
+const ADD = 'rgba(80,250,123,0.16)';
+const DEL = 'rgba(255,85,85,0.16)';
+const MONO = "'Fira Code', 'Consolas', 'Courier New', monospace";
+
+function fmtTime(ts: number): string {
+  return new Date(ts).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+}
+
+function fmtFull(ts: number): string {
+  return new Date(ts).toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
+function dayLabel(ts: number): string {
+  const d = new Date(ts);
+  const now = new Date();
+  const start = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const days = Math.round((start(now) - start(d)) / 86400000);
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  return d.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function groupByDay<T extends { timestamp: number }>(items: T[]): { label: string; items: T[] }[] {
+  const out: { label: string; items: T[] }[] = [];
+  for (const item of items) {
+    const label = dayLabel(item.timestamp);
+    const last = out[out.length - 1];
+    if (last && last.label === label) last.items.push(item);
+    else out.push({ label, items: [item] });
+  }
+  return out;
+}
+
+type ChangeRow = { kind: 'add' | 'del' | 'context'; text: string };
+
+function changeRows(original: string, modified: string): ChangeRow[] {
+  const rows: ChangeRow[] = [];
+  for (const change of diffLines(original, modified)) {
+    const kind: ChangeRow['kind'] = change.added ? 'add' : change.removed ? 'del' : 'context';
+    const lines = change.value.split('\n');
+    if (lines[lines.length - 1] === '') lines.pop();
+    for (const text of lines) rows.push({ kind, text });
+  }
+  return rows;
+}
+
+function rowStyle(kind: ChangeRow['kind']): React.CSSProperties {
+  if (kind === 'add') return { background: ADD, borderLeft: '3px solid #50fa7b' };
+  if (kind === 'del') return { background: DEL, borderLeft: '3px solid #ff5555' };
+  return { borderLeft: '3px solid transparent' };
+}
+
+const tabStyle = (active: boolean): React.CSSProperties => ({
+  background: active ? ACCENT : 'transparent',
+  color: active ? '#282a36' : MUTED,
+  border: 'none',
+  borderRadius: 999,
+  padding: '6px 14px',
+  fontWeight: 600,
+  fontSize: 13,
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+});
+
+const rowStyleBase = (active: boolean): React.CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  width: '100%',
+  textAlign: 'left',
+  background: active ? '#44475a' : 'transparent',
+  border: 'none',
+  borderLeft: `3px solid ${active ? ACCENT : 'transparent'}`,
+  borderRadius: 0,
+  padding: '9px 12px',
+  cursor: 'pointer',
+  color: TEXT,
+});
+
+const avatarStyle: React.CSSProperties = {
+  width: 28,
+  height: 28,
+  borderRadius: '50%',
+  background: '#6272a4',
+  color: TEXT,
+  display: 'grid',
+  placeItems: 'center',
+  fontSize: 12,
+  fontWeight: 700,
+  flexShrink: 0,
+};
+
+const badgeStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 3,
+  color: MUTED,
+  fontSize: 11,
+  fontWeight: 500,
+};
+
+export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanelProps) {
+  const [tab, setTab] = useState<Tab>('device');
+  const [device, setDevice] = useState<LocalSnapshot[]>([]);
+  const [deviceSel, setDeviceSel] = useState<LocalSnapshot | null>(null);
+  const [cloud, setCloud] = useState<CloudMeta[] | null>(null);
+  const [cloudErr, setCloudErr] = useState<string | null>(null);
+  const [cloudLoading, setCloudLoading] = useState(false);
+  const [cloudSel, setCloudSel] = useState<CloudSave | null>(null);
+  const [cloudOpening, setCloudOpening] = useState(false);
+  const [previewFile, setPreviewFile] = useState<string | null>(null);
+  // Off by default: a beginner opening a version should see their code exactly
+  // as it was, not a red/green diff they have to decode. Highlighting is opt-in.
+  const [showChanges, setShowChanges] = useState(false);
+  const [initial, setInitial] = useState('Y');
 
   const currentFile = useLessonStore((s) => s.currentFile);
   const fileContents = useLessonStore((s) => s.fileContents);
-  const commits = useLessonStore((s) => s.commits);
-  const lesson = useLessonStore((s) => s.lesson);
-  const restoreCommit = useLessonStore((s) => s.restoreCommit);
-  const restoreVersion = useLessonStore((s) => s.restoreVersion);
-  const pathToId = useLessonStore((s) => s.pathToId);
 
-  const currentContent = currentFile ? fileContents[currentFile] || '' : '';
-  const currentFileId = currentFile ? pathToId(currentFile) : '';
+  useEffect(() => {
+    let live = true;
+    getCurrentUser()
+      .then((u) => {
+        const first = u?.email?.trim()?.[0];
+        if (live && first) setInitial(first.toUpperCase());
+      })
+      .catch(() => { /* the avatar can stay "Y" */ });
+    return () => {
+      live = false;
+    };
+  }, []);
 
-  // File history: versions of the current file from commits
-  const fileVersions = useMemo(() => {
-    if (!currentFileId) return [];
-    const versions: Version[] = [];
-    for (let i = commits.length - 1; i >= 0; i--) {
-      const commit = commits[i];
-      if (commit.fileContentsSnapshot[currentFile || ''] !== undefined) {
-        versions.push({
-          timestamp: commit.timestamp,
-          content: commit.fileContentsSnapshot[currentFile || ''],
-        });
-      }
+  // ---- This device -------------------------------------------------------
+  useEffect(() => {
+    if (!isOpen || tab !== 'device') return;
+    const list = listLocalHistory(lessonId);
+    setDevice(list);
+    setDeviceSel((prev) => (prev && list.some((s) => s.id === prev.id) ? prev : list[0] ?? null));
+  }, [isOpen, tab, lessonId]);
+
+  // ---- Cloud -------------------------------------------------------------
+  useEffect(() => {
+    if (!isOpen || tab !== 'cloud') return;
+    let live = true;
+    setCloudLoading(true);
+    setCloudErr(null);
+    fetch(`/api/lesson-sync-history?lessonId=${encodeURIComponent(lessonId)}`, {
+      credentials: 'same-origin',
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          throw new Error(
+            res.status === 401
+              ? 'Sign in to see cloud saves.'
+              : `Could not load cloud saves (${res.status}).`,
+          );
+        }
+        const data = (await res.json()) as { saves?: CloudMeta[] };
+        if (live) setCloud(data.saves ?? []);
+      })
+      .catch((err) => {
+        if (live) setCloudErr(err instanceof Error ? err.message : 'Could not load cloud saves.');
+      })
+      .finally(() => {
+        if (live) setCloudLoading(false);
+      });
+    return () => {
+      live = false;
+    };
+  }, [isOpen, tab, lessonId]);
+
+  const pickCloud = useCallback(async (meta: CloudMeta) => {
+    setCloudSel(null);
+    setCloudOpening(true);
+    setCloudErr(null);
+    try {
+      const res = await fetch(`/api/lesson-sync-history?id=${encodeURIComponent(meta.id)}`, {
+        credentials: 'same-origin',
+      });
+      if (!res.ok) throw new Error('Could not open that save.');
+      const data = (await res.json()) as { save: CloudSave };
+      setCloudSel(data.save);
+    } catch (err) {
+      setCloudErr(err instanceof Error ? err.message : 'Could not open that save.');
+    } finally {
+      setCloudOpening(false);
     }
-    return versions;
-  }, [commits, currentFile, currentFileId]);
+  }, []);
 
-  // For `example` lessons, expose the starter code as a restore-to-default entry.
-  const defaultVersion = useMemo<Version | null>(() => {
-    if (!lesson || lesson.type !== 'example' || !currentFile) return null;
-    const node = findFileByPath(lesson.files, currentFile);
-    if (!node || node.content === undefined) return null;
-    return { timestamp: 0, content: node.content };
-  }, [lesson, currentFile]);
+  // Like Google Docs, open the newest version as soon as the list arrives. The
+  // ref makes it one attempt per newest id, so a failed fetch does not loop.
+  const autoOpened = useRef<string | null>(null);
+  useEffect(() => {
+    if (tab !== 'cloud' || !cloud || cloud.length === 0) return;
+    const newestId = cloud[0].id;
+    if (autoOpened.current === newestId) return;
+    autoOpened.current = newestId;
+    void pickCloud(cloud[0]);
+  }, [tab, cloud, pickCloud]);
+
+  // ---- The version on screen --------------------------------------------
+  const snapshot: FileMap | null = tab === 'device' ? deviceSel?.files ?? null : cloudSel?.files ?? null;
+  const snapshotTime = tab === 'device' ? deviceSel?.timestamp ?? null : cloudSel?.updatedAt ?? null;
+  const snapshotTitle =
+    tab === 'device' ? deviceSel?.message ?? null : cloudSel ? 'Saved to cloud' : null;
+
+  const filesInSnapshot = useMemo(
+    () => (snapshot ? Object.keys(snapshot).sort() : []),
+    [snapshot],
+  );
+
+  useEffect(() => {
+    if (filesInSnapshot.length === 0) {
+      setPreviewFile(null);
+      return;
+    }
+    setPreviewFile((prev) => {
+      if (prev && filesInSnapshot.includes(prev)) return prev;
+      if (currentFile && filesInSnapshot.includes(currentFile)) return currentFile;
+      return filesInSnapshot[0];
+    });
+  }, [filesInSnapshot, currentFile]);
+
+  const rows = useMemo<ChangeRow[]>(() => {
+    if (!snapshot || !previewFile) return [];
+    const saved = snapshot[previewFile] ?? '';
+    if (!showChanges) {
+      const lines = saved.split('\n');
+      return lines.map((text) => ({ kind: 'context', text }));
+    }
+    return changeRows(fileContents[previewFile] ?? '', saved);
+  }, [snapshot, previewFile, showChanges, fileContents]);
+
+  const deviceItems = useMemo(
+    () => device.map((s) => ({ ...s, timestamp: s.timestamp })),
+    [device],
+  );
+  const cloudItems = useMemo(
+    () => (cloud ?? []).map((s) => ({ ...s, timestamp: s.updatedAt, title: 'Saved to cloud' })),
+    [cloud],
+  );
 
   if (!isOpen) return null;
 
-  const formatTime = (ts: number) => {
-    const d = new Date(ts);
-    return d.toLocaleString();
-  };
-
-  const timeAgo = (ts: number) => {
-    const secs = Math.floor((Date.now() - ts) / 1000);
-    if (secs < 60) return 'just now';
-    if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
-    if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
-    return `${Math.floor(secs / 86400)}d ago`;
+  const restore = () => {
+    if (!snapshot) return;
+    if (!window.confirm('Restore this version? Anything unsaved on this device will be replaced.')) {
+      return;
+    }
+    useLessonStore.setState({ fileContents: { ...snapshot } });
+    onClose();
   };
 
   return (
-    <div className="history-panel-overlay" onClick={onClose}>
-      <div className="history-panel" onClick={(e) => e.stopPropagation()}>
-        <div className="history-panel-header">
-          <div className="history-tabs">
-            <button
-              className={tab === 'file' ? 'active' : ''}
-              onClick={() => { setTab('file'); setSelectedCommit(null); setSelectedVersion(null); }}
-            >
-              File History
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1000,
+        background: 'rgba(0,0,0,0.6)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Version history"
+        style={{
+          background: '#1e1f29',
+          border: `1px solid ${BORDER}`,
+          borderRadius: 10,
+          width: 'min(96vw, 1160px)',
+          height: 'min(92vh, 880px)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          color: TEXT,
+          boxShadow: '0 18px 60px rgba(0,0,0,0.45)',
+        }}
+      >
+        {/* Header */}
+        <div
+          style={{
+            padding: '14px 18px',
+            borderBottom: `1px solid ${BORDER}`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ fontSize: 18, fontWeight: 600 }}>Version history</div>
+          <div style={{ display: 'flex', gap: 4, marginLeft: 8 }}>
+            <button style={tabStyle(tab === 'device')} onClick={() => { setTab('device'); setCloudSel(null); }}>
+              <HardDrive size={14} /> This device
             </button>
-            <button
-              className={tab === 'project' ? 'active' : ''}
-              onClick={() => { setTab('project'); setSelectedCommit(null); setSelectedVersion(null); }}
-            >
-              Project History
+            <button style={tabStyle(tab === 'cloud')} onClick={() => { setTab('cloud'); setDeviceSel(null); }}>
+              <Cloud size={14} /> Cloud
             </button>
           </div>
-          <button className="history-close" onClick={onClose}>
-            <X size={18} />
+          <button
+            aria-label="Close"
+            onClick={onClose}
+            style={{
+              marginLeft: 'auto',
+              background: 'none',
+              border: 'none',
+              color: MUTED,
+              cursor: 'pointer',
+              padding: 4,
+              display: 'inline-flex',
+              alignItems: 'center',
+            }}
+          >
+            <X size={20} />
           </button>
         </div>
 
-        <div className="history-body">
-          <div className="history-list">
-            {tab === 'file' ? (
-              fileVersions.length === 0 && !defaultVersion ? (
-                <p className="history-empty">No history for this file yet.</p>
+        {/* Body */}
+        <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+          {/* Timeline */}
+          <div
+            style={{
+              width: 310,
+              borderRight: `1px solid ${BORDER}`,
+              overflowY: 'auto',
+              flexShrink: 0,
+              paddingBottom: 12,
+            }}
+          >
+            {tab === 'device' ? (
+              device.length === 0 ? (
+                <Empty text="No versions on this device yet." hint="Press Save to keep one." />
               ) : (
-                <>
-                  {fileVersions.map((v, i) => (
+                groupByDay(deviceItems).map((group) => (
+                  <div key={group.label}>
+                    <GroupLabel label={group.label} />
+                    {group.items.map((s) => (
+                      <button
+                        key={s.id}
+                        style={rowStyleBase(deviceSel?.id === s.id)}
+                        onClick={() => { setDeviceSel(s); setCloudSel(null); }}
+                      >
+                        <span style={avatarStyle}>{initial}</span>
+                        <span style={{ flex: 1, minWidth: 0 }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ fontWeight: 600, fontSize: 13 }}>{fmtTime(s.timestamp)}</span>
+                            <span style={badgeStyle}><HardDrive size={11} /> This device</span>
+                          </span>
+                          <span style={{ display: 'block', color: MUTED, fontSize: 12, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {s.message}
+                          </span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ))
+              )
+            ) : cloudLoading ? (
+              <Empty text="Loading cloud saves…" />
+            ) : cloudErr ? (
+              <Empty text={cloudErr} tone="error" />
+            ) : cloud === null || cloud.length === 0 ? (
+              <Empty text="No cloud saves yet." hint="Press Save to create one." />
+            ) : (
+              groupByDay(cloudItems).map((group) => (
+                <div key={group.label}>
+                  <GroupLabel label={group.label} />
+                  {group.items.map((s) => (
                     <button
-                      key={v.timestamp}
-                      className={`history-item ${selectedVersion?.timestamp === v.timestamp ? 'active' : ''}`}
-                      onClick={() => { setSelectedVersion(v); setSelectedCommit(null); }}
+                      key={s.id}
+                      style={rowStyleBase(cloudSel?.id === s.id)}
+                      onClick={() => void pickCloud(s)}
                     >
-                      <div className="history-item-title">
-                        {i === 0 ? 'Latest commit' : `Version ${fileVersions.length - i}`}
-                      </div>
-                      <div className="history-item-time">
-                        {timeAgo(v.timestamp)} - {formatTime(v.timestamp)}
-                      </div>
+                      <span style={avatarStyle}>{initial}</span>
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontWeight: 600, fontSize: 13 }}>{fmtTime(s.timestamp)}</span>
+                          <span style={badgeStyle}><Cloud size={11} /> Cloud</span>
+                        </span>
+                        <span style={{ display: 'block', color: MUTED, fontSize: 12, marginTop: 2 }}>
+                          {s.title}
+                        </span>
+                      </span>
                     </button>
                   ))}
-                  {defaultVersion && (
-                    <button
-                      className={`history-item ${selectedVersion?.timestamp === 0 ? 'active' : ''}`}
-                      onClick={() => { setSelectedVersion(defaultVersion); setSelectedCommit(null); }}
-                    >
-                      <div className="history-item-title">Original (starter)</div>
-                      <div className="history-item-time">Restore to default</div>
-                    </button>
-                  )}
-                </>
-              )
-            ) : (
-              [...commits].reverse().map((c) => (
-                <button
-                  key={c.id}
-                  className={`history-item ${selectedCommit?.id === c.id ? 'active' : ''}`}
-                  onClick={() => { setSelectedCommit(c); setSelectedVersion(null); }}
-                >
-                  <div className="history-item-title">{c.message}</div>
-                  <div className="history-item-time">
-                    {timeAgo(c.timestamp)} - {c.changedFileIds.length} file{c.changedFileIds.length !== 1 ? 's' : ''}
-                  </div>
-                </button>
+                </div>
               ))
             )}
           </div>
 
-          <div className="history-detail">
-            {tab === 'file' && selectedVersion ? (
-              <>
-                <div className="history-detail-header">
-                  <span>Comparing selected version with current</span>
-                  <button
-                    className="btn-primary btn-sm"
-                    onClick={() => {
-                      if (currentFileId) {
-                        restoreVersion(currentFileId, selectedVersion);
-                        onClose();
-                      }
-                    }}
-                    disabled={selectedVersion.content === currentContent}
-                  >
-                    <RotateCcw size={14} /> Restore
-                  </button>
-                </div>
-                <DiffViewer
-                  original={selectedVersion.content}
-                  modified={currentContent}
-                  language={currentFile?.split('.').pop() || 'text'}
-                />
-              </>
-            ) : tab === 'project' && selectedCommit ? (
-              <>
-                <div className="history-detail-header">
-                  <div>
-                    <strong>{selectedCommit.message}</strong>
-                    <div className="history-item-time">{formatTime(selectedCommit.timestamp)}</div>
-                  </div>
-                  <button
-                    className="btn-primary btn-sm"
-                    onClick={() => {
-                      restoreCommit(selectedCommit.id);
-                      onClose();
-                    }}
-                  >
-                    <RotateCcw size={14} /> Restore
-                  </button>
-                </div>
-                <div className="history-changed-files">
-                  <h4>Changed files:</h4>
-                  <ul>
-                    {selectedCommit.changedFileIds.map((id) => (
-                      <li key={id}>{id}</li>
-                    ))}
-                  </ul>
-                </div>
-              </>
-            ) : (
-              <div className="history-empty">
-                <History size={40} />
-                <p>Select a {tab === 'file' ? 'version' : 'commit'} to view details.</p>
+          {/* Preview */}
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            {!snapshot ? (
+              <div style={{ margin: 'auto', color: MUTED, fontSize: 13, padding: 24, textAlign: 'center' }}>
+                {tab === 'cloud' && cloudOpening ? 'Opening…' : 'Select a version to preview it.'}
               </div>
+            ) : (
+              <>
+                <div
+                  style={{
+                    padding: '10px 16px',
+                    borderBottom: `1px solid ${BORDER}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    flexShrink: 0,
+                  }}
+                >
+                  <span style={avatarStyle}>{initial}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>
+                      You
+                      {snapshotTime !== null && (
+                        <span style={{ color: MUTED, fontWeight: 400 }}> · {fmtFull(snapshotTime)}</span>
+                      )}
+                    </div>
+                    <div style={{ color: MUTED, fontSize: 12, marginTop: 2 }}>{snapshotTitle}</div>
+                  </div>
+                  <select
+                    aria-label="File"
+                    value={previewFile ?? ''}
+                    onChange={(e) => setPreviewFile(e.target.value)}
+                    style={{
+                      background: '#282a36',
+                      color: TEXT,
+                      border: `1px solid ${BORDER}`,
+                      borderRadius: 4,
+                      padding: '4px 8px',
+                      fontSize: 12,
+                      maxWidth: 220,
+                    }}
+                  >
+                    {filesInSnapshot.map((f) => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* The version, or the version with changes marked */}
+                <div
+                  style={{
+                    flex: 1,
+                    minHeight: 0,
+                    overflow: 'auto',
+                    background: '#282a36',
+                    fontFamily: MONO,
+                    fontSize: 13,
+                    lineHeight: 1.6,
+                    padding: '10px 0',
+                  }}
+                >
+                  {rows.map((row, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: 'flex',
+                        whiteSpace: 'pre',
+                        minWidth: 'max-content',
+                        ...rowStyle(row.kind),
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 46,
+                          flexShrink: 0,
+                          textAlign: 'right',
+                          paddingRight: 10,
+                          color: MUTED,
+                          userSelect: 'none',
+                        }}
+                      >
+                        {showChanges
+                          ? row.kind === 'add' ? '+' : row.kind === 'del' ? '−' : ''
+                          : i + 1}
+                      </span>
+                      <span style={{ flex: 1, paddingRight: 16 }}>{row.text || ' '}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Footer: the Google-Docs pair of controls */}
+                <div
+                  style={{
+                    padding: '10px 16px',
+                    borderTop: `1px solid ${BORDER}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    flexShrink: 0,
+                  }}
+                >
+                  <label
+                    title="Mark lines that differ from what is in the editor now."
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: MUTED, fontSize: 13, cursor: 'pointer' }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={showChanges}
+                      onChange={(e) => setShowChanges(e.target.checked)}
+                      style={{ accentColor: ACCENT }}
+                    />
+                    Highlight changes
+                  </label>
+                  <button
+                    onClick={restore}
+                    style={{
+                      marginLeft: 'auto',
+                      background: '#50fa7b',
+                      color: '#282a36',
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: '8px 16px',
+                      fontWeight: 700,
+                      fontSize: 13,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <RotateCcw size={14} /> Restore this version
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function GroupLabel({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        padding: '14px 14px 6px',
+        color: MUTED,
+        fontSize: 12,
+        fontWeight: 700,
+      }}
+    >
+      {label}
+    </div>
+  );
+}
+
+function Empty({ text, hint, tone }: { text: string; hint?: string; tone?: 'error' }) {
+  return (
+    <div style={{ padding: '18px 14px' }}>
+      <div style={{ color: tone === 'error' ? '#ff5555' : MUTED, fontSize: 13 }}>{text}</div>
+      {hint && <div style={{ color: MUTED, fontSize: 12, marginTop: 4 }}>{hint}</div>}
     </div>
   );
 }

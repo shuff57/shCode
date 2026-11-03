@@ -1,3 +1,51 @@
+# 2026-11-02: save-for-another-device replaces the Pull banner
+
+A student can **save a lesson's workspace for another device**, and it loads
+automatically when the same lesson opens elsewhere. Saving is deliberate — one
+toolbar button ("Save for another device"), no background timer or poll. The manual
+Pull banner is retired (`CrossDeviceSyncBanner` deleted; `LessonWorkspace` mounts
+`useCloudWorkspace`). Cloudflare-only: one new table and one Pages Function, no VPS.
+**Zero Workers AI calls**: opening a lesson is one D1 read, a Save is one D1 write.
+
+- `migrations/0037_lesson_sync.sql` + `functions/api/lesson-sync/[lessonId].ts`.
+  One row per (student, lesson): `files_gz`, `revision`, `updated_at`. GET returns
+  `{files:null,revision:0,...}` when absent; PUT takes `{files, baseRevision}` and a
+  stale base answers 409 with the live row. The guarded `UPDATE ... WHERE
+  revision = ?` plus `INSERT OR IGNORE` is the concurrency control; **`meta.changes`
+  is load-bearing**, and the D1 test facade in `scripts/_d1-sqlite.mjs` now returns it.
+- `lib/lesson-sync.ts` restores once on arrival (GET + per-file merge) and writes only
+  when the student presses Save. A save names the revision it read; a 409 merges and
+  retries once. `lib/lesson-sync-merge.ts` keeps a file this device changed and takes
+  the saved copy (including its deletion) everywhere else — the old Pull outcome per
+  file, without the button or throwing the rest of the workspace away.
+- The lesson toolbar is **History | Save**. The manual Commit UI is gone
+  (`CommitDialog` deleted; Submit still records a commit behind the scenes and
+  `TeacherPushBanner` still reads the commit list). **History is split in two**:
+  *This device* reads localStorage snapshots (`lib/local-history.ts`, written when
+  Save is pressed, when the student Submits, and when a teacher edit is adopted;
+  20 per lesson, 40 lessons kept), and *Cloud* reads D1's `lesson_sync_history`
+  (migration 0038, one row per successful Save, newest 20 kept, served by
+  `api/lesson-sync-history`). The panel is laid out like Google Docs' version
+  history: a date-grouped timeline on the left (avatar, time, source), one preview
+  on the right showing the version **exactly as it was** (highlighting the red/green
+  diff is an opt-in "Highlight changes" checkbox, off by default — a beginner should
+  not have to decode a diff), and **Restore this version** at the bottom. Restoring
+  either tab puts that version in the editor; it does not write to the cloud until
+  Save is pressed again. The store's `restoreCommit` / `restoreVersion` actions are
+  now unused by any component but stay for the tests and future use.
+- localStorage still holds the draft. A first visit with no sync record seeds the merge
+  base from `lastCommittedFileContents` (so uncommitted edits win), else the starter.
+  Reset clears the local draft but deliberately not the sync record, so a Save after
+  Reset replaces the old cloud copy rather than no-opping. Restore is once per lesson
+  mount, so Reset does not pull the old save back. Saving is off while an admin/teacher
+  previews the reference solution.
+- `scripts/test-lesson-sync.mjs` (in `npm test`, and `npm run test:sync`) pins the
+  revision guard and every merge case. The dev server serves an in-memory copy of the
+  same two routes keyed by the `dev_student` cookie, so two browser contexts share one
+  student and reproduce the 409.
+- **Deploy:** apply 0037 (`npm run d1:migrate`) before deploying; the migration
+  preflight blocks otherwise. The sync route 500s until the table exists.
+
 # 2026-10-29: 3.9.1 is a find-and-fix; 3.10 is four parts (both before they are sat)
 
 Content and schema changes only: the plan parser, the `required` flag, the picker and the

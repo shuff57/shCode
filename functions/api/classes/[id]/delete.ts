@@ -1,8 +1,8 @@
 // POST /api/classes/[id]/delete
 // Permanently removes the class row, its enrollments, class_teachers rows,
 // and all progress data (lesson_state, commits, lesson_submissions,
-// lesson_drafts) for students whose ONLY enrollment was in this class.
-// Students enrolled in at least one other class keep their progress data.
+// lesson_drafts, lesson_sync) for students whose ONLY enrollment was in this
+// class. Students enrolled in at least one other class keep their progress data.
 //
 // POST (not DELETE) because Cloudflare Pages Functions route body-carrying
 // DELETEs inconsistently on some CDN paths; POST with an explicit "delete"
@@ -44,12 +44,13 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
   `;
 
   const results = (await env.DB.batch([
-    // 1–4: purge progress data for students whose only class this was
+    // 1–5: purge progress data for students whose only class this was
     env.DB.prepare(`DELETE FROM lesson_state WHERE ${purgeWhere}`).bind(classId),
     env.DB.prepare(`DELETE FROM commits WHERE ${purgeWhere}`).bind(classId),
     env.DB.prepare(`DELETE FROM lesson_submissions WHERE ${purgeWhere}`).bind(classId),
     env.DB.prepare(`DELETE FROM lesson_drafts WHERE ${purgeWhere}`).bind(classId),
-    // 5: count students being purged (before deleting enrollments)
+    env.DB.prepare(`DELETE FROM lesson_sync WHERE ${purgeWhere}`).bind(classId),
+    // 6: count students being purged (before deleting enrollments)
     //    We approximate via the enrollments delta — everyone in this class
     //    minus those also in another class.
     env.DB.prepare(`
@@ -59,14 +60,14 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
           SELECT student_email FROM enrollments WHERE class_id != ?1
         )
     `).bind(classId),
-    // 6–8: remove the class itself
+    // 7–9: remove the class itself
     env.DB.prepare('DELETE FROM enrollments WHERE class_id = ?').bind(classId),
     env.DB.prepare('DELETE FROM class_teachers WHERE class_id = ?').bind(classId),
     env.DB.prepare('DELETE FROM classes WHERE id = ?').bind(classId),
   ])) as unknown as D1BatchResult[];
 
   const studentsPurged =
-    (results[4] as unknown as { results: { cnt: number }[] }).results[0]?.cnt ?? 0;
+    (results[5] as unknown as { results: { cnt: number }[] }).results[0]?.cnt ?? 0;
 
   return json({
     ok: true,
@@ -76,7 +77,8 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
       commits: results[1].meta.changes,
       lesson_submissions: results[2].meta.changes,
       lesson_drafts: results[3].meta.changes,
-      enrollments: results[5].meta.changes,
+      lesson_sync: results[4].meta.changes,
+      enrollments: results[6].meta.changes,
     },
   });
 };
