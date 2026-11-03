@@ -72,12 +72,41 @@
       "ignoreStrings": true
     },
     {
+      "id": "r8",
+      "title": "Make your sprite once, in setup()",
+      "description": "new Sprite(...) is written in setup(), or in a function that setup() calls, and no new Sprite(...) or new Canvas(...) is in draw(), which runs about 60 times a second. Help: 5.1.4 (Worked Example: Minimum Sprite Program) and 5.1.8 (Storing the sprite in a let variable)",
+      "hint": "Put new Sprite(...) inside setup(). If a new Sprite( or new Canvas( line is in draw(), or in a function draw() calls, move it up into setup(): draw() would make a new one every frame, and they pile up.",
+      "type": "inFunction",
+      "function": "setup",
+      "followCalls": true,
+      "file": "script.js",
+      "pattern": "\\bnew\\s+Sprite\\s*\\(",
+      "forbidIn": [
+        {
+          "function": [
+            "draw",
+            "update"
+          ],
+          "pattern": "\\bnew\\s+(?:Sprite|Canvas)\\s*\\("
+        }
+      ],
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
       "id": "r3",
       "title": "Horizontal keyboard input",
-      "description": "The left or right key (`'a'`, `'d'`, `'left'` or `'right'`) is read each frame, in draw() or in a function of your own (not setup(), which runs once). Help: 5.1.14 (Key names: WASD and the arrow keys)",
-      "type": "regex",
+      "description": "The left or right key (`'a'`, `'d'`, `'left'` or `'right'`) is read each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). Help: 5.1.14 (Key names: WASD and the arrow keys)",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "followCalls": true,
       "file": "script.js",
-      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:kb\\.pressing\\s*\\(\\s*['\"](?:[aAdD]|(?:[Aa]rrow)?(?:[Ll]eft|[Rr]ight))['\"])",
+      "pattern": "\\bkb\\s*\\.\\s*pressing\\s*\\(\\s*['\"`](?:[aAdD]|(?:[Aa]rrow)?(?:[Ll]eft|[Rr]ight))['\"`]",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -85,10 +114,15 @@
     {
       "id": "r4",
       "title": "Vertical keyboard input",
-      "description": "The up or down key (`'w'`, `'s'`, `'up'` or `'down'`) is read each frame, in draw() or in a function of your own (not setup(), which runs once). Help: 5.1.14 (Key names: WASD and the arrow keys)",
-      "type": "regex",
+      "description": "The up or down key (`'w'`, `'s'`, `'up'` or `'down'`) is read each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). Help: 5.1.14 (Key names: WASD and the arrow keys)",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "followCalls": true,
       "file": "script.js",
-      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:kb\\.pressing\\s*\\(\\s*['\"](?:[wWsS]|(?:[Aa]rrow)?(?:[Uu]p|[Dd]own))['\"])",
+      "pattern": "\\bkb\\s*\\.\\s*pressing\\s*\\(\\s*['\"`](?:[wWsS]|(?:[Aa]rrow)?(?:[Uu]p|[Dd]own))['\"`]",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -96,11 +130,16 @@
     {
       "id": "r5",
       "title": "Set horizontal velocity, and stop",
-      "description": "The left and right keys set vel.x each frame, and vel.x goes back to 0 when neither key is held, so the sprite stops when you let go. The final else that sets it to 0 does this; setting it to 0 at the top of draw(), before the key checks, works too. Help: 5.1.15 (Velocity: vel.x and vel.y) and 5.1.17 (The else-to-zero rule)",
-      "hint": "Tap a left or right key and let go. If the sprite keeps sliding, nothing sets vel.x back to 0 when no key is held.",
-      "type": "regex",
+      "description": "The left and right keys set vel.x each frame, and vel.x goes back to 0 when neither key is held, so the sprite moves both ways and stops when you let go. The final else of one if / else if / else chain does this; setting vel.x to 0 at the top of draw(), before the key checks, works too. An else under a second, separate if undoes the first key every frame, so the sprite cannot move that way. Help: 5.1.15 (Velocity: vel.x and vel.y), 5.1.16 (Movement pattern (if / else if / else)) and 5.1.17 (The else-to-zero rule)",
+      "hint": "Tap a left or right key and let go. If the sprite keeps sliding, nothing sets vel.x back to 0 when no key is held. If one key does nothing, an else is undoing it: an else belongs only to the if right above it, so make the second key an else if.",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "followCalls": true,
       "file": "script.js",
-      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\.\\s*vel\\s*\\.\\s*x\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.]))[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$))",
+      "pattern": "^(?![\\s\\S]*?\\b(?<bn>[A-Za-z_$][\\w$]*)\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.])|[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.)[-+\\w$(.](?:(?:(?!\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!\\s*0(?:\\.0+)?(?![\\w.])))(?:[^{]|\\{[^{}]*\\}))*?[;}]\\s*if\\s*\\((?:[^()\\n]|\\((?:[^()\\n]|\\([^()\\n]{0,80}\\)){0,80}\\)){0,200}\\)\\s*(?:\\{\\s*)?\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n}]*;?\\s*\\}?\\s*else\\s*(?:\\{\\s*)?\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*0(?:\\.0+)?(?![\\w.])|(?:[^{]|\\{[^{}]*\\})*?[;}]\\s*\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*0(?:\\.0+)?(?![\\w.])))[\\s\\S]*?(?:(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\bif\\s*\\((?:[^()\\n]|\\((?:[^()\\n]|\\([^()\\n]{0,80}\\)){0,80}\\)){0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.])|[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.)[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$))",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -109,11 +148,16 @@
     {
       "id": "r6",
       "title": "Set vertical velocity, and stop",
-      "description": "The up and down keys set vel.y each frame, and vel.y goes back to 0 when neither key is held, so the sprite stops when you let go. The final else that sets it to 0 does this; setting it to 0 at the top of draw(), before the key checks, works too. Help: 5.1.15 (Velocity: vel.x and vel.y) and 5.1.17 (The else-to-zero rule)",
-      "hint": "Tap an up or down key and let go. If the sprite keeps sliding, nothing sets vel.y back to 0 when no key is held.",
-      "type": "regex",
+      "description": "The up and down keys set vel.y each frame, and vel.y goes back to 0 when neither key is held, so the sprite moves both ways and stops when you let go. The final else of one if / else if / else chain does this; setting vel.y to 0 at the top of draw(), before the key checks, works too. An else under a second, separate if undoes the first key every frame, so the sprite cannot move that way. Help: 5.1.15 (Velocity: vel.x and vel.y), 5.1.16 (Movement pattern (if / else if / else)) and 5.1.17 (The else-to-zero rule)",
+      "hint": "Tap an up or down key and let go. If the sprite keeps sliding, nothing sets vel.y back to 0 when no key is held. If one key does nothing, an else is undoing it: an else belongs only to the if right above it, so make the second key an else if.",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "followCalls": true,
       "file": "script.js",
-      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\.\\s*vel\\s*\\.\\s*y\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.]))[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$))",
+      "pattern": "^(?![\\s\\S]*?\\b(?<bn>[A-Za-z_$][\\w$]*)\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.])|[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.)[-+\\w$(.](?:(?:(?!\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!\\s*0(?:\\.0+)?(?![\\w.])))(?:[^{]|\\{[^{}]*\\}))*?[;}]\\s*if\\s*\\((?:[^()\\n]|\\((?:[^()\\n]|\\([^()\\n]{0,80}\\)){0,80}\\)){0,200}\\)\\s*(?:\\{\\s*)?\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n}]*;?\\s*\\}?\\s*else\\s*(?:\\{\\s*)?\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*0(?:\\.0+)?(?![\\w.])|(?:[^{]|\\{[^{}]*\\})*?[;}]\\s*\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*0(?:\\.0+)?(?![\\w.])))[\\s\\S]*?(?:(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\bif\\s*\\((?:[^()\\n]|\\((?:[^()\\n]|\\([^()\\n]{0,80}\\)){0,80}\\)){0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.])|[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.)[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$))",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -122,9 +166,10 @@
     {
       "id": "r7",
       "title": "Clear the background each frame",
-      "description": "Previous frames don't stack up. Help: 5.1.9 (background(color) wipe rule)",
+      "description": "Previous frames don't stack up: background() is called in draw(), or in a function of your own that draw() calls. Help: 5.1.9 (background(color) wipe rule)",
       "type": "inFunction",
       "function": "draw",
+      "followCalls": true,
       "file": "script.js",
       "pattern": "background\\s*\\(",
       "flags": "",
@@ -141,7 +186,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.20 Make it Move\". The task they were given: In setup(), make a 400 by 400 canvas and one sprite in the middle, stored in the player variable declared at the top. In draw(), paint the background first, then set player.vel.x from the left and right keys and player.vel.y from the up and down keys: if one key is held set a speed, else if the other key is held set the opposite speed, else set 0. Up is a negative vel.y. WASD ('a', 'd', 'w', 's') or the arrow keys ('left', 'right', 'up', 'down') are both fine. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame. kb.pressing(key) is true on every frame the key is held. The key names 'left', 'right', 'up' and 'down' are the arrow keys, and spellings such as 'ArrowLeft' work too. vel.x and vel.y are the sprite's speed in pixels per frame. y grows downward, so moving up is a negative vel.y. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.20 Make it Move\". The task they were given: In setup(), make a 400 by 400 canvas and one sprite in the middle, stored in the player variable declared at the top. In draw(), paint the background first, then set player.vel.x from the left and right keys and player.vel.y from the up and down keys: if one key is held set a speed, else if the other key is held set the opposite speed, else set 0. Up is a negative vel.y. WASD ('a', 'd', 'w', 's') or the arrow keys ('left', 'right', 'up', 'down') are both fine. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame. kb.pressing(key) is true on every frame the key is held. The key names 'left', 'right', 'up' and 'down' are the arrow keys, and spellings such as 'ArrowLeft' work too. vel.x and vel.y are the sprite's speed in pixels per frame. y grows downward, so moving up is a negative vel.y. An else belongs only to the if right above it. With two separate ifs, such as if (left) vel.x = -4; if (right) vel.x = 4; else vel.x = 0;, the else sets vel.x to 0 on every frame the right key is up, so the left key can never move the sprite. A chain written as if / else if / else, or 0 set at the top of draw() before separate ifs, does not have that problem. Sprites and the canvas are made once, in setup() (or a function only setup() calls): a new Sprite(...) or new Canvas(...) in draw() is made again on every frame, which is the bug 5.1.4 shows. A function the student wrote counts only where it is called: a function that draw() (or update(), or another of their functions that draw() calls) calls by name runs every frame, a function only setup() calls runs once, and a function nothing calls never runs, so code that sits only inside it does not count. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
@@ -152,7 +197,13 @@
       {
         "id": "r2",
         "title": "Create a sprite",
-        "description": "A sprite is made with new Sprite(...), normally in setup() and stored in player. Any position and size count. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "description": "A sprite is made with new Sprite(...), normally in setup() and stored in player. Any position and size count. Where it is made is the job of the card \"Make your sprite once, in setup()\". Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r8",
+        "title": "Make your sprite once, in setup()",
+        "description": "Every new Sprite(...) and new Canvas(...) runs once: it is written in setup(), or in a function of the student's that only setup() calls. None is in draw(), update() or a function they call, because draw() runs about 60 times a second, so a sprite made there is made again every frame and they pile up (the bug 5.1.4 shows). A sprite made only in draw() is not met, even though one shows on the canvas; neither is a sprite made when a key is pressed in draw(). A sprite made at the very top of the file, outside setup(), is not met either: the course makes sprites in setup(). Help: 5.1.4 (Worked Example: Minimum Sprite Program) and 5.1.8 (Storing the sprite in a let variable)",
         "points": 1
       },
       {
@@ -170,19 +221,19 @@
       {
         "id": "r5",
         "title": "Set horizontal velocity, and stop",
-        "description": "Inside draw() (or update(), or a function of the student's that they call), the sprite's vel.x is set every frame from the left and right keys, AND it goes back to 0 when neither key is held, so the sprite stops when the key is let go. The final else that sets 0 is the course's shape; setting vel.x to 0 at the top of draw() before the key checks, or a ternary that ends in 0, also counts. Separate ifs with nothing that sets 0 leave the sprite drifting after one tap, so that is not met yet. Changing the sprite's x position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.15 (Velocity: vel.x and vel.y) and 5.1.17 (The else-to-zero rule)",
+        "description": "Inside draw() (or update(), or a function of the student's that they call), the sprite's vel.x is set every frame from the left and right keys, AND it goes back to 0 when neither key is held, so the sprite stops when the key is let go. The final else that sets 0 is the course's shape; setting vel.x to 0 at the top of draw() before the key checks, or a ternary that ends in 0, also counts. Separate ifs with nothing that sets 0 leave the sprite drifting after one tap, so that is not met yet. If one direction can never happen because a later line undoes it every frame (an else under a second, separate if, or a line after the keys that sets vel.x back to 0), it is not met: say which key is undone. Changing the sprite's x position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.15 (Velocity: vel.x and vel.y) and 5.1.17 (The else-to-zero rule)",
         "points": 1
       },
       {
         "id": "r6",
         "title": "Set vertical velocity, and stop",
-        "description": "Inside draw() (or update(), or a function of the student's that they call), the sprite's vel.y is set every frame from the up and down keys, AND it goes back to 0 when neither key is held, so the sprite stops when the key is let go. The final else that sets 0 is the course's shape; setting vel.y to 0 at the top of draw() before the key checks, or a ternary that ends in 0, also counts. Separate ifs with nothing that sets 0 leave the sprite drifting after one tap, so that is not met yet. Changing the sprite's y position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.15 (Velocity: vel.x and vel.y) and 5.1.17 (The else-to-zero rule)",
+        "description": "Inside draw() (or update(), or a function of the student's that they call), the sprite's vel.y is set every frame from the up and down keys, AND it goes back to 0 when neither key is held, so the sprite stops when the key is let go. The final else that sets 0 is the course's shape; setting vel.y to 0 at the top of draw() before the key checks, or a ternary that ends in 0, also counts. Separate ifs with nothing that sets 0 leave the sprite drifting after one tap, so that is not met yet. If one direction can never happen because a later line undoes it every frame (an else under a second, separate if, or a line after the keys that sets vel.y back to 0), it is not met: say which key is undone. Changing the sprite's y position directly also moves it, but it is a different tool from velocity: mark that partial and say so. Help: 5.1.15 (Velocity: vel.x and vel.y) and 5.1.17 (The else-to-zero rule)",
         "points": 1
       },
       {
         "id": "r7",
         "title": "Clear the background each frame",
-        "description": "background(...) is called inside draw(), with any colour, so old frames do not pile up. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
+        "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour, so old frames do not pile up. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
     ]

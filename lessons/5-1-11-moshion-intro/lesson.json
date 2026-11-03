@@ -17,7 +17,7 @@
       "title": "Create a canvas",
       "instructions": "Inside setup(), call `new Canvas(400, 400)` to make a 400×400 drawing area.",
       "hints": [
-        "Open the moSHion docs drawer on the right and find the Canvas section."
+        "Open the Docs tab on the right edge of the screen and pick Canvas in the list at the top. The part called Creating the canvas shows this line."
       ]
     },
     {
@@ -25,7 +25,7 @@
       "title": "Make a sprite",
       "instructions": "Create a sprite at the center: `player = new Sprite(200, 200, 40, 40)`. The four numbers are x, y, width, height.",
       "hints": [
-        "Check the Sprite section of the moSHion docs drawer for constructor arguments."
+        "In the Docs tab on the right, pick Sprite in the list at the top and read the part called Your first sprite."
       ]
     },
     {
@@ -33,7 +33,7 @@
       "title": "Color it",
       "instructions": "Set `player.color = 'deepskyblue'` (or any CSS color).",
       "hints": [
-        "Look up sprite properties in the moSHion docs drawer."
+        "In the Docs tab on the right, pick Sprite in the list at the top and read the part called Color, visibility, and layer."
       ]
     },
     {
@@ -41,7 +41,7 @@
       "title": "Paint the background",
       "instructions": "Inside draw(), call `background('#222')` so you can see the sprite clearly.",
       "hints": [
-        "Search the moSHion docs drawer for background()."
+        "In the Docs tab on the right, pick Canvas in the list at the top and read the part called Background and clearing. Or type background in the search box."
       ]
     }
   ],
@@ -71,6 +71,30 @@
       "ignoreStrings": true
     },
     {
+      "id": "r5",
+      "title": "Make your sprite once, in setup()",
+      "description": "new Sprite(...) is written in setup(), or in a function that setup() calls, and no new Sprite(...) or new Canvas(...) is in draw(), which runs about 60 times a second. Help: 5.1.4 (Worked Example: Minimum Sprite Program) and 5.1.8 (Storing the sprite in a let variable)",
+      "hint": "Put new Sprite(...) inside setup(). If a new Sprite( or new Canvas( line is in draw(), or in a function draw() calls, move it up into setup(): draw() would make a new one every frame, and they pile up.",
+      "type": "inFunction",
+      "function": "setup",
+      "followCalls": true,
+      "file": "script.js",
+      "pattern": "\\bnew\\s+Sprite\\s*\\(",
+      "forbidIn": [
+        {
+          "function": [
+            "draw",
+            "update"
+          ],
+          "pattern": "\\bnew\\s+(?:Sprite|Canvas)\\s*\\("
+        }
+      ],
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
       "id": "r3",
       "title": "Set a sprite color",
       "description": "A sprite has a color. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
@@ -85,9 +109,10 @@
     {
       "id": "r4",
       "title": "Clear the background each frame",
-      "description": "Previous frames don't stack up. Help: 5.1.9 (background(color) wipe rule)",
+      "description": "Previous frames don't stack up: background() is called in draw(), or in a function of your own that draw() calls. Help: 5.1.9 (background(color) wipe rule)",
       "type": "inFunction",
       "function": "draw",
+      "followCalls": true,
       "file": "script.js",
       "pattern": "background\\s*\\(",
       "flags": "",
@@ -104,7 +129,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.11 Hello Sprite\". The task they were given: Make a first moSHion sketch. In setup(): make a 400 by 400 canvas, make a sprite at the centre (200, 200) that is 40 wide and 40 tall and store it in player, and give it a colour. In draw(): paint the background every frame so the sprite can be seen clearly. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once when the sketch starts, and draw() runs again on every frame, about 60 times a second. new Canvas(w, h) makes the drawing area. new Sprite(x, y, w, h) makes a sprite; the course makes sprites once, in setup(). background(colour) inside draw() repaints the whole canvas every frame, so old frames do not pile up. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.11 Hello Sprite\". The task they were given: Make a first moSHion sketch. In setup(): make a 400 by 400 canvas, make a sprite at the centre (200, 200) that is 40 wide and 40 tall and store it in player, and give it a colour. In draw(): paint the background every frame so the sprite can be seen clearly. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once when the sketch starts, and draw() runs again on every frame, about 60 times a second. new Canvas(w, h) makes the drawing area. new Sprite(x, y, w, h) makes a sprite. Sprites and the canvas are made once, in setup() (or a function only setup() calls): a new Sprite(...) or new Canvas(...) in draw() is made again on every frame, which is the bug 5.1.4 shows. A function the student wrote counts only where it is called: a function that draw() (or update(), or another of their functions that draw() calls) calls by name runs every frame, a function only setup() calls runs once, and a function nothing calls never runs, so code that sits only inside it does not count. background(colour) inside draw() repaints the whole canvas every frame, so old frames do not pile up. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
@@ -115,7 +140,13 @@
       {
         "id": "r2",
         "title": "Create at least one sprite",
-        "description": "At least one sprite is made with new Sprite(...). Storing it in player is what the step asks, but any name, or no variable at all, still counts, and so does any position and size. A sprite made inside draw() still exists, so it counts, but say in the note that it belongs in setup(), because draw() makes a new one every frame. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "description": "At least one sprite is made with new Sprite(...). Storing it in player is what the step asks, but any name, or no variable at all, still counts, and so does any position and size. Where it is made is the job of the card \"Make your sprite once, in setup()\": a sprite made inside draw() still counts for this card. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Make your sprite once, in setup()",
+        "description": "Every new Sprite(...) and new Canvas(...) runs once: it is written in setup(), or in a function of the student's that only setup() calls. None is in draw(), update() or a function they call, because draw() runs about 60 times a second, so a sprite made there is made again every frame and they pile up (the bug 5.1.4 shows). A sprite made only in draw() is not met, even though one shows on the canvas; neither is a sprite made when a key is pressed in draw(). A sprite made at the very top of the file, outside setup(), is not met either: the course makes sprites in setup(). Help: 5.1.4 (Worked Example: Minimum Sprite Program) and 5.1.8 (Storing the sprite in a let variable)",
         "points": 1
       },
       {
@@ -127,7 +158,7 @@
       {
         "id": "r4",
         "title": "Clear the background each frame",
-        "description": "background(...) is called inside draw(), with any colour, so each frame starts clean. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
+        "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour, so each frame starts clean. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
     ]

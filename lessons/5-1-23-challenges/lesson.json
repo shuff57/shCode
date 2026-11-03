@@ -17,7 +17,7 @@
       "title": "Create a canvas",
       "instructions": "Inside setup(), create a canvas of any size.",
       "hints": [
-        "Open the moSHion docs drawer on the right and find the Canvas section."
+        "Open the Docs tab on the right edge of the screen and pick Canvas in the list at the top. The part called Creating the canvas shows this line."
       ]
     },
     {
@@ -25,7 +25,7 @@
       "title": "Create at least one sprite",
       "instructions": "In setup(), create a sprite and store it in the top-level `player` variable.",
       "hints": [
-        "Check the Sprite section of the moSHion docs drawer for constructor arguments."
+        "In the Docs tab on the right, pick Sprite in the list at the top and read the part called Your first sprite."
       ]
     },
     {
@@ -33,13 +33,13 @@
       "title": "Clear the background each frame",
       "instructions": "Call background() as the first line of draw() so old frames don't stack up.",
       "hints": [
-        "Search the moSHion docs drawer for background()."
+        "In the Docs tab on the right, pick Canvas in the list at the top and read the part called Background and clearing. Or type background in the search box."
       ]
     },
     {
       "id": "s4",
       "title": "Build one challenge",
-      "instructions": "Pick one of the challenges below and build it in `draw()`. The check turns green once any one of them is in `draw()`, so one is enough on its own.\n\n**Challenge 1: color by key (easy).** While an arrow key is held, the player wears a different color: test the key with `kb.pressing(...)` (5.1.13) and set `player.color`.\n\n**Challenge 2: an orbiting companion (medium).** A second sprite circles the player. Every frame, set its `pos.x` to `player.pos.x + cos(frameCount * 0.05) * 60`, and its `pos.y` the same way with `sin` (5.1.22).\n\n**Challenge 3: show a value (easy).** Draw one of the player's values on the canvas with `text()` (5.1.21), joining words and a number with `+`, for example `text('x: ' + player.pos.x, 10, 20);`.\n\n**Challenge 4: a HUD (medium).** At the top of the canvas, show `'Frame: ' + frameCount` on one line and the player's x and y on the next, one `text()` call per line.\n\n**Challenge 5: a wave (medium).** A sprite that bobs up and down on its own: every frame, set its `pos.y` to a middle value plus `sin(frameCount * 0.05) * 80`, the way 5.1.22's mover swings sideways.\n\n**Your own idea.** Something else beyond a canvas, a sprite and a background counts too. Two that work: a player that spins, with `player.rotation = frameCount * 2;` (5.1.22), or a fading trail: write `background('rgba(34, 34, 34, 0.1)')` in place of `background('#222')`. The last number makes each frame's paint only 10% solid, so the old frames fade out slowly behind a moving sprite instead of vanishing at once (moSHion docs: Background and clearing).",
+      "instructions": "Pick one of the challenges below and build it in `draw()`. The check turns green once any one of them is in `draw()` (or in a function of your own that `draw()` calls), so one is enough on its own.\n\n**Challenge 1: color by key (easy).** While an arrow key is held, the player wears a different color: test the key with `kb.pressing(...)` (5.1.13) and set `player.color`.\n\n**Challenge 2: an orbiting companion (medium).** A second sprite circles the player. Every frame, set its `pos.x` to `player.pos.x + cos(frameCount * 0.05) * 60`, and its `pos.y` the same way with `sin` (5.1.22).\n\n**Challenge 3: show a value (easy).** Draw one of the player's values on the canvas with `text()` (5.1.21), joining words and a number with `+`. Wrap the number in `round()`, which gives the nearest whole number, so it does not print a long tail like `304.99999999999966`: for example `text('x: ' + round(player.pos.x), 10, 20);`. (`Math.round()` does the same thing.)\n\n**Challenge 4: a HUD (medium).** At the top of the canvas, show `'Frame: ' + frameCount` on one line and the player's x and y on the next, one `text()` call per line. Use `round()` on x and y, as in Challenge 3.\n\n**Challenge 5: a wave (medium).** A sprite that bobs up and down on its own: every frame, set its `pos.y` to a middle value plus `sin(frameCount * 0.05) * 80`, the way 5.1.22's mover swings sideways.\n\n**Your own idea.** Something else beyond a canvas, a sprite and a background counts too. Two that work: a player that spins, with `player.rotation = frameCount * 2;` in `draw()` or `player.rotationSpeed = 3;` once in `setup()` (5.1.22), or a fading trail: write `background('rgba(34, 34, 34, 0.1)')` in place of `background('#222')`. The last number makes each frame's paint only 10% solid, so the old frames fade out slowly behind a moving sprite instead of vanishing at once (moSHion docs: Background and clearing).",
       "hints": [
         "Everything these challenges use has been shown in 5.1: the sin and cos lines are in 5.1.22 (Reading: Moving on its own: frameCount and sin()), and text() is in 5.1.21 (Reading: Words on the canvas: text()).",
         "Doing more than one challenge is fine: the check needs only one."
@@ -72,9 +72,10 @@
     {
       "id": "r3",
       "title": "Background set each frame",
-      "description": "Calls background() inside draw() with a colour of the student choosing. Help: 5.1.9 (background(color) wipe rule)",
+      "description": "Calls background() inside draw(), or in a function of your own that draw() calls, with a colour of the student choosing. Help: 5.1.9 (background(color) wipe rule)",
       "type": "inFunction",
       "function": "draw",
+      "followCalls": true,
       "file": "script.js",
       "pattern": "background\\s*\\(",
       "flags": "",
@@ -84,13 +85,32 @@
     {
       "id": "r4",
       "title": "Use at least one advanced feature",
-      "description": "Your sketch uses a technique beyond canvas + sprite + background, in draw() or in a function of your own (not setup(), which runs once): one of the five challenges, or your own idea such as a spin or a trail. Help: 5.1.22 (Moving on its own: frameCount and sin()) and 5.1.21 (Words on the canvas: text())",
-      "type": "regex",
+      "description": "Your sketch uses a technique beyond canvas + sprite + background, in draw() or in a function of your own that draw() calls: one of the five challenges, or your own idea, such as a spin (rotation, or a rotationSpeed set once in setup()), a fading trail, or a sprite that grows, pulses or wanders. Moving the player with the keys, on its own, is the earlier lab's job and does not count. Help: 5.1.22 (Moving on its own: frameCount and sin()), 5.1.21 (Words on the canvas: text()) and 5.1.13 (Reading: kb.pressing(key))",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "followCalls": true,
       "file": "script.js",
-      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:kb\\.presses\\s*\\(|\\bsin\\s*\\(|\\bcos\\s*\\(|mouse\\.(?:x|y|pressed|pressing)|\\blerp\\s*\\(|\\bframeCount\\b|\\btext\\s*\\(|kb\\.pressing\\s*\\([^)]{0,40}\\)[^;{}]{0,120}?\\)\\s*(?:\\{[^{}]{0,400}?|[^{};]{0,200}?)\\.color\\s*=(?!=)|\\.color\\s*=\\s*\\(?\\s*kb\\.pressing\\s*\\(|\\b(?:circle|square|rect|line|ellipse)\\s*\\(|\\.\\s*rotation\\s*(?:[-+]?=(?!=)|\\+\\+|--)|\\bbackground\\s*\\(\\s*['\"`]\\s*rgba\\s*\\()",
+      "pattern": "\\bkb\\s*\\.\\s*presses\\s*\\(|\\bsin\\s*\\(|\\bcos\\s*\\(|\\bmouse\\s*\\.\\s*(?:x|y|pressed|pressing)\\b|\\blerp\\s*\\(|\\bframeCount\\b|\\btext\\s*\\(|\\bkb\\s*\\.\\s*pressing\\s*\\([^)]{0,40}\\)[^;{}]{0,120}?\\)\\s*(?:\\{[^{}]{0,400}?|[^{};]{0,200}?)\\.\\s*color\\s*=(?!=)|\\.\\s*color\\s*=\\s*\\(?\\s*kb\\s*\\.\\s*pressing\\s*\\(|\\b(?:circle|square|rect|line|ellipse)\\s*\\(|\\.\\s*rotation\\s*(?:[-+]?=(?!=)|\\+\\+|--)|\\.\\s*rotationSpeed\\s*=(?!=)\\s*\\(?\\s*-?\\s*\\(?\\s*(?:[1-9]|0?\\.\\d*[1-9]|[A-Za-z_$])|\\.\\s*(?:w|h|width|height|scale|opacity|diameter)\\s*(?:[-+*/]=(?!=)|\\+\\+|--)|\\brandom\\s*\\(",
+      "orIn": [
+        {
+          "function": [
+            "draw",
+            "update"
+          ],
+          "pattern": "(?:^|[;{}\\n])[^\\S\\n]*background\\s*\\(\\s*['\"`]\\s*rgba\\s*\\(",
+          "ignoreStrings": false
+        },
+        {
+          "function": "setup",
+          "pattern": "(?:^|[;{}\\n])[^\\S\\n]*[A-Za-z_$][\\w$]*\\s*\\.\\s*rotationSpeed\\s*=(?!=)\\s*\\(?\\s*-?\\s*\\(?\\s*(?:[1-9]|0?\\.\\d*[1-9]|[A-Za-z_$])"
+        }
+      ],
       "flags": "",
       "points": 0,
-      "ignoreStrings": false
+      "ignoreStrings": true
     }
   ],
   "grading": {
@@ -101,7 +121,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.25 Challenges\". The task they were given: In setup(), make a canvas of any size and at least one sprite, the player. Call background() as the first line of draw(). Then build at least one of five challenges in draw(): (1) while an arrow key is held, the player wears a different colour; (2) a second sprite circles the player, placed with cos and sin of frameCount; (3) one of the player's values is drawn on the canvas with text(); (4) a HUD at the top shows the frame count on one line and the player's x and y on the next; (5) a sprite bobs up and down on its own, placed with sin of frameCount. The step also offers an idea of their own, such as a player that spins with rotation worked out from frameCount, or a fading trail made by painting the background with a see-through rgba colour (its last number below 1). The starter's comments also suggest moving the player with the keys, but that is not one of the challenges. What the starter file already had: a top-level `let player;` (declared, not yet a sprite), a setup() with only comments (no canvas, no sprite) and a draw() that already calls background('#222') followed by step comments. The student may add more variables of their own. On the starter only the background criterion is met. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame (update() too, if the student writes one). kb.pressing(key) is true on every frame a key is held; kb.presses(key) only on the frame it goes down. frameCount counts the frames since the start; sin() and cos() of a small number times frameCount swing between -1 and 1, so multiplying by 60 or 80 gives a swing that many pixels wide. A sprite's position can be read and set as x and y or as pos.x and pos.y. text(words, x, y) draws on the canvas, and words and a number join with +. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.25 Challenges\". The task they were given: In setup(), make a canvas of any size and at least one sprite, the player. Call background() as the first line of draw(). Then build at least one of five challenges in draw(): (1) while an arrow key is held, the player wears a different colour; (2) a second sprite circles the player, placed with cos and sin of frameCount; (3) one of the player's values is drawn on the canvas with text(); (4) a HUD at the top shows the frame count on one line and the player's x and y on the next; (5) a sprite bobs up and down on its own, placed with sin of frameCount. The step also offers an idea of their own, such as a player that spins with rotation worked out from frameCount, or a fading trail made by painting the background with a see-through rgba colour (its last number below 1). The starter's comments also suggest moving the player with the keys, but that is not one of the challenges. What the starter file already had: a top-level `let player;` (declared, not yet a sprite), a setup() with only comments (no canvas, no sprite) and a draw() that already calls background('#222') followed by step comments. The student may add more variables of their own. On the starter only the background criterion is met. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame (update() too, if the student writes one). kb.pressing(key) is true on every frame a key is held; kb.presses(key) only on the frame it goes down. frameCount counts the frames since the start; sin() and cos() of a small number times frameCount swing between -1 and 1, so multiplying by 60 or 80 gives a swing that many pixels wide. A sprite's position can be read and set as x and y or as pos.x and pos.y. text(words, x, y) draws on the canvas, and words and a number join with +. round(n) and Math.round(n) give the nearest whole number, so a value shows without a long decimal tail. rotationSpeed set once in setup() keeps a sprite spinning by itself. A function the student wrote counts only where it is called: a function that draw() (or update(), or another of their functions that draw() calls) calls by name runs every frame, a function only setup() calls runs once, and a function nothing calls never runs, so code that sits only inside it does not count. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
@@ -118,13 +138,13 @@
       {
         "id": "r3",
         "title": "Background set each frame",
-        "description": "background(...) is called inside draw(), with any colour. The starter already has this line, so it stays met unless it was deleted or moved out of draw(). Help: 5.1.9 (background(color) wipe rule)",
+        "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour. The starter already has this line, so it stays met unless it was deleted or moved out of draw(). Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "Use at least one advanced feature",
-        "description": "At least one of the five challenges is built and would really run in draw() (or update()): a held key changes the player's colour; a second sprite is placed around the player with cos and sin; a value is drawn with text(); a HUD of text() lines; or a sprite is moved up and down with sin. Other honest extras beyond a canvas, a sprite and a background also count, in draw() or a function the student wrote that draw() calls: a sprite that spins (rotation worked out from frameCount, or added to every frame), a fading trail (a see-through rgba background whose last number is below 1, or an array of past positions drawn with circle()), plain shapes such as circle() or rect(), the mouse's position, kb.presses(...), or a timer built from frameCount. Moving the player with the keys on its own is the earlier lab's job, not a challenge, so that alone is not met yet.",
+        "description": "At least one of the five challenges is built and would really run in draw() (or update()): a held key changes the player's colour; a second sprite is placed around the player with cos and sin; a value is drawn with text(); a HUD of text() lines; or a sprite is moved up and down with sin. Other honest extras beyond a canvas, a sprite and a background also count, in draw() or a function the student wrote that draw() calls: a sprite that spins (rotation worked out from frameCount, or added to every frame, or a rotationSpeed set once in setup()), a sprite that grows, shrinks or pulses (its w, h or scale changed every frame), a sprite that wanders with random() or Math.random(), a fading trail (a see-through rgba background whose last number is below 1, or an array of past positions drawn with circle()), plain shapes such as circle() or rect(), the mouse's position, kb.presses(...), or a timer built from frameCount. Moving the player with the keys on its own is the earlier lab's job, not a challenge, so that alone is not met yet. Code in a function the student wrote counts only if draw() (or update()) calls it; a function nothing calls never runs.",
         "points": 1
       }
     ]

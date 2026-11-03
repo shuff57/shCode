@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Wire keyboard movement to the player",
-      "instructions": "Use `kb.pressing(...)` with `'a'` / `'d'` / `'w'` / `'s'` (or `'left'` / `'right'` / `'up'` / `'down'`) to set the player's velocity. Include an else branch that resets velocity to 0 when no key is held.",
+      "instructions": "Use `kb.pressing(...)` with `'a'` / `'d'` / `'w'` / `'s'` (or `'left'` / `'right'` / `'up'` / `'down'`) to set the player's velocity. Include an else branch at the end of each chain (one for `vel.x`, one for `vel.y`) that resets velocity to 0 when no key is held.",
       "hints": [
         "Pick one set of keys and use it for all four directions. 5.1.14 lists both sets, and 5.1.17 explains the else branch."
       ]
@@ -32,7 +32,7 @@
       "instructions": "Make the `mover` sprite move on its own, with no key held. One way is the one 5.1.22 shows: work its position out from `frameCount`, such as `sin(frameCount * 0.05)` to swing it back and forth, or turn it with `rotation` to spin it. A simpler way counts too: add a little to its position every frame, like `mover.pos.x = mover.pos.x + 1;` from 5.1.9, or give it a velocity once in `setup()`, as in 5.1.15.",
       "hints": [
         "5.1.22 shows swinging, circling and spinning with `frameCount`, and the simpler ways, each with a line you can copy.",
-        "Run it and keep your hands off the keys. The mover should still move."
+        "Run it and keep your hands off the keys. The mover should still move. A line that copies the player's speed, or sits inside a key's if, moves the mover only when a key does."
       ]
     },
     {
@@ -74,32 +74,72 @@
       "ignoreStrings": true
     },
     {
+      "id": "r9",
+      "title": "Make your sprite once, in setup()",
+      "description": "new Sprite(...) is written in setup(), or in a function that setup() calls, and no new Sprite(...) or new Canvas(...) is in draw(), which runs about 60 times a second. Help: 5.1.4 (Worked Example: Minimum Sprite Program) and 5.1.8 (Storing the sprite in a let variable)",
+      "hint": "Put new Sprite(...) inside setup(). If a new Sprite( or new Canvas( line is in draw(), or in a function draw() calls, move it up into setup(): draw() would make a new one every frame, and they pile up.",
+      "type": "inFunction",
+      "function": "setup",
+      "followCalls": true,
+      "file": "script.js",
+      "pattern": "\\bnew\\s+Sprite\\s*\\(",
+      "forbidIn": [
+        {
+          "function": [
+            "draw",
+            "update"
+          ],
+          "pattern": "\\bnew\\s+(?:Sprite|Canvas)\\s*\\("
+        }
+      ],
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
       "id": "r3",
       "title": "Horizontal keyboard input",
-      "description": "The left or right key (`'a'`, `'d'`, `'left'` or `'right'`) moves the player horizontally each frame, in draw() or in a function of your own (not setup(), which runs once). Help: 5.1.14 (Key names: WASD and the arrow keys)",
-      "type": "regex",
+      "description": "The left or right key (`'a'`, `'d'`, `'left'` or `'right'`) moves the player horizontally each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). Help: 5.1.14 (Key names: WASD and the arrow keys)",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "followCalls": true,
       "file": "script.js",
-      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:kb\\.pressing\\s*\\(\\s*['\"](?:[aAdD]|(?:[Aa]rrow)?(?:[Ll]eft|[Rr]ight))['\"])",
+      "pattern": "\\bkb\\s*\\.\\s*pressing\\s*\\(\\s*['\"`](?:[aAdD]|(?:[Aa]rrow)?(?:[Ll]eft|[Rr]ight))['\"`]",
       "flags": "",
       "points": 0
     },
     {
       "id": "r4",
       "title": "Vertical keyboard input",
-      "description": "The up or down key (`'w'`, `'s'`, `'up'` or `'down'`) moves the player vertically each frame, in draw() or in a function of your own (not setup(), which runs once). Help: 5.1.14 (Key names: WASD and the arrow keys)",
-      "type": "regex",
+      "description": "The up or down key (`'w'`, `'s'`, `'up'` or `'down'`) moves the player vertically each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). Help: 5.1.14 (Key names: WASD and the arrow keys)",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "followCalls": true,
       "file": "script.js",
-      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:kb\\.pressing\\s*\\(\\s*['\"](?:[wWsS]|(?:[Aa]rrow)?(?:[Uu]p|[Dd]own))['\"])",
+      "pattern": "\\bkb\\s*\\.\\s*pressing\\s*\\(\\s*['\"`](?:[wWsS]|(?:[Aa]rrow)?(?:[Uu]p|[Dd]own))['\"`]",
       "flags": "",
       "points": 0
     },
     {
       "id": "r5",
       "title": "Velocity resets to zero",
-      "description": "The player stops when no movement key is held: an else that sets its vel.x or vel.y to 0, or setting it to 0 at the top of draw() before the key checks. Help: 5.1.17 (The else-to-zero rule)",
-      "type": "regex",
+      "description": "The player stops when no movement key is held, on both axes: vel.x and vel.y each go back to 0 (an else at the end of each chain, or 0 at the top of draw() before the key checks), and no else undoes a key, so the player can move all four ways. Help: 5.1.16 (Movement pattern (if / else if / else)) and 5.1.17 (The else-to-zero rule)",
+      "hint": "Tap each key and let go. If the player keeps sliding sideways or up and down, that axis has nothing that sets it back to 0. If a key does nothing, an else is undoing it: an else belongs only to the if right above it.",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "followCalls": true,
       "file": "script.js",
-      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\.\\s*vel\\s*\\.\\s*x\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.]))[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$)|(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\.\\s*vel\\s*\\.\\s*y\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.]))[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$))",
+      "pattern": "^(?![\\s\\S]*?\\b(?<bn>[A-Za-z_$][\\w$]*)\\s*\\.\\s*vel\\s*\\.\\s*(?<bax>[xy])\\s*=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.])|[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.)[-+\\w$(.](?:(?:(?!\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*\\k<bax>\\s*=(?!\\s*0(?:\\.0+)?(?![\\w.])))(?:[^{]|\\{[^{}]*\\}))*?[;}]\\s*if\\s*\\((?:[^()\\n]|\\((?:[^()\\n]|\\([^()\\n]{0,80}\\)){0,80}\\)){0,200}\\)\\s*(?:\\{\\s*)?\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*\\k<bax>\\s*=(?!=)[^;\\n}]*;?\\s*\\}?\\s*else\\s*(?:\\{\\s*)?\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*\\k<bax>\\s*=\\s*0(?:\\.0+)?(?![\\w.])|(?:[^{]|\\{[^{}]*\\})*?[;}]\\s*\\k<bn>\\s*\\.\\s*vel\\s*\\.\\s*\\k<bax>\\s*=\\s*0(?:\\.0+)?(?![\\w.])))(?=[\\s\\S]*?(?:(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\bif\\s*\\((?:[^()\\n]|\\((?:[^()\\n]|\\([^()\\n]{0,80}\\)){0,80}\\)){0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.])|[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.)[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$)))[\\s\\S]*?(?:(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\bif\\s*\\((?:[^()\\n]|\\((?:[^()\\n]|\\([^()\\n]{0,80}\\)){0,80}\\)){0,200}\\)\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.])|[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.)[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$))",
       "flags": "",
       "points": 0,
       "ignoreStrings": true
@@ -107,11 +147,26 @@
     {
       "id": "r6",
       "title": "Automatic motion for the mover",
-      "description": "The mover (any name, not the sprite the keys drive) moves on its own, with no key held: worked out from frameCount, nudged a little every frame (the way 5.1.9 nudged the player), or given a velocity or a rotationSpeed. Help: 5.1.22 (Moving on its own: frameCount and sin())",
-      "hint": "Run it and keep your hands off the keys. If the mover sits still, nothing changes its position or rotation every frame.",
-      "type": "regex",
+      "description": "The mover (any name, not the sprite the keys drive) moves on its own, by its own rule, with no key held: worked out from frameCount, nudged a little every frame (the way 5.1.9 nudged the player), or given a velocity or a rotationSpeed. A line that copies the player's speed, or one inside an if that tests a key, moves it only when a key does, so it does not count. Help: 5.1.22 (Moving on its own: frameCount and sin()) and 5.1.10 (Sprite property tour: pos, rotation, layer)",
+      "hint": "Run it and keep your hands off the keys. If the mover sits still, nothing changes its position or rotation by itself every frame. Its line must not test a key or copy the player's speed.",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "followCalls": true,
       "file": "script.js",
-      "pattern": "^(?=(?:[\\s\\S]*?\\bkb\\s*\\.\\s*\\w+\\s*\\([^;}]{0,200}?[^\\w$.;}](?<kd1>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:vel|pos|x|y|rotation)\\b)?)(?=(?:[\\s\\S]*?\\b(?<kd2>[A-Za-z_$][\\w$]*)\\s*\\.\\s*vel\\s*\\.\\s*[xy]\\s*=[^;}]{0,200}?\\bkb\\s*\\.)?)(?=(?:[\\s\\S]*?\\bkb\\s*\\.\\s*\\w+\\s*\\([^;}]{0,200}?[^\\w$.;}](?!\\k<kd1>(?![\\w$]))(?<kd3>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:vel|pos|x|y|rotation)\\b)?)[\\s\\S]*?(?:\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?[^\\w$.])?(?:(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s1>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:(?:pos\\s*\\.\\s*)?[xy]|rotation|vel\\s*\\.\\s*[xy])\\s*(?:[-+]=\\s*\\(?\\s*(?!0(?![.\\d]))[-\\w$.(]|\\+\\+|--)|(?:\\+\\+|--)\\s*(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s2>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:(?:pos\\s*\\.\\s*)?[xy]|rotation)\\b|(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s3>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?<p3>(?:pos\\s*\\.\\s*)?[xy]|rotation|vel\\s*\\.\\s*[xy])\\s*=\\s*\\(?\\s*\\b\\k<s3>\\s*\\.\\s*\\k<p3>\\s*[-+]\\s*\\(?\\s*(?!0(?![.\\d]))[-\\w$.(]|(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s4>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:(?:pos\\s*\\.\\s*)?[xy]|rotation)\\s*=(?!=)[^;\\n]{0,200}?(?:\\bframeCount\\b|\\b(?:sin|cos)\\s*\\())|\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?=(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?\\bframeCount\\b)(?:(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?[^\\w$.])?(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s5>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:(?:pos\\s*\\.\\s*)?[xy]|rotation)\\s*=(?!=)(?!\\s*-?\\d+(?:\\.\\d+)?\\s*[;\\n)])|(?:^|[;{}\\n])[^\\S\\n]*(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s6>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:vel\\s*\\.\\s*[xy]|rotationSpeed|speed)\\s*=(?!=)\\s*\\(?\\s*-?\\s*\\(?\\s*(?:[1-9]|0?\\.\\d*[1-9]|[A-Za-z_$]))",
+      "pattern": "^(?=(?:[\\s\\S]*?\\bkb\\s*\\.\\s*\\w+\\s*\\([^;}]{0,200}?[^\\w$.;}](?<kd1>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:vel|pos|x|y|rotation)\\b)?)(?=(?:[\\s\\S]*?\\b(?<kd2>[A-Za-z_$][\\w$]*)\\s*\\.\\s*vel\\s*\\.\\s*[xy]\\s*=[^;}]{0,200}?\\bkb\\s*\\.)?)(?=(?:[\\s\\S]*?\\bkb\\s*\\.\\s*\\w+\\s*\\([^;}]{0,200}?[^\\w$.;}](?!\\k<kd1>(?![\\w$]))(?<kd3>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:vel|pos|x|y|rotation)\\b)?)(?:(?=(?<kbb>\\bif\\s*\\((?=[^\\n{]{0,200}?\\bkb\\b)(?:[^()\\n]|\\((?:[^()\\n]|\\([^()\\n]{0,80}\\)){0,80}\\)){0,200}\\)\\s*(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\}|[^;\\n]*;?)))\\k<kbb>|(?!\\bif\\s*\\((?=[^\\n{]{0,200}?\\bkb\\b))[\\s\\S])*?(?:\\b(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s1>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:(?:pos\\s*\\.\\s*)?[xy]|rotation|vel\\s*\\.\\s*[xy])\\s*(?:[-+]=(?!=)(?![^;\\n]*?(?:\\bkb\\b|[^\\w$.](?:\\k<kd1>|\\k<kd2>|\\k<kd3>)\\s*\\.\\s*(?:vel|pos|[xy])\\b))\\s*\\(?\\s*(?!0(?:\\.0+)?(?![\\w.]))[-\\w$.(]|\\+\\+|--)|(?:\\+\\+|--)\\s*(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s2>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:(?:pos\\s*\\.\\s*)?[xy]|rotation)\\b|\\b(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s3>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?<p3>(?:pos\\s*\\.\\s*)?[xy]|rotation|vel\\s*\\.\\s*[xy])\\s*=(?![^;\\n]*?(?:\\bkb\\b|[^\\w$.](?:\\k<kd1>|\\k<kd2>|\\k<kd3>)\\s*\\.\\s*(?:vel|pos|[xy])\\b))\\s*\\(?\\s*\\b\\k<s3>\\s*\\.\\s*\\k<p3>\\s*[-+]\\s*\\(?\\s*(?!0(?:\\.0+)?(?![\\w.]))[-\\w$.(]|\\b(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s4>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:(?:pos\\s*\\.\\s*)?[xy]|rotation)\\s*=(?!=)(?![^;\\n]*?\\bkb\\b)[^;\\n]{0,200}?(?:\\bframeCount\\b|\\b(?:sin|cos)\\s*\\()|\\b(?<fv>[A-Za-z_$][\\w$]*)\\s*=(?!=)[^;\\n]{0,200}?\\bframeCount\\b[\\s\\S]*?\\b(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s5>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:(?:pos\\s*\\.\\s*)?[xy]|rotation)\\s*=(?!=)[^;\\n]{0,200}?[^\\w$.]\\k<fv>(?![\\w$])|(?:^|[;{}\\n])[^\\S\\n]*\\b(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s6>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:vel\\s*\\.\\s*[xy]|rotationSpeed|speed)\\s*=(?!=)(?![^;\\n]*?(?:\\bkb\\b|[^\\w$.](?:\\k<kd1>|\\k<kd2>|\\k<kd3>)\\s*\\.\\s*(?:vel|pos|[xy])\\b))\\s*\\(?\\s*-?\\s*\\(?\\s*(?:[1-9]|0?\\.\\d*[1-9]|[A-Za-z_$]))",
+      "orIn": [
+        {
+          "function": [
+            "setup",
+            "draw",
+            "update"
+          ],
+          "pattern": "^(?=(?:[\\s\\S]*?\\bkb\\s*\\.\\s*\\w+\\s*\\([^;}]{0,200}?[^\\w$.;}](?<kd1>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:vel|pos|x|y|rotation)\\b)?)(?=(?:[\\s\\S]*?\\b(?<kd2>[A-Za-z_$][\\w$]*)\\s*\\.\\s*vel\\s*\\.\\s*[xy]\\s*=[^;}]{0,200}?\\bkb\\s*\\.)?)(?=(?:[\\s\\S]*?\\bkb\\s*\\.\\s*\\w+\\s*\\([^;}]{0,200}?[^\\w$.;}](?!\\k<kd1>(?![\\w$]))(?<kd3>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:vel|pos|x|y|rotation)\\b)?)(?:(?=(?<kbb>\\bif\\s*\\((?=[^\\n{]{0,200}?\\bkb\\b)(?:[^()\\n]|\\((?:[^()\\n]|\\([^()\\n]{0,80}\\)){0,80}\\)){0,200}\\)\\s*(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\}|[^;\\n]*;?)))\\k<kbb>|(?!\\bif\\s*\\((?=[^\\n{]{0,200}?\\bkb\\b))[\\s\\S])*?(?:^|[;{}\\n])[^\\S\\n]*\\b(?!\\k<kd1>(?![\\w$]))(?!\\k<kd2>(?![\\w$]))(?!\\k<kd3>(?![\\w$]))(?<s6>[A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:vel\\s*\\.\\s*[xy]|rotationSpeed|speed)\\s*=(?!=)(?![^;\\n]*?(?:\\bkb\\b|[^\\w$.](?:\\k<kd1>|\\k<kd2>|\\k<kd3>)\\s*\\.\\s*(?:vel|pos|[xy])\\b))\\s*\\(?\\s*-?\\s*\\(?\\s*(?:[1-9]|0?\\.\\d*[1-9]|[A-Za-z_$])"
+        }
+      ],
       "flags": "",
       "points": 0,
       "ignoreStrings": true
@@ -119,10 +174,15 @@
     {
       "id": "r7",
       "title": "On-screen text label",
-      "description": "A text label is drawn on the canvas each frame, in draw() or in a function of your own (not setup(), which runs once). Help: 5.1.21 (Words on the canvas: text())",
-      "type": "regex",
+      "description": "A text label is drawn on the canvas each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). Help: 5.1.21 (Words on the canvas: text())",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "followCalls": true,
       "file": "script.js",
-      "pattern": "\\bfunction\\s+(?!setup\\b)[A-Za-z_$][\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\s+[A-Za-z_$])[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\}|\\{)*?(?:\\btext\\s*\\()",
+      "pattern": "\\btext\\s*\\(",
       "flags": "",
       "points": 0,
       "ignoreStrings": true
@@ -130,9 +190,10 @@
     {
       "id": "r8",
       "title": "Clear the background each frame",
-      "description": "Previous frames don't stack up. Help: 5.1.9 (background(color) wipe rule)",
+      "description": "Previous frames don't stack up: background() is called in draw(), or in a function of your own that draw() calls. Help: 5.1.9 (background(color) wipe rule)",
       "type": "inFunction",
       "function": "draw",
+      "followCalls": true,
       "file": "script.js",
       "pattern": "background\\s*\\(",
       "flags": "",
@@ -148,7 +209,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.23 Sprite Playground\". The task they were given: Make a canvas (any size from 300 by 300 to 800 by 600) and two sprites: player, which the keys control, and mover, which moves on its own. In draw(): paint the background every frame; move the player with kb.pressing and WASD or the arrow keys by setting its velocity, with an else that sets the velocity back to 0 when no key is held; make the mover move on its own with no key held, for example worked out from frameCount (swing back and forth, orbit or spin), nudged a little every frame, or given a velocity; and draw a text label on the canvas with fill(), textSize() and text(). What the starter file already had: `let player, mover;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame (update(), if the student writes one, also runs every frame). frameCount is the number of frames since the sketch started, so anything worked out from it changes every frame; sin() and cos() of a small number times frameCount swing between -1 and 1. kb.pressing(key) is true on every frame the key is held. vel.x and vel.y are speed in pixels per frame, and y grows downward. text(words, x, y) draws words on the canvas; fill() sets their colour and textSize() their size. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.23 Sprite Playground\". The task they were given: Make a canvas (any size from 300 by 300 to 800 by 600) and two sprites: player, which the keys control, and mover, which moves on its own. In draw(): paint the background every frame; move the player with kb.pressing and WASD or the arrow keys by setting its velocity, with an else that sets the velocity back to 0 when no key is held; make the mover move on its own with no key held, for example worked out from frameCount (swing back and forth, orbit or spin), nudged a little every frame, or given a velocity; and draw a text label on the canvas with fill(), textSize() and text(). What the starter file already had: `let player, mover;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: setup() runs once and draw() runs on every frame (update(), if the student writes one, also runs every frame). frameCount is the number of frames since the sketch started, so anything worked out from it changes every frame; sin() and cos() of a small number times frameCount swing between -1 and 1. kb.pressing(key) is true on every frame the key is held. vel.x and vel.y are speed in pixels per frame, and y grows downward. text(words, x, y) draws words on the canvas; fill() sets their colour and textSize() their size. A sprite's position can be read and set as x and y or as pos.x and pos.y, and Math.sin() is the same as sin(). An else belongs only to the if right above it. With two separate ifs, such as if (left) vel.x = -4; if (right) vel.x = 4; else vel.x = 0;, the else sets vel.x to 0 on every frame the right key is up, so the left key can never move the sprite. A chain written as if / else if / else, or 0 set at the top of draw() before separate ifs, does not have that problem. Sprites and the canvas are made once, in setup() (or a function only setup() calls): a new Sprite(...) or new Canvas(...) in draw() is made again on every frame, which is the bug 5.1.4 shows. A function the student wrote counts only where it is called: a function that draw() (or update(), or another of their functions that draw() calls) calls by name runs every frame, a function only setup() calls runs once, and a function nothing calls never runs, so code that sits only inside it does not count. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
@@ -159,7 +220,13 @@
       {
         "id": "r2",
         "title": "Create at least 2 sprites",
-        "description": "Two or more sprites are made with new Sprite(...), normally in setup(): one for the player and one for the mover. Any names, positions and sizes count. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "description": "Two or more sprites are made with new Sprite(...): one for the player and one for the mover. Any names, positions and sizes count. Where they are made is the job of the card \"Make your sprite once, in setup()\". Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
+        "points": 1
+      },
+      {
+        "id": "r9",
+        "title": "Make your sprite once, in setup()",
+        "description": "Every new Sprite(...) and new Canvas(...) runs once: it is written in setup(), or in a function of the student's that only setup() calls. None is in draw(), update() or a function they call, because draw() runs about 60 times a second, so a sprite made there is made again every frame and they pile up (the bug 5.1.4 shows). A sprite made only in draw() is not met, even though one shows on the canvas; neither is a sprite made when a key is pressed in draw(). A sprite made at the very top of the file, outside setup(), is not met either: the course makes sprites in setup(). Help: 5.1.4 (Worked Example: Minimum Sprite Program) and 5.1.8 (Storing the sprite in a let variable)",
         "points": 1
       },
       {
@@ -177,13 +244,13 @@
       {
         "id": "r5",
         "title": "Velocity resets to zero",
-        "description": "When no movement key is held, the player's vel.x or vel.y (one or both) is set back to 0, so the player stops. An else at the end of the key chain is the course's shape (with or without braces); any other way that sets it to 0 when no key is held also counts, such as setting it to 0 at the top of draw() before the key checks, or a ternary that ends in 0. Help: 5.1.17 (The else-to-zero rule)",
+        "description": "When no movement key is held, the player's vel.x AND vel.y are both set back to 0, so the player stops on both axes. An else at the end of each key chain is the course's shape (with or without braces); any other way that sets each one to 0 when no key is held also counts, such as setting both to 0 at the top of draw() before the key checks, or ternaries that end in 0. If only one axis stops, it is not met yet. If a key can never move the player because a later line undoes it every frame (an else under a second, separate if, or a line after the keys that sets the speed back to 0), it is not met: say which key is undone. Help: 5.1.16 (Movement pattern (if / else if / else)) and 5.1.17 (The else-to-zero rule)",
         "points": 1
       },
       {
         "id": "r6",
         "title": "Automatic motion for the mover",
-        "description": "The mover (whatever the student named it) changes every frame with no key held. Any honest way counts: its x, y or rotation worked out from frameCount (with or without sin() or cos()); adding a little to its x, y or rotation every frame in draw() or a function draw() calls (written longhand, with +=, or with ++); or giving it a velocity or rotationSpeed that nothing stops. The thing that changes must be a sprite, not only a label: frameCount shown in text() while the mover sits still is not met. A mover that only moves while a key is held, that never moves, or a key-driven player that spins while the mover sits still, is not met. Help: 5.1.22 (Moving on its own: frameCount and sin())",
+        "description": "The mover (whatever the student named it) changes every frame with no key held. Any honest way counts: its x, y or rotation worked out from frameCount (with or without sin() or cos()); adding a little to its x, y or rotation every frame in draw() or a function draw() calls (written longhand, with +=, or with ++); or giving it a velocity or rotationSpeed that nothing stops. The thing that changes must be a sprite, not only a label: frameCount shown in text() while the mover sits still is not met. A mover that only moves while a key is held, that never moves, or a key-driven player that spins while the mover sits still, is not met. The mover's line must follow its own rule: a line that copies the player's speed or position (such as mover.vel.x = player.vel.x), or that sits inside an if that tests a key, moves it only when a key does, so it is not met. Circling the player with a position worked out from frameCount (player.x + cos(frameCount * 0.05) * 60) is its own rule and counts. Help: 5.1.22 (Moving on its own: frameCount and sin()) and 5.1.10 (Sprite property tour: pos, rotation, layer)",
         "points": 1
       },
       {
@@ -195,7 +262,7 @@
       {
         "id": "r8",
         "title": "Clear the background each frame",
-        "description": "background(...) is called inside draw(), with any colour, so previous frames do not stack up. Help: 5.1.9 (background(color) wipe rule)",
+        "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour, so previous frames do not stack up. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
     ]

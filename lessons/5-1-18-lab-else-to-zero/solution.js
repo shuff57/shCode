@@ -13,11 +13,11 @@ function setup() {
 function draw() {
   background('#222');
 
-  if      (kb.pressing('a')) player.vel.x = -3;
-  else if (kb.pressing('d')) player.vel.x =  3;
-  else                       player.vel.x =  0;
+  if (kb.pressing('a')) player.vel.x = -3;
+  else if (kb.pressing('d')) player.vel.x = 3;
+  else player.vel.x = 0;
 
-  if      (kb.pressing('w')) player.vel.y = -3;
-  else if (kb.pressing('s')) player.vel.y =  3;
-  else                       player.vel.y =  0;
+  if (kb.pressing('w')) player.vel.y = -3;
+  else if (kb.pressing('s')) player.vel.y = 3;
+  else player.vel.y = 0;
 }
