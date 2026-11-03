@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { isPassingGrade, criteriaScore } from '../lib/grade-pass';
@@ -61,6 +61,9 @@ interface Props {
   lessonTitle: string;
   prompt: string;
   config: AiGraderConfig;
+  /** Drawn right after the "What to answer" box: a writeup's rubric (ContentLessonView,
+   *  lib/rubric-split.ts), so the questions come before how they are checked. */
+  afterPrompt?: ReactNode;
 }
 
 interface CriterionResult {
@@ -143,7 +146,7 @@ const isPassing = isPassingGrade;
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
-export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }: Props) {
+export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, afterPrompt }: Props) {
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
   // What the grader is currently doing. Null while idle, or when a deploy
@@ -522,6 +525,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           </div>
         </div>
       ) : null}
+
+      {afterPrompt ? <div style={{ margin: '0 0 16px' }}>{afterPrompt}</div> : null}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
         <label style={{ fontSize: 13, color: '#aaa' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
