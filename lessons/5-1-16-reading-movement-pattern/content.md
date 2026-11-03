@@ -1,6 +1,6 @@
 ## Movement Pattern (if / else if / else)
 
-Read before `5.1.18 Reading: The else-to-zero rule`. About 5 minutes.
+Read before `5.1.17 Reading: The else-to-zero rule`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -13,8 +13,8 @@ You know how to set `vel.x` to move a sprite, and you know `kb.pressing(key)` re
 **What you'll learn from it:**
 
 - The pattern belongs in `draw()` because it runs once per frame: the only place you can react to live key input.
-- An `if / else if` chain means **at most one branch runs** per frame. Without the `else if`, pressing two opposite keys at the same time could set velocity twice, causing glitchy movement.
-- The `else` branch at the end of each chain sets velocity to `0` when no key matches. It is covered in detail in the next reading.
+- An `if / else if / else` chain means **exactly one branch runs** per frame: the left one, the right one, or the `else`. Because they are one chain, the final `else` runs only when **neither** key is held.
+- A velocity stays until your code changes it. So every frame that no key is held, something has to set it back to `0`, or the sprite keeps sliding after you let go. The `else` at the end of the chain is that line. With two separate `if` lines and no `else`, nothing ever sets it back. The next reading covers this in detail.
 - Velocity values of 2–6 give good feel; the pattern works identically regardless of the specific number.
 
 **Try it:**
@@ -51,5 +51,5 @@ function draw() {
 
 | Term | Meaning |
 |------|---------|
-| **`if / else if / else`** | A chain where at most one branch runs. Guarantees only one velocity value is set per axis per frame. |
+| **`if / else if / else`** | A chain where exactly one branch runs each frame. The final `else` runs only when no key in the chain is held, so it is where the speed goes back to `0`. |
 | **`draw()` for input** | Input checks belong in `draw()` because `draw()` runs every frame; `setup()` runs only once at startup. |

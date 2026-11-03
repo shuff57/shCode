@@ -1,7 +1,7 @@
 {
   "id": "5-1-3-reading-canvas-sprite",
   "title": "5.1.3 Reading: Frame loop: setup() and draw()",
-  "description": "How moSHion calls `setup()` once and `draw()` every frame. Read before 5.1.4 (Canvas).",
+  "description": "How moSHion calls `setup()` once and `draw()` every frame. Read before 5.1.4 (Worked Example: Minimum Sprite Program).",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",

@@ -98,7 +98,7 @@ const PER_CRITERION = {
 
   // --- 5.3 ---------------------------------------------------------------
   '5-3-9-lab-write-property\u0000Detect a key press':
-    { target: '5.1.15', note: 'Keyboard Movement' },
+    { target: '5.1.18', note: 'Keyboard Movement' },
   '5-3-10-lab-two-instances\u0000Only b1.color is reassigned':
     { target: '5.3.3', note: 'Class and instance' },
   '5-3-13-lab-build-sprite\u0000Rectangle sprite (4-arg form)':

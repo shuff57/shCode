@@ -126,7 +126,7 @@ The setter refuses, with a plain message, any value but the two strings
 (TypeError), and any change once a sprite exists, gravity is non-zero or a
 frame has run (Error). The in-app docs teach it in the Coordinates section of
 `lib/moshion-docs.ts`; the only lesson that uses it is the optional, ungraded
-`5.1.25 Lab: A grid like math (optional)` (`lessons/5-1-25-math-grid`).
+`5.1.26 Lab: A grid like math (optional)` (`lessons/5-1-25-math-grid`).
 
 ### Key invariants when editing
 

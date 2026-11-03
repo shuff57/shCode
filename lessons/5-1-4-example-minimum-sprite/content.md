@@ -2,7 +2,7 @@
 
 ## Step 1: Hit Run
 
-You'll see a dark canvas. A square starts in the middle, then more squares crowd out around it. Step 2 explains why.
+You'll see a dark canvas. A square appears in the middle, then more and more squares pile up and spread out until they cover the whole canvas. Step 2 explains why.
 
 ```js live
 function setup() {
@@ -17,9 +17,9 @@ function draw() {
 
 ## Step 2: Notice the bug
 
-**Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame**: 60 per second. If you run this for 5 seconds, 300 sprites exist. Every new one starts in the same spot, but sprites push each other apart, so the squares spread out into a growing crowd.
+**Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame**: 60 per second. If you run this for 5 seconds, 300 sprites exist. Every new one starts in the same spot, but sprites are solid and push each other apart, so the pile keeps spreading until the squares fill the canvas and spill off its edges.
 
-Let it run for a while. The crowd keeps growing, and the frame rate slowly drops as sprites pile up.
+Let it run for a while. Squares keep piling up, and every frame adds one more sprite for the computer to move and draw, so a sketch left running long enough starts to slow down.
 
 ```js live
 function setup() {

@@ -1,0 +1,24 @@
+{
+  "id": "5-1-sin-frame-1-reading-moving-with-framecount",
+  "title": "5.1.22 Reading: Moving on its own: frameCount and sin()",
+  "description": "frameCount counts the frames, sin() turns that count into a smooth back-and-forth wave, and together they make a sprite move with no key held. Read before 5.1.23.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "reading",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/moshion",
+  "externalLinkLabel": "Open the in-app moSHion docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

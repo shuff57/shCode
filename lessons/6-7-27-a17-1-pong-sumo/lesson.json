@@ -76,7 +76,7 @@
     {
       "id": "r1",
       "title": "Two-player keyboard input",
-      "description": "Both players have keys assigned: kb.pressing is called with at least two different keys (one per player). Help: 5.1.15 (Keyboard Movement)",
+      "description": "Both players have keys assigned: kb.pressing is called with at least two different keys (one per player). Help: 5.1.18 (Keyboard Movement)",
       "type": "regex",
       "file": "script.js",
       "pattern": "kb\\.pressing\\s*\\(\\s*['\"](\\w+)['\"]\\s*\\)[\\s\\S]*?kb\\.pressing\\s*\\(\\s*['\"](?!\\1\\b)\\w+['\"]\\s*\\)",

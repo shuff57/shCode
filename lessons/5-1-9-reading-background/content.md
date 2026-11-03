@@ -31,14 +31,14 @@ function setup() {
 }
 
 function draw() {
-  // background('#222');  ← try uncommenting this line
+  // background('#222');  // ← try uncommenting this line
   player.pos.x = player.pos.x + 1;
 }
 ```
 
 **What you'll see:** a smear of blue squares across the canvas: every frame the sprite visited is still painted there, because nothing wiped the previous frame.
 
-**Try this:** uncomment the `background('#222')` line and rerun. The trail disappears and the sprite slides cleanly across a dark background. The wipe happens *every* frame, *before* anything else paints: that's why `background()` belongs at the top of `draw()`.
+**Try this:** uncomment the `background('#222')` line (delete the `//` at its start, so it is code again instead of a comment) and rerun. The trail disappears and the sprite slides cleanly across a dark background. The wipe happens *every* frame, *before* anything else paints: that's why `background()` belongs at the top of `draw()`.
 
 ---
 

@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "WASD horizontal input",
-      "description": "Use kb.pressing with 'a' or 'd' inside draw(). Help: 5.1.15 (Keyboard Movement)",
+      "description": "Use kb.pressing with 'a' or 'd' inside draw(). Help: 5.1.18 (Keyboard Movement)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

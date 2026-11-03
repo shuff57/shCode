@@ -94,7 +94,7 @@
     {
       "id": "r5",
       "title": "WASD drives the car",
-      "description": "Use kb.pressing with 'a' or 'd' inside draw(). Help: 5.1.15 (Keyboard Movement)",
+      "description": "Use kb.pressing with 'a' or 'd' inside draw(). Help: 5.1.18 (Keyboard Movement)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -105,7 +105,7 @@
     {
       "id": "r6",
       "title": "Drives the car",
-      "description": "Assign to the chassis's .vel.x (or call applyForce on it) to move the car. Help: 5.1.16 (Velocity: vel.x and vel.y)",
+      "description": "Assign to the chassis's .vel.x (or call applyForce on it) to move the car. Help: 5.1.15 (Velocity: vel.x and vel.y)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.vel\\.x\\s*[-+]?=(?!=)|\\.applyForce\\s*\\(",

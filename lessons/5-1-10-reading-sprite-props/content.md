@@ -28,7 +28,6 @@ function setup() {
 
   player = new Sprite(120, 140, 80, 80);
   player.color = 'deepskyblue';
-  player.rotation = 30;     // tilt 30 degrees clockwise
   player.layer = 2;         // draw in front of box
 
   box = new Sprite(150, 160, 80, 80);
@@ -38,12 +37,21 @@ function setup() {
 
 function draw() {
   background('#222');
+  // Sprites are solid, so the engine pushes these
+  // two apart. Putting them back every frame keeps
+  // them overlapping.
+  player.pos.x = 120;
+  player.pos.y = 140;
+  player.rotation = 30;     // tilt 30 degrees clockwise
+  box.pos.x = 150;
+  box.pos.y = 160;
+  box.rotation = 0;
 }
 ```
 
-**What you'll see:** a tilted blue square overlapping a red square, with the blue one on top because its `layer` is higher.
+**What you'll see:** a tilted blue square overlapping a red square, with the blue one on top because its `layer` is higher. Sprites are solid, so on their own the engine would push these two apart until they only touched. The lines in `draw()` put them back every frame, so they stay overlapping and you can see which one is on top.
 
-**Try this:** swap the two `layer` values (`player.layer = 1`, `box.layer = 2`) and run again: the red square jumps in front. Then add `player.pos.x = 80;` at the bottom of `setup()` to reposition the blue sprite before the sketch starts.
+**Try this:** swap the two `layer` values (`player.layer = 1`, `box.layer = 2`) and run again: the red square jumps in front. Then change `player.pos.x = 120;` to `player.pos.x = 80;` and rerun: the blue square moves left, and the two squares overlap less.
 
 ---
 
@@ -56,4 +64,4 @@ function draw() {
 | **`rotation`** | Clockwise tilt in degrees. `0` = upright; `90` = top edge points right. |
 | **`layer`** | Draw-order index. Higher value = drawn in front of lower-value sprites. |
 
-*"One more sprite property exists: `vel`, but it deserves its own reading. You'll meet it in 5.1.16."*
+*"One more sprite property exists: `vel`, but it deserves its own reading. You'll meet it in 5.1.15."*

@@ -10,7 +10,7 @@ By the end of this reading you should be able to answer:
 - Why does the paddle bounce the ball only while it is coming down?
 - How does the paddle steer the ball?
 
-**The ball is moved by your code.** Like the drone and the shots in Defender (5.9.5), the ball has `collider = 'none'`: nothing pushes it, nothing slows it down, and gravity leaves it alone. Two variables hold its speed in pixels per frame. `vx` is the speed across: plus is right, minus is left. `vy` is the speed down: plus is down and minus is up, because y grows downward on the canvas (5.1.16). Every frame the ball takes one step:
+**The ball is moved by your code.** Like the drone and the shots in Defender (5.9.5), the ball has `collider = 'none'`: nothing pushes it, nothing slows it down, and gravity leaves it alone. Two variables hold its speed in pixels per frame. `vx` is the speed across: plus is right, minus is left. `vy` is the speed down: plus is down and minus is up, because y grows downward on the canvas (5.1.15). Every frame the ball takes one step:
 
 ```js
 ball.x += vx;
