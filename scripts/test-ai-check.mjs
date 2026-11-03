@@ -200,6 +200,15 @@ for (const id of readdirSync(path.join(root, 'lessons'))) {
     check(fallbackRunner(l) === 'moshion', `${id}: a moSHion aiCheck lab falls back to the moSHion runner`);
   }
 }
+{
+  const { aiNoteForRun, GREEN_BUT_RUN_ERROR } = aiCheckLib;
+  const ok = { kind: 'ok', text: 'Great job! (5 of 5 green)' };
+  check(aiNoteForRun(null, { allGreen: true, runErrored: true }) === null, 'no note stays no note');
+  check(aiNoteForRun(ok, { allGreen: true, runErrored: true }) === GREEN_BUT_RUN_ERROR, 'green cards + run error: one plain sentence');
+  check(aiNoteForRun(ok, { allGreen: true, runErrored: false }) === ok.text, 'green and clean run: AI note unchanged');
+  check(aiNoteForRun(ok, { allGreen: false, runErrored: true }) === ok.text, 'red cards: AI note unchanged');
+  check(aiNoteForRun({ kind: 'error', text: 'x' }, { allGreen: true, runErrored: true }) === 'x', 'error note unchanged');
+}
 check(labs >= 1, 'at least one lesson carries aiCheck');
 
 console.log(failures ? `[test-ai-check] ${failures} FAILED of ${n}` : `[test-ai-check] ${n}/${n} checks passed`);

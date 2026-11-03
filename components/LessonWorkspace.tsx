@@ -9,7 +9,7 @@ import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
-import { aiCheckText, applyAiVerdicts, canSubmitMoshion, fallbackRunner, moshionRunNeed, moshionRunStep, moshionSubmitWords, NO_MOSHION_RUN, reportFromRequirements, runLetsSubmit, verdictsFromCriteria, type AiVerdicts, type MoshionRun } from '../lib/ai-check';
+import { aiCheckText, aiNoteForRun, applyAiVerdicts, canSubmitMoshion, fallbackRunner, moshionRunNeed, moshionRunStep, moshionSubmitWords, NO_MOSHION_RUN, reportFromRequirements, runLetsSubmit, verdictsFromCriteria, type AiVerdicts, type MoshionRun } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
@@ -1430,9 +1430,10 @@ export default function LessonWorkspace({
                   // The row wraps (globals.css .run-toolbar) when this does not
                   // fit, so it is never squeezed below its own width any more.
                   maxWidth: 360,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  // Wraps onto a second line rather than clipping; the full
+                  // runtime error stays in the title attribute.
+                  overflowWrap: 'anywhere',
+                  lineHeight: 1.3,
                 }}
               >
                 {allRequirementsPassed
@@ -1511,7 +1512,7 @@ export default function LessonWorkspace({
             <div style={{ marginBottom: 8 }}>
               <div role="status" aria-live="polite" style={{ fontSize: 14, color: '#8393c4' }}>
                 {aiCheckNote
-                  ? aiCheckNote.text
+                  ? aiNoteForRun(aiCheckNote, { allGreen: allRequirementsPassed, runErrored: !!runtimeError })
                   : isTextMode
                     ? 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'
                     : isMoshionMode
