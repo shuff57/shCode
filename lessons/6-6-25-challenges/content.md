@@ -6,13 +6,13 @@ Pick **one** challenge. Start from your A16.2 state machine code and build the f
 
 ### Challenge 1: Animated Transitions
 
-Fade to black between state changes. When a transition happens, draw a full-screen black rectangle with increasing alpha over several frames, then switch the state. The reverse when entering the new state.
+Fade to black between state changes. When a transition happens, draw a full-screen black rectangle that gets more solid over several frames, then switch the state. The reverse when entering the new state.
 
 **How to approach it:**
-- Add a `transitionAlpha` variable that counts from 0 to 255
-- When a state change is requested, set a `targetState` variable and start incrementing `transitionAlpha`
-- Draw `fill(0, 0, 0, transitionAlpha); rect(0, 0, width, height)` after the background each frame
-- When alpha hits 255, swap `state = targetState` and decrement alpha back to 0
+- Add a `transitionAlpha` variable that counts from 0 (see-through) to 1 (solid), for example by `0.05` a frame
+- When a state change is requested, set a `targetState` variable and start increasing `transitionAlpha`
+- Draw `fill('rgba(0, 0, 0, ' + transitionAlpha + ')'); rect(0, 0, width, height)` in `drawTop()` (5.4.5), so the black covers the sprites as well as the background. `width` and `height` are the canvas's size. Give `fill()` one rgba string like this: moSHion reads only its first value, so `fill(0, 0, 0, transitionAlpha)` would paint solid black from the first frame
+- When alpha reaches 1, swap `state = targetState` and decrease alpha back to 0
 
 ---
 

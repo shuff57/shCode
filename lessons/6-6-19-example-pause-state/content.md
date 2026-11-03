@@ -112,7 +112,7 @@ function draw() {
   if (state === 'pause') {
     text(`Score: ${score}`, 10, 20);
 
-    fill(0, 0, 0, 120);
+    fill('rgba(0, 0, 0, 0.5)');   // black at half strength: dims, does not hide
     rect(0, 0, 500, 400);
     fill(255);
     textSize(32);
@@ -131,4 +131,4 @@ function draw() {
 - Game data (score, position) is **preserved**, just not changed while paused.
 - The toggle pattern: pressing the same key in opposite states toggles between them.
 - Draw the game behind the overlay so the player sees what's frozen.
-- A semi-transparent rectangle (`fill(0,0,0,120)`) dims the background to make the overlay pop.
+- A semi-transparent rectangle (`fill('rgba(0, 0, 0, 0.5)')`) dims the background to make the overlay pop. The last number in `rgba(...)` runs from 0 (see-through) to 1 (solid). moSHion's `fill()` reads only its first value, so p5's `fill(0, 0, 0, 120)` would paint solid black over the frozen score instead of dimming it.

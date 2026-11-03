@@ -66,9 +66,9 @@ FPS: 60.0
 Make the player sprite leave a trail behind it as it moves.
 
 **Hints:**
-- Easy path: call `background('#222', 20)` instead of `background('#222')`: the second argument is alpha, so older frames fade instead of being overwritten fully.
+- Easy path: call `background('rgba(34, 34, 34, 0.1)')` instead of `background('#222')`. It is the same dark grey (`#222` is red, green and blue 34 each), but the last number makes it only 10% solid, so each frame paints only part of the way over the last one and older frames fade instead of vanishing (moSHion docs: Background and clearing). The last number runs from 0 (see-through) to 1 (solid).
 - Honest path: track the last N positions in an array. Each frame, `trail.push({x: player.pos.x, y: player.pos.y})` then `trail.shift()` once the array is longer than you want.
-- To draw the trail, `circle(x, y, 6)` works, and `fill(255, 255, 255, i * 8)` fades older positions.
+- To draw the trail, `circle(x, y, 6)` works, and `fill('rgba(255, 255, 255, ' + (i / trail.length) + ')')` fades older positions: the oldest point (`i` near 0) is nearly see-through and the newest is solid. Give `fill()` one colour like this: moSHion reads only the first value, so `fill(255, 255, 255, 120)` paints solid white.
 
 **Stretch it further:** rainbow trail: vary `fill()` by `i` so each trail-point is a different hue.
 

@@ -12,7 +12,8 @@ function setup() {
   // STEP 2: Build the vehicle: a dynamic chassis rectangle and two dynamic
   // circular wheels (use .diameter to make them round).
 
-  // STEP 3: Attach each wheel to the chassis with a WheelJoint.
+  // STEP 3: Attach each wheel to the chassis with a HingeJoint, wheel first
+  // so the pin sits at the wheel's centre.
 
 }
 

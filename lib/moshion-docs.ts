@@ -238,7 +238,9 @@ function draw() {
 
 rect and square are placed by their top-left corner. circle is placed by its centre, the same way a sprite is.
 
-fill(color) sets the colour inside the next shapes, and stroke(color) sets the outline. noFill() and noStroke() turn either one off, and strokeWeight(n) makes the outline thicker. They stay set until you change them, so set the colour just before the shape it belongs to. square() follows fill() like every other shape: fill('deepskyblue') then square(...) draws a blue square.`,
+fill(color) sets the colour inside the next shapes, and stroke(color) sets the outline. noFill() and noStroke() turn either one off, and strokeWeight(n) makes the outline thicker. They stay set until you change them, so set the colour just before the shape it belongs to. square() follows fill() like every other shape: fill('deepskyblue') then square(...) draws a blue square.
+
+fill() reads only its first value, so p5's fill(0, 0, 0, 120) ignores the alpha (and the green and blue) and paints solid black; for a see-through colour pass one rgba string instead, such as fill('rgba(0, 0, 0, 0.5)'), where the last number runs from 0 (clear) to 1 (solid).`,
         code: `function setup() {
   new Canvas(400, 300);
 }
@@ -1266,6 +1268,8 @@ function draw() {
         title: 'Sound',
         body: `loadSound('file.mp3') gives you a Sound. Call .play() for a one-off effect and .loop() for music that should keep going.
 
+moSHion ships two sounds you can load straight away, and the example uses both: '/moshion/assets/coin.wav' is a short chime and '/moshion/assets/music.wav' is a short tune. Type the path exactly as shown: a misspelled path shows no error, the sound just never plays.
+
 .play() starts a fresh copy every time it's called, so firing a laser three times in three frames gives you three overlapping shots rather than one restarting over and over. .loop() is the opposite — it's the single track you start once and stop later, and calling it again while it's already going does nothing.
 
 .volume runs 0 to 1. .pan runs -1 (hard left) to 1 (hard right), so a sound can come from where the thing is: enemy.x < player.x ? -0.6 : 0.6. .rate is playback speed, and because it shifts the pitch too it's the cheapest way to get variety out of one sound: coin.rate = 1 + Math.random() * 0.3 makes every pickup sound slightly different. masterVolume(0.5) halves everything at once without touching any individual .volume — that's your mute button.
@@ -1283,8 +1287,8 @@ function setup() {
   new Canvas(400, 300);
   world.gravity.y = 0;
 
-  coin = loadSound('coin.mp3');
-  music = loadSound('music.mp3');
+  coin = loadSound('/moshion/assets/coin.wav');
+  music = loadSound('/moshion/assets/music.wav');
   music.volume = 0.3;
 
   player = new Sprite(60, 150, 24, 24);
@@ -1815,29 +1819,29 @@ sprite.changeAni(name) switches to a previously registered animation. If the nam
 ani.frameDelay controls how many game frames each animation frame is held for (default 4). Set it on the Ani object returned by addAni, or on sprite.ani.frameDelay after activation.
 
 Setting sprite.image clears any active animation, and vice versa — they're mutually exclusive.`,
-        code: `let hero;
+        code: `let ghost;
 
 function setup() {
   new Canvas(400, 400);
-  world.gravity.y = 0;
 
-  hero = new Sprite(200, 200, 64, 64);
-  hero.collider = 'none';
+  ghost = new Sprite(200, 200, 80, 80);
+  ghost.collider = 'none';
 
-  // In a real project you'd use a URL to your own sprite sheet:
-  // hero.addAni('idle', 'hero-idle.png', 4);
-  // hero.addAni('run', 'hero-run.png', 6);
-
-  // For this sandbox, use an emoji as a stand-in:
-  hero.image = '\u{1F9D9}';
+  // Two frame strips that ship with moSHion.
+  // 'idle' is the first addAni, so it starts playing straight away.
+  ghost.addAni('idle', '/moshion/assets/ghost_idle.avif', 7);
+  const fly = ghost.addAni('fly', '/moshion/assets/ghost_fly.avif', 4);
+  fly.frameDelay = 3; // flap a little faster than the default 4
 }
 
 function update() {
+  // hold the right arrow (or D) to fly; let go to hover
   if (kb.pressing('right')) {
-    hero.x += 2;
-    // hero.changeAni('run');
+    ghost.x += 2;
+    if (ghost.x > 440) ghost.x = -40; // wrap back to the left edge
+    ghost.changeAni('fly');
   } else {
-    // hero.changeAni('idle');
+    ghost.changeAni('idle');
   }
 }
 

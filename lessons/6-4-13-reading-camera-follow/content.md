@@ -5,7 +5,7 @@
 **What you'll learn from it:**
 
 - The canonical follow pattern is `camera.x = player.pos.x;` placed inside `draw()`: every frame the camera re-centers on the player.
-- An offset like `camera.x = player.pos.x - canvas.w / 2 + 100` keeps the player off-center when your gameplay needs it.
+- An offset like `camera.x = player.pos.x + 100` keeps the player off-center when your gameplay needs it: the camera looks 100 pixels ahead, so the player sits 100 pixels left of the middle.
 - The player never visually moves on the canvas: the world scrolls beneath them.
 - One line in `draw()` is all it takes; no extra setup in `setup()`.
 
@@ -46,5 +46,5 @@ Press **D** to walk right. The row scrolls left while the player stays centered:
 |------|---------|
 | **Follow camera** | A camera whose position is updated each frame to track a sprite. |
 | **`camera.x = player.pos.x`** | The one-line canonical follow: re-centers the viewport on the player every frame. |
-| **Camera offset** | Adjusting by `- canvas.w / 2 + N` to position the player off-center in the view. |
+| **Camera offset** | Adding a number, as in `camera.x = player.pos.x + N`, to position the player off-center in the view. |
 | **Viewport** | The visible area of the world rendered to the canvas. |
