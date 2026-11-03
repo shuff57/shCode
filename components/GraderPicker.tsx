@@ -87,7 +87,6 @@ export default function GraderPicker({ graders, value, onChange, disabled, cloud
   if (!hasGraderChoice(graders)) return null;
 
   const selected = graders.find((g) => g.id === value);
-  const shownModel = cloudModel || selected?.model;
   // ponytail: with one target left, hasGraderChoice() is always false, so this
   // whole component is dead code. Delete it with its two parents
   // (WrittenGrader.tsx, DiagramAssignmentView.tsx) and the grader-pref half of
@@ -132,9 +131,6 @@ export default function GraderPicker({ graders, value, onChange, disabled, cloud
       </select>
       {selected?.description ? (
         <span style={{ color: '#6272a4', fontSize: 12 }}>{selected.description}</span>
-      ) : null}
-      {shownModel ? (
-        <code style={{ color: '#6272a4', fontSize: 11 }}>{shownModel}</code>
       ) : null}
     </div>
   );
