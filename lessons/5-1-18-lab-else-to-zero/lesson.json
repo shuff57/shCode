@@ -15,9 +15,9 @@
     {
       "id": "s1",
       "title": "Run as-is and confirm movement stops",
-      "instructions": "Click Run, then click the preview so it gets your keys. Hold a WASD key: the sprite moves. Release it: the sprite stops. That stop is the else-to-zero rule from 5.1.18 at work: each chain ends in an `else` line that sets the velocity back to 0.",
+      "instructions": "Click Run, then click the preview so it gets your keys. Hold a WASD key: the sprite moves. Release it: the sprite stops. That stop is the else-to-zero rule from 5.1.17 at work: each chain ends in an `else` line that sets the velocity back to 0.",
       "hints": [
-        "Open the moSHion docs drawer on the right and find the Sprite velocity section."
+        "Velocity is explained in 5.1.15. In the moSHion docs drawer on the right, it is under Physics, on the page called Gravity and velocity."
       ]
     },
     {
@@ -39,9 +39,9 @@
     {
       "id": "s4",
       "title": "Restore the else lines, then pick your speed",
-      "instructions": "Put both else lines back (`else player.vel.x = 0;` and `else player.vel.y = 0;`) so the sprite stops when no key is held. Then make the speed your own: change the 4s and the -4s to another speed from 2 to 6, as 5.1.17's Try this did. Run it once more: the sprite moves at your speed and still stops the moment you let go. The grader checks that both else lines are back in draw() and that at least one movement line uses a speed other than 4.",
+      "instructions": "Put both else lines back (`else player.vel.x = 0;` and `else player.vel.y = 0;`) so the sprite stops when no key is held. Then make the speed your own: change the 4s and the -4s to another speed from 2 to 6, as 5.1.16's Try this did. Run it once more: the sprite moves at your speed and still stops the moment you let go. The grader checks that both else lines are back in draw() and that at least one movement line uses a speed other than 4.",
       "hints": [
-        "Open the moSHion docs drawer on the right and review the velocity section for the correct pattern.",
+        "5.1.16 shows the whole pattern again: if, else if, then the else that sets the speed back to 0.",
         "Keep the minus sign on the `a` and `w` lines: `player.vel.x = -3;` moves left and `player.vel.x = 3;` moves right."
       ]
     }
@@ -50,11 +50,11 @@
     {
       "id": "r1",
       "title": "Restore else player.vel.x = 0",
-      "description": "The draw() function must contain an else branch that sets player.vel.x to 0, so the sprite stops horizontally when no key is held. Help: 5.1.18 (The else-to-zero rule)",
+      "description": "In draw(), player.vel.x goes back to 0 when no left or right key is held, so the sprite stops sideways. The else line you put back does this. Setting it to 0 at the top of draw(), before the key checks, also counts, and so does one line with ? : that ends in 0. Help: 5.1.17 (The else-to-zero rule)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "else[\\s{]*player\\.vel\\.x\\s*=\\s*0(?![\\w.])",
+      "pattern": "(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\.\\s*vel\\s*\\.\\s*x\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.]))[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -63,11 +63,11 @@
     {
       "id": "r2",
       "title": "Restore else player.vel.y = 0",
-      "description": "The draw() function must contain an else branch that sets player.vel.y to 0, so the sprite stops vertically when no key is held. Help: 5.1.18 (The else-to-zero rule)",
+      "description": "In draw(), player.vel.y goes back to 0 when no up or down key is held, so the sprite stops up and down. The else line you put back does this. Setting it to 0 at the top of draw(), before the key checks, also counts, and so does one line with ? : that ends in 0. Help: 5.1.17 (The else-to-zero rule)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "else[\\s{]*player\\.vel\\.y\\s*=\\s*0(?![\\w.])",
+      "pattern": "(?:\\belse\\b(?:\\s*if\\s*\\([^\\n]{0,200}?\\))?|\\bif\\s*\\(\\s*\\(?\\s*!\\s*\\(?\\s*kb\\b[^\\n]{0,200}?\\))\\s*(?:\\{[^{}]{0,300}?)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*0(?:\\.0+)?(?![\\w.])|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\?(?:[^;\\n]{0,200}:\\s*\\(?\\s*0(?:\\.0+)?(?![\\w.])|\\s*0(?:\\.0+)?(?![\\w.])\\s*:)|(?:^|[;{}\\n])[^\\S\\n]*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=\\s*(?:\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*x\\s*=\\s*)?0(?:\\.0+)?(?![\\w.])[\\s\\S]*?\\.\\s*vel\\s*\\.\\s*y\\s*[-+]?=(?!=)\\s*(?!0(?:\\.0+)?(?![\\w.]))[-+\\w$(.]|\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*vel\\s*\\.\\s*y\\s*=(?!=)[^;\\n?]{0,200}\\bkb\\s*\\.\\s*pressing\\s*\\([^;\\n?]{0,200}(?:[;\\n}]|$)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -76,11 +76,11 @@
     {
       "id": "r3",
       "title": "A speed of your own",
-      "description": "At least one movement line in draw() sets player.vel.x or player.vel.y to a speed other than the starter's 4, so the sprite moves at a speed you chose (5.1.17 suggests 2 to 6). Help: 5.1.17 (Movement pattern (if / else if / else))",
+      "description": "At least one movement line in draw() sets player.vel.x or player.vel.y to a speed other than the starter's 4, so the sprite moves at a speed you chose (5.1.16 suggests 2 to 6). Help: 5.1.16 (Movement pattern (if / else if / else))",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "\\bplayer\\.vel\\.[xy]\\s*=(?!=)\\s*(?:-\\s*)?\\(?\\s*(?!(?:4|0)(?![\\w.]))[\\w$]",
+      "pattern": "\\bplayer\\.vel\\.[xy]\\s*=(?!=)\\s*(?:-\\s*)?\\(?\\s*(?!(?:4|0)(?![\\w.])|kb\\b)[\\w$]|\\bplayer\\.vel\\.[xy]\\s*=(?!=)[^;\\n]{0,200}?[?:*]\\s*(?:-\\s*)?\\(?\\s*(?!(?:4|0)(?![\\w.])|kb\\b)[\\w$]",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -100,19 +100,19 @@
       {
         "id": "r1",
         "title": "Restore else player.vel.x = 0",
-        "description": "In draw(), when neither the left nor the right key is held, player.vel.x is set back to 0, so the sprite stops sideways. The else at the end of the chain is the shape the lab uses (with or without braces); any other way that sets vel.x to 0 whenever no left or right key is held also counts. Help: 5.1.18 (The else-to-zero rule)",
+        "description": "In draw(), when neither the left nor the right key is held, player.vel.x is set back to 0, so the sprite stops sideways. The else at the end of the chain is the shape the lab uses (with or without braces); any other way that sets vel.x to 0 whenever no left or right key is held also counts, such as setting it to 0 at the top of draw() before the key checks, or a ternary that ends in 0. Help: 5.1.17 (The else-to-zero rule)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "Restore else player.vel.y = 0",
-        "description": "In draw(), when neither the up nor the down key is held, player.vel.y is set back to 0, so the sprite stops up and down. The else at the end of the chain is the shape the lab uses (with or without braces); any other way that sets vel.y to 0 whenever no up or down key is held also counts. Help: 5.1.18 (The else-to-zero rule)",
+        "description": "In draw(), when neither the up nor the down key is held, player.vel.y is set back to 0, so the sprite stops up and down. The else at the end of the chain is the shape the lab uses (with or without braces); any other way that sets vel.y to 0 whenever no up or down key is held also counts, such as setting it to 0 at the top of draw() before the key checks, or a ternary that ends in 0. Help: 5.1.17 (The else-to-zero rule)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "A speed of your own",
-        "description": "At least one movement line in draw() sets player.vel.x or player.vel.y to a speed other than 4 (or -4), so the sprite moves at a speed the student chose. 5.1.17 suggests 2 to 6, but any other speed that moves the sprite counts, including a decimal or a variable holding the speed. The lines that set the speed back to 0 are not a speed. If every movement line still uses 4, it is not met yet. Help: 5.1.17 (Movement pattern (if / else if / else))",
+        "description": "At least one movement line in draw() sets player.vel.x or player.vel.y to a speed other than 4 (or -4), so the sprite moves at a speed the student chose. 5.1.16 suggests 2 to 6, but any other speed that moves the sprite counts, including a decimal or a variable holding the speed. The lines that set the speed back to 0 are not a speed. If every movement line still uses 4, it is not met yet. Help: 5.1.16 (Movement pattern (if / else if / else))",
         "points": 1
       }
     ]

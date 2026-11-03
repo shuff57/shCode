@@ -61,7 +61,7 @@
     {
       "id": "r2",
       "title": "Create at least one sprite",
-      "description": "A sprite exists in the sketch.",
+      "description": "A sprite exists in the sketch. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\(",
@@ -85,7 +85,7 @@
     {
       "id": "r4",
       "title": "Clear the background each frame",
-      "description": "Previous frames don't stack up.",
+      "description": "Previous frames don't stack up. Help: 5.1.9 (background(color) wipe rule)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -115,7 +115,7 @@
       {
         "id": "r2",
         "title": "Create at least one sprite",
-        "description": "At least one sprite is made with new Sprite(...). Storing it in player is what the step asks, but any name, or no variable at all, still counts, and so does any position and size. A sprite made inside draw() still exists, so it counts, but say in the note that it belongs in setup(), because draw() makes a new one every frame.",
+        "description": "At least one sprite is made with new Sprite(...). Storing it in player is what the step asks, but any name, or no variable at all, still counts, and so does any position and size. A sprite made inside draw() still exists, so it counts, but say in the note that it belongs in setup(), because draw() makes a new one every frame. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
         "points": 1
       },
       {
@@ -127,7 +127,7 @@
       {
         "id": "r4",
         "title": "Clear the background each frame",
-        "description": "background(...) is called inside draw(), with any colour, so each frame starts clean. A background() call only in setup() runs once, so it is not met.",
+        "description": "background(...) is called inside draw(), with any colour, so each frame starts clean. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
     ]
