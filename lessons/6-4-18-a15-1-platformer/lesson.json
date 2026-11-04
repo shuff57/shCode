@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Create the player with an initial visual",
-      "instructions": "In setup(), create the player sprite. Give it an initial visual: either addAni('idle', ...) or sprite.image = '🧍'.",
+      "instructions": "In setup(), create the player sprite. Give it an initial visual: either addAni('idle', ...) or sprite.image = '\ud83e\uddcd'.",
       "hints": [
         "Open the moSHion docs drawer and find the Visual / image section. Single emoji strings work as zero-asset placeholders."
       ]

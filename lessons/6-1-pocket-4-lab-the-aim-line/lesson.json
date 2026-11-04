@@ -1,0 +1,92 @@
+{
+  "id": "6-1-pocket-4-lab-the-aim-line",
+  "title": "6.1.4 Lab: The aim line on the table",
+  "description": "Put the aim line on a table with rails, so the line is the shot you are about to take.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.1 Pocket: plan and the aim line",
+  "preview": "moshion",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The cue ball sits on the table and the rails hold it. There is no line."
+    },
+    {
+      "id": "s2",
+      "title": "The line, on a table",
+      "instructions": "Add the same held-pointer line as the sub-build, from the cue ball to the pointer. Keep it inside `if (mouse.pressing())`."
+    },
+    {
+      "id": "s3",
+      "title": "Check it reads as a shot",
+      "instructions": "Pull toward a rail and away from it: the line should always start at the cue ball and end under the pointer.",
+      "hints": [
+        "A line that starts at the pointer and ends at the ball looks the same but reads backwards when you add power."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The line starts at the cue ball",
+      "description": "The line begins at the cue ball and ends at the pointer, inside a press test. Help: 6.1.2 (Reading: The pointer: press, hold, let go)",
+      "hint": "line(cue.x, cue.y, mouse.x, mouse.y);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "mouse\\s*\\.\\s*pressing\\s*\\([^)]*\\)[\\s\\S]{0,200}?\\bline\\s*\\([^)]{0,80}?mouse\\s*\\.\\s*x",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The pull is shown",
+      "description": "The distance from the ball to the pointer is shown. Help: 6.1.2 (Reading: The pointer: press, hold, let go)",
+      "hint": "text(round(dist(cue.x, cue.y, mouse.x, mouse.y)), 12, 24);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bdist\\s*\\(|\\bdistanceTo\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: The aim line on the table\". The task: draw an aim line from the cue ball to the pointer while the mouse is held, on a table with rails, and show the pull distance. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Line from the ball",
+        "description": "The line uses the cue ball position and the pointer, inside a press test.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "It is a shot, not a cursor",
+        "description": "The line starts at the ball, not at the pointer.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Pull shown",
+        "description": "The distance is displayed.",
+        "points": 1
+      }
+    ]
+  }
+}

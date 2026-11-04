@@ -1,0 +1,17 @@
+{
+  "moduleId": "6.2",
+  "source": "Pocket chain module, one day.",
+  "lessons": [
+    {
+      "id": "which-way-how-fast",
+      "title": "Which way, how fast",
+      "objective": "Motion is two numbers, direction and speed, and a pull-back sets both at the moment you let go.",
+      "screens": [
+        "6-2-pocket-1-reading-which-way-how-fast",
+        "6-2-pocket-2-sub-pull-back-and-let-go",
+        "6-2-pocket-3-example-pull-back-and-shoot",
+        "6-2-pocket-4-lab-take-the-shot"
+      ]
+    }
+  ]
+}

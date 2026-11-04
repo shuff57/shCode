@@ -17,7 +17,7 @@
       "title": "Set up the scene",
       "instructions": "Create a canvas, enable gravity (world.gravity.y), add a dynamic player sprite, and a static ground sprite.",
       "hints": [
-        "Open the Sprite docs chapter (right drawer → Docs tab) for the constructor signature and collider types."
+        "Open the Sprite docs chapter (right drawer \u2192 Docs tab) for the constructor signature and collider types."
       ]
     },
     {

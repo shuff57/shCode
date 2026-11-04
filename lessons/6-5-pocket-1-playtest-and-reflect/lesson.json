@@ -1,0 +1,19 @@
+{
+  "id": "6-5-pocket-1-playtest-and-reflect",
+  "title": "6.5.1 Playtest and reflect: Pocket",
+  "description": "Play your game at least three times, find one thing that surprised you, link it to your code and choose one change.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.5 Pocket: playtest and extend",
+  "preview": "assignment",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

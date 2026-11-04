@@ -1,0 +1,97 @@
+{
+  "id": "6-1-pocket-3-sub-an-aim-line",
+  "title": "6.1.3 Sub-build: An aim line",
+  "description": "A ball, a pointer and a line. The smallest possible aim, before there is a table.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.1 Pocket: plan and the aim line",
+  "preview": "moshion",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "There is a cue ball in the middle. Move the pointer and nothing happens: there is no line yet."
+    },
+    {
+      "id": "s2",
+      "title": "Draw while held",
+      "instructions": "In `draw()`, inside `if (mouse.pressing())`, draw `line(cue.x, cue.y, mouse.x, mouse.y)`. Set the stroke colour before the line, and clear it after.",
+      "hints": [
+        "`line()` is 6.1.2: four numbers, x1 y1 x2 y2.",
+        "Without the press test the line follows the pointer all the time."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Show the pull",
+      "instructions": "Also inside the press test, show the distance from the ball to the pointer with `text(round(dist(cue.x, cue.y, mouse.x, mouse.y)), 12, 24)`.",
+      "hints": [
+        "`dist(x1, y1, x2, y2)` returns a number.",
+        "Round it: a long decimal is hard to read."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The line follows the pointer",
+      "description": "A line joins the ball and the pointer while the button is held. Help: 6.1.2 (Reading: The pointer: press, hold, let go)",
+      "hint": "if (mouse.pressing()) { line(cue.x, cue.y, mouse.x, mouse.y); }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "mouse\\s*\\.\\s*pressing\\s*\\([^)]*\\)[\\s\\S]{0,200}?\\bline\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The pull is shown",
+      "description": "The distance from the ball to the pointer is shown as a number. Help: 6.1.2 (Reading: The pointer: press, hold, let go)",
+      "hint": "text(round(dist(cue.x, cue.y, mouse.x, mouse.y)), 12, 24);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bdist\\s*\\(|\\bdistanceTo\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: An aim line\". The task: draw a line from the cue ball to the pointer inside a mouse.pressing() test, and show the pull distance as a rounded number. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Only while held",
+        "description": "The line is inside a press/hold test, so it is not drawn all the time.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "From the ball to the pointer",
+        "description": "The line uses the ball's x/y and mouse.x/mouse.y, in either order.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The pull is visible",
+        "description": "A distance is shown, rounded or not.",
+        "points": 1
+      }
+    ]
+  }
+}

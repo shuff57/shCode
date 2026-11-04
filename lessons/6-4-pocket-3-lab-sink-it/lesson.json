@@ -1,0 +1,105 @@
+{
+  "id": "6-4-pocket-3-lab-sink-it",
+  "title": "6.4.3 Lab: Sink it",
+  "description": "The table with a pocket: a slow ball drops, a fast one rolls over, and the game says what happened.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.4 Pocket: the pocket",
+  "preview": "moshion",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The pocket is solid: aim at it and the ball bounces off."
+    },
+    {
+      "id": "s2",
+      "title": "Pass-through and the slow rule",
+      "instructions": "Add `collider = 'none'` to the pocket and the guarded slow drop from the sub-build."
+    },
+    {
+      "id": "s3",
+      "title": "Say what happened",
+      "instructions": "When the ball drops, show \"Pocketed\" in the middle, and keep the ball there until R puts it back.",
+      "hints": [
+        "A ball that vanishes means it was deleted; the round should keep it."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The pocket is pass-through",
+      "description": "The pocket has collider none. Help: 6.4.1 (Reading: A pocket you roll over)",
+      "hint": "pocket.collider = 'none';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "collider\\s*=\\s*['\"]none['\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    },
+    {
+      "id": "r2",
+      "title": "Slow drop, guarded",
+      "description": "Overlap plus speed test, once. Help: 6.4.1 (Reading: A pocket you roll over)",
+      "hint": "if (ball.overlaps(pocket) && ball.speed < 1 && !sunk)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "overlaps\\s*\\([^)]*\\)[\\s\\S]{0,120}?\\.\\s*speed\\s*<",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "The game says so",
+      "description": "Words appear when the ball is sunk. Help: 5.7.1 (Reading: Words on a sprite)",
+      "hint": "text('Pocketed', 160, 200);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\btext\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Sink it\". The task: make the pocket pass-through, drop a slow ball into it once, and show a word when it is sunk. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Pass-through pocket",
+        "description": "collider none on the pocket.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Slow and once",
+        "description": "A speed test and a guard.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Feedback",
+        "description": "A word or a message shows the ball was pocketed.",
+        "points": 1
+      }
+    ]
+  }
+}

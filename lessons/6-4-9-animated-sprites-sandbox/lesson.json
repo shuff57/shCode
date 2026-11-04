@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Create a player with an initial visual",
-      "instructions": "In setup(), create a sprite. Give it an idle visual: either sprite.image = '🧍' (emoji placeholder) or addAni('idle', 'img/idle.png') if you have art assets. The two forms swap the same way; we use sprite.image here because the in-app sandbox doesn't host image files.",
+      "instructions": "In setup(), create a sprite. Give it an idle visual: either sprite.image = '\ud83e\uddcd' (emoji placeholder) or addAni('idle', 'img/idle.png') if you have art assets. The two forms swap the same way; we use sprite.image here because the in-app sandbox doesn't host image files.",
       "hints": [
         "Open the moSHion docs drawer and find the Visual / image section."
       ]
@@ -39,7 +39,7 @@
     {
       "id": "s4",
       "title": "Swap the visual based on state",
-      "instructions": "When the player is moving horizontally, swap sprite.image to a 'run' emoji (e.g. '🏃'). While 'w' is held, swap to a 'jump' emoji (e.g. '🤸'). Otherwise, swap back to idle. Don't forget the else branch, without it the visual won't reset. (With real art, this is changeAni('run') / changeAni('idle') / changeAni('jump').)",
+      "instructions": "When the player is moving horizontally, swap sprite.image to a 'run' emoji (e.g. '\ud83c\udfc3'). While 'w' is held, swap to a 'jump' emoji (e.g. '\ud83e\udd38'). Otherwise, swap back to idle. Don't forget the else branch, without it the visual won't reset. (With real art, this is changeAni('run') / changeAni('idle') / changeAni('jump').)",
       "hints": [
         "Open the moSHion docs drawer and find the Visual / image section. Single emoji strings work as visuals."
       ]

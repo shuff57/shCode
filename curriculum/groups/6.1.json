@@ -1,0 +1,17 @@
+{
+  "moduleId": "6.1",
+  "source": "Pocket chain module, one day.",
+  "lessons": [
+    {
+      "id": "plan-and-the-aim-line",
+      "title": "Plan and the aim line",
+      "objective": "The pointer has three moments (press, hold, let go), and a pool shot is drawn on the second one.",
+      "screens": [
+        "6-1-pocket-1-plan-break-pocket-into-parts",
+        "6-1-pocket-2-reading-the-pointer",
+        "6-1-pocket-3-sub-an-aim-line",
+        "6-1-pocket-4-lab-the-aim-line"
+      ]
+    }
+  ]
+}

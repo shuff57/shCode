@@ -1,0 +1,96 @@
+{
+  "id": "6-2-pocket-4-lab-take-the-shot",
+  "title": "6.2.4 Lab: Take the shot",
+  "description": "Pull back from the cue ball and let go: the ball crosses the table, and the rails stop it.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.2 Pocket: which way, how fast",
+  "preview": "moshion",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The table and the rails are there. The ball does not move."
+    },
+    {
+      "id": "s2",
+      "title": "Aim and shoot",
+      "instructions": "Add the held line and the release shot from 6.2.3. The ball should leave the cue and cross the table.",
+      "hints": [
+        "Direction first, then speed.",
+        "Power from the pull, capped."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Prove the cap",
+      "instructions": "Pull far outside the table and let go: the shot must be the same as a shorter maximum pull.",
+      "hints": [
+        "If it is faster, the cap is missing or applied after the speed."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A shot on release",
+      "description": "Direction and speed are set inside a mouse.released() test. Help: 6.2.1 (Reading: Which way, how fast)",
+      "hint": "cue.direction = cue.angleTo(mouse.x, mouse.y) + 180;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "mouse\\s*\\.\\s*released\\s*\\([^)]*\\)[\\s\\S]{0,300}?\\.\\s*direction\\s*=",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Power from the pull, capped",
+      "description": "Speed comes from the distance and is capped. Help: 6.2.1 (Reading: Which way, how fast)",
+      "hint": "cue.speed = min(dist(...), 120) / 12;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bmin\\s*\\(|\\bconstrain\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Take the shot\". The task: turn a pull-back into a shot: a line while held, then direction away from the pointer and speed from the capped pull, on release. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Shot on release",
+        "description": "The release is what sets the shot.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Direction away",
+        "description": "The direction is the angle to the pointer plus 180 (or the equivalent).",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Capped power",
+        "description": "min/constrain caps the pull.",
+        "points": 1
+      }
+    ]
+  }
+}

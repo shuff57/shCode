@@ -1,0 +1,19 @@
+{
+  "id": "6-2-pocket-3-example-pull-back-and-shoot",
+  "title": "6.2.3 Worked Example: Pull back and shoot",
+  "description": "The whole shot, in one program: line while held, direction and speed on release, and a speed read-out.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.2 Pocket: which way, how fast",
+  "preview": "example",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.3",
+  "source": "Pocket chain module, one day.",
+  "lessons": [
+    {
+      "id": "slow-to-a-stop",
+      "title": "Slow to a stop",
+      "objective": "A top-down ball has nothing to rub on, so drag slows it; \"stopped\" is a speed below a number.",
+      "screens": [
+        "6-3-pocket-1-reading-rolling-to-a-stop",
+        "6-3-pocket-2-sub-slow-to-a-stop",
+        "6-3-pocket-3-lab-slow-stop-count"
+      ]
+    }
+  ]
+}

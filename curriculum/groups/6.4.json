@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.4",
+  "source": "Pocket chain module, one day.",
+  "lessons": [
+    {
+      "id": "the-pocket",
+      "title": "The pocket",
+      "objective": "A pocket is a target you roll over, not into: pass-through, and only a slow ball drops.",
+      "screens": [
+        "6-4-pocket-1-reading-a-pocket-you-roll-over",
+        "6-4-pocket-2-sub-a-pocket-you-roll-over",
+        "6-4-pocket-3-lab-sink-it"
+      ]
+    }
+  ]
+}

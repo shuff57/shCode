@@ -1,0 +1,93 @@
+{
+  "id": "6-3-pocket-2-sub-slow-to-a-stop",
+  "title": "6.3.2 Sub-build: Slow to a stop",
+  "description": "One ball, moving, and a rule that calls it stopped. No table, no pockets.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.3 Pocket: slow to a stop",
+  "preview": "moshion",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The ball slides for ever at the same speed: nothing slows it."
+    },
+    {
+      "id": "s2",
+      "title": "Add drag",
+      "instructions": "In `setup()`, set `cue.drag = 0.02;`. Run it: the ball slows, but never stops exactly."
+    },
+    {
+      "id": "s3",
+      "title": "Call it stopped",
+      "instructions": "In `draw()`, when `cue.speed < 0.2`, set `cue.speed = 0`. Now the ball really stops.",
+      "hints": [
+        "The threshold is a small number, not zero.",
+        "Show the speed with text so you can watch it fall."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Drag is set",
+      "description": "The ball has a drag above 0. Help: 6.3.1 (Reading: Rolling to a stop)",
+      "hint": "cue.drag = 0.02;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*drag\\s*=\\s*[\\d.]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Stopped is a threshold",
+      "description": "The speed is tested against a small number and set to 0 (or a flag). Help: 6.3.1 (Reading: Rolling to a stop)",
+      "hint": "if (cue.speed < 0.2) cue.speed = 0;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*speed\\s*<\\s*[\\d.]+[\\s\\S]{0,80}?\\.\\s*speed\\s*=\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Slow to a stop\". The task: give the ball drag and call it stopped when its speed falls under a small number, setting the speed to 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Drag",
+        "description": "The ball's drag is above 0.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A threshold, not zero",
+        "description": "The stop test compares speed with a small number, then sets it to 0 or sets a flag.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "It can be seen",
+        "description": "The speed or a stopped/rolling word is shown, so the change is visible.",
+        "points": 1
+      }
+    ]
+  }
+}

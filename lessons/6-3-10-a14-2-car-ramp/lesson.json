@@ -17,7 +17,7 @@
       "title": "Ground + ramp",
       "instructions": "Two static sprites: a flat ground and a tilted ramp. Set the ramp's .rotation in degrees to tilt it (moSHion rotation is in degrees, not radians).",
       "hints": [
-        "The Sprite docs chapter (right drawer → Docs tab) covers static colliders.",
+        "The Sprite docs chapter (right drawer \u2192 Docs tab) covers static colliders.",
         "ramp.rotation = -20 tilts up to the right; positive values tilt the other way."
       ]
     },

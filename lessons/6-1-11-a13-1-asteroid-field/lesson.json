@@ -18,7 +18,7 @@
       "title": "Set up the scene",
       "instructions": "Create a canvas, a player ship sprite, and an asteroids Group. Pick any visual style.",
       "hints": [
-        "The Groups docs chapter (right drawer → Docs tab) covers Group creation and defaults."
+        "The Groups docs chapter (right drawer \u2192 Docs tab) covers Group creation and defaults."
       ]
     },
     {

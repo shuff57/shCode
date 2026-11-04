@@ -1,0 +1,19 @@
+{
+  "id": "6-1-pocket-1-plan-break-pocket-into-parts",
+  "title": "6.1.1 Plan: Break Pocket into parts",
+  "description": "A plan is not code: four questions that decide what the pool game is made of before anything is drawn.",
+  "type": "assignment",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.1 Pocket: plan and the aim line",
+  "preview": "assignment",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
