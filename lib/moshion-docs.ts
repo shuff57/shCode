@@ -235,6 +235,29 @@ function draw() {
 }`,
       },
       {
+        title: 'A colour with alpha',
+        body: `A colour is one CSS string. fill(), stroke(), background() and a sprite's .color all take the same one, and the alpha goes inside it: 'rgba(255, 99, 71, 0.5)' is that red at half strength. The p5 form fill(r, g, b, a) does not work here — fill() reads only its first argument, so fill(0, 0, 0, 120) paints solid black.
+
+shCode adds two helpers so you do not have to build the string yourself. rgba(r, g, b, a) rounds and clamps the channels and the alpha, and randomColor(alpha) or randomColor(minAlpha, maxAlpha) picks a random colour for you. Both return a plain string, so they go anywhere a colour goes.`,
+        code: `let dots = [];
+
+function setup() {
+  new Canvas(400, 400);
+  for (let i = 0; i < 8; i++) {
+    const d = new Sprite(random(60, 340), random(60, 340), 60);
+    d.collider = 'none';
+    d.color = randomColor(0.3, 1);
+    dots.push(d);
+  }
+}
+
+function draw() {
+  background('#111');
+  fill(rgba(255, 255, 255, 0.35));
+  text('eight random colours', 12, 24);
+}`,
+      },
+      {
         title: 'Drawing plain shapes',
         body: `Not everything on screen has to be a sprite. Inside draw() you can paint a shape straight onto the canvas: rect(x, y, w, h), square(x, y, size), circle(x, y, diameter) and line(x1, y1, x2, y2). These have no physics and nothing collides with them; they are just pixels, redrawn every frame after background().
 

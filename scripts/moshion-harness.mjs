@@ -15,6 +15,8 @@ import { dirname, join } from 'node:path';
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PLANCK = join(REPO, 'public', 'moshion', 'planck.min.js');
 const MOSHION = join(REPO, 'public', 'moshion', 'moshion.js');
+// shCode's local colour helpers, loaded after the engine exactly as runner.html does.
+const EXTRAS = join(REPO, 'public', 'moshion', 'extras.js');
 // The generated texture catalog. runner.html loads this BEFORE moshion.js, so
 // the harness must too -- otherwise headless runs exercise an engine with an
 // empty catalog and every `sprite.texture = 'coin'` warns instead of drawing,
@@ -336,6 +338,7 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
     runInContext(readFileSync(TEXTURES, 'utf8'), sandbox, { filename: 'textures.js' });
   }
   runInContext(readFileSync(MOSHION, 'utf8'), sandbox, { filename: 'moshion.js' });
+  runInContext(readFileSync(EXTRAS, 'utf8'), sandbox, { filename: 'extras.js' });
 
   function drainTimers() {
     let guard = 0;
