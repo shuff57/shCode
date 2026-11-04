@@ -16,6 +16,7 @@ import DocsDrawer from './DocsDrawer';
 import HistoryPanel from './HistoryPanel';
 import { addLocalSnapshot } from '../lib/local-history';
 import { useCloudWorkspace } from '../lib/lesson-sync';
+import { useLessonState } from '../lib/progress';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
@@ -91,6 +92,7 @@ export default function SandboxWorkspace() {
   const fileContents = useLessonStore((s) => s.fileContents);
   const updateFile = useLessonStore((s) => s.updateFile);
   const resetLesson = useLessonStore((s) => s.resetLesson);
+  const lessonProgress = useLessonState();
 
   const [modeId, setModeId] = useState<SandboxModeId>('moshion');
   const mode = useMemo(() => getMode(modeId), [modeId]);
@@ -98,8 +100,9 @@ export default function SandboxWorkspace() {
 
   // The same save surface a lesson has: a deliberate cloud Save, and a History
   // panel that restores a snapshot. Every sandbox mode is its own lesson id, so
-  // the four modes keep independent histories.
-  const cloud = useCloudWorkspace(lesson, true);
+  // the four modes keep independent histories. Signed-out students keep the
+  // local draft but get no Save button, exactly as in a lesson.
+  const cloud = useCloudWorkspace(lesson, lessonProgress.authed);
   const [historyOpen, setHistoryOpen] = useState(false);
 
   const isFlow = mode.preview === 'diagram';
@@ -537,32 +540,36 @@ export default function SandboxWorkspace() {
         <History size={12} />
         History
       </button>
-      <button
-        style={chipStyle}
-        onClick={() => {
-          // Keep a copy on this device even if the cloud save fails.
-          addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, 'Saved on this device');
-          void cloud.save();
-        }}
-        disabled={cloud.saving}
-        title="Save this sandbox to the cloud so you can open it on another device."
-      >
-        <CloudUpload size={12} />
-        {cloud.saving ? 'Saving…' : 'Save'}
-      </button>
-      {cloud.note && (
-        <span
-          role="status"
-          aria-live="polite"
-          style={{
-            color: cloud.note.kind === 'error' ? '#ff5555' : '#50fa7b',
-            fontSize: 12,
-            alignSelf: 'center',
-          }}
-        >
-          {cloud.note.kind === 'error' ? '✗ ' : '✓ '}
-          {cloud.note.text}
-        </span>
+      {lessonProgress.authed && (
+        <>
+          <button
+            style={chipStyle}
+            onClick={() => {
+              // Keep a copy on this device even if the cloud save fails.
+              addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, 'Saved on this device');
+              void cloud.save();
+            }}
+            disabled={cloud.saving}
+            title="Save this sandbox to the cloud so you can open it on another device."
+          >
+            <CloudUpload size={12} />
+            {cloud.saving ? 'Saving…' : 'Save'}
+          </button>
+          {cloud.note && (
+            <span
+              role="status"
+              aria-live="polite"
+              style={{
+                color: cloud.note.kind === 'error' ? '#ff5555' : '#50fa7b',
+                fontSize: 12,
+                alignSelf: 'center',
+              }}
+            >
+              {cloud.note.kind === 'error' ? '✗ ' : '✓ '}
+              {cloud.note.text}
+            </span>
+          )}
+        </>
       )}
     </>
   );
