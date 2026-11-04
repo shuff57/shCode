@@ -1,5 +1,5 @@
-// 5.3.14 Lab: A chime on every bumper hit.
-// The three-bumper table from 5.3.8. It scores, but it is silent.
+// 5.6.2 Lab: A chime on every bumper hit.
+// The three-bumper table from 5.4.4. It scores, but it is silent.
 
 let ball, ground, score;
 let chime;   // the sound, loaded once in setup()

@@ -1,0 +1,15 @@
+{
+  "moduleId": "5.8",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "pinball-physics-knobs",
+      "title": "Physics knobs",
+      "objective": "Students can physics knobs and see it run.",
+      "screens": [
+        "5-3-pinball-polish-4-reading-four-physics-knobs",
+        "5-3-pinball-polish-5-lab-nudge-the-table"
+      ]
+    }
+  ]
+}

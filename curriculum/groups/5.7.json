@@ -1,0 +1,16 @@
+{
+  "moduleId": "5.7",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "pinball-labels-and-popups",
+      "title": "Labels and popups",
+      "objective": "Students can labels and popups and see it run.",
+      "screens": [
+        "5-3-pinball-polish-1-reading-words-and-sprites-that-run-out",
+        "5-3-pinball-polish-2-example-a-plus-that-floats-away",
+        "5-3-pinball-polish-3-lab-show-the-worth-pop-the-points"
+      ]
+    }
+  ]
+}

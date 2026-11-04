@@ -1,11 +1,11 @@
 {
   "id": "5-5-snake-6-lab-grow-and-eat",
-  "title": "5.5.6 Lab: Grow and eat",
+  "title": "5.14.2 Lab: Grow and eat",
   "description": "The snake is a three-cell body that moves as one cell, and the food does nothing. Move it by adding a head and removing the tail, then let eating keep the tail and add a point.",
   "type": "lesson",
   "estimateMins": 14,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.5 Project: Snake",
+  "unit": "5.14 Snake: grow",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Move by adding a head and removing a tail",
-      "instructions": "Besides `setup()`, `draw()` and `drawTop()`, the starter has five functions. Every one except `step()` is finished; the comment above each says what it does. `step()` does the job 5.5.4 did on each beat inside `draw()` (work out the next cell, stop at a wall), now in a function of its own; for now its last two lines delete the head and build a new one on the next cell, so the rest of the body is left behind. The words on screen are drawn in `drawTop()`, as in the Flappy labs, so the snake can never cover the score. Your work is all in `step()`. Replace its last two lines with the trick from 5.5.5: put a new head at the front of `segments` with `unshift`, then `pop` the tail and delete it. Run it: the whole three-cell snake should slide forward.",
+      "instructions": "Besides `setup()`, `draw()` and `drawTop()`, the starter has five functions. Every one except `step()` is finished; the comment above each says what it does. `step()` does the job 5.13.4 did on each beat inside `draw()` (work out the next cell, stop at a wall), now in a function of its own; for now its last two lines delete the head and build a new one on the next cell, so the rest of the body is left behind. The words on screen are drawn in `drawTop()`, as in the Flappy labs, so the snake can never cover the score. Your work is all in `step()`. Replace its last two lines with the trick from 5.14.1: put a new head at the front of `segments` with `unshift`, then `pop` the tail and delete it. Run it: the whole three-cell snake should slide forward.",
       "hints": [
         "`segments.unshift(makeSegment(col, row));`",
         "`const tail = segments.pop();` then `tail.delete();`"
@@ -43,7 +43,7 @@
     {
       "id": "r1",
       "title": "A new head goes on the front",
-      "description": "The snake moves by adding a cell to the front of the array. Help: 5.5.5 (Reading: A body that grows)",
+      "description": "The snake moves by adding a cell to the front of the array. Help: 5.14.1 (Reading: A body that grows)",
       "type": "regex",
       "file": "script.js",
       "pattern": "segments\\.unshift\\s*\\(",
@@ -54,7 +54,7 @@
     {
       "id": "r2",
       "title": "The tail is removed and deleted",
-      "description": "The last cell leaves the array and the screen. Help: 5.5.5 (Reading: A body that grows)",
+      "description": "The last cell leaves the array and the screen. Help: 5.14.1 (Reading: A body that grows)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:^|[^\\w$.])(\\w+)\\s*=\\s*segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1\\s*,\\s*1\\s*\\)(?:\\s*\\[\\s*0\\s*\\])?)\\s*;?[\\s\\S]{0,80}?\\b\\1\\.(?:delete|remove)\\s*\\(\\s*\\)|segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1\\s*,\\s*1\\s*\\)\\s*\\[\\s*0\\s*\\])\\s*\\.(?:delete|remove)\\s*\\(\\s*\\)|segments\\[\\s*segments\\.length\\s*-\\s*1\\s*\\]\\s*\\.(?:delete|remove)\\s*\\(\\s*\\)[\\s\\S]{0,80}?segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1)|(?:^|[^\\w$.])(\\w+)\\s*=\\s*segments\\[\\s*segments\\.length\\s*-\\s*1\\s*\\]\\s*;?[\\s\\S]{0,80}?\\b\\2\\.(?:delete|remove)\\s*\\(\\s*\\)[\\s\\S]{0,80}?segments\\.(?:pop\\s*\\(\\s*\\)|splice\\s*\\(\\s*segments\\.length\\s*-\\s*1)",
@@ -65,7 +65,7 @@
     {
       "id": "r3",
       "title": "Eating scores and replaces the food",
-      "description": "Reaching the food adds a point and makes a new piece. Help: 5.5.5 (Reading: A body that grows)",
+      "description": "Reaching the food adds a point and makes a new piece. Help: 5.14.1 (Reading: A body that grows)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)[\\s\\S]{0,80}?(?:food\\s*=\\s*makeFood\\s*\\(\\s*\\)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makeFood\\s*\\(\\s*\\)[\\s\\S]{0,60}?\\bfood\\s*=\\s*\\1\\b)|(?:food\\s*=\\s*makeFood\\s*\\(\\s*\\)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makeFood\\s*\\(\\s*\\)[\\s\\S]{0,60}?\\bfood\\s*=\\s*\\2\\b)[\\s\\S]{0,80}?(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)",
@@ -76,7 +76,7 @@
     {
       "id": "r4",
       "title": "Eating keeps the tail, so the snake grows",
-      "description": "The tail is removed only on a step that does not eat: the eating test compares the new head's cell with the food's cell, and the tail comes off in the else (or after the eating branch has returned). Help: 5.5.5 (Reading: A body that grows)",
+      "description": "The tail is removed only on a step that does not eat: the eating test compares the new head's cell with the food's cell, and the tail comes off in the else (or after the eating branch has returned). Help: 5.14.1 (Reading: A body that grows)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\((?=[^{};]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))(?:[^()]|\\([^()]*\\))*\\)\\s*\\{(?:(?!segments\\.(?:pop|splice)\\s*\\()(?:[^{}]|\\{[^{}]*\\}))*\\}\\s*else\\s*(?:\\{[^{}]*?|[^{};]*?)segments\\.(?:pop|splice)\\s*\\(|if\\s*\\((?=[^{};]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))(?:[^()]|\\([^()]*\\))*\\)\\s*\\{(?:(?!segments\\.(?:pop|splice)\\s*\\()(?:[^{}]|\\{[^{}]*\\}))*?\\breturn\\b(?:[^{}]|\\{[^{}]*\\})*\\}[\\s\\S]*?segments\\.(?:pop|splice)\\s*\\(|if\\s*\\((?=[^{};]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))(?=[^{};]*(?:!==?|!\\s*\\())(?:[^()]|\\([^()]*\\))*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)segments\\.(?:pop|splice)\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=(?=[^;]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))[^;]*;[\\s\\S]{0,300}?if\\s*\\(\\s*\\1\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{(?:(?!segments\\.(?:pop|splice)\\s*\\()(?:[^{}]|\\{[^{}]*\\}))*\\}\\s*else\\s*(?:\\{[^{}]*?|[^{};]*?)segments\\.(?:pop|splice)\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=(?=[^;]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))[^;]*;[\\s\\S]{0,400}?if\\s*\\(\\s*(?:!\\s*\\2|\\2\\s*===?\\s*false)\\s*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)segments\\.(?:pop|splice)\\s*\\(|(?<![\\w.$])(\\w+)\\s*=\\s*false\\b[\\s\\S]{0,300}?if\\s*\\((?=[^{};]*(?:\\bfood\\.(?:col|row)\\s*[!=]==?|[!=]==?\\s*food\\.(?:col|row)\\b))(?:[^()]|\\([^()]*\\))*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)(?<![\\w.$])\\3\\s*=\\s*true\\b[\\s\\S]{0,300}?if\\s*\\(\\s*(?:\\3\\s*(?:===?\\s*true\\s*)?\\)\\s*\\{(?:(?!segments\\.(?:pop|splice)\\s*\\()(?:[^{}]|\\{[^{}]*\\}))*\\}\\s*else\\s*|(?:!\\s*\\3|\\3\\s*===?\\s*false)\\s*\\)\\s*)(?:\\{[^{}]*?|[^{};]*?)segments\\.(?:pop|splice)\\s*\\(",
@@ -93,30 +93,30 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.5.6 Lab: Grow and eat\". The task they were given: The snake is an array, segments, with the head at segments[0], made of sprites built by makeSegment(col, row). All the work is in step(): replace its last two lines (delete the head and build a new one) with: put a new head at the front of segments with unshift, then pop the tail and delete it. Then, when the new head's cell is the food's cell (col === food.col and row === food.row), add 1 to score, delete the food, make a new one with makeFood(), and do not remove the tail on that step; otherwise remove the tail as before. You cannot run their code: read it and judge what it WOULD do when the sketch runs. unshift(x) adds x at the front of an array (index 0); pop() takes the last item off and gives it back, and splice(segments.length - 1, 1) does the same. Taking a sprite out of the array does not take it off the screen: that needs sprite.delete() (or its twin remove()). step() runs once per beat, and return ends it early. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: removing the tail on every step, the eating step included (the score rises but the snake never grows); adding the new head at the end with push (the rest of the code treats segments[0] as the head); a pop with no delete (the old tail stays drawn). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.14.2 Lab: Grow and eat\". The task they were given: The snake is an array, segments, with the head at segments[0], made of sprites built by makeSegment(col, row). All the work is in step(): replace its last two lines (delete the head and build a new one) with: put a new head at the front of segments with unshift, then pop the tail and delete it. Then, when the new head's cell is the food's cell (col === food.col and row === food.row), add 1 to score, delete the food, make a new one with makeFood(), and do not remove the tail on that step; otherwise remove the tail as before. You cannot run their code: read it and judge what it WOULD do when the sketch runs. unshift(x) adds x at the front of an array (index 0); pop() takes the last item off and gives it back, and splice(segments.length - 1, 1) does the same. Taking a sprite out of the array does not take it off the screen: that needs sprite.delete() (or its twin remove()). step() runs once per beat, and return ends it early. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: removing the tail on every step, the eating step included (the score rises but the snake never grows); adding the new head at the end with push (the rest of the code treats segments[0] as the head); a pop with no delete (the old tail stays drawn). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "A new head goes on the front",
-        "description": "A new segment for the next cell (made with makeSegment) goes on the front of segments: segments.unshift(...) directly, stored in a variable and then unshifted, or splice(0, 0, ...). Missing: the new cell is added at the end, or never added. Help: 5.5.5 (Reading: A body that grows)",
+        "description": "A new segment for the next cell (made with makeSegment) goes on the front of segments: segments.unshift(...) directly, stored in a variable and then unshifted, or splice(0, 0, ...). Missing: the new cell is added at the end, or never added. Help: 5.14.1 (Reading: A body that grows)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "The tail is removed and deleted",
-        "description": "The last segment leaves the array (pop(), or a splice of the last index) AND its sprite is deleted (delete() or remove()), in either order: kept in a variable and deleted, chained straight onto the pop, or read with segments[segments.length - 1] and deleted before the pop. Partial: only one of the two. Help: 5.5.5 (Reading: A body that grows)",
+        "description": "The last segment leaves the array (pop(), or a splice of the last index) AND its sprite is deleted (delete() or remove()), in either order: kept in a variable and deleted, chained straight onto the pop, or read with segments[segments.length - 1] and deleted before the pop. Partial: only one of the two. Help: 5.14.1 (Reading: A body that grows)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "Eating scores and replaces the food",
-        "description": "When the snake reaches the food, the score goes up by one (score += 1, score++ or score = score + 1) and food becomes a new piece from makeFood(). Deleting the old food first is what step 2 asks and is welcome. Partial: only one of the two. Help: 5.5.5 (Reading: A body that grows)",
+        "description": "When the snake reaches the food, the score goes up by one (score += 1, score++ or score = score + 1) and food becomes a new piece from makeFood(). Deleting the old food first is what step 2 asks and is welcome. Partial: only one of the two. Help: 5.14.1 (Reading: A body that grows)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "Eating keeps the tail, so the snake grows",
-        "description": "The eating test compares the new head's cell with the food's cell, column AND row (comparing the head sprite's x and y with the food's x and y, or segments[0] after the unshift, is the same idea), and the tail comes off only on a step that does not eat: in the else, after the eating branch has returned, behind an if that the snake did not eat, or behind a flag. Missing: the tail is removed whether or not the snake ate, or there is no eating test. Help: 5.5.5 (Reading: A body that grows)",
+        "description": "The eating test compares the new head's cell with the food's cell, column AND row (comparing the head sprite's x and y with the food's x and y, or segments[0] after the unshift, is the same idea), and the tail comes off only on a step that does not eat: in the else, after the eating branch has returned, behind an if that the snake did not eat, or behind a flag. Missing: the tail is removed whether or not the snake ate, or there is no eating test. Help: 5.14.1 (Reading: A body that grows)",
         "points": 1
       }
     ]

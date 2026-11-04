@@ -1,44 +1,14 @@
 {
   "moduleId": "5.5",
-  "source": "Not a book section. The shape (written plan, build with concepts injected where needed, playtest and reflection close) follows CodeHS's project modules in Introduction to Game Design; the grid-and-array game follows Video Game Design in JavaScript's Snake ladder. Structure only: no CodeHS text, problems or code is copied.",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
   "lessons": [
     {
-      "id": "plan-and-grid",
-      "title": "Plan, and a world on a grid",
-      "objective": "Students will be able to plan a game as parts and remembered values, and place and move a sprite on a grid of cells.",
+      "id": "pinball-lose-and-start-again",
+      "title": "Losing and restarting",
+      "objective": "Students can losing and restarting and see it run.",
       "screens": [
-        "5-5-snake-1-plan-break-snake-into-parts",
-        "5-5-snake-2-reading-a-world-on-a-grid",
-        "5-5-snake-3-example-a-block-that-walks-the-grid"
-      ]
-    },
-    {
-      "id": "steering",
-      "title": "Steering",
-      "objective": "Students will be able to steer a grid sprite with direction variables, refuse a turn straight back, and end the round at a wall.",
-      "screens": [
-        "5-5-snake-4-lab-steer-it"
-      ]
-    },
-    {
-      "id": "growing-and-searching",
-      "title": "Growing and searching",
-      "objective": "Students will be able to move and grow a snake by adding a head and removing a tail, and search the array to find a bite.",
-      "screens": [
-        "5-5-snake-5-reading-a-body-that-grows",
-        "5-5-snake-6-lab-grow-and-eat",
-        "5-5-snake-7-reading-searching-the-array",
-        "5-5-snake-8-lab-dont-bite-yourself"
-      ]
-    },
-    {
-      "id": "playtest-and-extend",
-      "title": "Playtest, check, and make it yours",
-      "objective": "Students will be able to playtest their own game, link what they saw to their code, and extend it with a rule of their own.",
-      "screens": [
-        "5-5-snake-9-playtest-and-reflect",
-        "5-5-snake-10-quiz-snake-check",
-        "5-5-snake-11-challenges-make-it-yours"
+        "5-3-pinball-8-reading-the-state-of-the-game",
+        "5-3-pinball-9-lab-lose-and-start-again"
       ]
     }
   ]

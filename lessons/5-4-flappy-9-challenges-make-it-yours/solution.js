@@ -1,4 +1,4 @@
-// 5.4.11 Challenges: Make it yours (reference solution: harder as you go, a best score, a random wobble).
+// 5.12.5 Challenges: Make it yours (reference solution: harder as you go, a best score, a random wobble).
 
 let bird, pipes, score, playing, best;
 

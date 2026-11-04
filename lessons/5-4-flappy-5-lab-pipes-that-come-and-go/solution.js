@@ -1,4 +1,4 @@
-// 5.4.6 Lab: Pipes that come and go (reference solution).
+// 5.11.2 Lab: Pipes that come and go (reference solution).
 
 let bird, pipes;
 

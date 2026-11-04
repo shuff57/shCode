@@ -1,0 +1,15 @@
+{
+  "moduleId": "5.11",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "flappy-the-world-scrolls",
+      "title": "A world that scrolls",
+      "objective": "Students can a world that scrolls and see it run.",
+      "screens": [
+        "5-4-flappy-4-reading-a-world-that-scrolls",
+        "5-4-flappy-5-lab-pipes-that-come-and-go"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 ## A collision is not an event
 
-**Read before `5.3.6 Worked Example: The score that climbs by itself`.** About 6 minutes.
+**Read before `5.4.2 Worked Example: The score that climbs by itself`.** About 6 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -86,7 +86,7 @@ function draw() {
 
 **What you'll see:** the ball drops, lands on the gold bar, and the score reads **1** — not hundreds. Press R and it becomes 2, then 3, then 4. The ball resting on the bar for a thousand frames still counts once.
 
-This ball has `bounciness` 0, so it lands and stays. A ball that bounces touches the bar, leaves it, and touches it again, and every one of those touches starts a new contact, so each one counts. That is correct: a bounce really is a second hit. 5.3.6 shows it.
+This ball has `bounciness` 0, so it lands and stays. A ball that bounces touches the bar, leaves it, and touches it again, and every one of those touches starts a new contact, so each one counts. That is correct: a bounce really is a second hit. 5.4.2 shows it.
 
 **Try this:** delete the line `wasTouching = touching;` and run it again. The score races again, about sixty points a second while the ball sits on the bar, exactly like the version with no memory. Nothing ever changes `wasTouching`, so it stays `false`, `!wasTouching` is always `true`, and the test is just `touching`. A memory that is never updated remembers nothing.
 

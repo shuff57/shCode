@@ -1,0 +1,15 @@
+{
+  "moduleId": "5.15",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "snake-search",
+      "title": "Searching the body",
+      "objective": "Students can searching the body and see it run.",
+      "screens": [
+        "5-5-snake-7-reading-searching-the-array",
+        "5-5-snake-8-lab-dont-bite-yourself"
+      ]
+    }
+  ]
+}

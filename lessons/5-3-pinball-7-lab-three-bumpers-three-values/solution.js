@@ -1,4 +1,4 @@
-// 5.3.8 Lab: Three bumpers, three values (reference solution).
+// 5.4.4 Lab: Three bumpers, three values (reference solution).
 
 let ball, ground, score;
 let bumpers = [];

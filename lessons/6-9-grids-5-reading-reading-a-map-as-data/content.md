@@ -39,7 +39,7 @@ player.x = start.x;
 
 Decide what to hand back when the letter is missing: the lab returns the centre of the top-left tile.
 
-**Cells to pixels.** The map speaks in rows and columns. Sprites speak in pixels. The centre of column `c` is `c * TILE + TILE / 2`: column 3 of 40-pixel tiles starts at 120 and its centre is half a tile further, 140. The row works the same way with `r`. This is the same rule as 5.5.2's `cellToPixel`, now applied to a map you did not place yourself.
+**Cells to pixels.** The map speaks in rows and columns. Sprites speak in pixels. The centre of column `c` is `c * TILE + TILE / 2`: column 3 of 40-pixel tiles starts at 120 and its centre is half a tile further, 140. The row works the same way with `r`. This is the same rule as 5.13.2's `cellToPixel`, now applied to a map you did not place yourself.
 
 **Pixels back to a cell.** Going the other way, the column is `floor(x / TILE)` and the row is `floor(y / TILE)`. With `x = 150` and `TILE = 40`, `150 / 40` is 3.75, and `floor` cuts off the 0.75 and leaves 3, the tile the pixel is inside. `round` would say 4, which is the next tile along. Use `floor`.
 

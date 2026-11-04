@@ -6,7 +6,7 @@ Every game in this unit gets a plan first. A plan is not code. It is a short lis
 
 You will build it in three parts: 7.4 the ship and its shots against a single drone, 7.5 many enemies and waves, 7.6 the same game rebuilt with classes.
 
-**What a plan lists.** Break it into parts, as you did for Snake in 5.5.1 (Plan: Break Snake into parts), where the snake's body, the food and the steering each became a part of their own. For each part ask: does the game have to *remember* something about it from frame to frame? If so, that is a variable, and the plan names it.
+**What a plan lists.** Break it into parts, as you did for Snake in 5.13.1 (Plan: Break Snake into parts), where the snake's body, the food and the steering each became a part of their own. For each part ask: does the game have to *remember* something about it from frame to frame? If so, that is a variable, and the plan names it.
 
 Write your response in the box below. Short sentences or a numbered list both work. Aim to cover:
 

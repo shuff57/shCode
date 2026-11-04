@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Three hp a round",
-      "instructions": "The top right says `base: undefined`, and runs off the edge of the canvas: nothing gives `baseHp` a value. In `startRound()`, set `baseHp` to 3, next to `score = 0;`. `startRound()` puts back everything a round owns, as in 5.5.6, and the base's hp is one of those things. Run it: the top right should read `base: 3`.",
+      "instructions": "The top right says `base: undefined`, and runs off the edge of the canvas: nothing gives `baseHp` a value. In `startRound()`, set `baseHp` to 3, next to `score = 0;`. `startRound()` puts back everything a round owns, as in 5.14.2, and the base's hp is one of those things. Run it: the top right should read `base: 3`.",
       "hints": [
         "`baseHp = 3;` goes inside `startRound()`, not in `setup()`, so that R will give the hp back too."
       ]
@@ -43,7 +43,7 @@
     {
       "id": "r1",
       "title": "Every round starts with base hp",
-      "description": "startRound() gives baseHp its starting value (3), so R gives the base its hp back. Help: 5.4.8 (Lab: Crash, and start again)",
+      "description": "startRound() gives baseHp its starting value (3), so R gives the base its hp back. Help: 5.12.2 (Lab: Crash, and start again)",
       "type": "inFunction",
       "function": "startRound",
       "file": "script.js",
@@ -72,7 +72,7 @@
     {
       "id": "r3",
       "title": "At 0 the round ends",
-      "description": "An if on baseHp reaching 0 sets playing to false. Help: 5.3.9 (Reading: The state of the game)",
+      "description": "An if on baseHp reaching 0 sets playing to false. Help: 5.5.1 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\((?=[^{};]{0,200}(?:\\bbaseHp\\s*(?:\\)\\s*)?(?:<=\\s*0\\b|===?\\s*0\\b|<\\s*1\\b)|\\b0\\s*(?:>=|===?)\\s*(?:\\(\\s*)?baseHp\\b|\\b1\\s*>\\s*(?:\\(\\s*)?baseHp\\b|!\\s*(?:\\(\\s*)?baseHp\\b))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)\\bplaying\\s*=(?!=)\\s*false\\b|\\bplaying\\s*=(?!=)\\s*(?:\\(\\s*)?(?:baseHp\\s*(?:\\)\\s*)?(?:>\\s*0|>=\\s*1|!==?\\s*0)|0\\s*<\\s*baseHp)|(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}(?:\\bbaseHp\\s*(?:\\)\\s*)?(?:<=\\s*0\\b|===?\\s*0\\b|<\\s*1\\b)|\\b0\\s*(?:>=|===?)\\s*(?:\\(\\s*)?baseHp\\b|\\b1\\s*>\\s*(?:\\(\\s*)?baseHp\\b|!\\s*(?:\\(\\s*)?baseHp\\b))[^;]{0,200}?[;\\n][\\s\\S]{0,300}?if\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\1\\b)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)\\bplaying\\s*=(?!=)\\s*false\\b",
@@ -84,7 +84,7 @@
     {
       "id": "r4",
       "title": "Game over is written in drawTop when the round is over",
-      "description": "In drawTop(), an if on !playing writes Game over (and press R) on top of the sprites. Help: 5.4.5 (Reading: A world that scrolls)",
+      "description": "In drawTop(), an if on !playing writes Game over (and press R) on top of the sprites. Help: 5.11.1 (Reading: A world that scrolls)",
       "type": "inFunction",
       "function": "drawTop",
       "file": "script.js",
@@ -97,7 +97,7 @@
     {
       "id": "r5",
       "title": "R starts a new round",
-      "description": "In draw(), outside if (playing), pressing R calls startRound() (directly, or through a function of your own that calls it), so it works after Game over too. Help: 5.4.8 (Lab: Crash, and start again)",
+      "description": "In draw(), outside if (playing), pressing R calls startRound() (directly, or through a function of your own that calls it), so it works after Game over too. Help: 5.12.2 (Lab: Crash, and start again)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*?if\\s*\\(\\s*(?:\\(\\s*)?playing\\s*(?:\\)\\s*)?(?:===?\\s*true\\s*)?\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\))(?:[\\s\\S]*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\)[\\s\\S]{0,80}?startRound\\s*\\(\\s*\\)|(?=[\\s\\S]*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\)[^;{}]{0,80}?\\)\\s*\\{?\\s*([A-Za-z_$][\\w$]*)\\s*\\(\\s*\\))[\\s\\S]*?\\bfunction\\s+\\1\\s*\\([^)]*\\)\\s*\\{[^{}]{0,300}?\\bstartRound\\s*\\(\\s*\\))",

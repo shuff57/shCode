@@ -1,4 +1,4 @@
-// 5.5.11 Challenges: Make it yours. Pick one rule and change it.
+// 5.16.3 Challenges: Make it yours. Pick one rule and change it.
 
 const CELL = 20;
 const BEAT = 8;
@@ -89,7 +89,7 @@ function draw() {
 }
 
 // drawTop() runs after the sprites are drawn, so the snake can never cover
-// its words (the same trick as the Flappy labs, from 5.4.5).
+// its words (the same trick as the Flappy labs, from 5.11.1).
 function drawTop() {
   fill('white');
   textSize(22);

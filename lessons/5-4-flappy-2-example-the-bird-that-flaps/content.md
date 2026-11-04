@@ -1,6 +1,6 @@
 ## The bird that flaps
 
-**Read before `5.4.4 Lab: Make it flap`.** About 8 minutes.
+**Read before `5.10.4 Lab: Make it flap`.** About 8 minutes.
 
 Press the space bar. Each tap sends the bird up, and gravity pulls it back.
 
@@ -32,7 +32,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** the bird drops from the middle. Each tap lifts it in a short arc. If it leaves the top or bottom it returns to the middle, which stands in for losing until 5.4.8.
+**What you'll see:** the bird drops from the middle. Each tap lifts it in a short arc. If it leaves the top or bottom it returns to the middle, which stands in for losing until 5.12.2.
 
 **Try this:**
 

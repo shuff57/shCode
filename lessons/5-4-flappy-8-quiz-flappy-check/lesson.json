@@ -1,11 +1,11 @@
 {
   "id": "5-4-flappy-8-quiz-flappy-check",
-  "title": "5.4.10 Check: the flapping game",
+  "title": "5.12.4 Check: the flapping game",
   "description": "Eight multiple-choice questions on gravity and the flap, the scrolling world, timed spawning, removing what has left, scoring a pass once, and what a restart puts back. Checked instantly.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Project: Flappy",
+  "unit": "5.12 Flappy: crash, and finish",
   "preview": "quiz",
   "week": 12,
   "slos": [
@@ -20,7 +20,7 @@
     "questions": [
       {
         "id": "q1-flap-sets",
-        "source": "5.4.2",
+        "source": "5.10.2",
         "question": "Why does the flap write `bird.vel.y = -4` instead of `bird.vel.y -= 4`?",
         "options": [
           "`-=` is not allowed on a sprite",
@@ -36,7 +36,7 @@
       },
       {
         "id": "q2-presses",
-        "source": "5.4.2",
+        "source": "5.10.2",
         "question": "While the space bar is held, the bird climbs at one steady speed; let go and it falls. Which line was used?",
         "options": [
           "`kb.presses(' ')`",
@@ -52,7 +52,7 @@
       },
       {
         "id": "q3-scroll",
-        "source": "5.4.5",
+        "source": "5.11.1",
         "question": "In this game, what makes the bird look as though it is flying forward?",
         "options": [
           "The bird's x increases",
@@ -68,7 +68,7 @@
       },
       {
         "id": "q4-beat",
-        "source": "5.4.5",
+        "source": "5.11.1",
         "question": "What does `if (frameCount % 90 === 0)` do?",
         "options": [
           "Runs on every frame",
@@ -84,7 +84,7 @@
       },
       {
         "id": "q5-backwards",
-        "source": "5.4.5",
+        "source": "5.11.1",
         "question": "Why does the loop that removes off-screen pipes count down from the end?",
         "options": [
           "It is faster",
@@ -100,7 +100,7 @@
       },
       {
         "id": "q6-two-things",
-        "source": "5.4.6",
+        "source": "5.11.2",
         "question": "A pipe has slid off the left edge. What must happen to it?",
         "options": [
           "Its sprite is deleted and it is spliced out of the array",
@@ -116,7 +116,7 @@
       },
       {
         "id": "q7-passed",
-        "source": "5.4.7",
+        "source": "5.12.1",
         "question": "What is the `passed` flag on each pipe for?",
         "options": [
           "It makes the pipe move",
@@ -125,14 +125,14 @@
           "It marks the pipe as deleted"
         ],
         "answer": 1,
-        "explanation": "Without it, `p.x < bird.x` stays true every frame after the pipe is behind the bird, and the score races, the same as in 5.3.5.",
+        "explanation": "Without it, `p.x < bird.x` stays true every frame after the pipe is behind the bird, and the score races, the same as in 5.4.1.",
         "sourceIds": [
           "5-4-flappy-6-lab-score-a-gap"
         ]
       },
       {
         "id": "q8-restart",
-        "source": "5.4.8",
+        "source": "5.12.2",
         "question": "What must a restart put back in this game, besides the bird and the score?",
         "options": [
           "Only the flag",

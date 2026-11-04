@@ -1,4 +1,4 @@
-// 5.3.17 Lab: Show the worth, pop the points (reference solution).
+// 5.7.3 Lab: Show the worth, pop the points (reference solution).
 
 let ball, ground, score;
 let chime;   // the sound, loaded once in setup()

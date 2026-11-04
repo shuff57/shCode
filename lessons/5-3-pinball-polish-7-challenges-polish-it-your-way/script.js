@@ -1,5 +1,5 @@
-// 5.3.21 Challenges: Polish it your way.
-// Your finished table from 5.3.19. Pick a polish from the steps and add it.
+// 5.9.4 Challenges: Polish it your way.
+// Your finished table from 5.8.2. Pick a polish from the steps and add it.
 
 let ball, ground, score;
 let chime;   // the sound, loaded once in setup()

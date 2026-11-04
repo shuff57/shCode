@@ -1,4 +1,4 @@
-// 5.3.19 Lab: Nudge the table (reference solution).
+// 5.8.2 Lab: Nudge the table (reference solution).
 // mass 1: the nudge can save a ball without throwing it off the table.
 
 let ball, ground, score;

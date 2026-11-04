@@ -1,82 +1,16 @@
 {
   "moduleId": "5.3",
-  "source": "Not a book section. The four-part shape of a game (goal, score, loss, restart) follows CodeHS's project modules in Introduction to Game Design, where each project is built in setup/mechanics/challenge steps. Structure only: no CodeHS text, problems or code is copied.",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
   "lessons": [
     {
-      "id": "from-scene-to-game",
-      "title": "Plan, and from scene to game",
-      "objective": "Students will be able to plan a game as parts and remembered values, name the four things that turn a physics scene into a game, and build a table with a goal on it.",
+      "id": "pinball-the-table",
+      "title": "Plan, and the table",
+      "objective": "Students can plan, and the table and see it run.",
       "screens": [
         "5-3-pinball-plan-sketch-the-game",
         "5-3-pinball-1-reading-from-scene-to-game",
         "5-3-pinball-2-example-the-table-and-the-goal",
         "5-3-pinball-3-lab-build-the-table"
-      ]
-    },
-    {
-      "id": "scoring-an-event",
-      "title": "Scoring an event",
-      "objective": "Students will be able to explain why a collision fires every frame, and score a hit exactly once by remembering the frame before.",
-      "screens": [
-        "5-3-pinball-4-reading-a-collision-is-not-an-event",
-        "5-3-pinball-5-example-the-score-that-climbs",
-        "5-3-pinball-6-lab-score-one-point-per-touch",
-        "5-3-pinball-7-lab-three-bumpers-three-values"
-      ]
-    },
-    {
-      "id": "losing-and-restarting",
-      "title": "Losing and restarting",
-      "objective": "Students will be able to hold a game's state in a variable and use it to end and restart a game.",
-      "screens": [
-        "5-3-pinball-8-reading-the-state-of-the-game",
-        "5-3-pinball-9-lab-lose-and-start-again"
-      ]
-    },
-    {
-      "id": "make-it-yours",
-      "title": "Playtest, and make it yours",
-      "objective": "Students will be able to playtest their own game, link what they saw to their code, and extend it with a rule of their own.",
-      "screens": [
-        "5-3-pinball-playtest-and-reflect",
-        "5-3-pinball-10-challenges-make-it-yours"
-      ]
-    },
-    {
-      "id": "sound-on-a-hit",
-      "title": "A sound on a hit",
-      "objective": "Students will be able to load a sound once in setup(), play it once per hit by putting .play() inside the same edge check that scores, and explain why a game can stay silent until the first click.",
-      "screens": [
-        "5-3-pinball-sound-1-reading-a-sound-on-a-hit",
-        "5-3-pinball-sound-2-lab-a-chime-on-every-hit"
-      ]
-    },
-    {
-      "id": "polish-labels-and-popups",
-      "title": "Polish: labels and popups",
-      "objective": "Students will be able to label a sprite with .text, make a popup only on the frame a hit starts, and let it remove itself with .life.",
-      "screens": [
-        "5-3-pinball-polish-1-reading-words-and-sprites-that-run-out",
-        "5-3-pinball-polish-2-example-a-plus-that-floats-away",
-        "5-3-pinball-polish-3-lab-show-the-worth-pop-the-points"
-      ]
-    },
-    {
-      "id": "polish-physics-knobs",
-      "title": "Polish: physics knobs",
-      "objective": "Students will be able to explain what mass, gravityScale, rotationLock and debug do to one sprite, and use applyForce on a held key with a chosen mass to nudge the ball.",
-      "screens": [
-        "5-3-pinball-polish-4-reading-four-physics-knobs",
-        "5-3-pinball-polish-5-lab-nudge-the-table"
-      ]
-    },
-    {
-      "id": "polish-close",
-      "title": "Playtest and polish it your way",
-      "objective": "Students will be able to playtest their game for polish rather than bugs, say what a polish changed for a player, and add one polish of their own.",
-      "screens": [
-        "5-3-pinball-polish-6-playtest-and-polish",
-        "5-3-pinball-polish-7-challenges-polish-it-your-way"
       ]
     }
   ]

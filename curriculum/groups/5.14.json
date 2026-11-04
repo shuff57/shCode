@@ -1,0 +1,15 @@
+{
+  "moduleId": "5.14",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "snake-grow",
+      "title": "A body that grows",
+      "objective": "Students can a body that grows and see it run.",
+      "screens": [
+        "5-5-snake-5-reading-a-body-that-grows",
+        "5-5-snake-6-lab-grow-and-eat"
+      ]
+    }
+  ]
+}

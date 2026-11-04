@@ -1,4 +1,4 @@
-// 5.3.12 Challenges: Make it yours (reference: all three).
+// 5.9.2 Challenges: Make it yours (reference: all three).
 // My rules: a second goal worth 5, a bumper that slides, and a best score
 // that survives R. Without the best score, every restart would forget it.
 

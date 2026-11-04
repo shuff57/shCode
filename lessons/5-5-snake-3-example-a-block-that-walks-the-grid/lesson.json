@@ -1,11 +1,11 @@
 {
   "id": "5-5-snake-3-example-a-block-that-walks-the-grid",
-  "title": "5.5.3 Worked Example: A block that walks the grid",
+  "title": "5.13.3 Worked Example: A block that walks the grid",
   "description": "One block steps right a cell at a time and wraps around the edge. Change the beat and the cell size to see what each one controls.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.5 Project: Snake",
+  "unit": "5.13 Snake: grid and steering",
   "preview": "example",
   "week": 12,
   "slos": [

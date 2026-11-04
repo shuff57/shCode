@@ -58,7 +58,7 @@ enemyHp.splice(j, 1);       // at the same index
 enemyWorth.splice(j, 1);
 ```
 
-**Falling, by hand.** Enemies fall the way the drone did in Part A (`drone.y += 1.5`): a loop adds to each one's `y` on every frame, inside `if (playing)`. The loop runs backwards, as `moveBullets()` does, because a removal splices (5.4.5). One whose `y` is more than `BASE_Y` has reached the base, which costs the base 1 hp, exactly as the drone did in 7.4.7.
+**Falling, by hand.** Enemies fall the way the drone did in Part A (`drone.y += 1.5`): a loop adds to each one's `y` on every frame, inside `if (playing)`. The loop runs backwards, as `moveBullets()` does, because a removal splices (5.11.1). One whose `y` is more than `BASE_Y` has reached the base, which costs the base 1 hp, exactly as the drone did in 7.4.7.
 
 ```js
 enemies[j].y += fallSpeed;

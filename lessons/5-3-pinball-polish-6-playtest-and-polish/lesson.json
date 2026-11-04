@@ -1,11 +1,11 @@
 {
   "id": "5-3-pinball-polish-6-playtest-and-polish",
-  "title": "5.3.20 Playtest and polish: Pinball",
+  "title": "5.9.3 Playtest and polish: Pinball",
   "description": "Play your polished pinball at least three rounds, and hand it to someone for one if you can. Say what still felt rough, what one polish changed for a player, and what you would polish next. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.3 Project: Pinball",
+  "unit": "5.9 Pinball: playtest and finish",
   "preview": "assignment",
   "week": 11,
   "slos": [
@@ -19,7 +19,7 @@
     "rubricTitle": "Playtest and polish Pinball: AI-graded rubric",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "prompt": "Everything you need is in 5.3.11 (Playtest and reflect: Pinball) and 5.3.19 (Lab: Nudge the table): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your polished pinball game at least three rounds. If you can, hand it to someone else for one round and watch them without explaining anything. Then answer:\n\n1. How many rounds did you play, or watch, and how did they go?\n\n2. What is one thing that still felt unfinished or rough, or one moment where a player hesitated?\n\n3. Which change from this polish arc (the labels, the popups, the nudge, the ball's mass) made the biggest difference, and what did it change for a player?\n\n4. What is one more polish you would add next?",
+    "prompt": "Everything you need is in 5.9.1 (Playtest and reflect: Pinball) and 5.8.2 (Lab: Nudge the table): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your polished pinball game at least three rounds. If you can, hand it to someone else for one round and watch them without explaining anything. Then answer:\n\n1. How many rounds did you play, or watch, and how did they go?\n\n2. What is one thing that still felt unfinished or rough, or one moment where a player hesitated?\n\n3. Which change from this polish arc (the labels, the popups, the nudge, the ball's mass) made the biggest difference, and what did it change for a player?\n\n4. What is one more polish you would add next?",
     "rubric": [
       {
         "id": "played",
@@ -36,7 +36,7 @@
       {
         "id": "polish",
         "title": "Names one change from this polish arc and what it changed for a player",
-        "description": "The student names any change from 5.3.15 to 5.3.19 (the labels on the bumpers, the popups, the nudge, the ball's mass, debug) or any polish of their own, and says anything about what it changed for a player, even loosely. Any polish named earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their pinball game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "description": "The student names any change from 5.7.1 to 5.8.2 (the labels on the bumpers, the popups, the nudge, the ball's mass, debug) or any polish of their own, and says anything about what it changed for a player, even loosely. Any polish named earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their pinball game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       },
       {

@@ -1,6 +1,6 @@
 ## Playtest and polish
 
-The playtest in 5.3.11 hunted for bugs: a score that jumped, a ball that stuck, a restart that left something behind. A polish pass asks a different question. It is not about bugs. It is about whether a new player understands what is happening **without being told**.
+The playtest in 5.9.1 hunted for bugs: a score that jumped, a ball that stuck, a restart that left something behind. A polish pass asks a different question. It is not about bugs. It is about whether a new player understands what is happening **without being told**.
 
 **How to playtest for polish.** Play your table at least three rounds. Then, if you can, hand it to someone else for one round and say nothing at all: no "press R", no "hold the arrows". Watch them. The moments where they stop, frown or ask you something are the places your game still needs polish.
 

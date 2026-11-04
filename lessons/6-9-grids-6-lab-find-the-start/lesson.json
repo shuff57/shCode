@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "Row and column become pixels",
-      "description": "A tile centre is its column (or row) times TILE, plus half a tile. Writing it out, or calling the cellToPixel helper from 5.5.2, both count. Help: 6.9.5 (Reading: Reading a map as data)",
+      "description": "A tile centre is its column (or row) times TILE, plus half a tile. Writing it out, or calling the cellToPixel helper from 5.13.2, both count. Help: 6.9.5 (Reading: Reading a map as data)",
       "type": "inFunction",
       "function": "findStart",
       "file": "script.js",

@@ -1,6 +1,6 @@
 ## The state of the game
 
-**Read before `5.3.10 Lab: Lose, and start again`.** About 5 minutes.
+**Read before `5.5.2 Lab: Lose, and start again`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -10,7 +10,7 @@ By the end of this reading you should be able to answer:
 
 A game in progress is in one of two states: **playing**, or **over**. Everything else follows from that one fact — whether the ball still moves, whether the score still counts, whether the screen says "press R".
 
-You already have a variable that survives between frames (the `wasTouching` flag from 5.3.5). A game-over flag is the same idea with a different job:
+You already have a variable that survives between frames (the `wasTouching` flag from 5.4.1). A game-over flag is the same idea with a different job:
 
 ```js
 let playing = true;      // true until the round ends

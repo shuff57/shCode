@@ -1,4 +1,4 @@
-// 5.4.8 Lab: Crash, and start again.
+// 5.12.2 Lab: Crash, and start again.
 
 let bird, pipes, score;
 

@@ -1,0 +1,198 @@
+{
+  "modules": [
+    {
+      "from": "5.3",
+      "id": "5.3",
+      "slug": "pinball-the-table",
+      "title": "Pinball: the table",
+      "group": "Plan, and the table",
+      "lessons": [
+        "5-3-pinball-plan-sketch-the-game",
+        "5-3-pinball-1-reading-from-scene-to-game",
+        "5-3-pinball-2-example-the-table-and-the-goal",
+        "5-3-pinball-3-lab-build-the-table"
+      ],
+      "idea": "A scene is not a game: a game needs a goal, a score, a loss and a restart, and the table is where they hang."
+    },
+    {
+      "from": "5.3",
+      "id": "5.4",
+      "slug": "pinball-score-once",
+      "title": "Pinball: score once",
+      "group": "Scoring an event",
+      "lessons": [
+        "5-3-pinball-4-reading-a-collision-is-not-an-event",
+        "5-3-pinball-5-example-the-score-that-climbs",
+        "5-3-pinball-6-lab-score-one-point-per-touch",
+        "5-3-pinball-7-lab-three-bumpers-three-values"
+      ],
+      "idea": "A collision is true every frame; the score changes once, on the frame a touch starts.",
+      "carriesFrom": "5.3"
+    },
+    {
+      "from": "5.3",
+      "id": "5.5",
+      "slug": "pinball-lose-and-start-again",
+      "title": "Pinball: lose and start again",
+      "group": "Losing and restarting",
+      "lessons": [
+        "5-3-pinball-8-reading-the-state-of-the-game",
+        "5-3-pinball-9-lab-lose-and-start-again"
+      ],
+      "idea": "The game's state is a value you set, so losing is a rule and R is the same code path as the start.",
+      "carriesFrom": "5.4"
+    },
+    {
+      "from": "5.3",
+      "id": "5.6",
+      "slug": "pinball-a-sound-on-a-hit",
+      "title": "Pinball: a sound on a hit",
+      "group": "A sound on a hit",
+      "lessons": [
+        "5-3-pinball-sound-1-reading-a-sound-on-a-hit",
+        "5-3-pinball-sound-2-lab-a-chime-on-every-hit"
+      ],
+      "idea": "A sound is loaded once in setup() and played where the event happens.",
+      "carriesFrom": "5.5"
+    },
+    {
+      "from": "5.3",
+      "id": "5.7",
+      "slug": "pinball-labels-and-popups",
+      "title": "Pinball: labels and popups",
+      "group": "Labels and popups",
+      "lessons": [
+        "5-3-pinball-polish-1-reading-words-and-sprites-that-run-out",
+        "5-3-pinball-polish-2-example-a-plus-that-floats-away",
+        "5-3-pinball-polish-3-lab-show-the-worth-pop-the-points"
+      ],
+      "idea": "A sprite can wear words and a lifetime: .text shows the worth, .life removes the popup.",
+      "carriesFrom": "5.6"
+    },
+    {
+      "from": "5.3",
+      "id": "5.8",
+      "slug": "pinball-physics-knobs",
+      "title": "Pinball: physics knobs",
+      "group": "Physics knobs",
+      "lessons": [
+        "5-3-pinball-polish-4-reading-four-physics-knobs",
+        "5-3-pinball-polish-5-lab-nudge-the-table"
+      ],
+      "idea": "Mass, gravityScale, rotationLock and debug change how the table feels, not what it does.",
+      "carriesFrom": "5.7"
+    },
+    {
+      "from": "5.3",
+      "id": "5.9",
+      "slug": "pinball-playtest-and-finish",
+      "title": "Pinball: playtest and finish",
+      "group": "Playtest and finish",
+      "lessons": [
+        "5-3-pinball-playtest-and-reflect",
+        "5-3-pinball-10-challenges-make-it-yours",
+        "5-3-pinball-polish-6-playtest-and-polish",
+        "5-3-pinball-polish-7-challenges-polish-it-your-way"
+      ],
+      "idea": "Play it, find one surprise, link it to a line, change one thing.",
+      "carriesFrom": "5.8"
+    },
+    {
+      "from": "5.4",
+      "id": "5.10",
+      "slug": "flappy-the-flap",
+      "title": "Flappy: the flap",
+      "group": "The flap",
+      "lessons": [
+        "5-4-flappy-plan-sketch-the-game",
+        "5-4-flappy-1-reading-gravity-and-the-flap",
+        "5-4-flappy-2-example-the-bird-that-flaps",
+        "5-4-flappy-3-lab-make-it-flap"
+      ],
+      "idea": "Gravity plus one tap is the whole bird: the flap sets a velocity, never a position."
+    },
+    {
+      "from": "5.4",
+      "id": "5.11",
+      "slug": "flappy-the-world-scrolls",
+      "title": "Flappy: the world scrolls",
+      "group": "A world that scrolls",
+      "lessons": [
+        "5-4-flappy-4-reading-a-world-that-scrolls",
+        "5-4-flappy-5-lab-pipes-that-come-and-go"
+      ],
+      "idea": "Pipes are made on a timer, moved, and removed from the screen and from the list.",
+      "carriesFrom": "5.10"
+    },
+    {
+      "from": "5.4",
+      "id": "5.12",
+      "slug": "flappy-crash-and-finish",
+      "title": "Flappy: crash, and finish",
+      "group": "Crash, and finish",
+      "lessons": [
+        "5-4-flappy-6-lab-score-a-gap",
+        "5-4-flappy-7-lab-crash-and-start-again",
+        "5-4-flappy-playtest-and-reflect",
+        "5-4-flappy-8-quiz-flappy-check",
+        "5-4-flappy-9-challenges-make-it-yours"
+      ],
+      "idea": "A score counts a gap once; a crash ends the round and R starts it again.",
+      "carriesFrom": "5.11"
+    },
+    {
+      "from": "5.5",
+      "id": "5.13",
+      "slug": "snake-grid-and-steering",
+      "title": "Snake: grid and steering",
+      "group": "Plan, and steering on a grid",
+      "lessons": [
+        "5-5-snake-1-plan-break-snake-into-parts",
+        "5-5-snake-2-reading-a-world-on-a-grid",
+        "5-5-snake-3-example-a-block-that-walks-the-grid",
+        "5-5-snake-4-lab-steer-it"
+      ],
+      "idea": "A grid is a position you can compute, and steering is which cell is next."
+    },
+    {
+      "from": "5.5",
+      "id": "5.14",
+      "slug": "snake-grow",
+      "title": "Snake: grow",
+      "group": "A body that grows",
+      "lessons": [
+        "5-5-snake-5-reading-a-body-that-grows",
+        "5-5-snake-6-lab-grow-and-eat"
+      ],
+      "idea": "The body is an array: growing is pushing onto it, and drawing it is a loop.",
+      "carriesFrom": "5.13"
+    },
+    {
+      "from": "5.5",
+      "id": "5.15",
+      "slug": "snake-search",
+      "title": "Snake: search",
+      "group": "Searching the body",
+      "lessons": [
+        "5-5-snake-7-reading-searching-the-array",
+        "5-5-snake-8-lab-dont-bite-yourself"
+      ],
+      "idea": "Searching your own body is the whole lose condition, and it is one loop.",
+      "carriesFrom": "5.14"
+    },
+    {
+      "from": "5.5",
+      "id": "5.16",
+      "slug": "snake-playtest-and-extend",
+      "title": "Snake: playtest and extend",
+      "group": "Playtest and extend",
+      "lessons": [
+        "5-5-snake-9-playtest-and-reflect",
+        "5-5-snake-10-quiz-snake-check",
+        "5-5-snake-11-challenges-make-it-yours"
+      ],
+      "idea": "Play it, check it, change one rule.",
+      "carriesFrom": "5.15"
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 {
   "id": "5-3-pinball-6-lab-score-one-point-per-touch",
-  "title": "5.3.7 Lab: Score one point per touch",
+  "title": "5.4.3 Lab: Score one point per touch",
   "description": "The starter scores on every frame the ball touches the goal, so one roll across the gold is worth 33 points. Fix it with a remembered last frame, so one touch is worth one point.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.3 Project: Pinball",
+  "unit": "5.4 Pinball: score once",
   "preview": "moshion",
   "week": 11,
   "slos": [
@@ -18,7 +18,7 @@
       "instructions": "Run the starter and watch the ball roll across the gold bar: the score jumps by 33 for one crossing, one point for every frame the ball was touching. In `draw()`, check the touch **once**, into a variable, so the rest of the frame can look at the same answer.",
       "hints": [
         "`const touching = ball.colliding(goal);` — after this line, `touching` holds this frame's answer.",
-        "Reread 5.3.5 (Reading: A collision is not an event) if the difference between this frame and last frame is not clear yet."
+        "Reread 5.4.1 (Reading: A collision is not an event) if the difference between this frame and last frame is not clear yet."
       ]
     },
     {
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "The touch is checked once into a variable",
-      "description": "This frame's collision answer is stored in a variable, so the same answer is used for the test and the memory. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "This frame's collision answer is stored in a variable, so the same answer is used for the test and the memory. Help: 5.4.1 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:const|let|var)\\s+\\w+\\s*=\\s*(?:ball\\.colliding\\s*\\(\\s*goal|goal\\.colliding\\s*\\(\\s*ball)\\s*\\)",
@@ -55,7 +55,7 @@
     {
       "id": "r2",
       "title": "A point is added only when contact starts",
-      "description": "The score goes up when the ball is touching now and was not touching a frame ago: the `score += 1` sits inside that `if`. `colliding()` gives a number (0 when not touching), so test the memory with `!wasTouching`: `wasTouching === false` is never true. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "The score goes up when the ball is touching now and was not touching a frame ago: the `score += 1` sits inside that `if`. `colliding()` gives a number (0 when not touching), so test the memory with `!wasTouching`: `wasTouching === false` is never true. Help: 5.4.1 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\(\\s*(?:\\(\\s*){0,2}(?:(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*\\))?(?:\\s*==\\s*true\\b|\\s*(?:>|!==?)\\s*0(?![\\w.]))?(?:\\s*\\)){0,2}\\s*&&\\s*(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+(?:\\s*\\))?\\s*(?:==\\s*false\\b|===?\\s*0(?![\\w.])))(?:\\s*\\)){0,2}|(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+(?:\\s*\\))?\\s*(?:==\\s*false\\b|===?\\s*0(?![\\w.])))(?:\\s*\\)){0,2}\\s*&&\\s*(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*\\))?(?:\\s*==\\s*true\\b|\\s*(?:>|!==?)\\s*0(?![\\w.]))?(?:\\s*\\)){0,2})(?:\\s*\\)){0,2}\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]{0,200}?)score\\s*(?:\\+=|\\+\\+|=\\s*(?:\\(\\s*)?score\\s*\\+)|if\\s*\\(\\s*(?:(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*\\))?(?:\\s*==\\s*true\\b|\\s*(?:>|!==?)\\s*0(?![\\w.]))?(?:\\s*\\)){0,2}|(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+(?:\\s*\\))?\\s*(?:==\\s*false\\b|===?\\s*0(?![\\w.])))(?:\\s*\\)){0,2})\\s*\\)\\s*(?:\\{\\s*)?if\\s*\\(\\s*(?:(?:\\(\\s*){0,2}(?:!\\s*(?:\\(\\s*)?[\\w.]+(?:\\s*\\))?|[\\w.]+(?:\\s*\\))?\\s*(?:==\\s*false\\b|===?\\s*0(?![\\w.])))(?:\\s*\\)){0,2}|(?:\\(\\s*){0,2}[\\w.]+(?:\\([^()]*\\))?(?:\\s*\\))?(?:\\s*==\\s*true\\b|\\s*(?:>|!==?)\\s*0(?![\\w.]))?(?:\\s*\\)){0,2})\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^{};]{0,200}?)score\\s*(?:\\+=|\\+\\+|=\\s*(?:\\(\\s*)?score\\s*\\+)",
@@ -66,7 +66,7 @@
     {
       "id": "r3",
       "title": "The memory is updated every frame",
-      "description": "The variable that remembers last frame is given this frame's answer on every frame, so the next touch is recognised. Any name works. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "The variable that remembers last frame is given this frame's answer on every frame, so the next touch is recognised. Any name works. Help: 5.4.1 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:const|let|var)\\s+(\\w+)\\s*=\\s*(?:ball\\.colliding\\s*\\(\\s*goal|goal\\.colliding\\s*\\(\\s*ball)\\s*\\)[\\s\\S]{0,800}?(?:!\\s*(?:\\(\\s*)?|\\b(?=\\w+\\s*\\)?\\s*===?\\s*(?:false\\b|0(?![\\w.]))))(\\w+)[\\s\\S]{0,800}?(?:(?=\\b\\2\\s*=\\s*(?:\\(\\s*)?\\1\\b(?!\\s*[=(.]))(?<!\\bif\\s*\\([^{}]{0,200}\\)\\s*\\{[^{}]{0,300}\\bscore\\b[^{}]{0,300})\\b\\2|\\b\\2\\s*=(?!=)(?:[^{}]{0,300}\\}|[^{};]{0,300};)\\s*else\\b\\s*(?:if\\s*\\([^{};]{0,200}\\)\\s*)?(?:\\{[^{}]{0,300}?|[^{};]{0,300}?)\\b\\2\\s*=(?!=))",
@@ -83,24 +83,24 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.7 Lab: Score one point per touch\". The task they were given: The starter adds a point on every frame the ball touches the gold goal, so one roll across it scores about 33. Fix it so one touch is worth one point: in draw(), check the touch once, into a variable; keep a second variable, made outside draw(), that remembers whether the ball was touching last frame; add a point only when the ball is touching now and was not a frame ago; then store this frame's answer in the memory, on every frame. What the starter file already had: the full table (walls, bumper, ground, gold goal, bouncy ball), score starting at 0, the R reset, and in draw() an if that adds 1 to the score whenever the ball is colliding with the goal. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame. ball.colliding(goal) is true on every frame the two touch, not just the first. It gives a number, not true or false: 0 while they are apart and a count of frames (1, 2, 3 ...) while they touch, so a test that it equals 1 is true only on the first frame of a touch. Because of that, a memory that holds colliding()'s number holds 0 after the first frame, so testing it with === false is never true, while testing it with ! works. If the student turned the answer into true or false first (for example with > 0), === false works. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.3 Lab: Score one point per touch\". The task they were given: The starter adds a point on every frame the ball touches the gold goal, so one roll across it scores about 33. Fix it so one touch is worth one point: in draw(), check the touch once, into a variable; keep a second variable, made outside draw(), that remembers whether the ball was touching last frame; add a point only when the ball is touching now and was not a frame ago; then store this frame's answer in the memory, on every frame. What the starter file already had: the full table (walls, bumper, ground, gold goal, bouncy ball), score starting at 0, the R reset, and in draw() an if that adds 1 to the score whenever the ball is colliding with the goal. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame. ball.colliding(goal) is true on every frame the two touch, not just the first. It gives a number, not true or false: 0 while they are apart and a count of frames (1, 2, 3 ...) while they touch, so a test that it equals 1 is true only on the first frame of a touch. Because of that, a memory that holds colliding()'s number holds 0 after the first frame, so testing it with === false is never true, while testing it with ! works. If the student turned the answer into true or false first (for example with > 0), === false works. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "The touch is checked once into a variable",
-        "description": "This frame's answer to whether the ball and the goal are touching (colliding() asked either way round) is stored in a variable, new or already declared, so the same answer can be used for the test and for the memory. Help: 5.3.5 (Reading: A collision is not an event)",
+        "description": "This frame's answer to whether the ball and the goal are touching (colliding() asked either way round) is stored in a variable, new or already declared, so the same answer can be used for the test and for the memory. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "A point is added only when contact starts",
-        "description": "The score goes up only on the frame contact starts: inside an if that needs touching now AND not touching last frame (joined with &&, or one if nested in the other), or any other test that is only true on the first frame of a touch. Not met: the starter's point on every touching frame, or a memory test written as === false while the memory holds colliding()'s number, which is never true. Help: 5.3.5 (Reading: A collision is not an event)",
+        "description": "The score goes up only on the frame contact starts: inside an if that needs touching now AND not touching last frame (joined with &&, or one if nested in the other), or any other test that is only true on the first frame of a touch. Not met: the starter's point on every touching frame, or a memory test written as === false while the memory holds colliding()'s number, which is never true. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "The memory is updated every frame",
-        "description": "The remembering variable is given this frame's touch answer on every frame, outside the scoring if, or by an if/else that sets it to true while touching and false when not, every frame. Any name works. Not met: the update only inside the scoring if (then nothing ever sets it back), or no update at all. Help: 5.3.5 (Reading: A collision is not an event)",
+        "description": "The remembering variable is given this frame's touch answer on every frame, outside the scoring if, or by an if/else that sets it to true while touching and false when not, every frame. Any name works. Not met: the update only inside the scoring if (then nothing ever sets it back), or no update at all. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       }
     ]

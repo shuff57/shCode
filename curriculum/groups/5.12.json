@@ -1,0 +1,18 @@
+{
+  "moduleId": "5.12",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "flappy-crash-and-finish",
+      "title": "Crash, and finish",
+      "objective": "Students can crash, and finish and see it run.",
+      "screens": [
+        "5-4-flappy-6-lab-score-a-gap",
+        "5-4-flappy-7-lab-crash-and-start-again",
+        "5-4-flappy-playtest-and-reflect",
+        "5-4-flappy-8-quiz-flappy-check",
+        "5-4-flappy-9-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

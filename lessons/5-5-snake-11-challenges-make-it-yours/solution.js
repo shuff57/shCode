@@ -1,4 +1,4 @@
-// 5.5.11 Challenges: Make it yours (reference solution: a faster snake, a best score, stored turns).
+// 5.16.3 Challenges: Make it yours (reference solution: a faster snake, a best score, stored turns).
 
 const CELL = 20;
 let segments, food, dx, dy, score, playing, beat, best, turnX, turnY;
@@ -96,7 +96,7 @@ function draw() {
 }
 
 // drawTop() runs after the sprites are drawn, so the snake can never cover
-// its words (the same trick as the Flappy labs, from 5.4.5).
+// its words (the same trick as the Flappy labs, from 5.11.1).
 function drawTop() {
   fill('white');
   textSize(22);

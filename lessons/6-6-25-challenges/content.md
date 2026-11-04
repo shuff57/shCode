@@ -11,7 +11,7 @@ Fade to black between state changes. When a transition happens, draw a full-scre
 **How to approach it:**
 - Add a `transitionAlpha` variable that counts from 0 (see-through) to 1 (solid), for example by `0.05` a frame
 - When a state change is requested, set a `targetState` variable and start increasing `transitionAlpha`
-- Draw `fill('rgba(0, 0, 0, ' + transitionAlpha + ')'); rect(0, 0, width, height)` in `drawTop()` (5.4.5), so the black covers the sprites as well as the background. `width` and `height` are the canvas's size. Give `fill()` one rgba string like this: moSHion reads only its first value, so `fill(0, 0, 0, transitionAlpha)` would paint solid black from the first frame
+- Draw `fill('rgba(0, 0, 0, ' + transitionAlpha + ')'); rect(0, 0, width, height)` in `drawTop()` (5.11.1), so the black covers the sprites as well as the background. `width` and `height` are the canvas's size. Give `fill()` one rgba string like this: moSHion reads only its first value, so `fill(0, 0, 0, transitionAlpha)` would paint solid black from the first frame
 - When alpha reaches 1, swap `state = targetState` and decrease alpha back to 0
 
 ---

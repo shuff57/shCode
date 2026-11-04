@@ -1,11 +1,11 @@
 {
   "id": "5-5-snake-8-lab-dont-bite-yourself",
-  "title": "5.5.8 Lab: Don't bite yourself",
+  "title": "5.15.2 Lab: Don't bite yourself",
   "description": "The snake passes through itself and the food can appear under its body. Write one search helper and use it both to end the round on a bite and to keep the food off the snake.",
   "type": "lesson",
   "estimateMins": 14,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.5 Project: Snake",
+  "unit": "5.15 Snake: search",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "isBody searches the segments",
-      "description": "A loop (for...of, or an index loop) goes through every segment and returns true when one matches. Help: 5.5.7 (Reading: Searching the array)",
+      "description": "A loop (for...of, or an index loop) goes through every segment and returns true when one matches. Help: 5.15.1 (Reading: Searching the array)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\([^)]*\\bsegments\\b[^)]*\\)[\\s\\S]{0,200}?\\bif\\s*\\([^{};]*\\)[^;]{0,120}?return\\s+true|for\\s*\\([^)]*\\bsegments\\b[^)]*\\)[\\s\\S]{0,200}?\\bif\\s*\\([^{};]*\\)[^;]{0,120}?(?<![\\w.$])(\\w+)\\s*=\\s*true\\b[\\s\\S]{0,200}?return\\s+\\1\\b",
@@ -55,7 +55,7 @@
     {
       "id": "r2",
       "title": "A bite ends the round",
-      "description": "The same test that checks the walls also asks isBody. Help: 5.5.7 (Reading: Searching the array)",
+      "description": "The same test that checks the walls also asks isBody. Help: 5.15.1 (Reading: Searching the array)",
       "type": "regex",
       "file": "script.js",
       "pattern": "isBody\\s*\\([^)]*\\)[\\s\\S]{0,120}?playing\\s*=\\s*false",
@@ -66,7 +66,7 @@
     {
       "id": "r3",
       "title": "Food keeps re-picking until the cell is free",
-      "description": "A while loop repeats the pick while the cell is part of the body. Help: 5.5.7 (Reading: Searching the array)",
+      "description": "A while loop repeats the pick while the cell is part of the body. Help: 5.15.1 (Reading: Searching the array)",
       "type": "regex",
       "file": "script.js",
       "pattern": "while\\s*\\(\\s*(?:\\(\\s*){0,3}isBody\\s*\\([^)]*\\)[^{]*?(?:\\{[^}]*?|[^{;]*?)(?<![\\w$.=!<>])\\w+\\s*=(?!=)",
@@ -83,24 +83,24 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.5.8 Lab: Don't bite yourself\". The task they were given: Fill in isBody(col, row): loop through segments and return true as soon as one has the same col and row; after the loop, return false. In step(), add isBody(col, row) to the test that ends the round at the walls, so running into the body ends it too. In makeFood(), keep picking a new random cell for as long as isBody(col, row) is true; the two picks must become let, not const, so they can be changed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. return ends the whole function at once, so a return true inside the loop answers as soon as a match is found. In step(), col and row are the NEXT cell, worked out before the new head is added; the current head is segments[0], which is always part of the body. Changing a const stops the sketch with an error, so the picks in makeFood() must be let. floor(random(20)) picks a whole number from 0 to 19. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: a return false inside the loop (for example in an else), which answers after looking at only the first segment; a match that joins the col and row tests with || instead of && (any segment in the same column would count as a bite); a return true inside a forEach callback, which returns from the callback and not from isBody; asking isBody about the current head's cell, or after the new head has been added (both are always true, so the round ends at once); an if instead of a while in makeFood() (it re-picks only once). The same ideas written differently all count: an index loop, a flag variable returned after the loop, segments.some(...) with both checks, or a separate if in step() that sets playing to false and returns. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.15.2 Lab: Don't bite yourself\". The task they were given: Fill in isBody(col, row): loop through segments and return true as soon as one has the same col and row; after the loop, return false. In step(), add isBody(col, row) to the test that ends the round at the walls, so running into the body ends it too. In makeFood(), keep picking a new random cell for as long as isBody(col, row) is true; the two picks must become let, not const, so they can be changed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. return ends the whole function at once, so a return true inside the loop answers as soon as a match is found. In step(), col and row are the NEXT cell, worked out before the new head is added; the current head is segments[0], which is always part of the body. Changing a const stops the sketch with an error, so the picks in makeFood() must be let. floor(random(20)) picks a whole number from 0 to 19. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: a return false inside the loop (for example in an else), which answers after looking at only the first segment; a match that joins the col and row tests with || instead of && (any segment in the same column would count as a bite); a return true inside a forEach callback, which returns from the callback and not from isBody; asking isBody about the current head's cell, or after the new head has been added (both are always true, so the round ends at once); an if instead of a while in makeFood() (it re-picks only once). The same ideas written differently all count: an index loop, a flag variable returned after the loop, segments.some(...) with both checks, or a separate if in step() that sets playing to false and returns. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "isBody searches the segments",
-        "description": "isBody goes through every segment (for...of, an index loop, or some) and answers true when one has the same col AND the same row as the cell asked about, with false given only after every segment has been checked. Partial: the match tests only one of col and row, or false is returned inside the loop. Missing: no loop over segments. Help: 5.5.7 (Reading: Searching the array)",
+        "description": "isBody goes through every segment (for...of, an index loop, or some) and answers true when one has the same col AND the same row as the cell asked about, with false given only after every segment has been checked. Partial: the match tests only one of col and row, or false is returned inside the loop. Missing: no loop over segments. Help: 5.15.1 (Reading: Searching the array)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "A bite ends the round",
-        "description": "step() asks isBody about the next cell (the col and row the head is about to move into, before the new head is added), and when it is true the round ends (playing = false), joined to the wall test with || or in an if of its own. Missing: isBody is never asked in step(), or it is asked about a cell that is always part of the body. Help: 5.5.7 (Reading: Searching the array)",
+        "description": "step() asks isBody about the next cell (the col and row the head is about to move into, before the new head is added), and when it is true the round ends (playing = false), joined to the wall test with || or in an if of its own. Missing: isBody is never asked in step(), or it is asked about a cell that is always part of the body. Help: 5.15.1 (Reading: Searching the array)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "Food keeps re-picking until the cell is free",
-        "description": "In makeFood(), a loop (while, or do...while) keeps choosing a new column and row for as long as isBody says that cell is part of the snake, and the picks can be changed (let, not const). Partial: an if that re-picks only once, or picks still declared const (the sketch stops with an error when it tries to change them). Missing: the food's cell is never checked. Help: 5.5.7 (Reading: Searching the array)",
+        "description": "In makeFood(), a loop (while, or do...while) keeps choosing a new column and row for as long as isBody says that cell is part of the snake, and the picks can be changed (let, not const). Partial: an if that re-picks only once, or picks still declared const (the sketch stops with an error when it tries to change them). Missing: the food's cell is never checked. Help: 5.15.1 (Reading: Searching the array)",
         "points": 1
       }
     ]

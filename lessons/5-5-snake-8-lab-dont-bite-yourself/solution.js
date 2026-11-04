@@ -1,4 +1,4 @@
-// 5.5.8 Lab: Don't bite yourself (reference solution).
+// 5.15.2 Lab: Don't bite yourself (reference solution).
 
 const CELL = 20;
 let segments, food, dx, dy, score, playing;
@@ -88,7 +88,7 @@ function draw() {
 }
 
 // drawTop() runs after the sprites are drawn, so the snake can never cover
-// its words (the same trick as the Flappy labs, from 5.4.5).
+// its words (the same trick as the Flappy labs, from 5.11.1).
 function drawTop() {
   fill('white');
   textSize(22);

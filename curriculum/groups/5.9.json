@@ -1,0 +1,17 @@
+{
+  "moduleId": "5.9",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "pinball-playtest-and-finish",
+      "title": "Playtest and finish",
+      "objective": "Students can playtest and finish and see it run.",
+      "screens": [
+        "5-3-pinball-playtest-and-reflect",
+        "5-3-pinball-10-challenges-make-it-yours",
+        "5-3-pinball-polish-6-playtest-and-polish",
+        "5-3-pinball-polish-7-challenges-polish-it-your-way"
+      ]
+    }
+  ]
+}

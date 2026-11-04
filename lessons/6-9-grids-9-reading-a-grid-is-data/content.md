@@ -41,7 +41,7 @@ for (let r = 0; r < grid.length; r++) {
 
 Three things in those four lines are new:
 
-- **`rect(x, y, w, h)`: x and y are the TOP-LEFT corner.** A sprite's x and y are its centre, but a `rect` hangs down and to the right from the point you give it. So the cell in column `c` starts at `c * CELL`, with no half-cell added. (The half is for a sprite sitting in the middle of a cell, as in 5.5.2.)
+- **`rect(x, y, w, h)`: x and y are the TOP-LEFT corner.** A sprite's x and y are its centre, but a `rect` hangs down and to the right from the point you give it. So the cell in column `c` starts at `c * CELL`, with no half-cell added. (The half is for a sprite sitting in the middle of a cell, as in 5.13.2.)
 - **`fill(...)` comes first, and it colours everything drawn after it.** The colour of a `rect` is whatever the last `fill` said. The thin black outline is the default, and it is what makes the grid lines.
 - **Loop over the data's own size**, `grid.length` and `grid[r].length`, so the loop can never disagree with the data. A cell that holds `true` or `false` can be tested on its own: `grid[r][c] ? 'gold' : '#334'` means "gold if lit, dark if not" (the `? :` from 2.1.20). A grid of 1s and 0s can do the same by drawing only where the cell is 1, and a gap draws nothing.
 - **Test a cell the way the grid stores it.** The live block below holds numbers, so it asks `=== 1`. A grid of `true` and `false` (the next lab) is tested on its own, as in `grid[r][c] ? 'gold' : '#334'`. Copy the `=== 1` onto a grid of booleans and `true === 1` is `false`: nothing ever lights, and no error tells you.

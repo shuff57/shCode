@@ -1,6 +1,6 @@
 ## Gravity and the flap
 
-**Read before `5.4.3 Worked Example: The bird that flaps`.** About 6 minutes.
+**Read before `5.10.3 Worked Example: The bird that flaps`.** About 6 minutes.
 
 By the end of this reading you should be able to answer:
 

@@ -1,4 +1,4 @@
-// 5.4.11 Challenges: Make it yours. Pick one rule and change it.
+// 5.12.5 Challenges: Make it yours. Pick one rule and change it.
 
 let bird, pipes, score, playing;
 

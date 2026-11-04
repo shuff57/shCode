@@ -1,0 +1,17 @@
+{
+  "moduleId": "5.10",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "flappy-the-flap",
+      "title": "The flap",
+      "objective": "Students can the flap and see it run.",
+      "screens": [
+        "5-4-flappy-plan-sketch-the-game",
+        "5-4-flappy-1-reading-gravity-and-the-flap",
+        "5-4-flappy-2-example-the-bird-that-flaps",
+        "5-4-flappy-3-lab-make-it-flap"
+      ]
+    }
+  ]
+}
